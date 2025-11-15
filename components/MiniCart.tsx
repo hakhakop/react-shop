@@ -13,7 +13,7 @@ type MiniCartProps = {
 export default function MiniCart({ open, onClose }: MiniCartProps) {
   const { items, totalAmount, updateItemQty, removeItem, clearCart } = useCart();
 
-  // Prevent background scroll when mini cart is open
+  // Prevent background scroll when mini cart is open Haua
   useEffect(() => {
     if (!open) return;
     const original = document.body.style.overflow;
