@@ -34,8 +34,9 @@ type ProductsData = {
 
 const PRODUCTS_QUERY = `
   query ProductsForHome {
-    products(first: 12) {
+    products(first: 200) {
       nodes {
+        __typename
         id
         slug
         name
@@ -45,9 +46,23 @@ const PRODUCTS_QUERY = `
         }
         ... on SimpleProduct {
           price(format: RAW)
+          attributes {
+            nodes {
+              name
+              label
+              options
+            }
+          }
         }
         ... on VariableProduct {
           price(format: RAW)
+          attributes {
+            nodes {
+              name
+              label
+              options
+            }
+          }
         }
       }
     }

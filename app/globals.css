@@ -122,9 +122,9 @@ body {
 /* Page wrappers */
 
 .page {
-  max-width: 1040px;
+  max-width: 1120px;
   margin: 0 auto;
-  padding: 28px 18px 40px;
+  padding: 32px 20px 44px;
 }
 
 .page-title {
@@ -169,12 +169,12 @@ body {
   text-decoration: none;
   color: inherit;
 
-  border-radius: 16px;
+  border-radius: 12px;
   border: 1px solid rgba(226, 232, 240, 0.95);
   background: #ffffff;
 
-  padding: 14px 14px 16px;
-  box-shadow: 0 14px 35px rgba(15, 23, 42, 0.06);
+  padding: 14px 14px 18px;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
 
   overflow: hidden;
 
@@ -185,36 +185,19 @@ body {
     background 0.2s ease;
 }
 
-.product-card::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(
-    circle at top right,
-    rgba(248, 250, 252, 0.85),
-    transparent 55%
-  );
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.2s ease;
-}
 
 .product-card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 22px 55px rgba(15, 23, 42, 0.16);
+  transform: translateY(-4px);
+  box-shadow: 0 14px 30px rgba(15, 23, 42, 0.12);
   border-color: rgba(148, 163, 184, 0.65);
-  background: #fdfefe;
 }
 
-.product-card:hover::before {
-  opacity: 1;
-}
 
 /* Grid image area – clean, consistent */
 
 .product-image {
   width: 100%;
-  height: 240px;
+  height: 260px;
   border-radius: 12px;
   background: #f9fafb;
   overflow: hidden;
@@ -223,14 +206,14 @@ body {
   align-items: center;
   justify-content: center;
 
-  margin-bottom: 12px;
+  margin: 0 0 12px;
 }
 
 .product-image img {
+  width: 100%;
+  height: 100%;
   max-width: 100%;
   max-height: 100%;
-  width: auto;
-  height: auto;
   object-fit: contain;
 }
 
@@ -258,7 +241,7 @@ body {
 /* Price pill – slightly calmer */
 
 .product-price {
-  margin-top: 8px;
+  margin-top: 10px;
   display: inline-flex;
   align-items: center;
   gap: 4px;
@@ -266,7 +249,7 @@ body {
   border-radius: 999px;
 
   background: rgba(248, 250, 252, 0.95);
-  border: 1px solid rgba(248, 113, 113, 0.18);
+  border: 1px solid rgba(248, 113, 113, 0.22);
 
   font-size: 13px;
   font-weight: 600;
@@ -860,17 +843,17 @@ body {
 }
 
 .wishlist-toggle-btn {
-  width: 28px;
-  height: 28px;
+  width: 26px;
+  height: 26px;
   border-radius: 999px;
-  border: 1px solid rgba(209, 213, 219, 0.9);
-  background: rgba(248, 250, 252, 0.95);
+  border: 1px solid rgba(209, 213, 219, 0.8);
+  background: rgba(248, 250, 252, 0.98);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   padding: 0;
-  font-size: 14px;
+  font-size: 13px;
   color: #9ca3af;
   transition: background 0.16s ease, border-color 0.16s ease,
     box-shadow 0.16s ease, transform 0.16s ease, color 0.16s ease;
@@ -879,7 +862,7 @@ body {
 .wishlist-toggle-btn:hover {
   background: #fef2f2;
   border-color: #f97316;
-  box-shadow: 0 6px 16px rgba(248, 113, 113, 0.35);
+  box-shadow: 0 6px 14px rgba(15, 23, 42, 0.18);
   transform: translateY(-1px);
 }
 
