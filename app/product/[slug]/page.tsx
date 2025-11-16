@@ -12,16 +12,21 @@ type WPImage = {
   altText?: string | null;
 };
 
+type ProductAttribute = {
+  name: string;
+  label: string;
+  options: string[];
+};
+
 type Product = {
   id: string;
   name: string;
   slug: string;
   description?: string | null;
   image?: WPImage | null;
-  galleryImages?: {
-    nodes: WPImage[];
-  } | null;
+  galleryImages?: { nodes: WPImage[] } | null;
   price?: string | null;
+  attributes?: { nodes: ProductAttribute[] } | null;
 };
 
 type ProductData = {
@@ -45,11 +50,27 @@ const PRODUCT_QUERY = `
           altText
         }
       }
+
       ... on SimpleProduct {
         price(format: RAW)
+        attributes {
+          nodes {
+            name
+            label
+            options
+          }
+        }
       }
+
       ... on VariableProduct {
         price(format: RAW)
+        attributes {
+          nodes {
+            name
+            label
+            options
+          }
+        }
       }
     }
   }
@@ -97,7 +118,7 @@ export default async function ProductPage({
         />
         <h1 className="page-title">Product not found</h1>
         <p style={{ color: "#6b7280" }}>
-          We couldn&apos;t find this product. It may be unpublished or
+          We couldn’t find this product. It may be unpublished or
           the URL is wrong.
         </p>
         <p className="product-back-link">
@@ -110,24 +131,20 @@ export default async function ProductPage({
   const p = data.product;
   const priceNumber = p.price ? parseFloat(p.price) : null;
 
-  const galleryNodes = p.galleryImages?.nodes ?? [];
   const images: WPImage[] = [];
+  const galleryNodes = p.galleryImages?.nodes ?? [];
 
-  if (p.image?.sourceUrl) {
-    images.push(p.image);
-  }
+  if (p.image?.sourceUrl) images.push(p.image);
 
   for (const img of galleryNodes) {
-    if (!img.sourceUrl) continue;
-    const already = images.some(
-      (i) => i.sourceUrl === img.sourceUrl
-    );
-    if (!already) {
+    if (img.sourceUrl && !images.some((i) => i.sourceUrl === img.sourceUrl)) {
       images.push(img);
     }
   }
 
   const mainImageUrl = p.image?.sourceUrl || undefined;
+
+  const attributes = p.attributes?.nodes ?? [];
 
   return (
     <main className="product-page">
@@ -172,6 +189,24 @@ export default async function ProductPage({
               imageUrl={mainImageUrl}
             />
           </div>
+
+          {/* ATTRIBUTES SECTION */}
+          {attributes.length > 0 && (
+            <div style={{ margin: "24px 0" }}>
+              <h3 style={{ fontSize: "15px", fontWeight: 600, marginBottom: "8px" }}>
+                Product Details
+              </h3>
+
+              <ul style={{ fontSize: "14px", color: "#374151", lineHeight: "22px" }}>
+                {attributes.map((attr) => (
+                  <li key={attr.name}>
+                    <strong>{attr.label}:</strong>{" "}
+                    {attr.options.join(", ")}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
 
           {p.description && (
             <div

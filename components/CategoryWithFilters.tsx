@@ -528,6 +528,11 @@ export default function CategoryWithFilters({ products }: Props) {
                       })
                     : "";
 
+                const attributes =
+                  (p as any).attributes?.nodes && Array.isArray((p as any).attributes.nodes)
+                    ? (p as any).attributes.nodes
+                    : [];
+
                 return (
                   <div key={p.id} className="product-card">
                     <div className="product-card-top-right">
@@ -559,6 +564,40 @@ export default function CategoryWithFilters({ products }: Props) {
                       <h2 className="product-title product-title-2lines">
                         {p.name}
                       </h2>
+
+                      {attributes.length > 0 && (
+                        <div className="product-attributes-row">
+                          {attributes.map((attr: any) => {
+                            const key =
+                              (attr?.name ?? attr?.label ?? "").toString() || "attr";
+                            const label =
+                              (attr?.label ?? attr?.name ?? "").toString();
+                            const values = Array.isArray(attr?.options)
+                              ? attr.options
+                                  .map((v: any) => (v != null ? String(v).trim() : ""))
+                                  .filter((v: string) => v.length > 0)
+                              : [];
+
+                            if (!label || values.length === 0) {
+                              return null;
+                            }
+
+                            return (
+                              <div
+                                key={key}
+                                className="product-attribute-badge"
+                              >
+                                <span className="product-attribute-label">
+                                  {label}:
+                                </span>
+                                <span className="product-attribute-values">
+                                  {values.join(", ")}
+                                </span>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
 
                       {priceNumber > 0 && !Number.isNaN(priceNumber) && (
                         <div className="product-price">

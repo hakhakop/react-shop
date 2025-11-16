@@ -1,5 +1,3 @@
-// wc-store/app/category/[slug]/page.tsx
-
 import Link from "next/link";
 import {
   getCategoryProductsBySlug,
@@ -23,7 +21,8 @@ export default async function CategoryPage({
         <Breadcrumbs
           items={[
             { label: "Home", href: "/" },
-            { label: "Category" },
+            { label: "Shop", href: "/shop" },
+            { label: "Category not found" },
           ]}
         />
         <h1 className="page-title">Category not found</h1>
@@ -45,7 +44,7 @@ export default async function CategoryPage({
       <Breadcrumbs
         items={[
           { label: "Home", href: "/" },
-          { label: "Category" },
+          { label: "Shop", href: "/shop" },
           { label: category.name },
         ]}
       />

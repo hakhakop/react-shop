@@ -182,7 +182,6 @@ body {
     transform 0.2s ease,
     box-shadow 0.2s ease,
     border-color 0.2s ease,
-    background 0.2s ease;
 }
 
 
@@ -215,7 +214,14 @@ body {
   max-width: 100%;
   max-height: 100%;
   object-fit: contain;
+  transition: transform 0.25s ease-out;
 }
+
+.product-card:hover .product-image img {
+  transform: scale(1.07);
+}
+
+
 
 .product-image-placeholder {
   color: #9ca3af;
@@ -1202,12 +1208,34 @@ body {
 }
 
 .site-header-nav-link {
+  position: relative;
   text-decoration: none;
   color: #4b5563;
+  padding-bottom: 2px;
+}
+
+.site-header-nav-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 2px;
+  width: 0;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #ec4899, #db2777);
+  opacity: 0;
+  transition:
+    width 0.18s ease-out,
+    opacity 0.18s ease-out;
 }
 
 .site-header-nav-link:hover {
   color: #111827;
+}
+
+.site-header-nav-link:hover::after {
+  width: 100%;
+  opacity: 1;
 }
 
 /* Header action pills */
@@ -1547,4 +1575,183 @@ body {
 
 .mini-cart-button.primary:hover {
   background: #000000;
+}
+
+/* Meta line under title (e.g. category) */
+.product-meta-line {
+  margin-top: 4px;
+  font-size: 11px;
+  display: flex;
+  gap: 6px;
+  align-items: baseline;
+  color: #6b7280;
+}
+
+.product-meta-label {
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 10px;
+  color: #9ca3af;
+}
+
+.product-meta-value {
+  font-size: 11px;
+  color: #4b5563;
+}
+
+
+/* Attribute badges row */
+.product-attributes-row {
+  margin-top: 6px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.product-attribute-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #f3f4f6;
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  font-size: 11px;
+  color: #374151;
+}
+
+.product-attribute-label {
+  font-weight: 500;
+}
+
+.product-attribute-values {
+  opacity: 0.9;
+}
+
+@media (prefers-color-scheme: dark) {
+  .product-meta-line {
+    color: #9ca3af;
+  }
+  .product-meta-label {
+    color: #6b7280;
+  }
+  .product-meta-value {
+    color: #e5e7eb;
+  }
+  .product-attribute-badge {
+    background: #111827;
+    border-color: rgba(55, 65, 81, 0.9);
+    color: #e5e7eb;
+  }
+}
+
+/* Product cards: smooth motion & depth */
+.product-card {
+  transition:
+    transform 0.18s ease-out,
+    box-shadow 0.18s ease-out,
+    border-color 0.18s ease-out,
+    background-color 0.18s ease-out;
+  will-change: transform, box-shadow;
+}
+
+.product-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.18);
+  background-color: #ffffff;
+  border-color: #e5e7eb;
+}
+
+
+/* ===== Global smoothness layer (Graphcommerce-like vibe) ===== */
+
+/* Smooth scrolling everywhere */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Slightly softer base look */
+body {
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  background-color: #f3f4f6;
+  color: #111827;
+}
+
+/* Soft page fade-in on route change */
+main {
+  animation: pageFadeIn 0.35s ease-out;
+}
+
+@keyframes pageFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pageFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Generic clickable elements */
+button,
+.btn,
+.add-to-cart-btn,
+.header-icon-button,
+.site-header-action-pill,
+.wishlist-header-button {
+  transition:
+    background-color 0.16s ease-out,
+    color 0.16s ease-out,
+    border-color 0.16s ease-out,
+    box-shadow 0.16s ease-out,
+    transform 0.12s ease-out;
+}
+
+button:hover,
+.btn:hover,
+.add-to-cart-btn:hover,
+.header-icon-button:hover,
+.site-header-action-pill:hover,
+.wishlist-header-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.12);
+}
+
+/* Links subtle hover refinement */
+a {
+  transition:
+    color 0.14s ease-out,
+    opacity 0.14s ease-out,
+    text-decoration-color 0.14s ease-out;
+}
+
+.mini-cart-panel {
+  transition:
+    opacity 0.18s ease-out,
+    transform 0.18s ease-out;
+}
+
+.mini-cart-panel-open {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.mini-cart-panel-closed {
+  opacity: 0;
+  transform: translateY(-4px);
+  pointer-events: none;
 }
