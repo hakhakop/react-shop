@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useWishlist } from "./WishlistProvider";
 import { useCart } from "./CartProvider";
 import MiniCart from "./MiniCart";
+import ThemeToggle from "./ThemeToggle";
 
 export default function HeaderActions() {
   const { totalCount: wishlistCount } = useWishlist();
@@ -35,6 +36,10 @@ export default function HeaderActions() {
             </span>
           )}
         </button>
+
+        <div className="site-header-action-pill">
+          <ThemeToggle />
+        </div>
       </div>
 
       <MiniCart
