@@ -27,10 +27,10 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
   // Load navigation categories and theme settings in parallel
-  const [categories, themeSettingsRaw] = await Promise.all<
-    ProductCategory[],
-    Record<string, unknown> | null
-  >([getProductCategories(), getThemeSettings()]);
+  const [categories, themeSettingsRaw] = await Promise.all([
+    getProductCategories(),
+    getThemeSettings(),
+  ]);
 
   // All ACF options from WordPress (via webpagesThemeSettingsRaw)
   const settings = (themeSettingsRaw || {}) as Record<string, any>;
@@ -65,6 +65,29 @@ export default async function RootLayout({
 
     // Otherwise trust what user typed (e.g. "auto", "1 / 1")
     return raw;
+  };
+
+  const normalizeObjectFit = (
+    value: unknown,
+    fallback: string
+  ): string => {
+    if (value === undefined || value === null) return fallback;
+    const raw = String(value).trim();
+    if (!raw) return fallback;
+
+    const lower = raw.toLowerCase();
+    // Only allow valid CSS object-fit values
+    if (
+      lower === "contain" ||
+      lower === "cover" ||
+      lower === "fill" ||
+      lower === "none" ||
+      lower === "scale-down"
+    ) {
+      return lower;
+    }
+
+    return fallback;
   };
 
   // Product card look
@@ -117,12 +140,23 @@ export default async function RootLayout({
     "auto"
   );
 
-  const productImageObjectFit =
+  const productImageNoPadding =
     settings.product_image_no_padding === true ||
     settings.product_image_no_padding === 1 ||
-    settings.product_image_no_padding === "1"
-      ? "cover"
-      : "contain";
+    settings.product_image_no_padding === "1" ||
+    settings.disable_image_padding === true ||
+    settings.disable_image_padding === 1 ||
+    settings.disable_image_padding === "1";
+
+  // Prefer ACF select (contain / cover / fill / etc),
+  // fall back to the old tick logic if empty.
+  const productImageObjectFit = normalizeObjectFit(
+    settings.product_image_fit ??
+      settings.product_image_object_fit ??
+      settings.image_fit_mode ??
+      settings.product_image_mode,
+    productImageNoPadding ? "cover" : "contain"
+  );
 
   return (
     <html lang="en">

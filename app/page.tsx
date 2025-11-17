@@ -191,7 +191,7 @@ export default async function Home() {
                 alt="Store logo"
                 width={72}
                 height={72}
-                style={{ objectFit: "contain" }}
+                style={{ objectFit: "var(--product-image-object-fit, contain)" as any }}
               />
             </div>
           )}
@@ -250,7 +250,7 @@ export default async function Home() {
                             alt={p.image.altText || p.name}
                             width={400}
                             height={300}
-                            style={{ objectFit: "contain" }}
+                            style={{ objectFit: "var(--product-image-object-fit, contain)" as any }}
                           />
                         ) : (
                           <div className="product-image-placeholder">
@@ -320,7 +320,7 @@ export default async function Home() {
                             alt={p.image.altText || p.name}
                             width={400}
                             height={300}
-                            style={{ objectFit: "contain" }}
+                            style={{ objectFit: "var(--product-image-object-fit, contain)" as any }}
                           />
                         ) : (
                           <div className="product-image-placeholder">

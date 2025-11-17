@@ -27,7 +27,7 @@ export async function graphqlFetch<T>(
       variables,
     }),
     // Server Component can revalidate, but this is optional
-    next: { revalidate: 60 },
+    next: { revalidate: 5 },
   });
 
   if (!res.ok) {

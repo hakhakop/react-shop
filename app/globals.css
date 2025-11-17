@@ -16,7 +16,7 @@ body {
 body {
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
     sans-serif;
-  background: radial-gradient(circle at top left, #f9fafb, #e5e7eb);
+  background: #f3f4f6;
   color: #111827;
 }
 
@@ -35,6 +35,7 @@ body {
   --product-image-height: 260px;
   --product-image-max-width: 100%;
   --product-image-max-height: 100%;
+  --product-image-aspect-ratio: auto;
 }
 
 /* Layout */
@@ -139,16 +140,17 @@ body {
 /* Page wrappers */
 
 .page {
-  max-width: 1120px;
+  max-width: 1280px;
   margin: 0 auto;
-  padding: 32px 20px 44px;
+  padding: 32px 24px 44px;
 }
 
 .page-title {
-  font-size: 24px;
-  font-weight: 650;
-  margin-bottom: 8px;
-  letter-spacing: -0.02em;
+  font-size: 2rem;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  font-weight: 600;
+  margin: 0 0 0.25rem;
   color: #0f172a;
 }
 
@@ -174,7 +176,7 @@ body {
 
 @media (min-width: 1024px) {
   .product-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
 
@@ -220,6 +222,7 @@ body {
 .product-image {
   width: var(--product-image-width, 100%);
   height: var(--product-image-height, 260px);
+  aspect-ratio: var(--product-image-aspect-ratio, auto);
   border-radius: 10px;
   background: #f9fafb;
   overflow: hidden;
@@ -236,7 +239,7 @@ body {
   height: var(--product-image-height, 260px);
   max-width: var(--product-image-max-width, 100%);
   max-height: var(--product-image-max-height, 100%);
-  object-fit: contain;
+  object-fit: var(--product-image-object-fit, contain);
   transition: transform 0.25s ease-out;
 }
 
@@ -254,8 +257,9 @@ body {
 /* Text */
 
 .product-title {
-  font-size: 14px;
-  font-weight: 540;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  font-weight: 500;
   color: #111827;
   margin: 2px 0 0;
 }
@@ -280,7 +284,7 @@ body {
   background: rgba(248, 250, 252, 0.95);
   border: 1px solid rgba(248, 113, 113, 0.22);
 
-  font-size: 13px;
+  font-size: 0.95rem;
   font-weight: 600;
   color: #b91c1c;
 }
@@ -288,9 +292,9 @@ body {
 /* Product page */
 
 .product-page {
-  max-width: 1040px;
+  max-width: 1280px;
   margin: 0 auto;
-  padding: 28px 18px 40px;
+  padding: 32px 24px 44px;
 }
 
 .product-back-link {
@@ -342,7 +346,7 @@ body {
   max-height: 100%;
   width: auto;
   height: auto;
-  object-fit: contain;
+  object-fit: var(--product-image-object-fit, contain);
 }
 
 .product-name {
@@ -529,7 +533,7 @@ body {
 .cart-item-image img {
   max-width: 100%;
   max-height: 100%;
-  object-fit: contain;
+  object-fit: var(--product-image-object-fit, contain);
 }
 
 .cart-item-info {
@@ -670,7 +674,7 @@ body {
 .product-gallery-thumb img {
   max-width: 100%;
   max-height: 100%;
-  object-fit: contain;
+  object-fit: var(--product-image-object-fit, contain);
 }
 
 .product-gallery-thumb-active {
@@ -960,14 +964,16 @@ body {
 }
 
 .home-section-title {
-  font-size: 18px;
+  font-size: 1.3rem;
+  line-height: 1.25;
   font-weight: 600;
   letter-spacing: -0.02em;
   color: #0f172a;
 }
 
 .home-section-subtitle {
-  font-size: 13px;
+  font-size: 0.9rem;
+  line-height: 1.5;
   color: #6b7280;
   margin-top: 2px;
 }
@@ -1024,12 +1030,12 @@ body {
 }
 
 .category-card-name {
-  font-size: 14px;
+  font-size: 0.95rem;
   font-weight: 500;
 }
 
 .category-card-count {
-  font-size: 12px;
+  font-size: 0.8rem;
   color: #6b7280;
 }
 
@@ -1056,21 +1062,13 @@ body {
 
 .home-featured {
   padding: 12px 0;
-  border-radius: 12px;
-  background: linear-gradient(
-    135deg,
-    rgba(244, 114, 182, 0.08),
-    rgba(236, 72, 153, 0.08)
-  );
+  border-radius: 0;
+  background: transparent;
   margin-bottom: 24px;
 }
 
 [data-theme="dark"] .home-featured {
-  background: linear-gradient(
-    135deg,
-    rgba(236, 72, 153, 0.12),
-    rgba(219, 39, 119, 0.12)
-  );
+  background: transparent;
 }
 
 /* --- HEADER --- */
@@ -1273,10 +1271,10 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  padding: 0.25rem 0.85rem;
+  padding: 0.25rem 0.75rem;
   border-radius: 999px;
-  border: 1px solid #e5e7eb;
-  background: #f9fafb;
+  border: 1px solid transparent;
+  background: transparent;
   font-size: 0.8rem;
   color: #374151;
   text-decoration: none;
@@ -1287,7 +1285,7 @@ body {
 
 .site-header-action-pill:hover {
   background: #f3f4f6;
-  border-color: #d1d5db;
+  border-color: #e5e7eb;
   color: #111827;
 }
 
