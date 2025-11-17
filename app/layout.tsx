@@ -8,12 +8,14 @@ import {
   getProductCategories,
   ProductCategory,
 } from "../lib/navigation";
+import { getCategoryTree } from "../lib/categories";
 import { getThemeSettings } from "../lib/themeSettings";
 import { CartProvider } from "../components/CartProvider";
 import { ToastProvider } from "../components/ToastProvider";
 import { ThemeProvider } from "../components/ThemeProvider";
 import { WishlistProvider } from "../components/WishlistProvider";
 import HeaderShell from "../components/HeaderShell";
+import CategoryBar from "../components/CategoryBar";
 
 export const metadata: Metadata = {
   title: "Webpages Store",
@@ -27,10 +29,23 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
   // Load navigation categories and theme settings in parallel
-  const [categories, themeSettingsRaw] = await Promise.all([
-    getProductCategories(),
-    getThemeSettings(),
-  ]);
+  const [[flatCategories, categoryTree], themeSettingsRaw] =
+    await Promise.all([
+      Promise.all([getProductCategories(), getCategoryTree()]),
+      getThemeSettings(),
+    ]);
+
+  // Map category slug -> product count for quick lookup
+  const countsBySlug = new Map<string, number>();
+  flatCategories.forEach((cat: ProductCategory) => {
+    countsBySlug.set(cat.slug, cat.count);
+  });
+
+  // Convert Map to plain object so it can be passed to a client component
+  const countsBySlugObj: Record<string, number> = {};
+  countsBySlug.forEach((value, key) => {
+    countsBySlugObj[key] = value;
+  });
 
   // All ACF options from WordPress (via webpagesThemeSettingsRaw)
   const settings = (themeSettingsRaw || {}) as Record<string, any>;
@@ -193,23 +208,11 @@ export default async function RootLayout({
                 <HeaderShell />
 
                 {/* Category bar under the header */}
-                {categories.length > 0 && (
-                  <div className="category-bar">
-                    {categories.map((cat) => (
-                      <Link
-                        key={cat.id}
-                        href={`/category/${cat.slug}`}
-                        className="category-pill"
-                      >
-                        {cat.name}
-                        {cat.count > 0 && (
-                          <span className="category-pill-count">
-                            {cat.count}
-                          </span>
-                        )}
-                      </Link>
-                    ))}
-                  </div>
+                {categoryTree.length > 0 && (
+                  <CategoryBar
+                    categoryTree={categoryTree}
+                    countsBySlug={countsBySlugObj}
+                  />
                 )}
 
                 {/* Main content */}
