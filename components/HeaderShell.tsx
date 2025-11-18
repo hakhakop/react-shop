@@ -6,6 +6,7 @@ import { getMainMenuItems, MenuItem } from "../lib/navigation";
 import HeaderActions from "./HeaderActions";
 import CategoryMegaMenu from "./CategoryMegaMenu";
 
+import HeaderNav from "./HeaderNav";
 function asString(value: unknown, fallback: string | null = null): string | null {
   if (typeof value === "string" && value.trim() !== "") return value;
   return fallback;
@@ -154,7 +155,7 @@ export default async function HeaderShell() {
               </div>
 
               <div className="site-header-main-center">
-                {renderMenu()}
+                <HeaderNav items={itemsToRender} />
                 {renderCategoriesMega()}
               </div>
 
@@ -188,7 +189,7 @@ export default async function HeaderShell() {
             </div>
 
             <div className="site-header-main-center">
-              {renderMenu()}
+             <HeaderNav items={itemsToRender} />
               {renderCategoriesMega()}
             </div>
 
@@ -222,7 +223,7 @@ export default async function HeaderShell() {
             </p>
 
             <div className="site-header-hero-menu">
-              {renderMenu()}
+              <HeaderNav items={itemsToRender} />
               {renderCategoriesMega()}
             </div>
 

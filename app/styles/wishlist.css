@@ -1,0 +1,123 @@
+/* Wishlist header button */
+
+.wishlist-header-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  padding: 0.25rem;             /* tap area only */
+  border-radius: 0;             /* no pill */
+  border: none;                 /* no border frame */
+  background: transparent;      /* no pill background */
+  text-decoration: none;
+  font-size: 0;                 /* hide text label, icon-only */
+  color: #4b5563;
+  transition:
+    color 0.18s ease,
+    transform 0.18s ease;
+}
+
+.wishlist-header-button:hover {
+  transform: translateY(-1px);
+  color: #111827;
+  box-shadow: none;
+  background: transparent;
+  border-color: transparent;
+}
+
+.wishlist-header-icon {
+  font-size: 20px;  /* clearly larger icon */
+  line-height: 1;
+  color: #db2777;
+}
+
+.wishlist-header-label {
+  font-weight: 500;
+}
+
+.wishlist-header-count {
+  min-width: 0.8rem;
+  height: 0.8rem;
+  padding: 0 0.18rem;
+  margin-left: 4px;
+  border-radius: 999px;
+  background: #111827;
+  color: #ffffff;
+  font-size: 0.6rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Wishlist heart on cards / product */
+
+.product-card-top-right {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 2;
+}
+
+.wishlist-toggle-btn {
+  width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  border: 1px solid rgba(209, 213, 219, 0.8);
+  background: rgba(248, 250, 252, 0.98);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  font-size: 13px;
+  color: #9ca3af;
+  transition: background 0.16s ease, border-color 0.16s ease,
+    box-shadow 0.16s ease, transform 0.16s ease, color 0.16s ease;
+}
+
+.wishlist-toggle-btn:hover {
+  background: #fef2f2;
+  border-color: #f97316;
+  box-shadow: 0 6px 14px rgba(15, 23, 42, 0.18);
+  transform: translateY(-1px);
+}
+
+.wishlist-toggle-btn-active {
+  background: #fef2f2;
+  border-color: #db2777;
+  color: #db2777;
+}
+
+.wishlist-heart {
+  pointer-events: none;
+}
+
+/* Product header row (title + heart) */
+
+.product-header-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+/* Dark mode tweaks for wishlist */
+
+[data-theme="dark"] .wishlist-header-button {
+  background: transparent;
+  border-color: transparent;
+  color: #e5e7eb;
+}
+
+[data-theme="dark"] .wishlist-toggle-btn {
+  background: #020617;
+  border-color: #1f2937;
+  color: #6b7280;
+}
+
+[data-theme="dark"] .wishlist-toggle-btn-active {
+  background: #111827;
+  border-color: #db2777;
+  color: #fb7185;
+}

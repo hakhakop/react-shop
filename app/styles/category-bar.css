@@ -1,0 +1,112 @@
+/* CATEGORY PILL BAR UNDER HEADER – flat, Graphcommerce-like */
+
+/* Bar container – lower and wider than header */
+.category-bar {
+  max-width: 1360px;
+  margin: 12px auto 6px;          /* moves it a bit lower, separates from header */
+  padding: 6px 24px 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  font-size: 13px;
+}
+
+/* Root pill – big, flat, modern */
+.category-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 999px;
+
+  background: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  color: #374151;
+
+  cursor: pointer;
+  text-decoration: none;
+
+  transition:
+    background-color 0.15s ease-out,
+    border-color 0.15s ease-out,
+    color 0.15s ease-out,
+    transform 0.12s ease-out;
+}
+
+.category-pill:hover {
+  background: #e5e7eb;
+  border-color: #d1d5db;
+  color: #111827;
+  transform: translateY(-1px);
+}
+
+/* Wrapper for pills that have children / dropdown */
+.category-pill-wrapper {
+  position: relative;
+  padding-bottom: 18px; /* space for dropdown */
+}
+
+/* Small arrow if root has children */
+.category-pill-wrapper.has-children .category-pill::after {
+  content: "";
+  display: inline-block;
+  margin-left: 4px;
+  border-style: solid;
+  border-width: 4px 4px 0 4px;
+  border-color: #9ca3af transparent transparent transparent;
+}
+
+/* Dropdown (children) – still click-open from React */
+.category-dropdown {
+  position: absolute;
+  left: 0;
+  top: 100%;
+  margin-top: 4px;
+  z-index: 20;
+
+  min-width: 220px;
+  max-width: 360px;
+  padding: 8px;
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow: 0 14px 32px rgba(15, 23, 42, 0.16);
+
+  opacity: 0;
+  transform: translateY(4px);
+  pointer-events: none;
+  transition:
+    opacity 0.18s ease-out,
+    transform 0.18s ease-out;
+}
+
+.category-dropdown-inner {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+/* Child category pills – a bit smaller but same flat style */
+.category-pill--child {
+  font-size: 12px;
+  padding: 5px 11px;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 999px;
+}
+
+/* Open state controlled by React (.is-open) */
+.category-pill-wrapper.is-open .category-dropdown {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+/* Count badge */
+.category-pill-count {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  font-size: 11px;
+  color: #6b7280;
+}

@@ -20,45 +20,12 @@
 
 /* Card shell */
 
-.product-card {
-  display: block;
-  position: relative;
-  text-decoration: none;
-  color: inherit;
-
-  border-radius: var(--product-card-radius, 10px);
-  border: 1px solid rgba(226, 232, 240, 0.95);
-  background: var(--product-card-bg, #ffffff);
-
-  min-height: var(--product-card-min-height, 0);
-  max-width: var(--product-card-max-width, 100%);
-
-  padding: 14px 14px 18px;
-  box-shadow: var(--product-card-shadow, 0 0 0 rgba(15, 23, 42, 0));
-
-  overflow: hidden;
-
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease,
-    border-color 0.2s ease;
-}
-
-.product-card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(
-    --product-card-shadow-hover,
-    0 18px 40px rgba(15, 23, 42, 0.14)
-  );
-  border-color: rgba(148, 163, 184, 0.65);
-}
-
 /* Grid image area – clean, consistent */
 
 .product-image {
   width: var(--product-image-width, 100%);
   height: var(--product-image-height, 260px);
-  border-radius: 10px;
+  border-radius: 12px;
   background: #f9fafb;
   overflow: hidden;
 
@@ -66,7 +33,7 @@
   align-items: center;
   justify-content: center;
 
-  margin: 0 0 12px;
+  margin: 0 0 10px;
 }
 
 .product-image img {
@@ -194,21 +161,33 @@ object-fit: var(--product-image-object-fit, contain);
 
 /* Product cards: smooth motion & depth */
 
+/* Product cards – flat, modern, no polaroid frame */
+
 .product-card {
+  display: block;
+  position: relative;
+  text-decoration: none;
+  color: inherit;
+
+  /* flatten the card – no white tile */
+  border-radius: 0;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+
+  min-height: var(--product-card-min-height, 0);
+  max-width: var(--product-card-max-width, 100%);
+  padding: 0 0 18px;
+
+  overflow: visible;
+
   transition:
-    transform 0.18s ease-out,
-    box-shadow 0.18s ease-out,
-    border-color 0.18s ease-out,
-    background-color 0.18s ease-out;
+    transform 0.14s ease-out,
+    box-shadow 0.14s ease-out;
   will-change: transform, box-shadow;
 }
 
 .product-card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(
-    --product-card-shadow-hover,
-    0 18px 40px rgba(15, 23, 42, 0.14)
-  );
-  background-color: var(--product-card-bg, #ffffff);
-  border-color: #e5e7eb;
+  transform: translateY(-2px);
+  box-shadow: none; /* no big drop shadow */
 }
