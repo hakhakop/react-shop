@@ -1,3 +1,4 @@
+import React from "react";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -5,10 +6,10 @@ import { getThemeSettings } from "../lib/themeSettings";
 import { getMainMenuItems, MenuItem } from "../lib/navigation";
 import HeaderActions from "./HeaderActions";
 import CategoryMegaMenu from "./CategoryMegaMenu";
-
 import HeaderNav from "./HeaderNav";
+
 function asString(value: unknown, fallback: string | null = null): string | null {
-  if (typeof value === "string" && value.trim() !== "") return value;
+  if (typeof value === "string" && value.trim() !== "") return value.trim();
   return fallback;
 }
 
@@ -19,16 +20,15 @@ export default async function HeaderShell() {
     getMainMenuItems(),
   ]);
 
-  // settingsRaw is the parsed JSON from webpagesThemeSettingsRaw
   const settings = settingsRaw as Record<string, any>;
 
-  // Colors
+  // ----- COLORS -----
   const primaryColor =
     asString(settings.primary_color, "#111827") || "#111827";
   const accentColor =
     asString(settings.accent_color, "#ec4899") || "#ec4899";
 
-  // Logo
+  // ----- LOGO -----
   const logoField =
     settings.logo ||
     settings.site_logo ||
@@ -46,11 +46,34 @@ export default async function HeaderShell() {
       null;
   }
 
-  // ----- HEADER LAYOUT: uses ACF field "layout" -----
+  // ----- BRAND NAME (OPTIONAL) -----
+  // Try to read a name from ACF / general settings.
+  // If nothing is present, we simply skip the text completely.
+  const brandName =
+    asString(
+      settings.brand_name ||
+        settings.site_title ||
+        settings.store_name ||
+        settings.blogname,
+      null
+    );
+
+  // ----- TOP BAR CONTENT (OPTIONAL) -----
+  const topBarText = asString(
+    settings.top_bar_text,
+    "Fast support & setup by Webpages"
+  );
+
+  const supportPhone = asString(
+    settings.support_phone,
+    "+374 xx xx xx"
+  );
+
+  const currencyLabel = asString(settings.currency_label, "AMD ֏");
+
+  // ----- HEADER LAYOUT: ACF field "layout" -----
   // Field values: simple / centered / split
   const layoutValue = (asString(settings.layout, "centered") || "centered").toLowerCase();
-
-  console.log("Theme settings layout field:", layoutValue);
 
   let layout: "simple" | "two-row" | "hero";
 
@@ -59,7 +82,6 @@ export default async function HeaderShell() {
       layout = "simple";
       break;
     case "split":
-      // treat "split" as hero-style header for now
       layout = "hero";
       break;
     case "centered":
@@ -69,9 +91,9 @@ export default async function HeaderShell() {
   }
 
   // ----- MENU -----
-
-  const menuItems: MenuItem[] =
-    (Array.isArray(menuItemsRaw) ? menuItemsRaw : []) || [];
+  const menuItems = (Array.isArray(menuItemsRaw)
+    ? (menuItemsRaw as MenuItem[])
+    : []) as MenuItem[];
 
   const itemsToRender =
     menuItems.length > 0
@@ -81,22 +103,6 @@ export default async function HeaderShell() {
           { id: "shop", label: "Shop", url: "/", path: "/" },
         ];
 
-  const renderMenu = () => (
-    <nav className="site-header-nav">
-      {itemsToRender.map((item) => {
-        const href = item.path || item.url || "#";
-        return (
-          <Link
-            key={item.id}
-            href={href}
-            className="site-header-nav-link"
-          >
-            {item.label}
-          </Link>
-        );
-      })}
-    </nav>
-  );
   const renderCategoriesMega = () => (
     <div className="site-header-categories">
       <button
@@ -111,6 +117,7 @@ export default async function HeaderShell() {
     </div>
   );
 
+  // ----- RENDER -----
   return (
     <header
       className="site-header"
@@ -121,18 +128,21 @@ export default async function HeaderShell() {
       {/* LAYOUT 2: TWO-ROW (ACF = centered) */}
       {layout === "two-row" && (
         <>
-          {/* Top bar */}
-          <div className="site-header-top">
-            <div className="site-header-top-inner">
-              <div className="site-header-top-left">
-                Fast support &amp; setup by Webpages
-              </div>
-              <div className="site-header-top-right">
-                <span>Call: +374 xx xx xx</span>
-                <span>AMD ֏</span>
+          {/* Top bar – now driven by settings, can be "turned off"
+              by emptying text in WP later if you want */}
+          {(topBarText || supportPhone || currencyLabel) && (
+            <div className="site-header-top">
+              <div className="site-header-top-inner">
+                <div className="site-header-top-left">
+                  {topBarText && <span>{topBarText}</span>}
+                </div>
+                <div className="site-header-top-right">
+                  {supportPhone && <span>Call: {supportPhone}</span>}
+                  {currencyLabel && <span>{currencyLabel}</span>}
+                </div>
               </div>
             </div>
-          </div>
+          )}
 
           {/* Main bar */}
           <div className="site-header-main">
@@ -142,16 +152,19 @@ export default async function HeaderShell() {
                   <Link href="/" className="site-header-logo-img-wrap">
                     <Image
                       src={logoUrl}
-                      alt="Store logo"
+                      alt={brandName || "Store logo"}
                       width={40}
                       height={40}
                       style={{ objectFit: "contain" }}
                     />
                   </Link>
                 )}
-                <Link href="/" className="site-header-brand">
-                  <span style={{ color: primaryColor }}>Webpages</span>
-                </Link>
+
+                {brandName && (
+                  <Link href="/" className="site-header-brand">
+                    <span style={{ color: primaryColor }}>{brandName}</span>
+                  </Link>
+                )}
               </div>
 
               <div className="site-header-main-center">
@@ -176,20 +189,23 @@ export default async function HeaderShell() {
                 <Link href="/" className="site-header-logo-img-wrap">
                   <Image
                     src={logoUrl}
-                    alt="Store logo"
+                    alt={brandName || "Store logo"}
                     width={40}
                     height={40}
                     style={{ objectFit: "contain" }}
                   />
                 </Link>
               )}
-              <Link href="/" className="site-header-brand">
-                <span style={{ color: primaryColor }}>Webpages</span>
-              </Link>
+
+              {brandName && (
+                <Link href="/" className="site-header-brand">
+                  <span style={{ color: primaryColor }}>{brandName}</span>
+                </Link>
+              )}
             </div>
 
             <div className="site-header-main-center">
-             <HeaderNav items={itemsToRender} />
+              <HeaderNav items={itemsToRender} />
               {renderCategoriesMega()}
             </div>
 
@@ -208,16 +224,20 @@ export default async function HeaderShell() {
               <div className="site-header-hero-logo">
                 <Image
                   src={logoUrl}
-                  alt="Store logo"
+                  alt={brandName || "Store logo"}
                   width={56}
                   height={56}
                   style={{ objectFit: "contain" }}
                 />
               </div>
             )}
+
             <Link href="/" className="site-header-hero-title">
-              <span style={{ color: primaryColor }}>Webpages Store</span>
+              <span style={{ color: primaryColor }}>
+                {brandName || "Webpages Store"}
+              </span>
             </Link>
+
             <p className="site-header-hero-subtitle">
               Curated tech &amp; setup by Webpages.
             </p>
