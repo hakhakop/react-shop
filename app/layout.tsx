@@ -50,6 +50,12 @@ export default async function RootLayout({
   // All ACF options from WordPress (via webpagesThemeSettingsRaw)
   const settings = (themeSettingsRaw || {}) as Record<string, any>;
 
+  const designTokens = (settings.designTokens ?? {}) as Record<string, string>;
+
+  const designTokensCss = Object.entries(designTokens)
+    .map(([key, value]) => `${key}: ${value};`)
+    .join("\n  ");
+
   const getCssValue = (value: unknown, fallback: string): string => {
     if (value === undefined || value === null) return fallback;
     const raw = String(value).trim();
@@ -195,6 +201,8 @@ export default async function RootLayout({
   --product-image-max-height: ${productImageMaxHeight};
   --product-image-object-fit: ${productImageObjectFit};
   --product-image-aspect-ratio: ${productImageAspectRatio};
+
+  ${designTokensCss}
 }
             `.trim(),
           }}

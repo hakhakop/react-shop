@@ -25,7 +25,7 @@
 .product-image {
   width: var(--product-image-width, 100%);
   height: var(--product-image-height, 260px);
-  border-radius: 12px;
+  border-radius: var(--radius-lg, 12px);
   background: #f9fafb;
   overflow: hidden;
 
@@ -41,7 +41,7 @@
   height: var(--product-image-height, 260px);
   max-width: var(--product-image-max-width, 100%);
   max-height: var(--product-image-max-height, 100%);
-object-fit: var(--product-image-object-fit, contain);
+  object-fit: var(--product-image-object-fit, contain);
   transition: transform 0.25s ease-out;
 }
 
@@ -169,11 +169,11 @@ object-fit: var(--product-image-object-fit, contain);
   text-decoration: none;
   color: inherit;
 
-  /* flatten the card – no white tile */
-  border-radius: 0;
+  /* card visual design driven by design tokens */
+  border-radius: var(--radius-md, 0);
   border: none;
   background: transparent;
-  box-shadow: none;
+  box-shadow: none; /* base is flat; hover can add depth via tokens */
 
   min-height: var(--product-card-min-height, 0);
   max-width: var(--product-card-max-width, 100%);
@@ -189,5 +189,5 @@ object-fit: var(--product-image-object-fit, contain);
 
 .product-card:hover {
   transform: translateY(-2px);
-  box-shadow: none; /* no big drop shadow */
+  box-shadow: var(--shadow-md, none);
 }
