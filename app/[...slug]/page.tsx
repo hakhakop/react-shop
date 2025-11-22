@@ -1,11 +1,24 @@
 // wc-store/app/[...slug]/page.tsx
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { getPageByPath } from "../../lib/pages";
+import { graphqlFetch } from "../../lib/graphql";
 import Breadcrumbs from "../../components/Breadcrumbs";
+import PageRenderer from "../../components/PageRenderer";
+import { mapPageBuilder } from "../../lib/pageBuilder";
 
 type WPPageParams = {
   slug?: string[];
+};
+
+type PageByUriResult = {
+  pageBy: {
+    title: string;
+    uri?: string | null;
+    content?: string | null;
+    pageBuilderLayout?: {
+      pageBuilder?: any[] | null;
+    } | null;
+  } | null;
 };
 
 export default async function WPPage({
@@ -24,11 +37,54 @@ export default async function WPPage({
     slugSegments.length === 1 &&
     slugSegments[0] === "shop"
   ) {
-    // You can change "/" to "/category/all" or any other route later
     redirect("/");
   }
 
-  const page = await getPageByPath(slugSegments);
+  // Build WordPress URI from slug segments, e.g. ["about"] → "/about/"
+  const uri =
+    !slugSegments || slugSegments.length === 0
+      ? "/"
+      : `/${slugSegments.join("/")}/`;
+
+  // Fetch page by URI from WordPress via GraphQL
+  const data = await graphqlFetch<PageByUriResult>(`
+    query {
+      pageBy(uri: "${uri}") {
+        title
+        uri
+        content
+        pageBuilderLayout {
+          pageBuilder {
+            __typename
+            fieldGroupName
+
+            ... on PageBuilderLayoutPageBuilderHeroLayout {
+              primaryButtonLink {
+                url
+                title
+                target
+              }
+            }
+
+            ... on PageBuilderLayoutPageBuilderProductGridLayout {
+              cardPreset
+              gridLimit
+              source
+              category {
+                nodes {
+                  databaseId
+                  name
+                  slug
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  `);
+
+  const page = data.pageBy;
 
   if (!page) {
     return (
@@ -44,21 +100,27 @@ export default async function WPPage({
     );
   }
 
+  const blocks = mapPageBuilder(page.pageBuilderLayout);
+
   return (
     <main className="page">
       <Breadcrumbs
         items={[
           { label: "Home", href: "/" },
-          { label: page.title, href: page.uri || "" },
+          { label: page.title, href: page.uri || uri },
         ]}
       />
 
       <h1 className="page-title">{page.title}</h1>
 
-      <article
-        className="prose"
-        dangerouslySetInnerHTML={{ __html: page.content ?? "" }}
-      />
+      {blocks.length > 0 ? (
+        <PageRenderer blocks={blocks} />
+      ) : (
+        <article
+          className="prose"
+          dangerouslySetInnerHTML={{ __html: page.content ?? "" }}
+        />
+      )}
     </main>
   );
 }

@@ -167,3 +167,156 @@ export async function getCategoryProductsBySlug(
     products: data.products?.nodes ?? [],
   };
 }
+
+/**
+ * Generic grid product fetcher for Page Builder blocks
+ */
+type GridProductsResponse = {
+  products: {
+    nodes: ProductNode[];
+  };
+};
+
+const FEATURED_PRODUCTS_QUERY = `
+  query FeaturedProducts($limit: Int!) {
+    products(first: $limit, where: { featured: true }) {
+      nodes {
+        __typename
+        id
+        slug
+        name
+        image {
+          sourceUrl
+          altText
+        }
+        ... on SimpleProduct {
+          price(format: RAW)
+          attributes {
+            nodes {
+              name
+              label
+              options
+            }
+          }
+        }
+        ... on VariableProduct {
+          price(format: RAW)
+          attributes {
+            nodes {
+              name
+              label
+              options
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+const CATEGORY_ID_PRODUCTS_QUERY = `
+  query ProductsByCategoryId($limit: Int!, $catId: [ID]) {
+    products(first: $limit, where: { categoryIn: $catId }) {
+      nodes {
+        __typename
+        id
+        slug
+        name
+        image {
+          sourceUrl
+          altText
+        }
+        ... on SimpleProduct {
+          price(format: RAW)
+          attributes {
+            nodes {
+              name
+              label
+              options
+            }
+          }
+        }
+        ... on VariableProduct {
+          price(format: RAW)
+          attributes {
+            nodes {
+              name
+              label
+              options
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+const ALL_PRODUCTS_QUERY = `
+  query AllProducts($limit: Int!) {
+    products(first: $limit) {
+      nodes {
+        __typename
+        id
+        slug
+        name
+        image {
+          sourceUrl
+          altText
+        }
+        ... on SimpleProduct {
+          price(format: RAW)
+          attributes {
+            nodes {
+              name
+              label
+              options
+            }
+          }
+        }
+        ... on VariableProduct {
+          price(format: RAW)
+          attributes {
+            nodes {
+              name
+              label
+              options
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+export async function getProductsForGrid(options: {
+  limit: number;
+  source?: "featured" | "category" | "all";
+  categoryId?: number;
+}): Promise<ProductNode[]> {
+  const { limit, source, categoryId } = options;
+
+  // Category mode
+  if (source === "category" && categoryId) {
+    const data = await graphqlFetch<GridProductsResponse>(
+      CATEGORY_ID_PRODUCTS_QUERY,
+      { limit, catId: [categoryId] }
+    );
+    return data.products?.nodes ?? [];
+  }
+
+  // All products
+  if (source === "all") {
+    const data = await graphqlFetch<GridProductsResponse>(
+      ALL_PRODUCTS_QUERY,
+      { limit }
+    );
+    return data.products?.nodes ?? [];
+  }
+
+  // Default: featured
+  const data = await graphqlFetch<GridProductsResponse>(
+    FEATURED_PRODUCTS_QUERY,
+    { limit }
+  );
+  return data.products?.nodes ?? [];
+}

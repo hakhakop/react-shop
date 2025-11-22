@@ -18,8 +18,8 @@ export type FeaturedProductsData = {
 };
 
 const FEATURED_QUERY = `
-  query FeaturedProducts {
-    products(where: { featured: true }, first: 12) {
+  query FeaturedProducts($limit: Int) {
+    products(where: { featured: true }, first: $limit) {
       nodes {
         id
         slug
@@ -39,7 +39,7 @@ const FEATURED_QUERY = `
   }
 `;
 
-export async function getFeaturedProducts() {
-  const data = await graphqlFetch<FeaturedProductsData>(FEATURED_QUERY);
+export async function getFeaturedProducts(limit?: number) {
+  const data = await graphqlFetch<FeaturedProductsData>(FEATURED_QUERY, { limit: limit ?? 12 });
   return data.products.nodes;
 }

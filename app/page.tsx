@@ -7,8 +7,8 @@ import {
   getProductCategories,
   ProductCategory,
 } from "../lib/navigation";
-import WishlistToggle from "../components/WishlistToggle";
 import { getThemeSettings } from "../lib/themeSettings";
+import ProductCard from "../components/ProductCard";
 
 //
 // Types
@@ -90,9 +90,7 @@ function asBool(value: unknown, fallback: boolean): boolean {
 
 export default async function Home() {
   try {
-    //
     // Fetch theme settings + products + categories in parallel
-    //
     const [settingsRaw, featured, categories, allProducts] = await Promise.all([
       getThemeSettings(),
       getFeaturedProducts(),
@@ -108,11 +106,6 @@ export default async function Home() {
       (settingsRaw?.webpages_headless_theme as Record<string, any>) ||
       (settingsRaw as Record<string, any>);
 
-    // Debug root object shape
-    console.log("Theme Settings Root:", settings);
-
-    // ----- THEME SETTINGS MAPPING -----
-
     // Colors (from ACF color pickers: primary_color, accent_color)
     const primaryColor =
       asString(settings.primary_color, "#111827") || "#111827"; // default dark gray
@@ -122,13 +115,16 @@ export default async function Home() {
     // Hero title / subtitle
     const heroTitle =
       asString(settings.home_hero_title, "Webpages Store") || "Webpages Store";
-    const heroSubtitle = asString(settings.home_hero_subtitle, null);
+    const heroSubtitle =
+      asString(
+        settings.home_hero_subtitle,
+        "Discover carefully curated products with a clean, fast shopping experience."
+      ) ||
+      "Discover carefully curated products with a clean, fast shopping experience.";
 
     // Logo: try to extract URL from the ACF image field
     const logoField =
-      settings.logo ||
-      settings.site_logo ||
-      settings.store_logo;
+      settings.logo || settings.site_logo || settings.store_logo;
 
     let logoUrl: string | null = null;
     if (typeof logoField === "string") {
@@ -143,9 +139,6 @@ export default async function Home() {
         null;
     }
 
-    console.log("Logo field from settings:", logoField);
-    console.log("Resolved logoUrl:", logoUrl);
-
     // Featured limit: try several possible keys, then convert
     const rawLimitCandidate =
       settings.home_featured_limit ??
@@ -153,15 +146,12 @@ export default async function Home() {
       settings.featured_limit ??
       settings.featured_products_limit;
 
-    console.log("Raw featured limit from settings:", rawLimitCandidate);
-
     const featuredLimit = asPositiveInt(rawLimitCandidate, 4);
 
     // Show category tiles
     const showCategoryTiles = asBool(settings.show_category_tiles, true);
 
-    // ----- PRODUCTS & CATEGORIES -----
-
+    // PRODUCTS & CATEGORIES
     const featuredProducts = (featured || []).slice(0, featuredLimit);
     const allNodes = allProducts.products.nodes;
 
@@ -170,228 +160,148 @@ export default async function Home() {
       (p) => !featuredProducts.find((f) => f.id === p.id)
     );
 
-    const topCategories = categories.slice(0, 8);
+    const topCategories: ProductCategory[] = categories.slice(0, 8);
 
-    //
     // RENDER
-    //
     return (
-      <main className="page">
-        {/* HERO */}
-        <section
-          className="home-hero"
-          style={{
-            borderBottom: `3px solid ${accentColor}`,
-          }}
-        >
-          {logoUrl && (
-            <div className="mb-4 flex justify-center">
-              <Image
-                src={logoUrl}
-                alt="Store logo"
-                width={72}
-                height={72}
-                style={{ objectFit: "var(--product-image-object-fit, contain)" as any }}
-              />
-            </div>
-          )}
+      <main className="home-page">
+        <div className="home-inner">
+          {/* HERO */}
+          <section className="home-hero">
+            <div>
+              {logoUrl && (
+                <div className="mb-4">
+                  <Image
+                    src={logoUrl}
+                    alt="Store logo"
+                    width={64}
+                    height={64}
+                    style={{ objectFit: "contain" }}
+                  />
+                </div>
+              )}
 
-          <h1 className="page-title" style={{ color: primaryColor }}>
-            {heroTitle}
-          </h1>
-          {heroSubtitle && (
-            <p className="page-subtitle" style={{ color: "#4b5563" }}>
-              {heroSubtitle}
-            </p>
-          )}
-        </section>
+              <div className="home-hero-kicker">Online store</div>
 
-        {/* FEATURED PRODUCTS */}
-        {featuredProducts.length > 0 && (
-          <section
-            className="home-section home-featured"
-            style={{
-              background: `linear-gradient(135deg, ${primaryColor}11, ${accentColor}11)`,
-            }}
-          >
-            <div className="home-section-header">
-              <div>
-                <h2 className="home-section-title">Featured products</h2>
-                <p className="home-section-subtitle">
-                  Highlighted items selected from WooCommerce.
-                </p>
-              </div>
-            </div>
+              <h1 className="home-hero-title" style={{ color: primaryColor }}>
+                {heroTitle}
+              </h1>
 
-            <div className="product-grid">
-              {featuredProducts.map((p) => {
-                const priceNumber = p.price ? parseFloat(p.price) : null;
-                const imageUrl = p.image?.sourceUrl || undefined;
+              {heroSubtitle && (
+                <p className="home-hero-subtitle">{heroSubtitle}</p>
+              )}
 
-                return (
-                  <div key={p.id} className="product-card">
-                    <div className="product-card-top-right">
-                      <WishlistToggle
-                        id={p.id}
-                        slug={p.slug}
-                        name={p.name}
-                        imageUrl={imageUrl}
-                      />
-                    </div>
-
-                    <Link
-                      href={`/product/${p.slug}`}
-                      className="product-card-link"
-                    >
-                      <div className="product-image">
-                        {p.image?.sourceUrl ? (
-                          <Image
-                            src={p.image.sourceUrl}
-                            alt={p.image.altText || p.name}
-                            width={400}
-                            height={300}
-                            style={{ objectFit: "var(--product-image-object-fit, contain)" as any }}
-                          />
-                        ) : (
-                          <div className="product-image-placeholder">
-                            No image
-                          </div>
-                        )}
-                      </div>
-
-                      <h3 className="product-title product-title-2lines">
-                        {p.name}
-                      </h3>
-
-                      {priceNumber !== null &&
-                        !Number.isNaN(priceNumber) && (
-                          <div className="product-price">
-                            {priceNumber.toLocaleString("hy-AM", {
-                              style: "currency",
-                              currency: "AMD",
-                              maximumFractionDigits: 0,
-                            })}
-                          </div>
-                        )}
-                    </Link>
-                  </div>
-                );
-              })}
-            </div>
-          </section>
-        )}
-
-        {/* MORE PRODUCTS */}
-        {moreProducts.length > 0 && (
-          <section className="home-section">
-            <div className="home-section-header">
-              <div>
-                <h2 className="home-section-title">More products</h2>
-                <p className="home-section-subtitle">
-                  Explore the rest of the catalog loaded from WordPress.
-                </p>
-              </div>
-            </div>
-
-            <div className="product-grid">
-              {moreProducts.map((p) => {
-                const priceNumber = p.price ? parseFloat(p.price) : null;
-                const imageUrl = p.image?.sourceUrl || undefined;
-
-                return (
-                  <div key={p.id} className="product-card">
-                    <div className="product-card-top-right">
-                      <WishlistToggle
-                        id={p.id}
-                        slug={p.slug}
-                        name={p.name}
-                        imageUrl={imageUrl}
-                      />
-                    </div>
-
-                    <Link
-                      href={`/product/${p.slug}`}
-                      className="product-card-link"
-                    >
-                      <div className="product-image">
-                        {p.image?.sourceUrl ? (
-                          <Image
-                            src={p.image.sourceUrl}
-                            alt={p.image.altText || p.name}
-                            width={400}
-                            height={300}
-                            style={{ objectFit: "var(--product-image-object-fit, contain)" as any }}
-                          />
-                        ) : (
-                          <div className="product-image-placeholder">
-                            No image
-                          </div>
-                        )}
-                      </div>
-
-                      <h3 className="product-title product-title-2lines">
-                        {p.name}
-                      </h3>
-
-                      {priceNumber !== null &&
-                        !Number.isNaN(priceNumber) && (
-                          <div className="product-price">
-                            {priceNumber.toLocaleString("hy-AM", {
-                              style: "currency",
-                              currency: "AMD",
-                              maximumFractionDigits: 0,
-                            })}
-                          </div>
-                        )}
-                    </Link>
-                  </div>
-                );
-              })}
-            </div>
-          </section>
-        )}
-
-        {/* CATEGORIES */}
-        {showCategoryTiles && topCategories.length > 0 && (
-          <section className="home-section">
-            <div className="home-section-header">
-              <div>
-                <h2 className="home-section-title">Shop by category</h2>
-                <p className="home-section-subtitle">
-                  Jump directly into top-level product categories.
-                </p>
-              </div>
-            </div>
-
-            <div className="category-grid">
-              {topCategories.map((cat) => (
-                <Link
-                  key={cat.id}
-                  href={`/category/${cat.slug}`}
-                  className="category-card"
-                >
-                  <div className="category-card-name">
-                    {cat.name}
-                  </div>
-                  {cat.count > 0 && (
-                    <div className="category-card-count">
-                      {cat.count} item{cat.count === 1 ? "" : "s"}
-                    </div>
-                  )}
+              <div className="home-hero-actions">
+                <Link href="/shop" className="home-hero-primary">
+                  Browse all products
                 </Link>
-              ))}
+                <Link href="/product-category" className="home-hero-secondary">
+                  Explore categories
+                </Link>
+              </div>
+            </div>
+
+            <div className="home-hero-side">
+              <div style={{ fontSize: 13, color: "#4b5563" }}>
+                Clean, modular WooCommerce storefront powered by React and Next.js.
+              </div>
             </div>
           </section>
-        )}
+
+
+          {/* FEATURED PRODUCTS */}
+          {featuredProducts.length > 0 && (
+            <section
+              className="home-section home-featured"
+              style={{
+                background: `linear-gradient(135deg, ${primaryColor}11, ${accentColor}11)`,
+              }}
+            >
+              <div className="home-section-header">
+                <div>
+                  <h2 className="home-section-title">Featured products</h2>
+                  <p className="home-section-subtitle">
+                    Highlighted items selected from WooCommerce.
+                  </p>
+                </div>
+              </div>
+
+              <div className="product-grid">
+                {featuredProducts.map((p) => {
+                  const priceNumber = p.price ? parseFloat(p.price) : null;
+                  const imageUrl = p.image?.sourceUrl || undefined;
+
+                  return <ProductCard key={p.id} product={p} />;
+                })}
+              </div>
+            </section>
+          )}
+
+          {/* MORE PRODUCTS */}
+          {moreProducts.length > 0 && (
+            <section className="home-section">
+              <div className="home-section-header">
+                <div>
+                  <h2 className="home-section-title">More products</h2>
+                  <p className="home-section-subtitle">
+                    Explore the rest of the catalog loaded from WordPress.
+                  </p>
+                </div>
+              </div>
+
+              <div className="product-grid">
+                {moreProducts.map((p) => {
+                  const priceNumber = p.price ? parseFloat(p.price) : null;
+                  const imageUrl = p.image?.sourceUrl || undefined;
+
+                  return <ProductCard key={p.id} product={p} />;
+                })}
+              </div>
+            </section>
+          )}
+
+          {/* CATEGORIES */}
+          {showCategoryTiles && topCategories.length > 0 && (
+            <section className="home-section">
+              <div className="home-section-header">
+                <div>
+                  <h2 className="home-section-title">Shop by category</h2>
+                  <p className="home-section-subtitle">
+                    Jump directly into top-level product categories.
+                  </p>
+                </div>
+              </div>
+
+              <div className="category-grid">
+                {topCategories.map((cat) => (
+                  <Link
+                    key={cat.id}
+                    href={`/category/${cat.slug}`}
+                    className="category-card"
+                  >
+                    <div className="category-card-name">{cat.name}</div>
+                    {cat.count > 0 && (
+                      <div className="category-card-count">
+                        {cat.count} item{cat.count === 1 ? "" : "s"}
+                      </div>
+                    )}
+                  </Link>
+                ))}
+              </div>
+            </section>
+          )}
+        </div>
       </main>
     );
   } catch (err: any) {
     return (
-      <main className="page">
-        <h1 className="page-title">Store</h1>
-        <p style={{ color: "#b91c1c" }}>
-          Failed to load products: {String(err?.message || err)}
-        </p>
+      <main className="home-page">
+        <div className="home-inner">
+          <h1 className="page-title">Store</h1>
+          <p style={{ color: "#b91c1c" }}>
+            Failed to load products: {String(err?.message || err)}
+          </p>
+        </div>
       </main>
     );
   }
