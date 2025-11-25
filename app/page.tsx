@@ -9,6 +9,8 @@ import {
 } from "../lib/navigation";
 import { getThemeSettings } from "../lib/themeSettings";
 import ProductCard from "../components/ProductCard";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
 //
 // Types
@@ -191,14 +193,15 @@ export default async function Home() {
                 <p className="home-hero-subtitle">{heroSubtitle}</p>
               )}
 
-              <div className="home-hero-actions">
-                <Link href="/shop" className="home-hero-primary">
-                  Browse all products
-                </Link>
-                <Link href="/product-category" className="home-hero-secondary">
-                  Explore categories
-                </Link>
-              </div>
+             <div className="home-hero-actions flex gap-3 mt-6">
+  <Button asChild size="lg">
+    <Link href="/shop">Browse all products</Link>
+  </Button>
+
+  <Button variant="outline" asChild size="lg">
+    <Link href="/categories">Explore categories</Link>
+  </Button>
+</div>
             </div>
 
             <div className="home-hero-side">
@@ -224,6 +227,11 @@ export default async function Home() {
                     Highlighted items selected from WooCommerce.
                   </p>
                 </div>
+                <div className="home-section-actions">
+                  <Button variant="outline" size="sm" asChild>
+                    <Link href="/shop">View all products</Link>
+                  </Button>
+                </div>
               </div>
 
               <div className="product-grid">
@@ -246,6 +254,11 @@ export default async function Home() {
                   <p className="home-section-subtitle">
                     Explore the rest of the catalog loaded from WordPress.
                   </p>
+                </div>
+                <div className="home-section-actions">
+                  <Button variant="outline" size="sm" asChild>
+                    <Link href="/shop">Browse full catalog</Link>
+                  </Button>
                 </div>
               </div>
 
@@ -281,9 +294,12 @@ export default async function Home() {
                   >
                     <div className="category-card-name">{cat.name}</div>
                     {cat.count > 0 && (
-                      <div className="category-card-count">
+                      <Badge
+                        variant="secondary"
+                        className="category-card-count"
+                      >
                         {cat.count} item{cat.count === 1 ? "" : "s"}
-                      </div>
+                      </Badge>
                     )}
                   </Link>
                 ))}

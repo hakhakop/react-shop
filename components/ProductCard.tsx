@@ -60,15 +60,17 @@ export default function ProductCard({
           {product.name}
         </h3>
 
-        {priceNumber !== null && !Number.isNaN(priceNumber) && (
-          <div className="product-price">
-            {priceNumber.toLocaleString("hy-AM", {
-              style: "currency",
-              currency: "AMD",
-              maximumFractionDigits: 0,
-            })}
-          </div>
-        )}
+      {priceNumber !== null && !Number.isNaN(priceNumber) && (
+  <div className="product-price">
+    {(() => {
+      const rounded = Math.round(priceNumber);
+      const withSpaces = rounded
+        .toString()
+        .replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+      return `${withSpaces} ֏`;
+    })()}
+  </div>
+)}
       </Link>
     </div>
   );

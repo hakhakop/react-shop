@@ -70,6 +70,7 @@ export default async function WPPage({
               cardPreset
               gridLimit
               source
+              layoutVariant
               category {
                 nodes {
                   databaseId

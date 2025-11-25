@@ -180,7 +180,7 @@ export default async function RootLayout({
   );
 
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className="body-root">
         {/* Theme-driven CSS variables for product cards and images */}
         <style

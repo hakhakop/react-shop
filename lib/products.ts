@@ -215,7 +215,7 @@ const FEATURED_PRODUCTS_QUERY = `
 `;
 
 const CATEGORY_ID_PRODUCTS_QUERY = `
-  query ProductsByCategoryId($limit: Int!, $catId: [ID]) {
+  query ProductsByCategoryId($limit: Int!, $catId: [String]) {
     products(first: $limit, where: { categoryIn: $catId }) {
       nodes {
         __typename
@@ -291,15 +291,18 @@ const ALL_PRODUCTS_QUERY = `
 export async function getProductsForGrid(options: {
   limit: number;
   source?: "featured" | "category" | "all";
-  categoryId?: number;
+  categoryId?: string;
 }): Promise<ProductNode[]> {
-  const { limit, source, categoryId } = options;
+  const { limit, source = "featured", categoryId } = options;
 
   // Category mode
   if (source === "category" && categoryId) {
     const data = await graphqlFetch<GridProductsResponse>(
       CATEGORY_ID_PRODUCTS_QUERY,
-      { limit, catId: [categoryId] }
+      {
+        limit,
+        catId: [categoryId], // categoryId is already a slug string
+      }
     );
     return data.products?.nodes ?? [];
   }

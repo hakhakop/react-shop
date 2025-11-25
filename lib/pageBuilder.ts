@@ -23,14 +23,20 @@ export interface ProductGridLayoutBlock {
   __typename: "PageBuilderLayoutPageBuilderProductGridLayout";
   fieldGroupName: string;
   cardPreset?: string[] | null;
+  layoutVariant?: string[] | null;
   gridLimit?: number | null;
-  source?: string | null;
+  source?: string[] | null;
   category?: {
     node?: {
       databaseId: number;
       name?: string | null;
       slug?: string | null;
     } | null;
+    nodes?: {
+      databaseId: number;
+      name?: string | null;
+      slug?: string | null;
+    }[] | null;
   } | null;
 }
 

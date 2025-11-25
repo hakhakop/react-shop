@@ -40,12 +40,22 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
     setTheme(initial);
     document.documentElement.dataset.theme = initial;
+    if (initial === "dark") {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
   }, []);
 
   // Keep document + storage in sync when theme changes
   useEffect(() => {
     if (typeof window === "undefined") return;
     document.documentElement.dataset.theme = theme;
+    if (theme === "dark") {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
     window.localStorage.setItem(STORAGE_KEY, theme);
   }, [theme]);
 

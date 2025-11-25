@@ -4,25 +4,27 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0;
-  padding: 0.25rem;             /* tap area only */
-  border-radius: 0;             /* no pill */
-  border: none;                 /* no border frame */
-  background: transparent;      /* no pill background */
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 9999px;
+  border: 1px solid hsl(var(--border));
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
   text-decoration: none;
-  font-size: 0;                 /* hide text label, icon-only */
-  color: #4b5563;
+  font-size: 0; /* icon-only */
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.12);
   transition:
-    color 0.18s ease,
-    transform 0.18s ease;
+    background-color 0.15s ease,
+    color 0.15s ease,
+    transform 0.12s ease,
+    box-shadow 0.15s ease;
 }
 
 .wishlist-header-button:hover {
   transform: translateY(-1px);
-  color: #111827;
-  box-shadow: none;
-  background: transparent;
-  border-color: transparent;
+  background-color: hsl(var(--muted));
+  color: hsl(var(--foreground));
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.18);
 }
 
 .wishlist-header-icon {
@@ -36,18 +38,19 @@
 }
 
 .wishlist-header-count {
-  min-width: 0.8rem;
-  height: 0.8rem;
-  padding: 0 0.18rem;
+  min-width: 1rem;
+  height: 1rem;
+  padding: 0 0.3rem;
   margin-left: 4px;
   border-radius: 999px;
-  background: #111827;
-  color: #ffffff;
+  background: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
   font-size: 0.6rem;
   font-weight: 600;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.18);
 }
 
 /* Wishlist heart on cards / product */
@@ -104,10 +107,12 @@
 
 /* Dark mode tweaks for wishlist */
 
-[data-theme="dark"] .wishlist-header-button {
-  background: transparent;
-  border-color: transparent;
-  color: #e5e7eb;
+[data-theme="dark"] .wishlist-header-button,
+.dark .wishlist-header-button {
+  background-color: hsl(var(--background));
+  border-color: hsl(var(--border));
+  color: hsl(var(--foreground));
+  box-shadow: 0 0 0 1px rgba(148, 163, 184, 0.45);
 }
 
 [data-theme="dark"] .wishlist-toggle-btn {
