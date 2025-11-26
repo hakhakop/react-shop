@@ -6,11 +6,12 @@ import { useWishlist } from "./WishlistProvider";
 import { useCart } from "./CartProvider";
 import MiniCart from "./MiniCart";
 import ThemeToggle from "./ThemeToggle";
+import { AppIconButton } from "@/components/ui/AppIconButton";
 
 function HeartIcon() {
   return (
     <svg
-      className="site-header-icon"
+      className="h-4 w-4"
       viewBox="0 0 24 24"
       aria-hidden="true"
     >
@@ -29,7 +30,7 @@ function HeartIcon() {
 function CartIcon() {
   return (
     <svg
-      className="site-header-icon"
+      className="h-4 w-4"
       viewBox="0 0 24 24"
       aria-hidden="true"
     >
@@ -69,33 +70,36 @@ export default function HeaderActions() {
   return (
     <>
       <div className="site-header-actions">
-        <Link
+        <AppIconButton
+          icon={<HeartIcon />}
+          badgeCount={wishlistCount}
           href="/wishlist"
-          className="site-header-action-pill site-header-action-pill--wishlist"
-        >
-          <span className="site-header-action-label">Wishlist</span>
-          <HeartIcon />
-          {wishlistCount > 0 && (
-            <span className="site-header-action-badge">
-              {wishlistCount}
-            </span>
-          )}
-        </Link>
+          size="md"
+          variant="subtle"
+          aria-label={
+            wishlistCount > 0
+              ? `Wishlist (${wishlistCount} items)`
+              : "Wishlist"
+          }
+        />
 
-        <button
-          type="button"
-          className="site-header-action-pill site-header-action-pill--cart"
+        <AppIconButton
+          icon={<CartIcon />}
+          badgeCount={cartCount}
           onClick={() => setMiniCartOpen(true)}
-        >
-          <span className="site-header-action-label">Cart</span>
-          <CartIcon />
-          {cartCount > 0 && (
-            <span className="site-header-action-badge">
-              {cartCount}
-            </span>
-          )}
-        </button>
-
+          size="md"
+          variant="subtle"
+          aria-label={
+            cartCount > 0
+              ? `Cart (${cartCount} items)`
+              : "Cart"
+          }
+        />
+           <AppIconButton
+    icon="👤"
+    href="/my-account"
+    aria-label="My account"
+  />
         <div className="site-header-theme-toggle">
           <ThemeToggle />
         </div>
