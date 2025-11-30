@@ -148,3 +148,33 @@
 .home-section-link:hover {
   text-decoration: underline;
 }
+
+/* in app/styles/layout.css or a new home.css, wherever you like */
+
+.home-perks-grid {
+  display: grid;
+  gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .home-perks-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.home-perk-card {
+  border-radius: 1rem;
+  padding: 1.25rem 1.5rem;
+  background: var(--card-bg, #f9fafb);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+}
+
+.home-perk-title {
+  font-weight: 600;
+  margin-bottom: 0.35rem;
+}
+
+.home-perk-body {
+  font-size: 0.9rem;
+  color: #4b5563;
+}

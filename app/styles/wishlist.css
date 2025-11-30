@@ -62,38 +62,40 @@
   z-index: 2;
 }
 
-.wishlist-toggle-btn {
+/* The button that wraps the heart icon in product cards */
+.wishlist-toggle-icon {
   width: 26px;
   height: 26px;
   border-radius: 999px;
-  border: 1px solid rgba(209, 213, 219, 0.8);
-  background: rgba(248, 250, 252, 0.98);
+  border: none;
+  background: transparent;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   padding: 0;
-  font-size: 13px;
-  color: #9ca3af;
-  transition: background 0.16s ease, border-color 0.16s ease,
-    box-shadow 0.16s ease, transform 0.16s ease, color 0.16s ease;
 }
 
-.wishlist-toggle-btn:hover {
-  background: #fef2f2;
-  border-color: #f97316;
-  box-shadow: 0 6px 14px rgba(15, 23, 42, 0.18);
-  transform: translateY(-1px);
+/* Base heart appearance (outline / inactive) */
+.wishlist-heart-icon {
+  width: 20px;
+  height: 20px;
+  color: #6b7280; /* gray when inactive */
+  transition:
+    color 0.2s ease,
+    transform 0.2s ease;
 }
 
-.wishlist-toggle-btn-active {
-  background: #fef2f2;
-  border-color: #db2777;
-  color: #db2777;
+/* Hover state – subtle darkening */
+.wishlist-toggle-icon:hover .wishlist-heart-icon {
+  color: #111;
 }
 
-.wishlist-heart {
-  pointer-events: none;
+/* Active state – clearly filled red heart with a small pop */
+.wishlist-toggle-icon-active .wishlist-heart-icon {
+  color: #060606;          /* Tailwind red-500 */
+  transform: scale(1.15);
+  fill: rgb(9, 9, 9);
 }
 
 /* Product header row (title + heart) */
@@ -115,14 +117,10 @@
   box-shadow: 0 0 0 1px rgba(148, 163, 184, 0.45);
 }
 
-[data-theme="dark"] .wishlist-toggle-btn {
-  background: #020617;
-  border-color: #1f2937;
-  color: #6b7280;
+[data-theme="dark"] .wishlist-toggle-icon .wishlist-heart-icon {
+  color: #9ca3af;
 }
 
-[data-theme="dark"] .wishlist-toggle-btn-active {
-  background: #111827;
-  border-color: #db2777;
-  color: #fb7185;
+[data-theme="dark"] .wishlist-toggle-icon-active .wishlist-heart-icon {
+  color: #0a0a0a; /* softer red in dark mode */
 }

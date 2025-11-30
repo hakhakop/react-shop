@@ -191,3 +191,295 @@
   transform: translateY(-2px);
   box-shadow: var(--shadow-md, none);
 }
+
+.quick-view-backdrop {
+  position: fixed;
+  inset: 0; /* top:0; right:0; bottom:0; left:0; */
+  background: rgba(15, 23, 42, 0.65); /* dark slate with transparency */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 50; /* higher than header/cards */
+}
+.quick-view-modal {
+  background: rgba(15, 23, 42, 0.98); /* dark glassy panel */
+  border-radius: 18px;
+  padding: 18px 20px 20px;
+  max-width: 720px;
+  width: min(720px, 100% - 32px);
+  box-shadow:
+    0 22px 45px rgba(15, 23, 42, 0.55),
+    0 0 0 1px rgba(148, 163, 184, 0.25);
+  color: #e5e7eb;
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  gap: 18px;
+}
+
+.quick-view-content {
+  display: contents;
+}
+
+.quick-view-image img {
+  width: 100%;
+  height: auto;
+  border-radius: 14px;
+  object-fit: var(--product-image-object-fit, contain);
+  background: #020617;
+}
+
+.quick-view-details {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.quick-view-title {
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.quick-view-price {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.quick-view-actions {
+  margin-top: 12px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.quick-view-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  border: none;
+  background: rgba(15, 23, 42, 0.85);
+  color: #e5e7eb;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    background 0.15s ease,
+    transform 0.12s ease;
+}
+
+.quick-view-close:hover {
+  background: rgba(30, 64, 175, 0.9);
+  transform: translateY(-1px);
+}
+
+/* Button under card (text Quick view, if you keep it) */
+.product-card-footer {
+  margin-top: 8px;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.product-quick-view-button {
+  font-size: 0.8rem;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.6);
+  background: rgba(15, 23, 42, 0.7);
+  color: #e5e7eb;
+  cursor: pointer;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.product-quick-view-button:hover {
+  background: rgba(30, 64, 175, 0.95);
+  border-color: rgba(191, 219, 254, 0.9);
+  transform: translateY(-1px);
+  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.45);
+}
+
+/* Top-right icon stack on card */
+.product-card-top-right {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: flex-end;
+  z-index: 3;
+}
+
+.wishlist-toggle-btn-clean {
+  box-shadow: 0 0 0 1px rgba(148, 163, 184, 0.45);
+  background: rgba(15, 23, 42, 0.75);
+  border-radius: 999px;
+}
+
+.wishlist-toggle-btn-clean.wishlist-toggle-btn-active {
+  background: transparent;
+  box-shadow:
+    0 0 0 1px #111,
+    0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.product-quick-view-icon-btn {
+  box-shadow: 0 0 0 1px rgba(148, 163, 184, 0.35);
+  background: rgba(15, 23, 42, 0.65);
+  border-radius: 999px;
+}
+
+.product-quick-view-icon-btn:hover {
+  box-shadow:
+    0 0 0 1px rgba(191, 219, 254, 0.9),
+    0 10px 22px rgba(15, 23, 42, 0.55);
+  background: rgba(30, 64, 175, 0.95);
+}
+
+@media (max-width: 640px) {
+  .quick-view-modal {
+    grid-template-columns: minmax(0, 1fr);
+    max-width: 100%;
+    width: calc(100% - 24px);
+    padding: 14px 14px 16px;
+  }
+
+  .quick-view-close {
+    top: 8px;
+    right: 8px;
+  }
+}
+
+.product-card-top-right {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: flex-end;
+  z-index: 3;
+}
+
+/* Generic ghost icon button: no pill, just outline icon */
+.icon-ghost {
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-ghost:focus-visible {
+  outline: 2px solid var(--color-accent, #f97316);
+  outline-offset: 2px;
+}
+
+
+
+/* Quick view search outline */
+.product-quick-view-icon .quick-view-icon-svg {
+  width: 20px;
+  height: 20px;
+  color: #111;
+  transition:
+    color 0.15s ease,
+    transform 0.12s ease;
+}
+
+.product-quick-view-icon:hover .quick-view-icon-svg {
+  color: #000;
+  transform: translateY(-1px);
+}
+
+/* View mode overrides: list (1 per row) and compact (2-wide) */
+
+/* List mode: one card per row */
+[data-view-mode="list"] .product-grid {
+  grid-template-columns: minmax(0, 1fr) !important;
+}
+
+/* Compact mode: two cards per row */
+[data-view-mode="compact"] .product-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+}
+
+/* List mode: card-like row with soft background, no separators */
+[data-view-mode="list"] .product-card {
+  box-shadow: none;
+  border-radius: 10px;
+  background: rgba(248, 250, 252, 0.9);
+  border: none;
+  padding: 12px 12px 16px;
+  margin-bottom: 12px;
+}
+
+[data-view-mode="list"] .product-card:last-child {
+  margin-bottom: 0;
+}
+
+/* Strong list mode: image left, everything else on the right in a stretched row */
+[data-view-mode="list"] .product-card {
+  max-width: 100%;
+  width: 100%;
+  display: grid;
+  grid-template-columns: 130px minmax(0, 1fr);
+  column-gap: 16px;
+  align-items: flex-start;
+}
+
+/* Flatten the link so its children participate directly in the grid */
+[data-view-mode="list"] .product-card-link {
+  display: contents;
+}
+
+/* Image in the left column, spanning the vertical space */
+[data-view-mode="list"] .product-image {
+  margin: 0;
+  height: 130px !important;
+  grid-column: 1;
+  grid-row: 1 / span 4;
+}
+
+[data-view-mode="list"] .product-image img {
+  height: 130px !important;
+  object-fit: contain !important;
+}
+
+/* Text, price, attributes, footer all in the right column */
+[data-view-mode="list"] .product-title,
+[data-view-mode="list"] .product-price,
+[data-view-mode="list"] .product-attributes-row,
+[data-view-mode="list"] .product-card-footer {
+  grid-column: 2;
+}
+
+[data-view-mode="list"] .product-title {
+  font-size: 15px;
+  margin: 0;
+}
+
+[data-view-mode="list"] .product-price {
+  margin-top: 6px;
+}
+
+[data-view-mode="list"] .product-attributes-row {
+  margin-top: 6px;
+}

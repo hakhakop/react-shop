@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
+import { Suspense } from "react";
 
 import { graphqlFetch } from "../lib/graphql";
 import { getFeaturedProducts } from "../lib/featured";
@@ -11,6 +12,8 @@ import { getThemeSettings } from "../lib/themeSettings";
 import ProductCard from "../components/ProductCard";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import HomePerks from "../components/HomePerks";
+import RecentlyViewedStrip from "../components/RecentlyViewedStrip";
 
 //
 // Types
@@ -90,7 +93,7 @@ function asBool(value: unknown, fallback: boolean): boolean {
 // PAGE
 //
 
-export default async function Home() {
+async function HomeContent() {
   try {
     // Fetch theme settings + products + categories in parallel
     const [settingsRaw, featured, categories, allProducts] = await Promise.all([
@@ -193,15 +196,15 @@ export default async function Home() {
                 <p className="home-hero-subtitle">{heroSubtitle}</p>
               )}
 
-             <div className="home-hero-actions flex gap-3 mt-6">
-  <Button asChild size="lg">
-    <Link href="/shop">Browse all products</Link>
-  </Button>
+              <div className="home-hero-actions flex gap-3 mt-6">
+                <Button asChild size="lg">
+                  <Link href="/shop">Browse all products</Link>
+                </Button>
 
-  <Button variant="outline" asChild size="lg">
-    <Link href="/categories">Explore categories</Link>
-  </Button>
-</div>
+                <Button variant="outline" asChild size="lg">
+                  <Link href="/categories">Explore categories</Link>
+                </Button>
+              </div>
             </div>
 
             <div className="home-hero-side">
@@ -211,6 +214,11 @@ export default async function Home() {
             </div>
           </section>
 
+          {/* NEW DEMO BLOCK */}
+          <HomePerks />
+
+          {/* RECENTLY VIEWED STRIP */}
+          <RecentlyViewedStrip />
 
           {/* FEATURED PRODUCTS */}
           {featuredProducts.length > 0 && (
@@ -235,12 +243,9 @@ export default async function Home() {
               </div>
 
               <div className="product-grid">
-                {featuredProducts.map((p) => {
-                  const priceNumber = p.price ? parseFloat(p.price) : null;
-                  const imageUrl = p.image?.sourceUrl || undefined;
-
-                  return <ProductCard key={p.id} product={p} />;
-                })}
+                {featuredProducts.map((p) => (
+                  <ProductCard key={p.id} product={p} />
+                ))}
               </div>
             </section>
           )}
@@ -263,12 +268,9 @@ export default async function Home() {
               </div>
 
               <div className="product-grid">
-                {moreProducts.map((p) => {
-                  const priceNumber = p.price ? parseFloat(p.price) : null;
-                  const imageUrl = p.image?.sourceUrl || undefined;
-
-                  return <ProductCard key={p.id} product={p} />;
-                })}
+                {moreProducts.map((p) => (
+                  <ProductCard key={p.id} product={p} />
+                ))}
               </div>
             </section>
           )}
@@ -321,4 +323,67 @@ export default async function Home() {
       </main>
     );
   }
+}
+
+function HomeSkeleton() {
+  return (
+    <main className="home-page">
+      <div className="home-inner">
+        {/* HERO SKELETON */}
+        <section className="home-hero">
+          <div>
+            <div className="mb-4 h-16 w-16 animate-pulse rounded-full bg-slate-800/40" />
+
+            <div className="mb-2 h-4 w-24 animate-pulse rounded bg-slate-800/60" />
+
+            <div className="mb-3 h-8 w-64 max-w-full animate-pulse rounded bg-slate-800/70" />
+
+            <div className="mb-4 h-4 w-80 max-w-full animate-pulse rounded bg-slate-800/60" />
+
+            <div className="mt-6 flex gap-3">
+              <div className="h-10 w-40 animate-pulse rounded-full bg-slate-800/60" />
+              <div className="h-10 w-40 animate-pulse rounded-full bg-slate-800/40" />
+            </div>
+          </div>
+
+          <div className="home-hero-side">
+            <div className="h-24 w-full max-w-xs animate-pulse rounded-xl bg-slate-900/60" />
+          </div>
+        </section>
+
+        {/* FEATURED PRODUCTS SKELETON */}
+        <section className="home-section home-featured mt-6">
+          <div className="home-section-header mb-4">
+            <div>
+              <div className="mb-2 h-5 w-40 animate-pulse rounded bg-slate-800/60" />
+              <div className="h-4 w-64 max-w-full animate-pulse rounded bg-slate-800/40" />
+            </div>
+            <div className="home-section-actions">
+              <div className="h-8 w-28 animate-pulse rounded-full bg-slate-800/60" />
+            </div>
+          </div>
+
+          <div className="product-grid">
+            {Array.from({ length: 8 }).map((_, idx) => (
+              <div key={idx} className="product-card">
+                <div className="product-image animate-pulse rounded-lg bg-slate-800/40" />
+                <div className="mt-2 space-y-2">
+                  <div className="h-4 w-3/4 animate-pulse rounded bg-slate-800/60" />
+                  <div className="h-4 w-1/3 animate-pulse rounded bg-slate-800/60" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      </div>
+    </main>
+  );
+}
+
+export default function Home() {
+  return (
+    <Suspense fallback={<HomeSkeleton />}>
+      <HomeContent />
+    </Suspense>
+  );
 }

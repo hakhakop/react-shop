@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect, useRef, MouseEvent } from "react";
+import { motion } from "framer-motion";
+const MotionDiv = motion.div;
 import Link from "next/link";
 import type { CategoryTreeItem } from "../lib/categories";
 
@@ -75,13 +77,16 @@ export default function CategoryBar({
         const rootCount = countsBySlug[root.slug] ?? 0;
 
         return (
-          <div
+          <MotionDiv
             key={root.id}
             className={
               "category-pill-wrapper" +
               (hasChildren ? " has-children" : "") +
               (isOpen ? " is-open" : "")
             }
+            whileHover={{ y: -2, scale: 1.02 }}
+            whileTap={{ scale: 0.97 }}
+            transition={{ type: "spring", stiffness: 260, damping: 18 }}
           >
             <Link
               href={`/category/${root.slug}`}
@@ -112,7 +117,7 @@ export default function CategoryBar({
                 </div>
               </div>
             )}
-          </div>
+          </MotionDiv>
         );
       })}
     </div>

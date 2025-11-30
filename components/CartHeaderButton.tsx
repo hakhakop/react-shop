@@ -1,22 +1,15 @@
 "use client";
 
-import { useState } from "react";
-import Link from "next/link";
 import { useCart } from "./CartProvider";
-import MiniCart from "./MiniCart";
 
 export default function CartHeaderButton() {
-  const { totalCount } = useCart();
-  const [open, setOpen] = useState(false);
-
-  const toggle = () => setOpen((v) => !v);
-  const close = () => setOpen(false);
+  const { totalCount, openMiniCart } = useCart();
 
   return (
     <div className="cart-header-wrapper">
       <button
         type="button"
-        onClick={toggle}
+        onClick={openMiniCart}
         className="cart-header-button"
       >
         <span className="cart-header-icon">🛒</span>
@@ -25,8 +18,6 @@ export default function CartHeaderButton() {
           <span className="cart-header-count">{totalCount}</span>
         )}
       </button>
-
-      <MiniCart open={open} onClose={close} />
     </div>
   );
 }

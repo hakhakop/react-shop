@@ -5,31 +5,34 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect } from "react";
 
-type MiniCartProps = {
-  open: boolean;
-  onClose: () => void;
-};
-
-export default function MiniCart({ open, onClose }: MiniCartProps) {
-  const { items, totalAmount, updateItemQty, removeItem, clearCart } = useCart();
+export default function MiniCart() {
+  const {
+    items,
+    totalAmount,
+    updateItemQty,
+    removeItem,
+    clearCart,
+    isMiniCartOpen,
+    closeMiniCart,
+  } = useCart();
 
   // Prevent background scroll when mini cart is open Haua1 and Hawai new 11 11
   useEffect(() => {
-    if (!open) return;
+    if (!isMiniCartOpen) return;
     const original = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     return () => {
       document.body.style.overflow = original;
     };
-  }, [open]);
+  }, [isMiniCartOpen]);
 
-  if (!open) return null;
+  if (!isMiniCartOpen) return null;
 
   const hasItems = items.length > 0;
 
   return (
     <div className="mini-cart-overlay" role="dialog" aria-modal="true">
-      <div className="mini-cart-backdrop" onClick={onClose} />
+      <div className="mini-cart-backdrop" onClick={closeMiniCart} />
 
       <div className="mini-cart-panel">
         {/* Header */}
@@ -47,7 +50,7 @@ export default function MiniCart({ open, onClose }: MiniCartProps) {
           <button
             type="button"
             className="mini-cart-close"
-            onClick={onClose}
+            onClick={closeMiniCart}
             aria-label="Close mini cart"
           >
             ×
@@ -62,7 +65,7 @@ export default function MiniCart({ open, onClose }: MiniCartProps) {
               <button
                 type="button"
                 className="mini-cart-empty-button"
-                onClick={onClose}
+                onClick={closeMiniCart}
               >
                 Continue shopping
               </button>
@@ -93,7 +96,7 @@ export default function MiniCart({ open, onClose }: MiniCartProps) {
                     <Link
                       href={`/product/${item.slug}`}
                       className="mini-cart-item-name"
-                      onClick={onClose}
+                      onClick={closeMiniCart}
                     >
                       {item.name}
                     </Link>
@@ -157,14 +160,14 @@ export default function MiniCart({ open, onClose }: MiniCartProps) {
               <Link
                 href="/cart"
                 className="mini-cart-button secondary"
-                onClick={onClose}
+                onClick={closeMiniCart}
               >
                 View cart
               </Link>
               <Link
                 href="/checkout"
                 className="mini-cart-button primary"
-                onClick={onClose}
+                onClick={closeMiniCart}
               >
                 Checkout
               </Link>

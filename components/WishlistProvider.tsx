@@ -5,17 +5,17 @@ import {
   useContext,
   useEffect,
   useState,
-  ReactNode,
+  type ReactNode,
 } from "react";
 
 export type WishlistItem = {
   id: string;
   slug: string;
   name: string;
-  imageUrl?: string | null;
+  imageUrl?: string;
 };
 
-type WishlistContextType = {
+export type WishlistContextType = {
   items: WishlistItem[];
   toggleItem: (item: WishlistItem) => void;
   removeItem: (id: string) => void;
@@ -28,47 +28,46 @@ const WishlistContext = createContext<WishlistContextType | undefined>(
   undefined
 );
 
-const STORAGE_KEY = "wc-store-wishlist";
-
-function loadInitialWishlist(): WishlistItem[] {
-  if (typeof window === "undefined") return [];
-  try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (!raw) return [];
-    const parsed = JSON.parse(raw);
-    if (!Array.isArray(parsed)) return [];
-    return parsed;
-  } catch {
-    return [];
-  }
-}
-
-function saveWishlist(items: WishlistItem[]) {
-  if (typeof window === "undefined") return;
-  try {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
-  } catch {
-    // ignore
-  }
-}
+const STORAGE_KEY = "wishlist";
 
 export function WishlistProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<WishlistItem[]>([]);
 
+  // Load from localStorage on mount
   useEffect(() => {
-    setItems(loadInitialWishlist());
+    if (typeof window === "undefined") return;
+    try {
+      const raw = window.localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) {
+          setItems(parsed);
+        }
+      }
+    } catch (error) {
+      console.error("Failed to load wishlist from localStorage", error);
+    }
   }, []);
 
+  // Persist to localStorage whenever items change
   useEffect(() => {
-    saveWishlist(items);
+    if (typeof window === "undefined") return;
+    try {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+    } catch (error) {
+      console.error("Failed to save wishlist to localStorage", error);
+    }
   }, [items]);
+
+  const isInWishlist = (id: string) => items.some((item) => item.id === id);
 
   const toggleItem = (item: WishlistItem) => {
     setItems((prev) => {
-      const exists = prev.some((p) => p.id === item.id);
-      if (exists) {
+      if (prev.some((p) => p.id === item.id)) {
+        // remove
         return prev.filter((p) => p.id !== item.id);
       }
+      // add
       return [...prev, item];
     });
   };
@@ -77,12 +76,9 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
     setItems((prev) => prev.filter((p) => p.id !== id));
   };
 
-  const clearWishlist = () => setItems([]);
-
-  const isInWishlist = (id: string) =>
-    items.some((p) => p.id === id);
-
-  const totalCount = items.length;
+  const clearWishlist = () => {
+    setItems([]);
+  };
 
   const value: WishlistContextType = {
     items,
@@ -90,7 +86,7 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
     removeItem,
     clearWishlist,
     isInWishlist,
-    totalCount,
+    totalCount: items.length,
   };
 
   return (
@@ -103,7 +99,7 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
 export function useWishlist(): WishlistContextType {
   const ctx = useContext(WishlistContext);
   if (!ctx) {
-    throw new Error("useWishlist must be used inside WishlistProvider");
+    throw new Error("useWishlist must be used within a WishlistProvider");
   }
   return ctx;
 }

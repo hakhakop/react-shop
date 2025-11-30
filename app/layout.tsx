@@ -1,9 +1,6 @@
-// app/layout.tsx
-
 import type { Metadata } from "next";
 import "./globals.css";
 
-import Link from "next/link";
 import {
   getProductCategories,
   ProductCategory,
@@ -14,8 +11,13 @@ import { CartProvider } from "../components/CartProvider";
 import { ToastProvider } from "../components/ToastProvider";
 import { ThemeProvider } from "../components/ThemeProvider";
 import { WishlistProvider } from "../components/WishlistProvider";
+import MiniCart from "../components/MiniCart";
 import HeaderShell from "../components/HeaderShell";
 import CategoryBar from "../components/CategoryBar";
+import SearchProvider from "../components/SearchProvider";
+import RecentlyViewedProvider from "../components/RecentlyViewedProvider";
+import FloatingCartSummary from "../components/FloatingCartSummary";
+import ScrollToTopButton from "../components/ScrollToTopButton";
 
 export const metadata: Metadata = {
   title: "Webpages Store",
@@ -169,8 +171,6 @@ export default async function RootLayout({
     settings.disable_image_padding === 1 ||
     settings.disable_image_padding === "1";
 
-  // Prefer ACF select (contain / cover / fill / etc),
-  // fall back to the old tick logic if empty.
   const productImageObjectFit = normalizeObjectFit(
     settings.product_image_fit ??
       settings.product_image_object_fit ??
@@ -212,34 +212,40 @@ export default async function RootLayout({
           <ToastProvider>
             <CartProvider>
               <WishlistProvider>
-                {/* Header controlled by Theme Settings */}
-                <HeaderShell />
+                <SearchProvider>
+                   <RecentlyViewedProvider>
+                  <HeaderShell />
 
-                {/* Category bar under the header */}
-                {categoryTree.length > 0 && (
-                  <CategoryBar
-                    categoryTree={categoryTree}
-                    countsBySlug={countsBySlugObj}
-                  />
-                )}
+                  {categoryTree.length > 0 && (
+                    <CategoryBar
+                      categoryTree={categoryTree}
+                      countsBySlug={countsBySlugObj}
+                    />
+                  )}
 
-                {/* Main content */}
-                <main className="site-main">{children}</main>
+                  <main className="site-main">{children}</main>
 
-                {/* Footer */}
-                <footer className="site-footer">
-                  <div className="site-footer-inner">
-                    <span>
-                      © 2025 Webpages · Headless WooCommerce demo
-                    </span>
-                    <span>
-                      Powered by{" "}
-                      <span className="site-footer-strong">
-                        WordPress · WooCommerce · WPGraphQL · Next.js
+                  {/* Scroll to top + Floating cart bubble */}
+                    <ScrollToTopButton />
+                  {/* Floating cart bubble */}
+                    <FloatingCartSummary />
+                  <MiniCart />
+
+                  <footer className="site-footer">
+                    <div className="site-footer-inner">
+                      <span>
+                        © 2025 Webpages · Headless WooCommerce demo
                       </span>
-                    </span>
-                  </div>
-                </footer>
+                      <span>
+                        Powered by{" "}
+                          <span className="site-footer-strong">
+                            WordPress · WooCommerce · WPGraphQL · Next.js
+                          </span>
+                      </span>
+                    </div>
+                  </footer>
+                  </RecentlyViewedProvider>
+                </SearchProvider>
               </WishlistProvider>
             </CartProvider>
           </ToastProvider>

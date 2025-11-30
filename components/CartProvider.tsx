@@ -25,6 +25,10 @@ type CartContextType = {
   updateItemQty: (id: string, qty: number) => void;
   totalCount: number;
   totalAmount: number;
+  isMiniCartOpen: boolean;
+  openMiniCart: () => void;
+  closeMiniCart: () => void;
+  toggleMiniCart: () => void;
 };
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -55,6 +59,7 @@ function saveCart(items: CartItem[]) {
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
+  const [isMiniCartOpen, setIsMiniCartOpen] = useState(false);
 
   // Load from localStorage once on mount
   useEffect(() => {
@@ -66,6 +71,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
     saveCart(items);
   }, [items]);
 
+  const openMiniCart = () => setIsMiniCartOpen(true);
+  const closeMiniCart = () => setIsMiniCartOpen(false);
+  const toggleMiniCart = () => setIsMiniCartOpen((prev) => !prev);
+
   const addItem = (item: Omit<CartItem, "qty">, qty: number = 1) => {
     setItems((prev) => {
       const existing = prev.find((p) => p.id === item.id);
@@ -76,6 +85,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
       }
       return [...prev, { ...item, qty }];
     });
+
+    // Automatically open the MiniCart whenever an item is added
+    openMiniCart();
   };
 
   const removeItem = (id: string) => {
@@ -104,6 +116,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
     updateItemQty,
     totalCount,
     totalAmount,
+    isMiniCartOpen,
+    openMiniCart,
+    closeMiniCart,
+    toggleMiniCart,
   };
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

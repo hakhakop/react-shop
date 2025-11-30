@@ -1,6 +1,9 @@
+import { Suspense } from "react";
 import { getProducts } from "@/lib/products";
 import CategoryWithFilters from "@/components/CategoryWithFilters";
 import Breadcrumbs from "@/components/Breadcrumbs";
+import RecentlyViewedStrip from "@/components/RecentlyViewedStrip";
+
 
 export const metadata = {
   title: "Shop – All Products",
@@ -8,9 +11,30 @@ export const metadata = {
     "Browse all products in our store. Filter by category, attributes and price to quickly find what you need.",
 };
 
-export default async function ShopPage() {
+async function ShopProductsSection() {
   const products = await getProducts();
+  return <CategoryWithFilters products={products} />;
+}
 
+function ShopProductsSkeleton() {
+  return (
+    <div className="mt-4">
+      <div className="product-grid">
+        {Array.from({ length: 12 }).map((_, idx) => (
+          <div key={idx} className="product-card">
+            <div className="product-image animate-pulse rounded-lg bg-slate-800/40" />
+            <div className="mt-2 space-y-2">
+              <div className="h-4 w-3/4 animate-pulse rounded bg-slate-800/60" />
+              <div className="h-4 w-1/3 animate-pulse rounded bg-slate-800/60" />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export default function ShopPage() {
   return (
     <main className="page">
       <Breadcrumbs
@@ -25,8 +49,15 @@ export default async function ShopPage() {
         Explore all products in one place. Use filters on the left to narrow
         down by category, attributes and price.
       </p>
+      <div className="mt-2 mb-3 flex justify-end">
+  
+</div>
+      {/* Recently Viewed Strip */}
+      <RecentlyViewedStrip />
 
-      <CategoryWithFilters products={products} />
+      <Suspense fallback={<ShopProductsSkeleton />}>
+        <ShopProductsSection />
+      </Suspense>
     </main>
   );
 }

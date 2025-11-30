@@ -78,6 +78,17 @@ export default function CategoryWithFilters({ products }: Props) {
   const [currentPage, setCurrentPage] = useState(1);
   const PAGE_SIZE = 12;
 
+  const [viewMode, setViewMode] = useState<"default" | "compact" | "list">(
+    "default"
+  );
+
+  const gridStyle =
+    viewMode === "compact"
+      ? { gridTemplateColumns: "repeat(2, minmax(0, 1fr))" }
+      : viewMode === "list"
+      ? { gridTemplateColumns: "minmax(0, 1fr)" }
+      : undefined;
+
   const attributeFacets: AttributeFacet[] = useMemo(() => {
     const map: Record<string, { label: string; optionSet: Set<string> }> = {};
 
@@ -516,7 +527,75 @@ export default function CategoryWithFilters({ products }: Props) {
           </div>
         ) : (
           <>
-            <div className="product-grid">
+            <div
+              style={{
+                marginBottom: "8px",
+                display: "flex",
+                justifyContent: "flex-end",
+                gap: "6px",
+                fontSize: "12px",
+              }}
+            >
+              <button
+                type="button"
+                onClick={() => setViewMode("default")}
+                style={{
+                  padding: "4px 8px",
+                  borderRadius: 999,
+                  border:
+                    viewMode === "default"
+                      ? "1px solid rgba(148,163,184,0.9)"
+                      : "1px solid rgba(148,163,184,0.4)",
+                  background:
+                    viewMode === "default"
+                      ? "rgba(248,250,252,0.95)"
+                      : "transparent",
+                  cursor: "pointer",
+                }}
+              >
+                Comfort
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode("compact")}
+                style={{
+                  padding: "4px 8px",
+                  borderRadius: 999,
+                  border:
+                    viewMode === "compact"
+                      ? "1px solid rgba(148,163,184,0.9)"
+                      : "1px solid rgba(148,163,184,0.4)",
+                  background:
+                    viewMode === "compact"
+                      ? "rgba(248,250,252,0.95)"
+                      : "transparent",
+                  cursor: "pointer",
+                }}
+              >
+                2-wide
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode("list")}
+                style={{
+                  padding: "4px 8px",
+                  borderRadius: 999,
+                  border:
+                    viewMode === "list"
+                      ? "1px solid rgba(148,163,184,0.9)"
+                      : "1px solid rgba(148,163,184,0.4)",
+                  background:
+                    viewMode === "list"
+                      ? "rgba(248,250,252,0.95)"
+                      : "transparent",
+                  cursor: "pointer",
+                }}
+              >
+                List
+              </button>
+            </div>
+
+            <div className="product-grid" style={gridStyle}>
               {paginatedProducts.map((p) => {
                 const priceNumber = toNumberPrice(p.price);
                 const imageUrl = p.image?.sourceUrl || undefined;
@@ -534,7 +613,25 @@ export default function CategoryWithFilters({ products }: Props) {
                     : [];
 
                 return (
-                  <div key={p.id} className="product-card">
+                  <div
+                    key={p.id}
+                    className="product-card"
+                    style={
+                      viewMode === "list"
+                        ? {
+                            width: "100%",
+                            maxWidth: "100%",
+                            boxSizing: "border-box",
+                            display: "flex",
+                            gap: 16,
+                            borderRadius: "10px",
+                            background: "#f8fafc",
+                            padding: "10px 12px",
+                            margin: "0 0 12px 0",
+                          }
+                        : undefined
+                    }
+                  >
                     <div className="product-card-top-right">
                       <WishlistToggle
                         id={p.id}
@@ -547,12 +644,42 @@ export default function CategoryWithFilters({ products }: Props) {
                     <Link
                       href={`/product/${p.slug}`}
                       className="product-card-link"
+                      style={
+                        viewMode === "list"
+                          ? {
+                              display: "flex",
+                              alignItems: "flex-start",
+                              gap: 16,
+                            }
+                          : undefined
+                      }
                     >
-                      <div className="product-image">
+                      <div
+                        className="product-image"
+                        style={
+                          viewMode === "list"
+                            ? {
+                                margin: 0,
+                                width: 130,
+                                height: 130,
+                                flexShrink: 0,
+                              }
+                            : undefined
+                        }
+                      >
                         {p.image?.sourceUrl ? (
                           <img
                             src={p.image.sourceUrl}
                             alt={p.image.altText || p.name}
+                            style={
+                              viewMode === "list"
+                                ? {
+                                    width: "100%",
+                                    height: "100%",
+                                    objectFit: "contain",
+                                  }
+                                : undefined
+                            }
                           />
                         ) : (
                           <div className="product-image-placeholder">
@@ -561,49 +688,53 @@ export default function CategoryWithFilters({ products }: Props) {
                         )}
                       </div>
 
-                      <h2 className="product-title product-title-2lines">
-                        {p.name}
-                      </h2>
+                      <div className="product-main">
+                        <h2 className="product-title product-title-2lines">
+                          {p.name}
+                        </h2>
 
-                      {attributes.length > 0 && (
-                        <div className="product-attributes-row">
-                          {attributes.map((attr: any) => {
-                            const key =
-                              (attr?.name ?? attr?.label ?? "").toString() || "attr";
-                            const label =
-                              (attr?.label ?? attr?.name ?? "").toString();
-                            const values = Array.isArray(attr?.options)
-                              ? attr.options
-                                  .map((v: any) => (v != null ? String(v).trim() : ""))
-                                  .filter((v: string) => v.length > 0)
-                              : [];
+                        {attributes.length > 0 && (
+                          <div className="product-attributes-row">
+                            {attributes.map((attr: any) => {
+                              const key =
+                                (attr?.name ?? attr?.label ?? "").toString() || "attr";
+                              const label =
+                                (attr?.label ?? attr?.name ?? "").toString();
+                              const values = Array.isArray(attr?.options)
+                                ? attr.options
+                                    .map((v: any) =>
+                                      v != null ? String(v).trim() : ""
+                                    )
+                                    .filter((v: string) => v.length > 0)
+                                : [];
 
-                            if (!label || values.length === 0) {
-                              return null;
-                            }
+                              if (!label || values.length === 0) {
+                                return null;
+                              }
 
-                            return (
-                              <div
-                                key={key}
-                                className="product-attribute-badge"
-                              >
-                                <span className="product-attribute-label">
-                                  {label}:
-                                </span>
-                                <span className="product-attribute-values">
-                                  {values.join(", ")}
-                                </span>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      )}
+                              return (
+                                <div
+                                  key={key}
+                                  className="product-attribute-badge"
+                                >
+                                  <span className="product-attribute-label">
+                                    {label}:
+                                  </span>
+                                  <span className="product-attribute-values">
+                                    {values.join(", ")}
+                                  </span>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
 
-                      {priceNumber > 0 && !Number.isNaN(priceNumber) && (
-                        <div className="product-price">
-                          {formattedPrice} ֏
-                        </div>
-                      )}
+                        {priceNumber > 0 && !Number.isNaN(priceNumber) && (
+                          <div className="product-price">
+                            {formattedPrice} ֏
+                          </div>
+                        )}
+                      </div>
                     </Link>
                   </div>
                 );

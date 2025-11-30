@@ -411,3 +411,11 @@
   gap: 0.75rem;
   font-size: 0.9rem;
 }
+
+/* Header action icons: no link underline / border */
+.site-header-actions a,
+.site-header-actions a:hover,
+.site-header-actions a:focus {
+  text-decoration: none;
+  border-bottom: none;
+}

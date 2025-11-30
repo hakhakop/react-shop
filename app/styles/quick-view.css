@@ -1,0 +1,143 @@
+/* === Quick View Overlay === */
+
+.quick-view-backdrop {
+  position: fixed;
+  inset: 0; /* top:0; right:0; bottom:0; left:0 */
+  background: rgba(15, 23, 42, 0.65); /* slate/black with transparency */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 50; /* above header & cards */
+}
+
+/* Modal panel */
+.quick-view-modal {
+  background: rgba(15, 23, 42, 0.98);
+  border-radius: 18px;
+  padding: 18px 20px 20px;
+  max-width: 720px;
+  width: min(720px, 100% - 32px);
+  box-shadow:
+    0 22px 45px rgba(15, 23, 42, 0.55),
+    0 0 0 1px rgba(148, 163, 184, 0.25);
+  color: #e5e7eb;
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  gap: 18px;
+}
+
+/* Let the grid live on the modal, content uses display: contents */
+.quick-view-content {
+  display: contents;
+}
+
+/* Image side */
+.quick-view-image img {
+  width: 100%;
+  height: auto;
+  border-radius: 14px;
+  object-fit: var(--product-image-object-fit, contain);
+  background: #020617;
+}
+
+/* Text / details side */
+.quick-view-details {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.quick-view-title {
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.quick-view-price {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.quick-view-actions {
+  margin-top: 12px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* Close button */
+.quick-view-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  border: none;
+  background: rgba(15, 23, 42, 0.85);
+  color: #e5e7eb;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    background 0.15s ease,
+    transform 0.12s ease;
+}
+
+.quick-view-close:hover {
+  background: rgba(30, 64, 175, 0.9);
+  transform: translateY(-1px);
+}
+
+/* Button under card */
+.product-card-footer {
+  margin-top: 8px;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.product-quick-view-button {
+  font-size: 0.8rem;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.6);
+  background: rgba(15, 23, 42, 0.7);
+  color: #e5e7eb;
+  cursor: pointer;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.product-quick-view-button:hover {
+  background: rgba(30, 64, 175, 0.95);
+  border-color: rgba(191, 219, 254, 0.9);
+  transform: translateY(-1px);
+  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.45);
+}
+
+/* Mobile-friendly: stack into one column */
+@media (max-width: 640px) {
+  .quick-view-modal {
+    grid-template-columns: minmax(0, 1fr);
+    max-width: 100%;
+    width: calc(100% - 24px);
+    padding: 14px 14px 16px;
+  }
+
+  .quick-view-close {
+    top: 8px;
+    right: 8px;
+  }
+}

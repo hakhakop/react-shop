@@ -16,13 +16,21 @@ type ThemeContextType = {
 };
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
-
 const STORAGE_KEY = "wc-store-theme";
+
+function applyThemeToDocument(theme: Theme) {
+  const root = document.documentElement;
+  root.dataset.theme = theme;
+  if (theme === "dark") {
+    root.classList.add("dark");
+  } else {
+    root.classList.remove("dark");
+  }
+}
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setTheme] = useState<Theme>("light");
 
-  // Initialize from localStorage or system preference
   useEffect(() => {
     if (typeof window === "undefined") return;
 
@@ -39,23 +47,12 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         : "light";
 
     setTheme(initial);
-    document.documentElement.dataset.theme = initial;
-    if (initial === "dark") {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
+    applyThemeToDocument(initial);
   }, []);
 
-  // Keep document + storage in sync when theme changes
   useEffect(() => {
     if (typeof window === "undefined") return;
-    document.documentElement.dataset.theme = theme;
-    if (theme === "dark") {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
+    applyThemeToDocument(theme);
     window.localStorage.setItem(STORAGE_KEY, theme);
   }, [theme]);
 

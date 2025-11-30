@@ -1,14 +1,16 @@
 "use client";
 
-import { MouseEvent } from "react";
+import type { MouseEvent } from "react";
+import { useEffect, useState } from "react";
 import { useWishlist } from "./WishlistProvider";
 import { useToast } from "./ToastProvider";
+import { SiteIcon } from "@/components/ui/SiteIcon";
 
-type Props = {
+type WishlistToggleProps = {
   id: string;
   slug: string;
   name: string;
-  imageUrl?: string | null;
+  imageUrl?: string;
 };
 
 export default function WishlistToggle({
@@ -16,39 +18,56 @@ export default function WishlistToggle({
   slug,
   name,
   imageUrl,
-}: Props) {
+}: WishlistToggleProps) {
   const { isInWishlist, toggleItem } = useWishlist();
   const { showToast } = useToast();
 
+  // active if this product is currently in wishlist
   const active = isInWishlist(id);
 
-  const handleClick = (e: MouseEvent<HTMLButtonElement>) => {
-    // prevent card/link navigation
-    e.preventDefault();
-    e.stopPropagation();
+  // local flag for "just added" heartbeat animation
+  const [justAdded, setJustAdded] = useState(false);
 
-    toggleItem({ id, slug, name, imageUrl });
+  useEffect(() => {
+    if (active) {
+      setJustAdded(true);
+      const timer = setTimeout(() => {
+        setJustAdded(false);
+      }, 320); // length of heartbeat animation
+      return () => clearTimeout(timer);
+    }
+  }, [active]);
+
+  function handleClick(event: MouseEvent<HTMLButtonElement>) {
+    event.preventDefault();
+
+    // use the real API from WishlistProvider
+    toggleItem({
+      id,
+      slug,
+      name,
+      imageUrl,
+    });
 
     if (active) {
-      showToast(`Removed “${name}” from wishlist`);
+      showToast(`Removed ${name} from wishlist.`);
     } else {
-      showToast(`Added “${name}” to wishlist`);
+      showToast(`Added ${name} to wishlist.`);
     }
-  };
+  }
+
+  const baseClass = "icon-ghost wishlist-toggle-icon";
+  const activeClass = active ? " wishlist-toggle-icon-active" : "";
+  const pulseClass = justAdded ? " wishlist-toggle-just-added" : "";
 
   return (
     <button
       type="button"
-      className={
-        "wishlist-toggle-btn" +
-        (active ? " wishlist-toggle-btn-active" : "")
-      }
       onClick={handleClick}
+      className={baseClass + activeClass + pulseClass}
       aria-label={active ? "Remove from wishlist" : "Add to wishlist"}
     >
-      <span className="wishlist-heart">
-        {active ? "♥" : "♡"}
-      </span>
+      <SiteIcon name="heart" className="wishlist-heart-icon" />
     </button>
   );
 }

@@ -1,11 +1,10 @@
-// wc-store/app/product/[slug]/page.tsx
-
 import Link from "next/link";
 import { graphqlFetch } from "../../../lib/graphql";
 import AddToCartButton from "../../../components/AddToCartButton";
 import Breadcrumbs from "../../../components/Breadcrumbs";
 import ProductGallery from "../../../components/ProductGallery";
 import WishlistToggle from "../../../components/WishlistToggle";
+import { ProductRecentlyViewedTracker } from "@/components/RecentlyViewedProvider";
 
 type WPImage = {
   sourceUrl: string;
@@ -129,7 +128,17 @@ export default async function ProductPage({
   }
 
   const p = data.product;
-  const priceNumber = p.price ? parseFloat(p.price) : null;
+
+const priceNumber = p.price ? parseFloat(p.price) : null;
+
+const priceFormatted =
+  priceNumber !== null && !Number.isNaN(priceNumber)
+    ? priceNumber.toLocaleString("hy-AM", {
+        style: "currency",
+        currency: "AMD",
+        maximumFractionDigits: 0,
+      })
+    : null;
 
   const images: WPImage[] = [];
   const galleryNodes = p.galleryImages?.nodes ?? [];
@@ -148,6 +157,14 @@ export default async function ProductPage({
 
   return (
     <main className="product-page">
+      <ProductRecentlyViewedTracker
+  id={p.id}
+  slug={p.slug}
+  name={p.name}
+  thumbnailUrl={p.image?.sourceUrl}
+  price={priceFormatted}
+/>
+
       <Breadcrumbs
         items={[
           { label: "Home", href: "/" },

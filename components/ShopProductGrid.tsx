@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { motion, AnimatePresence } from "framer-motion";
 import WishlistToggle from "./WishlistToggle";
 import AddToCartButton from "./AddToCartButton";
 import type { ProductNode } from "../lib/products";
@@ -19,6 +20,7 @@ function toNumberPrice(price: string | null | undefined): number | null {
 
 export function ShopProductGrid({ products }: Props) {
   const [visibleCount, setVisibleCount] = useState(12);
+  const [quickViewProduct, setQuickViewProduct] = useState<ProductNode | null>(null);
 
   const visibleProducts = products.slice(0, visibleCount);
   const hasMore = visibleCount < products.length;
@@ -80,7 +82,15 @@ export function ShopProductGrid({ products }: Props) {
                 )}
               </Link>
 
-              <div className="product-add-to-cart">
+              <div className="product-card-actions">
+                <button
+                  type="button"
+                  className="product-quick-view-button"
+                  onClick={() => setQuickViewProduct(p)}
+                >
+                  Quick view
+                </button>
+
                 <AddToCartButton
                   id={p.id}
                   slug={p.slug}
@@ -105,6 +115,109 @@ export function ShopProductGrid({ products }: Props) {
           </button>
         </div>
       )}
+
+      <AnimatePresence>
+        {quickViewProduct && (
+          <motion.div
+            className="quick-view-backdrop"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.18 }}
+            onClick={() => setQuickViewProduct(null)}
+          >
+            <motion.div
+              className="quick-view-modal"
+              initial={{ opacity: 0, scale: 0.95, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 10 }}
+              transition={{ type: "spring", stiffness: 260, damping: 20 }}
+              onClick={(event) => event.stopPropagation()}
+            >
+              {(() => {
+                const qp = quickViewProduct;
+                const qpPriceNumber = toNumberPrice(qp.price);
+                const qpImageUrl = qp.image?.sourceUrl || null;
+                const qpAttributes = qp.attributes?.nodes ?? [];
+
+                const qpFormattedPrice =
+                  qpPriceNumber !== null
+                    ? qpPriceNumber.toLocaleString("en-US", {
+                        maximumFractionDigits: 0,
+                      })
+                    : "";
+
+                return (
+                  <>
+                    <button
+                      type="button"
+                      className="quick-view-close"
+                      onClick={() => setQuickViewProduct(null)}
+                    >
+                      ×
+                    </button>
+
+                    <div className="quick-view-content">
+                      <div className="quick-view-image">
+                        {qpImageUrl ? (
+                          <img
+                            src={qpImageUrl}
+                            alt={qp.image?.altText || qp.name}
+                          />
+                        ) : (
+                          <div className="product-image-placeholder">
+                            No image
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="quick-view-details">
+                        <h2 className="quick-view-title">{qp.name}</h2>
+
+                        {qpPriceNumber !== null && (
+                          <div className="quick-view-price">
+                            {qpFormattedPrice} ֏
+                          </div>
+                        )}
+
+                        {qpAttributes.length > 0 && (
+                          <div className="quick-view-attributes">
+                            {qpAttributes.slice(0, 4).map((attr) => (
+                              <span
+                                key={attr.name}
+                                className="product-attr-pill"
+                              >
+                                {attr.options?.join(", ") || attr.name}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+
+                        <div className="quick-view-actions">
+                          <AddToCartButton
+                            id={qp.id}
+                            slug={qp.slug}
+                            name={qp.name}
+                            priceNumber={qpPriceNumber}
+                            imageUrl={qpImageUrl}
+                          />
+                          <Link
+                            href={`/product/${qp.slug}`}
+                            className="quick-view-full-link"
+                            onClick={() => setQuickViewProduct(null)}
+                          >
+                            View full product
+                          </Link>
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                );
+              })()}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 }

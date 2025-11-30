@@ -1,14 +1,24 @@
 "use client";
 
 import { useTheme } from "@/components/ThemeProvider";
-import { AppIconButton } from "@/components/ui/AppIconButton";
+import { SiteIconButton } from "@/components/ui/SiteIconButton";
 
-export default function ThemeToggle() {
+type ThemeToggleProps = {
+  variant?: "muted" | "ghost" | "solid" | "icon";
+  size?: "sm" | "md" | "lg";
+};
+
+export default function ThemeToggle({
+  variant = "muted",
+  size = "md",
+}: ThemeToggleProps) {
   const { theme, toggleTheme } = useTheme();
 
   return (
-    <AppIconButton
-      icon={theme === "dark" ? "🌙" : "☀️"}
+    <SiteIconButton
+      icon={theme === "dark" ? "moon" : "sun"}
+      variant={variant}
+      size={size}
       onClick={toggleTheme}
       aria-label="Toggle dark mode"
     />

@@ -2,37 +2,45 @@ import React from "react";
 import Link from "next/link";
 import Image from "next/image";
 
-import { getThemeSettings } from "../lib/themeSettings";
-import { getMainMenuItems, MenuItem } from "../lib/navigation";
+import {
+  getThemeSettings,
+  extractHeaderSettings,
+  type HeaderSettings,
+} from "../lib/themeSettings";
+import { getMainMenuItems, type MenuItem } from "../lib/navigation";
 import HeaderActions from "./HeaderActions";
 import CategoryMegaMenu from "./CategoryMegaMenu";
 import HeaderNav from "./HeaderNav";
-
+import HeaderFrame from "./HeaderFrame";
 function asString(value: unknown, fallback: string | null = null): string | null {
   if (typeof value === "string" && value.trim() !== "") return value.trim();
   return fallback;
 }
 
 export default async function HeaderShell() {
-  // Theme settings + WP "Main" menu
+  // Load theme settings and main menu in parallel
   const [settingsRaw, menuItemsRaw] = await Promise.all([
     getThemeSettings(),
     getMainMenuItems(),
   ]);
 
-  const settings = settingsRaw as Record<string, any>;
+  const settings = (settingsRaw || {}) as Record<string, any>;
 
-  // ----- COLORS -----
-  const primaryColor =
-    asString(settings.primary_color, "#111827") || "#111827";
-  const accentColor =
-    asString(settings.accent_color, "#ec4899") || "#ec4899";
+  const headerSettings: HeaderSettings = settings.headerSettings
+    ? (settings.headerSettings as HeaderSettings)
+    : extractHeaderSettings(settings);
 
-  // ----- LOGO -----
+  const headerIconOrder = headerSettings.iconOrder;
+  const headerIconVariant = headerSettings.iconVariant;
+  const headerLogoMaxWidth = headerSettings.logoMaxWidth;
+
+  // Colors
+  const primaryColor = asString(settings.primary_color, "#111827") || "#111827";
+  const accentColor = asString(settings.accent_color, "#ec4899") || "#ec4899";
+
+  // Logo resolution: accept URL string or ACF image object
   const logoField =
-    settings.logo ||
-    settings.site_logo ||
-    settings.store_logo;
+    settings.logo || settings.site_logo || settings.store_logo;
 
   let logoUrl: string | null = null;
   if (typeof logoField === "string") {
@@ -46,9 +54,7 @@ export default async function HeaderShell() {
       null;
   }
 
-  // ----- BRAND NAME (OPTIONAL) -----
-  // Try to read a name from ACF / general settings.
-  // If nothing is present, we simply skip the text completely.
+  // Brand name (optional)
   const brandName =
     asString(
       settings.brand_name ||
@@ -58,25 +64,19 @@ export default async function HeaderShell() {
       null
     );
 
-  // ----- TOP BAR CONTENT (OPTIONAL) -----
+  // Top bar content (optional)
   const topBarText = asString(
     settings.top_bar_text,
     "Fast support & setup by Webpages"
   );
-
-  const supportPhone = asString(
-    settings.support_phone,
-    "+374 xx xx xx"
-  );
-
+  const supportPhone = asString(settings.support_phone, "+374 xx xx xx");
   const currencyLabel = asString(settings.currency_label, "AMD ֏");
 
-  // ----- HEADER LAYOUT: ACF field "layout" -----
-  // Field values: simple / centered / split
-  const layoutValue = (asString(settings.layout, "centered") || "centered").toLowerCase();
+  // Header layout from ACF `layout` field: simple / centered / split
+  const layoutValue =
+    (asString(settings.layout, "centered") || "centered").toLowerCase();
 
   let layout: "simple" | "two-row" | "hero";
-
   switch (layoutValue) {
     case "simple":
       layout = "simple";
@@ -90,7 +90,7 @@ export default async function HeaderShell() {
       break;
   }
 
-  // ----- MENU -----
+  // Menu items (from WPGraphQL) with fallback
   const menuItems = (Array.isArray(menuItemsRaw)
     ? (menuItemsRaw as MenuItem[])
     : []) as MenuItem[];
@@ -117,19 +117,33 @@ export default async function HeaderShell() {
     </div>
   );
 
-  // ----- RENDER -----
-  return (
-    <header
-      className="site-header"
-      style={{
-        borderBottomColor: accentColor,
-      }}
-    >
+  const renderLogoAndBrand = () => (
+    <div className="site-header-logo-wrap">
+      {logoUrl && (
+        <Link href="/" className="site-header-logo-img-wrap">
+          <Image
+            src={logoUrl}
+            alt={brandName || "Store logo"}
+            width={headerLogoMaxWidth}
+            height={headerLogoMaxWidth}
+            style={{ objectFit: "contain" }}
+          />
+        </Link>
+      )}
+
+      {brandName && (
+        <Link href="/" className="site-header-brand">
+          <span style={{ color: primaryColor }}>{brandName}</span>
+        </Link>
+      )}
+    </div>
+  );
+
+   return (
+    <HeaderFrame accentColor={accentColor}>
       {/* LAYOUT 2: TWO-ROW (ACF = centered) */}
       {layout === "two-row" && (
         <>
-          {/* Top bar – now driven by settings, can be "turned off"
-              by emptying text in WP later if you want */}
           {(topBarText || supportPhone || currencyLabel) && (
             <div className="site-header-top">
               <div className="site-header-top-inner">
@@ -144,28 +158,9 @@ export default async function HeaderShell() {
             </div>
           )}
 
-          {/* Main bar */}
           <div className="site-header-main">
             <div className="site-header-main-inner">
-              <div className="site-header-logo-wrap">
-                {logoUrl && (
-                  <Link href="/" className="site-header-logo-img-wrap">
-                    <Image
-                      src={logoUrl}
-                      alt={brandName || "Store logo"}
-                      width={40}
-                      height={40}
-                      style={{ objectFit: "contain" }}
-                    />
-                  </Link>
-                )}
-
-                {brandName && (
-                  <Link href="/" className="site-header-brand">
-                    <span style={{ color: primaryColor }}>{brandName}</span>
-                  </Link>
-                )}
-              </div>
+              {renderLogoAndBrand()}
 
               <div className="site-header-main-center">
                 <HeaderNav items={itemsToRender} />
@@ -173,7 +168,10 @@ export default async function HeaderShell() {
               </div>
 
               <div className="site-header-main-right">
-                <HeaderActions />
+                <HeaderActions
+                  icons={headerIconOrder}
+                  iconVariant={headerIconVariant}
+                />
               </div>
             </div>
           </div>
@@ -184,25 +182,7 @@ export default async function HeaderShell() {
       {layout === "simple" && (
         <div className="site-header-main">
           <div className="site-header-main-inner">
-            <div className="site-header-logo-wrap">
-              {logoUrl && (
-                <Link href="/" className="site-header-logo-img-wrap">
-                  <Image
-                    src={logoUrl}
-                    alt={brandName || "Store logo"}
-                    width={40}
-                    height={40}
-                    style={{ objectFit: "contain" }}
-                  />
-                </Link>
-              )}
-
-              {brandName && (
-                <Link href="/" className="site-header-brand">
-                  <span style={{ color: primaryColor }}>{brandName}</span>
-                </Link>
-              )}
-            </div>
+            {renderLogoAndBrand()}
 
             <div className="site-header-main-center">
               <HeaderNav items={itemsToRender} />
@@ -210,7 +190,10 @@ export default async function HeaderShell() {
             </div>
 
             <div className="site-header-main-right">
-              <HeaderActions />
+              <HeaderActions
+                icons={headerIconOrder}
+                iconVariant={headerIconVariant}
+              />
             </div>
           </div>
         </div>
@@ -225,8 +208,8 @@ export default async function HeaderShell() {
                 <Image
                   src={logoUrl}
                   alt={brandName || "Store logo"}
-                  width={56}
-                  height={56}
+                  width={headerLogoMaxWidth}
+                  height={headerLogoMaxWidth}
                   style={{ objectFit: "contain" }}
                 />
               </div>
@@ -248,11 +231,14 @@ export default async function HeaderShell() {
             </div>
 
             <div className="site-header-hero-actions">
-              <HeaderActions />
+              <HeaderActions
+                icons={headerIconOrder}
+                iconVariant={headerIconVariant}
+              />
             </div>
           </div>
         </div>
       )}
-    </header>
+    </HeaderFrame>
   );
 }

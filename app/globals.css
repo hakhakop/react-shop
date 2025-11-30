@@ -7,6 +7,7 @@
 @import "./styles/wishlist.css";
 @import "./styles/home.css";
 @import "./styles/product-carousel.css";
+@import "./styles/quick-view.css";
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -23,7 +24,7 @@ body {
   padding: 0;
   margin: 0;
 }
-
+ß
 body {
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
     sans-serif;
@@ -1132,3 +1133,4 @@ a {
     @apply bg-background text-foreground;
   }
 }
+
