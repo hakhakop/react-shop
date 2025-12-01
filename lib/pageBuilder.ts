@@ -5,7 +5,9 @@
 
 export type PageBuilderBlock =
   | HeroLayoutBlock
-  | ProductGridLayoutBlock;
+  | ProductGridLayoutBlock
+  | PromoStripLayoutBlock
+  | BadgeGridLayoutBlock;
 
 // ---- HERO BLOCK ----
 export interface HeroLayoutBlock {
@@ -38,6 +40,32 @@ export interface ProductGridLayoutBlock {
       slug?: string | null;
     }[] | null;
   } | null;
+}
+
+// ---- PROMO STRIP ----
+export interface PromoStripLayoutBlock {
+  __typename: "PageBuilderLayoutPageBuilderPromoStripLayout";
+  fieldGroupName: string;
+  psText?: string | null;
+  psSubtext?: string | null;
+  psCtaLabel?: string | null;
+  psCtaUrl?: string | null;
+  psVariant?: string | null; // e.g. "default" | "accent" | "soft"
+}
+
+// ---- BADGE GRID (Perks-style cards) ----
+export interface BadgeGridLayoutBlock {
+  __typename: "PageBuilderLayoutPageBuilderBadgeGridLayoutLayout";
+  fieldGroupName: string;
+  bgColumnsDesktop?: number | string | null;
+  bgItems?:
+    | {
+        bgId?: string | null;
+        bgLabel?: string | null;
+        bgTitle?: string | null;
+        bgBody?: string | null;
+      }[]
+    | null;
 }
 
 // ---- ROOT WRAPPER ----

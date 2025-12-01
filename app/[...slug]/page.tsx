@@ -79,6 +79,24 @@ export default async function WPPage({
                 }
               }
             }
+
+            ... on PageBuilderLayoutPageBuilderPromoStripLayout {
+              psText
+              psSubtext
+              psCtaLabel
+              psCtaUrl
+              psVariant
+            }
+
+            ... on PageBuilderLayoutPageBuilderBadgeGridLayoutLayout {
+              bgColumnsDesktop: columnsOnDesktop
+              bgItems: bgitems {
+                bgId: bgid
+                bgLabel: bglabel
+                bgTitle: bgtitle
+                bgBody: bgbody
+              }
+            }
           }
         }
       }
