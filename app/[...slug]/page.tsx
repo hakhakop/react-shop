@@ -47,61 +47,155 @@ export default async function WPPage({
       : `/${slugSegments.join("/")}/`;
 
   // Fetch page by URI from WordPress via GraphQL
-  const data = await graphqlFetch<PageByUriResult>(`
-    query {
-      pageBy(uri: "${uri}") {
-        title
-        uri
-        content
-        pageBuilderLayout {
-          pageBuilder {
-            __typename
-            fieldGroupName
+  let data: PageByUriResult;
 
-            ... on PageBuilderLayoutPageBuilderHeroLayout {
-              primaryButtonLink {
-                url
-                title
-                target
-              }
-            }
+  try {
+    // Preferred query: assumes ACF-based section settings are exposed to WPGraphQL
+    data = await graphqlFetch<PageByUriResult>(`
+      query {
+        pageBy(uri: "${uri}") {
+          title
+          uri
+          content
+          pageBuilderLayout {
+            pageBuilder {
+              __typename
+              fieldGroupName
 
-            ... on PageBuilderLayoutPageBuilderProductGridLayout {
-              cardPreset
-              gridLimit
-              source
-              layoutVariant
-              category {
-                nodes {
-                  databaseId
-                  name
-                  slug
+              ... on PageBuilderLayoutPageBuilderHeroLayout {
+                sectionBackground
+                sectionTopSpacing
+                sectionBottomSpacing
+
+                primaryButtonLink {
+                  url
+                  title
+                  target
                 }
               }
-            }
 
-            ... on PageBuilderLayoutPageBuilderPromoStripLayout {
-              psText
-              psSubtext
-              psCtaLabel
-              psCtaUrl
-              psVariant
-            }
+              ... on PageBuilderLayoutPageBuilderProductGridLayout {
+                sectionSettings {
+                  sectionBackground
+                  sectionTopSpacing
+                  sectionBottomSpacing
+                }
 
-            ... on PageBuilderLayoutPageBuilderBadgeGridLayoutLayout {
-              bgColumnsDesktop: columnsOnDesktop
-              bgItems: bgitems {
-                bgId: bgid
-                bgLabel: bglabel
-                bgTitle: bgtitle
-                bgBody: bgbody
+                cardPreset
+                gridLimit
+                source
+                layoutVariant
+                category {
+                  nodes {
+                    databaseId
+                    name
+                    slug
+                  }
+                }
+              }
+
+              ... on PageBuilderLayoutPageBuilderPromoStripLayout {
+                sectionBackground
+                sectionTopSpacing
+                sectionBottomSpacing
+
+                psText
+                psSubtext
+                psCtaLabel
+                psCtaUrl
+                psVariant
+              }
+
+              ... on PageBuilderLayoutPageBuilderBadgeGridLayoutLayout {
+                bgColumnsDesktop: columnsOnDesktop
+                bgItems: bgitems {
+                  bgId: bgid
+                  bgLabel: bglabel
+                  bgTitle: bgtitle
+                  bgBody: bgbody
+                }
               }
             }
           }
         }
       }
+    `);
+  } catch (error: any) {
+    const message = error instanceof Error ? error.message : String(error);
+
+    // Fallback: if ACF section fields are not present in the schema yet,
+    // re-run a simpler query without sectionBackground/sectionTopSpacing/sectionBottomSpacing.
+    if (
+      message.includes('Cannot query field "sectionBackground"') ||
+      message.includes("sectionTopSpacing") ||
+      message.includes("sectionBottomSpacing")
+    ) {
+      data = await graphqlFetch<PageByUriResult>(`
+        query {
+          pageBy(uri: "${uri}") {
+            title
+            uri
+            content
+            pageBuilderLayout {
+              pageBuilder {
+                __typename
+                fieldGroupName
+
+                ... on PageBuilderLayoutPageBuilderHeroLayout {
+                  primaryButtonLink {
+                    url
+                    title
+                    target
+                  }
+                }
+
+                ... on PageBuilderLayoutPageBuilderProductGridLayout {
+                  sectionSettings {
+                    sectionBackground
+                    sectionTopSpacing
+                    sectionBottomSpacing
+                  }
+
+                  cardPreset
+                  gridLimit
+                  source
+                  layoutVariant
+                  category {
+                    nodes {
+                      databaseId
+                      name
+                      slug
+                    }
+                  }
+                }
+
+                ... on PageBuilderLayoutPageBuilderPromoStripLayout {
+                  psText
+                  psSubtext
+                  psCtaLabel
+                  psCtaUrl
+                  psVariant
+                }
+
+                ... on PageBuilderLayoutPageBuilderBadgeGridLayoutLayout {
+                  bgColumnsDesktop: columnsOnDesktop
+                  bgItems: bgitems {
+                    bgId: bgid
+                    bgLabel: bglabel
+                    bgTitle: bgtitle
+                    bgBody: bgbody
+                  }
+                }
+              }
+            }
+          }
+        }
+      `);
+    } else {
+      // If it's some other GraphQL error, rethrow so we see it.
+      throw error;
     }
-  `);
+  }
 
   const page = data.pageBy;
 

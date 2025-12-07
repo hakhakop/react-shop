@@ -1,5 +1,3 @@
-// components/blocks/ProductGridBlock.tsx
-
 import { ProductGridLayoutBlock } from "../../lib/pageBuilder";
 import ProductCard from "../ProductCard";
 import { getProductsForGrid } from "../../lib/products";
@@ -84,7 +82,7 @@ export default async function ProductGridBlock({
 console.log("BLOCK layoutVariant:", block.layoutVariant);
 console.log("Computed layoutVariant:", layoutVariant);
   return (
-    <section className="pb-product-grid">
+    <div className="pb-product-grid">
       <h2 className="pb-grid-title">Product Grid ({preset})</h2>
 
       {layoutVariant === "carousel" ? (
@@ -96,6 +94,6 @@ console.log("Computed layoutVariant:", layoutVariant);
           ))}
         </div>
       )}
-    </section>
+    </div>
   );
 }

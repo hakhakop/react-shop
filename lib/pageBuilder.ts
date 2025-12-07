@@ -2,7 +2,12 @@
 //
 // Central type mapper for ACF flexible content “Page Builder”
 // -----------------------------------------------------------
-
+// lib/pageBuilder.ts
+type SectionSettings = {
+  sectionBackground?: string | null;
+  sectionTopSpacing?: string | null;
+  sectionBottomSpacing?: string | null;
+};
 export type PageBuilderBlock =
   | HeroLayoutBlock
   | ProductGridLayoutBlock
@@ -12,11 +17,11 @@ export type PageBuilderBlock =
 // ---- HERO BLOCK ----
 export interface HeroLayoutBlock {
   __typename: "PageBuilderLayoutPageBuilderHeroLayout";
-  fieldGroupName: string;
+   fieldGroupName?: string | null;
   primaryButtonLink?: {
-    url: string;
-    title: string;
-    target?: string;
+    url?: string | null;
+    title?: string | null;
+    target?: string | null;
   } | null;
 }
 

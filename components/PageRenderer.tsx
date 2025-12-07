@@ -1,14 +1,18 @@
-import {
-  PageBuilderBlock,
-  HeroLayoutBlock,
-  ProductGridLayoutBlock,
-  PromoStripLayoutBlock,
-  BadgeGridLayoutBlock,
-} from "../lib/pageBuilder";
+// components/PageRenderer.tsx
+import { Container } from "./layout/Container";
+import { PageSection } from "./layout/PageSection";
 
 import HeroBlock from "./blocks/HeroBlock";
 import ProductGridBlock from "./blocks/ProductGridBlock";
 import { HomePerksGrid, Perk } from "./HomePerks";
+
+import {
+  HeroLayoutBlock,
+  ProductGridLayoutBlock,
+  PromoStripLayoutBlock,
+  BadgeGridLayoutBlock,
+  PageBuilderBlock,
+} from "../lib/pageBuilder";
 
 function mapBadgeGridToPerks(block: BadgeGridLayoutBlock): Perk[] {
   return (block.bgItems ?? []).map((item, index) => ({
@@ -20,21 +24,13 @@ function mapBadgeGridToPerks(block: BadgeGridLayoutBlock): Perk[] {
 }
 
 function coerceColumnsDesktop(
-  value?: number | string | (number | string)[] | null
+  value?: number | string | null
 ): 2 | 3 | 4 | undefined {
-  let raw: number | string | undefined;
-
-  if (Array.isArray(value)) {
-    raw = value[0];
-  } else {
-    raw = value ?? undefined;
-  }
-
   const n =
-    typeof raw === "string"
-      ? parseInt(raw, 10)
-      : typeof raw === "number"
-      ? raw
+    typeof value === "string"
+      ? parseInt(value, 10)
+      : typeof value === "number"
+      ? value
       : undefined;
 
   return n === 2 || n === 3 || n === 4 ? (n as 2 | 3 | 4) : undefined;
@@ -80,6 +76,15 @@ function PromoStripBlockView({ block }: { block: PromoStripLayoutBlock }) {
   );
 }
 
+function pickFirstString(value: unknown): string | undefined {
+  if (Array.isArray(value)) {
+    const first = value[0];
+    return typeof first === "string" ? first : undefined;
+  }
+
+  return typeof value === "string" ? value : undefined;
+}
+
 export default async function PageRenderer({
   blocks,
 }: {
@@ -88,52 +93,116 @@ export default async function PageRenderer({
   return (
     <>
       {blocks.map((block, i) => {
-        if (
-          (block as PageBuilderBlock).__typename ===
-          "PageBuilderLayoutPageBuilderBadgeGridLayoutLayout"
-        ) {
-          console.log(
-            "[BadgeGrid] bgColumnsDesktop =",
-            (block as any).bgColumnsDesktop
-          );
-        }
+        const typename = block.__typename;
 
-        switch (block.__typename) {
+        const raw = block as any;
+
+        const sectionBackground = pickFirstString(
+          raw.sectionBackground ??
+            raw.sectionbackground ??
+            raw.sectionSettings?.sectionBackground ??
+            raw.sectionSettings?.sectionbackground
+        );
+
+        const sectionTopSpacing = pickFirstString(
+          raw.sectionTopSpacing ??
+            raw.sectiontopspacing ??
+            raw.sectionSettings?.sectionTopSpacing ??
+            raw.sectionSettings?.sectiontopspacing
+        );
+
+        const sectionBottomSpacing = pickFirstString(
+          raw.sectionBottomSpacing ??
+            raw.sectionbottomspacing ??
+            raw.sectionSettings?.sectionBottomSpacing ??
+            raw.sectionSettings?.sectionbottomspacing
+        );
+
+        console.log("[PageRenderer] block1", {
+          index: i,
+          typename,
+          sectionBackground,
+          sectionTopSpacing,
+          sectionBottomSpacing,
+          rawSectionSettings: raw.sectionSettings,
+        });
+
+        switch (typename) {
           case "PageBuilderLayoutPageBuilderHeroLayout":
-            return <HeroBlock key={i} block={block as HeroLayoutBlock} />;
+            return (
+              <PageSection
+                key={i}
+                backgroundVariant={sectionBackground}
+                topSpacing={sectionTopSpacing || (i === 0 ? "large" : "medium")}
+                bottomSpacing={sectionBottomSpacing}
+              >
+                <Container size="wide">
+                  <HeroBlock block={block as HeroLayoutBlock} />
+                </Container>
+              </PageSection>
+            );
 
           case "PageBuilderLayoutPageBuilderProductGridLayout":
             return (
-              <ProductGridBlock
+              <PageSection
                 key={i}
-                block={block as ProductGridLayoutBlock}
-              />
+                backgroundVariant={sectionBackground || "soft"}
+                topSpacing={sectionTopSpacing}
+                bottomSpacing={sectionBottomSpacing || "large"}
+              >
+                <Container size="wide">
+                  <ProductGridBlock block={block as ProductGridLayoutBlock} />
+                </Container>
+              </PageSection>
             );
 
           case "PageBuilderLayoutPageBuilderPromoStripLayout":
             return (
-              <PromoStripBlockView
+              <PageSection
                 key={i}
-                block={block as PromoStripLayoutBlock}
-              />
+                backgroundVariant={sectionBackground || "primary"}
+                topSpacing={sectionTopSpacing || "small"}
+                bottomSpacing={sectionBottomSpacing || "small"}
+              >
+                <Container size="default">
+                  <PromoStripBlockView block={block as PromoStripLayoutBlock} />
+                </Container>
+              </PageSection>
             );
 
           case "PageBuilderLayoutPageBuilderBadgeGridLayoutLayout":
             return (
-              <HomePerksGrid
+              <PageSection
                 key={i}
-                items={mapBadgeGridToPerks(block as BadgeGridLayoutBlock)}
-                columnsDesktop={coerceColumnsDesktop(
-                  (block as BadgeGridLayoutBlock).bgColumnsDesktop
-                )}
-              />
+                backgroundVariant={sectionBackground || "default"}
+                topSpacing={sectionTopSpacing || "medium"}
+                bottomSpacing={sectionBottomSpacing || "large"}
+              >
+                <Container size="default">
+                  <HomePerksGrid
+                    items={mapBadgeGridToPerks(block as BadgeGridLayoutBlock)}
+                    columnsDesktop={coerceColumnsDesktop(
+                      (block as BadgeGridLayoutBlock).bgColumnsDesktop
+                    )}
+                  />
+                </Container>
+              </PageSection>
             );
 
           default:
             return (
-              <div key={i} style={{ padding: 20, opacity: 0.4 }}>
-                Unknown block: {(block as PageBuilderBlock).__typename}
-              </div>
+              <PageSection
+                key={i}
+                backgroundVariant={sectionBackground || "default"}
+                topSpacing={sectionTopSpacing || "medium"}
+                bottomSpacing={sectionBottomSpacing || "medium"}
+              >
+                <Container size="default">
+                  <div className="opacity-50 text-sm">
+                    Unknown block: {typename}
+                  </div>
+                </Container>
+              </PageSection>
             );
         }
       })}
