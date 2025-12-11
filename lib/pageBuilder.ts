@@ -3,21 +3,23 @@
 // Central type mapper for ACF flexible content “Page Builder”
 // -----------------------------------------------------------
 // lib/pageBuilder.ts
-type SectionSettings = {
+export interface SectionSettings {
   sectionBackground?: string | null;
   sectionTopSpacing?: string | null;
   sectionBottomSpacing?: string | null;
-};
+}
+
 export type PageBuilderBlock =
   | HeroLayoutBlock
   | ProductGridLayoutBlock
   | PromoStripLayoutBlock
-  | BadgeGridLayoutBlock;
+  | BadgeGridLayoutBlock
+  | CarouselLayoutBlock;
 
 // ---- HERO BLOCK ----
-export interface HeroLayoutBlock {
+export interface HeroLayoutBlock extends SectionSettings {
   __typename: "PageBuilderLayoutPageBuilderHeroLayout";
-   fieldGroupName?: string | null;
+  fieldGroupName?: string | null;
   primaryButtonLink?: {
     url?: string | null;
     title?: string | null;
@@ -26,7 +28,7 @@ export interface HeroLayoutBlock {
 }
 
 // ---- PRODUCT GRID ----
-export interface ProductGridLayoutBlock {
+export interface ProductGridLayoutBlock extends SectionSettings {
   __typename: "PageBuilderLayoutPageBuilderProductGridLayout";
   fieldGroupName: string;
   cardPreset?: string[] | null;
@@ -48,7 +50,7 @@ export interface ProductGridLayoutBlock {
 }
 
 // ---- PROMO STRIP ----
-export interface PromoStripLayoutBlock {
+export interface PromoStripLayoutBlock extends SectionSettings {
   __typename: "PageBuilderLayoutPageBuilderPromoStripLayout";
   fieldGroupName: string;
   psText?: string | null;
@@ -59,7 +61,7 @@ export interface PromoStripLayoutBlock {
 }
 
 // ---- BADGE GRID (Perks-style cards) ----
-export interface BadgeGridLayoutBlock {
+export interface BadgeGridLayoutBlock extends SectionSettings {
   __typename: "PageBuilderLayoutPageBuilderBadgeGridLayoutLayout";
   fieldGroupName: string;
   bgColumnsDesktop?: number | string | null;
@@ -71,6 +73,35 @@ export interface BadgeGridLayoutBlock {
         bgBody?: string | null;
       }[]
     | null;
+}
+
+// ---- CAROUSEL LAYOUT ----
+export interface CarouselLayoutBlock extends SectionSettings {
+  __typename: "PageBuilderLayoutPageBuilderCarouselLayoutLayout";
+  fieldGroupName: string;
+  slides?:
+    | {
+        slideId?: string | null;
+        image?: {
+          sourceUrl?: string | null;
+          altText?: string | null;
+        } | null;
+        title?: string | null;
+        subtitle?: string | null;
+        text?: string | null;
+        buttonLabel?: string | null;
+        buttonUrl?: string | null;
+        badge?: string | null;
+      }[]
+    | null;
+  carouselSettings?: {
+    variant?: string | null;
+    loop?: boolean | null;
+    autoplay?: boolean | null;
+    autoplayDelayMs?: number | null;
+    align?: string | null;
+    dragFree?: boolean | null;
+  } | null;
 }
 
 // ---- ROOT WRAPPER ----

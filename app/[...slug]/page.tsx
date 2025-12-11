@@ -115,6 +115,33 @@ export default async function WPPage({
                   bgBody: bgbody
                 }
               }
+
+              ... on PageBuilderLayoutPageBuilderCarouselLayoutLayout {
+                sectionSettings {
+                  sectionBackground
+                  sectionTopSpacing
+                  sectionBottomSpacing
+                }
+
+                carouselSettings: carouselsettings {
+                  variant
+                  loop
+                  autoplay
+                  autoplayDelayMs
+                  align
+                  dragFree
+                }
+
+                slides {
+                  slideId
+                  title
+                  subtitle
+                  text
+                  buttonLabel
+                  buttonUrl
+                  badge
+                }
+              }
             }
           }
         }
@@ -186,6 +213,39 @@ export default async function WPPage({
                     bgBody: bgbody
                   }
                 }
+
+              ... on PageBuilderLayoutPageBuilderCarouselLayoutLayout {
+                sectionSettings {
+                  sectionBackground
+                  sectionTopSpacing
+                  sectionBottomSpacing
+                }
+
+                carouselSettings: carouselsettings {
+                  variant
+                  loop
+                  autoplay
+                  autoplayDelayMs
+                  align
+                  dragFree
+                }
+
+                slides {
+                  slideId
+                  image {
+                    node {
+                      sourceUrl
+                      altText
+                    }
+                  }
+                  title
+                  subtitle
+                  text
+                  buttonLabel
+                  buttonUrl
+                  badge
+                }
+              }
               }
             }
           }

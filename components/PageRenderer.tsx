@@ -4,6 +4,7 @@ import { PageSection } from "./layout/PageSection";
 
 import HeroBlock from "./blocks/HeroBlock";
 import ProductGridBlock from "./blocks/ProductGridBlock";
+import CarouselBlock from "./blocks/CarouselBlock";
 import { HomePerksGrid, Perk } from "./HomePerks";
 
 import {
@@ -11,6 +12,7 @@ import {
   ProductGridLayoutBlock,
   PromoStripLayoutBlock,
   BadgeGridLayoutBlock,
+  CarouselLayoutBlock,
   PageBuilderBlock,
 } from "../lib/pageBuilder";
 
@@ -170,6 +172,7 @@ export default async function PageRenderer({
               </PageSection>
             );
 
+            
           case "PageBuilderLayoutPageBuilderBadgeGridLayoutLayout":
             return (
               <PageSection
@@ -188,6 +191,59 @@ export default async function PageRenderer({
                 </Container>
               </PageSection>
             );
+
+          case "PageBuilderLayoutPageBuilderCarouselLayoutLayout": {
+            console.log("[PageRenderer] CAROUSEL BLOCK RAW", block);
+
+            const rawCarousel = block as any;
+            console.log("[PageRenderer] rawCarousel", rawCarousel);
+
+            const slides = (rawCarousel.slides || []).map((s: any, idx: number) => ({
+              id: s.slideId || String(idx),
+              imageUrl: s.image?.node?.sourceUrl || "",
+              imageAlt: s.image?.node?.altText || null,
+              title: s.title,
+              subtitle: s.subtitle,
+              text: s.text,
+              buttonLabel: s.buttonLabel,
+              buttonUrl: s.buttonUrl,
+              badge: s.badge,
+            }));
+            console.log("[PageRenderer] slides after mapping", slides);
+
+            const settings = rawCarousel.carouselSettings
+              ? {
+                  variant: rawCarousel.carouselSettings.variant || "basic",
+                  loop: rawCarousel.carouselSettings.loop ?? true,
+                  autoplay: rawCarousel.carouselSettings.autoplay ?? true,
+                  autoplayDelayMs:
+                    rawCarousel.carouselSettings.autoplayDelayMs ?? 5000,
+                  align:
+                    rawCarousel.carouselSettings.align === "center"
+                      ? ("center" as const)
+                      : ("start" as const),
+                  dragFree: rawCarousel.carouselSettings.dragFree ?? false,
+                }
+              : undefined;
+            console.log("[PageRenderer] carousel settings", settings);
+
+            return (
+              <PageSection
+                key={i}
+                backgroundVariant={sectionBackground}
+                topSpacing={sectionTopSpacing}
+                bottomSpacing={sectionBottomSpacing}
+              >
+                <Container size="wide">
+                  <CarouselBlock
+                    block={block as CarouselLayoutBlock}
+                    slides={slides}
+                    settings={settings}
+                  />
+                </Container>
+              </PageSection>
+            );
+          }
 
           default:
             return (
