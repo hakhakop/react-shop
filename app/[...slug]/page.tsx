@@ -130,6 +130,7 @@ export default async function WPPage({
                   autoplayDelayMs
                   align
                   dragFree
+                  cardsPerView
                 }
 
                 slides {
@@ -228,6 +229,7 @@ export default async function WPPage({
                   autoplayDelayMs
                   align
                   dragFree
+                  cardsPerView
                 }
 
                 slides {

@@ -24,6 +24,8 @@ export type CarouselSettings = {
   autoplayDelayMs?: number;
   align?: "center" | "start";
   dragFree?: boolean;
+  /** Optional: how many cards should be visible in one viewport on desktop */
+  cardsPerView?: number | null;
 };
 
 type CarouselBlockProps = {
@@ -46,22 +48,41 @@ export default function CarouselBlock({
       </div>
     );
   }
-
+console.log("[CarouselBlock] settings", settings);
   // Normalize variant: ACF/GraphQL may give us ["basic"] instead of "basic"
   const normalizedVariant =
     Array.isArray(settings?.variant)
       ? settings.variant[0] ?? "basic"
       : settings?.variant ?? "basic";
 
+  // Normalize cards-per-view, defaulting to 1 and clamping to [1, 4]
+  const rawCardsPerView = settings?.cardsPerView ?? 1;
+  const cardsPerView = Math.min(Math.max(Number(rawCardsPerView) || 1, 1), 4);
+
+  // Decide item width classes based on desired cardsPerView (desktop)
+  const itemWidthClasses = (() => {
+    switch (cardsPerView) {
+      case 2:
+        return "flex-[0_0_100%] md:flex-[0_0_50%]";
+      case 3:
+        return "flex-[0_0_100%] md:flex-[0_0_33.3333%]";
+      case 4:
+        return "flex-[0_0_100%] md:flex-[0_0_25%]";
+      case 1:
+      default:
+        return "flex-[0_0_100%] md:flex-[0_0_100%]";
+    }
+  })();
+
   const options = {
-    // Only loop if we actually have more than one slide
-    loop: slides.length > 1 && (settings?.loop ?? true),
+    // Only loop if we actually have more than one viewport worth of slides
+    loop: slides.length > cardsPerView && (settings?.loop ?? true),
     align: settings?.align ?? "center",
     dragFree: settings?.dragFree ?? false,
   };
 
-  // Only autoplay if there is more than one slide
-  const autoplay = slides.length > 1 && (settings?.autoplay ?? true);
+  // Only autoplay if there is more than one viewport worth of slides
+  const autoplay = slides.length > cardsPerView && (settings?.autoplay ?? true);
 
   // Clamp autoplay delay so it never becomes "crazy fast"
   const rawDelay = settings?.autoplayDelayMs ?? 5000;
@@ -127,7 +148,7 @@ export default function CarouselBlock({
           return (
             <div
               key={slide.id}
-              className="min-w-0 flex-[0_0_100%] md:flex-[0_0_100%] px-2 md:px-4"
+              className={`min-w-0 ${itemWidthClasses} px-2 md:px-4`}
             >
               <div className={`${baseCardClasses} ${variantCardClasses}`}>
                 {normalizedVariant === "overlay" && slide.imageUrl ? (

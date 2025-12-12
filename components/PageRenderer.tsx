@@ -211,18 +211,35 @@ export default async function PageRenderer({
             }));
             console.log("[PageRenderer] slides after mapping", slides);
 
-            const settings = rawCarousel.carouselSettings
+            const rawSettings =
+              rawCarousel.carouselSettings ?? rawCarousel.carouselsettings;
+
+            const settings = rawSettings
               ? {
-                  variant: rawCarousel.carouselSettings.variant || "basic",
-                  loop: rawCarousel.carouselSettings.loop ?? true,
-                  autoplay: rawCarousel.carouselSettings.autoplay ?? true,
-                  autoplayDelayMs:
-                    rawCarousel.carouselSettings.autoplayDelayMs ?? 5000,
+                  // ACF may give variant as a string or array, we just forward it
+                  variant: rawSettings.variant ?? "basic",
+                  loop: rawSettings.loop ?? true,
+                  autoplay: rawSettings.autoplay ?? true,
+                  autoplayDelayMs: rawSettings.autoplayDelayMs ?? 5000,
+                  // Align may also come as an array, normalize via pickFirstString
                   align:
-                    rawCarousel.carouselSettings.align === "center"
+                    pickFirstString(rawSettings.align) === "center"
                       ? ("center" as const)
                       : ("start" as const),
-                  dragFree: rawCarousel.carouselSettings.dragFree ?? false,
+                  dragFree: rawSettings.dragFree ?? false,
+                  // Cards-per-view can be string or number; normalize to number | null
+                  cardsPerView: (() => {
+                    const rawCards =
+                      rawSettings.cardsPerView ?? rawSettings.cardsperview;
+                    if (typeof rawCards === "string") {
+                      const parsed = parseInt(rawCards, 10);
+                      return Number.isNaN(parsed) ? null : parsed;
+                    }
+                    if (typeof rawCards === "number") {
+                      return rawCards;
+                    }
+                    return null;
+                  })(),
                 }
               : undefined;
             console.log("[PageRenderer] carousel settings", settings);
