@@ -1,5 +1,3 @@
-// components/blocks/CarouselBlock.tsx
-
 import React from "react";
 import Image from "next/image";
 import { EmblaCarousel } from "../ui/EmblaCarousel";
@@ -21,11 +19,14 @@ export type CarouselSettings = {
   variant?: string | string[]; // ACF may give an array
   loop?: boolean;
   autoplay?: boolean;
-  autoplayDelayMs?: number;
-  align?: "center" | "start";
+  autoplayDelayMs?: number | string;
+  align?: ("center" | "start") | string | string[];
   dragFree?: boolean;
   /** Optional: how many cards should be visible in one viewport on desktop */
   cardsPerView?: number | null;
+  showArrows?: boolean | "true" | "false" | 1 | 0 | null;
+  showDots?: boolean | "true" | "false" | 1 | 0 | null;
+  pauseOnHover?: boolean | "true" | "false" | 1 | 0 | null;
 };
 
 type CarouselBlockProps = {
@@ -55,6 +56,15 @@ console.log("[CarouselBlock] settings", settings);
       ? settings.variant[0] ?? "basic"
       : settings?.variant ?? "basic";
 
+  const normalizedAlign = (() => {
+    const raw = Array.isArray(settings?.align)
+      ? settings?.align?.[0]
+      : (settings?.align as any);
+
+    if (raw === "start" || raw === "center") return raw;
+    return "center";
+  })();
+
   // Normalize cards-per-view, defaulting to 1 and clamping to [1, 4]
   const rawCardsPerView = settings?.cardsPerView ?? 1;
   const cardsPerView = Math.min(Math.max(Number(rawCardsPerView) || 1, 1), 4);
@@ -77,7 +87,7 @@ console.log("[CarouselBlock] settings", settings);
   const options = {
     // Only loop if we actually have more than one viewport worth of slides
     loop: slides.length > cardsPerView && (settings?.loop ?? true),
-    align: settings?.align ?? "center",
+    align: normalizedAlign,
     dragFree: settings?.dragFree ?? false,
   };
 
@@ -85,8 +95,8 @@ console.log("[CarouselBlock] settings", settings);
   const autoplay = slides.length > cardsPerView && (settings?.autoplay ?? true);
 
   // Clamp autoplay delay so it never becomes "crazy fast"
-  const rawDelay = settings?.autoplayDelayMs ?? 5000;
-  const autoplayDelayMs = Math.min(Math.max(rawDelay, 2000), 30000);
+  const rawDelay = Number(settings?.autoplayDelayMs ?? 5000);
+  const autoplayDelayMs = Math.min(Math.max(rawDelay || 5000, 2000), 30000);
 
   return (
     <div className="relative w-full">
@@ -94,6 +104,9 @@ console.log("[CarouselBlock] settings", settings);
         options={options}
         autoplay={autoplay}
         autoplayDelayMs={autoplayDelayMs}
+        pauseOnHover={settings?.pauseOnHover}
+        showArrows={settings?.showArrows}
+        showDots={settings?.showDots}
         className="w-full"
       >
         {slides.map((slide) => {

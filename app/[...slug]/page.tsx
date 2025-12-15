@@ -131,6 +131,9 @@ export default async function WPPage({
                   align
                   dragFree
                   cardsPerView
+                  showArrows
+                  showDots
+                  pauseOnHover
                 }
 
                 slides {
@@ -230,6 +233,9 @@ export default async function WPPage({
                   align
                   dragFree
                   cardsPerView
+                  showArrows
+                  showDots
+                  pauseOnHover
                 }
 
                 slides {

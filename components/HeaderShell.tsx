@@ -76,13 +76,17 @@ export default async function HeaderShell() {
   const layoutValue =
     (asString(settings.layout, "centered") || "centered").toLowerCase();
 
-  let layout: "simple" | "two-row" | "hero";
+  let layout: "simple" | "two-row" | "hero" | "pill";
   switch (layoutValue) {
     case "simple":
       layout = "simple";
       break;
     case "split":
       layout = "hero";
+      break;
+    case "pill":
+    case "princity":
+      layout = "pill";
       break;
     case "centered":
     default:
@@ -140,7 +144,11 @@ export default async function HeaderShell() {
   );
 
    return (
-    <HeaderFrame accentColor={accentColor}>
+    <HeaderFrame
+      accentColor={accentColor}
+      mode={layout === "pill" ? "none" : "sticky"}
+      className={layout === "pill" ? "site-header--pill" : ""}
+    >
       {/* LAYOUT 2: TWO-ROW (ACF = centered) */}
       {layout === "two-row" && (
         <>
@@ -175,6 +183,102 @@ export default async function HeaderShell() {
               </div>
             </div>
           </div>
+        </>
+      )}
+
+      {/* LAYOUT 4: PILL ON SCROLL (ACF = pill / princity) */}
+      {layout === "pill" && (
+        <>
+          <div
+            id="site-header-pill"
+            data-scrolled="false"
+            className="w-full"
+            suppressHydrationWarning
+          >
+            {/* Top bar row only while at top */}
+            {(topBarText || supportPhone || currencyLabel) && (
+              <div className="site-header-top">
+                <div className="site-header-top-inner">
+                  <div className="site-header-top-left">
+                    {topBarText && <span>{topBarText}</span>}
+                  </div>
+                  <div className="site-header-top-right">
+                    {supportPhone && <span>Call: {supportPhone}</span>}
+                    {currencyLabel && <span>{currencyLabel}</span>}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Main bar: normal at top, becomes floating pill when scrolled */}
+            <div className="site-header-main site-header-pill-main">
+              <div className="site-header-main-inner site-header-pill-inner">
+                {renderLogoAndBrand()}
+
+                <div className="site-header-main-center">
+                  <HeaderNav items={itemsToRender} />
+                  {renderCategoriesMega()}
+                </div>
+
+                <div className="site-header-main-right">
+                  <HeaderActions
+                    icons={headerIconOrder}
+                    iconVariant={headerIconVariant}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Spacer only when pill is floating, so content doesn't jump under it */}
+            <div className="site-header-pill-spacer" />
+          </div>
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `(function () {
+  try {
+    var threshold = 24;
+
+    function getScrollY() {
+      return (
+        window.scrollY ||
+        window.pageYOffset ||
+        document.documentElement.scrollTop ||
+        document.body.scrollTop ||
+        0
+      );
+    }
+
+    function init(attempt) {
+      var el = document.getElementById('site-header-pill');
+      if (!el) {
+        if (attempt < 40) return setTimeout(function () { init(attempt + 1); }, 50);
+        return;
+      }
+
+      var ticking = false;
+      function update() {
+        ticking = false;
+        var scrolled = getScrollY() > threshold;
+        el.setAttribute('data-scrolled', scrolled ? 'true' : 'false');
+      }
+      function onScroll() {
+        if (ticking) return;
+        ticking = true;
+        window.requestAnimationFrame(update);
+      }
+
+      update();
+      window.addEventListener('scroll', onScroll, { passive: true });
+      window.addEventListener('resize', onScroll, { passive: true });
+    }
+
+    // Delay init to avoid mutating SSR HTML before React hydration
+    setTimeout(function () { init(0); }, 60);
+
+  } catch (e) {}
+})();`,
+            }}
+          />
         </>
       )}
 

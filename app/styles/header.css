@@ -8,6 +8,92 @@
   z-index: 20;
 }
 
+/* --- PILL ON SCROLL HEADER (layout = pill / princity) --- */
+
+/* When scrolled, the main bar becomes a floating wrapper */
+/* Main wrapper is fixed in BOTH states so we can animate `top` smoothly */
+#site-header-pill .site-header-pill-main {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 56px; /* sit under the topbar while at top */
+  z-index: 60;
+  background: transparent;
+  border-bottom: none;
+  transition: top 280ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Top state: show a normal full-width header bar (not boxed) */
+#site-header-pill[data-scrolled="false"] .site-header-pill-main {
+  background: rgba(255, 255, 255, 0.96);
+  border-bottom: 1px solid rgba(209, 213, 219, 0.7);
+}
+
+[data-theme="dark"] #site-header-pill[data-scrolled="false"] .site-header-pill-main {
+  background: rgba(15, 23, 42, 0.96);
+  border-bottom-color: rgba(51, 65, 85, 0.65);
+}
+
+/* Scrolled state: wrapper stays transparent; only the pill has background */
+#site-header-pill[data-scrolled="true"] .site-header-pill-main {
+  background: transparent;
+  border-bottom: none;
+}
+
+#site-header-pill[data-scrolled="true"] .site-header-pill-main {
+  top: 12px;
+}
+
+#site-header-pill[data-scrolled="false"] .site-header-pill-main {
+  top: 36px;
+}
+
+/* The pill itself */
+#site-header-pill .site-header-pill-inner {
+  width: min(1440px, calc(100% - 2rem));
+  margin: 0 auto;
+  padding: 1rem 2rem;
+  border-radius: 0;
+  border: 1px solid rgba(229, 231, 235, 0);
+  background: transparent; /* top state: bar background lives on the full-width wrapper */
+  backdrop-filter: none;
+  box-shadow: none;
+  gap: 2rem;
+}
+
+/* Scrolled = compact floating pill */
+#site-header-pill[data-scrolled="true"] .site-header-pill-inner {
+  width: fit-content;
+  padding: 0.1rem 0.9rem;
+  border-radius: 9999px;
+  border-color: rgba(229, 231, 235, 0.85);
+  background: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(16px);
+  box-shadow: 0 18px 48px rgba(15, 23, 42, 0.18);
+  gap: 1.25rem;
+}
+
+/* Slightly tighten nav links inside pill */
+#site-header-pill[data-scrolled="true"] .site-header-nav {
+  gap: 0.9rem;
+  font-size: 0.98rem;
+}
+
+/* Add spacing so content doesn't jump under the floating pill */
+.site-header-pill-spacer {
+  display: block;
+  height: 72px; /* reserve space for the header row while at top */
+  transition: height 280ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+#site-header-pill[data-scrolled="true"] .site-header-pill-spacer {
+  height: 64px; /* slightly tighter once it becomes a pill */
+}
+
+/* Dark theme pill */
+[data-theme="dark"] #site-header-pill[data-scrolled="true"] .site-header-pill-inner {
+  border-color: rgba(51, 65, 85, 0.75);
+  background: rgba(15, 23, 42, 0.72);
+}
 
 /* Dark theme header + toggle */
 
@@ -110,7 +196,7 @@
   position: absolute;
   left: 0;
   top: 100%;
-  z-index: 50;
+  z-index: 90; /* above the fixed pill header (z=60) */
 
   /* visual style */
   min-width: 560px;
@@ -129,6 +215,9 @@
     transform 160ms ease,
     visibility 0ms linear 160ms,
     box-shadow 160ms ease;
+}
+.site-header-categories-panel * {
+  position: relative;
 }
 
 /* when wrapper is hovered – open with a tiny delay */
@@ -177,6 +266,9 @@
 .site-header-top {
   background: #f9fafb;
   border-bottom: 1px solid #e5e7eb;
+  max-height: 56px;
+  overflow: hidden;
+  will-change: opacity, transform, max-height;
 }
 
 .site-header-top-inner {
@@ -418,4 +510,117 @@
 .site-header-actions a:focus {
   text-decoration: none;
   border-bottom: none;
+}
+
+/* --- PILL MODE: force-remove legacy header wrapper backgrounds --- */
+.site-header.site-header--pill {
+  background: transparent !important;
+  border-bottom: none !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+}
+
+/* While scrolled, ensure the full-width fixed container stays transparent */
+#site-header-pill[data-scrolled="true"] .site-header-pill-main,
+#site-header-pill[data-scrolled="true"] .site-header-pill-main.site-header-main {
+  background: transparent !important;
+  border-bottom: none !important;
+  box-shadow: none !important;
+}
+
+/* If your base styles add a background to the inner row, keep only the pill itself */
+#site-header-pill[data-scrolled="true"] .site-header-main-inner {
+  background: transparent;
+}
+
+.site-header-pill-inner {
+  transition:
+    background-color 280ms ease,
+    box-shadow 280ms ease,
+    transform 280ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 200ms ease,
+    padding 280ms ease,
+    border-radius 280ms ease,
+    border-color 280ms ease,
+    gap 280ms ease;
+}
+
+#site-header-pill[data-scrolled="true"] .site-header-pill-inner {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+#site-header-pill[data-scrolled="false"] .site-header-pill-inner {
+  transform: translateY(2px);
+  opacity: 0.98;
+}
+
+.site-header-top {
+  transition:
+    opacity 220ms ease,
+    transform 220ms ease,
+    max-height 280ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+#site-header-pill[data-scrolled="true"] .site-header-top {
+  opacity: 0;
+  transform: translateY(-6px);
+  max-height: 0;
+  pointer-events: none;
+}
+
+#site-header-pill[data-scrolled="false"] .site-header-top {
+  opacity: 1;
+  transform: translateY(0);
+  max-height: 36px;
+}
+
+.site-header-nav-link {
+  transition:
+    color 180ms ease,
+    background-color 180ms ease;
+}
+
+/* --- PILL + DARK MODE: ensure text/icons are light on dark pill background --- */
+
+/* Nav links */
+[data-theme="dark"] #site-header-pill .site-header-nav-link {
+  color: rgba(226, 232, 240, 0.88); /* slate-200 */
+}
+[data-theme="dark"] #site-header-pill .site-header-nav-link:hover {
+  color: rgba(248, 250, 252, 0.96); /* near-white */
+}
+[data-theme="dark"] #site-header-pill .site-header-nav-link.is-active,
+[data-theme="dark"] #site-header-pill .site-header-nav-link[aria-current="page"],
+[data-theme="dark"] #site-header-pill .site-header-nav-link[data-active="true"] {
+  color: rgba(248, 250, 252, 0.98);
+}
+
+/* Header action icons/buttons (cart, wishlist, search, theme toggle wrapper, etc.) */
+[data-theme="dark"] #site-header-pill .site-header-action-pill {
+  color: rgba(226, 232, 240, 0.92);
+}
+[data-theme="dark"] #site-header-pill .site-header-action-pill:hover {
+  color: rgba(248, 250, 252, 0.98);
+}
+
+/* Ensure SVGs follow currentColor in case some icons have hard-coded fills */
+[data-theme="dark"] #site-header-pill .site-header-action-pill svg,
+[data-theme="dark"] #site-header-pill .site-header-action-pill svg * {
+  fill: currentColor;
+  stroke: currentColor;
+}
+
+/* Categories burger toggle */
+[data-theme="dark"] #site-header-pill .site-header-categories-toggle {
+  color: rgba(226, 232, 240, 0.88);
+}
+[data-theme="dark"] #site-header-pill .site-header-categories-toggle:hover {
+  color: rgba(248, 250, 252, 0.98);
+}
+
+/* Optional: top bar text in dark pill layout */
+[data-theme="dark"] #site-header-pill .site-header-top,
+[data-theme="dark"] #site-header-pill .site-header-top-inner {
+  color: rgba(226, 232, 240, 0.82);
 }

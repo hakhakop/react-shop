@@ -222,10 +222,10 @@ export default async function PageRenderer({
                   autoplay: rawSettings.autoplay ?? true,
                   autoplayDelayMs: rawSettings.autoplayDelayMs ?? 5000,
                   // Align may also come as an array, normalize via pickFirstString
-                  align:
-                    pickFirstString(rawSettings.align) === "center"
-                      ? ("center" as const)
-                      : ("start" as const),
+                  align: (() => {
+                    const a = pickFirstString(rawSettings.align);
+                    return a === "start" ? ("start" as const) : ("center" as const);
+                  })(),
                   dragFree: rawSettings.dragFree ?? false,
                   // Cards-per-view can be string or number; normalize to number | null
                   cardsPerView: (() => {
@@ -240,6 +240,9 @@ export default async function PageRenderer({
                     }
                     return null;
                   })(),
+                  showArrows: rawSettings.showArrows ?? rawSettings.showarrows,
+                  showDots: rawSettings.showDots ?? rawSettings.showdots,
+                  pauseOnHover: rawSettings.pauseOnHover ?? rawSettings.pauseonhover,
                 }
               : undefined;
             console.log("[PageRenderer] carousel settings", settings);
