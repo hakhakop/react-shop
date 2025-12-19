@@ -195,6 +195,7 @@ export default async function HeaderShell() {
             className="w-full"
             suppressHydrationWarning
           >
+
             {/* Top bar row only while at top */}
             {(topBarText || supportPhone || currencyLabel) && (
               <div className="site-header-top">
@@ -236,16 +237,22 @@ export default async function HeaderShell() {
             dangerouslySetInnerHTML={{
               __html: `(function () {
   try {
-    var threshold = 24;
+    if (window.__headerPillInit) return;
+    window.__headerPillInit = true;
+
+    var threshold = 72; // move the switch point slightly lower to avoid top-of-page settle jitter
+    var hysteresis = 24; // wider buffer for slow-scroll stability
+    var cooldownMs = 200; // still protects from rapid flips without feeling laggy
 
     function getScrollY() {
-      return (
+      var y = (
         window.scrollY ||
         window.pageYOffset ||
         document.documentElement.scrollTop ||
         document.body.scrollTop ||
         0
       );
+      return Math.round(y);
     }
 
     function init(attempt) {
@@ -254,27 +261,57 @@ export default async function HeaderShell() {
         if (attempt < 40) return setTimeout(function () { init(attempt + 1); }, 50);
         return;
       }
+      if (el.getAttribute('data-pill-init') === 'true') return;
+      el.setAttribute('data-pill-init', 'true');
 
+      var isScrolled = el.getAttribute('data-scrolled') === 'true';
+      var lastFlip = 0;
       var ticking = false;
+      var lastY = getScrollY();
+
+      function applyState(next) {
+        if (next === isScrolled) return;
+        var now = Date.now();
+        if (now - lastFlip < cooldownMs) return;
+        lastFlip = now;
+        isScrolled = next;
+        el.setAttribute('data-scrolled', isScrolled ? 'true' : 'false');
+      }
+
+      function computeNext(y) {
+        // Direction-aware hysteresis:
+        // only turn ON while scrolling down, only turn OFF while scrolling up.
+        var dir = y > lastY ? 1 : y < lastY ? -1 : 0;
+        lastY = y;
+
+        if (!isScrolled && dir >= 0 && y > (threshold + hysteresis)) return true;
+        if (isScrolled && dir <= 0 && y < (threshold - hysteresis)) return false;
+        return isScrolled;
+      }
+
       function update() {
         ticking = false;
-        var scrolled = getScrollY() > threshold;
-        el.setAttribute('data-scrolled', scrolled ? 'true' : 'false');
+        var y = getScrollY();
+        if (y === lastY) return;
+        applyState(computeNext(y));
       }
+
       function onScroll() {
         if (ticking) return;
         ticking = true;
         window.requestAnimationFrame(update);
       }
 
-      update();
+      // Initial state
+      isScrolled = getScrollY() > (threshold + hysteresis);
+      el.setAttribute('data-scrolled', isScrolled ? 'true' : 'false');
+
       window.addEventListener('scroll', onScroll, { passive: true });
       window.addEventListener('resize', onScroll, { passive: true });
     }
 
     // Delay init to avoid mutating SSR HTML before React hydration
     setTimeout(function () { init(0); }, 60);
-
   } catch (e) {}
 })();`,
             }}

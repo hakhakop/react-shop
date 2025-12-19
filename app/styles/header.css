@@ -1,3 +1,11 @@
+:root {
+  --header-topbar-h: 56px;
+  --header-main-h: 72px;
+  --header-pill-h: 64px;
+  --header-pill-top-at-top: 36px; /* fixed header row position when NOT scrolled */
+  --header-pill-top-scrolled: 12px; /* fixed header row position when scrolled */
+}
+
 /* --- HEADER --- */
 .site-header {
   border-bottom: 1px solid rgba(229, 231, 235, 0.9);
@@ -16,11 +24,19 @@
   position: fixed;
   left: 0;
   right: 0;
-  top: 56px; /* sit under the topbar while at top */
+  top: var(--header-pill-top-at-top);
   z-index: 60;
   background: transparent;
   border-bottom: none;
   transition: top 280ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+#site-header-pill[data-scrolled="true"] .site-header-pill-main {
+  top: var(--header-pill-top-scrolled);
+}
+
+#site-header-pill[data-scrolled="false"] .site-header-pill-main {
+  top: var(--header-pill-top-at-top);
 }
 
 /* Top state: show a normal full-width header bar (not boxed) */
@@ -30,22 +46,36 @@
 }
 
 [data-theme="dark"] #site-header-pill[data-scrolled="false"] .site-header-pill-main {
+  background: rgba(15, 23, 42, 0.96) !important;
+  border-bottom-color: rgba(51, 65, 85, 0.65);
+}
+.dark #site-header-pill[data-scrolled="false"] .site-header-pill-main {
+  background: rgba(15, 23, 42, 0.96) !important;
+  border-bottom-color: rgba(51, 65, 85, 0.65);
+}
+
+/* DARK MODE: ensure the full-width strip rows are dark (top state) */
+[data-theme="dark"] #site-header-pill .site-header-top,
+.dark #site-header-pill .site-header-top {
   background: rgba(15, 23, 42, 0.96);
   border-bottom-color: rgba(51, 65, 85, 0.65);
+}
+
+[data-theme="dark"] #site-header-pill .site-header-main,
+.dark #site-header-pill .site-header-main {
+  background: rgba(15, 23, 42, 0.96);
+  border-bottom-color: rgba(51, 65, 85, 0.65);
+}
+
+[data-theme="dark"] #site-header-pill .site-header-main-inner,
+.dark #site-header-pill .site-header-main-inner {
+  background: transparent;
 }
 
 /* Scrolled state: wrapper stays transparent; only the pill has background */
 #site-header-pill[data-scrolled="true"] .site-header-pill-main {
   background: transparent;
   border-bottom: none;
-}
-
-#site-header-pill[data-scrolled="true"] .site-header-pill-main {
-  top: 12px;
-}
-
-#site-header-pill[data-scrolled="false"] .site-header-pill-main {
-  top: 36px;
 }
 
 /* The pill itself */
@@ -61,17 +91,66 @@
   gap: 2rem;
 }
 
-/* Scrolled = compact floating pill */
+/* Scrolled = compact floating pill (LIGHT MODE: glass) */
 #site-header-pill[data-scrolled="true"] .site-header-pill-inner {
   width: fit-content;
   padding: 0.1rem 0.9rem;
   border-radius: 9999px;
-  border-color: rgba(229, 231, 235, 0.85);
+  border: 1px solid rgba(229, 231, 235, 0.85);
   background: rgba(255, 255, 255, 0.78);
   backdrop-filter: blur(16px);
   box-shadow: 0 18px 48px rgba(15, 23, 42, 0.18);
   gap: 1.25rem;
 }
+
+/* Scrolled pill (DARK MODE: flat, no glass, no border, no shadow) */
+[data-theme="dark"] #site-header-pill[data-scrolled="true"] .site-header-pill-inner {
+  border: none;
+  background: rgba(15, 23, 42, 0.96) !important;
+  backdrop-filter: none !important;
+  box-shadow: none;
+}
+.dark #site-header-pill[data-scrolled="true"] .site-header-pill-inner {
+  border: none;
+  background: rgba(15, 23, 42, 0.96) !important;
+  backdrop-filter: none !important;
+  box-shadow: none;
+}
+
+/* DARK MODE: ensure text/icons are light on the dark pill */
+[data-theme="dark"] #site-header-pill[data-scrolled="true"] .site-header-nav-link {
+  color: rgba(226, 232, 240, 0.88);
+}
+[data-theme="dark"] #site-header-pill[data-scrolled="true"] .site-header-nav-link:hover {
+  color: rgba(248, 250, 252, 0.96);
+}
+[data-theme="dark"] #site-header-pill[data-scrolled="true"] .site-header-nav-link.is-active,
+[data-theme="dark"] #site-header-pill[data-scrolled="true"] .site-header-nav-link[aria-current="page"],
+[data-theme="dark"] #site-header-pill[data-scrolled="true"] .site-header-nav-link[data-active="true"] {
+  color: rgba(248, 250, 252, 0.98);
+}
+
+[data-theme="dark"] #site-header-pill[data-scrolled="true"] .site-header-action-pill {
+  color: rgba(226, 232, 240, 0.92);
+}
+[data-theme="dark"] #site-header-pill[data-scrolled="true"] .site-header-action-pill:hover {
+  color: rgba(248, 250, 252, 0.98);
+}
+
+[data-theme="dark"] #site-header-pill[data-scrolled="true"] .site-header-action-pill svg,
+[data-theme="dark"] #site-header-pill[data-scrolled="true"] .site-header-action-pill svg * {
+  fill: currentColor;
+  stroke: currentColor;
+}
+
+[data-theme="dark"] #site-header-pill[data-scrolled="true"] .site-header-categories-toggle {
+  color: rgba(226, 232, 240, 0.88);
+}
+[data-theme="dark"] #site-header-pill[data-scrolled="true"] .site-header-categories-toggle:hover {
+  color: rgba(248, 250, 252, 0.98);
+}
+
+
 
 /* Slightly tighten nav links inside pill */
 #site-header-pill[data-scrolled="true"] .site-header-nav {
@@ -82,18 +161,9 @@
 /* Add spacing so content doesn't jump under the floating pill */
 .site-header-pill-spacer {
   display: block;
-  height: 72px; /* reserve space for the header row while at top */
-  transition: height 280ms cubic-bezier(0.22, 1, 0.36, 1);
-}
-#site-header-pill[data-scrolled="true"] .site-header-pill-spacer {
-  height: 64px; /* slightly tighter once it becomes a pill */
+  height: calc(var(--header-topbar-h) + var(--header-main-h));
 }
 
-/* Dark theme pill */
-[data-theme="dark"] #site-header-pill[data-scrolled="true"] .site-header-pill-inner {
-  border-color: rgba(51, 65, 85, 0.75);
-  background: rgba(15, 23, 42, 0.72);
-}
 
 /* Dark theme header + toggle */
 
@@ -266,9 +336,9 @@
 .site-header-top {
   background: #f9fafb;
   border-bottom: 1px solid #e5e7eb;
-  max-height: 56px;
+  max-height: var(--header-topbar-h);
   overflow: hidden;
-  will-change: opacity, transform, max-height;
+  will-change: opacity, transform;
 }
 
 .site-header-top-inner {
@@ -520,6 +590,16 @@
   backdrop-filter: none !important;
 }
 
+/* While scrolled=true, prevent inner legacy rows from painting backgrounds */
+#site-header-pill[data-scrolled="true"] .site-header-main,
+#site-header-pill[data-scrolled="true"] .site-header-main-inner {
+  background: transparent !important;
+}
+
+#site-header-pill[data-scrolled="true"] .site-header-main {
+  border-bottom: none !important;
+}
+
 /* While scrolled, ensure the full-width fixed container stays transparent */
 #site-header-pill[data-scrolled="true"] .site-header-pill-main,
 #site-header-pill[data-scrolled="true"] .site-header-pill-main.site-header-main {
@@ -558,21 +638,19 @@
 .site-header-top {
   transition:
     opacity 220ms ease,
-    transform 220ms ease,
-    max-height 280ms cubic-bezier(0.22, 1, 0.36, 1);
+    transform 220ms ease;
 }
 
 #site-header-pill[data-scrolled="true"] .site-header-top {
   opacity: 0;
   transform: translateY(-6px);
-  max-height: 0;
   pointer-events: none;
 }
 
 #site-header-pill[data-scrolled="false"] .site-header-top {
   opacity: 1;
   transform: translateY(0);
-  max-height: 36px;
+  pointer-events: auto;
 }
 
 .site-header-nav-link {
@@ -595,6 +673,17 @@
 [data-theme="dark"] #site-header-pill .site-header-nav-link[data-active="true"] {
   color: rgba(248, 250, 252, 0.98);
 }
+.dark #site-header-pill .site-header-nav-link {
+  color: rgba(226, 232, 240, 0.88);
+}
+.dark #site-header-pill .site-header-nav-link:hover {
+  color: rgba(248, 250, 252, 0.96);
+}
+.dark #site-header-pill .site-header-nav-link.is-active,
+.dark #site-header-pill .site-header-nav-link[aria-current="page"],
+.dark #site-header-pill .site-header-nav-link[data-active="true"] {
+  color: rgba(248, 250, 252, 0.98);
+}
 
 /* Header action icons/buttons (cart, wishlist, search, theme toggle wrapper, etc.) */
 [data-theme="dark"] #site-header-pill .site-header-action-pill {
@@ -603,10 +692,21 @@
 [data-theme="dark"] #site-header-pill .site-header-action-pill:hover {
   color: rgba(248, 250, 252, 0.98);
 }
+.dark #site-header-pill .site-header-action-pill {
+  color: rgba(226, 232, 240, 0.92);
+}
+.dark #site-header-pill .site-header-action-pill:hover {
+  color: rgba(248, 250, 252, 0.98);
+}
 
 /* Ensure SVGs follow currentColor in case some icons have hard-coded fills */
 [data-theme="dark"] #site-header-pill .site-header-action-pill svg,
 [data-theme="dark"] #site-header-pill .site-header-action-pill svg * {
+  fill: currentColor;
+  stroke: currentColor;
+}
+.dark #site-header-pill .site-header-action-pill svg,
+.dark #site-header-pill .site-header-action-pill svg * {
   fill: currentColor;
   stroke: currentColor;
 }
@@ -618,9 +718,19 @@
 [data-theme="dark"] #site-header-pill .site-header-categories-toggle:hover {
   color: rgba(248, 250, 252, 0.98);
 }
+.dark #site-header-pill .site-header-categories-toggle {
+  color: rgba(226, 232, 240, 0.88);
+}
+.dark #site-header-pill .site-header-categories-toggle:hover {
+  color: rgba(248, 250, 252, 0.98);
+}
 
 /* Optional: top bar text in dark pill layout */
 [data-theme="dark"] #site-header-pill .site-header-top,
 [data-theme="dark"] #site-header-pill .site-header-top-inner {
+  color: rgba(226, 232, 240, 0.82);
+}
+.dark #site-header-pill .site-header-top,
+.dark #site-header-pill .site-header-top-inner {
   color: rgba(226, 232, 240, 0.82);
 }
