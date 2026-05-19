@@ -7,7 +7,10 @@ import { useEffect, useMemo, useState } from "react";
 
 function isLocalHost() {
   if (typeof window === "undefined") return false;
-  return ["localhost", "127.0.0.1", "::1"].includes(window.location.hostname);
+  return (
+    ["localhost", "127.0.0.1", "::1"].includes(window.location.hostname) ||
+    process.env.NEXT_PUBLIC_SHOW_FRONTEND_ADMIN_BAR === "true"
+  );
 }
 
 function labelFromSlug(slug: string) {
