@@ -14,7 +14,7 @@ export default function FloatingCartSummary() {
         <motion.button
           type="button"
           onClick={openMiniCart}
-          className="fixed bottom-4 right-4 z-40 flex items-center gap-2 rounded-full border border-slate-700/80 bg-slate-900/95 px-3 py-2 text-xs font-medium text-slate-50 shadow-lg shadow-black/50 hover:border-slate-500 hover:bg-slate-800/95 md:bottom-6 md:right-6"
+          className="floating-cart-summary flex items-center gap-2 rounded-full border border-slate-700/80 bg-slate-900/95 px-3 py-2 text-xs font-medium text-slate-50 shadow-lg shadow-black/50 hover:border-slate-500 hover:bg-slate-800/95"
           initial={{ opacity: 0, y: 12, scale: 0.96 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: 8, scale: 0.96 }}

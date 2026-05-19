@@ -980,7 +980,7 @@ body {
 .mini-cart-overlay {
   position: fixed;
   inset: 0;
-  z-index: 40;
+  z-index: 1050;
 }
 
 .mini-cart-backdrop {
@@ -993,9 +993,9 @@ body {
   position: absolute;
   top: 18px;
   right: 18px;
-  bottom: 118px;
+  bottom: 218px;
   width: min(400px, 100%);
-  max-height: calc(100dvh - 136px);
+  max-height: calc(100dvh - 236px);
   background: #ffffff;
   border-radius: 18px;
   box-shadow: -2px 0 12px rgba(15, 23, 42, 0.2);
@@ -1303,11 +1303,26 @@ a {
   pointer-events: none;
 }
 
+.floating-cart-summary,
+.scroll-to-top-button {
+  position: fixed;
+  right: 22px;
+  z-index: 1080;
+}
+
+.floating-cart-summary {
+  bottom: 22px;
+}
+
+.scroll-to-top-button {
+  bottom: 84px;
+}
+
 .frontend-admin-bar {
   position: fixed;
-  z-index: 1100;
+  z-index: 1110;
   right: 22px;
-  bottom: 144px;
+  bottom: 148px;
   max-width: min(calc(100vw - 24px), 720px);
   padding: 7px;
   border-radius: 999px;
@@ -1380,9 +1395,9 @@ a {
 
 .frontend-admin-bar-toggle {
   position: fixed;
-  z-index: 1100;
+  z-index: 1110;
   right: 22px;
-  bottom: 144px;
+  bottom: 148px;
   min-width: 94px;
   padding: 0 14px;
   background: rgba(10, 10, 10, 0.9);
@@ -1390,9 +1405,32 @@ a {
 }
 
 @media (max-width: 760px) {
+  .mini-cart-panel {
+    top: 10px;
+    right: 10px;
+    bottom: 220px;
+    left: 10px;
+    width: auto;
+    max-height: calc(100dvh - 230px);
+    border-radius: 18px;
+  }
+
+  .floating-cart-summary,
+  .scroll-to-top-button {
+    right: 10px;
+  }
+
+  .floating-cart-summary {
+    bottom: 16px;
+  }
+
+  .scroll-to-top-button {
+    bottom: 76px;
+  }
+
   .frontend-admin-bar {
     right: 10px;
-    bottom: 128px;
+    bottom: 132px;
     left: 10px;
     max-width: none;
     border-radius: 16px;
@@ -1401,7 +1439,7 @@ a {
 
   .frontend-admin-bar-toggle {
     right: 10px;
-    bottom: 128px;
+    bottom: 132px;
   }
 
   .frontend-admin-bar div {
