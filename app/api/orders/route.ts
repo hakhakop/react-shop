@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getWordPressBaseUrl } from "@/lib/wordpressUrl";
 
 /**
  * Try to extract a numeric WooCommerce product ID from a cart item payload.
@@ -10,6 +11,7 @@ import { NextRequest, NextResponse } from "next/server";
 function getNumericProductIdFromItem(item: any): number | null {
   const candidates = [
     item?.productId,
+    item?.variationId,
     item?.databaseId,
     item?.id,
     item?.product_id,
@@ -45,6 +47,19 @@ function getNumericProductIdFromItem(item: any): number | null {
   }
 
   return null;
+}
+
+function getOrderPaymentUrl(order: any) {
+  if (typeof order?.payment_url === "string" && order.payment_url) {
+    return order.payment_url;
+  }
+
+  const baseUrl = getWordPressBaseUrl();
+  if (!baseUrl || !order?.id || !order?.order_key) return null;
+
+  return `${baseUrl}/checkout/order-pay/${order.id}/?pay_for_order=true&key=${encodeURIComponent(
+    order.order_key
+  )}`;
 }
 
 export async function POST(req: NextRequest) {
@@ -88,6 +103,9 @@ export async function POST(req: NextRequest) {
   const line_items = items
     .map((item: any) => {
       const productId = getNumericProductIdFromItem(item);
+      const variationId = item?.variationId
+        ? getNumericProductIdFromItem({ productId: item.variationId })
+        : null;
       const quantity = Number(item.quantity ?? item.qty ?? 1);
 
       if (!productId || quantity <= 0 || Number.isNaN(quantity)) {
@@ -96,6 +114,7 @@ export async function POST(req: NextRequest) {
 
       return {
         product_id: productId,
+        ...(variationId ? { variation_id: variationId } : {}),
         quantity,
       };
     })
@@ -129,8 +148,7 @@ export async function POST(req: NextRequest) {
   };
 
   const orderPayload = {
-    payment_method: "cod",
-    payment_method_title: "Cash on delivery",
+    status: "pending",
     set_paid: false,
     billing,
     shipping: billing,
@@ -168,6 +186,7 @@ export async function POST(req: NextRequest) {
       {
         success: true,
         orderId: data.id,
+        checkoutUrl: getOrderPaymentUrl(data),
       },
       { status: 200 }
     );

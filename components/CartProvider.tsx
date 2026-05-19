@@ -4,12 +4,15 @@ import React, {
   createContext,
   useContext,
   useEffect,
+  useRef,
   useState,
   ReactNode,
 } from "react";
 
 export type CartItem = {
   id: string; // product GraphQL ID
+  productId?: string | number; // original WooCommerce product ID/global ID, even when cart line has options
+  variationId?: string | number | null;
   slug: string;
   name: string;
   price: number;
@@ -60,14 +63,19 @@ function saveCart(items: CartItem[]) {
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [isMiniCartOpen, setIsMiniCartOpen] = useState(false);
+  const hasLoadedStoredCart = useRef(false);
 
-  // Load from localStorage once on mount
   useEffect(() => {
-    setItems(loadInitialCart());
+    const storedItems = loadInitialCart();
+    window.queueMicrotask(() => {
+      hasLoadedStoredCart.current = true;
+      setItems(storedItems);
+    });
   }, []);
 
   // Persist to localStorage whenever items change
   useEffect(() => {
+    if (!hasLoadedStoredCart.current) return;
     saveCart(items);
   }, [items]);
 

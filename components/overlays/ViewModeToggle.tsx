@@ -16,16 +16,7 @@ function getInitialMode(): ViewMode {
 }
 
 export default function ViewModeToggle() {
-  const [mode, setMode] = useState<ViewMode>("comfortable");
-
-  // Load saved mode on mount
-  useEffect(() => {
-    const initial = getInitialMode();
-    setMode(initial);
-    if (typeof document !== "undefined") {
-      document.documentElement.dataset.viewMode = initial;
-    }
-  }, []);
+  const [mode, setMode] = useState<ViewMode>(getInitialMode);
 
   // Persist + apply to <html> when mode changes
   useEffect(() => {

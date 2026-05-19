@@ -22,7 +22,24 @@ type SearchResult = {
   price?: string | null;
 };
 
+type SearchProductsResponse = {
+  data?: {
+    products?: {
+      nodes?: Array<{
+        id: string;
+        slug: string;
+        name: string;
+        price?: string | null;
+        image?: {
+          sourceUrl?: string | null;
+        } | null;
+      }>;
+    };
+  };
+};
+
 const SearchContext = createContext<SearchContextType | null>(null);
+const GRAPHQL_ENDPOINT = process.env.NEXT_PUBLIC_WORDPRESS_GRAPHQL_URL;
 
 export function SearchProvider({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false);
@@ -69,9 +86,9 @@ export function SearchProvider({ children }: { children: ReactNode }) {
     let cancelled = false;
     const timeoutId = window.setTimeout(async () => {
       try {
-        if (!process.env.NEXT_PUBLIC_WPGRAPHQL_ENDPOINT) {
+        if (!GRAPHQL_ENDPOINT) {
           console.warn(
-            "NEXT_PUBLIC_WPGRAPHQL_ENDPOINT is not defined – search will not work."
+            "NEXT_PUBLIC_WORDPRESS_GRAPHQL_URL is not defined - search will not work."
           );
           return;
         }
@@ -96,7 +113,7 @@ export function SearchProvider({ children }: { children: ReactNode }) {
           }
         `;
 
-        const res = await fetch(process.env.NEXT_PUBLIC_WPGRAPHQL_ENDPOINT, {
+        const res = await fetch(GRAPHQL_ENDPOINT, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -109,10 +126,10 @@ export function SearchProvider({ children }: { children: ReactNode }) {
           throw new Error(`Network error: ${res.status}`);
         }
 
-        const json = await res.json();
+        const json = (await res.json()) as SearchProductsResponse;
         if (cancelled) return;
 
-        const nodes = (json?.data?.products?.nodes ?? []) as any[];
+        const nodes = json.data?.products?.nodes ?? [];
 
         const mapped: SearchResult[] = nodes.map((node) => ({
           id: node.id,

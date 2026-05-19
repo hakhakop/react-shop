@@ -1,12 +1,17 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import WishlistToggle from "./WishlistToggle";
+import AddToCartButton from "./AddToCartButton";
 import type { ProductNode } from "../lib/products";
 
 type Props = {
   products: ProductNode[];
+  columns?: number | null;
+  filterPosition?: "left" | "top" | "drawer" | "hidden" | string | null;
+  cardStyle?: "flat" | "soft" | "lined" | string | null;
+  pageSize?: number | null;
 };
 
 function toNumberPrice(price: string | null | undefined): number {
@@ -54,15 +59,13 @@ function normalizeAttributeNode(
   };
 }
 
-export default function CategoryWithFilters({ products }: Props) {
-  // 🔍 Debug – now we can see attributes
-  if (products && products.length > 0) {
-    console.log(
-      "DEBUG first product in CategoryWithFilters:",
-      products[0]
-    );
-  }
-
+export default function CategoryWithFilters({
+  products,
+  columns,
+  filterPosition = "left",
+  cardStyle = "flat",
+  pageSize,
+}: Props) {
   const [searchTerm, setSearchTerm] = useState("");
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
@@ -73,21 +76,36 @@ export default function CategoryWithFilters({ products }: Props) {
   const [selectedAttributes, setSelectedAttributes] = useState<
     Record<string, string[]>
   >({});
+  const [openTopFacet, setOpenTopFacet] = useState<string | null>(null);
+  const topFiltersRef = useRef<HTMLDivElement | null>(null);
 
   // simple client-side pagination
   const [currentPage, setCurrentPage] = useState(1);
-  const PAGE_SIZE = 12;
+  const normalizedPageSize =
+    typeof pageSize === "number" && pageSize >= 4 && pageSize <= 48
+      ? Math.round(pageSize)
+      : 12;
 
   const [viewMode, setViewMode] = useState<"default" | "compact" | "list">(
     "default"
   );
+
+  const archiveColumns =
+    typeof columns === "number" && columns >= 2 && columns <= 6 ? columns : 4;
+  const normalizedFilterPosition =
+    filterPosition === "top" ||
+    filterPosition === "drawer" ||
+    filterPosition === "hidden"
+      ? filterPosition
+      : "left";
+  const isTopFilterLayout = normalizedFilterPosition === "top";
 
   const gridStyle =
     viewMode === "compact"
       ? { gridTemplateColumns: "repeat(2, minmax(0, 1fr))" }
       : viewMode === "list"
       ? { gridTemplateColumns: "minmax(0, 1fr)" }
-      : undefined;
+      : { gridTemplateColumns: `repeat(${archiveColumns}, minmax(0, 1fr))` };
 
   const attributeFacets: AttributeFacet[] = useMemo(() => {
     const map: Record<string, { label: string; optionSet: Set<string> }> = {};
@@ -130,6 +148,25 @@ export default function CategoryWithFilters({ products }: Props) {
     () => Object.keys(selectedAttributes).length > 0,
     [selectedAttributes]
   );
+
+  useEffect(() => {
+    if (!openTopFacet) return;
+
+    function handlePointerDown(event: MouseEvent | TouchEvent) {
+      if (!topFiltersRef.current) return;
+      if (!topFiltersRef.current.contains(event.target as Node)) {
+        setOpenTopFacet(null);
+      }
+    }
+
+    document.addEventListener("mousedown", handlePointerDown);
+    document.addEventListener("touchstart", handlePointerDown);
+
+    return () => {
+      document.removeEventListener("mousedown", handlePointerDown);
+      document.removeEventListener("touchstart", handlePointerDown);
+    };
+  }, [openTopFacet]);
 
   function toggleAttribute(attrKey: string, optionKey: string) {
     setCurrentPage(1); // reset page when changing filters
@@ -244,10 +281,10 @@ export default function CategoryWithFilters({ products }: Props) {
 
   // pagination derived from filtered products
   const total = filteredProducts.length;
-  const pageCount = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  const pageCount = Math.max(1, Math.ceil(total / normalizedPageSize));
   const safePage = Math.min(currentPage, pageCount);
-  const start = (safePage - 1) * PAGE_SIZE;
-  const end = start + PAGE_SIZE;
+  const start = (safePage - 1) * normalizedPageSize;
+  const end = start + normalizedPageSize;
   const paginatedProducts = filteredProducts.slice(start, end);
 
   function goToPage(page: number) {
@@ -260,25 +297,191 @@ export default function CategoryWithFilters({ products }: Props) {
 
   return (
     <div
+      className={`shop-filter-layout shop-filter-layout--${normalizedFilterPosition} shop-card-style--${cardStyle ?? "flat"}`}
       style={{
         display: "grid",
-        gridTemplateColumns: "260px minmax(0, 1fr)",
+        gridTemplateColumns:
+          normalizedFilterPosition === "left"
+            ? "260px minmax(0, 1fr)"
+            : "minmax(0, 1fr)",
         gap: "24px",
         marginTop: "16px",
       }}
     >
       {/* Sidebar */}
       <aside
+        className={`shop-filter-panel ${
+          isTopFilterLayout ? "shop-filter-panel--top" : ""
+        }`}
         style={{
-          borderRadius: "16px",
-          border: "1px solid #e5e7eb",
-          background: "#ffffff",
-          padding: "14px 14px 16px",
-          boxShadow: "0 10px 30px rgba(15, 23, 42, 0.04)",
+          display: normalizedFilterPosition === "hidden" ? "none" : undefined,
+          borderRadius: isTopFilterLayout ? undefined : "16px",
+          border: isTopFilterLayout ? undefined : "1px solid #e5e7eb",
+          background: isTopFilterLayout ? undefined : "#ffffff",
+          padding: isTopFilterLayout ? undefined : "14px 14px 16px",
+          boxShadow: isTopFilterLayout
+            ? undefined
+            : "0 10px 30px rgba(15, 23, 42, 0.04)",
           alignSelf: "flex-start",
         }}
       >
+        {isTopFilterLayout ? (
+          <div className="shop-top-attribute-filters" ref={topFiltersRef}>
+            {attributeFacets.map((facet) => {
+              const selectedForFacet = selectedAttributes[facet.key] ?? [];
+              const isOpen = openTopFacet === facet.key;
+              return (
+                <div
+                  key={facet.key}
+                  className={`shop-top-attribute-filter ${
+                    isOpen ? "is-open" : ""
+                  }`}
+                >
+                  <button
+                    type="button"
+                    className="shop-top-attribute-trigger"
+                    onClick={() =>
+                      setOpenTopFacet((current) =>
+                        current === facet.key ? null : facet.key
+                      )
+                    }
+                  >
+                    <span>{facet.label}</span>
+                    {selectedForFacet.length > 0 && (
+                      <strong>{selectedForFacet.length}</strong>
+                    )}
+                  </button>
+
+                  <div className="shop-top-attribute-dropdown">
+                    {facet.options.map((opt) => {
+                      const isSelected = selectedForFacet.includes(opt.key);
+                      return (
+                        <button
+                          key={opt.key}
+                          type="button"
+                          className={isSelected ? "is-selected" : ""}
+                          onClick={() => toggleAttribute(facet.key, opt.key)}
+                        >
+                          {opt.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })}
+
+            <div
+              className={`shop-top-attribute-filter ${
+                openTopFacet === "__price" ? "is-open" : ""
+              }`}
+            >
+              <button
+                type="button"
+                className="shop-top-attribute-trigger"
+                onClick={() =>
+                  setOpenTopFacet((current) =>
+                    current === "__price" ? null : "__price"
+                  )
+                }
+              >
+                <span>Price</span>
+                {(minPrice || maxPrice) && <strong>1</strong>}
+              </button>
+
+              <div className="shop-top-attribute-dropdown shop-top-price-dropdown">
+                <input
+                  type="number"
+                  min={0}
+                  value={minPrice}
+                  onChange={(event) => {
+                    setMinPrice(event.target.value);
+                    setCurrentPage(1);
+                  }}
+                  placeholder="Min"
+                />
+                <input
+                  type="number"
+                  min={0}
+                  value={maxPrice}
+                  onChange={(event) => {
+                    setMaxPrice(event.target.value);
+                    setCurrentPage(1);
+                  }}
+                  placeholder="Max"
+                />
+              </div>
+            </div>
+
+            <div
+              className={`shop-top-attribute-filter ${
+                openTopFacet === "__sort" ? "is-open" : ""
+              }`}
+            >
+              <button
+                type="button"
+                className="shop-top-attribute-trigger"
+                onClick={() =>
+                  setOpenTopFacet((current) =>
+                    current === "__sort" ? null : "__sort"
+                  )
+                }
+              >
+                <span>Sort by</span>
+              </button>
+
+              <div className="shop-top-attribute-dropdown shop-top-sort-dropdown">
+                {[
+                  ["default", "Default"],
+                  ["price-asc", "Price: Low to high"],
+                  ["price-desc", "Price: High to low"],
+                  ["name-asc", "Name: A to Z"],
+                ].map(([value, label]) => (
+                  <button
+                    key={value}
+                    type="button"
+                    className={sortBy === value ? "is-selected" : ""}
+                    onClick={() => {
+                      setSortBy(value as typeof sortBy);
+                      setCurrentPage(1);
+                      setOpenTopFacet(null);
+                    }}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {attributeFacets.length > 0 && (
+              <label className="shop-top-attribute-search">
+                <span className="sr-only">Search products</span>
+                <input
+                  type="text"
+                  value={searchTerm}
+                  onChange={(event) => {
+                    setSearchTerm(event.target.value);
+                    setCurrentPage(1);
+                  }}
+                  placeholder="Search products..."
+                />
+              </label>
+            )}
+
+            {attributeFacets.length > 0 && (
+              <button
+                type="button"
+                className="shop-top-attribute-reset"
+                onClick={resetFilters}
+              >
+                Reset
+              </button>
+            )}
+          </div>
+        ) : (
+          <>
         <div
+          className="shop-filter-title"
           style={{
             fontSize: "15px",
             fontWeight: 600,
@@ -290,7 +493,7 @@ export default function CategoryWithFilters({ products }: Props) {
         </div>
 
         {/* Search */}
-        <div style={{ marginBottom: "12px" }}>
+        <div className="shop-filter-group" style={{ marginBottom: "12px" }}>
           <label
             style={{
               display: "block",
@@ -320,7 +523,7 @@ export default function CategoryWithFilters({ products }: Props) {
         </div>
 
         {/* Price range */}
-        <div style={{ marginBottom: "12px" }}>
+        <div className="shop-filter-group" style={{ marginBottom: "12px" }}>
           <label
             style={{
               display: "block",
@@ -376,7 +579,7 @@ export default function CategoryWithFilters({ products }: Props) {
         </div>
 
         {/* Sort */}
-        <div style={{ marginBottom: "12px" }}>
+        <div className="shop-filter-group" style={{ marginBottom: "12px" }}>
           <label
             style={{
               display: "block",
@@ -412,6 +615,7 @@ export default function CategoryWithFilters({ products }: Props) {
         {/* Attribute filters */}
         {attributeFacets.length > 0 && (
           <div
+            className="shop-filter-attributes"
             style={{
               marginTop: "4px",
               paddingTop: "10px",
@@ -456,6 +660,7 @@ export default function CategoryWithFilters({ products }: Props) {
                         <button
                           key={opt.key}
                           type="button"
+                          className={isSelected ? "is-selected" : ""}
                           onClick={() =>
                             toggleAttribute(facet.key, opt.key)
                           }
@@ -487,6 +692,7 @@ export default function CategoryWithFilters({ products }: Props) {
 
         {/* Reset */}
         <button
+          className="shop-filter-reset"
           type="button"
           onClick={resetFilters}
           style={{
@@ -504,6 +710,7 @@ export default function CategoryWithFilters({ products }: Props) {
         </button>
 
         <div
+          className="shop-filter-summary"
           style={{
             marginTop: "10px",
             fontSize: "11px",
@@ -512,6 +719,8 @@ export default function CategoryWithFilters({ products }: Props) {
         >
           Showing {showingFrom}-{showingTo} of {total} products.
         </div>
+          </>
+        )}
       </aside>
 
       {/* Product grid + pagination */}
@@ -736,6 +945,20 @@ export default function CategoryWithFilters({ products }: Props) {
                         )}
                       </div>
                     </Link>
+
+                    <div className="product-card-actions-row">
+                      <AddToCartButton
+                        id={p.id}
+                        slug={p.slug}
+                        name={p.name}
+                        priceNumber={
+                          priceNumber > 0 && !Number.isNaN(priceNumber)
+                            ? priceNumber
+                            : null
+                        }
+                        imageUrl={imageUrl}
+                      />
+                    </div>
                   </div>
                 );
               })}

@@ -87,6 +87,10 @@ function pickFirstString(value: unknown): string | undefined {
   return typeof value === "string" ? value : undefined;
 }
 
+function hasOwnSectionBackground(value: string | undefined) {
+  return typeof value === "string" && value.trim().length > 0;
+}
+
 export default async function PageRenderer({
   blocks,
 }: {
@@ -120,15 +124,6 @@ export default async function PageRenderer({
             raw.sectionSettings?.sectionbottomspacing
         );
 
-        console.log("[PageRenderer] block1", {
-          index: i,
-          typename,
-          sectionBackground,
-          sectionTopSpacing,
-          sectionBottomSpacing,
-          rawSectionSettings: raw.sectionSettings,
-        });
-
         switch (typename) {
           case "PageBuilderLayoutPageBuilderHeroLayout":
             return (
@@ -148,9 +143,14 @@ export default async function PageRenderer({
             return (
               <PageSection
                 key={i}
-                backgroundVariant={sectionBackground || "soft"}
+                backgroundVariant={sectionBackground}
                 topSpacing={sectionTopSpacing}
                 bottomSpacing={sectionBottomSpacing || "large"}
+                className={
+                  hasOwnSectionBackground(sectionBackground)
+                    ? "page-section--product-grid page-section--product-grid-explicit-bg"
+                    : "page-section--product-grid page-section--product-grid-auto-bg"
+                }
               >
                 <Container size="wide">
                   <ProductGridBlock block={block as ProductGridLayoutBlock} />
@@ -193,10 +193,7 @@ export default async function PageRenderer({
             );
 
           case "PageBuilderLayoutPageBuilderCarouselLayoutLayout": {
-            console.log("[PageRenderer] CAROUSEL BLOCK RAW", block);
-
             const rawCarousel = block as any;
-            console.log("[PageRenderer] rawCarousel", rawCarousel);
 
             const slides = (rawCarousel.slides || []).map((s: any, idx: number) => ({
               id: s.slideId || String(idx),
@@ -209,7 +206,6 @@ export default async function PageRenderer({
               buttonUrl: s.buttonUrl,
               badge: s.badge,
             }));
-            console.log("[PageRenderer] slides after mapping", slides);
 
             const rawSettings =
               rawCarousel.carouselSettings ?? rawCarousel.carouselsettings;
@@ -245,7 +241,6 @@ export default async function PageRenderer({
                   pauseOnHover: rawSettings.pauseOnHover ?? rawSettings.pauseonhover,
                 }
               : undefined;
-            console.log("[PageRenderer] carousel settings", settings);
 
             return (
               <PageSection

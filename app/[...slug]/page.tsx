@@ -4,7 +4,13 @@ import { redirect } from "next/navigation";
 import { graphqlFetch } from "../../lib/graphql";
 import Breadcrumbs from "../../components/Breadcrumbs";
 import PageRenderer from "../../components/PageRenderer";
+import StorefrontBuilderRenderer from "../../components/builder/StorefrontBuilderRenderer";
 import { mapPageBuilder } from "../../lib/pageBuilder";
+import {
+  getPublishedBuilderLayout,
+  readBuilderCustomPages,
+  type BuilderCustomPageKey,
+} from "../../lib/builderLayouts";
 
 type WPPageParams = {
   slug?: string[];
@@ -46,6 +52,41 @@ export default async function WPPage({
       ? "/"
       : `/${slugSegments.join("/")}/`;
 
+  if (slugSegments?.length === 1) {
+    const slug = slugSegments[0];
+    const builderPages = await readBuilderCustomPages();
+    const builderPage = builderPages.find((page) => page.slug === slug);
+
+    if (builderPage) {
+      const layout = await getPublishedBuilderLayout(
+        builderPage.key as BuilderCustomPageKey
+      );
+
+      if (layout?.sections?.some((section) => section.visible)) {
+        return (
+          <StorefrontBuilderRenderer
+            layout={layout}
+            page={builderPage.key}
+            pageLabel={builderPage.title}
+            breadcrumbItems={[
+              { label: "Home", href: "/" },
+              { label: builderPage.title, href: `/${builderPage.slug}` },
+            ]}
+          />
+        );
+      }
+
+      return (
+        <main className="page">
+          <h1 className="page-title">{builderPage.title}</h1>
+          <p className="page-subtitle">
+            Publish this builder page from the dashboard to show its layout.
+          </p>
+        </main>
+      );
+    }
+  }
+
   // Fetch page by URI from WordPress via GraphQL
   let data: PageByUriResult;
 
@@ -82,6 +123,7 @@ export default async function WPPage({
                 }
 
                 cardPreset
+                columnsDesktop
                 gridLimit
                 source
                 layoutVariant
@@ -188,6 +230,7 @@ export default async function WPPage({
                   }
 
                   cardPreset
+                  columnsDesktop
                   gridLimit
                   source
                   layoutVariant

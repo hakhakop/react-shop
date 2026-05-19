@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { type CSSProperties, useState } from "react";
 
 type WPImage = {
   sourceUrl: string;
@@ -10,9 +10,17 @@ type WPImage = {
 export default function ProductGallery({
   images,
   name,
+  showThumbnails = true,
+  thumbnailPosition = "bottom",
+  imageFit = "contain",
+  height,
 }: {
   images: WPImage[];
   name: string;
+  showThumbnails?: boolean;
+  thumbnailPosition?: "bottom" | "left";
+  imageFit?: "contain" | "cover";
+  height?: number;
 }) {
   const [selectedIndex, setSelectedIndex] = useState(0);
 
@@ -28,14 +36,22 @@ export default function ProductGallery({
   const current = images[Math.min(selectedIndex, images.length - 1)];
 
   return (
-    <div>
+    <div
+      className={`product-gallery product-gallery--thumbs-${thumbnailPosition}`}
+      style={
+        {
+          "--product-gallery-height": height ? `${height}px` : undefined,
+          "--product-gallery-image-fit": imageFit,
+        } as CSSProperties
+      }
+    >
       <div className="product-gallery-main">
         <div className="product-main-image">
           <img src={current.sourceUrl} alt={current.altText || name} />
         </div>
       </div>
 
-      {images.length > 1 && (
+      {showThumbnails && images.length > 1 && (
         <div className="product-gallery-thumbs">
           {images.map((img, idx) => (
             <button

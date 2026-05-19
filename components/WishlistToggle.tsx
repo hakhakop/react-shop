@@ -1,7 +1,7 @@
 "use client";
 
 import type { MouseEvent } from "react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useWishlist } from "./WishlistProvider";
 import { useToast } from "./ToastProvider";
 import { SiteIcon } from "@/components/ui/SiteIcon";
@@ -28,16 +28,6 @@ export default function WishlistToggle({
   // local flag for "just added" heartbeat animation
   const [justAdded, setJustAdded] = useState(false);
 
-  useEffect(() => {
-    if (active) {
-      setJustAdded(true);
-      const timer = setTimeout(() => {
-        setJustAdded(false);
-      }, 320); // length of heartbeat animation
-      return () => clearTimeout(timer);
-    }
-  }, [active]);
-
   function handleClick(event: MouseEvent<HTMLButtonElement>) {
     event.preventDefault();
 
@@ -52,6 +42,8 @@ export default function WishlistToggle({
     if (active) {
       showToast(`Removed ${name} from wishlist.`);
     } else {
+      setJustAdded(true);
+      window.setTimeout(() => setJustAdded(false), 320);
       showToast(`Added ${name} to wishlist.`);
     }
   }

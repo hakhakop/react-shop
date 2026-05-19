@@ -2,6 +2,8 @@
 
 /* Bar container – lower and wider than header */
 .category-bar {
+  position: relative;
+  z-index: 2;
   max-width: 1360px;
   margin: 12px auto 6px;          /* moves it a bit lower, separates from header */
   padding: 6px 24px 12px;
@@ -62,7 +64,7 @@
   left: 0;
   top: 100%;
   margin-top: 4px;
-  z-index: 20;
+  z-index: 40;
 
   min-width: 220px;
   max-width: 360px;

@@ -32,6 +32,11 @@ export interface ProductGridLayoutBlock extends SectionSettings {
   __typename: "PageBuilderLayoutPageBuilderProductGridLayout";
   fieldGroupName: string;
   cardPreset?: string[] | null;
+  cardSurface?: string[] | string | null;
+  gridSurface?: string[] | string | null;
+  productGridSurface?: string[] | string | null;
+  productCardSurface?: string[] | string | null;
+  columnsDesktop?: number | string | null;
   layoutVariant?: string[] | null;
   gridLimit?: number | null;
   source?: string[] | null;

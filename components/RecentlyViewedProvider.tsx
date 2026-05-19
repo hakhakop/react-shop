@@ -22,6 +22,7 @@ type RecentlyViewedContextValue = {
   items: RecentlyViewedItem[];
   addViewedProduct: (item: RecentlyViewedItem) => void;
   clear: () => void;
+  storageReady: boolean;
 };
 
 const STORAGE_KEY = "recentlyViewedProducts";
@@ -31,6 +32,7 @@ const defaultValue: RecentlyViewedContextValue = {
   items: [],
   addViewedProduct: () => {},
   clear: () => {},
+  storageReady: false,
 };
 
 const RecentlyViewedContext =
@@ -41,30 +43,37 @@ type RecentlyViewedProviderProps = {
   maxItems?: number;
 };
 
+function loadInitialRecentlyViewed(): RecentlyViewedItem[] {
+  if (typeof window === "undefined") return [];
+
+  try {
+    const raw = window.localStorage.getItem(STORAGE_KEY);
+    if (!raw) return [];
+    const parsed: unknown = JSON.parse(raw);
+    return Array.isArray(parsed) ? (parsed as RecentlyViewedItem[]) : [];
+  } catch (err) {
+    console.warn("Failed to parse recently viewed from localStorage", err);
+    return [];
+  }
+}
+
 export function RecentlyViewedProvider({
   children,
   maxItems = 8,
 }: RecentlyViewedProviderProps) {
   const [items, setItems] = useState<RecentlyViewedItem[]>([]);
+  const [storageReady, setStorageReady] = useState(false);
 
-  // Load from localStorage on mount
   useEffect(() => {
-    if (typeof window === "undefined") return;
-
-    try {
-      const raw = window.localStorage.getItem(STORAGE_KEY);
-      if (!raw) return;
-      const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed)) {
-        setItems(parsed);
-      }
-    } catch (err) {
-      console.warn("Failed to parse recently viewed from localStorage", err);
-    }
+    window.queueMicrotask(() => {
+      setItems(loadInitialRecentlyViewed());
+      setStorageReady(true);
+    });
   }, []);
 
   // Persist to localStorage on change
   useEffect(() => {
+    if (!storageReady) return;
     if (typeof window === "undefined") return;
 
     try {
@@ -72,7 +81,7 @@ export function RecentlyViewedProvider({
     } catch (err) {
       console.warn("Failed to save recently viewed to localStorage", err);
     }
-  }, [items]);
+  }, [items, storageReady]);
 
   const addViewedProduct = useCallback(
     (item: RecentlyViewedItem) => {
@@ -101,8 +110,9 @@ export function RecentlyViewedProvider({
       items,
       addViewedProduct,
       clear,
+      storageReady,
     }),
-    [items, addViewedProduct]
+    [items, addViewedProduct, storageReady]
   );
 
   return (
@@ -126,10 +136,11 @@ export function ProductRecentlyViewedTracker(
   props: ProductRecentlyViewedTrackerProps
 ) {
   const { addViewedProduct } = useRecentlyViewed();
+  const { id, slug, name, thumbnailUrl, price } = props;
 
   useEffect(() => {
-    addViewedProduct(props);
-  }, [props.id, props.slug, addViewedProduct]);
+    addViewedProduct({ id, slug, name, thumbnailUrl, price });
+  }, [id, slug, name, thumbnailUrl, price, addViewedProduct]);
 
   return null;
 }

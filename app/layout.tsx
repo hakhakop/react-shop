@@ -1,11 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
 
-import {
-  getProductCategories,
-  ProductCategory,
-} from "../lib/navigation";
-import { getCategoryTree } from "../lib/categories";
 import { getThemeSettings } from "../lib/themeSettings";
 import { CartProvider } from "../components/CartProvider";
 import { ToastProvider } from "../components/ToastProvider";
@@ -13,11 +8,12 @@ import { ThemeProvider } from "../components/ThemeProvider";
 import { WishlistProvider } from "../components/WishlistProvider";
 import MiniCart from "../components/MiniCart";
 import HeaderShell from "../components/HeaderShell";
-import CategoryBar from "../components/CategoryBar";
 import SearchProvider from "../components/SearchProvider";
 import RecentlyViewedProvider from "../components/RecentlyViewedProvider";
 import FloatingCartSummary from "../components/FloatingCartSummary";
 import ScrollToTopButton from "../components/ScrollToTopButton";
+import FrontendAdminBar from "../components/FrontendAdminBar";
+import { getBuilderShellSettings } from "../lib/builderShell";
 
 export const metadata: Metadata = {
   title: "Webpages Store",
@@ -30,24 +26,10 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  // Load navigation categories and theme settings in parallel
-  const [[flatCategories, categoryTree], themeSettingsRaw] =
-    await Promise.all([
-      Promise.all([getProductCategories(), getCategoryTree()]),
-      getThemeSettings(),
-    ]);
-
-  // Map category slug -> product count for quick lookup
-  const countsBySlug = new Map<string, number>();
-  flatCategories.forEach((cat: ProductCategory) => {
-    countsBySlug.set(cat.slug, cat.count);
-  });
-
-  // Convert Map to plain object so it can be passed to a client component
-  const countsBySlugObj: Record<string, number> = {};
-  countsBySlug.forEach((value, key) => {
-    countsBySlugObj[key] = value;
-  });
+  const [themeSettingsRaw, shellSettings] = await Promise.all([
+    getThemeSettings(),
+    getBuilderShellSettings(),
+  ]);
 
   // All ACF options from WordPress (via webpagesThemeSettingsRaw)
   const settings = (themeSettingsRaw || {}) as Record<string, any>;
@@ -57,6 +39,7 @@ export default async function RootLayout({
   const designTokensCss = Object.entries(designTokens)
     .map(([key, value]) => `${key}: ${value};`)
     .join("\n  ");
+  const storefrontPreset = String(settings.storefrontPreset ?? "minimal");
 
   const getCssValue = (value: unknown, fallback: string): string => {
     if (value === undefined || value === null) return fallback;
@@ -113,22 +96,44 @@ export default async function RootLayout({
     return fallback;
   };
 
+  const hasSettingValue = (value: unknown): boolean => {
+    return value !== undefined && value !== null && String(value).trim() !== "";
+  };
+
+  const optionalCssVar = (name: string, value: unknown): string => {
+    return hasSettingValue(value) ? `  ${name}: ${String(value).trim()};` : "";
+  };
+
   // Product card look
-  const productCardRadius = getCssValue(
+  const productCardRadius = toCssSize(
     settings.product_card_radius,
-    "10px"
+    designTokens["--radius-lg"] ?? "10px"
   );
+
+  const sectionSpacingToCss = (value: string | undefined) => {
+    switch (value) {
+      case "none":
+        return "0px";
+      case "small":
+        return "clamp(18px, 3vw, 36px)";
+      case "large":
+        return "clamp(52px, 7vw, 96px)";
+      case "medium":
+      default:
+        return "clamp(28px, 5vw, 72px)";
+    }
+  };
   const productCardBg = getCssValue(
     settings.product_card_background,
-    "#ffffff"
+    designTokens["--product-card-bg"] ?? "#ffffff"
   );
   const productCardShadow = getCssValue(
     settings.product_card_shadow,
-    "0 0 0 rgba(15, 23, 42, 0)"
+    designTokens["--shadow-sm"] ?? "0 0 0 rgba(15, 23, 42, 0)"
   );
   const productCardShadowHover = getCssValue(
     settings.product_card_shadow_hover,
-    "0 18px 40px rgba(15, 23, 42, 0.14)"
+    designTokens["--shadow-lg"] ?? "0 18px 40px rgba(15, 23, 42, 0.14)"
   );
 
   // Product card sizing
@@ -179,14 +184,27 @@ export default async function RootLayout({
     productImageNoPadding ? "cover" : "contain"
   );
 
+  const explicitWordPressProductVars = [
+    optionalCssVar("--wp-product-card-bg", settings.product_card_background),
+    optionalCssVar("--wp-product-card-shadow", settings.product_card_shadow),
+    optionalCssVar(
+      "--wp-product-card-shadow-hover",
+      settings.product_card_shadow_hover
+    ),
+  ]
+    .filter(Boolean)
+    .join("\n");
+
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className="body-root">
+      <body className="body-root" data-storefront-preset={storefrontPreset}>
         {/* Theme-driven CSS variables for product cards and images */}
         <style
           dangerouslySetInnerHTML={{
             __html: `
 :root {
+  ${designTokensCss}
+
   --product-card-radius: ${productCardRadius};
   --product-card-bg: ${productCardBg};
   --product-card-shadow: ${productCardShadow};
@@ -201,8 +219,11 @@ export default async function RootLayout({
   --product-image-max-height: ${productImageMaxHeight};
   --product-image-object-fit: ${productImageObjectFit};
   --product-image-aspect-ratio: ${productImageAspectRatio};
-
-  ${designTokensCss}
+  --builder-global-section-padding-top: ${sectionSpacingToCss(shellSettings.sectionPaddingTop)};
+  --builder-global-section-padding-bottom: ${sectionSpacingToCss(shellSettings.sectionPaddingBottom)};
+  --builder-global-section-margin-top: ${sectionSpacingToCss(shellSettings.sectionMarginTop)};
+  --builder-global-section-margin-bottom: ${sectionSpacingToCss(shellSettings.sectionMarginBottom)};
+${explicitWordPressProductVars}
 }
             `.trim(),
           }}
@@ -214,18 +235,14 @@ export default async function RootLayout({
               <WishlistProvider>
                 <SearchProvider>
                    <RecentlyViewedProvider>
-                  <HeaderShell />
-
-                  {categoryTree.length > 0 && (
-                    <CategoryBar
-                      categoryTree={categoryTree}
-                      countsBySlug={countsBySlugObj}
-                    />
+                  {shellSettings.headerVisible && (
+                    <HeaderShell layoutOverride={shellSettings.headerLayout} />
                   )}
 
                   <main className="site-main">{children}</main>
 
                   {/* Scroll to top + Floating cart bubble */}
+                    <FrontendAdminBar />
                     <ScrollToTopButton />
                   {/* Floating cart bubble */}
                     <FloatingCartSummary />

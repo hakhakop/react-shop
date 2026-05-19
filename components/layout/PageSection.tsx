@@ -119,14 +119,6 @@ export function PageSection({
   const top = normalizeSpacing(topSpacing);
   const bottom = normalizeSpacing(bottomSpacing);
 
-  console.log("[PageSection]", {
-  id,
-  rawTop: topSpacing,
-  rawBottom: bottomSpacing,
-  normalizedTop: top,
-  normalizedBottom: bottom,
-});
-
   const paddingTop = spacingToPx(top);
   const paddingBottom = spacingToPx(bottom);
 

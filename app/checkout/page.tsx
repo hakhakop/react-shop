@@ -55,6 +55,7 @@ export default function CheckoutPage() {
 
     const itemsPayload = (items || []).map((item: AnyCartItem) => ({
       productId: item.productId ?? item.databaseId ?? item.id,
+      variationId: item.variationId ?? null,
       quantity: item.quantity ?? item.qty ?? 1,
     }));
 
@@ -78,7 +79,13 @@ export default function CheckoutPage() {
         );
       }
 
-      // Success: clear cart, show message, reset form
+      if (data.checkoutUrl) {
+        clearCart();
+        window.location.assign(data.checkoutUrl);
+        return;
+      }
+
+      // Fallback: order created, but WooCommerce did not return a payment URL.
       clearCart();
       form.reset();
       setPlaced(true);
@@ -147,7 +154,10 @@ export default function CheckoutPage() {
           <div style={{ fontWeight: 600, marginBottom: "4px" }}>
             Thank you! 💗
           </div>
-          <div>Your order was created in WooCommerce and the cart is empty.</div>
+          <div>
+            Your order was created in WooCommerce. WooCommerce did not return a
+            payment URL, so we stayed here.
+          </div>
           <div style={{ marginTop: "8px" }}>
             <Link href="/" style={{ color: "#15803d" }}>
               Back to store
@@ -320,7 +330,7 @@ export default function CheckoutPage() {
                       opacity: placing ? 0.7 : 1,
                     }}
                   >
-                    {placing ? "Placing order…" : "Place order"}
+                    {placing ? "Connecting to WooCommerce…" : "Continue to WooCommerce checkout"}
                   </button>
 
                   <div
@@ -330,8 +340,8 @@ export default function CheckoutPage() {
                       textAlign: "center",
                     }}
                   >
-                    This checkout creates a real order in your WooCommerce
-                    backend using the REST API.
+                    This creates the WooCommerce order, then hands the customer
+                    to WooCommerce for payment.
                   </div>
                 </div>
               </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { ReactNode, useEffect, useMemo, useState, useCallback } from "react";
+import React, { ReactNode, useEffect, useState, useCallback } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 
 type EmblaOptions = Parameters<typeof useEmblaCarousel>[0];

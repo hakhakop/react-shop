@@ -1,0 +1,18 @@
+[Unit]
+Description=React Shop Next.js storefront
+After=network.target
+
+[Service]
+Type=simple
+User=react
+Group=react
+WorkingDirectory=/home/react/app
+Environment=NODE_ENV=production
+Environment=HOST=127.0.0.1
+Environment=PORT=3001
+ExecStart=/usr/bin/npm run start
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

@@ -5,6 +5,8 @@ import {
 } from "../../../lib/products";
 import Breadcrumbs from "../../../components/Breadcrumbs";
 import CategoryWithFilters from "../../../components/CategoryWithFilters";
+import StorefrontBuilderRenderer from "@/components/builder/StorefrontBuilderRenderer";
+import { getPublishedBuilderLayout } from "@/lib/builderLayouts";
 
 export default async function CategoryPage({
   params,
@@ -38,6 +40,32 @@ export default async function CategoryPage({
   }
 
   const products: ProductNode[] = category.products;
+  const [specificTemplateLayout, defaultTemplateLayout] = await Promise.all([
+    getPublishedBuilderLayout("product-category-specific"),
+    getPublishedBuilderLayout("product-category"),
+  ]);
+  const specificTemplateMatches = specificTemplateLayout?.sections.some(
+    (section) => section.source === "category" && section.categoryId === slug
+  );
+  const templateLayout = specificTemplateMatches
+    ? specificTemplateLayout
+    : defaultTemplateLayout;
+
+  if (templateLayout) {
+    return (
+      <StorefrontBuilderRenderer
+        layout={templateLayout}
+        page={templateLayout.page}
+        pageLabel={category.name}
+        breadcrumbItems={[
+          { label: "Home", href: "/" },
+          { label: "Shop", href: "/shop" },
+          { label: category.name },
+        ]}
+        products={products}
+      />
+    );
+  }
 
   return (
     <main className="page">

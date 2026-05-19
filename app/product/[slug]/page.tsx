@@ -1,10 +1,12 @@
 import Link from "next/link";
 import { graphqlFetch } from "../../../lib/graphql";
-import AddToCartButton from "../../../components/AddToCartButton";
 import Breadcrumbs from "../../../components/Breadcrumbs";
 import ProductGallery from "../../../components/ProductGallery";
+import ProductOptionsSelector from "../../../components/ProductOptionsSelector";
 import WishlistToggle from "../../../components/WishlistToggle";
+import StorefrontBuilderRenderer from "@/components/builder/StorefrontBuilderRenderer";
 import { ProductRecentlyViewedTracker } from "@/components/RecentlyViewedProvider";
+import { getPublishedBuilderLayout } from "@/lib/builderLayouts";
 
 type WPImage = {
   sourceUrl: string;
@@ -154,6 +156,42 @@ const priceFormatted =
   const mainImageUrl = p.image?.sourceUrl || undefined;
 
   const attributes = p.attributes?.nodes ?? [];
+  const templateLayout = await getPublishedBuilderLayout("product-single");
+
+  if (templateLayout) {
+    return (
+      <>
+        <ProductRecentlyViewedTracker
+          id={p.id}
+          slug={p.slug}
+          name={p.name}
+          thumbnailUrl={p.image?.sourceUrl}
+          price={priceFormatted}
+        />
+        <StorefrontBuilderRenderer
+          layout={templateLayout}
+          page="product-single"
+          pageLabel={p.name}
+          breadcrumbItems={[
+            { label: "Home", href: "/" },
+            { label: "Shop", href: "/shop" },
+            { label: p.name },
+          ]}
+          product={{
+            id: p.id,
+            slug: p.slug,
+            name: p.name,
+            description: p.description,
+            priceNumber,
+            priceFormatted,
+            imageUrl: mainImageUrl,
+            images,
+            attributes,
+          }}
+        />
+      </>
+    );
+  }
 
   return (
     <main className="product-page">
@@ -198,12 +236,13 @@ const priceFormatted =
           )}
 
           <div style={{ marginBottom: "16px" }}>
-            <AddToCartButton
+            <ProductOptionsSelector
               id={p.id}
               slug={p.slug}
               name={p.name}
               priceNumber={priceNumber}
               imageUrl={mainImageUrl}
+              attributes={attributes}
             />
           </div>
 

@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect, type ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
 import Image from "next/image";
 import WishlistToggle from "./WishlistToggle";
+import AddToCartButton from "./AddToCartButton";
 import { SiteIcon } from "@/components/ui/SiteIcon";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -21,16 +22,44 @@ export type BasicProduct = {
   name: string;
   image?: WPImage | null;
   price?: string | null;
+  attributes?: {
+    nodes?: {
+      name?: string | null;
+      label?: string | null;
+      options?: string[] | null;
+    }[] | null;
+  } | null;
 };
 
+function formatPrice(price: string | null | undefined) {
+  if (!price) return null;
+  const priceNumber = parseFloat(price);
+  if (Number.isNaN(priceNumber)) return null;
+
+  const rounded = Math.round(priceNumber);
+  const withSpaces = rounded
+    .toString()
+    .replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+
+  return `${withSpaces} ֏`;
+}
+
+function getProductAttributes(product: BasicProduct) {
+  return (product.attributes?.nodes ?? [])
+    .map((attr) => {
+      const label = (attr.label || attr.name || "").trim();
+      const values = (attr.options ?? [])
+        .map((value) => value.trim())
+        .filter(Boolean);
+
+      return { label, values };
+    })
+    .filter((attr) => attr.label && attr.values.length > 0)
+    .slice(0, 2);
+}
+
 function QuickViewPortal({ children }: { children: ReactNode }) {
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted || typeof document === "undefined") return null;
+  if (typeof document === "undefined") return null;
 
   return createPortal(children, document.body);
 }
@@ -42,15 +71,17 @@ export default function ProductCard({
   product: BasicProduct;
   preset?: string;
 }) {
-  const priceNumber = product.price ? parseFloat(product.price) : null;
   const imageUrl = product.image?.sourceUrl || undefined;
+  const priceNumber = product.price ? parseFloat(product.price) : null;
+  const formattedPrice = formatPrice(product.price);
+  const attributes = getProductAttributes(product);
 
   const [isQuickViewOpen, setIsQuickViewOpen] = useState(false);
 
   return (
     <MotionDiv
       className="product-card"
-      whileHover={{ y: -4, scale: 1.01 }}
+      data-card-preset={preset}
       transition={{ type: "spring", stiffness: 260, damping: 22 }}
     >
       <div className="product-card-inner">
@@ -79,14 +110,14 @@ export default function ProductCard({
           className="product-card-link"
           aria-label={product.name}
         >
-          <div className="product-image-wrapper">
+          <div className="product-image">
             {imageUrl ? (
               <Image
                 src={imageUrl}
                 alt={product.image?.altText || product.name}
                 width={400}
                 height={400}
-                className="product-image"
+                className="product-image-img"
                 style={{
                   objectFit:
                     "var(--product-image-object-fit, cover)" as React.CSSProperties["objectFit"],
@@ -101,18 +132,33 @@ export default function ProductCard({
             {product.name}
           </h3>
 
-          {priceNumber !== null && !Number.isNaN(priceNumber) && (
-            <div className="product-price">
-              {(() => {
-                const rounded = Math.round(priceNumber);
-                const withSpaces = rounded
-                  .toString()
-                  .replace(/\B(?=(\d{3})+(?!\d))/g, " ");
-                return `${withSpaces} ֏`;
-              })()}
+          {attributes.length > 0 && (
+            <div className="product-attributes-row">
+              {attributes.map((attr) => (
+                <div key={attr.label} className="product-attribute-badge">
+                  <span className="product-attribute-label">{attr.label}</span>
+                  <span className="product-attribute-values">
+                    {attr.values.join(", ")}
+                  </span>
+                </div>
+              ))}
             </div>
           )}
+
+          {formattedPrice && (
+            <div className="product-price">{formattedPrice}</div>
+          )}
         </Link>
+
+        <div className="product-card-actions-row">
+          <AddToCartButton
+            id={product.id}
+            slug={product.slug}
+            name={product.name}
+            priceNumber={priceNumber}
+            imageUrl={imageUrl}
+          />
+        </div>
       </div>
 
       {/* Quick View modal in a portal (overlays whole page) */}
@@ -164,16 +210,8 @@ export default function ProductCard({
                   <div className="quick-view-details">
                     <h2 className="quick-view-title">{product.name}</h2>
 
-                    {priceNumber !== null && !Number.isNaN(priceNumber) && (
-                      <div className="quick-view-price">
-                        {(() => {
-                          const rounded = Math.round(priceNumber);
-                          const withSpaces = rounded
-                            .toString()
-                            .replace(/\B(?=(\d{3})+(?!\d))/g, " ");
-                          return `${withSpaces} ֏`;
-                        })()}
-                      </div>
+                    {formattedPrice && (
+                      <div className="quick-view-price">{formattedPrice}</div>
                     )}
 
                     <div className="quick-view-actions">

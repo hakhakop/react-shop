@@ -48,6 +48,9 @@ export default function CartPageClient() {
             >
               Clear cart
             </button>
+            <Link href="/checkout" className="btn btn-primary">
+              Checkout
+            </Link>
           </div>
 
           <div className="cart-items">

@@ -9,19 +9,28 @@ import {
 } from "../lib/themeSettings";
 import { getMainMenuItems, type MenuItem } from "../lib/navigation";
 import HeaderActions from "./HeaderActions";
+import HeaderCategoriesDropdown from "./HeaderCategoriesDropdown";
 import CategoryMegaMenu from "./CategoryMegaMenu";
 import HeaderNav from "./HeaderNav";
 import HeaderFrame from "./HeaderFrame";
+import HeaderPillController from "./HeaderPillController";
+import type { BuilderHeaderLayout } from "../lib/builderShell";
+import { readBuilderCustomPages } from "../lib/builderLayouts";
 function asString(value: unknown, fallback: string | null = null): string | null {
   if (typeof value === "string" && value.trim() !== "") return value.trim();
   return fallback;
 }
 
-export default async function HeaderShell() {
+type HeaderShellProps = {
+  layoutOverride?: BuilderHeaderLayout;
+};
+
+export default async function HeaderShell({ layoutOverride }: HeaderShellProps) {
   // Load theme settings and main menu in parallel
-  const [settingsRaw, menuItemsRaw] = await Promise.all([
+  const [settingsRaw, menuItemsRaw, builderPages] = await Promise.all([
     getThemeSettings(),
     getMainMenuItems(),
+    readBuilderCustomPages(),
   ]);
 
   const settings = (settingsRaw || {}) as Record<string, any>;
@@ -74,9 +83,11 @@ export default async function HeaderShell() {
 
   // Header layout from ACF `layout` field: simple / centered / split
   const layoutValue =
-    (asString(settings.layout, "centered") || "centered").toLowerCase();
+    layoutOverride && layoutOverride !== "wordpress"
+      ? layoutOverride
+      : (asString(settings.layout, "centered") || "centered").toLowerCase();
 
-  let layout: "simple" | "two-row" | "hero" | "pill";
+  let layout: "simple" | "two-row" | "hero" | "pill" | "princity";
   switch (layoutValue) {
     case "simple":
       layout = "simple";
@@ -85,8 +96,14 @@ export default async function HeaderShell() {
       layout = "hero";
       break;
     case "pill":
-    case "princity":
       layout = "pill";
+      break;
+    case "princity":
+    case "princity-clean":
+    case "princity_clean":
+    case "princity-flat":
+    case "princity_flat":
+      layout = "princity";
       break;
     case "centered":
     default:
@@ -99,26 +116,26 @@ export default async function HeaderShell() {
     ? (menuItemsRaw as MenuItem[])
     : []) as MenuItem[];
 
+  const builderPageItems: MenuItem[] = builderPages.map((page) => ({
+    id: page.key,
+    label: page.title,
+    url: `/${page.slug}`,
+    path: `/${page.slug}`,
+  }));
+
   const itemsToRender =
     menuItems.length > 0
-      ? menuItems
+      ? [...menuItems, ...builderPageItems]
       : [
           { id: "home", label: "Home", url: "/", path: "/" },
           { id: "shop", label: "Shop", url: "/", path: "/" },
+          ...builderPageItems,
         ];
 
   const renderCategoriesMega = () => (
-    <div className="site-header-categories">
-      <button
-        type="button"
-        className="site-header-nav-link site-header-categories-toggle"
-      >
-        <span>Categories</span>
-      </button>
-      <div className="site-header-categories-panel">
-        <CategoryMegaMenu />
-      </div>
-    </div>
+    <HeaderCategoriesDropdown>
+      <CategoryMegaMenu />
+    </HeaderCategoriesDropdown>
   );
 
   const renderLogoAndBrand = () => (
@@ -146,8 +163,8 @@ export default async function HeaderShell() {
    return (
     <HeaderFrame
       accentColor={accentColor}
-      mode={layout === "pill" ? "none" : "sticky"}
-      className={layout === "pill" ? "site-header--pill" : ""}
+      mode={layout === "pill" || layout === "princity" ? "none" : "sticky"}
+      className={layout === "pill" || layout === "princity" ? "site-header--pill" : ""}
     >
       {/* LAYOUT 2: TWO-ROW (ACF = centered) */}
       {layout === "two-row" && (
@@ -189,6 +206,7 @@ export default async function HeaderShell() {
       {/* LAYOUT 4: PILL ON SCROLL (ACF = pill / princity) */}
       {layout === "pill" && (
         <>
+          <HeaderPillController />
           <div
             id="site-header-pill"
             data-scrolled="false"
@@ -233,89 +251,48 @@ export default async function HeaderShell() {
             {/* Spacer only when pill is floating, so content doesn't jump under it */}
             <div className="site-header-pill-spacer" />
           </div>
-          <script
-            dangerouslySetInnerHTML={{
-              __html: `(function () {
-  try {
-    if (window.__headerPillInit) return;
-    window.__headerPillInit = true;
+        </>
+      )}
 
-    var threshold = 72; // move the switch point slightly lower to avoid top-of-page settle jitter
-    var hysteresis = 24; // wider buffer for slow-scroll stability
-    var cooldownMs = 200; // still protects from rapid flips without feeling laggy
+      {/* LAYOUT 5: PRINCITY-INSPIRED FLAT COMMERCE HEADER */}
+      {layout === "princity" && (
+        <>
+          <HeaderPillController />
+          <div
+            id="site-header-pill"
+            data-scrolled="false"
+            className="site-header-princity-shell"
+            suppressHydrationWarning
+          >
+            <div className="site-header-princity-meta-row">
+              <span>{topBarText || "Modern commerce by Webpages"}</span>
+              <span>
+                {[supportPhone, currencyLabel].filter(Boolean).join("   ")}
+              </span>
+            </div>
 
-    function getScrollY() {
-      var y = (
-        window.scrollY ||
-        window.pageYOffset ||
-        document.documentElement.scrollTop ||
-        document.body.scrollTop ||
-        0
-      );
-      return Math.round(y);
-    }
+            <div className="site-header-princity">
+              <div className="site-header-princity-inner">
+                <div className="site-header-princity-left">
+                  {renderLogoAndBrand()}
+                </div>
 
-    function init(attempt) {
-      var el = document.getElementById('site-header-pill');
-      if (!el) {
-        if (attempt < 40) return setTimeout(function () { init(attempt + 1); }, 50);
-        return;
-      }
-      if (el.getAttribute('data-pill-init') === 'true') return;
-      el.setAttribute('data-pill-init', 'true');
+                <div className="site-header-princity-center">
+                  <HeaderNav items={itemsToRender} />
+                  {renderCategoriesMega()}
+                </div>
 
-      var isScrolled = el.getAttribute('data-scrolled') === 'true';
-      var lastFlip = 0;
-      var ticking = false;
-      var lastY = getScrollY();
+                <div className="site-header-princity-right">
+                  <HeaderActions
+                    icons={headerIconOrder}
+                    iconVariant={headerIconVariant}
+                  />
+                </div>
+              </div>
+            </div>
 
-      function applyState(next) {
-        if (next === isScrolled) return;
-        var now = Date.now();
-        if (now - lastFlip < cooldownMs) return;
-        lastFlip = now;
-        isScrolled = next;
-        el.setAttribute('data-scrolled', isScrolled ? 'true' : 'false');
-      }
-
-      function computeNext(y) {
-        // Direction-aware hysteresis:
-        // only turn ON while scrolling down, only turn OFF while scrolling up.
-        var dir = y > lastY ? 1 : y < lastY ? -1 : 0;
-        lastY = y;
-
-        if (!isScrolled && dir >= 0 && y > (threshold + hysteresis)) return true;
-        if (isScrolled && dir <= 0 && y < (threshold - hysteresis)) return false;
-        return isScrolled;
-      }
-
-      function update() {
-        ticking = false;
-        var y = getScrollY();
-        if (y === lastY) return;
-        applyState(computeNext(y));
-      }
-
-      function onScroll() {
-        if (ticking) return;
-        ticking = true;
-        window.requestAnimationFrame(update);
-      }
-
-      // Initial state
-      isScrolled = getScrollY() > (threshold + hysteresis);
-      el.setAttribute('data-scrolled', isScrolled ? 'true' : 'false');
-
-      window.addEventListener('scroll', onScroll, { passive: true });
-      window.addEventListener('resize', onScroll, { passive: true });
-    }
-
-    // Delay init to avoid mutating SSR HTML before React hydration
-    setTimeout(function () { init(0); }, 60);
-  } catch (e) {}
-})();`,
-            }}
-          />
+            <div className="site-header-pill-spacer site-header-princity-spacer" />
+          </div>
         </>
       )}
 

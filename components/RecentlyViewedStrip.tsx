@@ -2,12 +2,30 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { useSyncExternalStore } from "react";
 import { useRecentlyViewed } from "./RecentlyViewedProvider";
 
-export default function RecentlyViewedStrip() {
-  const { items, clear } = useRecentlyViewed();
+const subscribeToHydration = (callback: () => void) => {
+  window.queueMicrotask(callback);
+  return () => {};
+};
 
-  if (!items.length) {
+const getHydratedSnapshot = () => true;
+const getServerHydratedSnapshot = () => false;
+
+function useHydrated() {
+  return useSyncExternalStore(
+    subscribeToHydration,
+    getHydratedSnapshot,
+    getServerHydratedSnapshot
+  );
+}
+
+export default function RecentlyViewedStrip() {
+  const { items, clear, storageReady } = useRecentlyViewed();
+  const hydrated = useHydrated();
+
+  if (!hydrated || !storageReady || !items.length) {
     return null;
   }
 

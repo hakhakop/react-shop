@@ -3,7 +3,10 @@ import { getProducts } from "@/lib/products";
 import CategoryWithFilters from "@/components/CategoryWithFilters";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import RecentlyViewedStrip from "@/components/RecentlyViewedStrip";
+import StorefrontBuilderRenderer from "@/components/builder/StorefrontBuilderRenderer";
+import { getPublishedBuilderLayout } from "@/lib/builderLayouts";
 
+export const dynamic = "force-dynamic";
 
 export const metadata = {
   title: "Shop – All Products",
@@ -34,7 +37,7 @@ function ShopProductsSkeleton() {
   );
 }
 
-export default function ShopPage() {
+function DefaultShopPage() {
   return (
     <main className="page">
       <Breadcrumbs
@@ -60,4 +63,14 @@ export default function ShopPage() {
       </Suspense>
     </main>
   );
+}
+
+export default async function ShopPage() {
+  const layout = await getPublishedBuilderLayout("shop");
+
+  if (layout?.sections?.some((section) => section.visible)) {
+    return <StorefrontBuilderRenderer layout={layout} page="shop" />;
+  }
+
+  return <DefaultShopPage />;
 }

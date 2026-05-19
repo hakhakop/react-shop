@@ -1,7 +1,29 @@
 import { ProductGridLayoutBlock } from "../../lib/pageBuilder";
+import type { CSSProperties } from "react";
 import ProductCard from "../ProductCard";
 import { getProductsForGrid } from "../../lib/products";
 import ProductCarousel from "../ProductCarousel"; // make sure this file exists
+
+function pickFirstString(value: unknown): string | undefined {
+  if (Array.isArray(value)) {
+    const first = value[0];
+    return typeof first === "string" ? first : undefined;
+  }
+
+  return typeof value === "string" ? value : undefined;
+}
+
+function normalizeColumnsDesktop(value: unknown): number | undefined {
+  const parsed =
+    typeof value === "number"
+      ? value
+      : typeof value === "string"
+        ? parseInt(value, 10)
+        : NaN;
+
+  if (!Number.isFinite(parsed)) return undefined;
+  return Math.min(Math.max(parsed, 2), 6);
+}
 
 export default async function ProductGridBlock({
   block,
@@ -77,12 +99,33 @@ export default async function ProductGridBlock({
     .trim()
     .toLowerCase();
 
-  // DEBUG (optional): uncomment to see what the block gives you
-  // console.log("ProductGridBlock layoutVariant:", layoutVariant, "raw:", block.layoutVariant);
-console.log("BLOCK layoutVariant:", block.layoutVariant);
-console.log("Computed layoutVariant:", layoutVariant);
+  const gridSurface =
+    pickFirstString(block.gridSurface) ??
+    pickFirstString(block.productGridSurface) ??
+    "auto";
+
+  const cardSurface =
+    pickFirstString(block.cardSurface) ??
+    pickFirstString(block.productCardSurface) ??
+    "auto";
+
+  const columnsDesktop = normalizeColumnsDesktop(block.columnsDesktop);
+
   return (
-    <div className="pb-product-grid">
+    <div
+      className="pb-product-grid"
+      style={
+        columnsDesktop
+          ? ({
+              "--pb-grid-columns-desktop": columnsDesktop,
+            } as CSSProperties)
+          : undefined
+      }
+      data-layout-variant={layoutVariant}
+      data-card-preset={preset}
+      data-grid-surface={gridSurface}
+      data-card-surface={cardSurface}
+    >
       <h2 className="pb-grid-title">Product Grid ({preset})</h2>
 
       {layoutVariant === "carousel" ? (

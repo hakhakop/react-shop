@@ -13,6 +13,7 @@ export type CarouselSlide = {
   buttonLabel?: string | null;
   buttonUrl?: string | null;
   badge?: string | null;
+  imagePadding?: "frameless" | "small" | "medium" | "max" | string | null;
 };
 
 export type CarouselSettings = {
@@ -30,7 +31,7 @@ export type CarouselSettings = {
 };
 
 type CarouselBlockProps = {
-  block: CarouselLayoutBlock;
+  block?: CarouselLayoutBlock;
   slides: CarouselSlide[];
   settings?: CarouselSettings;
 };
@@ -39,9 +40,6 @@ export default function CarouselBlock({
   slides,
   settings,
 }: CarouselBlockProps) {
-  // Server-side debug log so we can see if slides arrive from PageRenderer
-  console.log("[CarouselBlock] slides", slides);
-
   if (!slides || slides.length === 0) {
     return (
       <div className="text-sm opacity-60">
@@ -49,7 +47,6 @@ export default function CarouselBlock({
       </div>
     );
   }
-console.log("[CarouselBlock] settings", settings);
   // Normalize variant: ACF/GraphQL may give us ["basic"] instead of "basic"
   const normalizedVariant =
     Array.isArray(settings?.variant)
@@ -110,6 +107,32 @@ console.log("[CarouselBlock] settings", settings);
         className="w-full"
       >
         {slides.map((slide) => {
+          const imagePanelPadding = (() => {
+            switch (slide.imagePadding) {
+              case "frameless":
+                return {
+                  panel: "p-0",
+                  media: "rounded-none",
+                };
+              case "small":
+                return {
+                  panel: "p-3 pb-0",
+                  media: "rounded-xl",
+                };
+              case "max":
+                return {
+                  panel: "p-8 md:p-14 pb-0 md:pb-0",
+                  media: "rounded-lg",
+                };
+              case "medium":
+              default:
+                return {
+                  panel: "p-6 pb-0",
+                  media: "rounded-xl",
+                };
+            }
+          })();
+
           const content = (
             <>
               {slide.badge && (
@@ -144,17 +167,26 @@ console.log("[CarouselBlock] settings", settings);
           );
 
           const baseCardClasses =
-            "relative w-full overflow-hidden rounded-2xl bg-neutral-900 text-neutral-50 flex flex-col gap-4 md:gap-6";
+            "relative w-full overflow-hidden rounded-2xl bg-neutral-900 text-neutral-50 flex flex-col";
 
-          const variantCardClasses = (() => {
+          const variantClasses = (() => {
             switch (normalizedVariant) {
               case "hero":
-                return "p-8 md:p-14 items-center text-center justify-center min-h-[260px] md:min-h-[360px]";
+                return {
+                  card: "items-stretch text-center justify-center min-h-[260px] md:min-h-[360px]",
+                  content: "p-8 md:p-14 items-center",
+                };
               case "overlay":
-                return "p-6 md:p-10 justify-end min-h-[260px] md:min-h-[360px]";
+                return {
+                  card: "justify-end min-h-[260px] md:min-h-[360px]",
+                  content: "p-6 md:p-10",
+                };
               default:
                 // "basic" and anything unknown
-                return "p-6 md:p-10";
+                return {
+                  card: "",
+                  content: "p-6 md:p-10",
+                };
             }
           })();
 
@@ -163,7 +195,7 @@ console.log("[CarouselBlock] settings", settings);
               key={slide.id}
               className={`min-w-0 ${itemWidthClasses} px-2 md:px-4`}
             >
-              <div className={`${baseCardClasses} ${variantCardClasses}`}>
+              <div className={`${baseCardClasses} ${variantClasses.card}`}>
                 {normalizedVariant === "overlay" && slide.imageUrl ? (
                   <>
                     <Image
@@ -173,23 +205,33 @@ console.log("[CarouselBlock] settings", settings);
                       className="object-cover opacity-70"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent" />
-                    <div className="relative z-10 flex flex-col gap-4 md:gap-6">
+                    <div
+                      className={`relative z-10 flex flex-col gap-4 md:gap-6 ${variantClasses.content}`}
+                    >
                       {content}
                     </div>
                   </>
                 ) : (
                   <>
                     {slide.imageUrl && (
-                      <div className="relative w-full h-48 md:h-72 overflow-hidden rounded-xl">
-                        <Image
-                          src={slide.imageUrl}
-                          alt={slide.imageAlt ?? ""}
-                          fill
-                          className="object-cover"
-                        />
+                      <div className={`w-full ${imagePanelPadding.panel}`}>
+                        <div
+                          className={`relative w-full h-48 md:h-72 overflow-hidden ${imagePanelPadding.media}`}
+                        >
+                          <Image
+                            src={slide.imageUrl}
+                            alt={slide.imageAlt ?? ""}
+                            fill
+                            className="object-cover"
+                          />
+                        </div>
                       </div>
                     )}
-                    {content}
+                    <div
+                      className={`flex flex-col gap-4 md:gap-6 ${variantClasses.content}`}
+                    >
+                      {content}
+                    </div>
                   </>
                 )}
               </div>

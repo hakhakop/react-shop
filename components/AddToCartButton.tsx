@@ -5,6 +5,7 @@ import { useToast } from "./ToastProvider";
 
 type Props = {
   id: string;
+  productId?: string | number;
   slug: string;
   name: string;
   priceNumber: number | null;
@@ -13,6 +14,7 @@ type Props = {
 
 export default function AddToCartButton({
   id,
+  productId,
   slug,
   name,
   priceNumber,
@@ -28,6 +30,7 @@ export default function AddToCartButton({
     addItem(
       {
         id,
+        productId: productId ?? id,
         slug,
         name,
         price: priceNumber,
