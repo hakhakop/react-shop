@@ -13,7 +13,7 @@ export async function graphqlFetch<T>(
 ): Promise<T> {
   if (!ENDPOINT) {
     throw new Error(
-      "NEXT_PUBLIC_WORDPRESS_GRAPHQL_URL is not set in .env.local"
+      "NEXT_PUBLIC_WORDPRESS_GRAPHQL_URL is not set. Create .env.local for local development or .env.production for the server."
     );
   }
 
