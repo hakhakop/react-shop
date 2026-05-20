@@ -5,7 +5,9 @@ import Image from "next/image";
 import Link from "next/link";
 import {
   CheckCircle2,
+  CreditCard,
   LockKeyhole,
+  LogIn,
   PackageCheck,
   ShieldCheck,
   Truck,
@@ -14,6 +16,9 @@ import { CartItem, useCart } from "../../components/CartProvider";
 import { useWordPressSession } from "../../components/useWordPressSession";
 
 const wordpressBaseUrl = process.env.NEXT_PUBLIC_WORDPRESS_SITE_URL ?? null;
+const wooAccountUrl = wordpressBaseUrl
+  ? `${wordpressBaseUrl.replace(/\/$/, "")}/my-account/`
+  : "/my-account";
 
 type CheckoutAddress = {
   firstName: string;
@@ -290,6 +295,12 @@ export default function CheckoutPage() {
         </div>
       </section>
 
+      <nav className="checkout-progress" aria-label="Checkout progress">
+        <span className="is-complete">Cart</span>
+        <span className="is-current">Details</span>
+        <span>Payment</span>
+      </nav>
+
       {error && (
         <div className="checkout-alert checkout-alert--error" role="alert">
           {error}
@@ -349,6 +360,12 @@ export default function CheckoutPage() {
                 </div>
               )}
 
+              {session.status === "checking" && (
+                <div className="checkout-session">
+                  Checking your WordPress account session...
+                </div>
+              )}
+
               {session.status === "logged-in" && profileMessage && (
                 <div className="checkout-session checkout-session--profile">
                   {profileMessage}
@@ -360,6 +377,24 @@ export default function CheckoutPage() {
                   Checking out as guest. Sign in from My account if you want the
                   order saved to a WordPress user.
                 </div>
+              )}
+
+              {session.status === "unreadable" && (
+                <div className="checkout-session checkout-session--warning">
+                  {session.message}
+                </div>
+              )}
+
+              {session.status !== "logged-in" && wooAccountUrl && (
+                <a className="checkout-login-card" href={wooAccountUrl}>
+                  <span>
+                    <LogIn size={18} />
+                  </span>
+                  <div>
+                    <strong>Have an account?</strong>
+                    <em>Sign in to use saved WooCommerce details.</em>
+                  </div>
+                </a>
               )}
 
               <div className="checkout-field-grid checkout-field-grid--two">
@@ -598,6 +633,37 @@ export default function CheckoutPage() {
                   rows={4}
                   placeholder="Delivery notes, preferred time, or anything we should know."
                 />
+              </label>
+            </section>
+
+            <section className="checkout-panel">
+              <div className="checkout-panel-heading">
+                <span>04</span>
+                <div>
+                  <h2>Payment handoff</h2>
+                  <p>WooCommerce will calculate final shipping, taxes, and payment.</p>
+                </div>
+              </div>
+
+              <div className="checkout-payment-step">
+                <span>
+                  <CreditCard size={18} />
+                </span>
+                <div>
+                  <strong>Secure WooCommerce payment page</strong>
+                  <p>
+                    After this step, the order is created and the customer is
+                    sent to WooCommerce to choose an available payment method.
+                  </p>
+                </div>
+              </div>
+
+              <label className="checkout-check-row">
+                <input type="checkbox" name="confirmOrderHandoff" required />
+                <span>
+                  I confirm these details are correct and understand payment
+                  continues in WooCommerce.
+                </span>
               </label>
             </section>
           </div>
