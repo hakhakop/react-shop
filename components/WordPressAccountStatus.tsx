@@ -34,7 +34,7 @@ export default function WordPressAccountStatus({
     setAccountState({ status: "checking" });
 
     try {
-      const sessionUrl = `${wordpressBaseUrl}/wp-json/react-shop/v1/session`;
+      const sessionUrl = `${wordpressBaseUrl}/wp-admin/admin-ajax.php?action=react_shop_session`;
       const response = await fetch(sessionUrl, {
         credentials: "include",
         headers: { Accept: "application/json" },
@@ -77,7 +77,7 @@ export default function WordPressAccountStatus({
       setAccountState({
         status: "unreadable",
         message:
-          "React cannot read the WordPress session yet. Add the React Shop session snippet in WordPress and allow this React domain.",
+          "React cannot read the WordPress session yet. Add the React Shop admin-ajax session snippet in WordPress and allow this React domain.",
       });
     }
   }, [wordpressBaseUrl]);
