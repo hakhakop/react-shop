@@ -440,13 +440,18 @@ async function ContentProductsBlock({ block }: { block: BuilderLayoutBlock }) {
   });
 
   return (
-    <CategoryWithFilters
-      products={products}
-      columns={block.columns}
-      filterPosition={block.filterPosition ?? "hidden"}
-      cardStyle={block.cardStyle}
-      pageSize={limit}
-    />
+    <div className={`shop-builder-grid--margin-${block.gridMargin ?? "none"}`}>
+      <CategoryWithFilters
+        products={products}
+        columns={block.columns}
+        filterPosition={block.filterPosition ?? "hidden"}
+        cardStyle={block.cardStyle}
+        pageSize={limit}
+        gridGap={block.gridGap}
+        cardPadding={block.cardPadding}
+        imagePadding={block.imagePadding}
+      />
+    </div>
   );
 }
 

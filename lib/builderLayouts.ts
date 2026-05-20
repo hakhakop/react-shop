@@ -52,6 +52,8 @@ export type BuilderLayoutBlock = {
   cardStyle?: string;
   cardPreset?: string;
   gridLimit?: number;
+  cardPadding?: string;
+  imagePadding?: string;
   source?: string;
   categoryId?: string;
   layoutVariant?: string;

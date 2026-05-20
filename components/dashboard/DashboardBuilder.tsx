@@ -167,8 +167,10 @@ type BuilderLayoutBlock = {
   dateLabel?: string;
   gridSource?: "static" | "products";
   gridRows?: number;
-  gridGap?: "small" | "medium" | "large";
+  gridGap?: "none" | "small" | "medium" | "large" | "max";
   gridMargin?: "none" | "small" | "medium" | "large";
+  cardPadding?: "none" | "small" | "medium" | "large" | "max";
+  imagePadding?: "none" | "small" | "medium" | "large" | "max";
   gridImagePadding?: "frameless" | "small" | "medium" | "max";
   gridContentPadding?: "none" | "small" | "medium" | "large";
   gridImageFrame?: "none" | "soft";
@@ -5256,6 +5258,84 @@ export default function DashboardBuilder() {
                                       <option value="compact">Compact</option>
                                     </select>
                                   </label>
+                                  <details className="builder-collapse" open>
+                                    <summary>Product Grid Spacing</summary>
+                                    <div className="builder-two-column">
+                                      <label className="builder-field">
+                                        <span>Grid Gap</span>
+                                        <select
+                                          value={block.gridGap ?? "medium"}
+                                          onChange={(event) =>
+                                            updateSelectedLayoutBlock(index, blockIndex, {
+                                              gridGap: event.target
+                                                .value as BuilderLayoutBlock["gridGap"],
+                                            })
+                                          }
+                                        >
+                                          <option value="none">None</option>
+                                          <option value="small">Small</option>
+                                          <option value="medium">Medium</option>
+                                          <option value="large">Large</option>
+                                          <option value="max">Max</option>
+                                        </select>
+                                      </label>
+                                      <label className="builder-field">
+                                        <span>Outer Margin</span>
+                                        <select
+                                          value={block.gridMargin ?? "none"}
+                                          onChange={(event) =>
+                                            updateSelectedLayoutBlock(index, blockIndex, {
+                                              gridMargin: event.target
+                                                .value as BuilderLayoutBlock["gridMargin"],
+                                            })
+                                          }
+                                        >
+                                          <option value="none">None</option>
+                                          <option value="small">Small</option>
+                                          <option value="medium">Medium</option>
+                                          <option value="large">Large</option>
+                                        </select>
+                                      </label>
+                                    </div>
+                                    <div className="builder-two-column">
+                                      <label className="builder-field">
+                                        <span>Card Padding</span>
+                                        <select
+                                          value={block.cardPadding ?? "medium"}
+                                          onChange={(event) =>
+                                            updateSelectedLayoutBlock(index, blockIndex, {
+                                              cardPadding: event.target
+                                                .value as BuilderLayoutBlock["cardPadding"],
+                                            })
+                                          }
+                                        >
+                                          <option value="none">None</option>
+                                          <option value="small">Small</option>
+                                          <option value="medium">Medium</option>
+                                          <option value="large">Large</option>
+                                          <option value="max">Max</option>
+                                        </select>
+                                      </label>
+                                      <label className="builder-field">
+                                        <span>Image Padding</span>
+                                        <select
+                                          value={block.imagePadding ?? "large"}
+                                          onChange={(event) =>
+                                            updateSelectedLayoutBlock(index, blockIndex, {
+                                              imagePadding: event.target
+                                                .value as BuilderLayoutBlock["imagePadding"],
+                                            })
+                                          }
+                                        >
+                                          <option value="none">Frameless</option>
+                                          <option value="small">Small</option>
+                                          <option value="medium">Medium</option>
+                                          <option value="large">Large</option>
+                                          <option value="max">Max</option>
+                                        </select>
+                                      </label>
+                                    </div>
+                                  </details>
                                 </>
                               ) : block.kind === "productGallery" ? (
                                 <>
@@ -7938,13 +8018,22 @@ function PreviewSection({
                     <div className="shop-builder-column-block shop-builder-column-block--products">
                       {block.title && <h3>{block.title}</h3>}
                       {previewProducts.length > 0 ? (
-                        <CategoryWithFilters
-                          products={previewProducts.slice(0, block.gridLimit ?? 4)}
-                          columns={block.columns}
-                          filterPosition={block.filterPosition}
-                          cardStyle={block.cardStyle}
-                          pageSize={block.gridLimit}
-                        />
+                        <div
+                          className={`shop-builder-grid--margin-${
+                            block.gridMargin ?? "none"
+                          }`}
+                        >
+                          <CategoryWithFilters
+                            products={previewProducts.slice(0, block.gridLimit ?? 4)}
+                            columns={block.columns}
+                            filterPosition={block.filterPosition}
+                            cardStyle={block.cardStyle}
+                            pageSize={block.gridLimit}
+                            gridGap={block.gridGap}
+                            cardPadding={block.cardPadding}
+                            imagePadding={block.imagePadding}
+                          />
+                        </div>
                       ) : (
                         <div className="builder-preview-products">
                           {sampleProducts

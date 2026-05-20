@@ -26,6 +26,7 @@ function toNumberPrice(price: string | null | undefined): number {
 function productSpaceToCss(value: string | null | undefined, fallback: string) {
   const key = (value || fallback).toString().toLowerCase();
   switch (key) {
+    case "frameless":
     case "none":
       return "0px";
     case "small":
