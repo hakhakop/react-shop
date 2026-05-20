@@ -25,15 +25,21 @@ export function useWordPressSession(wordpressBaseUrl?: string | null) {
   });
 
   const checkSession = useCallback(async () => {
+    if (!wordpressBaseUrl) {
+      setSession({
+        status: "unreadable",
+        message: "WordPress URL is not configured yet.",
+      });
+      return;
+    }
+
     setSession({ status: "checking" });
 
     try {
-      const sessionUrl = wordpressBaseUrl
-        ? `${wordpressBaseUrl.replace(
-            /\/$/,
-            ""
-          )}/wp-admin/admin-ajax.php?action=react_shop_session`
-        : "/api/account/session";
+      const sessionUrl = `${wordpressBaseUrl.replace(
+        /\/$/,
+        ""
+      )}/wp-admin/admin-ajax.php?action=react_shop_session`;
       const response = await fetch(sessionUrl, {
         credentials: "include",
         headers: { Accept: "application/json" },

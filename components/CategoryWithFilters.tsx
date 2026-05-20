@@ -2,6 +2,18 @@
 
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import Link from "next/link";
+import Image from "next/image";
+import {
+  ArrowUpDown,
+  ChevronLeft,
+  ChevronRight,
+  Grid2X2,
+  Rows3,
+  Search,
+  SlidersHorizontal,
+  Sparkles,
+  X,
+} from "lucide-react";
 import WishlistToggle from "./WishlistToggle";
 import AddToCartButton from "./AddToCartButton";
 import type { ProductNode } from "../lib/products";
@@ -16,6 +28,7 @@ type Props = {
   gridGap?: string | null;
   cardPadding?: string | null;
   imagePadding?: string | null;
+  imageFrame?: string | null;
 };
 
 function toNumberPrice(price: string | null | undefined): number {
@@ -39,6 +52,23 @@ function productSpaceToCss(value: string | null | undefined, fallback: string) {
     case "medium":
     default:
       return "clamp(16px, 1.8vw, 26px)";
+  }
+}
+
+function productGridGapToCss(value: string | null | undefined, fallback: string) {
+  const key = (value || fallback).toString().toLowerCase();
+  switch (key) {
+    case "none":
+      return "0px";
+    case "small":
+      return "clamp(10px, 1vw, 14px)";
+    case "large":
+      return "clamp(18px, 1.8vw, 26px)";
+    case "max":
+      return "clamp(24px, 2.4vw, 34px)";
+    case "medium":
+    default:
+      return "clamp(14px, 1.4vw, 20px)";
   }
 }
 
@@ -91,6 +121,7 @@ export default function CategoryWithFilters({
   gridGap,
   cardPadding,
   imagePadding,
+  imageFrame,
 }: Props) {
   const [searchTerm, setSearchTerm] = useState("");
   const [minPrice, setMinPrice] = useState("");
@@ -126,7 +157,9 @@ export default function CategoryWithFilters({
       : "left";
   const isTopFilterLayout = normalizedFilterPosition === "top";
   const normalizedCardStyle =
-    cardStyle === "soft" || cardStyle === "lined" ? cardStyle : "flat";
+    cardStyle === "soft" || cardStyle === "lined" || cardStyle === "none"
+      ? cardStyle
+      : "flat";
   const normalizedCardPreset =
     cardPreset === "graph" ||
     cardPreset === "gallery" ||
@@ -138,23 +171,21 @@ export default function CategoryWithFilters({
       : "standard";
 
   const productSpaceVars = {
-    "--product-grid-gap": productSpaceToCss(gridGap, "medium"),
+    "--product-grid-gap": productGridGapToCss(gridGap, "medium"),
     "--product-card-padding": productSpaceToCss(cardPadding, "medium"),
     "--product-image-padding": productSpaceToCss(imagePadding, "large"),
+    "--archive-columns": archiveColumns,
   } as CSSProperties;
 
   const gridStyle =
     viewMode === "compact"
       ? {
           ...productSpaceVars,
-          gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+          "--archive-columns": 2,
         }
       : viewMode === "list"
-      ? { ...productSpaceVars, gridTemplateColumns: "minmax(0, 1fr)" }
-      : {
-          ...productSpaceVars,
-          gridTemplateColumns: `repeat(${archiveColumns}, minmax(0, 1fr))`,
-        };
+      ? { ...productSpaceVars, "--archive-columns": 1 }
+      : productSpaceVars;
 
   const attributeFacets: AttributeFacet[] = useMemo(() => {
     const map: Record<string, { label: string; optionSet: Set<string> }> = {};
@@ -343,19 +374,20 @@ export default function CategoryWithFilters({
 
   const showingFrom = total === 0 ? 0 : start + 1;
   const showingTo = Math.min(end, total);
+  const selectedAttributeCount = Object.values(selectedAttributes).reduce(
+    (sum, values) => sum + values.length,
+    0
+  );
+  const activeFilterCount =
+    selectedAttributeCount + (searchTerm.trim() ? 1 : 0) + (minPrice || maxPrice ? 1 : 0);
 
   return (
     <div
-      className={`shop-filter-layout shop-filter-layout--${normalizedFilterPosition} shop-card-style--${normalizedCardStyle} shop-card-preset--${normalizedCardPreset}`}
-      style={{
-        display: "grid",
-        gridTemplateColumns:
-          normalizedFilterPosition === "left"
-            ? "260px minmax(0, 1fr)"
-            : "minmax(0, 1fr)",
-        gap: "24px",
-        marginTop: "16px",
-      }}
+      className={`shop-filter-layout shop-filter-layout--${normalizedFilterPosition} shop-card-style--${normalizedCardStyle} shop-card-preset--${normalizedCardPreset} shop-image-padding--${
+        imagePadding === "frameless" || imagePadding === "none"
+          ? "none"
+          : imagePadding || "large"
+      } shop-image-frame--${imageFrame === "soft" ? "soft" : "none"}`}
     >
       {/* Sidebar */}
       <aside
@@ -364,14 +396,6 @@ export default function CategoryWithFilters({
         }`}
         style={{
           display: normalizedFilterPosition === "hidden" ? "none" : undefined,
-          borderRadius: isTopFilterLayout ? undefined : "16px",
-          border: isTopFilterLayout ? undefined : "1px solid #e5e7eb",
-          background: isTopFilterLayout ? undefined : "#ffffff",
-          padding: isTopFilterLayout ? undefined : "14px 14px 16px",
-          boxShadow: isTopFilterLayout
-            ? undefined
-            : "0 10px 30px rgba(15, 23, 42, 0.04)",
-          alignSelf: "flex-start",
         }}
       >
         {isTopFilterLayout ? (
@@ -529,67 +553,37 @@ export default function CategoryWithFilters({
           </div>
         ) : (
           <>
-        <div
-          className="shop-filter-title"
-          style={{
-            fontSize: "15px",
-            fontWeight: 600,
-            marginBottom: "10px",
-            color: "#0f172a",
-          }}
-        >
-          Filters
+        <div className="shop-filter-title">
+          <span>
+            <SlidersHorizontal size={16} aria-hidden="true" />
+            Filters
+          </span>
+          {activeFilterCount > 0 && <strong>{activeFilterCount}</strong>}
         </div>
 
         {/* Search */}
-        <div className="shop-filter-group" style={{ marginBottom: "12px" }}>
-          <label
-            style={{
-              display: "block",
-              fontSize: "12px",
-              color: "#6b7280",
-              marginBottom: "4px",
-            }}
-          >
+        <div className="shop-filter-group">
+          <label>
             Search in category
           </label>
-          <input
-            type="text"
-            value={searchTerm}
-            onChange={(e) => {
-              setSearchTerm(e.target.value);
-              setCurrentPage(1);
-            }}
-            placeholder="Search products…"
-            style={{
-              width: "100%",
-              padding: "7px 9px",
-              borderRadius: "10px",
-              border: "1px solid #e5e7eb",
-              fontSize: "13px",
-            }}
-          />
+          <div className="shop-filter-input-wrap">
+            <Search size={15} aria-hidden="true" />
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setCurrentPage(1);
+              }}
+              placeholder="Search products..."
+            />
+          </div>
         </div>
 
         {/* Price range */}
-        <div className="shop-filter-group" style={{ marginBottom: "12px" }}>
-          <label
-            style={{
-              display: "block",
-              fontSize: "12px",
-              color: "#6b7280",
-              marginBottom: "4px",
-            }}
-          >
-            Price range (AMD)
-          </label>
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1fr 1fr",
-              gap: "8px",
-            }}
-          >
+        <div className="shop-filter-group">
+          <label>Price range</label>
+          <div className="shop-filter-price-grid">
             <input
               type="number"
               min={0}
@@ -599,13 +593,6 @@ export default function CategoryWithFilters({
                 setCurrentPage(1);
               }}
               placeholder="Min"
-              style={{
-                width: "100%",
-                padding: "7px 9px",
-                borderRadius: "10px",
-                border: "1px solid #e5e7eb",
-                fontSize: "13px",
-              }}
             />
             <input
               type="number"
@@ -616,93 +603,47 @@ export default function CategoryWithFilters({
                 setCurrentPage(1);
               }}
               placeholder="Max"
-              style={{
-                width: "100%",
-                padding: "7px 9px",
-                borderRadius: "10px",
-                border: "1px solid #e5e7eb",
-                fontSize: "13px",
-              }}
             />
           </div>
         </div>
 
         {/* Sort */}
-        <div className="shop-filter-group" style={{ marginBottom: "12px" }}>
-          <label
-            style={{
-              display: "block",
-              fontSize: "12px",
-              color: "#6b7280",
-              marginBottom: "4px",
-            }}
-          >
+        <div className="shop-filter-group">
+          <label>
             Sort by
           </label>
-          <select
-            value={sortBy}
-            onChange={(e) => {
-              setSortBy(e.target.value as typeof sortBy);
-              setCurrentPage(1);
-            }}
-            style={{
-              width: "100%",
-              padding: "7px 9px",
-              borderRadius: "10px",
-              border: "1px solid #e5e7eb",
-              fontSize: "13px",
-              backgroundColor: "#ffffff",
-            }}
-          >
-            <option value="default">Default</option>
-            <option value="price-asc">Price: Low to high</option>
-            <option value="price-desc">Price: High to low</option>
-            <option value="name-asc">Name: A → Z</option>
-          </select>
+          <div className="shop-filter-select-wrap">
+            <ArrowUpDown size={15} aria-hidden="true" />
+            <select
+              value={sortBy}
+              onChange={(e) => {
+                setSortBy(e.target.value as typeof sortBy);
+                setCurrentPage(1);
+              }}
+            >
+              <option value="default">Default</option>
+              <option value="price-asc">Price: Low to high</option>
+              <option value="price-desc">Price: High to low</option>
+              <option value="name-asc">Name: A to Z</option>
+            </select>
+          </div>
         </div>
 
         {/* Attribute filters */}
         {attributeFacets.length > 0 && (
-          <div
-            className="shop-filter-attributes"
-            style={{
-              marginTop: "4px",
-              paddingTop: "10px",
-              borderTop: "1px solid #f3f4f6",
-            }}
-          >
-            <div
-              style={{
-                fontSize: "13px",
-                fontWeight: 500,
-                marginBottom: "8px",
-                color: "#111827",
-              }}
-            >
+          <div className="shop-filter-attributes">
+            <div className="shop-filter-subtitle">
               Attributes
             </div>
 
             {attributeFacets.map((facet) => {
               const selectedForFacet = selectedAttributes[facet.key] ?? [];
               return (
-                <div key={facet.key} style={{ marginBottom: "10px" }}>
-                  <div
-                    style={{
-                      fontSize: "12px",
-                      fontWeight: 500,
-                      color: "#4b5563",
-                      marginBottom: "6px",
-                    }}
-                  >
+                <div key={facet.key} className="shop-filter-facet">
+                  <div className="shop-filter-facet-label">
                     {facet.label}
                   </div>
-                  <div
-                    style={{
-                      display: "flex",
-                      flexWrap: "wrap",
-                      gap: "6px",
-                    }}
-                  >
+                  <div className="shop-filter-chip-row">
                     {facet.options.map((opt) => {
                       const isSelected = selectedForFacet.includes(opt.key);
                       return (
@@ -713,20 +654,6 @@ export default function CategoryWithFilters({
                           onClick={() =>
                             toggleAttribute(facet.key, opt.key)
                           }
-                          style={{
-                            borderRadius: "999px",
-                            padding: "4px 9px 5px 9px",
-                            fontSize: "11px",
-                            border: isSelected
-                              ? "1px solid #111827"
-                              : "1px solid #e5e7eb",
-                            backgroundColor: isSelected
-                              ? "#111827"
-                              : "#f9fafb",
-                            color: isSelected ? "#ffffff" : "#111827",
-                            cursor: "pointer",
-                            lineHeight: 1.4,
-                          }}
                         >
                           {opt.label}
                         </button>
@@ -744,28 +671,12 @@ export default function CategoryWithFilters({
           className="shop-filter-reset"
           type="button"
           onClick={resetFilters}
-          style={{
-            marginTop: "8px",
-            width: "100%",
-            borderRadius: "999px",
-            border: "1px solid #e5e7eb",
-            padding: "7px 10px",
-            fontSize: "13px",
-            background: "#f9fafb",
-            cursor: "pointer",
-          }}
         >
+          <X size={14} aria-hidden="true" />
           Reset all filters
         </button>
 
-        <div
-          className="shop-filter-summary"
-          style={{
-            marginTop: "10px",
-            fontSize: "11px",
-            color: "#9ca3af",
-          }}
-        >
+        <div className="shop-filter-summary">
           Showing {showingFrom}-{showingTo} of {total} products.
         </div>
           </>
@@ -773,87 +684,57 @@ export default function CategoryWithFilters({
       </aside>
 
       {/* Product grid + pagination */}
-      <section>
+      <section className="shop-archive-results">
         {paginatedProducts.length === 0 ? (
-          <div
-            style={{
-              fontSize: "14px",
-              color: "#6b7280",
-            }}
-          >
-            No products match these filters. Try adjusting them.
+          <div className="shop-archive-empty">
+            <Sparkles size={24} aria-hidden="true" />
+            <h2>No products match these filters</h2>
+            <p>Try a wider price range or clear a selected attribute.</p>
+            <button type="button" onClick={resetFilters}>
+              Reset filters
+            </button>
           </div>
         ) : (
           <>
-            <div
-              style={{
-                marginBottom: "8px",
-                display: "flex",
-                justifyContent: "flex-end",
-                gap: "6px",
-                fontSize: "12px",
-              }}
-            >
+            <div className="shop-archive-toolbar">
+              <div>
+                <strong>
+                  {showingFrom}-{showingTo}
+                </strong>{" "}
+                of {total} products
+              </div>
+              <div className="shop-view-switcher" aria-label="Archive view">
               <button
                 type="button"
+                className={viewMode === "default" ? "is-active" : ""}
                 onClick={() => setViewMode("default")}
-                style={{
-                  padding: "4px 8px",
-                  borderRadius: 999,
-                  border:
-                    viewMode === "default"
-                      ? "1px solid rgba(148,163,184,0.9)"
-                      : "1px solid rgba(148,163,184,0.4)",
-                  background:
-                    viewMode === "default"
-                      ? "rgba(248,250,252,0.95)"
-                      : "transparent",
-                  cursor: "pointer",
-                }}
               >
+                <Grid2X2 size={15} aria-hidden="true" />
                 Comfort
               </button>
               <button
                 type="button"
+                className={viewMode === "compact" ? "is-active" : ""}
                 onClick={() => setViewMode("compact")}
-                style={{
-                  padding: "4px 8px",
-                  borderRadius: 999,
-                  border:
-                    viewMode === "compact"
-                      ? "1px solid rgba(148,163,184,0.9)"
-                      : "1px solid rgba(148,163,184,0.4)",
-                  background:
-                    viewMode === "compact"
-                      ? "rgba(248,250,252,0.95)"
-                      : "transparent",
-                  cursor: "pointer",
-                }}
               >
+                <Grid2X2 size={15} aria-hidden="true" />
                 2-wide
               </button>
               <button
                 type="button"
+                className={viewMode === "list" ? "is-active" : ""}
                 onClick={() => setViewMode("list")}
-                style={{
-                  padding: "4px 8px",
-                  borderRadius: 999,
-                  border:
-                    viewMode === "list"
-                      ? "1px solid rgba(148,163,184,0.9)"
-                      : "1px solid rgba(148,163,184,0.4)",
-                  background:
-                    viewMode === "list"
-                      ? "rgba(248,250,252,0.95)"
-                      : "transparent",
-                  cursor: "pointer",
-                }}
               >
+                <Rows3 size={15} aria-hidden="true" />
                 List
               </button>
+              </div>
             </div>
 
-            <div className="product-grid" style={gridStyle}>
+            <div
+              className={`product-grid shop-archive-grid shop-archive-grid--${viewMode}`}
+              style={gridStyle}
+            >
               {paginatedProducts.map((p) => {
                 const priceNumber = toNumberPrice(p.price);
                 const imageUrl = p.image?.sourceUrl || undefined;
@@ -873,23 +754,10 @@ export default function CategoryWithFilters({
                 return (
                   <div
                     key={p.id}
-                    className="product-card"
+                    className={`product-card shop-archive-card ${
+                      viewMode === "list" ? "shop-archive-card--list" : ""
+                    }`}
                     data-card-preset={normalizedCardPreset}
-                    style={
-                      viewMode === "list"
-                        ? {
-                            width: "100%",
-                            maxWidth: "100%",
-                            boxSizing: "border-box",
-                            display: "flex",
-                            gap: 16,
-                            borderRadius: "10px",
-                            background: "#f8fafc",
-                            padding: "10px 12px",
-                            margin: "0 0 12px 0",
-                          }
-                        : undefined
-                    }
                   >
                     <div className="product-card-top-right">
                       <WishlistToggle
@@ -903,42 +771,15 @@ export default function CategoryWithFilters({
                     <Link
                       href={`/product/${p.slug}`}
                       className="product-card-link"
-                      style={
-                        viewMode === "list"
-                          ? {
-                              display: "flex",
-                              alignItems: "flex-start",
-                              gap: 16,
-                            }
-                          : undefined
-                      }
                     >
-                      <div
-                        className="product-image"
-                        style={
-                          viewMode === "list"
-                            ? {
-                                margin: 0,
-                                width: 130,
-                                height: 130,
-                                flexShrink: 0,
-                              }
-                            : undefined
-                        }
-                      >
+                      <div className="product-image">
                         {p.image?.sourceUrl ? (
-                          <img
+                          <Image
                             src={p.image.sourceUrl}
                             alt={p.image.altText || p.name}
-                            style={
-                              viewMode === "list"
-                                ? {
-                                    width: "100%",
-                                    height: "100%",
-                                    objectFit: "contain",
-                                  }
-                                : undefined
-                            }
+                            width={420}
+                            height={420}
+                            className="product-image-img"
                           />
                         ) : (
                           <div className="product-image-placeholder">
@@ -1017,31 +858,14 @@ export default function CategoryWithFilters({
 
             {/* Pagination controls */}
             {pageCount > 1 && (
-              <div
-                style={{
-                  marginTop: "16px",
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  gap: "8px",
-                  fontSize: "13px",
-                }}
-              >
+              <div className="shop-pagination">
                 <button
                   type="button"
                   onClick={() => goToPage(safePage - 1)}
                   disabled={safePage === 1}
-                  style={{
-                    padding: "4px 10px",
-                    borderRadius: "999px",
-                    border: "1px solid #e5e7eb",
-                    backgroundColor:
-                      safePage === 1 ? "#f9fafb" : "#ffffff",
-                    cursor:
-                      safePage === 1 ? "default" : "pointer",
-                  }}
                 >
-                  ‹ Prev
+                  <ChevronLeft size={15} aria-hidden="true" />
+                  Prev
                 </button>
 
                 {Array.from({ length: pageCount }).map((_, i) => {
@@ -1051,20 +875,8 @@ export default function CategoryWithFilters({
                     <button
                       key={pageNumber}
                       type="button"
+                      className={active ? "is-active" : ""}
                       onClick={() => goToPage(pageNumber)}
-                      style={{
-                        minWidth: "30px",
-                        padding: "4px 8px",
-                        borderRadius: "999px",
-                        border: active
-                          ? "1px solid #111827"
-                          : "1px solid #e5e7eb",
-                        backgroundColor: active
-                          ? "#111827"
-                          : "#ffffff",
-                        color: active ? "#ffffff" : "#111827",
-                        cursor: "pointer",
-                      }}
                     >
                       {pageNumber}
                     </button>
@@ -1075,21 +887,9 @@ export default function CategoryWithFilters({
                   type="button"
                   onClick={() => goToPage(safePage + 1)}
                   disabled={safePage === pageCount}
-                  style={{
-                    padding: "4px 10px",
-                    borderRadius: "999px",
-                    border: "1px solid #e5e7eb",
-                    backgroundColor:
-                      safePage === pageCount
-                        ? "#f9fafb"
-                        : "#ffffff",
-                    cursor:
-                      safePage === pageCount
-                        ? "default"
-                        : "pointer",
-                  }}
                 >
-                  Next ›
+                  Next
+                  <ChevronRight size={15} aria-hidden="true" />
                 </button>
               </div>
             )}

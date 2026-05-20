@@ -92,7 +92,7 @@
         "background": "#24241f",
         "columns": 4,
         "filterPosition": "top",
-        "cardStyle": "flat",
+        "cardStyle": "none",
         "visible": true,
         "colorScheme": "inherit",
         "gridLimit": 8,
@@ -135,7 +135,7 @@
         "layoutRows": 1
       }
     ],
-    "updatedAt": "2026-05-20T12:25:08.776Z"
+    "updatedAt": "2026-05-20T20:40:46.878Z"
   },
   "shop": {
     "version": 1,

@@ -155,7 +155,7 @@ type BuilderLayoutBlock = {
   fluentFormId?: string;
   columns?: number;
   filterPosition?: "left" | "top" | "drawer" | "hidden";
-  cardStyle?: "flat" | "soft" | "lined";
+  cardStyle?: "flat" | "soft" | "lined" | "none";
   cardPreset?:
     | "standard"
     | "graph"
@@ -225,7 +225,7 @@ type BuilderSection = {
   buttonTarget?: "_self" | "_blank";
   columns?: number;
   filterPosition?: "left" | "top" | "drawer" | "hidden";
-  cardStyle?: "flat" | "soft" | "lined";
+  cardStyle?: "flat" | "soft" | "lined" | "none";
   cardPreset?:
     | "standard"
     | "graph"
@@ -4306,7 +4306,7 @@ export default function DashboardBuilder() {
                   </small>
                 </summary>
 
-            {selectedSection.kind === "productArchive" && (
+            {!selectedLayoutBlock && selectedSection.kind === "productArchive" && (
               <>
                 <div className="builder-two-column">
                   <label className="builder-field">
@@ -4406,12 +4406,13 @@ export default function DashboardBuilder() {
                         cardStyle: event.target.value as BuilderSection["cardStyle"],
                       })
                     }
-                  >
-                    <option value="flat">Flat</option>
-                    <option value="soft">Soft</option>
-                    <option value="lined">Lined</option>
-                  </select>
-                </label>
+                    >
+                      <option value="flat">Flat</option>
+                      <option value="soft">Soft</option>
+                      <option value="lined">Lined</option>
+                      <option value="none">No background</option>
+                    </select>
+                  </label>
 
                 <label className="builder-field">
                   <span>Card Preset</span>
@@ -5307,6 +5308,7 @@ export default function DashboardBuilder() {
                                       <option value="flat">Flat</option>
                                       <option value="soft">Soft</option>
                                       <option value="lined">Lined</option>
+                                      <option value="none">No background</option>
                                     </select>
                                   </label>
                                   <label className="builder-field">
@@ -5406,6 +5408,21 @@ export default function DashboardBuilder() {
                                         </select>
                                       </label>
                                     </div>
+                                    <label className="builder-field">
+                                      <span>Image Frame</span>
+                                      <select
+                                        value={block.gridImageFrame ?? "none"}
+                                        onChange={(event) =>
+                                          updateSelectedLayoutBlock(index, blockIndex, {
+                                            gridImageFrame: event.target
+                                              .value as BuilderLayoutBlock["gridImageFrame"],
+                                          })
+                                        }
+                                      >
+                                        <option value="none">None / clean</option>
+                                        <option value="soft">Soft frame</option>
+                                      </select>
+                                    </label>
                                   </details>
                                 </>
                               ) : block.kind === "productGallery" ? (
@@ -7503,6 +7520,11 @@ function PreviewSection({
                     <strong className="product-title">{name}</strong>
                     <span className="product-attr-pill">Preview product</span>
                     <small className="product-price">No live products</small>
+                    <div className="product-card-actions-row">
+                      <button className="btn btn-primary" type="button">
+                        Add to cart
+                      </button>
+                    </div>
                   </div>
                 ))}
             </div>
@@ -8107,6 +8129,7 @@ function PreviewSection({
                             gridGap={block.gridGap}
                             cardPadding={block.cardPadding}
                             imagePadding={block.imagePadding}
+                            imageFrame={block.gridImageFrame}
                           />
                         </div>
                       ) : (

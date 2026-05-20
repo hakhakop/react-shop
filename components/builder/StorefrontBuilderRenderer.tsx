@@ -453,6 +453,7 @@ async function ContentProductsBlock({ block }: { block: BuilderLayoutBlock }) {
         gridGap={block.gridGap}
         cardPadding={block.cardPadding}
         imagePadding={block.imagePadding}
+        imageFrame={block.gridImageFrame}
       />
     </div>
   );
