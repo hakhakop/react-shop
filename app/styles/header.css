@@ -575,6 +575,87 @@
   outline: none;
 }
 
+.header-account-pill {
+  min-height: 38px;
+  max-width: 180px;
+  border-radius: 999px;
+  padding: 5px 10px 5px 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--surface-muted, #f5f5f3);
+  color: var(--text-main, #111111);
+  text-decoration: none;
+  border: 1px solid transparent;
+  box-shadow: none;
+}
+
+.header-account-pill:hover {
+  background: var(--text-main, #111111);
+  color: var(--accent-contrast, #ffffff);
+  transform: none;
+  box-shadow: none;
+}
+
+.header-account-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.65);
+  color: currentColor;
+  flex: 0 0 auto;
+}
+
+.header-account-copy {
+  min-width: 0;
+  display: grid;
+  gap: 0;
+  line-height: 1.05;
+}
+
+.header-account-copy strong,
+.header-account-copy small {
+  max-width: 92px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.header-account-copy strong {
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.header-account-copy small {
+  color: currentColor;
+  font-size: 10px;
+  opacity: 0.58;
+}
+
+.header-account-state {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: rgba(107, 114, 128, 0.75);
+  flex: 0 0 auto;
+}
+
+.header-account-pill--logged-in .header-account-state {
+  background: #16a34a;
+}
+
+.header-account-pill--checking .header-account-state {
+  background: #f59e0b;
+}
+
+.header-account-pill--unreadable .header-account-state,
+.header-account-pill--logged-out .header-account-state {
+  background: rgba(107, 114, 128, 0.75);
+}
+
 .site-header-action-label {
   position: absolute;
   width: 1px;
@@ -1042,6 +1123,10 @@
   border: 1px solid transparent;
   color: var(--text-main, #111111);
   box-shadow: none;
+}
+
+.site-header-princity .header-account-pill {
+  height: 38px;
 }
 
 .site-header-princity .site-header-action-pill:hover,

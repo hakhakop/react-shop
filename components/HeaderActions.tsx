@@ -7,6 +7,7 @@ import { useWishlist } from "./WishlistProvider";
 import { useCart } from "./CartProvider";
 import { useSearch } from "./SearchProvider";
 import ThemeToggle from "./ThemeToggle";
+import HeaderAccountButton from "./HeaderAccountButton";
 import { SiteIconButton } from "@/components/ui/SiteIconButton";
 import type { HeaderIconId } from "../lib/themeSettings";
 
@@ -84,13 +85,7 @@ export default function HeaderActions({
                 whileTap={{ scale: 0.95 }}
                 transition={{ type: "spring", stiffness: 260, damping: 18 }}
               >
-                <SiteIconButton
-                  icon="user"
-                  variant={iconVariant}
-                  href="/my-account"
-                  size="md"
-                  aria-label="My account"
-                />
+                <HeaderAccountButton />
               </motion.div>
             );
 

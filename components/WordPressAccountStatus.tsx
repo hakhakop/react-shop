@@ -1,13 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
 import { RefreshCw, ShieldCheck, UserRound } from "lucide-react";
-
-type AccountState =
-  | { status: "checking" }
-  | { status: "logged-in"; name: string; email?: string }
-  | { status: "logged-out" }
-  | { status: "unreadable"; message: string };
+import { useWordPressSession } from "./useWordPressSession";
 
 type Props = {
   wordpressBaseUrl: string | null;
@@ -18,73 +12,8 @@ export default function WordPressAccountStatus({
   wordpressBaseUrl,
   accountUrl,
 }: Props) {
-  const [accountState, setAccountState] = useState<AccountState>({
-    status: "checking",
-  });
-
-  const checkSession = useCallback(async () => {
-    if (!wordpressBaseUrl) {
-      setAccountState({
-        status: "unreadable",
-        message: "WordPress URL is not configured yet.",
-      });
-      return;
-    }
-
-    setAccountState({ status: "checking" });
-
-    try {
-      const sessionUrl = `${wordpressBaseUrl}/wp-admin/admin-ajax.php?action=react_shop_session`;
-      const response = await fetch(sessionUrl, {
-        credentials: "include",
-        headers: { Accept: "application/json" },
-        cache: "no-store",
-      });
-
-      if (response.status === 401 || response.status === 403) {
-        setAccountState({ status: "logged-out" });
-        return;
-      }
-
-      if (!response.ok) {
-        throw new Error(`WordPress returned ${response.status}.`);
-      }
-
-      const result = await response.json();
-
-      if (result?.status === "logged-out") {
-        setAccountState({ status: "logged-out" });
-        return;
-      }
-
-      if (result?.status === "unreadable") {
-        setAccountState({
-          status: "unreadable",
-          message:
-            result.message ||
-            "React cannot read the WordPress browser session yet.",
-        });
-        return;
-      }
-
-      const user = result?.user;
-      setAccountState({
-        status: "logged-in",
-        name: user?.name || user?.slug || "WordPress user",
-        email: user?.email,
-      });
-    } catch {
-      setAccountState({
-        status: "unreadable",
-        message:
-          "React cannot read the WordPress session yet. Add the React Shop admin-ajax session snippet in WordPress and allow this React domain.",
-      });
-    }
-  }, [wordpressBaseUrl]);
-
-  useEffect(() => {
-    checkSession();
-  }, [checkSession]);
+  const { session: accountState, checkSession } =
+    useWordPressSession(wordpressBaseUrl);
 
   const title =
     accountState.status === "logged-in"
