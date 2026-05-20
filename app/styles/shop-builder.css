@@ -284,6 +284,111 @@
   width: 100%;
 }
 
+.shop-builder-fluent-form .fluentform {
+  width: 100%;
+}
+
+.shop-builder-fluent-form form,
+.shop-builder-fluent-form fieldset {
+  display: grid;
+  gap: 18px;
+}
+
+.shop-builder-fluent-form .ff-t-container {
+  display: grid;
+  gap: 16px;
+}
+
+.shop-builder-fluent-form .ff-el-group {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+}
+
+.shop-builder-fluent-form .ff-el-input--label label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--builder-active-text, var(--foreground, #111111));
+  font-size: 0.86rem;
+  font-weight: 650;
+  letter-spacing: 0;
+}
+
+.shop-builder-fluent-form .ff-el-is-required label::after {
+  content: "*";
+  color: #b42318;
+  font-weight: 700;
+}
+
+.shop-builder-fluent-form .ff-el-form-control {
+  width: 100%;
+  min-height: 46px;
+  border: 1px solid color-mix(in srgb, var(--builder-active-text, #111111) 14%, transparent);
+  border-radius: var(--builder-radius, 8px);
+  padding: 12px 14px;
+  color: var(--builder-active-text, var(--foreground, #111111));
+  background: color-mix(in srgb, var(--builder-active-surface, #ffffff) 96%, transparent);
+  font: inherit;
+  font-size: 0.95rem;
+  line-height: 1.35;
+  outline: none;
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    background 160ms ease;
+}
+
+.shop-builder-fluent-form textarea.ff-el-form-control {
+  min-height: 126px;
+  resize: vertical;
+}
+
+.shop-builder-fluent-form .ff-el-form-control::placeholder {
+  color: color-mix(in srgb, var(--builder-active-text, #111111) 42%, transparent);
+}
+
+.shop-builder-fluent-form .ff-el-form-control:focus {
+  border-color: color-mix(in srgb, var(--builder-active-button-bg, #111111) 72%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--builder-active-button-bg, #111111) 14%, transparent);
+}
+
+.shop-builder-fluent-form .ff-btn-submit {
+  min-height: 46px;
+  width: 100%;
+  border: 0;
+  border-radius: var(--button-radius, 999px);
+  padding: 0 22px;
+  color: var(--builder-active-button-text, #ffffff);
+  background: var(--builder-active-button-bg, #111111);
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 750;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    opacity 160ms ease,
+    transform 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.shop-builder-fluent-form .ff-btn-submit:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.14);
+}
+
+.shop-builder-fluent-form .ff-btn-submit:disabled {
+  cursor: not-allowed;
+  opacity: 0.68;
+  transform: none;
+  box-shadow: none;
+}
+
+.shop-builder-fluent-form .ff-errors-in-stack {
+  margin-top: 10px;
+}
+
 .shop-builder-fluent-form-empty,
 .shop-builder-fluent-form-error {
   border: 1px dashed var(--border-soft, rgba(17, 17, 17, 0.16));
@@ -295,6 +400,24 @@
 
 .shop-builder-fluent-form-error {
   border-color: rgba(220, 38, 38, 0.35);
+  color: #b91c1c;
+  background: rgba(254, 226, 226, 0.72);
+}
+
+.shop-builder-fluent-form-submit-message {
+  margin-top: 12px;
+  border-radius: var(--builder-radius, 8px);
+  padding: 10px 12px;
+  font-size: 0.92rem;
+  line-height: 1.45;
+}
+
+.shop-builder-fluent-form-submit-message--success {
+  color: #05603a;
+  background: #ecfdf3;
+}
+
+.shop-builder-fluent-form-submit-message--error {
   color: #b91c1c;
   background: rgba(254, 226, 226, 0.72);
 }
@@ -321,6 +444,17 @@
 .builder-preview-form-lines b {
   width: 42%;
   background: var(--accent, #111111);
+}
+
+@media (min-width: 680px) {
+  .shop-builder-fluent-form .ff-t-container {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .shop-builder-fluent-form .ff-btn-submit {
+    width: auto;
+    min-width: 168px;
+  }
 }
 
 .shop-builder-grid {

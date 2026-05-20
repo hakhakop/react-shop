@@ -101,9 +101,41 @@
         "imagePadding": "none",
         "cardPreset": "standard",
         "contentMode": "boxed"
+      },
+      {
+        "id": "contentLayout-mpe18gdv-yy9c7",
+        "kind": "contentLayout",
+        "title": "",
+        "background": "#ffffff",
+        "backgroundMode": "boxed",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "topSpacing": "inherit",
+        "bottomSpacing": "inherit",
+        "topMargin": "inherit",
+        "bottomMargin": "inherit",
+        "visible": true,
+        "eyebrow": "",
+        "body": "",
+        "layoutColumns": 1,
+        "layoutItems": [
+          {
+            "id": "layout-item-mpe18gdv-1",
+            "blocks": [
+              {
+                "id": "fluentForm-block-mpe18jbh-hhjxd",
+                "kind": "fluentForm",
+                "title": "Contact Form",
+                "body": "Rendered from Fluent Forms in WordPress.",
+                "fluentFormId": "1"
+              }
+            ]
+          }
+        ],
+        "layoutRows": 1
       }
     ],
-    "updatedAt": "2026-05-20T09:35:52.247Z"
+    "updatedAt": "2026-05-20T12:25:08.776Z"
   },
   "shop": {
     "version": 1,
