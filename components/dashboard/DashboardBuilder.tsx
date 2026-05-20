@@ -154,7 +154,14 @@ type BuilderLayoutBlock = {
   columns?: number;
   filterPosition?: "left" | "top" | "drawer" | "hidden";
   cardStyle?: "flat" | "soft" | "lined";
-  cardPreset?: "standard" | "editorial" | "compact";
+  cardPreset?:
+    | "standard"
+    | "graph"
+    | "gallery"
+    | "editorial"
+    | "compact"
+    | "minimal"
+    | "luxury";
   gridLimit?: number;
   source?: "all" | "featured" | "category";
   categoryId?: string;
@@ -217,7 +224,14 @@ type BuilderSection = {
   columns?: number;
   filterPosition?: "left" | "top" | "drawer" | "hidden";
   cardStyle?: "flat" | "soft" | "lined";
-  cardPreset?: "standard" | "editorial" | "compact";
+  cardPreset?:
+    | "standard"
+    | "graph"
+    | "gallery"
+    | "editorial"
+    | "compact"
+    | "minimal"
+    | "luxury";
   gridGap?: "none" | "small" | "medium" | "large" | "max";
   cardPadding?: "none" | "small" | "medium" | "large" | "max";
   imagePadding?: "none" | "small" | "medium" | "large" | "max";
@@ -4396,8 +4410,12 @@ export default function DashboardBuilder() {
                     }
                   >
                     <option value="standard">Standard</option>
+                    <option value="graph">Graph Clean</option>
+                    <option value="gallery">Gallery</option>
                     <option value="editorial">Editorial</option>
                     <option value="compact">Compact</option>
+                    <option value="minimal">Minimal</option>
+                    <option value="luxury">Luxury</option>
                   </select>
                 </label>
 
@@ -5254,8 +5272,12 @@ export default function DashboardBuilder() {
                                       }
                                     >
                                       <option value="standard">Standard</option>
+                                      <option value="graph">Graph Clean</option>
+                                      <option value="gallery">Gallery</option>
                                       <option value="editorial">Editorial</option>
                                       <option value="compact">Compact</option>
+                                      <option value="minimal">Minimal</option>
+                                      <option value="luxury">Luxury</option>
                                     </select>
                                   </label>
                                   <details className="builder-collapse" open>
@@ -7407,6 +7429,7 @@ function PreviewSection({
             columns={section.columns}
             filterPosition={section.filterPosition}
             cardStyle={section.cardStyle}
+            cardPreset={section.cardPreset}
             pageSize={section.gridLimit}
             gridGap={section.gridGap}
             cardPadding={section.cardPadding}
@@ -8028,6 +8051,7 @@ function PreviewSection({
                             columns={block.columns}
                             filterPosition={block.filterPosition}
                             cardStyle={block.cardStyle}
+                            cardPreset={block.cardPreset}
                             pageSize={block.gridLimit}
                             gridGap={block.gridGap}
                             cardPadding={block.cardPadding}

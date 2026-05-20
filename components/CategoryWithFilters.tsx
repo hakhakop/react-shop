@@ -11,6 +11,7 @@ type Props = {
   columns?: number | null;
   filterPosition?: "left" | "top" | "drawer" | "hidden" | string | null;
   cardStyle?: "flat" | "soft" | "lined" | string | null;
+  cardPreset?: string | null;
   pageSize?: number | null;
   gridGap?: string | null;
   cardPadding?: string | null;
@@ -30,14 +31,14 @@ function productSpaceToCss(value: string | null | undefined, fallback: string) {
     case "none":
       return "0px";
     case "small":
-      return "clamp(8px, 1vw, 12px)";
+      return "clamp(6px, 0.7vw, 10px)";
     case "large":
-      return "clamp(22px, 2.4vw, 36px)";
+      return "clamp(28px, 3vw, 46px)";
     case "max":
-      return "clamp(32px, 4vw, 56px)";
+      return "clamp(44px, 5vw, 76px)";
     case "medium":
     default:
-      return "clamp(14px, 1.5vw, 22px)";
+      return "clamp(16px, 1.8vw, 26px)";
   }
 }
 
@@ -85,6 +86,7 @@ export default function CategoryWithFilters({
   columns,
   filterPosition = "left",
   cardStyle = "flat",
+  cardPreset = "standard",
   pageSize,
   gridGap,
   cardPadding,
@@ -123,6 +125,17 @@ export default function CategoryWithFilters({
       ? filterPosition
       : "left";
   const isTopFilterLayout = normalizedFilterPosition === "top";
+  const normalizedCardStyle =
+    cardStyle === "soft" || cardStyle === "lined" ? cardStyle : "flat";
+  const normalizedCardPreset =
+    cardPreset === "graph" ||
+    cardPreset === "gallery" ||
+    cardPreset === "editorial" ||
+    cardPreset === "compact" ||
+    cardPreset === "minimal" ||
+    cardPreset === "luxury"
+      ? cardPreset
+      : "standard";
 
   const productSpaceVars = {
     "--product-grid-gap": productSpaceToCss(gridGap, "medium"),
@@ -333,7 +346,7 @@ export default function CategoryWithFilters({
 
   return (
     <div
-      className={`shop-filter-layout shop-filter-layout--${normalizedFilterPosition} shop-card-style--${cardStyle ?? "flat"}`}
+      className={`shop-filter-layout shop-filter-layout--${normalizedFilterPosition} shop-card-style--${normalizedCardStyle} shop-card-preset--${normalizedCardPreset}`}
       style={{
         display: "grid",
         gridTemplateColumns:
@@ -861,6 +874,7 @@ export default function CategoryWithFilters({
                   <div
                     key={p.id}
                     className="product-card"
+                    data-card-preset={normalizedCardPreset}
                     style={
                       viewMode === "list"
                         ? {

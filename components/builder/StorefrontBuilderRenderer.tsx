@@ -175,6 +175,7 @@ async function BuilderProductsSection({
       columns={section.columns}
       filterPosition={section.filterPosition}
       cardStyle={section.cardStyle}
+      cardPreset={section.cardPreset}
       pageSize={section.gridLimit}
       gridGap={section.gridGap}
       cardPadding={section.cardPadding}
@@ -446,6 +447,7 @@ async function ContentProductsBlock({ block }: { block: BuilderLayoutBlock }) {
         columns={block.columns}
         filterPosition={block.filterPosition ?? "hidden"}
         cardStyle={block.cardStyle}
+        cardPreset={block.cardPreset}
         pageSize={limit}
         gridGap={block.gridGap}
         cardPadding={block.cardPadding}

@@ -28,17 +28,18 @@ function normalizeColumnsDesktop(value: unknown): number | undefined {
 function productSpaceToCss(value: unknown, fallback: string) {
   const key = (pickFirstString(value) ?? fallback).toString().toLowerCase();
   switch (key) {
+    case "frameless":
     case "none":
       return "0px";
     case "small":
-      return "clamp(8px, 1vw, 12px)";
+      return "clamp(6px, 0.7vw, 10px)";
     case "large":
-      return "clamp(22px, 2.4vw, 36px)";
+      return "clamp(28px, 3vw, 46px)";
     case "max":
-      return "clamp(32px, 4vw, 56px)";
+      return "clamp(44px, 5vw, 76px)";
     case "medium":
     default:
-      return "clamp(14px, 1.5vw, 22px)";
+      return "clamp(16px, 1.8vw, 26px)";
   }
 }
 

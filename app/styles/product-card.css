@@ -195,6 +195,126 @@
   will-change: transform, box-shadow;
 }
 
+.shop-card-style--flat .product-card {
+  --product-card-bg: transparent;
+  --product-card-border: transparent;
+  --product-card-shadow: none;
+  --product-card-shadow-hover: none;
+}
+
+.shop-card-style--soft .product-card {
+  --product-card-bg: var(--surface-main, #ffffff);
+  --product-card-border: rgba(148, 163, 184, 0.2);
+  --product-card-shadow: 0 16px 42px rgba(15, 23, 42, 0.08);
+  --product-card-shadow-hover: 0 22px 56px rgba(15, 23, 42, 0.12);
+}
+
+.shop-card-style--lined .product-card {
+  --product-card-bg: transparent;
+  --product-card-border: color-mix(in srgb, var(--text-main, #111827) 18%, transparent);
+  --product-card-shadow: none;
+  --product-card-shadow-hover: none;
+}
+
+.shop-card-preset--graph .product-card,
+.product-card[data-card-preset="graph"] {
+  --product-card-radius: 8px;
+  --product-image-height: clamp(310px, 28vw, 460px);
+  --product-image-bg: #ffffff;
+  --product-image-padding: clamp(24px, 4vw, 64px);
+  --product-image-object-fit: contain;
+}
+
+.shop-card-preset--minimal .product-card,
+.product-card[data-card-preset="minimal"] {
+  --product-card-bg: transparent;
+  --product-card-border: transparent;
+  --product-card-shadow: none;
+  --product-card-shadow-hover: none;
+  --product-card-radius: 0px;
+  --product-image-height: clamp(250px, 24vw, 390px);
+  --product-image-bg: transparent;
+  --product-image-padding: 0px;
+}
+
+.shop-card-preset--graph .product-card-info,
+.product-card[data-card-preset="graph"] .product-card-info,
+.shop-card-preset--graph .product-main,
+.product-card[data-card-preset="graph"] .product-main {
+  align-items: baseline;
+}
+
+.shop-card-preset--gallery .product-card,
+.product-card[data-card-preset="gallery"] {
+  --product-card-radius: 6px;
+  --product-image-height: clamp(360px, 34vw, 560px);
+  --product-image-bg: color-mix(in srgb, var(--surface-main, #ffffff) 94%, #f8fafc);
+  --product-image-padding: clamp(10px, 1.5vw, 22px);
+  --product-image-object-fit: cover;
+}
+
+.shop-card-preset--gallery .product-image,
+.product-card[data-card-preset="gallery"] .product-image {
+  aspect-ratio: 4 / 5;
+}
+
+.shop-card-preset--editorial .product-card,
+.product-card[data-card-preset="editorial"] {
+  --product-card-radius: 0px;
+  --product-image-height: clamp(330px, 30vw, 500px);
+  --product-image-bg: color-mix(in srgb, var(--surface-muted, #f3f4f6) 88%, transparent);
+  --product-image-padding: clamp(18px, 3vw, 44px);
+}
+
+.shop-card-preset--editorial .product-title,
+.product-card[data-card-preset="editorial"] .product-title {
+  font-size: clamp(18px, 1.35vw, 25px);
+  font-weight: 760;
+}
+
+.shop-card-preset--compact .product-card,
+.product-card[data-card-preset="compact"] {
+  --product-card-radius: 6px;
+  --product-image-height: clamp(180px, 19vw, 260px);
+  --product-image-padding: clamp(6px, 1vw, 14px);
+}
+
+.shop-card-preset--compact .product-title,
+.product-card[data-card-preset="compact"] .product-title,
+.shop-card-preset--compact .product-price,
+.product-card[data-card-preset="compact"] .product-price {
+  font-size: 14px;
+}
+
+.shop-card-preset--compact .product-attributes-row,
+.product-card[data-card-preset="compact"] .product-attributes-row {
+  display: none;
+}
+
+.shop-card-preset--luxury .product-card,
+.product-card[data-card-preset="luxury"] {
+  --product-card-bg: #111111;
+  --product-card-border: rgba(255, 255, 255, 0.08);
+  --product-card-radius: 4px;
+  --product-image-height: clamp(310px, 29vw, 470px);
+  --product-image-bg: #f7f4ee;
+  --product-image-padding: clamp(18px, 3vw, 48px);
+  color: #f8fafc;
+}
+
+.shop-card-preset--luxury .product-title,
+.product-card[data-card-preset="luxury"] .product-title,
+.shop-card-preset--luxury .product-price,
+.product-card[data-card-preset="luxury"] .product-price {
+  color: #f8fafc;
+}
+
+.shop-card-preset--luxury .product-attribute-badge,
+.product-card[data-card-preset="luxury"] .product-attribute-badge {
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(248, 250, 252, 0.9);
+}
+
 .product-card:hover {
   transform: translateY(-3px);
   border-color: color-mix(in srgb, var(--accent, #db2777) 28%, var(--product-card-border, transparent));
