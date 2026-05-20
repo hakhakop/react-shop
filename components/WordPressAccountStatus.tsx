@@ -34,7 +34,8 @@ export default function WordPressAccountStatus({
     setAccountState({ status: "checking" });
 
     try {
-      const response = await fetch("/api/account/session", {
+      const sessionUrl = `${wordpressBaseUrl}/wp-json/react-shop/v1/session`;
+      const response = await fetch(sessionUrl, {
         credentials: "include",
         headers: { Accept: "application/json" },
         cache: "no-store",
@@ -76,7 +77,7 @@ export default function WordPressAccountStatus({
       setAccountState({
         status: "unreadable",
         message:
-          "React cannot read the WordPress session yet. This usually means the WordPress login cookie is not shared with the React domain.",
+          "React cannot read the WordPress session yet. Add the React Shop session snippet in WordPress and allow this React domain.",
       });
     }
   }, [wordpressBaseUrl]);
