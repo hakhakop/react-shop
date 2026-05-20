@@ -126,14 +126,16 @@
   width: 100%;
   margin-top: 12px;
   display: flex;
+  flex-direction: column;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 6px;
 }
 
 .product-attribute-badge {
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  width: fit-content;
   max-width: 100%;
   padding: 5px 9px;
   border-radius: 999px;
@@ -379,6 +381,7 @@
 }
 
 .product-main .product-attribute-badge {
+  width: 100%;
   background: transparent;
   padding-inline: 0;
   border-radius: 0;
