@@ -62,6 +62,12 @@ function getOrderPaymentUrl(order: any) {
   )}`;
 }
 
+function getPositiveNumber(value: unknown): number | null {
+  const numeric = Number(value);
+  if (!Number.isFinite(numeric) || numeric <= 0) return null;
+  return Math.trunc(numeric);
+}
+
 export async function POST(req: NextRequest) {
   const apiUrl = process.env.WC_API_URL;
   const ck = process.env.WC_CONSUMER_KEY;
@@ -134,6 +140,7 @@ export async function POST(req: NextRequest) {
   const name = (customer.name ?? "").toString().trim();
   const [first_name, ...restName] = name.split(" ");
   const last_name = restName.join(" ");
+  const customerId = getPositiveNumber(customer.customerId ?? customer.id);
 
   const billing = {
     first_name,
@@ -150,6 +157,7 @@ export async function POST(req: NextRequest) {
   const orderPayload = {
     status: "pending",
     set_paid: false,
+    ...(customerId ? { customer_id: customerId } : {}),
     billing,
     shipping: billing,
     line_items,

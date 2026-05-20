@@ -4,13 +4,14 @@ import { useCallback, useEffect, useState } from "react";
 
 export type WordPressSessionState =
   | { status: "checking" }
-  | { status: "logged-in"; name: string; email?: string }
+  | { status: "logged-in"; id?: number; name: string; email?: string }
   | { status: "logged-out" }
   | { status: "unreadable"; message: string };
 
 type WordPressSessionResponse = {
   status?: string;
   user?: {
+    id?: number;
     name?: string;
     slug?: string;
     email?: string;
@@ -55,6 +56,7 @@ export function useWordPressSession(wordpressBaseUrl?: string | null) {
         const user = result.user;
         setSession({
           status: "logged-in",
+          id: user?.id,
           name: user?.name || user?.slug || "WordPress user",
           email: user?.email,
         });

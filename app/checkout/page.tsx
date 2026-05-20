@@ -4,7 +4,9 @@ import { useState, FormEvent } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useCart } from "../../components/CartProvider";
+import { useWordPressSession } from "../../components/useWordPressSession";
 
+const wordpressBaseUrl = process.env.NEXT_PUBLIC_WORDPRESS_SITE_URL ?? null;
 
 type AnyCartItem = any;
 
@@ -26,6 +28,15 @@ export default function CheckoutPage() {
   const [placing, setPlacing] = useState(false);
   const [placed, setPlaced] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { session } = useWordPressSession(wordpressBaseUrl);
+  const loggedInCustomer =
+    session.status === "logged-in" && session.id
+      ? {
+          id: session.id,
+          name: session.name,
+          email: session.email ?? "",
+        }
+      : null;
 
   const subtotal = (items || []).reduce((sum, item: AnyCartItem) => {
     const rawPrice =
@@ -66,7 +77,13 @@ export default function CheckoutPage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          customer: { name, email, phone, address },
+          customer: {
+            customerId: loggedInCustomer?.id,
+            name,
+            email,
+            phone,
+            address,
+          },
           items: itemsPayload,
         }),
       });
@@ -182,7 +199,10 @@ export default function CheckoutPage() {
             }}
           >
             {/* Customer details + Place order */}
-            <form onSubmit={handlePlaceOrder}>
+            <form
+              key={loggedInCustomer?.id ?? session.status}
+              onSubmit={handlePlaceOrder}
+            >
               <div
                 style={{
                   borderRadius: "16px",
@@ -204,6 +224,40 @@ export default function CheckoutPage() {
                 >
                   Contact details
                 </h2>
+
+                {session.status === "logged-in" && (
+                  <div
+                    style={{
+                      marginBottom: "12px",
+                      borderRadius: "12px",
+                      background: "#ecfdf5",
+                      border: "1px solid #bbf7d0",
+                      color: "#166534",
+                      padding: "10px 12px",
+                      fontSize: "13px",
+                    }}
+                  >
+                    Signed in as <strong>{session.name}</strong>. This order
+                    will be attached to your WordPress customer account.
+                  </div>
+                )}
+
+                {session.status === "logged-out" && (
+                  <div
+                    style={{
+                      marginBottom: "12px",
+                      borderRadius: "12px",
+                      background: "#f8fafc",
+                      border: "1px solid #e2e8f0",
+                      color: "#475569",
+                      padding: "10px 12px",
+                      fontSize: "13px",
+                    }}
+                  >
+                    You are checking out as a guest. Log in from My account if
+                    you want this order saved to a WordPress user.
+                  </div>
+                )}
 
                 <div
                   style={{
@@ -227,6 +281,7 @@ export default function CheckoutPage() {
                       type="text"
                       name="name"
                       required
+                      defaultValue={loggedInCustomer?.name ?? ""}
                       style={{
                         width: "100%",
                         padding: "8px 10px",
@@ -252,6 +307,7 @@ export default function CheckoutPage() {
                       type="email"
                       name="email"
                       required
+                      defaultValue={loggedInCustomer?.email ?? ""}
                       style={{
                         width: "100%",
                         padding: "8px 10px",
