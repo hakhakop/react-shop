@@ -1571,7 +1571,9 @@ function createWireframeSection(columns: number, rows: number): BuilderSection {
   const safeRows = Math.min(Math.max(rows, 1), 4);
   return {
     ...createSection("contentLayout"),
-    title: "Blank Grid",
+    title: "",
+    eyebrow: "",
+    body: "",
     layoutColumns: safeColumns,
     layoutRows: safeRows,
     layoutItems: Array.from({ length: safeColumns * safeRows }, (_, index) => ({
@@ -4015,7 +4017,9 @@ export default function DashboardBuilder() {
                     {selectedLayoutBlock || sectionSettingsOpen ? "open" : "closed"}
                   </small>
                 </summary>
-              {inspectorTab === "content" && !selectedLayoutBlock && (
+              {inspectorTab === "content" &&
+                !selectedLayoutBlock &&
+                selectedSection.kind !== "contentLayout" && (
                 <>
                 <details className="builder-collapse" open>
                   <summary>
@@ -7424,30 +7428,34 @@ function PreviewSection({
         ];
     return (
       <div className="shop-builder-section-content builder-preview-content-layout">
-        <div className="shop-builder-content-layout-heading">
-          {section.eyebrow && (
-            <InlineEditableText
-              as="p"
-              className="shop-builder-eyebrow"
-              value={section.eyebrow}
-              onChange={(eyebrow) => onUpdateSection(section.id, { eyebrow })}
-            />
-          )}
-          <InlineEditableText
-            as="h2"
-            className="shop-builder-title"
-            value={section.title}
-            onChange={(title) => onUpdateSection(section.id, { title })}
-          />
-          {section.body && (
-            <InlineEditableText
-              as="p"
-              className="shop-builder-body"
-              value={section.body}
-              onChange={(body) => onUpdateSection(section.id, { body })}
-            />
-          )}
-        </div>
+        {(section.eyebrow || section.title || section.body) && (
+          <div className="shop-builder-content-layout-heading">
+            {section.eyebrow && (
+              <InlineEditableText
+                as="p"
+                className="shop-builder-eyebrow"
+                value={section.eyebrow}
+                onChange={(eyebrow) => onUpdateSection(section.id, { eyebrow })}
+              />
+            )}
+            {section.title && (
+              <InlineEditableText
+                as="h2"
+                className="shop-builder-title"
+                value={section.title}
+                onChange={(title) => onUpdateSection(section.id, { title })}
+              />
+            )}
+            {section.body && (
+              <InlineEditableText
+                as="p"
+                className="shop-builder-body"
+                value={section.body}
+                onChange={(body) => onUpdateSection(section.id, { body })}
+              />
+            )}
+          </div>
+        )}
         <div
           className="shop-builder-content-layout-grid builder-preview-content-layout-grid"
           style={
@@ -7527,10 +7535,12 @@ function PreviewSection({
             >
               <div className="builder-preview-column-label">Column {index + 1}</div>
               {blocks.length === 0 && (
-                <div className="builder-preview-drop-zone">
+                <div
+                  className="builder-preview-drop-zone"
+                  aria-label={`Drop element into column ${index + 1}`}
+                  title={`Drop element into column ${index + 1}`}
+                >
                   <Plus size={16} />
-                  <strong>Drop element here</strong>
-                  <small>Drag from the Element Library</small>
                 </div>
               )}
               {blocks.map((block, blockIndex) => {

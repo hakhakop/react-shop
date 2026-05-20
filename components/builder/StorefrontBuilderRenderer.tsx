@@ -1089,20 +1089,19 @@ function ContentLayoutSection({
 
   return (
     <SectionFrame section={section} extra="shop-builder-content-layout">
-      <div className="shop-builder-content-layout-heading">
-        {section.eyebrow && <p className="shop-builder-eyebrow">{section.eyebrow}</p>}
-        <h2 className="shop-builder-title">{section.title}</h2>
-        {section.body && <p className="shop-builder-body">{section.body}</p>}
-      </div>
+      {(section.eyebrow || section.title || section.body) && (
+        <div className="shop-builder-content-layout-heading">
+          {section.eyebrow && <p className="shop-builder-eyebrow">{section.eyebrow}</p>}
+          {section.title && <h2 className="shop-builder-title">{section.title}</h2>}
+          {section.body && <p className="shop-builder-body">{section.body}</p>}
+        </div>
+      )}
       <div
         className="shop-builder-content-layout-grid"
         style={{ "--builder-layout-columns": section.layoutColumns ?? 2 } as CSSProperties}
       >
         {items.map((item, index) => (
           <article key={item.id ?? index} className="shop-builder-content-layout-card">
-            {getContentLayoutBlocks(item).length === 0 && (
-              <div className="shop-builder-column-empty">Empty column</div>
-            )}
             {getContentLayoutBlocks(item).map((block, blockIndex) => (
               <div
                 key={block.id ?? blockIndex}
