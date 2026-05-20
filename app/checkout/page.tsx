@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -38,6 +38,22 @@ type CheckoutCartItem = CartItem & {
     altText?: string | null;
     alt?: string | null;
   } | null;
+};
+
+type CheckoutCustomerAddress = CheckoutAddress & {
+  company?: string;
+  email?: string;
+  phone?: string;
+};
+
+type CheckoutCustomerProfile = {
+  id?: number;
+  firstName?: string;
+  lastName?: string;
+  username?: string;
+  email?: string;
+  billing?: CheckoutCustomerAddress;
+  shipping?: CheckoutCustomerAddress;
 };
 
 function formatPrice(amount: number): string {
@@ -80,6 +96,9 @@ export default function CheckoutPage() {
   const [placing, setPlacing] = useState(false);
   const [placed, setPlaced] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [profileMessage, setProfileMessage] = useState<string | null>(null);
+  const [customerProfile, setCustomerProfile] =
+    useState<CheckoutCustomerProfile | null>(null);
   const [billingMatchesShipping, setBillingMatchesShipping] = useState(true);
   const { session } = useWordPressSession(wordpressBaseUrl);
 
@@ -110,6 +129,66 @@ export default function CheckoutPage() {
   const [defaultFirstName = "", ...defaultLastNameParts] =
     loggedInCustomer?.name?.split(" ") ?? [];
   const defaultLastName = defaultLastNameParts.join(" ");
+  const fallbackFirstName =
+    customerProfile?.shipping?.firstName ||
+    customerProfile?.billing?.firstName ||
+    customerProfile?.firstName ||
+    defaultFirstName;
+  const fallbackLastName =
+    customerProfile?.shipping?.lastName ||
+    customerProfile?.billing?.lastName ||
+    customerProfile?.lastName ||
+    defaultLastName;
+  const fallbackEmail =
+    customerProfile?.billing?.email ||
+    customerProfile?.email ||
+    loggedInCustomer?.email ||
+    "";
+  const fallbackPhone = customerProfile?.billing?.phone || "";
+  const shippingDefaults = customerProfile?.shipping;
+  const billingDefaults = customerProfile?.billing;
+
+  useEffect(() => {
+    if (session.status !== "logged-in" || !session.id) {
+      setCustomerProfile(null);
+      setProfileMessage(null);
+      return;
+    }
+
+    let cancelled = false;
+    setProfileMessage("Loading saved WooCommerce details...");
+
+    fetch(`/api/account/customer?customerId=${encodeURIComponent(session.id)}`, {
+      cache: "no-store",
+    })
+      .then(async (response) => {
+        const payload = await response.json();
+        if (!response.ok) {
+          throw new Error(
+            payload?.message || "Saved WooCommerce details could not be loaded."
+          );
+        }
+        return payload as CheckoutCustomerProfile;
+      })
+      .then((profile) => {
+        if (cancelled) return;
+        setCustomerProfile(profile);
+        setProfileMessage("Saved WooCommerce details loaded.");
+      })
+      .catch((caughtError) => {
+        if (cancelled) return;
+        setCustomerProfile(null);
+        setProfileMessage(
+          caughtError instanceof Error
+            ? caughtError.message
+            : "Saved WooCommerce details could not be loaded."
+        );
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [session]);
 
   async function handlePlaceOrder(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -248,7 +327,11 @@ export default function CheckoutPage() {
       )}
 
       {hasItems && (
-        <form className="checkout-layout" onSubmit={handlePlaceOrder}>
+        <form
+          key={customerProfile?.id ?? session.status}
+          className="checkout-layout"
+          onSubmit={handlePlaceOrder}
+        >
           <div className="checkout-form-stack">
             <section className="checkout-panel">
               <div className="checkout-panel-heading">
@@ -263,6 +346,12 @@ export default function CheckoutPage() {
                 <div className="checkout-session checkout-session--success">
                   Signed in as <strong>{session.name}</strong>. This order will
                   be attached to your WordPress customer account.
+                </div>
+              )}
+
+              {session.status === "logged-in" && profileMessage && (
+                <div className="checkout-session checkout-session--profile">
+                  {profileMessage}
                 </div>
               )}
 
@@ -281,7 +370,7 @@ export default function CheckoutPage() {
                     name="email"
                     required
                     autoComplete="email"
-                    defaultValue={loggedInCustomer?.email ?? ""}
+                    defaultValue={fallbackEmail}
                     placeholder="you@example.com"
                   />
                 </label>
@@ -291,6 +380,7 @@ export default function CheckoutPage() {
                     type="tel"
                     name="phone"
                     autoComplete="tel"
+                    defaultValue={fallbackPhone}
                     placeholder="+374"
                   />
                 </label>
@@ -314,7 +404,7 @@ export default function CheckoutPage() {
                     name="shippingFirstName"
                     required
                     autoComplete="given-name"
-                    defaultValue={defaultFirstName}
+                    defaultValue={fallbackFirstName}
                   />
                 </label>
                 <label className="checkout-field">
@@ -324,7 +414,7 @@ export default function CheckoutPage() {
                     name="shippingLastName"
                     required
                     autoComplete="family-name"
-                    defaultValue={defaultLastName}
+                    defaultValue={fallbackLastName}
                   />
                 </label>
               </div>
@@ -336,6 +426,7 @@ export default function CheckoutPage() {
                   name="shippingAddress1"
                   required
                   autoComplete="shipping address-line1"
+                  defaultValue={shippingDefaults?.address1 || billingDefaults?.address1 || ""}
                   placeholder="Street and house number"
                 />
               </label>
@@ -346,6 +437,7 @@ export default function CheckoutPage() {
                   type="text"
                   name="shippingAddress2"
                   autoComplete="shipping address-line2"
+                  defaultValue={shippingDefaults?.address2 || billingDefaults?.address2 || ""}
                   placeholder="Optional"
                 />
               </label>
@@ -358,7 +450,7 @@ export default function CheckoutPage() {
                     name="shippingCity"
                     required
                     autoComplete="shipping address-level2"
-                    defaultValue="Yerevan"
+                    defaultValue={shippingDefaults?.city || billingDefaults?.city || "Yerevan"}
                   />
                 </label>
                 <label className="checkout-field">
@@ -367,6 +459,7 @@ export default function CheckoutPage() {
                     type="text"
                     name="shippingState"
                     autoComplete="shipping address-level1"
+                    defaultValue={shippingDefaults?.state || billingDefaults?.state || ""}
                   />
                 </label>
                 <label className="checkout-field">
@@ -375,6 +468,7 @@ export default function CheckoutPage() {
                     type="text"
                     name="shippingPostcode"
                     autoComplete="shipping postal-code"
+                    defaultValue={shippingDefaults?.postcode || billingDefaults?.postcode || ""}
                   />
                 </label>
               </div>
@@ -385,7 +479,7 @@ export default function CheckoutPage() {
                   name="shippingCountry"
                   required
                   autoComplete="shipping country"
-                  defaultValue="AM"
+                  defaultValue={shippingDefaults?.country || billingDefaults?.country || "AM"}
                 >
                   <option value="AM">Armenia</option>
                   <option value="US">United States</option>
@@ -420,38 +514,74 @@ export default function CheckoutPage() {
                   <div className="checkout-field-grid checkout-field-grid--two">
                     <label className="checkout-field">
                       <span>First name</span>
-                      <input type="text" name="billingFirstName" required />
+                      <input
+                        type="text"
+                        name="billingFirstName"
+                        required
+                        defaultValue={billingDefaults?.firstName || fallbackFirstName}
+                      />
                     </label>
                     <label className="checkout-field">
                       <span>Last name</span>
-                      <input type="text" name="billingLastName" required />
+                      <input
+                        type="text"
+                        name="billingLastName"
+                        required
+                        defaultValue={billingDefaults?.lastName || fallbackLastName}
+                      />
                     </label>
                   </div>
                   <label className="checkout-field">
                     <span>Billing address</span>
-                    <input type="text" name="billingAddress1" required />
+                    <input
+                      type="text"
+                      name="billingAddress1"
+                      required
+                      defaultValue={billingDefaults?.address1 || ""}
+                    />
                   </label>
                   <label className="checkout-field">
                     <span>Apartment, suite, floor</span>
-                    <input type="text" name="billingAddress2" />
+                    <input
+                      type="text"
+                      name="billingAddress2"
+                      defaultValue={billingDefaults?.address2 || ""}
+                    />
                   </label>
                   <div className="checkout-field-grid checkout-field-grid--three">
                     <label className="checkout-field">
                       <span>City</span>
-                      <input type="text" name="billingCity" required />
+                      <input
+                        type="text"
+                        name="billingCity"
+                        required
+                        defaultValue={billingDefaults?.city || ""}
+                      />
                     </label>
                     <label className="checkout-field">
                       <span>Region</span>
-                      <input type="text" name="billingState" />
+                      <input
+                        type="text"
+                        name="billingState"
+                        defaultValue={billingDefaults?.state || ""}
+                      />
                     </label>
                     <label className="checkout-field">
                       <span>Postcode</span>
-                      <input type="text" name="billingPostcode" />
+                      <input
+                        type="text"
+                        name="billingPostcode"
+                        defaultValue={billingDefaults?.postcode || ""}
+                      />
                     </label>
                   </div>
                   <label className="checkout-field checkout-field--compact">
                     <span>Country</span>
-                    <select name="billingCountry" required defaultValue="AM">
+                    <select
+                      name="billingCountry"
+                      required
+                      defaultValue={billingDefaults?.country || "AM"}
+                    >
                       <option value="AM">Armenia</option>
                       <option value="US">United States</option>
                       <option value="GE">Georgia</option>

@@ -153,6 +153,10 @@
   background: #ecfdf3;
 }
 
+.checkout-session--profile {
+  border-style: dashed;
+}
+
 .checkout-alert--error {
   margin-bottom: 18px;
   border-color: rgba(220, 38, 38, 0.28);
