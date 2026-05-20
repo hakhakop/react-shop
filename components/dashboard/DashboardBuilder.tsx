@@ -96,6 +96,7 @@ type LayoutBlockKind =
   | "text"
   | "slider"
   | "embed"
+  | "fluentForm"
   | "badgeGrid"
   | "icon"
   | "list"
@@ -151,6 +152,7 @@ type BuilderLayoutBlock = {
   embedCode?: string;
   embedUrl?: string;
   embedHeight?: number;
+  fluentFormId?: string;
   columns?: number;
   filterPosition?: "left" | "top" | "drawer" | "hidden";
   cardStyle?: "flat" | "soft" | "lined";
@@ -338,6 +340,7 @@ const layoutBlockLabels: Record<LayoutBlockKind, string> = {
   text: "Text",
   slider: "Slider",
   embed: "HTML",
+  fluentForm: "Fluent Form",
   badgeGrid: "Badges",
   icon: "Icon",
   list: "List",
@@ -364,6 +367,7 @@ const baseLayoutBlockKinds: LayoutBlockKind[] = [
   "panel",
   "text",
   "slider",
+  "fluentForm",
   "embed",
   "badgeGrid",
   "icon",
@@ -395,6 +399,7 @@ const layoutBlockDescriptions: Record<LayoutBlockKind, string> = {
   text: "Static copy, button, and small editorial content.",
   slider: "Carousel with editable slides and images.",
   embed: "Forms, chat widgets, maps, or trusted HTML.",
+  fluentForm: "Render a Fluent Forms form from WordPress by form ID.",
   badgeGrid: "Compact promises, services, or feature badges.",
   icon: "Decorative icon with optional label and text.",
   list: "Clean bullet or checklist content.",
@@ -465,7 +470,7 @@ const layoutBlockGroups: {
   {
     id: "wordpress",
     label: "WordPress & Utility",
-    kinds: ["embed", "breadcrumbs"],
+    kinds: ["fluentForm", "embed", "breadcrumbs"],
   },
 ];
 
@@ -1292,6 +1297,16 @@ function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
       embedCode: "<div>Custom HTML block</div>",
       embedUrl: "",
       embedHeight: 260,
+    };
+  }
+
+  if (kind === "fluentForm") {
+    return {
+      id,
+      kind,
+      title: "Contact Form",
+      body: "Rendered from Fluent Forms in WordPress.",
+      fluentFormId: "",
     };
   }
 
@@ -4828,6 +4843,40 @@ export default function DashboardBuilder() {
                                     />
                                   </label>
                                 </>
+                              ) : block.kind === "fluentForm" ? (
+                                <>
+                                  <label className="builder-field">
+                                    <span>Block Title</span>
+                                    <input
+                                      value={block.title ?? ""}
+                                      onChange={(event) =>
+                                        updateSelectedLayoutBlock(index, blockIndex, {
+                                          title: event.target.value,
+                                        })
+                                      }
+                                    />
+                                  </label>
+                                  <label className="builder-field">
+                                    <span>Fluent Form ID</span>
+                                    <input
+                                      inputMode="numeric"
+                                      value={block.fluentFormId ?? ""}
+                                      placeholder="Example: 3"
+                                      onChange={(event) =>
+                                        updateSelectedLayoutBlock(index, blockIndex, {
+                                          fluentFormId: event.target.value,
+                                        })
+                                      }
+                                    />
+                                  </label>
+                                  <div className="builder-dynamic-field-note">
+                                    <strong>WordPress renderer required</strong>
+                                    <span>
+                                      Add the React Shop Fluent Forms snippet in WordPress,
+                                      then this element can show the real Fluent Form.
+                                    </span>
+                                  </div>
+                                </>
                               ) : block.kind === "grid" ? (
                                 <>
                                   <label className="builder-field">
@@ -7057,6 +7106,8 @@ function getLayoutBlockLibraryIcon(kind: LayoutBlockKind) {
       return <GalleryHorizontal size={16} />;
     case "embed":
       return <Code2 size={16} />;
+    case "fluentForm":
+      return <TextCursorInput size={16} />;
     case "badgeGrid":
       return <Grid3X3 size={16} />;
     case "icon":
@@ -8246,6 +8297,22 @@ function PreviewSection({
                             {badge.body && <p>{badge.body}</p>}
                           </article>
                         ))}
+                      </div>
+                    </div>
+                  ) : block.kind === "fluentForm" ? (
+                    <div className="shop-builder-column-block shop-builder-column-block--fluent-form builder-preview-fluent-form">
+                      <small>Fluent Form</small>
+                      <strong>{block.title || "Contact Form"}</strong>
+                      <span>
+                        {block.fluentFormId
+                          ? `WordPress form ID ${block.fluentFormId}`
+                          : "Add a Fluent Forms form ID"}
+                      </span>
+                      <div className="builder-preview-form-lines">
+                        <i />
+                        <i />
+                        <i />
+                        <b />
                       </div>
                     </div>
                   ) : (

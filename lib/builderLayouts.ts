@@ -47,6 +47,7 @@ export type BuilderLayoutBlock = {
   embedCode?: string;
   embedUrl?: string;
   embedHeight?: number;
+  fluentFormId?: string;
   columns?: number;
   filterPosition?: string;
   cardStyle?: string;

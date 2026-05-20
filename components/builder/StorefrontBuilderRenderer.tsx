@@ -8,6 +8,7 @@ import CarouselBlock, {
 import CategoryWithFilters from "@/components/CategoryWithFilters";
 import CategoryBar from "@/components/CategoryBar";
 import EmbedSectionClient from "@/components/builder/EmbedSectionClient";
+import FluentFormClient from "@/components/builder/FluentFormClient";
 import ProductGallery from "@/components/ProductGallery";
 import ProductOptionsSelector from "@/components/ProductOptionsSelector";
 import RecentlyViewedStrip from "@/components/RecentlyViewedStrip";
@@ -899,6 +900,14 @@ function ContentLayoutBlock({
           height={block.embedHeight}
           title={block.title}
         />
+      </div>
+    );
+  }
+
+  if (block.kind === "fluentForm") {
+    return (
+      <div className="shop-builder-column-block shop-builder-column-block--fluent-form">
+        <FluentFormClient formId={block.fluentFormId} title={block.title} />
       </div>
     );
   }
