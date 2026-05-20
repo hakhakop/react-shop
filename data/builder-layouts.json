@@ -24,194 +24,6 @@
     },
     "sections": [
       {
-        "id": "contentLayout-mp5jzj8t-xxvjr",
-        "kind": "contentLayout",
-        "title": "2 Section",
-        "background": "#111111",
-        "backgroundMode": "boxed",
-        "contentMode": "boxed",
-        "colorScheme": "inherit",
-        "visible": true,
-        "eyebrow": "",
-        "body": "",
-        "layoutColumns": 1,
-        "layoutItems": [
-          {
-            "id": "layout-item-2",
-            "blocks": [
-              {
-                "id": "categoryFilters-block-mp5k00qt-6pe6r",
-                "kind": "categoryFilters",
-                "title": "Category Filters",
-                "body": "Dynamic WooCommerce category pills."
-              }
-            ]
-          }
-        ]
-      },
-      {
-        "id": "contentLayout-mp8jw0m8-vlukl",
-        "kind": "contentLayout",
-        "title": "Blank Grid",
-        "background": "#ffffff",
-        "backgroundMode": "full",
-        "contentMode": "boxed",
-        "colorScheme": "inherit",
-        "topSpacing": "inherit",
-        "bottomSpacing": "inherit",
-        "topMargin": "inherit",
-        "bottomMargin": "inherit",
-        "visible": true,
-        "eyebrow": "Section",
-        "body": "",
-        "layoutColumns": 1,
-        "layoutItems": [
-          {
-            "id": "layout-item-mp8jw0m8-1",
-            "blocks": [
-              {
-                "id": "grid-block-mp8jw8yh-fjc5h",
-                "kind": "grid",
-                "title": "Grid",
-                "gridSource": "static",
-                "columns": 4,
-                "gridRows": 1,
-                "gridGap": "medium",
-                "gridMargin": "medium",
-                "gridImagePadding": "small",
-                "gridContentPadding": "medium",
-                "gridImageFrame": "soft",
-                "gridShowImage": true,
-                "gridShowEyebrow": true,
-                "gridShowMeta": true,
-                "gridShowText": true,
-                "gridShowButton": true,
-                "gridItems": [
-                  {
-                    "id": "grid-block-mp8jw8yh-fjc5h-1",
-                    "eyebrow": "01",
-                    "title": "Grid item one",
-                    "meta": "Meta",
-                    "text": "Map static or dynamic content into a reusable card.",
-                    "buttonLabel": "Learn more",
-                    "buttonUrl": "/",
-                    "imageUrl": "/uploads/builder/whatsapp-image-2026-03-13-at-23-42-09-mp8k46ns.jpg",
-                    "imageAlt": "WhatsApp Image 2026-03-13 at 23.42.09.jpeg"
-                  },
-                  {
-                    "id": "grid-block-mp8jw8yh-fjc5h-2",
-                    "eyebrow": "02",
-                    "title": "Grid item two",
-                    "meta": "Meta",
-                    "text": "Control columns, spacing, images, and content.",
-                    "buttonLabel": "Learn more",
-                    "buttonUrl": "/"
-                  },
-                  {
-                    "id": "grid-block-mp8jw8yh-fjc5h-3",
-                    "eyebrow": "03",
-                    "title": "Grid item three",
-                    "meta": "Meta",
-                    "text": "Later this can read posts, products, or custom fields.",
-                    "buttonLabel": "Learn more",
-                    "buttonUrl": "/"
-                  },
-                  {
-                    "id": "grid-item-mp9gsmw2",
-                    "eyebrow": "04",
-                    "title": "Grid item 4",
-                    "meta": "Meta",
-                    "text": "Edit this grid item.",
-                    "buttonLabel": "Learn more",
-                    "buttonUrl": "/"
-                  }
-                ],
-                "elementBackgroundMode": "custom",
-                "elementBackground": "",
-                "elementPadding": "medium"
-              }
-            ]
-          }
-        ],
-        "layoutRows": 1
-      },
-      {
-        "id": "contentLayout-mp6nvru9-utx9p",
-        "kind": "contentLayout",
-        "title": "1 Section",
-        "background": "#111111",
-        "backgroundMode": "boxed",
-        "contentMode": "boxed",
-        "colorScheme": "inherit",
-        "topSpacing": "inherit",
-        "bottomSpacing": "inherit",
-        "topMargin": "inherit",
-        "bottomMargin": "inherit",
-        "visible": true,
-        "eyebrow": "",
-        "body": "",
-        "layoutColumns": 2,
-        "layoutItems": [
-          {
-            "id": "layout-item-1",
-            "blocks": []
-          },
-          {
-            "id": "layout-item-2",
-            "blocks": []
-          }
-        ]
-      },
-      {
-        "id": "contentLayout-mp7eo86a-k53us",
-        "kind": "contentLayout",
-        "title": "Blank Grid",
-        "background": "#111111",
-        "backgroundMode": "full",
-        "contentMode": "boxed",
-        "colorScheme": "inherit",
-        "topSpacing": "inherit",
-        "bottomSpacing": "inherit",
-        "topMargin": "inherit",
-        "bottomMargin": "inherit",
-        "visible": true,
-        "eyebrow": "Section",
-        "body": "",
-        "layoutColumns": 1,
-        "layoutItems": [
-          {
-            "id": "layout-item-mp7eo86a-1",
-            "blocks": [
-              {
-                "id": "products-block-mp7eobqj-ynulf",
-                "kind": "products",
-                "title": "Products",
-                "source": "all",
-                "layoutVariant": "grid",
-                "columns": 4,
-                "gridLimit": 12,
-                "filterPosition": "top",
-                "cardStyle": "soft",
-                "cardPreset": "standard"
-              }
-            ]
-          }
-        ],
-        "layoutRows": 1
-      },
-      {
-        "id": "home-hero-1",
-        "kind": "hero",
-        "title": "Home",
-        "eyebrow": "Visual storefront",
-        "body": "A flexible homepage controlled by the React dashboard.",
-        "background": "#ffffff",
-        "layout": "split",
-        "visible": true,
-        "colorScheme": "light",
-        "topSpacing": "large"
-      },
-      {
         "id": "slider-moy4mk2e-k1u4f",
         "kind": "slider",
         "title": "Featured Slider",
@@ -274,58 +86,6 @@
         "colorScheme": "inherit"
       },
       {
-        "id": "contentLayout-mp7yh7cs-63yb8",
-        "kind": "contentLayout",
-        "title": "Blank Grid",
-        "background": "#ffffff",
-        "backgroundMode": "boxed",
-        "contentMode": "boxed",
-        "colorScheme": "inherit",
-        "topSpacing": "inherit",
-        "bottomSpacing": "inherit",
-        "topMargin": "inherit",
-        "bottomMargin": "inherit",
-        "visible": true,
-        "eyebrow": "Section",
-        "body": "",
-        "layoutColumns": 2,
-        "layoutItems": [
-          {
-            "id": "layout-item-mp7yh7cs-1",
-            "blocks": [
-              {
-                "id": "panel-block-mp7yhfoy-dx2y9",
-                "kind": "panel",
-                "eyebrow": "Panel",
-                "title": "Content Panel",
-                "body": "Add image, title, text, and action in one flexible element.",
-                "buttonLabel": "Learn more",
-                "buttonUrl": "/",
-                "imageUrl": "",
-                "imageAlt": ""
-              }
-            ]
-          },
-          {
-            "id": "layout-item-mp7yje3v",
-            "blocks": [
-              {
-                "id": "panel-block-mp7yj2q4-3rme3",
-                "kind": "panel",
-                "eyebrow": "Panel",
-                "title": "Content Panel",
-                "body": "Add image, title, text, and action in one flexible element.",
-                "buttonLabel": "Learn more",
-                "buttonUrl": "/",
-                "imageUrl": "",
-                "imageAlt": ""
-              }
-            ]
-          }
-        ],
-        "layoutRows": 1
-      },
-      {
         "id": "home-archive-1",
         "kind": "productArchive",
         "title": "Featured Products",
@@ -335,10 +95,15 @@
         "cardStyle": "flat",
         "visible": true,
         "colorScheme": "inherit",
-        "gridLimit": 8
+        "gridLimit": 8,
+        "gridGap": "small",
+        "cardPadding": "small",
+        "imagePadding": "none",
+        "cardPreset": "standard",
+        "contentMode": "boxed"
       }
     ],
-    "updatedAt": "2026-05-17T07:40:26.308Z"
+    "updatedAt": "2026-05-20T09:35:52.247Z"
   },
   "shop": {
     "version": 1,
@@ -702,7 +467,7 @@
         "ctaUrl": "/shop"
       }
     ],
-    "updatedAt": "2026-05-16T05:08:02.078Z"
+    "updatedAt": "2026-05-20T04:31:31.380Z"
   },
   "client": {
     "version": 1,
