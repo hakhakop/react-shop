@@ -68,6 +68,30 @@ function getPositiveNumber(value: unknown): number | null {
   return Math.trunc(numeric);
 }
 
+function getString(value: unknown): string {
+  return value == null ? "" : String(value);
+}
+
+function getAddressPayload(address: any, fallback: any) {
+  const fallbackName = getString(fallback?.name).trim();
+  const [fallbackFirstName, ...fallbackLastNameParts] = fallbackName.split(" ");
+
+  return {
+    first_name: getString(address?.firstName || fallbackFirstName).trim(),
+    last_name: getString(
+      address?.lastName || fallbackLastNameParts.join(" ")
+    ).trim(),
+    address_1: getString(address?.address1 || fallback?.address).trim(),
+    address_2: getString(address?.address2).trim(),
+    city: getString(address?.city).trim(),
+    state: getString(address?.state).trim(),
+    postcode: getString(address?.postcode).trim(),
+    country: getString(address?.country || "AM").trim(),
+    email: getString(fallback?.email).trim(),
+    phone: getString(fallback?.phone).trim(),
+  };
+}
+
 export async function POST(req: NextRequest) {
   const apiUrl = process.env.WC_API_URL;
   const ck = process.env.WC_CONSUMER_KEY;
@@ -137,29 +161,17 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const name = (customer.name ?? "").toString().trim();
-  const [first_name, ...restName] = name.split(" ");
-  const last_name = restName.join(" ");
   const customerId = getPositiveNumber(customer.customerId ?? customer.id);
-
-  const billing = {
-    first_name,
-    last_name,
-    address_1: (customer.address ?? "").toString(),
-    city: "",
-    state: "",
-    postcode: "",
-    country: "",
-    email: (customer.email ?? "").toString(),
-    phone: (customer.phone ?? "").toString(),
-  };
+  const billing = getAddressPayload(customer.billing, customer);
+  const shipping = getAddressPayload(customer.shipping ?? customer.billing, customer);
 
   const orderPayload = {
     status: "pending",
     set_paid: false,
     ...(customerId ? { customer_id: customerId } : {}),
     billing,
-    shipping: billing,
+    shipping,
+    customer_note: getString(customer.customerNote).trim(),
     line_items,
   };
 

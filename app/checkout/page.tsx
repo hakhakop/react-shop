@@ -1,34 +1,88 @@
 "use client";
 
-import { useState, FormEvent } from "react";
-import Link from "next/link";
+import { FormEvent, useMemo, useState } from "react";
 import Image from "next/image";
-import { useCart } from "../../components/CartProvider";
+import Link from "next/link";
+import {
+  CheckCircle2,
+  LockKeyhole,
+  PackageCheck,
+  ShieldCheck,
+  Truck,
+} from "lucide-react";
+import { CartItem, useCart } from "../../components/CartProvider";
 import { useWordPressSession } from "../../components/useWordPressSession";
 
 const wordpressBaseUrl = process.env.NEXT_PUBLIC_WORDPRESS_SITE_URL ?? null;
 
-type AnyCartItem = any;
+type CheckoutAddress = {
+  firstName: string;
+  lastName: string;
+  address1: string;
+  address2: string;
+  city: string;
+  state: string;
+  postcode: string;
+  country: string;
+};
+
+type CheckoutCartItem = CartItem & {
+  key?: string;
+  quantity?: number;
+  databaseId?: string | number;
+  productSlug?: string;
+  title?: string;
+  image?: {
+    sourceUrl?: string | null;
+    src?: string | null;
+    altText?: string | null;
+    alt?: string | null;
+  } | null;
+};
 
 function formatPrice(amount: number): string {
   if (!amount || Number.isNaN(amount)) return "0 ֏";
-  return amount.toLocaleString("hy-AM", {
-    style: "currency",
-    currency: "AMD",
+  return `${amount.toLocaleString("hy-AM", {
     maximumFractionDigits: 0,
-  });
+  })} ֏`;
+}
+
+function getCartItemQuantity(item: CheckoutCartItem) {
+  return item.quantity ?? item.qty ?? 1;
+}
+
+function getCartItemPrice(item: CheckoutCartItem) {
+  return typeof item.price === "number"
+    ? item.price
+    : parseFloat(String(item.price ?? "0")) || 0;
+}
+
+function getField(formData: FormData, key: string) {
+  return String(formData.get(key) || "").trim();
+}
+
+function getAddress(formData: FormData, prefix: "shipping" | "billing"): CheckoutAddress {
+  return {
+    firstName: getField(formData, `${prefix}FirstName`),
+    lastName: getField(formData, `${prefix}LastName`),
+    address1: getField(formData, `${prefix}Address1`),
+    address2: getField(formData, `${prefix}Address2`),
+    city: getField(formData, `${prefix}City`),
+    state: getField(formData, `${prefix}State`),
+    postcode: getField(formData, `${prefix}Postcode`),
+    country: getField(formData, `${prefix}Country`) || "AM",
+  };
 }
 
 export default function CheckoutPage() {
-  const { items, clearCart } = useCart() as {
-    items: AnyCartItem[];
-    clearCart: () => void;
-  };
-
+  const { items, clearCart } = useCart();
+  const checkoutItems = items as CheckoutCartItem[];
   const [placing, setPlacing] = useState(false);
   const [placed, setPlaced] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [billingMatchesShipping, setBillingMatchesShipping] = useState(true);
   const { session } = useWordPressSession(wordpressBaseUrl);
+
   const loggedInCustomer =
     session.status === "logged-in" && session.id
       ? {
@@ -38,40 +92,50 @@ export default function CheckoutPage() {
         }
       : null;
 
-  const subtotal = (items || []).reduce((sum, item: AnyCartItem) => {
-    const rawPrice =
-      typeof item.price === "number"
-        ? item.price
-        : parseFloat(item.price ?? "0") || 0;
-    const qty = item.quantity ?? item.qty ?? 1;
-    return sum + rawPrice * qty;
-  }, 0);
+  const subtotal = useMemo(
+    () =>
+      checkoutItems.reduce(
+        (sum, item) => sum + getCartItemPrice(item) * getCartItemQuantity(item),
+        0
+      ),
+    [checkoutItems]
+  );
 
-  const hasItems = items && items.length > 0;
+  const itemCount = useMemo(
+    () => checkoutItems.reduce((sum, item) => sum + getCartItemQuantity(item), 0),
+    [checkoutItems]
+  );
 
-  async function handlePlaceOrder(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault();
+  const hasItems = checkoutItems.length > 0;
+  const [defaultFirstName = "", ...defaultLastNameParts] =
+    loggedInCustomer?.name?.split(" ") ?? [];
+  const defaultLastName = defaultLastNameParts.join(" ");
+
+  async function handlePlaceOrder(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
     if (!hasItems || placing) return;
 
     setPlacing(true);
     setError(null);
 
-    const form = e.currentTarget;
+    const form = event.currentTarget;
     const formData = new FormData(form);
+    const email = getField(formData, "email");
+    const phone = getField(formData, "phone");
+    const shipping = getAddress(formData, "shipping");
+    const billing = billingMatchesShipping
+      ? shipping
+      : getAddress(formData, "billing");
+    const name = `${billing.firstName} ${billing.lastName}`.trim();
 
-    const name = String(formData.get("name") || "");
-    const email = String(formData.get("email") || "");
-    const phone = String(formData.get("phone") || "");
-    const address = String(formData.get("address") || "");
-
-    const itemsPayload = (items || []).map((item: AnyCartItem) => ({
+    const itemsPayload = checkoutItems.map((item) => ({
       productId: item.productId ?? item.databaseId ?? item.id,
       variationId: item.variationId ?? null,
-      quantity: item.quantity ?? item.qty ?? 1,
+      quantity: getCartItemQuantity(item),
     }));
 
     try {
-      const res = await fetch("/api/orders", {
+      const response = await fetch("/api/orders", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -82,35 +146,36 @@ export default function CheckoutPage() {
             name,
             email,
             phone,
-            address,
+            billing,
+            shipping,
+            customerNote: getField(formData, "customerNote"),
           },
           items: itemsPayload,
         }),
       });
 
-      const data = await res.json();
+      const data = await response.json();
 
-      if (!res.ok || !data?.success) {
+      if (!response.ok || !data?.success) {
         throw new Error(
           data?.message || "Failed to create order in WooCommerce."
         );
       }
 
+      clearCart();
+
       if (data.checkoutUrl) {
-        clearCart();
         window.location.assign(data.checkoutUrl);
         return;
       }
 
-      // Fallback: order created, but WooCommerce did not return a payment URL.
-      clearCart();
       form.reset();
       setPlaced(true);
-    } catch (err: any) {
-      console.error("Checkout error:", err);
+    } catch (caughtError) {
       setError(
-        err?.message ||
-          "Something went wrong while placing the order. Please try again."
+        caughtError instanceof Error
+          ? caughtError.message
+          : "Something went wrong while placing the order. Please try again."
       );
     } finally {
       setPlacing(false);
@@ -118,332 +183,309 @@ export default function CheckoutPage() {
   }
 
   return (
-    <main className="page">
-      <h1 className="page-title">Checkout</h1>
-      <p className="page-subtitle">
-        Review your order and enter your details to complete the purchase.
-      </p>
+    <main className="checkout-page">
+      <section className="checkout-hero" aria-labelledby="checkout-title">
+        <div>
+          <Link href="/cart" className="checkout-back-link">
+            Back to cart
+          </Link>
+          <h1 id="checkout-title">Checkout</h1>
+          <p>
+            Complete your details here, then continue to WooCommerce for secure
+            payment.
+          </p>
+        </div>
+        <div className="checkout-trust-strip" aria-label="Checkout assurances">
+          <span>
+            <ShieldCheck size={16} />
+            Secure order
+          </span>
+          <span>
+            <PackageCheck size={16} />
+            {itemCount} {itemCount === 1 ? "item" : "items"}
+          </span>
+          <span>
+            <Truck size={16} />
+            Shipping calculated next
+          </span>
+        </div>
+      </section>
 
       {error && (
-        <div
-          style={{
-            marginTop: "10px",
-            padding: "8px 10px",
-            borderRadius: "10px",
-            background: "#fef2f2",
-            border: "1px solid #fecaca",
-            color: "#b91c1c",
-            fontSize: "13px",
-          }}
-        >
+        <div className="checkout-alert checkout-alert--error" role="alert">
           {error}
         </div>
       )}
 
-      {/* Empty state */}
       {!hasItems && !placed && (
-        <div style={{ fontSize: "14px", color: "#6b7280", marginTop: "8px" }}>
-          Your cart is empty.{" "}
-          <Link href="/cart" style={{ color: "#be185d" }}>
-            Go back to cart
-          </Link>{" "}
-          or{" "}
-          <Link href="/" style={{ color: "#be185d" }}>
-            continue shopping
-          </Link>
-          .
-        </div>
-      )}
-
-      {/* After "order" placed */}
-      {!hasItems && placed && (
-        <div
-          style={{
-            marginTop: "12px",
-            padding: "12px 14px",
-            borderRadius: "12px",
-            background: "#ecfdf3",
-            border: "1px solid #bbf7d0",
-            fontSize: "14px",
-            color: "#166534",
-          }}
-        >
-          <div style={{ fontWeight: 600, marginBottom: "4px" }}>
-            Thank you! 💗
-          </div>
+        <section className="checkout-empty">
+          <PackageCheck size={30} />
+          <h2>Your cart is empty</h2>
+          <p>Add a few products before starting checkout.</p>
           <div>
-            Your order was created in WooCommerce. WooCommerce did not return a
-            payment URL, so we stayed here.
-          </div>
-          <div style={{ marginTop: "8px" }}>
-            <Link href="/" style={{ color: "#15803d" }}>
-              Back to store
+            <Link href="/shop" className="checkout-primary-link">
+              Continue shopping
+            </Link>
+            <Link href="/cart" className="checkout-secondary-link">
+              View cart
             </Link>
           </div>
-        </div>
+        </section>
+      )}
+
+      {!hasItems && placed && (
+        <section className="checkout-complete">
+          <CheckCircle2 size={32} />
+          <h2>Order created</h2>
+          <p>
+            Your order was created in WooCommerce. If no payment page opened,
+            you can continue shopping and we can inspect the payment URL next.
+          </p>
+          <Link href="/shop" className="checkout-primary-link">
+            Back to shop
+          </Link>
+        </section>
       )}
 
       {hasItems && (
-        <div
-          style={{
-            display: "grid",
-            gap: "24px",
-            marginTop: "20px",
-          }}
-        >
-          {/* 2-column layout on larger screens */}
-          <div
-            style={{
-              display: "grid",
-              gap: "20px",
-            }}
-          >
-            {/* Customer details + Place order */}
-            <form
-              key={loggedInCustomer?.id ?? session.status}
-              onSubmit={handlePlaceOrder}
-            >
-              <div
-                style={{
-                  borderRadius: "16px",
-                  border: "1px solid #e5e7eb",
-                  background: "#ffffff",
-                  padding: "16px 16px 18px",
-                  boxShadow: "0 10px 30px rgba(15, 23, 42, 0.04)",
-                  marginBottom: "16px",
-                }}
-              >
-                <h2
-                  style={{
-                    fontSize: "16px",
-                    fontWeight: 600,
-                    marginBottom: "10px",
-                    letterSpacing: "-0.01em",
-                    color: "#0f172a",
-                  }}
-                >
-                  Contact details
-                </h2>
-
-                {session.status === "logged-in" && (
-                  <div
-                    style={{
-                      marginBottom: "12px",
-                      borderRadius: "12px",
-                      background: "#ecfdf5",
-                      border: "1px solid #bbf7d0",
-                      color: "#166534",
-                      padding: "10px 12px",
-                      fontSize: "13px",
-                    }}
-                  >
-                    Signed in as <strong>{session.name}</strong>. This order
-                    will be attached to your WordPress customer account.
-                  </div>
-                )}
-
-                {session.status === "logged-out" && (
-                  <div
-                    style={{
-                      marginBottom: "12px",
-                      borderRadius: "12px",
-                      background: "#f8fafc",
-                      border: "1px solid #e2e8f0",
-                      color: "#475569",
-                      padding: "10px 12px",
-                      fontSize: "13px",
-                    }}
-                  >
-                    You are checking out as a guest. Log in from My account if
-                    you want this order saved to a WordPress user.
-                  </div>
-                )}
-
-                <div
-                  style={{
-                    display: "grid",
-                    gap: "10px",
-                    marginBottom: "8px",
-                  }}
-                >
-                  <div>
-                    <label
-                      style={{
-                        display: "block",
-                        fontSize: "12px",
-                        color: "#6b7280",
-                        marginBottom: "4px",
-                      }}
-                    >
-                      Full name
-                    </label>
-                    <input
-                      type="text"
-                      name="name"
-                      required
-                      defaultValue={loggedInCustomer?.name ?? ""}
-                      style={{
-                        width: "100%",
-                        padding: "8px 10px",
-                        borderRadius: "10px",
-                        border: "1px solid #e5e7eb",
-                        fontSize: "14px",
-                      }}
-                    />
-                  </div>
-
-                  <div>
-                    <label
-                      style={{
-                        display: "block",
-                        fontSize: "12px",
-                        color: "#6b7280",
-                        marginBottom: "4px",
-                      }}
-                    >
-                      Email
-                    </label>
-                    <input
-                      type="email"
-                      name="email"
-                      required
-                      defaultValue={loggedInCustomer?.email ?? ""}
-                      style={{
-                        width: "100%",
-                        padding: "8px 10px",
-                        borderRadius: "10px",
-                        border: "1px solid #e5e7eb",
-                        fontSize: "14px",
-                      }}
-                    />
-                  </div>
-
-                  <div>
-                    <label
-                      style={{
-                        display: "block",
-                        fontSize: "12px",
-                        color: "#6b7280",
-                        marginBottom: "4px",
-                      }}
-                    >
-                      Phone
-                    </label>
-                    <input
-                      type="tel"
-                      name="phone"
-                      style={{
-                        width: "100%",
-                        padding: "8px 10px",
-                        borderRadius: "10px",
-                        border: "1px solid #e5e7eb",
-                        fontSize: "14px",
-                      }}
-                    />
-                  </div>
-
-                  <div>
-                    <label
-                      style={{
-                        display: "block",
-                        fontSize: "12px",
-                        color: "#6b7280",
-                        marginBottom: "4px",
-                      }}
-                    >
-                      Address
-                    </label>
-                    <textarea
-                      name="address"
-                      rows={3}
-                      style={{
-                        width: "100%",
-                        padding: "8px 10px",
-                        borderRadius: "10px",
-                        border: "1px solid #e5e7eb",
-                        fontSize: "14px",
-                        resize: "vertical",
-                      }}
-                    />
-                  </div>
-                </div>
-
-                <div
-                  style={{
-                    marginTop: "10px",
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: "8px",
-                  }}
-                >
-                  <button
-                    type="submit"
-                    className="btn btn-primary"
-                    disabled={placing}
-                    style={{
-                      width: "100%",
-                      justifyContent: "center",
-                      opacity: placing ? 0.7 : 1,
-                    }}
-                  >
-                    {placing ? "Connecting to WooCommerce…" : "Continue to WooCommerce checkout"}
-                  </button>
-
-                  <div
-                    style={{
-                      fontSize: "12px",
-                      color: "#6b7280",
-                      textAlign: "center",
-                    }}
-                  >
-                    This creates the WooCommerce order, then hands the customer
-                    to WooCommerce for payment.
-                  </div>
+        <form className="checkout-layout" onSubmit={handlePlaceOrder}>
+          <div className="checkout-form-stack">
+            <section className="checkout-panel">
+              <div className="checkout-panel-heading">
+                <span>01</span>
+                <div>
+                  <h2>Contact</h2>
+                  <p>Used for order updates and receipts.</p>
                 </div>
               </div>
-            </form>
 
-            {/* Order summary */}
-            <div
-              style={{
-                borderRadius: "16px",
-                border: "1px solid #e5e7eb",
-                background: "#ffffff",
-                padding: "16px 16px 18px",
-                boxShadow: "0 10px 30px rgba(15, 23, 42, 0.04)",
-              }}
-            >
-              <h2
-                style={{
-                  fontSize: "16px",
-                  fontWeight: 600,
-                  marginBottom: "10px",
-                  letterSpacing: "-0.01em",
-                  color: "#0f172a",
-                }}
-              >
-                Order summary
-              </h2>
+              {session.status === "logged-in" && (
+                <div className="checkout-session checkout-session--success">
+                  Signed in as <strong>{session.name}</strong>. This order will
+                  be attached to your WordPress customer account.
+                </div>
+              )}
 
-              <ul
-                style={{
-                  listStyle: "none",
-                  padding: 0,
-                  margin: 0,
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: "10px",
-                  marginBottom: "12px",
-                }}
-              >
-                {items.map((item: AnyCartItem) => {
-                  const qty = item.quantity ?? item.qty ?? 1;
-                  const rawPrice =
-                    typeof item.price === "number"
-                      ? item.price
-                      : parseFloat(item.price ?? "0") || 0;
-                  const lineTotal = rawPrice * qty;
+              {session.status === "logged-out" && (
+                <div className="checkout-session">
+                  Checking out as guest. Sign in from My account if you want the
+                  order saved to a WordPress user.
+                </div>
+              )}
 
+              <div className="checkout-field-grid checkout-field-grid--two">
+                <label className="checkout-field">
+                  <span>Email</span>
+                  <input
+                    type="email"
+                    name="email"
+                    required
+                    autoComplete="email"
+                    defaultValue={loggedInCustomer?.email ?? ""}
+                    placeholder="you@example.com"
+                  />
+                </label>
+                <label className="checkout-field">
+                  <span>Phone</span>
+                  <input
+                    type="tel"
+                    name="phone"
+                    autoComplete="tel"
+                    placeholder="+374"
+                  />
+                </label>
+              </div>
+            </section>
+
+            <section className="checkout-panel">
+              <div className="checkout-panel-heading">
+                <span>02</span>
+                <div>
+                  <h2>Shipping address</h2>
+                  <p>Where WooCommerce should send the order.</p>
+                </div>
+              </div>
+
+              <div className="checkout-field-grid checkout-field-grid--two">
+                <label className="checkout-field">
+                  <span>First name</span>
+                  <input
+                    type="text"
+                    name="shippingFirstName"
+                    required
+                    autoComplete="given-name"
+                    defaultValue={defaultFirstName}
+                  />
+                </label>
+                <label className="checkout-field">
+                  <span>Last name</span>
+                  <input
+                    type="text"
+                    name="shippingLastName"
+                    required
+                    autoComplete="family-name"
+                    defaultValue={defaultLastName}
+                  />
+                </label>
+              </div>
+
+              <label className="checkout-field">
+                <span>Address</span>
+                <input
+                  type="text"
+                  name="shippingAddress1"
+                  required
+                  autoComplete="shipping address-line1"
+                  placeholder="Street and house number"
+                />
+              </label>
+
+              <label className="checkout-field">
+                <span>Apartment, suite, floor</span>
+                <input
+                  type="text"
+                  name="shippingAddress2"
+                  autoComplete="shipping address-line2"
+                  placeholder="Optional"
+                />
+              </label>
+
+              <div className="checkout-field-grid checkout-field-grid--three">
+                <label className="checkout-field">
+                  <span>City</span>
+                  <input
+                    type="text"
+                    name="shippingCity"
+                    required
+                    autoComplete="shipping address-level2"
+                    defaultValue="Yerevan"
+                  />
+                </label>
+                <label className="checkout-field">
+                  <span>Region</span>
+                  <input
+                    type="text"
+                    name="shippingState"
+                    autoComplete="shipping address-level1"
+                  />
+                </label>
+                <label className="checkout-field">
+                  <span>Postcode</span>
+                  <input
+                    type="text"
+                    name="shippingPostcode"
+                    autoComplete="shipping postal-code"
+                  />
+                </label>
+              </div>
+
+              <label className="checkout-field checkout-field--compact">
+                <span>Country</span>
+                <select
+                  name="shippingCountry"
+                  required
+                  autoComplete="shipping country"
+                  defaultValue="AM"
+                >
+                  <option value="AM">Armenia</option>
+                  <option value="US">United States</option>
+                  <option value="GE">Georgia</option>
+                  <option value="FR">France</option>
+                </select>
+              </label>
+            </section>
+
+            <section className="checkout-panel">
+              <div className="checkout-panel-heading">
+                <span>03</span>
+                <div>
+                  <h2>Billing</h2>
+                  <p>Use the same address, or enter billing details.</p>
+                </div>
+              </div>
+
+              <label className="checkout-check-row">
+                <input
+                  type="checkbox"
+                  checked={billingMatchesShipping}
+                  onChange={(event) =>
+                    setBillingMatchesShipping(event.currentTarget.checked)
+                  }
+                />
+                <span>Billing address is the same as shipping</span>
+              </label>
+
+              {!billingMatchesShipping && (
+                <div className="checkout-billing-fields">
+                  <div className="checkout-field-grid checkout-field-grid--two">
+                    <label className="checkout-field">
+                      <span>First name</span>
+                      <input type="text" name="billingFirstName" required />
+                    </label>
+                    <label className="checkout-field">
+                      <span>Last name</span>
+                      <input type="text" name="billingLastName" required />
+                    </label>
+                  </div>
+                  <label className="checkout-field">
+                    <span>Billing address</span>
+                    <input type="text" name="billingAddress1" required />
+                  </label>
+                  <label className="checkout-field">
+                    <span>Apartment, suite, floor</span>
+                    <input type="text" name="billingAddress2" />
+                  </label>
+                  <div className="checkout-field-grid checkout-field-grid--three">
+                    <label className="checkout-field">
+                      <span>City</span>
+                      <input type="text" name="billingCity" required />
+                    </label>
+                    <label className="checkout-field">
+                      <span>Region</span>
+                      <input type="text" name="billingState" />
+                    </label>
+                    <label className="checkout-field">
+                      <span>Postcode</span>
+                      <input type="text" name="billingPostcode" />
+                    </label>
+                  </div>
+                  <label className="checkout-field checkout-field--compact">
+                    <span>Country</span>
+                    <select name="billingCountry" required defaultValue="AM">
+                      <option value="AM">Armenia</option>
+                      <option value="US">United States</option>
+                      <option value="GE">Georgia</option>
+                      <option value="FR">France</option>
+                    </select>
+                  </label>
+                </div>
+              )}
+
+              <label className="checkout-field">
+                <span>Order notes</span>
+                <textarea
+                  name="customerNote"
+                  rows={4}
+                  placeholder="Delivery notes, preferred time, or anything we should know."
+                />
+              </label>
+            </section>
+          </div>
+
+          <aside className="checkout-summary" aria-label="Order summary">
+            <div className="checkout-summary-card">
+              <div className="checkout-summary-heading">
+                <div>
+                  <h2>Order summary</h2>
+                  <p>{itemCount} {itemCount === 1 ? "item" : "items"} in cart</p>
+                </div>
+                <LockKeyhole size={18} />
+              </div>
+
+              <ul className="checkout-summary-list">
+                {checkoutItems.map((item) => {
+                  const qty = getCartItemQuantity(item);
+                  const lineTotal = getCartItemPrice(item) * qty;
                   const slug = item.productSlug || item.slug || "";
                   const name = item.name || item.title || "Product";
                   const imageSrc =
@@ -451,133 +493,73 @@ export default function CheckoutPage() {
                     item.imageUrl ||
                     item.image?.src ||
                     null;
-                  const imageAlt =
-                    item.image?.altText || item.image?.alt || name;
+                  const imageAlt = item.image?.altText || item.image?.alt || name;
 
                   return (
-                    <li
-                      key={item.key || slug || name}
-                      style={{ display: "flex", gap: "10px" }}
-                    >
-                      <div
-                        style={{
-                          width: "56px",
-                          height: "56px",
-                          borderRadius: "10px",
-                          background: "#f9fafb",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          overflow: "hidden",
-                          flexShrink: 0,
-                        }}
-                      >
+                    <li key={item.key || slug || name}>
+                      <div className="checkout-summary-image">
                         {imageSrc ? (
                           <Image
                             src={imageSrc}
                             alt={imageAlt}
-                            width={56}
-                            height={56}
-                            style={{ objectFit: "contain" }}
+                            width={72}
+                            height={72}
                           />
                         ) : (
-                          <span
-                            style={{
-                              fontSize: "11px",
-                              color: "#9ca3af",
-                              textAlign: "center",
-                            }}
-                          >
-                            No image
-                          </span>
+                          <span>No image</span>
                         )}
                       </div>
-
-                      <div
-                        style={{
-                          flex: 1,
-                          display: "flex",
-                          flexDirection: "column",
-                          gap: "2px",
-                        }}
-                      >
+                      <div className="checkout-summary-item-main">
                         {slug ? (
-                          <Link
-                            href={`/product/${slug}`}
-                            style={{
-                              fontSize: "14px",
-                              fontWeight: 500,
-                              color: "#111827",
-                              textDecoration: "none",
-                            }}
-                          >
-                            {name}
-                          </Link>
+                          <Link href={`/product/${slug}`}>{name}</Link>
                         ) : (
-                          <div
-                            style={{
-                              fontSize: "14px",
-                              fontWeight: 500,
-                              color: "#111827",
-                            }}
-                          >
-                            {name}
-                          </div>
+                          <strong>{name}</strong>
                         )}
-
-                        <div
-                          style={{
-                            fontSize: "12px",
-                            color: "#6b7280",
-                          }}
-                        >
-                          Qty: {qty}
-                        </div>
+                        <span>Qty {qty}</span>
                       </div>
-
-                      <div
-                        style={{
-                          fontSize: "13px",
-                          fontWeight: 600,
-                          color: "#b91c1c",
-                          whiteSpace: "nowrap",
-                        }}
-                      >
+                      <strong className="checkout-summary-price">
                         {formatPrice(lineTotal)}
-                      </div>
+                      </strong>
                     </li>
                   );
                 })}
               </ul>
 
-              <div
-                style={{
-                  borderTop: "1px solid #e5e7eb",
-                  paddingTop: "10px",
-                  fontSize: "14px",
-                  display: "flex",
-                  justifyContent: "space-between",
-                }}
-              >
-                <span>Subtotal</span>
-                <span style={{ fontWeight: 600 }}>
-                  {formatPrice(subtotal)}
-                </span>
+              <div className="checkout-totals">
+                <div>
+                  <span>Subtotal</span>
+                  <strong>{formatPrice(subtotal)}</strong>
+                </div>
+                <div>
+                  <span>Shipping</span>
+                  <em>Calculated in WooCommerce</em>
+                </div>
+                <div>
+                  <span>Taxes</span>
+                  <em>Calculated in WooCommerce</em>
+                </div>
+                <div className="checkout-total-row">
+                  <span>Due now</span>
+                  <strong>{formatPrice(subtotal)}</strong>
+                </div>
               </div>
 
-              <div
-                style={{
-                  marginTop: "6px",
-                  fontSize: "12px",
-                  color: "#6b7280",
-                }}
+              <button
+                type="submit"
+                className="checkout-place-order"
+                disabled={placing}
               >
-                Taxes, shipping and payment gateway details can be added later
-                in a more advanced flow.
-              </div>
+                <LockKeyhole size={16} />
+                {placing ? "Creating order..." : "Continue to payment"}
+              </button>
+
+              <p className="checkout-payment-note">
+                We create the WooCommerce order first, then hand you to the
+                store payment page.
+              </p>
             </div>
-          </div>
-        </div>
+          </aside>
+        </form>
       )}
     </main>
   );

@@ -8,6 +8,7 @@
 @import "./styles/home.css";
 @import "./styles/product-carousel.css";
 @import "./styles/quick-view.css";
+@import "./styles/checkout.css";
 @import "./styles/dashboard.css";
 @import "./styles/shop-builder.css";
 @tailwind base;
