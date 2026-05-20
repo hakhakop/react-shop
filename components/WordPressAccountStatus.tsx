@@ -34,9 +34,10 @@ export default function WordPressAccountStatus({
     setAccountState({ status: "checking" });
 
     try {
-      const response = await fetch(`${wordpressBaseUrl}/wp-json/wp/v2/users/me`, {
+      const response = await fetch("/api/account/session", {
         credentials: "include",
         headers: { Accept: "application/json" },
+        cache: "no-store",
       });
 
       if (response.status === 401 || response.status === 403) {
@@ -48,7 +49,24 @@ export default function WordPressAccountStatus({
         throw new Error(`WordPress returned ${response.status}.`);
       }
 
-      const user = await response.json();
+      const result = await response.json();
+
+      if (result?.status === "logged-out") {
+        setAccountState({ status: "logged-out" });
+        return;
+      }
+
+      if (result?.status === "unreadable") {
+        setAccountState({
+          status: "unreadable",
+          message:
+            result.message ||
+            "React cannot read the WordPress browser session yet.",
+        });
+        return;
+      }
+
+      const user = result?.user;
       setAccountState({
         status: "logged-in",
         name: user?.name || user?.slug || "WordPress user",
@@ -58,7 +76,7 @@ export default function WordPressAccountStatus({
       setAccountState({
         status: "unreadable",
         message:
-          "React cannot read the WordPress browser session yet. This needs the future connector plugin or a shared auth token.",
+          "React cannot read the WordPress session yet. This usually means the WordPress login cookie is not shared with the React domain.",
       });
     }
   }, [wordpressBaseUrl]);
