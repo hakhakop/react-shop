@@ -25,6 +25,23 @@ function normalizeColumnsDesktop(value: unknown): number | undefined {
   return Math.min(Math.max(parsed, 2), 6);
 }
 
+function productSpaceToCss(value: unknown, fallback: string) {
+  const key = (pickFirstString(value) ?? fallback).toString().toLowerCase();
+  switch (key) {
+    case "none":
+      return "0px";
+    case "small":
+      return "clamp(8px, 1vw, 12px)";
+    case "large":
+      return "clamp(22px, 2.4vw, 36px)";
+    case "max":
+      return "clamp(32px, 4vw, 56px)";
+    case "medium":
+    default:
+      return "clamp(14px, 1.5vw, 22px)";
+  }
+}
+
 export default async function ProductGridBlock({
   block,
 }: {
@@ -110,6 +127,11 @@ export default async function ProductGridBlock({
     "auto";
 
   const columnsDesktop = normalizeColumnsDesktop(block.columnsDesktop);
+  const productSpacingStyle = {
+    "--product-grid-gap": productSpaceToCss(block.gridGap, "medium"),
+    "--product-card-padding": productSpaceToCss(block.cardPadding, "medium"),
+    "--product-image-padding": productSpaceToCss(block.imagePadding, "large"),
+  } as CSSProperties;
 
   return (
     <div
@@ -117,9 +139,10 @@ export default async function ProductGridBlock({
       style={
         columnsDesktop
           ? ({
+              ...productSpacingStyle,
               "--pb-grid-columns-desktop": columnsDesktop,
             } as CSSProperties)
-          : undefined
+          : productSpacingStyle
       }
       data-layout-variant={layoutVariant}
       data-card-preset={preset}

@@ -139,6 +139,9 @@ export type BuilderSection = {
   filterPosition?: string;
   cardStyle?: string;
   cardPreset?: string;
+  gridGap?: string;
+  cardPadding?: string;
+  imagePadding?: string;
   source?: string;
   categoryId?: string;
   gridLimit?: number;

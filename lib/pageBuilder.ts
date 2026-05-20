@@ -37,6 +37,9 @@ export interface ProductGridLayoutBlock extends SectionSettings {
   productGridSurface?: string[] | string | null;
   productCardSurface?: string[] | string | null;
   columnsDesktop?: number | string | null;
+  gridGap?: string[] | string | null;
+  cardPadding?: string[] | string | null;
+  imagePadding?: string[] | string | null;
   layoutVariant?: string[] | null;
   gridLimit?: number | null;
   source?: string[] | null;

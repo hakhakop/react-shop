@@ -216,6 +216,9 @@ type BuilderSection = {
   filterPosition?: "left" | "top" | "drawer" | "hidden";
   cardStyle?: "flat" | "soft" | "lined";
   cardPreset?: "standard" | "editorial" | "compact";
+  gridGap?: "none" | "small" | "medium" | "large" | "max";
+  cardPadding?: "none" | "small" | "medium" | "large" | "max";
+  imagePadding?: "none" | "small" | "medium" | "large" | "max";
   source?: "all" | "featured" | "category";
   categoryId?: string;
   gridLimit?: number;
@@ -747,6 +750,9 @@ const defaultState: BuilderState = {
       filterPosition: "left",
       cardStyle: "flat",
       cardPreset: "standard",
+      gridGap: "large",
+      cardPadding: "medium",
+      imagePadding: "large",
       source: "all",
       gridLimit: 12,
       layoutVariant: "grid",
@@ -4392,6 +4398,64 @@ export default function DashboardBuilder() {
                     <option value="compact">Compact</option>
                   </select>
                 </label>
+
+                <div className="builder-two-column">
+                  <label className="builder-field">
+                    <span>Grid Gap</span>
+                    <select
+                      value={selectedSection.gridGap ?? "large"}
+                      onChange={(event) =>
+                        updateSelected({
+                          gridGap: event.target.value as BuilderSection["gridGap"],
+                        })
+                      }
+                    >
+                      <option value="none">None</option>
+                      <option value="small">Small</option>
+                      <option value="medium">Medium</option>
+                      <option value="large">Large</option>
+                      <option value="max">Max</option>
+                    </select>
+                  </label>
+
+                  <label className="builder-field">
+                    <span>Card Padding</span>
+                    <select
+                      value={selectedSection.cardPadding ?? "medium"}
+                      onChange={(event) =>
+                        updateSelected({
+                          cardPadding: event.target
+                            .value as BuilderSection["cardPadding"],
+                        })
+                      }
+                    >
+                      <option value="none">None</option>
+                      <option value="small">Small</option>
+                      <option value="medium">Medium</option>
+                      <option value="large">Large</option>
+                      <option value="max">Max</option>
+                    </select>
+                  </label>
+                </div>
+
+                <label className="builder-field">
+                  <span>Image Padding</span>
+                  <select
+                    value={selectedSection.imagePadding ?? "large"}
+                    onChange={(event) =>
+                      updateSelected({
+                        imagePadding: event.target
+                          .value as BuilderSection["imagePadding"],
+                      })
+                    }
+                  >
+                    <option value="none">Frameless</option>
+                    <option value="small">Small</option>
+                    <option value="medium">Medium</option>
+                    <option value="large">Large</option>
+                    <option value="max">Max</option>
+                  </select>
+                </label>
               </>
             )}
 
@@ -7264,6 +7328,9 @@ function PreviewSection({
             filterPosition={section.filterPosition}
             cardStyle={section.cardStyle}
             pageSize={section.gridLimit}
+            gridGap={section.gridGap}
+            cardPadding={section.cardPadding}
+            imagePadding={section.imagePadding}
           />
         ) : (
           <div className="builder-preview-products">

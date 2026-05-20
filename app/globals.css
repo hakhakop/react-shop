@@ -772,7 +772,7 @@ body {
 }
 
 [data-theme="dark"] .product-image {
-  background: #020617;
+  background: #ffffff;
 }
 
 [data-theme="dark"] .product-title {
@@ -780,9 +780,9 @@ body {
 }
 
 [data-theme="dark"] .product-price {
-  background: rgba(24, 24, 27, 0.9);
-  border-color: rgba(244, 114, 182, 0.4);
-  color: #fb7185;
+  background: transparent;
+  border-color: transparent;
+  color: #f9fafb;
 }
 
 [data-theme="dark"] .page-title,

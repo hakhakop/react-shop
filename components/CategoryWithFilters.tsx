@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import Link from "next/link";
 import WishlistToggle from "./WishlistToggle";
 import AddToCartButton from "./AddToCartButton";
@@ -12,12 +12,32 @@ type Props = {
   filterPosition?: "left" | "top" | "drawer" | "hidden" | string | null;
   cardStyle?: "flat" | "soft" | "lined" | string | null;
   pageSize?: number | null;
+  gridGap?: string | null;
+  cardPadding?: string | null;
+  imagePadding?: string | null;
 };
 
 function toNumberPrice(price: string | null | undefined): number {
   if (!price) return 0;
   const n = parseFloat(price);
   return Number.isNaN(n) ? 0 : n;
+}
+
+function productSpaceToCss(value: string | null | undefined, fallback: string) {
+  const key = (value || fallback).toString().toLowerCase();
+  switch (key) {
+    case "none":
+      return "0px";
+    case "small":
+      return "clamp(8px, 1vw, 12px)";
+    case "large":
+      return "clamp(22px, 2.4vw, 36px)";
+    case "max":
+      return "clamp(32px, 4vw, 56px)";
+    case "medium":
+    default:
+      return "clamp(14px, 1.5vw, 22px)";
+  }
 }
 
 type AttributeOption = {
@@ -65,6 +85,9 @@ export default function CategoryWithFilters({
   filterPosition = "left",
   cardStyle = "flat",
   pageSize,
+  gridGap,
+  cardPadding,
+  imagePadding,
 }: Props) {
   const [searchTerm, setSearchTerm] = useState("");
   const [minPrice, setMinPrice] = useState("");
@@ -100,12 +123,24 @@ export default function CategoryWithFilters({
       : "left";
   const isTopFilterLayout = normalizedFilterPosition === "top";
 
+  const productSpaceVars = {
+    "--product-grid-gap": productSpaceToCss(gridGap, "medium"),
+    "--product-card-padding": productSpaceToCss(cardPadding, "medium"),
+    "--product-image-padding": productSpaceToCss(imagePadding, "large"),
+  } as CSSProperties;
+
   const gridStyle =
     viewMode === "compact"
-      ? { gridTemplateColumns: "repeat(2, minmax(0, 1fr))" }
+      ? {
+          ...productSpaceVars,
+          gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+        }
       : viewMode === "list"
-      ? { gridTemplateColumns: "minmax(0, 1fr)" }
-      : { gridTemplateColumns: `repeat(${archiveColumns}, minmax(0, 1fr))` };
+      ? { ...productSpaceVars, gridTemplateColumns: "minmax(0, 1fr)" }
+      : {
+          ...productSpaceVars,
+          gridTemplateColumns: `repeat(${archiveColumns}, minmax(0, 1fr))`,
+        };
 
   const attributeFacets: AttributeFacet[] = useMemo(() => {
     const map: Record<string, { label: string; optionSet: Set<string> }> = {};
@@ -902,6 +937,12 @@ export default function CategoryWithFilters({
                           {p.name}
                         </h2>
 
+                        {priceNumber > 0 && !Number.isNaN(priceNumber) && (
+                          <div className="product-price">
+                            {formattedPrice} ֏
+                          </div>
+                        )}
+
                         {attributes.length > 0 && (
                           <div className="product-attributes-row">
                             {attributes.map((attr: any) => {
@@ -938,11 +979,6 @@ export default function CategoryWithFilters({
                           </div>
                         )}
 
-                        {priceNumber > 0 && !Number.isNaN(priceNumber) && (
-                          <div className="product-price">
-                            {formattedPrice} ֏
-                          </div>
-                        )}
                       </div>
                     </Link>
 

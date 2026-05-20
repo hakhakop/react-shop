@@ -1236,7 +1236,7 @@ body[data-storefront-preset="princity"] .page-section--product-grid-auto-bg {
 }
 
 body[data-storefront-preset="princity"] .pb-product-grid[data-layout-variant="grid"] .product-grid {
-  gap: clamp(18px, 1.8vw, 28px);
+  gap: var(--product-grid-gap, clamp(22px, 2vw, 34px));
   background: transparent;
   border: 0;
   box-shadow: none;
@@ -1276,8 +1276,9 @@ body[data-storefront-preset="princity"] .product-image {
   border-radius: calc(var(--product-card-radius, 0px) * 0.65);
   margin-bottom: 16px;
   aspect-ratio: var(--product-image-aspect-ratio, auto);
-  background: var(--product-image-bg, var(--surface-muted, #f5f5f3));
+  background: var(--product-image-bg, #ffffff);
   background-image: none;
+  padding: var(--product-image-padding, clamp(22px, 2.4vw, 36px));
 }
 
 body[data-storefront-preset="princity"] .product-card:hover .product-image img,
@@ -1286,19 +1287,20 @@ body[data-storefront-preset="princity"] .product-card:hover .product-image-img {
 }
 
 body[data-storefront-preset="princity"] .product-title {
-  padding: 0 18px;
-  font-size: 15px;
-  font-weight: 620;
+  padding: 0;
+  font-size: clamp(16px, 1.1vw, 20px);
+  font-weight: 720;
 }
 
 body[data-storefront-preset="princity"] .product-price {
-  margin: 14px 18px 18px;
-  border-radius: 999px;
-  font-size: 12px;
+  margin: 0;
+  border-radius: 0;
+  font-size: clamp(16px, 1.1vw, 20px);
+  color: var(--text-main, #111111);
 }
 
 body[data-storefront-preset="princity"] .product-card-actions-row {
-  padding: 0 18px 18px;
+  padding: 16px 0 0;
 }
 
 body[data-storefront-preset="princity"] .product-card-actions-row .btn {
@@ -1390,8 +1392,13 @@ body[data-storefront-preset="princity"] .product-card-top-right a {
 }
 
 body[data-storefront-preset="princity"] .product-attributes-row {
-  padding: 0 18px;
+  padding: 0;
   gap: 6px;
+}
+
+body[data-storefront-preset="princity"] .product-card-info,
+body[data-storefront-preset="princity"] .product-main {
+  padding: 0;
 }
 
 body[data-storefront-preset="princity"] .product-attribute-badge {
@@ -1422,9 +1429,9 @@ body[data-storefront-preset="princity"] .product-attribute-label {
   --accent-contrast: #050505;
   --header-bg: rgba(5, 5, 5, 0.94);
   --header-border: rgba(255, 255, 255, 0.12);
-  --product-card-bg: #0b0b0b;
-  --product-card-border: rgba(255, 255, 255, 0.1);
-  --product-image-bg: #151515;
+  --product-card-bg: transparent;
+  --product-card-border: transparent;
+  --product-image-bg: #ffffff;
   --price-bg: transparent;
   --price-border: var(--color-accent, #f7f7f4);
   --price-color: var(--color-accent, #f7f7f4);
@@ -1469,8 +1476,12 @@ body[data-storefront-preset="princity"] .product-attribute-label {
 
 [data-theme="dark"] body[data-storefront-preset="princity"] .category-pill,
 [data-theme="dark"] body[data-storefront-preset="princity"] .product-card {
-  background: var(--surface-main, #0b0b0b);
   color: var(--text-main, #f7f7f4);
+}
+
+[data-theme="dark"] body[data-storefront-preset="princity"] .product-card {
+  background: transparent;
+  border-color: transparent;
 }
 
 [data-theme="dark"] body[data-storefront-preset="princity"] .category-bar {

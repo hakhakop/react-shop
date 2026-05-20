@@ -176,6 +176,9 @@ async function BuilderProductsSection({
       filterPosition={section.filterPosition}
       cardStyle={section.cardStyle}
       pageSize={section.gridLimit}
+      gridGap={section.gridGap}
+      cardPadding={section.cardPadding}
+      imagePadding={section.imagePadding}
     />
   );
 }

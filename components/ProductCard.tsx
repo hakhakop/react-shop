@@ -128,9 +128,15 @@ export default function ProductCard({
             )}
           </div>
 
-          <h3 className="product-title product-title-2lines">
-            {product.name}
-          </h3>
+          <div className="product-card-info">
+            <h3 className="product-title product-title-2lines">
+              {product.name}
+            </h3>
+
+            {formattedPrice && (
+              <div className="product-price">{formattedPrice}</div>
+            )}
+          </div>
 
           {attributes.length > 0 && (
             <div className="product-attributes-row">
@@ -143,10 +149,6 @@ export default function ProductCard({
                 </div>
               ))}
             </div>
-          )}
-
-          {formattedPrice && (
-            <div className="product-price">{formattedPrice}</div>
           )}
         </Link>
 

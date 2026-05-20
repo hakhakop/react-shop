@@ -3,7 +3,7 @@
 .product-grid {
   display: grid;
   grid-template-columns: repeat(1, minmax(0, 1fr));
-  gap: clamp(16px, 2vw, 24px);
+  gap: var(--product-grid-gap, clamp(18px, 2vw, 28px));
 }
 
 @media (min-width: 640px) {
@@ -26,30 +26,31 @@
   width: var(--product-image-width, 100%);
   height: var(--product-image-height, 260px);
   border-radius: calc(var(--product-card-radius, var(--radius-lg, 12px)) - 2px);
-  background:
-    radial-gradient(circle at 50% 0%, color-mix(in srgb, var(--surface-main, #fff) 72%, transparent), transparent 58%),
-    var(--product-image-bg, #f9fafb);
+  background: var(--product-image-bg, #ffffff);
   overflow: hidden;
 
   display: flex;
   align-items: center;
   justify-content: center;
 
-  margin: 0 0 12px;
+  margin: 0 0 clamp(12px, 1.4vw, 20px);
+  padding: var(--product-image-padding, clamp(22px, 2.4vw, 36px));
 }
 
 .product-image img,
 .product-image-img {
   width: var(--product-image-width, 100%);
-  height: var(--product-image-height, 260px);
+  height: 100%;
   max-width: var(--product-image-max-width, 100%);
   max-height: var(--product-image-max-height, 100%);
   object-fit: var(--product-image-object-fit, contain);
-  transition: transform 0.25s ease-out;
+  transition:
+    transform 0.22s ease-out,
+    filter 0.22s ease-out;
 }
 
 .product-card:hover .product-image img {
-  transform: scale(1.07);
+  transform: scale(1.035);
 }
 
 .product-image-placeholder {
@@ -60,11 +61,12 @@
 /* Text */
 
 .product-title {
-  font-size: 14px;
-  line-height: 1.32;
-  font-weight: 620;
+  font-size: clamp(15px, 1vw, 18px);
+  line-height: 1.12;
+  font-weight: 720;
   color: var(--text-main, #111827);
-  margin: 2px 0 0;
+  margin: 0;
+  letter-spacing: 0;
 }
 
 .product-title-2lines {
@@ -78,19 +80,20 @@
 /* Price pill – slightly calmer */
 
 .product-price {
-  margin-top: 10px;
+  margin: 0;
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  padding: 4px 10px;
-  border-radius: 999px;
+  padding: 0;
+  border-radius: 0;
 
-  background: var(--price-bg, rgba(248, 250, 252, 0.95));
-  border: 1px solid var(--price-border, rgba(248, 113, 113, 0.22));
+  background: transparent;
+  border: 0;
 
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--price-color, #b91c1c);
+  font-size: clamp(15px, 1vw, 18px);
+  font-weight: 720;
+  color: var(--price-color, var(--text-main, #111827));
+  white-space: nowrap;
 }
 
 /* Meta line under title (e.g. category) */
@@ -120,21 +123,21 @@
 /* Attribute badges row */
 
 .product-attributes-row {
-  margin-top: 6px;
+  margin-top: 10px;
   display: flex;
   flex-wrap: wrap;
-  gap: 4px;
+  gap: 6px;
 }
 
 .product-attribute-badge {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  padding: 2px 8px;
+  padding: 4px 8px;
   border-radius: 999px;
-  background: var(--surface-muted, #f3f4f6);
-  border: 1px solid var(--border-soft, rgba(148, 163, 184, 0.4));
-  font-size: 11px;
+  background: color-mix(in srgb, var(--surface-muted, #f3f4f6) 88%, transparent);
+  border: 0;
+  font-size: 10px;
   color: var(--text-main, #374151);
 }
 
@@ -180,7 +183,7 @@
 
   min-height: var(--product-card-min-height, 0);
   max-width: var(--product-card-max-width, 100%);
-  padding: var(--product-card-padding, 12px);
+  padding: var(--product-card-padding, clamp(14px, 1.5vw, 22px));
 
   overflow: visible;
 
@@ -193,23 +196,51 @@
 }
 
 .product-card:hover {
-  transform: translateY(-2px);
+  transform: translateY(-3px);
   border-color: color-mix(in srgb, var(--accent, #db2777) 28%, var(--product-card-border, transparent));
   box-shadow: var(--product-card-shadow-hover, var(--shadow-lg, none));
 }
 
 .product-card-inner {
   height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .product-card-actions-row {
-  margin-top: 14px;
-  padding: 0;
+  margin-top: auto;
+  padding-top: 16px;
 }
 
 .product-card-actions-row .btn {
   width: 100%;
-  min-height: 38px;
+  min-height: 42px;
+  border-radius: 999px;
+}
+
+.product-card-link {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+
+.product-card-info,
+.product-main {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.product-card-info .product-title,
+.product-main .product-title {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.product-card-info .product-price,
+.product-main .product-price {
+  flex: 0 0 auto;
 }
 
 .quick-view-backdrop {
