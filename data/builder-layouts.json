@@ -100,7 +100,9 @@
         "cardPadding": "small",
         "imagePadding": "none",
         "cardPreset": "standard",
-        "contentMode": "boxed"
+        "contentMode": "boxed",
+        "addToCartSize": "medium",
+        "addToCartStyle": "blue"
       },
       {
         "id": "contentLayout-mpe18gdv-yy9c7",
@@ -135,7 +137,7 @@
         "layoutRows": 1
       }
     ],
-    "updatedAt": "2026-05-20T20:40:46.878Z"
+    "updatedAt": "2026-05-21T05:32:43.310Z"
   },
   "shop": {
     "version": 1,
@@ -393,11 +395,18 @@
         "visible": true,
         "columns": 4,
         "filterPosition": "left",
-        "cardStyle": "flat",
-        "cardPreset": "compact",
+        "cardStyle": "none",
+        "cardPreset": "standard",
         "source": "all",
         "gridLimit": 12,
-        "layoutVariant": "grid"
+        "layoutVariant": "grid",
+        "addToCartSize": "compact",
+        "addToCartStyle": "blue",
+        "gridGap": "small",
+        "cardPadding": "small",
+        "imagePadding": "none",
+        "addToCartDisplay": "icon",
+        "addToCartPosition": "under-wishlist"
       },
       {
         "id": "contentLayout-mp7vxi05-1id5q",
@@ -499,7 +508,7 @@
         "ctaUrl": "/shop"
       }
     ],
-    "updatedAt": "2026-05-20T04:31:31.380Z"
+    "updatedAt": "2026-05-21T06:55:20.740Z"
   },
   "client": {
     "version": 1,

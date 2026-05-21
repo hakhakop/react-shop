@@ -35,9 +35,11 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import type { CSSProperties, RefObject } from "react";
+import type { ChangeEvent, CSSProperties, RefObject } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
-import CarouselBlock, { type CarouselSlide } from "@/components/blocks/CarouselBlock";
+import CarouselBlock, {
+  type CarouselSlide,
+} from "@/components/blocks/CarouselBlock";
 import CategoryBar from "@/components/CategoryBar";
 import CategoryWithFilters from "@/components/CategoryWithFilters";
 import ProductOptionsSelector from "@/components/ProductOptionsSelector";
@@ -183,6 +185,11 @@ type BuilderLayoutBlock = {
   gridImagePadding?: "frameless" | "small" | "medium" | "max";
   gridContentPadding?: "none" | "small" | "medium" | "large";
   gridImageFrame?: "none" | "soft";
+  addToCartStyle?: "blue" | "dark" | "light" | "inherit";
+  addToCartSize?: "compact" | "medium" | "large" | "full";
+  addToCartPosition?: "below" | "under-price" | "under-wishlist";
+  addToCartVisibility?: "hover" | "always";
+  addToCartDisplay?: "button" | "icon";
   gridShowImage?: boolean;
   gridShowEyebrow?: boolean;
   gridShowMeta?: boolean;
@@ -203,6 +210,16 @@ type BuilderLayoutBlock = {
   galleryThumbnailPosition?: "bottom" | "left";
   galleryImageFit?: "contain" | "cover";
   galleryHeight?: number;
+};
+
+type WordPressMediaItem = {
+  id: number;
+  title: string;
+  altText?: string;
+  mimeType?: string;
+  sourceUrl: string;
+  thumbnailUrl: string;
+  date?: string;
 };
 
 type BuilderSection = {
@@ -237,6 +254,11 @@ type BuilderSection = {
   gridGap?: "none" | "small" | "medium" | "large" | "max";
   cardPadding?: "none" | "small" | "medium" | "large" | "max";
   imagePadding?: "none" | "small" | "medium" | "large" | "max";
+  addToCartStyle?: "blue" | "dark" | "light" | "inherit";
+  addToCartSize?: "compact" | "medium" | "large" | "full";
+  addToCartPosition?: "below" | "under-price" | "under-wishlist";
+  addToCartVisibility?: "hover" | "always";
+  addToCartDisplay?: "button" | "icon";
   source?: "all" | "featured" | "category";
   categoryId?: string;
   gridLimit?: number;
@@ -474,7 +496,10 @@ const layoutBlockGroups: {
   },
 ];
 
-const basePageLabels: Record<Exclude<BuilderPage, BuilderCustomPageKey>, string> = {
+const basePageLabels: Record<
+  Exclude<BuilderPage, BuilderCustomPageKey>,
+  string
+> = {
   home: "Home",
   shop: "Shop",
   client: "Client Page",
@@ -510,7 +535,9 @@ function parseBuilderLayoutKey(value: string | null): BuilderLayoutKey | null {
     : null;
 }
 
-function isBuilderCustomPageKey(value: string | null): value is BuilderCustomPageKey {
+function isBuilderCustomPageKey(
+  value: string | null,
+): value is BuilderCustomPageKey {
   return /^page:[a-z0-9]+(?:-[a-z0-9]+)*$/.test(value ?? "");
 }
 
@@ -524,7 +551,10 @@ function slugifyPageTitle(value: string) {
     .slice(0, 60);
 }
 
-function getLayoutLabel(key: BuilderLayoutKey, customPages: BuilderCustomPage[]) {
+function getLayoutLabel(
+  key: BuilderLayoutKey,
+  customPages: BuilderCustomPage[],
+) {
   if (isBuilderCustomPageKey(key)) {
     return customPages.find((page) => page.key === key)?.title ?? "Custom Page";
   }
@@ -534,7 +564,7 @@ function getLayoutLabel(key: BuilderLayoutKey, customPages: BuilderCustomPage[])
 
 function getFrontendUrlForBuilderKey(
   key: BuilderLayoutKey,
-  customPages: BuilderCustomPage[]
+  customPages: BuilderCustomPage[],
 ) {
   if (key === "home") return "/";
   if (key === "shop") return "/shop";
@@ -554,11 +584,15 @@ function getFrontendUrlForBuilderKey(
 const templateDescriptions: Record<BuilderTemplate, string> = {
   "product-single": "Default layout for every product detail page.",
   "product-category": "Default layout for product category archive pages.",
-  "product-category-specific": "Override layout for one chosen product category.",
+  "product-category-specific":
+    "Override layout for one chosen product category.",
   "search-results": "Default layout for search result pages.",
 };
 
-const designPresets: Record<NonNullable<BuilderDesign["preset"]>, BuilderDesign> = {
+const designPresets: Record<
+  NonNullable<BuilderDesign["preset"]>,
+  BuilderDesign
+> = {
   princity: {
     preset: "princity",
     colorScheme: "auto",
@@ -686,7 +720,9 @@ function sectionSchemeStyle(section: BuilderSection) {
   return {};
 }
 
-function resolveSectionColorScheme(section: BuilderSection): Exclude<SectionColorScheme, "inherit"> {
+function resolveSectionColorScheme(
+  section: BuilderSection,
+): Exclude<SectionColorScheme, "inherit"> {
   if (section.colorScheme === "dark" || section.colorScheme === "light") {
     return section.colorScheme;
   }
@@ -1318,8 +1354,18 @@ function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
       body: "Use badge blocks for services, promises, or compact feature rows.",
       columns: 2,
       badges: [
-        { id: `${id}-badge-1`, label: "01", title: "Fast", body: "Reusable block settings." },
-        { id: `${id}-badge-2`, label: "02", title: "Clean", body: "Flat, modern presentation." },
+        {
+          id: `${id}-badge-1`,
+          label: "01",
+          title: "Fast",
+          body: "Reusable block settings.",
+        },
+        {
+          id: `${id}-badge-2`,
+          label: "02",
+          title: "Clean",
+          body: "Flat, modern presentation.",
+        },
       ],
     };
   }
@@ -1647,7 +1693,7 @@ function loadInitialState(): BuilderState {
 
 function normalizeBuilderState(
   state: BuilderState,
-  fallbackKey: BuilderLayoutKey
+  fallbackKey: BuilderLayoutKey,
 ): BuilderState {
   const key = state.page ?? fallbackKey;
   const isTemplate = key in defaultTemplateStates;
@@ -1709,7 +1755,9 @@ function migrateProductTemplateSections(sections: BuilderSection[]) {
   });
 }
 
-function createProductDynamicBlock(kind: Extract<LayoutBlockKind, `product${string}`>) {
+function createProductDynamicBlock(
+  kind: Extract<LayoutBlockKind, `product${string}`>,
+) {
   return {
     id: createBlockId(kind),
     kind,
@@ -1728,7 +1776,9 @@ function loadDraftForKey(key: BuilderLayoutKey): BuilderState {
   try {
     const raw = window.localStorage.getItem(STORAGE_BY_KEY);
     if (!raw) return getDefaultStateForKey(key);
-    const drafts = JSON.parse(raw) as Partial<Record<BuilderLayoutKey, BuilderState>>;
+    const drafts = JSON.parse(raw) as Partial<
+      Record<BuilderLayoutKey, BuilderState>
+    >;
     const draft = drafts[key];
     if (!draft?.sections?.length) return getDefaultStateForKey(key);
     return normalizeBuilderState(draft, key);
@@ -1782,17 +1832,16 @@ function getPreviewProductModel(previewProducts: ProductNode[]) {
     priceFormatted: formatPreviewPrice(product?.price) || `${priceNumber} ֏`,
     imageUrl: product?.image?.sourceUrl,
     imageAlt: product?.image?.altText ?? product?.name ?? "Preview product",
-    attributes:
-      product?.attributes?.nodes
-        ?.map((attribute) => ({
-          name: attribute.name,
-          label: attribute.label ?? attribute.name,
-          options: (attribute.options ?? []).filter(Boolean),
-        }))
-        .filter((attribute) => attribute.options.length > 0) ?? [
-        { name: "size", label: "Size", options: ["one-size"] },
-        { name: "color", label: "Color", options: ["pink"] },
-      ],
+    attributes: product?.attributes?.nodes
+      ?.map((attribute) => ({
+        name: attribute.name,
+        label: attribute.label ?? attribute.name,
+        options: (attribute.options ?? []).filter(Boolean),
+      }))
+      .filter((attribute) => attribute.options.length > 0) ?? [
+      { name: "size", label: "Size", options: ["one-size"] },
+      { name: "color", label: "Color", options: ["pink"] },
+    ],
     description:
       "Live product description from WooCommerce appears here in the real product template.",
   };
@@ -1803,28 +1852,32 @@ export default function DashboardBuilder() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [builderState, setBuilderState] = useState<BuilderState>(defaultState);
-  const [selectedId, setSelectedId] = useState(defaultState.sections[0]?.id ?? "");
+  const [selectedId, setSelectedId] = useState(
+    defaultState.sections[0]?.id ?? "",
+  );
   const [device, setDevice] = useState<PreviewDevice>("desktop");
   const [copied, setCopied] = useState(false);
   const [draftReady, setDraftReady] = useState(false);
   const [publishStatus, setPublishStatus] = useState("Local draft autosaves");
   const [publishCelebration, setPublishCelebration] = useState(false);
   const [uploadingSlide, setUploadingSlide] = useState<number | null>(null);
-  const [uploadingNestedSlide, setUploadingNestedSlide] = useState<string | null>(
-    null
-  );
+  const [uploadingNestedSlide, setUploadingNestedSlide] = useState<
+    string | null
+  >(null);
   const [openSlideId, setOpenSlideId] = useState<string | null>(null);
   const [openLayoutItemId, setOpenLayoutItemId] = useState<string | null>(null);
-  const [selectedLayoutColumnKey, setSelectedLayoutColumnKey] = useState<string | null>(
-    null
+  const [selectedLayoutColumnKey, setSelectedLayoutColumnKey] = useState<
+    string | null
+  >(null);
+  const [selectedLayoutBlockKey, setSelectedLayoutBlockKey] = useState<
+    string | null
+  >(null);
+  const [draggingSectionId, setDraggingSectionId] = useState<string | null>(
+    null,
   );
-  const [selectedLayoutBlockKey, setSelectedLayoutBlockKey] = useState<string | null>(
-    null
-  );
-  const [draggingSectionId, setDraggingSectionId] = useState<string | null>(null);
-  const [draggingLayoutBlockKey, setDraggingLayoutBlockKey] = useState<string | null>(
-    null
-  );
+  const [draggingLayoutBlockKey, setDraggingLayoutBlockKey] = useState<
+    string | null
+  >(null);
   const [inspectorTab, setInspectorTab] = useState<InspectorTab>("content");
   const [inspectorOpen, setInspectorOpen] = useState(false);
   const [adminPillVisible, setAdminPillVisible] = useState(true);
@@ -1833,31 +1886,50 @@ export default function DashboardBuilder() {
   const [globalStylesOpen, setGlobalStylesOpen] = useState(false);
   const [shellSettings, setShellSettings] =
     useState<BuilderShellSettings>(defaultShellSettings);
-  const [shellStatus, setShellStatus] = useState("Shell settings load from React");
+  const [shellStatus, setShellStatus] = useState(
+    "Shell settings load from React",
+  );
   const publishCelebrationTimer = useRef<number | null>(null);
   const shellAutoSaveTimer = useRef<number | null>(null);
   const [customPages, setCustomPages] = useState<BuilderCustomPage[]>([]);
   const [newPageTitle, setNewPageTitle] = useState("");
   const [pageStatus, setPageStatus] = useState("Builder pages save to React");
   const [previewProducts, setPreviewProducts] = useState<ProductNode[]>([]);
-  const [previewCategoryTree, setPreviewCategoryTree] = useState<CategoryTreeItem[]>([]);
-  const [previewCategoryCounts, setPreviewCategoryCounts] = useState<Record<string, number>>({});
+  const [previewCategoryTree, setPreviewCategoryTree] = useState<
+    CategoryTreeItem[]
+  >([]);
+  const [previewCategoryCounts, setPreviewCategoryCounts] = useState<
+    Record<string, number>
+  >({});
+  const [mediaPickerOpen, setMediaPickerOpen] = useState(false);
+  const [mediaPickerTitle, setMediaPickerTitle] = useState("WordPress Media");
+  const [mediaPickerCurrentUrl, setMediaPickerCurrentUrl] = useState("");
+  const [mediaSearch, setMediaSearch] = useState("");
+  const [mediaItems, setMediaItems] = useState<WordPressMediaItem[]>([]);
+  const [mediaLoading, setMediaLoading] = useState(false);
+  const [mediaStatus, setMediaStatus] = useState(
+    "Browse images from WordPress",
+  );
   const previewHeaderSlotRef = useRef<HTMLDivElement>(null);
   const previewShellRef = useRef<HTMLDivElement>(null);
+  const mediaSelectRef = useRef<((media: WordPressMediaItem) => void) | null>(
+    null,
+  );
   const undoHistoryRef = useRef<BuilderState[]>([]);
   const skipUndoCaptureRef = useRef(false);
 
   const selectedSection = useMemo(
     () => builderState.sections.find((section) => section.id === selectedId),
-    [builderState.sections, selectedId]
+    [builderState.sections, selectedId],
   );
   const selectedLayoutBlock = useMemo(() => {
-    if (!selectedSection || selectedSection.kind !== "contentLayout") return null;
+    if (!selectedSection || selectedSection.kind !== "contentLayout")
+      return null;
     for (const item of selectedSection.layoutItems ?? []) {
       const block = (item.blocks ?? []).find(
         (entry, index) =>
           (entry.id ?? `${item.id ?? "layout-item"}-block-${index}`) ===
-          selectedLayoutBlockKey
+          selectedLayoutBlockKey,
       );
       if (block) return block;
     }
@@ -1865,11 +1937,11 @@ export default function DashboardBuilder() {
   }, [selectedLayoutBlockKey, selectedSection]);
   const availableLayoutBlockKinds = useMemo(
     () => getLayoutBlockKindsForState(),
-    []
+    [],
   );
   const currentFrontendUrl = useMemo(
     () => getFrontendUrlForBuilderKey(builderState.page, customPages),
-    [builderState.page, customPages]
+    [builderState.page, customPages],
   );
 
   const builderJson = useMemo(
@@ -1885,9 +1957,9 @@ export default function DashboardBuilder() {
           sections: builderState.sections,
         },
         null,
-        2
+        2,
       ),
-    [builderState]
+    [builderState],
   );
 
   useEffect(() => {
@@ -1897,7 +1969,7 @@ export default function DashboardBuilder() {
       const rawPages = window.localStorage.getItem(STORAGE_CUSTOM_PAGES);
       localPages = rawPages
         ? (JSON.parse(rawPages) as BuilderCustomPage[]).filter((page) =>
-            isBuilderCustomPageKey(page.key)
+            isBuilderCustomPageKey(page.key),
           )
         : [];
     } catch {
@@ -1913,9 +1985,10 @@ export default function DashboardBuilder() {
 
   useEffect(() => {
     const updatePreviewHeaderPill = () => {
-      const pill = previewHeaderSlotRef.current?.querySelector<HTMLElement>(
-        "#site-header-pill"
-      );
+      const pill =
+        previewHeaderSlotRef.current?.querySelector<HTMLElement>(
+          "#site-header-pill",
+        );
       if (!pill) return;
       const shellScrollTop = previewShellRef.current?.scrollTop ?? 0;
       const isScrolled = Math.max(shellScrollTop, window.scrollY) > 56;
@@ -1925,8 +1998,12 @@ export default function DashboardBuilder() {
 
     const shell = previewShellRef.current;
     updatePreviewHeaderPill();
-    shell?.addEventListener("scroll", updatePreviewHeaderPill, { passive: true });
-    window.addEventListener("scroll", updatePreviewHeaderPill, { passive: true });
+    shell?.addEventListener("scroll", updatePreviewHeaderPill, {
+      passive: true,
+    });
+    window.addEventListener("scroll", updatePreviewHeaderPill, {
+      passive: true,
+    });
 
     return () => {
       shell?.removeEventListener("scroll", updatePreviewHeaderPill);
@@ -1976,17 +2053,22 @@ export default function DashboardBuilder() {
 
     async function loadBuilderPages() {
       try {
-        const response = await fetch("/api/builder-pages", { cache: "no-store" });
+        const response = await fetch("/api/builder-pages", {
+          cache: "no-store",
+        });
         if (!response.ok) return;
         const payload = (await response.json()) as {
           pages?: BuilderCustomPage[];
         };
         const pages = (payload.pages ?? []).filter((page) =>
-          isBuilderCustomPageKey(page.key)
+          isBuilderCustomPageKey(page.key),
         );
         if (!cancelled) {
           setCustomPages(pages);
-          window.localStorage.setItem(STORAGE_CUSTOM_PAGES, JSON.stringify(pages));
+          window.localStorage.setItem(
+            STORAGE_CUSTOM_PAGES,
+            JSON.stringify(pages),
+          );
         }
       } catch {
         if (!cancelled) setPageStatus("Builder pages unavailable");
@@ -2063,7 +2145,7 @@ export default function DashboardBuilder() {
     if (!draftReady) return;
 
     const nextKey = parseBuilderLayoutKey(
-      searchParams.get("page") ?? searchParams.get("template")
+      searchParams.get("page") ?? searchParams.get("template"),
     );
 
     if (!nextKey || nextKey === builderState.page) return;
@@ -2083,7 +2165,9 @@ export default function DashboardBuilder() {
 
     async function loadShellSettings() {
       try {
-        const response = await fetch("/api/builder-shell", { cache: "no-store" });
+        const response = await fetch("/api/builder-shell", {
+          cache: "no-store",
+        });
         if (!response.ok) return;
         const payload = (await response.json()) as {
           settings?: Partial<BuilderShellSettings>;
@@ -2113,7 +2197,9 @@ export default function DashboardBuilder() {
     try {
       const rawDrafts = window.localStorage.getItem(STORAGE_BY_KEY);
       drafts = rawDrafts
-        ? (JSON.parse(rawDrafts) as Partial<Record<BuilderLayoutKey, BuilderState>>)
+        ? (JSON.parse(rawDrafts) as Partial<
+            Record<BuilderLayoutKey, BuilderState>
+          >)
         : {};
     } catch {
       drafts = {};
@@ -2139,9 +2225,61 @@ export default function DashboardBuilder() {
     if (history.length > 80) history.shift();
   }, [builderState, draftReady]);
 
+  useEffect(() => {
+    if (!mediaPickerOpen) return;
+
+    const controller = new AbortController();
+    const timer = window.setTimeout(async () => {
+      setMediaLoading(true);
+      setMediaStatus("Loading WordPress media...");
+
+      try {
+        const params = new URLSearchParams({
+          page: "1",
+          perPage: "36",
+        });
+        if (mediaSearch.trim()) params.set("search", mediaSearch.trim());
+
+        const response = await fetch(`/api/wordpress-media?${params}`, {
+          cache: "no-store",
+          signal: controller.signal,
+        });
+        const payload = (await response.json()) as {
+          media?: WordPressMediaItem[];
+          message?: string;
+        };
+
+        if (!response.ok) {
+          setMediaItems([]);
+          setMediaStatus(payload.message ?? "WordPress media could not load");
+          return;
+        }
+
+        setMediaItems(payload.media ?? []);
+        setMediaStatus(
+          payload.media?.length
+            ? "Select an image to use it here"
+            : "No WordPress images matched this search",
+        );
+      } catch (error) {
+        if ((error as Error).name !== "AbortError") {
+          setMediaItems([]);
+          setMediaStatus("WordPress media could not load");
+        }
+      } finally {
+        if (!controller.signal.aborted) setMediaLoading(false);
+      }
+    }, 220);
+
+    return () => {
+      window.clearTimeout(timer);
+      controller.abort();
+    };
+  }, [mediaPickerOpen, mediaSearch]);
+
   const switchBuilderTarget = (
     nextKey: BuilderLayoutKey,
-    options: { syncUrl?: boolean } = {}
+    options: { syncUrl?: boolean } = {},
   ) => {
     const nextState = loadDraftForKey(nextKey);
     undoHistoryRef.current = [structuredClone(nextState)];
@@ -2162,19 +2300,19 @@ export default function DashboardBuilder() {
     setBuilderState((current) => ({
       ...current,
       sections: current.sections.map((section) =>
-        section.id === selectedId ? { ...section, ...patch } : section
+        section.id === selectedId ? { ...section, ...patch } : section,
       ),
     }));
   };
 
   const updateSectionById = (
     sectionId: string,
-    patch: Partial<BuilderSection>
+    patch: Partial<BuilderSection>,
   ) => {
     setBuilderState((current) => ({
       ...current,
       sections: current.sections.map((section) =>
-        section.id === sectionId ? { ...section, ...patch } : section
+        section.id === sectionId ? { ...section, ...patch } : section,
       ),
     }));
   };
@@ -2183,7 +2321,7 @@ export default function DashboardBuilder() {
     sectionId: string,
     columnKey: string,
     blockKey: string,
-    patch: Partial<BuilderLayoutBlock>
+    patch: Partial<BuilderLayoutBlock>,
   ) => {
     setBuilderState((current) => ({
       ...current,
@@ -2197,8 +2335,11 @@ export default function DashboardBuilder() {
             return {
               ...item,
               blocks: getLayoutItemBlocks(item).map((block, blockIndex) => {
-                const currentBlockKey = block.id ?? `${itemKey}-block-${blockIndex}`;
-                return currentBlockKey === blockKey ? { ...block, ...patch } : block;
+                const currentBlockKey =
+                  block.id ?? `${itemKey}-block-${blockIndex}`;
+                return currentBlockKey === blockKey
+                  ? { ...block, ...patch }
+                  : block;
               }),
             };
           }),
@@ -2212,7 +2353,7 @@ export default function DashboardBuilder() {
     columnKey: string,
     blockKey: string,
     itemIndex: number,
-    patch: NonNullable<BuilderLayoutBlock["gridItems"]>[number]
+    patch: NonNullable<BuilderLayoutBlock["gridItems"]>[number],
   ) => {
     setBuilderState((current) => ({
       ...current,
@@ -2226,10 +2367,14 @@ export default function DashboardBuilder() {
             return {
               ...item,
               blocks: getLayoutItemBlocks(item).map((block, blockIndex) => {
-                const currentBlockKey = block.id ?? `${itemKey}-block-${blockIndex}`;
+                const currentBlockKey =
+                  block.id ?? `${itemKey}-block-${blockIndex}`;
                 if (currentBlockKey !== blockKey) return block;
                 const gridItems = [...(block.gridItems ?? [])];
-                gridItems[itemIndex] = { ...(gridItems[itemIndex] ?? {}), ...patch };
+                gridItems[itemIndex] = {
+                  ...(gridItems[itemIndex] ?? {}),
+                  ...patch,
+                };
                 return { ...block, gridItems };
               }),
             };
@@ -2266,14 +2411,18 @@ export default function DashboardBuilder() {
     if (section?.kind === "contentLayout") {
       const firstColumn = section.layoutItems?.[0]?.id ?? null;
       setSelectedLayoutColumnKey((current) =>
-        section.layoutItems?.some((item, index) => (item.id ?? `layout-item-${index}`) === current)
+        section.layoutItems?.some(
+          (item, index) => (item.id ?? `layout-item-${index}`) === current,
+        )
           ? current
-          : firstColumn
+          : firstColumn,
       );
       setOpenLayoutItemId((current) =>
-        section.layoutItems?.some((item, index) => (item.id ?? `layout-item-${index}`) === current)
+        section.layoutItems?.some(
+          (item, index) => (item.id ?? `layout-item-${index}`) === current,
+        )
           ? current
-          : firstColumn
+          : firstColumn,
       );
     } else {
       setSelectedLayoutColumnKey(null);
@@ -2292,7 +2441,7 @@ export default function DashboardBuilder() {
   const selectLayoutBlock = (
     sectionId: string,
     columnKey: string,
-    blockKey: string
+    blockKey: string,
   ) => {
     setSelectedId(sectionId);
     setSelectedLayoutColumnKey(columnKey);
@@ -2305,7 +2454,7 @@ export default function DashboardBuilder() {
 
   const updateSelectedSlide = (
     index: number,
-    patch: NonNullable<BuilderSection["slides"]>[number]
+    patch: NonNullable<BuilderSection["slides"]>[number],
   ) => {
     if (!selectedSection) return;
     const slides = [...(selectedSection.slides ?? [])];
@@ -2339,7 +2488,9 @@ export default function DashboardBuilder() {
     if (!selectedSection) return;
     const slide = selectedSection.slides?.[index];
     updateSelected({
-      slides: (selectedSection.slides ?? []).filter((_, slideIndex) => slideIndex !== index),
+      slides: (selectedSection.slides ?? []).filter(
+        (_, slideIndex) => slideIndex !== index,
+      ),
     });
     if (slide?.id === openSlideId) {
       setOpenSlideId(null);
@@ -2348,7 +2499,7 @@ export default function DashboardBuilder() {
 
   const updateSelectedBadge = (
     index: number,
-    patch: NonNullable<BuilderSection["badges"]>[number]
+    patch: NonNullable<BuilderSection["badges"]>[number],
   ) => {
     if (!selectedSection) return;
     const badges = [...(selectedSection.badges ?? [])];
@@ -2357,10 +2508,16 @@ export default function DashboardBuilder() {
   };
 
   const getLayoutItemBlocks = (
-    item: NonNullable<BuilderSection["layoutItems"]>[number]
+    item: NonNullable<BuilderSection["layoutItems"]>[number],
   ) => {
     if (item.blocks?.length) return item.blocks;
-    if (item.title || item.body || item.eyebrow || item.buttonLabel || item.buttonUrl) {
+    if (
+      item.title ||
+      item.body ||
+      item.eyebrow ||
+      item.buttonLabel ||
+      item.buttonUrl
+    ) {
       return [
         {
           id: `${item.id ?? "legacy"}-text`,
@@ -2379,7 +2536,7 @@ export default function DashboardBuilder() {
   const updateSelectedLayoutBlock = (
     columnIndex: number,
     blockIndex: number,
-    patch: BuilderLayoutBlock
+    patch: BuilderLayoutBlock,
   ) => {
     if (!selectedSection) return;
     const layoutItems = [...(selectedSection.layoutItems ?? [])];
@@ -2394,7 +2551,7 @@ export default function DashboardBuilder() {
     columnIndex: number,
     blockIndex: number,
     slideIndex: number,
-    patch: NonNullable<BuilderLayoutBlock["slides"]>[number]
+    patch: NonNullable<BuilderLayoutBlock["slides"]>[number],
   ) => {
     if (!selectedSection) return;
     const layoutItems = [...(selectedSection.layoutItems ?? [])];
@@ -2408,7 +2565,10 @@ export default function DashboardBuilder() {
     updateSelected({ layoutItems });
   };
 
-  const addSelectedLayoutBlockSlide = (columnIndex: number, blockIndex: number) => {
+  const addSelectedLayoutBlockSlide = (
+    columnIndex: number,
+    blockIndex: number,
+  ) => {
     if (!selectedSection) return;
     const layoutItems = [...(selectedSection.layoutItems ?? [])];
     const item = layoutItems[columnIndex] ?? {};
@@ -2439,7 +2599,7 @@ export default function DashboardBuilder() {
   const deleteSelectedLayoutBlockSlide = (
     columnIndex: number,
     blockIndex: number,
-    slideIndex: number
+    slideIndex: number,
   ) => {
     if (!selectedSection) return;
     const layoutItems = [...(selectedSection.layoutItems ?? [])];
@@ -2464,7 +2624,7 @@ export default function DashboardBuilder() {
     columnIndex: number,
     blockIndex: number,
     badgeIndex: number,
-    patch: NonNullable<BuilderLayoutBlock["badges"]>[number]
+    patch: NonNullable<BuilderLayoutBlock["badges"]>[number],
   ) => {
     if (!selectedSection) return;
     const layoutItems = [...(selectedSection.layoutItems ?? [])];
@@ -2478,7 +2638,10 @@ export default function DashboardBuilder() {
     updateSelected({ layoutItems });
   };
 
-  const addSelectedLayoutBlockBadge = (columnIndex: number, blockIndex: number) => {
+  const addSelectedLayoutBlockBadge = (
+    columnIndex: number,
+    blockIndex: number,
+  ) => {
     if (!selectedSection) return;
     const layoutItems = [...(selectedSection.layoutItems ?? [])];
     const item = layoutItems[columnIndex] ?? {};
@@ -2506,7 +2669,7 @@ export default function DashboardBuilder() {
   const deleteSelectedLayoutBlockBadge = (
     columnIndex: number,
     blockIndex: number,
-    badgeIndex: number
+    badgeIndex: number,
   ) => {
     if (!selectedSection) return;
     const layoutItems = [...(selectedSection.layoutItems ?? [])];
@@ -2525,7 +2688,7 @@ export default function DashboardBuilder() {
     columnIndex: number,
     blockIndex: number,
     itemIndex: number,
-    patch: NonNullable<BuilderLayoutBlock["gridItems"]>[number]
+    patch: NonNullable<BuilderLayoutBlock["gridItems"]>[number],
   ) => {
     if (!selectedSection) return;
     const layoutItems = [...(selectedSection.layoutItems ?? [])];
@@ -2539,7 +2702,10 @@ export default function DashboardBuilder() {
     updateSelected({ layoutItems });
   };
 
-  const addSelectedLayoutBlockGridItem = (columnIndex: number, blockIndex: number) => {
+  const addSelectedLayoutBlockGridItem = (
+    columnIndex: number,
+    blockIndex: number,
+  ) => {
     if (!selectedSection) return;
     const layoutItems = [...(selectedSection.layoutItems ?? [])];
     const item = layoutItems[columnIndex] ?? {};
@@ -2569,7 +2735,7 @@ export default function DashboardBuilder() {
   const deleteSelectedLayoutBlockGridItem = (
     columnIndex: number,
     blockIndex: number,
-    itemIndex: number
+    itemIndex: number,
   ) => {
     if (!selectedSection) return;
     const layoutItems = [...(selectedSection.layoutItems ?? [])];
@@ -2578,19 +2744,26 @@ export default function DashboardBuilder() {
     const block = blocks[blockIndex] ?? {};
     blocks[blockIndex] = {
       ...block,
-      gridItems: (block.gridItems ?? []).filter((_, index) => index !== itemIndex),
+      gridItems: (block.gridItems ?? []).filter(
+        (_, index) => index !== itemIndex,
+      ),
     };
     layoutItems[columnIndex] = { ...item, blocks };
     updateSelected({ layoutItems });
   };
 
-  const deleteSelectedLayoutBlock = (columnIndex: number, blockIndex: number) => {
+  const deleteSelectedLayoutBlock = (
+    columnIndex: number,
+    blockIndex: number,
+  ) => {
     if (!selectedSection) return;
     const layoutItems = [...(selectedSection.layoutItems ?? [])];
     const item = layoutItems[columnIndex] ?? {};
     layoutItems[columnIndex] = {
       ...item,
-      blocks: getLayoutItemBlocks(item).filter((_, index) => index !== blockIndex),
+      blocks: getLayoutItemBlocks(item).filter(
+        (_, index) => index !== blockIndex,
+      ),
     };
     updateSelected({ layoutItems });
   };
@@ -2613,14 +2786,15 @@ export default function DashboardBuilder() {
 
         const layoutItems = [...(section.layoutItems ?? [])];
         const columnIndex = layoutItems.findIndex(
-          (item, index) => (item.id ?? `layout-item-${index}`) === columnKey
+          (item, index) => (item.id ?? `layout-item-${index}`) === columnKey,
         );
         if (columnIndex < 0) return section;
 
         const item = layoutItems[columnIndex] ?? {};
         const blocks = [...getLayoutItemBlocks(item)];
         const blockIndex = blocks.findIndex(
-          (block, index) => (block.id ?? `${columnKey}-block-${index}`) === blockKey
+          (block, index) =>
+            (block.id ?? `${columnKey}-block-${index}`) === blockKey,
         );
         const block = blocks[blockIndex];
         if (blockIndex < 0 || !block) return section;
@@ -2653,7 +2827,7 @@ export default function DashboardBuilder() {
 
         const layoutItems = [...(section.layoutItems ?? [])];
         const columnIndex = layoutItems.findIndex(
-          (item, index) => (item.id ?? `layout-item-${index}`) === columnKey
+          (item, index) => (item.id ?? `layout-item-${index}`) === columnKey,
         );
         if (columnIndex < 0) return section;
 
@@ -2661,7 +2835,8 @@ export default function DashboardBuilder() {
         layoutItems[columnIndex] = {
           ...item,
           blocks: getLayoutItemBlocks(item).filter(
-            (block, index) => (block.id ?? `${columnKey}-block-${index}`) !== blockKey
+            (block, index) =>
+              (block.id ?? `${columnKey}-block-${index}`) !== blockKey,
           ),
         };
         return { ...section, layoutItems };
@@ -2695,10 +2870,12 @@ export default function DashboardBuilder() {
 
         const layoutItems = [...(section.layoutItems ?? [])];
         const sourceColumnIndex = layoutItems.findIndex(
-          (item, index) => (item.id ?? `layout-item-${index}`) === sourceColumnKey
+          (item, index) =>
+            (item.id ?? `layout-item-${index}`) === sourceColumnKey,
         );
         const targetColumnIndex = layoutItems.findIndex(
-          (item, index) => (item.id ?? `layout-item-${index}`) === targetColumnKey
+          (item, index) =>
+            (item.id ?? `layout-item-${index}`) === targetColumnKey,
         );
 
         if (sourceColumnIndex < 0 || targetColumnIndex < 0) return section;
@@ -2707,7 +2884,8 @@ export default function DashboardBuilder() {
         const sourceBlocks = [...getLayoutItemBlocks(sourceItem)];
         const sourceBlockIndex = sourceBlocks.findIndex(
           (block, index) =>
-            (block.id ?? `${sourceColumnKey}-block-${index}`) === sourceBlockKey
+            (block.id ?? `${sourceColumnKey}-block-${index}`) ===
+            sourceBlockKey,
         );
 
         if (sourceBlockIndex < 0) return section;
@@ -2719,24 +2897,43 @@ export default function DashboardBuilder() {
           const targetIndex = targetBlockKey
             ? sourceBlocks.findIndex(
                 (block, index) =>
-                  (block.id ?? `${targetColumnKey}-block-${index}`) === targetBlockKey
+                  (block.id ?? `${targetColumnKey}-block-${index}`) ===
+                  targetBlockKey,
               )
             : -1;
-          sourceBlocks.splice(targetIndex >= 0 ? targetIndex : sourceBlocks.length, 0, movingBlock);
-          layoutItems[sourceColumnIndex] = { ...sourceItem, blocks: sourceBlocks };
+          sourceBlocks.splice(
+            targetIndex >= 0 ? targetIndex : sourceBlocks.length,
+            0,
+            movingBlock,
+          );
+          layoutItems[sourceColumnIndex] = {
+            ...sourceItem,
+            blocks: sourceBlocks,
+          };
         } else {
           const targetItem = layoutItems[targetColumnIndex] ?? {};
           const targetBlocks = [...getLayoutItemBlocks(targetItem)];
           const targetIndex = targetBlockKey
             ? targetBlocks.findIndex(
                 (block, index) =>
-                  (block.id ?? `${targetColumnKey}-block-${index}`) === targetBlockKey
+                  (block.id ?? `${targetColumnKey}-block-${index}`) ===
+                  targetBlockKey,
               )
             : -1;
 
-          layoutItems[sourceColumnIndex] = { ...sourceItem, blocks: sourceBlocks };
-          targetBlocks.splice(targetIndex >= 0 ? targetIndex : targetBlocks.length, 0, movingBlock);
-          layoutItems[targetColumnIndex] = { ...targetItem, blocks: targetBlocks };
+          layoutItems[sourceColumnIndex] = {
+            ...sourceItem,
+            blocks: sourceBlocks,
+          };
+          targetBlocks.splice(
+            targetIndex >= 0 ? targetIndex : targetBlocks.length,
+            0,
+            movingBlock,
+          );
+          layoutItems[targetColumnIndex] = {
+            ...targetItem,
+            blocks: targetBlocks,
+          };
         }
 
         return { ...section, layoutItems };
@@ -2770,7 +2967,8 @@ export default function DashboardBuilder() {
 
         const layoutItems = [...(section.layoutItems ?? [])];
         const targetColumnIndex = layoutItems.findIndex(
-          (item, index) => (item.id ?? `layout-item-${index}`) === targetColumnKey
+          (item, index) =>
+            (item.id ?? `layout-item-${index}`) === targetColumnKey,
         );
         if (targetColumnIndex < 0) return section;
 
@@ -2779,12 +2977,20 @@ export default function DashboardBuilder() {
         const targetIndex = targetBlockKey
           ? targetBlocks.findIndex(
               (item, index) =>
-                (item.id ?? `${targetColumnKey}-block-${index}`) === targetBlockKey
+                (item.id ?? `${targetColumnKey}-block-${index}`) ===
+                targetBlockKey,
             )
           : -1;
 
-        targetBlocks.splice(targetIndex >= 0 ? targetIndex : targetBlocks.length, 0, block);
-        layoutItems[targetColumnIndex] = { ...targetItem, blocks: targetBlocks };
+        targetBlocks.splice(
+          targetIndex >= 0 ? targetIndex : targetBlocks.length,
+          0,
+          block,
+        );
+        layoutItems[targetColumnIndex] = {
+          ...targetItem,
+          blocks: targetBlocks,
+        };
 
         return { ...section, layoutItems };
       }),
@@ -2803,7 +3009,7 @@ export default function DashboardBuilder() {
       const nextSection = createWireframeSection(1, 1);
       setBuilderState((current) => {
         const selectedIndex = current.sections.findIndex(
-          (section) => section.id === selectedId
+          (section) => section.id === selectedId,
         );
         const insertIndex =
           selectedIndex >= 0 ? selectedIndex + 1 : current.sections.length;
@@ -2820,9 +3026,11 @@ export default function DashboardBuilder() {
     const targetColumn =
       layoutItems.find(
         (item, index) =>
-          (item.id ?? `layout-item-${index}`) === selectedLayoutColumnKey
+          (item.id ?? `layout-item-${index}`) === selectedLayoutColumnKey,
       ) ?? layoutItems[0];
-    const targetColumnIndex = layoutItems.findIndex((item) => item === targetColumn);
+    const targetColumnIndex = layoutItems.findIndex(
+      (item) => item === targetColumn,
+    );
     const targetColumnKey =
       targetColumn?.id ??
       (targetColumnIndex >= 0 ? `layout-item-${targetColumnIndex}` : undefined);
@@ -2851,7 +3059,10 @@ export default function DashboardBuilder() {
           blocks: [],
         },
       ],
-      layoutColumns: Math.min(Math.max(selectedSection.layoutColumns ?? 2, 1), 6),
+      layoutColumns: Math.min(
+        Math.max(selectedSection.layoutColumns ?? 2, 1),
+        6,
+      ),
     });
     setOpenLayoutItemId(id);
   };
@@ -2861,7 +3072,7 @@ export default function DashboardBuilder() {
     const item = selectedSection.layoutItems?.[index];
     updateSelected({
       layoutItems: (selectedSection.layoutItems ?? []).filter(
-        (_, itemIndex) => itemIndex !== index
+        (_, itemIndex) => itemIndex !== index,
       ),
     });
     if (item?.id === openLayoutItemId) {
@@ -2871,6 +3082,32 @@ export default function DashboardBuilder() {
       setSelectedLayoutColumnKey(null);
       setSelectedLayoutBlockKey(null);
     }
+  };
+
+  const openWordPressMediaPicker = ({
+    title,
+    currentUrl,
+    onSelect,
+  }: {
+    title: string;
+    currentUrl?: string;
+    onSelect: (media: WordPressMediaItem) => void;
+  }) => {
+    mediaSelectRef.current = onSelect;
+    setMediaPickerTitle(title);
+    setMediaPickerCurrentUrl(currentUrl ?? "");
+    setMediaPickerOpen(true);
+  };
+
+  const closeWordPressMediaPicker = () => {
+    setMediaPickerOpen(false);
+    mediaSelectRef.current = null;
+  };
+
+  const selectWordPressMedia = (media: WordPressMediaItem) => {
+    mediaSelectRef.current?.(media);
+    setPublishStatus("WordPress media selected");
+    closeWordPressMediaPicker();
   };
 
   const uploadSelectedSlideImage = async (index: number, file: File | null) => {
@@ -2915,7 +3152,7 @@ export default function DashboardBuilder() {
     columnIndex: number,
     blockIndex: number,
     slideIndex: number,
-    file: File | null
+    file: File | null,
   ) => {
     if (!file) return;
     const uploadKey = `${columnIndex}-${blockIndex}-${slideIndex}`;
@@ -2941,7 +3178,9 @@ export default function DashboardBuilder() {
       }
 
       const layoutItem = selectedSection?.layoutItems?.[columnIndex];
-      const block = layoutItem ? getLayoutItemBlocks(layoutItem)[blockIndex] : undefined;
+      const block = layoutItem
+        ? getLayoutItemBlocks(layoutItem)[blockIndex]
+        : undefined;
       const slide = block?.slides?.[slideIndex];
 
       updateSelectedLayoutBlockSlide(columnIndex, blockIndex, slideIndex, {
@@ -2961,7 +3200,7 @@ export default function DashboardBuilder() {
     columnKey: string,
     blockKey: string,
     itemIndex: number,
-    file: File | null
+    file: File | null,
   ) => {
     if (!file) return;
     setPublishStatus("Uploading grid image...");
@@ -2973,7 +3212,10 @@ export default function DashboardBuilder() {
         method: "POST",
         body: formData,
       });
-      const payload = (await response.json()) as { url?: string; error?: string };
+      const payload = (await response.json()) as {
+        url?: string;
+        error?: string;
+      };
       if (!response.ok || !payload.url) {
         setPublishStatus(payload.error ?? "Image upload failed");
         return;
@@ -2992,12 +3234,12 @@ export default function DashboardBuilder() {
     columns: number,
     rows: number,
     targetSectionId: string,
-    placement: "above" | "below"
+    placement: "above" | "below",
   ) => {
     const nextSection = createWireframeSection(columns, rows);
     setBuilderState((current) => {
       const targetIndex = current.sections.findIndex(
-        (section) => section.id === targetSectionId
+        (section) => section.id === targetSectionId,
       );
       const insertIndex =
         targetIndex < 0
@@ -3025,9 +3267,12 @@ export default function DashboardBuilder() {
 
   const moveSection = (sectionId: string, direction: -1 | 1) => {
     setBuilderState((current) => {
-      const index = current.sections.findIndex((section) => section.id === sectionId);
+      const index = current.sections.findIndex(
+        (section) => section.id === sectionId,
+      );
       const target = index + direction;
-      if (index < 0 || target < 0 || target >= current.sections.length) return current;
+      if (index < 0 || target < 0 || target >= current.sections.length)
+        return current;
       const nextSections = [...current.sections];
       const [section] = nextSections.splice(index, 1);
       nextSections.splice(target, 0, section);
@@ -3039,8 +3284,12 @@ export default function DashboardBuilder() {
   const reorderSection = (sourceId: string, targetId: string) => {
     if (sourceId === targetId) return;
     setBuilderState((current) => {
-      const sourceIndex = current.sections.findIndex((section) => section.id === sourceId);
-      const targetIndex = current.sections.findIndex((section) => section.id === targetId);
+      const sourceIndex = current.sections.findIndex(
+        (section) => section.id === sourceId,
+      );
+      const targetIndex = current.sections.findIndex(
+        (section) => section.id === targetId,
+      );
       if (sourceIndex < 0 || targetIndex < 0) return current;
       const nextSections = [...current.sections];
       const [section] = nextSections.splice(sourceIndex, 1);
@@ -3057,7 +3306,7 @@ export default function DashboardBuilder() {
 
   const duplicateSection = (sectionId: string) => {
     const sourceSection = builderState.sections.find(
-      (section) => section.id === sectionId
+      (section) => section.id === sectionId,
     );
     if (!sourceSection) return;
     const copySection = {
@@ -3066,7 +3315,9 @@ export default function DashboardBuilder() {
       title: `${sourceSection.title} Copy`,
     };
     setBuilderState((current) => {
-      const index = current.sections.findIndex((section) => section.id === sectionId);
+      const index = current.sections.findIndex(
+        (section) => section.id === sectionId,
+      );
       const nextSections = [...current.sections];
       nextSections.splice(index + 1, 0, copySection);
       return { ...current, sections: nextSections };
@@ -3080,14 +3331,14 @@ export default function DashboardBuilder() {
 
   const deleteSection = (sectionId: string) => {
     const removedIndex = builderState.sections.findIndex(
-      (section) => section.id === sectionId
+      (section) => section.id === sectionId,
     );
     const nextSections = builderState.sections.filter(
-      (section) => section.id !== sectionId
+      (section) => section.id !== sectionId,
     );
     const nextSelected =
-      nextSections[Math.max(0, Math.min(removedIndex, nextSections.length - 1))]?.id ??
-      "";
+      nextSections[Math.max(0, Math.min(removedIndex, nextSections.length - 1))]
+        ?.id ?? "";
     setBuilderState((current) => ({
       ...current,
       sections: current.sections.filter((section) => section.id !== sectionId),
@@ -3122,9 +3373,12 @@ export default function DashboardBuilder() {
 
   const loadPublishedLayout = async () => {
     setPublishStatus("Reading published layout...");
-    const response = await fetch(`/api/builder-layouts?key=${builderState.page}`, {
-      cache: "no-store",
-    });
+    const response = await fetch(
+      `/api/builder-layouts?key=${builderState.page}`,
+      {
+        cache: "no-store",
+      },
+    );
 
     if (!response.ok) {
       setPublishStatus("Could not read published layout");
@@ -3142,7 +3396,8 @@ export default function DashboardBuilder() {
 
     setBuilderState({
       page: payload.layout.page,
-      targetType: payload.layout.targetType ?? builderState.targetType ?? "page",
+      targetType:
+        payload.layout.targetType ?? builderState.targetType ?? "page",
       template: payload.layout.template,
       design: {
         ...defaultDesign,
@@ -3189,7 +3444,7 @@ export default function DashboardBuilder() {
 
   const saveShellSettings = async (
     nextSettings: BuilderShellSettings,
-    status = "Global settings saved"
+    status = "Global settings saved",
   ) => {
     const response = await fetch("/api/builder-shell", {
       method: "POST",
@@ -3269,7 +3524,10 @@ export default function DashboardBuilder() {
       payload.page,
     ];
     setCustomPages(nextPages);
-    window.localStorage.setItem(STORAGE_CUSTOM_PAGES, JSON.stringify(nextPages));
+    window.localStorage.setItem(
+      STORAGE_CUSTOM_PAGES,
+      JSON.stringify(nextPages),
+    );
     setNewPageTitle("");
 
     const nextState = getDefaultStateForKey(payload.page.key);
@@ -3285,9 +3543,12 @@ export default function DashboardBuilder() {
 
   const deleteBuilderPage = async (key: BuilderCustomPageKey) => {
     setPageStatus("Deleting page...");
-    const response = await fetch(`/api/builder-pages?key=${encodeURIComponent(key)}`, {
-      method: "DELETE",
-    });
+    const response = await fetch(
+      `/api/builder-pages?key=${encodeURIComponent(key)}`,
+      {
+        method: "DELETE",
+      },
+    );
 
     if (!response.ok) {
       setPageStatus("Page delete failed");
@@ -3296,12 +3557,17 @@ export default function DashboardBuilder() {
 
     const nextPages = customPages.filter((page) => page.key !== key);
     setCustomPages(nextPages);
-    window.localStorage.setItem(STORAGE_CUSTOM_PAGES, JSON.stringify(nextPages));
+    window.localStorage.setItem(
+      STORAGE_CUSTOM_PAGES,
+      JSON.stringify(nextPages),
+    );
 
     try {
       const rawDrafts = window.localStorage.getItem(STORAGE_BY_KEY);
       const drafts = rawDrafts
-        ? (JSON.parse(rawDrafts) as Partial<Record<BuilderLayoutKey, BuilderState>>)
+        ? (JSON.parse(rawDrafts) as Partial<
+            Record<BuilderLayoutKey, BuilderState>
+          >)
         : {};
       delete drafts[key];
       window.localStorage.setItem(STORAGE_BY_KEY, JSON.stringify(drafts));
@@ -3317,7 +3583,9 @@ export default function DashboardBuilder() {
   };
 
   return (
-    <div className={`builder-dashboard ${inspectorOpen ? "" : "is-inspector-closed"}`}>
+    <div
+      className={`builder-dashboard ${inspectorOpen ? "" : "is-inspector-closed"}`}
+    >
       <aside className="builder-sidebar builder-panel">
         <div className="builder-brand">
           <span className="builder-brand-icon">
@@ -3335,10 +3603,14 @@ export default function DashboardBuilder() {
               key={targetType}
               type="button"
               className={
-                (builderState.targetType ?? "page") === targetType ? "is-active" : ""
+                (builderState.targetType ?? "page") === targetType
+                  ? "is-active"
+                  : ""
               }
               onClick={() =>
-                switchBuilderTarget(targetType === "page" ? "shop" : "product-single")
+                switchBuilderTarget(
+                  targetType === "page" ? "shop" : "product-single",
+                )
               }
             >
               {targetType === "page" ? "Pages" : "Templates"}
@@ -3359,19 +3631,20 @@ export default function DashboardBuilder() {
           </button>
 
           <div className="builder-device-toggle" aria-label="Preview device">
-            {(["desktop", "tablet", "mobile"] as PreviewDevice[]).map((item) => (
-              <button
-                key={item}
-                type="button"
-                className={device === item ? "is-active" : ""}
-                onClick={() => setDevice(item)}
-                title={`${item} preview`}
-              >
-                <MonitorSmartphone size={16} />
-              </button>
-            ))}
+            {(["desktop", "tablet", "mobile"] as PreviewDevice[]).map(
+              (item) => (
+                <button
+                  key={item}
+                  type="button"
+                  className={device === item ? "is-active" : ""}
+                  onClick={() => setDevice(item)}
+                  title={`${item} preview`}
+                >
+                  <MonitorSmartphone size={16} />
+                </button>
+              ),
+            )}
           </div>
-
         </div>
         <small className="builder-sidebar-status">{publishStatus}</small>
 
@@ -3447,12 +3720,13 @@ export default function DashboardBuilder() {
           </div>
         )}
 
-        {(builderState.targetType ?? "page") === "template" && builderState.template && (
-          <div className="builder-template-note">
-            <strong>{templateLabels[builderState.template]}</strong>
-            <span>{templateDescriptions[builderState.template]}</span>
-          </div>
-        )}
+        {(builderState.targetType ?? "page") === "template" &&
+          builderState.template && (
+            <div className="builder-template-note">
+              <strong>{templateLabels[builderState.template]}</strong>
+              <span>{templateDescriptions[builderState.template]}</span>
+            </div>
+          )}
 
         <details className="builder-collapse" open>
           <summary>
@@ -3461,47 +3735,47 @@ export default function DashboardBuilder() {
           </summary>
 
           <div className="builder-element-library" aria-label="Element library">
-          {layoutBlockGroups.map((group) => {
-            const groupKinds = group.kinds.filter((kind) =>
-              availableLayoutBlockKinds.includes(kind)
-            );
-            if (!groupKinds.length) return null;
+            {layoutBlockGroups.map((group) => {
+              const groupKinds = group.kinds.filter((kind) =>
+                availableLayoutBlockKinds.includes(kind),
+              );
+              if (!groupKinds.length) return null;
 
-            return (
-              <div key={group.id} className="builder-element-library-group">
-                <div className="builder-element-library-group-title">
-                  {group.label}
+              return (
+                <div key={group.id} className="builder-element-library-group">
+                  <div className="builder-element-library-group-title">
+                    {group.label}
+                  </div>
+                  {groupKinds.map((blockKind) => (
+                    <button
+                      key={blockKind}
+                      type="button"
+                      draggable
+                      onClick={() => addElementFromLibrary(blockKind)}
+                      onDragStart={(event) => {
+                        event.dataTransfer.setData(
+                          "application/x-builder-new-block",
+                          blockKind,
+                        );
+                        event.dataTransfer.setData(
+                          "text/plain",
+                          `builder-new-block:${blockKind}`,
+                        );
+                        event.dataTransfer.effectAllowed = "copy";
+                      }}
+                    >
+                      <span className="builder-element-library-icon">
+                        {getLayoutBlockLibraryIcon(blockKind)}
+                      </span>
+                      <span>
+                        <strong>{layoutBlockLabels[blockKind]}</strong>
+                        <small>{layoutBlockDescriptions[blockKind]}</small>
+                      </span>
+                    </button>
+                  ))}
                 </div>
-                {groupKinds.map((blockKind) => (
-                  <button
-                    key={blockKind}
-                    type="button"
-                    draggable
-                    onClick={() => addElementFromLibrary(blockKind)}
-                    onDragStart={(event) => {
-                      event.dataTransfer.setData(
-                        "application/x-builder-new-block",
-                        blockKind
-                      );
-                      event.dataTransfer.setData(
-                        "text/plain",
-                        `builder-new-block:${blockKind}`
-                      );
-                      event.dataTransfer.effectAllowed = "copy";
-                    }}
-                  >
-                    <span className="builder-element-library-icon">
-                      {getLayoutBlockLibraryIcon(blockKind)}
-                    </span>
-                    <span>
-                      <strong>{layoutBlockLabels[blockKind]}</strong>
-                      <small>{layoutBlockDescriptions[blockKind]}</small>
-                    </span>
-                  </button>
-                ))}
-              </div>
-            );
-          })}
+              );
+            })}
           </div>
         </details>
       </aside>
@@ -3522,7 +3796,9 @@ export default function DashboardBuilder() {
                     value={builderState.design.preset ?? "princity"}
                     onChange={(event) =>
                       applyDesignPreset(
-                        event.target.value as NonNullable<BuilderDesign["preset"]>
+                        event.target.value as NonNullable<
+                          BuilderDesign["preset"]
+                        >,
                       )
                     }
                   >
@@ -3563,8 +3839,9 @@ export default function DashboardBuilder() {
                       <input
                         type="color"
                         value={
-                          (builderState.design[key as keyof BuilderDesign] as string) ??
-                          "#ffffff"
+                          (builderState.design[
+                            key as keyof BuilderDesign
+                          ] as string) ?? "#ffffff"
                         }
                         onChange={(event) =>
                           updateDesign({
@@ -3583,7 +3860,10 @@ export default function DashboardBuilder() {
                     <select
                       value={builderState.design.radius ?? "8px"}
                       onChange={(event) =>
-                        updateDesign({ radius: event.target.value, preset: undefined })
+                        updateDesign({
+                          radius: event.target.value,
+                          preset: undefined,
+                        })
                       }
                     >
                       <option value="0px">Flat</option>
@@ -3635,7 +3915,9 @@ export default function DashboardBuilder() {
                       System sans
                     </option>
                     <option value="Georgia, serif">Classic serif</option>
-                    <option value='"Times New Roman", serif'>Times serif</option>
+                    <option value='"Times New Roman", serif'>
+                      Times serif
+                    </option>
                     <option value='"Courier New", monospace'>Monospace</option>
                   </select>
                 </label>
@@ -3743,7 +4025,9 @@ export default function DashboardBuilder() {
                     type="checkbox"
                     checked={shellSettings.headerVisible}
                     onChange={(event) =>
-                      updateShellSettings({ headerVisible: event.target.checked })
+                      updateShellSettings({
+                        headerVisible: event.target.checked,
+                      })
                     }
                   />
                   <span>Show website header</span>
@@ -3771,8 +4055,8 @@ export default function DashboardBuilder() {
                 <div className="builder-shell-note">
                   <strong>{shellStatus}</strong>
                   <span>
-                    New sections inherit these spacing defaults until you override
-                    them inside a section.
+                    New sections inherit these spacing defaults until you
+                    override them inside a section.
                   </span>
                 </div>
 
@@ -3783,8 +4067,8 @@ export default function DashboardBuilder() {
                       value={shellSettings.sectionPaddingTop}
                       onChange={(event) =>
                         updateShellSettings({
-                          sectionPaddingTop:
-                            event.target.value as GlobalSectionSpacing,
+                          sectionPaddingTop: event.target
+                            .value as GlobalSectionSpacing,
                         })
                       }
                     >
@@ -3801,8 +4085,8 @@ export default function DashboardBuilder() {
                       value={shellSettings.sectionPaddingBottom}
                       onChange={(event) =>
                         updateShellSettings({
-                          sectionPaddingBottom:
-                            event.target.value as GlobalSectionSpacing,
+                          sectionPaddingBottom: event.target
+                            .value as GlobalSectionSpacing,
                         })
                       }
                     >
@@ -3821,7 +4105,8 @@ export default function DashboardBuilder() {
                       value={shellSettings.sectionMarginTop}
                       onChange={(event) =>
                         updateShellSettings({
-                          sectionMarginTop: event.target.value as GlobalSectionSpacing,
+                          sectionMarginTop: event.target
+                            .value as GlobalSectionSpacing,
                         })
                       }
                     >
@@ -3838,8 +4123,8 @@ export default function DashboardBuilder() {
                       value={shellSettings.sectionMarginBottom}
                       onChange={(event) =>
                         updateShellSettings({
-                          sectionMarginBottom:
-                            event.target.value as GlobalSectionSpacing,
+                          sectionMarginBottom: event.target
+                            .value as GlobalSectionSpacing,
                         })
                       }
                     >
@@ -3864,7 +4149,11 @@ export default function DashboardBuilder() {
           </section>
         )}
         {publishCelebration && (
-          <div className="builder-publish-celebration" role="status" aria-live="polite">
+          <div
+            className="builder-publish-celebration"
+            role="status"
+            aria-live="polite"
+          >
             <span className="builder-publish-sparkles" aria-hidden="true">
               <i />
               <i />
@@ -3923,11 +4212,7 @@ export default function DashboardBuilder() {
             <strong>Builder</strong>
             <span>{getLayoutLabel(builderState.page, customPages)}</span>
           </div>
-          <button
-            type="button"
-            onClick={undoBuilder}
-            title="Undo last change"
-          >
+          <button type="button" onClick={undoBuilder} title="Undo last change">
             <Undo2 size={15} />
             Undo
           </button>
@@ -3936,7 +4221,11 @@ export default function DashboardBuilder() {
             onClick={() => setInspectorOpen((current) => !current)}
             aria-label={inspectorOpen ? "Close inspector" : "Open inspector"}
           >
-            {inspectorOpen ? <PanelRightClose size={15} /> : <PanelRightOpen size={15} />}
+            {inspectorOpen ? (
+              <PanelRightClose size={15} />
+            ) : (
+              <PanelRightOpen size={15} />
+            )}
             Inspector
           </button>
           <button
@@ -3972,10 +4261,27 @@ export default function DashboardBuilder() {
         </button>
       )}
 
-      <aside className={`builder-inspector builder-panel ${inspectorOpen ? "is-open" : ""}`}>
+      <WordPressMediaPicker
+        open={mediaPickerOpen}
+        title={mediaPickerTitle}
+        currentUrl={mediaPickerCurrentUrl}
+        search={mediaSearch}
+        items={mediaItems}
+        loading={mediaLoading}
+        status={mediaStatus}
+        onSearchChange={setMediaSearch}
+        onSelect={selectWordPressMedia}
+        onClose={closeWordPressMediaPicker}
+      />
+
+      <aside
+        className={`builder-inspector builder-panel ${inspectorOpen ? "is-open" : ""}`}
+      >
         <div className="builder-inspector-header">
           <Settings2 size={18} />
-          <span>{selectedLayoutBlock ? "Element Settings" : "Section Settings"}</span>
+          <span>
+            {selectedLayoutBlock ? "Element Settings" : "Section Settings"}
+          </span>
           <button
             type="button"
             className="builder-inspector-close"
@@ -4004,7 +4310,10 @@ export default function DashboardBuilder() {
               )}
             </div>
             {!selectedLayoutBlock && (
-              <div className="builder-inspector-tabs" aria-label="Inspector tabs">
+              <div
+                className="builder-inspector-tabs"
+                aria-label="Inspector tabs"
+              >
                 {[
                   ["content", "Content"],
                   ["style", "Style"],
@@ -4022,22 +4331,37 @@ export default function DashboardBuilder() {
               </div>
             )}
 
-            {!selectedLayoutBlock && <div className="builder-actions-row">
-              <button type="button" onClick={() => moveSelected(-1)} title="Move up">
-                <ArrowUp size={15} />
-              </button>
-              <button type="button" onClick={() => moveSelected(1)} title="Move down">
-                <ArrowDown size={15} />
-              </button>
-              <button type="button" onClick={duplicateSelected} title="Duplicate">
-                <Copy size={15} />
-              </button>
-              <button type="button" onClick={deleteSelected} title="Delete">
-                <Trash2 size={15} />
-              </button>
-            </div>}
+            {!selectedLayoutBlock && (
+              <div className="builder-actions-row">
+                <button
+                  type="button"
+                  onClick={() => moveSelected(-1)}
+                  title="Move up"
+                >
+                  <ArrowUp size={15} />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => moveSelected(1)}
+                  title="Move down"
+                >
+                  <ArrowDown size={15} />
+                </button>
+                <button
+                  type="button"
+                  onClick={duplicateSelected}
+                  title="Duplicate"
+                >
+                  <Copy size={15} />
+                </button>
+                <button type="button" onClick={deleteSelected} title="Delete">
+                  <Trash2 size={15} />
+                </button>
+              </div>
+            )}
 
-            {(!selectedLayoutBlock || selectedSection.kind === "contentLayout") && (
+            {(!selectedLayoutBlock ||
+              selectedSection.kind === "contentLayout") && (
               <details
                 className={`builder-collapse builder-section-settings-toggle ${
                   selectedLayoutBlock ? "is-element-focus" : ""
@@ -4045,2551 +4369,4010 @@ export default function DashboardBuilder() {
                 open={selectedLayoutBlock ? true : sectionSettingsOpen}
                 onToggle={(event) =>
                   !selectedLayoutBlock &&
-                  setSectionSettingsOpen((event.currentTarget as HTMLDetailsElement).open)
+                  setSectionSettingsOpen(
+                    (event.currentTarget as HTMLDetailsElement).open,
+                  )
                 }
               >
                 <summary>
-                  <span>{selectedLayoutBlock ? "Element Settings" : "Section Settings"}</span>
-                  <small>
-                    {selectedLayoutBlock || sectionSettingsOpen ? "open" : "closed"}
-                  </small>
-                </summary>
-              {inspectorTab === "content" &&
-                !selectedLayoutBlock &&
-                selectedSection.kind !== "contentLayout" && (
-                <>
-                <details className="builder-collapse" open>
-                  <summary>
-                    <span>Basic Content</span>
-                    <small>{sectionLabels[selectedSection.kind]}</small>
-                  </summary>
-
-                  <label className="builder-field">
-                    <span>Section Title</span>
-                    <input
-                      value={selectedSection.title}
-                      onChange={(event) =>
-                        updateSelected({ title: event.target.value })
-                      }
-                    />
-                  </label>
-
-                  <label className="builder-field">
-                    <span>Eyebrow</span>
-                    <input
-                      value={selectedSection.eyebrow ?? ""}
-                      onChange={(event) =>
-                        updateSelected({ eyebrow: event.target.value })
-                      }
-                    />
-                  </label>
-                </details>
-                </>
-              )}
-
-            {inspectorTab === "style" && !selectedLayoutBlock && (
-              <>
-                <details className="builder-collapse" open>
-                  <summary>
-                    <span>Background</span>
-                    <small>{selectedSection.backgroundMode ?? "full"}</small>
-                  </summary>
-
-                  <label className="builder-field">
-                    <span>Background</span>
-                    <div className="builder-background-presets">
-                      {sectionBackgroundPresets.map((preset) => (
-                        <button
-                          key={preset.value}
-                          type="button"
-                          className={
-                            selectedSection.background?.toLowerCase() ===
-                            preset.value
-                              ? "is-active"
-                              : ""
-                          }
-                          onClick={() =>
-                      updateSelected({
-                        background: preset.value,
-                        colorScheme: "inherit",
-                      })
-                          }
-                          title={preset.label}
-                        >
-                          <span style={{ background: preset.value }} />
-                          {preset.label}
-                        </button>
-                      ))}
-                    </div>
-                    <div className="builder-color-row">
-                      <input
-                        type="color"
-                        value={selectedSection.background}
-                        onChange={(event) =>
-                          updateSelected({
-                            background: event.target.value,
-                            colorScheme: "inherit",
-                          })
-                        }
-                      />
-                      <input
-                        value={selectedSection.background}
-                        onChange={(event) =>
-                          updateSelected({
-                            background: event.target.value,
-                            colorScheme: "inherit",
-                          })
-                        }
-                      />
-                    </div>
-                  </label>
-                </details>
-
-                <details className="builder-collapse" open>
-                  <summary>
-                    <span>Layout Widths</span>
-                    <small>{selectedSection.contentMode ?? "boxed"}</small>
-                  </summary>
-
-                  <label className="builder-field">
-                    <span>Background Width</span>
-                    <select
-                      value={selectedSection.backgroundMode ?? "full"}
-                      onChange={(event) =>
-                        updateSelected({
-                          backgroundMode: event.target
-                            .value as SectionBackgroundMode,
-                        })
-                      }
-                    >
-                      <option value="full">Full width</option>
-                      <option value="boxed">Boxed</option>
-                    </select>
-                  </label>
-
-                  <label className="builder-field">
-                    <span>Content Width</span>
-                    <select
-                      value={selectedSection.contentMode ?? "boxed"}
-                      onChange={(event) =>
-                        updateSelected({
-                          contentMode: event.target.value as SectionContentMode,
-                        })
-                      }
-                    >
-                      <option value="full">Full</option>
-                      <option value="boxed">Boxed</option>
-                      <option value="narrow">Narrow</option>
-                    </select>
-                  </label>
-                </details>
-
-                <details className="builder-collapse" open>
-                  <summary>
-                    <span>Color & Spacing</span>
-                    <small>{sectionColorModeLabel(selectedSection)}</small>
-                  </summary>
-
-                  <label className="builder-field">
-                    <span>Section Color Mode</span>
-                    <select
-                      value={selectedSection.colorScheme ?? "inherit"}
-                      onChange={(event) =>
-                        updateSelected({
-                          colorScheme: event.target.value as SectionColorScheme,
-                        })
-                      }
-                    >
-                      <option value="inherit">Auto by background</option>
-                      <option value="light">Dark text for light background</option>
-                      <option value="dark">Light text for dark background</option>
-                    </select>
-                  </label>
-
-                  <div className="builder-contrast-note">
-                    <strong>{sectionColorModeLabel(selectedSection)}</strong>
-                    <span>
-                      Auto keeps text readable against this section background.
-                      Use Light or Dark only when you want to force the look.
-                    </span>
-                  </div>
-
-                  <div className="builder-two-column">
-                    <label className="builder-field">
-                      <span>Top Padding</span>
-                      <select
-                        value={selectedSection.topSpacing ?? "inherit"}
-                        onChange={(event) =>
-                          updateSelected({
-                            topSpacing: event.target.value as SectionSpacing,
-                          })
-                        }
-                      >
-                        <option value="inherit">Use global</option>
-                        <option value="none">None</option>
-                        <option value="small">Small</option>
-                        <option value="medium">Medium</option>
-                        <option value="large">Large</option>
-                      </select>
-                    </label>
-
-                    <label className="builder-field">
-                      <span>Bottom Padding</span>
-                      <select
-                        value={selectedSection.bottomSpacing ?? "inherit"}
-                        onChange={(event) =>
-                          updateSelected({
-                            bottomSpacing: event.target.value as SectionSpacing,
-                          })
-                        }
-                      >
-                        <option value="inherit">Use global</option>
-                        <option value="none">None</option>
-                        <option value="small">Small</option>
-                        <option value="medium">Medium</option>
-                        <option value="large">Large</option>
-                      </select>
-                    </label>
-                  </div>
-
-                  <div className="builder-two-column">
-                    <label className="builder-field">
-                      <span>Top Margin</span>
-                      <select
-                        value={selectedSection.topMargin ?? "inherit"}
-                        onChange={(event) =>
-                          updateSelected({
-                            topMargin: event.target.value as SectionSpacing,
-                          })
-                        }
-                      >
-                        <option value="inherit">Use global</option>
-                        <option value="none">None</option>
-                        <option value="small">Small</option>
-                        <option value="medium">Medium</option>
-                        <option value="large">Large</option>
-                      </select>
-                    </label>
-
-                    <label className="builder-field">
-                      <span>Bottom Margin</span>
-                      <select
-                        value={selectedSection.bottomMargin ?? "inherit"}
-                        onChange={(event) =>
-                          updateSelected({
-                            bottomMargin: event.target.value as SectionSpacing,
-                          })
-                        }
-                      >
-                        <option value="inherit">Use global</option>
-                        <option value="none">None</option>
-                        <option value="small">Small</option>
-                        <option value="medium">Medium</option>
-                        <option value="large">Large</option>
-                      </select>
-                    </label>
-                  </div>
-                </details>
-              </>
-            )}
-
-              {inspectorTab === "content" &&
-              selectedSection.kind !== "hero" &&
-              selectedSection.kind !== "promo" && (
-              <details className="builder-collapse" open>
-                <summary>
-                  <span>{selectedLayoutBlock ? "Element Content" : "Section Type Options"}</span>
-                  <small>
+                  <span>
                     {selectedLayoutBlock
-                      ? layoutBlockLabels[selectedLayoutBlock.kind ?? "text"]
-                      : sectionLabels[selectedSection.kind]}
+                      ? "Element Settings"
+                      : "Section Settings"}
+                  </span>
+                  <small>
+                    {selectedLayoutBlock || sectionSettingsOpen
+                      ? "open"
+                      : "closed"}
                   </small>
                 </summary>
+                {inspectorTab === "content" &&
+                  !selectedLayoutBlock &&
+                  selectedSection.kind !== "contentLayout" && (
+                    <>
+                      <details className="builder-collapse" open>
+                        <summary>
+                          <span>Basic Content</span>
+                          <small>{sectionLabels[selectedSection.kind]}</small>
+                        </summary>
 
-            {!selectedLayoutBlock && selectedSection.kind === "productArchive" && (
-              <>
-                <div className="builder-two-column">
-                  <label className="builder-field">
-                    <span>Source</span>
-                    <select
-                      value={selectedSection.source ?? "all"}
-                      onChange={(event) =>
-                        updateSelected({
-                          source: event.target.value as BuilderSection["source"],
-                        })
-                      }
-                    >
-                      <option value="all">All products</option>
-                      <option value="featured">Featured</option>
-                  <option value="category">Category</option>
-                    </select>
-                  </label>
+                        <label className="builder-field">
+                          <span>Section Title</span>
+                          <input
+                            value={selectedSection.title}
+                            onChange={(event) =>
+                              updateSelected({ title: event.target.value })
+                            }
+                          />
+                        </label>
 
-                  <label className="builder-field">
-                    <span>Layout Variant</span>
-                    <select
-                      value={selectedSection.layoutVariant ?? "grid"}
-                      onChange={(event) =>
-                        updateSelected({
-                          layoutVariant: event.target
-                            .value as BuilderSection["layoutVariant"],
-                        })
-                      }
-                    >
-                      <option value="grid">Grid</option>
-                      <option value="carousel">Carousel</option>
-                    </select>
-                  </label>
-                </div>
+                        <label className="builder-field">
+                          <span>Eyebrow</span>
+                          <input
+                            value={selectedSection.eyebrow ?? ""}
+                            onChange={(event) =>
+                              updateSelected({ eyebrow: event.target.value })
+                            }
+                          />
+                        </label>
+                      </details>
+                    </>
+                  )}
 
-                {selectedSection.source === "category" && (
-                  <label className="builder-field">
-                    <span>Category Slug / ID</span>
-                    <input
-                      value={selectedSection.categoryId ?? ""}
-                      onChange={(event) =>
-                        updateSelected({ categoryId: event.target.value })
-                      }
-                    />
-                  </label>
-                )}
+                {inspectorTab === "style" && !selectedLayoutBlock && (
+                  <>
+                    <details className="builder-collapse" open>
+                      <summary>
+                        <span>Background</span>
+                        <small>
+                          {selectedSection.backgroundMode ?? "full"}
+                        </small>
+                      </summary>
 
-                <label className="builder-field">
-                  <span>Columns</span>
-                  <input
-                    type="number"
-                    min={2}
-                    max={6}
-                    value={selectedSection.columns ?? 4}
-                    onChange={(event) =>
-                      updateSelected({ columns: Number(event.target.value) })
-                    }
-                  />
-                </label>
-
-                <label className="builder-field">
-                  <span>Grid Limit / Page Size</span>
-                  <input
-                    type="number"
-                    min={4}
-                    max={48}
-                    value={selectedSection.gridLimit ?? 12}
-                    onChange={(event) =>
-                      updateSelected({ gridLimit: Number(event.target.value) })
-                    }
-                  />
-                </label>
-
-                <label className="builder-field">
-                  <span>Filter Position</span>
-                  <select
-                    value={selectedSection.filterPosition ?? "left"}
-                    onChange={(event) =>
-                      updateSelected({
-                        filterPosition: event.target.value as BuilderSection["filterPosition"],
-                      })
-                    }
-                  >
-                    <option value="left">Left sidebar</option>
-                    <option value="top">Top pills</option>
-                    <option value="drawer">Drawer</option>
-                    <option value="hidden">Hidden</option>
-                  </select>
-                </label>
-
-                <label className="builder-field">
-                  <span>Card Style</span>
-                  <select
-                    value={selectedSection.cardStyle ?? "flat"}
-                    onChange={(event) =>
-                      updateSelected({
-                        cardStyle: event.target.value as BuilderSection["cardStyle"],
-                      })
-                    }
-                    >
-                      <option value="flat">Flat</option>
-                      <option value="soft">Soft</option>
-                      <option value="lined">Lined</option>
-                      <option value="none">No background</option>
-                    </select>
-                  </label>
-
-                <label className="builder-field">
-                  <span>Card Preset</span>
-                  <select
-                    value={selectedSection.cardPreset ?? "standard"}
-                    onChange={(event) =>
-                      updateSelected({
-                        cardPreset: event.target
-                          .value as BuilderSection["cardPreset"],
-                      })
-                    }
-                  >
-                    <option value="standard">Standard</option>
-                    <option value="graph">Graph Clean</option>
-                    <option value="gallery">Gallery</option>
-                    <option value="editorial">Editorial</option>
-                    <option value="compact">Compact</option>
-                    <option value="minimal">Minimal</option>
-                    <option value="luxury">Luxury</option>
-                  </select>
-                </label>
-
-                <div className="builder-two-column">
-                  <label className="builder-field">
-                    <span>Grid Gap</span>
-                    <select
-                      value={selectedSection.gridGap ?? "large"}
-                      onChange={(event) =>
-                        updateSelected({
-                          gridGap: event.target.value as BuilderSection["gridGap"],
-                        })
-                      }
-                    >
-                      <option value="none">None</option>
-                      <option value="small">Small</option>
-                      <option value="medium">Medium</option>
-                      <option value="large">Large</option>
-                      <option value="max">Max</option>
-                    </select>
-                  </label>
-
-                  <label className="builder-field">
-                    <span>Card Padding</span>
-                    <select
-                      value={selectedSection.cardPadding ?? "medium"}
-                      onChange={(event) =>
-                        updateSelected({
-                          cardPadding: event.target
-                            .value as BuilderSection["cardPadding"],
-                        })
-                      }
-                    >
-                      <option value="none">None</option>
-                      <option value="small">Small</option>
-                      <option value="medium">Medium</option>
-                      <option value="large">Large</option>
-                      <option value="max">Max</option>
-                    </select>
-                  </label>
-                </div>
-
-                <label className="builder-field">
-                  <span>Image Padding</span>
-                  <select
-                    value={selectedSection.imagePadding ?? "large"}
-                    onChange={(event) =>
-                      updateSelected({
-                        imagePadding: event.target
-                          .value as BuilderSection["imagePadding"],
-                      })
-                    }
-                  >
-                    <option value="none">Frameless</option>
-                    <option value="small">Small</option>
-                    <option value="medium">Medium</option>
-                    <option value="large">Large</option>
-                    <option value="max">Max</option>
-                  </select>
-                </label>
-              </>
-            )}
-
-            {selectedSection.kind === "badgeGrid" && (
-              <>
-                <label className="builder-field">
-                  <span>Columns</span>
-                  <input
-                    type="number"
-                    min={2}
-                    max={4}
-                    value={selectedSection.columns ?? 3}
-                    onChange={(event) =>
-                      updateSelected({ columns: Number(event.target.value) })
-                    }
-                  />
-                </label>
-
-                <div className="builder-section-heading">
-                  <span>Badges</span>
-                  <span>{selectedSection.badges?.length ?? 0}</span>
-                </div>
-
-                {(selectedSection.badges ?? []).map((badge, index) => (
-                  <div key={badge.id ?? index} className="builder-nested-card">
-                    <label className="builder-field">
-                      <span>Badge Label</span>
-                      <input
-                        value={badge.label ?? ""}
-                        onChange={(event) =>
-                          updateSelectedBadge(index, { label: event.target.value })
-                        }
-                      />
-                    </label>
-                    <label className="builder-field">
-                      <span>Badge Title</span>
-                      <input
-                        value={badge.title ?? ""}
-                        onChange={(event) =>
-                          updateSelectedBadge(index, { title: event.target.value })
-                        }
-                      />
-                    </label>
-                    <label className="builder-field">
-                      <span>Badge Body</span>
-                      <textarea
-                        rows={3}
-                        value={badge.body ?? ""}
-                        onChange={(event) =>
-                          updateSelectedBadge(index, { body: event.target.value })
-                        }
-                      />
-                    </label>
-                  </div>
-                ))}
-              </>
-            )}
-
-            {selectedSection.kind === "contentLayout" && (
-              <>
-                {selectedLayoutBlock && (
-                  <div className="builder-element-inspector-note">
-                    <strong>Element Settings</strong>
-                    <span>
-                      You are editing the selected element only. Section layout,
-                      spacing, and background stay in Section Settings.
-                    </span>
-                  </div>
-                )}
-                {!selectedLayoutBlock && <label className="builder-field">
-                  <span>Layout Columns</span>
-                  <select
-                    value={selectedSection.layoutColumns ?? 2}
-                    onChange={(event) =>
-                      updateSelected({ layoutColumns: Number(event.target.value) })
-                    }
-                  >
-                    <option value={1}>Full width</option>
-                    <option value={2}>2 columns</option>
-                    <option value={3}>3 columns</option>
-                    <option value={4}>4 columns</option>
-                    <option value={5}>5 columns</option>
-                    <option value={6}>6 columns</option>
-                  </select>
-                </label>}
-
-                {!selectedLayoutBlock && (
-                  <details
-                    className="builder-collapse builder-structure-summary"
-                    open={sectionStructureOpen}
-                    onToggle={(event) =>
-                      setSectionStructureOpen(
-                        (event.currentTarget as HTMLDetailsElement).open
-                      )
-                    }
-                  >
-                    <summary>
-                      <span>Columns</span>
-                      <small>{selectedSection.layoutItems?.length ?? 0}</small>
-                    </summary>
-                    <div className="builder-structure-note">
-                      Select an element in the canvas to edit it. This area only manages the
-                      section grid itself.
-                    </div>
-                    <button
-                      type="button"
-                      className="builder-inline-add"
-                      onClick={addSelectedLayoutItem}
-                    >
-                      <Plus size={15} />
-                      Add column
-                    </button>
-                    <div className="builder-compact-column-list">
-                      {(selectedSection.layoutItems ?? []).map((item, index) => {
-                        const itemKey = item.id ?? `layout-item-${index}`;
-                        const blocks = getLayoutItemBlocks(item);
-                        return (
-                          <div key={itemKey} className="builder-compact-column-row">
-                            <div>
-                              <strong>Column {index + 1}</strong>
-                              <span>{blocks.length} elements</span>
-                            </div>
+                      <label className="builder-field">
+                        <span>Background</span>
+                        <div className="builder-background-presets">
+                          {sectionBackgroundPresets.map((preset) => (
                             <button
+                              key={preset.value}
                               type="button"
-                              onClick={() => deleteSelectedLayoutItem(index)}
-                              title="Delete column"
+                              className={
+                                selectedSection.background?.toLowerCase() ===
+                                preset.value
+                                  ? "is-active"
+                                  : ""
+                              }
+                              onClick={() =>
+                                updateSelected({
+                                  background: preset.value,
+                                  colorScheme: "inherit",
+                                })
+                              }
+                              title={preset.label}
                             >
-                              <Trash2 size={14} />
+                              <span style={{ background: preset.value }} />
+                              {preset.label}
                             </button>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </details>
+                          ))}
+                        </div>
+                        <div className="builder-color-row">
+                          <input
+                            type="color"
+                            value={selectedSection.background}
+                            onChange={(event) =>
+                              updateSelected({
+                                background: event.target.value,
+                                colorScheme: "inherit",
+                              })
+                            }
+                          />
+                          <input
+                            value={selectedSection.background}
+                            onChange={(event) =>
+                              updateSelected({
+                                background: event.target.value,
+                                colorScheme: "inherit",
+                              })
+                            }
+                          />
+                        </div>
+                      </label>
+                    </details>
+
+                    <details className="builder-collapse" open>
+                      <summary>
+                        <span>Layout Widths</span>
+                        <small>{selectedSection.contentMode ?? "boxed"}</small>
+                      </summary>
+
+                      <label className="builder-field">
+                        <span>Background Width</span>
+                        <select
+                          value={selectedSection.backgroundMode ?? "full"}
+                          onChange={(event) =>
+                            updateSelected({
+                              backgroundMode: event.target
+                                .value as SectionBackgroundMode,
+                            })
+                          }
+                        >
+                          <option value="full">Full width</option>
+                          <option value="boxed">Boxed</option>
+                        </select>
+                      </label>
+
+                      <label className="builder-field">
+                        <span>Content Width</span>
+                        <select
+                          value={selectedSection.contentMode ?? "boxed"}
+                          onChange={(event) =>
+                            updateSelected({
+                              contentMode: event.target
+                                .value as SectionContentMode,
+                            })
+                          }
+                        >
+                          <option value="full">Full</option>
+                          <option value="boxed">Boxed</option>
+                          <option value="narrow">Narrow</option>
+                        </select>
+                      </label>
+                    </details>
+
+                    <details className="builder-collapse" open>
+                      <summary>
+                        <span>Color & Spacing</span>
+                        <small>{sectionColorModeLabel(selectedSection)}</small>
+                      </summary>
+
+                      <label className="builder-field">
+                        <span>Section Color Mode</span>
+                        <select
+                          value={selectedSection.colorScheme ?? "inherit"}
+                          onChange={(event) =>
+                            updateSelected({
+                              colorScheme: event.target
+                                .value as SectionColorScheme,
+                            })
+                          }
+                        >
+                          <option value="inherit">Auto by background</option>
+                          <option value="light">
+                            Dark text for light background
+                          </option>
+                          <option value="dark">
+                            Light text for dark background
+                          </option>
+                        </select>
+                      </label>
+
+                      <div className="builder-contrast-note">
+                        <strong>
+                          {sectionColorModeLabel(selectedSection)}
+                        </strong>
+                        <span>
+                          Auto keeps text readable against this section
+                          background. Use Light or Dark only when you want to
+                          force the look.
+                        </span>
+                      </div>
+
+                      <div className="builder-two-column">
+                        <label className="builder-field">
+                          <span>Top Padding</span>
+                          <select
+                            value={selectedSection.topSpacing ?? "inherit"}
+                            onChange={(event) =>
+                              updateSelected({
+                                topSpacing: event.target
+                                  .value as SectionSpacing,
+                              })
+                            }
+                          >
+                            <option value="inherit">Use global</option>
+                            <option value="none">None</option>
+                            <option value="small">Small</option>
+                            <option value="medium">Medium</option>
+                            <option value="large">Large</option>
+                          </select>
+                        </label>
+
+                        <label className="builder-field">
+                          <span>Bottom Padding</span>
+                          <select
+                            value={selectedSection.bottomSpacing ?? "inherit"}
+                            onChange={(event) =>
+                              updateSelected({
+                                bottomSpacing: event.target
+                                  .value as SectionSpacing,
+                              })
+                            }
+                          >
+                            <option value="inherit">Use global</option>
+                            <option value="none">None</option>
+                            <option value="small">Small</option>
+                            <option value="medium">Medium</option>
+                            <option value="large">Large</option>
+                          </select>
+                        </label>
+                      </div>
+
+                      <div className="builder-two-column">
+                        <label className="builder-field">
+                          <span>Top Margin</span>
+                          <select
+                            value={selectedSection.topMargin ?? "inherit"}
+                            onChange={(event) =>
+                              updateSelected({
+                                topMargin: event.target.value as SectionSpacing,
+                              })
+                            }
+                          >
+                            <option value="inherit">Use global</option>
+                            <option value="none">None</option>
+                            <option value="small">Small</option>
+                            <option value="medium">Medium</option>
+                            <option value="large">Large</option>
+                          </select>
+                        </label>
+
+                        <label className="builder-field">
+                          <span>Bottom Margin</span>
+                          <select
+                            value={selectedSection.bottomMargin ?? "inherit"}
+                            onChange={(event) =>
+                              updateSelected({
+                                bottomMargin: event.target
+                                  .value as SectionSpacing,
+                              })
+                            }
+                          >
+                            <option value="inherit">Use global</option>
+                            <option value="none">None</option>
+                            <option value="small">Small</option>
+                            <option value="medium">Medium</option>
+                            <option value="large">Large</option>
+                          </select>
+                        </label>
+                      </div>
+                    </details>
+                  </>
                 )}
 
-                {(selectedSection.layoutItems ?? []).map((item, index) => {
-                  if (!selectedLayoutBlock) {
-                    return null;
-                  }
-                  if (
-                    selectedLayoutBlock &&
-                    !(item.blocks ?? []).some(
-                      (block) => block.id === selectedLayoutBlockKey
-                    )
-                  ) {
-                    return null;
-                  }
-                  const itemKey = item.id ?? `layout-item-${index}`;
-                  const isOpen = Boolean(selectedLayoutBlock) || openLayoutItemId === itemKey;
-                  const blocks = getLayoutItemBlocks(item);
-                  const columnLabel =
-                    blocks[0]?.title || item.title || `${blocks.length} blocks`;
+                {inspectorTab === "content" &&
+                  selectedSection.kind !== "hero" &&
+                  selectedSection.kind !== "promo" && (
+                    <details className="builder-collapse" open>
+                      <summary>
+                        <span>
+                          {selectedLayoutBlock
+                            ? "Element Content"
+                            : "Section Type Options"}
+                        </span>
+                        <small>
+                          {selectedLayoutBlock
+                            ? layoutBlockLabels[
+                                selectedLayoutBlock.kind ?? "text"
+                              ]
+                            : sectionLabels[selectedSection.kind]}
+                        </small>
+                      </summary>
 
-                  return (
-                    <div
-                      key={itemKey}
-                      className={`builder-nested-card ${isOpen ? "is-open" : ""} ${
-                        selectedLayoutBlock ? "is-element-focus-card" : ""
-                      }`}
-                    >
-                      {isOpen && (
-                        <div className="builder-nested-card-body">
-                          {blocks.length === 0 && (
-                            <div className="builder-mini-empty">
-                              Select this column in the preview, then drag an element from the
-                              Element Library.
-                            </div>
-                          )}
-
-                          {blocks.map((block, blockIndex) => {
-                            const blockKey = block.id ?? `${itemKey}-block-${blockIndex}`;
-                            const isSelectedBlock =
-                              selectedLayoutBlockKey === blockKey;
-
-                            return (
-                            <div
-                              key={blockKey}
-                              className={`builder-layout-block-card ${
-                                isSelectedBlock ? "is-selected" : ""
-                              } ${selectedLayoutBlock ? "is-element-focus-block" : ""}`}
-                            >
-                              <div className="builder-layout-block-header">
-                                <span>
-                                  {layoutBlockLabels[block.kind ?? "text"] ?? "Block"}
-                                </span>
-                                <button
-                                  type="button"
-                                  onClick={() =>
-                                    deleteSelectedLayoutBlock(index, blockIndex)
+                      {!selectedLayoutBlock &&
+                        selectedSection.kind === "productArchive" && (
+                          <>
+                            <div className="builder-two-column">
+                              <label className="builder-field">
+                                <span>Source</span>
+                                <select
+                                  value={selectedSection.source ?? "all"}
+                                  onChange={(event) =>
+                                    updateSelected({
+                                      source: event.target
+                                        .value as BuilderSection["source"],
+                                    })
                                   }
-                                  title="Delete block"
                                 >
-                                  <Trash2 size={13} />
-                                </button>
-                              </div>
+                                  <option value="all">All products</option>
+                                  <option value="featured">Featured</option>
+                                  <option value="category">Category</option>
+                                </select>
+                              </label>
 
-                              <details className="builder-collapse">
-                                <summary>
-                                  <span>Element Surface</span>
-                                  <small>{block.elementBackgroundMode ?? "default"}</small>
-                                </summary>
+                              <label className="builder-field">
+                                <span>Layout Variant</span>
+                                <select
+                                  value={
+                                    selectedSection.layoutVariant ?? "grid"
+                                  }
+                                  onChange={(event) =>
+                                    updateSelected({
+                                      layoutVariant: event.target
+                                        .value as BuilderSection["layoutVariant"],
+                                    })
+                                  }
+                                >
+                                  <option value="grid">Grid</option>
+                                  <option value="carousel">Carousel</option>
+                                </select>
+                              </label>
+                            </div>
+
+                            {selectedSection.source === "category" && (
+                              <label className="builder-field">
+                                <span>Category Slug / ID</span>
+                                <input
+                                  value={selectedSection.categoryId ?? ""}
+                                  onChange={(event) =>
+                                    updateSelected({
+                                      categoryId: event.target.value,
+                                    })
+                                  }
+                                />
+                              </label>
+                            )}
+
+                            <label className="builder-field">
+                              <span>Columns</span>
+                              <input
+                                type="number"
+                                min={2}
+                                max={6}
+                                value={selectedSection.columns ?? 4}
+                                onChange={(event) =>
+                                  updateSelected({
+                                    columns: Number(event.target.value),
+                                  })
+                                }
+                              />
+                            </label>
+
+                            <label className="builder-field">
+                              <span>Grid Limit / Page Size</span>
+                              <input
+                                type="number"
+                                min={4}
+                                max={48}
+                                value={selectedSection.gridLimit ?? 12}
+                                onChange={(event) =>
+                                  updateSelected({
+                                    gridLimit: Number(event.target.value),
+                                  })
+                                }
+                              />
+                            </label>
+
+                            <label className="builder-field">
+                              <span>Filter Position</span>
+                              <select
+                                value={selectedSection.filterPosition ?? "left"}
+                                onChange={(event) =>
+                                  updateSelected({
+                                    filterPosition: event.target
+                                      .value as BuilderSection["filterPosition"],
+                                  })
+                                }
+                              >
+                                <option value="left">Left sidebar</option>
+                                <option value="top">Top pills</option>
+                                <option value="drawer">Drawer</option>
+                                <option value="hidden">Hidden</option>
+                              </select>
+                            </label>
+
+                            <label className="builder-field">
+                              <span>Card Style</span>
+                              <select
+                                value={selectedSection.cardStyle ?? "flat"}
+                                onChange={(event) =>
+                                  updateSelected({
+                                    cardStyle: event.target
+                                      .value as BuilderSection["cardStyle"],
+                                  })
+                                }
+                              >
+                                <option value="flat">Flat</option>
+                                <option value="soft">Soft</option>
+                                <option value="lined">Lined</option>
+                                <option value="none">No background</option>
+                              </select>
+                            </label>
+
+                            <label className="builder-field">
+                              <span>Card Preset</span>
+                              <select
+                                value={selectedSection.cardPreset ?? "standard"}
+                                onChange={(event) =>
+                                  updateSelected({
+                                    cardPreset: event.target
+                                      .value as BuilderSection["cardPreset"],
+                                  })
+                                }
+                              >
+                                <option value="standard">Standard</option>
+                                <option value="graph">Graph Clean</option>
+                                <option value="gallery">Gallery</option>
+                                <option value="editorial">Editorial</option>
+                                <option value="compact">Compact</option>
+                                <option value="minimal">Minimal</option>
+                                <option value="luxury">Luxury</option>
+                              </select>
+                            </label>
+
+                            <div className="builder-two-column">
+                              <label className="builder-field">
+                                <span>Grid Gap</span>
+                                <select
+                                  value={selectedSection.gridGap ?? "large"}
+                                  onChange={(event) =>
+                                    updateSelected({
+                                      gridGap: event.target
+                                        .value as BuilderSection["gridGap"],
+                                    })
+                                  }
+                                >
+                                  <option value="none">None</option>
+                                  <option value="small">Small</option>
+                                  <option value="medium">Medium</option>
+                                  <option value="large">Large</option>
+                                  <option value="max">Max</option>
+                                </select>
+                              </label>
+
+                              <label className="builder-field">
+                                <span>Card Padding</span>
+                                <select
+                                  value={
+                                    selectedSection.cardPadding ?? "medium"
+                                  }
+                                  onChange={(event) =>
+                                    updateSelected({
+                                      cardPadding: event.target
+                                        .value as BuilderSection["cardPadding"],
+                                    })
+                                  }
+                                >
+                                  <option value="none">None</option>
+                                  <option value="small">Small</option>
+                                  <option value="medium">Medium</option>
+                                  <option value="large">Large</option>
+                                  <option value="max">Max</option>
+                                </select>
+                              </label>
+                            </div>
+
+                            <label className="builder-field">
+                              <span>Image Padding</span>
+                              <select
+                                value={selectedSection.imagePadding ?? "large"}
+                                onChange={(event) =>
+                                  updateSelected({
+                                    imagePadding: event.target
+                                      .value as BuilderSection["imagePadding"],
+                                  })
+                                }
+                              >
+                                <option value="none">Frameless</option>
+                                <option value="small">Small</option>
+                                <option value="medium">Medium</option>
+                                <option value="large">Large</option>
+                                <option value="max">Max</option>
+                              </select>
+                            </label>
+
+                            <details className="builder-collapse" open>
+                              <summary>
+                                <span>Add To Cart Button</span>
+                                <small>
+                                  {selectedSection.addToCartStyle ?? "blue"}
+                                </small>
+                              </summary>
+                              <div className="builder-two-column">
                                 <label className="builder-field">
-                                  <span>Background Mode</span>
+                                  <span>Color</span>
                                   <select
-                                    value={block.elementBackgroundMode ?? "default"}
+                                    value={
+                                      selectedSection.addToCartStyle ?? "blue"
+                                    }
                                     onChange={(event) =>
-                                      updateSelectedLayoutBlock(index, blockIndex, {
-                                        elementBackgroundMode: event.target
-                                          .value as BuilderLayoutBlock["elementBackgroundMode"],
+                                      updateSelected({
+                                        addToCartStyle: event.target
+                                          .value as BuilderSection["addToCartStyle"],
                                       })
                                     }
                                   >
-                                    <option value="default">Use element default</option>
-                                    <option value="transparent">Transparent</option>
-                                    <option value="custom">Custom color</option>
+                                    <option value="blue">Publish blue</option>
+                                    <option value="dark">Dark</option>
+                                    <option value="light">Light</option>
+                                    <option value="inherit">
+                                      Theme button
+                                    </option>
                                   </select>
                                 </label>
-                                {block.elementBackgroundMode === "custom" && (
-                                  <label className="builder-field">
-                                    <span>Background</span>
-                                    <div className="builder-background-presets">
-                                      {elementBackgroundPresets.map((preset) => (
-                                        <button
-                                          key={preset.value}
-                                          type="button"
-                                          className={
-                                            block.elementBackground?.toLowerCase() ===
-                                            preset.value
-                                              ? "is-active"
-                                              : ""
-                                          }
-                                          onClick={() =>
-                                            updateSelectedLayoutBlock(index, blockIndex, {
-                                              elementBackground: preset.value,
-                                            })
-                                          }
-                                        >
-                                          <span style={{ background: preset.value }} />
-                                          {preset.label}
-                                        </button>
-                                      ))}
-                                    </div>
-                                    <div className="builder-color-row">
-                                      <input
-                                        type="color"
-                                        value={block.elementBackground ?? "#ffffff"}
-                                        onChange={(event) =>
-                                          updateSelectedLayoutBlock(index, blockIndex, {
-                                            elementBackground: event.target.value,
-                                          })
-                                        }
-                                      />
-                                      <input
-                                        value={block.elementBackground ?? "#ffffff"}
-                                        onChange={(event) =>
-                                          updateSelectedLayoutBlock(index, blockIndex, {
-                                            elementBackground: event.target.value,
-                                          })
-                                        }
-                                      />
-                                    </div>
-                                  </label>
-                                )}
                                 <label className="builder-field">
-                                  <span>Element Padding</span>
+                                  <span>Size</span>
                                   <select
-                                    value={block.elementPadding ?? "none"}
+                                    value={
+                                      selectedSection.addToCartSize ?? "medium"
+                                    }
                                     onChange={(event) =>
-                                      updateSelectedLayoutBlock(index, blockIndex, {
-                                        elementPadding: event.target
-                                          .value as BuilderLayoutBlock["elementPadding"],
+                                      updateSelected({
+                                        addToCartSize: event.target
+                                          .value as BuilderSection["addToCartSize"],
                                       })
                                     }
                                   >
-                                    <option value="none">None</option>
-                                    <option value="small">Small</option>
+                                    <option value="compact">Compact</option>
                                     <option value="medium">Medium</option>
                                     <option value="large">Large</option>
+                                    <option value="full">Full width</option>
                                   </select>
                                 </label>
-                              </details>
-
-                              {block.kind === "embed" ? (
-                                <>
-                                  <label className="builder-field">
-                                    <span>Block Title</span>
-                                    <input
-                                      value={block.title ?? ""}
-                                      onChange={(event) =>
-                                        updateSelectedLayoutBlock(index, blockIndex, {
-                                          title: event.target.value,
-                                        })
-                                      }
-                                    />
-                                  </label>
-                                  <label className="builder-field">
-                                    <span>Embed Mode</span>
-                                    <select
-                                      value={block.embedMode ?? "code"}
-                                      onChange={(event) =>
-                                        updateSelectedLayoutBlock(index, blockIndex, {
-                                          embedMode: event.target.value as EmbedMode,
-                                        })
-                                      }
-                                    >
-                                      <option value="code">Custom HTML / Script</option>
-                                      <option value="iframe">Iframe URL</option>
-                                    </select>
-                                  </label>
-                                  {block.embedMode === "iframe" ? (
-                                    <label className="builder-field">
-                                      <span>Iframe URL</span>
-                                      <input
-                                        value={block.embedUrl ?? ""}
-                                        placeholder="https://..."
-                                        onChange={(event) =>
-                                          updateSelectedLayoutBlock(index, blockIndex, {
-                                            embedUrl: event.target.value,
-                                          })
-                                        }
-                                      />
-                                    </label>
-                                  ) : (
-                                    <label className="builder-field">
-                                      <span>HTML / Script</span>
-                                      <textarea
-                                        rows={5}
-                                        value={block.embedCode ?? ""}
-                                        onChange={(event) =>
-                                          updateSelectedLayoutBlock(index, blockIndex, {
-                                            embedCode: event.target.value,
-                                          })
-                                        }
-                                      />
-                                    </label>
-                                  )}
-                                  <label className="builder-field">
-                                    <span>Height</span>
-                                    <input
-                                      type="number"
-                                      min={120}
-                                      max={900}
-                                      value={block.embedHeight ?? 260}
-                                      onChange={(event) =>
-                                        updateSelectedLayoutBlock(index, blockIndex, {
-                                          embedHeight: Number(event.target.value),
-                                        })
-                                      }
-                                    />
-                                  </label>
-                                </>
-                              ) : block.kind === "fluentForm" ? (
-                                <>
-                                  <label className="builder-field">
-                                    <span>Block Title</span>
-                                    <input
-                                      value={block.title ?? ""}
-                                      onChange={(event) =>
-                                        updateSelectedLayoutBlock(index, blockIndex, {
-                                          title: event.target.value,
-                                        })
-                                      }
-                                    />
-                                  </label>
-                                  <label className="builder-field">
-                                    <span>Fluent Form ID</span>
-                                    <input
-                                      inputMode="numeric"
-                                      value={block.fluentFormId ?? ""}
-                                      placeholder="Example: 3"
-                                      onChange={(event) =>
-                                        updateSelectedLayoutBlock(index, blockIndex, {
-                                          fluentFormId: event.target.value,
-                                        })
-                                      }
-                                    />
-                                  </label>
-                                  <div className="builder-dynamic-field-note">
-                                    <strong>WordPress renderer required</strong>
-                                    <span>
-                                      Add the React Shop Fluent Forms snippet in WordPress,
-                                      then this element can show the real Fluent Form.
-                                    </span>
-                                  </div>
-                                </>
-                              ) : block.kind === "grid" ? (
-                                <>
-                                  <label className="builder-field">
-                                    <span>Content Source</span>
-                                    <select
-                                      value={block.gridSource ?? "static"}
-                                      onChange={(event) =>
-                                        updateSelectedLayoutBlock(index, blockIndex, {
-                                          gridSource: event.target
-                                            .value as BuilderLayoutBlock["gridSource"],
-                                        })
-                                      }
-                                    >
-                                      <option value="static">Static items</option>
-                                      <option value="products">WooCommerce products</option>
-                                    </select>
-                                  </label>
-                                  <div className="builder-two-column">
-                                    <label className="builder-field">
-                                      <span>Columns</span>
-                                      <input
-                                        type="number"
-                                        min={1}
-                                        max={6}
-                                        value={block.columns ?? 3}
-                                        onChange={(event) =>
-                                          updateSelectedLayoutBlock(index, blockIndex, {
-                                            columns: Number(event.target.value),
-                                          })
-                                        }
-                                      />
-                                    </label>
-                                    <label className="builder-field">
-                                      <span>Rows</span>
-                                      <input
-                                        type="number"
-                                        min={1}
-                                        max={6}
-                                        value={block.gridRows ?? 1}
-                                        onChange={(event) =>
-                                          updateSelectedLayoutBlock(index, blockIndex, {
-                                            gridRows: Number(event.target.value),
-                                          })
-                                        }
-                                      />
-                                    </label>
-                                  </div>
-                                  <div className="builder-two-column">
-                                    <label className="builder-field">
-                                      <span>Grid Gap</span>
-                                      <select
-                                        value={block.gridGap ?? "medium"}
-                                        onChange={(event) =>
-                                          updateSelectedLayoutBlock(index, blockIndex, {
-                                            gridGap: event.target
-                                              .value as BuilderLayoutBlock["gridGap"],
-                                          })
-                                        }
-                                      >
-                                        <option value="small">Small</option>
-                                        <option value="medium">Medium</option>
-                                        <option value="large">Large</option>
-                                      </select>
-                                    </label>
-                                    <label className="builder-field">
-                                      <span>Outer Margin</span>
-                                      <select
-                                        value={block.gridMargin ?? "none"}
-                                        onChange={(event) =>
-                                          updateSelectedLayoutBlock(index, blockIndex, {
-                                            gridMargin: event.target
-                                              .value as BuilderLayoutBlock["gridMargin"],
-                                          })
-                                        }
-                                      >
-                                        <option value="none">None</option>
-                                        <option value="small">Small</option>
-                                        <option value="medium">Medium</option>
-                                        <option value="large">Large</option>
-                                      </select>
-                                    </label>
-                                  </div>
-                                  <div className="builder-two-column">
-                                    <label className="builder-field">
-                                      <span>Image Padding</span>
-                                      <select
-                                        value={block.gridImagePadding ?? "frameless"}
-                                        onChange={(event) =>
-                                          updateSelectedLayoutBlock(index, blockIndex, {
-                                            gridImagePadding: event.target
-                                              .value as BuilderLayoutBlock["gridImagePadding"],
-                                          })
-                                        }
-                                      >
-                                        <option value="frameless">Frameless</option>
-                                        <option value="small">Small</option>
-                                        <option value="medium">Medium</option>
-                                        <option value="max">Max</option>
-                                      </select>
-                                    </label>
-                                    <label className="builder-field">
-                                      <span>Content Padding</span>
-                                      <select
-                                        value={block.gridContentPadding ?? "medium"}
-                                        onChange={(event) =>
-                                          updateSelectedLayoutBlock(index, blockIndex, {
-                                            gridContentPadding: event.target
-                                              .value as BuilderLayoutBlock["gridContentPadding"],
-                                          })
-                                        }
-                                      >
-                                        <option value="none">None</option>
-                                        <option value="small">Small</option>
-                                        <option value="medium">Medium</option>
-                                        <option value="large">Large</option>
-                                      </select>
-                                    </label>
-                                  </div>
-                                  <label className="builder-field">
-                                    <span>Image Frame</span>
-                                    <select
-                                      value={block.gridImageFrame ?? "none"}
-                                      onChange={(event) =>
-                                        updateSelectedLayoutBlock(index, blockIndex, {
-                                          gridImageFrame: event.target
-                                            .value as BuilderLayoutBlock["gridImageFrame"],
-                                        })
-                                      }
-                                    >
-                                      <option value="none">No frame</option>
-                                      <option value="soft">Soft surface</option>
-                                    </select>
-                                  </label>
-                                  <details className="builder-collapse" open>
-                                    <summary>
-                                      <span>Fields</span>
-                                      <small>visibility</small>
-                                    </summary>
-                                    <div className="builder-grid-toggle-list">
-                                      {[
-                                        ["gridShowImage", "Image"],
-                                        ["gridShowEyebrow", "Eyebrow"],
-                                        ["gridShowMeta", "Meta"],
-                                        ["gridShowText", "Text"],
-                                        ["gridShowButton", "Button"],
-                                      ].map(([field, label]) => (
-                                        <label key={field}>
-                                          <input
-                                            type="checkbox"
-                                            checked={
-                                              block[
-                                                field as keyof BuilderLayoutBlock
-                                              ] !== false
-                                            }
-                                            onChange={(event) =>
-                                              updateSelectedLayoutBlock(index, blockIndex, {
-                                                [field]: event.target.checked,
-                                              })
-                                            }
-                                          />
-                                          <span>{label}</span>
-                                        </label>
-                                      ))}
-                                    </div>
-                                  </details>
-                                  {block.gridSource !== "products" && (
-                                    <details className="builder-collapse" open>
-                                      <summary>
-                                        <span>Static Items</span>
-                                        <small>{block.gridItems?.length ?? 0}</small>
-                                      </summary>
-                                      <button
-                                        type="button"
-                                        className="builder-inline-add"
-                                        onClick={() =>
-                                          addSelectedLayoutBlockGridItem(index, blockIndex)
-                                        }
-                                      >
-                                        <Plus size={15} />
-                                        Add item
-                                      </button>
-                                      {(block.gridItems ?? []).map((gridItem, gridItemIndex) => (
-                                        <div
-                                          key={gridItem.id ?? `${blockKey}-grid-${gridItemIndex}`}
-                                          className="builder-nested-card is-open"
-                                        >
-                                          <div className="builder-nested-card-header">
-                                            <span>Item {gridItemIndex + 1}</span>
-                                            <button
-                                              type="button"
-                                              onClick={() =>
-                                                deleteSelectedLayoutBlockGridItem(
-                                                  index,
-                                                  blockIndex,
-                                                  gridItemIndex
-                                                )
-                                              }
-                                              title="Delete grid item"
-                                            >
-                                              <Trash2 size={14} />
-                                            </button>
-                                          </div>
-                                          <div className="builder-nested-card-body">
-                                            <label className="builder-field">
-                                              <span>Image URL</span>
-                                              <input
-                                                value={gridItem.imageUrl ?? ""}
-                                                onChange={(event) =>
-                                                  updateSelectedLayoutBlockGridItem(
-                                                    index,
-                                                    blockIndex,
-                                                    gridItemIndex,
-                                                    { imageUrl: event.target.value }
-                                                  )
-                                                }
-                                              />
-                                            </label>
-                                            <label className="builder-field">
-                                              <span>Eyebrow</span>
-                                              <input
-                                                value={gridItem.eyebrow ?? ""}
-                                                onChange={(event) =>
-                                                  updateSelectedLayoutBlockGridItem(
-                                                    index,
-                                                    blockIndex,
-                                                    gridItemIndex,
-                                                    { eyebrow: event.target.value }
-                                                  )
-                                                }
-                                              />
-                                            </label>
-                                            <label className="builder-field">
-                                              <span>Title</span>
-                                              <input
-                                                value={gridItem.title ?? ""}
-                                                onChange={(event) =>
-                                                  updateSelectedLayoutBlockGridItem(
-                                                    index,
-                                                    blockIndex,
-                                                    gridItemIndex,
-                                                    { title: event.target.value }
-                                                  )
-                                                }
-                                              />
-                                            </label>
-                                            <label className="builder-field">
-                                              <span>Meta</span>
-                                              <input
-                                                value={gridItem.meta ?? ""}
-                                                onChange={(event) =>
-                                                  updateSelectedLayoutBlockGridItem(
-                                                    index,
-                                                    blockIndex,
-                                                    gridItemIndex,
-                                                    { meta: event.target.value }
-                                                  )
-                                                }
-                                              />
-                                            </label>
-                                            <label className="builder-field">
-                                              <span>Text</span>
-                                              <textarea
-                                                rows={3}
-                                                value={gridItem.text ?? ""}
-                                                onChange={(event) =>
-                                                  updateSelectedLayoutBlockGridItem(
-                                                    index,
-                                                    blockIndex,
-                                                    gridItemIndex,
-                                                    { text: event.target.value }
-                                                  )
-                                                }
-                                              />
-                                            </label>
-                                            <div className="builder-two-column">
-                                              <label className="builder-field">
-                                                <span>Button Label</span>
-                                                <input
-                                                  value={gridItem.buttonLabel ?? ""}
-                                                  onChange={(event) =>
-                                                    updateSelectedLayoutBlockGridItem(
-                                                      index,
-                                                      blockIndex,
-                                                      gridItemIndex,
-                                                      { buttonLabel: event.target.value }
-                                                    )
-                                                  }
-                                                />
-                                              </label>
-                                              <label className="builder-field">
-                                                <span>Button Link</span>
-                                                <input
-                                                  value={gridItem.buttonUrl ?? ""}
-                                                  onChange={(event) =>
-                                                    updateSelectedLayoutBlockGridItem(
-                                                      index,
-                                                      blockIndex,
-                                                      gridItemIndex,
-                                                      { buttonUrl: event.target.value }
-                                                    )
-                                                  }
-                                                />
-                                              </label>
-                                            </div>
-                                          </div>
-                                        </div>
-                                      ))}
-                                    </details>
-                                  )}
-                                </>
-                              ) : block.kind === "products" ? (
-                                <>
-                                  <label className="builder-field">
-                                    <span>Block Title</span>
-                                    <input
-                                      value={block.title ?? ""}
-                                      onChange={(event) =>
-                                        updateSelectedLayoutBlock(index, blockIndex, {
-                                          title: event.target.value,
-                                        })
-                                      }
-                                    />
-                                  </label>
-                                  <div className="builder-two-column">
-                                    <label className="builder-field">
-                                      <span>Columns</span>
-                                      <input
-                                        type="number"
-                                        min={1}
-                                        max={4}
-                                        value={block.columns ?? 2}
-                                        onChange={(event) =>
-                                          updateSelectedLayoutBlock(index, blockIndex, {
-                                            columns: Number(event.target.value),
-                                          })
-                                        }
-                                      />
-                                    </label>
-                                    <label className="builder-field">
-                                      <span>Limit</span>
-                                      <input
-                                        type="number"
-                                        min={2}
-                                        max={12}
-                                        value={block.gridLimit ?? 4}
-                                        onChange={(event) =>
-                                          updateSelectedLayoutBlock(index, blockIndex, {
-                                            gridLimit: Number(event.target.value),
-                                          })
-                                        }
-                                      />
-                                    </label>
-                                  </div>
-                                  <div className="builder-two-column">
-                                    <label className="builder-field">
-                                      <span>Source</span>
-                                      <select
-                                        value={block.source ?? "all"}
-                                        onChange={(event) =>
-                                          updateSelectedLayoutBlock(index, blockIndex, {
-                                            source: event.target
-                                              .value as BuilderLayoutBlock["source"],
-                                          })
-                                        }
-                                      >
-                                        <option value="all">All products</option>
-                                        <option value="featured">Featured</option>
-                                        <option value="category">Category</option>
-                                      </select>
-                                    </label>
-                                    <label className="builder-field">
-                                      <span>Layout Variant</span>
-                                      <select
-                                        value={block.layoutVariant ?? "grid"}
-                                        onChange={(event) =>
-                                          updateSelectedLayoutBlock(index, blockIndex, {
-                                            layoutVariant: event.target
-                                              .value as BuilderLayoutBlock["layoutVariant"],
-                                          })
-                                        }
-                                      >
-                                        <option value="grid">Grid</option>
-                                        <option value="carousel">Carousel</option>
-                                      </select>
-                                    </label>
-                                  </div>
-                                  {block.source === "category" && (
-                                    <label className="builder-field">
-                                      <span>Category Slug / ID</span>
-                                      <input
-                                        value={block.categoryId ?? ""}
-                                        onChange={(event) =>
-                                          updateSelectedLayoutBlock(index, blockIndex, {
-                                            categoryId: event.target.value,
-                                          })
-                                        }
-                                      />
-                                    </label>
-                                  )}
-                                  <label className="builder-field">
-                                    <span>Filter Position</span>
-                                    <select
-                                      value={block.filterPosition ?? "left"}
-                                      onChange={(event) =>
-                                        updateSelectedLayoutBlock(index, blockIndex, {
-                                          filterPosition: event.target
-                                            .value as BuilderLayoutBlock["filterPosition"],
-                                        })
-                                      }
-                                    >
-                                      <option value="left">Left sidebar</option>
-                                      <option value="top">Top pills</option>
-                                      <option value="drawer">Drawer</option>
-                                      <option value="hidden">Hidden</option>
-                                    </select>
-                                  </label>
-                                  <label className="builder-field">
-                                    <span>Card Style</span>
-                                    <select
-                                      value={block.cardStyle ?? "flat"}
-                                      onChange={(event) =>
-                                        updateSelectedLayoutBlock(index, blockIndex, {
-                                          cardStyle: event.target
-                                            .value as BuilderLayoutBlock["cardStyle"],
-                                        })
-                                      }
-                                    >
-                                      <option value="flat">Flat</option>
-                                      <option value="soft">Soft</option>
-                                      <option value="lined">Lined</option>
-                                      <option value="none">No background</option>
-                                    </select>
-                                  </label>
-                                  <label className="builder-field">
-                                    <span>Card Preset</span>
-                                    <select
-                                      value={block.cardPreset ?? "standard"}
-                                      onChange={(event) =>
-                                        updateSelectedLayoutBlock(index, blockIndex, {
-                                          cardPreset: event.target
-                                            .value as BuilderLayoutBlock["cardPreset"],
-                                        })
-                                      }
-                                    >
-                                      <option value="standard">Standard</option>
-                                      <option value="graph">Graph Clean</option>
-                                      <option value="gallery">Gallery</option>
-                                      <option value="editorial">Editorial</option>
-                                      <option value="compact">Compact</option>
-                                      <option value="minimal">Minimal</option>
-                                      <option value="luxury">Luxury</option>
-                                    </select>
-                                  </label>
-                                  <details className="builder-collapse" open>
-                                    <summary>Product Grid Spacing</summary>
-                                    <div className="builder-two-column">
-                                      <label className="builder-field">
-                                        <span>Grid Gap</span>
-                                        <select
-                                          value={block.gridGap ?? "medium"}
-                                          onChange={(event) =>
-                                            updateSelectedLayoutBlock(index, blockIndex, {
-                                              gridGap: event.target
-                                                .value as BuilderLayoutBlock["gridGap"],
-                                            })
-                                          }
-                                        >
-                                          <option value="none">None</option>
-                                          <option value="small">Small</option>
-                                          <option value="medium">Medium</option>
-                                          <option value="large">Large</option>
-                                          <option value="max">Max</option>
-                                        </select>
-                                      </label>
-                                      <label className="builder-field">
-                                        <span>Outer Margin</span>
-                                        <select
-                                          value={block.gridMargin ?? "none"}
-                                          onChange={(event) =>
-                                            updateSelectedLayoutBlock(index, blockIndex, {
-                                              gridMargin: event.target
-                                                .value as BuilderLayoutBlock["gridMargin"],
-                                            })
-                                          }
-                                        >
-                                          <option value="none">None</option>
-                                          <option value="small">Small</option>
-                                          <option value="medium">Medium</option>
-                                          <option value="large">Large</option>
-                                        </select>
-                                      </label>
-                                    </div>
-                                    <div className="builder-two-column">
-                                      <label className="builder-field">
-                                        <span>Card Padding</span>
-                                        <select
-                                          value={block.cardPadding ?? "medium"}
-                                          onChange={(event) =>
-                                            updateSelectedLayoutBlock(index, blockIndex, {
-                                              cardPadding: event.target
-                                                .value as BuilderLayoutBlock["cardPadding"],
-                                            })
-                                          }
-                                        >
-                                          <option value="none">None</option>
-                                          <option value="small">Small</option>
-                                          <option value="medium">Medium</option>
-                                          <option value="large">Large</option>
-                                          <option value="max">Max</option>
-                                        </select>
-                                      </label>
-                                      <label className="builder-field">
-                                        <span>Image Padding</span>
-                                        <select
-                                          value={block.imagePadding ?? "large"}
-                                          onChange={(event) =>
-                                            updateSelectedLayoutBlock(index, blockIndex, {
-                                              imagePadding: event.target
-                                                .value as BuilderLayoutBlock["imagePadding"],
-                                            })
-                                          }
-                                        >
-                                          <option value="none">Frameless</option>
-                                          <option value="small">Small</option>
-                                          <option value="medium">Medium</option>
-                                          <option value="large">Large</option>
-                                          <option value="max">Max</option>
-                                        </select>
-                                      </label>
-                                    </div>
-                                    <label className="builder-field">
-                                      <span>Image Frame</span>
-                                      <select
-                                        value={block.gridImageFrame ?? "none"}
-                                        onChange={(event) =>
-                                          updateSelectedLayoutBlock(index, blockIndex, {
-                                            gridImageFrame: event.target
-                                              .value as BuilderLayoutBlock["gridImageFrame"],
-                                          })
-                                        }
-                                      >
-                                        <option value="none">None / clean</option>
-                                        <option value="soft">Soft frame</option>
-                                      </select>
-                                    </label>
-                                  </details>
-                                </>
-                              ) : block.kind === "productGallery" ? (
-                                <>
-                                  <div className="builder-dynamic-field-note">
-                                    <strong>Dynamic Product Gallery</strong>
-                                    <span>
-                                      Uses images from the current WooCommerce product.
-                                    </span>
-                                  </div>
-                                  <label className="builder-field">
-                                    <span>Show Thumbnails</span>
-                                    <select
-                                      value={block.galleryShowThumbnails === false ? "no" : "yes"}
-                                      onChange={(event) =>
-                                        updateSelectedLayoutBlock(index, blockIndex, {
-                                          galleryShowThumbnails: event.target.value === "yes",
-                                        })
-                                      }
-                                    >
-                                      <option value="yes">Yes</option>
-                                      <option value="no">No</option>
-                                    </select>
-                                  </label>
-                                  <label className="builder-field">
-                                    <span>Thumbnail Position</span>
-                                    <select
-                                      value={block.galleryThumbnailPosition ?? "bottom"}
-                                      onChange={(event) =>
-                                        updateSelectedLayoutBlock(index, blockIndex, {
-                                          galleryThumbnailPosition: event.target
-                                            .value as BuilderLayoutBlock["galleryThumbnailPosition"],
-                                        })
-                                      }
-                                    >
-                                      <option value="bottom">Bottom</option>
-                                      <option value="left">Left</option>
-                                    </select>
-                                  </label>
-                                  <label className="builder-field">
-                                    <span>Image Fit</span>
-                                    <select
-                                      value={block.galleryImageFit ?? "contain"}
-                                      onChange={(event) =>
-                                        updateSelectedLayoutBlock(index, blockIndex, {
-                                          galleryImageFit: event.target
-                                            .value as BuilderLayoutBlock["galleryImageFit"],
-                                        })
-                                      }
-                                    >
-                                      <option value="contain">Contain</option>
-                                      <option value="cover">Cover</option>
-                                    </select>
-                                  </label>
-                                  <label className="builder-field">
-                                    <span>Gallery Height</span>
-                                    <input
-                                      type="number"
-                                      min={220}
-                                      max={900}
-                                      value={block.galleryHeight ?? 420}
-                                      onChange={(event) =>
-                                        updateSelectedLayoutBlock(index, blockIndex, {
-                                          galleryHeight: Number(event.target.value),
-                                        })
-                                      }
-                                    />
-                                  </label>
-                                </>
-                              ) : block.kind === "categoryFilters" ||
-                                block.kind === "breadcrumbs" ? (
-                                <>
-                                  <div className="builder-dynamic-field-note">
-                                    <strong>Dynamic Store Element</strong>
-                                    <span>
-                                      This element renders live storefront data in
-                                      the published page.
-                                    </span>
-                                  </div>
-                                  <label className="builder-field">
-                                    <span>Editor Label</span>
-                                    <input
-                                      value={block.title ?? ""}
-                                      onChange={(event) =>
-                                        updateSelectedLayoutBlock(index, blockIndex, {
-                                          title: event.target.value,
-                                        })
-                                      }
-                                    />
-                                  </label>
-                                  <label className="builder-field">
-                                    <span>Editor Note</span>
-                                    <textarea
-                                      rows={2}
-                                      value={block.body ?? ""}
-                                      onChange={(event) =>
-                                        updateSelectedLayoutBlock(index, blockIndex, {
-                                          body: event.target.value,
-                                        })
-                                      }
-                                    />
-                                  </label>
-                                </>
-                              ) : block.kind?.startsWith("product") ? (
-                                <>
-                                  <div className="builder-dynamic-field-note">
-                                    <strong>Dynamic Product Field</strong>
-                                    <span>
-                                      This element reads from the current WooCommerce
-                                      product on the live product page.
-                                    </span>
-                                  </div>
-                                  <label className="builder-field">
-                                    <span>Editor Label</span>
-                                    <input
-                                      value={block.title ?? ""}
-                                      onChange={(event) =>
-                                        updateSelectedLayoutBlock(index, blockIndex, {
-                                          title: event.target.value,
-                                        })
-                                      }
-                                    />
-                                  </label>
-                                  <label className="builder-field">
-                                    <span>Editor Note</span>
-                                    <textarea
-                                      rows={2}
-                                      value={block.body ?? ""}
-                                      onChange={(event) =>
-                                        updateSelectedLayoutBlock(index, blockIndex, {
-                                          body: event.target.value,
-                                        })
-                                      }
-                                    />
-                                  </label>
-                                </>
-                              ) : block.kind === "slider" ? (
-                                <>
-                                  <label className="builder-field">
-                                    <span>Block Title</span>
-                                    <input
-                                      value={block.title ?? ""}
-                                      onChange={(event) =>
-                                        updateSelectedLayoutBlock(index, blockIndex, {
-                                          title: event.target.value,
-                                        })
-                                      }
-                                    />
-                                  </label>
-                                  <label className="builder-field">
-                                    <span>Body</span>
-                                    <textarea
-                                      rows={3}
-                                      value={block.body ?? ""}
-                                      onChange={(event) =>
-                                        updateSelectedLayoutBlock(index, blockIndex, {
-                                          body: event.target.value,
-                                        })
-                                      }
-                                    />
-                                  </label>
-                                  <div className="builder-two-column">
-                                    <label className="builder-field">
-                                      <span>Cards Per View</span>
-                                      <input
-                                        type="number"
-                                        min={1}
-                                        max={3}
-                                        value={block.carouselSettings?.cardsPerView ?? 1}
-                                        onChange={(event) =>
-                                          updateSelectedLayoutBlock(index, blockIndex, {
-                                            carouselSettings: {
-                                              ...(block.carouselSettings ?? {}),
-                                              cardsPerView: Number(event.target.value),
-                                            },
-                                          })
-                                        }
-                                      />
-                                    </label>
-                                    <label className="builder-field">
-                                      <span>Autoplay Delay</span>
-                                      <input
-                                        type="number"
-                                        min={2000}
-                                        max={30000}
-                                        step={500}
-                                        value={
-                                          block.carouselSettings?.autoplayDelayMs ?? 5000
-                                        }
-                                        onChange={(event) =>
-                                          updateSelectedLayoutBlock(index, blockIndex, {
-                                            carouselSettings: {
-                                              ...(block.carouselSettings ?? {}),
-                                              autoplayDelayMs: Number(event.target.value),
-                                            },
-                                          })
-                                        }
-                                      />
-                                    </label>
-                                  </div>
-                                  <div className="builder-slider-options">
-                                    {[
-                                      ["autoplay", "Autoplay"],
-                                      ["showArrows", "Arrows"],
-                                      ["showDots", "Dots"],
-                                      ["dragFree", "Drag free"],
-                                      ["pauseOnHover", "Pause hover"],
-                                    ].map(([key, label]) => (
-                                      <label key={key} className="builder-check">
-                                        <input
-                                          type="checkbox"
-                                          checked={Boolean(
-                                            block.carouselSettings?.[
-                                              key as keyof NonNullable<
-                                                BuilderLayoutBlock["carouselSettings"]
-                                              >
-                                            ] ??
-                                              (key === "dragFree" ||
-                                              key === "autoplay"
-                                                ? false
-                                                : true)
-                                          )}
-                                          onChange={(event) =>
-                                            updateSelectedLayoutBlock(index, blockIndex, {
-                                              carouselSettings: {
-                                                ...(block.carouselSettings ?? {}),
-                                                [key]: event.target.checked,
-                                              },
-                                            })
-                                          }
-                                        />
-                                        <span>{label}</span>
-                                      </label>
-                                    ))}
-                                  </div>
-                                  <div className="builder-section-heading">
-                                    <span>Slider Slides</span>
-                                    <span>{block.slides?.length ?? 0}</span>
-                                  </div>
-                                  <button
-                                    type="button"
-                                    className="builder-inline-add"
-                                    onClick={() =>
-                                      addSelectedLayoutBlockSlide(index, blockIndex)
+                              </div>
+                              <div className="builder-two-column">
+                                <label className="builder-field">
+                                  <span>Display</span>
+                                  <select
+                                    value={
+                                      selectedSection.addToCartDisplay ??
+                                      "button"
+                                    }
+                                    onChange={(event) =>
+                                      updateSelected({
+                                        addToCartDisplay: event.target
+                                          .value as BuilderSection["addToCartDisplay"],
+                                      })
                                     }
                                   >
-                                    <Plus size={15} />
-                                    Add slide
-                                  </button>
-                                  {(block.slides ?? []).map((slide, slideIndex) => {
-                                    const slideKey =
-                                      slide.id ??
-                                      `${blockKey}-nested-slide-${slideIndex}`;
-                                    const isSlideOpen = openSlideId === slideKey;
+                                    <option value="button">Text button</option>
+                                    <option value="icon">Cart icon</option>
+                                  </select>
+                                </label>
+                                <label className="builder-field">
+                                  <span>Visibility</span>
+                                  <select
+                                    value={
+                                      selectedSection.addToCartVisibility ??
+                                      "hover"
+                                    }
+                                    onChange={(event) =>
+                                      updateSelected({
+                                        addToCartVisibility: event.target
+                                          .value as BuilderSection["addToCartVisibility"],
+                                      })
+                                    }
+                                  >
+                                    <option value="hover">On hover</option>
+                                    <option value="always">
+                                      Always visible
+                                    </option>
+                                  </select>
+                                </label>
+                              </div>
+                              <div className="builder-two-column">
+                                <label className="builder-field">
+                                  <span>Position</span>
+                                  <select
+                                    value={
+                                      selectedSection.addToCartPosition ??
+                                      "below"
+                                    }
+                                    onChange={(event) =>
+                                      updateSelected({
+                                        addToCartPosition: event.target
+                                          .value as BuilderSection["addToCartPosition"],
+                                      })
+                                    }
+                                  >
+                                    <option value="below">Below details</option>
+                                    <option value="under-price">
+                                      Under price
+                                    </option>
+                                    <option value="under-wishlist">
+                                      Under wishlist
+                                    </option>
+                                  </select>
+                                </label>
+                                <div className="builder-field">
+                                  <span>Best with</span>
+                                  <small>
+                                    Icon works nicely under wishlist
+                                  </small>
+                                </div>
+                              </div>
+                            </details>
+                          </>
+                        )}
 
+                      {selectedSection.kind === "badgeGrid" && (
+                        <>
+                          <label className="builder-field">
+                            <span>Columns</span>
+                            <input
+                              type="number"
+                              min={2}
+                              max={4}
+                              value={selectedSection.columns ?? 3}
+                              onChange={(event) =>
+                                updateSelected({
+                                  columns: Number(event.target.value),
+                                })
+                              }
+                            />
+                          </label>
+
+                          <div className="builder-section-heading">
+                            <span>Badges</span>
+                            <span>{selectedSection.badges?.length ?? 0}</span>
+                          </div>
+
+                          {(selectedSection.badges ?? []).map(
+                            (badge, index) => (
+                              <div
+                                key={badge.id ?? index}
+                                className="builder-nested-card"
+                              >
+                                <label className="builder-field">
+                                  <span>Badge Label</span>
+                                  <input
+                                    value={badge.label ?? ""}
+                                    onChange={(event) =>
+                                      updateSelectedBadge(index, {
+                                        label: event.target.value,
+                                      })
+                                    }
+                                  />
+                                </label>
+                                <label className="builder-field">
+                                  <span>Badge Title</span>
+                                  <input
+                                    value={badge.title ?? ""}
+                                    onChange={(event) =>
+                                      updateSelectedBadge(index, {
+                                        title: event.target.value,
+                                      })
+                                    }
+                                  />
+                                </label>
+                                <label className="builder-field">
+                                  <span>Badge Body</span>
+                                  <textarea
+                                    rows={3}
+                                    value={badge.body ?? ""}
+                                    onChange={(event) =>
+                                      updateSelectedBadge(index, {
+                                        body: event.target.value,
+                                      })
+                                    }
+                                  />
+                                </label>
+                              </div>
+                            ),
+                          )}
+                        </>
+                      )}
+
+                      {selectedSection.kind === "contentLayout" && (
+                        <>
+                          {selectedLayoutBlock && (
+                            <div className="builder-element-inspector-note">
+                              <strong>Element Settings</strong>
+                              <span>
+                                You are editing the selected element only.
+                                Section layout, spacing, and background stay in
+                                Section Settings.
+                              </span>
+                            </div>
+                          )}
+                          {!selectedLayoutBlock && (
+                            <label className="builder-field">
+                              <span>Layout Columns</span>
+                              <select
+                                value={selectedSection.layoutColumns ?? 2}
+                                onChange={(event) =>
+                                  updateSelected({
+                                    layoutColumns: Number(event.target.value),
+                                  })
+                                }
+                              >
+                                <option value={1}>Full width</option>
+                                <option value={2}>2 columns</option>
+                                <option value={3}>3 columns</option>
+                                <option value={4}>4 columns</option>
+                                <option value={5}>5 columns</option>
+                                <option value={6}>6 columns</option>
+                              </select>
+                            </label>
+                          )}
+
+                          {!selectedLayoutBlock && (
+                            <details
+                              className="builder-collapse builder-structure-summary"
+                              open={sectionStructureOpen}
+                              onToggle={(event) =>
+                                setSectionStructureOpen(
+                                  (event.currentTarget as HTMLDetailsElement)
+                                    .open,
+                                )
+                              }
+                            >
+                              <summary>
+                                <span>Columns</span>
+                                <small>
+                                  {selectedSection.layoutItems?.length ?? 0}
+                                </small>
+                              </summary>
+                              <div className="builder-structure-note">
+                                Select an element in the canvas to edit it. This
+                                area only manages the section grid itself.
+                              </div>
+                              <button
+                                type="button"
+                                className="builder-inline-add"
+                                onClick={addSelectedLayoutItem}
+                              >
+                                <Plus size={15} />
+                                Add column
+                              </button>
+                              <div className="builder-compact-column-list">
+                                {(selectedSection.layoutItems ?? []).map(
+                                  (item, index) => {
+                                    const itemKey =
+                                      item.id ?? `layout-item-${index}`;
+                                    const blocks = getLayoutItemBlocks(item);
                                     return (
                                       <div
-                                        key={slideKey}
-                                        className={`builder-nested-card ${
-                                          isSlideOpen ? "is-open" : ""
-                                        }`}
+                                        key={itemKey}
+                                        className="builder-compact-column-row"
                                       >
-                                        <div className="builder-nested-card-header">
-                                          <button
-                                            type="button"
-                                            className="builder-slide-toggle"
-                                            onClick={() =>
-                                              setOpenSlideId(
-                                                isSlideOpen ? null : slideKey
-                                              )
-                                            }
-                                          >
-                                            <span>Slide {slideIndex + 1}</span>
-                                            <small>
-                                              {slide.title || "Untitled slide"}
-                                            </small>
-                                          </button>
-                                          <button
-                                            type="button"
-                                            onClick={() =>
-                                              deleteSelectedLayoutBlockSlide(
-                                                index,
-                                                blockIndex,
-                                                slideIndex
-                                              )
-                                            }
-                                            title="Delete slide"
-                                          >
-                                            <Trash2 size={14} />
-                                          </button>
+                                        <div>
+                                          <strong>Column {index + 1}</strong>
+                                          <span>{blocks.length} elements</span>
                                         </div>
-                                        {isSlideOpen && (
-                                          <div className="builder-nested-card-body">
-                                            <label className="builder-field">
-                                              <span>Slide Badge</span>
-                                              <input
-                                                value={slide.badge ?? ""}
-                                                onChange={(event) =>
-                                                  updateSelectedLayoutBlockSlide(
-                                                    index,
-                                                    blockIndex,
-                                                    slideIndex,
-                                                    { badge: event.target.value }
-                                                  )
-                                                }
-                                              />
-                                            </label>
-                                            <label className="builder-field">
-                                              <span>Slide Title</span>
-                                              <input
-                                                value={slide.title ?? ""}
-                                                onChange={(event) =>
-                                                  updateSelectedLayoutBlockSlide(
-                                                    index,
-                                                    blockIndex,
-                                                    slideIndex,
-                                                    { title: event.target.value }
-                                                  )
-                                                }
-                                              />
-                                            </label>
-                                            <label className="builder-field">
-                                              <span>Slide Text</span>
-                                              <textarea
-                                                rows={3}
-                                                value={slide.text ?? ""}
-                                                onChange={(event) =>
-                                                  updateSelectedLayoutBlockSlide(
-                                                    index,
-                                                    blockIndex,
-                                                    slideIndex,
-                                                    { text: event.target.value }
-                                                  )
-                                                }
-                                              />
-                                            </label>
-                                            <label className="builder-field">
-                                              <span>Image URL</span>
-                                              <input
-                                                value={slide.imageUrl ?? ""}
-                                                placeholder="https://... or /uploads/image.jpg"
-                                                onChange={(event) =>
-                                                  updateSelectedLayoutBlockSlide(
-                                                    index,
-                                                    blockIndex,
-                                                    slideIndex,
-                                                    { imageUrl: event.target.value }
-                                                  )
-                                                }
-                                              />
-                                            </label>
-                                            <label className="builder-upload-field">
-                                              <span>Upload Image</span>
-                                              <input
-                                                type="file"
-                                                accept="image/jpeg,image/png,image/webp,image/gif,image/svg+xml"
-                                                onChange={(event) => {
-                                                  void uploadSelectedLayoutBlockSlideImage(
-                                                    index,
-                                                    blockIndex,
-                                                    slideIndex,
-                                                    event.target.files?.[0] ?? null
-                                                  );
-                                                  event.target.value = "";
-                                                }}
-                                              />
-                                              <small>
-                                                {uploadingNestedSlide ===
-                                                `${index}-${blockIndex}-${slideIndex}`
-                                                  ? "Uploading..."
-                                                  : "Saved to /uploads/builder"}
-                                              </small>
-                                            </label>
-                                            <label className="builder-field">
-                                              <span>Image Alt Text</span>
-                                              <input
-                                                value={slide.imageAlt ?? ""}
-                                                onChange={(event) =>
-                                                  updateSelectedLayoutBlockSlide(
-                                                    index,
-                                                    blockIndex,
-                                                    slideIndex,
-                                                    { imageAlt: event.target.value }
-                                                  )
-                                                }
-                                              />
-                                            </label>
-                                            <label className="builder-field">
-                                              <span>Image To Panel Padding</span>
-                                              <select
-                                                value={slide.imagePadding ?? "medium"}
-                                                onChange={(event) =>
-                                                  updateSelectedLayoutBlockSlide(
-                                                    index,
-                                                    blockIndex,
-                                                    slideIndex,
-                                                    {
-                                                      imagePadding: event.target
-                                                        .value as SlideImagePadding,
-                                                    }
-                                                  )
-                                                }
-                                              >
-                                                <option value="frameless">
-                                                  Frameless
-                                                </option>
-                                                <option value="small">Small</option>
-                                                <option value="medium">Medium</option>
-                                                <option value="max">Max</option>
-                                              </select>
-                                            </label>
-                                            <label className="builder-field">
-                                              <span>Button Label</span>
-                                              <input
-                                                value={slide.buttonLabel ?? ""}
-                                                onChange={(event) =>
-                                                  updateSelectedLayoutBlockSlide(
-                                                    index,
-                                                    blockIndex,
-                                                    slideIndex,
-                                                    { buttonLabel: event.target.value }
-                                                  )
-                                                }
-                                              />
-                                            </label>
-                                            <label className="builder-field">
-                                              <span>Button URL</span>
-                                              <input
-                                                value={slide.buttonUrl ?? ""}
-                                                onChange={(event) =>
-                                                  updateSelectedLayoutBlockSlide(
-                                                    index,
-                                                    blockIndex,
-                                                    slideIndex,
-                                                    { buttonUrl: event.target.value }
-                                                  )
-                                                }
-                                              />
-                                            </label>
-                                          </div>
-                                        )}
-                                      </div>
-                                    );
-                                  })}
-                                </>
-                              ) : block.kind === "icon" ? (
-                                <>
-                                  <label className="builder-field">
-                                    <span>Icon</span>
-                                    <select
-                                      value={block.iconName ?? "sparkles"}
-                                      onChange={(event) =>
-                                        updateSelectedLayoutBlock(index, blockIndex, {
-                                          iconName: event.target
-                                            .value as BuilderLayoutBlock["iconName"],
-                                        })
-                                      }
-                                    >
-                                      <option value="sparkles">Sparkles</option>
-                                      <option value="heart">Heart</option>
-                                      <option value="truck">Truck</option>
-                                      <option value="shield">Shield</option>
-                                    </select>
-                                  </label>
-                                  <label className="builder-field">
-                                    <span>Title</span>
-                                    <input
-                                      value={block.title ?? ""}
-                                      onChange={(event) =>
-                                        updateSelectedLayoutBlock(index, blockIndex, {
-                                          title: event.target.value,
-                                        })
-                                      }
-                                    />
-                                  </label>
-                                  <label className="builder-field">
-                                    <span>Text</span>
-                                    <textarea
-                                      rows={3}
-                                      value={block.body ?? ""}
-                                      onChange={(event) =>
-                                        updateSelectedLayoutBlock(index, blockIndex, {
-                                          body: event.target.value,
-                                        })
-                                      }
-                                    />
-                                  </label>
-                                </>
-                              ) : block.kind === "list" ? (
-                                <>
-                                  <label className="builder-field">
-                                    <span>Title</span>
-                                    <input
-                                      value={block.title ?? ""}
-                                      onChange={(event) =>
-                                        updateSelectedLayoutBlock(index, blockIndex, {
-                                          title: event.target.value,
-                                        })
-                                      }
-                                    />
-                                  </label>
-                                  <label className="builder-field">
-                                    <span>Items</span>
-                                    <textarea
-                                      rows={5}
-                                      value={(block.items ?? []).join("\n")}
-                                      onChange={(event) =>
-                                        updateSelectedLayoutBlock(index, blockIndex, {
-                                          items: event.target.value
-                                            .split("\n")
-                                            .map((item) => item.trim())
-                                            .filter(Boolean),
-                                        })
-                                      }
-                                    />
-                                  </label>
-                                </>
-                              ) : block.kind === "datePicker" ? (
-                                <>
-                                  <label className="builder-field">
-                                    <span>Title</span>
-                                    <input
-                                      value={block.title ?? ""}
-                                      onChange={(event) =>
-                                        updateSelectedLayoutBlock(index, blockIndex, {
-                                          title: event.target.value,
-                                        })
-                                      }
-                                    />
-                                  </label>
-                                  <label className="builder-field">
-                                    <span>Field Label</span>
-                                    <input
-                                      value={block.dateLabel ?? ""}
-                                      onChange={(event) =>
-                                        updateSelectedLayoutBlock(index, blockIndex, {
-                                          dateLabel: event.target.value,
-                                        })
-                                      }
-                                    />
-                                  </label>
-                                  <label className="builder-field">
-                                    <span>Help Text</span>
-                                    <textarea
-                                      rows={3}
-                                      value={block.body ?? ""}
-                                      onChange={(event) =>
-                                        updateSelectedLayoutBlock(index, blockIndex, {
-                                          body: event.target.value,
-                                        })
-                                      }
-                                    />
-                                  </label>
-                                </>
-                              ) : block.kind === "badgeGrid" ? (
-                                <>
-                                  <label className="builder-field">
-                                    <span>Block Title</span>
-                                    <input
-                                      value={block.title ?? ""}
-                                      onChange={(event) =>
-                                        updateSelectedLayoutBlock(index, blockIndex, {
-                                          title: event.target.value,
-                                        })
-                                      }
-                                    />
-                                  </label>
-                                  <label className="builder-field">
-                                    <span>Body</span>
-                                    <textarea
-                                      rows={3}
-                                      value={block.body ?? ""}
-                                      onChange={(event) =>
-                                        updateSelectedLayoutBlock(index, blockIndex, {
-                                          body: event.target.value,
-                                        })
-                                      }
-                                    />
-                                  </label>
-                                  {block.kind === "badgeGrid" && (
-                                    <label className="builder-field">
-                                      <span>Badge Columns</span>
-                                      <input
-                                        type="number"
-                                        min={1}
-                                        max={3}
-                                        value={block.columns ?? 2}
-                                        onChange={(event) =>
-                                          updateSelectedLayoutBlock(index, blockIndex, {
-                                            columns: Number(event.target.value),
-                                          })
-                                        }
-                                      />
-                                    </label>
-                                  )}
-                                  <div className="builder-section-heading">
-                                    <span>Badges</span>
-                                    <span>{block.badges?.length ?? 0}</span>
-                                  </div>
-                                  <button
-                                    type="button"
-                                    className="builder-inline-add"
-                                    onClick={() =>
-                                      addSelectedLayoutBlockBadge(index, blockIndex)
-                                    }
-                                  >
-                                    <Plus size={15} />
-                                    Add badge
-                                  </button>
-                                  {(block.badges ?? []).map((badge, badgeIndex) => (
-                                    <div
-                                      key={badge.id ?? `${blockKey}-badge-${badgeIndex}`}
-                                      className="builder-nested-card is-open"
-                                    >
-                                      <div className="builder-nested-card-header">
-                                        <span>Badge {badgeIndex + 1}</span>
                                         <button
                                           type="button"
                                           onClick={() =>
-                                            deleteSelectedLayoutBlockBadge(
-                                              index,
-                                              blockIndex,
-                                              badgeIndex
-                                            )
+                                            deleteSelectedLayoutItem(index)
                                           }
-                                          title="Delete badge"
+                                          title="Delete column"
                                         >
                                           <Trash2 size={14} />
                                         </button>
                                       </div>
-                                      <div className="builder-nested-card-body">
-                                        <label className="builder-field">
-                                          <span>Label</span>
-                                          <input
-                                            value={badge.label ?? ""}
-                                            onChange={(event) =>
-                                              updateSelectedLayoutBlockBadge(
-                                                index,
-                                                blockIndex,
-                                                badgeIndex,
-                                                { label: event.target.value }
-                                              )
-                                            }
-                                          />
-                                        </label>
-                                        <label className="builder-field">
-                                          <span>Title</span>
-                                          <input
-                                            value={badge.title ?? ""}
-                                            onChange={(event) =>
-                                              updateSelectedLayoutBlockBadge(
-                                                index,
-                                                blockIndex,
-                                                badgeIndex,
-                                                { title: event.target.value }
-                                              )
-                                            }
-                                          />
-                                        </label>
-                                        <label className="builder-field">
-                                          <span>Text</span>
-                                          <textarea
-                                            rows={3}
-                                            value={badge.body ?? ""}
-                                            onChange={(event) =>
-                                              updateSelectedLayoutBlockBadge(
-                                                index,
-                                                blockIndex,
-                                                badgeIndex,
-                                                { body: event.target.value }
-                                              )
-                                            }
-                                          />
-                                        </label>
-                                      </div>
+                                    );
+                                  },
+                                )}
+                              </div>
+                            </details>
+                          )}
+
+                          {(selectedSection.layoutItems ?? []).map(
+                            (item, index) => {
+                              if (!selectedLayoutBlock) {
+                                return null;
+                              }
+                              if (
+                                selectedLayoutBlock &&
+                                !(item.blocks ?? []).some(
+                                  (block) =>
+                                    block.id === selectedLayoutBlockKey,
+                                )
+                              ) {
+                                return null;
+                              }
+                              const itemKey = item.id ?? `layout-item-${index}`;
+                              const isOpen =
+                                Boolean(selectedLayoutBlock) ||
+                                openLayoutItemId === itemKey;
+                              const blocks = getLayoutItemBlocks(item);
+                              const columnLabel =
+                                blocks[0]?.title ||
+                                item.title ||
+                                `${blocks.length} blocks`;
+
+                              return (
+                                <div
+                                  key={itemKey}
+                                  className={`builder-nested-card ${isOpen ? "is-open" : ""} ${
+                                    selectedLayoutBlock
+                                      ? "is-element-focus-card"
+                                      : ""
+                                  }`}
+                                >
+                                  {isOpen && (
+                                    <div className="builder-nested-card-body">
+                                      {blocks.length === 0 && (
+                                        <div className="builder-mini-empty">
+                                          Select this column in the preview,
+                                          then drag an element from the Element
+                                          Library.
+                                        </div>
+                                      )}
+
+                                      {blocks.map((block, blockIndex) => {
+                                        const blockKey =
+                                          block.id ??
+                                          `${itemKey}-block-${blockIndex}`;
+                                        const isSelectedBlock =
+                                          selectedLayoutBlockKey === blockKey;
+
+                                        return (
+                                          <div
+                                            key={blockKey}
+                                            className={`builder-layout-block-card ${
+                                              isSelectedBlock
+                                                ? "is-selected"
+                                                : ""
+                                            } ${selectedLayoutBlock ? "is-element-focus-block" : ""}`}
+                                          >
+                                            <div className="builder-layout-block-header">
+                                              <span>
+                                                {layoutBlockLabels[
+                                                  block.kind ?? "text"
+                                                ] ?? "Block"}
+                                              </span>
+                                              <button
+                                                type="button"
+                                                onClick={() =>
+                                                  deleteSelectedLayoutBlock(
+                                                    index,
+                                                    blockIndex,
+                                                  )
+                                                }
+                                                title="Delete block"
+                                              >
+                                                <Trash2 size={13} />
+                                              </button>
+                                            </div>
+
+                                            <details className="builder-collapse">
+                                              <summary>
+                                                <span>Element Surface</span>
+                                                <small>
+                                                  {block.elementBackgroundMode ??
+                                                    "default"}
+                                                </small>
+                                              </summary>
+                                              <label className="builder-field">
+                                                <span>Background Mode</span>
+                                                <select
+                                                  value={
+                                                    block.elementBackgroundMode ??
+                                                    "default"
+                                                  }
+                                                  onChange={(event) =>
+                                                    updateSelectedLayoutBlock(
+                                                      index,
+                                                      blockIndex,
+                                                      {
+                                                        elementBackgroundMode:
+                                                          event.target
+                                                            .value as BuilderLayoutBlock["elementBackgroundMode"],
+                                                      },
+                                                    )
+                                                  }
+                                                >
+                                                  <option value="default">
+                                                    Use element default
+                                                  </option>
+                                                  <option value="transparent">
+                                                    Transparent
+                                                  </option>
+                                                  <option value="custom">
+                                                    Custom color
+                                                  </option>
+                                                </select>
+                                              </label>
+                                              {block.elementBackgroundMode ===
+                                                "custom" && (
+                                                <label className="builder-field">
+                                                  <span>Background</span>
+                                                  <div className="builder-background-presets">
+                                                    {elementBackgroundPresets.map(
+                                                      (preset) => (
+                                                        <button
+                                                          key={preset.value}
+                                                          type="button"
+                                                          className={
+                                                            block.elementBackground?.toLowerCase() ===
+                                                            preset.value
+                                                              ? "is-active"
+                                                              : ""
+                                                          }
+                                                          onClick={() =>
+                                                            updateSelectedLayoutBlock(
+                                                              index,
+                                                              blockIndex,
+                                                              {
+                                                                elementBackground:
+                                                                  preset.value,
+                                                              },
+                                                            )
+                                                          }
+                                                        >
+                                                          <span
+                                                            style={{
+                                                              background:
+                                                                preset.value,
+                                                            }}
+                                                          />
+                                                          {preset.label}
+                                                        </button>
+                                                      ),
+                                                    )}
+                                                  </div>
+                                                  <div className="builder-color-row">
+                                                    <input
+                                                      type="color"
+                                                      value={
+                                                        block.elementBackground ??
+                                                        "#ffffff"
+                                                      }
+                                                      onChange={(event) =>
+                                                        updateSelectedLayoutBlock(
+                                                          index,
+                                                          blockIndex,
+                                                          {
+                                                            elementBackground:
+                                                              event.target
+                                                                .value,
+                                                          },
+                                                        )
+                                                      }
+                                                    />
+                                                    <input
+                                                      value={
+                                                        block.elementBackground ??
+                                                        "#ffffff"
+                                                      }
+                                                      onChange={(event) =>
+                                                        updateSelectedLayoutBlock(
+                                                          index,
+                                                          blockIndex,
+                                                          {
+                                                            elementBackground:
+                                                              event.target
+                                                                .value,
+                                                          },
+                                                        )
+                                                      }
+                                                    />
+                                                  </div>
+                                                </label>
+                                              )}
+                                              <label className="builder-field">
+                                                <span>Element Padding</span>
+                                                <select
+                                                  value={
+                                                    block.elementPadding ??
+                                                    "none"
+                                                  }
+                                                  onChange={(event) =>
+                                                    updateSelectedLayoutBlock(
+                                                      index,
+                                                      blockIndex,
+                                                      {
+                                                        elementPadding: event
+                                                          .target
+                                                          .value as BuilderLayoutBlock["elementPadding"],
+                                                      },
+                                                    )
+                                                  }
+                                                >
+                                                  <option value="none">
+                                                    None
+                                                  </option>
+                                                  <option value="small">
+                                                    Small
+                                                  </option>
+                                                  <option value="medium">
+                                                    Medium
+                                                  </option>
+                                                  <option value="large">
+                                                    Large
+                                                  </option>
+                                                </select>
+                                              </label>
+                                            </details>
+
+                                            {block.kind === "embed" ? (
+                                              <>
+                                                <label className="builder-field">
+                                                  <span>Block Title</span>
+                                                  <input
+                                                    value={block.title ?? ""}
+                                                    onChange={(event) =>
+                                                      updateSelectedLayoutBlock(
+                                                        index,
+                                                        blockIndex,
+                                                        {
+                                                          title:
+                                                            event.target.value,
+                                                        },
+                                                      )
+                                                    }
+                                                  />
+                                                </label>
+                                                <label className="builder-field">
+                                                  <span>Embed Mode</span>
+                                                  <select
+                                                    value={
+                                                      block.embedMode ?? "code"
+                                                    }
+                                                    onChange={(event) =>
+                                                      updateSelectedLayoutBlock(
+                                                        index,
+                                                        blockIndex,
+                                                        {
+                                                          embedMode: event
+                                                            .target
+                                                            .value as EmbedMode,
+                                                        },
+                                                      )
+                                                    }
+                                                  >
+                                                    <option value="code">
+                                                      Custom HTML / Script
+                                                    </option>
+                                                    <option value="iframe">
+                                                      Iframe URL
+                                                    </option>
+                                                  </select>
+                                                </label>
+                                                {block.embedMode ===
+                                                "iframe" ? (
+                                                  <label className="builder-field">
+                                                    <span>Iframe URL</span>
+                                                    <input
+                                                      value={
+                                                        block.embedUrl ?? ""
+                                                      }
+                                                      placeholder="https://..."
+                                                      onChange={(event) =>
+                                                        updateSelectedLayoutBlock(
+                                                          index,
+                                                          blockIndex,
+                                                          {
+                                                            embedUrl:
+                                                              event.target
+                                                                .value,
+                                                          },
+                                                        )
+                                                      }
+                                                    />
+                                                  </label>
+                                                ) : (
+                                                  <label className="builder-field">
+                                                    <span>HTML / Script</span>
+                                                    <textarea
+                                                      rows={5}
+                                                      value={
+                                                        block.embedCode ?? ""
+                                                      }
+                                                      onChange={(event) =>
+                                                        updateSelectedLayoutBlock(
+                                                          index,
+                                                          blockIndex,
+                                                          {
+                                                            embedCode:
+                                                              event.target
+                                                                .value,
+                                                          },
+                                                        )
+                                                      }
+                                                    />
+                                                  </label>
+                                                )}
+                                                <label className="builder-field">
+                                                  <span>Height</span>
+                                                  <input
+                                                    type="number"
+                                                    min={120}
+                                                    max={900}
+                                                    value={
+                                                      block.embedHeight ?? 260
+                                                    }
+                                                    onChange={(event) =>
+                                                      updateSelectedLayoutBlock(
+                                                        index,
+                                                        blockIndex,
+                                                        {
+                                                          embedHeight: Number(
+                                                            event.target.value,
+                                                          ),
+                                                        },
+                                                      )
+                                                    }
+                                                  />
+                                                </label>
+                                              </>
+                                            ) : block.kind === "fluentForm" ? (
+                                              <>
+                                                <label className="builder-field">
+                                                  <span>Block Title</span>
+                                                  <input
+                                                    value={block.title ?? ""}
+                                                    onChange={(event) =>
+                                                      updateSelectedLayoutBlock(
+                                                        index,
+                                                        blockIndex,
+                                                        {
+                                                          title:
+                                                            event.target.value,
+                                                        },
+                                                      )
+                                                    }
+                                                  />
+                                                </label>
+                                                <label className="builder-field">
+                                                  <span>Fluent Form ID</span>
+                                                  <input
+                                                    inputMode="numeric"
+                                                    value={
+                                                      block.fluentFormId ?? ""
+                                                    }
+                                                    placeholder="Example: 3"
+                                                    onChange={(event) =>
+                                                      updateSelectedLayoutBlock(
+                                                        index,
+                                                        blockIndex,
+                                                        {
+                                                          fluentFormId:
+                                                            event.target.value,
+                                                        },
+                                                      )
+                                                    }
+                                                  />
+                                                </label>
+                                                <div className="builder-dynamic-field-note">
+                                                  <strong>
+                                                    WordPress renderer required
+                                                  </strong>
+                                                  <span>
+                                                    Add the React Shop Fluent
+                                                    Forms snippet in WordPress,
+                                                    then this element can show
+                                                    the real Fluent Form.
+                                                  </span>
+                                                </div>
+                                              </>
+                                            ) : block.kind === "grid" ? (
+                                              <>
+                                                <label className="builder-field">
+                                                  <span>Content Source</span>
+                                                  <select
+                                                    value={
+                                                      block.gridSource ??
+                                                      "static"
+                                                    }
+                                                    onChange={(event) =>
+                                                      updateSelectedLayoutBlock(
+                                                        index,
+                                                        blockIndex,
+                                                        {
+                                                          gridSource: event
+                                                            .target
+                                                            .value as BuilderLayoutBlock["gridSource"],
+                                                        },
+                                                      )
+                                                    }
+                                                  >
+                                                    <option value="static">
+                                                      Static items
+                                                    </option>
+                                                    <option value="products">
+                                                      WooCommerce products
+                                                    </option>
+                                                  </select>
+                                                </label>
+                                                <div className="builder-two-column">
+                                                  <label className="builder-field">
+                                                    <span>Columns</span>
+                                                    <input
+                                                      type="number"
+                                                      min={1}
+                                                      max={6}
+                                                      value={block.columns ?? 3}
+                                                      onChange={(event) =>
+                                                        updateSelectedLayoutBlock(
+                                                          index,
+                                                          blockIndex,
+                                                          {
+                                                            columns: Number(
+                                                              event.target
+                                                                .value,
+                                                            ),
+                                                          },
+                                                        )
+                                                      }
+                                                    />
+                                                  </label>
+                                                  <label className="builder-field">
+                                                    <span>Rows</span>
+                                                    <input
+                                                      type="number"
+                                                      min={1}
+                                                      max={6}
+                                                      value={
+                                                        block.gridRows ?? 1
+                                                      }
+                                                      onChange={(event) =>
+                                                        updateSelectedLayoutBlock(
+                                                          index,
+                                                          blockIndex,
+                                                          {
+                                                            gridRows: Number(
+                                                              event.target
+                                                                .value,
+                                                            ),
+                                                          },
+                                                        )
+                                                      }
+                                                    />
+                                                  </label>
+                                                </div>
+                                                <div className="builder-two-column">
+                                                  <label className="builder-field">
+                                                    <span>Grid Gap</span>
+                                                    <select
+                                                      value={
+                                                        block.gridGap ??
+                                                        "medium"
+                                                      }
+                                                      onChange={(event) =>
+                                                        updateSelectedLayoutBlock(
+                                                          index,
+                                                          blockIndex,
+                                                          {
+                                                            gridGap: event
+                                                              .target
+                                                              .value as BuilderLayoutBlock["gridGap"],
+                                                          },
+                                                        )
+                                                      }
+                                                    >
+                                                      <option value="small">
+                                                        Small
+                                                      </option>
+                                                      <option value="medium">
+                                                        Medium
+                                                      </option>
+                                                      <option value="large">
+                                                        Large
+                                                      </option>
+                                                    </select>
+                                                  </label>
+                                                  <label className="builder-field">
+                                                    <span>Outer Margin</span>
+                                                    <select
+                                                      value={
+                                                        block.gridMargin ??
+                                                        "none"
+                                                      }
+                                                      onChange={(event) =>
+                                                        updateSelectedLayoutBlock(
+                                                          index,
+                                                          blockIndex,
+                                                          {
+                                                            gridMargin: event
+                                                              .target
+                                                              .value as BuilderLayoutBlock["gridMargin"],
+                                                          },
+                                                        )
+                                                      }
+                                                    >
+                                                      <option value="none">
+                                                        None
+                                                      </option>
+                                                      <option value="small">
+                                                        Small
+                                                      </option>
+                                                      <option value="medium">
+                                                        Medium
+                                                      </option>
+                                                      <option value="large">
+                                                        Large
+                                                      </option>
+                                                    </select>
+                                                  </label>
+                                                </div>
+                                                <div className="builder-two-column">
+                                                  <label className="builder-field">
+                                                    <span>Image Padding</span>
+                                                    <select
+                                                      value={
+                                                        block.gridImagePadding ??
+                                                        "frameless"
+                                                      }
+                                                      onChange={(event) =>
+                                                        updateSelectedLayoutBlock(
+                                                          index,
+                                                          blockIndex,
+                                                          {
+                                                            gridImagePadding:
+                                                              event.target
+                                                                .value as BuilderLayoutBlock["gridImagePadding"],
+                                                          },
+                                                        )
+                                                      }
+                                                    >
+                                                      <option value="frameless">
+                                                        Frameless
+                                                      </option>
+                                                      <option value="small">
+                                                        Small
+                                                      </option>
+                                                      <option value="medium">
+                                                        Medium
+                                                      </option>
+                                                      <option value="max">
+                                                        Max
+                                                      </option>
+                                                    </select>
+                                                  </label>
+                                                  <label className="builder-field">
+                                                    <span>Content Padding</span>
+                                                    <select
+                                                      value={
+                                                        block.gridContentPadding ??
+                                                        "medium"
+                                                      }
+                                                      onChange={(event) =>
+                                                        updateSelectedLayoutBlock(
+                                                          index,
+                                                          blockIndex,
+                                                          {
+                                                            gridContentPadding:
+                                                              event.target
+                                                                .value as BuilderLayoutBlock["gridContentPadding"],
+                                                          },
+                                                        )
+                                                      }
+                                                    >
+                                                      <option value="none">
+                                                        None
+                                                      </option>
+                                                      <option value="small">
+                                                        Small
+                                                      </option>
+                                                      <option value="medium">
+                                                        Medium
+                                                      </option>
+                                                      <option value="large">
+                                                        Large
+                                                      </option>
+                                                    </select>
+                                                  </label>
+                                                </div>
+                                                <label className="builder-field">
+                                                  <span>Image Frame</span>
+                                                  <select
+                                                    value={
+                                                      block.gridImageFrame ??
+                                                      "none"
+                                                    }
+                                                    onChange={(event) =>
+                                                      updateSelectedLayoutBlock(
+                                                        index,
+                                                        blockIndex,
+                                                        {
+                                                          gridImageFrame: event
+                                                            .target
+                                                            .value as BuilderLayoutBlock["gridImageFrame"],
+                                                        },
+                                                      )
+                                                    }
+                                                  >
+                                                    <option value="none">
+                                                      No frame
+                                                    </option>
+                                                    <option value="soft">
+                                                      Soft surface
+                                                    </option>
+                                                  </select>
+                                                </label>
+                                                <details
+                                                  className="builder-collapse"
+                                                  open
+                                                >
+                                                  <summary>
+                                                    <span>Fields</span>
+                                                    <small>visibility</small>
+                                                  </summary>
+                                                  <div className="builder-grid-toggle-list">
+                                                    {[
+                                                      [
+                                                        "gridShowImage",
+                                                        "Image",
+                                                      ],
+                                                      [
+                                                        "gridShowEyebrow",
+                                                        "Eyebrow",
+                                                      ],
+                                                      ["gridShowMeta", "Meta"],
+                                                      ["gridShowText", "Text"],
+                                                      [
+                                                        "gridShowButton",
+                                                        "Button",
+                                                      ],
+                                                    ].map(([field, label]) => (
+                                                      <label key={field}>
+                                                        <input
+                                                          type="checkbox"
+                                                          checked={
+                                                            block[
+                                                              field as keyof BuilderLayoutBlock
+                                                            ] !== false
+                                                          }
+                                                          onChange={(event) =>
+                                                            updateSelectedLayoutBlock(
+                                                              index,
+                                                              blockIndex,
+                                                              {
+                                                                [field]:
+                                                                  event.target
+                                                                    .checked,
+                                                              },
+                                                            )
+                                                          }
+                                                        />
+                                                        <span>{label}</span>
+                                                      </label>
+                                                    ))}
+                                                  </div>
+                                                </details>
+                                                {block.gridSource !==
+                                                  "products" && (
+                                                  <details
+                                                    className="builder-collapse"
+                                                    open
+                                                  >
+                                                    <summary>
+                                                      <span>Static Items</span>
+                                                      <small>
+                                                        {block.gridItems
+                                                          ?.length ?? 0}
+                                                      </small>
+                                                    </summary>
+                                                    <button
+                                                      type="button"
+                                                      className="builder-inline-add"
+                                                      onClick={() =>
+                                                        addSelectedLayoutBlockGridItem(
+                                                          index,
+                                                          blockIndex,
+                                                        )
+                                                      }
+                                                    >
+                                                      <Plus size={15} />
+                                                      Add item
+                                                    </button>
+                                                    {(
+                                                      block.gridItems ?? []
+                                                    ).map(
+                                                      (
+                                                        gridItem,
+                                                        gridItemIndex,
+                                                      ) => (
+                                                        <div
+                                                          key={
+                                                            gridItem.id ??
+                                                            `${blockKey}-grid-${gridItemIndex}`
+                                                          }
+                                                          className="builder-nested-card is-open"
+                                                        >
+                                                          <div className="builder-nested-card-header">
+                                                            <span>
+                                                              Item{" "}
+                                                              {gridItemIndex +
+                                                                1}
+                                                            </span>
+                                                            <button
+                                                              type="button"
+                                                              onClick={() =>
+                                                                deleteSelectedLayoutBlockGridItem(
+                                                                  index,
+                                                                  blockIndex,
+                                                                  gridItemIndex,
+                                                                )
+                                                              }
+                                                              title="Delete grid item"
+                                                            >
+                                                              <Trash2
+                                                                size={14}
+                                                              />
+                                                            </button>
+                                                          </div>
+                                                          <div className="builder-nested-card-body">
+                                                            <label className="builder-field">
+                                                              <span>
+                                                                Image URL
+                                                              </span>
+                                                              <BuilderImageUrlControl
+                                                                value={
+                                                                  gridItem.imageUrl ??
+                                                                  ""
+                                                                }
+                                                                onChange={(
+                                                                  event,
+                                                                ) =>
+                                                                  updateSelectedLayoutBlockGridItem(
+                                                                    index,
+                                                                    blockIndex,
+                                                                    gridItemIndex,
+                                                                    {
+                                                                      imageUrl:
+                                                                        event
+                                                                          .target
+                                                                          .value,
+                                                                    },
+                                                                  )
+                                                                }
+                                                                onChoose={() =>
+                                                                  openWordPressMediaPicker(
+                                                                    {
+                                                                      title: `Item ${gridItemIndex + 1} Image`,
+                                                                      currentUrl:
+                                                                        gridItem.imageUrl,
+                                                                      onSelect:
+                                                                        (
+                                                                          media,
+                                                                        ) =>
+                                                                          updateSelectedLayoutBlockGridItem(
+                                                                            index,
+                                                                            blockIndex,
+                                                                            gridItemIndex,
+                                                                            {
+                                                                              imageUrl:
+                                                                                media.sourceUrl,
+                                                                              imageAlt:
+                                                                                gridItem.imageAlt ||
+                                                                                media.altText ||
+                                                                                media.title,
+                                                                            },
+                                                                          ),
+                                                                    },
+                                                                  )
+                                                                }
+                                                              />
+                                                            </label>
+                                                            <label className="builder-field">
+                                                              <span>
+                                                                Eyebrow
+                                                              </span>
+                                                              <input
+                                                                value={
+                                                                  gridItem.eyebrow ??
+                                                                  ""
+                                                                }
+                                                                onChange={(
+                                                                  event,
+                                                                ) =>
+                                                                  updateSelectedLayoutBlockGridItem(
+                                                                    index,
+                                                                    blockIndex,
+                                                                    gridItemIndex,
+                                                                    {
+                                                                      eyebrow:
+                                                                        event
+                                                                          .target
+                                                                          .value,
+                                                                    },
+                                                                  )
+                                                                }
+                                                              />
+                                                            </label>
+                                                            <label className="builder-field">
+                                                              <span>Title</span>
+                                                              <input
+                                                                value={
+                                                                  gridItem.title ??
+                                                                  ""
+                                                                }
+                                                                onChange={(
+                                                                  event,
+                                                                ) =>
+                                                                  updateSelectedLayoutBlockGridItem(
+                                                                    index,
+                                                                    blockIndex,
+                                                                    gridItemIndex,
+                                                                    {
+                                                                      title:
+                                                                        event
+                                                                          .target
+                                                                          .value,
+                                                                    },
+                                                                  )
+                                                                }
+                                                              />
+                                                            </label>
+                                                            <label className="builder-field">
+                                                              <span>Meta</span>
+                                                              <input
+                                                                value={
+                                                                  gridItem.meta ??
+                                                                  ""
+                                                                }
+                                                                onChange={(
+                                                                  event,
+                                                                ) =>
+                                                                  updateSelectedLayoutBlockGridItem(
+                                                                    index,
+                                                                    blockIndex,
+                                                                    gridItemIndex,
+                                                                    {
+                                                                      meta: event
+                                                                        .target
+                                                                        .value,
+                                                                    },
+                                                                  )
+                                                                }
+                                                              />
+                                                            </label>
+                                                            <label className="builder-field">
+                                                              <span>Text</span>
+                                                              <textarea
+                                                                rows={3}
+                                                                value={
+                                                                  gridItem.text ??
+                                                                  ""
+                                                                }
+                                                                onChange={(
+                                                                  event,
+                                                                ) =>
+                                                                  updateSelectedLayoutBlockGridItem(
+                                                                    index,
+                                                                    blockIndex,
+                                                                    gridItemIndex,
+                                                                    {
+                                                                      text: event
+                                                                        .target
+                                                                        .value,
+                                                                    },
+                                                                  )
+                                                                }
+                                                              />
+                                                            </label>
+                                                            <div className="builder-two-column">
+                                                              <label className="builder-field">
+                                                                <span>
+                                                                  Button Label
+                                                                </span>
+                                                                <input
+                                                                  value={
+                                                                    gridItem.buttonLabel ??
+                                                                    ""
+                                                                  }
+                                                                  onChange={(
+                                                                    event,
+                                                                  ) =>
+                                                                    updateSelectedLayoutBlockGridItem(
+                                                                      index,
+                                                                      blockIndex,
+                                                                      gridItemIndex,
+                                                                      {
+                                                                        buttonLabel:
+                                                                          event
+                                                                            .target
+                                                                            .value,
+                                                                      },
+                                                                    )
+                                                                  }
+                                                                />
+                                                              </label>
+                                                              <label className="builder-field">
+                                                                <span>
+                                                                  Button Link
+                                                                </span>
+                                                                <input
+                                                                  value={
+                                                                    gridItem.buttonUrl ??
+                                                                    ""
+                                                                  }
+                                                                  onChange={(
+                                                                    event,
+                                                                  ) =>
+                                                                    updateSelectedLayoutBlockGridItem(
+                                                                      index,
+                                                                      blockIndex,
+                                                                      gridItemIndex,
+                                                                      {
+                                                                        buttonUrl:
+                                                                          event
+                                                                            .target
+                                                                            .value,
+                                                                      },
+                                                                    )
+                                                                  }
+                                                                />
+                                                              </label>
+                                                            </div>
+                                                          </div>
+                                                        </div>
+                                                      ),
+                                                    )}
+                                                  </details>
+                                                )}
+                                              </>
+                                            ) : block.kind === "products" ? (
+                                              <>
+                                                <label className="builder-field">
+                                                  <span>Block Title</span>
+                                                  <input
+                                                    value={block.title ?? ""}
+                                                    onChange={(event) =>
+                                                      updateSelectedLayoutBlock(
+                                                        index,
+                                                        blockIndex,
+                                                        {
+                                                          title:
+                                                            event.target.value,
+                                                        },
+                                                      )
+                                                    }
+                                                  />
+                                                </label>
+                                                <div className="builder-two-column">
+                                                  <label className="builder-field">
+                                                    <span>Columns</span>
+                                                    <input
+                                                      type="number"
+                                                      min={1}
+                                                      max={4}
+                                                      value={block.columns ?? 2}
+                                                      onChange={(event) =>
+                                                        updateSelectedLayoutBlock(
+                                                          index,
+                                                          blockIndex,
+                                                          {
+                                                            columns: Number(
+                                                              event.target
+                                                                .value,
+                                                            ),
+                                                          },
+                                                        )
+                                                      }
+                                                    />
+                                                  </label>
+                                                  <label className="builder-field">
+                                                    <span>Limit</span>
+                                                    <input
+                                                      type="number"
+                                                      min={2}
+                                                      max={12}
+                                                      value={
+                                                        block.gridLimit ?? 4
+                                                      }
+                                                      onChange={(event) =>
+                                                        updateSelectedLayoutBlock(
+                                                          index,
+                                                          blockIndex,
+                                                          {
+                                                            gridLimit: Number(
+                                                              event.target
+                                                                .value,
+                                                            ),
+                                                          },
+                                                        )
+                                                      }
+                                                    />
+                                                  </label>
+                                                </div>
+                                                <div className="builder-two-column">
+                                                  <label className="builder-field">
+                                                    <span>Source</span>
+                                                    <select
+                                                      value={
+                                                        block.source ?? "all"
+                                                      }
+                                                      onChange={(event) =>
+                                                        updateSelectedLayoutBlock(
+                                                          index,
+                                                          blockIndex,
+                                                          {
+                                                            source: event.target
+                                                              .value as BuilderLayoutBlock["source"],
+                                                          },
+                                                        )
+                                                      }
+                                                    >
+                                                      <option value="all">
+                                                        All products
+                                                      </option>
+                                                      <option value="featured">
+                                                        Featured
+                                                      </option>
+                                                      <option value="category">
+                                                        Category
+                                                      </option>
+                                                    </select>
+                                                  </label>
+                                                  <label className="builder-field">
+                                                    <span>Layout Variant</span>
+                                                    <select
+                                                      value={
+                                                        block.layoutVariant ??
+                                                        "grid"
+                                                      }
+                                                      onChange={(event) =>
+                                                        updateSelectedLayoutBlock(
+                                                          index,
+                                                          blockIndex,
+                                                          {
+                                                            layoutVariant: event
+                                                              .target
+                                                              .value as BuilderLayoutBlock["layoutVariant"],
+                                                          },
+                                                        )
+                                                      }
+                                                    >
+                                                      <option value="grid">
+                                                        Grid
+                                                      </option>
+                                                      <option value="carousel">
+                                                        Carousel
+                                                      </option>
+                                                    </select>
+                                                  </label>
+                                                </div>
+                                                {block.source ===
+                                                  "category" && (
+                                                  <label className="builder-field">
+                                                    <span>
+                                                      Category Slug / ID
+                                                    </span>
+                                                    <input
+                                                      value={
+                                                        block.categoryId ?? ""
+                                                      }
+                                                      onChange={(event) =>
+                                                        updateSelectedLayoutBlock(
+                                                          index,
+                                                          blockIndex,
+                                                          {
+                                                            categoryId:
+                                                              event.target
+                                                                .value,
+                                                          },
+                                                        )
+                                                      }
+                                                    />
+                                                  </label>
+                                                )}
+                                                <label className="builder-field">
+                                                  <span>Filter Position</span>
+                                                  <select
+                                                    value={
+                                                      block.filterPosition ??
+                                                      "left"
+                                                    }
+                                                    onChange={(event) =>
+                                                      updateSelectedLayoutBlock(
+                                                        index,
+                                                        blockIndex,
+                                                        {
+                                                          filterPosition: event
+                                                            .target
+                                                            .value as BuilderLayoutBlock["filterPosition"],
+                                                        },
+                                                      )
+                                                    }
+                                                  >
+                                                    <option value="left">
+                                                      Left sidebar
+                                                    </option>
+                                                    <option value="top">
+                                                      Top pills
+                                                    </option>
+                                                    <option value="drawer">
+                                                      Drawer
+                                                    </option>
+                                                    <option value="hidden">
+                                                      Hidden
+                                                    </option>
+                                                  </select>
+                                                </label>
+                                                <label className="builder-field">
+                                                  <span>Card Style</span>
+                                                  <select
+                                                    value={
+                                                      block.cardStyle ?? "flat"
+                                                    }
+                                                    onChange={(event) =>
+                                                      updateSelectedLayoutBlock(
+                                                        index,
+                                                        blockIndex,
+                                                        {
+                                                          cardStyle: event
+                                                            .target
+                                                            .value as BuilderLayoutBlock["cardStyle"],
+                                                        },
+                                                      )
+                                                    }
+                                                  >
+                                                    <option value="flat">
+                                                      Flat
+                                                    </option>
+                                                    <option value="soft">
+                                                      Soft
+                                                    </option>
+                                                    <option value="lined">
+                                                      Lined
+                                                    </option>
+                                                    <option value="none">
+                                                      No background
+                                                    </option>
+                                                  </select>
+                                                </label>
+                                                <label className="builder-field">
+                                                  <span>Card Preset</span>
+                                                  <select
+                                                    value={
+                                                      block.cardPreset ??
+                                                      "standard"
+                                                    }
+                                                    onChange={(event) =>
+                                                      updateSelectedLayoutBlock(
+                                                        index,
+                                                        blockIndex,
+                                                        {
+                                                          cardPreset: event
+                                                            .target
+                                                            .value as BuilderLayoutBlock["cardPreset"],
+                                                        },
+                                                      )
+                                                    }
+                                                  >
+                                                    <option value="standard">
+                                                      Standard
+                                                    </option>
+                                                    <option value="graph">
+                                                      Graph Clean
+                                                    </option>
+                                                    <option value="gallery">
+                                                      Gallery
+                                                    </option>
+                                                    <option value="editorial">
+                                                      Editorial
+                                                    </option>
+                                                    <option value="compact">
+                                                      Compact
+                                                    </option>
+                                                    <option value="minimal">
+                                                      Minimal
+                                                    </option>
+                                                    <option value="luxury">
+                                                      Luxury
+                                                    </option>
+                                                  </select>
+                                                </label>
+                                                <details
+                                                  className="builder-collapse"
+                                                  open
+                                                >
+                                                  <summary>
+                                                    Product Grid Spacing
+                                                  </summary>
+                                                  <div className="builder-two-column">
+                                                    <label className="builder-field">
+                                                      <span>Grid Gap</span>
+                                                      <select
+                                                        value={
+                                                          block.gridGap ??
+                                                          "medium"
+                                                        }
+                                                        onChange={(event) =>
+                                                          updateSelectedLayoutBlock(
+                                                            index,
+                                                            blockIndex,
+                                                            {
+                                                              gridGap: event
+                                                                .target
+                                                                .value as BuilderLayoutBlock["gridGap"],
+                                                            },
+                                                          )
+                                                        }
+                                                      >
+                                                        <option value="none">
+                                                          None
+                                                        </option>
+                                                        <option value="small">
+                                                          Small
+                                                        </option>
+                                                        <option value="medium">
+                                                          Medium
+                                                        </option>
+                                                        <option value="large">
+                                                          Large
+                                                        </option>
+                                                        <option value="max">
+                                                          Max
+                                                        </option>
+                                                      </select>
+                                                    </label>
+                                                    <label className="builder-field">
+                                                      <span>Outer Margin</span>
+                                                      <select
+                                                        value={
+                                                          block.gridMargin ??
+                                                          "none"
+                                                        }
+                                                        onChange={(event) =>
+                                                          updateSelectedLayoutBlock(
+                                                            index,
+                                                            blockIndex,
+                                                            {
+                                                              gridMargin: event
+                                                                .target
+                                                                .value as BuilderLayoutBlock["gridMargin"],
+                                                            },
+                                                          )
+                                                        }
+                                                      >
+                                                        <option value="none">
+                                                          None
+                                                        </option>
+                                                        <option value="small">
+                                                          Small
+                                                        </option>
+                                                        <option value="medium">
+                                                          Medium
+                                                        </option>
+                                                        <option value="large">
+                                                          Large
+                                                        </option>
+                                                      </select>
+                                                    </label>
+                                                  </div>
+                                                  <div className="builder-two-column">
+                                                    <label className="builder-field">
+                                                      <span>Card Padding</span>
+                                                      <select
+                                                        value={
+                                                          block.cardPadding ??
+                                                          "medium"
+                                                        }
+                                                        onChange={(event) =>
+                                                          updateSelectedLayoutBlock(
+                                                            index,
+                                                            blockIndex,
+                                                            {
+                                                              cardPadding: event
+                                                                .target
+                                                                .value as BuilderLayoutBlock["cardPadding"],
+                                                            },
+                                                          )
+                                                        }
+                                                      >
+                                                        <option value="none">
+                                                          None
+                                                        </option>
+                                                        <option value="small">
+                                                          Small
+                                                        </option>
+                                                        <option value="medium">
+                                                          Medium
+                                                        </option>
+                                                        <option value="large">
+                                                          Large
+                                                        </option>
+                                                        <option value="max">
+                                                          Max
+                                                        </option>
+                                                      </select>
+                                                    </label>
+                                                    <label className="builder-field">
+                                                      <span>Image Padding</span>
+                                                      <select
+                                                        value={
+                                                          block.imagePadding ??
+                                                          "large"
+                                                        }
+                                                        onChange={(event) =>
+                                                          updateSelectedLayoutBlock(
+                                                            index,
+                                                            blockIndex,
+                                                            {
+                                                              imagePadding:
+                                                                event.target
+                                                                  .value as BuilderLayoutBlock["imagePadding"],
+                                                            },
+                                                          )
+                                                        }
+                                                      >
+                                                        <option value="none">
+                                                          Frameless
+                                                        </option>
+                                                        <option value="small">
+                                                          Small
+                                                        </option>
+                                                        <option value="medium">
+                                                          Medium
+                                                        </option>
+                                                        <option value="large">
+                                                          Large
+                                                        </option>
+                                                        <option value="max">
+                                                          Max
+                                                        </option>
+                                                      </select>
+                                                    </label>
+                                                  </div>
+                                                  <label className="builder-field">
+                                                    <span>Image Frame</span>
+                                                    <select
+                                                      value={
+                                                        block.gridImageFrame ??
+                                                        "none"
+                                                      }
+                                                      onChange={(event) =>
+                                                        updateSelectedLayoutBlock(
+                                                          index,
+                                                          blockIndex,
+                                                          {
+                                                            gridImageFrame:
+                                                              event.target
+                                                                .value as BuilderLayoutBlock["gridImageFrame"],
+                                                          },
+                                                        )
+                                                      }
+                                                    >
+                                                      <option value="none">
+                                                        None / clean
+                                                      </option>
+                                                      <option value="soft">
+                                                        Soft frame
+                                                      </option>
+                                                    </select>
+                                                  </label>
+                                                  <details
+                                                    className="builder-collapse"
+                                                    open
+                                                  >
+                                                    <summary>
+                                                      Add To Cart Button
+                                                    </summary>
+                                                    <div className="builder-two-column">
+                                                      <label className="builder-field">
+                                                        <span>Color</span>
+                                                        <select
+                                                          value={
+                                                            block.addToCartStyle ??
+                                                            "blue"
+                                                          }
+                                                          onChange={(event) =>
+                                                            updateSelectedLayoutBlock(
+                                                              index,
+                                                              blockIndex,
+                                                              {
+                                                                addToCartStyle:
+                                                                  event.target
+                                                                    .value as BuilderLayoutBlock["addToCartStyle"],
+                                                              },
+                                                            )
+                                                          }
+                                                        >
+                                                          <option value="blue">
+                                                            Publish blue
+                                                          </option>
+                                                          <option value="dark">
+                                                            Dark
+                                                          </option>
+                                                          <option value="light">
+                                                            Light
+                                                          </option>
+                                                          <option value="inherit">
+                                                            Theme button
+                                                          </option>
+                                                        </select>
+                                                      </label>
+                                                      <label className="builder-field">
+                                                        <span>Size</span>
+                                                        <select
+                                                          value={
+                                                            block.addToCartSize ??
+                                                            "medium"
+                                                          }
+                                                          onChange={(event) =>
+                                                            updateSelectedLayoutBlock(
+                                                              index,
+                                                              blockIndex,
+                                                              {
+                                                                addToCartSize:
+                                                                  event.target
+                                                                    .value as BuilderLayoutBlock["addToCartSize"],
+                                                              },
+                                                            )
+                                                          }
+                                                        >
+                                                          <option value="compact">
+                                                            Compact
+                                                          </option>
+                                                          <option value="medium">
+                                                            Medium
+                                                          </option>
+                                                          <option value="large">
+                                                            Large
+                                                          </option>
+                                                          <option value="full">
+                                                            Full width
+                                                          </option>
+                                                        </select>
+                                                      </label>
+                                                    </div>
+                                                    <div className="builder-two-column">
+                                                      <label className="builder-field">
+                                                        <span>Display</span>
+                                                        <select
+                                                          value={
+                                                            block.addToCartDisplay ??
+                                                            "button"
+                                                          }
+                                                          onChange={(event) =>
+                                                            updateSelectedLayoutBlock(
+                                                              index,
+                                                              blockIndex,
+                                                              {
+                                                                addToCartDisplay:
+                                                                  event.target
+                                                                    .value as BuilderLayoutBlock["addToCartDisplay"],
+                                                              },
+                                                            )
+                                                          }
+                                                        >
+                                                          <option value="button">
+                                                            Text button
+                                                          </option>
+                                                          <option value="icon">
+                                                            Cart icon
+                                                          </option>
+                                                        </select>
+                                                      </label>
+                                                      <label className="builder-field">
+                                                        <span>Visibility</span>
+                                                        <select
+                                                          value={
+                                                            block.addToCartVisibility ??
+                                                            "hover"
+                                                          }
+                                                          onChange={(event) =>
+                                                            updateSelectedLayoutBlock(
+                                                              index,
+                                                              blockIndex,
+                                                              {
+                                                                addToCartVisibility:
+                                                                  event.target
+                                                                    .value as BuilderLayoutBlock["addToCartVisibility"],
+                                                              },
+                                                            )
+                                                          }
+                                                        >
+                                                          <option value="hover">
+                                                            On hover
+                                                          </option>
+                                                          <option value="always">
+                                                            Always visible
+                                                          </option>
+                                                        </select>
+                                                      </label>
+                                                    </div>
+                                                    <div className="builder-two-column">
+                                                      <label className="builder-field">
+                                                        <span>Position</span>
+                                                        <select
+                                                          value={
+                                                            block.addToCartPosition ??
+                                                            "below"
+                                                          }
+                                                          onChange={(event) =>
+                                                            updateSelectedLayoutBlock(
+                                                              index,
+                                                              blockIndex,
+                                                              {
+                                                                addToCartPosition:
+                                                                  event.target
+                                                                    .value as BuilderLayoutBlock["addToCartPosition"],
+                                                              },
+                                                            )
+                                                          }
+                                                        >
+                                                          <option value="below">
+                                                            Below details
+                                                          </option>
+                                                          <option value="under-price">
+                                                            Under price
+                                                          </option>
+                                                          <option value="under-wishlist">
+                                                            Under wishlist
+                                                          </option>
+                                                        </select>
+                                                      </label>
+                                                      <div className="builder-field">
+                                                        <span>Best with</span>
+                                                        <small>
+                                                          Icon works nicely
+                                                          under wishlist
+                                                        </small>
+                                                      </div>
+                                                    </div>
+                                                  </details>
+                                                </details>
+                                              </>
+                                            ) : block.kind ===
+                                              "productGallery" ? (
+                                              <>
+                                                <div className="builder-dynamic-field-note">
+                                                  <strong>
+                                                    Dynamic Product Gallery
+                                                  </strong>
+                                                  <span>
+                                                    Uses images from the current
+                                                    WooCommerce product.
+                                                  </span>
+                                                </div>
+                                                <label className="builder-field">
+                                                  <span>Show Thumbnails</span>
+                                                  <select
+                                                    value={
+                                                      block.galleryShowThumbnails ===
+                                                      false
+                                                        ? "no"
+                                                        : "yes"
+                                                    }
+                                                    onChange={(event) =>
+                                                      updateSelectedLayoutBlock(
+                                                        index,
+                                                        blockIndex,
+                                                        {
+                                                          galleryShowThumbnails:
+                                                            event.target
+                                                              .value === "yes",
+                                                        },
+                                                      )
+                                                    }
+                                                  >
+                                                    <option value="yes">
+                                                      Yes
+                                                    </option>
+                                                    <option value="no">
+                                                      No
+                                                    </option>
+                                                  </select>
+                                                </label>
+                                                <label className="builder-field">
+                                                  <span>
+                                                    Thumbnail Position
+                                                  </span>
+                                                  <select
+                                                    value={
+                                                      block.galleryThumbnailPosition ??
+                                                      "bottom"
+                                                    }
+                                                    onChange={(event) =>
+                                                      updateSelectedLayoutBlock(
+                                                        index,
+                                                        blockIndex,
+                                                        {
+                                                          galleryThumbnailPosition:
+                                                            event.target
+                                                              .value as BuilderLayoutBlock["galleryThumbnailPosition"],
+                                                        },
+                                                      )
+                                                    }
+                                                  >
+                                                    <option value="bottom">
+                                                      Bottom
+                                                    </option>
+                                                    <option value="left">
+                                                      Left
+                                                    </option>
+                                                  </select>
+                                                </label>
+                                                <label className="builder-field">
+                                                  <span>Image Fit</span>
+                                                  <select
+                                                    value={
+                                                      block.galleryImageFit ??
+                                                      "contain"
+                                                    }
+                                                    onChange={(event) =>
+                                                      updateSelectedLayoutBlock(
+                                                        index,
+                                                        blockIndex,
+                                                        {
+                                                          galleryImageFit: event
+                                                            .target
+                                                            .value as BuilderLayoutBlock["galleryImageFit"],
+                                                        },
+                                                      )
+                                                    }
+                                                  >
+                                                    <option value="contain">
+                                                      Contain
+                                                    </option>
+                                                    <option value="cover">
+                                                      Cover
+                                                    </option>
+                                                  </select>
+                                                </label>
+                                                <label className="builder-field">
+                                                  <span>Gallery Height</span>
+                                                  <input
+                                                    type="number"
+                                                    min={220}
+                                                    max={900}
+                                                    value={
+                                                      block.galleryHeight ?? 420
+                                                    }
+                                                    onChange={(event) =>
+                                                      updateSelectedLayoutBlock(
+                                                        index,
+                                                        blockIndex,
+                                                        {
+                                                          galleryHeight: Number(
+                                                            event.target.value,
+                                                          ),
+                                                        },
+                                                      )
+                                                    }
+                                                  />
+                                                </label>
+                                              </>
+                                            ) : block.kind ===
+                                                "categoryFilters" ||
+                                              block.kind === "breadcrumbs" ? (
+                                              <>
+                                                <div className="builder-dynamic-field-note">
+                                                  <strong>
+                                                    Dynamic Store Element
+                                                  </strong>
+                                                  <span>
+                                                    This element renders live
+                                                    storefront data in the
+                                                    published page.
+                                                  </span>
+                                                </div>
+                                                <label className="builder-field">
+                                                  <span>Editor Label</span>
+                                                  <input
+                                                    value={block.title ?? ""}
+                                                    onChange={(event) =>
+                                                      updateSelectedLayoutBlock(
+                                                        index,
+                                                        blockIndex,
+                                                        {
+                                                          title:
+                                                            event.target.value,
+                                                        },
+                                                      )
+                                                    }
+                                                  />
+                                                </label>
+                                                <label className="builder-field">
+                                                  <span>Editor Note</span>
+                                                  <textarea
+                                                    rows={2}
+                                                    value={block.body ?? ""}
+                                                    onChange={(event) =>
+                                                      updateSelectedLayoutBlock(
+                                                        index,
+                                                        blockIndex,
+                                                        {
+                                                          body: event.target
+                                                            .value,
+                                                        },
+                                                      )
+                                                    }
+                                                  />
+                                                </label>
+                                              </>
+                                            ) : block.kind?.startsWith(
+                                                "product",
+                                              ) ? (
+                                              <>
+                                                <div className="builder-dynamic-field-note">
+                                                  <strong>
+                                                    Dynamic Product Field
+                                                  </strong>
+                                                  <span>
+                                                    This element reads from the
+                                                    current WooCommerce product
+                                                    on the live product page.
+                                                  </span>
+                                                </div>
+                                                <label className="builder-field">
+                                                  <span>Editor Label</span>
+                                                  <input
+                                                    value={block.title ?? ""}
+                                                    onChange={(event) =>
+                                                      updateSelectedLayoutBlock(
+                                                        index,
+                                                        blockIndex,
+                                                        {
+                                                          title:
+                                                            event.target.value,
+                                                        },
+                                                      )
+                                                    }
+                                                  />
+                                                </label>
+                                                <label className="builder-field">
+                                                  <span>Editor Note</span>
+                                                  <textarea
+                                                    rows={2}
+                                                    value={block.body ?? ""}
+                                                    onChange={(event) =>
+                                                      updateSelectedLayoutBlock(
+                                                        index,
+                                                        blockIndex,
+                                                        {
+                                                          body: event.target
+                                                            .value,
+                                                        },
+                                                      )
+                                                    }
+                                                  />
+                                                </label>
+                                              </>
+                                            ) : block.kind === "slider" ? (
+                                              <>
+                                                <label className="builder-field">
+                                                  <span>Block Title</span>
+                                                  <input
+                                                    value={block.title ?? ""}
+                                                    onChange={(event) =>
+                                                      updateSelectedLayoutBlock(
+                                                        index,
+                                                        blockIndex,
+                                                        {
+                                                          title:
+                                                            event.target.value,
+                                                        },
+                                                      )
+                                                    }
+                                                  />
+                                                </label>
+                                                <label className="builder-field">
+                                                  <span>Body</span>
+                                                  <textarea
+                                                    rows={3}
+                                                    value={block.body ?? ""}
+                                                    onChange={(event) =>
+                                                      updateSelectedLayoutBlock(
+                                                        index,
+                                                        blockIndex,
+                                                        {
+                                                          body: event.target
+                                                            .value,
+                                                        },
+                                                      )
+                                                    }
+                                                  />
+                                                </label>
+                                                <div className="builder-two-column">
+                                                  <label className="builder-field">
+                                                    <span>Cards Per View</span>
+                                                    <input
+                                                      type="number"
+                                                      min={1}
+                                                      max={3}
+                                                      value={
+                                                        block.carouselSettings
+                                                          ?.cardsPerView ?? 1
+                                                      }
+                                                      onChange={(event) =>
+                                                        updateSelectedLayoutBlock(
+                                                          index,
+                                                          blockIndex,
+                                                          {
+                                                            carouselSettings: {
+                                                              ...(block.carouselSettings ??
+                                                                {}),
+                                                              cardsPerView:
+                                                                Number(
+                                                                  event.target
+                                                                    .value,
+                                                                ),
+                                                            },
+                                                          },
+                                                        )
+                                                      }
+                                                    />
+                                                  </label>
+                                                  <label className="builder-field">
+                                                    <span>Autoplay Delay</span>
+                                                    <input
+                                                      type="number"
+                                                      min={2000}
+                                                      max={30000}
+                                                      step={500}
+                                                      value={
+                                                        block.carouselSettings
+                                                          ?.autoplayDelayMs ??
+                                                        5000
+                                                      }
+                                                      onChange={(event) =>
+                                                        updateSelectedLayoutBlock(
+                                                          index,
+                                                          blockIndex,
+                                                          {
+                                                            carouselSettings: {
+                                                              ...(block.carouselSettings ??
+                                                                {}),
+                                                              autoplayDelayMs:
+                                                                Number(
+                                                                  event.target
+                                                                    .value,
+                                                                ),
+                                                            },
+                                                          },
+                                                        )
+                                                      }
+                                                    />
+                                                  </label>
+                                                </div>
+                                                <div className="builder-slider-options">
+                                                  {[
+                                                    ["autoplay", "Autoplay"],
+                                                    ["showArrows", "Arrows"],
+                                                    ["showDots", "Dots"],
+                                                    ["dragFree", "Drag free"],
+                                                    [
+                                                      "pauseOnHover",
+                                                      "Pause hover",
+                                                    ],
+                                                  ].map(([key, label]) => (
+                                                    <label
+                                                      key={key}
+                                                      className="builder-check"
+                                                    >
+                                                      <input
+                                                        type="checkbox"
+                                                        checked={Boolean(
+                                                          block
+                                                            .carouselSettings?.[
+                                                            key as keyof NonNullable<
+                                                              BuilderLayoutBlock["carouselSettings"]
+                                                            >
+                                                          ] ??
+                                                          (key === "dragFree" ||
+                                                          key === "autoplay"
+                                                            ? false
+                                                            : true),
+                                                        )}
+                                                        onChange={(event) =>
+                                                          updateSelectedLayoutBlock(
+                                                            index,
+                                                            blockIndex,
+                                                            {
+                                                              carouselSettings:
+                                                                {
+                                                                  ...(block.carouselSettings ??
+                                                                    {}),
+                                                                  [key]:
+                                                                    event.target
+                                                                      .checked,
+                                                                },
+                                                            },
+                                                          )
+                                                        }
+                                                      />
+                                                      <span>{label}</span>
+                                                    </label>
+                                                  ))}
+                                                </div>
+                                                <div className="builder-section-heading">
+                                                  <span>Slider Slides</span>
+                                                  <span>
+                                                    {block.slides?.length ?? 0}
+                                                  </span>
+                                                </div>
+                                                <button
+                                                  type="button"
+                                                  className="builder-inline-add"
+                                                  onClick={() =>
+                                                    addSelectedLayoutBlockSlide(
+                                                      index,
+                                                      blockIndex,
+                                                    )
+                                                  }
+                                                >
+                                                  <Plus size={15} />
+                                                  Add slide
+                                                </button>
+                                                {(block.slides ?? []).map(
+                                                  (slide, slideIndex) => {
+                                                    const slideKey =
+                                                      slide.id ??
+                                                      `${blockKey}-nested-slide-${slideIndex}`;
+                                                    const isSlideOpen =
+                                                      openSlideId === slideKey;
+
+                                                    return (
+                                                      <div
+                                                        key={slideKey}
+                                                        className={`builder-nested-card ${
+                                                          isSlideOpen
+                                                            ? "is-open"
+                                                            : ""
+                                                        }`}
+                                                      >
+                                                        <div className="builder-nested-card-header">
+                                                          <button
+                                                            type="button"
+                                                            className="builder-slide-toggle"
+                                                            onClick={() =>
+                                                              setOpenSlideId(
+                                                                isSlideOpen
+                                                                  ? null
+                                                                  : slideKey,
+                                                              )
+                                                            }
+                                                          >
+                                                            <span>
+                                                              Slide{" "}
+                                                              {slideIndex + 1}
+                                                            </span>
+                                                            <small>
+                                                              {slide.title ||
+                                                                "Untitled slide"}
+                                                            </small>
+                                                          </button>
+                                                          <button
+                                                            type="button"
+                                                            onClick={() =>
+                                                              deleteSelectedLayoutBlockSlide(
+                                                                index,
+                                                                blockIndex,
+                                                                slideIndex,
+                                                              )
+                                                            }
+                                                            title="Delete slide"
+                                                          >
+                                                            <Trash2 size={14} />
+                                                          </button>
+                                                        </div>
+                                                        {isSlideOpen && (
+                                                          <div className="builder-nested-card-body">
+                                                            <label className="builder-field">
+                                                              <span>
+                                                                Slide Badge
+                                                              </span>
+                                                              <input
+                                                                value={
+                                                                  slide.badge ??
+                                                                  ""
+                                                                }
+                                                                onChange={(
+                                                                  event,
+                                                                ) =>
+                                                                  updateSelectedLayoutBlockSlide(
+                                                                    index,
+                                                                    blockIndex,
+                                                                    slideIndex,
+                                                                    {
+                                                                      badge:
+                                                                        event
+                                                                          .target
+                                                                          .value,
+                                                                    },
+                                                                  )
+                                                                }
+                                                              />
+                                                            </label>
+                                                            <label className="builder-field">
+                                                              <span>
+                                                                Slide Title
+                                                              </span>
+                                                              <input
+                                                                value={
+                                                                  slide.title ??
+                                                                  ""
+                                                                }
+                                                                onChange={(
+                                                                  event,
+                                                                ) =>
+                                                                  updateSelectedLayoutBlockSlide(
+                                                                    index,
+                                                                    blockIndex,
+                                                                    slideIndex,
+                                                                    {
+                                                                      title:
+                                                                        event
+                                                                          .target
+                                                                          .value,
+                                                                    },
+                                                                  )
+                                                                }
+                                                              />
+                                                            </label>
+                                                            <label className="builder-field">
+                                                              <span>
+                                                                Slide Text
+                                                              </span>
+                                                              <textarea
+                                                                rows={3}
+                                                                value={
+                                                                  slide.text ??
+                                                                  ""
+                                                                }
+                                                                onChange={(
+                                                                  event,
+                                                                ) =>
+                                                                  updateSelectedLayoutBlockSlide(
+                                                                    index,
+                                                                    blockIndex,
+                                                                    slideIndex,
+                                                                    {
+                                                                      text: event
+                                                                        .target
+                                                                        .value,
+                                                                    },
+                                                                  )
+                                                                }
+                                                              />
+                                                            </label>
+                                                            <label className="builder-field">
+                                                              <span>
+                                                                Image URL
+                                                              </span>
+                                                              <BuilderImageUrlControl
+                                                                value={
+                                                                  slide.imageUrl ??
+                                                                  ""
+                                                                }
+                                                                placeholder="https://... or /uploads/image.jpg"
+                                                                onChange={(
+                                                                  event,
+                                                                ) =>
+                                                                  updateSelectedLayoutBlockSlide(
+                                                                    index,
+                                                                    blockIndex,
+                                                                    slideIndex,
+                                                                    {
+                                                                      imageUrl:
+                                                                        event
+                                                                          .target
+                                                                          .value,
+                                                                    },
+                                                                  )
+                                                                }
+                                                                onChoose={() =>
+                                                                  openWordPressMediaPicker(
+                                                                    {
+                                                                      title: `Slide ${slideIndex + 1} Image`,
+                                                                      currentUrl:
+                                                                        slide.imageUrl,
+                                                                      onSelect:
+                                                                        (
+                                                                          media,
+                                                                        ) =>
+                                                                          updateSelectedLayoutBlockSlide(
+                                                                            index,
+                                                                            blockIndex,
+                                                                            slideIndex,
+                                                                            {
+                                                                              imageUrl:
+                                                                                media.sourceUrl,
+                                                                              imageAlt:
+                                                                                slide.imageAlt ||
+                                                                                media.altText ||
+                                                                                media.title,
+                                                                            },
+                                                                          ),
+                                                                    },
+                                                                  )
+                                                                }
+                                                              />
+                                                            </label>
+                                                            <label className="builder-upload-field">
+                                                              <span>
+                                                                Upload Image
+                                                              </span>
+                                                              <input
+                                                                type="file"
+                                                                accept="image/jpeg,image/png,image/webp,image/gif,image/svg+xml"
+                                                                onChange={(
+                                                                  event,
+                                                                ) => {
+                                                                  void uploadSelectedLayoutBlockSlideImage(
+                                                                    index,
+                                                                    blockIndex,
+                                                                    slideIndex,
+                                                                    event.target
+                                                                      .files?.[0] ??
+                                                                      null,
+                                                                  );
+                                                                  event.target.value =
+                                                                    "";
+                                                                }}
+                                                              />
+                                                              <small>
+                                                                {uploadingNestedSlide ===
+                                                                `${index}-${blockIndex}-${slideIndex}`
+                                                                  ? "Uploading..."
+                                                                  : "Saved to /uploads/builder"}
+                                                              </small>
+                                                            </label>
+                                                            <label className="builder-field">
+                                                              <span>
+                                                                Image Alt Text
+                                                              </span>
+                                                              <input
+                                                                value={
+                                                                  slide.imageAlt ??
+                                                                  ""
+                                                                }
+                                                                onChange={(
+                                                                  event,
+                                                                ) =>
+                                                                  updateSelectedLayoutBlockSlide(
+                                                                    index,
+                                                                    blockIndex,
+                                                                    slideIndex,
+                                                                    {
+                                                                      imageAlt:
+                                                                        event
+                                                                          .target
+                                                                          .value,
+                                                                    },
+                                                                  )
+                                                                }
+                                                              />
+                                                            </label>
+                                                            <label className="builder-field">
+                                                              <span>
+                                                                Image To Panel
+                                                                Padding
+                                                              </span>
+                                                              <select
+                                                                value={
+                                                                  slide.imagePadding ??
+                                                                  "medium"
+                                                                }
+                                                                onChange={(
+                                                                  event,
+                                                                ) =>
+                                                                  updateSelectedLayoutBlockSlide(
+                                                                    index,
+                                                                    blockIndex,
+                                                                    slideIndex,
+                                                                    {
+                                                                      imagePadding:
+                                                                        event
+                                                                          .target
+                                                                          .value as SlideImagePadding,
+                                                                    },
+                                                                  )
+                                                                }
+                                                              >
+                                                                <option value="frameless">
+                                                                  Frameless
+                                                                </option>
+                                                                <option value="small">
+                                                                  Small
+                                                                </option>
+                                                                <option value="medium">
+                                                                  Medium
+                                                                </option>
+                                                                <option value="max">
+                                                                  Max
+                                                                </option>
+                                                              </select>
+                                                            </label>
+                                                            <label className="builder-field">
+                                                              <span>
+                                                                Button Label
+                                                              </span>
+                                                              <input
+                                                                value={
+                                                                  slide.buttonLabel ??
+                                                                  ""
+                                                                }
+                                                                onChange={(
+                                                                  event,
+                                                                ) =>
+                                                                  updateSelectedLayoutBlockSlide(
+                                                                    index,
+                                                                    blockIndex,
+                                                                    slideIndex,
+                                                                    {
+                                                                      buttonLabel:
+                                                                        event
+                                                                          .target
+                                                                          .value,
+                                                                    },
+                                                                  )
+                                                                }
+                                                              />
+                                                            </label>
+                                                            <label className="builder-field">
+                                                              <span>
+                                                                Button URL
+                                                              </span>
+                                                              <input
+                                                                value={
+                                                                  slide.buttonUrl ??
+                                                                  ""
+                                                                }
+                                                                onChange={(
+                                                                  event,
+                                                                ) =>
+                                                                  updateSelectedLayoutBlockSlide(
+                                                                    index,
+                                                                    blockIndex,
+                                                                    slideIndex,
+                                                                    {
+                                                                      buttonUrl:
+                                                                        event
+                                                                          .target
+                                                                          .value,
+                                                                    },
+                                                                  )
+                                                                }
+                                                              />
+                                                            </label>
+                                                          </div>
+                                                        )}
+                                                      </div>
+                                                    );
+                                                  },
+                                                )}
+                                              </>
+                                            ) : block.kind === "icon" ? (
+                                              <>
+                                                <label className="builder-field">
+                                                  <span>Icon</span>
+                                                  <select
+                                                    value={
+                                                      block.iconName ??
+                                                      "sparkles"
+                                                    }
+                                                    onChange={(event) =>
+                                                      updateSelectedLayoutBlock(
+                                                        index,
+                                                        blockIndex,
+                                                        {
+                                                          iconName: event.target
+                                                            .value as BuilderLayoutBlock["iconName"],
+                                                        },
+                                                      )
+                                                    }
+                                                  >
+                                                    <option value="sparkles">
+                                                      Sparkles
+                                                    </option>
+                                                    <option value="heart">
+                                                      Heart
+                                                    </option>
+                                                    <option value="truck">
+                                                      Truck
+                                                    </option>
+                                                    <option value="shield">
+                                                      Shield
+                                                    </option>
+                                                  </select>
+                                                </label>
+                                                <label className="builder-field">
+                                                  <span>Title</span>
+                                                  <input
+                                                    value={block.title ?? ""}
+                                                    onChange={(event) =>
+                                                      updateSelectedLayoutBlock(
+                                                        index,
+                                                        blockIndex,
+                                                        {
+                                                          title:
+                                                            event.target.value,
+                                                        },
+                                                      )
+                                                    }
+                                                  />
+                                                </label>
+                                                <label className="builder-field">
+                                                  <span>Text</span>
+                                                  <textarea
+                                                    rows={3}
+                                                    value={block.body ?? ""}
+                                                    onChange={(event) =>
+                                                      updateSelectedLayoutBlock(
+                                                        index,
+                                                        blockIndex,
+                                                        {
+                                                          body: event.target
+                                                            .value,
+                                                        },
+                                                      )
+                                                    }
+                                                  />
+                                                </label>
+                                              </>
+                                            ) : block.kind === "list" ? (
+                                              <>
+                                                <label className="builder-field">
+                                                  <span>Title</span>
+                                                  <input
+                                                    value={block.title ?? ""}
+                                                    onChange={(event) =>
+                                                      updateSelectedLayoutBlock(
+                                                        index,
+                                                        blockIndex,
+                                                        {
+                                                          title:
+                                                            event.target.value,
+                                                        },
+                                                      )
+                                                    }
+                                                  />
+                                                </label>
+                                                <label className="builder-field">
+                                                  <span>Items</span>
+                                                  <textarea
+                                                    rows={5}
+                                                    value={(
+                                                      block.items ?? []
+                                                    ).join("\n")}
+                                                    onChange={(event) =>
+                                                      updateSelectedLayoutBlock(
+                                                        index,
+                                                        blockIndex,
+                                                        {
+                                                          items:
+                                                            event.target.value
+                                                              .split("\n")
+                                                              .map((item) =>
+                                                                item.trim(),
+                                                              )
+                                                              .filter(Boolean),
+                                                        },
+                                                      )
+                                                    }
+                                                  />
+                                                </label>
+                                              </>
+                                            ) : block.kind === "datePicker" ? (
+                                              <>
+                                                <label className="builder-field">
+                                                  <span>Title</span>
+                                                  <input
+                                                    value={block.title ?? ""}
+                                                    onChange={(event) =>
+                                                      updateSelectedLayoutBlock(
+                                                        index,
+                                                        blockIndex,
+                                                        {
+                                                          title:
+                                                            event.target.value,
+                                                        },
+                                                      )
+                                                    }
+                                                  />
+                                                </label>
+                                                <label className="builder-field">
+                                                  <span>Field Label</span>
+                                                  <input
+                                                    value={
+                                                      block.dateLabel ?? ""
+                                                    }
+                                                    onChange={(event) =>
+                                                      updateSelectedLayoutBlock(
+                                                        index,
+                                                        blockIndex,
+                                                        {
+                                                          dateLabel:
+                                                            event.target.value,
+                                                        },
+                                                      )
+                                                    }
+                                                  />
+                                                </label>
+                                                <label className="builder-field">
+                                                  <span>Help Text</span>
+                                                  <textarea
+                                                    rows={3}
+                                                    value={block.body ?? ""}
+                                                    onChange={(event) =>
+                                                      updateSelectedLayoutBlock(
+                                                        index,
+                                                        blockIndex,
+                                                        {
+                                                          body: event.target
+                                                            .value,
+                                                        },
+                                                      )
+                                                    }
+                                                  />
+                                                </label>
+                                              </>
+                                            ) : block.kind === "badgeGrid" ? (
+                                              <>
+                                                <label className="builder-field">
+                                                  <span>Block Title</span>
+                                                  <input
+                                                    value={block.title ?? ""}
+                                                    onChange={(event) =>
+                                                      updateSelectedLayoutBlock(
+                                                        index,
+                                                        blockIndex,
+                                                        {
+                                                          title:
+                                                            event.target.value,
+                                                        },
+                                                      )
+                                                    }
+                                                  />
+                                                </label>
+                                                <label className="builder-field">
+                                                  <span>Body</span>
+                                                  <textarea
+                                                    rows={3}
+                                                    value={block.body ?? ""}
+                                                    onChange={(event) =>
+                                                      updateSelectedLayoutBlock(
+                                                        index,
+                                                        blockIndex,
+                                                        {
+                                                          body: event.target
+                                                            .value,
+                                                        },
+                                                      )
+                                                    }
+                                                  />
+                                                </label>
+                                                {block.kind === "badgeGrid" && (
+                                                  <label className="builder-field">
+                                                    <span>Badge Columns</span>
+                                                    <input
+                                                      type="number"
+                                                      min={1}
+                                                      max={3}
+                                                      value={block.columns ?? 2}
+                                                      onChange={(event) =>
+                                                        updateSelectedLayoutBlock(
+                                                          index,
+                                                          blockIndex,
+                                                          {
+                                                            columns: Number(
+                                                              event.target
+                                                                .value,
+                                                            ),
+                                                          },
+                                                        )
+                                                      }
+                                                    />
+                                                  </label>
+                                                )}
+                                                <div className="builder-section-heading">
+                                                  <span>Badges</span>
+                                                  <span>
+                                                    {block.badges?.length ?? 0}
+                                                  </span>
+                                                </div>
+                                                <button
+                                                  type="button"
+                                                  className="builder-inline-add"
+                                                  onClick={() =>
+                                                    addSelectedLayoutBlockBadge(
+                                                      index,
+                                                      blockIndex,
+                                                    )
+                                                  }
+                                                >
+                                                  <Plus size={15} />
+                                                  Add badge
+                                                </button>
+                                                {(block.badges ?? []).map(
+                                                  (badge, badgeIndex) => (
+                                                    <div
+                                                      key={
+                                                        badge.id ??
+                                                        `${blockKey}-badge-${badgeIndex}`
+                                                      }
+                                                      className="builder-nested-card is-open"
+                                                    >
+                                                      <div className="builder-nested-card-header">
+                                                        <span>
+                                                          Badge {badgeIndex + 1}
+                                                        </span>
+                                                        <button
+                                                          type="button"
+                                                          onClick={() =>
+                                                            deleteSelectedLayoutBlockBadge(
+                                                              index,
+                                                              blockIndex,
+                                                              badgeIndex,
+                                                            )
+                                                          }
+                                                          title="Delete badge"
+                                                        >
+                                                          <Trash2 size={14} />
+                                                        </button>
+                                                      </div>
+                                                      <div className="builder-nested-card-body">
+                                                        <label className="builder-field">
+                                                          <span>Label</span>
+                                                          <input
+                                                            value={
+                                                              badge.label ?? ""
+                                                            }
+                                                            onChange={(event) =>
+                                                              updateSelectedLayoutBlockBadge(
+                                                                index,
+                                                                blockIndex,
+                                                                badgeIndex,
+                                                                {
+                                                                  label:
+                                                                    event.target
+                                                                      .value,
+                                                                },
+                                                              )
+                                                            }
+                                                          />
+                                                        </label>
+                                                        <label className="builder-field">
+                                                          <span>Title</span>
+                                                          <input
+                                                            value={
+                                                              badge.title ?? ""
+                                                            }
+                                                            onChange={(event) =>
+                                                              updateSelectedLayoutBlockBadge(
+                                                                index,
+                                                                blockIndex,
+                                                                badgeIndex,
+                                                                {
+                                                                  title:
+                                                                    event.target
+                                                                      .value,
+                                                                },
+                                                              )
+                                                            }
+                                                          />
+                                                        </label>
+                                                        <label className="builder-field">
+                                                          <span>Text</span>
+                                                          <textarea
+                                                            rows={3}
+                                                            value={
+                                                              badge.body ?? ""
+                                                            }
+                                                            onChange={(event) =>
+                                                              updateSelectedLayoutBlockBadge(
+                                                                index,
+                                                                blockIndex,
+                                                                badgeIndex,
+                                                                {
+                                                                  body: event
+                                                                    .target
+                                                                    .value,
+                                                                },
+                                                              )
+                                                            }
+                                                          />
+                                                        </label>
+                                                      </div>
+                                                    </div>
+                                                  ),
+                                                )}
+                                              </>
+                                            ) : block.kind === "panel" ? (
+                                              <>
+                                                <label className="builder-field">
+                                                  <span>Image URL</span>
+                                                  <BuilderImageUrlControl
+                                                    value={block.imageUrl ?? ""}
+                                                    onChange={(event) =>
+                                                      updateSelectedLayoutBlock(
+                                                        index,
+                                                        blockIndex,
+                                                        {
+                                                          imageUrl:
+                                                            event.target.value,
+                                                        },
+                                                      )
+                                                    }
+                                                    onChoose={() =>
+                                                      openWordPressMediaPicker({
+                                                        title: "Panel Image",
+                                                        currentUrl:
+                                                          block.imageUrl,
+                                                        onSelect: (media) =>
+                                                          updateSelectedLayoutBlock(
+                                                            index,
+                                                            blockIndex,
+                                                            {
+                                                              imageUrl:
+                                                                media.sourceUrl,
+                                                              imageAlt:
+                                                                block.imageAlt ||
+                                                                media.altText ||
+                                                                media.title,
+                                                            },
+                                                          ),
+                                                      })
+                                                    }
+                                                  />
+                                                </label>
+                                                <label className="builder-field">
+                                                  <span>Image Alt</span>
+                                                  <input
+                                                    value={block.imageAlt ?? ""}
+                                                    onChange={(event) =>
+                                                      updateSelectedLayoutBlock(
+                                                        index,
+                                                        blockIndex,
+                                                        {
+                                                          imageAlt:
+                                                            event.target.value,
+                                                        },
+                                                      )
+                                                    }
+                                                  />
+                                                </label>
+                                                <label className="builder-field">
+                                                  <span>Eyebrow</span>
+                                                  <input
+                                                    value={block.eyebrow ?? ""}
+                                                    onChange={(event) =>
+                                                      updateSelectedLayoutBlock(
+                                                        index,
+                                                        blockIndex,
+                                                        {
+                                                          eyebrow:
+                                                            event.target.value,
+                                                        },
+                                                      )
+                                                    }
+                                                  />
+                                                </label>
+                                                <label className="builder-field">
+                                                  <span>Title</span>
+                                                  <input
+                                                    value={block.title ?? ""}
+                                                    onChange={(event) =>
+                                                      updateSelectedLayoutBlock(
+                                                        index,
+                                                        blockIndex,
+                                                        {
+                                                          title:
+                                                            event.target.value,
+                                                        },
+                                                      )
+                                                    }
+                                                  />
+                                                </label>
+                                                <label className="builder-field">
+                                                  <span>Body</span>
+                                                  <textarea
+                                                    rows={4}
+                                                    value={block.body ?? ""}
+                                                    onChange={(event) =>
+                                                      updateSelectedLayoutBlock(
+                                                        index,
+                                                        blockIndex,
+                                                        {
+                                                          body: event.target
+                                                            .value,
+                                                        },
+                                                      )
+                                                    }
+                                                  />
+                                                </label>
+                                                <label className="builder-field">
+                                                  <span>Button Label</span>
+                                                  <input
+                                                    value={
+                                                      block.buttonLabel ?? ""
+                                                    }
+                                                    onChange={(event) =>
+                                                      updateSelectedLayoutBlock(
+                                                        index,
+                                                        blockIndex,
+                                                        {
+                                                          buttonLabel:
+                                                            event.target.value,
+                                                        },
+                                                      )
+                                                    }
+                                                  />
+                                                </label>
+                                                <label className="builder-field">
+                                                  <span>Button URL</span>
+                                                  <input
+                                                    value={
+                                                      block.buttonUrl ?? ""
+                                                    }
+                                                    onChange={(event) =>
+                                                      updateSelectedLayoutBlock(
+                                                        index,
+                                                        blockIndex,
+                                                        {
+                                                          buttonUrl:
+                                                            event.target.value,
+                                                        },
+                                                      )
+                                                    }
+                                                  />
+                                                </label>
+                                              </>
+                                            ) : (
+                                              <>
+                                                <label className="builder-field">
+                                                  <span>Eyebrow</span>
+                                                  <input
+                                                    value={block.eyebrow ?? ""}
+                                                    onChange={(event) =>
+                                                      updateSelectedLayoutBlock(
+                                                        index,
+                                                        blockIndex,
+                                                        {
+                                                          eyebrow:
+                                                            event.target.value,
+                                                        },
+                                                      )
+                                                    }
+                                                  />
+                                                </label>
+                                                <label className="builder-field">
+                                                  <span>Title</span>
+                                                  <input
+                                                    value={block.title ?? ""}
+                                                    onChange={(event) =>
+                                                      updateSelectedLayoutBlock(
+                                                        index,
+                                                        blockIndex,
+                                                        {
+                                                          title:
+                                                            event.target.value,
+                                                        },
+                                                      )
+                                                    }
+                                                  />
+                                                </label>
+                                                <label className="builder-field">
+                                                  <span>Body</span>
+                                                  <textarea
+                                                    rows={4}
+                                                    value={block.body ?? ""}
+                                                    onChange={(event) =>
+                                                      updateSelectedLayoutBlock(
+                                                        index,
+                                                        blockIndex,
+                                                        {
+                                                          body: event.target
+                                                            .value,
+                                                        },
+                                                      )
+                                                    }
+                                                  />
+                                                </label>
+                                                <label className="builder-field">
+                                                  <span>Button Label</span>
+                                                  <input
+                                                    value={
+                                                      block.buttonLabel ?? ""
+                                                    }
+                                                    onChange={(event) =>
+                                                      updateSelectedLayoutBlock(
+                                                        index,
+                                                        blockIndex,
+                                                        {
+                                                          buttonLabel:
+                                                            event.target.value,
+                                                        },
+                                                      )
+                                                    }
+                                                  />
+                                                </label>
+                                                <label className="builder-field">
+                                                  <span>Button URL</span>
+                                                  <input
+                                                    value={
+                                                      block.buttonUrl ?? ""
+                                                    }
+                                                    onChange={(event) =>
+                                                      updateSelectedLayoutBlock(
+                                                        index,
+                                                        blockIndex,
+                                                        {
+                                                          buttonUrl:
+                                                            event.target.value,
+                                                        },
+                                                      )
+                                                    }
+                                                  />
+                                                </label>
+                                              </>
+                                            )}
+                                          </div>
+                                        );
+                                      })}
                                     </div>
-                                  ))}
-                                </>
-                              ) : block.kind === "panel" ? (
-                                <>
-                                  <label className="builder-field">
-                                    <span>Image URL</span>
-                                    <input
-                                      value={block.imageUrl ?? ""}
-                                      onChange={(event) =>
-                                        updateSelectedLayoutBlock(index, blockIndex, {
-                                          imageUrl: event.target.value,
-                                        })
-                                      }
-                                    />
-                                  </label>
-                                  <label className="builder-field">
-                                    <span>Image Alt</span>
-                                    <input
-                                      value={block.imageAlt ?? ""}
-                                      onChange={(event) =>
-                                        updateSelectedLayoutBlock(index, blockIndex, {
-                                          imageAlt: event.target.value,
-                                        })
-                                      }
-                                    />
-                                  </label>
-                                  <label className="builder-field">
-                                    <span>Eyebrow</span>
-                                    <input
-                                      value={block.eyebrow ?? ""}
-                                      onChange={(event) =>
-                                        updateSelectedLayoutBlock(index, blockIndex, {
-                                          eyebrow: event.target.value,
-                                        })
-                                      }
-                                    />
-                                  </label>
-                                  <label className="builder-field">
-                                    <span>Title</span>
-                                    <input
-                                      value={block.title ?? ""}
-                                      onChange={(event) =>
-                                        updateSelectedLayoutBlock(index, blockIndex, {
-                                          title: event.target.value,
-                                        })
-                                      }
-                                    />
-                                  </label>
-                                  <label className="builder-field">
-                                    <span>Body</span>
-                                    <textarea
-                                      rows={4}
-                                      value={block.body ?? ""}
-                                      onChange={(event) =>
-                                        updateSelectedLayoutBlock(index, blockIndex, {
-                                          body: event.target.value,
-                                        })
-                                      }
-                                    />
-                                  </label>
-                                  <label className="builder-field">
-                                    <span>Button Label</span>
-                                    <input
-                                      value={block.buttonLabel ?? ""}
-                                      onChange={(event) =>
-                                        updateSelectedLayoutBlock(index, blockIndex, {
-                                          buttonLabel: event.target.value,
-                                        })
-                                      }
-                                    />
-                                  </label>
-                                  <label className="builder-field">
-                                    <span>Button URL</span>
-                                    <input
-                                      value={block.buttonUrl ?? ""}
-                                      onChange={(event) =>
-                                        updateSelectedLayoutBlock(index, blockIndex, {
-                                          buttonUrl: event.target.value,
-                                        })
-                                      }
-                                    />
-                                  </label>
-                                </>
-                              ) : (
-                                <>
-                                  <label className="builder-field">
-                                    <span>Eyebrow</span>
-                                    <input
-                                      value={block.eyebrow ?? ""}
-                                      onChange={(event) =>
-                                        updateSelectedLayoutBlock(index, blockIndex, {
-                                          eyebrow: event.target.value,
-                                        })
-                                      }
-                                    />
-                                  </label>
-                                  <label className="builder-field">
-                                    <span>Title</span>
-                                    <input
-                                      value={block.title ?? ""}
-                                      onChange={(event) =>
-                                        updateSelectedLayoutBlock(index, blockIndex, {
-                                          title: event.target.value,
-                                        })
-                                      }
-                                    />
-                                  </label>
-                                  <label className="builder-field">
-                                    <span>Body</span>
-                                    <textarea
-                                      rows={4}
-                                      value={block.body ?? ""}
-                                      onChange={(event) =>
-                                        updateSelectedLayoutBlock(index, blockIndex, {
-                                          body: event.target.value,
-                                        })
-                                      }
-                                    />
-                                  </label>
-                                  <label className="builder-field">
-                                    <span>Button Label</span>
-                                    <input
-                                      value={block.buttonLabel ?? ""}
-                                      onChange={(event) =>
-                                        updateSelectedLayoutBlock(index, blockIndex, {
-                                          buttonLabel: event.target.value,
-                                        })
-                                      }
-                                    />
-                                  </label>
-                                  <label className="builder-field">
-                                    <span>Button URL</span>
-                                    <input
-                                      value={block.buttonUrl ?? ""}
-                                      onChange={(event) =>
-                                        updateSelectedLayoutBlock(index, blockIndex, {
-                                          buttonUrl: event.target.value,
-                                        })
-                                      }
-                                    />
-                                  </label>
-                                </>
-                              )}
-                            </div>
-                            );
-                          })}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </>
-            )}
-
-            {selectedSection.kind === "embed" && (
-              <>
-                <label className="builder-field">
-                  <span>Embed Mode</span>
-                  <select
-                    value={selectedSection.embedMode ?? "iframe"}
-                    onChange={(event) =>
-                      updateSelected({
-                        embedMode: event.target.value as EmbedMode,
-                      })
-                    }
-                  >
-                    <option value="iframe">Iframe URL</option>
-                    <option value="code">Custom HTML / Script</option>
-                  </select>
-                </label>
-
-                {selectedSection.embedMode !== "code" && (
-                  <label className="builder-field">
-                    <span>Iframe URL</span>
-                    <input
-                      value={selectedSection.embedUrl ?? ""}
-                      placeholder="https://..."
-                      onChange={(event) =>
-                        updateSelected({ embedUrl: event.target.value })
-                      }
-                    />
-                  </label>
-                )}
-
-                {selectedSection.embedMode === "code" && (
-                  <label className="builder-field">
-                    <span>Embed Code</span>
-                    <textarea
-                      rows={7}
-                      value={selectedSection.embedCode ?? ""}
-                      placeholder="<div>...</div> or trusted widget script"
-                      onChange={(event) =>
-                        updateSelected({ embedCode: event.target.value })
-                      }
-                    />
-                  </label>
-                )}
-
-                <label className="builder-field">
-                  <span>Embed Height</span>
-                  <input
-                    type="number"
-                    min={120}
-                    max={1200}
-                    value={selectedSection.embedHeight ?? 420}
-                    onChange={(event) =>
-                      updateSelected({ embedHeight: Number(event.target.value) })
-                    }
-                  />
-                </label>
-              </>
-            )}
-
-            {selectedSection.kind === "slider" && (
-              <>
-                <label className="builder-field">
-                  <span>Slider Variant</span>
-                  <select
-                    value={selectedSection.carouselSettings?.variant ?? "hero"}
-                    onChange={(event) =>
-                      updateSelected({
-                        carouselSettings: {
-                          ...(selectedSection.carouselSettings ?? {}),
-                          variant: event.target.value,
-                        },
-                      })
-                    }
-                  >
-                    <option value="hero">Hero</option>
-                    <option value="basic">Basic</option>
-                    <option value="overlay">Overlay</option>
-                  </select>
-                </label>
-
-                <label className="builder-field">
-                  <span>Cards Per View</span>
-                  <input
-                    type="number"
-                    min={1}
-                    max={4}
-                    value={selectedSection.carouselSettings?.cardsPerView ?? 1}
-                    onChange={(event) =>
-                      updateSelected({
-                        carouselSettings: {
-                          ...(selectedSection.carouselSettings ?? {}),
-                          cardsPerView: Number(event.target.value),
-                        },
-                      })
-                    }
-                  />
-                </label>
-
-                <label className="builder-field">
-                  <span>Autoplay Delay (ms)</span>
-                  <input
-                    type="number"
-                    min={2000}
-                    max={30000}
-                    step={500}
-                    value={selectedSection.carouselSettings?.autoplayDelayMs ?? 5000}
-                    onChange={(event) =>
-                      updateSelected({
-                        carouselSettings: {
-                          ...(selectedSection.carouselSettings ?? {}),
-                          autoplayDelayMs: Number(event.target.value),
-                        },
-                      })
-                    }
-                  />
-                </label>
-
-                <label className="builder-field">
-                  <span>Align</span>
-                  <select
-                    value={selectedSection.carouselSettings?.align ?? "center"}
-                    onChange={(event) =>
-                      updateSelected({
-                        carouselSettings: {
-                          ...(selectedSection.carouselSettings ?? {}),
-                          align: event.target
-                            .value as NonNullable<
-                            BuilderSection["carouselSettings"]
-                          >["align"],
-                        },
-                      })
-                    }
-                  >
-                    <option value="center">Center</option>
-                    <option value="start">Start</option>
-                  </select>
-                </label>
-
-                <div className="builder-slider-options">
-                  {[
-                    ["autoplay", "Autoplay"],
-                    ["showArrows", "Arrows"],
-                    ["showDots", "Dots"],
-                    ["dragFree", "Drag free"],
-                    ["pauseOnHover", "Pause hover"],
-                  ].map(([key, label]) => (
-                    <label key={key} className="builder-check">
-                      <input
-                        type="checkbox"
-                        checked={Boolean(
-                          selectedSection.carouselSettings?.[
-                            key as keyof NonNullable<BuilderSection["carouselSettings"]>
-                          ] ??
-                          (key === "dragFree" ? false : true)
-                        )}
-                        onChange={(event) =>
-                          updateSelected({
-                            carouselSettings: {
-                              ...(selectedSection.carouselSettings ?? {}),
-                              [key]: event.target.checked,
+                                  )}
+                                </div>
+                              );
                             },
-                          })
-                        }
-                      />
-                      <span>{label}</span>
-                    </label>
-                  ))}
-                </div>
+                          )}
+                        </>
+                      )}
 
-                <div className="builder-section-heading">
-                  <span>Slides</span>
-                  <span>{selectedSection.slides?.length ?? 0}</span>
-                </div>
-
-                <button
-                  type="button"
-                  className="builder-inline-add"
-                  onClick={addSelectedSlide}
-                >
-                  <Plus size={15} />
-                  Add slide
-                </button>
-
-                {(selectedSection.slides ?? []).map((slide, index) => {
-                  const slideKey = slide.id ?? `slide-${index}`;
-                  const isOpen = openSlideId === slideKey;
-
-                  return (
-                    <div
-                      key={slideKey}
-                      className={`builder-nested-card ${isOpen ? "is-open" : ""}`}
-                    >
-                      <div className="builder-nested-card-header">
-                        <button
-                          type="button"
-                          className="builder-slide-toggle"
-                          onClick={() => setOpenSlideId(isOpen ? null : slideKey)}
-                        >
-                          <span>Slide {index + 1}</span>
-                          <small>{slide.title || "Untitled slide"}</small>
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => deleteSelectedSlide(index)}
-                          title="Delete slide"
-                        >
-                          <Trash2 size={14} />
-                        </button>
-                      </div>
-
-                      {isOpen && (
-                        <div className="builder-nested-card-body">
+                      {selectedSection.kind === "embed" && (
+                        <>
                           <label className="builder-field">
-                            <span>Slide Badge</span>
-                            <input
-                              value={slide.badge ?? ""}
-                              onChange={(event) =>
-                                updateSelectedSlide(index, {
-                                  badge: event.target.value,
-                                })
-                              }
-                            />
-                          </label>
-                          <label className="builder-field">
-                            <span>Slide Title</span>
-                            <input
-                              value={slide.title ?? ""}
-                              onChange={(event) =>
-                                updateSelectedSlide(index, {
-                                  title: event.target.value,
-                                })
-                              }
-                            />
-                          </label>
-                          <label className="builder-field">
-                            <span>Slide Text</span>
-                            <textarea
-                              rows={3}
-                              value={slide.text ?? ""}
-                              onChange={(event) =>
-                                updateSelectedSlide(index, {
-                                  text: event.target.value,
-                                })
-                              }
-                            />
-                          </label>
-                          <label className="builder-field">
-                            <span>Image URL</span>
-                            <input
-                              value={slide.imageUrl ?? ""}
-                              placeholder="https://... or /uploads/image.jpg"
-                              onChange={(event) =>
-                                updateSelectedSlide(index, {
-                                  imageUrl: event.target.value,
-                                })
-                              }
-                            />
-                          </label>
-                          <label className="builder-upload-field">
-                            <span>Upload Image</span>
-                            <input
-                              type="file"
-                              accept="image/jpeg,image/png,image/webp,image/gif,image/svg+xml"
-                              onChange={(event) => {
-                                void uploadSelectedSlideImage(
-                                  index,
-                                  event.target.files?.[0] ?? null
-                                );
-                                event.target.value = "";
-                              }}
-                            />
-                            <small>
-                              {uploadingSlide === index
-                                ? "Uploading..."
-                                : "Saved to /uploads/builder"}
-                            </small>
-                          </label>
-                          <label className="builder-field">
-                            <span>Image Alt Text</span>
-                            <input
-                              value={slide.imageAlt ?? ""}
-                              onChange={(event) =>
-                                updateSelectedSlide(index, {
-                                  imageAlt: event.target.value,
-                                })
-                              }
-                            />
-                          </label>
-                          <label className="builder-field">
-                            <span>Image To Panel Padding</span>
+                            <span>Embed Mode</span>
                             <select
-                              value={slide.imagePadding ?? "medium"}
+                              value={selectedSection.embedMode ?? "iframe"}
                               onChange={(event) =>
-                                updateSelectedSlide(index, {
-                                  imagePadding: event.target
-                                    .value as SlideImagePadding,
+                                updateSelected({
+                                  embedMode: event.target.value as EmbedMode,
                                 })
                               }
                             >
-                              <option value="frameless">Frameless</option>
-                              <option value="small">Small</option>
-                              <option value="medium">Medium</option>
-                              <option value="max">Max</option>
+                              <option value="iframe">Iframe URL</option>
+                              <option value="code">Custom HTML / Script</option>
                             </select>
                           </label>
-                          <label className="builder-field">
-                            <span>Button Label</span>
-                            <input
-                              value={slide.buttonLabel ?? ""}
-                              onChange={(event) =>
-                                updateSelectedSlide(index, {
-                                  buttonLabel: event.target.value,
-                                })
-                              }
-                            />
-                          </label>
-                          <label className="builder-field">
-                            <span>Button URL</span>
-                            <input
-                              value={slide.buttonUrl ?? ""}
-                              onChange={(event) =>
-                                updateSelectedSlide(index, {
-                                  buttonUrl: event.target.value,
-                                })
-                              }
-                            />
-                          </label>
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </>
-            )}
 
-              </details>
-            )}
+                          {selectedSection.embedMode !== "code" && (
+                            <label className="builder-field">
+                              <span>Iframe URL</span>
+                              <input
+                                value={selectedSection.embedUrl ?? ""}
+                                placeholder="https://..."
+                                onChange={(event) =>
+                                  updateSelected({
+                                    embedUrl: event.target.value,
+                                  })
+                                }
+                              />
+                            </label>
+                          )}
+
+                          {selectedSection.embedMode === "code" && (
+                            <label className="builder-field">
+                              <span>Embed Code</span>
+                              <textarea
+                                rows={7}
+                                value={selectedSection.embedCode ?? ""}
+                                placeholder="<div>...</div> or trusted widget script"
+                                onChange={(event) =>
+                                  updateSelected({
+                                    embedCode: event.target.value,
+                                  })
+                                }
+                              />
+                            </label>
+                          )}
+
+                          <label className="builder-field">
+                            <span>Embed Height</span>
+                            <input
+                              type="number"
+                              min={120}
+                              max={1200}
+                              value={selectedSection.embedHeight ?? 420}
+                              onChange={(event) =>
+                                updateSelected({
+                                  embedHeight: Number(event.target.value),
+                                })
+                              }
+                            />
+                          </label>
+                        </>
+                      )}
+
+                      {selectedSection.kind === "slider" && (
+                        <>
+                          <label className="builder-field">
+                            <span>Slider Variant</span>
+                            <select
+                              value={
+                                selectedSection.carouselSettings?.variant ??
+                                "hero"
+                              }
+                              onChange={(event) =>
+                                updateSelected({
+                                  carouselSettings: {
+                                    ...(selectedSection.carouselSettings ?? {}),
+                                    variant: event.target.value,
+                                  },
+                                })
+                              }
+                            >
+                              <option value="hero">Hero</option>
+                              <option value="basic">Basic</option>
+                              <option value="overlay">Overlay</option>
+                            </select>
+                          </label>
+
+                          <label className="builder-field">
+                            <span>Cards Per View</span>
+                            <input
+                              type="number"
+                              min={1}
+                              max={4}
+                              value={
+                                selectedSection.carouselSettings
+                                  ?.cardsPerView ?? 1
+                              }
+                              onChange={(event) =>
+                                updateSelected({
+                                  carouselSettings: {
+                                    ...(selectedSection.carouselSettings ?? {}),
+                                    cardsPerView: Number(event.target.value),
+                                  },
+                                })
+                              }
+                            />
+                          </label>
+
+                          <label className="builder-field">
+                            <span>Autoplay Delay (ms)</span>
+                            <input
+                              type="number"
+                              min={2000}
+                              max={30000}
+                              step={500}
+                              value={
+                                selectedSection.carouselSettings
+                                  ?.autoplayDelayMs ?? 5000
+                              }
+                              onChange={(event) =>
+                                updateSelected({
+                                  carouselSettings: {
+                                    ...(selectedSection.carouselSettings ?? {}),
+                                    autoplayDelayMs: Number(event.target.value),
+                                  },
+                                })
+                              }
+                            />
+                          </label>
+
+                          <label className="builder-field">
+                            <span>Align</span>
+                            <select
+                              value={
+                                selectedSection.carouselSettings?.align ??
+                                "center"
+                              }
+                              onChange={(event) =>
+                                updateSelected({
+                                  carouselSettings: {
+                                    ...(selectedSection.carouselSettings ?? {}),
+                                    align: event.target.value as NonNullable<
+                                      BuilderSection["carouselSettings"]
+                                    >["align"],
+                                  },
+                                })
+                              }
+                            >
+                              <option value="center">Center</option>
+                              <option value="start">Start</option>
+                            </select>
+                          </label>
+
+                          <div className="builder-slider-options">
+                            {[
+                              ["autoplay", "Autoplay"],
+                              ["showArrows", "Arrows"],
+                              ["showDots", "Dots"],
+                              ["dragFree", "Drag free"],
+                              ["pauseOnHover", "Pause hover"],
+                            ].map(([key, label]) => (
+                              <label key={key} className="builder-check">
+                                <input
+                                  type="checkbox"
+                                  checked={Boolean(
+                                    selectedSection.carouselSettings?.[
+                                      key as keyof NonNullable<
+                                        BuilderSection["carouselSettings"]
+                                      >
+                                    ] ?? (key === "dragFree" ? false : true),
+                                  )}
+                                  onChange={(event) =>
+                                    updateSelected({
+                                      carouselSettings: {
+                                        ...(selectedSection.carouselSettings ??
+                                          {}),
+                                        [key]: event.target.checked,
+                                      },
+                                    })
+                                  }
+                                />
+                                <span>{label}</span>
+                              </label>
+                            ))}
+                          </div>
+
+                          <div className="builder-section-heading">
+                            <span>Slides</span>
+                            <span>{selectedSection.slides?.length ?? 0}</span>
+                          </div>
+
+                          <button
+                            type="button"
+                            className="builder-inline-add"
+                            onClick={addSelectedSlide}
+                          >
+                            <Plus size={15} />
+                            Add slide
+                          </button>
+
+                          {(selectedSection.slides ?? []).map(
+                            (slide, index) => {
+                              const slideKey = slide.id ?? `slide-${index}`;
+                              const isOpen = openSlideId === slideKey;
+
+                              return (
+                                <div
+                                  key={slideKey}
+                                  className={`builder-nested-card ${isOpen ? "is-open" : ""}`}
+                                >
+                                  <div className="builder-nested-card-header">
+                                    <button
+                                      type="button"
+                                      className="builder-slide-toggle"
+                                      onClick={() =>
+                                        setOpenSlideId(isOpen ? null : slideKey)
+                                      }
+                                    >
+                                      <span>Slide {index + 1}</span>
+                                      <small>
+                                        {slide.title || "Untitled slide"}
+                                      </small>
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => deleteSelectedSlide(index)}
+                                      title="Delete slide"
+                                    >
+                                      <Trash2 size={14} />
+                                    </button>
+                                  </div>
+
+                                  {isOpen && (
+                                    <div className="builder-nested-card-body">
+                                      <label className="builder-field">
+                                        <span>Slide Badge</span>
+                                        <input
+                                          value={slide.badge ?? ""}
+                                          onChange={(event) =>
+                                            updateSelectedSlide(index, {
+                                              badge: event.target.value,
+                                            })
+                                          }
+                                        />
+                                      </label>
+                                      <label className="builder-field">
+                                        <span>Slide Title</span>
+                                        <input
+                                          value={slide.title ?? ""}
+                                          onChange={(event) =>
+                                            updateSelectedSlide(index, {
+                                              title: event.target.value,
+                                            })
+                                          }
+                                        />
+                                      </label>
+                                      <label className="builder-field">
+                                        <span>Slide Text</span>
+                                        <textarea
+                                          rows={3}
+                                          value={slide.text ?? ""}
+                                          onChange={(event) =>
+                                            updateSelectedSlide(index, {
+                                              text: event.target.value,
+                                            })
+                                          }
+                                        />
+                                      </label>
+                                      <label className="builder-field">
+                                        <span>Image URL</span>
+                                        <BuilderImageUrlControl
+                                          value={slide.imageUrl ?? ""}
+                                          placeholder="https://... or /uploads/image.jpg"
+                                          onChange={(event) =>
+                                            updateSelectedSlide(index, {
+                                              imageUrl: event.target.value,
+                                            })
+                                          }
+                                          onChoose={() =>
+                                            openWordPressMediaPicker({
+                                              title: `Slide ${index + 1} Image`,
+                                              currentUrl: slide.imageUrl,
+                                              onSelect: (media) =>
+                                                updateSelectedSlide(index, {
+                                                  imageUrl: media.sourceUrl,
+                                                  imageAlt:
+                                                    slide.imageAlt ||
+                                                    media.altText ||
+                                                    media.title,
+                                                }),
+                                            })
+                                          }
+                                        />
+                                      </label>
+                                      <label className="builder-upload-field">
+                                        <span>Upload Image</span>
+                                        <input
+                                          type="file"
+                                          accept="image/jpeg,image/png,image/webp,image/gif,image/svg+xml"
+                                          onChange={(event) => {
+                                            void uploadSelectedSlideImage(
+                                              index,
+                                              event.target.files?.[0] ?? null,
+                                            );
+                                            event.target.value = "";
+                                          }}
+                                        />
+                                        <small>
+                                          {uploadingSlide === index
+                                            ? "Uploading..."
+                                            : "Saved to /uploads/builder"}
+                                        </small>
+                                      </label>
+                                      <label className="builder-field">
+                                        <span>Image Alt Text</span>
+                                        <input
+                                          value={slide.imageAlt ?? ""}
+                                          onChange={(event) =>
+                                            updateSelectedSlide(index, {
+                                              imageAlt: event.target.value,
+                                            })
+                                          }
+                                        />
+                                      </label>
+                                      <label className="builder-field">
+                                        <span>Image To Panel Padding</span>
+                                        <select
+                                          value={slide.imagePadding ?? "medium"}
+                                          onChange={(event) =>
+                                            updateSelectedSlide(index, {
+                                              imagePadding: event.target
+                                                .value as SlideImagePadding,
+                                            })
+                                          }
+                                        >
+                                          <option value="frameless">
+                                            Frameless
+                                          </option>
+                                          <option value="small">Small</option>
+                                          <option value="medium">Medium</option>
+                                          <option value="max">Max</option>
+                                        </select>
+                                      </label>
+                                      <label className="builder-field">
+                                        <span>Button Label</span>
+                                        <input
+                                          value={slide.buttonLabel ?? ""}
+                                          onChange={(event) =>
+                                            updateSelectedSlide(index, {
+                                              buttonLabel: event.target.value,
+                                            })
+                                          }
+                                        />
+                                      </label>
+                                      <label className="builder-field">
+                                        <span>Button URL</span>
+                                        <input
+                                          value={slide.buttonUrl ?? ""}
+                                          onChange={(event) =>
+                                            updateSelectedSlide(index, {
+                                              buttonUrl: event.target.value,
+                                            })
+                                          }
+                                        />
+                                      </label>
+                                    </div>
+                                  )}
+                                </div>
+                              );
+                            },
+                          )}
+                        </>
+                      )}
+                    </details>
+                  )}
               </details>
             )}
 
@@ -6598,7 +8381,9 @@ export default function DashboardBuilder() {
                 <details className="builder-collapse" open>
                   <summary>
                     <span>Publishing State</span>
-                    <small>{selectedSection.visible ? "visible" : "hidden"}</small>
+                    <small>
+                      {selectedSection.visible ? "visible" : "hidden"}
+                    </small>
                   </summary>
 
                   <label className="builder-check">
@@ -6622,7 +8407,11 @@ export default function DashboardBuilder() {
                     <span>Current JSON</span>
                     <pre>{builderJson}</pre>
                   </div>
-                  <button type="button" className="builder-secondary-button builder-full-button" onClick={copyJson}>
+                  <button
+                    type="button"
+                    className="builder-secondary-button builder-full-button"
+                    onClick={copyJson}
+                  >
                     <Save size={16} />
                     {copied ? "Copied JSON" : "Export JSON"}
                   </button>
@@ -6637,6 +8426,122 @@ export default function DashboardBuilder() {
           </div>
         )}
       </aside>
+    </div>
+  );
+}
+
+function BuilderImageUrlControl({
+  value,
+  placeholder = "https://... or /uploads/image.jpg",
+  onChange,
+  onChoose,
+}: {
+  value: string;
+  placeholder?: string;
+  onChange: (event: ChangeEvent<HTMLInputElement>) => void;
+  onChoose: () => void;
+}) {
+  return (
+    <div className="builder-media-url-row">
+      <input value={value} placeholder={placeholder} onChange={onChange} />
+      <button type="button" onClick={onChoose}>
+        <GalleryHorizontal size={14} />
+        Library
+      </button>
+    </div>
+  );
+}
+
+function WordPressMediaPicker({
+  open,
+  title,
+  currentUrl,
+  search,
+  items,
+  loading,
+  status,
+  onSearchChange,
+  onSelect,
+  onClose,
+}: {
+  open: boolean;
+  title: string;
+  currentUrl: string;
+  search: string;
+  items: WordPressMediaItem[];
+  loading: boolean;
+  status: string;
+  onSearchChange: (value: string) => void;
+  onSelect: (media: WordPressMediaItem) => void;
+  onClose: () => void;
+}) {
+  if (!open) return null;
+
+  return (
+    <div className="builder-media-modal" role="dialog" aria-modal="true">
+      <div className="builder-media-dialog builder-panel">
+        <div className="builder-media-header">
+          <div>
+            <strong>{title}</strong>
+            <span>{status}</span>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close media library"
+          >
+            <X size={16} />
+          </button>
+        </div>
+
+        <div className="builder-media-search">
+          <input
+            value={search}
+            placeholder="Search WordPress media"
+            onChange={(event) => onSearchChange(event.target.value)}
+          />
+          {loading && <span>Loading...</span>}
+        </div>
+
+        <div className="builder-media-grid">
+          {items.map((item) => {
+            const isSelected = currentUrl === item.sourceUrl;
+            return (
+              <button
+                key={item.id}
+                type="button"
+                className={isSelected ? "is-selected" : ""}
+                onClick={() => onSelect(item)}
+              >
+                <span className="builder-media-thumb">
+                  {item.thumbnailUrl ? (
+                    <Image
+                      src={item.thumbnailUrl}
+                      alt={item.altText || item.title}
+                      width={240}
+                      height={180}
+                      unoptimized
+                    />
+                  ) : (
+                    <ImageIcon size={22} />
+                  )}
+                </span>
+                <span>{item.title}</span>
+              </button>
+            );
+          })}
+        </div>
+
+        {!loading && items.length === 0 && (
+          <div className="builder-media-empty">
+            <ImageIcon size={22} />
+            <strong>No images found</strong>
+            <span>
+              Try another search or check that WordPress media is public.
+            </span>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
@@ -6690,7 +8595,11 @@ function PreviewCanvas({
   draggingLayoutBlockKey: string | null;
   onSelect: (id: string) => void;
   onSelectColumn: (sectionId: string, columnKey: string) => void;
-  onSelectBlock: (sectionId: string, columnKey: string, blockKey: string) => void;
+  onSelectBlock: (
+    sectionId: string,
+    columnKey: string,
+    blockKey: string,
+  ) => void;
   onDragStart: (sectionId: string) => void;
   onDragEnd: () => void;
   onReorder: (sourceId: string, targetId: string) => void;
@@ -6724,27 +8633,27 @@ function PreviewCanvas({
     sectionId: string,
     columnKey: string,
     blockKey: string,
-    patch: Partial<BuilderLayoutBlock>
+    patch: Partial<BuilderLayoutBlock>,
   ) => void;
   onUpdateGridItem: (
     sectionId: string,
     columnKey: string,
     blockKey: string,
     itemIndex: number,
-    patch: NonNullable<BuilderLayoutBlock["gridItems"]>[number]
+    patch: NonNullable<BuilderLayoutBlock["gridItems"]>[number],
   ) => void;
   onUploadGridItemImage: (
     sectionId: string,
     columnKey: string,
     blockKey: string,
     itemIndex: number,
-    file: File | null
+    file: File | null,
   ) => void;
   onAddWireframe: (
     columns: number,
     rows: number,
     targetSectionId: string,
-    placement: "above" | "below"
+    placement: "above" | "below",
   ) => void;
   onMoveSection: (sectionId: string, direction: -1 | 1) => void;
   onDuplicateSection: (sectionId: string) => void;
@@ -6753,27 +8662,29 @@ function PreviewCanvas({
 }) {
   const [wireframeColumns, setWireframeColumns] = useState(2);
   const [wireframeRows, setWireframeRows] = useState(1);
-  const [insertAfterSectionId, setInsertAfterSectionId] = useState<string | null>(
-    null
-  );
+  const [insertAfterSectionId, setInsertAfterSectionId] = useState<
+    string | null
+  >(null);
   const visibleSections = sections.filter((section) => section.visible);
   return (
     <div
       className="builder-preview-canvas"
-      style={{
-        "--builder-global-section-padding-top": getPreviewSpacing(
-          shellSettings.sectionPaddingTop
-        ),
-        "--builder-global-section-padding-bottom": getPreviewSpacing(
-          shellSettings.sectionPaddingBottom
-        ),
-        "--builder-global-section-margin-top": getPreviewSpacing(
-          shellSettings.sectionMarginTop
-        ),
-        "--builder-global-section-margin-bottom": getPreviewSpacing(
-          shellSettings.sectionMarginBottom
-        ),
-      } as CSSProperties}
+      style={
+        {
+          "--builder-global-section-padding-top": getPreviewSpacing(
+            shellSettings.sectionPaddingTop,
+          ),
+          "--builder-global-section-padding-bottom": getPreviewSpacing(
+            shellSettings.sectionPaddingBottom,
+          ),
+          "--builder-global-section-margin-top": getPreviewSpacing(
+            shellSettings.sectionMarginTop,
+          ),
+          "--builder-global-section-margin-bottom": getPreviewSpacing(
+            shellSettings.sectionMarginBottom,
+          ),
+        } as CSSProperties
+      }
     >
       <div ref={headerSlotRef} className="builder-preview-header-slot" />
       {visibleSections.length === 0 && (
@@ -6790,225 +8701,236 @@ function PreviewCanvas({
         } builder-preview-page`}
         style={previewDesignStyle(design)}
       >
-      <div className="shop-builder-inner builder-preview-inner" aria-label={`${pageLabel} preview`}>
-      {visibleSections.map((section) => {
-        const sourceIndex = sections.findIndex((item) => item.id === section.id);
-        const isSelected = selectedId === section.id;
+        <div
+          className="shop-builder-inner builder-preview-inner"
+          aria-label={`${pageLabel} preview`}
+        >
+          {visibleSections.map((section) => {
+            const sourceIndex = sections.findIndex(
+              (item) => item.id === section.id,
+            );
+            const isSelected = selectedId === section.id;
 
-        return (
-          <div
-            key={section.id}
-            role="button"
-            tabIndex={0}
-            draggable
-            className={`builder-preview-section ${getStorefrontPreviewClass(
-              section
-            )} builder-preview-${section.kind} builder-preview-section--${
-              section.backgroundMode === "boxed" ? "boxed" : "full"
-            } builder-preview-section--content-${
-              section.contentMode ?? "boxed"
-            } builder-preview-section--scheme-${resolveSectionColorScheme(section)} ${
-              isSelected ? "is-selected" : ""
-            } ${
-              draggingSectionId === section.id ? "is-dragging" : ""
-            }`}
-            style={
-              {
-                background: section.background,
-                "--builder-preview-padding-top": getPreviewSpacing(section.topSpacing),
-                "--builder-preview-padding-bottom": getPreviewSpacing(
-                  section.bottomSpacing
-                ),
-                "--builder-section-padding-top": getPreviewSpacing(
-                  section.topSpacing
-                ),
-                "--builder-section-padding-bottom": getPreviewSpacing(
-                  section.bottomSpacing
-                ),
-                "--builder-section-margin-top": getPreviewSpacing(section.topMargin),
-                "--builder-section-margin-bottom": getPreviewSpacing(
-                  section.bottomMargin
-                ),
-                ...sectionSchemeStyle(section),
-              } as CSSProperties
-            }
-            onClick={() => onSelect(section.id)}
-            onKeyDown={(event) => {
-              if (event.key === "Enter" || event.key === " ") {
-                event.preventDefault();
-                onSelect(section.id);
-              }
-            }}
-            onDragStart={(event) => {
-              event.dataTransfer.setData("text/plain", section.id);
-              event.dataTransfer.effectAllowed = "move";
-              onDragStart(section.id);
-            }}
-            onDragOver={(event) => {
-              event.preventDefault();
-              event.dataTransfer.dropEffect = "move";
-            }}
-            onDrop={(event) => {
-              event.preventDefault();
-              const sourceId = event.dataTransfer.getData("text/plain");
-              if (sourceId.startsWith("builder-block:")) return;
-              onReorder(sourceId, section.id);
-              onDragEnd();
-            }}
-            onDragEnd={onDragEnd}
-          >
-            <div
-              className={`builder-preview-section-tools ${
-                isSelected ? "is-selected-tools" : ""
-              }`}
-                onClick={(event) => event.stopPropagation()}
-                onMouseDown={(event) => event.stopPropagation()}
-                onDragStart={(event) => event.stopPropagation()}
-              >
-                <div className="builder-preview-section-tools-main">
-                  <span>{sectionLabels[section.kind]}</span>
-                  <button
-                    type="button"
-                    onClick={() => onMoveSection(section.id, -1)}
-                    disabled={sourceIndex <= 0}
-                    title="Move section up"
-                  >
-                    <ArrowUp size={14} />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => onMoveSection(section.id, 1)}
-                    disabled={sourceIndex < 0 || sourceIndex >= sections.length - 1}
-                    title="Move section down"
-                  >
-                    <ArrowDown size={14} />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => onDuplicateSection(section.id)}
-                    title="Duplicate section"
-                  >
-                    <Copy size={14} />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => onDeleteSection(section.id)}
-                    title="Delete section"
-                  >
-                    <Trash2 size={14} />
-                  </button>
-                </div>
-              </div>
+            return (
               <div
-                className="builder-preview-section-insert"
-                onClick={(event) => event.stopPropagation()}
-                onMouseDown={(event) => event.stopPropagation()}
-                onDragStart={(event) => event.stopPropagation()}
-              >
-                <button
-                  type="button"
-                  className="builder-preview-section-insert-trigger"
-                  onClick={() =>
-                    setInsertAfterSectionId((current) =>
-                      current === section.id ? null : section.id
-                    )
+                key={section.id}
+                role="button"
+                tabIndex={0}
+                draggable
+                className={`builder-preview-section ${getStorefrontPreviewClass(
+                  section,
+                )} builder-preview-${section.kind} builder-preview-section--${
+                  section.backgroundMode === "boxed" ? "boxed" : "full"
+                } builder-preview-section--content-${
+                  section.contentMode ?? "boxed"
+                } builder-preview-section--scheme-${resolveSectionColorScheme(section)} ${
+                  isSelected ? "is-selected" : ""
+                } ${draggingSectionId === section.id ? "is-dragging" : ""}`}
+                style={
+                  {
+                    background: section.background,
+                    "--builder-preview-padding-top": getPreviewSpacing(
+                      section.topSpacing,
+                    ),
+                    "--builder-preview-padding-bottom": getPreviewSpacing(
+                      section.bottomSpacing,
+                    ),
+                    "--builder-section-padding-top": getPreviewSpacing(
+                      section.topSpacing,
+                    ),
+                    "--builder-section-padding-bottom": getPreviewSpacing(
+                      section.bottomSpacing,
+                    ),
+                    "--builder-section-margin-top": getPreviewSpacing(
+                      section.topMargin,
+                    ),
+                    "--builder-section-margin-bottom": getPreviewSpacing(
+                      section.bottomMargin,
+                    ),
+                    ...sectionSchemeStyle(section),
+                  } as CSSProperties
+                }
+                onClick={() => onSelect(section.id)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    onSelect(section.id);
                   }
-                  aria-label="Add section below"
-                  title="Add section below"
+                }}
+                onDragStart={(event) => {
+                  event.dataTransfer.setData("text/plain", section.id);
+                  event.dataTransfer.effectAllowed = "move";
+                  onDragStart(section.id);
+                }}
+                onDragOver={(event) => {
+                  event.preventDefault();
+                  event.dataTransfer.dropEffect = "move";
+                }}
+                onDrop={(event) => {
+                  event.preventDefault();
+                  const sourceId = event.dataTransfer.getData("text/plain");
+                  if (sourceId.startsWith("builder-block:")) return;
+                  onReorder(sourceId, section.id);
+                  onDragEnd();
+                }}
+                onDragEnd={onDragEnd}
+              >
+                <div
+                  className={`builder-preview-section-tools ${
+                    isSelected ? "is-selected-tools" : ""
+                  }`}
+                  onClick={(event) => event.stopPropagation()}
+                  onMouseDown={(event) => event.stopPropagation()}
+                  onDragStart={(event) => event.stopPropagation()}
                 >
-                  <Plus size={16} />
-                </button>
-
-                {insertAfterSectionId === section.id && (
-                  <div className="builder-preview-section-insert-panel">
-                    <strong>New section</strong>
-                    <div className="builder-wireframe-controls">
-                      <label>
-                        <span>Cols</span>
-                        <select
-                          value={wireframeColumns}
-                          onChange={(event) =>
-                            setWireframeColumns(Number(event.target.value))
-                          }
-                        >
-                          <option value={1}>1</option>
-                          <option value={2}>2</option>
-                          <option value={3}>3</option>
-                          <option value={4}>4</option>
-                          <option value={5}>5</option>
-                          <option value={6}>6</option>
-                        </select>
-                      </label>
-                      <label>
-                        <span>Rows</span>
-                        <select
-                          value={wireframeRows}
-                          onChange={(event) =>
-                            setWireframeRows(Number(event.target.value))
-                          }
-                        >
-                          <option value={1}>1</option>
-                          <option value={2}>2</option>
-                          <option value={3}>3</option>
-                          <option value={4}>4</option>
-                        </select>
-                      </label>
-                      <span
-                        className="builder-wireframe-preview"
-                        style={
-                          { "--wireframe-columns": wireframeColumns } as CSSProperties
-                        }
-                        aria-hidden="true"
-                      >
-                        {Array.from({
-                          length: wireframeColumns * wireframeRows,
-                        }).map((_, index) => (
-                          <i key={index} />
-                        ))}
-                      </span>
-                    </div>
+                  <div className="builder-preview-section-tools-main">
+                    <span>{sectionLabels[section.kind]}</span>
                     <button
                       type="button"
-                      onClick={() => {
-                        onAddWireframe(
-                          wireframeColumns,
-                          wireframeRows,
-                          section.id,
-                          "below"
-                        );
-                        setInsertAfterSectionId(null);
-                      }}
+                      onClick={() => onMoveSection(section.id, -1)}
+                      disabled={sourceIndex <= 0}
+                      title="Move section up"
                     >
-                      Add section
+                      <ArrowUp size={14} />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => onMoveSection(section.id, 1)}
+                      disabled={
+                        sourceIndex < 0 || sourceIndex >= sections.length - 1
+                      }
+                      title="Move section down"
+                    >
+                      <ArrowDown size={14} />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => onDuplicateSection(section.id)}
+                      title="Duplicate section"
+                    >
+                      <Copy size={14} />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => onDeleteSection(section.id)}
+                      title="Delete section"
+                    >
+                      <Trash2 size={14} />
                     </button>
                   </div>
-                )}
+                </div>
+                <div
+                  className="builder-preview-section-insert"
+                  onClick={(event) => event.stopPropagation()}
+                  onMouseDown={(event) => event.stopPropagation()}
+                  onDragStart={(event) => event.stopPropagation()}
+                >
+                  <button
+                    type="button"
+                    className="builder-preview-section-insert-trigger"
+                    onClick={() =>
+                      setInsertAfterSectionId((current) =>
+                        current === section.id ? null : section.id,
+                      )
+                    }
+                    aria-label="Add section below"
+                    title="Add section below"
+                  >
+                    <Plus size={16} />
+                  </button>
+
+                  {insertAfterSectionId === section.id && (
+                    <div className="builder-preview-section-insert-panel">
+                      <strong>New section</strong>
+                      <div className="builder-wireframe-controls">
+                        <label>
+                          <span>Cols</span>
+                          <select
+                            value={wireframeColumns}
+                            onChange={(event) =>
+                              setWireframeColumns(Number(event.target.value))
+                            }
+                          >
+                            <option value={1}>1</option>
+                            <option value={2}>2</option>
+                            <option value={3}>3</option>
+                            <option value={4}>4</option>
+                            <option value={5}>5</option>
+                            <option value={6}>6</option>
+                          </select>
+                        </label>
+                        <label>
+                          <span>Rows</span>
+                          <select
+                            value={wireframeRows}
+                            onChange={(event) =>
+                              setWireframeRows(Number(event.target.value))
+                            }
+                          >
+                            <option value={1}>1</option>
+                            <option value={2}>2</option>
+                            <option value={3}>3</option>
+                            <option value={4}>4</option>
+                          </select>
+                        </label>
+                        <span
+                          className="builder-wireframe-preview"
+                          style={
+                            {
+                              "--wireframe-columns": wireframeColumns,
+                            } as CSSProperties
+                          }
+                          aria-hidden="true"
+                        >
+                          {Array.from({
+                            length: wireframeColumns * wireframeRows,
+                          }).map((_, index) => (
+                            <i key={index} />
+                          ))}
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          onAddWireframe(
+                            wireframeColumns,
+                            wireframeRows,
+                            section.id,
+                            "below",
+                          );
+                          setInsertAfterSectionId(null);
+                        }}
+                      >
+                        Add section
+                      </button>
+                    </div>
+                  )}
+                </div>
+                <PreviewSection
+                  section={section}
+                  previewProducts={previewProducts}
+                  previewCategoryTree={previewCategoryTree}
+                  previewCategoryCounts={previewCategoryCounts}
+                  selectedLayoutColumnKey={selectedLayoutColumnKey}
+                  selectedLayoutBlockKey={selectedLayoutBlockKey}
+                  draggingLayoutBlockKey={draggingLayoutBlockKey}
+                  onSelectColumn={onSelectColumn}
+                  onSelectBlock={onSelectBlock}
+                  onBlockDragStart={onBlockDragStart}
+                  onBlockDragEnd={onBlockDragEnd}
+                  onMoveBlock={onMoveBlock}
+                  onCreateBlock={onCreateBlock}
+                  onDuplicateBlock={onDuplicateBlock}
+                  onDeleteBlock={onDeleteBlock}
+                  onUpdateSection={onUpdateSection}
+                  onUpdateBlock={onUpdateBlock}
+                  onUpdateGridItem={onUpdateGridItem}
+                  onUploadGridItemImage={onUploadGridItemImage}
+                />
               </div>
-            <PreviewSection
-              section={section}
-              previewProducts={previewProducts}
-              previewCategoryTree={previewCategoryTree}
-              previewCategoryCounts={previewCategoryCounts}
-              selectedLayoutColumnKey={selectedLayoutColumnKey}
-              selectedLayoutBlockKey={selectedLayoutBlockKey}
-              draggingLayoutBlockKey={draggingLayoutBlockKey}
-              onSelectColumn={onSelectColumn}
-              onSelectBlock={onSelectBlock}
-              onBlockDragStart={onBlockDragStart}
-              onBlockDragEnd={onBlockDragEnd}
-              onMoveBlock={onMoveBlock}
-              onCreateBlock={onCreateBlock}
-              onDuplicateBlock={onDuplicateBlock}
-              onDeleteBlock={onDeleteBlock}
-              onUpdateSection={onUpdateSection}
-              onUpdateBlock={onUpdateBlock}
-              onUpdateGridItem={onUpdateGridItem}
-              onUploadGridItemImage={onUploadGridItemImage}
-            />
-          </div>
-        );
-      })}
-      </div>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
@@ -7089,10 +9011,16 @@ function getStorefrontPreviewClass(section: BuilderSection) {
 }
 
 function getPreviewLayoutBlocks(
-  item: NonNullable<BuilderSection["layoutItems"]>[number]
+  item: NonNullable<BuilderSection["layoutItems"]>[number],
 ) {
   if (item.blocks?.length) return item.blocks;
-  if (item.title || item.body || item.eyebrow || item.buttonLabel || item.buttonUrl) {
+  if (
+    item.title ||
+    item.body ||
+    item.eyebrow ||
+    item.buttonLabel ||
+    item.buttonUrl
+  ) {
     return [
       {
         id: `${item.id ?? "legacy"}-text`,
@@ -7238,7 +9166,9 @@ function PreviewProductBlockContent({
   }
 
   if (block.kind === "productPrice") {
-    return <div className="shop-builder-product-price">{product.priceFormatted}</div>;
+    return (
+      <div className="shop-builder-product-price">{product.priceFormatted}</div>
+    );
   }
 
   if (block.kind === "productAddToCart") {
@@ -7260,7 +9190,9 @@ function PreviewProductBlockContent({
   }
 
   if (block.kind === "productDescription") {
-    return <p className="shop-builder-product-description">{product.description}</p>;
+    return (
+      <p className="shop-builder-product-description">{product.description}</p>
+    );
   }
 
   if (block.kind === "productHero") {
@@ -7270,8 +9202,12 @@ function PreviewProductBlockContent({
         <div className="shop-builder-premium-product-copy">
           <span>Featured Product</span>
           <h3>{product.name}</h3>
-          <div className="shop-builder-product-price">{product.priceFormatted}</div>
-          <p className="shop-builder-product-description">{product.description}</p>
+          <div className="shop-builder-product-price">
+            {product.priceFormatted}
+          </div>
+          <p className="shop-builder-product-description">
+            {product.description}
+          </p>
           <ProductOptionsSelector
             id={product.id}
             slug={product.slug}
@@ -7290,8 +9226,12 @@ function PreviewProductBlockContent({
     return (
       <div className="shop-builder-product-info-stack">
         <h3>{product.name}</h3>
-        <div className="shop-builder-product-price">{product.priceFormatted}</div>
-        <p className="shop-builder-product-description">{product.description}</p>
+        <div className="shop-builder-product-price">
+          {product.priceFormatted}
+        </div>
+        <p className="shop-builder-product-description">
+          {product.description}
+        </p>
         <ProductOptionsSelector
           id={product.id}
           slug={product.slug}
@@ -7310,7 +9250,9 @@ function PreviewProductBlockContent({
       <div className="shop-builder-product-purchase-panel">
         <span>Ready to order</span>
         <h3>{product.name}</h3>
-        <div className="shop-builder-product-price">{product.priceFormatted}</div>
+        <div className="shop-builder-product-price">
+          {product.priceFormatted}
+        </div>
         <ProductOptionsSelector
           id={product.id}
           slug={product.slug}
@@ -7405,7 +9347,11 @@ function PreviewSection({
   selectedLayoutBlockKey: string | null;
   draggingLayoutBlockKey: string | null;
   onSelectColumn: (sectionId: string, columnKey: string) => void;
-  onSelectBlock: (sectionId: string, columnKey: string, blockKey: string) => void;
+  onSelectBlock: (
+    sectionId: string,
+    columnKey: string,
+    blockKey: string,
+  ) => void;
   onBlockDragStart: (blockKey: string) => void;
   onBlockDragEnd: () => void;
   onMoveBlock: (payload: {
@@ -7436,21 +9382,21 @@ function PreviewSection({
     sectionId: string,
     columnKey: string,
     blockKey: string,
-    patch: Partial<BuilderLayoutBlock>
+    patch: Partial<BuilderLayoutBlock>,
   ) => void;
   onUpdateGridItem: (
     sectionId: string,
     columnKey: string,
     blockKey: string,
     itemIndex: number,
-    patch: NonNullable<BuilderLayoutBlock["gridItems"]>[number]
+    patch: NonNullable<BuilderLayoutBlock["gridItems"]>[number],
   ) => void;
   onUploadGridItemImage: (
     sectionId: string,
     columnKey: string,
     blockKey: string,
     itemIndex: number,
-    file: File | null
+    file: File | null,
   ) => void;
 }) {
   if (section.kind === "hero") {
@@ -7483,7 +9429,10 @@ function PreviewSection({
             <span className="shop-builder-cta">{section.buttonLabel}</span>
           )}
         </div>
-        <div className="shop-builder-hero-media builder-preview-hero-media" aria-hidden="true" />
+        <div
+          className="shop-builder-hero-media builder-preview-hero-media"
+          aria-hidden="true"
+        />
       </div>
     );
   }
@@ -7502,6 +9451,11 @@ function PreviewSection({
             gridGap={section.gridGap}
             cardPadding={section.cardPadding}
             imagePadding={section.imagePadding}
+            addToCartStyle={section.addToCartStyle}
+            addToCartSize={section.addToCartSize}
+            addToCartPosition={section.addToCartPosition}
+            addToCartVisibility={section.addToCartVisibility}
+            addToCartDisplay={section.addToCartDisplay}
           />
         ) : (
           <div className="builder-preview-products">
@@ -7509,13 +9463,23 @@ function PreviewSection({
             <div
               className={`builder-preview-product-grid cards-${
                 section.cardStyle ?? "flat"
-              } preset-${section.cardPreset ?? "standard"}`}
-              style={{ "--builder-preview-columns": section.columns ?? 4 } as CSSProperties}
+              } preset-${section.cardPreset ?? "standard"} cart-${section.addToCartStyle ?? "blue"} cart-size-${section.addToCartSize ?? "medium"} cart-position-${section.addToCartPosition ?? "below"} cart-visibility-${section.addToCartVisibility ?? "hover"} cart-display-${section.addToCartDisplay ?? "button"}`}
+              style={
+                {
+                  "--builder-preview-columns": section.columns ?? 4,
+                } as CSSProperties
+              }
             >
               {sampleProducts
-                .slice(0, Math.min(section.gridLimit ?? 12, sampleProducts.length))
+                .slice(
+                  0,
+                  Math.min(section.gridLimit ?? 12, sampleProducts.length),
+                )
                 .map((name) => (
-                  <div key={name} className="product-card builder-preview-product-card">
+                  <div
+                    key={name}
+                    className="product-card builder-preview-product-card"
+                  >
                     <div className="product-image builder-preview-product-image" />
                     <strong className="product-title">{name}</strong>
                     <span className="product-attr-pill">Preview product</span>
@@ -7545,7 +9509,10 @@ function PreviewSection({
             ? recentProducts.map((product) => {
                 const attributes = getPreviewProductAttributes(product);
                 return (
-                  <article key={product.id} className="product-card builder-preview-product-card">
+                  <article
+                    key={product.id}
+                    className="product-card builder-preview-product-card"
+                  >
                     <div className="product-image builder-preview-product-image">
                       {product.image?.sourceUrl ? (
                         <Image
@@ -7555,7 +9522,9 @@ function PreviewSection({
                           height={520}
                         />
                       ) : (
-                        <div className="product-image-placeholder">No image</div>
+                        <div className="product-image-placeholder">
+                          No image
+                        </div>
                       )}
                     </div>
                     <strong className="product-title">{product.name}</strong>
@@ -7576,9 +9545,9 @@ function PreviewSection({
                   </article>
                 );
               })
-            : sampleProducts.slice(0, 4).map((name) => (
-                <span key={name}>{name}</span>
-              ))}
+            : sampleProducts
+                .slice(0, 4)
+                .map((name) => <span key={name}>{name}</span>)}
         </div>
       </div>
     );
@@ -7713,676 +9682,828 @@ function PreviewSection({
             const blocks = getPreviewLayoutBlocks(item);
 
             return (
-            <article
-              key={columnKey}
-              className={`shop-builder-content-layout-card ${
-                blocks.length === 0 ? "is-empty-column" : ""
-              } ${
-                selectedLayoutColumnKey === columnKey ? "is-selected-column" : ""
-              }`}
-              onClick={(event) => {
-                event.stopPropagation();
-                onSelectColumn(section.id, columnKey);
-              }}
-              onDragOver={(event) => {
-                const types = Array.from(event.dataTransfer.types);
-                if (
-                  types.includes("application/x-builder-block") ||
-                  types.includes("application/x-builder-new-block")
-                ) {
-                  event.preventDefault();
+              <article
+                key={columnKey}
+                className={`shop-builder-content-layout-card ${
+                  blocks.length === 0 ? "is-empty-column" : ""
+                } ${
+                  selectedLayoutColumnKey === columnKey
+                    ? "is-selected-column"
+                    : ""
+                }`}
+                onClick={(event) => {
                   event.stopPropagation();
-                  event.dataTransfer.dropEffect = types.includes(
-                    "application/x-builder-new-block"
-                  )
-                    ? "copy"
-                    : "move";
-                }
-              }}
-              onDrop={(event) => {
-                const newBlockKind = event.dataTransfer.getData(
-                  "application/x-builder-new-block"
-                ) as LayoutBlockKind;
-                if (newBlockKind && newBlockKind in layoutBlockLabels) {
-                  event.preventDefault();
-                  event.stopPropagation();
-                  onCreateBlock({
-                    sectionId: section.id,
-                    targetColumnKey: columnKey,
-                    kind: newBlockKind,
-                  });
-                  return;
-                }
-
-                const payload = event.dataTransfer.getData(
-                  "application/x-builder-block"
-                );
-                if (!payload) return;
-                event.preventDefault();
-                event.stopPropagation();
-                try {
-                  const parsed = JSON.parse(payload) as {
-                    sectionId: string;
-                    sourceColumnKey: string;
-                    sourceBlockKey: string;
-                  };
-                  onMoveBlock({
-                    ...parsed,
-                    targetColumnKey: columnKey,
-                  });
-                } catch {
-                  onBlockDragEnd();
-                }
-                onBlockDragEnd();
-              }}
-            >
-              <div className="builder-preview-column-label">Column {index + 1}</div>
-              {blocks.length === 0 && (
-                <div
-                  className="builder-preview-drop-zone"
-                  aria-label={`Drop element into column ${index + 1}`}
-                  title={`Drop element into column ${index + 1}`}
-                >
-                  <Plus size={16} />
-                </div>
-              )}
-              {blocks.map((block, blockIndex) => {
-                const blockKey = block.id ?? `${columnKey}-block-${blockIndex}`;
-
-                return (
-                <div
-                  key={blockKey}
-                  draggable
-                  className={`builder-preview-layout-block is-${
-                    block.kind ?? "text"
-                  } ${
-                    selectedLayoutBlockKey === blockKey ? "is-selected-block" : ""
-                  } ${
-                    draggingLayoutBlockKey === blockKey ? "is-dragging-block" : ""
-                  } is-padding-${block.elementPadding ?? "none"}`}
-                  style={
-                    {
-                      "--builder-element-bg":
-                        block.elementBackgroundMode === "transparent"
-                          ? "transparent"
-                          : block.elementBackgroundMode === "custom"
-                            ? block.elementBackground ?? "#ffffff"
-                            : undefined,
-                    } as CSSProperties
-                  }
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    onSelectBlock(section.id, columnKey, blockKey);
-                  }}
-                  onDragStart={(event) => {
-                    event.stopPropagation();
-                    const payload = JSON.stringify({
-                      sectionId: section.id,
-                      sourceColumnKey: columnKey,
-                      sourceBlockKey: blockKey,
-                    });
-                    event.dataTransfer.setData(
-                      "application/x-builder-block",
-                      payload
-                    );
-                    event.dataTransfer.setData("text/plain", `builder-block:${blockKey}`);
-                    event.dataTransfer.effectAllowed = "move";
-                    onBlockDragStart(blockKey);
-                  }}
-                  onDragOver={(event) => {
-                    const types = Array.from(event.dataTransfer.types);
-                    if (
-                      types.includes("application/x-builder-block") ||
-                      types.includes("application/x-builder-new-block")
-                    ) {
-                      event.preventDefault();
-                      event.stopPropagation();
-                      event.dataTransfer.dropEffect = types.includes(
-                        "application/x-builder-new-block"
-                      )
-                        ? "copy"
-                        : "move";
-                    }
-                  }}
-                  onDrop={(event) => {
-                    const newBlockKind = event.dataTransfer.getData(
-                      "application/x-builder-new-block"
-                    ) as LayoutBlockKind;
-                    if (newBlockKind && newBlockKind in layoutBlockLabels) {
-                      event.preventDefault();
-                      event.stopPropagation();
-                      onCreateBlock({
-                        sectionId: section.id,
-                        targetColumnKey: columnKey,
-                        targetBlockKey: blockKey,
-                        kind: newBlockKind,
-                      });
-                      return;
-                    }
-
-                    const payload = event.dataTransfer.getData(
-                      "application/x-builder-block"
-                    );
-                    if (!payload) return;
+                  onSelectColumn(section.id, columnKey);
+                }}
+                onDragOver={(event) => {
+                  const types = Array.from(event.dataTransfer.types);
+                  if (
+                    types.includes("application/x-builder-block") ||
+                    types.includes("application/x-builder-new-block")
+                  ) {
                     event.preventDefault();
                     event.stopPropagation();
-                    try {
-                      const parsed = JSON.parse(payload) as {
-                        sectionId: string;
-                        sourceColumnKey: string;
-                        sourceBlockKey: string;
-                      };
-                      onMoveBlock({
-                        ...parsed,
-                        targetColumnKey: columnKey,
-                        targetBlockKey: blockKey,
-                      });
-                    } catch {
-                      onBlockDragEnd();
-                    }
+                    event.dataTransfer.dropEffect = types.includes(
+                      "application/x-builder-new-block",
+                    )
+                      ? "copy"
+                      : "move";
+                  }
+                }}
+                onDrop={(event) => {
+                  const newBlockKind = event.dataTransfer.getData(
+                    "application/x-builder-new-block",
+                  ) as LayoutBlockKind;
+                  if (newBlockKind && newBlockKind in layoutBlockLabels) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    onCreateBlock({
+                      sectionId: section.id,
+                      targetColumnKey: columnKey,
+                      kind: newBlockKind,
+                    });
+                    return;
+                  }
+
+                  const payload = event.dataTransfer.getData(
+                    "application/x-builder-block",
+                  );
+                  if (!payload) return;
+                  event.preventDefault();
+                  event.stopPropagation();
+                  try {
+                    const parsed = JSON.parse(payload) as {
+                      sectionId: string;
+                      sourceColumnKey: string;
+                      sourceBlockKey: string;
+                    };
+                    onMoveBlock({
+                      ...parsed,
+                      targetColumnKey: columnKey,
+                    });
+                  } catch {
                     onBlockDragEnd();
-                  }}
-                  onDragEnd={onBlockDragEnd}
-                >
+                  }
+                  onBlockDragEnd();
+                }}
+              >
+                <div className="builder-preview-column-label">
+                  Column {index + 1}
+                </div>
+                {blocks.length === 0 && (
                   <div
-                    className="builder-preview-block-tools"
-                    onClick={(event) => event.stopPropagation()}
-                    onMouseDown={(event) => event.stopPropagation()}
-                    onDragStart={(event) => event.stopPropagation()}
+                    className="builder-preview-drop-zone"
+                    aria-label={`Drop element into column ${index + 1}`}
+                    title={`Drop element into column ${index + 1}`}
                   >
-                    <span>{layoutBlockLabels[block.kind ?? "text"] ?? "Block"}</span>
-                    <button
-                      type="button"
-                      onClick={() => onSelectBlock(section.id, columnKey, blockKey)}
-                      title="Edit element"
-                    >
-                      <Settings2 size={13} />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() =>
-                        onDuplicateBlock({
-                          sectionId: section.id,
-                          columnKey,
-                          blockKey,
-                        })
-                      }
-                      title="Duplicate element"
-                    >
-                      <Copy size={13} />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() =>
-                        onDeleteBlock({
-                          sectionId: section.id,
-                          columnKey,
-                          blockKey,
-                        })
-                      }
-                      title="Delete element"
-                    >
-                      <Trash2 size={13} />
-                    </button>
+                    <Plus size={16} />
                   </div>
-                  <span className="builder-preview-drag-handle" aria-hidden="true">
-                    ::
-                  </span>
-                  {block.kind !== "products" && block.kind?.startsWith("product") ? (
-                    <PreviewProductBlockContent
-                      block={block}
-                      product={previewProduct}
-                    />
-                  ) : block.kind === "icon" ? (
-                    <div className="builder-preview-goodie builder-preview-goodie-icon">
-                      {getPreviewGoodieIcon(block.iconName)}
-                      {block.title && <strong>{block.title}</strong>}
-                      {block.body && <p>{block.body}</p>}
-                    </div>
-                  ) : block.kind === "list" ? (
-                    <div className="builder-preview-goodie builder-preview-goodie-list">
-                      {block.title && <strong>{block.title}</strong>}
-                      <ul>
-                        {(block.items ?? []).map((item) => (
-                          <li key={item}>
-                            <Check size={14} />
-                            {item}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  ) : block.kind === "datePicker" ? (
-                    <div className="builder-preview-goodie builder-preview-goodie-date">
-                      <CalendarDays size={24} />
-                      {block.title && <strong>{block.title}</strong>}
-                      {block.body && <p>{block.body}</p>}
-                      <label>
-                        <span>{block.dateLabel ?? "Preferred date"}</span>
-                        <input type="date" />
-                      </label>
-                    </div>
-                  ) : block.kind === "hero" ? (
-                    <div className="shop-builder-column-block shop-builder-column-block--hero">
-                      {block.eyebrow && (
-                        <InlineEditableText
-                          as="span"
-                          value={block.eyebrow}
-                          onChange={(eyebrow) =>
-                            onUpdateBlock(section.id, columnKey, blockKey, { eyebrow })
-                          }
-                        />
-                      )}
-                      {block.title && (
-                        <InlineEditableText
-                          as="h3"
-                          value={block.title}
-                          onChange={(title) =>
-                            onUpdateBlock(section.id, columnKey, blockKey, { title })
-                          }
-                        />
-                      )}
-                      {block.body && (
-                        <InlineEditableText
-                          as="p"
-                          value={block.body}
-                          onChange={(body) =>
-                            onUpdateBlock(section.id, columnKey, blockKey, { body })
-                          }
-                        />
-                      )}
-                      {block.buttonLabel && (
-                        <span className="builder-preview-cta">{block.buttonLabel}</span>
-                      )}
-                    </div>
-                  ) : block.kind === "promoStrip" ? (
-                    <div className="shop-builder-column-block shop-builder-column-block--promo-strip">
-                      <div>
-                        {block.eyebrow && (
-                          <InlineEditableText
-                            as="span"
-                            value={block.eyebrow}
-                            onChange={(eyebrow) =>
-                              onUpdateBlock(section.id, columnKey, blockKey, { eyebrow })
-                            }
-                          />
-                        )}
-                        {block.title && (
-                          <InlineEditableText
-                            as="h3"
-                            value={block.title}
-                            onChange={(title) =>
-                              onUpdateBlock(section.id, columnKey, blockKey, { title })
-                            }
-                          />
-                        )}
-                        {block.body && (
-                          <InlineEditableText
-                            as="p"
-                            value={block.body}
-                            onChange={(body) =>
-                              onUpdateBlock(section.id, columnKey, blockKey, { body })
-                            }
-                          />
-                        )}
-                      </div>
-                      {block.buttonLabel && (
-                        <span className="builder-preview-cta">{block.buttonLabel}</span>
-                      )}
-                    </div>
-                  ) : block.kind === "panel" ? (
-                    <div className="shop-builder-column-block shop-builder-column-block--panel">
-                      {block.imageUrl && (
-                        <div
-                          className="shop-builder-panel-media"
-                          style={{ backgroundImage: `url(${block.imageUrl})` }}
-                        />
-                      )}
-                      <div>
-                        {block.eyebrow && (
-                          <InlineEditableText
-                            as="span"
-                            value={block.eyebrow}
-                            onChange={(eyebrow) =>
-                              onUpdateBlock(section.id, columnKey, blockKey, { eyebrow })
-                            }
-                          />
-                        )}
-                        {block.title && (
-                          <InlineEditableText
-                            as="strong"
-                            value={block.title}
-                            onChange={(title) =>
-                              onUpdateBlock(section.id, columnKey, blockKey, { title })
-                            }
-                          />
-                        )}
-                        {block.body && (
-                          <InlineEditableText
-                            as="p"
-                            value={block.body}
-                            onChange={(body) =>
-                              onUpdateBlock(section.id, columnKey, blockKey, { body })
-                            }
-                          />
-                        )}
-                        {block.buttonLabel && (
-                          <span className="builder-preview-cta">{block.buttonLabel}</span>
-                        )}
-                      </div>
-                    </div>
-                  ) : block.kind === "categoryFilters" ? (
-                    <div className="shop-builder-column-block shop-builder-column-block--category-filters">
-                      {previewCategoryTree.length > 0 ? (
-                        <CategoryBar
-                          categoryTree={previewCategoryTree}
-                          countsBySlug={previewCategoryCounts}
-                        />
-                      ) : (
-                        <div className="shop-builder-filter-pills">
-                          <span>Women</span>
-                          <span>Men</span>
-                          <span>Boots</span>
-                          <span>Accessories</span>
-                        </div>
-                      )}
-                    </div>
-                  ) : block.kind === "slider" ? (
-                    <div className="shop-builder-column-block shop-builder-column-block--slider">
-                      {block.title && <h3>{block.title}</h3>}
-                      {block.body && <p>{block.body}</p>}
-                      <CarouselBlock
-                        block={{
-                          __typename: "PageBuilderLayoutPageBuilderCarouselLayoutLayout",
-                          fieldGroupName: "ReactBuilderColumnSliderPreview",
-                        }}
-                        slides={(block.slides ?? []).map((slide, slideIndex) => ({
-                          id: slide.id ?? `${blockKey}-slide-${slideIndex}`,
-                          title: slide.title,
-                          subtitle: slide.subtitle,
-                          text: slide.text,
-                          badge: slide.badge,
-                          imageUrl: slide.imageUrl,
-                          imageAlt: slide.imageAlt,
-                          imagePadding: slide.imagePadding,
-                          buttonLabel: slide.buttonLabel,
-                          buttonUrl: slide.buttonUrl,
-                        }))}
-                        settings={block.carouselSettings}
-                      />
-                    </div>
-                  ) : block.kind === "products" ? (
-                    <div className="shop-builder-column-block shop-builder-column-block--products">
-                      {block.title && <h3>{block.title}</h3>}
-                      {previewProducts.length > 0 ? (
-                        <div
-                          className={`shop-builder-grid--margin-${
-                            block.gridMargin ?? "none"
-                          }`}
-                        >
-                          <CategoryWithFilters
-                            products={previewProducts.slice(0, block.gridLimit ?? 4)}
-                            columns={block.columns}
-                            filterPosition={block.filterPosition}
-                            cardStyle={block.cardStyle}
-                            cardPreset={block.cardPreset}
-                            pageSize={block.gridLimit}
-                            gridGap={block.gridGap}
-                            cardPadding={block.cardPadding}
-                            imagePadding={block.imagePadding}
-                            imageFrame={block.gridImageFrame}
-                          />
-                        </div>
-                      ) : (
-                        <div className="builder-preview-products">
-                          {sampleProducts
-                            .slice(0, block.gridLimit ?? 4)
-                            .map((name) => (
-                              <span key={name}>{name}</span>
-                            ))}
-                        </div>
-                      )}
-                    </div>
-                  ) : block.kind === "grid" ? (
-                    <div className="shop-builder-column-block shop-builder-column-block--grid">
-                      <div
-                        className={`shop-builder-grid shop-builder-grid--gap-${
-                          block.gridGap ?? "medium"
-                        } shop-builder-grid--margin-${block.gridMargin ?? "none"}`}
-                        style={
-                          {
-                            "--shop-builder-grid-columns": block.columns ?? 3,
-                          } as CSSProperties
+                )}
+                {blocks.map((block, blockIndex) => {
+                  const blockKey =
+                    block.id ?? `${columnKey}-block-${blockIndex}`;
+
+                  return (
+                    <div
+                      key={blockKey}
+                      draggable
+                      className={`builder-preview-layout-block is-${
+                        block.kind ?? "text"
+                      } ${
+                        selectedLayoutBlockKey === blockKey
+                          ? "is-selected-block"
+                          : ""
+                      } ${
+                        draggingLayoutBlockKey === blockKey
+                          ? "is-dragging-block"
+                          : ""
+                      } is-padding-${block.elementPadding ?? "none"}`}
+                      style={
+                        {
+                          "--builder-element-bg":
+                            block.elementBackgroundMode === "transparent"
+                              ? "transparent"
+                              : block.elementBackgroundMode === "custom"
+                                ? (block.elementBackground ?? "#ffffff")
+                                : undefined,
+                        } as CSSProperties
+                      }
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        onSelectBlock(section.id, columnKey, blockKey);
+                      }}
+                      onDragStart={(event) => {
+                        event.stopPropagation();
+                        const payload = JSON.stringify({
+                          sectionId: section.id,
+                          sourceColumnKey: columnKey,
+                          sourceBlockKey: blockKey,
+                        });
+                        event.dataTransfer.setData(
+                          "application/x-builder-block",
+                          payload,
+                        );
+                        event.dataTransfer.setData(
+                          "text/plain",
+                          `builder-block:${blockKey}`,
+                        );
+                        event.dataTransfer.effectAllowed = "move";
+                        onBlockDragStart(blockKey);
+                      }}
+                      onDragOver={(event) => {
+                        const types = Array.from(event.dataTransfer.types);
+                        if (
+                          types.includes("application/x-builder-block") ||
+                          types.includes("application/x-builder-new-block")
+                        ) {
+                          event.preventDefault();
+                          event.stopPropagation();
+                          event.dataTransfer.dropEffect = types.includes(
+                            "application/x-builder-new-block",
+                          )
+                            ? "copy"
+                            : "move";
                         }
+                      }}
+                      onDrop={(event) => {
+                        const newBlockKind = event.dataTransfer.getData(
+                          "application/x-builder-new-block",
+                        ) as LayoutBlockKind;
+                        if (newBlockKind && newBlockKind in layoutBlockLabels) {
+                          event.preventDefault();
+                          event.stopPropagation();
+                          onCreateBlock({
+                            sectionId: section.id,
+                            targetColumnKey: columnKey,
+                            targetBlockKey: blockKey,
+                            kind: newBlockKind,
+                          });
+                          return;
+                        }
+
+                        const payload = event.dataTransfer.getData(
+                          "application/x-builder-block",
+                        );
+                        if (!payload) return;
+                        event.preventDefault();
+                        event.stopPropagation();
+                        try {
+                          const parsed = JSON.parse(payload) as {
+                            sectionId: string;
+                            sourceColumnKey: string;
+                            sourceBlockKey: string;
+                          };
+                          onMoveBlock({
+                            ...parsed,
+                            targetColumnKey: columnKey,
+                            targetBlockKey: blockKey,
+                          });
+                        } catch {
+                          onBlockDragEnd();
+                        }
+                        onBlockDragEnd();
+                      }}
+                      onDragEnd={onBlockDragEnd}
+                    >
+                      <div
+                        className="builder-preview-block-tools"
+                        onClick={(event) => event.stopPropagation()}
+                        onMouseDown={(event) => event.stopPropagation()}
+                        onDragStart={(event) => event.stopPropagation()}
                       >
-                        {(block.gridSource === "products"
-                          ? previewProducts.map((product) => ({
-                              id: product.id,
-                              imageUrl: product.image?.sourceUrl,
-                              imageAlt: product.image?.altText ?? product.name,
-                              eyebrow: "Product",
-                              title: product.name,
-                              meta: product.price ?? "",
-                              text: product.attributes?.nodes
-                                ?.map((attribute) => attribute.label ?? attribute.name)
-                                .join(", "),
-                              buttonLabel: "View product",
-                              buttonUrl: `/product/${product.slug}`,
-                            }))
-                          : block.gridItems ?? []
-                        )
-                          .slice(0, Math.max(1, (block.columns ?? 3) * (block.gridRows ?? 1)))
-                          .map((item, itemIndex) => (
-                            <article
-                              key={item.id ?? `${blockKey}-grid-${itemIndex}`}
-                              className={`shop-builder-grid-card is-image-${
-                                block.gridImagePadding ?? "frameless"
-                              } is-content-${block.gridContentPadding ?? "medium"} is-frame-${
-                                block.gridImageFrame ?? "none"
+                        <span>
+                          {layoutBlockLabels[block.kind ?? "text"] ?? "Block"}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            onSelectBlock(section.id, columnKey, blockKey)
+                          }
+                          title="Edit element"
+                        >
+                          <Settings2 size={13} />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            onDuplicateBlock({
+                              sectionId: section.id,
+                              columnKey,
+                              blockKey,
+                            })
+                          }
+                          title="Duplicate element"
+                        >
+                          <Copy size={13} />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            onDeleteBlock({
+                              sectionId: section.id,
+                              columnKey,
+                              blockKey,
+                            })
+                          }
+                          title="Delete element"
+                        >
+                          <Trash2 size={13} />
+                        </button>
+                      </div>
+                      <span
+                        className="builder-preview-drag-handle"
+                        aria-hidden="true"
+                      >
+                        ::
+                      </span>
+                      {block.kind !== "products" &&
+                      block.kind?.startsWith("product") ? (
+                        <PreviewProductBlockContent
+                          block={block}
+                          product={previewProduct}
+                        />
+                      ) : block.kind === "icon" ? (
+                        <div className="builder-preview-goodie builder-preview-goodie-icon">
+                          {getPreviewGoodieIcon(block.iconName)}
+                          {block.title && <strong>{block.title}</strong>}
+                          {block.body && <p>{block.body}</p>}
+                        </div>
+                      ) : block.kind === "list" ? (
+                        <div className="builder-preview-goodie builder-preview-goodie-list">
+                          {block.title && <strong>{block.title}</strong>}
+                          <ul>
+                            {(block.items ?? []).map((item) => (
+                              <li key={item}>
+                                <Check size={14} />
+                                {item}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      ) : block.kind === "datePicker" ? (
+                        <div className="builder-preview-goodie builder-preview-goodie-date">
+                          <CalendarDays size={24} />
+                          {block.title && <strong>{block.title}</strong>}
+                          {block.body && <p>{block.body}</p>}
+                          <label>
+                            <span>{block.dateLabel ?? "Preferred date"}</span>
+                            <input type="date" />
+                          </label>
+                        </div>
+                      ) : block.kind === "hero" ? (
+                        <div className="shop-builder-column-block shop-builder-column-block--hero">
+                          {block.eyebrow && (
+                            <InlineEditableText
+                              as="span"
+                              value={block.eyebrow}
+                              onChange={(eyebrow) =>
+                                onUpdateBlock(section.id, columnKey, blockKey, {
+                                  eyebrow,
+                                })
+                              }
+                            />
+                          )}
+                          {block.title && (
+                            <InlineEditableText
+                              as="h3"
+                              value={block.title}
+                              onChange={(title) =>
+                                onUpdateBlock(section.id, columnKey, blockKey, {
+                                  title,
+                                })
+                              }
+                            />
+                          )}
+                          {block.body && (
+                            <InlineEditableText
+                              as="p"
+                              value={block.body}
+                              onChange={(body) =>
+                                onUpdateBlock(section.id, columnKey, blockKey, {
+                                  body,
+                                })
+                              }
+                            />
+                          )}
+                          {block.buttonLabel && (
+                            <span className="builder-preview-cta">
+                              {block.buttonLabel}
+                            </span>
+                          )}
+                        </div>
+                      ) : block.kind === "promoStrip" ? (
+                        <div className="shop-builder-column-block shop-builder-column-block--promo-strip">
+                          <div>
+                            {block.eyebrow && (
+                              <InlineEditableText
+                                as="span"
+                                value={block.eyebrow}
+                                onChange={(eyebrow) =>
+                                  onUpdateBlock(
+                                    section.id,
+                                    columnKey,
+                                    blockKey,
+                                    { eyebrow },
+                                  )
+                                }
+                              />
+                            )}
+                            {block.title && (
+                              <InlineEditableText
+                                as="h3"
+                                value={block.title}
+                                onChange={(title) =>
+                                  onUpdateBlock(
+                                    section.id,
+                                    columnKey,
+                                    blockKey,
+                                    { title },
+                                  )
+                                }
+                              />
+                            )}
+                            {block.body && (
+                              <InlineEditableText
+                                as="p"
+                                value={block.body}
+                                onChange={(body) =>
+                                  onUpdateBlock(
+                                    section.id,
+                                    columnKey,
+                                    blockKey,
+                                    { body },
+                                  )
+                                }
+                              />
+                            )}
+                          </div>
+                          {block.buttonLabel && (
+                            <span className="builder-preview-cta">
+                              {block.buttonLabel}
+                            </span>
+                          )}
+                        </div>
+                      ) : block.kind === "panel" ? (
+                        <div className="shop-builder-column-block shop-builder-column-block--panel">
+                          {block.imageUrl && (
+                            <div
+                              className="shop-builder-panel-media"
+                              style={{
+                                backgroundImage: `url(${block.imageUrl})`,
+                              }}
+                            />
+                          )}
+                          <div>
+                            {block.eyebrow && (
+                              <InlineEditableText
+                                as="span"
+                                value={block.eyebrow}
+                                onChange={(eyebrow) =>
+                                  onUpdateBlock(
+                                    section.id,
+                                    columnKey,
+                                    blockKey,
+                                    { eyebrow },
+                                  )
+                                }
+                              />
+                            )}
+                            {block.title && (
+                              <InlineEditableText
+                                as="strong"
+                                value={block.title}
+                                onChange={(title) =>
+                                  onUpdateBlock(
+                                    section.id,
+                                    columnKey,
+                                    blockKey,
+                                    { title },
+                                  )
+                                }
+                              />
+                            )}
+                            {block.body && (
+                              <InlineEditableText
+                                as="p"
+                                value={block.body}
+                                onChange={(body) =>
+                                  onUpdateBlock(
+                                    section.id,
+                                    columnKey,
+                                    blockKey,
+                                    { body },
+                                  )
+                                }
+                              />
+                            )}
+                            {block.buttonLabel && (
+                              <span className="builder-preview-cta">
+                                {block.buttonLabel}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      ) : block.kind === "categoryFilters" ? (
+                        <div className="shop-builder-column-block shop-builder-column-block--category-filters">
+                          {previewCategoryTree.length > 0 ? (
+                            <CategoryBar
+                              categoryTree={previewCategoryTree}
+                              countsBySlug={previewCategoryCounts}
+                            />
+                          ) : (
+                            <div className="shop-builder-filter-pills">
+                              <span>Women</span>
+                              <span>Men</span>
+                              <span>Boots</span>
+                              <span>Accessories</span>
+                            </div>
+                          )}
+                        </div>
+                      ) : block.kind === "slider" ? (
+                        <div className="shop-builder-column-block shop-builder-column-block--slider">
+                          {block.title && <h3>{block.title}</h3>}
+                          {block.body && <p>{block.body}</p>}
+                          <CarouselBlock
+                            block={{
+                              __typename:
+                                "PageBuilderLayoutPageBuilderCarouselLayoutLayout",
+                              fieldGroupName: "ReactBuilderColumnSliderPreview",
+                            }}
+                            slides={(block.slides ?? []).map(
+                              (slide, slideIndex) => ({
+                                id:
+                                  slide.id ?? `${blockKey}-slide-${slideIndex}`,
+                                title: slide.title,
+                                subtitle: slide.subtitle,
+                                text: slide.text,
+                                badge: slide.badge,
+                                imageUrl: slide.imageUrl,
+                                imageAlt: slide.imageAlt,
+                                imagePadding: slide.imagePadding,
+                                buttonLabel: slide.buttonLabel,
+                                buttonUrl: slide.buttonUrl,
+                              }),
+                            )}
+                            settings={block.carouselSettings}
+                          />
+                        </div>
+                      ) : block.kind === "products" ? (
+                        <div className="shop-builder-column-block shop-builder-column-block--products">
+                          {block.title && <h3>{block.title}</h3>}
+                          {previewProducts.length > 0 ? (
+                            <div
+                              className={`shop-builder-grid--margin-${
+                                block.gridMargin ?? "none"
                               }`}
                             >
-                              {block.gridShowImage !== false && (
-                                <div
-                                  className={`shop-builder-grid-image ${
-                                    item.imageUrl ? "" : "is-empty"
+                              <CategoryWithFilters
+                                products={previewProducts.slice(
+                                  0,
+                                  block.gridLimit ?? 4,
+                                )}
+                                columns={block.columns}
+                                filterPosition={block.filterPosition}
+                                cardStyle={block.cardStyle}
+                                cardPreset={block.cardPreset}
+                                pageSize={block.gridLimit}
+                                gridGap={block.gridGap}
+                                cardPadding={block.cardPadding}
+                                imagePadding={block.imagePadding}
+                                imageFrame={block.gridImageFrame}
+                                addToCartStyle={block.addToCartStyle}
+                                addToCartSize={block.addToCartSize}
+                                addToCartPosition={block.addToCartPosition}
+                                addToCartVisibility={block.addToCartVisibility}
+                                addToCartDisplay={block.addToCartDisplay}
+                              />
+                            </div>
+                          ) : (
+                            <div className="builder-preview-products">
+                              {sampleProducts
+                                .slice(0, block.gridLimit ?? 4)
+                                .map((name) => (
+                                  <span key={name}>{name}</span>
+                                ))}
+                            </div>
+                          )}
+                        </div>
+                      ) : block.kind === "grid" ? (
+                        <div className="shop-builder-column-block shop-builder-column-block--grid">
+                          <div
+                            className={`shop-builder-grid shop-builder-grid--gap-${
+                              block.gridGap ?? "medium"
+                            } shop-builder-grid--margin-${block.gridMargin ?? "none"}`}
+                            style={
+                              {
+                                "--shop-builder-grid-columns":
+                                  block.columns ?? 3,
+                              } as CSSProperties
+                            }
+                          >
+                            {(block.gridSource === "products"
+                              ? previewProducts.map((product) => ({
+                                  id: product.id,
+                                  imageUrl: product.image?.sourceUrl,
+                                  imageAlt:
+                                    product.image?.altText ?? product.name,
+                                  eyebrow: "Product",
+                                  title: product.name,
+                                  meta: product.price ?? "",
+                                  text: product.attributes?.nodes
+                                    ?.map(
+                                      (attribute) =>
+                                        attribute.label ?? attribute.name,
+                                    )
+                                    .join(", "),
+                                  buttonLabel: "View product",
+                                  buttonUrl: `/product/${product.slug}`,
+                                }))
+                              : (block.gridItems ?? [])
+                            )
+                              .slice(
+                                0,
+                                Math.max(
+                                  1,
+                                  (block.columns ?? 3) * (block.gridRows ?? 1),
+                                ),
+                              )
+                              .map((item, itemIndex) => (
+                                <article
+                                  key={
+                                    item.id ?? `${blockKey}-grid-${itemIndex}`
+                                  }
+                                  className={`shop-builder-grid-card is-image-${
+                                    block.gridImagePadding ?? "frameless"
+                                  } is-content-${block.gridContentPadding ?? "medium"} is-frame-${
+                                    block.gridImageFrame ?? "none"
                                   }`}
                                 >
-                                  {item.imageUrl ? (
-                                    <Image
-                                      src={item.imageUrl}
-                                      alt={item.imageAlt || item.title || ""}
-                                      width={420}
-                                      height={420}
-                                    />
-                                  ) : block.gridSource !== "products" ? (
-                                    <span>No image</span>
-                                  ) : null}
-                                  {block.gridSource !== "products" && (
-                                    <label
-                                      className="builder-preview-image-upload"
-                                      onClick={(event) => event.stopPropagation()}
+                                  {block.gridShowImage !== false && (
+                                    <div
+                                      className={`shop-builder-grid-image ${
+                                        item.imageUrl ? "" : "is-empty"
+                                      }`}
                                     >
-                                      <ImageIcon size={14} />
-                                      <span>{item.imageUrl ? "Change image" : "Select image"}</span>
-                                      <input
-                                        type="file"
-                                        accept="image/*"
-                                        onChange={(event) =>
-                                          onUploadGridItemImage(
-                                            section.id,
-                                            columnKey,
-                                            blockKey,
-                                            itemIndex,
-                                            event.target.files?.[0] ?? null
-                                          )
-                                        }
-                                      />
-                                    </label>
+                                      {item.imageUrl ? (
+                                        <Image
+                                          src={item.imageUrl}
+                                          alt={
+                                            item.imageAlt || item.title || ""
+                                          }
+                                          width={420}
+                                          height={420}
+                                        />
+                                      ) : block.gridSource !== "products" ? (
+                                        <span>No image</span>
+                                      ) : null}
+                                      {block.gridSource !== "products" && (
+                                        <label
+                                          className="builder-preview-image-upload"
+                                          onClick={(event) =>
+                                            event.stopPropagation()
+                                          }
+                                        >
+                                          <ImageIcon size={14} />
+                                          <span>
+                                            {item.imageUrl
+                                              ? "Change image"
+                                              : "Select image"}
+                                          </span>
+                                          <input
+                                            type="file"
+                                            accept="image/*"
+                                            onChange={(event) =>
+                                              onUploadGridItemImage(
+                                                section.id,
+                                                columnKey,
+                                                blockKey,
+                                                itemIndex,
+                                                event.target.files?.[0] ?? null,
+                                              )
+                                            }
+                                          />
+                                        </label>
+                                      )}
+                                    </div>
                                   )}
-                                </div>
-                              )}
-                              <div className="shop-builder-grid-content">
-                                {block.gridSource !== "products" ? (
-                                  <>
-                                    {block.gridShowEyebrow !== false && item.eyebrow && (
-                                      <InlineEditableText
-                                        as="span"
-                                        value={item.eyebrow}
-                                        onChange={(eyebrow) =>
-                                          onUpdateGridItem(section.id, columnKey, blockKey, itemIndex, {
-                                            eyebrow,
-                                          })
-                                        }
-                                      />
+                                  <div className="shop-builder-grid-content">
+                                    {block.gridSource !== "products" ? (
+                                      <>
+                                        {block.gridShowEyebrow !== false &&
+                                          item.eyebrow && (
+                                            <InlineEditableText
+                                              as="span"
+                                              value={item.eyebrow}
+                                              onChange={(eyebrow) =>
+                                                onUpdateGridItem(
+                                                  section.id,
+                                                  columnKey,
+                                                  blockKey,
+                                                  itemIndex,
+                                                  {
+                                                    eyebrow,
+                                                  },
+                                                )
+                                              }
+                                            />
+                                          )}
+                                        {item.title && (
+                                          <InlineEditableText
+                                            as="h3"
+                                            value={item.title}
+                                            onChange={(title) =>
+                                              onUpdateGridItem(
+                                                section.id,
+                                                columnKey,
+                                                blockKey,
+                                                itemIndex,
+                                                {
+                                                  title,
+                                                },
+                                              )
+                                            }
+                                          />
+                                        )}
+                                        {block.gridShowMeta !== false &&
+                                          item.meta && (
+                                            <InlineEditableText
+                                              as="span"
+                                              className="shop-builder-grid-meta"
+                                              value={item.meta}
+                                              onChange={(meta) =>
+                                                onUpdateGridItem(
+                                                  section.id,
+                                                  columnKey,
+                                                  blockKey,
+                                                  itemIndex,
+                                                  {
+                                                    meta,
+                                                  },
+                                                )
+                                              }
+                                            />
+                                          )}
+                                        {block.gridShowText !== false &&
+                                          item.text && (
+                                            <InlineEditableText
+                                              as="p"
+                                              value={item.text}
+                                              onChange={(text) =>
+                                                onUpdateGridItem(
+                                                  section.id,
+                                                  columnKey,
+                                                  blockKey,
+                                                  itemIndex,
+                                                  {
+                                                    text,
+                                                  },
+                                                )
+                                              }
+                                            />
+                                          )}
+                                        {block.gridShowButton !== false &&
+                                          item.buttonLabel && (
+                                            <InlineEditableText
+                                              as="span"
+                                              className="builder-preview-cta"
+                                              value={item.buttonLabel}
+                                              onChange={(buttonLabel) =>
+                                                onUpdateGridItem(
+                                                  section.id,
+                                                  columnKey,
+                                                  blockKey,
+                                                  itemIndex,
+                                                  {
+                                                    buttonLabel,
+                                                  },
+                                                )
+                                              }
+                                            />
+                                          )}
+                                      </>
+                                    ) : (
+                                      <>
+                                        {block.gridShowEyebrow !== false &&
+                                          item.eyebrow && (
+                                            <span>{item.eyebrow}</span>
+                                          )}
+                                        {item.title && <h3>{item.title}</h3>}
+                                        {block.gridShowMeta !== false &&
+                                          item.meta && (
+                                            <small>{item.meta}</small>
+                                          )}
+                                        {block.gridShowText !== false &&
+                                          item.text && <p>{item.text}</p>}
+                                        {block.gridShowButton !== false &&
+                                          item.buttonLabel && (
+                                            <span className="builder-preview-cta">
+                                              {item.buttonLabel}
+                                            </span>
+                                          )}
+                                      </>
                                     )}
-                                    {item.title && (
-                                      <InlineEditableText
-                                        as="h3"
-                                        value={item.title}
-                                        onChange={(title) =>
-                                          onUpdateGridItem(section.id, columnKey, blockKey, itemIndex, {
-                                            title,
-                                          })
-                                        }
-                                      />
-                                    )}
-                                    {block.gridShowMeta !== false && item.meta && (
-                                      <InlineEditableText
-                                        as="span"
-                                        className="shop-builder-grid-meta"
-                                        value={item.meta}
-                                        onChange={(meta) =>
-                                          onUpdateGridItem(section.id, columnKey, blockKey, itemIndex, {
-                                            meta,
-                                          })
-                                        }
-                                      />
-                                    )}
-                                    {block.gridShowText !== false && item.text && (
-                                      <InlineEditableText
-                                        as="p"
-                                        value={item.text}
-                                        onChange={(text) =>
-                                          onUpdateGridItem(section.id, columnKey, blockKey, itemIndex, {
-                                            text,
-                                          })
-                                        }
-                                      />
-                                    )}
-                                    {block.gridShowButton !== false && item.buttonLabel && (
-                                      <InlineEditableText
-                                        as="span"
-                                        className="builder-preview-cta"
-                                        value={item.buttonLabel}
-                                        onChange={(buttonLabel) =>
-                                          onUpdateGridItem(section.id, columnKey, blockKey, itemIndex, {
-                                            buttonLabel,
-                                          })
-                                        }
-                                      />
-                                    )}
-                                  </>
-                                ) : (
-                                  <>
-                                    {block.gridShowEyebrow !== false && item.eyebrow && (
-                                      <span>{item.eyebrow}</span>
-                                    )}
-                                    {item.title && <h3>{item.title}</h3>}
-                                    {block.gridShowMeta !== false && item.meta && (
-                                      <small>{item.meta}</small>
-                                    )}
-                                    {block.gridShowText !== false && item.text && <p>{item.text}</p>}
-                                    {block.gridShowButton !== false && item.buttonLabel && (
-                                      <span className="builder-preview-cta">{item.buttonLabel}</span>
-                                    )}
-                                  </>
-                                )}
-                              </div>
-                            </article>
-                          ))}
-                      </div>
+                                  </div>
+                                </article>
+                              ))}
+                          </div>
+                        </div>
+                      ) : block.kind === "badgeGrid" ? (
+                        <div className="shop-builder-column-block shop-builder-column-block--badges">
+                          {block.title && <h3>{block.title}</h3>}
+                          {block.body && <p>{block.body}</p>}
+                          <div
+                            className="shop-builder-column-badges"
+                            style={
+                              {
+                                "--builder-column-badge-columns":
+                                  block.columns ?? 2,
+                              } as CSSProperties
+                            }
+                          >
+                            {(block.badges ?? []).map((badge, badgeIndex) => (
+                              <article
+                                key={
+                                  badge.id ?? `${blockKey}-badge-${badgeIndex}`
+                                }
+                              >
+                                {badge.label && <span>{badge.label}</span>}
+                                {badge.title && <strong>{badge.title}</strong>}
+                                {badge.body && <p>{badge.body}</p>}
+                              </article>
+                            ))}
+                          </div>
+                        </div>
+                      ) : block.kind === "fluentForm" ? (
+                        <div className="shop-builder-column-block shop-builder-column-block--fluent-form builder-preview-fluent-form">
+                          <small>Fluent Form</small>
+                          <strong>{block.title || "Contact Form"}</strong>
+                          <span>
+                            {block.fluentFormId
+                              ? `WordPress form ID ${block.fluentFormId}`
+                              : "Add a Fluent Forms form ID"}
+                          </span>
+                          <div className="builder-preview-form-lines">
+                            <i />
+                            <i />
+                            <i />
+                            <b />
+                          </div>
+                        </div>
+                      ) : (
+                        <>
+                          <small>
+                            {layoutBlockLabels[block.kind ?? "text"]}
+                          </small>
+                          {block.eyebrow && (
+                            <InlineEditableText
+                              as="em"
+                              value={block.eyebrow}
+                              onChange={(eyebrow) =>
+                                onUpdateBlock(section.id, columnKey, blockKey, {
+                                  eyebrow,
+                                })
+                              }
+                            />
+                          )}
+                          {block.title && (
+                            <InlineEditableText
+                              as="strong"
+                              value={block.title}
+                              onChange={(title) =>
+                                onUpdateBlock(section.id, columnKey, blockKey, {
+                                  title,
+                                })
+                              }
+                            />
+                          )}
+                          {block.body && (
+                            <InlineEditableText
+                              as="p"
+                              value={block.body}
+                              onChange={(body) =>
+                                onUpdateBlock(section.id, columnKey, blockKey, {
+                                  body,
+                                })
+                              }
+                            />
+                          )}
+                          {block.kind === "embed" && (
+                            <span>{block.embedMode ?? "code"} block</span>
+                          )}
+                          {block.kind === "breadcrumbs" && (
+                            <span>Dynamic navigation path</span>
+                          )}
+                          {block.buttonLabel && (
+                            <span className="builder-preview-cta">
+                              {block.buttonLabel}
+                            </span>
+                          )}
+                        </>
+                      )}
                     </div>
-                  ) : block.kind === "badgeGrid" ? (
-                    <div className="shop-builder-column-block shop-builder-column-block--badges">
-                      {block.title && <h3>{block.title}</h3>}
-                      {block.body && <p>{block.body}</p>}
-                      <div
-                        className="shop-builder-column-badges"
-                        style={
-                          {
-                            "--builder-column-badge-columns": block.columns ?? 2,
-                          } as CSSProperties
-                        }
-                      >
-                        {(block.badges ?? []).map((badge, badgeIndex) => (
-                          <article key={badge.id ?? `${blockKey}-badge-${badgeIndex}`}>
-                            {badge.label && <span>{badge.label}</span>}
-                            {badge.title && <strong>{badge.title}</strong>}
-                            {badge.body && <p>{badge.body}</p>}
-                          </article>
-                        ))}
-                      </div>
-                    </div>
-                  ) : block.kind === "fluentForm" ? (
-                    <div className="shop-builder-column-block shop-builder-column-block--fluent-form builder-preview-fluent-form">
-                      <small>Fluent Form</small>
-                      <strong>{block.title || "Contact Form"}</strong>
-                      <span>
-                        {block.fluentFormId
-                          ? `WordPress form ID ${block.fluentFormId}`
-                          : "Add a Fluent Forms form ID"}
-                      </span>
-                      <div className="builder-preview-form-lines">
-                        <i />
-                        <i />
-                        <i />
-                        <b />
-                      </div>
-                    </div>
-                  ) : (
-                    <>
-                      <small>{layoutBlockLabels[block.kind ?? "text"]}</small>
-                      {block.eyebrow && (
-                        <InlineEditableText
-                          as="em"
-                          value={block.eyebrow}
-                          onChange={(eyebrow) =>
-                            onUpdateBlock(section.id, columnKey, blockKey, { eyebrow })
-                          }
-                        />
-                      )}
-                      {block.title && (
-                        <InlineEditableText
-                          as="strong"
-                          value={block.title}
-                          onChange={(title) =>
-                            onUpdateBlock(section.id, columnKey, blockKey, { title })
-                          }
-                        />
-                      )}
-                      {block.body && (
-                        <InlineEditableText
-                          as="p"
-                          value={block.body}
-                          onChange={(body) =>
-                            onUpdateBlock(section.id, columnKey, blockKey, { body })
-                          }
-                        />
-                      )}
-                      {block.kind === "embed" && (
-                        <span>{block.embedMode ?? "code"} block</span>
-                      )}
-                      {block.kind === "breadcrumbs" && (
-                        <span>Dynamic navigation path</span>
-                      )}
-                      {block.buttonLabel && (
-                        <span className="builder-preview-cta">{block.buttonLabel}</span>
-                      )}
-                    </>
-                  )}
-                </div>
-                );
-              })}
-            </article>
+                  );
+                })}
+              </article>
             );
           })}
         </div>
@@ -8410,7 +10531,10 @@ function PreviewSection({
           }
         >
           {(section.badges ?? []).map((badge, index) => (
-            <article key={badge.id ?? index} className="shop-builder-badge-card">
+            <article
+              key={badge.id ?? index}
+              className="shop-builder-badge-card"
+            >
               {badge.label && <span>{badge.label}</span>}
               {badge.title && <h3>{badge.title}</h3>}
               {badge.body && <p>{badge.body}</p>}

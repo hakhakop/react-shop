@@ -1,6 +1,12 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+} from "react";
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -29,6 +35,11 @@ type Props = {
   cardPadding?: string | null;
   imagePadding?: string | null;
   imageFrame?: string | null;
+  addToCartStyle?: string | null;
+  addToCartSize?: string | null;
+  addToCartPosition?: string | null;
+  addToCartVisibility?: string | null;
+  addToCartDisplay?: string | null;
 };
 
 function toNumberPrice(price: string | null | undefined): number {
@@ -55,7 +66,10 @@ function productSpaceToCss(value: string | null | undefined, fallback: string) {
   }
 }
 
-function productGridGapToCss(value: string | null | undefined, fallback: string) {
+function productGridGapToCss(
+  value: string | null | undefined,
+  fallback: string,
+) {
   const key = (value || fallback).toString().toLowerCase();
   switch (key) {
     case "none":
@@ -72,6 +86,63 @@ function productGridGapToCss(value: string | null | undefined, fallback: string)
   }
 }
 
+function getCartButtonStyle({
+  style,
+  size,
+  display,
+}: {
+  style: string;
+  size: string;
+  display: string;
+}): CSSProperties {
+  const sizeStyle: CSSProperties =
+    display === "icon"
+      ? {
+          width: 42,
+          minWidth: 42,
+          height: 42,
+          minHeight: 42,
+          padding: 0,
+          fontSize: 0,
+        }
+      : size === "compact"
+        ? { minWidth: 96, minHeight: 32, padding: "0 14px", fontSize: 11 }
+        : size === "large"
+          ? { minWidth: 168, minHeight: 48, padding: "0 28px", fontSize: 13 }
+          : size === "full"
+            ? { width: "100%", minHeight: 54, padding: "0 24px", fontSize: 13 }
+            : { minWidth: 128, minHeight: 38, padding: "0 20px", fontSize: 12 };
+
+  const colorStyle: CSSProperties =
+    style === "dark"
+      ? { background: "#111111", borderColor: "#111111", color: "#ffffff" }
+      : style === "light"
+        ? {
+            background: "#ffffff",
+            borderColor: "rgba(17, 17, 17, 0.14)",
+            color: "#111111",
+            boxShadow: "inset 0 0 0 1px rgba(17, 17, 17, 0.08)",
+          }
+        : style === "inherit"
+          ? {
+              background:
+                "var(--builder-active-button-bg, var(--text-main, #111111))",
+              borderColor:
+                "var(--builder-active-button-bg, var(--text-main, #111111))",
+              color: "var(--builder-active-button-text, #ffffff)",
+            }
+          : { background: "#0d7cff", borderColor: "#0d7cff", color: "#ffffff" };
+
+  return {
+    ...sizeStyle,
+    ...colorStyle,
+    borderRadius: 999,
+    fontWeight: 800,
+    letterSpacing: "0.06em",
+    boxShadow: colorStyle.boxShadow ?? "none",
+  };
+}
+
 type AttributeOption = {
   key: string; // normalized key (e.g. "yellow")
   label: string; // display label (e.g. "Yellow")
@@ -84,7 +155,7 @@ type AttributeFacet = {
 };
 
 function normalizeAttributeNode(
-  attr: any
+  attr: any,
 ): { attrKey: string; label: string; values: string[] } | null {
   if (!attr) return null;
 
@@ -122,6 +193,11 @@ export default function CategoryWithFilters({
   cardPadding,
   imagePadding,
   imageFrame,
+  addToCartStyle,
+  addToCartSize,
+  addToCartPosition,
+  addToCartVisibility,
+  addToCartDisplay,
 }: Props) {
   const [searchTerm, setSearchTerm] = useState("");
   const [minPrice, setMinPrice] = useState("");
@@ -144,7 +220,7 @@ export default function CategoryWithFilters({
       : 12;
 
   const [viewMode, setViewMode] = useState<"default" | "compact" | "list">(
-    "default"
+    "default",
   );
 
   const archiveColumns =
@@ -169,6 +245,31 @@ export default function CategoryWithFilters({
     cardPreset === "luxury"
       ? cardPreset
       : "standard";
+  const normalizedCartStyle =
+    addToCartStyle === "dark" ||
+    addToCartStyle === "light" ||
+    addToCartStyle === "inherit"
+      ? addToCartStyle
+      : "blue";
+  const normalizedCartSize =
+    addToCartSize === "compact" ||
+    addToCartSize === "large" ||
+    addToCartSize === "full"
+      ? addToCartSize
+      : "medium";
+  const normalizedCartPosition =
+    addToCartPosition === "under-price" ||
+    addToCartPosition === "under-wishlist"
+      ? addToCartPosition
+      : "below";
+  const normalizedCartVisibility =
+    addToCartVisibility === "always" ? "always" : "hover";
+  const normalizedCartDisplay = addToCartDisplay === "icon" ? "icon" : "button";
+  const cartButtonStyle = getCartButtonStyle({
+    style: normalizedCartStyle,
+    size: normalizedCartSize,
+    display: normalizedCartDisplay,
+  });
 
   const productSpaceVars = {
     "--product-grid-gap": productGridGapToCss(gridGap, "medium"),
@@ -184,8 +285,8 @@ export default function CategoryWithFilters({
           "--archive-columns": 2,
         }
       : viewMode === "list"
-      ? { ...productSpaceVars, "--archive-columns": 1 }
-      : productSpaceVars;
+        ? { ...productSpaceVars, "--archive-columns": 1 }
+        : productSpaceVars;
 
   const attributeFacets: AttributeFacet[] = useMemo(() => {
     const map: Record<string, { label: string; optionSet: Set<string> }> = {};
@@ -226,7 +327,7 @@ export default function CategoryWithFilters({
 
   const hasAttributeFilters = useMemo(
     () => Object.keys(selectedAttributes).length > 0,
-    [selectedAttributes]
+    [selectedAttributes],
   );
 
   useEffect(() => {
@@ -316,7 +417,7 @@ export default function CategoryWithFilters({
         }
 
         for (const [attrKey, selectedOptions] of Object.entries(
-          selectedAttributes
+          selectedAttributes,
         )) {
           if (selectedOptions.length === 0) continue;
 
@@ -326,7 +427,7 @@ export default function CategoryWithFilters({
           }
 
           const match = selectedOptions.some((optKey) =>
-            productValues.has(optKey)
+            productValues.has(optKey),
           );
           if (!match) return false;
         }
@@ -337,13 +438,9 @@ export default function CategoryWithFilters({
 
     // sorting
     if (sortBy === "price-asc") {
-      items.sort(
-        (a, b) => toNumberPrice(a.price) - toNumberPrice(b.price)
-      );
+      items.sort((a, b) => toNumberPrice(a.price) - toNumberPrice(b.price));
     } else if (sortBy === "price-desc") {
-      items.sort(
-        (a, b) => toNumberPrice(b.price) - toNumberPrice(a.price)
-      );
+      items.sort((a, b) => toNumberPrice(b.price) - toNumberPrice(a.price));
     } else if (sortBy === "name-asc") {
       items.sort((a, b) => a.name.localeCompare(b.name));
     }
@@ -376,14 +473,16 @@ export default function CategoryWithFilters({
   const showingTo = Math.min(end, total);
   const selectedAttributeCount = Object.values(selectedAttributes).reduce(
     (sum, values) => sum + values.length,
-    0
+    0,
   );
   const activeFilterCount =
-    selectedAttributeCount + (searchTerm.trim() ? 1 : 0) + (minPrice || maxPrice ? 1 : 0);
+    selectedAttributeCount +
+    (searchTerm.trim() ? 1 : 0) +
+    (minPrice || maxPrice ? 1 : 0);
 
   return (
     <div
-      className={`shop-filter-layout shop-filter-layout--${normalizedFilterPosition} shop-card-style--${normalizedCardStyle} shop-card-preset--${normalizedCardPreset} shop-image-padding--${
+      className={`shop-filter-layout shop-filter-layout--${normalizedFilterPosition} shop-card-style--${normalizedCardStyle} shop-card-preset--${normalizedCardPreset} shop-cart-button--${normalizedCartStyle} shop-cart-size--${normalizedCartSize} shop-cart-position--${normalizedCartPosition} shop-cart-visibility--${normalizedCartVisibility} shop-cart-display--${normalizedCartDisplay} shop-image-padding--${
         imagePadding === "frameless" || imagePadding === "none"
           ? "none"
           : imagePadding || "large"
@@ -415,7 +514,7 @@ export default function CategoryWithFilters({
                     className="shop-top-attribute-trigger"
                     onClick={() =>
                       setOpenTopFacet((current) =>
-                        current === facet.key ? null : facet.key
+                        current === facet.key ? null : facet.key,
                       )
                     }
                   >
@@ -454,7 +553,7 @@ export default function CategoryWithFilters({
                 className="shop-top-attribute-trigger"
                 onClick={() =>
                   setOpenTopFacet((current) =>
-                    current === "__price" ? null : "__price"
+                    current === "__price" ? null : "__price",
                   )
                 }
               >
@@ -496,7 +595,7 @@ export default function CategoryWithFilters({
                 className="shop-top-attribute-trigger"
                 onClick={() =>
                   setOpenTopFacet((current) =>
-                    current === "__sort" ? null : "__sort"
+                    current === "__sort" ? null : "__sort",
                   )
                 }
               >
@@ -553,132 +652,126 @@ export default function CategoryWithFilters({
           </div>
         ) : (
           <>
-        <div className="shop-filter-title">
-          <span>
-            <SlidersHorizontal size={16} aria-hidden="true" />
-            Filters
-          </span>
-          {activeFilterCount > 0 && <strong>{activeFilterCount}</strong>}
-        </div>
-
-        {/* Search */}
-        <div className="shop-filter-group">
-          <label>
-            Search in category
-          </label>
-          <div className="shop-filter-input-wrap">
-            <Search size={15} aria-hidden="true" />
-            <input
-              type="text"
-              value={searchTerm}
-              onChange={(e) => {
-                setSearchTerm(e.target.value);
-                setCurrentPage(1);
-              }}
-              placeholder="Search products..."
-            />
-          </div>
-        </div>
-
-        {/* Price range */}
-        <div className="shop-filter-group">
-          <label>Price range</label>
-          <div className="shop-filter-price-grid">
-            <input
-              type="number"
-              min={0}
-              value={minPrice}
-              onChange={(e) => {
-                setMinPrice(e.target.value);
-                setCurrentPage(1);
-              }}
-              placeholder="Min"
-            />
-            <input
-              type="number"
-              min={0}
-              value={maxPrice}
-              onChange={(e) => {
-                setMaxPrice(e.target.value);
-                setCurrentPage(1);
-              }}
-              placeholder="Max"
-            />
-          </div>
-        </div>
-
-        {/* Sort */}
-        <div className="shop-filter-group">
-          <label>
-            Sort by
-          </label>
-          <div className="shop-filter-select-wrap">
-            <ArrowUpDown size={15} aria-hidden="true" />
-            <select
-              value={sortBy}
-              onChange={(e) => {
-                setSortBy(e.target.value as typeof sortBy);
-                setCurrentPage(1);
-              }}
-            >
-              <option value="default">Default</option>
-              <option value="price-asc">Price: Low to high</option>
-              <option value="price-desc">Price: High to low</option>
-              <option value="name-asc">Name: A to Z</option>
-            </select>
-          </div>
-        </div>
-
-        {/* Attribute filters */}
-        {attributeFacets.length > 0 && (
-          <div className="shop-filter-attributes">
-            <div className="shop-filter-subtitle">
-              Attributes
+            <div className="shop-filter-title">
+              <span>
+                <SlidersHorizontal size={16} aria-hidden="true" />
+                Filters
+              </span>
+              {activeFilterCount > 0 && <strong>{activeFilterCount}</strong>}
             </div>
 
-            {attributeFacets.map((facet) => {
-              const selectedForFacet = selectedAttributes[facet.key] ?? [];
-              return (
-                <div key={facet.key} className="shop-filter-facet">
-                  <div className="shop-filter-facet-label">
-                    {facet.label}
-                  </div>
-                  <div className="shop-filter-chip-row">
-                    {facet.options.map((opt) => {
-                      const isSelected = selectedForFacet.includes(opt.key);
-                      return (
-                        <button
-                          key={opt.key}
-                          type="button"
-                          className={isSelected ? "is-selected" : ""}
-                          onClick={() =>
-                            toggleAttribute(facet.key, opt.key)
-                          }
-                        >
-                          {opt.label}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
+            {/* Search */}
+            <div className="shop-filter-group">
+              <label>Search in category</label>
+              <div className="shop-filter-input-wrap">
+                <Search size={15} aria-hidden="true" />
+                <input
+                  type="text"
+                  value={searchTerm}
+                  onChange={(e) => {
+                    setSearchTerm(e.target.value);
+                    setCurrentPage(1);
+                  }}
+                  placeholder="Search products..."
+                />
+              </div>
+            </div>
 
-        {/* Reset */}
-        <button
-          className="shop-filter-reset"
-          type="button"
-          onClick={resetFilters}
-        >
-          <X size={14} aria-hidden="true" />
-          Reset all filters
-        </button>
+            {/* Price range */}
+            <div className="shop-filter-group">
+              <label>Price range</label>
+              <div className="shop-filter-price-grid">
+                <input
+                  type="number"
+                  min={0}
+                  value={minPrice}
+                  onChange={(e) => {
+                    setMinPrice(e.target.value);
+                    setCurrentPage(1);
+                  }}
+                  placeholder="Min"
+                />
+                <input
+                  type="number"
+                  min={0}
+                  value={maxPrice}
+                  onChange={(e) => {
+                    setMaxPrice(e.target.value);
+                    setCurrentPage(1);
+                  }}
+                  placeholder="Max"
+                />
+              </div>
+            </div>
 
-        <div className="shop-filter-summary">
-          Showing {showingFrom}-{showingTo} of {total} products.
-        </div>
+            {/* Sort */}
+            <div className="shop-filter-group">
+              <label>Sort by</label>
+              <div className="shop-filter-select-wrap">
+                <ArrowUpDown size={15} aria-hidden="true" />
+                <select
+                  value={sortBy}
+                  onChange={(e) => {
+                    setSortBy(e.target.value as typeof sortBy);
+                    setCurrentPage(1);
+                  }}
+                >
+                  <option value="default">Default</option>
+                  <option value="price-asc">Price: Low to high</option>
+                  <option value="price-desc">Price: High to low</option>
+                  <option value="name-asc">Name: A to Z</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Attribute filters */}
+            {attributeFacets.length > 0 && (
+              <div className="shop-filter-attributes">
+                <div className="shop-filter-subtitle">Attributes</div>
+
+                {attributeFacets.map((facet) => {
+                  const selectedForFacet = selectedAttributes[facet.key] ?? [];
+                  return (
+                    <div key={facet.key} className="shop-filter-facet">
+                      <div className="shop-filter-facet-label">
+                        {facet.label}
+                      </div>
+                      <div className="shop-filter-chip-row">
+                        {facet.options.map((opt) => {
+                          const isSelected = selectedForFacet.includes(opt.key);
+                          return (
+                            <button
+                              key={opt.key}
+                              type="button"
+                              className={isSelected ? "is-selected" : ""}
+                              onClick={() =>
+                                toggleAttribute(facet.key, opt.key)
+                              }
+                            >
+                              {opt.label}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* Reset */}
+            <button
+              className="shop-filter-reset"
+              type="button"
+              onClick={resetFilters}
+            >
+              <X size={14} aria-hidden="true" />
+              Reset all filters
+            </button>
+
+            <div className="shop-filter-summary">
+              Showing {showingFrom}-{showingTo} of {total} products.
+            </div>
           </>
         )}
       </aside>
@@ -704,30 +797,30 @@ export default function CategoryWithFilters({
                 of {total} products
               </div>
               <div className="shop-view-switcher" aria-label="Archive view">
-              <button
-                type="button"
-                className={viewMode === "default" ? "is-active" : ""}
-                onClick={() => setViewMode("default")}
-              >
-                <Grid2X2 size={15} aria-hidden="true" />
-                Comfort
-              </button>
-              <button
-                type="button"
-                className={viewMode === "compact" ? "is-active" : ""}
-                onClick={() => setViewMode("compact")}
-              >
-                <Grid2X2 size={15} aria-hidden="true" />
-                2-wide
-              </button>
-              <button
-                type="button"
-                className={viewMode === "list" ? "is-active" : ""}
-                onClick={() => setViewMode("list")}
-              >
-                <Rows3 size={15} aria-hidden="true" />
-                List
-              </button>
+                <button
+                  type="button"
+                  className={viewMode === "default" ? "is-active" : ""}
+                  onClick={() => setViewMode("default")}
+                >
+                  <Grid2X2 size={15} aria-hidden="true" />
+                  Comfort
+                </button>
+                <button
+                  type="button"
+                  className={viewMode === "compact" ? "is-active" : ""}
+                  onClick={() => setViewMode("compact")}
+                >
+                  <Grid2X2 size={15} aria-hidden="true" />
+                  2-wide
+                </button>
+                <button
+                  type="button"
+                  className={viewMode === "list" ? "is-active" : ""}
+                  onClick={() => setViewMode("list")}
+                >
+                  <Rows3 size={15} aria-hidden="true" />
+                  List
+                </button>
               </div>
             </div>
 
@@ -747,9 +840,27 @@ export default function CategoryWithFilters({
                     : "";
 
                 const attributes =
-                  (p as any).attributes?.nodes && Array.isArray((p as any).attributes.nodes)
+                  (p as any).attributes?.nodes &&
+                  Array.isArray((p as any).attributes.nodes)
                     ? (p as any).attributes.nodes
                     : [];
+                const cartAction = (
+                  <div className="product-card-actions-row">
+                    <AddToCartButton
+                      id={p.id}
+                      slug={p.slug}
+                      name={p.name}
+                      priceNumber={
+                        priceNumber > 0 && !Number.isNaN(priceNumber)
+                          ? priceNumber
+                          : null
+                      }
+                      imageUrl={imageUrl}
+                      style={cartButtonStyle}
+                      display={normalizedCartDisplay}
+                    />
+                  </div>
+                );
 
                 return (
                   <div
@@ -766,6 +877,8 @@ export default function CategoryWithFilters({
                         name={p.name}
                         imageUrl={imageUrl}
                       />
+                      {normalizedCartPosition === "under-wishlist" &&
+                        cartAction}
                     </div>
 
                     <Link
@@ -787,70 +900,66 @@ export default function CategoryWithFilters({
                           </div>
                         )}
                       </div>
+                    </Link>
 
-                      <div className="product-main">
+                    <div className="product-main">
+                      <Link
+                        href={`/product/${p.slug}`}
+                        className="product-card-title-link"
+                      >
                         <h2 className="product-title product-title-2lines">
                           {p.name}
                         </h2>
+                      </Link>
 
-                        {priceNumber > 0 && !Number.isNaN(priceNumber) && (
-                          <div className="product-price">
-                            {formattedPrice} ֏
-                          </div>
-                        )}
+                      {priceNumber > 0 && !Number.isNaN(priceNumber) && (
+                        <div className="product-price">{formattedPrice} ֏</div>
+                      )}
 
-                        {attributes.length > 0 && (
-                          <div className="product-attributes-row">
-                            {attributes.map((attr: any) => {
-                              const key =
-                                (attr?.name ?? attr?.label ?? "").toString() || "attr";
-                              const label =
-                                (attr?.label ?? attr?.name ?? "").toString();
-                              const values = Array.isArray(attr?.options)
-                                ? attr.options
-                                    .map((v: any) =>
-                                      v != null ? String(v).trim() : ""
-                                    )
-                                    .filter((v: string) => v.length > 0)
-                                : [];
+                      {normalizedCartPosition === "under-price" && cartAction}
 
-                              if (!label || values.length === 0) {
-                                return null;
-                              }
+                      {attributes.length > 0 && (
+                        <div className="product-attributes-row">
+                          {attributes.map((attr: any) => {
+                            const key =
+                              (attr?.name ?? attr?.label ?? "").toString() ||
+                              "attr";
+                            const label = (
+                              attr?.label ??
+                              attr?.name ??
+                              ""
+                            ).toString();
+                            const values = Array.isArray(attr?.options)
+                              ? attr.options
+                                  .map((v: any) =>
+                                    v != null ? String(v).trim() : "",
+                                  )
+                                  .filter((v: string) => v.length > 0)
+                              : [];
 
-                              return (
-                                <div
-                                  key={key}
-                                  className="product-attribute-badge"
-                                >
-                                  <span className="product-attribute-label">
-                                    {label}:
-                                  </span>
-                                  <span className="product-attribute-values">
-                                    {values.join(", ")}
-                                  </span>
-                                </div>
-                              );
-                            })}
-                          </div>
-                        )}
+                            if (!label || values.length === 0) {
+                              return null;
+                            }
 
-                      </div>
-                    </Link>
-
-                    <div className="product-card-actions-row">
-                      <AddToCartButton
-                        id={p.id}
-                        slug={p.slug}
-                        name={p.name}
-                        priceNumber={
-                          priceNumber > 0 && !Number.isNaN(priceNumber)
-                            ? priceNumber
-                            : null
-                        }
-                        imageUrl={imageUrl}
-                      />
+                            return (
+                              <div
+                                key={key}
+                                className="product-attribute-badge"
+                              >
+                                <span className="product-attribute-label">
+                                  {label}:
+                                </span>
+                                <span className="product-attribute-values">
+                                  {values.join(", ")}
+                                </span>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
                     </div>
+
+                    {normalizedCartPosition === "below" && cartAction}
                   </div>
                 );
               })}

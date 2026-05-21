@@ -1,5 +1,7 @@
 "use client";
 
+import type { CSSProperties } from "react";
+import { ShoppingCart } from "lucide-react";
 import { useCart } from "./CartProvider";
 import { useToast } from "./ToastProvider";
 
@@ -10,6 +12,9 @@ type Props = {
   name: string;
   priceNumber: number | null;
   imageUrl?: string | null;
+  className?: string;
+  style?: CSSProperties;
+  display?: "button" | "icon";
 };
 
 export default function AddToCartButton({
@@ -19,6 +24,9 @@ export default function AddToCartButton({
   name,
   priceNumber,
   imageUrl,
+  className,
+  style,
+  display = "button",
 }: Props) {
   const { addItem } = useCart();
   const { showToast } = useToast();
@@ -36,7 +44,7 @@ export default function AddToCartButton({
         price: priceNumber,
         imageUrl,
       },
-      1
+      1,
     );
     showToast(`Added “${name}” to cart`);
   };
@@ -50,8 +58,19 @@ export default function AddToCartButton({
   }
 
   return (
-    <button className="btn btn-primary" type="button" onClick={handleClick}>
-      Add to cart
+    <button
+      className={className ? `btn btn-primary ${className}` : "btn btn-primary"}
+      style={style}
+      type="button"
+      onClick={handleClick}
+      aria-label={display === "icon" ? `Add ${name} to cart` : undefined}
+      title={display === "icon" ? "Add to cart" : undefined}
+    >
+      {display === "icon" ? (
+        <ShoppingCart size={18} aria-hidden="true" />
+      ) : (
+        "Add to cart"
+      )}
     </button>
   );
 }

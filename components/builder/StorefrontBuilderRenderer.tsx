@@ -1,6 +1,13 @@
 import { Suspense } from "react";
 import type { CSSProperties, ReactNode } from "react";
-import { CalendarDays, Check, Heart, ShieldCheck, Sparkles, Truck } from "lucide-react";
+import {
+  CalendarDays,
+  Check,
+  Heart,
+  ShieldCheck,
+  Sparkles,
+  Truck,
+} from "lucide-react";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import CarouselBlock, {
   type CarouselSlide,
@@ -181,6 +188,11 @@ async function BuilderProductsSection({
       gridGap={section.gridGap}
       cardPadding={section.cardPadding}
       imagePadding={section.imagePadding}
+      addToCartStyle={section.addToCartStyle}
+      addToCartSize={section.addToCartSize}
+      addToCartPosition={section.addToCartPosition}
+      addToCartVisibility={section.addToCartVisibility}
+      addToCartDisplay={section.addToCartDisplay}
     />
   );
 }
@@ -214,14 +226,14 @@ function sectionStyle(section: BuilderSection): BuilderStyle {
           "--builder-section-button-text": builderDarkScheme.buttonTextColor,
         } satisfies BuilderStyle)
       : colorScheme === "light"
-      ? ({
-          "--builder-section-text": builderLightScheme.textColor,
-          "--builder-section-muted": builderLightScheme.mutedTextColor,
-          "--builder-section-surface": builderLightScheme.surfaceColor,
-          "--builder-section-button-bg": builderLightScheme.buttonBackground,
-          "--builder-section-button-text": builderLightScheme.buttonTextColor,
-        } satisfies BuilderStyle)
-      : ({} satisfies BuilderStyle);
+        ? ({
+            "--builder-section-text": builderLightScheme.textColor,
+            "--builder-section-muted": builderLightScheme.mutedTextColor,
+            "--builder-section-surface": builderLightScheme.surfaceColor,
+            "--builder-section-button-bg": builderLightScheme.buttonBackground,
+            "--builder-section-button-text": builderLightScheme.buttonTextColor,
+          } satisfies BuilderStyle)
+        : ({} satisfies BuilderStyle);
 
   return {
     background: section.background,
@@ -253,7 +265,10 @@ function SectionFrame({
   children: ReactNode;
 }) {
   return (
-    <section className={sectionClassName(section, extra)} style={sectionStyle(section)}>
+    <section
+      className={sectionClassName(section, extra)}
+      style={sectionStyle(section)}
+    >
       <div className="shop-builder-section-content">{children}</div>
     </section>
   );
@@ -284,7 +299,9 @@ function HeroSection({
   section: BuilderSection;
   product?: StorefrontBuilderProduct;
 }) {
-  const isProductTemplate = Boolean(product && section.id.includes("template-product"));
+  const isProductTemplate = Boolean(
+    product && section.id.includes("template-product"),
+  );
 
   return (
     <SectionFrame section={section} extra="shop-builder-hero">
@@ -338,7 +355,10 @@ function PromoSection({ section }: { section: BuilderSection }) {
         {section.body && <p className="shop-builder-body">{section.body}</p>}
       </div>
       {section.ctaLabel && section.ctaUrl && (
-        <a className="shop-builder-cta shop-builder-cta--light" href={section.ctaUrl}>
+        <a
+          className="shop-builder-cta shop-builder-cta--light"
+          href={section.ctaUrl}
+        >
           {section.ctaLabel}
         </a>
       )}
@@ -359,21 +379,40 @@ function BadgeGridSection({ section }: { section: BuilderSection }) {
   const badges = section.badges?.length
     ? section.badges
     : [
-        { id: "one", label: "01", title: "Fast setup", body: "Reusable client-ready settings." },
-        { id: "two", label: "02", title: "Clean layouts", body: "Flat sections with simple controls." },
-        { id: "three", label: "03", title: "Woo data", body: "Products stay powered by WordPress." },
+        {
+          id: "one",
+          label: "01",
+          title: "Fast setup",
+          body: "Reusable client-ready settings.",
+        },
+        {
+          id: "two",
+          label: "02",
+          title: "Clean layouts",
+          body: "Flat sections with simple controls.",
+        },
+        {
+          id: "three",
+          label: "03",
+          title: "Woo data",
+          body: "Products stay powered by WordPress.",
+        },
       ];
 
   return (
     <SectionFrame section={section} extra="shop-builder-badge-grid">
       <div>
-        {section.eyebrow && <p className="shop-builder-eyebrow">{section.eyebrow}</p>}
+        {section.eyebrow && (
+          <p className="shop-builder-eyebrow">{section.eyebrow}</p>
+        )}
         <h2 className="shop-builder-title">{section.title}</h2>
         {section.body && <p className="shop-builder-body">{section.body}</p>}
       </div>
       <div
         className="shop-builder-badges"
-        style={{ "--builder-badge-columns": section.columns ?? 3 } as CSSProperties}
+        style={
+          { "--builder-badge-columns": section.columns ?? 3 } as CSSProperties
+        }
       >
         {badges.map((badge, index) => (
           <article key={badge.id ?? index} className="shop-builder-badge-card">
@@ -388,10 +427,16 @@ function BadgeGridSection({ section }: { section: BuilderSection }) {
 }
 
 function getContentLayoutBlocks(
-  item: NonNullable<BuilderSection["layoutItems"]>[number]
+  item: NonNullable<BuilderSection["layoutItems"]>[number],
 ): BuilderLayoutBlock[] {
   if (item.blocks?.length) return item.blocks;
-  if (item.title || item.body || item.eyebrow || item.buttonLabel || item.buttonUrl) {
+  if (
+    item.title ||
+    item.body ||
+    item.eyebrow ||
+    item.buttonLabel ||
+    item.buttonUrl
+  ) {
     return [
       {
         id: `${item.id ?? "legacy"}-text`,
@@ -437,7 +482,10 @@ async function ContentProductsBlock({ block }: { block: BuilderLayoutBlock }) {
       : 4;
   const products = await getProductsForGrid({
     limit,
-    source: block.source === "featured" || block.source === "category" ? block.source : "all",
+    source:
+      block.source === "featured" || block.source === "category"
+        ? block.source
+        : "all",
     categoryId: block.categoryId,
   });
 
@@ -454,6 +502,11 @@ async function ContentProductsBlock({ block }: { block: BuilderLayoutBlock }) {
         cardPadding={block.cardPadding}
         imagePadding={block.imagePadding}
         imageFrame={block.gridImageFrame}
+        addToCartStyle={block.addToCartStyle}
+        addToCartSize={block.addToCartSize}
+        addToCartPosition={block.addToCartPosition}
+        addToCartVisibility={block.addToCartVisibility}
+        addToCartDisplay={block.addToCartDisplay}
       />
     </div>
   );
@@ -480,7 +533,9 @@ function GridCards({
   return (
     <div
       className={`shop-builder-grid shop-builder-grid--gap-${block.gridGap ?? "medium"} shop-builder-grid--margin-${block.gridMargin ?? "none"}`}
-      style={{ "--shop-builder-grid-columns": block.columns ?? 3 } as CSSProperties}
+      style={
+        { "--shop-builder-grid-columns": block.columns ?? 3 } as CSSProperties
+      }
     >
       {items.slice(0, limit).map((item) => (
         <article
@@ -489,19 +544,28 @@ function GridCards({
         >
           {block.gridShowImage !== false && item.imageUrl && (
             <div className="shop-builder-grid-image">
-              <img src={item.imageUrl} alt={item.imageAlt || item.title || ""} />
+              <img
+                src={item.imageUrl}
+                alt={item.imageAlt || item.title || ""}
+              />
             </div>
           )}
           <div className="shop-builder-grid-content">
-            {block.gridShowEyebrow !== false && item.eyebrow && <span>{item.eyebrow}</span>}
-            {item.title && <h3>{item.title}</h3>}
-            {block.gridShowMeta !== false && item.meta && <small>{item.meta}</small>}
-            {block.gridShowText !== false && item.text && <p>{item.text}</p>}
-            {block.gridShowButton !== false && item.buttonLabel && item.buttonUrl && (
-              <a className="shop-builder-cta" href={item.buttonUrl}>
-                {item.buttonLabel}
-              </a>
+            {block.gridShowEyebrow !== false && item.eyebrow && (
+              <span>{item.eyebrow}</span>
             )}
+            {item.title && <h3>{item.title}</h3>}
+            {block.gridShowMeta !== false && item.meta && (
+              <small>{item.meta}</small>
+            )}
+            {block.gridShowText !== false && item.text && <p>{item.text}</p>}
+            {block.gridShowButton !== false &&
+              item.buttonLabel &&
+              item.buttonUrl && (
+                <a className="shop-builder-cta" href={item.buttonUrl}>
+                  {item.buttonLabel}
+                </a>
+              )}
           </div>
         </article>
       ))}
@@ -547,7 +611,11 @@ async function ContentGridBlock({ block }: { block: BuilderLayoutBlock }) {
   );
 }
 
-function ProductSummaryBlock({ product }: { product: StorefrontBuilderProduct }) {
+function ProductSummaryBlock({
+  product,
+}: {
+  product: StorefrontBuilderProduct;
+}) {
   return (
     <div className="shop-builder-product-summary">
       <div className="product-header-row">
@@ -561,7 +629,9 @@ function ProductSummaryBlock({ product }: { product: StorefrontBuilderProduct })
       </div>
 
       {product.priceFormatted && (
-        <div className="shop-builder-product-price">{product.priceFormatted}</div>
+        <div className="shop-builder-product-price">
+          {product.priceFormatted}
+        </div>
       )}
 
       <ProductOptionsSelector
@@ -825,7 +895,13 @@ function ContentLayoutBlock({
   if (block.kind === "categoryFilters") {
     return (
       <div className="shop-builder-column-block shop-builder-column-block--category-filters">
-        <Suspense fallback={<div className="shop-builder-column-empty">Loading categories...</div>}>
+        <Suspense
+          fallback={
+            <div className="shop-builder-column-empty">
+              Loading categories...
+            </div>
+          }
+        >
           <CategoryFiltersBlock />
         </Suspense>
       </div>
@@ -835,7 +911,11 @@ function ContentLayoutBlock({
   if (product && block.id?.includes("product-media")) {
     return (
       <div className="shop-builder-column-block shop-builder-column-block--product-media">
-        <ProductDynamicBlock kind="productGallery" product={product} block={block} />
+        <ProductDynamicBlock
+          kind="productGallery"
+          product={product}
+          block={block}
+        />
       </div>
     );
   }
@@ -848,12 +928,20 @@ function ContentLayoutBlock({
     );
   }
 
-  if (product && block.kind !== "products" && block.kind?.startsWith("product")) {
+  if (
+    product &&
+    block.kind !== "products" &&
+    block.kind?.startsWith("product")
+  ) {
     return (
       <div
         className={`shop-builder-column-block shop-builder-column-block--${block.kind}`}
       >
-        <ProductDynamicBlock kind={block.kind} product={product} block={block} />
+        <ProductDynamicBlock
+          kind={block.kind}
+          product={product}
+          block={block}
+        />
       </div>
     );
   }
@@ -917,8 +1005,18 @@ function ContentLayoutBlock({
     const badges = block.badges?.length
       ? block.badges
       : [
-          { id: "one", label: "01", title: "Fast setup", body: "Reusable settings." },
-          { id: "two", label: "02", title: "Clean blocks", body: "Flat nested sections." },
+          {
+            id: "one",
+            label: "01",
+            title: "Fast setup",
+            body: "Reusable settings.",
+          },
+          {
+            id: "two",
+            label: "02",
+            title: "Clean blocks",
+            body: "Flat nested sections.",
+          },
         ];
 
     return (
@@ -927,7 +1025,11 @@ function ContentLayoutBlock({
         {block.body && <p>{block.body}</p>}
         <div
           className="shop-builder-column-badges"
-          style={{ "--builder-column-badge-columns": block.columns ?? 2 } as CSSProperties}
+          style={
+            {
+              "--builder-column-badge-columns": block.columns ?? 2,
+            } as CSSProperties
+          }
         >
           {badges.map((badge, index) => (
             <article key={badge.id ?? index}>
@@ -1073,7 +1175,9 @@ function ContentLayoutBlock({
   );
 }
 
-function blockSurfaceStyle(block: BuilderLayoutBlock): CSSProperties | undefined {
+function blockSurfaceStyle(
+  block: BuilderLayoutBlock,
+): CSSProperties | undefined {
   if (block.elementBackgroundMode === "transparent") {
     return { "--builder-element-bg": "transparent" } as CSSProperties;
   }
@@ -1111,17 +1215,28 @@ function ContentLayoutSection({
     <SectionFrame section={section} extra="shop-builder-content-layout">
       {(section.eyebrow || section.title || section.body) && (
         <div className="shop-builder-content-layout-heading">
-          {section.eyebrow && <p className="shop-builder-eyebrow">{section.eyebrow}</p>}
-          {section.title && <h2 className="shop-builder-title">{section.title}</h2>}
+          {section.eyebrow && (
+            <p className="shop-builder-eyebrow">{section.eyebrow}</p>
+          )}
+          {section.title && (
+            <h2 className="shop-builder-title">{section.title}</h2>
+          )}
           {section.body && <p className="shop-builder-body">{section.body}</p>}
         </div>
       )}
       <div
         className="shop-builder-content-layout-grid"
-        style={{ "--builder-layout-columns": section.layoutColumns ?? 2 } as CSSProperties}
+        style={
+          {
+            "--builder-layout-columns": section.layoutColumns ?? 2,
+          } as CSSProperties
+        }
       >
         {items.map((item, index) => (
-          <article key={item.id ?? index} className="shop-builder-content-layout-card">
+          <article
+            key={item.id ?? index}
+            className="shop-builder-content-layout-card"
+          >
             {getContentLayoutBlocks(item).map((block, blockIndex) => (
               <div
                 key={block.id ?? blockIndex}
@@ -1287,10 +1402,7 @@ export default function StorefrontBuilderRenderer({
     breadcrumbItems ??
     (page === "home"
       ? [{ label: "Home" }]
-      : [
-          { label: "Home", href: "/" },
-          { label },
-        ]);
+      : [{ label: "Home", href: "/" }, { label }]);
 
   return (
     <main className={designClassName(layout)} style={designStyle(layout)}>

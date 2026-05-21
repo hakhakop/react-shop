@@ -98,6 +98,11 @@ export type BuilderLayoutBlock = {
   gridImagePadding?: string;
   gridContentPadding?: string;
   gridImageFrame?: string;
+  addToCartStyle?: string;
+  addToCartSize?: string;
+  addToCartPosition?: string;
+  addToCartVisibility?: string;
+  addToCartDisplay?: string;
   gridShowImage?: boolean;
   gridShowEyebrow?: boolean;
   gridShowMeta?: boolean;
@@ -145,6 +150,11 @@ export type BuilderSection = {
   gridGap?: string;
   cardPadding?: string;
   imagePadding?: string;
+  addToCartStyle?: string;
+  addToCartSize?: string;
+  addToCartPosition?: string;
+  addToCartVisibility?: string;
+  addToCartDisplay?: string;
   source?: string;
   categoryId?: string;
   gridLimit?: number;
@@ -232,7 +242,7 @@ const templates = new Set([
 const layoutKeys = new Set([...pages, ...templates]);
 
 export function isBuilderCustomPageKey(
-  value: string | null | undefined
+  value: string | null | undefined,
 ): value is BuilderCustomPageKey {
   return /^page:[a-z0-9]+(?:-[a-z0-9]+)*$/.test(value ?? "");
 }
@@ -244,7 +254,9 @@ export function normalizeBuilderPage(value: string | null): BuilderPage {
   return "shop";
 }
 
-export function normalizeBuilderLayoutKey(value: string | null): BuilderLayoutKey {
+export function normalizeBuilderLayoutKey(
+  value: string | null,
+): BuilderLayoutKey {
   if (layoutKeys.has(value ?? "") || isBuilderCustomPageKey(value)) {
     return value as BuilderLayoutKey;
   }
@@ -255,7 +267,9 @@ export function getBuilderTargetType(key: BuilderLayoutKey) {
   return templates.has(key) ? "template" : "page";
 }
 
-export function isBuilderTemplate(key: BuilderLayoutKey): key is BuilderTemplate {
+export function isBuilderTemplate(
+  key: BuilderLayoutKey,
+): key is BuilderTemplate {
   return templates.has(key);
 }
 
@@ -270,7 +284,7 @@ export async function readBuilderLayoutStore(): Promise<BuilderLayoutStore> {
 }
 
 export async function getPublishedBuilderLayout(
-  page: BuilderLayoutKey
+  page: BuilderLayoutKey,
 ): Promise<BuilderLayout | null> {
   const store = await readBuilderLayoutStore();
   return store[page] ?? null;
@@ -290,16 +304,22 @@ export async function readBuilderCustomPages(): Promise<BuilderCustomPage[]> {
       (page) =>
         isBuilderCustomPageKey(page.key) &&
         typeof page.title === "string" &&
-        typeof page.slug === "string"
+        typeof page.slug === "string",
     );
   } catch {
     return [];
   }
 }
 
-export async function writeBuilderCustomPages(pagesToWrite: BuilderCustomPage[]) {
+export async function writeBuilderCustomPages(
+  pagesToWrite: BuilderCustomPage[],
+) {
   await mkdir(DATA_DIR, { recursive: true });
-  await writeFile(PAGES_FILE, `${JSON.stringify(pagesToWrite, null, 2)}\n`, "utf8");
+  await writeFile(
+    PAGES_FILE,
+    `${JSON.stringify(pagesToWrite, null, 2)}\n`,
+    "utf8",
+  );
 }
 
 export function isValidBuilderSection(value: unknown): value is BuilderSection {
