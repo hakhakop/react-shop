@@ -8,7 +8,7 @@
   "menuPresentation": {
     "cG9zdDo1MzQ2": {
       "showHeading": false,
-      "icon": "home",
+      "icon": "trash",
       "submenuLayout": "list",
       "submenuColumns": 3,
       "badgeText": null
@@ -35,5 +35,5 @@
       "badgeText": null
     }
   },
-  "updatedAt": "2026-05-22T07:22:57.015Z"
+  "updatedAt": "2026-05-22T16:21:17.414Z"
 }
