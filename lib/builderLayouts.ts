@@ -43,6 +43,7 @@ export type BuilderLayoutBlock = {
   elementBackgroundMode?: string;
   elementBackground?: string;
   elementPadding?: string;
+  elementAlign?: string;
   embedMode?: string;
   embedCode?: string;
   embedUrl?: string;

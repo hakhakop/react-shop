@@ -5,5 +5,35 @@
   "sectionPaddingBottom": "medium",
   "sectionMarginTop": "medium",
   "sectionMarginBottom": "medium",
-  "updatedAt": "2026-05-16T04:47:52.757Z"
+  "menuPresentation": {
+    "cG9zdDo1MzQ2": {
+      "showHeading": false,
+      "icon": "home",
+      "submenuLayout": "list",
+      "submenuColumns": 3,
+      "badgeText": null
+    },
+    "cG9zdDo4MQ==": {
+      "showHeading": true,
+      "icon": "bag",
+      "submenuLayout": "list",
+      "submenuColumns": 3,
+      "badgeText": null
+    },
+    "cG9zdDo3OQ==": {
+      "showHeading": false,
+      "icon": null,
+      "submenuLayout": "list",
+      "submenuColumns": 3,
+      "badgeText": null
+    },
+    "cG9zdDo3Nw==": {
+      "showHeading": true,
+      "icon": null,
+      "submenuLayout": "grid",
+      "submenuColumns": 3,
+      "badgeText": null
+    }
+  },
+  "updatedAt": "2026-05-22T07:22:57.015Z"
 }

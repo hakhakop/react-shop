@@ -9,6 +9,16 @@ export type BuilderHeaderLayout =
   | "pill"
   | "princity";
 
+export type BuilderMenuPresentation = {
+  showHeading: boolean;
+  icon: string | null;
+  submenuLayout: "list" | "grid" | "mega";
+  submenuColumns: number;
+  badgeText: string | null;
+};
+
+export type BuilderMenuPresentationMap = Record<string, BuilderMenuPresentation>;
+
 export type BuilderShellSettings = {
   headerVisible: boolean;
   headerLayout: BuilderHeaderLayout;
@@ -16,6 +26,7 @@ export type BuilderShellSettings = {
   sectionPaddingBottom: BuilderSectionSpacing;
   sectionMarginTop: BuilderSectionSpacing;
   sectionMarginBottom: BuilderSectionSpacing;
+  menuPresentation: BuilderMenuPresentationMap;
   updatedAt?: string;
 };
 
@@ -31,6 +42,7 @@ export const defaultBuilderShellSettings: BuilderShellSettings = {
   sectionPaddingBottom: "medium",
   sectionMarginTop: "none",
   sectionMarginBottom: "none",
+  menuPresentation: {},
 };
 
 function normalizeHeaderLayout(value: unknown): BuilderHeaderLayout {
@@ -50,6 +62,50 @@ function normalizeSectionSpacing(value: unknown, fallback: BuilderSectionSpacing
     value === "large"
     ? value
     : fallback;
+}
+
+function normalizeMenuPresentation(value: unknown): BuilderMenuPresentation {
+  const raw = (value && typeof value === "object" ? value : {}) as Partial<
+    BuilderMenuPresentation
+  >;
+  const submenuColumnsNumber = Number(raw.submenuColumns);
+
+  return {
+    showHeading: typeof raw.showHeading === "boolean" ? raw.showHeading : true,
+    icon:
+      typeof raw.icon === "string" && raw.icon.trim().length > 0
+        ? raw.icon.trim()
+        : null,
+    submenuLayout:
+      raw.submenuLayout === "grid" || raw.submenuLayout === "mega"
+        ? raw.submenuLayout
+        : "list",
+    submenuColumns: Number.isFinite(submenuColumnsNumber)
+      ? Math.min(Math.max(Math.round(submenuColumnsNumber), 1), 6)
+      : 3,
+    badgeText:
+      typeof raw.badgeText === "string" && raw.badgeText.trim().length > 0
+        ? raw.badgeText.trim()
+        : null,
+  };
+}
+
+function normalizeMenuPresentationMap(
+  value: unknown
+): BuilderMenuPresentationMap {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    return {};
+  }
+
+  const entries = Object.entries(value as Record<string, unknown>);
+  const normalized: BuilderMenuPresentationMap = {};
+
+  for (const [id, item] of entries) {
+    if (typeof id !== "string" || id.trim().length === 0) continue;
+    normalized[id] = normalizeMenuPresentation(item);
+  }
+
+  return normalized;
 }
 
 export function normalizeBuilderShellSettings(
@@ -79,6 +135,7 @@ export function normalizeBuilderShellSettings(
       value?.sectionMarginBottom,
       defaultBuilderShellSettings.sectionMarginBottom
     ),
+    menuPresentation: normalizeMenuPresentationMap(value?.menuPresentation),
   };
 }
 

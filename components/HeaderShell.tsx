@@ -14,7 +14,11 @@ import CategoryMegaMenu from "./CategoryMegaMenu";
 import HeaderNav from "./HeaderNav";
 import HeaderFrame from "./HeaderFrame";
 import HeaderPillController from "./HeaderPillController";
-import type { BuilderHeaderLayout } from "../lib/builderShell";
+import {
+  getBuilderShellSettings,
+  type BuilderHeaderLayout,
+  type BuilderMenuPresentationMap,
+} from "../lib/builderShell";
 import { readBuilderCustomPages } from "../lib/builderLayouts";
 function asString(value: unknown, fallback: string | null = null): string | null {
   if (typeof value === "string" && value.trim() !== "") return value.trim();
@@ -27,13 +31,15 @@ type HeaderShellProps = {
 
 export default async function HeaderShell({ layoutOverride }: HeaderShellProps) {
   // Load theme settings and main menu in parallel
-  const [settingsRaw, menuItemsRaw, builderPages] = await Promise.all([
-    getThemeSettings(),
-    getMainMenuItems(),
-    readBuilderCustomPages(),
-  ]);
+  const [settingsRaw, menuItemsRaw, builderPages, shellSettingsRaw] =
+    await Promise.all([
+      getThemeSettings(),
+      getMainMenuItems(),
+      readBuilderCustomPages(),
+      getBuilderShellSettings(),
+    ]);
 
-  const settings = (settingsRaw || {}) as Record<string, any>;
+  const settings = (settingsRaw || {}) as Record<string, unknown>;
 
   const headerSettings: HeaderSettings = settings.headerSettings
     ? (settings.headerSettings as HeaderSettings)
@@ -55,11 +61,12 @@ export default async function HeaderShell({ layoutOverride }: HeaderShellProps) 
   if (typeof logoField === "string") {
     logoUrl = logoField;
   } else if (logoField && typeof logoField === "object") {
+    const logoObject = logoField as Record<string, unknown>;
     logoUrl =
-      (logoField.url as string) ||
-      (logoField.source_url as string) ||
-      (logoField.sourceUrl as string) ||
-      (logoField.full_url as string) ||
+      (logoObject.url as string) ||
+      (logoObject.source_url as string) ||
+      (logoObject.sourceUrl as string) ||
+      (logoObject.full_url as string) ||
       null;
   }
 
@@ -132,6 +139,10 @@ export default async function HeaderShell({ layoutOverride }: HeaderShellProps) 
           ...builderPageItems,
         ];
 
+  const menuPresentation = (
+    (shellSettingsRaw || {}) as { menuPresentation?: BuilderMenuPresentationMap }
+  ).menuPresentation ?? {};
+
   const renderCategoriesMega = () => (
     <HeaderCategoriesDropdown>
       <CategoryMegaMenu />
@@ -188,7 +199,10 @@ export default async function HeaderShell({ layoutOverride }: HeaderShellProps) 
               {renderLogoAndBrand()}
 
               <div className="site-header-main-center">
-                <HeaderNav items={itemsToRender} />
+                <HeaderNav
+                  items={itemsToRender}
+                  presentationById={menuPresentation}
+                />
                 {renderCategoriesMega()}
               </div>
 
@@ -235,7 +249,10 @@ export default async function HeaderShell({ layoutOverride }: HeaderShellProps) 
                 {renderLogoAndBrand()}
 
                 <div className="site-header-main-center">
-                  <HeaderNav items={itemsToRender} />
+                  <HeaderNav
+                    items={itemsToRender}
+                    presentationById={menuPresentation}
+                  />
                   {renderCategoriesMega()}
                 </div>
 
@@ -278,7 +295,10 @@ export default async function HeaderShell({ layoutOverride }: HeaderShellProps) 
                 </div>
 
                 <div className="site-header-princity-center">
-                  <HeaderNav items={itemsToRender} />
+                  <HeaderNav
+                    items={itemsToRender}
+                    presentationById={menuPresentation}
+                  />
                   {renderCategoriesMega()}
                 </div>
 
@@ -303,7 +323,10 @@ export default async function HeaderShell({ layoutOverride }: HeaderShellProps) 
             {renderLogoAndBrand()}
 
             <div className="site-header-main-center">
-              <HeaderNav items={itemsToRender} />
+              <HeaderNav
+                items={itemsToRender}
+                presentationById={menuPresentation}
+              />
               {renderCategoriesMega()}
             </div>
 
@@ -344,7 +367,10 @@ export default async function HeaderShell({ layoutOverride }: HeaderShellProps) 
             </p>
 
             <div className="site-header-hero-menu">
-              <HeaderNav items={itemsToRender} />
+              <HeaderNav
+                items={itemsToRender}
+                presentationById={menuPresentation}
+              />
               {renderCategoriesMega()}
             </div>
 

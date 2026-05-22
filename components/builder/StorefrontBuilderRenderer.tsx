@@ -1188,7 +1188,9 @@ function blockSurfaceStyle(
 }
 
 function blockShellClassName(block: BuilderLayoutBlock) {
-  return `shop-builder-element-shell is-padding-${block.elementPadding ?? "none"}`;
+  return `shop-builder-element-shell is-padding-${
+    block.elementPadding ?? "none"
+  } is-align-${block.elementAlign ?? "left"}`;
 }
 
 function ContentLayoutSection({

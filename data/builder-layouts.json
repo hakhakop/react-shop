@@ -86,6 +86,99 @@
         "colorScheme": "inherit"
       },
       {
+        "id": "contentLayout-mpgu1y58-o77su",
+        "kind": "contentLayout",
+        "title": "",
+        "background": "#111111",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "topSpacing": "inherit",
+        "bottomSpacing": "inherit",
+        "topMargin": "inherit",
+        "bottomMargin": "inherit",
+        "visible": true,
+        "eyebrow": "",
+        "body": "",
+        "layoutColumns": 1,
+        "layoutItems": [
+          {
+            "id": "layout-item-mpgu1y58-1",
+            "blocks": [
+              {
+                "id": "slider-block-mpgu2i7f-i5ita",
+                "kind": "slider",
+                "title": "",
+                "body": "",
+                "slides": [
+                  {
+                    "id": "slider-block-mpgu2i7f-i5ita-slide-1",
+                    "badge": "First Slide",
+                    "title": "First slide",
+                    "text": "Edit this slider block from the column.",
+                    "imagePadding": "frameless",
+                    "imageUrl": "https://cms.webpages.am/wp-content/uploads/2025/11/products-post-single-breasted-blazer-suit-feature.jpg",
+                    "imageAlt": "products-post-single-breasted-blazer-suit-feature.jpg",
+                    "buttonLabel": "NyuNyu",
+                    "buttonUrl": "/"
+                  },
+                  {
+                    "id": "slider-block-mpgu2i7f-i5ita-slide-2",
+                    "badge": "02",
+                    "title": "Second slide",
+                    "text": "Use this for campaigns, features, or visual stories.",
+                    "imagePadding": "frameless",
+                    "imageUrl": "https://cms.webpages.am/wp-content/uploads/2025/11/cropped-image-scaled-1.png",
+                    "imageAlt": "cropped-image-scaled-1.png",
+                    "buttonLabel": "hyuhyu",
+                    "buttonUrl": "/"
+                  },
+                  {
+                    "id": "nested-slide-mpgu4dda",
+                    "badge": "03",
+                    "title": "Slide 3",
+                    "text": "Edit this nested slider slide.",
+                    "imagePadding": "frameless",
+                    "imageUrl": "https://cms.webpages.am/wp-content/uploads/2025/11/products-post-turtleneck-blue-sweater-image-02-scaled-1.jpg",
+                    "imageAlt": "products-post-turtleneck-blue-sweater-image-02-scaled-1.jpg",
+                    "buttonLabel": "LyuLyu",
+                    "buttonUrl": "/"
+                  },
+                  {
+                    "id": "nested-slide-mpgugyok",
+                    "badge": "04",
+                    "title": "Slide 4",
+                    "text": "Edit this nested slider slide.",
+                    "imagePadding": "medium"
+                  },
+                  {
+                    "id": "nested-slide-mpgugzvi",
+                    "badge": "05",
+                    "title": "Slide 5",
+                    "text": "Edit this nested slider slide.",
+                    "imagePadding": "medium"
+                  }
+                ],
+                "carouselSettings": {
+                  "variant": "basic",
+                  "loop": true,
+                  "autoplay": false,
+                  "autoplayDelayMs": 5000,
+                  "align": "start",
+                  "dragFree": false,
+                  "cardsPerView": 3,
+                  "showArrows": true,
+                  "showDots": true,
+                  "pauseOnHover": true
+                },
+                "elementAlign": "center"
+              }
+            ]
+          }
+        ],
+        "layoutRows": 1
+      },
+      {
         "id": "home-archive-1",
         "kind": "productArchive",
         "title": "Featured Products",
@@ -110,9 +203,9 @@
         "id": "contentLayout-mpe18gdv-yy9c7",
         "kind": "contentLayout",
         "title": "",
-        "background": "#ffffff",
+        "background": "#111111",
         "backgroundMode": "boxed",
-        "contentMode": "boxed",
+        "contentMode": "narrow",
         "colorScheme": "inherit",
         "topSpacing": "inherit",
         "bottomSpacing": "inherit",
@@ -139,7 +232,7 @@
         "layoutRows": 1
       }
     ],
-    "updatedAt": "2026-05-22T05:41:40.754Z"
+    "updatedAt": "2026-05-22T12:29:06.074Z"
   },
   "shop": {
     "version": 1,
@@ -1058,5 +1151,47 @@
       }
     ],
     "updatedAt": "2026-05-14T14:10:11.919Z"
+  },
+  "page:hello": {
+    "version": 1,
+    "key": "page:hello",
+    "page": "page:hello",
+    "targetType": "page",
+    "design": {
+      "preset": "princity",
+      "colorScheme": "auto",
+      "pageBackground": "#f7f7f4",
+      "textColor": "#111111",
+      "mutedTextColor": "#5f5f58",
+      "accentColor": "#a4be7b",
+      "surfaceColor": "#efefe9",
+      "buttonBackground": "#111111",
+      "buttonTextColor": "#ffffff",
+      "radius": "8px",
+      "sectionMaxWidth": "1640px",
+      "sectionGutter": "48px",
+      "headingFontFamily": "inherit",
+      "headingSize": "clamp(42px, 8vw, 126px)",
+      "headingWeight": "760",
+      "headingLineHeight": "0.92"
+    },
+    "sections": [
+      {
+        "id": "page:hello-hero",
+        "kind": "hero",
+        "title": "Hello",
+        "eyebrow": "Builder page",
+        "body": "A custom React page created from the visual dashboard.",
+        "background": "#f7f7f4",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "layout": "split",
+        "topSpacing": "medium",
+        "bottomSpacing": "medium",
+        "visible": true
+      }
+    ],
+    "updatedAt": "2026-05-22T06:12:17.819Z"
   }
 }

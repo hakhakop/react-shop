@@ -516,10 +516,46 @@
 }
 
 .site-header-nav-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
   position: relative;
   text-decoration: none;
   color: var(--text-muted, #4b5563);
   padding-bottom: 6px; /* more space above underline */
+}
+
+.site-header-nav-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 0;
+  color: inherit;
+  flex: 0 0 auto;
+}
+
+.uikit-icon {
+  display: block;
+  width: 1em;
+  height: 1em;
+  fill: currentColor;
+  stroke: currentColor;
+  flex: 0 0 auto;
+}
+
+.site-header-nav-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 1.3rem;
+  padding: 0 0.45rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--accent, #ec4899) 14%, transparent);
+  color: var(--accent-strong, #be185d);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  line-height: 1;
 }
 
 .site-header-nav-link::after {
@@ -550,11 +586,10 @@
   position: absolute;
   top: 100%;
   left: 0;
-  min-width: 12rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  padding: 0.85rem;
+  min-width: 15rem;
+  display: grid;
+  gap: 0.85rem;
+  padding: 0.95rem;
   border: 1px solid var(--header-border, rgba(229, 231, 235, 0.9));
   border-radius: 1rem;
   background: var(--surface-main, #ffffff);
@@ -570,6 +605,35 @@
   z-index: 30;
 }
 
+.site-header-nav-submenu--grid,
+.site-header-nav-submenu--mega {
+  min-width: min(42rem, 80vw);
+}
+
+.site-header-nav-submenu-heading {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: var(--text-main, #111827);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.site-header-nav-submenu-items {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.site-header-nav-submenu--grid .site-header-nav-submenu-items,
+.site-header-nav-submenu--mega .site-header-nav-submenu-items {
+  grid-template-columns: repeat(var(--submenu-columns, 3), minmax(0, 1fr));
+  gap: 0.6rem 0.8rem;
+}
+
+.site-header-nav-submenu--mega {
+  padding: 1.05rem;
+}
+
 .site-header-nav-item:hover > .site-header-nav-submenu,
 .site-header-nav-item:focus-within > .site-header-nav-submenu {
   opacity: 1;
@@ -578,9 +642,14 @@
   transform: translateY(0);
 }
 
+.site-header-nav-submenu .site-header-nav-item {
+  padding-bottom: 0;
+}
+
 .site-header-nav-submenu-link {
   padding-bottom: 0;
   white-space: nowrap;
+  font-size: 0.95rem;
 }
 
 .site-header-nav-submenu-link::after {

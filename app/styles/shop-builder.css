@@ -519,6 +519,37 @@
   padding: 32px;
 }
 
+.shop-builder-element-shell.is-align-left {
+  text-align: left;
+}
+
+.shop-builder-element-shell.is-align-center {
+  text-align: center;
+}
+
+.shop-builder-element-shell.is-align-right {
+  text-align: right;
+}
+
+.shop-builder-element-shell.is-align-center .shop-builder-column-block p,
+.shop-builder-element-shell.is-align-center .shop-builder-cta {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.shop-builder-element-shell.is-align-right .shop-builder-column-block p,
+.shop-builder-element-shell.is-align-right .shop-builder-cta {
+  margin-left: auto;
+}
+
+.shop-builder-element-shell.is-align-right .shop-builder-column-block--promo-strip {
+  justify-content: flex-end;
+}
+
+.shop-builder-element-shell.is-align-center .shop-builder-column-block--promo-strip {
+  justify-content: center;
+}
+
 .shop-builder-grid-image {
   aspect-ratio: 1 / 1;
   display: grid;
