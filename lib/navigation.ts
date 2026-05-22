@@ -11,6 +11,8 @@ export type MenuItem = {
   label: string;
   url: string;
   path?: string | null;
+  parentId?: string | null;
+  children?: MenuItem[];
 };
 
 type MainMenuData = {
@@ -30,11 +32,35 @@ const MAIN_MENU_QUERY = `
           label
           url
           path
+          parentId
         }
       }
     }
   }
 `;
+
+function buildMenuTree(items: MenuItem[]): MenuItem[] {
+  const byId = new Map<string, MenuItem & { children: MenuItem[] }>();
+  const roots: (MenuItem & { children: MenuItem[] })[] = [];
+
+  for (const item of items) {
+    byId.set(item.id, {
+      ...item,
+      children: [],
+    });
+  }
+
+  for (const item of byId.values()) {
+    const parentId = item.parentId ?? null;
+    if (parentId && byId.has(parentId)) {
+      byId.get(parentId)!.children.push(item);
+    } else {
+      roots.push(item);
+    }
+  }
+
+  return roots;
+}
 
 export async function getMainMenuItems(): Promise<MenuItem[]> {
   try {
@@ -44,8 +70,8 @@ export async function getMainMenuItems(): Promise<MenuItem[]> {
       return [];
     }
 
-    return data.menu.menuItems.nodes ?? [];
-  } catch (e) {
+    return buildMenuTree(data.menu.menuItems.nodes ?? []);
+  } catch {
     // If menu query fails for any reason, just return empty — header will still work.
     return [];
   }
@@ -108,7 +134,7 @@ export async function getProductCategories(): Promise<ProductCategory[]> {
     unique.sort((a, b) => a.name.localeCompare(b.name, "en"));
 
     return unique;
-  } catch (e) {
+  } catch {
     return [];
   }
 }

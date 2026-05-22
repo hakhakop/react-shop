@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import type { ReactNode } from "react";
 import type { MenuItem } from "../lib/navigation";
 
 interface HeaderNavProps {
@@ -59,40 +60,76 @@ function getDashboardEditHref(href: string, currentPath: string): string {
   return href;
 }
 
+function itemHasActiveDescendant(
+  item: MenuItem,
+  currentPath: string
+): boolean {
+  const href = item.path || item.url || "#";
+  const itemPath =
+    href === "#" ? "#" : normalizePath(item.path || item.url || href);
+  const isActive =
+    itemPath !== "#" &&
+    (currentPath === itemPath || currentPath.startsWith(itemPath + "/"));
+
+  if (isActive) return true;
+
+  return (item.children ?? []).some((child) =>
+    itemHasActiveDescendant(child, currentPath)
+  );
+}
+
+function renderMenuItems(
+  items: MenuItem[],
+  currentPath: string,
+  level = 0
+): ReactNode {
+  return items.map((item) => {
+    const href = item.path || item.url || "#";
+    const dashboardHref = getDashboardEditHref(href, currentPath);
+    const itemPath =
+      href === "#" ? "#" : normalizePath(item.path || item.url || href);
+    const isActive =
+      itemPath !== "#" &&
+      (currentPath === itemPath || currentPath.startsWith(itemPath + "/"));
+    const children = item.children ?? [];
+    const hasChildren = children.length > 0;
+    const isBranchActive = itemHasActiveDescendant(item, currentPath);
+
+    return (
+      <div
+        key={item.id}
+        className={`site-header-nav-item${
+          hasChildren ? " has-children" : ""
+        }${isBranchActive ? " is-active" : ""}`}
+      >
+        <Link
+          href={dashboardHref}
+          className={`site-header-nav-link${
+            level > 0 ? " site-header-nav-submenu-link" : ""
+          }${isActive ? " is-active" : ""}`}
+          aria-current={isActive ? "page" : undefined}
+          aria-haspopup={hasChildren ? "menu" : undefined}
+        >
+          {item.label}
+        </Link>
+
+        {hasChildren && (
+          <div className="site-header-nav-submenu" role="menu">
+            {renderMenuItems(children, currentPath, level + 1)}
+          </div>
+        )}
+      </div>
+    );
+  });
+}
+
 export default function HeaderNav({ items }: HeaderNavProps) {
   const rawPathname = usePathname();
   const currentPath = normalizePath(rawPathname || "/");
 
   return (
     <nav className="site-header-nav">
-      {items.map((item) => {
-        const href = item.path || item.url || "#";
-        const dashboardHref = getDashboardEditHref(href, currentPath);
-
-        // Normalize the item's path for comparison (works with full WP URLs or app-relative paths)
-        const itemPath =
-          href === "#"
-            ? "#"
-            : normalizePath(item.path || item.url || href);
-
-        const isActive =
-          itemPath !== "#" &&
-          (currentPath === itemPath ||
-            currentPath.startsWith(itemPath + "/"));
-
-        return (
-          <Link
-            key={item.id}
-            href={dashboardHref}
-            className={`site-header-nav-link${
-              isActive ? " is-active" : ""
-            }`}
-            aria-current={isActive ? "page" : undefined}
-          >
-            {item.label}
-          </Link>
-        );
-      })}
+      {renderMenuItems(items, currentPath)}
     </nav>
   );
 }
