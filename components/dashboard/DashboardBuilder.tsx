@@ -21,6 +21,7 @@ import {
   PanelRightOpen,
   Plus,
   ShoppingBag,
+  LockKeyhole,
   Undo2,
   Settings2,
   Sparkles,
@@ -29,6 +30,7 @@ import {
   TextCursorInput,
   Truck,
   Trash2,
+  UserRound,
   X,
 } from "lucide-react";
 import Image from "next/image";
@@ -125,7 +127,10 @@ export type LayoutBlockKind =
   | "productPrice"
   | "productAddToCart"
   | "productAttributes"
-  | "productDescription";
+  | "productDescription"
+  | "cartContent"
+  | "checkoutContent"
+  | "accountContent";
 
 export type BuilderDesign = {
   preset?: "princity" | "editorial" | "contrast";
@@ -570,6 +575,9 @@ const layoutBlockLabels: Record<LayoutBlockKind, string> = {
   productAddToCart: "Add To Cart",
   productAttributes: "Product Details",
   productDescription: "Description",
+  cartContent: "Cart Content",
+  checkoutContent: "Checkout Content",
+  accountContent: "My Account Content",
 };
 
 const baseLayoutBlockKinds: LayoutBlockKind[] = [
@@ -588,6 +596,9 @@ const baseLayoutBlockKinds: LayoutBlockKind[] = [
   "products",
   "categoryFilters",
   "breadcrumbs",
+  "cartContent",
+  "checkoutContent",
+  "accountContent",
 ];
 
 const productLayoutBlockKinds: LayoutBlockKind[] = [
@@ -629,6 +640,9 @@ const layoutBlockDescriptions: Record<LayoutBlockKind, string> = {
   productAddToCart: "Dynamic WooCommerce add-to-cart action.",
   productAttributes: "Dynamic current product attributes.",
   productDescription: "Dynamic current product description.",
+  cartContent: "Live cart page content slot.",
+  checkoutContent: "Live checkout page content slot.",
+  accountContent: "Live my-account page content slot.",
 };
 
 const layoutBlockGroups: {
@@ -659,6 +673,11 @@ const layoutBlockGroups: {
     ],
   },
   {
+    id: "woocommerce-pages",
+    label: "WooCommerce Pages",
+    kinds: ["cartContent", "checkoutContent", "accountContent"],
+  },
+  {
     id: "woocommerce-catalog",
     label: "WooCommerce Catalog",
     kinds: ["products", "categoryFilters"],
@@ -686,13 +705,13 @@ const layoutBlockGroups: {
   },
 ];
 
-const basePageLabels: Record<
-  Exclude<BuilderPage, BuilderCustomPageKey>,
-  string
-> = {
+const basePageLabels: Record<string, string> = {
   home: "Home",
   shop: "Shop",
   client: "Client Page",
+  "page:cart": "Cart",
+  "page:checkout": "Checkout",
+  "page:my-account": "My Account",
 };
 
 const templateLabels: Record<BuilderTemplate, string> = {
@@ -711,6 +730,9 @@ const builderLayoutKeys = new Set<BuilderLayoutKey>([
   "home",
   "shop",
   "client",
+  "page:cart",
+  "page:checkout",
+  "page:my-account",
   "product-single",
   "product-category",
   "product-category-specific",
@@ -745,6 +767,10 @@ function getLayoutLabel(
   key: BuilderLayoutKey,
   customPages: BuilderCustomPage[],
 ) {
+  if (layoutLabels[key]) {
+    return layoutLabels[key] as string;
+  }
+
   if (isBuilderCustomPageKey(key)) {
     return customPages.find((page) => page.key === key)?.title ?? "Custom Page";
   }
@@ -759,6 +785,9 @@ function getFrontendUrlForBuilderKey(
   if (key === "home") return "/";
   if (key === "shop") return "/shop";
   if (key === "client") return "/client";
+  if (key === "page:cart") return "/cart";
+  if (key === "page:checkout") return "/checkout";
+  if (key === "page:my-account") return "/my-account";
   if (key === "product-single") return "/product/pink-jumper";
   if (key === "product-category" || key === "product-category-specific") {
     return "/category/shoes";
@@ -1238,6 +1267,60 @@ function getDefaultStateForKey(key: BuilderLayoutKey): BuilderState {
     return structuredClone(defaultTemplateStates[key as BuilderTemplate]);
   }
 
+  if (
+    key === "page:cart" ||
+    key === "page:checkout" ||
+    key === "page:my-account"
+  ) {
+    const title =
+      key === "page:cart"
+        ? "Cart"
+        : key === "page:checkout"
+          ? "Checkout"
+          : "My account";
+    const slotKind =
+      key === "page:cart"
+        ? "cartContent"
+        : key === "page:checkout"
+          ? "checkoutContent"
+          : "accountContent";
+
+    return {
+      ...structuredClone(defaultState),
+      page: key,
+      targetType: "page",
+      template: undefined,
+      sections: [
+        {
+          id: `${key}-content`,
+          kind: "contentLayout",
+          title,
+          eyebrow: "WooCommerce page",
+          body: "Keep the functional store content in place, then customize the surrounding layout.",
+          background: "#ffffff",
+          backgroundMode: "boxed",
+          contentMode: "boxed",
+          colorScheme: "inherit",
+          layoutColumns: 1,
+          layoutItems: [
+            {
+              id: `${key}-slot`,
+              blocks: [
+                {
+                  id: `${key}-slot-block`,
+                  kind: slotKind,
+                  title: `${title} content`,
+                  body: `Live ${title.toLowerCase()} UI rendered from the React storefront.`,
+                },
+              ],
+            },
+          ],
+          visible: true,
+        },
+      ],
+    };
+  }
+
   if (isBuilderCustomPageKey(key)) {
     const title = key
       .replace(/^page:/, "")
@@ -1473,6 +1556,33 @@ function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
       kind,
       title: "Product Description",
       body: "Dynamic field: current product description.",
+    };
+  }
+
+  if (kind === "cartContent") {
+    return {
+      id,
+      kind,
+      title: "Cart Content",
+      body: "Live cart UI rendered from the React storefront.",
+    };
+  }
+
+  if (kind === "checkoutContent") {
+    return {
+      id,
+      kind,
+      title: "Checkout Content",
+      body: "Live checkout UI rendered from the React storefront.",
+    };
+  }
+
+  if (kind === "accountContent") {
+    return {
+      id,
+      kind,
+      title: "My Account Content",
+      body: "Live account UI rendered from the React storefront.",
     };
   }
 
@@ -5071,6 +5181,12 @@ function getLayoutBlockLibraryIcon(kind: LayoutBlockKind) {
       return <ListChecks size={16} />;
     case "productDescription":
       return <TextCursorInput size={16} />;
+    case "cartContent":
+      return <ShoppingBag size={16} />;
+    case "checkoutContent":
+      return <LockKeyhole size={16} />;
+    case "accountContent":
+      return <UserRound size={16} />;
     default:
       return <Sparkles size={16} />;
   }

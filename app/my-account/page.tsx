@@ -1,6 +1,7 @@
-import Link from "next/link";
 import { ArrowRight, Download, Home, MapPin, Package, UserRound } from "lucide-react";
+import StorefrontBuilderRenderer from "@/components/builder/StorefrontBuilderRenderer";
 import WordPressAccountStatus from "@/components/WordPressAccountStatus";
+import { getPublishedBuilderLayout } from "@/lib/builderLayouts";
 import { getWooAccountUrl, getWordPressBaseUrl } from "@/lib/wordpressUrl";
 
 const accountLinks = [
@@ -30,16 +31,12 @@ const accountLinks = [
   },
 ];
 
-export default function MyAccountPage() {
+function MyAccountPageContent() {
   const wordpressBaseUrl = getWordPressBaseUrl();
   const accountUrl = getWooAccountUrl();
 
   return (
-    <main className="page account-bridge-page">
-      <p className="product-back-link">
-        <Link href="/">← Back to store</Link>
-      </p>
-
+    <>
       <section className="account-bridge-hero">
         <div>
           <span className="account-bridge-kicker">WordPress account</span>
@@ -103,6 +100,24 @@ export default function MyAccountPage() {
           </span>
         </div>
       )}
-    </main>
+    </>
   );
+}
+
+export default async function MyAccountPage() {
+  const layout = await getPublishedBuilderLayout("page:my-account");
+  const content = <MyAccountPageContent />;
+
+  if (layout) {
+    return (
+      <StorefrontBuilderRenderer
+        layout={layout}
+        page="page:my-account"
+        pageLabel="My account"
+        pageContent={content}
+      />
+    );
+  }
+
+  return <main className="page account-bridge-page">{content}</main>;
 }

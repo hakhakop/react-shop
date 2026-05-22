@@ -38,6 +38,7 @@ type StorefrontBuilderRendererProps = {
   breadcrumbItems?: { label: string; href?: string }[];
   products?: ProductNode[];
   product?: StorefrontBuilderProduct;
+  pageContent?: ReactNode;
 };
 
 type StorefrontBuilderProduct = {
@@ -879,10 +880,14 @@ function ContentLayoutBlock({
   block,
   product,
   breadcrumbItems,
+  page,
+  pageContent,
 }: {
   block: BuilderLayoutBlock;
   product?: StorefrontBuilderProduct;
   breadcrumbItems: { label: string; href?: string }[];
+  page: BuilderLayoutKey;
+  pageContent?: ReactNode;
 }) {
   if (block.kind === "breadcrumbs") {
     return (
@@ -1104,6 +1109,54 @@ function ContentLayoutBlock({
     );
   }
 
+  if (block.kind === "cartContent") {
+    return page === "page:cart" ? (
+      pageContent ?? (
+        <div className="shop-builder-column-block shop-builder-column-block--text">
+          <h3>Cart content</h3>
+          <p>The live cart UI will render here.</p>
+        </div>
+      )
+    ) : (
+      <div className="shop-builder-column-block shop-builder-column-block--text">
+        <h3>Cart content</h3>
+        <p>Use this block on the Cart page.</p>
+      </div>
+    );
+  }
+
+  if (block.kind === "checkoutContent") {
+    return page === "page:checkout" ? (
+      pageContent ?? (
+        <div className="shop-builder-column-block shop-builder-column-block--text">
+          <h3>Checkout content</h3>
+          <p>The live checkout UI will render here.</p>
+        </div>
+      )
+    ) : (
+      <div className="shop-builder-column-block shop-builder-column-block--text">
+        <h3>Checkout content</h3>
+        <p>Use this block on the Checkout page.</p>
+      </div>
+    );
+  }
+
+  if (block.kind === "accountContent") {
+    return page === "page:my-account" ? (
+      pageContent ?? (
+        <div className="shop-builder-column-block shop-builder-column-block--text">
+          <h3>My account content</h3>
+          <p>The live account UI will render here.</p>
+        </div>
+      )
+    ) : (
+      <div className="shop-builder-column-block shop-builder-column-block--text">
+        <h3>My account content</h3>
+        <p>Use this block on the My Account page.</p>
+      </div>
+    );
+  }
+
   if (block.kind === "hero") {
     return (
       <div className="shop-builder-column-block shop-builder-column-block--hero">
@@ -1197,10 +1250,14 @@ function ContentLayoutSection({
   section,
   product,
   breadcrumbItems,
+  page,
+  pageContent,
 }: {
   section: BuilderSection;
   product?: StorefrontBuilderProduct;
   breadcrumbItems: { label: string; href?: string }[];
+  page: BuilderLayoutKey;
+  pageContent?: ReactNode;
 }) {
   const items = section.layoutItems?.length
     ? section.layoutItems
@@ -1249,6 +1306,8 @@ function ContentLayoutSection({
                   block={block}
                   product={product}
                   breadcrumbItems={breadcrumbItems}
+                  page={page}
+                  pageContent={pageContent}
                 />
               </div>
             ))}
@@ -1318,11 +1377,15 @@ function BuilderSectionRenderer({
   products,
   product,
   breadcrumbItems,
+  page,
+  pageContent,
 }: {
   section: BuilderSection;
   products?: ProductNode[];
   product?: StorefrontBuilderProduct;
   breadcrumbItems: { label: string; href?: string }[];
+  page: BuilderLayoutKey;
+  pageContent?: ReactNode;
 }) {
   if (!section.visible) return null;
 
@@ -1366,6 +1429,8 @@ function BuilderSectionRenderer({
         section={section}
         product={product}
         breadcrumbItems={breadcrumbItems}
+        page={page}
+        pageContent={pageContent}
       />
     );
   }
@@ -1388,6 +1453,7 @@ export default function StorefrontBuilderRenderer({
   breadcrumbItems,
   products,
   product,
+  pageContent,
 }: StorefrontBuilderRendererProps) {
   const label =
     pageLabel ??
@@ -1416,6 +1482,8 @@ export default function StorefrontBuilderRenderer({
             products={products}
             product={product}
             breadcrumbItems={resolvedBreadcrumbItems}
+            page={page}
+            pageContent={pageContent}
           />
         ))}
       </div>

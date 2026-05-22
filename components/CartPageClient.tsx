@@ -14,7 +14,11 @@ import {
 } from "lucide-react";
 import { useCart } from "./CartProvider";
 
-export default function CartPageClient() {
+type CartPageClientProps = {
+  asSlot?: boolean;
+};
+
+export default function CartPageClient({ asSlot = false }: CartPageClientProps) {
   const { items, totalAmount, totalCount, removeItem, clearCart, updateItemQty } =
     useCart();
 
@@ -35,8 +39,8 @@ export default function CartPageClient() {
 
   const estimatedProtection = totalAmount > 0 ? Math.max(1, Math.round(totalAmount * 0.02)) : 0;
 
-  return (
-    <main className="cart-page">
+  const content = (
+    <>
       <section className="cart-hero" aria-labelledby="cart-title">
         <div>
           <Link href="/shop" className="cart-back-link">
@@ -209,6 +213,12 @@ export default function CartPageClient() {
           </aside>
         </div>
       )}
-    </main>
+    </>
   );
+
+  if (asSlot) {
+    return content;
+  }
+
+  return <main className="cart-page">{content}</main>;
 }
