@@ -37,38 +37,41 @@ export default function ElementLibrary({
           if (!groupKinds.length) return null;
 
           return (
-            <div key={group.id} className="builder-element-library-group">
-              <div className="builder-element-library-group-title">
+            <details key={group.id} className="builder-collapse builder-element-library-group">
+              <summary className="builder-element-library-group-title">
                 {group.label}
+                <small>{groupKinds.length}</small>
+              </summary>
+              <div className="builder-element-library-group-content">
+                {groupKinds.map((blockKind) => (
+                  <button
+                    key={blockKind}
+                    type="button"
+                    draggable
+                    onClick={() => onAddElement(blockKind)}
+                    onDragStart={(event) => {
+                      event.dataTransfer.setData(
+                        "application/x-builder-new-block",
+                        blockKind,
+                      );
+                      event.dataTransfer.setData(
+                        "text/plain",
+                        `builder-new-block:${blockKind}`,
+                      );
+                      event.dataTransfer.effectAllowed = "copy";
+                    }}
+                  >
+                    <span className="builder-element-library-icon">
+                      {onRenderLayoutBlockIcon(blockKind)}
+                    </span>
+                    <span>
+                      <strong>{layoutBlockLabels[blockKind]}</strong>
+                      <small>{layoutBlockDescriptions[blockKind]}</small>
+                    </span>
+                  </button>
+                ))}
               </div>
-              {groupKinds.map((blockKind) => (
-                <button
-                  key={blockKind}
-                  type="button"
-                  draggable
-                  onClick={() => onAddElement(blockKind)}
-                  onDragStart={(event) => {
-                    event.dataTransfer.setData(
-                      "application/x-builder-new-block",
-                      blockKind,
-                    );
-                    event.dataTransfer.setData(
-                      "text/plain",
-                      `builder-new-block:${blockKind}`,
-                    );
-                    event.dataTransfer.effectAllowed = "copy";
-                  }}
-                >
-                  <span className="builder-element-library-icon">
-                    {onRenderLayoutBlockIcon(blockKind)}
-                  </span>
-                  <span>
-                    <strong>{layoutBlockLabels[blockKind]}</strong>
-                    <small>{layoutBlockDescriptions[blockKind]}</small>
-                  </span>
-                </button>
-              ))}
-            </div>
+            </details>
           );
         })}
       </div>
