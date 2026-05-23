@@ -31,17 +31,23 @@
 }
 
 .builder-dashboard.is-sidebar-collapsed {
-  grid-template-columns: 76px minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr);
 }
 
 .builder-dashboard.is-sidebar-collapsed .builder-sidebar {
-  padding: 12px 10px;
+  display: none;
 }
 
-.builder-dashboard.is-sidebar-collapsed .builder-brand-copy,
-.builder-dashboard.is-sidebar-collapsed .builder-sidebar-tabs,
-.builder-dashboard.is-sidebar-collapsed .builder-sidebar-content {
-  display: none;
+.builder-sidebar-open-toggle {
+  position: fixed;
+  z-index: 42;
+  top: 24px;
+  left: 24px;
+  box-shadow: 0 10px 24px rgba(17, 17, 17, 0.12);
+}
+
+.builder-dashboard.is-sidebar-collapsed .builder-workspace {
+  grid-column: 1 / -1;
 }
 
 .builder-sidebar-top {

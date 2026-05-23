@@ -4004,6 +4004,18 @@ export default function DashboardBuilder({
         updateMenuPresentation={updateMenuPresentation}
       />
 
+      {sidebarCollapsed && (
+        <button
+          type="button"
+          className="builder-sidebar-open-toggle builder-icon-button"
+          onClick={() => setSidebarCollapsed(false)}
+          aria-label="Open sidebar"
+          title="Open sidebar"
+        >
+          <PanelRightOpen size={16} />
+        </button>
+      )}
+
       <main className="builder-workspace">
         {globalStylesOpen && (
           <section className="builder-global-styles builder-panel">
