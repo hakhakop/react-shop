@@ -3402,6 +3402,61 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                 />
                                               </label>
                                             </>
+                                          ) : block.kind === "image" ? (
+                                            <>
+                                              <label className="builder-field">
+                                                <span>Image URL</span>
+                                                <BuilderImageUrlControl
+                                                  value={block.imageUrl ?? ""}
+                                                  onChange={(event) =>
+                                                    updateSelectedLayoutBlock(
+                                                      index,
+                                                      blockIndex,
+                                                      {
+                                                        imageUrl:
+                                                          event.target.value,
+                                                      },
+                                                    )
+                                                  }
+                                                  onChoose={() =>
+                                                    openWordPressMediaPicker({
+                                                      title: "Image Block",
+                                                      currentUrl:
+                                                        block.imageUrl,
+                                                      onSelect: (media) =>
+                                                        updateSelectedLayoutBlock(
+                                                          index,
+                                                          blockIndex,
+                                                          {
+                                                            imageUrl:
+                                                              media.sourceUrl,
+                                                            imageAlt:
+                                                              block.imageAlt ||
+                                                              media.altText ||
+                                                              media.title,
+                                                          },
+                                                        ),
+                                                    })
+                                                  }
+                                                />
+                                              </label>
+                                              <label className="builder-field">
+                                                <span>Image Alt</span>
+                                                <input
+                                                  value={block.imageAlt ?? ""}
+                                                  onChange={(event) =>
+                                                    updateSelectedLayoutBlock(
+                                                      index,
+                                                      blockIndex,
+                                                      {
+                                                        imageAlt:
+                                                          event.target.value,
+                                                      },
+                                                    )
+                                                  }
+                                                />
+                                              </label>
+                                            </>
                                           ) : (
                                             <>
                                               <label className="builder-field">

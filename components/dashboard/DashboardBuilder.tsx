@@ -107,6 +107,7 @@ export type LayoutBlockKind =
   | "hero"
   | "promoStrip"
   | "grid"
+  | "image"
   | "panel"
   | "text"
   | "slider"
@@ -554,6 +555,7 @@ const layoutBlockLabels: Record<LayoutBlockKind, string> = {
   hero: "Hero",
   promoStrip: "Promo Strip",
   grid: "Grid",
+  image: "Image",
   panel: "Panel",
   text: "Text",
   slider: "Slider",
@@ -619,6 +621,7 @@ const layoutBlockDescriptions: Record<LayoutBlockKind, string> = {
   hero: "Large intro with eyebrow, title, copy, and button.",
   promoStrip: "Compact announcement, offer, or callout.",
   grid: "Configurable static or dynamic card grid.",
+  image: "Simple image block with optional caption metadata.",
   panel: "Image, eyebrow, title, copy, and button in one content block.",
   text: "Static copy, button, and small editorial content.",
   slider: "Carousel with editable slides and images.",
@@ -690,6 +693,7 @@ const layoutBlockGroups: {
       "hero",
       "promoStrip",
       "grid",
+      "image",
       "panel",
       "text",
       "slider",
@@ -1448,6 +1452,17 @@ function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
           buttonUrl: "/",
         },
       ],
+    };
+  }
+
+  if (kind === "image") {
+    return {
+      id,
+      kind,
+      title: "Image",
+      body: "A simple image block for banners, artwork, and visual breaks.",
+      imageUrl: "",
+      imageAlt: "",
     };
   }
 
@@ -3961,6 +3976,12 @@ export default function DashboardBuilder({
       className={`builder-dashboard ${inspectorOpen ? "" : "is-inspector-closed"}${
         sidebarCollapsed ? " is-sidebar-collapsed" : ""
       }`}
+      style={
+        {
+          "--builder-dashboard-bg":
+            builderState.design.pageBackground ?? "#dfdfd7",
+        } as CSSProperties
+      }
     >
       <DashboardSidebar
         availableLayoutBlockKinds={availableLayoutBlockKinds}
@@ -5170,6 +5191,8 @@ function getLayoutBlockLibraryIcon(kind: LayoutBlockKind) {
       return <TextCursorInput size={16} />;
     case "slider":
       return <GalleryHorizontal size={16} />;
+    case "image":
+      return <ImageIcon size={16} />;
     case "embed":
       return <Code2 size={16} />;
     case "fluentForm":
@@ -6231,6 +6254,30 @@ function PreviewSection({
                               </span>
                             )}
                           </div>
+                        </div>
+                      ) : block.kind === "image" ? (
+                        <div className="shop-builder-column-block shop-builder-column-block--image">
+                          <div className="shop-builder-panel-media">
+                            {block.imageUrl ? (
+                              <Image
+                                src={block.imageUrl}
+                                alt={block.imageAlt ?? block.title ?? ""}
+                                width={1200}
+                                height={800}
+                                style={{
+                                  width: "100%",
+                                  height: "100%",
+                                  objectFit: "cover",
+                                }}
+                              />
+                            ) : (
+                              <div className="builder-mini-empty">
+                                Choose an image in the inspector.
+                              </div>
+                            )}
+                          </div>
+                          {block.title && <h3>{block.title}</h3>}
+                          {block.body && <p>{block.body}</p>}
                         </div>
                       ) : block.kind === "categoryFilters" ? (
                         <div className="shop-builder-column-block shop-builder-column-block--category-filters">

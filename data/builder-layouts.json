@@ -86,6 +86,56 @@
         "colorScheme": "inherit"
       },
       {
+        "id": "contentLayout-mpi04iz6-owri8",
+        "kind": "contentLayout",
+        "title": "",
+        "background": "#ffffff",
+        "backgroundMode": "boxed",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "topSpacing": "inherit",
+        "bottomSpacing": "inherit",
+        "topMargin": "inherit",
+        "bottomMargin": "inherit",
+        "visible": true,
+        "eyebrow": "",
+        "body": "",
+        "layoutColumns": 2,
+        "layoutItems": [
+          {
+            "id": "layout-item-mpi04iz6-1",
+            "blocks": [
+              {
+                "id": "hero-block-mpi04xlk-pkk6g",
+                "kind": "hero",
+                "eyebrow": "Featured",
+                "title": "Hero Element",
+                "body": "A strong visual opening with editable copy and action.",
+                "buttonLabel": "Learn more",
+                "buttonUrl": "/"
+              }
+            ]
+          },
+          {
+            "id": "layout-item-mpi04roi",
+            "blocks": [
+              {
+                "id": "panel-block-mpi054xm-ub5v5",
+                "kind": "panel",
+                "eyebrow": "Panel",
+                "title": "Content Panel",
+                "body": "Add image, title, text, and action in one flexible element.",
+                "buttonLabel": "Learn more",
+                "buttonUrl": "/",
+                "imageUrl": "",
+                "imageAlt": ""
+              }
+            ]
+          }
+        ],
+        "layoutRows": 1
+      },
+      {
         "id": "contentLayout-mpgu1y58-o77su",
         "kind": "contentLayout",
         "title": "",
@@ -232,7 +282,7 @@
         "layoutRows": 1
       }
     ],
-    "updatedAt": "2026-05-23T06:01:51.410Z"
+    "updatedAt": "2026-05-23T07:04:19.648Z"
   },
   "shop": {
     "version": 1,

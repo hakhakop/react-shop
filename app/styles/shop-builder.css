@@ -636,6 +636,16 @@
   gap: 10px;
 }
 
+.shop-builder-column-block--image {
+  display: grid;
+  gap: 10px;
+}
+
+.shop-builder-column-block--image h3,
+.shop-builder-column-block--image p {
+  margin: 0;
+}
+
 .shop-builder-column-block--icon svg {
   color: var(--builder-section-text, var(--builder-text, #111111));
 }

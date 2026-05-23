@@ -1,16 +1,10 @@
 .builder-dashboard {
   min-height: calc(100vh - 160px);
-  padding: 18px;
+  padding: 0;
   display: grid;
   grid-template-columns: minmax(340px, 390px) minmax(0, 1fr);
-  gap: 12px;
-  background:
-    linear-gradient(
-      180deg,
-      rgba(247, 247, 244, 0.88),
-      rgba(238, 241, 244, 0.92)
-    ),
-    var(--page-bg, #f7f7f4);
+  gap: 0;
+  background: var(--builder-dashboard-bg, var(--page-bg, #f7f7f4));
   color: #171717;
 }
 
@@ -24,8 +18,8 @@
 .builder-sidebar,
 .builder-inspector {
   position: sticky;
-  top: 18px;
-  height: calc(100vh - 36px);
+  top: 0;
+  height: 100vh;
   overflow: auto;
   padding: 16px;
 }
@@ -41,8 +35,8 @@
 .builder-sidebar-open-toggle {
   position: fixed;
   z-index: 42;
-  top: 24px;
-  left: 24px;
+  top: 16px;
+  left: 16px;
   box-shadow: 0 10px 24px rgba(17, 17, 17, 0.12);
 }
 
@@ -65,8 +59,8 @@
 .builder-inspector {
   position: fixed;
   z-index: 30;
-  top: 18px;
-  right: 22px;
+  top: 0;
+  right: 0;
   bottom: 204px;
   width: min(340px, calc(100vw - 44px));
   height: auto;
@@ -1241,12 +1235,12 @@
 .builder-preview-shell {
   flex: 1;
   min-height: 720px;
-  padding: 18px;
+  padding: 0;
   display: flex;
   justify-content: center;
   overflow: visible;
-  border-radius: 8px;
-  background: var(--builder-preview-shell-bg, #dfdfd7);
+  border-radius: 0;
+  background: transparent;
 }
 
 .builder-preview-canvas {
@@ -1274,7 +1268,7 @@
   #site-header-pill.site-header-princity-shell[data-scrolled="true"]
 ) {
   position: sticky;
-  top: 18px;
+  top: 0;
   height: 66px;
 }
 
@@ -3486,7 +3480,7 @@ body[data-storefront-preset="princity"]
 
   .builder-preview-shell {
     min-height: 560px;
-    padding: 10px;
+    padding: 0;
   }
 
   .builder-preview-header nav {
