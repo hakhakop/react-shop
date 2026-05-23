@@ -5,6 +5,7 @@ import ProductGallery from "../../../components/ProductGallery";
 import ProductOptionsSelector from "../../../components/ProductOptionsSelector";
 import WishlistToggle from "../../../components/WishlistToggle";
 import StorefrontBuilderRenderer from "@/components/builder/StorefrontBuilderRenderer";
+import ProductAdminMarker from "@/components/ProductAdminMarker";
 import { ProductRecentlyViewedTracker } from "@/components/RecentlyViewedProvider";
 import { getPublishedBuilderLayout } from "@/lib/builderLayouts";
 
@@ -21,6 +22,7 @@ type ProductAttribute = {
 
 type Product = {
   id: string;
+  databaseId?: number | null;
   name: string;
   slug: string;
   description?: string | null;
@@ -38,6 +40,7 @@ const PRODUCT_QUERY = `
   query SingleProduct($id: ID!) {
     product(id: $id, idType: SLUG) {
       id
+      databaseId
       name
       slug
       description
@@ -130,6 +133,7 @@ export default async function ProductPage({
   }
 
   const p = data.product;
+  const wpProductId = p.databaseId ?? null;
 
 const priceNumber = p.price ? parseFloat(p.price) : null;
 
@@ -161,6 +165,7 @@ const priceFormatted =
   if (templateLayout) {
     return (
       <>
+        <ProductAdminMarker productId={wpProductId} />
         <ProductRecentlyViewedTracker
           id={p.id}
           slug={p.slug}
@@ -195,6 +200,7 @@ const priceFormatted =
 
   return (
     <main className="product-page">
+      <ProductAdminMarker productId={wpProductId} />
       <ProductRecentlyViewedTracker
   id={p.id}
   slug={p.slug}

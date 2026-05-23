@@ -3152,6 +3152,7 @@ export default function DashboardBuilder({
         sectionLabels={sectionLabels}
         sectionSettingsOpen={sectionSettingsOpen}
         sectionStructureOpen={sectionStructureOpen}
+        selectedLayoutColumnKey={selectedLayoutColumnKey}
         selectedLayoutBlock={selectedLayoutBlock}
         selectedLayoutBlockKey={selectedLayoutBlockKey}
         selectedSection={selectedSection}

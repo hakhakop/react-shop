@@ -1,6 +1,8 @@
 "use client";
 
+import { ChevronDown, Search } from "lucide-react";
 import type { ReactNode } from "react";
+import { useMemo, useState } from "react";
 import type { LayoutBlockKind } from "@/components/dashboard/builderTypes";
 import {
   layoutBlockDescriptions,
@@ -19,6 +21,53 @@ export default function ElementLibrary({
   onAddElement,
   onRenderLayoutBlockIcon,
 }: ElementLibraryProps) {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [openGroupIds, setOpenGroupIds] = useState<Set<string>>(
+    () => new Set(layoutBlockGroups.slice(0, 2).map((group) => group.id)),
+  );
+  const normalizedQuery = searchQuery.trim().toLowerCase();
+
+  const filteredGroups = useMemo(
+    () =>
+      layoutBlockGroups
+        .map((group) => {
+          const kinds = group.kinds.filter((kind) => {
+            if (!availableLayoutBlockKinds.includes(kind)) return false;
+            if (!normalizedQuery) return true;
+
+            const label = layoutBlockLabels[kind].toLowerCase();
+            const description = layoutBlockDescriptions[kind].toLowerCase();
+            return (
+              kind.toLowerCase().includes(normalizedQuery) ||
+              label.includes(normalizedQuery) ||
+              description.includes(normalizedQuery) ||
+              group.label.toLowerCase().includes(normalizedQuery)
+            );
+          });
+
+          return { ...group, kinds };
+        })
+        .filter((group) => group.kinds.length > 0),
+    [availableLayoutBlockKinds, normalizedQuery],
+  );
+
+  const toggleGroup = (groupId: string) => {
+    setOpenGroupIds((current) => {
+      const next = new Set(current);
+      if (next.has(groupId)) {
+        next.delete(groupId);
+      } else {
+        next.add(groupId);
+      }
+      return next;
+    });
+  };
+
+  const visibleElementCount = filteredGroups.reduce(
+    (count, group) => count + group.kinds.length,
+    0,
+  );
+
   return (
     <div className="builder-sidebar-panel">
       <div className="builder-sidebar-panel-header">
@@ -26,23 +75,49 @@ export default function ElementLibrary({
           <strong>Element Library</strong>
           <span>Drag or click to add blocks</span>
         </div>
-        <small>{availableLayoutBlockKinds.length} items</small>
+        <small>
+          {visibleElementCount}/{availableLayoutBlockKinds.length}
+        </small>
       </div>
+      <label className="builder-element-library-search">
+        <Search size={15} />
+        <input
+          type="search"
+          value={searchQuery}
+          onChange={(event) => setSearchQuery(event.target.value)}
+          placeholder="Search elements"
+        />
+      </label>
       <div className="builder-element-library" aria-label="Element library">
-        {layoutBlockGroups.map((group) => {
-          const groupKinds = group.kinds.filter((kind) =>
-            availableLayoutBlockKinds.includes(kind),
-          );
-          if (!groupKinds.length) return null;
+        {filteredGroups.length === 0 && (
+          <div className="builder-empty-state builder-element-library-empty">
+            <Search size={22} />
+            <p>No elements match this search.</p>
+          </div>
+        )}
 
+        {filteredGroups.map((group) => {
           return (
-            <details key={group.id} className="builder-collapse builder-element-library-group">
-              <summary className="builder-element-library-group-title">
-                {group.label}
-                <small>{groupKinds.length}</small>
+            <details
+              key={group.id}
+              className="builder-collapse builder-element-library-group"
+              open={normalizedQuery.length > 0 || openGroupIds.has(group.id)}
+            >
+              <summary
+                className="builder-element-library-group-title"
+                onClick={(event) => {
+                  event.preventDefault();
+                  toggleGroup(group.id);
+                }}
+              >
+                <span>
+                  <ChevronDown size={14} />
+                  {group.label}
+                </span>
+                <small>{group.kinds.length}</small>
               </summary>
               <div className="builder-element-library-group-content">
-                {groupKinds.map((blockKind) => (
+                {group.kinds.map((blockKind) => (
                   <button
                     key={blockKind}
                     type="button"

@@ -48,6 +48,7 @@ type DashboardInspectorProps = {
   sectionLabels: Record<SectionKind, string>;
   sectionSettingsOpen: boolean;
   sectionStructureOpen: boolean;
+  selectedLayoutColumnKey: string | null;
   selectedLayoutBlock: BuilderLayoutBlock | null;
   selectedLayoutBlockKey: string | null;
   selectedSection: BuilderSection | undefined;
@@ -108,13 +109,33 @@ function BuilderImageUrlControl({
   );
 }
 
+function InspectorGroupSummary({
+  title,
+  description,
+  meta,
+}: {
+  title: string;
+  description?: string;
+  meta?: string;
+}) {
+  return (
+    <>
+      <span className="builder-group-summary-copy">
+        <strong>{title}</strong>
+        {description ? <em>{description}</em> : null}
+      </span>
+      {meta ? <small>{meta}</small> : null}
+    </>
+  );
+}
+
 export default function DashboardInspector(props: DashboardInspectorProps) {
   const {
     builderJson, copied, elementBackgroundPresets, getLayoutItemBlocks,
     inspectorOpen, inspectorTab, layoutBlockLabels, openLayoutItemId, openSlideId,
     sectionBackgroundPresets, sectionColorModeLabel, sectionLabels,
     sectionSettingsOpen, sectionStructureOpen, selectedLayoutBlock,
-    selectedLayoutBlockKey, selectedSection, uploadingNestedSlide, uploadingSlide,
+    selectedLayoutBlockKey, selectedLayoutColumnKey, selectedSection, uploadingNestedSlide, uploadingSlide,
     addSelectedLayoutBlockBadge, addSelectedLayoutBlockGridItem,
     addSelectedLayoutBlockSlide, addSelectedLayoutItem, addSelectedSlide, copyJson,
     deleteSelected, deleteSelectedLayoutBlock, deleteSelectedLayoutBlockBadge,
@@ -132,6 +153,23 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
     ["element", "Element"],
     ["advanced", "Advanced"],
   ];
+  const selectedColumnIndex =
+    selectedSection?.kind === "contentLayout"
+      ? (selectedSection.layoutItems ?? []).findIndex(
+          (item, index) =>
+            (item.id ?? `layout-item-${index}`) === selectedLayoutColumnKey,
+        )
+      : -1;
+  const selectedColumnLabel =
+    selectedColumnIndex >= 0 ? `Column ${selectedColumnIndex + 1}` : "None";
+  const selectedElementLabel = selectedLayoutBlock
+    ? layoutBlockLabels[selectedLayoutBlock.kind ?? "text"] ?? "Element"
+    : "None";
+  const activeTrailLevel = selectedLayoutBlock
+    ? "element"
+    : selectedColumnIndex >= 0
+      ? "column"
+      : "section";
 
   return (
     <aside
@@ -171,6 +209,19 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                 Back to section
               </button>
             )}
+          </div>
+          <div className="builder-inspector-selection-trail" aria-label="Selection trail">
+            <span className={activeTrailLevel === "section" ? "is-active" : ""}>
+              Section: {sectionLabels[selectedSection.kind]}
+            </span>
+            <i aria-hidden="true">→</i>
+            <span className={activeTrailLevel === "column" ? "is-active" : ""}>
+              Column: {selectedColumnLabel}
+            </span>
+            <i aria-hidden="true">→</i>
+            <span className={activeTrailLevel === "element" ? "is-active" : ""}>
+              Element: {selectedElementLabel}
+            </span>
           </div>
           <div className="builder-inspector-tabs" aria-label="Inspector tabs">
             {inspectorTabs.map(([tab, label]) => (
@@ -266,8 +317,11 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                   <>
                     <details className="builder-collapse" open>
                       <summary>
-                        <span>Basic Content</span>
-                        <small>{sectionLabels[selectedSection.kind]}</small>
+                        <InspectorGroupSummary
+                          title="Basic Content"
+                          description="Edit title and eyebrow text for this section."
+                          meta={sectionLabels[selectedSection.kind]}
+                        />
                       </summary>
 
                       <label className="builder-field">
@@ -295,12 +349,13 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
 
               {inspectorTab === "section" && !selectedLayoutBlock && (
                 <>
-                  <details className="builder-collapse" open>
+                  <details className="builder-collapse">
                     <summary>
-                      <span>Background</span>
-                      <small>
-                        {selectedSection.backgroundMode ?? "full"}
-                      </small>
+                      <InspectorGroupSummary
+                        title="Background"
+                        description="Set section background color and quick presets."
+                        meta={selectedSection.backgroundMode ?? "full"}
+                      />
                     </summary>
 
                     <label className="builder-field">
@@ -353,10 +408,13 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                     </label>
                   </details>
 
-                  <details className="builder-collapse" open>
+                  <details className="builder-collapse">
                     <summary>
-                      <span>Layout Widths</span>
-                      <small>{selectedSection.contentMode ?? "boxed"}</small>
+                      <InspectorGroupSummary
+                        title="Layout Widths"
+                        description="Control section width and inner content width."
+                        meta={selectedSection.contentMode ?? "boxed"}
+                      />
                     </summary>
 
                     <label className="builder-field">
@@ -393,10 +451,13 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                     </label>
                   </details>
 
-                  <details className="builder-collapse" open>
+                  <details className="builder-collapse">
                     <summary>
-                      <span>Color & Spacing</span>
-                      <small>{sectionColorModeLabel(selectedSection)}</small>
+                      <InspectorGroupSummary
+                        title="Color & Spacing"
+                        description="Manage readable text mode, padding, and margins."
+                        meta={sectionColorModeLabel(selectedSection)}
+                      />
                     </summary>
 
                     <label className="builder-field">
@@ -520,16 +581,21 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                 ((inspectorTab as string) === "element" &&
                   selectedSection.kind === "contentLayout" &&
                   selectedLayoutBlock)) && (
-                  <details className="builder-collapse" open>
+                  <details className="builder-collapse">
                     <summary>
-                      <span>
-                        {selectedLayoutBlock
-                          ? "Element Content"
-                          : "Section Type Options"}
-                      </span>
-                      <small>
-                        {sectionLabels[selectedSection.kind]}
-                      </small>
+                      <InspectorGroupSummary
+                        title={
+                          selectedLayoutBlock
+                            ? "Element Content"
+                            : "Section Type Options"
+                        }
+                        description={
+                          selectedLayoutBlock
+                            ? "Edit the selected element without leaving this section."
+                            : "Controls specific to the selected section type."
+                        }
+                        meta={sectionLabels[selectedSection.kind]}
+                      />
                     </summary>
 
 
@@ -596,7 +662,11 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                   return (
                                     <div
                                       key={itemKey}
-                                      className="builder-compact-column-row"
+                                      className={`builder-compact-column-row ${
+                                        selectedLayoutColumnKey === itemKey
+                                          ? "is-selected"
+                                          : ""
+                                      }`}
                                     >
                                       <div>
                                         <strong>Column {index + 1}</strong>
@@ -652,6 +722,10 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                               <div
                                 key={itemKey}
                                 className={`builder-nested-card ${isOpen ? "is-open" : ""} ${
+                                  selectedLayoutColumnKey === itemKey
+                                    ? "is-selected-column-card"
+                                    : ""
+                                } ${
                                   selectedLayoutBlock
                                     ? "is-element-focus-card"
                                     : ""
@@ -4338,10 +4412,11 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
             <>
               <details className="builder-collapse" open>
                 <summary>
-                  <span>Publishing State</span>
-                  <small>
-                    {selectedSection.visible ? "visible" : "hidden"}
-                  </small>
+                  <InspectorGroupSummary
+                    title="Publishing State"
+                    description="Toggle whether this section is rendered on the page."
+                    meta={selectedSection.visible ? "visible" : "hidden"}
+                  />
                 </summary>
 
                 <label className="builder-check">
@@ -4358,8 +4433,11 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
 
               <details className="builder-collapse">
                 <summary>
-                  <span>Current JSON</span>
-                  <small>advanced</small>
+                  <InspectorGroupSummary
+                    title="Current JSON"
+                    description="Inspect or export the current builder payload."
+                    meta="advanced"
+                  />
                 </summary>
                 <div className="builder-json-card">
                   <span>Current JSON</span>

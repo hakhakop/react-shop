@@ -5,6 +5,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
+const PRODUCT_EDIT_EVENT = "react-shop:product-edit-target";
+
 function isLocalHost() {
   if (typeof window === "undefined") return false;
   return (
@@ -86,6 +88,7 @@ export default function FrontendAdminBar() {
   const pathname = usePathname();
   const [ready, setReady] = useState(false);
   const [visible, setVisible] = useState(true);
+  const [productEditHref, setProductEditHref] = useState<string | null>(null);
   const target = useMemo(
     () => dashboardTargetForPath(pathname ?? "/"),
     [pathname]
@@ -96,6 +99,41 @@ export default function FrontendAdminBar() {
       setReady(true);
     });
   }, []);
+
+  useEffect(() => {
+    if (!pathname?.startsWith("/product/")) return;
+
+    const readHref = () => {
+      const productId = document.body.dataset.wpProductId;
+      setProductEditHref(
+        productId
+          ? `https://cms.webpages.am/wp-admin/post.php?post=${productId}&action=edit`
+          : null
+      );
+    };
+
+    readHref();
+
+    const observer = new MutationObserver(() => {
+      readHref();
+    });
+
+    observer.observe(document.body, {
+      attributes: true,
+      attributeFilter: ["data-wp-product-id"],
+    });
+
+    const onProductEditTarget = () => {
+      readHref();
+    };
+
+    window.addEventListener(PRODUCT_EDIT_EVENT, onProductEditTarget);
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener(PRODUCT_EDIT_EVENT, onProductEditTarget);
+    };
+  }, [pathname]);
 
   const shouldShow = ready && target && isLocalHost();
 
@@ -127,6 +165,11 @@ export default function FrontendAdminBar() {
         <Edit3 size={15} />
         {target.label}
       </Link>
+      {pathname?.startsWith("/product/") && productEditHref ? (
+        <a href={productEditHref} target="_blank" rel="noopener noreferrer">
+          Edit Product
+        </a>
+      ) : null}
       <Link href="/dashboard">
         <Gauge size={15} />
         Dashboard

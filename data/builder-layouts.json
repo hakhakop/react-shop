@@ -24,68 +24,6 @@
     },
     "sections": [
       {
-        "id": "slider-moy4mk2e-k1u4f",
-        "kind": "slider",
-        "title": "Featured Slider",
-        "background": "#111111",
-        "visible": true,
-        "body": "A swipeable section powered by the existing Embla carousel.",
-        "slides": [
-          {
-            "id": "slide-1",
-            "badge": "New",
-            "title": "Modern commerce layouts",
-            "text": "Use sliders for hero stories, campaigns, or featured collections.",
-            "buttonLabel": "Shop now",
-            "buttonUrl": "/shop",
-            "imageUrl": "/uploads/builder/6-moypvvtc.jpg",
-            "imageAlt": "Modern commerce layouts",
-            "imagePadding": "frameless"
-          },
-          {
-            "id": "slide-2",
-            "badge": "Client",
-            "title": "Design per client",
-            "text": "Publish unique storefront sections without touching code.",
-            "buttonLabel": "View page",
-            "buttonUrl": "/client",
-            "imageUrl": "/uploads/builder/3-moypxdcd.jpg",
-            "imageAlt": "Design per client",
-            "imagePadding": "frameless"
-          },
-          {
-            "id": "slide-3",
-            "badge": "Fast",
-            "title": "Preview and publish",
-            "text": "Keep drafts local, then publish layout JSON when ready.",
-            "imageUrl": "/uploads/builder/1-moypxh75.jpg",
-            "imageAlt": "Preview and publish",
-            "imagePadding": "frameless"
-          },
-          {
-            "id": "slide-moyq29zr",
-            "badge": "New",
-            "title": "Slide 4",
-            "text": "Add slide copy, upload an image, and publish.",
-            "buttonLabel": "Explore",
-            "buttonUrl": "/shop",
-            "imageUrl": "/uploads/builder/4-moyq2jzb.jpg",
-            "imageAlt": "Slide 4",
-            "imagePadding": "frameless"
-          }
-        ],
-        "carouselSettings": {
-          "variant": "hero",
-          "loop": true,
-          "autoplay": true,
-          "autoplayDelayMs": 5000,
-          "cardsPerView": 3,
-          "showArrows": true,
-          "showDots": true
-        },
-        "colorScheme": "inherit"
-      },
-      {
         "id": "contentLayout-mpi04iz6-owri8",
         "kind": "contentLayout",
         "title": "",
@@ -229,25 +167,136 @@
         "layoutRows": 1
       },
       {
-        "id": "home-archive-1",
-        "kind": "productArchive",
-        "title": "Featured Products",
+        "id": "contentLayout-mpied591-m92cv",
+        "kind": "contentLayout",
+        "title": "",
         "background": "#24241f",
-        "columns": 4,
-        "filterPosition": "top",
-        "cardStyle": "none",
-        "visible": true,
-        "colorScheme": "inherit",
-        "gridLimit": 8,
-        "gridGap": "small",
-        "cardPadding": "small",
-        "imagePadding": "none",
-        "cardPreset": "standard",
+        "backgroundMode": "boxed",
         "contentMode": "boxed",
-        "addToCartSize": "medium",
-        "addToCartStyle": "blue",
-        "addToCartDisplay": "button",
-        "addToCartPosition": "below"
+        "colorScheme": "inherit",
+        "topSpacing": "inherit",
+        "bottomSpacing": "inherit",
+        "topMargin": "inherit",
+        "bottomMargin": "inherit",
+        "visible": true,
+        "eyebrow": "",
+        "body": "",
+        "layoutColumns": 1,
+        "layoutItems": [
+          {
+            "id": "layout-item-mpied591-1",
+            "blocks": [
+              {
+                "id": "products-block-mpieddte-n6fsr",
+                "kind": "products",
+                "title": "Products",
+                "source": "all",
+                "layoutVariant": "grid",
+                "columns": 4,
+                "gridLimit": 12,
+                "filterPosition": "top",
+                "cardStyle": "none",
+                "cardPreset": "standard",
+                "imagePadding": "none",
+                "gridImageFrame": "none",
+                "gridGap": "small",
+                "cardPadding": "small",
+                "addToCartDisplay": "button",
+                "addToCartPosition": "under-price"
+              }
+            ]
+          }
+        ],
+        "layoutRows": 1
+      },
+      {
+        "id": "contentLayout-mpie4y2v-hsjzy",
+        "kind": "contentLayout",
+        "title": "",
+        "background": "#111111",
+        "backgroundMode": "boxed",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "topSpacing": "inherit",
+        "bottomSpacing": "inherit",
+        "topMargin": "inherit",
+        "bottomMargin": "inherit",
+        "visible": true,
+        "eyebrow": "",
+        "body": "",
+        "layoutColumns": 1,
+        "layoutItems": [
+          {
+            "id": "layout-item-mpie4y2v-1",
+            "blocks": [
+              {
+                "id": "grid-block-mpie541p-a7lmm",
+                "kind": "grid",
+                "title": "Grid",
+                "gridSource": "static",
+                "columns": 4,
+                "gridRows": 1,
+                "gridGap": "medium",
+                "gridMargin": "small",
+                "gridImagePadding": "frameless",
+                "gridContentPadding": "medium",
+                "gridImageFrame": "none",
+                "gridShowImage": true,
+                "gridShowEyebrow": true,
+                "gridShowMeta": true,
+                "gridShowText": true,
+                "gridShowButton": true,
+                "gridItems": [
+                  {
+                    "id": "grid-block-mpie541p-a7lmm-1",
+                    "eyebrow": "01",
+                    "title": "Grid item one",
+                    "meta": "Meta",
+                    "text": "Map static or dynamic content into a reusable card.",
+                    "buttonLabel": "Learn more",
+                    "buttonUrl": "/",
+                    "imageUrl": "https://cms.webpages.am/wp-content/uploads/2025/11/cropped-image-scaled-1.png",
+                    "imageAlt": "cropped-image-scaled-1.png"
+                  },
+                  {
+                    "id": "grid-block-mpie541p-a7lmm-2",
+                    "eyebrow": "02",
+                    "title": "Grid item two",
+                    "meta": "Meta",
+                    "text": "Control columns, spacing, images, and content.",
+                    "buttonLabel": "Learn more",
+                    "buttonUrl": "/",
+                    "imageUrl": "https://cms.webpages.am/wp-content/uploads/2025/11/image-9.png",
+                    "imageAlt": "image-9.png"
+                  },
+                  {
+                    "id": "grid-block-mpie541p-a7lmm-3",
+                    "eyebrow": "03",
+                    "title": "Grid item three",
+                    "meta": "Meta",
+                    "text": "Later this can read posts, products, or custom fields.",
+                    "buttonLabel": "Learn more",
+                    "buttonUrl": "/",
+                    "imageUrl": "https://cms.webpages.am/wp-content/uploads/2025/11/products-post-brown-calfskin-boots-image-03-scaled-1.jpg",
+                    "imageAlt": "products-post-brown-calfskin-boots-image-03-scaled-1.jpg"
+                  },
+                  {
+                    "id": "grid-item-mpie7yx2",
+                    "eyebrow": "04",
+                    "title": "Grid item 4",
+                    "meta": "Meta",
+                    "text": "Edit this grid item.",
+                    "buttonLabel": "Learn more",
+                    "buttonUrl": "/",
+                    "imageUrl": "https://cms.webpages.am/wp-content/uploads/2025/11/products-post-brown-lined-boots-image-01-scaled-1.jpg",
+                    "imageAlt": "products-post-brown-lined-boots-image-01-scaled-1.jpg"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "layoutRows": 1
       },
       {
         "id": "contentLayout-mpe18gdv-yy9c7",
@@ -282,7 +331,7 @@
         "layoutRows": 1
       }
     ],
-    "updatedAt": "2026-05-23T07:04:19.648Z"
+    "updatedAt": "2026-05-23T14:35:12.841Z"
   },
   "shop": {
     "version": 1,
