@@ -1,6 +1,6 @@
 "use client";
 
-import { Edit3, Gauge, Settings, X } from "lucide-react";
+import { Edit3, ExternalLink, Gauge, Settings, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
@@ -167,6 +167,7 @@ export default function FrontendAdminBar() {
       </Link>
       {pathname?.startsWith("/product/") && productEditHref ? (
         <a href={productEditHref} target="_blank" rel="noopener noreferrer">
+          <Edit3 size={15} />
           Edit Product
         </a>
       ) : null}
@@ -175,6 +176,7 @@ export default function FrontendAdminBar() {
         Dashboard
       </Link>
       <a href="https://cms.webpages.am/wp-admin/" target="_blank" rel="noreferrer">
+        <ExternalLink size={15} />
         WP Admin
       </a>
       <button

@@ -1226,12 +1226,14 @@ a {
   z-index: 1110;
   right: 22px;
   bottom: 148px;
-  max-width: min(calc(100vw - 24px), 720px);
-  padding: 7px;
-  border-radius: 999px;
+  width: min(calc(100vw - 24px), 224px);
+  max-width: 224px;
+  padding: 8px;
+  border-radius: 16px;
   display: flex;
-  align-items: center;
-  gap: 7px;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
   background: rgba(10, 10, 10, 0.92);
   color: #ffffff;
   box-shadow: 0 18px 46px rgba(0, 0, 0, 0.22);
@@ -1240,7 +1242,8 @@ a {
 
 .frontend-admin-bar div {
   min-width: 0;
-  padding: 0 10px;
+  width: 100%;
+  padding: 2px 4px 4px;
   display: grid;
   gap: 1px;
 }
@@ -1266,11 +1269,12 @@ a {
 .frontend-admin-bar-toggle {
   height: 34px;
   border: 0;
-  border-radius: 999px;
-  padding: 0 13px;
+  border-radius: 10px;
+  padding: 0 12px;
+  width: 100%;
   display: inline-flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 7px;
   background: rgba(255, 255, 255, 0.1);
   color: #ffffff;
@@ -1279,6 +1283,12 @@ a {
   font-weight: 800;
   text-decoration: none;
   cursor: pointer;
+}
+
+.frontend-admin-bar-toggle {
+  width: auto;
+  min-width: 94px;
+  justify-content: center;
 }
 
 .frontend-admin-bar a:hover,
@@ -1301,7 +1311,6 @@ a {
   z-index: 1110;
   right: 22px;
   bottom: 148px;
-  min-width: 94px;
   padding: 0 14px;
   background: rgba(10, 10, 10, 0.9);
   box-shadow: 0 14px 34px rgba(0, 0, 0, 0.2);
@@ -1336,8 +1345,8 @@ a {
     bottom: 132px;
     left: 10px;
     max-width: none;
+    width: auto;
     border-radius: 16px;
-    flex-wrap: wrap;
   }
 
   .frontend-admin-bar-toggle {
@@ -1347,6 +1356,12 @@ a {
 
   .frontend-admin-bar div {
     width: 100%;
+  }
+
+  .frontend-admin-bar a,
+  .frontend-admin-bar button {
+    width: 100%;
+    justify-content: flex-start;
   }
 }
 
