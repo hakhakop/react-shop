@@ -27,12 +27,32 @@ type GraphQLMediaResponse = {
           sizes?: { name?: string; sourceUrl?: string }[];
         };
       }[];
+      pageInfo?: {
+        hasNextPage?: boolean;
+        endCursor?: string | null;
+      };
     };
   };
 };
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+
+type CachedGraphQLMedia = {
+  items: {
+    id: number;
+    title: string;
+    altText: string;
+    mimeType: string;
+    sourceUrl: string;
+    thumbnailUrl: string;
+    date: string;
+  }[];
+  total: number;
+  totalPages: number;
+};
+
+const graphQLMediaCache = new Map<string, CachedGraphQLMedia>();
 
 function getThumbnailUrl(item: WordPressMediaResponse) {
   return (
@@ -61,47 +81,80 @@ async function loadMediaFromGraphQL({
   search: string;
   perPage: number;
 }) {
-  const response = await fetch(getGraphQLEndpoint(wordpressBaseUrl), {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-    },
-    cache: "no-store",
-    body: JSON.stringify({
-      query: `
-        query ReactShopMedia($first: Int!, $search: String) {
-          mediaItems(first: $first, where: { search: $search }) {
-            nodes {
-              databaseId
-              title
-              altText
-              mimeType
-              sourceUrl
-              mediaItemUrl
-              mediaDetails {
-                sizes {
-                  name
-                  sourceUrl
+  async function loadPage(cursor: string | null, first: number) {
+    const response = await fetch(getGraphQLEndpoint(wordpressBaseUrl), {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      cache: "no-store",
+        body: JSON.stringify({
+          query: `
+            query ReactShopMedia($first: Int!, $search: String, $after: String) {
+              mediaItems(first: $first, after: $after, where: { search: $search }) {
+              nodes {
+                databaseId
+                title
+                altText
+                mimeType
+                sourceUrl
+                mediaItemUrl
+                mediaDetails {
+                  sizes {
+                    name
+                    sourceUrl
+                  }
                 }
+              }
+              pageInfo {
+                hasNextPage
+                endCursor
               }
             }
           }
-        }
-      `,
-      variables: {
-        first: perPage,
-        search: search || null,
-      },
-    }),
-  });
+          `,
+          variables: {
+          first,
+          search: search || null,
+          after: cursor,
+        },
+      }),
+    });
 
-  if (!response.ok) {
-    throw new Error(`WordPress GraphQL returned ${response.status}.`);
+    if (!response.ok) {
+      throw new Error(`WordPress GraphQL returned ${response.status}.`);
+    }
+
+    return (await response.json()) as GraphQLMediaResponse;
   }
 
-  const payload = (await response.json()) as GraphQLMediaResponse;
-  const media = (payload.data?.mediaItems?.nodes ?? [])
+  let after: string | null = null;
+  const allMedia: {
+    databaseId?: number;
+    title?: string;
+    altText?: string;
+    mimeType?: string;
+    sourceUrl?: string;
+    mediaItemUrl?: string;
+    mediaDetails?: {
+      sizes?: { name?: string; sourceUrl?: string }[];
+    };
+  }[] = [];
+  const batchSize = Math.max(perPage, 1000);
+
+  while (true) {
+    const payload = await loadPage(after, batchSize);
+    const connection = payload.data?.mediaItems;
+    const nodes = connection?.nodes ?? [];
+    const pageInfo = connection?.pageInfo;
+    allMedia.push(...nodes);
+
+    if (!pageInfo?.hasNextPage) break;
+    after = pageInfo.endCursor ?? null;
+  }
+
+  const items = allMedia
     .filter((item) => item.sourceUrl || item.mediaItemUrl)
     .map((item) => {
       const sizes = item.mediaDetails?.sizes ?? [];
@@ -119,11 +172,13 @@ async function loadMediaFromGraphQL({
       };
     });
 
+  const total = items.length;
+  const totalPages = Math.max(1, Math.ceil(total / perPage));
+
   return {
-    media,
-    total: media.length,
-    totalPages: 1,
-    page: 1,
+    items,
+    total,
+    totalPages,
     source: "graphql",
   };
 }
@@ -142,9 +197,9 @@ export async function GET(request: NextRequest) {
   }
 
   const search = request.nextUrl.searchParams.get("search")?.trim() ?? "";
-  const page = Math.min(
-    Math.max(Number(request.nextUrl.searchParams.get("page") ?? 1) || 1, 1),
-    20
+  const page = Math.max(
+    Number(request.nextUrl.searchParams.get("page") ?? 1) || 1,
+    1
   );
   const perPage = Math.min(
     Math.max(Number(request.nextUrl.searchParams.get("perPage") ?? 36) || 36, 12),
@@ -160,6 +215,21 @@ export async function GET(request: NextRequest) {
     "id,date,title,alt_text,mime_type,source_url,media_details"
   );
   if (search) mediaUrl.searchParams.set("search", search);
+  const cacheKey = `${wordpressBaseUrl}::${search.toLowerCase()}`;
+
+  const cached = graphQLMediaCache.get(cacheKey);
+  if (cached) {
+    const start = (page - 1) * perPage;
+    const media = cached.items.slice(start, start + perPage);
+    return NextResponse.json({
+      media,
+      total: cached.total,
+      totalPages: cached.totalPages,
+      page,
+      hasNextPage: page < cached.totalPages,
+      source: "graphql-cache",
+    });
+  }
 
   try {
     const response = await fetch(mediaUrl, {
@@ -173,7 +243,16 @@ export async function GET(request: NextRequest) {
         search,
         perPage,
       });
-      return NextResponse.json(fallback);
+      graphQLMediaCache.set(cacheKey, fallback);
+      const start = (page - 1) * perPage;
+      return NextResponse.json({
+        media: fallback.items.slice(start, start + perPage),
+        total: fallback.total,
+        totalPages: fallback.totalPages,
+        page,
+        hasNextPage: page < fallback.totalPages,
+        source: fallback.source,
+      });
     }
 
     const payload = (await response.json()) as WordPressMediaResponse[];
@@ -189,18 +268,33 @@ export async function GET(request: NextRequest) {
         date: item.date ?? "",
       }));
 
+    const total = Number(response.headers.get("x-wp-total") ?? media.length);
+    const totalPages = Number(response.headers.get("x-wp-totalpages") ?? 1);
     return NextResponse.json({
       media,
-      total: Number(response.headers.get("x-wp-total") ?? media.length),
-      totalPages: Number(response.headers.get("x-wp-totalpages") ?? 1),
+      total,
+      totalPages,
       page,
+      hasNextPage: page < totalPages,
       source: "rest",
     });
   } catch {
     try {
-      return NextResponse.json(
-        await loadMediaFromGraphQL({ wordpressBaseUrl, search, perPage })
-      );
+      const fallback = await loadMediaFromGraphQL({
+        wordpressBaseUrl,
+        search,
+        perPage,
+      });
+      graphQLMediaCache.set(cacheKey, fallback);
+      const start = (page - 1) * perPage;
+      return NextResponse.json({
+        media: fallback.items.slice(start, start + perPage),
+        total: fallback.total,
+        totalPages: fallback.totalPages,
+        page,
+        hasNextPage: page < fallback.totalPages,
+        source: fallback.source,
+      });
     } catch {
       return NextResponse.json(
         { message: "React could not reach WordPress media library." },

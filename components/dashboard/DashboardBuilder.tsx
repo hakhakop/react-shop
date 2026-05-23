@@ -2239,6 +2239,10 @@ export default function DashboardBuilder({
   const [mediaStatus, setMediaStatus] = useState(
     "Browse images from WordPress",
   );
+  const [mediaPage, setMediaPage] = useState(1);
+  const [mediaTotalItems, setMediaTotalItems] = useState(0);
+  const [mediaTotalPages, setMediaTotalPages] = useState(1);
+  const mediaPerPage = 60;
   const previewHeaderSlotRef = useRef<HTMLDivElement>(null);
   const previewShellRef = useRef<HTMLDivElement>(null);
   const mediaSelectRef = useRef<((media: WordPressMediaItem) => void) | null>(
@@ -2296,6 +2300,13 @@ export default function DashboardBuilder({
       );
     });
   }, [menuIconSearch]);
+
+  const mediaRangeStart =
+    mediaTotalItems === 0 ? 0 : (mediaPage - 1) * mediaPerPage + 1;
+  const mediaRangeEnd = Math.min(
+    mediaPage * mediaPerPage,
+    mediaTotalItems,
+  );
 
   const builderJson = useMemo(
     () =>
@@ -2601,51 +2612,70 @@ export default function DashboardBuilder({
     const controller = new AbortController();
     const timer = window.setTimeout(async () => {
       setMediaLoading(true);
+      setMediaItems([]);
+      setMediaTotalItems(0);
+      setMediaTotalPages(1);
       setMediaStatus("Loading WordPress media...");
 
       try {
+        const searchTerm = mediaSearch.trim();
         const params = new URLSearchParams({
-          page: "1",
-          perPage: "36",
+          page: String(mediaPage),
+          perPage: String(mediaPerPage),
         });
-        if (mediaSearch.trim()) params.set("search", mediaSearch.trim());
+        if (searchTerm) params.set("search", searchTerm);
 
-        const response = await fetch(`/api/wordpress-media?${params}`, {
+        const apiResponse = await fetch(`/api/wordpress-media?${params}`, {
           cache: "no-store",
           signal: controller.signal,
         });
-        const payload = (await response.json()) as {
-          media?: WordPressMediaItem[];
-          message?: string;
-        };
+        const payload = (await apiResponse.json()) as
+          | {
+              media?: WordPressMediaItem[];
+              total?: number;
+              totalPages?: number;
+              hasNextPage?: boolean;
+              page?: number;
+              message?: string;
+            }
+          | undefined;
 
-        if (!response.ok) {
-          setMediaItems([]);
-          setMediaStatus(payload.message ?? "WordPress media could not load");
+        if (!apiResponse.ok) {
+          setMediaStatus(payload?.message ?? "WordPress media could not load");
           return;
         }
 
-        setMediaItems(payload.media ?? []);
+        const nextItems = payload?.media ?? [];
+        const nextTotal = payload?.total ?? nextItems.length;
+        const nextTotalPages = payload?.totalPages ?? 1;
+        setMediaItems(nextItems);
+        setMediaTotalItems(nextTotal);
+        setMediaTotalPages(nextTotalPages);
         setMediaStatus(
-          payload.media?.length
-            ? "Select an image to use it here"
+          nextItems.length
+            ? `Showing ${Math.min(
+                (mediaPage - 1) * mediaPerPage + 1,
+                nextTotal,
+              )}-${Math.min(mediaPage * mediaPerPage, nextTotal)} of ${nextTotal}`
             : "No WordPress images matched this search",
         );
       } catch (error) {
         if ((error as Error).name !== "AbortError") {
           setMediaItems([]);
+          setMediaTotalItems(0);
+          setMediaTotalPages(1);
           setMediaStatus("WordPress media could not load");
         }
       } finally {
         if (!controller.signal.aborted) setMediaLoading(false);
       }
-    }, 220);
+    }, 120);
 
     return () => {
       window.clearTimeout(timer);
       controller.abort();
     };
-  }, [mediaPickerOpen, mediaSearch]);
+  }, [mediaPickerOpen, mediaPage, mediaSearch]);
 
   const switchBuilderTarget = (
     nextKey: BuilderLayoutKey,
@@ -3468,12 +3498,22 @@ export default function DashboardBuilder({
     mediaSelectRef.current = onSelect;
     setMediaPickerTitle(title);
     setMediaPickerCurrentUrl(currentUrl ?? "");
+    setMediaPage(1);
     setMediaPickerOpen(true);
   };
 
   const closeWordPressMediaPicker = () => {
     setMediaPickerOpen(false);
     mediaSelectRef.current = null;
+  };
+
+  const handleMediaSearchChange = (value: string) => {
+    setMediaPage(1);
+    setMediaSearch(value);
+  };
+
+  const goToMediaPage = (nextPage: number) => {
+    setMediaPage(Math.max(nextPage, 1));
   };
 
   const selectWordPressMedia = (media: WordPressMediaItem) => {
@@ -4533,7 +4573,13 @@ export default function DashboardBuilder({
         items={mediaItems}
         loading={mediaLoading}
         status={mediaStatus}
-        onSearchChange={setMediaSearch}
+        page={mediaPage}
+        totalItems={mediaTotalItems}
+        totalPages={mediaTotalPages}
+        rangeStart={mediaRangeStart}
+        rangeEnd={mediaRangeEnd}
+        onPageChange={goToMediaPage}
+        onSearchChange={handleMediaSearchChange}
         onSelect={selectWordPressMedia}
         onClose={closeWordPressMediaPicker}
       />
@@ -4602,7 +4648,13 @@ function WordPressMediaPicker({
   items,
   loading,
   status,
+  page,
+  totalItems,
+  totalPages,
+  rangeStart,
+  rangeEnd,
   onSearchChange,
+  onPageChange,
   onSelect,
   onClose,
 }: {
@@ -4613,7 +4665,13 @@ function WordPressMediaPicker({
   items: WordPressMediaItem[];
   loading: boolean;
   status: string;
+  page: number;
+  totalItems: number;
+  totalPages: number;
+  rangeStart: number;
+  rangeEnd: number;
   onSearchChange: (value: string) => void;
+  onPageChange: (page: number) => void;
   onSelect: (media: WordPressMediaItem) => void;
   onClose: () => void;
 }) {
@@ -4672,6 +4730,33 @@ function WordPressMediaPicker({
               </button>
             );
           })}
+        </div>
+
+        <div className="builder-media-footer">
+          <button
+            type="button"
+            className="builder-secondary-button"
+            onClick={() => onPageChange(page - 1)}
+            disabled={loading || page <= 1}
+          >
+            Previous
+          </button>
+          <div className="builder-media-page-indicator">
+            <strong>
+              Showing {rangeStart}-{rangeEnd} of {totalItems}
+            </strong>
+            <span>
+              Page {page} of {Math.max(totalPages, 1)}
+            </span>
+          </div>
+          <button
+            type="button"
+            className="builder-secondary-button"
+            onClick={() => onPageChange(page + 1)}
+            disabled={loading || page >= totalPages}
+          >
+            Next
+          </button>
         </div>
 
         {!loading && items.length === 0 && (

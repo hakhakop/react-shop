@@ -33,7 +33,7 @@ export default async function HeaderShell({ layoutOverride }: HeaderShellProps) 
   // Load theme settings and main menu in parallel
   const [settingsRaw, menuItemsRaw, builderPages, shellSettingsRaw] =
     await Promise.all([
-      getThemeSettings(),
+      getThemeSettings().catch(() => ({})),
       getMainMenuItems(),
       readBuilderCustomPages(),
       getBuilderShellSettings(),
