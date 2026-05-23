@@ -1246,7 +1246,7 @@
   justify-content: center;
   overflow: visible;
   border-radius: 8px;
-  background: #dfdfd7;
+  background: var(--builder-preview-shell-bg, #dfdfd7);
 }
 
 .builder-preview-canvas {

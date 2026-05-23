@@ -7,7 +7,7 @@
     "design": {
       "preset": "princity",
       "colorScheme": "auto",
-      "pageBackground": "#f7f7f4",
+      "pageBackground": "#171717",
       "textColor": "#111111",
       "mutedTextColor": "#5f5f58",
       "accentColor": "#a4be7b",
@@ -232,7 +232,7 @@
         "layoutRows": 1
       }
     ],
-    "updatedAt": "2026-05-22T12:29:06.074Z"
+    "updatedAt": "2026-05-23T06:01:51.410Z"
   },
   "shop": {
     "version": 1,

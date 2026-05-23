@@ -42,6 +42,7 @@ import CarouselBlock, {
 } from "@/components/blocks/CarouselBlock";
 import CategoryBar from "@/components/CategoryBar";
 import CategoryWithFilters from "@/components/CategoryWithFilters";
+import FluentFormClient from "@/components/builder/FluentFormClient";
 import ProductOptionsSelector from "@/components/ProductOptionsSelector";
 import DashboardInspector from "@/components/dashboard/DashboardInspector";
 import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
@@ -4403,6 +4404,12 @@ export default function DashboardBuilder({
         <div
           ref={previewShellRef}
           className={`builder-preview-shell builder-preview-${device}`}
+          style={
+            {
+              "--builder-preview-shell-bg":
+                builderState.design.pageBackground ?? "#dfdfd7",
+            } as CSSProperties
+          }
         >
           <PreviewCanvas
             sections={builderState.sections}
@@ -6557,19 +6564,10 @@ function PreviewSection({
                         </div>
                       ) : block.kind === "fluentForm" ? (
                         <div className="shop-builder-column-block shop-builder-column-block--fluent-form builder-preview-fluent-form">
-                          <small>Fluent Form</small>
-                          <strong>{block.title || "Contact Form"}</strong>
-                          <span>
-                            {block.fluentFormId
-                              ? `WordPress form ID ${block.fluentFormId}`
-                              : "Add a Fluent Forms form ID"}
-                          </span>
-                          <div className="builder-preview-form-lines">
-                            <i />
-                            <i />
-                            <i />
-                            <b />
-                          </div>
+                          <FluentFormClient
+                            formId={block.fluentFormId}
+                            title={block.title}
+                          />
                         </div>
                       ) : (
                         <>
