@@ -21,7 +21,7 @@ import type {
   MenuPresentationSettings,
   PreviewDevice,
   SidebarTab,
-} from "@/components/dashboard/DashboardBuilder";
+} from "@/components/dashboard/builderTypes";
 import ElementLibrary from "@/components/dashboard/ElementLibrary";
 import MenuPresentationPanel from "@/components/dashboard/MenuPresentationPanel";
 
@@ -33,9 +33,6 @@ type DashboardSidebarProps = {
   filteredMenuIcons: readonly { name: string; label: string; keywords: string }[];
   getMenuIconLabel: (icon: string | null) => string;
   globalStylesOpen: boolean;
-  layoutBlockDescriptions: Record<LayoutBlockKind, string>;
-  layoutBlockGroups: { id: string; label: string; kinds: LayoutBlockKind[] }[];
-  layoutBlockLabels: Record<LayoutBlockKind, string>;
   menuIconPickerOpen: boolean;
   menuIconSearch: string;
   menuTree: MenuItem[];
@@ -76,9 +73,6 @@ export default function DashboardSidebar({
   filteredMenuIcons,
   getMenuIconLabel,
   globalStylesOpen,
-  layoutBlockDescriptions,
-  layoutBlockGroups,
-  layoutBlockLabels,
   menuIconPickerOpen,
   menuIconSearch,
   menuTree,
@@ -157,9 +151,6 @@ export default function DashboardSidebar({
         {sidebarTab === "elements" && (
           <ElementLibrary
             availableLayoutBlockKinds={availableLayoutBlockKinds}
-            layoutBlockDescriptions={layoutBlockDescriptions}
-            layoutBlockGroups={layoutBlockGroups}
-            layoutBlockLabels={layoutBlockLabels}
             onAddElement={onAddElementFromLibrary}
             onRenderLayoutBlockIcon={onRenderLayoutBlockIcon}
           />

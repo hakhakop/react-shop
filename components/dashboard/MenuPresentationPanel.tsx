@@ -2,7 +2,7 @@
 
 import type { Dispatch, ReactNode, SetStateAction } from "react";
 import type { MenuItem } from "@/lib/navigation";
-import type { MenuPresentationSettings } from "@/components/dashboard/DashboardBuilder";
+import type { MenuPresentationSettings } from "@/components/dashboard/builderTypes";
 
 type MenuPresentationPanelProps = {
   filteredMenuIcons: readonly { name: string; label: string; keywords: string }[];

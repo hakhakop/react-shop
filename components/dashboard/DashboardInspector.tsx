@@ -26,7 +26,7 @@ import type {
   SectionContentMode,
   SectionSpacing,
   WordPressMediaItem,
-} from "@/components/dashboard/DashboardBuilder";
+} from "@/components/dashboard/builderTypes";
 
 // Inspector handlers mirror the lifted builder callbacks during this JSX-only extraction.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

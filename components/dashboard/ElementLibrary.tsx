@@ -1,22 +1,21 @@
 "use client";
 
 import type { ReactNode } from "react";
-import type { LayoutBlockKind } from "@/components/dashboard/DashboardBuilder";
+import type { LayoutBlockKind } from "@/components/dashboard/builderTypes";
+import {
+  layoutBlockDescriptions,
+  layoutBlockGroups,
+  layoutBlockLabels,
+} from "@/components/dashboard/builderRegistry";
 
 type ElementLibraryProps = {
   availableLayoutBlockKinds: LayoutBlockKind[];
-  layoutBlockDescriptions: Record<LayoutBlockKind, string>;
-  layoutBlockGroups: { id: string; label: string; kinds: LayoutBlockKind[] }[];
-  layoutBlockLabels: Record<LayoutBlockKind, string>;
   onAddElement: (kind: LayoutBlockKind) => void;
   onRenderLayoutBlockIcon: (kind: LayoutBlockKind) => ReactNode;
 };
 
 export default function ElementLibrary({
   availableLayoutBlockKinds,
-  layoutBlockDescriptions,
-  layoutBlockGroups,
-  layoutBlockLabels,
   onAddElement,
   onRenderLayoutBlockIcon,
 }: ElementLibraryProps) {
