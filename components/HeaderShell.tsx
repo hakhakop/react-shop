@@ -197,61 +197,12 @@ export default async function HeaderShell({ layoutOverride }: HeaderShellProps) 
     });
   }
 
-  const serviceMenuItems: MenuItem[] = [
-    { id: "service-home", label: "Home", url: "/", path: "/" },
-    {
-      id: "service-problem",
-      label: "Problems",
-      url: "/#webpages-problem",
-      path: "/#webpages-problem",
-    },
-    {
-      id: "service-solution",
-      label: "Solution",
-      url: "/#webpages-solution",
-      path: "/#webpages-solution",
-    },
-    {
-      id: "service-workflow",
-      label: "Workflow",
-      url: "/#webpages-workflow",
-      path: "/#webpages-workflow",
-    },
-    {
-      id: "service-pricing",
-      label: "Pricing",
-      url: "/#webpages-pricing",
-      path: "/#webpages-pricing",
-    },
-    {
-      id: "service-demos",
-      label: "Demos",
-      url: "/demos",
-      path: "/demos",
-      children: [
-        {
-          id: "service-demo-furniture",
-          label: "Furniture Store",
-          url: "/furniture-store",
-          path: "/furniture-store",
-        },
-        {
-          id: "service-demo-fashion",
-          label: "Fashion Store",
-          url: "/fashion-store",
-          path: "/fashion-store",
-        },
-      ],
-    },
-  ];
-
-  const itemsToRender = serviceHomepageMode
-    ? serviceMenuItems
-    : menuItems.length > 0
+  const itemsToRender =
+    menuItems.length > 0
       ? [...menuItems, ...builderPageItems]
       : [
           { id: "home", label: "Home", url: "/", path: "/" },
-          { id: "shop", label: "Shop", url: "/", path: "/" },
+          { id: "shop", label: "Shop", url: "/shop", path: "/shop" },
           ...builderPageItems,
         ];
 
