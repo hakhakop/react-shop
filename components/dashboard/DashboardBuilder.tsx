@@ -17,7 +17,6 @@ import {
   ListChecks,
   Navigation,
   PanelLeft,
-  PanelRightClose,
   PanelRightOpen,
   Plus,
   ShoppingBag,
@@ -795,6 +794,10 @@ export default function DashboardBuilder({
   const [sectionStructureOpen, setSectionStructureOpen] = useState(false);
   const [globalStylesOpen, setGlobalStylesOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [sidebarWidth, setSidebarWidth] = useState(390);
+  const [sidebarResizing, setSidebarResizing] = useState(false);
+  const [previewScale, setPreviewScale] = useState(1);
+  const [previewCanvasWidth, setPreviewCanvasWidth] = useState(1180);
   const [sidebarTab, setSidebarTab] = useState<SidebarTab>("elements");
   const [shellSettings, setShellSettings] =
     useState<BuilderShellSettings>(defaultShellSettings);
@@ -945,6 +948,30 @@ export default function DashboardBuilder({
     setMenuIconPickerOpen(false);
     setMenuIconSearch("");
   }, [selectedMenuItemId]);
+
+  useEffect(() => {
+    const shell = previewShellRef.current;
+    if (!shell) return;
+
+    const updatePreviewViewport = () => {
+      const shellWidth = shell.clientWidth || window.innerWidth;
+      const desktopWidth = Math.max(1180, window.innerWidth);
+      setPreviewCanvasWidth(desktopWidth);
+      setPreviewScale(
+        device === "desktop" ? Math.min(1, shellWidth / desktopWidth) : 1,
+      );
+    };
+
+    updatePreviewViewport();
+    const observer = new ResizeObserver(updatePreviewViewport);
+    observer.observe(shell);
+    window.addEventListener("resize", updatePreviewViewport);
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("resize", updatePreviewViewport);
+    };
+  }, [device, sidebarCollapsed, sidebarWidth]);
 
   useEffect(() => {
     const updatePreviewHeaderPill = () => {
@@ -1427,6 +1454,7 @@ export default function DashboardBuilder({
     setSelectedId(sectionId);
     setSelectedLayoutBlockKey(null);
     setInspectorOpen(true);
+    setSidebarTab("inspector");
     setInspectorTab("section");
     setSectionSettingsOpen(true);
     setSectionStructureOpen(false);
@@ -1459,6 +1487,7 @@ export default function DashboardBuilder({
     setOpenLayoutItemId(columnKey);
     setInspectorTab("section");
     setInspectorOpen(true);
+    setSidebarTab("inspector");
   };
 
   const selectLayoutBlock = (
@@ -1473,6 +1502,7 @@ export default function DashboardBuilder({
     setSectionStructureOpen(false);
     setInspectorTab("element");
     setInspectorOpen(true);
+    setSidebarTab("inspector");
   };
 
   const updateSelectedSlide = (
@@ -2845,19 +2875,153 @@ export default function DashboardBuilder({
     setTemplateStatus("Template deleted");
   };
 
+  const startSidebarResize = (clientX: number) => {
+    const startX = clientX;
+    const startWidth = sidebarWidth;
+    setSidebarResizing(true);
+
+    const handleMouseMove = (moveEvent: MouseEvent) => {
+      const nextWidth = startWidth + moveEvent.clientX - startX;
+      setSidebarWidth(Math.min(620, Math.max(300, nextWidth)));
+    };
+
+    const stopResize = () => {
+      setSidebarResizing(false);
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", stopResize);
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mouseup", stopResize);
+  };
+
+  const inspectorPanel = (
+    <DashboardInspector
+      builderJson={builderJson}
+      copied={copied}
+      elementBackgroundPresets={elementBackgroundPresets}
+      getLayoutItemBlocks={getLayoutItemBlocks}
+      inspectorOpen
+      inspectorTab={inspectorTab}
+      layoutBlockLabels={layoutBlockLabels}
+      openLayoutItemId={openLayoutItemId}
+      openSlideId={openSlideId}
+      sectionBackgroundPresets={sectionBackgroundPresets}
+      sectionColorModeLabel={sectionColorModeLabel}
+      sectionLabels={sectionLabels}
+      sectionSettingsOpen={sectionSettingsOpen}
+      sectionStructureOpen={sectionStructureOpen}
+      selectedLayoutColumnKey={selectedLayoutColumnKey}
+      selectedLayoutBlock={selectedLayoutBlock}
+      selectedLayoutBlockKey={selectedLayoutBlockKey}
+      selectedSection={selectedSection}
+      uploadingNestedSlide={uploadingNestedSlide}
+      uploadingSlide={uploadingSlide}
+      addSelectedLayoutBlockBadge={addSelectedLayoutBlockBadge}
+      addSelectedLayoutBlockGridItem={addSelectedLayoutBlockGridItem}
+      addSelectedLayoutBlockSlide={addSelectedLayoutBlockSlide}
+      addSelectedLayoutItem={addSelectedLayoutItem}
+      addSelectedSlide={addSelectedSlide}
+      copyJson={copyJson}
+      deleteSelected={deleteSelected}
+      deleteSelectedLayoutBlock={deleteSelectedLayoutBlock}
+      deleteSelectedLayoutBlockBadge={deleteSelectedLayoutBlockBadge}
+      deleteSelectedLayoutBlockGridItem={deleteSelectedLayoutBlockGridItem}
+      deleteSelectedLayoutBlockSlide={deleteSelectedLayoutBlockSlide}
+      deleteSelectedLayoutItem={deleteSelectedLayoutItem}
+      deleteSelectedSlide={deleteSelectedSlide}
+      duplicateSelected={duplicateSelected}
+      applyLayoutPreset={applyContentLayoutPreset}
+      moveSelected={moveSelected}
+      openWordPressMediaPicker={openWordPressMediaPicker}
+      setInspectorOpen={setInspectorOpen}
+      setInspectorTab={setInspectorTab}
+      setOpenSlideId={setOpenSlideId}
+      setSectionSettingsOpen={setSectionSettingsOpen}
+      setSectionStructureOpen={setSectionStructureOpen}
+      setSelectedLayoutBlockKey={setSelectedLayoutBlockKey}
+      updateSelected={updateSelected}
+      updateSelectedBadge={updateSelectedBadge}
+      updateSelectedLayoutBlock={updateSelectedLayoutBlock}
+      updateSelectedLayoutBlockBadge={updateSelectedLayoutBlockBadge}
+      updateSelectedLayoutBlockGridItem={updateSelectedLayoutBlockGridItem}
+      updateSelectedLayoutBlockSlide={updateSelectedLayoutBlockSlide}
+      updateSelectedSlide={updateSelectedSlide}
+      uploadSelectedLayoutBlockSlideImage={uploadSelectedLayoutBlockSlideImage}
+      uploadSelectedSlideImage={uploadSelectedSlideImage}
+    />
+  );
+
+  const builderActions = adminPillVisible ? (
+    <div className="builder-sidebar-action-stack" aria-label="Builder page actions">
+      <div className="builder-sidebar-action-heading">
+        <strong>Builder</strong>
+        <span>{getLayoutLabel(builderState.page, customPages)}</span>
+      </div>
+      <button type="button" onClick={undoBuilder} title="Undo last change">
+        <Undo2 size={15} />
+        Undo
+      </button>
+      <button
+        type="button"
+        onClick={() => {
+          setInspectorOpen(true);
+          setSidebarTab("inspector");
+        }}
+      >
+        <PanelRightOpen size={15} />
+        Inspector
+      </button>
+      <button
+        type="button"
+        onClick={() => {
+          window.open(currentFrontendUrl, "_blank", "noopener,noreferrer");
+        }}
+      >
+        <ExternalLink size={15} />
+        View Page
+      </button>
+      <button type="button" className="is-primary" onClick={publishLayout}>
+        <CloudUpload size={15} />
+        Publish
+      </button>
+      <button
+        type="button"
+        className="is-quiet"
+        onClick={() => setAdminPillVisible(false)}
+        aria-label="Hide builder actions"
+      >
+        <X size={15} />
+        Hide
+      </button>
+    </div>
+  ) : (
+    <button
+      className="builder-sidebar-actions-toggle"
+      type="button"
+      onClick={() => setAdminPillVisible(true)}
+      aria-label="Show builder actions"
+    >
+      <Settings2 size={16} />
+      <span>Builder actions</span>
+    </button>
+  );
+
   return (
     <div
       className={`builder-dashboard ${inspectorOpen ? "" : "is-inspector-closed"}${
         sidebarCollapsed ? " is-sidebar-collapsed" : ""
-      }`}
+      }${sidebarResizing ? " is-sidebar-resizing" : ""}`}
       style={
         {
           "--builder-dashboard-bg":
             builderState.design.pageBackground ?? "#dfdfd7",
+          "--builder-sidebar-width": `${sidebarWidth}px`,
         } as CSSProperties
       }
     >
       <DashboardSidebar
+        actionsSlot={builderActions}
         availableLayoutBlockKinds={availableLayoutBlockKinds}
         builderState={builderState}
         customPages={customPages}
@@ -2865,6 +3029,7 @@ export default function DashboardBuilder({
         globalStylesOpen={globalStylesOpen}
         menuTree={menuTree}
         newPageTitle={newPageTitle}
+        inspectorSlot={inspectorPanel}
         pageStatus={pageStatus}
         publishStatus={publishStatus}
         selectedMenuItem={selectedMenuItem}
@@ -2889,6 +3054,7 @@ export default function DashboardBuilder({
         onSetSelectedMenuItemId={setSelectedMenuItemId}
         onSetSidebarCollapsed={setSidebarCollapsed}
         onSetSidebarTab={setSidebarTab}
+        onStartSidebarResize={startSidebarResize}
         onSwitchBuilderTarget={switchBuilderTarget}
         filteredMenuIcons={filteredMenuIcons}
         getMenuIconLabel={getMenuIconLabel}
@@ -3509,6 +3675,8 @@ export default function DashboardBuilder({
             {
               "--builder-preview-shell-bg":
                 builderState.design.pageBackground ?? "#dfdfd7",
+              "--builder-preview-scale": previewScale,
+              "--builder-preview-canvas-width": `${previewCanvasWidth}px`,
             } as CSSProperties
           }
         >
@@ -3550,61 +3718,6 @@ export default function DashboardBuilder({
         </div>
       </main>
 
-      {adminPillVisible ? (
-        <div className="builder-admin-pill" aria-label="Builder page actions">
-          <div>
-            <strong>Builder</strong>
-            <span>{getLayoutLabel(builderState.page, customPages)}</span>
-          </div>
-          <button type="button" onClick={undoBuilder} title="Undo last change">
-            <Undo2 size={15} />
-            Undo
-          </button>
-          <button
-            type="button"
-            onClick={() => setInspectorOpen((current) => !current)}
-            aria-label={inspectorOpen ? "Close inspector" : "Open inspector"}
-          >
-            {inspectorOpen ? (
-              <PanelRightClose size={15} />
-            ) : (
-              <PanelRightOpen size={15} />
-            )}
-            Inspector
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              window.open(currentFrontendUrl, "_blank", "noopener,noreferrer");
-            }}
-          >
-            <ExternalLink size={15} />
-            View Page
-          </button>
-          <button type="button" className="is-primary" onClick={publishLayout}>
-            <CloudUpload size={15} />
-            Publish
-          </button>
-          <button
-            type="button"
-            onClick={() => setAdminPillVisible(false)}
-            aria-label="Hide builder toolbar"
-          >
-            <X size={15} />
-          </button>
-        </div>
-      ) : (
-        <button
-          className="builder-admin-pill-toggle"
-          type="button"
-          onClick={() => setAdminPillVisible(true)}
-          aria-label="Show builder toolbar"
-        >
-          <Settings2 size={16} />
-          <span>Builder</span>
-        </button>
-      )}
-
       <WordPressMediaPicker
         open={mediaPickerOpen}
         title={mediaPickerTitle}
@@ -3624,60 +3737,6 @@ export default function DashboardBuilder({
         onClose={closeWordPressMediaPicker}
       />
 
-      <DashboardInspector
-        builderJson={builderJson}
-        copied={copied}
-        elementBackgroundPresets={elementBackgroundPresets}
-        getLayoutItemBlocks={getLayoutItemBlocks}
-        inspectorOpen={inspectorOpen}
-        inspectorTab={inspectorTab}
-        layoutBlockLabels={layoutBlockLabels}
-        openLayoutItemId={openLayoutItemId}
-        openSlideId={openSlideId}
-        sectionBackgroundPresets={sectionBackgroundPresets}
-        sectionColorModeLabel={sectionColorModeLabel}
-        sectionLabels={sectionLabels}
-        sectionSettingsOpen={sectionSettingsOpen}
-        sectionStructureOpen={sectionStructureOpen}
-        selectedLayoutColumnKey={selectedLayoutColumnKey}
-        selectedLayoutBlock={selectedLayoutBlock}
-        selectedLayoutBlockKey={selectedLayoutBlockKey}
-        selectedSection={selectedSection}
-        uploadingNestedSlide={uploadingNestedSlide}
-        uploadingSlide={uploadingSlide}
-        addSelectedLayoutBlockBadge={addSelectedLayoutBlockBadge}
-        addSelectedLayoutBlockGridItem={addSelectedLayoutBlockGridItem}
-        addSelectedLayoutBlockSlide={addSelectedLayoutBlockSlide}
-        addSelectedLayoutItem={addSelectedLayoutItem}
-        addSelectedSlide={addSelectedSlide}
-        copyJson={copyJson}
-        deleteSelected={deleteSelected}
-        deleteSelectedLayoutBlock={deleteSelectedLayoutBlock}
-        deleteSelectedLayoutBlockBadge={deleteSelectedLayoutBlockBadge}
-        deleteSelectedLayoutBlockGridItem={deleteSelectedLayoutBlockGridItem}
-        deleteSelectedLayoutBlockSlide={deleteSelectedLayoutBlockSlide}
-        deleteSelectedLayoutItem={deleteSelectedLayoutItem}
-        deleteSelectedSlide={deleteSelectedSlide}
-        duplicateSelected={duplicateSelected}
-        applyLayoutPreset={applyContentLayoutPreset}
-        moveSelected={moveSelected}
-        openWordPressMediaPicker={openWordPressMediaPicker}
-        setInspectorOpen={setInspectorOpen}
-        setInspectorTab={setInspectorTab}
-        setOpenSlideId={setOpenSlideId}
-        setSectionSettingsOpen={setSectionSettingsOpen}
-        setSectionStructureOpen={setSectionStructureOpen}
-        setSelectedLayoutBlockKey={setSelectedLayoutBlockKey}
-        updateSelected={updateSelected}
-        updateSelectedBadge={updateSelectedBadge}
-        updateSelectedLayoutBlock={updateSelectedLayoutBlock}
-        updateSelectedLayoutBlockBadge={updateSelectedLayoutBlockBadge}
-        updateSelectedLayoutBlockGridItem={updateSelectedLayoutBlockGridItem}
-        updateSelectedLayoutBlockSlide={updateSelectedLayoutBlockSlide}
-        updateSelectedSlide={updateSelectedSlide}
-        uploadSelectedLayoutBlockSlideImage={uploadSelectedLayoutBlockSlideImage}
-        uploadSelectedSlideImage={uploadSelectedSlideImage}
-      />
     </div>
   );
 }
@@ -3930,12 +3989,13 @@ function PreviewCanvas({
   onDeleteSection: (sectionId: string) => void;
   headerSlotRef: RefObject<HTMLDivElement | null>;
 }) {
-  const [insertAfterSectionId, setInsertAfterSectionId] = useState<string | null>(
-    null,
-  );
+  const [insertTarget, setInsertTarget] = useState<{
+    sectionId: string | null;
+    placement: "above" | "below";
+  } | null>(null);
   const visibleSections = sections.filter((section) => section.visible);
   const insertTargetSection =
-    sections.find((section) => section.id === insertAfterSectionId) ?? null;
+    sections.find((section) => section.id === insertTarget?.sectionId) ?? null;
   return (
     <div
       className="builder-preview-canvas"
@@ -3962,6 +4022,16 @@ function PreviewCanvas({
           <Layers3 size={22} />
           <strong>No visible sections</strong>
           <small>Use the section list or turn a hidden section back on.</small>
+          <button
+            type="button"
+            className="builder-preview-empty-add"
+            onClick={() =>
+              setInsertTarget({ sectionId: null, placement: "below" })
+            }
+          >
+            <Plus size={16} />
+            Add section
+          </button>
         </div>
       )}
 
@@ -4090,7 +4160,7 @@ function PreviewCanvas({
                   </div>
                 </div>
                 <div
-                  className="builder-preview-section-insert"
+                  className="builder-preview-section-insert builder-preview-section-insert--top"
                   onClick={(event) => event.stopPropagation()}
                   onMouseDown={(event) => event.stopPropagation()}
                   onDragStart={(event) => event.stopPropagation()}
@@ -4098,7 +4168,33 @@ function PreviewCanvas({
                   <button
                     type="button"
                     className="builder-preview-section-insert-trigger"
-                    onClick={() => setInsertAfterSectionId(section.id)}
+                    onClick={() =>
+                      setInsertTarget({
+                        sectionId: section.id,
+                        placement: "above",
+                      })
+                    }
+                    aria-label="Add section above"
+                    title="Add section above"
+                  >
+                    <Plus size={16} />
+                  </button>
+                </div>
+                <div
+                  className="builder-preview-section-insert builder-preview-section-insert--bottom"
+                  onClick={(event) => event.stopPropagation()}
+                  onMouseDown={(event) => event.stopPropagation()}
+                  onDragStart={(event) => event.stopPropagation()}
+                >
+                  <button
+                    type="button"
+                    className="builder-preview-section-insert-trigger"
+                    onClick={() =>
+                      setInsertTarget({
+                        sectionId: section.id,
+                        placement: "below",
+                      })
+                    }
                     aria-label="Add section below"
                     title="Add section below"
                   >
@@ -4131,13 +4227,13 @@ function PreviewCanvas({
           })}
         </div>
       </div>
-      {insertTargetSection ? (
+      {insertTarget ? (
         <div
           className="builder-layout-modal"
           role="dialog"
           aria-modal="true"
           aria-labelledby="builder-layout-picker-title"
-          onClick={() => setInsertAfterSectionId(null)}
+          onClick={() => setInsertTarget(null)}
         >
           <div
             className="builder-layout-dialog"
@@ -4149,15 +4245,17 @@ function PreviewCanvas({
                   Choose row layout
                 </strong>
                 <span>
-                  Insert a section below{" "}
-                  {sectionLabels[insertTargetSection.kind].toLowerCase()} and
-                  pick a preset layout.
+                  {insertTargetSection
+                    ? `Insert a section ${insertTarget.placement} ${sectionLabels[
+                        insertTargetSection.kind
+                      ].toLowerCase()} and pick a preset layout.`
+                    : "Choose a preset layout for the first section on this page."}
                 </span>
               </div>
               <button
                 type="button"
                 className="builder-layout-close"
-                onClick={() => setInsertAfterSectionId(null)}
+                onClick={() => setInsertTarget(null)}
                 aria-label="Close row layout picker"
               >
                 <X size={15} />
@@ -4174,11 +4272,11 @@ function PreviewCanvas({
                     onAddWireframe(
                       preset.ratios.length,
                       1,
-                      insertTargetSection.id,
-                      "below",
+                      insertTarget.sectionId ?? "__empty-page__",
+                      insertTarget.placement,
                       preset.key,
                     );
-                    setInsertAfterSectionId(null);
+                    setInsertTarget(null);
                   }}
                 >
                   <span className="builder-layout-picker-card-copy">

@@ -29,6 +29,7 @@ import ElementLibrary from "@/components/dashboard/ElementLibrary";
 import MenuPresentationPanel from "@/components/dashboard/MenuPresentationPanel";
 
 type DashboardSidebarProps = {
+  actionsSlot: ReactNode;
   availableLayoutBlockKinds: LayoutBlockKind[];
   builderState: BuilderState;
   customPages: BuilderCustomPage[];
@@ -40,6 +41,7 @@ type DashboardSidebarProps = {
   menuIconSearch: string;
   menuTree: MenuItem[];
   newPageTitle: string;
+  inspectorSlot: ReactNode;
   normalizeMenuPresentation: (value?: Partial<MenuPresentationSettings> | null) => MenuPresentationSettings;
   pageStatus: string;
   publishStatus: string;
@@ -69,10 +71,12 @@ type DashboardSidebarProps = {
   onSetSelectedMenuItemId: Dispatch<SetStateAction<string | null>>;
   onSetSidebarCollapsed: Dispatch<SetStateAction<boolean>>;
   onSetSidebarTab: Dispatch<SetStateAction<SidebarTab>>;
+  onStartSidebarResize: (clientX: number) => void;
   onSwitchBuilderTarget: (nextKey: BuilderLayoutKey) => void;
 };
 
 export default function DashboardSidebar({
+  actionsSlot,
   availableLayoutBlockKinds,
   builderState,
   customPages,
@@ -84,6 +88,7 @@ export default function DashboardSidebar({
   menuIconSearch,
   menuTree,
   newPageTitle,
+  inspectorSlot,
   normalizeMenuPresentation,
   pageStatus,
   publishStatus,
@@ -113,6 +118,7 @@ export default function DashboardSidebar({
   onSetSelectedMenuItemId,
   onSetSidebarCollapsed,
   onSetSidebarTab,
+  onStartSidebarResize,
   onSwitchBuilderTarget,
 }: DashboardSidebarProps) {
   const renderSidebarTabButton = (
@@ -153,6 +159,7 @@ export default function DashboardSidebar({
 
       <div className="builder-sidebar-tabs" role="tablist" aria-label="Sidebar panels">
         {renderSidebarTabButton("elements", "Elements", availableLayoutBlockKinds.length)}
+        {renderSidebarTabButton("inspector", "Inspector")}
         {renderSidebarTabButton("menu", "Menu", menuTree.length)}
         {renderSidebarTabButton("pages", "Pages", customPages.length)}
         {renderSidebarTabButton("templates", "Templates", savedTemplates.length)}
@@ -187,6 +194,8 @@ export default function DashboardSidebar({
             onSetSelectedMenuItemId={onSetSelectedMenuItemId}
           />
         )}
+
+        {sidebarTab === "inspector" && inspectorSlot}
 
         {sidebarTab === "pages" && (
           <div className="builder-sidebar-panel">
@@ -294,6 +303,17 @@ export default function DashboardSidebar({
           </div>
         )}
       </div>
+      <div className="builder-sidebar-actions">{actionsSlot}</div>
+      <button
+        type="button"
+        className="builder-sidebar-resize-handle"
+        onMouseDown={(event) => {
+          event.preventDefault();
+          onStartSidebarResize(event.clientX);
+        }}
+        aria-label="Resize dashboard panel"
+        title="Resize panel"
+      />
     </aside>
   );
 }

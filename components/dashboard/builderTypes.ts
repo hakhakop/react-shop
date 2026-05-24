@@ -71,6 +71,7 @@ export type SectionSpacing = "inherit" | GlobalSectionSpacing;
 export type InspectorTab = "section" | "element" | "style" | "advanced";
 export type SidebarTab =
   | "elements"
+  | "inspector"
   | "menu"
   | "pages"
   | "templates"
