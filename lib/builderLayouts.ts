@@ -9,6 +9,14 @@ export type BuilderTemplate =
   | "product-category-specific"
   | "search-results";
 export type BuilderLayoutKey = BuilderPage | BuilderTemplate;
+export type BuilderPanelStyle =
+  | "default"
+  | "secondary"
+  | "dark"
+  | "light"
+  | "clean-shadow"
+  | "flat-dark"
+  | "flat-white";
 
 export type BuilderDesign = {
   preset?: string;
@@ -44,6 +52,7 @@ export type BuilderLayoutBlock = {
   elementBackground?: string;
   elementPadding?: string;
   elementAlign?: string;
+  panelStyle?: BuilderPanelStyle;
   embedMode?: string;
   embedCode?: string;
   embedUrl?: string;

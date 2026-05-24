@@ -12,6 +12,7 @@ import Breadcrumbs from "@/components/Breadcrumbs";
 import CarouselBlock, {
   type CarouselSlide,
 } from "@/components/blocks/CarouselBlock";
+import HomeGsapAnimations from "@/components/animations/HomeGsapAnimations";
 import CategoryWithFilters from "@/components/CategoryWithFilters";
 import CategoryBar from "@/components/CategoryBar";
 import EmbedSectionClient from "@/components/builder/EmbedSectionClient";
@@ -280,8 +281,18 @@ function SectionFrame({
     <section
       className={sectionClassName(section, extra)}
       style={sectionStyle(section)}
+      data-gsap-section={section.kind === "hero" ? "hero" : section.kind}
     >
-      <div className="shop-builder-section-content">{children}</div>
+      <div
+        className="shop-builder-section-content"
+        data-gsap-stagger={
+          section.kind === "hero" || section.kind === "embed"
+            ? undefined
+            : true
+        }
+      >
+        {children}
+      </div>
     </section>
   );
 }
@@ -317,7 +328,7 @@ function HeroSection({
 
   return (
     <SectionFrame section={section} extra="shop-builder-hero">
-      <div>
+      <div data-gsap-hero-item>
         {section.eyebrow && (
           <p className="shop-builder-eyebrow">{section.eyebrow}</p>
         )}
@@ -345,10 +356,17 @@ function HeroSection({
           className="shop-builder-hero-media shop-builder-hero-media--image"
           role="img"
           aria-label={product.name}
+          data-gsap-hero-item
+          data-gsap-float
           style={{ backgroundImage: `url(${product.imageUrl})` }}
         />
       ) : (
-        <div className="shop-builder-hero-media" aria-hidden="true" />
+        <div
+          className="shop-builder-hero-media"
+          aria-hidden="true"
+          data-gsap-hero-item
+          data-gsap-float
+        />
       )}
     </SectionFrame>
   );
@@ -505,19 +523,21 @@ async function ContentProductsBlock({ block }: { block: BuilderLayoutBlock }) {
     return (
       <ProductCarousel
         products={products}
-        preset={block.cardPreset ?? "standard"}
+        preset={block.panelStyle ?? block.cardPreset ?? "standard"}
       />
     );
   }
 
   return (
-    <div className={`shop-builder-grid--margin-${block.gridMargin ?? "none"}`}>
+    <div
+      className={`shop-builder-grid--margin-${block.gridMargin ?? "none"} shop-card-preset--${block.panelStyle ?? "default"}`}
+    >
       <CategoryWithFilters
         products={products}
         columns={block.columns}
         filterPosition={block.filterPosition ?? "hidden"}
         cardStyle={block.cardStyle}
-        cardPreset={block.cardPreset}
+        cardPreset={block.panelStyle ?? block.cardPreset}
         pageSize={limit}
         gridGap={block.gridGap}
         cardPadding={block.cardPadding}
@@ -553,7 +573,7 @@ function GridCards({
   const limit = Math.max(1, (block.columns ?? 3) * (block.gridRows ?? 1));
   return (
     <div
-      className={`shop-builder-grid shop-builder-grid--gap-${block.gridGap ?? "medium"} shop-builder-grid--margin-${block.gridMargin ?? "none"}`}
+      className={`shop-builder-grid shop-builder-grid--gap-${block.gridGap ?? "medium"} shop-builder-grid--margin-${block.gridMargin ?? "none"} shop-card-preset--${block.panelStyle ?? "default"}`}
       style={
         { "--shop-builder-grid-columns": block.columns ?? 3 } as CSSProperties
       }
@@ -1261,9 +1281,13 @@ function blockSurfaceStyle(
 }
 
 function blockShellClassName(block: BuilderLayoutBlock) {
-  return `shop-builder-element-shell is-padding-${
+  return `shop-builder-element-shell shop-card-preset--${
+    block.panelStyle ?? "default"
+  } is-padding-${
     block.elementPadding ?? "none"
-  } is-align-${block.elementAlign ?? "left"}`;
+  } is-align-${
+    block.elementAlign ?? "left"
+  }`;
 }
 
 function ContentLayoutSection({
@@ -1311,28 +1335,41 @@ function ContentLayoutSection({
           } as CSSProperties
         }
       >
-        {items.map((item, index) => (
-          <article
-            key={item.id ?? index}
-            className="shop-builder-content-layout-card"
-          >
-            {getContentLayoutBlocks(item).map((block, blockIndex) => (
-              <div
-                key={block.id ?? blockIndex}
-                className={blockShellClassName(block)}
-                style={blockSurfaceStyle(block)}
-              >
-                <ContentLayoutBlock
-                  block={block}
-                  product={product}
-                  breadcrumbItems={breadcrumbItems}
-                  page={page}
-                  pageContent={pageContent}
-                />
-              </div>
-            ))}
-          </article>
-        ))}
+        {items.map((item, index) => {
+          const blocks = getContentLayoutBlocks(item);
+          const cardStyle =
+            blocks.find(
+              (block) =>
+                block.panelStyle && block.panelStyle !== "default",
+            )?.panelStyle ??
+            blocks.find((block) => block.cardPreset)?.cardPreset ??
+            blocks[0]?.panelStyle ??
+            blocks[0]?.cardPreset ??
+            "default";
+
+          return (
+            <article
+              key={item.id ?? index}
+              className={`shop-builder-content-layout-card shop-card-preset--${cardStyle}`}
+            >
+              {blocks.map((block, blockIndex) => (
+                <div
+                  key={block.id ?? blockIndex}
+                  className={blockShellClassName(block)}
+                  style={blockSurfaceStyle(block)}
+                >
+                  <ContentLayoutBlock
+                    block={block}
+                    product={product}
+                    breadcrumbItems={breadcrumbItems}
+                    page={page}
+                    pageContent={pageContent}
+                  />
+                </div>
+              ))}
+            </article>
+          );
+        })}
       </div>
     </SectionFrame>
   );
@@ -1492,8 +1529,15 @@ export default function StorefrontBuilderRenderer({
       ? [{ label: "Home" }]
       : [{ label: "Home", href: "/" }, { label }]);
 
+  const isHomePage = page === "home";
+
   return (
-    <main className={designClassName(layout)} style={designStyle(layout)}>
+    <main
+      className={designClassName(layout)}
+      style={designStyle(layout)}
+      data-gsap-home={isHomePage ? true : undefined}
+    >
+      {isHomePage && <HomeGsapAnimations />}
       <div className="shop-builder-inner">
         {layout.sections.map((section) => (
           <BuilderSectionRenderer

@@ -2957,6 +2957,91 @@ body[data-storefront-preset="princity"]
   cursor: grab;
 }
 
+.builder-preview-layout-block.shop-card-preset--secondary .shop-builder-grid-card,
+.builder-preview-layout-block.shop-card-preset--secondary .shop-builder-column-badges article,
+.builder-preview-layout-block.shop-card-preset--secondary .product-card,
+.builder-preview-layout-block.shop-card-preset--secondary .shop-archive-card,
+.builder-preview-layout-block.shop-card-preset--secondary .builder-preview-product-card {
+  background: color-mix(in srgb, var(--builder-preview-active-surface, #f4f4ef) 90%, #ffffff);
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  box-shadow: 0 14px 34px rgba(15, 23, 42, 0.08);
+}
+
+.builder-preview-layout-block.shop-card-preset--light .shop-builder-grid-card,
+.builder-preview-layout-block.shop-card-preset--light .shop-builder-column-badges article,
+.builder-preview-layout-block.shop-card-preset--light .product-card,
+.builder-preview-layout-block.shop-card-preset--light .shop-archive-card,
+.builder-preview-layout-block.shop-card-preset--light .builder-preview-product-card,
+.builder-preview-layout-block.shop-card-preset--flat-white .shop-builder-grid-card,
+.builder-preview-layout-block.shop-card-preset--flat-white .shop-builder-column-badges article,
+.builder-preview-layout-block.shop-card-preset--flat-white .product-card,
+.builder-preview-layout-block.shop-card-preset--flat-white .shop-archive-card,
+.builder-preview-layout-block.shop-card-preset--flat-white .builder-preview-product-card {
+  background: #ffffff;
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.06);
+}
+
+.builder-preview-layout-block.shop-card-preset--clean-shadow .shop-builder-grid-card,
+.builder-preview-layout-block.shop-card-preset--clean-shadow .shop-builder-column-badges article,
+.builder-preview-layout-block.shop-card-preset--clean-shadow .product-card,
+.builder-preview-layout-block.shop-card-preset--clean-shadow .shop-archive-card,
+.builder-preview-layout-block.shop-card-preset--clean-shadow .builder-preview-product-card {
+  background: #ffffff;
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  box-shadow: 0 22px 54px rgba(15, 23, 42, 0.12);
+}
+
+.builder-preview-layout-block.shop-card-preset--dark .shop-builder-grid-card,
+.builder-preview-layout-block.shop-card-preset--dark .shop-builder-column-badges article,
+.builder-preview-layout-block.shop-card-preset--dark .product-card,
+.builder-preview-layout-block.shop-card-preset--dark .shop-archive-card,
+.builder-preview-layout-block.shop-card-preset--dark .builder-preview-product-card,
+.builder-preview-layout-block.shop-card-preset--flat-dark .shop-builder-grid-card,
+.builder-preview-layout-block.shop-card-preset--flat-dark .shop-builder-column-badges article,
+.builder-preview-layout-block.shop-card-preset--flat-dark .product-card,
+.builder-preview-layout-block.shop-card-preset--flat-dark .shop-archive-card,
+.builder-preview-layout-block.shop-card-preset--flat-dark .builder-preview-product-card {
+  background: #111111;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: none;
+  color: #f7f7f1;
+}
+
+.builder-preview-layout-block.shop-card-preset--flat-dark .shop-builder-grid-card,
+.builder-preview-layout-block.shop-card-preset--flat-dark .shop-builder-column-badges article,
+.builder-preview-layout-block.shop-card-preset--flat-dark .product-card,
+.builder-preview-layout-block.shop-card-preset--flat-dark .shop-archive-card,
+.builder-preview-layout-block.shop-card-preset--flat-dark .builder-preview-product-card,
+.builder-preview-layout-block.shop-card-preset--flat-white .shop-builder-grid-card,
+.builder-preview-layout-block.shop-card-preset--flat-white .shop-builder-column-badges article,
+.builder-preview-layout-block.shop-card-preset--flat-white .product-card,
+.builder-preview-layout-block.shop-card-preset--flat-white .shop-archive-card,
+.builder-preview-layout-block.shop-card-preset--flat-white .builder-preview-product-card {
+  box-shadow: none;
+}
+
+.builder-preview-layout-block.shop-card-preset--dark .shop-builder-grid-card h3,
+.builder-preview-layout-block.shop-card-preset--dark .shop-builder-grid-card p,
+.builder-preview-layout-block.shop-card-preset--dark .shop-builder-grid-card span,
+.builder-preview-layout-block.shop-card-preset--dark .shop-builder-column-badges article,
+.builder-preview-layout-block.shop-card-preset--dark .shop-builder-column-badges article strong,
+.builder-preview-layout-block.shop-card-preset--dark .shop-builder-column-badges article p,
+.builder-preview-layout-block.shop-card-preset--dark .shop-builder-column-badges article span,
+.builder-preview-layout-block.shop-card-preset--dark .product-card,
+.builder-preview-layout-block.shop-card-preset--dark .shop-archive-card,
+.builder-preview-layout-block.shop-card-preset--flat-dark .shop-builder-grid-card h3,
+.builder-preview-layout-block.shop-card-preset--flat-dark .shop-builder-grid-card p,
+.builder-preview-layout-block.shop-card-preset--flat-dark .shop-builder-grid-card span,
+.builder-preview-layout-block.shop-card-preset--flat-dark .shop-builder-column-badges article,
+.builder-preview-layout-block.shop-card-preset--flat-dark .shop-builder-column-badges article strong,
+.builder-preview-layout-block.shop-card-preset--flat-dark .shop-builder-column-badges article p,
+.builder-preview-layout-block.shop-card-preset--flat-dark .shop-builder-column-badges article span,
+.builder-preview-layout-block.shop-card-preset--flat-dark .product-card,
+.builder-preview-layout-block.shop-card-preset--flat-dark .shop-archive-card {
+  color: #f7f7f1;
+}
+
 .builder-preview-layout-block.is-padding-small {
   padding: 12px;
 }
@@ -2991,8 +3076,8 @@ body[data-storefront-preset="princity"]
 }
 
 .builder-preview-layout-block.is-selected-block {
-  box-shadow: inset 0 0 0 1px rgba(164, 190, 123, 0.72);
-  background: rgba(164, 190, 123, 0.04);
+  outline: 1px solid rgba(164, 190, 123, 0.72);
+  outline-offset: -1px;
 }
 
 .builder-preview-layout-block.is-dragging-block {

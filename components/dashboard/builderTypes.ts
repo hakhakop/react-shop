@@ -40,6 +40,14 @@ export type BuilderShellSettings = {
   sectionMarginBottom: GlobalSectionSpacing;
   menuPresentation: Record<string, MenuPresentationSettings>;
 };
+export type BuilderPanelStyle =
+  | "default"
+  | "secondary"
+  | "dark"
+  | "light"
+  | "clean-shadow"
+  | "flat-dark"
+  | "flat-white";
 export type MenuPresentationSettings = {
   showHeading: boolean;
   icon: string | null;
@@ -138,6 +146,7 @@ export type BuilderLayoutBlock = {
   elementBackground?: string;
   elementPadding?: "none" | "small" | "medium" | "large";
   elementAlign?: "left" | "center" | "right";
+  panelStyle?: BuilderPanelStyle;
   embedMode?: EmbedMode;
   embedCode?: string;
   embedUrl?: string;

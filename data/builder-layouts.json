@@ -52,7 +52,8 @@
                 "body": "Launch a premium React frontend connected to WordPress content, WooCommerce selling tools, managed hosting, and support from one place.",
                 "buttonLabel": "Start your modern website",
                 "buttonUrl": "/client",
-                "elementPadding": "large"
+                "elementPadding": "large",
+                "panelStyle": "dark"
               },
               {
                 "id": "webpages-hero-proof",
@@ -372,7 +373,8 @@
                     "title": "Support available",
                     "text": "Help with setup, improvements, content updates, and ongoing site care."
                   }
-                ]
+                ],
+                "panelStyle": "dark"
               }
             ]
           }
@@ -446,7 +448,7 @@
         "visible": true
       }
     ],
-    "updatedAt": "2026-05-23T23:01:18.267Z"
+    "updatedAt": "2026-05-24T06:54:08.172Z"
   },
   "shop": {
     "version": 1,

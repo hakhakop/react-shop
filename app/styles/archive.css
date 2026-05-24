@@ -296,6 +296,73 @@
   background: var(--product-image-bg, var(--surface-soft, #f8fafc));
 }
 
+.shop-card-preset--secondary .shop-archive-card,
+.shop-card-preset--secondary .shop-archive-card:hover {
+  background: color-mix(
+    in srgb,
+    var(--surface-soft, #f7f7f4) 88%,
+    #ffffff
+  );
+  border-color: rgba(148, 163, 184, 0.18);
+  box-shadow: 0 14px 34px rgba(15, 23, 42, 0.08);
+}
+
+.shop-card-preset--light .shop-archive-card,
+.shop-card-preset--light .shop-archive-card:hover,
+.shop-card-preset--clean-shadow .shop-archive-card,
+.shop-card-preset--clean-shadow .shop-archive-card:hover,
+.shop-card-preset--flat-white .shop-archive-card,
+.shop-card-preset--flat-white .shop-archive-card:hover {
+  background: #ffffff;
+  border-color: rgba(148, 163, 184, 0.14);
+}
+
+.shop-card-preset--light .shop-archive-card,
+.shop-card-preset--light .shop-archive-card:hover {
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.06);
+}
+
+.shop-card-preset--clean-shadow .shop-archive-card,
+.shop-card-preset--clean-shadow .shop-archive-card:hover {
+  box-shadow: 0 18px 42px rgba(15, 23, 42, 0.1);
+}
+
+.shop-card-preset--dark .shop-archive-card,
+.shop-card-preset--dark .shop-archive-card:hover,
+.shop-card-preset--flat-dark .shop-archive-card,
+.shop-card-preset--flat-dark .shop-archive-card:hover {
+  background: #111111;
+  border-color: rgba(255, 255, 255, 0.08);
+  box-shadow: none;
+  color: #f7f7f1;
+}
+
+.shop-card-preset--flat-dark .shop-archive-card,
+.shop-card-preset--flat-dark .shop-archive-card:hover,
+.shop-card-preset--flat-white .shop-archive-card,
+.shop-card-preset--flat-white .shop-archive-card:hover {
+  box-shadow: none;
+}
+
+.shop-card-preset--flat-white .shop-archive-card,
+.shop-card-preset--flat-white .shop-archive-card:hover {
+  background: #ffffff;
+  border-color: rgba(148, 163, 184, 0.12);
+}
+
+.shop-card-preset--dark .shop-archive-card .product-title,
+.shop-card-preset--dark .shop-archive-card .product-price,
+.shop-card-preset--flat-dark .shop-archive-card .product-title,
+.shop-card-preset--flat-dark .shop-archive-card .product-price {
+  color: #f7f7f1;
+}
+
+.shop-card-preset--dark .shop-archive-card .product-attribute-badge,
+.shop-card-preset--flat-dark .shop-archive-card .product-attribute-badge {
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(247, 247, 241, 0.92);
+}
+
 .shop-card-style--flat .shop-archive-card {
   background: transparent;
   border-color: transparent;

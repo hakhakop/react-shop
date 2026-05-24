@@ -242,7 +242,14 @@ export default function CategoryWithFilters({
     cardPreset === "editorial" ||
     cardPreset === "compact" ||
     cardPreset === "minimal" ||
-    cardPreset === "luxury"
+    cardPreset === "luxury" ||
+    cardPreset === "default" ||
+    cardPreset === "secondary" ||
+    cardPreset === "dark" ||
+    cardPreset === "light" ||
+    cardPreset === "clean-shadow" ||
+    cardPreset === "flat-dark" ||
+    cardPreset === "flat-white"
       ? cardPreset
       : "standard";
   const normalizedCartStyle =

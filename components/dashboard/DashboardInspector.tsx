@@ -20,6 +20,7 @@ import type {
   EmbedMode,
   InspectorTab,
   LayoutBlockKind,
+  BuilderPanelStyle,
   SectionKind,
   SlideImagePadding,
   SectionBackgroundMode,
@@ -38,6 +39,15 @@ import {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type LooseHandler = (...args: any[]) => void;
 type BackgroundPreset = { label: string; value: string; scheme?: string };
+const panelStyleOptions: { label: string; value: BuilderPanelStyle }[] = [
+  { label: "Default", value: "default" },
+  { label: "Secondary", value: "secondary" },
+  { label: "Dark", value: "dark" },
+  { label: "Light", value: "light" },
+  { label: "Clean with shadow", value: "clean-shadow" },
+  { label: "Flat dark", value: "flat-dark" },
+  { label: "Flat white", value: "flat-white" },
+];
 
 type DashboardInspectorProps = {
   builderJson: string;
@@ -815,14 +825,75 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                             </button>
                                           </div>
 
+                                          {isSelectedBlock && (
+                                            <label className="builder-field">
+                                              <span>Card Style</span>
+                                              <select
+                                                value={
+                                                  block.panelStyle ?? "default"
+                                                }
+                                                onChange={(event) =>
+                                                  updateSelectedLayoutBlock(
+                                                    index,
+                                                    blockIndex,
+                                                    {
+                                                      panelStyle: event.target
+                                                        .value as BuilderPanelStyle,
+                                                    },
+                                                  )
+                                                }
+                                              >
+                                                {panelStyleOptions.map(
+                                                  (option) => (
+                                                    <option
+                                                      key={option.value}
+                                                      value={option.value}
+                                                    >
+                                                      {option.label}
+                                                    </option>
+                                                  ),
+                                                )}
+                                              </select>
+                                            </label>
+                                          )}
+
                                           <details className="builder-collapse">
                                             <summary>
-                                              <span>Element Surface</span>
+                                              <span>Element Cards</span>
                                               <small>
-                                                {block.elementBackgroundMode ??
+                                                {block.panelStyle ??
                                                   "default"}
                                               </small>
                                             </summary>
+                                            <label className="builder-field">
+                                              <span>Card Style</span>
+                                              <select
+                                                value={
+                                                  block.panelStyle ?? "default"
+                                                }
+                                                onChange={(event) =>
+                                                  updateSelectedLayoutBlock(
+                                                    index,
+                                                    blockIndex,
+                                                    {
+                                                      panelStyle: event.target
+                                                        .value as BuilderPanelStyle,
+                                                    },
+                                                  )
+                                                }
+                                              >
+                                                {panelStyleOptions.map(
+                                                  (option) => (
+                                                    <option
+                                                      key={option.value}
+                                                      value={option.value}
+                                                    >
+                                                      {option.label}
+                                                    </option>
+                                                  ),
+                                                )}
+                                              </select>
+                                            </label>
                                             <label className="builder-field">
                                               <span>Background Mode</span>
                                               <select

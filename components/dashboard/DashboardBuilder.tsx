@@ -4950,11 +4950,20 @@ function PreviewSection({
           {items.map((item, index) => {
             const columnKey = item.id ?? `layout-item-${index}`;
             const blocks = getPreviewLayoutBlocks(item);
+            const cardStyle =
+              blocks.find(
+                (block) =>
+                  block.panelStyle && block.panelStyle !== "default",
+              )?.panelStyle ??
+              blocks.find((block) => block.cardPreset)?.cardPreset ??
+              blocks[0]?.panelStyle ??
+              blocks[0]?.cardPreset ??
+              "default";
 
             return (
               <article
                 key={columnKey}
-                className={`shop-builder-content-layout-card ${
+                className={`shop-builder-content-layout-card shop-card-preset--${cardStyle} ${
                   blocks.length === 0 ? "is-empty-column" : ""
                 } ${
                   selectedLayoutColumnKey === columnKey
@@ -5039,7 +5048,7 @@ function PreviewSection({
                       draggable
                       className={`builder-preview-layout-block is-${
                         block.kind ?? "text"
-                      } ${
+                      } shop-card-preset--${block.panelStyle ?? "default"} ${
                         selectedLayoutBlockKey === blockKey
                           ? "is-selected-block"
                           : ""
@@ -5454,13 +5463,15 @@ function PreviewSection({
                                   0,
                                   block.gridLimit ?? 8,
                                 )}
-                                preset={block.cardPreset ?? "standard"}
+                                preset={
+                                  block.panelStyle ?? block.cardPreset ?? "standard"
+                                }
                               />
                             ) : (
                               <div
                                 className={`shop-builder-grid--margin-${
                                   block.gridMargin ?? "none"
-                                }`}
+                                } shop-card-preset--${block.panelStyle ?? "default"}`}
                               >
                                 <CategoryWithFilters
                                   products={previewProducts.slice(
@@ -5470,7 +5481,7 @@ function PreviewSection({
                                   columns={block.columns}
                                   filterPosition={block.filterPosition}
                                   cardStyle={block.cardStyle}
-                                  cardPreset={block.cardPreset}
+                                  cardPreset={block.panelStyle ?? block.cardPreset}
                                   pageSize={block.gridLimit}
                                   gridGap={block.gridGap}
                                   cardPadding={block.cardPadding}
@@ -5485,11 +5496,18 @@ function PreviewSection({
                               </div>
                             )
                           ) : (
-                            <div className="builder-preview-products">
+                            <div
+                              className={`builder-preview-products shop-card-preset--${block.panelStyle ?? "default"}`}
+                            >
                               {sampleProducts
                                 .slice(0, block.gridLimit ?? 4)
                                 .map((name) => (
-                                  <span key={name}>{name}</span>
+                                  <span
+                                    key={name}
+                                    className="product-card builder-preview-product-card"
+                                  >
+                                    {name}
+                                  </span>
                                 ))}
                             </div>
                           )}
@@ -5499,7 +5517,7 @@ function PreviewSection({
                           <div
                             className={`shop-builder-grid shop-builder-grid--gap-${
                               block.gridGap ?? "medium"
-                            } shop-builder-grid--margin-${block.gridMargin ?? "none"}`}
+                            } shop-builder-grid--margin-${block.gridMargin ?? "none"} shop-card-preset--${block.panelStyle ?? "default"}`}
                             style={
                               {
                                 "--shop-builder-grid-columns":
