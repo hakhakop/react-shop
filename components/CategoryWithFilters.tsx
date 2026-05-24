@@ -479,7 +479,6 @@ export default function CategoryWithFilters({
     selectedAttributeCount +
     (searchTerm.trim() ? 1 : 0) +
     (minPrice || maxPrice ? 1 : 0);
-
   return (
     <div
       className={`shop-filter-layout shop-filter-layout--${normalizedFilterPosition} shop-card-style--${normalizedCardStyle} shop-card-preset--${normalizedCardPreset} shop-cart-button--${normalizedCartStyle} shop-cart-size--${normalizedCartSize} shop-cart-position--${normalizedCartPosition} shop-cart-visibility--${normalizedCartVisibility} shop-cart-display--${normalizedCartDisplay} shop-image-padding--${

@@ -17,6 +17,7 @@ import CategoryBar from "@/components/CategoryBar";
 import EmbedSectionClient from "@/components/builder/EmbedSectionClient";
 import FluentFormClient from "@/components/builder/FluentFormClient";
 import ProductGallery from "@/components/ProductGallery";
+import ProductCarousel from "@/components/ProductCarousel";
 import ProductOptionsSelector from "@/components/ProductOptionsSelector";
 import RecentlyViewedStrip from "@/components/RecentlyViewedStrip";
 import WishlistToggle from "@/components/WishlistToggle";
@@ -178,6 +179,16 @@ async function BuilderProductsSection({
       source,
       categoryId: section.categoryId,
     }));
+
+  if (section.layoutVariant === "carousel") {
+    return (
+      <ProductCarousel
+        products={products.slice(0, pageSize)}
+        preset={section.cardPreset ?? "standard"}
+      />
+    );
+  }
+
   return (
     <CategoryWithFilters
       products={products}
@@ -489,6 +500,15 @@ async function ContentProductsBlock({ block }: { block: BuilderLayoutBlock }) {
         : "all",
     categoryId: block.categoryId,
   });
+
+  if (block.layoutVariant === "carousel") {
+    return (
+      <ProductCarousel
+        products={products}
+        preset={block.cardPreset ?? "standard"}
+      />
+    );
+  }
 
   return (
     <div className={`shop-builder-grid--margin-${block.gridMargin ?? "none"}`}>

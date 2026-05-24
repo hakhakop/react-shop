@@ -18,8 +18,12 @@ import {
   getBuilderShellSettings,
   type BuilderHeaderLayout,
   type BuilderMenuPresentationMap,
+  type BuilderShellSettings,
 } from "../lib/builderShell";
-import { readBuilderCustomPages } from "../lib/builderLayouts";
+import {
+  getPublishedBuilderLayout,
+  readBuilderCustomPages,
+} from "../lib/builderLayouts";
 function asString(value: unknown, fallback: string | null = null): string | null {
   if (typeof value === "string" && value.trim() !== "") return value.trim();
   return fallback;
@@ -31,12 +35,13 @@ type HeaderShellProps = {
 
 export default async function HeaderShell({ layoutOverride }: HeaderShellProps) {
   // Load theme settings and main menu in parallel
-  const [settingsRaw, menuItemsRaw, builderPages, shellSettingsRaw] =
+  const [settingsRaw, menuItemsRaw, builderPages, shellSettingsRaw, homeLayout] =
     await Promise.all([
       getThemeSettings().catch(() => ({})),
       getMainMenuItems(),
       readBuilderCustomPages(),
       getBuilderShellSettings(),
+      getPublishedBuilderLayout("home").catch(() => null),
     ]);
 
   const settings = (settingsRaw || {}) as Record<string, unknown>;
@@ -44,10 +49,6 @@ export default async function HeaderShell({ layoutOverride }: HeaderShellProps) 
   const headerSettings: HeaderSettings = settings.headerSettings
     ? (settings.headerSettings as HeaderSettings)
     : extractHeaderSettings(settings);
-
-  const headerIconOrder = headerSettings.iconOrder;
-  const headerIconVariant = headerSettings.iconVariant;
-  const headerLogoMaxWidth = headerSettings.logoMaxWidth;
 
   // Colors
   const primaryColor = asString(settings.primary_color, "#111827") || "#111827";
@@ -79,7 +80,6 @@ export default async function HeaderShell({ layoutOverride }: HeaderShellProps) 
         settings.blogname,
       null
     );
-
   // Top bar content (optional)
   const topBarText = asString(
     settings.top_bar_text,
@@ -118,20 +118,136 @@ export default async function HeaderShell({ layoutOverride }: HeaderShellProps) 
       break;
   }
 
+  const serviceHomepageMode = Boolean(
+    homeLayout?.sections?.some((section) =>
+      section.title?.includes("Beautiful React Websites") ||
+      section.layoutItems?.some((item) =>
+        item.blocks?.some((block) =>
+          block.title?.includes("Beautiful React Websites"),
+        ),
+      ),
+    ),
+  );
+  const shellSettings = (shellSettingsRaw || {}) as Partial<BuilderShellSettings>;
+  const effectiveLogoUrl = shellSettings.headerLogoUrl || logoUrl;
+  const effectiveBrandText =
+    shellSettings.headerBrandText ||
+    (brandName ? brandName : serviceHomepageMode ? "WebPages" : null);
+  const effectiveLogoAlt =
+    shellSettings.headerLogoAlt || effectiveBrandText || "Store logo";
+  const effectiveBrandMode =
+    shellSettings.headerBrandMode || (serviceHomepageMode ? "brand" : "logo");
+  const effectiveLogoMaxWidth =
+    shellSettings.headerLogoMaxWidth || headerSettings.logoMaxWidth;
+  const effectiveIconOrder =
+    shellSettings.headerIconOrder && shellSettings.headerIconOrder.length > 0
+      ? shellSettings.headerIconOrder
+      : headerSettings.iconOrder;
+  const effectiveIconVariant =
+    shellSettings.headerIconVariant || headerSettings.iconVariant;
+  const effectiveActiveIndicator =
+    shellSettings.headerActiveIndicator ||
+    (layout === "princity" ? "princity" : "underline");
+  const showLogo =
+    Boolean(effectiveLogoUrl) &&
+    (effectiveBrandMode === "logo" || effectiveBrandMode === "both");
+  const showBrand =
+    Boolean(effectiveBrandText) &&
+    (effectiveBrandMode === "brand" ||
+      effectiveBrandMode === "both" ||
+      !showLogo);
+
   // Menu items (from WPGraphQL) with fallback
   const menuItems = (Array.isArray(menuItemsRaw)
     ? (menuItemsRaw as MenuItem[])
     : []) as MenuItem[];
 
-  const builderPageItems: MenuItem[] = builderPages.map((page) => ({
-    id: page.key,
-    label: page.title,
-    url: `/${page.slug}`,
-    path: `/${page.slug}`,
-  }));
+  const demoPageKeys = new Set([
+    "page:demos",
+    "page:furniture-store",
+    "page:fashion-store",
+  ]);
+  const demoChildOrder = ["page:furniture-store", "page:fashion-store"];
+  const demoChildren = demoChildOrder
+    .map((key) => builderPages.find((page) => page.key === key))
+    .filter(Boolean)
+    .map((page) => ({
+      id: page!.key,
+      label: page!.title,
+      url: `/${page!.slug}`,
+      path: `/${page!.slug}`,
+    }));
+  const demosPage = builderPages.find((page) => page.key === "page:demos");
+  const builderPageItems: MenuItem[] = builderPages
+    .filter((page) => !demoPageKeys.has(page.key))
+    .map((page) => ({
+      id: page.key,
+      label: page.title,
+      url: `/${page.slug}`,
+      path: `/${page.slug}`,
+    }));
 
-  const itemsToRender =
-    menuItems.length > 0
+  if (demoChildren.length > 0) {
+    builderPageItems.push({
+      id: demosPage?.key ?? "builder-demos",
+      label: demosPage?.title ?? "Demos",
+      url: demosPage ? `/${demosPage.slug}` : "#",
+      path: demosPage ? `/${demosPage.slug}` : "#",
+      children: demoChildren,
+    });
+  }
+
+  const serviceMenuItems: MenuItem[] = [
+    { id: "service-home", label: "Home", url: "/", path: "/" },
+    {
+      id: "service-problem",
+      label: "Problems",
+      url: "/#webpages-problem",
+      path: "/#webpages-problem",
+    },
+    {
+      id: "service-solution",
+      label: "Solution",
+      url: "/#webpages-solution",
+      path: "/#webpages-solution",
+    },
+    {
+      id: "service-workflow",
+      label: "Workflow",
+      url: "/#webpages-workflow",
+      path: "/#webpages-workflow",
+    },
+    {
+      id: "service-pricing",
+      label: "Pricing",
+      url: "/#webpages-pricing",
+      path: "/#webpages-pricing",
+    },
+    {
+      id: "service-demos",
+      label: "Demos",
+      url: "/demos",
+      path: "/demos",
+      children: [
+        {
+          id: "service-demo-furniture",
+          label: "Furniture Store",
+          url: "/furniture-store",
+          path: "/furniture-store",
+        },
+        {
+          id: "service-demo-fashion",
+          label: "Fashion Store",
+          url: "/fashion-store",
+          path: "/fashion-store",
+        },
+      ],
+    },
+  ];
+
+  const itemsToRender = serviceHomepageMode
+    ? serviceMenuItems
+    : menuItems.length > 0
       ? [...menuItems, ...builderPageItems]
       : [
           { id: "home", label: "Home", url: "/", path: "/" },
@@ -151,31 +267,47 @@ export default async function HeaderShell({ layoutOverride }: HeaderShellProps) 
 
   const renderLogoAndBrand = () => (
     <div className="site-header-logo-wrap">
-      {logoUrl && (
+      {showLogo && effectiveLogoUrl && (
         <Link href="/" className="site-header-logo-img-wrap">
           <Image
-            src={logoUrl}
-            alt={brandName || "Store logo"}
-            width={headerLogoMaxWidth}
-            height={headerLogoMaxWidth}
+            src={effectiveLogoUrl}
+            alt={effectiveLogoAlt}
+            width={effectiveLogoMaxWidth}
+            height={effectiveLogoMaxWidth}
             style={{ objectFit: "contain" }}
           />
         </Link>
       )}
 
-      {brandName && (
+      {showBrand && effectiveBrandText && (
         <Link href="/" className="site-header-brand">
-          <span style={{ color: primaryColor }}>{brandName}</span>
+          <span style={{ color: primaryColor }}>{effectiveBrandText}</span>
         </Link>
       )}
     </div>
+  );
+
+  const renderHeaderActions = () => (
+    <>
+      {serviceHomepageMode && (
+        <Link href="/client" className="site-header-action-pill site-header-service-cta">
+          Start
+        </Link>
+      )}
+      <HeaderActions
+        icons={effectiveIconOrder}
+        iconVariant={effectiveIconVariant}
+      />
+    </>
   );
 
    return (
     <HeaderFrame
       accentColor={accentColor}
       mode={layout === "pill" || layout === "princity" ? "none" : "sticky"}
-      className={layout === "pill" || layout === "princity" ? "site-header--pill" : ""}
+      className={`${layout === "pill" || layout === "princity" ? "site-header--pill" : ""}${
+        serviceHomepageMode ? " site-header--service" : ""
+      } site-header--indicator-${effectiveActiveIndicator}`.trim()}
     >
       {/* LAYOUT 2: TWO-ROW (ACF = centered) */}
       {layout === "two-row" && (
@@ -207,10 +339,7 @@ export default async function HeaderShell({ layoutOverride }: HeaderShellProps) 
               </div>
 
               <div className="site-header-main-right">
-                <HeaderActions
-                  icons={headerIconOrder}
-                  iconVariant={headerIconVariant}
-                />
+                {renderHeaderActions()}
               </div>
             </div>
           </div>
@@ -257,10 +386,7 @@ export default async function HeaderShell({ layoutOverride }: HeaderShellProps) 
                 </div>
 
                 <div className="site-header-main-right">
-                  <HeaderActions
-                    icons={headerIconOrder}
-                    iconVariant={headerIconVariant}
-                  />
+                  {renderHeaderActions()}
                 </div>
               </div>
             </div>
@@ -282,9 +408,15 @@ export default async function HeaderShell({ layoutOverride }: HeaderShellProps) 
             suppressHydrationWarning
           >
             <div className="site-header-princity-meta-row">
-              <span>{topBarText || "Modern commerce by Webpages"}</span>
               <span>
-                {[supportPhone, currencyLabel].filter(Boolean).join("   ")}
+                {serviceHomepageMode
+                  ? "Beautiful React websites with WordPress CMS and hosting included"
+                  : topBarText || "Modern commerce by Webpages"}
+              </span>
+              <span>
+                {serviceHomepageMode
+                  ? "Plans coming soon"
+                  : [supportPhone, currencyLabel].filter(Boolean).join("   ")}
               </span>
             </div>
 
@@ -303,10 +435,7 @@ export default async function HeaderShell({ layoutOverride }: HeaderShellProps) 
                 </div>
 
                 <div className="site-header-princity-right">
-                  <HeaderActions
-                    icons={headerIconOrder}
-                    iconVariant={headerIconVariant}
-                  />
+                  {renderHeaderActions()}
                 </div>
               </div>
             </div>
@@ -331,10 +460,7 @@ export default async function HeaderShell({ layoutOverride }: HeaderShellProps) 
             </div>
 
             <div className="site-header-main-right">
-              <HeaderActions
-                icons={headerIconOrder}
-                iconVariant={headerIconVariant}
-              />
+              {renderHeaderActions()}
             </div>
           </div>
         </div>
@@ -344,23 +470,25 @@ export default async function HeaderShell({ layoutOverride }: HeaderShellProps) 
       {layout === "hero" && (
         <div className="site-header-hero">
           <div className="site-header-hero-inner">
-            {logoUrl && (
+            {showLogo && effectiveLogoUrl && (
               <div className="site-header-hero-logo">
                 <Image
-                  src={logoUrl}
-                  alt={brandName || "Store logo"}
-                  width={headerLogoMaxWidth}
-                  height={headerLogoMaxWidth}
+                  src={effectiveLogoUrl}
+                  alt={effectiveLogoAlt}
+                  width={effectiveLogoMaxWidth}
+                  height={effectiveLogoMaxWidth}
                   style={{ objectFit: "contain" }}
                 />
               </div>
             )}
 
-            <Link href="/" className="site-header-hero-title">
-              <span style={{ color: primaryColor }}>
-                {brandName || "Webpages Store"}
-              </span>
-            </Link>
+            {effectiveBrandText && (
+              <Link href="/" className="site-header-hero-title">
+                <span style={{ color: primaryColor }}>
+                  {effectiveBrandText}
+                </span>
+              </Link>
+            )}
 
             <p className="site-header-hero-subtitle">
               Curated tech &amp; setup by Webpages.
@@ -375,10 +503,7 @@ export default async function HeaderShell({ layoutOverride }: HeaderShellProps) 
             </div>
 
             <div className="site-header-hero-actions">
-              <HeaderActions
-                icons={headerIconOrder}
-                iconVariant={headerIconVariant}
-              />
+              {renderHeaderActions()}
             </div>
           </div>
         </div>

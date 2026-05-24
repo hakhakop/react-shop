@@ -11,8 +11,9 @@ import {
   Save,
   Settings2,
   Trash2,
+  X,
 } from "lucide-react";
-import type { ChangeEvent, Dispatch, SetStateAction } from "react";
+import { useState, type ChangeEvent, type Dispatch, type SetStateAction } from "react";
 import type {
   BuilderLayoutBlock,
   BuilderSection,
@@ -27,6 +28,11 @@ import type {
   SectionSpacing,
   WordPressMediaItem,
 } from "@/components/dashboard/builderTypes";
+import {
+  builderRowLayoutPresets,
+  getBuilderRowLayoutPreset,
+  getBuilderRowLayoutSummary,
+} from "@/components/dashboard/builderLayoutPresets";
 
 // Inspector handlers mirror the lifted builder callbacks during this JSX-only extraction.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -68,6 +74,7 @@ type DashboardInspectorProps = {
   deleteSelectedLayoutItem: LooseHandler;
   deleteSelectedSlide: LooseHandler;
   duplicateSelected: LooseHandler;
+  applyLayoutPreset: (sectionId: string, presetKey: string) => void;
   moveSelected: LooseHandler;
   openWordPressMediaPicker: (options: { title: string; currentUrl?: string; onSelect: (media: WordPressMediaItem) => void }) => void;
   setInspectorOpen: Dispatch<SetStateAction<boolean>>;
@@ -130,6 +137,7 @@ function InspectorGroupSummary({
 }
 
 export default function DashboardInspector(props: DashboardInspectorProps) {
+  const [isLayoutPickerOpen, setLayoutPickerOpen] = useState(false);
   const {
     builderJson, copied, elementBackgroundPresets, getLayoutItemBlocks,
     inspectorOpen, inspectorTab, layoutBlockLabels, openLayoutItemId, openSlideId,
@@ -140,7 +148,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
     addSelectedLayoutBlockSlide, addSelectedLayoutItem, addSelectedSlide, copyJson,
     deleteSelected, deleteSelectedLayoutBlock, deleteSelectedLayoutBlockBadge,
     deleteSelectedLayoutBlockGridItem, deleteSelectedLayoutBlockSlide,
-    deleteSelectedLayoutItem, deleteSelectedSlide, duplicateSelected, moveSelected,
+    deleteSelectedLayoutItem, deleteSelectedSlide, duplicateSelected, applyLayoutPreset, moveSelected,
     openWordPressMediaPicker, setInspectorOpen, setInspectorTab, setOpenSlideId,
     setSectionSettingsOpen, setSectionStructureOpen, setSelectedLayoutBlockKey,
     updateSelected, updateSelectedBadge, updateSelectedLayoutBlock,
@@ -170,6 +178,13 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
     : selectedColumnIndex >= 0
       ? "column"
       : "section";
+  const currentRowLayoutPreset = getBuilderRowLayoutPreset(
+    selectedSection?.kind === "contentLayout" ? selectedSection.layout : null,
+  );
+  const currentRowLayoutSummary = getBuilderRowLayoutSummary(
+    selectedSection?.kind === "contentLayout" ? selectedSection.layout : null,
+    selectedSection?.layoutColumns ?? null,
+  );
 
   return (
     <aside
@@ -607,12 +622,26 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                       selectedSection.kind === "contentLayout" && (
                         <>
                           <label className="builder-field">
+                            <span>Current Row Layout</span>
+                            <input
+                              value={currentRowLayoutSummary}
+                              readOnly
+                            />
+                            <small>
+                              {currentRowLayoutPreset
+                                ? "Chosen preset"
+                                : "Custom or manual column count"}
+                            </small>
+                          </label>
+
+                          <label className="builder-field">
                             <span>Layout Columns</span>
                             <select
                               value={selectedSection.layoutColumns ?? 2}
                               onChange={(event) =>
                                 updateSelected({
                                   layoutColumns: Number(event.target.value),
+                                  layout: undefined,
                                 })
                               }
                             >
@@ -624,6 +653,15 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                               <option value={6}>6 columns</option>
                             </select>
                           </label>
+
+                          <button
+                            type="button"
+                            className="builder-inline-add"
+                            onClick={() => setLayoutPickerOpen(true)}
+                          >
+                            <Layers3 size={15} />
+                            Choose row layout
+                          </button>
 
                           <details
                             className="builder-collapse builder-structure-summary"
@@ -4096,6 +4134,55 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
 
                     {selectedSection.kind === "slider" && (
                       <>
+                        <details className="builder-collapse" open>
+                          <summary>
+                            <InspectorGroupSummary
+                              title="Slider Heading"
+                              description="Optional title and description shown above the carousel."
+                              meta={
+                                selectedSection.title?.trim() ||
+                                selectedSection.body?.trim()
+                                  ? "visible"
+                                  : "hidden"
+                              }
+                            />
+                          </summary>
+
+                          <label className="builder-field">
+                            <span>Title</span>
+                            <input
+                              value={selectedSection.title ?? ""}
+                              placeholder="Leave blank to hide"
+                              onChange={(event) =>
+                                updateSelected({ title: event.target.value })
+                              }
+                            />
+                          </label>
+
+                          <label className="builder-field">
+                            <span>Description</span>
+                            <textarea
+                              rows={3}
+                              value={selectedSection.body ?? ""}
+                              placeholder="Leave blank to hide"
+                              onChange={(event) =>
+                                updateSelected({ body: event.target.value })
+                              }
+                            />
+                          </label>
+
+                          <button
+                            type="button"
+                            className="builder-inline-add"
+                            onClick={() =>
+                              updateSelected({ title: "", body: "" })
+                            }
+                          >
+                            <X size={15} />
+                            Hide heading
+                          </button>
+                        </details>
+
                         <label className="builder-field">
                           <span>Slider Variant</span>
                           <select
@@ -4461,6 +4548,76 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
           <p>Add a section to start designing.</p>
         </div>
       )}
+
+      {isLayoutPickerOpen && selectedSection?.kind === "contentLayout" ? (
+        <div
+          className="builder-layout-modal"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="builder-layout-picker-title"
+          onClick={() => setLayoutPickerOpen(false)}
+        >
+          <div
+            className="builder-layout-dialog"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="builder-layout-header">
+              <div>
+                <strong id="builder-layout-picker-title">
+                  Choose row layout
+                </strong>
+                <span>
+                  Pick a preset. Existing blocks stay in place if columns are
+                  reduced.
+                </span>
+              </div>
+              <button
+                type="button"
+                className="builder-layout-close"
+                onClick={() => setLayoutPickerOpen(false)}
+                aria-label="Close row layout picker"
+              >
+                <X size={15} />
+              </button>
+            </div>
+
+            <div className="builder-layout-picker-grid">
+              {builderRowLayoutPresets.map((preset) => {
+                const isActive = currentRowLayoutPreset?.key === preset.key;
+                return (
+                  <button
+                    key={preset.key}
+                    type="button"
+                    className={`builder-layout-picker-card ${
+                      isActive ? "is-active" : ""
+                    }`}
+                    onClick={() => {
+                      applyLayoutPreset(selectedSection.id, preset.key);
+                      setLayoutPickerOpen(false);
+                    }}
+                  >
+                    <span className="builder-layout-picker-card-copy">
+                      <strong>{preset.label}</strong>
+                      <small>{preset.description}</small>
+                    </span>
+                    <span
+                      className="builder-layout-picker-preview"
+                      aria-hidden="true"
+                    >
+                      {preset.ratios.map((ratio, index) => (
+                        <i
+                          key={`${preset.key}-${index}`}
+                          style={{ flex: ratio }}
+                        />
+                      ))}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      ) : null}
     </aside>
   );
 }

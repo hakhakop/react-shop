@@ -1,3 +1,4 @@
+import { getBuilderRowLayoutPreset } from "@/components/dashboard/builderLayoutPresets";
 import type {
   BuilderDesign,
   BuilderLayoutBlock,
@@ -174,6 +175,7 @@ export const defaultTemplateStates: Record<BuilderTemplate, BuilderState> = {
         backgroundMode: "boxed",
         contentMode: "boxed",
         colorScheme: "inherit",
+        layout: "halves",
         layoutColumns: 2,
         layoutItems: [
           {
@@ -924,6 +926,7 @@ export function createSection(kind: SectionKind): BuilderSection {
       background: "#ffffff",
       backgroundMode: "boxed",
       contentMode: "boxed",
+      layout: "halves",
       layoutColumns: 2,
       layoutItems: [
         {
@@ -963,14 +966,34 @@ export function createSection(kind: SectionKind): BuilderSection {
   };
 }
 
-export function createWireframeSection(columns: number, rows: number): BuilderSection {
+export function createWireframeSection(
+  columns: number,
+  rows: number,
+  presetKey?: string,
+): BuilderSection {
   const safeColumns = Math.min(Math.max(columns, 1), 6);
   const safeRows = Math.min(Math.max(rows, 1), 4);
+  const layout =
+    getBuilderRowLayoutPreset(presetKey)?.key ??
+    (safeRows === 1
+      ? safeColumns === 1
+        ? "whole"
+        : safeColumns === 2
+          ? "halves"
+          : safeColumns === 3
+            ? "thirds"
+            : safeColumns === 4
+              ? "quarters"
+              : safeColumns === 5
+                ? "fifths"
+                : "sixths"
+      : undefined);
   return {
     ...createSection("contentLayout"),
     title: "",
     eyebrow: "",
     body: "",
+    layout,
     layoutColumns: safeColumns,
     layoutRows: safeRows,
     layoutItems: Array.from({ length: safeColumns * safeRows }, (_, index) => ({

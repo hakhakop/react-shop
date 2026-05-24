@@ -1,0 +1,1328 @@
+[
+  {
+    "id": "webpages-react-service",
+    "title": "WebPages React Service",
+    "description": "Premium service homepage for React websites with WordPress CMS, WooCommerce, hosting, and support.",
+    "sourcePage": "home",
+    "design": {
+      "preset": "princity",
+      "colorScheme": "auto",
+      "pageBackground": "#f5f3ee",
+      "textColor": "#111111",
+      "mutedTextColor": "#5f5c55",
+      "accentColor": "#d8ff65",
+      "surfaceColor": "#ebe8df",
+      "buttonBackground": "#111111",
+      "buttonTextColor": "#ffffff",
+      "radius": "8px",
+      "sectionMaxWidth": "1560px",
+      "sectionGutter": "44px",
+      "headingFontFamily": "inherit",
+      "headingSize": "clamp(48px, 8vw, 132px)",
+      "headingWeight": "820",
+      "headingLineHeight": "0.9",
+      "headingColor": "#111111"
+    },
+    "sections": [
+      {
+        "id": "webpages-hero",
+        "kind": "contentLayout",
+        "title": "",
+        "eyebrow": "",
+        "body": "",
+        "background": "#f5f3ee",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "light",
+        "topSpacing": "large",
+        "bottomSpacing": "medium",
+        "visible": true,
+        "layout": "thirds-2-1",
+        "layoutColumns": 2,
+        "layoutRows": 1,
+        "layoutItems": [
+          {
+            "id": "webpages-hero-copy",
+            "blocks": [
+              {
+                "id": "webpages-hero-title",
+                "kind": "hero",
+                "eyebrow": "WebPages React service",
+                "title": "Beautiful React Websites with WordPress CMS & Hosting Included",
+                "body": "Launch a premium React frontend connected to WordPress content, WooCommerce selling tools, managed hosting, and support from one place.",
+                "buttonLabel": "Start your modern website",
+                "buttonUrl": "/client",
+                "elementPadding": "large"
+              },
+              {
+                "id": "webpages-hero-proof",
+                "kind": "badgeGrid",
+                "title": "",
+                "body": "",
+                "columns": 3,
+                "elementBackgroundMode": "transparent",
+                "badges": [
+                  {
+                    "id": "webpages-hero-proof-1",
+                    "label": "React",
+                    "title": "Fast frontend",
+                    "body": "Modern app-style pages tuned for premium browsing."
+                  },
+                  {
+                    "id": "webpages-hero-proof-2",
+                    "label": "CMS",
+                    "title": "WordPress editing",
+                    "body": "Keep content, menus, products, and media manageable."
+                  },
+                  {
+                    "id": "webpages-hero-proof-3",
+                    "label": "Hosting",
+                    "title": "Managed setup",
+                    "body": "Infrastructure, publishing, and support under one service."
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "webpages-hero-ui",
+            "blocks": [
+              {
+                "id": "webpages-hero-floating-panel",
+                "kind": "grid",
+                "gridSource": "static",
+                "columns": 1,
+                "gridRows": 3,
+                "gridGap": "small",
+                "gridMargin": "none",
+                "cardPadding": "medium",
+                "gridImagePadding": "frameless",
+                "gridContentPadding": "large",
+                "gridImageFrame": "none",
+                "gridShowImage": false,
+                "gridShowEyebrow": true,
+                "gridShowMeta": true,
+                "gridShowText": true,
+                "gridShowButton": false,
+                "gridItems": [
+                  {
+                    "id": "webpages-panel-1",
+                    "eyebrow": "01",
+                    "title": "React storefront",
+                    "meta": "Frontend layer",
+                    "text": "Cinematic pages, fast navigation, modern product browsing, and polished interaction states."
+                  },
+                  {
+                    "id": "webpages-panel-2",
+                    "eyebrow": "02",
+                    "title": "WordPress control room",
+                    "meta": "CMS layer",
+                    "text": "Menus, media, pages, products, forms, and content remain editable without rebuilding the site."
+                  },
+                  {
+                    "id": "webpages-panel-3",
+                    "eyebrow": "03",
+                    "title": "Hosting included",
+                    "meta": "Managed layer",
+                    "text": "Deployment, updates, performance care, and support are part of the website plan."
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "webpages-problem",
+        "kind": "badgeGrid",
+        "title": "Why classic websites feel limited",
+        "eyebrow": "The problem",
+        "body": "Most small business websites separate design, content, commerce, hosting, and support into disconnected pieces. That makes every improvement slower than it should be.",
+        "background": "#111111",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "dark",
+        "topSpacing": "large",
+        "bottomSpacing": "large",
+        "columns": 4,
+        "badges": [
+          {
+            "id": "webpages-problem-1",
+            "label": "01",
+            "title": "Slow design changes",
+            "body": "Simple page updates become tickets, plugins, theme edits, or risky layout work."
+          },
+          {
+            "id": "webpages-problem-2",
+            "label": "02",
+            "title": "Outdated shop experience",
+            "body": "Classic commerce pages often feel heavy, generic, and disconnected from the brand."
+          },
+          {
+            "id": "webpages-problem-3",
+            "label": "03",
+            "title": "Scattered hosting/support",
+            "body": "Domain, hosting, developer, CMS, and shop issues live in different places."
+          },
+          {
+            "id": "webpages-problem-4",
+            "label": "04",
+            "title": "Hard content management",
+            "body": "Teams need a practical CMS, but customers still deserve a modern frontend."
+          }
+        ],
+        "visible": true
+      },
+      {
+        "id": "webpages-solution",
+        "kind": "contentLayout",
+        "title": "One modern website system",
+        "eyebrow": "The solution",
+        "body": "React frontend + WordPress CMS + WooCommerce + managed hosting, packaged as a clear service instead of a scattered technical puzzle.",
+        "background": "#ffffff",
+        "backgroundMode": "boxed",
+        "contentMode": "boxed",
+        "colorScheme": "light",
+        "topSpacing": "large",
+        "bottomSpacing": "large",
+        "visible": true,
+        "layout": "thirds-1-2",
+        "layoutColumns": 2,
+        "layoutRows": 1,
+        "layoutItems": [
+          {
+            "id": "webpages-solution-copy",
+            "blocks": [
+              {
+                "id": "webpages-solution-panel",
+                "kind": "panel",
+                "eyebrow": "Service stack",
+                "title": "A premium frontend with a familiar content engine behind it.",
+                "body": "Your visitors get a polished React website. Your team keeps WordPress for everyday content and WooCommerce for product management.",
+                "buttonLabel": "See the workflow",
+                "buttonUrl": "#webpages-workflow",
+                "elementBackgroundMode": "transparent",
+                "elementPadding": "large"
+              }
+            ]
+          },
+          {
+            "id": "webpages-solution-grid",
+            "blocks": [
+              {
+                "id": "webpages-solution-cards",
+                "kind": "grid",
+                "gridSource": "static",
+                "columns": 2,
+                "gridRows": 2,
+                "gridGap": "medium",
+                "gridMargin": "none",
+                "cardPadding": "medium",
+                "gridContentPadding": "large",
+                "gridShowImage": false,
+                "gridShowEyebrow": true,
+                "gridShowMeta": true,
+                "gridShowText": true,
+                "gridShowButton": false,
+                "gridItems": [
+                  {
+                    "id": "webpages-stack-react",
+                    "eyebrow": "Frontend",
+                    "title": "React",
+                    "meta": "Fast user experience",
+                    "text": "Modern page transitions, flexible layouts, and frontend polish."
+                  },
+                  {
+                    "id": "webpages-stack-wp",
+                    "eyebrow": "CMS",
+                    "title": "WordPress",
+                    "meta": "Content management",
+                    "text": "Pages, posts, menus, media, forms, and editorial control."
+                  },
+                  {
+                    "id": "webpages-stack-woo",
+                    "eyebrow": "Commerce",
+                    "title": "WooCommerce",
+                    "meta": "Online selling",
+                    "text": "Products, categories, cart, checkout, accounts, and orders."
+                  },
+                  {
+                    "id": "webpages-stack-hosting",
+                    "eyebrow": "Platform",
+                    "title": "Hosting",
+                    "meta": "Managed service",
+                    "text": "Deployment, performance care, SSL, updates, and support."
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "webpages-workflow",
+        "kind": "badgeGrid",
+        "title": "From idea to live website without the usual maze",
+        "eyebrow": "Visual workflow",
+        "body": "A clear path for clients who want a modern website without managing every technical layer themselves.",
+        "background": "#f1eee7",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "light",
+        "topSpacing": "large",
+        "bottomSpacing": "large",
+        "columns": 4,
+        "badges": [
+          {
+            "id": "webpages-flow-1",
+            "label": "01",
+            "title": "Choose plan",
+            "body": "Pick the website and hosting package that fits your launch."
+          },
+          {
+            "id": "webpages-flow-2",
+            "label": "02",
+            "title": "Build design",
+            "body": "Shape the homepage, shop, product pages, and content sections."
+          },
+          {
+            "id": "webpages-flow-3",
+            "label": "03",
+            "title": "Manage content",
+            "body": "Use WordPress to update text, media, menus, forms, and pages."
+          },
+          {
+            "id": "webpages-flow-4",
+            "label": "04",
+            "title": "Sell online",
+            "body": "Enable WooCommerce products, cart, checkout, and customer accounts."
+          }
+        ],
+        "visible": true
+      },
+      {
+        "id": "webpages-features",
+        "kind": "contentLayout",
+        "title": "Everything needed for a modern business website",
+        "eyebrow": "Features",
+        "body": "Built for service businesses, brands, and shops that need premium presentation with practical editing and commerce tools.",
+        "background": "#ffffff",
+        "backgroundMode": "boxed",
+        "contentMode": "boxed",
+        "colorScheme": "light",
+        "topSpacing": "large",
+        "bottomSpacing": "large",
+        "visible": true,
+        "layout": "whole",
+        "layoutColumns": 1,
+        "layoutRows": 1,
+        "layoutItems": [
+          {
+            "id": "webpages-features-column",
+            "blocks": [
+              {
+                "id": "webpages-features-grid",
+                "kind": "grid",
+                "gridSource": "static",
+                "columns": 3,
+                "gridRows": 2,
+                "gridGap": "medium",
+                "gridMargin": "none",
+                "cardPadding": "medium",
+                "gridContentPadding": "large",
+                "gridShowImage": false,
+                "gridShowEyebrow": true,
+                "gridShowMeta": false,
+                "gridShowText": true,
+                "gridShowButton": false,
+                "gridItems": [
+                  {
+                    "id": "webpages-feature-react",
+                    "eyebrow": "01",
+                    "title": "React frontend",
+                    "text": "A premium, app-like customer experience for your public website."
+                  },
+                  {
+                    "id": "webpages-feature-woo",
+                    "eyebrow": "02",
+                    "title": "WooCommerce shop",
+                    "text": "Sell products with familiar WordPress commerce tools and a modern frontend."
+                  },
+                  {
+                    "id": "webpages-feature-cms",
+                    "eyebrow": "03",
+                    "title": "WordPress CMS",
+                    "text": "Edit pages, posts, menus, images, forms, and product content."
+                  },
+                  {
+                    "id": "webpages-feature-builder",
+                    "eyebrow": "04",
+                    "title": "Dashboard builder",
+                    "text": "Adjust sections, blocks, layouts, spacing, and page templates visually."
+                  },
+                  {
+                    "id": "webpages-feature-hosting",
+                    "eyebrow": "05",
+                    "title": "Hosting included",
+                    "text": "A managed deployment path with SSL, performance care, and publishing."
+                  },
+                  {
+                    "id": "webpages-feature-support",
+                    "eyebrow": "06",
+                    "title": "Support available",
+                    "text": "Help with setup, improvements, content updates, and ongoing site care."
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "webpages-pricing",
+        "kind": "contentLayout",
+        "title": "",
+        "eyebrow": "",
+        "body": "",
+        "background": "#111111",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "dark",
+        "topSpacing": "large",
+        "bottomSpacing": "large",
+        "visible": true,
+        "layout": "halves",
+        "layoutColumns": 2,
+        "layoutRows": 1,
+        "layoutItems": [
+          {
+            "id": "webpages-pricing-copy",
+            "blocks": [
+              {
+                "id": "webpages-pricing-title",
+                "kind": "hero",
+                "eyebrow": "Pricing teaser",
+                "title": "Website + hosting plan",
+                "body": "A simple service package for a React website, WordPress CMS, WooCommerce-ready commerce, hosting, and support.",
+                "buttonLabel": "Coming soon",
+                "buttonUrl": "#webpages-cta",
+                "elementPadding": "large"
+              }
+            ]
+          },
+          {
+            "id": "webpages-pricing-panel",
+            "blocks": [
+              {
+                "id": "webpages-pricing-card",
+                "kind": "panel",
+                "eyebrow": "Coming soon",
+                "title": "One plan, one stack, one support path.",
+                "body": "Designed for businesses that want the polish of a custom React website and the practicality of WordPress management without assembling every tool separately.",
+                "buttonLabel": "Start your modern website",
+                "buttonUrl": "/client",
+                "elementBackgroundMode": "transparent",
+                "elementPadding": "large"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "webpages-cta",
+        "kind": "promo",
+        "title": "Start your modern website",
+        "eyebrow": "WebPages",
+        "body": "Beautiful React websites with WordPress/WooCommerce CMS and hosting included.",
+        "background": "#d8ff65",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "light",
+        "topSpacing": "large",
+        "bottomSpacing": "large",
+        "promoVariant": "accent",
+        "ctaLabel": "Request a website plan",
+        "ctaUrl": "/client",
+        "visible": true
+      }
+    ],
+    "updatedAt": "2026-05-23T23:01:18.269Z"
+  },
+  {
+    "id": "fashion-store",
+    "title": "Fashion Store",
+    "description": "Premium fashion storefront demo using imported WooCommerce products.",
+    "sourcePage": "page:fashion-store",
+    "design": {
+      "preset": "editorial",
+      "colorScheme": "light",
+      "pageBackground": "#f3f0ea",
+      "textColor": "#0f0f0d",
+      "mutedTextColor": "#6a655d",
+      "accentColor": "#b7a184",
+      "surfaceColor": "#e9e4dc",
+      "buttonBackground": "#11110f",
+      "buttonTextColor": "#ffffff",
+      "radius": "4px",
+      "sectionMaxWidth": "1560px",
+      "sectionGutter": "40px",
+      "headingFontFamily": "Georgia, serif",
+      "headingSize": "clamp(44px, 8vw, 132px)",
+      "headingWeight": "700",
+      "headingLineHeight": "0.9",
+      "headingColor": "#0f0f0d"
+    },
+    "sections": [
+      {
+        "id": "page:fashion-store-cinematic-hero",
+        "kind": "contentLayout",
+        "title": "",
+        "eyebrow": "",
+        "body": "",
+        "background": "#f3f0ea",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "light",
+        "topSpacing": "medium",
+        "bottomSpacing": "small",
+        "topMargin": "inherit",
+        "bottomMargin": "inherit",
+        "visible": true,
+        "layout": "halves",
+        "layoutColumns": 2,
+        "layoutRows": 1,
+        "layoutItems": [
+          {
+            "id": "page:fashion-store-hero-copy",
+            "blocks": [
+              {
+                "id": "page:fashion-store-hero-heading",
+                "kind": "hero",
+                "eyebrow": "Maison Webpages",
+                "title": "New silhouettes for the modern city wardrobe.",
+                "body": "A refined fashion storefront demo shaped for editorial storytelling, clean commerce, and imported WooCommerce product data.",
+                "buttonLabel": "Shop new arrivals",
+                "buttonUrl": "/shop",
+                "elementPadding": "large"
+              },
+              {
+                "id": "page:fashion-store-hero-points",
+                "kind": "badgeGrid",
+                "title": "",
+                "body": "",
+                "columns": 3,
+                "elementBackgroundMode": "transparent",
+                "badges": [
+                  {
+                    "id": "page:fashion-store-point-1",
+                    "label": "01",
+                    "title": "Tailored layers",
+                    "body": "Coats, blazers, and knits styled for a sharp seasonal edit."
+                  },
+                  {
+                    "id": "page:fashion-store-point-2",
+                    "label": "02",
+                    "title": "Quiet luxury",
+                    "body": "Monochrome surfaces, measured rhythm, and restrained campaign language."
+                  },
+                  {
+                    "id": "page:fashion-store-point-3",
+                    "label": "03",
+                    "title": "Commerce ready",
+                    "body": "Live products, prices, options, cart, and checkout remain untouched."
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "page:fashion-store-hero-visual",
+            "blocks": [
+              {
+                "id": "page:fashion-store-hero-panel",
+                "kind": "grid",
+                "gridSource": "static",
+                "columns": 1,
+                "gridRows": 1,
+                "gridGap": "none",
+                "gridMargin": "none",
+                "cardPadding": "none",
+                "gridImagePadding": "frameless",
+                "gridContentPadding": "medium",
+                "gridImageFrame": "soft",
+                "gridShowImage": true,
+                "gridShowEyebrow": true,
+                "gridShowMeta": true,
+                "gridShowText": true,
+                "gridShowButton": false,
+                "gridItems": [
+                  {
+                    "id": "page:fashion-store-hero-image",
+                    "eyebrow": "Campaign 2026",
+                    "title": "The city edit",
+                    "meta": "Outerwear / boots / knitwear",
+                    "text": "Editorial commerce built from reusable dashboard blocks.",
+                    "imageUrl": "https://cms.webpages.am/wp-content/uploads/2025/11/cropped-image-scaled-1.png",
+                    "imageAlt": "Fashion model in tailored outerwear campaign image"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "page:fashion-store-featured-categories",
+        "kind": "contentLayout",
+        "title": "Featured categories",
+        "eyebrow": "Shop by mood",
+        "body": "Minimal category cards keep the page commercial without losing its editorial pace.",
+        "background": "#ffffff",
+        "backgroundMode": "boxed",
+        "contentMode": "boxed",
+        "colorScheme": "light",
+        "topSpacing": "medium",
+        "bottomSpacing": "medium",
+        "visible": true,
+        "layout": "whole",
+        "layoutColumns": 1,
+        "layoutRows": 1,
+        "layoutItems": [
+          {
+            "id": "page:fashion-store-category-column",
+            "blocks": [
+              {
+                "id": "page:fashion-store-category-grid",
+                "kind": "grid",
+                "gridSource": "static",
+                "columns": 4,
+                "gridRows": 1,
+                "gridGap": "medium",
+                "gridMargin": "none",
+                "cardPadding": "none",
+                "gridImagePadding": "frameless",
+                "gridContentPadding": "small",
+                "gridImageFrame": "soft",
+                "gridShowImage": true,
+                "gridShowEyebrow": true,
+                "gridShowMeta": true,
+                "gridShowText": false,
+                "gridShowButton": true,
+                "gridItems": [
+                  {
+                    "id": "page:fashion-store-cat-outerwear",
+                    "eyebrow": "01",
+                    "title": "Outerwear",
+                    "meta": "Coats and blazers",
+                    "buttonLabel": "Explore",
+                    "buttonUrl": "/shop",
+                    "imageUrl": "https://cms.webpages.am/wp-content/uploads/2025/11/products-post-single-breasted-blazer-suit-feature.jpg",
+                    "imageAlt": "Tailored blazer fashion product"
+                  },
+                  {
+                    "id": "page:fashion-store-cat-footwear",
+                    "eyebrow": "02",
+                    "title": "Footwear",
+                    "meta": "Boots and leather forms",
+                    "buttonLabel": "Explore",
+                    "buttonUrl": "/shop",
+                    "imageUrl": "https://cms.webpages.am/wp-content/uploads/2025/11/products-post-brown-calfskin-boots-image-03-scaled-1.jpg",
+                    "imageAlt": "Brown leather fashion boots"
+                  },
+                  {
+                    "id": "page:fashion-store-cat-knitwear",
+                    "eyebrow": "03",
+                    "title": "Knitwear",
+                    "meta": "Soft seasonal layers",
+                    "buttonLabel": "Explore",
+                    "buttonUrl": "/shop",
+                    "imageUrl": "https://cms.webpages.am/wp-content/uploads/2025/11/products-post-turtleneck-blue-sweater-image-02-scaled-1.jpg",
+                    "imageAlt": "Blue turtleneck sweater product"
+                  },
+                  {
+                    "id": "page:fashion-store-cat-accessories",
+                    "eyebrow": "04",
+                    "title": "Accessories",
+                    "meta": "Finishing details",
+                    "buttonLabel": "Explore",
+                    "buttonUrl": "/shop",
+                    "imageUrl": "https://cms.webpages.am/wp-content/uploads/2025/11/products-post-brown-lined-boots-image-01-scaled-1.jpg",
+                    "imageAlt": "Minimal fashion product detail"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "page:fashion-store-editorial-split",
+        "kind": "contentLayout",
+        "title": "",
+        "eyebrow": "",
+        "body": "",
+        "background": "#11110f",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "dark",
+        "topSpacing": "medium",
+        "bottomSpacing": "medium",
+        "visible": true,
+        "layout": "thirds-1-2",
+        "layoutColumns": 2,
+        "layoutRows": 1,
+        "layoutItems": [
+          {
+            "id": "page:fashion-store-editorial-image",
+            "blocks": [
+              {
+                "id": "page:fashion-store-editorial-image-block",
+                "kind": "image",
+                "imageUrl": "https://cms.webpages.am/wp-content/uploads/2025/11/image-9.png",
+                "imageAlt": "Modern fashion campaign editorial image",
+                "title": "Campaign visual",
+                "body": "",
+                "elementPadding": "none"
+              }
+            ]
+          },
+          {
+            "id": "page:fashion-store-editorial-copy",
+            "blocks": [
+              {
+                "id": "page:fashion-store-editorial-copy-block",
+                "kind": "panel",
+                "eyebrow": "Editorial note",
+                "title": "Sharp pieces, softer styling, and a storefront that lets the product breathe.",
+                "body": "Use the builder to tune image rhythm, product density, and campaign language while WooCommerce continues to power the catalog beneath the surface.",
+                "buttonLabel": "View the collection",
+                "buttonUrl": "/shop",
+                "elementBackgroundMode": "transparent",
+                "elementPadding": "large"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "page:fashion-store-new-arrivals",
+        "kind": "productArchive",
+        "title": "New arrivals",
+        "eyebrow": "Latest edit",
+        "body": "Live WooCommerce products presented as a polished fashion grid.",
+        "background": "#f7f4ef",
+        "backgroundMode": "boxed",
+        "contentMode": "full",
+        "colorScheme": "light",
+        "topSpacing": "medium",
+        "bottomSpacing": "medium",
+        "columns": 4,
+        "filterPosition": "hidden",
+        "cardStyle": "none",
+        "cardPreset": "minimal",
+        "gridGap": "large",
+        "cardPadding": "none",
+        "imagePadding": "medium",
+        "addToCartStyle": "dark",
+        "addToCartSize": "compact",
+        "addToCartPosition": "under-price",
+        "addToCartVisibility": "hover",
+        "addToCartDisplay": "button",
+        "source": "all",
+        "gridLimit": 8,
+        "layoutVariant": "grid",
+        "visible": true
+      },
+      {
+        "id": "page:fashion-store-campaign-banner",
+        "kind": "slider",
+        "title": "",
+        "eyebrow": "",
+        "body": "",
+        "background": "#ffffff",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "light",
+        "topSpacing": "small",
+        "bottomSpacing": "small",
+        "visible": true,
+        "carouselSettings": {
+          "variant": "editorial",
+          "loop": true,
+          "autoplay": false,
+          "autoplayDelayMs": 5200,
+          "align": "center",
+          "dragFree": false,
+          "cardsPerView": 1,
+          "showArrows": true,
+          "showDots": true,
+          "pauseOnHover": true
+        },
+        "slides": [
+          {
+            "id": "page:fashion-store-campaign-1",
+            "badge": "Campaign",
+            "title": "Monochrome essentials",
+            "subtitle": "A quiet wardrobe, edited for impact.",
+            "text": "Layer charcoal, ivory, and beige with sculptural boots and tailored volume.",
+            "imageUrl": "https://cms.webpages.am/wp-content/uploads/2025/11/products-post-single-breasted-blazer-suit-feature.jpg",
+            "imageAlt": "Fashion blazer campaign image",
+            "imagePadding": "frameless",
+            "buttonLabel": "Shop campaign",
+            "buttonUrl": "/shop"
+          },
+          {
+            "id": "page:fashion-store-campaign-2",
+            "badge": "Footwear",
+            "title": "Grounded in leather",
+            "subtitle": "Boots with presence.",
+            "text": "Anchor each look with polished leather forms from the imported catalog.",
+            "imageUrl": "https://cms.webpages.am/wp-content/uploads/2025/11/products-post-brown-calfskin-boots-image-03-scaled-1.jpg",
+            "imageAlt": "Brown ankle boots campaign image",
+            "imagePadding": "frameless",
+            "buttonLabel": "View footwear",
+            "buttonUrl": "/shop"
+          }
+        ]
+      },
+      {
+        "id": "page:fashion-store-product-carousel-section",
+        "kind": "contentLayout",
+        "title": "The runway shelf",
+        "eyebrow": "Product carousel",
+        "body": "A compact moving shelf for featured fashion products using the current WooCommerce catalog.",
+        "background": "#11110f",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "dark",
+        "topSpacing": "medium",
+        "bottomSpacing": "medium",
+        "visible": true,
+        "layout": "whole",
+        "layoutColumns": 1,
+        "layoutRows": 1,
+        "layoutItems": [
+          {
+            "id": "page:fashion-store-product-carousel-column",
+            "blocks": [
+              {
+                "id": "page:fashion-store-product-carousel-block",
+                "kind": "products",
+                "title": "",
+                "body": "",
+                "layoutVariant": "carousel",
+                "source": "all",
+                "gridLimit": 8,
+                "columns": 4,
+                "cardPreset": "minimal",
+                "cardStyle": "none",
+                "gridGap": "large",
+                "imagePadding": "medium",
+                "addToCartStyle": "light",
+                "addToCartSize": "compact",
+                "addToCartPosition": "under-price",
+                "addToCartVisibility": "always"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "page:fashion-store-minimal-cta",
+        "kind": "promo",
+        "title": "Build the edit. Keep the commerce live.",
+        "eyebrow": "Fashion demo",
+        "body": "A premium storefront direction for imported fashion products, ready to keep refining in the visual builder.",
+        "background": "#11110f",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "dark",
+        "topSpacing": "medium",
+        "bottomSpacing": "medium",
+        "promoVariant": "minimal",
+        "ctaLabel": "Open the shop",
+        "ctaUrl": "/shop",
+        "visible": true
+      }
+    ],
+    "updatedAt": "2026-05-23T22:50:18.186Z"
+  },
+  {
+    "id": "furniture-store",
+    "title": "Furniture Store",
+    "description": "Saved from Furniture Store",
+    "sourcePage": "page:furniture-store",
+    "design": {
+      "preset": "editorial",
+      "colorScheme": "light",
+      "pageBackground": "#f4f1ea",
+      "textColor": "#151512",
+      "mutedTextColor": "#5f6156",
+      "accentColor": "#8d6f4f",
+      "surfaceColor": "#e9eee3",
+      "buttonBackground": "#151512",
+      "buttonTextColor": "#ffffff",
+      "radius": "8px",
+      "sectionMaxWidth": "1500px",
+      "sectionGutter": "28px",
+      "headingFontFamily": "Georgia, serif",
+      "headingSize": "clamp(34px, 5vw, 78px)",
+      "headingWeight": "700",
+      "headingLineHeight": "0.96",
+      "headingColor": "#151512"
+    },
+    "sections": [
+      {
+        "id": "page:furniture-store-premium-hero",
+        "kind": "contentLayout",
+        "title": "",
+        "eyebrow": "",
+        "body": "",
+        "background": "#f4f1ea",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "light",
+        "topSpacing": "medium",
+        "bottomSpacing": "small",
+        "topMargin": "inherit",
+        "bottomMargin": "inherit",
+        "visible": true,
+        "layout": "thirds-2-1",
+        "layoutColumns": 2,
+        "layoutRows": 1,
+        "layoutItems": [
+          {
+            "id": "page:furniture-store-hero-copy",
+            "blocks": [
+              {
+                "id": "page:furniture-store-hero-copy-block",
+                "kind": "hero",
+                "eyebrow": "Furniture Store",
+                "title": "A considered home, built piece by piece.",
+                "body": "Warm furniture, grounded materials, and useful commerce sections shaped into one editable React builder template.",
+                "buttonLabel": "Shop the edit",
+                "buttonUrl": "/shop",
+                "elementPadding": "large"
+              },
+              {
+                "id": "page:furniture-store-hero-services",
+                "kind": "badgeGrid",
+                "title": "",
+                "body": "",
+                "columns": 3,
+                "elementBackgroundMode": "transparent",
+                "badges": [
+                  {
+                    "id": "page:furniture-store-hero-service-1",
+                    "label": "01",
+                    "title": "Room-first edits",
+                    "body": "Collections arranged by living, dining, bedroom, and accent needs."
+                  },
+                  {
+                    "id": "page:furniture-store-hero-service-2",
+                    "label": "02",
+                    "title": "Delivery ready",
+                    "body": "Clear service messaging beside the shopping experience."
+                  },
+                  {
+                    "id": "page:furniture-store-hero-service-3",
+                    "label": "03",
+                    "title": "Commerce native",
+                    "body": "WooCommerce product data stays live and editable."
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "page:furniture-store-hero-visuals",
+            "blocks": [
+              {
+                "id": "page:furniture-store-hero-visual-grid",
+                "kind": "grid",
+                "gridSource": "static",
+                "columns": 2,
+                "gridRows": 2,
+                "gridGap": "small",
+                "gridMargin": "none",
+                "gridImagePadding": "frameless",
+                "gridContentPadding": "small",
+                "gridImageFrame": "soft",
+                "gridShowImage": true,
+                "gridShowEyebrow": true,
+                "gridShowMeta": true,
+                "gridShowText": false,
+                "gridShowButton": false,
+                "gridItems": [
+                  {
+                    "id": "page:furniture-store-hero-visual-1",
+                    "eyebrow": "Lounge",
+                    "title": "Soft seating",
+                    "meta": "Calm silhouettes",
+                    "imageUrl": "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=1200&q=85",
+                    "imageAlt": "Warm living room with sofa and table"
+                  },
+                  {
+                    "id": "page:furniture-store-hero-visual-2",
+                    "eyebrow": "Dining",
+                    "title": "Gathering tables",
+                    "meta": "Oak, linen, stone",
+                    "imageUrl": "https://images.unsplash.com/photo-1615873968403-89e068629265?auto=format&fit=crop&w=1200&q=85",
+                    "imageAlt": "Dining room with modern wooden table"
+                  },
+                  {
+                    "id": "page:furniture-store-hero-visual-3",
+                    "eyebrow": "Bedroom",
+                    "title": "Quiet storage",
+                    "meta": "Daily rituals",
+                    "imageUrl": "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=1200&q=85",
+                    "imageAlt": "Minimal bedroom interior"
+                  },
+                  {
+                    "id": "page:furniture-store-hero-visual-4",
+                    "eyebrow": "Accent",
+                    "title": "Lighting and objects",
+                    "meta": "Finishing pieces",
+                    "imageUrl": "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1200&q=85",
+                    "imageAlt": "Interior lamp and furniture detail"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "page:furniture-store-value-cards",
+        "kind": "badgeGrid",
+        "title": "Service that feels as composed as the room.",
+        "eyebrow": "Store promises",
+        "body": "A compact value section for delivery, design support, payment confidence, and returns.",
+        "background": "#151512",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "dark",
+        "topSpacing": "small",
+        "bottomSpacing": "small",
+        "columns": 4,
+        "badges": [
+          {
+            "id": "page:furniture-store-value-1",
+            "label": "01",
+            "title": "White-glove delivery",
+            "body": "Clear delivery guidance for larger pieces and room-ready placement."
+          },
+          {
+            "id": "page:furniture-store-value-2",
+            "label": "02",
+            "title": "Material samples",
+            "body": "Help shoppers compare finishes before choosing the full piece."
+          },
+          {
+            "id": "page:furniture-store-value-3",
+            "label": "03",
+            "title": "Design support",
+            "body": "Make space for consultation messaging without slowing shopping."
+          },
+          {
+            "id": "page:furniture-store-value-4",
+            "label": "04",
+            "title": "Secure checkout",
+            "body": "All cart, checkout, account, and order logic remains untouched."
+          }
+        ],
+        "visible": true
+      },
+      {
+        "id": "page:furniture-store-feature-panels",
+        "kind": "contentLayout",
+        "title": "Visual feature panels",
+        "eyebrow": "Room stories",
+        "body": "Editorial panels give the page rhythm between commerce sections.",
+        "background": "#ffffff",
+        "backgroundMode": "boxed",
+        "contentMode": "boxed",
+        "colorScheme": "light",
+        "topSpacing": "medium",
+        "bottomSpacing": "medium",
+        "visible": true,
+        "layout": "thirds-1-2",
+        "layoutColumns": 2,
+        "layoutRows": 1,
+        "layoutItems": [
+          {
+            "id": "page:furniture-store-feature-left",
+            "blocks": [
+              {
+                "id": "page:furniture-store-feature-panel-1",
+                "kind": "panel",
+                "eyebrow": "Studio edit",
+                "title": "Furniture that keeps the room useful.",
+                "body": "Pair large catalog moments with smaller material notes so the page feels curated, not crowded.",
+                "buttonLabel": "Explore categories",
+                "buttonUrl": "/categories",
+                "imageUrl": "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1200&q=85",
+                "imageAlt": "Modern interior studio with warm furniture",
+                "elementPadding": "small"
+              }
+            ]
+          },
+          {
+            "id": "page:furniture-store-feature-right",
+            "blocks": [
+              {
+                "id": "page:furniture-store-feature-grid",
+                "kind": "grid",
+                "gridSource": "static",
+                "columns": 2,
+                "gridRows": 1,
+                "gridGap": "medium",
+                "gridMargin": "none",
+                "gridImagePadding": "frameless",
+                "gridContentPadding": "medium",
+                "gridImageFrame": "soft",
+                "gridShowImage": true,
+                "gridShowEyebrow": true,
+                "gridShowMeta": true,
+                "gridShowText": true,
+                "gridShowButton": true,
+                "gridItems": [
+                  {
+                    "id": "page:furniture-store-feature-grid-1",
+                    "eyebrow": "Materials",
+                    "title": "Oak, linen, leather",
+                    "meta": "Natural surfaces",
+                    "text": "Use this card to tell a tactile story before the shopper reaches the grid.",
+                    "buttonLabel": "Shop materials",
+                    "buttonUrl": "/shop",
+                    "imageUrl": "https://images.unsplash.com/photo-1617103996702-96ff29b1c467?auto=format&fit=crop&w=1200&q=85",
+                    "imageAlt": "Warm material and textile detail"
+                  },
+                  {
+                    "id": "page:furniture-store-feature-grid-2",
+                    "eyebrow": "Storage",
+                    "title": "Quiet utility",
+                    "meta": "Shelves and cabinets",
+                    "text": "A commerce-friendly panel for storage, organization, and everyday pieces.",
+                    "buttonLabel": "View storage",
+                    "buttonUrl": "/shop",
+                    "imageUrl": "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=1200&q=85",
+                    "imageAlt": "Modern cabinet and shelf interior"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "page:furniture-store-grouped-content",
+        "kind": "badgeGrid",
+        "title": "Choose by how the room should feel.",
+        "eyebrow": "Grouped guidance",
+        "body": "A tab-inspired grouped section using existing editable cards.",
+        "background": "#e8eee1",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "light",
+        "topSpacing": "medium",
+        "bottomSpacing": "medium",
+        "columns": 3,
+        "badges": [
+          {
+            "id": "page:furniture-store-group-1",
+            "label": "Calm",
+            "title": "Low contrast, soft textures",
+            "body": "For rooms that should feel quiet, open, and slow."
+          },
+          {
+            "id": "page:furniture-store-group-2",
+            "label": "Gather",
+            "title": "Tables, chairs, storage",
+            "body": "For dining, hosting, and daily shared routines."
+          },
+          {
+            "id": "page:furniture-store-group-3",
+            "label": "Anchor",
+            "title": "Statement pieces",
+            "body": "For a sofa, cabinet, or chair that sets the tone."
+          }
+        ],
+        "visible": true
+      },
+      {
+        "id": "page:furniture-store-featured-categories",
+        "kind": "contentLayout",
+        "title": "Featured categories",
+        "eyebrow": "Shop by room",
+        "body": "Clear starting points keep the homepage useful and commerce-led.",
+        "background": "#f4f1ea",
+        "backgroundMode": "boxed",
+        "contentMode": "boxed",
+        "colorScheme": "light",
+        "topSpacing": "medium",
+        "bottomSpacing": "small",
+        "visible": true,
+        "layout": "whole",
+        "layoutColumns": 1,
+        "layoutRows": 1,
+        "layoutItems": [
+          {
+            "id": "page:furniture-store-featured-categories-column",
+            "blocks": [
+              {
+                "id": "page:furniture-store-featured-category-grid",
+                "kind": "grid",
+                "gridSource": "static",
+                "columns": 4,
+                "gridRows": 1,
+                "gridGap": "medium",
+                "gridMargin": "small",
+                "gridImagePadding": "frameless",
+                "gridContentPadding": "medium",
+                "gridImageFrame": "soft",
+                "gridShowImage": true,
+                "gridShowEyebrow": true,
+                "gridShowMeta": true,
+                "gridShowText": false,
+                "gridShowButton": true,
+                "gridItems": [
+                  {
+                    "id": "page:furniture-store-category-1",
+                    "eyebrow": "Living",
+                    "title": "Sofas and lounge",
+                    "meta": "Soft silhouettes",
+                    "buttonLabel": "Browse",
+                    "buttonUrl": "/categories",
+                    "imageUrl": "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=1200&q=85",
+                    "imageAlt": "Living room category"
+                  },
+                  {
+                    "id": "page:furniture-store-category-2",
+                    "eyebrow": "Dining",
+                    "title": "Dining and chairs",
+                    "meta": "Gathering pieces",
+                    "buttonLabel": "Browse",
+                    "buttonUrl": "/categories",
+                    "imageUrl": "https://images.unsplash.com/photo-1615873968403-89e068629265?auto=format&fit=crop&w=1200&q=85",
+                    "imageAlt": "Dining room category"
+                  },
+                  {
+                    "id": "page:furniture-store-category-3",
+                    "eyebrow": "Bedroom",
+                    "title": "Beds and storage",
+                    "meta": "Quiet utility",
+                    "buttonLabel": "Browse",
+                    "buttonUrl": "/categories",
+                    "imageUrl": "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=1200&q=85",
+                    "imageAlt": "Bedroom category"
+                  },
+                  {
+                    "id": "page:furniture-store-category-4",
+                    "eyebrow": "Accent",
+                    "title": "Lighting and decor",
+                    "meta": "Finishing touches",
+                    "buttonLabel": "Browse",
+                    "buttonUrl": "/categories",
+                    "imageUrl": "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1200&q=85",
+                    "imageAlt": "Accent furniture category"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "page:furniture-store-product-showcase",
+        "kind": "productArchive",
+        "title": "Product showcase",
+        "eyebrow": "WooCommerce archive",
+        "body": "A GraphCommerce-inspired commerce section with clean product cards, hidden filters, and live WooCommerce data.",
+        "background": "#ffffff",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "light",
+        "topSpacing": "medium",
+        "bottomSpacing": "small",
+        "columns": 4,
+        "filterPosition": "hidden",
+        "cardStyle": "flat",
+        "cardPreset": "standard",
+        "gridGap": "large",
+        "cardPadding": "medium",
+        "imagePadding": "large",
+        "addToCartStyle": "inherit",
+        "addToCartSize": "medium",
+        "addToCartPosition": "under-price",
+        "addToCartVisibility": "always",
+        "addToCartDisplay": "button",
+        "source": "all",
+        "gridLimit": 8,
+        "layoutVariant": "grid",
+        "visible": true
+      },
+      {
+        "id": "page:furniture-store-product-carousel-section",
+        "kind": "contentLayout",
+        "title": "New arrivals",
+        "eyebrow": "Carousel",
+        "body": "A smaller product rail for featured or recently added catalog pieces.",
+        "background": "#151512",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "dark",
+        "topSpacing": "medium",
+        "bottomSpacing": "medium",
+        "visible": true,
+        "layout": "whole",
+        "layoutColumns": 1,
+        "layoutRows": 1,
+        "layoutItems": [
+          {
+            "id": "page:furniture-store-product-carousel-column",
+            "blocks": [
+              {
+                "id": "page:furniture-store-product-carousel-block",
+                "kind": "products",
+                "title": "",
+                "source": "all",
+                "layoutVariant": "carousel",
+                "columns": 4,
+                "gridLimit": 8,
+                "filterPosition": "hidden",
+                "cardStyle": "flat",
+                "cardPreset": "standard",
+                "gridGap": "large",
+                "cardPadding": "medium",
+                "imagePadding": "large",
+                "addToCartStyle": "inherit",
+                "addToCartSize": "compact",
+                "addToCartPosition": "under-price",
+                "addToCartVisibility": "always",
+                "addToCartDisplay": "button"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "page:furniture-store-final-cta",
+        "kind": "promo",
+        "title": "Ready to build a calmer storefront?",
+        "body": "Use this reusable Furniture Store template as a public demo, then keep editing every section from the dashboard builder.",
+        "background": "#65725c",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "dark",
+        "topSpacing": "medium",
+        "bottomSpacing": "medium",
+        "promoVariant": "default",
+        "ctaLabel": "Open the shop",
+        "ctaUrl": "/shop",
+        "visible": true
+      }
+    ],
+    "updatedAt": "2026-05-23T22:10:33.971Z"
+  }
+]

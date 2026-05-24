@@ -14,9 +14,26 @@ export type BuilderHeaderLayout =
   | "hero"
   | "pill"
   | "princity";
+export type BuilderHeaderBrandMode = "logo" | "brand" | "both";
+export type BuilderHeaderIconId =
+  | "wishlist"
+  | "cart"
+  | "account"
+  | "theme"
+  | "search";
+export type BuilderHeaderIconVariant = "muted" | "solid" | "ghost" | "icon";
+export type BuilderHeaderActiveIndicator = "underline" | "princity" | "none";
 export type BuilderShellSettings = {
   headerVisible: boolean;
   headerLayout: BuilderHeaderLayout;
+  headerBrandMode: BuilderHeaderBrandMode;
+  headerBrandText: string;
+  headerLogoUrl: string | null;
+  headerLogoAlt: string;
+  headerLogoMaxWidth: number;
+  headerIconVariant: BuilderHeaderIconVariant;
+  headerIconOrder: BuilderHeaderIconId[];
+  headerActiveIndicator: BuilderHeaderActiveIndicator;
   sectionPaddingTop: GlobalSectionSpacing;
   sectionPaddingBottom: GlobalSectionSpacing;
   sectionMarginTop: GlobalSectionSpacing;
@@ -44,7 +61,12 @@ export type PreviewDevice = "desktop" | "tablet" | "mobile";
 export type GlobalSectionSpacing = "none" | "small" | "medium" | "large";
 export type SectionSpacing = "inherit" | GlobalSectionSpacing;
 export type InspectorTab = "section" | "element" | "style" | "advanced";
-export type SidebarTab = "elements" | "menu" | "pages" | "settings";
+export type SidebarTab =
+  | "elements"
+  | "menu"
+  | "pages"
+  | "templates"
+  | "settings";
 export type SlideImagePadding = "frameless" | "small" | "medium" | "max";
 export type SectionBackgroundMode = "full" | "boxed";
 export type SectionContentMode = "full" | "boxed" | "narrow";
@@ -293,4 +315,14 @@ export type BuilderCustomPage = {
   title: string;
   slug: string;
   updatedAt?: string;
+};
+
+export type BuilderSavedTemplate = {
+  id: string;
+  title: string;
+  description?: string;
+  sourcePage?: BuilderLayoutKey;
+  design?: BuilderDesign;
+  sections: BuilderSection[];
+  updatedAt: string;
 };

@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 type FluentFormClientProps = {
   formId?: string | number | null;
   title?: string | null;
+  previewMode?: boolean;
 };
 
 type FluentFormPayload = {
@@ -102,6 +103,7 @@ function appendAssetOnce(tagName: "script" | "link", key: string, src: string) {
 export default function FluentFormClient({
   formId,
   title,
+  previewMode = false,
 }: FluentFormClientProps) {
   const hostRef = useRef<HTMLDivElement>(null);
   const [status, setStatus] = useState<"idle" | "loading" | "ready" | "error">(
@@ -116,7 +118,7 @@ export default function FluentFormClient({
 
   useEffect(() => {
     const host = hostRef.current;
-    if (!host || !safeFormId) return;
+    if (previewMode || !host || !safeFormId) return;
 
     let cancelled = false;
     setStatus("loading");
@@ -168,11 +170,11 @@ export default function FluentFormClient({
     return () => {
       cancelled = true;
     };
-  }, [safeFormId]);
+  }, [previewMode, safeFormId]);
 
   useEffect(() => {
     const host = hostRef.current;
-    if (!host || status !== "ready" || !safeFormId) return;
+    if (previewMode || !host || status !== "ready" || !safeFormId) return;
 
     const form = host.querySelector<HTMLFormElement>("form.frm-fluent-form");
     if (!form) return;
@@ -226,7 +228,21 @@ export default function FluentFormClient({
     return () => {
       form.removeEventListener("submit", handleSubmit);
     };
-  }, [safeFormId, status]);
+  }, [previewMode, safeFormId, status]);
+
+  if (previewMode) {
+    return (
+      <div className="shop-builder-fluent-form" data-preview-mode="true">
+        {title && <h3>{title}</h3>}
+        <div className="builder-preview-form-lines" aria-hidden="true">
+          <i />
+          <i />
+          <i />
+          <b />
+        </div>
+      </div>
+    );
+  }
 
   if (!safeFormId) {
     return (
@@ -237,7 +253,11 @@ export default function FluentFormClient({
   }
 
   return (
-    <div className="shop-builder-fluent-form" data-form-id={safeFormId}>
+    <div
+      className="shop-builder-fluent-form"
+      data-form-id={safeFormId}
+      data-status={status}
+    >
       {title && <h3>{title}</h3>}
       {status === "loading" && (
         <div className="shop-builder-fluent-form-empty">Loading form...</div>

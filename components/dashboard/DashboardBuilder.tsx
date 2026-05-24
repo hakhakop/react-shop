@@ -43,6 +43,7 @@ import CarouselBlock, {
 import CategoryBar from "@/components/CategoryBar";
 import CategoryWithFilters from "@/components/CategoryWithFilters";
 import FluentFormClient from "@/components/builder/FluentFormClient";
+import ProductCarousel from "@/components/ProductCarousel";
 import ProductOptionsSelector from "@/components/ProductOptionsSelector";
 import DashboardInspector from "@/components/dashboard/DashboardInspector";
 import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
@@ -51,9 +52,14 @@ import type {
   BuilderCustomPageKey,
   BuilderColorScheme,
   BuilderDesign,
+  BuilderHeaderActiveIndicator,
   BuilderHeaderLayout,
+  BuilderHeaderBrandMode,
+  BuilderHeaderIconId,
+  BuilderHeaderIconVariant,
   BuilderLayoutBlock,
   BuilderLayoutKey,
+  BuilderSavedTemplate,
   BuilderSection,
   BuilderShellSettings,
   BuilderState,
@@ -79,6 +85,11 @@ import {
   templateLabels,
 } from "@/components/dashboard/builderRegistry";
 import {
+  builderRowLayoutPresets,
+  getBuilderRowLayoutPreset,
+  getBuilderRowLayoutPreviewTemplate,
+} from "@/components/dashboard/builderLayoutPresets";
+import {
   createBlockId,
   createId,
   createLayoutBlock,
@@ -101,6 +112,14 @@ const STORAGE_CUSTOM_PAGES = "react-shop-visual-builder-pages-v1";
 const defaultShellSettings: BuilderShellSettings = {
   headerVisible: true,
   headerLayout: "wordpress",
+  headerBrandMode: "logo",
+  headerBrandText: "WebPages",
+  headerLogoUrl: null,
+  headerLogoAlt: "Site logo",
+  headerLogoMaxWidth: 160,
+  headerIconVariant: "muted",
+  headerIconOrder: ["wishlist", "cart", "account", "theme", "search"],
+  headerActiveIndicator: "underline",
   sectionPaddingTop: "medium",
   sectionPaddingBottom: "medium",
   sectionMarginTop: "none",
@@ -109,12 +128,23 @@ const defaultShellSettings: BuilderShellSettings = {
 };
 
 const defaultMenuPresentation: MenuPresentationSettings = {
-  showHeading: true,
+  showHeading: false,
   icon: null,
   submenuLayout: "list",
   submenuColumns: 3,
   badgeText: null,
 };
+
+const headerIconOptions: {
+  id: BuilderHeaderIconId;
+  label: string;
+}[] = [
+  { id: "wishlist", label: "Wishlist" },
+  { id: "cart", label: "Cart" },
+  { id: "account", label: "Account" },
+  { id: "theme", label: "Night mode" },
+  { id: "search", label: "Search" },
+];
 
 function normalizeMenuPresentation(
   value?: Partial<MenuPresentationSettings> | null,
@@ -122,7 +152,8 @@ function normalizeMenuPresentation(
   const rawColumns = Number(value?.submenuColumns);
 
   return {
-    showHeading: typeof value?.showHeading === "boolean" ? value.showHeading : true,
+    showHeading:
+      typeof value?.showHeading === "boolean" ? value.showHeading : false,
     icon:
       typeof value?.icon === "string" && value.icon.trim().length > 0
         ? value.icon.trim()
@@ -488,6 +519,7 @@ function getDefaultStateForKey(key: BuilderLayoutKey): BuilderState {
           backgroundMode: "boxed",
           contentMode: "boxed",
           colorScheme: "inherit",
+          layout: "whole",
           layoutColumns: 1,
           layoutItems: [
             {
@@ -779,6 +811,12 @@ export default function DashboardBuilder({
   const [customPages, setCustomPages] = useState<BuilderCustomPage[]>([]);
   const [newPageTitle, setNewPageTitle] = useState("");
   const [pageStatus, setPageStatus] = useState("Builder pages save to React");
+  const [savedTemplates, setSavedTemplates] = useState<BuilderSavedTemplate[]>(
+    [],
+  );
+  const [templateStatus, setTemplateStatus] = useState(
+    "Templates save to React",
+  );
   const [previewProducts, setPreviewProducts] = useState<ProductNode[]>([]);
   const [previewCategoryTree, setPreviewCategoryTree] = useState<
     CategoryTreeItem[]
@@ -1001,6 +1039,33 @@ export default function DashboardBuilder({
     }
 
     void loadBuilderPages();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadBuilderTemplates() {
+      try {
+        const response = await fetch("/api/builder-templates", {
+          cache: "no-store",
+        });
+        if (!response.ok) return;
+        const payload = (await response.json()) as {
+          templates?: BuilderSavedTemplate[];
+        };
+        if (!cancelled) {
+          setSavedTemplates(payload.templates ?? []);
+        }
+      } catch {
+        if (!cancelled) setTemplateStatus("Templates unavailable");
+      }
+    }
+
+    void loadBuilderTemplates();
 
     return () => {
       cancelled = true;
@@ -1489,6 +1554,99 @@ export default function DashboardBuilder({
       ];
     }
     return [];
+  };
+
+  const reflowContentLayoutItems = (
+    items: NonNullable<BuilderSection["layoutItems"]>,
+    targetColumns: number,
+  ) => {
+    const safeColumns = Math.min(Math.max(targetColumns, 1), 6);
+    const normalizedItems = items.map((item, index) => ({
+      ...item,
+      id: item.id ?? `layout-item-${index + 1}`,
+      blocks: [...getLayoutItemBlocks(item)],
+    }));
+    const nextItems = Array.from({ length: safeColumns }, (_, index) => {
+      const sourceItem = normalizedItems[index];
+      return (
+        sourceItem ?? {
+          id: `layout-item-${index + 1}`,
+          blocks: [],
+        }
+      );
+    });
+
+    if (normalizedItems.length > safeColumns) {
+      const overflowBlocks = normalizedItems
+        .slice(safeColumns)
+        .flatMap((item) => getLayoutItemBlocks(item));
+      if (overflowBlocks.length > 0) {
+        const lastIndex = safeColumns - 1;
+        nextItems[lastIndex] = {
+          ...nextItems[lastIndex],
+          blocks: [...getLayoutItemBlocks(nextItems[lastIndex]), ...overflowBlocks],
+        };
+      }
+    }
+
+    return nextItems;
+  };
+
+  const applyContentLayoutPreset = (
+    sectionId: string,
+    presetKey: string,
+  ) => {
+    const preset = getBuilderRowLayoutPreset(presetKey);
+    if (!preset) return;
+
+    const nextColumns = preset.ratios.length;
+    let nextSelectedColumnKey: string | null = null;
+    let nextSelectedBlockKey = selectedLayoutBlockKey;
+
+    setBuilderState((current) => ({
+      ...current,
+      sections: current.sections.map((section) => {
+        if (section.id !== sectionId || section.kind !== "contentLayout") {
+          return section;
+        }
+
+        const layoutItems = reflowContentLayoutItems(
+          section.layoutItems ?? [],
+          nextColumns,
+        );
+        nextSelectedColumnKey = layoutItems[0]?.id ?? null;
+
+        if (selectedLayoutBlockKey) {
+          const selectedBlockMatch = layoutItems.find((item, index) =>
+            getLayoutItemBlocks(item).some(
+              (block, blockIndex) =>
+                (block.id ?? `${item.id ?? `layout-item-${index}`}-block-${blockIndex}`) ===
+                selectedLayoutBlockKey,
+            ),
+          );
+          if (selectedBlockMatch) {
+            nextSelectedColumnKey =
+              selectedBlockMatch.id ?? nextSelectedColumnKey ?? null;
+          } else {
+            nextSelectedBlockKey = null;
+          }
+        }
+
+        return {
+          ...section,
+          layout: preset.key,
+          layoutColumns: nextColumns,
+          layoutItems,
+        };
+      }),
+    }));
+
+    if (nextSelectedColumnKey) {
+      setSelectedLayoutColumnKey(nextSelectedColumnKey);
+      setOpenLayoutItemId(nextSelectedColumnKey);
+    }
+
+    setSelectedLayoutBlockKey(nextSelectedBlockKey);
   };
 
   const updateSelectedLayoutBlock = (
@@ -2017,6 +2175,7 @@ export default function DashboardBuilder({
           blocks: [],
         },
       ],
+      layout: undefined,
       layoutColumns: Math.min(
         Math.max(selectedSection.layoutColumns ?? 2, 1),
         6,
@@ -2029,6 +2188,7 @@ export default function DashboardBuilder({
     if (!selectedSection) return;
     const item = selectedSection.layoutItems?.[index];
     updateSelected({
+      layout: undefined,
       layoutItems: (selectedSection.layoutItems ?? []).filter(
         (_, itemIndex) => itemIndex !== index,
       ),
@@ -2203,8 +2363,9 @@ export default function DashboardBuilder({
     rows: number,
     targetSectionId: string,
     placement: "above" | "below",
+    presetKey?: string,
   ) => {
-    const nextSection = createWireframeSection(columns, rows);
+    const nextSection = createWireframeSection(columns, rows, presetKey);
     setBuilderState((current) => {
       const targetIndex = current.sections.findIndex(
         (section) => section.id === targetSectionId,
@@ -2470,6 +2631,62 @@ export default function DashboardBuilder({
     });
   };
 
+  const updateHeaderIcon = (
+    icon: BuilderHeaderIconId,
+    enabled: boolean,
+  ) => {
+    const currentOrder =
+      shellSettings.headerIconOrder?.length > 0
+        ? shellSettings.headerIconOrder
+        : defaultShellSettings.headerIconOrder;
+    const nextOrder = enabled
+      ? [...currentOrder.filter((item) => item !== icon), icon]
+      : currentOrder.filter((item) => item !== icon);
+
+    updateShellSettings({
+      headerIconOrder: nextOrder.length > 0 ? nextOrder : [icon],
+    });
+  };
+
+  const applyHeaderPreset = (
+    preset: "service" | "commerce" | "classic",
+  ) => {
+    if (preset === "service") {
+      updateShellSettings({
+        headerVisible: true,
+        headerLayout: "princity",
+        headerBrandMode: "brand",
+        headerBrandText: "WebPages",
+        headerIconVariant: "muted",
+        headerIconOrder: ["wishlist", "cart", "account", "theme", "search"],
+        headerActiveIndicator: "princity",
+      });
+      return;
+    }
+
+    if (preset === "commerce") {
+      updateShellSettings({
+        headerVisible: true,
+        headerLayout: "pill",
+        headerBrandMode: "both",
+        headerBrandText: "WebPages Store",
+        headerIconVariant: "ghost",
+        headerIconOrder: ["search", "wishlist", "cart", "account", "theme"],
+        headerActiveIndicator: "underline",
+      });
+      return;
+    }
+
+    updateShellSettings({
+      headerVisible: true,
+      headerLayout: "two-row",
+      headerBrandMode: "logo",
+      headerIconVariant: "muted",
+      headerIconOrder: ["wishlist", "cart", "account", "theme", "search"],
+      headerActiveIndicator: "underline",
+    });
+  };
+
   const publishShellSettings = async () => {
     setShellStatus("Publishing global settings...");
     await saveShellSettings(shellSettings, "Global settings published");
@@ -2567,6 +2784,67 @@ export default function DashboardBuilder({
     setPageStatus("Page deleted");
   };
 
+  const saveCurrentPageAsTemplate = async () => {
+    const title = getLayoutLabel(builderState.page, customPages);
+    setTemplateStatus("Saving template...");
+
+    const response = await fetch("/api/builder-templates", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        title,
+        description: `Saved from ${title}`,
+        sourcePage: builderState.page,
+        design: builderState.design,
+        sections: builderState.sections,
+      }),
+    });
+
+    if (!response.ok) {
+      setTemplateStatus("Template save failed");
+      return;
+    }
+
+    const payload = (await response.json()) as {
+      template?: BuilderSavedTemplate;
+      templates?: BuilderSavedTemplate[];
+    };
+
+    if (payload.templates) {
+      setSavedTemplates(payload.templates);
+    } else if (payload.template) {
+      setSavedTemplates((templates) => [
+        payload.template as BuilderSavedTemplate,
+        ...templates.filter((template) => template.id !== payload.template?.id),
+      ]);
+    }
+
+    setTemplateStatus("Template saved");
+  };
+
+  const deleteSavedTemplate = async (id: string) => {
+    setTemplateStatus("Deleting template...");
+    const response = await fetch(
+      `/api/builder-templates?id=${encodeURIComponent(id)}`,
+      {
+        method: "DELETE",
+      },
+    );
+
+    if (!response.ok) {
+      setTemplateStatus("Template delete failed");
+      return;
+    }
+
+    const payload = (await response.json()) as {
+      templates?: BuilderSavedTemplate[];
+    };
+    setSavedTemplates(payload.templates ?? []);
+    setTemplateStatus("Template deleted");
+  };
+
   return (
     <div
       className={`builder-dashboard ${inspectorOpen ? "" : "is-inspector-closed"}${
@@ -2591,14 +2869,18 @@ export default function DashboardBuilder({
         publishStatus={publishStatus}
         selectedMenuItem={selectedMenuItem}
         selectedMenuItemId={selectedMenuItemId}
+        savedTemplates={savedTemplates}
         sidebarCollapsed={sidebarCollapsed}
         sidebarTab={sidebarTab}
         templateDescriptions={templateDescriptions}
         templateLabels={templateLabels}
+        templateStatus={templateStatus}
         onAddElementFromLibrary={addElementFromLibrary}
         onCreateBuilderPage={createBuilderPage}
         onDeleteBuilderPage={deleteBuilderPage}
+        onDeleteSavedTemplate={deleteSavedTemplate}
         onRenderLayoutBlockIcon={getLayoutBlockLibraryIcon}
+        onSaveCurrentPageAsTemplate={saveCurrentPageAsTemplate}
         onSetDevice={setDevice}
         onSetGlobalStylesOpen={setGlobalStylesOpen}
         onSetMenuIconPickerOpen={setMenuIconPickerOpen}
@@ -2903,6 +3185,211 @@ export default function DashboardBuilder({
                   </select>
                 </label>
 
+                <div className="builder-header-presets">
+                  <button
+                    type="button"
+                    onClick={() => applyHeaderPreset("service")}
+                  >
+                    Princity service
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => applyHeaderPreset("commerce")}
+                  >
+                    Commerce pill
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => applyHeaderPreset("classic")}
+                  >
+                    Classic store
+                  </button>
+                </div>
+
+                <div className="builder-two-column">
+                  <label className="builder-field">
+                    <span>Brand Display</span>
+                    <select
+                      value={shellSettings.headerBrandMode}
+                      onChange={(event) =>
+                        updateShellSettings({
+                          headerBrandMode: event.target
+                            .value as BuilderHeaderBrandMode,
+                        })
+                      }
+                    >
+                      <option value="logo">Logo only</option>
+                      <option value="brand">Text brand</option>
+                      <option value="both">Logo + text</option>
+                    </select>
+                  </label>
+
+                  <label className="builder-field">
+                    <span>Logo Width</span>
+                    <input
+                      type="number"
+                      min="40"
+                      max="360"
+                      value={shellSettings.headerLogoMaxWidth}
+                      onChange={(event) =>
+                        updateShellSettings({
+                          headerLogoMaxWidth: Number(event.target.value),
+                        })
+                      }
+                    />
+                  </label>
+                </div>
+
+                <label className="builder-field">
+                  <span>Brand Text</span>
+                  <input
+                    type="text"
+                    value={shellSettings.headerBrandText}
+                    onChange={(event) =>
+                      updateShellSettings({
+                        headerBrandText: event.target.value,
+                      })
+                    }
+                    placeholder="WebPages"
+                  />
+                </label>
+
+                <div className="builder-field">
+                  <span>Logo Image</span>
+                  <div className="builder-header-logo-picker">
+                    <div className="builder-header-logo-preview">
+                      {shellSettings.headerLogoUrl ? (
+                        <Image
+                          src={shellSettings.headerLogoUrl}
+                          alt={
+                            shellSettings.headerLogoAlt ||
+                            shellSettings.headerBrandText ||
+                            "Site logo"
+                          }
+                          width={120}
+                          height={72}
+                          unoptimized
+                        />
+                      ) : (
+                        <ImageIcon size={20} />
+                      )}
+                    </div>
+                    <div className="builder-header-logo-actions">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          openWordPressMediaPicker({
+                            title: "Header Logo",
+                            currentUrl: shellSettings.headerLogoUrl ?? "",
+                            onSelect: (media) =>
+                              updateShellSettings({
+                                headerLogoUrl: media.sourceUrl,
+                                headerLogoAlt:
+                                  shellSettings.headerLogoAlt ||
+                                  media.altText ||
+                                  media.title ||
+                                  "Site logo",
+                              }),
+                          })
+                        }
+                      >
+                        <GalleryHorizontal size={14} />
+                        Choose from library
+                      </button>
+                      {shellSettings.headerLogoUrl ? (
+                        <button
+                          type="button"
+                          className="is-muted"
+                          onClick={() =>
+                            updateShellSettings({ headerLogoUrl: null })
+                          }
+                        >
+                          Clear
+                        </button>
+                      ) : null}
+                      <small>
+                        {shellSettings.headerLogoUrl
+                          ? "Logo selected from WordPress media."
+                          : "Select an image from WordPress media."}
+                      </small>
+                    </div>
+                  </div>
+                </div>
+
+                <label className="builder-field">
+                  <span>Logo Alt Text</span>
+                  <input
+                    type="text"
+                    value={shellSettings.headerLogoAlt}
+                    onChange={(event) =>
+                      updateShellSettings({
+                        headerLogoAlt: event.target.value,
+                      })
+                    }
+                    placeholder="Site logo"
+                  />
+                </label>
+
+                <div className="builder-two-column">
+                  <label className="builder-field">
+                    <span>Icon Style</span>
+                    <select
+                      value={shellSettings.headerIconVariant}
+                      onChange={(event) =>
+                        updateShellSettings({
+                          headerIconVariant: event.target
+                            .value as BuilderHeaderIconVariant,
+                        })
+                      }
+                    >
+                      <option value="muted">Muted</option>
+                      <option value="ghost">Ghost</option>
+                      <option value="solid">Solid</option>
+                      <option value="icon">Icon only</option>
+                    </select>
+                  </label>
+
+                  <label className="builder-field">
+                    <span>Active Indicator</span>
+                    <select
+                      value={shellSettings.headerActiveIndicator}
+                      onChange={(event) =>
+                        updateShellSettings({
+                          headerActiveIndicator: event.target
+                            .value as BuilderHeaderActiveIndicator,
+                        })
+                      }
+                    >
+                      <option value="princity">Princity motion</option>
+                      <option value="underline">Underline</option>
+                      <option value="none">None</option>
+                    </select>
+                  </label>
+
+                  <div className="builder-field">
+                    <span>Header Icons</span>
+                    <div className="builder-header-icon-grid">
+                      {headerIconOptions.map((option) => (
+                        <label key={option.id}>
+                          <input
+                            type="checkbox"
+                            checked={shellSettings.headerIconOrder.includes(
+                              option.id,
+                            )}
+                            onChange={(event) =>
+                              updateHeaderIcon(
+                                option.id,
+                                event.target.checked,
+                              )
+                            }
+                          />
+                          <span>{option.label}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
                 <div className="builder-shell-note">
                   <strong>{shellStatus}</strong>
                   <span>
@@ -3172,6 +3659,7 @@ export default function DashboardBuilder({
         deleteSelectedLayoutItem={deleteSelectedLayoutItem}
         deleteSelectedSlide={deleteSelectedSlide}
         duplicateSelected={duplicateSelected}
+        applyLayoutPreset={applyContentLayoutPreset}
         moveSelected={moveSelected}
         openWordPressMediaPicker={openWordPressMediaPicker}
         setInspectorOpen={setInspectorOpen}
@@ -3435,18 +3923,19 @@ function PreviewCanvas({
     rows: number,
     targetSectionId: string,
     placement: "above" | "below",
+    presetKey?: string,
   ) => void;
   onMoveSection: (sectionId: string, direction: -1 | 1) => void;
   onDuplicateSection: (sectionId: string) => void;
   onDeleteSection: (sectionId: string) => void;
   headerSlotRef: RefObject<HTMLDivElement | null>;
 }) {
-  const [wireframeColumns, setWireframeColumns] = useState(2);
-  const [wireframeRows, setWireframeRows] = useState(1);
-  const [insertAfterSectionId, setInsertAfterSectionId] = useState<
-    string | null
-  >(null);
+  const [insertAfterSectionId, setInsertAfterSectionId] = useState<string | null>(
+    null,
+  );
   const visibleSections = sections.filter((section) => section.visible);
+  const insertTargetSection =
+    sections.find((section) => section.id === insertAfterSectionId) ?? null;
   return (
     <div
       className="builder-preview-canvas"
@@ -3609,83 +4098,12 @@ function PreviewCanvas({
                   <button
                     type="button"
                     className="builder-preview-section-insert-trigger"
-                    onClick={() =>
-                      setInsertAfterSectionId((current) =>
-                        current === section.id ? null : section.id,
-                      )
-                    }
+                    onClick={() => setInsertAfterSectionId(section.id)}
                     aria-label="Add section below"
                     title="Add section below"
                   >
                     <Plus size={16} />
                   </button>
-
-                  {insertAfterSectionId === section.id && (
-                    <div className="builder-preview-section-insert-panel">
-                      <strong>New section</strong>
-                      <div className="builder-wireframe-controls">
-                        <label>
-                          <span>Cols</span>
-                          <select
-                            value={wireframeColumns}
-                            onChange={(event) =>
-                              setWireframeColumns(Number(event.target.value))
-                            }
-                          >
-                            <option value={1}>1</option>
-                            <option value={2}>2</option>
-                            <option value={3}>3</option>
-                            <option value={4}>4</option>
-                            <option value={5}>5</option>
-                            <option value={6}>6</option>
-                          </select>
-                        </label>
-                        <label>
-                          <span>Rows</span>
-                          <select
-                            value={wireframeRows}
-                            onChange={(event) =>
-                              setWireframeRows(Number(event.target.value))
-                            }
-                          >
-                            <option value={1}>1</option>
-                            <option value={2}>2</option>
-                            <option value={3}>3</option>
-                            <option value={4}>4</option>
-                          </select>
-                        </label>
-                        <span
-                          className="builder-wireframe-preview"
-                          style={
-                            {
-                              "--wireframe-columns": wireframeColumns,
-                            } as CSSProperties
-                          }
-                          aria-hidden="true"
-                        >
-                          {Array.from({
-                            length: wireframeColumns * wireframeRows,
-                          }).map((_, index) => (
-                            <i key={index} />
-                          ))}
-                        </span>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          onAddWireframe(
-                            wireframeColumns,
-                            wireframeRows,
-                            section.id,
-                            "below",
-                          );
-                          setInsertAfterSectionId(null);
-                        }}
-                      >
-                        Add section
-                      </button>
-                    </div>
-                  )}
                 </div>
                 <PreviewSection
                   section={section}
@@ -3713,6 +4131,74 @@ function PreviewCanvas({
           })}
         </div>
       </div>
+      {insertTargetSection ? (
+        <div
+          className="builder-layout-modal"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="builder-layout-picker-title"
+          onClick={() => setInsertAfterSectionId(null)}
+        >
+          <div
+            className="builder-layout-dialog"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="builder-layout-header">
+              <div>
+                <strong id="builder-layout-picker-title">
+                  Choose row layout
+                </strong>
+                <span>
+                  Insert a section below{" "}
+                  {sectionLabels[insertTargetSection.kind].toLowerCase()} and
+                  pick a preset layout.
+                </span>
+              </div>
+              <button
+                type="button"
+                className="builder-layout-close"
+                onClick={() => setInsertAfterSectionId(null)}
+                aria-label="Close row layout picker"
+              >
+                <X size={15} />
+              </button>
+            </div>
+
+            <div className="builder-layout-picker-grid">
+              {builderRowLayoutPresets.map((preset) => (
+                <button
+                  key={preset.key}
+                  type="button"
+                  className="builder-layout-picker-card"
+                  onClick={() => {
+                    onAddWireframe(
+                      preset.ratios.length,
+                      1,
+                      insertTargetSection.id,
+                      "below",
+                      preset.key,
+                    );
+                    setInsertAfterSectionId(null);
+                  }}
+                >
+                  <span className="builder-layout-picker-card-copy">
+                    <strong>{preset.label}</strong>
+                    <small>{preset.description}</small>
+                  </span>
+                  <span
+                    className="builder-layout-picker-preview"
+                    aria-hidden="true"
+                  >
+                    {preset.ratios.map((ratio, index) => (
+                      <i key={`${preset.key}-${index}`} style={{ flex: ratio }} />
+                    ))}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -4201,22 +4687,29 @@ function PreviewSection({
     return (
       <div className="shop-builder-section-content builder-preview-live-products">
         {previewProducts.length > 0 ? (
-          <CategoryWithFilters
-            products={previewProducts}
-            columns={section.columns}
-            filterPosition={section.filterPosition}
-            cardStyle={section.cardStyle}
-            cardPreset={section.cardPreset}
-            pageSize={section.gridLimit}
-            gridGap={section.gridGap}
-            cardPadding={section.cardPadding}
-            imagePadding={section.imagePadding}
-            addToCartStyle={section.addToCartStyle}
-            addToCartSize={section.addToCartSize}
-            addToCartPosition={section.addToCartPosition}
-            addToCartVisibility={section.addToCartVisibility}
-            addToCartDisplay={section.addToCartDisplay}
-          />
+          section.layoutVariant === "carousel" ? (
+            <ProductCarousel
+              products={previewProducts.slice(0, section.gridLimit ?? 8)}
+              preset={section.cardPreset ?? "standard"}
+            />
+          ) : (
+            <CategoryWithFilters
+              products={previewProducts}
+              columns={section.columns}
+              filterPosition={section.filterPosition}
+              cardStyle={section.cardStyle}
+              cardPreset={section.cardPreset}
+              pageSize={section.gridLimit}
+              gridGap={section.gridGap}
+              cardPadding={section.cardPadding}
+              imagePadding={section.imagePadding}
+              addToCartStyle={section.addToCartStyle}
+              addToCartSize={section.addToCartSize}
+              addToCartPosition={section.addToCartPosition}
+              addToCartVisibility={section.addToCartVisibility}
+              addToCartDisplay={section.addToCartDisplay}
+            />
+          )
         ) : (
           <div className="builder-preview-products">
             <h2 className="shop-builder-title">{section.title}</h2>
@@ -4347,18 +4840,31 @@ function PreviewSection({
       badge: slide.badge,
       imagePadding: slide.imagePadding,
     })) satisfies CarouselSlide[];
+    const showSliderHeading = Boolean(
+      section.title?.trim() || section.body?.trim(),
+    );
 
     return (
       <div className="shop-builder-section-content builder-preview-slider">
-        <div className="shop-builder-slider-heading">
-          <p className="shop-builder-eyebrow">
-            <GalleryHorizontal size={18} />
-            {section.carouselSettings?.variant ?? "hero"} slider
-          </p>
-          <h2 className="shop-builder-title">{section.title}</h2>
-          {section.body && <p className="shop-builder-body">{section.body}</p>}
-        </div>
-        <CarouselBlock slides={slides} settings={section.carouselSettings} />
+        {showSliderHeading && (
+          <div className="shop-builder-slider-heading">
+            <p className="shop-builder-eyebrow">
+              <GalleryHorizontal size={18} />
+              {section.carouselSettings?.variant ?? "hero"} slider
+            </p>
+            {section.title?.trim() ? (
+              <h2 className="shop-builder-title">{section.title}</h2>
+            ) : null}
+            {section.body?.trim() ? (
+              <p className="shop-builder-body">{section.body}</p>
+            ) : null}
+          </div>
+        )}
+        <CarouselBlock
+          slides={slides}
+          settings={section.carouselSettings}
+          className="builder-preview-carousel"
+        />
       </div>
     );
   }
@@ -4398,6 +4904,9 @@ function PreviewSection({
             body: "Choose one, two, or three columns from the dashboard.",
           },
         ];
+    const previewLayoutTemplate = getBuilderRowLayoutPreviewTemplate(
+      section.layout,
+    );
     return (
       <div className="shop-builder-section-content builder-preview-content-layout">
         {(section.eyebrow || section.title || section.body) && (
@@ -4434,6 +4943,7 @@ function PreviewSection({
             {
               "--builder-preview-layout-columns": section.layoutColumns ?? 2,
               "--builder-layout-columns": section.layoutColumns ?? 2,
+              gridTemplateColumns: previewLayoutTemplate ?? undefined,
             } as CSSProperties
           }
         >
@@ -4931,38 +5441,49 @@ function PreviewSection({
                               }),
                             )}
                             settings={block.carouselSettings}
+                            className="builder-preview-carousel"
                           />
                         </div>
                       ) : block.kind === "products" ? (
                         <div className="shop-builder-column-block shop-builder-column-block--products">
                           {block.title && <h3>{block.title}</h3>}
                           {previewProducts.length > 0 ? (
-                            <div
-                              className={`shop-builder-grid--margin-${
-                                block.gridMargin ?? "none"
-                              }`}
-                            >
-                              <CategoryWithFilters
+                            block.layoutVariant === "carousel" ? (
+                              <ProductCarousel
                                 products={previewProducts.slice(
                                   0,
-                                  block.gridLimit ?? 4,
+                                  block.gridLimit ?? 8,
                                 )}
-                                columns={block.columns}
-                                filterPosition={block.filterPosition}
-                                cardStyle={block.cardStyle}
-                                cardPreset={block.cardPreset}
-                                pageSize={block.gridLimit}
-                                gridGap={block.gridGap}
-                                cardPadding={block.cardPadding}
-                                imagePadding={block.imagePadding}
-                                imageFrame={block.gridImageFrame}
-                                addToCartStyle={block.addToCartStyle}
-                                addToCartSize={block.addToCartSize}
-                                addToCartPosition={block.addToCartPosition}
-                                addToCartVisibility={block.addToCartVisibility}
-                                addToCartDisplay={block.addToCartDisplay}
+                                preset={block.cardPreset ?? "standard"}
                               />
-                            </div>
+                            ) : (
+                              <div
+                                className={`shop-builder-grid--margin-${
+                                  block.gridMargin ?? "none"
+                                }`}
+                              >
+                                <CategoryWithFilters
+                                  products={previewProducts.slice(
+                                    0,
+                                    block.gridLimit ?? 4,
+                                  )}
+                                  columns={block.columns}
+                                  filterPosition={block.filterPosition}
+                                  cardStyle={block.cardStyle}
+                                  cardPreset={block.cardPreset}
+                                  pageSize={block.gridLimit}
+                                  gridGap={block.gridGap}
+                                  cardPadding={block.cardPadding}
+                                  imagePadding={block.imagePadding}
+                                  imageFrame={block.gridImageFrame}
+                                  addToCartStyle={block.addToCartStyle}
+                                  addToCartSize={block.addToCartSize}
+                                  addToCartPosition={block.addToCartPosition}
+                                  addToCartVisibility={block.addToCartVisibility}
+                                  addToCartDisplay={block.addToCartDisplay}
+                                />
+                              </div>
+                            )
                           ) : (
                             <div className="builder-preview-products">
                               {sampleProducts
@@ -5224,6 +5745,7 @@ function PreviewSection({
                           <FluentFormClient
                             formId={block.fluentFormId}
                             title={block.title}
+                            previewMode
                           />
                         </div>
                       ) : (

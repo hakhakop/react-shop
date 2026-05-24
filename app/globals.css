@@ -1226,9 +1226,9 @@ a {
   z-index: 1110;
   right: 22px;
   bottom: 148px;
-  width: min(calc(100vw - 24px), 224px);
-  max-width: 224px;
-  padding: 8px;
+  width: min(calc(100vw - 24px), 196px);
+  max-width: 196px;
+  padding: 6px;
   border-radius: 16px;
   display: flex;
   flex-direction: column;
@@ -1243,7 +1243,7 @@ a {
 .frontend-admin-bar div {
   min-width: 0;
   width: 100%;
-  padding: 2px 4px 4px;
+  padding: 2px 2px 4px;
   display: grid;
   gap: 1px;
 }
@@ -1270,7 +1270,7 @@ a {
   height: 34px;
   border: 0;
   border-radius: 10px;
-  padding: 0 12px;
+  padding: 0 10px;
   width: 100%;
   display: inline-flex;
   align-items: center;
@@ -1287,7 +1287,7 @@ a {
 
 .frontend-admin-bar-toggle {
   width: auto;
-  min-width: 94px;
+  min-width: 86px;
   justify-content: center;
 }
 
@@ -1311,7 +1311,7 @@ a {
   z-index: 1110;
   right: 22px;
   bottom: 148px;
-  padding: 0 14px;
+  padding: 0 12px;
   background: rgba(10, 10, 10, 0.9);
   box-shadow: 0 14px 34px rgba(0, 0, 0, 0.2);
 }
@@ -1432,4 +1432,37 @@ a {
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* Dashboard preview corrections live after Tailwind utilities and storefront CSS
+   so product/card preview typography cannot be inflated by later imports. */
+.builder-preview-live-products .shop-archive-card .product-main .product-title,
+.builder-preview-live-products .shop-archive-card .product-main .product-price,
+.builder-preview-live-products
+  .shop-card-preset--graph.shop-card-style--none
+  .product-title,
+.builder-preview-live-products
+  .shop-card-preset--graph.shop-card-style--none
+  .product-price,
+.builder-preview-live-products
+  .shop-card-preset--graph.shop-card-style--flat
+  .product-title,
+.builder-preview-live-products
+  .shop-card-preset--graph.shop-card-style--flat
+  .product-price,
+.builder-preview-live-products .builder-preview-product-card .product-title,
+.builder-preview-live-products .builder-preview-product-card .product-price,
+.builder-preview-recent-products .product-card .product-title,
+.builder-preview-recent-products .product-card .product-price {
+  font-size: clamp(15px, 1vw, 18px) !important;
+  line-height: 1.12 !important;
+  font-weight: 720 !important;
+  letter-spacing: 0 !important;
+}
+
+.builder-preview-carousel h2 {
+  font-size: clamp(20px, 1.8vw, 30px) !important;
+  line-height: 1.08 !important;
+  font-weight: 650 !important;
+  letter-spacing: 0 !important;
 }

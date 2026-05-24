@@ -153,7 +153,8 @@ function normalizeMenuPresentation(
   const rawColumns = Number(value?.submenuColumns);
 
   return {
-    showHeading: typeof value?.showHeading === "boolean" ? value.showHeading : true,
+    showHeading:
+      typeof value?.showHeading === "boolean" ? value.showHeading : false,
     icon:
       typeof value?.icon === "string" && value.icon.trim().length > 0
         ? value.icon.trim()
@@ -177,9 +178,11 @@ function itemHasActiveDescendant(
   currentPath: string
 ): boolean {
   const href = item.path || item.url || "#";
+  const isSectionLink = href.includes("#");
   const itemPath =
     href === "#" ? "#" : normalizePath(item.path || item.url || href);
   const isActive =
+    !isSectionLink &&
     itemPath !== "#" &&
     (currentPath === itemPath || currentPath.startsWith(itemPath + "/"));
 
@@ -198,10 +201,12 @@ function renderMenuItems(
 ): ReactNode {
   return items.map((item) => {
     const href = item.path || item.url || "#";
+    const isSectionLink = href.includes("#");
     const dashboardHref = getDashboardEditHref(href, currentPath);
     const itemPath =
       href === "#" ? "#" : normalizePath(item.path || item.url || href);
     const isActive =
+      !isSectionLink &&
       itemPath !== "#" &&
       (currentPath === itemPath || currentPath.startsWith(itemPath + "/"));
     const children = item.children ?? [];

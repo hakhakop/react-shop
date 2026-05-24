@@ -504,15 +504,15 @@
   flex-wrap: wrap;
   gap: 1.4rem;
   font-size: 1rem;
-  align-items: flex-start;
+  align-items: center;
 }
 
 .site-header-nav-item {
   position: relative;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  padding-bottom: 0.7rem;
+  align-items: center;
+  padding-bottom: 0;
 }
 
 .site-header-nav-link {
@@ -522,7 +522,7 @@
   position: relative;
   text-decoration: none;
   color: var(--text-muted, #4b5563);
-  padding-bottom: 6px; /* more space above underline */
+  padding: 8px 0;
 }
 
 .site-header-nav-icon {
@@ -562,15 +562,17 @@
   content: "";
   position: absolute;
   left: 0;
-  bottom: -3px; /* a bit further down from text */
+  bottom: 1px;
   height: 2px;
-  width: 0;
+  width: 100%;
   border-radius: 999px;
   background: linear-gradient(90deg, var(--accent, #ec4899), var(--accent-strong, #db2777));
   opacity: 0;
+  transform: scaleX(0);
+  transform-origin: left center;
   transition:
-    width 0.18s ease-out,
-    opacity 0.18s ease-out;
+    opacity 0.2s ease-out,
+    transform 0.24s ease-out;
 }
 
 .site-header-nav-link:hover {
@@ -578,8 +580,8 @@
 }
 
 .site-header-nav-link:hover::after {
-  width: 100%;
   opacity: 1;
+  transform: scaleX(1);
 }
 
 .site-header-nav-submenu {
@@ -666,8 +668,44 @@
 .site-header-nav-link.is-active::after,
 .site-header-nav-link[aria-current="page"]::after,
 .site-header-nav-link[data-active="true"]::after {
-  width: 100%;
   opacity: 1;
+  transform: scaleX(1);
+}
+
+.site-header--indicator-none .site-header-nav-link::after {
+  display: none;
+}
+
+.site-header--indicator-princity .site-header-nav-link {
+  transition:
+    color 0.22s ease,
+    transform 0.22s ease;
+}
+
+.site-header--indicator-princity .site-header-nav-link::after {
+  left: 50%;
+  bottom: 1px;
+  height: 1px;
+  width: calc(100% + 12px);
+  background: currentColor;
+  opacity: 0;
+  transform: translateX(-50%) scaleX(0.18);
+  transform-origin: center;
+  transition:
+    opacity 0.22s ease,
+    transform 0.34s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.site-header--indicator-princity .site-header-nav-link:hover {
+  transform: translateY(-1px);
+}
+
+.site-header--indicator-princity .site-header-nav-link:hover::after,
+.site-header--indicator-princity .site-header-nav-link.is-active::after,
+.site-header--indicator-princity .site-header-nav-link[aria-current="page"]::after,
+.site-header--indicator-princity .site-header-nav-link[data-active="true"]::after {
+  opacity: 0.55;
+  transform: translateX(-50%) scaleX(1);
 }
 
 /* Header action pills */
@@ -1191,6 +1229,11 @@
   font-size: 15px;
 }
 
+.site-header-princity .site-header-nav-item {
+  align-items: center;
+  padding-bottom: 0;
+}
+
 .site-header-princity .site-header-nav-link {
   padding: 8px 0;
   color: var(--text-main, #111111);
@@ -1202,6 +1245,19 @@
   bottom: 0;
   height: 1px;
   background: var(--accent, #111111);
+}
+
+.site-header-princity .site-header-nav-submenu {
+  top: calc(100% + 10px);
+}
+
+.site-header-princity .site-header-nav-item.has-children::before {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: -8px;
+  right: -8px;
+  height: 12px;
 }
 
 .site-header-princity .site-header-categories {
@@ -1246,6 +1302,46 @@
 
 .site-header-princity .header-account-pill {
   height: 38px;
+}
+
+.site-header--service .site-header-princity .site-header-brand {
+  display: inline-flex;
+  font-size: 20px;
+  font-weight: 850;
+  letter-spacing: -0.04em;
+}
+
+.site-header--service .site-header-princity .site-header-nav {
+  gap: 18px;
+}
+
+.site-header--service .site-header-princity .site-header-nav-link {
+  font-weight: 760;
+}
+
+.site-header--service .site-header-nav-link::after {
+  height: 1px;
+  bottom: 1px;
+  background: currentColor;
+  opacity: 0;
+}
+
+.site-header--service .site-header-nav-link:hover::after {
+  opacity: 0.42;
+}
+
+.site-header--service .site-header-nav-link.is-active::after,
+.site-header--service .site-header-nav-link[aria-current="page"]::after,
+.site-header--service .site-header-nav-link[data-active="true"]::after {
+  opacity: 0.5;
+}
+
+.site-header--service .site-header-princity .site-header-service-cta {
+  width: auto;
+  min-width: 0;
+  padding: 0 18px;
+  font-weight: 850;
+  text-decoration: none;
 }
 
 .site-header-princity .site-header-action-pill:hover,

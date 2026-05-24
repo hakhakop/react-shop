@@ -8,6 +8,15 @@ export type BuilderHeaderLayout =
   | "hero"
   | "pill"
   | "princity";
+export type BuilderHeaderBrandMode = "logo" | "brand" | "both";
+export type BuilderHeaderIconId =
+  | "wishlist"
+  | "cart"
+  | "account"
+  | "theme"
+  | "search";
+export type BuilderHeaderIconVariant = "muted" | "solid" | "ghost" | "icon";
+export type BuilderHeaderActiveIndicator = "underline" | "princity" | "none";
 
 export type BuilderMenuPresentation = {
   showHeading: boolean;
@@ -22,6 +31,14 @@ export type BuilderMenuPresentationMap = Record<string, BuilderMenuPresentation>
 export type BuilderShellSettings = {
   headerVisible: boolean;
   headerLayout: BuilderHeaderLayout;
+  headerBrandMode: BuilderHeaderBrandMode;
+  headerBrandText: string;
+  headerLogoUrl: string | null;
+  headerLogoAlt: string;
+  headerLogoMaxWidth: number;
+  headerIconVariant: BuilderHeaderIconVariant;
+  headerIconOrder: BuilderHeaderIconId[];
+  headerActiveIndicator: BuilderHeaderActiveIndicator;
   sectionPaddingTop: BuilderSectionSpacing;
   sectionPaddingBottom: BuilderSectionSpacing;
   sectionMarginTop: BuilderSectionSpacing;
@@ -38,6 +55,14 @@ const DATA_FILE = path.join(DATA_DIR, "builder-shell.json");
 export const defaultBuilderShellSettings: BuilderShellSettings = {
   headerVisible: true,
   headerLayout: "wordpress",
+  headerBrandMode: "logo",
+  headerBrandText: "WebPages",
+  headerLogoUrl: null,
+  headerLogoAlt: "Site logo",
+  headerLogoMaxWidth: 160,
+  headerIconVariant: "muted",
+  headerIconOrder: ["wishlist", "cart", "account", "theme", "search"],
+  headerActiveIndicator: "underline",
   sectionPaddingTop: "medium",
   sectionPaddingBottom: "medium",
   sectionMarginTop: "none",
@@ -53,6 +78,61 @@ function normalizeHeaderLayout(value: unknown): BuilderHeaderLayout {
     value === "princity"
     ? value
     : "wordpress";
+}
+
+function normalizeHeaderBrandMode(value: unknown): BuilderHeaderBrandMode {
+  return value === "brand" || value === "both" || value === "logo"
+    ? value
+    : "logo";
+}
+
+function normalizeHeaderIconVariant(value: unknown): BuilderHeaderIconVariant {
+  return value === "solid" || value === "ghost" || value === "icon"
+    ? value
+    : "muted";
+}
+
+function normalizeHeaderActiveIndicator(
+  value: unknown,
+): BuilderHeaderActiveIndicator {
+  return value === "princity" || value === "none" || value === "underline"
+    ? value
+    : "underline";
+}
+
+function normalizeHeaderIconOrder(value: unknown): BuilderHeaderIconId[] {
+  const allowed = new Set<BuilderHeaderIconId>([
+    "wishlist",
+    "cart",
+    "account",
+    "theme",
+    "search",
+  ]);
+  if (!Array.isArray(value)) {
+    return defaultBuilderShellSettings.headerIconOrder;
+  }
+
+  const normalized = value.filter(
+    (item): item is BuilderHeaderIconId =>
+      typeof item === "string" && allowed.has(item as BuilderHeaderIconId),
+  );
+
+  return normalized.length > 0
+    ? [...new Set(normalized)]
+    : defaultBuilderShellSettings.headerIconOrder;
+}
+
+function normalizeOptionalString(value: unknown) {
+  return typeof value === "string" && value.trim().length > 0
+    ? value.trim()
+    : null;
+}
+
+function normalizeHeaderLogoMaxWidth(value: unknown) {
+  const numberValue = Number(value);
+  return Number.isFinite(numberValue)
+    ? Math.min(Math.max(Math.round(numberValue), 40), 360)
+    : defaultBuilderShellSettings.headerLogoMaxWidth;
 }
 
 function normalizeSectionSpacing(value: unknown, fallback: BuilderSectionSpacing) {
@@ -71,7 +151,7 @@ function normalizeMenuPresentation(value: unknown): BuilderMenuPresentation {
   const submenuColumnsNumber = Number(raw.submenuColumns);
 
   return {
-    showHeading: typeof raw.showHeading === "boolean" ? raw.showHeading : true,
+    showHeading: typeof raw.showHeading === "boolean" ? raw.showHeading : false,
     icon:
       typeof raw.icon === "string" && raw.icon.trim().length > 0
         ? raw.icon.trim()
@@ -119,6 +199,20 @@ export function normalizeBuilderShellSettings(
         ? value.headerVisible
         : defaultBuilderShellSettings.headerVisible,
     headerLayout: normalizeHeaderLayout(value?.headerLayout),
+    headerBrandMode: normalizeHeaderBrandMode(value?.headerBrandMode),
+    headerBrandText:
+      normalizeOptionalString(value?.headerBrandText) ??
+      defaultBuilderShellSettings.headerBrandText,
+    headerLogoUrl: normalizeOptionalString(value?.headerLogoUrl),
+    headerLogoAlt:
+      normalizeOptionalString(value?.headerLogoAlt) ??
+      defaultBuilderShellSettings.headerLogoAlt,
+    headerLogoMaxWidth: normalizeHeaderLogoMaxWidth(value?.headerLogoMaxWidth),
+    headerIconVariant: normalizeHeaderIconVariant(value?.headerIconVariant),
+    headerIconOrder: normalizeHeaderIconOrder(value?.headerIconOrder),
+    headerActiveIndicator: normalizeHeaderActiveIndicator(
+      value?.headerActiveIndicator,
+    ),
     sectionPaddingTop: normalizeSectionSpacing(
       value?.sectionPaddingTop,
       defaultBuilderShellSettings.sectionPaddingTop

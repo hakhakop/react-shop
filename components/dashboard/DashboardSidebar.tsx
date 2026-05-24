@@ -1,10 +1,12 @@
 "use client";
 
 import {
+  LibraryBig,
   MonitorSmartphone,
   PanelRightClose,
   PanelRightOpen,
   Plus,
+  Save,
   Settings2,
   Sparkles,
   Trash2,
@@ -14,6 +16,7 @@ import type { MenuItem } from "@/lib/navigation";
 import type {
   BuilderCustomPage,
   BuilderLayoutKey,
+  BuilderSavedTemplate,
   BuilderState,
   BuilderTargetType,
   BuilderTemplate,
@@ -47,13 +50,17 @@ type DashboardSidebarProps = {
   shellSettings: { menuPresentation?: Record<string, MenuPresentationSettings> };
   sidebarCollapsed: boolean;
   sidebarTab: SidebarTab;
+  savedTemplates: BuilderSavedTemplate[];
   templateDescriptions: Record<BuilderTemplate, string>;
   templateLabels: Record<BuilderTemplate, string>;
+  templateStatus: string;
   updateMenuPresentation: (itemId: string, patch: Partial<MenuPresentationSettings>) => void;
   onAddElementFromLibrary: (kind: LayoutBlockKind) => void;
   onCreateBuilderPage: () => void;
   onDeleteBuilderPage: (key: BuilderCustomPage["key"]) => void;
+  onDeleteSavedTemplate: (id: string) => void;
   onRenderLayoutBlockIcon: (kind: LayoutBlockKind) => ReactNode;
+  onSaveCurrentPageAsTemplate: () => void;
   onSetDevice: Dispatch<SetStateAction<PreviewDevice>>;
   onSetGlobalStylesOpen: Dispatch<SetStateAction<boolean>>;
   onSetMenuIconPickerOpen: Dispatch<SetStateAction<boolean>>;
@@ -87,13 +94,17 @@ export default function DashboardSidebar({
   shellSettings,
   sidebarCollapsed,
   sidebarTab,
+  savedTemplates,
   templateDescriptions,
   templateLabels,
+  templateStatus,
   updateMenuPresentation,
   onAddElementFromLibrary,
   onCreateBuilderPage,
   onDeleteBuilderPage,
+  onDeleteSavedTemplate,
   onRenderLayoutBlockIcon,
+  onSaveCurrentPageAsTemplate,
   onSetDevice,
   onSetGlobalStylesOpen,
   onSetMenuIconPickerOpen,
@@ -144,6 +155,7 @@ export default function DashboardSidebar({
         {renderSidebarTabButton("elements", "Elements", availableLayoutBlockKinds.length)}
         {renderSidebarTabButton("menu", "Menu", menuTree.length)}
         {renderSidebarTabButton("pages", "Pages", customPages.length)}
+        {renderSidebarTabButton("templates", "Templates", savedTemplates.length)}
         {renderSidebarTabButton("settings", "Settings")}
       </div>
 
@@ -200,6 +212,41 @@ export default function DashboardSidebar({
               )}
               <small>{pageStatus}</small>
             </div>
+          </div>
+        )}
+
+        {sidebarTab === "templates" && (
+          <div className="builder-sidebar-panel">
+            <div className="builder-sidebar-panel-header">
+              <div><strong>Templates</strong><span>Save reusable page starting points</span></div>
+              <small>{savedTemplates.length}</small>
+            </div>
+            <div className="builder-card builder-pages-card">
+              <div className="builder-card-title"><strong>Open Page</strong><span>{builderState.page}</span></div>
+              <button type="button" className="builder-secondary-button builder-full-button" onClick={onSaveCurrentPageAsTemplate}>
+                <Save size={16} />
+                Save open page as template
+              </button>
+              <small>{templateStatus}</small>
+            </div>
+            {savedTemplates.length > 0 ? (
+              <div className="builder-pages-list">
+                {savedTemplates.map((template) => (
+                  <div key={template.id} className="builder-page-row">
+                    <button type="button" disabled>
+                      <strong>{template.title}</strong>
+                      <span>{template.sourcePage ?? "template"} · {new Date(template.updatedAt).toLocaleDateString()}</span>
+                    </button>
+                    <button type="button" className="builder-icon-button" onClick={() => onDeleteSavedTemplate(template.id)} aria-label={`Delete ${template.title}`}><Trash2 size={14} /></button>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="builder-template-note">
+                <LibraryBig size={16} />
+                <span>Saved templates will appear here after you save the current builder page.</span>
+              </div>
+            )}
           </div>
         )}
 

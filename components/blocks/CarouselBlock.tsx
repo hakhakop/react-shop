@@ -34,11 +34,13 @@ type CarouselBlockProps = {
   block?: CarouselLayoutBlock;
   slides: CarouselSlide[];
   settings?: CarouselSettings;
+  className?: string;
 };
 
 export default function CarouselBlock({
   slides,
   settings,
+  className,
 }: CarouselBlockProps) {
   if (!slides || slides.length === 0) {
     return (
@@ -96,7 +98,7 @@ export default function CarouselBlock({
   const autoplayDelayMs = Math.min(Math.max(rawDelay || 5000, 2000), 30000);
 
   return (
-    <div className="relative w-full">
+    <div className={`relative w-full ${className ?? ""}`.trim()}>
       <EmblaCarousel
         options={options}
         autoplay={autoplay}

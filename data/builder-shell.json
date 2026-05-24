@@ -1,6 +1,20 @@
 {
   "headerVisible": true,
   "headerLayout": "princity",
+  "headerBrandMode": "logo",
+  "headerBrandText": "WebPages",
+  "headerLogoUrl": "https://cms.webpages.am/wp-content/uploads/2025/11/logo-2-small.png",
+  "headerLogoAlt": "WebPages logo",
+  "headerLogoMaxWidth": 160,
+  "headerIconVariant": "muted",
+  "headerIconOrder": [
+    "wishlist",
+    "cart",
+    "account",
+    "theme",
+    "search"
+  ],
+  "headerActiveIndicator": "underline",
   "sectionPaddingTop": "medium",
   "sectionPaddingBottom": "medium",
   "sectionMarginTop": "medium",
@@ -14,7 +28,7 @@
       "badgeText": null
     },
     "cG9zdDo4MQ==": {
-      "showHeading": true,
+      "showHeading": false,
       "icon": "bag",
       "submenuLayout": "list",
       "submenuColumns": 3,
@@ -28,12 +42,12 @@
       "badgeText": null
     },
     "cG9zdDo3Nw==": {
-      "showHeading": true,
+      "showHeading": false,
       "icon": null,
       "submenuLayout": "grid",
       "submenuColumns": 3,
       "badgeText": null
     }
   },
-  "updatedAt": "2026-05-23T06:01:48.988Z"
+  "updatedAt": "2026-05-24T05:39:06.088Z"
 }

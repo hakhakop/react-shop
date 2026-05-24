@@ -230,9 +230,20 @@ export type BuilderCustomPage = {
   updatedAt: string;
 };
 
+export type BuilderSavedTemplate = {
+  id: string;
+  title: string;
+  description?: string;
+  sourcePage?: BuilderLayoutKey;
+  design?: BuilderDesign;
+  sections: BuilderSection[];
+  updatedAt: string;
+};
+
 const DATA_DIR = path.join(process.cwd(), "data");
 const DATA_FILE = path.join(DATA_DIR, "builder-layouts.json");
 const PAGES_FILE = path.join(DATA_DIR, "builder-pages.json");
+const TEMPLATES_FILE = path.join(DATA_DIR, "builder-templates.json");
 const pages = new Set(["home", "shop", "client"]);
 const templates = new Set([
   "product-single",
@@ -323,6 +334,30 @@ export async function writeBuilderCustomPages(
   );
 }
 
+export async function readBuilderSavedTemplates(): Promise<
+  BuilderSavedTemplate[]
+> {
+  try {
+    const raw = await readFile(TEMPLATES_FILE, "utf8");
+    const parsed = JSON.parse(raw) as BuilderSavedTemplate[];
+    if (!Array.isArray(parsed)) return [];
+    return parsed.filter(isValidBuilderSavedTemplate);
+  } catch {
+    return [];
+  }
+}
+
+export async function writeBuilderSavedTemplates(
+  templatesToWrite: BuilderSavedTemplate[],
+) {
+  await mkdir(DATA_DIR, { recursive: true });
+  await writeFile(
+    TEMPLATES_FILE,
+    `${JSON.stringify(templatesToWrite, null, 2)}\n`,
+    "utf8",
+  );
+}
+
 export function isValidBuilderSection(value: unknown): value is BuilderSection {
   if (!value || typeof value !== "object") return false;
   const section = value as Partial<BuilderSection>;
@@ -332,5 +367,19 @@ export function isValidBuilderSection(value: unknown): value is BuilderSection {
     typeof section.title === "string" &&
     typeof section.background === "string" &&
     typeof section.visible === "boolean"
+  );
+}
+
+export function isValidBuilderSavedTemplate(
+  value: unknown,
+): value is BuilderSavedTemplate {
+  if (!value || typeof value !== "object") return false;
+  const template = value as Partial<BuilderSavedTemplate>;
+  return (
+    typeof template.id === "string" &&
+    typeof template.title === "string" &&
+    Array.isArray(template.sections) &&
+    template.sections.every(isValidBuilderSection) &&
+    typeof template.updatedAt === "string"
   );
 }
