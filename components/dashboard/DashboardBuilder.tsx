@@ -836,7 +836,9 @@ export default function DashboardBuilder({
   const [inspectorOpen, setInspectorOpen] = useState(false);
   const [sectionSettingsOpen, setSectionSettingsOpen] = useState(false);
   const [sectionStructureOpen, setSectionStructureOpen] = useState(false);
-  const [globalStylesOpen, setGlobalStylesOpen] = useState(false);
+  const [globalStylesTab, setGlobalStylesTab] = useState<
+    "siteDesign" | "typography" | "header"
+  >("siteDesign");
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [sidebarWidth, setSidebarWidth] = useState(390);
   const [sidebarResizing, setSidebarResizing] = useState(false);
@@ -3033,6 +3035,588 @@ export default function DashboardBuilder({
     />
   );
 
+  const globalStylesPanel = (
+    <div className="builder-sidebar-panel builder-sidebar-global-styles">
+      <div className="builder-sidebar-panel-header">
+        <div>
+          <strong>Global Styles</strong>
+          <span>Site design, typography, header, and spacing</span>
+        </div>
+        <small>{shellStatus}</small>
+      </div>
+
+      <div className="builder-global-style-tabs" aria-label="Global style sections">
+        {(
+          [
+            ["siteDesign", "Site Design"],
+            ["typography", "Typography"],
+            ["header", "Header"],
+          ] as const
+        ).map(([tab, label]) => (
+          <button
+            key={tab}
+            type="button"
+            className={globalStylesTab === tab ? "is-active" : ""}
+            onClick={() => setGlobalStylesTab(tab)}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
+      {globalStylesTab === "siteDesign" && (
+        <div className="builder-global-styles-group">
+          <div className="builder-card-title">
+            <strong>Site Design</strong>
+            <span>{builderState.design.preset ?? "custom"}</span>
+          </div>
+
+          <label className="builder-field">
+            <span>Design Preset</span>
+            <select
+              value={builderState.design.preset ?? "princity"}
+              onChange={(event) =>
+                applyDesignPreset(
+                  event.target.value as NonNullable<BuilderDesign["preset"]>,
+                )
+              }
+            >
+              <option value="princity">Princity clean</option>
+              <option value="editorial">Editorial warm</option>
+              <option value="contrast">Dark contrast</option>
+            </select>
+          </label>
+
+          <label className="builder-field">
+            <span>Website Color Mode</span>
+            <select
+              value={builderState.design.colorScheme ?? "auto"}
+              onChange={(event) =>
+                updateDesign({
+                  colorScheme: event.target.value as BuilderColorScheme,
+                  preset: undefined,
+                })
+              }
+            >
+              <option value="auto">Follow visitor switch</option>
+              <option value="light">Force light</option>
+              <option value="dark">Force dark</option>
+            </select>
+          </label>
+
+          <div className="builder-design-grid">
+            {[
+              ["pageBackground", "Page"],
+              ["textColor", "Text"],
+              ["mutedTextColor", "Muted"],
+              ["accentColor", "Accent"],
+              ["surfaceColor", "Surface"],
+              ["buttonBackground", "Button"],
+            ].map(([key, label]) => (
+              <label key={key} className="builder-swatch-field">
+                <span>{label}</span>
+                <input
+                  type="color"
+                  value={
+                    (builderState.design[key as keyof BuilderDesign] as string) ??
+                    "#ffffff"
+                  }
+                  onChange={(event) =>
+                    updateDesign({
+                      [key]: event.target.value,
+                      preset: undefined,
+                    } as Partial<BuilderDesign>)
+                  }
+                />
+              </label>
+            ))}
+          </div>
+
+          <div className="builder-two-column">
+            <label className="builder-field">
+              <span>Radius</span>
+              <select
+                value={builderState.design.radius ?? "8px"}
+                onChange={(event) =>
+                  updateDesign({
+                    radius: event.target.value,
+                    preset: undefined,
+                  })
+                }
+              >
+                <option value="0px">Flat</option>
+                <option value="4px">Small</option>
+                <option value="8px">Medium</option>
+                <option value="16px">Large</option>
+                <option value="999px">Pill</option>
+              </select>
+            </label>
+
+            <label className="builder-field">
+              <span>Gutter</span>
+              <select
+                value={builderState.design.sectionGutter ?? "48px"}
+                onChange={(event) =>
+                  updateDesign({
+                    sectionGutter: event.target.value,
+                    preset: undefined,
+                  })
+                }
+              >
+                <option value="28px">Tight</option>
+                <option value="48px">Medium</option>
+                <option value="72px">Wide</option>
+              </select>
+            </label>
+          </div>
+        </div>
+      )}
+
+      {globalStylesTab === "typography" && (
+        <div className="builder-global-styles-group">
+          <div className="builder-card-title">
+            <strong>Typography</strong>
+            <span>headings</span>
+          </div>
+
+          <label className="builder-field">
+            <span>Heading Font</span>
+            <select
+              value={builderState.design.headingFontFamily ?? "inherit"}
+              onChange={(event) =>
+                updateDesign({
+                  headingFontFamily: event.target.value,
+                  preset: undefined,
+                })
+              }
+            >
+              <option value="inherit">Website font</option>
+              <option value='system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'>
+                System sans
+              </option>
+              <option value="Georgia, serif">Classic serif</option>
+              <option value='"Times New Roman", serif'>Times serif</option>
+              <option value='"Courier New", monospace'>Monospace</option>
+            </select>
+          </label>
+
+          <label className="builder-field">
+            <span>Heading Size</span>
+            <select
+              value={
+                builderState.design.headingSize ?? "clamp(42px, 8vw, 126px)"
+              }
+              onChange={(event) =>
+                updateDesign({
+                  headingSize: event.target.value,
+                  preset: undefined,
+                })
+              }
+            >
+              <option value="clamp(32px, 5vw, 76px)">Compact</option>
+              <option value="clamp(42px, 8vw, 126px)">Display</option>
+              <option value="clamp(52px, 9vw, 144px)">Large</option>
+            </select>
+          </label>
+
+          <div className="builder-two-column">
+            <label className="builder-field">
+              <span>Weight</span>
+              <select
+                value={builderState.design.headingWeight ?? "760"}
+                onChange={(event) =>
+                  updateDesign({
+                    headingWeight: event.target.value,
+                    preset: undefined,
+                  })
+                }
+              >
+                <option value="500">Medium</option>
+                <option value="600">Semibold</option>
+                <option value="700">Bold</option>
+                <option value="760">Heavy</option>
+              </select>
+            </label>
+
+            <label className="builder-field">
+              <span>Line Height</span>
+              <select
+                value={builderState.design.headingLineHeight ?? "0.92"}
+                onChange={(event) =>
+                  updateDesign({
+                    headingLineHeight: event.target.value,
+                    preset: undefined,
+                  })
+                }
+              >
+                <option value="0.88">Tight</option>
+                <option value="0.92">Display</option>
+                <option value="1">Balanced</option>
+                <option value="1.1">Relaxed</option>
+              </select>
+            </label>
+          </div>
+
+          <div className="builder-two-column">
+            <label className="builder-swatch-field">
+              <span>Heading Color</span>
+              <input
+                type="color"
+                value={
+                  builderState.design.headingColor ??
+                  builderState.design.textColor ??
+                  "#111111"
+                }
+                onChange={(event) =>
+                  updateDesign({
+                    headingColor: event.target.value,
+                    preset: undefined,
+                  })
+                }
+              />
+            </label>
+
+            <button
+              type="button"
+              className="builder-secondary-button builder-typography-reset"
+              onClick={() =>
+                updateDesign({
+                  headingColor: undefined,
+                  preset: undefined,
+                })
+              }
+            >
+              Use section color
+            </button>
+          </div>
+        </div>
+      )}
+
+      {globalStylesTab === "header" && (
+        <div className="builder-global-styles-group">
+          <div className="builder-card-title">
+            <strong>Header</strong>
+            <span>layout + spacing</span>
+          </div>
+
+          <label className="builder-check">
+            <input
+              type="checkbox"
+              checked={shellSettings.headerVisible}
+              onChange={(event) =>
+                updateShellSettings({
+                  headerVisible: event.target.checked,
+                })
+              }
+            />
+            <span>Show website header</span>
+          </label>
+
+          <label className="builder-field">
+            <span>Header Layout</span>
+            <select
+              value={shellSettings.headerLayout}
+              onChange={(event) =>
+                updateShellSettings({
+                  headerLayout: event.target.value as BuilderHeaderLayout,
+                })
+              }
+            >
+              <option value="wordpress">Use WordPress setting</option>
+              <option value="princity">Princity flat</option>
+              <option value="pill">Pill on scroll</option>
+              <option value="two-row">Two row</option>
+              <option value="simple">Simple</option>
+              <option value="hero">Hero</option>
+            </select>
+          </label>
+
+          <div className="builder-header-presets">
+            <button type="button" onClick={() => applyHeaderPreset("service")}>
+              Princity service
+            </button>
+            <button type="button" onClick={() => applyHeaderPreset("commerce")}>
+              Commerce pill
+            </button>
+            <button type="button" onClick={() => applyHeaderPreset("classic")}>
+              Classic store
+            </button>
+          </div>
+
+          <div className="builder-two-column">
+            <label className="builder-field">
+              <span>Brand Display</span>
+              <select
+                value={shellSettings.headerBrandMode}
+                onChange={(event) =>
+                  updateShellSettings({
+                    headerBrandMode: event.target
+                      .value as BuilderHeaderBrandMode,
+                  })
+                }
+              >
+                <option value="logo">Logo only</option>
+                <option value="brand">Text brand</option>
+                <option value="both">Logo + text</option>
+              </select>
+            </label>
+
+            <label className="builder-field">
+              <span>Logo Width</span>
+              <input
+                type="number"
+                min="40"
+                max="360"
+                value={shellSettings.headerLogoMaxWidth}
+                onChange={(event) =>
+                  updateShellSettings({
+                    headerLogoMaxWidth: Number(event.target.value),
+                  })
+                }
+              />
+            </label>
+          </div>
+
+          <label className="builder-field">
+            <span>Brand Text</span>
+            <input
+              type="text"
+              value={shellSettings.headerBrandText}
+              onChange={(event) =>
+                updateShellSettings({
+                  headerBrandText: event.target.value,
+                })
+              }
+              placeholder="WebPages"
+            />
+          </label>
+
+          <div className="builder-field">
+            <span>Logo Image</span>
+            <div className="builder-header-logo-picker">
+              <div className="builder-header-logo-preview">
+                {shellSettings.headerLogoUrl ? (
+                  <Image
+                    src={shellSettings.headerLogoUrl ?? ""}
+                    alt={
+                      shellSettings.headerLogoAlt ||
+                      shellSettings.headerBrandText ||
+                      "Site logo"
+                    }
+                    width={120}
+                    height={72}
+                    unoptimized
+                  />
+                ) : (
+                  <ImageIcon size={20} />
+                )}
+              </div>
+              <div className="builder-header-logo-actions">
+                <button
+                  type="button"
+                  onClick={() =>
+                    openWordPressMediaPicker({
+                      title: "Header Logo",
+                      currentUrl: shellSettings.headerLogoUrl ?? "",
+                      onSelect: (media) =>
+                        updateShellSettings({
+                          headerLogoUrl: media.sourceUrl,
+                          headerLogoAlt:
+                            shellSettings.headerLogoAlt ||
+                            media.altText ||
+                            media.title ||
+                            "Site logo",
+                        }),
+                    })
+                  }
+                >
+                  <GalleryHorizontal size={14} />
+                  Choose from library
+                </button>
+                {shellSettings.headerLogoUrl ? (
+                  <button
+                    type="button"
+                    className="is-muted"
+                    onClick={() => updateShellSettings({ headerLogoUrl: null })}
+                  >
+                    Clear
+                  </button>
+                ) : null}
+                <small>
+                  {shellSettings.headerLogoUrl
+                    ? "Logo selected from WordPress media."
+                    : "Select an image from WordPress media."}
+                </small>
+              </div>
+            </div>
+          </div>
+
+          <label className="builder-field">
+            <span>Logo Alt Text</span>
+            <input
+              type="text"
+              value={shellSettings.headerLogoAlt}
+              onChange={(event) =>
+                updateShellSettings({
+                  headerLogoAlt: event.target.value,
+                })
+              }
+              placeholder="Site logo"
+            />
+          </label>
+
+          <div className="builder-two-column">
+            <label className="builder-field">
+              <span>Icon Style</span>
+              <select
+                value={shellSettings.headerIconVariant}
+                onChange={(event) =>
+                  updateShellSettings({
+                    headerIconVariant: event.target
+                      .value as BuilderHeaderIconVariant,
+                  })
+                }
+              >
+                <option value="muted">Muted</option>
+                <option value="ghost">Ghost</option>
+                <option value="solid">Solid</option>
+                <option value="icon">Icon only</option>
+              </select>
+            </label>
+
+            <label className="builder-field">
+              <span>Active Indicator</span>
+              <select
+                value={shellSettings.headerActiveIndicator}
+                onChange={(event) =>
+                  updateShellSettings({
+                    headerActiveIndicator: event.target
+                      .value as BuilderHeaderActiveIndicator,
+                  })
+                }
+              >
+                <option value="princity">Princity motion</option>
+                <option value="underline">Underline</option>
+                <option value="none">None</option>
+              </select>
+            </label>
+          </div>
+
+          <div className="builder-field">
+            <span>Header Icons</span>
+            <div className="builder-header-icon-grid">
+              {headerIconOptions.map((option) => (
+                <label key={option.id}>
+                  <input
+                    type="checkbox"
+                    checked={shellSettings.headerIconOrder.includes(option.id)}
+                    onChange={(event) =>
+                      updateHeaderIcon(option.id, event.target.checked)
+                    }
+                  />
+                  <span>{option.label}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+
+          <div className="builder-shell-note">
+            <strong>{shellStatus}</strong>
+            <span>
+              New sections inherit these spacing defaults until you override
+              them inside a section.
+            </span>
+          </div>
+
+          <div className="builder-two-column">
+            <label className="builder-field">
+              <span>Default Top Padding</span>
+              <select
+                value={shellSettings.sectionPaddingTop}
+                onChange={(event) =>
+                  updateShellSettings({
+                    sectionPaddingTop: event.target
+                      .value as GlobalSectionSpacing,
+                  })
+                }
+              >
+                <option value="none">None</option>
+                <option value="small">Small</option>
+                <option value="medium">Medium</option>
+                <option value="large">Large</option>
+              </select>
+            </label>
+
+            <label className="builder-field">
+              <span>Default Bottom Padding</span>
+              <select
+                value={shellSettings.sectionPaddingBottom}
+                onChange={(event) =>
+                  updateShellSettings({
+                    sectionPaddingBottom: event.target
+                      .value as GlobalSectionSpacing,
+                  })
+                }
+              >
+                <option value="none">None</option>
+                <option value="small">Small</option>
+                <option value="medium">Medium</option>
+                <option value="large">Large</option>
+              </select>
+            </label>
+          </div>
+
+          <div className="builder-two-column">
+            <label className="builder-field">
+              <span>Default Top Margin</span>
+              <select
+                value={shellSettings.sectionMarginTop}
+                onChange={(event) =>
+                  updateShellSettings({
+                    sectionMarginTop: event.target
+                      .value as GlobalSectionSpacing,
+                  })
+                }
+              >
+                <option value="none">None</option>
+                <option value="small">Small</option>
+                <option value="medium">Medium</option>
+                <option value="large">Large</option>
+              </select>
+            </label>
+
+            <label className="builder-field">
+              <span>Default Bottom Margin</span>
+              <select
+                value={shellSettings.sectionMarginBottom}
+                onChange={(event) =>
+                  updateShellSettings({
+                    sectionMarginBottom: event.target
+                      .value as GlobalSectionSpacing,
+                  })
+                }
+              >
+                <option value="none">None</option>
+                <option value="small">Small</option>
+                <option value="medium">Medium</option>
+                <option value="large">Large</option>
+              </select>
+            </label>
+          </div>
+
+          <button
+            type="button"
+            className="builder-secondary-button builder-full-button"
+            onClick={publishShellSettings}
+          >
+            <CloudUpload size={16} />
+            Publish Global Settings
+          </button>
+        </div>
+      )}
+    </div>
+  );
+
   const sidebarTopActions = (
     <div className="builder-sidebar-top-action-bar" aria-label="Builder page actions">
       <div className="builder-sidebar-top-action-copy">
@@ -3104,7 +3688,7 @@ export default function DashboardBuilder({
         builderState={builderState}
         customPages={customPages}
         device={device}
-        globalStylesOpen={globalStylesOpen}
+        globalStylesSlot={globalStylesPanel}
         menuTree={menuTree}
         newPageTitle={newPageTitle}
         inspectorSlot={inspectorPanel}
@@ -3129,7 +3713,6 @@ export default function DashboardBuilder({
         onRenderLayoutBlockIcon={getLayoutBlockLibraryIcon}
         onSaveCurrentPageAsTemplate={saveCurrentPageAsTemplate}
         onSetDevice={setDevice}
-        onSetGlobalStylesOpen={setGlobalStylesOpen}
         onSetMenuIconPickerOpen={setMenuIconPickerOpen}
         onSetMenuIconSearch={setMenuIconSearch}
         onSetNewPageTitle={setNewPageTitle}
@@ -3161,7 +3744,7 @@ export default function DashboardBuilder({
       )}
 
       <main className="builder-workspace">
-        {globalStylesOpen && (
+        {false && (
           <section className="builder-global-styles builder-panel">
             <div className="builder-global-styles-grid">
               <div className="builder-global-styles-group">
@@ -3507,7 +4090,7 @@ export default function DashboardBuilder({
                     <div className="builder-header-logo-preview">
                       {shellSettings.headerLogoUrl ? (
                         <Image
-                          src={shellSettings.headerLogoUrl}
+                          src={shellSettings.headerLogoUrl ?? ""}
                           alt={
                             shellSettings.headerLogoAlt ||
                             shellSettings.headerBrandText ||

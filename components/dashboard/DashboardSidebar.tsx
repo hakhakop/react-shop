@@ -7,7 +7,6 @@ import {
   MonitorSmartphone,
   Plus,
   Save,
-  Settings2,
   Trash2,
 } from "lucide-react";
 import {
@@ -40,11 +39,11 @@ type DashboardSidebarProps = {
   device: PreviewDevice;
   filteredMenuIcons: readonly { name: string; label: string; keywords: string }[];
   getMenuIconLabel: (icon: string | null) => string;
-  globalStylesOpen: boolean;
   menuIconPickerOpen: boolean;
   menuIconSearch: string;
   menuTree: MenuItem[];
   newPageTitle: string;
+  globalStylesSlot: ReactNode;
   inspectorSlot: ReactNode;
   normalizeMenuPresentation: (value?: Partial<MenuPresentationSettings> | null) => MenuPresentationSettings;
   pageStatus: string;
@@ -70,7 +69,6 @@ type DashboardSidebarProps = {
   onRenderLayoutBlockIcon: (kind: LayoutBlockKind) => ReactNode;
   onSaveCurrentPageAsTemplate: () => void;
   onSetDevice: Dispatch<SetStateAction<PreviewDevice>>;
-  onSetGlobalStylesOpen: Dispatch<SetStateAction<boolean>>;
   onSetMenuIconPickerOpen: Dispatch<SetStateAction<boolean>>;
   onSetMenuIconSearch: Dispatch<SetStateAction<string>>;
   onSetNewPageTitle: Dispatch<SetStateAction<string>>;
@@ -87,11 +85,11 @@ export default function DashboardSidebar({
   device,
   filteredMenuIcons,
   getMenuIconLabel,
-  globalStylesOpen,
   menuIconPickerOpen,
   menuIconSearch,
   menuTree,
   newPageTitle,
+  globalStylesSlot,
   inspectorSlot,
   normalizeMenuPresentation,
   pageStatus,
@@ -117,7 +115,6 @@ export default function DashboardSidebar({
   onRenderLayoutBlockIcon,
   onSaveCurrentPageAsTemplate,
   onSetDevice,
-  onSetGlobalStylesOpen,
   onSetMenuIconPickerOpen,
   onSetMenuIconSearch,
   onSetNewPageTitle,
@@ -150,6 +147,11 @@ export default function DashboardSidebar({
       tab: "inspector",
       label: "Inspector",
       description: "Edit the selected section, column, or element.",
+    },
+    {
+      tab: "globalStyles",
+      label: "Global Styles",
+      description: "Site design, typography, header, and spacing.",
     },
     {
       tab: "menu",
@@ -266,6 +268,8 @@ export default function DashboardSidebar({
 
         {nestedOpen && sidebarTab === "inspector" && inspectorSlot}
 
+        {nestedOpen && sidebarTab === "globalStyles" && globalStylesSlot}
+
         {nestedOpen && sidebarTab === "pages" && (
           <div className="builder-sidebar-panel">
             <div className="builder-sidebar-panel-header">
@@ -335,10 +339,6 @@ export default function DashboardSidebar({
               <small>{publishStatus}</small>
             </div>
             <div className="builder-sidebar-controls">
-              <button type="button" className={`builder-secondary-button builder-full-button builder-global-styles-button ${globalStylesOpen ? "is-active" : ""}`} onClick={() => onSetGlobalStylesOpen((value) => !value)}>
-                <Settings2 size={16} />
-                Global Styles
-              </button>
               <button
                 type="button"
                 className="builder-secondary-button builder-full-button"

@@ -1720,6 +1720,46 @@
   gap: var(--builder-ui-gap);
 }
 
+.builder-sidebar-global-styles .builder-global-styles-group {
+  padding: 12px;
+}
+
+.builder-global-style-tabs {
+  padding: 4px;
+  border-radius: var(--builder-ui-radius);
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 4px;
+  background: var(--builder-ui-surface-strong);
+}
+
+.builder-global-style-tabs button {
+  min-width: 0;
+  min-height: 36px;
+  border: 0;
+  border-radius: var(--builder-ui-radius-sm);
+  padding: 7px 8px;
+  background: transparent;
+  color: var(--builder-ui-muted);
+  font: inherit;
+  font-size: 11px;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.builder-global-style-tabs button.is-active {
+  background: var(--builder-ui-accent);
+  color: #ffffff;
+}
+
+.builder-sidebar-global-styles .builder-header-presets {
+  grid-template-columns: 1fr;
+}
+
+.builder-sidebar-global-styles .builder-header-logo-picker {
+  grid-template-columns: 88px minmax(0, 1fr);
+}
+
 .builder-sidebar-panel-header {
   display: flex;
   align-items: flex-start;

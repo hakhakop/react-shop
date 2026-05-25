@@ -82,6 +82,7 @@ export type InspectorTab = SectionInspectorTab | ElementInspectorTab;
 export type SidebarTab =
   | "elements"
   | "inspector"
+  | "globalStyles"
   | "menu"
   | "pages"
   | "templates"
