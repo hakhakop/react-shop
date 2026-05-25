@@ -1,17 +1,22 @@
 "use client";
 
 import {
+  ChevronLeft,
+  ExternalLink,
   LibraryBig,
   MonitorSmartphone,
-  PanelRightClose,
-  PanelRightOpen,
   Plus,
   Save,
   Settings2,
-  Sparkles,
   Trash2,
 } from "lucide-react";
-import type { Dispatch, ReactNode, SetStateAction } from "react";
+import {
+  useEffect,
+  useState,
+  type Dispatch,
+  type ReactNode,
+  type SetStateAction,
+} from "react";
 import type { MenuItem } from "@/lib/navigation";
 import type {
   BuilderCustomPage,
@@ -29,7 +34,6 @@ import ElementLibrary from "@/components/dashboard/ElementLibrary";
 import MenuPresentationPanel from "@/components/dashboard/MenuPresentationPanel";
 
 type DashboardSidebarProps = {
-  actionsSlot: ReactNode;
   availableLayoutBlockKinds: LayoutBlockKind[];
   builderState: BuilderState;
   customPages: BuilderCustomPage[];
@@ -49,18 +53,20 @@ type DashboardSidebarProps = {
   resolveUIKitIconName: (icon: string | null) => string | null;
   selectedMenuItem: MenuItem | null;
   selectedMenuItemId: string | null;
+  selectedLayoutBlockKey: string | null;
   shellSettings: { menuPresentation?: Record<string, MenuPresentationSettings> };
-  sidebarCollapsed: boolean;
   sidebarTab: SidebarTab;
   savedTemplates: BuilderSavedTemplate[];
   templateDescriptions: Record<BuilderTemplate, string>;
   templateLabels: Record<BuilderTemplate, string>;
   templateStatus: string;
   updateMenuPresentation: (itemId: string, patch: Partial<MenuPresentationSettings>) => void;
+  topActionsSlot?: ReactNode;
   onAddElementFromLibrary: (kind: LayoutBlockKind) => void;
   onCreateBuilderPage: () => void;
   onDeleteBuilderPage: (key: BuilderCustomPage["key"]) => void;
   onDeleteSavedTemplate: (id: string) => void;
+  onOpenCurrentPage: () => void;
   onRenderLayoutBlockIcon: (kind: LayoutBlockKind) => ReactNode;
   onSaveCurrentPageAsTemplate: () => void;
   onSetDevice: Dispatch<SetStateAction<PreviewDevice>>;
@@ -69,14 +75,12 @@ type DashboardSidebarProps = {
   onSetMenuIconSearch: Dispatch<SetStateAction<string>>;
   onSetNewPageTitle: Dispatch<SetStateAction<string>>;
   onSetSelectedMenuItemId: Dispatch<SetStateAction<string | null>>;
-  onSetSidebarCollapsed: Dispatch<SetStateAction<boolean>>;
   onSetSidebarTab: Dispatch<SetStateAction<SidebarTab>>;
   onStartSidebarResize: (clientX: number) => void;
   onSwitchBuilderTarget: (nextKey: BuilderLayoutKey) => void;
 };
 
 export default function DashboardSidebar({
-  actionsSlot,
   availableLayoutBlockKinds,
   builderState,
   customPages,
@@ -96,18 +100,20 @@ export default function DashboardSidebar({
   resolveUIKitIconName,
   selectedMenuItem,
   selectedMenuItemId,
+  selectedLayoutBlockKey,
   shellSettings,
-  sidebarCollapsed,
   sidebarTab,
   savedTemplates,
   templateDescriptions,
   templateLabels,
   templateStatus,
+  topActionsSlot,
   updateMenuPresentation,
   onAddElementFromLibrary,
   onCreateBuilderPage,
   onDeleteBuilderPage,
   onDeleteSavedTemplate,
+  onOpenCurrentPage,
   onRenderLayoutBlockIcon,
   onSaveCurrentPageAsTemplate,
   onSetDevice,
@@ -116,58 +122,121 @@ export default function DashboardSidebar({
   onSetMenuIconSearch,
   onSetNewPageTitle,
   onSetSelectedMenuItemId,
-  onSetSidebarCollapsed,
   onSetSidebarTab,
   onStartSidebarResize,
   onSwitchBuilderTarget,
 }: DashboardSidebarProps) {
-  const renderSidebarTabButton = (
-    tab: SidebarTab,
-    label: string,
-    count?: number,
-  ) => (
-    <button
-      type="button"
-      className={sidebarTab === tab ? "is-active" : ""}
-      onClick={() => onSetSidebarTab(tab)}
-    >
-      {label}
-      {typeof count === "number" ? <small>{count}</small> : null}
-    </button>
-  );
+  const [nestedOpen, setNestedOpen] = useState(false);
+
+  useEffect(() => {
+    if (sidebarTab !== "inspector") return;
+    const frame = window.requestAnimationFrame(() => setNestedOpen(true));
+    return () => window.cancelAnimationFrame(frame);
+  }, [selectedLayoutBlockKey, sidebarTab]);
+
+  const sidebarPanels: {
+    tab: SidebarTab;
+    label: string;
+    description: string;
+    count?: number;
+  }[] = [
+    {
+      tab: "elements",
+      label: "Elements",
+      description: "Add blocks to the selected layout column.",
+      count: availableLayoutBlockKinds.length,
+    },
+    {
+      tab: "inspector",
+      label: "Inspector",
+      description: "Edit the selected section, column, or element.",
+    },
+    {
+      tab: "menu",
+      label: "Menu",
+      description: "Tune WordPress menu presentation.",
+      count: menuTree.length,
+    },
+    {
+      tab: "pages",
+      label: "Pages",
+      description: "Create and switch editable builder pages.",
+      count: customPages.length,
+    },
+    {
+      tab: "templates",
+      label: "Templates",
+      description: "Save reusable page starting points.",
+      count: savedTemplates.length,
+    },
+    {
+      tab: "settings",
+      label: "Settings",
+      description: "Preview, target, and global layout controls.",
+    },
+  ];
+
+  const activePanel =
+    sidebarPanels.find((panel) => panel.tab === sidebarTab) ?? sidebarPanels[0];
+
+  const openPanel = (tab: SidebarTab) => {
+    onSetSidebarTab(tab);
+    setNestedOpen(true);
+  };
 
   return (
     <aside className="builder-sidebar builder-panel">
-      <div className="builder-sidebar-top">
-        <div className="builder-brand">
-          <span className="builder-brand-icon"><Sparkles size={18} /></span>
-          <span className="builder-brand-copy">
-            <strong>Visual Builder</strong>
-            <small>React storefront layouts</small>
-          </span>
+      {topActionsSlot ? (
+        <div className="builder-sidebar-top-actions">{topActionsSlot}</div>
+      ) : null}
+
+      {!nestedOpen ? (
+        <div className="builder-sidebar-home" aria-label="Builder menu">
+          {sidebarPanels.map((panel) => (
+            <button
+              key={panel.tab}
+              type="button"
+              className={sidebarTab === panel.tab ? "is-active" : ""}
+              onClick={() => openPanel(panel.tab)}
+            >
+              <span>
+                <strong>{panel.label}</strong>
+                <small>{panel.description}</small>
+              </span>
+              {typeof panel.count === "number" ? <em>{panel.count}</em> : null}
+            </button>
+          ))}
         </div>
-        <button
-          type="button"
-          className="builder-sidebar-collapse-toggle builder-icon-button"
-          onClick={() => onSetSidebarCollapsed((value) => !value)}
-          aria-label={sidebarCollapsed ? "Open sidebar" : "Collapse sidebar"}
-          title={sidebarCollapsed ? "Open sidebar" : "Collapse sidebar"}
-        >
-          {sidebarCollapsed ? <PanelRightOpen size={16} /> : <PanelRightClose size={16} />}
-        </button>
-      </div>
+      ) : (
+        <div className="builder-sidebar-nested-header">
+          <button
+            type="button"
+            className="builder-icon-button"
+            onClick={() => setNestedOpen(false)}
+            aria-label="Back to builder menu"
+            title="Back to builder menu"
+          >
+            <ChevronLeft size={16} />
+          </button>
+          <div>
+            <strong>{activePanel.label}</strong>
+            <span>{activePanel.description}</span>
+          </div>
+          {typeof activePanel.count === "number" ? (
+            <small>{activePanel.count}</small>
+          ) : null}
+        </div>
+      )}
 
-      <div className="builder-sidebar-tabs" role="tablist" aria-label="Sidebar panels">
-        {renderSidebarTabButton("elements", "Elements", availableLayoutBlockKinds.length)}
-        {renderSidebarTabButton("inspector", "Inspector")}
-        {renderSidebarTabButton("menu", "Menu", menuTree.length)}
-        {renderSidebarTabButton("pages", "Pages", customPages.length)}
-        {renderSidebarTabButton("templates", "Templates", savedTemplates.length)}
-        {renderSidebarTabButton("settings", "Settings")}
-      </div>
+      <div className={`builder-sidebar-content${nestedOpen ? "" : " is-menu-screen"}`}>
+        {!nestedOpen && (
+          <div className="builder-sidebar-menu-hint">
+            <LibraryBig size={16} />
+            <span>Choose a panel above. Element settings and inspector controls open one level deeper.</span>
+          </div>
+        )}
 
-      <div className="builder-sidebar-content">
-        {sidebarTab === "elements" && (
+        {nestedOpen && sidebarTab === "elements" && (
           <ElementLibrary
             availableLayoutBlockKinds={availableLayoutBlockKinds}
             onAddElement={onAddElementFromLibrary}
@@ -175,7 +244,7 @@ export default function DashboardSidebar({
           />
         )}
 
-        {sidebarTab === "menu" && (
+        {nestedOpen && sidebarTab === "menu" && (
           <MenuPresentationPanel
             filteredMenuIcons={filteredMenuIcons}
             getMenuIconLabel={getMenuIconLabel}
@@ -195,9 +264,9 @@ export default function DashboardSidebar({
           />
         )}
 
-        {sidebarTab === "inspector" && inspectorSlot}
+        {nestedOpen && sidebarTab === "inspector" && inspectorSlot}
 
-        {sidebarTab === "pages" && (
+        {nestedOpen && sidebarTab === "pages" && (
           <div className="builder-sidebar-panel">
             <div className="builder-sidebar-panel-header">
               <div><strong>Builder Pages</strong><span>Create and switch between editable pages</span></div>
@@ -224,7 +293,7 @@ export default function DashboardSidebar({
           </div>
         )}
 
-        {sidebarTab === "templates" && (
+        {nestedOpen && sidebarTab === "templates" && (
           <div className="builder-sidebar-panel">
             <div className="builder-sidebar-panel-header">
               <div><strong>Templates</strong><span>Save reusable page starting points</span></div>
@@ -259,7 +328,7 @@ export default function DashboardSidebar({
           </div>
         )}
 
-        {sidebarTab === "settings" && (
+        {nestedOpen && sidebarTab === "settings" && (
           <div className="builder-sidebar-panel">
             <div className="builder-sidebar-panel-header">
               <div><strong>Settings</strong><span>Layout, preview, and publishing controls</span></div>
@@ -269,6 +338,14 @@ export default function DashboardSidebar({
               <button type="button" className={`builder-secondary-button builder-full-button builder-global-styles-button ${globalStylesOpen ? "is-active" : ""}`} onClick={() => onSetGlobalStylesOpen((value) => !value)}>
                 <Settings2 size={16} />
                 Global Styles
+              </button>
+              <button
+                type="button"
+                className="builder-secondary-button builder-full-button"
+                onClick={onOpenCurrentPage}
+              >
+                <ExternalLink size={16} />
+                Open Page
               </button>
               <div className="builder-device-toggle" aria-label="Preview device">
                 {(["desktop", "tablet", "mobile"] as PreviewDevice[]).map((item) => (
@@ -303,7 +380,6 @@ export default function DashboardSidebar({
           </div>
         )}
       </div>
-      <div className="builder-sidebar-actions">{actionsSlot}</div>
       <button
         type="button"
         className="builder-sidebar-resize-handle"

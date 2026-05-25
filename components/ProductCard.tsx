@@ -8,6 +8,10 @@ import WishlistToggle from "./WishlistToggle";
 import AddToCartButton from "./AddToCartButton";
 import { SiteIcon } from "@/components/ui/SiteIcon";
 import { motion, AnimatePresence } from "framer-motion";
+import type {
+  TypographyGroup,
+  TypographySettings,
+} from "@/lib/builderTypography";
 
 const MotionDiv = motion.div;
 
@@ -67,10 +71,57 @@ function QuickViewPortal({ children }: { children: ReactNode }) {
 export default function ProductCard({
   product,
   preset, // currently just passed through if needed later
+  typography,
 }: {
   product: BasicProduct;
   preset?: string;
+  typography?: TypographySettings | TypographyGroup;
 }) {
+
+  function typographyStyle(typ: any) {
+    if (!typ) return { className: undefined, style: undefined };
+    const classes: string[] = [];
+    const style: React.CSSProperties = {};
+    const isClassLike = (v?: string) => typeof v === "string" && /^[a-z-]+[0-9a-z-]*$/.test(v);
+    if (typ.fontSize) {
+      if (isClassLike(typ.fontSize) && typ.fontSize.startsWith("text-")) classes.push(typ.fontSize);
+      else style.fontSize = typ.fontSize;
+    }
+    if (typ.fontWeight) {
+      if (isClassLike(String(typ.fontWeight)) && String(typ.fontWeight).startsWith("font-")) classes.push(String(typ.fontWeight));
+      else style.fontWeight = typ.fontWeight;
+    }
+    if (typ.lineHeight) {
+      if (isClassLike(typ.lineHeight) && typ.lineHeight.startsWith("leading-")) classes.push(typ.lineHeight);
+      else style.lineHeight = typ.lineHeight;
+    }
+    if (typ.letterSpacing) {
+      if (isClassLike(typ.letterSpacing) && typ.letterSpacing.startsWith("tracking-")) classes.push(typ.letterSpacing);
+      else style.letterSpacing = typ.letterSpacing;
+    }
+    if (typ.color) {
+      if (isClassLike(typ.color) && typ.color.startsWith("text-")) classes.push(typ.color);
+      else style.color = typ.color;
+    }
+    if (typ.textAlign) {
+      const map: Record<string, string> = { left: "text-left", center: "text-center", right: "text-right", justify: "text-justify" };
+      classes.push(map[typ.textAlign] ?? "");
+    }
+    if (typ.textTransform) {
+      if (isClassLike(typ.textTransform)) classes.push(typ.textTransform);
+      else style.textTransform = typ.textTransform;
+    }
+    if (typ.textDecoration) {
+      if (isClassLike(typ.textDecoration)) classes.push(typ.textDecoration);
+      else style.textDecoration = typ.textDecoration;
+    }
+    if (typ.fontFamily) {
+      if (isClassLike(typ.fontFamily) && typ.fontFamily.startsWith("font-")) classes.push(typ.fontFamily);
+      else style.fontFamily = typ.fontFamily;
+    }
+    return { className: classes.filter(Boolean).join(" ") || undefined, style: Object.keys(style).length ? style : undefined };
+  }
+  const titleTypography = typographyStyle((typography as any)?.title ?? typography);
   const imageUrl = product.image?.sourceUrl || undefined;
   const priceNumber = product.price ? parseFloat(product.price) : null;
   const formattedPrice = formatPrice(product.price);
@@ -129,7 +180,7 @@ export default function ProductCard({
           </div>
 
           <div className="product-card-info">
-            <h3 className="product-title product-title-2lines">
+            <h3 className={['product-title product-title-2lines', titleTypography.className].filter(Boolean).join(' ')} style={titleTypography.style}>
               {product.name}
             </h3>
 

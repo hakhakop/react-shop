@@ -1,18 +1,18 @@
 {
   "headerVisible": true,
   "headerLayout": "princity",
-  "headerBrandMode": "logo",
-  "headerBrandText": "WebPages",
+  "headerBrandMode": "both",
+  "headerBrandText": "WebPages Store",
   "headerLogoUrl": "https://cms.webpages.am/wp-content/uploads/2025/11/logo-2-small.png",
   "headerLogoAlt": "WebPages logo",
   "headerLogoMaxWidth": 160,
-  "headerIconVariant": "muted",
+  "headerIconVariant": "ghost",
   "headerIconOrder": [
+    "search",
     "wishlist",
     "cart",
     "account",
-    "theme",
-    "search"
+    "theme"
   ],
   "headerActiveIndicator": "underline",
   "sectionPaddingTop": "medium",
@@ -49,5 +49,5 @@
       "badgeText": null
     }
   },
-  "updatedAt": "2026-05-24T05:39:06.088Z"
+  "updatedAt": "2026-05-24T12:13:34.732Z"
 }

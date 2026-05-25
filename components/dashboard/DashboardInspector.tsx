@@ -13,7 +13,13 @@ import {
   Trash2,
   X,
 } from "lucide-react";
-import { useState, type ChangeEvent, type Dispatch, type SetStateAction } from "react";
+import {
+  useEffect,
+  useState,
+  type ChangeEvent,
+  type Dispatch,
+  type SetStateAction,
+} from "react";
 import type {
   BuilderLayoutBlock,
   BuilderSection,
@@ -34,6 +40,9 @@ import {
   getBuilderRowLayoutPreset,
   getBuilderRowLayoutSummary,
 } from "@/components/dashboard/builderLayoutPresets";
+import TypographyPanel from "@/components/dashboard/TypographyPanel";
+import StyleTabPanel from "@/components/dashboard/style/StyleTabPanel";
+import type { BuilderVisualStyle } from "@/lib/builderVisualStyle";
 
 // Inspector handlers mirror the lifted builder callbacks during this JSX-only extraction.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -148,6 +157,13 @@ function InspectorGroupSummary({
 
 export default function DashboardInspector(props: DashboardInspectorProps) {
   const [isLayoutPickerOpen, setLayoutPickerOpen] = useState(false);
+  const [activeTypographyAreaState, setActiveTypographyAreaState] = useState<{
+    area: "title" | "body" | "button" | "eyebrow";
+    blockKey: string | null;
+  }>({
+    area: "title",
+    blockKey: null,
+  });
   const {
     builderJson, copied, elementBackgroundPresets, getLayoutItemBlocks,
     inspectorOpen, inspectorTab, layoutBlockLabels, openLayoutItemId, openSlideId,
@@ -166,11 +182,81 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
     updateSelectedLayoutBlockSlide, updateSelectedSlide,
     uploadSelectedLayoutBlockSlideImage, uploadSelectedSlideImage,
   } = props;
-  const inspectorTabs: [InspectorTab, string][] = [
-    ["section", "Section"],
-    ["element", "Element"],
-    ["advanced", "Advanced"],
-  ];
+  const inspectorTabs: [InspectorTab, string][] = selectedLayoutBlock
+    ? [
+        ["content", "Content"],
+        ["settings", "Settings"],
+        ["typography", "Typography"],
+        ["advanced", "Advanced"],
+      ]
+      : [
+        ["section", "Section"],
+        ["style", "Style"],
+        ["typography", "Typography"],
+        ["advanced", "Advanced"],
+      ];
+
+  useEffect(() => {
+    if (!selectedLayoutBlock) return;
+    if (inspectorTab === "section" || inspectorTab === "style") {
+      setInspectorTab(inspectorTab === "style" ? "settings" : "content");
+    }
+  }, [inspectorTab, selectedLayoutBlock, setInspectorTab]);
+
+  useEffect(() => {
+    if (selectedLayoutBlock) return;
+    if (inspectorTab === "content" || inspectorTab === "settings") {
+      setInspectorTab("section");
+    }
+  }, [inspectorTab, selectedLayoutBlock, setInspectorTab]);
+
+  const activeTypographyArea =
+    activeTypographyAreaState.blockKey === selectedLayoutBlockKey
+      ? activeTypographyAreaState.area
+      : "title";
+  const styleTarget = selectedLayoutBlock
+    ? {
+        visualStyle: selectedLayoutBlock.visualStyle,
+        typography: selectedLayoutBlock.typography,
+      }
+    : {
+        visualStyle: selectedSection?.visualStyle,
+        typography: selectedSection?.typography,
+      };
+
+  function updateStyleTarget(
+    patch: Partial<{
+      visualStyle?: BuilderVisualStyle;
+      typography?: BuilderLayoutBlock["typography"];
+    }>,
+  ) {
+    if (selectedLayoutBlock) {
+      updateSelectedLayoutBlock(patch);
+      return;
+    }
+    updateSelected(patch);
+  }
+
+  function pickStyleBackgroundImage() {
+    const currentUrl = styleTarget.visualStyle?.background?.imageUrl;
+    openWordPressMediaPicker({
+      title: "Background image",
+      currentUrl,
+      onSelect: (media) => {
+        const nextBackground = {
+          ...(styleTarget.visualStyle?.background ?? {}),
+          type: "image" as const,
+          imageUrl: media.sourceUrl,
+        };
+        updateStyleTarget({
+          visualStyle: {
+            ...(styleTarget.visualStyle ?? {}),
+            background: nextBackground,
+          },
+        });
+      },
+    });
+  }
   const selectedColumnIndex =
     selectedSection?.kind === "contentLayout"
       ? (selectedSection.layoutItems ?? []).findIndex(
@@ -188,6 +274,9 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
     : selectedColumnIndex >= 0
       ? "column"
       : "section";
+  const isElementContentTab = inspectorTab === "content";
+  const isElementSettingsTab = inspectorTab === "settings";
+  const isElementTypographyTab = inspectorTab === "typography";
   const currentRowLayoutPreset = getBuilderRowLayoutPreset(
     selectedSection?.kind === "contentLayout" ? selectedSection.layout : null,
   );
@@ -290,28 +379,87 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
             </div>
           )}
 
-          {inspectorTab === "element" &&
-            !selectedLayoutBlock &&
-            selectedSection.kind !== "contentLayout" && (
-            <div className="builder-empty-state builder-inspector-empty-tab">
-              <Layers3 size={22} />
-              <p>Select an element in the canvas to edit its controls here.</p>
-            </div>
+          {!selectedLayoutBlock && inspectorTab === "typography" && (
+            <details className="builder-collapse" open>
+              <summary>
+                <InspectorGroupSummary
+                  title="Section Typography"
+                  description="Tune the section title, body, button, and eyebrow text."
+                  meta={sectionLabels[selectedSection.kind]}
+                />
+              </summary>
+
+              <div className="builder-element-typography-panel">
+                <div className="builder-style-preset-row builder-typography-area-tabs">
+                  {(
+                    [
+                      ["title", "Title"],
+                      ["body", "Body"],
+                      ["button", "Button"],
+                      ["eyebrow", "Eyebrow"],
+                    ] as const
+                  ).map(([area, label]) => (
+                    <button
+                      key={area}
+                      type="button"
+                      className={
+                        activeTypographyArea === area ? "is-active" : ""
+                      }
+                      onClick={() =>
+                        setActiveTypographyAreaState({
+                          area,
+                          blockKey: null,
+                        })
+                      }
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+                <div className="builder-typography-area-panel">
+                  <span className="builder-typography-area-label">
+                    {activeTypographyArea === "title"
+                      ? "Title typography"
+                      : activeTypographyArea === "body"
+                        ? "Body typography"
+                        : activeTypographyArea === "button"
+                          ? "Button typography"
+                          : "Eyebrow typography"}
+                  </span>
+                  <TypographyPanel
+                    value={
+                      activeTypographyArea === "title"
+                        ? (selectedSection.typography as any)?.title ??
+                          (typeof selectedSection.typography === "object" &&
+                          !(selectedSection.typography as any)?.title
+                            ? (selectedSection.typography as any)
+                            : undefined)
+                        : activeTypographyArea === "body"
+                          ? (selectedSection.typography as any)?.body
+                          : activeTypographyArea === "button"
+                            ? (selectedSection.typography as any)?.button
+                            : (selectedSection.typography as any)?.eyebrow
+                    }
+                    onChange={(t) =>
+                      updateSelected({
+                        typography: {
+                          ...((selectedSection.typography as any) ?? {}),
+                          [activeTypographyArea]: t,
+                        },
+                      })
+                    }
+                  />
+                </div>
+              </div>
+            </details>
           )}
 
-          {inspectorTab === "section" && selectedLayoutBlock && (
-            <div className="builder-empty-state builder-inspector-empty-tab">
-              <Layers3 size={22} />
-              <p>
-                You are editing an element. Use the Element tab, or go back to
-                the section.
-              </p>
-            </div>
-          )}
-
-          {((!selectedLayoutBlock && inspectorTab !== "element") ||
-            (selectedSection.kind === "contentLayout" &&
-              inspectorTab === "element")) && (
+          {((!selectedLayoutBlock && inspectorTab === "section") ||
+            (selectedLayoutBlock &&
+              selectedSection.kind === "contentLayout" &&
+              (isElementContentTab ||
+                isElementSettingsTab ||
+                isElementTypographyTab))) && (
             <details
               className={`builder-collapse builder-section-settings-toggle ${
                 selectedLayoutBlock ? "is-element-focus" : ""
@@ -327,7 +475,13 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
               <summary>
                 <span>
                   {selectedLayoutBlock
-                    ? "Element Settings"
+                    ? isElementContentTab
+                      ? "Content"
+                      : isElementSettingsTab
+                        ? "Settings"
+                        : isElementTypographyTab
+                          ? "Typography"
+                          : "Element"
                     : "Section Settings"}
                 </span>
                 <small>
@@ -374,7 +528,15 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
 
               {inspectorTab === "section" && !selectedLayoutBlock && (
                 <>
-                  <details className="builder-collapse">
+                  <details
+                    className="builder-collapse"
+                    open={Boolean(
+                      selectedLayoutBlock &&
+                        (isElementContentTab ||
+                          isElementSettingsTab ||
+                          isElementTypographyTab),
+                    )}
+                  >
                     <summary>
                       <InspectorGroupSummary
                         title="Background"
@@ -433,7 +595,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                     </label>
                   </details>
 
-                  <details className="builder-collapse">
+                  <details className="builder-collapse" open>
                     <summary>
                       <InspectorGroupSummary
                         title="Layout Widths"
@@ -603,20 +765,37 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                 !selectedLayoutBlock &&
                 selectedSection.kind !== "hero" &&
                 selectedSection.kind !== "promo") ||
-                ((inspectorTab as string) === "element" &&
+                ((isElementContentTab ||
+                  isElementSettingsTab ||
+                  isElementTypographyTab) &&
                   selectedSection.kind === "contentLayout" &&
                   selectedLayoutBlock)) && (
-                  <details className="builder-collapse">
+                  <details
+                    className={`builder-collapse ${
+                      selectedLayoutBlock
+                        ? "builder-element-direct-collapse"
+                        : ""
+                    }`}
+                    open={Boolean(selectedLayoutBlock)}
+                  >
                     <summary>
                       <InspectorGroupSummary
                         title={
                           selectedLayoutBlock
-                            ? "Element Content"
+                            ? isElementContentTab
+                              ? "Element Content"
+                              : isElementSettingsTab
+                                ? "Element Settings"
+                                : "Element Typography"
                             : "Section Type Options"
                         }
                         description={
                           selectedLayoutBlock
-                            ? "Edit the selected element without leaving this section."
+                            ? isElementContentTab
+                              ? "Edit the selected element without leaving this section."
+                              : isElementSettingsTab
+                                ? "Tune appearance, spacing, and background for this element."
+                                : "Tune title, body, and button typography for this element."
                             : "Controls specific to the selected section type."
                         }
                         meta={sectionLabels[selectedSection.kind]}
@@ -738,16 +917,37 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                         </>
                       )}
 
-                    {(inspectorTab as string) === "element" &&
+                    {(isElementContentTab ||
+                      isElementSettingsTab ||
+                      isElementTypographyTab) &&
+                      selectedLayoutBlock &&
                       selectedSection.kind === "contentLayout" && (
                       <>
+                        {isElementSettingsTab ? (
+                          <>
                             <div className="builder-element-inspector-note">
-                          <strong>Element Settings</strong>
-                          <span>
-                            Manage column elements here. Select an element in
-                            the canvas to focus its controls.
-                          </span>
-                        </div>
+                              <strong>Element settings</strong>
+                              <span>
+                                Card style, spacing, colors, and appearance for{" "}
+                                {layoutBlockLabels[selectedLayoutBlock.kind ?? "text"]}.
+                              </span>
+                            </div>
+                            <StyleTabPanel
+                              target={styleTarget}
+                              showTypography={false}
+                              onChange={updateStyleTarget}
+                              onPickBackgroundImage={pickStyleBackgroundImage}
+                            />
+                          </>
+                        ) : isElementTypographyTab ? (
+                          <div className="builder-element-inspector-note">
+                            <strong>Typography</strong>
+                            <span>
+                              Edit title, body, and button typography for{" "}
+                              {layoutBlockLabels[selectedLayoutBlock.kind ?? "text"]}.
+                            </span>
+                          </div>
+                        ) : null}
 
                         {(selectedSection.layoutItems ?? []).map(
                           (item, index) => {
@@ -825,41 +1025,95 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                             </button>
                                           </div>
 
-                                          {isSelectedBlock && (
-                                            <label className="builder-field">
-                                              <span>Card Style</span>
-                                              <select
-                                                value={
-                                                  block.panelStyle ?? "default"
-                                                }
-                                                onChange={(event) =>
-                                                  updateSelectedLayoutBlock(
-                                                    index,
-                                                    blockIndex,
-                                                    {
-                                                      panelStyle: event.target
-                                                        .value as BuilderPanelStyle,
-                                                    },
-                                                  )
-                                                }
-                                              >
-                                                {panelStyleOptions.map(
-                                                  (option) => (
-                                                    <option
-                                                      key={option.value}
-                                                      value={option.value}
-                                                    >
-                                                      {option.label}
-                                                    </option>
-                                                  ),
-                                                )}
-                                              </select>
-                                            </label>
+                                          {isSelectedBlock &&
+                                            isElementTypographyTab && (
+                                            <div className="builder-element-typography-panel">
+                                              <div className="builder-style-preset-row builder-typography-area-tabs">
+                                                {(
+                                                  [
+                                                    ["title", "Title"],
+                                                    ["body", "Body"],
+                                                    ["button", "Button"],
+                                                    ["eyebrow", "Eyebrow"],
+                                                  ] as const
+                                                ).map(([area, label]) => (
+                                                  <button
+                                                    key={area}
+                                                    type="button"
+                                                    className={
+                                                      activeTypographyArea === area
+                                                        ? "is-active"
+                                                        : ""
+                                                    }
+                                                    onClick={() =>
+                                                      setActiveTypographyAreaState({
+                                                        area,
+                                                        blockKey:
+                                                          selectedLayoutBlockKey,
+                                                      })
+                                                    }
+                                                  >
+                                                    {label}
+                                                  </button>
+                                                ))}
+                                              </div>
+                                              <div className="builder-typography-area-panel">
+                                                <span className="builder-typography-area-label">
+                                                  {activeTypographyArea === "title"
+                                                    ? "Title typography"
+                                                    : activeTypographyArea === "body"
+                                                      ? "Body typography"
+                                                      : activeTypographyArea ===
+                                                          "button"
+                                                        ? "Button typography"
+                                                        : "Eyebrow typography"}
+                                                </span>
+                                                <TypographyPanel
+                                                  value={
+                                                    activeTypographyArea === "title"
+                                                      ? (block.typography as any)
+                                                          ?.title ??
+                                                        (typeof block.typography ===
+                                                          "object" &&
+                                                        !(block.typography as any)
+                                                          .title
+                                                          ? (block.typography as any)
+                                                          : undefined)
+                                                      : activeTypographyArea ===
+                                                          "body"
+                                                        ? (block.typography as any)
+                                                            ?.body
+                                                        : activeTypographyArea ===
+                                                            "button"
+                                                          ? (block.typography as any)
+                                                              ?.button
+                                                          : (block.typography as any)
+                                                              ?.eyebrow
+                                                  }
+                                                  onChange={(t) =>
+                                                    updateSelectedLayoutBlock(
+                                                      index,
+                                                      blockIndex,
+                                                      {
+                                                        typography: {
+                                                          ...((block.typography as any) ??
+                                                            {}),
+                                                          [activeTypographyArea]:
+                                                            t,
+                                                        },
+                                                      },
+                                                    )
+                                                  }
+                                                />
+                                              </div>
+                                            </div>
                                           )}
 
+                                          {isSelectedBlock &&
+                                            isElementSettingsTab && (
                                           <details className="builder-collapse">
                                             <summary>
-                                              <span>Element Cards</span>
+                                              <span>Element appearance</span>
                                               <small>
                                                 {block.panelStyle ??
                                                   "default"}
@@ -1064,7 +1318,11 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                               </select>
                                             </label>
                                           </details>
+                                          )}
 
+                                          {isSelectedBlock &&
+                                            isElementContentTab && (
+                                            <>
                                           {block.kind === "embed" ? (
                                             <>
                                               <label className="builder-field">
@@ -3729,6 +3987,8 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                               </label>
                                             </>
                                           )}
+                                          </>
+                                          )}
                                         </div>
                                       );
                                     })}
@@ -4566,50 +4826,112 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                 )}
             </details>
           )}
+          {inspectorTab === "style" && !selectedLayoutBlock && selectedSection && (
+            <StyleTabPanel
+              target={styleTarget}
+              showTypography={false}
+              onChange={updateStyleTarget}
+              onPickBackgroundImage={pickStyleBackgroundImage}
+            />
+          )}
+
           {inspectorTab === "advanced" && (
             <>
-              <details className="builder-collapse" open>
-                <summary>
-                  <InspectorGroupSummary
-                    title="Publishing State"
-                    description="Toggle whether this section is rendered on the page."
-                    meta={selectedSection.visible ? "visible" : "hidden"}
-                  />
-                </summary>
+              {!selectedLayoutBlock ? (
+                <>
+                  <details className="builder-collapse" open>
+                    <summary>
+                      <InspectorGroupSummary
+                        title="Publishing State"
+                        description="Toggle whether this section is rendered on the page."
+                        meta={selectedSection.visible ? "visible" : "hidden"}
+                      />
+                    </summary>
 
-                <label className="builder-check">
-                  <input
-                    type="checkbox"
-                    checked={selectedSection.visible}
-                    onChange={(event) =>
-                      updateSelected({ visible: event.target.checked })
-                    }
-                  />
-                  <span>Visible on page</span>
-                </label>
-              </details>
+                    <label className="builder-check">
+                      <input
+                        type="checkbox"
+                        checked={selectedSection.visible}
+                        onChange={(event) =>
+                          updateSelected({ visible: event.target.checked })
+                        }
+                      />
+                      <span>Visible on page</span>
+                    </label>
+                  </details>
 
-              <details className="builder-collapse">
-                <summary>
-                  <InspectorGroupSummary
-                    title="Current JSON"
-                    description="Inspect or export the current builder payload."
-                    meta="advanced"
-                  />
-                </summary>
-                <div className="builder-json-card">
-                  <span>Current JSON</span>
-                  <pre>{builderJson}</pre>
-                </div>
-                <button
-                  type="button"
-                  className="builder-secondary-button builder-full-button"
-                  onClick={copyJson}
-                >
-                  <Save size={16} />
-                  {copied ? "Copied JSON" : "Export JSON"}
-                </button>
-              </details>
+                  <details
+                    className="builder-collapse"
+                    open={Boolean(selectedLayoutBlock)}
+                  >
+                    <summary>
+                      <InspectorGroupSummary
+                        title="Current JSON"
+                        description="Inspect or export the current builder payload."
+                        meta="advanced"
+                      />
+                    </summary>
+                    <div className="builder-json-card">
+                      <span>Current JSON</span>
+                      <pre>{builderJson}</pre>
+                    </div>
+                    <button
+                      type="button"
+                      className="builder-secondary-button builder-full-button"
+                      onClick={copyJson}
+                    >
+                      <Save size={16} />
+                      {copied ? "Copied JSON" : "Export JSON"}
+                    </button>
+                  </details>
+                </>
+              ) : (
+                <>
+                  <details className="builder-collapse" open>
+                    <summary>
+                      <InspectorGroupSummary
+                        title="Selected element"
+                        description="Metadata for the focused block."
+                        meta={
+                          layoutBlockLabels[selectedLayoutBlock?.kind ?? "text"]
+                        }
+                      />
+                    </summary>
+                    <div className="builder-contrast-note">
+                      <strong>
+                        {layoutBlockLabels[selectedLayoutBlock?.kind ?? "text"]}
+                      </strong>
+                      <span>
+                        Use the delete control on the element card in the
+                        canvas, or remove it from the column list in the
+                        section tab.
+                      </span>
+                    </div>
+                  </details>
+
+                  <details className="builder-collapse">
+                    <summary>
+                      <InspectorGroupSummary
+                        title="Page JSON"
+                        description="Full builder payload for this page."
+                        meta="advanced"
+                      />
+                    </summary>
+                    <div className="builder-json-card">
+                      <span>Current JSON</span>
+                      <pre>{builderJson}</pre>
+                    </div>
+                    <button
+                      type="button"
+                      className="builder-secondary-button builder-full-button"
+                      onClick={copyJson}
+                    >
+                      <Save size={16} />
+                      {copied ? "Copied JSON" : "Export JSON"}
+                    </button>
+                  </details>
+                </>
+              )}
             </>
           )}
         </>

@@ -68,7 +68,17 @@ export type SectionKind =
 export type PreviewDevice = "desktop" | "tablet" | "mobile";
 export type GlobalSectionSpacing = "none" | "small" | "medium" | "large";
 export type SectionSpacing = "inherit" | GlobalSectionSpacing;
-export type InspectorTab = "section" | "element" | "style" | "advanced";
+export type SectionInspectorTab =
+  | "section"
+  | "style"
+  | "typography"
+  | "advanced";
+export type ElementInspectorTab =
+  | "content"
+  | "settings"
+  | "typography"
+  | "advanced";
+export type InspectorTab = SectionInspectorTab | ElementInspectorTab;
 export type SidebarTab =
   | "elements"
   | "inspector"
@@ -132,6 +142,28 @@ export type BuilderDesign = {
   headingLineHeight?: string;
   headingColor?: string;
 };
+
+export type {
+  TypographyVariant,
+  TypographySettings,
+  TypographyGroup,
+} from "@/lib/builderTypography";
+
+export type {
+  BuilderVisualStyle,
+  BuilderSpacingSides,
+  BuilderBackgroundStyle,
+  BuilderBorderStyle,
+  BuilderEffectsStyle,
+  BuilderVisibilityStyle,
+} from "@/lib/builderVisualStyle";
+
+import type { BuilderVisualStyle } from "@/lib/builderVisualStyle";
+import type {
+  TypographyGroup,
+  TypographySettings,
+} from "@/lib/builderTypography";
+
 
 export type BuilderLayoutBlock = {
   id?: string;
@@ -203,11 +235,14 @@ export type BuilderLayoutBlock = {
     text?: string;
     buttonLabel?: string;
     buttonUrl?: string;
+    typography?: TypographySettings;
   }[];
   galleryShowThumbnails?: boolean;
   galleryThumbnailPosition?: "bottom" | "left";
   galleryImageFit?: "contain" | "cover";
   galleryHeight?: number;
+  typography?: TypographySettings | TypographyGroup;
+  visualStyle?: BuilderVisualStyle;
 };
 
 export type WordPressMediaItem = {
@@ -296,6 +331,7 @@ export type BuilderSection = {
     imagePadding?: SlideImagePadding;
     buttonLabel?: string;
     buttonUrl?: string;
+    typography?: TypographySettings;
   }[];
   carouselSettings?: {
     variant?: string;
@@ -310,6 +346,8 @@ export type BuilderSection = {
     pauseOnHover?: boolean;
   };
   visible: boolean;
+  typography?: TypographySettings | TypographyGroup;
+  visualStyle?: BuilderVisualStyle;
 };
 
 export type BuilderState = {

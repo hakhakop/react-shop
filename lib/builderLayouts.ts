@@ -128,11 +128,14 @@ export type BuilderLayoutBlock = {
     text?: string;
     buttonLabel?: string;
     buttonUrl?: string;
+    typography?: Record<string, unknown>;
   }[];
   galleryShowThumbnails?: boolean;
   galleryThumbnailPosition?: string;
   galleryImageFit?: string;
   galleryHeight?: number;
+  typography?: Record<string, unknown>;
+  visualStyle?: Record<string, unknown>;
 };
 
 export type BuilderSection = {
@@ -204,6 +207,7 @@ export type BuilderSection = {
     imagePadding?: string;
     buttonLabel?: string;
     buttonUrl?: string;
+    typography?: Record<string, unknown>;
   }[];
   carouselSettings?: {
     variant?: string;
@@ -218,6 +222,8 @@ export type BuilderSection = {
     pauseOnHover?: boolean;
   };
   visible: boolean;
+  typography?: Record<string, unknown>;
+  visualStyle?: Record<string, unknown>;
 };
 
 export type BuilderLayout = {

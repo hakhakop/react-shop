@@ -17,12 +17,13 @@ import {
   ListChecks,
   Navigation,
   PanelLeft,
+  PanelRightClose,
   PanelRightOpen,
   Plus,
   ShoppingBag,
   LockKeyhole,
-  Undo2,
   Settings2,
+  Undo2,
   Sparkles,
   ShieldCheck,
   SquareMousePointer,
@@ -34,8 +35,9 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import type { CSSProperties, RefObject } from "react";
+import type { CSSProperties } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import CarouselBlock, {
   type CarouselSlide,
 } from "@/components/blocks/CarouselBlock";
@@ -103,6 +105,12 @@ import {
 import type { CategoryTreeItem } from "@/lib/categories";
 import type { MenuItem } from "@/lib/navigation";
 import type { ProductNode } from "@/lib/products";
+import type { BuilderVisualStyle } from "@/lib/builderVisualStyle";
+import { typographyProps, type TypographyArea } from "@/lib/builderTypography";
+import {
+  visualStyleClassName,
+  visualStyleToCss,
+} from "@/lib/builderVisualStyle";
 
 const STORAGE_KEY = "react-shop-visual-builder-v1";
 const STORAGE_BY_KEY = "react-shop-visual-builder-drafts-v2";
@@ -479,6 +487,43 @@ function readableSchemeForColor(color: string): SectionColorScheme {
   return luminance < 0.48 ? "dark" : "light";
 }
 
+function DashboardTypog({
+  as: As = "div",
+  typography,
+  className,
+  children,
+  ...props
+}: any) {
+  const Tag = As as any;
+  const tp = typographyProps(
+    typography,
+    inferTypographyArea(String(As), className),
+  );
+  const combined = [className, tp.className].filter(Boolean).join(" ");
+  return (
+    <Tag className={combined || undefined} style={tp.style} {...props}>
+      {children}
+    </Tag>
+  );
+}
+
+function inferTypographyArea(
+  tagName: string,
+  className?: string,
+): TypographyArea {
+  const tag = tagName.toLowerCase();
+  const classHint = String(className || "").toLowerCase();
+
+  if (classHint.includes("eyebrow")) return "eyebrow";
+  if (classHint.includes("cta") || tag === "a" || tag === "button") {
+    return "button";
+  }
+  if (/^h[1-6]$/.test(tag) || tag === "strong" || tag === "em") {
+    return "title";
+  }
+  return "body";
+}
+
 function getDefaultStateForKey(key: BuilderLayoutKey): BuilderState {
   if (key in defaultTemplateStates) {
     return structuredClone(defaultTemplateStates[key as BuilderTemplate]);
@@ -789,7 +834,6 @@ export default function DashboardBuilder({
   >(null);
   const [inspectorTab, setInspectorTab] = useState<InspectorTab>("section");
   const [inspectorOpen, setInspectorOpen] = useState(false);
-  const [adminPillVisible, setAdminPillVisible] = useState(true);
   const [sectionSettingsOpen, setSectionSettingsOpen] = useState(false);
   const [sectionStructureOpen, setSectionStructureOpen] = useState(false);
   const [globalStylesOpen, setGlobalStylesOpen] = useState(false);
@@ -847,6 +891,8 @@ export default function DashboardBuilder({
   );
   const undoHistoryRef = useRef<BuilderState[]>([]);
   const skipUndoCaptureRef = useRef(false);
+  const [committedBuilderStateSignature, setCommittedBuilderStateSignature] =
+    useState("");
 
   const selectedSection = useMemo(
     () => builderState.sections.find((section) => section.id === selectedId),
@@ -873,6 +919,19 @@ export default function DashboardBuilder({
     () => getFrontendUrlForBuilderKey(builderState.page, customPages),
     [builderState.page, customPages],
   );
+  const builderStateSignature = useMemo(
+    () => JSON.stringify(builderState),
+    [builderState],
+  );
+  const hasPendingChanges =
+    draftReady &&
+    committedBuilderStateSignature.length > 0 &&
+    builderStateSignature !== committedBuilderStateSignature;
+  const previewColors = resolveDesignColors(builderState.design);
+  const previewPageBackground =
+    previewColors.pageBackground ??
+    builderState.design.pageBackground ??
+    "#f7f7f4";
   const selectedMenuItem = useMemo(() => {
     function findItem(items: MenuItem[]): MenuItem | null {
       for (const item of items) {
@@ -955,11 +1014,8 @@ export default function DashboardBuilder({
 
     const updatePreviewViewport = () => {
       const shellWidth = shell.clientWidth || window.innerWidth;
-      const desktopWidth = Math.max(1180, window.innerWidth);
-      setPreviewCanvasWidth(desktopWidth);
-      setPreviewScale(
-        device === "desktop" ? Math.min(1, shellWidth / desktopWidth) : 1,
-      );
+      setPreviewCanvasWidth(shellWidth);
+      setPreviewScale(1);
     };
 
     updatePreviewViewport();
@@ -1255,6 +1311,12 @@ export default function DashboardBuilder({
   }, [builderState, draftReady]);
 
   useEffect(() => {
+    if (!draftReady) return;
+    if (committedBuilderStateSignature) return;
+    setCommittedBuilderStateSignature(JSON.stringify(builderState));
+  }, [builderState, committedBuilderStateSignature, draftReady]);
+
+  useEffect(() => {
     if (!mediaPickerOpen) return;
 
     const controller = new AbortController();
@@ -1331,6 +1393,7 @@ export default function DashboardBuilder({
   ) => {
     const nextState = loadDraftForKey(nextKey);
     undoHistoryRef.current = [structuredClone(nextState)];
+    setCommittedBuilderStateSignature(JSON.stringify(nextState));
     setBuilderState(nextState);
     setSelectedId(nextState.sections[0]?.id ?? "");
     setSelectedLayoutColumnKey(null);
@@ -1500,7 +1563,7 @@ export default function DashboardBuilder({
     setSelectedLayoutBlockKey(blockKey);
     setOpenLayoutItemId(columnKey);
     setSectionStructureOpen(false);
-    setInspectorTab("element");
+    setInspectorTab("content");
     setInspectorOpen(true);
     setSidebarTab("inspector");
   };
@@ -1996,20 +2059,33 @@ export default function DashboardBuilder({
 
   const moveLayoutBlock = ({
     sectionId,
+    targetSectionId = sectionId,
     sourceColumnKey,
     sourceBlockKey,
     targetColumnKey,
     targetBlockKey,
   }: {
     sectionId: string;
+    targetSectionId?: string;
     sourceColumnKey: string;
     sourceBlockKey: string;
     targetColumnKey: string;
     targetBlockKey?: string;
   }) => {
-    setBuilderState((current) => ({
-      ...current,
-      sections: current.sections.map((section) => {
+    setBuilderState((current) => {
+      let movingBlock: BuilderLayoutBlock | null = null;
+      const targetSection = current.sections.find(
+        (section) =>
+          section.id === targetSectionId && section.kind === "contentLayout",
+      );
+      const hasTargetColumn = (targetSection?.layoutItems ?? []).some(
+        (item, index) =>
+          (item.id ?? `layout-item-${index}`) === targetColumnKey,
+      );
+
+      if (!hasTargetColumn) return current;
+
+      const sectionsWithoutBlock = current.sections.map((section) => {
         if (section.id !== sectionId || section.kind !== "contentLayout") {
           return section;
         }
@@ -2019,12 +2095,7 @@ export default function DashboardBuilder({
           (item, index) =>
             (item.id ?? `layout-item-${index}`) === sourceColumnKey,
         );
-        const targetColumnIndex = layoutItems.findIndex(
-          (item, index) =>
-            (item.id ?? `layout-item-${index}`) === targetColumnKey,
-        );
-
-        if (sourceColumnIndex < 0 || targetColumnIndex < 0) return section;
+        if (sourceColumnIndex < 0) return section;
 
         const sourceItem = layoutItems[sourceColumnIndex] ?? {};
         const sourceBlocks = [...getLayoutItemBlocks(sourceItem)];
@@ -2033,30 +2104,39 @@ export default function DashboardBuilder({
             (block.id ?? `${sourceColumnKey}-block-${index}`) ===
             sourceBlockKey,
         );
-
         if (sourceBlockIndex < 0) return section;
 
-        const [movingBlock] = sourceBlocks.splice(sourceBlockIndex, 1);
-        if (!movingBlock) return section;
+        const [removedBlock] = sourceBlocks.splice(sourceBlockIndex, 1);
+        if (!removedBlock) return section;
 
-        if (sourceColumnIndex === targetColumnIndex) {
-          const targetIndex = targetBlockKey
-            ? sourceBlocks.findIndex(
-                (block, index) =>
-                  (block.id ?? `${targetColumnKey}-block-${index}`) ===
-                  targetBlockKey,
-              )
-            : -1;
-          sourceBlocks.splice(
-            targetIndex >= 0 ? targetIndex : sourceBlocks.length,
-            0,
-            movingBlock,
+        movingBlock = removedBlock;
+        layoutItems[sourceColumnIndex] = {
+          ...sourceItem,
+          blocks: sourceBlocks,
+        };
+        return { ...section, layoutItems };
+      });
+
+      const blockToMove = movingBlock;
+      if (!blockToMove) return current;
+
+      return {
+        ...current,
+        sections: sectionsWithoutBlock.map((section) => {
+          if (
+            section.id !== targetSectionId ||
+            section.kind !== "contentLayout"
+          ) {
+            return section;
+          }
+
+          const layoutItems = [...(section.layoutItems ?? [])];
+          const targetColumnIndex = layoutItems.findIndex(
+            (item, index) =>
+              (item.id ?? `layout-item-${index}`) === targetColumnKey,
           );
-          layoutItems[sourceColumnIndex] = {
-            ...sourceItem,
-            blocks: sourceBlocks,
-          };
-        } else {
+          if (targetColumnIndex < 0) return section;
+
           const targetItem = layoutItems[targetColumnIndex] ?? {};
           const targetBlocks = [...getLayoutItemBlocks(targetItem)];
           const targetIndex = targetBlockKey
@@ -2067,26 +2147,22 @@ export default function DashboardBuilder({
               )
             : -1;
 
-          layoutItems[sourceColumnIndex] = {
-            ...sourceItem,
-            blocks: sourceBlocks,
-          };
           targetBlocks.splice(
             targetIndex >= 0 ? targetIndex : targetBlocks.length,
             0,
-            movingBlock,
+            blockToMove,
           );
           layoutItems[targetColumnIndex] = {
             ...targetItem,
             blocks: targetBlocks,
           };
-        }
 
-        return { ...section, layoutItems };
-      }),
-    }));
+          return { ...section, layoutItems };
+        }),
+      };
+    });
 
-    setSelectedId(sectionId);
+    setSelectedId(targetSectionId);
     setSelectedLayoutColumnKey(targetColumnKey);
     setOpenLayoutItemId(targetColumnKey);
     setSelectedLayoutBlockKey(sourceBlockKey);
@@ -2550,10 +2626,11 @@ export default function DashboardBuilder({
 
     if (!payload.layout?.sections?.length) {
       setPublishStatus("No published layout yet");
+      setCommittedBuilderStateSignature(JSON.stringify(builderState));
       return;
     }
 
-    setBuilderState({
+    const nextPublishedState = {
       page: payload.layout.page,
       targetType:
         payload.layout.targetType ?? builderState.targetType ?? "page",
@@ -2563,7 +2640,10 @@ export default function DashboardBuilder({
         ...(payload.layout.design ?? {}),
       },
       sections: payload.layout.sections,
-    });
+    };
+    undoHistoryRef.current = [structuredClone(nextPublishedState)];
+    setCommittedBuilderStateSignature(JSON.stringify(nextPublishedState));
+    setBuilderState(nextPublishedState);
     setSelectedId(payload.layout.sections[0]?.id ?? "");
     setPublishStatus("Published layout loaded");
   };
@@ -2591,6 +2671,7 @@ export default function DashboardBuilder({
       return;
     }
 
+    setCommittedBuilderStateSignature(JSON.stringify(builderState));
     setPublishStatus("Published layout saved");
     setPublishCelebration(true);
     if (publishCelebrationTimer.current) {
@@ -2952,76 +3033,73 @@ export default function DashboardBuilder({
     />
   );
 
-  const builderActions = adminPillVisible ? (
-    <div className="builder-sidebar-action-stack" aria-label="Builder page actions">
-      <div className="builder-sidebar-action-heading">
-        <strong>Builder</strong>
-        <span>{getLayoutLabel(builderState.page, customPages)}</span>
+  const sidebarTopActions = (
+    <div className="builder-sidebar-top-action-bar" aria-label="Builder page actions">
+      <div className="builder-sidebar-top-action-copy">
+        <strong>{hasPendingChanges ? "Unsaved changes" : "Saved draft"}</strong>
+        <span>
+          {hasPendingChanges
+            ? getLayoutLabel(builderState.page, customPages)
+            : publishStatus}
+        </span>
       </div>
-      <button type="button" onClick={undoBuilder} title="Undo last change">
-        <Undo2 size={15} />
-        Undo
-      </button>
-      <button
-        type="button"
-        onClick={() => {
-          setInspectorOpen(true);
-          setSidebarTab("inspector");
-        }}
-      >
-        <PanelRightOpen size={15} />
-        Inspector
-      </button>
-      <button
-        type="button"
-        onClick={() => {
-          window.open(currentFrontendUrl, "_blank", "noopener,noreferrer");
-        }}
-      >
-        <ExternalLink size={15} />
-        View Page
-      </button>
-      <button type="button" className="is-primary" onClick={publishLayout}>
-        <CloudUpload size={15} />
-        Publish
-      </button>
-      <button
-        type="button"
-        className="is-quiet"
-        onClick={() => setAdminPillVisible(false)}
-        aria-label="Hide builder actions"
-      >
-        <X size={15} />
-        Hide
-      </button>
+      <div className="builder-sidebar-top-action-buttons">
+        <button
+          type="button"
+          className="builder-sidebar-collapse-inline"
+          onClick={() => setSidebarCollapsed((value) => !value)}
+          title={sidebarCollapsed ? "Open panel" : "Collapse panel"}
+          aria-label={sidebarCollapsed ? "Open panel" : "Collapse panel"}
+        >
+          {sidebarCollapsed ? (
+            <PanelRightOpen size={15} />
+          ) : (
+            <PanelRightClose size={15} />
+          )}
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            window.open(currentFrontendUrl, "_blank", "noopener,noreferrer");
+          }}
+          title="Open page"
+        >
+          <ExternalLink size={15} />
+          View Page
+        </button>
+        {hasPendingChanges && (
+          <>
+            <button type="button" onClick={undoBuilder} title="Undo last change">
+              <Undo2 size={15} />
+              Undo
+            </button>
+            <button type="button" className="is-primary" onClick={publishLayout}>
+              <CloudUpload size={15} />
+              Publish
+            </button>
+          </>
+        )}
+      </div>
     </div>
-  ) : (
-    <button
-      className="builder-sidebar-actions-toggle"
-      type="button"
-      onClick={() => setAdminPillVisible(true)}
-      aria-label="Show builder actions"
-    >
-      <Settings2 size={16} />
-      <span>Builder actions</span>
-    </button>
   );
 
   return (
     <div
       className={`builder-dashboard ${inspectorOpen ? "" : "is-inspector-closed"}${
         sidebarCollapsed ? " is-sidebar-collapsed" : ""
-      }${sidebarResizing ? " is-sidebar-resizing" : ""}`}
+      }${sidebarResizing ? " is-sidebar-resizing" : ""} builder-preview-scheme-${
+        builderState.design.colorScheme ?? "auto"
+      }`}
       style={
         {
           "--builder-dashboard-bg":
             builderState.design.pageBackground ?? "#dfdfd7",
+          "--builder-preview-real-bg": previewPageBackground,
           "--builder-sidebar-width": `${sidebarWidth}px`,
         } as CSSProperties
       }
     >
       <DashboardSidebar
-        actionsSlot={builderActions}
         availableLayoutBlockKinds={availableLayoutBlockKinds}
         builderState={builderState}
         customPages={customPages}
@@ -3032,18 +3110,22 @@ export default function DashboardBuilder({
         inspectorSlot={inspectorPanel}
         pageStatus={pageStatus}
         publishStatus={publishStatus}
+        selectedLayoutBlockKey={selectedLayoutBlockKey}
         selectedMenuItem={selectedMenuItem}
         selectedMenuItemId={selectedMenuItemId}
         savedTemplates={savedTemplates}
-        sidebarCollapsed={sidebarCollapsed}
         sidebarTab={sidebarTab}
         templateDescriptions={templateDescriptions}
         templateLabels={templateLabels}
         templateStatus={templateStatus}
+        topActionsSlot={sidebarTopActions}
         onAddElementFromLibrary={addElementFromLibrary}
         onCreateBuilderPage={createBuilderPage}
         onDeleteBuilderPage={deleteBuilderPage}
         onDeleteSavedTemplate={deleteSavedTemplate}
+        onOpenCurrentPage={() => {
+          window.open(currentFrontendUrl, "_blank", "noopener,noreferrer");
+        }}
         onRenderLayoutBlockIcon={getLayoutBlockLibraryIcon}
         onSaveCurrentPageAsTemplate={saveCurrentPageAsTemplate}
         onSetDevice={setDevice}
@@ -3052,7 +3134,6 @@ export default function DashboardBuilder({
         onSetMenuIconSearch={setMenuIconSearch}
         onSetNewPageTitle={setNewPageTitle}
         onSetSelectedMenuItemId={setSelectedMenuItemId}
-        onSetSidebarCollapsed={setSidebarCollapsed}
         onSetSidebarTab={setSidebarTab}
         onStartSidebarResize={startSidebarResize}
         onSwitchBuilderTarget={switchBuilderTarget}
@@ -3670,16 +3751,21 @@ export default function DashboardBuilder({
 
         <div
           ref={previewShellRef}
-          className={`builder-preview-shell builder-preview-${device}`}
+          className={`builder-preview-shell builder-preview-${device} builder-preview-scheme-${
+            builderState.design.colorScheme ?? "auto"
+          }`}
           style={
             {
-              "--builder-preview-shell-bg":
-                builderState.design.pageBackground ?? "#dfdfd7",
+              "--builder-preview-shell-bg": previewPageBackground,
               "--builder-preview-scale": previewScale,
               "--builder-preview-canvas-width": `${previewCanvasWidth}px`,
             } as CSSProperties
           }
         >
+          <div
+            ref={previewHeaderSlotRef}
+            className="builder-preview-header-slot"
+          />
           <PreviewCanvas
             sections={builderState.sections}
             previewProducts={previewProducts}
@@ -3713,7 +3799,6 @@ export default function DashboardBuilder({
             onMoveSection={moveSection}
             onDuplicateSection={duplicateSection}
             onDeleteSection={deleteSection}
-            headerSlotRef={previewHeaderSlotRef}
           />
         </div>
       </main>
@@ -3907,7 +3992,6 @@ function PreviewCanvas({
   onMoveSection,
   onDuplicateSection,
   onDeleteSection,
-  headerSlotRef,
 }: {
   sections: BuilderSection[];
   previewProducts: ProductNode[];
@@ -3935,6 +4019,7 @@ function PreviewCanvas({
   onBlockDragEnd: () => void;
   onMoveBlock: (payload: {
     sectionId: string;
+    targetSectionId?: string;
     sourceColumnKey: string;
     sourceBlockKey: string;
     targetColumnKey: string;
@@ -3987,7 +4072,6 @@ function PreviewCanvas({
   onMoveSection: (sectionId: string, direction: -1 | 1) => void;
   onDuplicateSection: (sectionId: string) => void;
   onDeleteSection: (sectionId: string) => void;
-  headerSlotRef: RefObject<HTMLDivElement | null>;
 }) {
   const [insertTarget, setInsertTarget] = useState<{
     sectionId: string | null;
@@ -3996,6 +4080,77 @@ function PreviewCanvas({
   const visibleSections = sections.filter((section) => section.visible);
   const insertTargetSection =
     sections.find((section) => section.id === insertTarget?.sectionId) ?? null;
+  const insertLayoutPicker = insertTarget ? (
+    <div
+      className="builder-layout-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="builder-layout-picker-title"
+      onClick={() => setInsertTarget(null)}
+    >
+      <div
+        className="builder-layout-dialog"
+        onClick={(event) => event.stopPropagation()}
+      >
+        <div className="builder-layout-header">
+          <div>
+            <strong id="builder-layout-picker-title">
+              Choose row layout
+            </strong>
+            <span>
+              {insertTargetSection
+                ? `Insert a section ${insertTarget.placement} ${sectionLabels[
+                    insertTargetSection.kind
+                  ].toLowerCase()} and pick a preset layout.`
+                : "Choose a preset layout for the first section on this page."}
+            </span>
+          </div>
+          <button
+            type="button"
+            className="builder-layout-close"
+            onClick={() => setInsertTarget(null)}
+            aria-label="Close row layout picker"
+          >
+            <X size={15} />
+          </button>
+        </div>
+
+        <div className="builder-layout-picker-grid">
+          {builderRowLayoutPresets.map((preset) => (
+            <button
+              key={preset.key}
+              type="button"
+              className="builder-layout-picker-card"
+              onClick={() => {
+                onAddWireframe(
+                  preset.ratios.length,
+                  1,
+                  insertTarget.sectionId ?? "__empty-page__",
+                  insertTarget.placement,
+                  preset.key,
+                );
+                setInsertTarget(null);
+              }}
+            >
+              <span className="builder-layout-picker-card-copy">
+                <strong>{preset.label}</strong>
+                <small>{preset.description}</small>
+              </span>
+              <span
+                className="builder-layout-picker-preview"
+                aria-hidden="true"
+              >
+                {preset.ratios.map((ratio, index) => (
+                  <i key={`${preset.key}-${index}`} style={{ flex: ratio }} />
+                ))}
+              </span>
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  ) : null;
+
   return (
     <div
       className="builder-preview-canvas"
@@ -4016,7 +4171,6 @@ function PreviewCanvas({
         } as CSSProperties
       }
     >
-      <div ref={headerSlotRef} className="builder-preview-header-slot" />
       {visibleSections.length === 0 && (
         <div className="builder-preview-empty">
           <Layers3 size={22} />
@@ -4065,7 +4219,7 @@ function PreviewCanvas({
                   section.contentMode ?? "boxed"
                 } builder-preview-section--scheme-${resolveSectionColorScheme(section)} ${
                   isSelected ? "is-selected" : ""
-                } ${draggingSectionId === section.id ? "is-dragging" : ""}`}
+                } ${visualStyleClassName(section.visualStyle)} ${draggingSectionId === section.id ? "is-dragging" : ""}`}
                 style={
                   {
                     background: section.background,
@@ -4088,6 +4242,9 @@ function PreviewCanvas({
                       section.bottomMargin,
                     ),
                     ...sectionSchemeStyle(section),
+                    ...visualStyleToCss(
+                      section.visualStyle as BuilderVisualStyle | undefined,
+                    ),
                   } as CSSProperties
                 }
                 onClick={() => onSelect(section.id)}
@@ -4227,76 +4384,7 @@ function PreviewCanvas({
           })}
         </div>
       </div>
-      {insertTarget ? (
-        <div
-          className="builder-layout-modal"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="builder-layout-picker-title"
-          onClick={() => setInsertTarget(null)}
-        >
-          <div
-            className="builder-layout-dialog"
-            onClick={(event) => event.stopPropagation()}
-          >
-            <div className="builder-layout-header">
-              <div>
-                <strong id="builder-layout-picker-title">
-                  Choose row layout
-                </strong>
-                <span>
-                  {insertTargetSection
-                    ? `Insert a section ${insertTarget.placement} ${sectionLabels[
-                        insertTargetSection.kind
-                      ].toLowerCase()} and pick a preset layout.`
-                    : "Choose a preset layout for the first section on this page."}
-                </span>
-              </div>
-              <button
-                type="button"
-                className="builder-layout-close"
-                onClick={() => setInsertTarget(null)}
-                aria-label="Close row layout picker"
-              >
-                <X size={15} />
-              </button>
-            </div>
-
-            <div className="builder-layout-picker-grid">
-              {builderRowLayoutPresets.map((preset) => (
-                <button
-                  key={preset.key}
-                  type="button"
-                  className="builder-layout-picker-card"
-                  onClick={() => {
-                    onAddWireframe(
-                      preset.ratios.length,
-                      1,
-                      insertTarget.sectionId ?? "__empty-page__",
-                      insertTarget.placement,
-                      preset.key,
-                    );
-                    setInsertTarget(null);
-                  }}
-                >
-                  <span className="builder-layout-picker-card-copy">
-                    <strong>{preset.label}</strong>
-                    <small>{preset.description}</small>
-                  </span>
-                  <span
-                    className="builder-layout-picker-preview"
-                    aria-hidden="true"
-                  >
-                    {preset.ratios.map((ratio, index) => (
-                      <i key={`${preset.key}-${index}`} style={{ flex: ratio }} />
-                    ))}
-                  </span>
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-      ) : null}
+      {insertLayoutPicker ? createPortal(insertLayoutPicker, document.body) : null}
     </div>
   );
 }
@@ -4503,7 +4591,9 @@ function PreviewProductBlockContent({
   if (block.kind === "productTitle") {
     return (
       <div className="product-header-row builder-preview-product-title-row">
-        <h3>{product.name}</h3>
+        <DashboardTypog as="h3" typography={block.typography}>
+          {product.name}
+        </DashboardTypog>
         <span aria-hidden="true">♡</span>
       </div>
     );
@@ -4535,7 +4625,13 @@ function PreviewProductBlockContent({
 
   if (block.kind === "productDescription") {
     return (
-      <p className="shop-builder-product-description">{product.description}</p>
+      <DashboardTypog
+        as="p"
+        className="shop-builder-product-description"
+        typography={block.typography}
+      >
+        {product.description}
+      </DashboardTypog>
     );
   }
 
@@ -4545,13 +4641,19 @@ function PreviewProductBlockContent({
         <PreviewProductGallery product={product} />
         <div className="shop-builder-premium-product-copy">
           <span>Featured Product</span>
-          <h3>{product.name}</h3>
+          <DashboardTypog as="h3" typography={block.typography}>
+            {product.name}
+          </DashboardTypog>
           <div className="shop-builder-product-price">
             {product.priceFormatted}
           </div>
-          <p className="shop-builder-product-description">
+          <DashboardTypog
+            as="p"
+            className="shop-builder-product-description"
+            typography={block.typography}
+          >
             {product.description}
-          </p>
+          </DashboardTypog>
           <ProductOptionsSelector
             id={product.id}
             slug={product.slug}
@@ -4569,13 +4671,19 @@ function PreviewProductBlockContent({
   if (block.kind === "productInfoStack") {
     return (
       <div className="shop-builder-product-info-stack">
-        <h3>{product.name}</h3>
+        <DashboardTypog as="h3" typography={block.typography}>
+          {product.name}
+        </DashboardTypog>
         <div className="shop-builder-product-price">
           {product.priceFormatted}
         </div>
-        <p className="shop-builder-product-description">
+        <DashboardTypog
+          as="p"
+          className="shop-builder-product-description"
+          typography={block.typography}
+        >
           {product.description}
-        </p>
+        </DashboardTypog>
         <ProductOptionsSelector
           id={product.id}
           slug={product.slug}
@@ -4593,7 +4701,9 @@ function PreviewProductBlockContent({
     return (
       <div className="shop-builder-product-purchase-panel">
         <span>Ready to order</span>
-        <h3>{product.name}</h3>
+        <DashboardTypog as="h3" typography={block.typography}>
+          {product.name}
+        </DashboardTypog>
         <div className="shop-builder-product-price">
           {product.priceFormatted}
         </div>
@@ -4627,15 +4737,22 @@ function InlineEditableText({
   value,
   className,
   onChange,
+  typography,
 }: {
   as: "span" | "em" | "strong" | "p" | "h2" | "h3";
   value: string;
   className?: string;
   onChange: (value: string) => void;
+  typography?: any;
 }) {
+  const tp = typographyProps(typography, inferTypographyArea(Tag, className));
+
   return (
     <Tag
-      className={`builder-inline-editable ${className ?? ""}`.trim()}
+      className={["builder-inline-editable", className, tp.className]
+        .filter(Boolean)
+        .join(" ")}
+      style={tp.style}
       contentEditable
       suppressContentEditableWarning
       onClick={(event) => event.stopPropagation()}
@@ -4700,6 +4817,7 @@ function PreviewSection({
   onBlockDragEnd: () => void;
   onMoveBlock: (payload: {
     sectionId: string;
+    targetSectionId?: string;
     sourceColumnKey: string;
     sourceBlockKey: string;
     targetColumnKey: string;
@@ -4752,6 +4870,7 @@ function PreviewSection({
               as="p"
               className="shop-builder-eyebrow"
               value={section.eyebrow}
+              typography={section.typography}
               onChange={(eyebrow) => onUpdateSection(section.id, { eyebrow })}
             />
           )}
@@ -4759,6 +4878,7 @@ function PreviewSection({
             as="h2"
             className="shop-builder-title"
             value={section.title}
+            typography={section.typography}
             onChange={(title) => onUpdateSection(section.id, { title })}
           />
           {section.body && (
@@ -4766,11 +4886,18 @@ function PreviewSection({
               as="p"
               className="shop-builder-body"
               value={section.body}
+              typography={section.typography}
               onChange={(body) => onUpdateSection(section.id, { body })}
             />
           )}
           {section.buttonLabel && section.buttonUrl && (
-            <span className="shop-builder-cta">{section.buttonLabel}</span>
+            <DashboardTypog
+              as="span"
+              className="shop-builder-cta"
+              typography={section.typography}
+            >
+              {section.buttonLabel}
+            </DashboardTypog>
           )}
         </div>
         <div
@@ -4806,6 +4933,7 @@ function PreviewSection({
               addToCartPosition={section.addToCartPosition}
               addToCartVisibility={section.addToCartVisibility}
               addToCartDisplay={section.addToCartDisplay}
+              typography={section.typography}
             />
           )
         ) : (
@@ -5014,6 +5142,7 @@ function PreviewSection({
                 as="p"
                 className="shop-builder-eyebrow"
                 value={section.eyebrow}
+                typography={section.typography}
                 onChange={(eyebrow) => onUpdateSection(section.id, { eyebrow })}
               />
             )}
@@ -5022,6 +5151,7 @@ function PreviewSection({
                 as="h2"
                 className="shop-builder-title"
                 value={section.title}
+                typography={section.typography}
                 onChange={(title) => onUpdateSection(section.id, { title })}
               />
             )}
@@ -5030,6 +5160,7 @@ function PreviewSection({
                 as="p"
                 className="shop-builder-body"
                 value={section.body}
+                typography={section.typography}
                 onChange={(body) => onUpdateSection(section.id, { body })}
               />
             )}
@@ -5116,6 +5247,7 @@ function PreviewSection({
                     };
                     onMoveBlock({
                       ...parsed,
+                      targetSectionId: section.id,
                       targetColumnKey: columnKey,
                     });
                   } catch {
@@ -5156,7 +5288,7 @@ function PreviewSection({
                           : ""
                       } is-padding-${block.elementPadding ?? "none"} is-align-${
                         block.elementAlign ?? "left"
-                      }`}
+                      } ${visualStyleClassName(block.visualStyle)}`}
                       style={
                         {
                           "--builder-element-bg":
@@ -5165,6 +5297,9 @@ function PreviewSection({
                               : block.elementBackgroundMode === "custom"
                                 ? (block.elementBackground ?? "#ffffff")
                                 : undefined,
+                          ...visualStyleToCss(
+                            block.visualStyle as BuilderVisualStyle | undefined,
+                          ),
                         } as CSSProperties
                       }
                       onClick={(event) => {
@@ -5234,6 +5369,7 @@ function PreviewSection({
                           };
                           onMoveBlock({
                             ...parsed,
+                            targetSectionId: section.id,
                             targetColumnKey: columnKey,
                             targetBlockKey: blockKey,
                           });
@@ -5304,17 +5440,40 @@ function PreviewSection({
                       ) : block.kind === "icon" ? (
                         <div className="builder-preview-goodie builder-preview-goodie-icon">
                           {getPreviewGoodieIcon(block.iconName)}
-                          {block.title && <strong>{block.title}</strong>}
-                          {block.body && <p>{block.body}</p>}
+                          {block.title && (
+                            <DashboardTypog
+                              as="strong"
+                              typography={block.typography}
+                            >
+                              {block.title}
+                            </DashboardTypog>
+                          )}
+                          {block.body && (
+                            <DashboardTypog as="p" typography={block.typography}>
+                              {block.body}
+                            </DashboardTypog>
+                          )}
                         </div>
                       ) : block.kind === "list" ? (
                         <div className="builder-preview-goodie builder-preview-goodie-list">
-                          {block.title && <strong>{block.title}</strong>}
+                          {block.title && (
+                            <DashboardTypog
+                              as="strong"
+                              typography={block.typography}
+                            >
+                              {block.title}
+                            </DashboardTypog>
+                          )}
                           <ul>
                             {(block.items ?? []).map((item) => (
                               <li key={item}>
                                 <Check size={14} />
-                                {item}
+                                <DashboardTypog
+                                  as="span"
+                                  typography={block.typography}
+                                >
+                                  {item}
+                                </DashboardTypog>
                               </li>
                             ))}
                           </ul>
@@ -5322,8 +5481,19 @@ function PreviewSection({
                       ) : block.kind === "datePicker" ? (
                         <div className="builder-preview-goodie builder-preview-goodie-date">
                           <CalendarDays size={24} />
-                          {block.title && <strong>{block.title}</strong>}
-                          {block.body && <p>{block.body}</p>}
+                          {block.title && (
+                            <DashboardTypog
+                              as="strong"
+                              typography={block.typography}
+                            >
+                              {block.title}
+                            </DashboardTypog>
+                          )}
+                          {block.body && (
+                            <DashboardTypog as="p" typography={block.typography}>
+                              {block.body}
+                            </DashboardTypog>
+                          )}
                           <label>
                             <span>{block.dateLabel ?? "Preferred date"}</span>
                             <input type="date" />
@@ -5334,6 +5504,8 @@ function PreviewSection({
                           {block.eyebrow && (
                             <InlineEditableText
                               as="span"
+                              className="shop-builder-eyebrow"
+                              typography={block.typography}
                               value={block.eyebrow}
                               onChange={(eyebrow) =>
                                 onUpdateBlock(section.id, columnKey, blockKey, {
@@ -5345,6 +5517,7 @@ function PreviewSection({
                           {block.title && (
                             <InlineEditableText
                               as="h3"
+                              typography={block.typography}
                               value={block.title}
                               onChange={(title) =>
                                 onUpdateBlock(section.id, columnKey, blockKey, {
@@ -5356,6 +5529,7 @@ function PreviewSection({
                           {block.body && (
                             <InlineEditableText
                               as="p"
+                              typography={block.typography}
                               value={block.body}
                               onChange={(body) =>
                                 onUpdateBlock(section.id, columnKey, blockKey, {
@@ -5365,9 +5539,13 @@ function PreviewSection({
                             />
                           )}
                           {block.buttonLabel && (
-                            <span className="builder-preview-cta">
+                            <DashboardTypog
+                              as="span"
+                              className="builder-preview-cta"
+                              typography={block.typography}
+                            >
                               {block.buttonLabel}
-                            </span>
+                            </DashboardTypog>
                           )}
                         </div>
                       ) : block.kind === "promoStrip" ? (
@@ -5376,6 +5554,8 @@ function PreviewSection({
                             {block.eyebrow && (
                               <InlineEditableText
                                 as="span"
+                                className="shop-builder-eyebrow"
+                                typography={block.typography}
                                 value={block.eyebrow}
                                 onChange={(eyebrow) =>
                                   onUpdateBlock(
@@ -5390,6 +5570,7 @@ function PreviewSection({
                             {block.title && (
                               <InlineEditableText
                                 as="h3"
+                                typography={block.typography}
                                 value={block.title}
                                 onChange={(title) =>
                                   onUpdateBlock(
@@ -5404,6 +5585,7 @@ function PreviewSection({
                             {block.body && (
                               <InlineEditableText
                                 as="p"
+                                typography={block.typography}
                                 value={block.body}
                                 onChange={(body) =>
                                   onUpdateBlock(
@@ -5417,9 +5599,13 @@ function PreviewSection({
                             )}
                           </div>
                           {block.buttonLabel && (
-                            <span className="builder-preview-cta">
+                            <DashboardTypog
+                              as="span"
+                              className="builder-preview-cta"
+                              typography={block.typography}
+                            >
                               {block.buttonLabel}
-                            </span>
+                            </DashboardTypog>
                           )}
                         </div>
                       ) : block.kind === "panel" ? (
@@ -5436,6 +5622,8 @@ function PreviewSection({
                             {block.eyebrow && (
                               <InlineEditableText
                                 as="span"
+                                className="shop-builder-eyebrow"
+                                typography={block.typography}
                                 value={block.eyebrow}
                                 onChange={(eyebrow) =>
                                   onUpdateBlock(
@@ -5449,7 +5637,8 @@ function PreviewSection({
                             )}
                             {block.title && (
                               <InlineEditableText
-                                as="strong"
+                                as="h3"
+                                typography={block.typography}
                                 value={block.title}
                                 onChange={(title) =>
                                   onUpdateBlock(
@@ -5464,6 +5653,7 @@ function PreviewSection({
                             {block.body && (
                               <InlineEditableText
                                 as="p"
+                                typography={block.typography}
                                 value={block.body}
                                 onChange={(body) =>
                                   onUpdateBlock(
@@ -5476,9 +5666,13 @@ function PreviewSection({
                               />
                             )}
                             {block.buttonLabel && (
-                              <span className="builder-preview-cta">
+                              <DashboardTypog
+                                as="span"
+                                className="builder-preview-cta"
+                                typography={block.typography}
+                              >
                                 {block.buttonLabel}
-                              </span>
+                              </DashboardTypog>
                             )}
                           </div>
                         </div>
@@ -5503,8 +5697,16 @@ function PreviewSection({
                               </div>
                             )}
                           </div>
-                          {block.title && <h3>{block.title}</h3>}
-                          {block.body && <p>{block.body}</p>}
+                          {block.title && (
+                            <DashboardTypog as="h3" typography={block.typography}>
+                              {block.title}
+                            </DashboardTypog>
+                          )}
+                          {block.body && (
+                            <DashboardTypog as="p" typography={block.typography}>
+                              {block.body}
+                            </DashboardTypog>
+                          )}
                         </div>
                       ) : block.kind === "categoryFilters" ? (
                         <div className="shop-builder-column-block shop-builder-column-block--category-filters">
@@ -5524,8 +5726,16 @@ function PreviewSection({
                         </div>
                       ) : block.kind === "slider" ? (
                         <div className="shop-builder-column-block shop-builder-column-block--slider">
-                          {block.title && <h3>{block.title}</h3>}
-                          {block.body && <p>{block.body}</p>}
+                          {block.title && (
+                            <DashboardTypog as="h3" typography={block.typography}>
+                              {block.title}
+                            </DashboardTypog>
+                          )}
+                          {block.body && (
+                            <DashboardTypog as="p" typography={block.typography}>
+                              {block.body}
+                            </DashboardTypog>
+                          )}
                           <CarouselBlock
                             block={{
                               __typename:
@@ -5553,7 +5763,11 @@ function PreviewSection({
                         </div>
                       ) : block.kind === "products" ? (
                         <div className="shop-builder-column-block shop-builder-column-block--products">
-                          {block.title && <h3>{block.title}</h3>}
+                          {block.title && (
+                            <DashboardTypog as="h3" typography={block.typography}>
+                              {block.title}
+                            </DashboardTypog>
+                          )}
                           {previewProducts.length > 0 ? (
                             block.layoutVariant === "carousel" ? (
                               <ProductCarousel
@@ -5564,6 +5778,7 @@ function PreviewSection({
                                 preset={
                                   block.panelStyle ?? block.cardPreset ?? "standard"
                                 }
+                                typography={block.typography}
                               />
                             ) : (
                               <div
@@ -5590,6 +5805,7 @@ function PreviewSection({
                                   addToCartPosition={block.addToCartPosition}
                                   addToCartVisibility={block.addToCartVisibility}
                                   addToCartDisplay={block.addToCartDisplay}
+                                  typography={block.typography}
                                 />
                               </div>
                             )
@@ -5650,7 +5866,13 @@ function PreviewSection({
                                   (block.columns ?? 3) * (block.gridRows ?? 1),
                                 ),
                               )
-                              .map((item, itemIndex) => (
+                              .map((item, itemIndex) => {
+                                const itemTypography =
+                                  ("typography" in item
+                                    ? item.typography
+                                    : undefined) ?? block.typography;
+
+                                return (
                                 <article
                                   key={
                                     item.id ?? `${blockKey}-grid-${itemIndex}`
@@ -5716,6 +5938,8 @@ function PreviewSection({
                                           item.eyebrow && (
                                             <InlineEditableText
                                               as="span"
+                                              className="shop-builder-eyebrow"
+                                              typography={itemTypography}
                                               value={item.eyebrow}
                                               onChange={(eyebrow) =>
                                                 onUpdateGridItem(
@@ -5733,6 +5957,8 @@ function PreviewSection({
                                         {item.title && (
                                           <InlineEditableText
                                             as="h3"
+                                            className="shop-builder-title"
+                                            typography={itemTypography}
                                             value={item.title}
                                             onChange={(title) =>
                                               onUpdateGridItem(
@@ -5752,6 +5978,7 @@ function PreviewSection({
                                             <InlineEditableText
                                               as="span"
                                               className="shop-builder-grid-meta"
+                                              typography={itemTypography}
                                               value={item.meta}
                                               onChange={(meta) =>
                                                 onUpdateGridItem(
@@ -5770,6 +5997,8 @@ function PreviewSection({
                                           item.text && (
                                             <InlineEditableText
                                               as="p"
+                                              className="shop-builder-body"
+                                              typography={itemTypography}
                                               value={item.text}
                                               onChange={(text) =>
                                                 onUpdateGridItem(
@@ -5789,6 +6018,7 @@ function PreviewSection({
                                             <InlineEditableText
                                               as="span"
                                               className="builder-preview-cta"
+                                              typography={itemTypography}
                                               value={item.buttonLabel}
                                               onChange={(buttonLabel) =>
                                                 onUpdateGridItem(
@@ -5827,13 +6057,22 @@ function PreviewSection({
                                     )}
                                   </div>
                                 </article>
-                              ))}
+                              );
+                              })}
                           </div>
                         </div>
                       ) : block.kind === "badgeGrid" ? (
                         <div className="shop-builder-column-block shop-builder-column-block--badges">
-                          {block.title && <h3>{block.title}</h3>}
-                          {block.body && <p>{block.body}</p>}
+                          {block.title && (
+                            <DashboardTypog as="h3" typography={block.typography}>
+                              {block.title}
+                            </DashboardTypog>
+                          )}
+                          {block.body && (
+                            <DashboardTypog as="p" typography={block.typography}>
+                              {block.body}
+                            </DashboardTypog>
+                          )}
                           <div
                             className="shop-builder-column-badges"
                             style={
@@ -5849,9 +6088,30 @@ function PreviewSection({
                                   badge.id ?? `${blockKey}-badge-${badgeIndex}`
                                 }
                               >
-                                {badge.label && <span>{badge.label}</span>}
-                                {badge.title && <strong>{badge.title}</strong>}
-                                {badge.body && <p>{badge.body}</p>}
+                                {badge.label && (
+                                  <DashboardTypog
+                                    as="span"
+                                    typography={block.typography}
+                                  >
+                                    {badge.label}
+                                  </DashboardTypog>
+                                )}
+                                {badge.title && (
+                                  <DashboardTypog
+                                    as="strong"
+                                    typography={block.typography}
+                                  >
+                                    {badge.title}
+                                  </DashboardTypog>
+                                )}
+                                {badge.body && (
+                                  <DashboardTypog
+                                    as="p"
+                                    typography={block.typography}
+                                  >
+                                    {badge.body}
+                                  </DashboardTypog>
+                                )}
                               </article>
                             ))}
                           </div>
@@ -5873,6 +6133,7 @@ function PreviewSection({
                             <InlineEditableText
                               as="em"
                               value={block.eyebrow}
+                              typography={block.typography}
                               onChange={(eyebrow) =>
                                 onUpdateBlock(section.id, columnKey, blockKey, {
                                   eyebrow,
@@ -5884,6 +6145,7 @@ function PreviewSection({
                             <InlineEditableText
                               as="strong"
                               value={block.title}
+                              typography={block.typography}
                               onChange={(title) =>
                                 onUpdateBlock(section.id, columnKey, blockKey, {
                                   title,
@@ -5895,6 +6157,7 @@ function PreviewSection({
                             <InlineEditableText
                               as="p"
                               value={block.body}
+                              typography={block.typography}
                               onChange={(body) =>
                                 onUpdateBlock(section.id, columnKey, blockKey, {
                                   body,

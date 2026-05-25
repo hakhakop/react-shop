@@ -87,7 +87,7 @@ function dashboardTargetForPath(pathname: string) {
 export default function FrontendAdminBar() {
   const pathname = usePathname();
   const [ready, setReady] = useState(false);
-  const [visible, setVisible] = useState(true);
+  const [visible, setVisible] = useState(false);
   const [productEditHref, setProductEditHref] = useState<string | null>(null);
   const target = useMemo(
     () => dashboardTargetForPath(pathname ?? "/"),

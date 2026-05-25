@@ -1,8 +1,8 @@
 "use client";
 
-import { ChevronDown, Search } from "lucide-react";
+import { ChevronDown, Search, Star } from "lucide-react";
 import type { ReactNode } from "react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { LayoutBlockKind } from "@/components/dashboard/builderTypes";
 import {
   layoutBlockDescriptions,
@@ -10,11 +10,32 @@ import {
   layoutBlockLabels,
 } from "@/components/dashboard/builderRegistry";
 
+const FAVORITES_KEY = "react-shop-builder-favorite-blocks";
+const RECENT_KEY = "react-shop-builder-recent-blocks";
+const MAX_RECENT = 8;
+
 type ElementLibraryProps = {
   availableLayoutBlockKinds: LayoutBlockKind[];
   onAddElement: (kind: LayoutBlockKind) => void;
   onRenderLayoutBlockIcon: (kind: LayoutBlockKind) => ReactNode;
 };
+
+function readStoredKinds(key: string): LayoutBlockKind[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = window.localStorage.getItem(key);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? (parsed as LayoutBlockKind[]) : [];
+  } catch {
+    return [];
+  }
+}
+
+function writeStoredKinds(key: string, kinds: LayoutBlockKind[]) {
+  if (typeof window === "undefined") return;
+  window.localStorage.setItem(key, JSON.stringify(kinds));
+}
 
 export default function ElementLibrary({
   availableLayoutBlockKinds,
@@ -22,10 +43,43 @@ export default function ElementLibrary({
   onRenderLayoutBlockIcon,
 }: ElementLibraryProps) {
   const [searchQuery, setSearchQuery] = useState("");
+  const [favoriteKinds, setFavoriteKinds] = useState<LayoutBlockKind[]>([]);
+  const [recentKinds, setRecentKinds] = useState<LayoutBlockKind[]>([]);
   const [openGroupIds, setOpenGroupIds] = useState<Set<string>>(
     () => new Set(layoutBlockGroups.slice(0, 2).map((group) => group.id)),
   );
   const normalizedQuery = searchQuery.trim().toLowerCase();
+
+  useEffect(() => {
+    setFavoriteKinds(readStoredKinds(FAVORITES_KEY));
+    setRecentKinds(readStoredKinds(RECENT_KEY));
+  }, []);
+
+  const rememberRecent = (kind: LayoutBlockKind) => {
+    setRecentKinds((current) => {
+      const next = [kind, ...current.filter((entry) => entry !== kind)].slice(
+        0,
+        MAX_RECENT,
+      );
+      writeStoredKinds(RECENT_KEY, next);
+      return next;
+    });
+  };
+
+  const toggleFavorite = (kind: LayoutBlockKind) => {
+    setFavoriteKinds((current) => {
+      const next = current.includes(kind)
+        ? current.filter((entry) => entry !== kind)
+        : [...current, kind];
+      writeStoredKinds(FAVORITES_KEY, next);
+      return next;
+    });
+  };
+
+  const addElement = (kind: LayoutBlockKind) => {
+    rememberRecent(kind);
+    onAddElement(kind);
+  };
 
   const filteredGroups = useMemo(
     () =>
@@ -51,6 +105,18 @@ export default function ElementLibrary({
     [availableLayoutBlockKinds, normalizedQuery],
   );
 
+  const quickKinds = useMemo(() => {
+    const merged = [...favoriteKinds, ...recentKinds];
+    return merged.filter(
+      (kind, index) =>
+        availableLayoutBlockKinds.includes(kind) &&
+        merged.indexOf(kind) === index &&
+        (!normalizedQuery ||
+          layoutBlockLabels[kind].toLowerCase().includes(normalizedQuery) ||
+          kind.toLowerCase().includes(normalizedQuery)),
+    );
+  }, [availableLayoutBlockKinds, favoriteKinds, normalizedQuery, recentKinds]);
+
   const toggleGroup = (groupId: string) => {
     setOpenGroupIds((current) => {
       const next = new Set(current);
@@ -63,32 +129,89 @@ export default function ElementLibrary({
     });
   };
 
-  const visibleElementCount = filteredGroups.reduce(
-    (count, group) => count + group.kinds.length,
-    0,
+  const renderKindButton = (blockKind: LayoutBlockKind) => (
+    <button
+      key={blockKind}
+      type="button"
+      draggable
+      onClick={() => addElement(blockKind)}
+      onDragStart={(event) => {
+        rememberRecent(blockKind);
+        event.dataTransfer.setData(
+          "application/x-builder-new-block",
+          blockKind,
+        );
+        event.dataTransfer.setData(
+          "text/plain",
+          `builder-new-block:${blockKind}`,
+        );
+        event.dataTransfer.effectAllowed = "copy";
+      }}
+    >
+      <span className="builder-element-library-icon">
+        {onRenderLayoutBlockIcon(blockKind)}
+      </span>
+      <span>
+        <strong>{layoutBlockLabels[blockKind]}</strong>
+        <small>{layoutBlockDescriptions[blockKind]}</small>
+      </span>
+      <span
+        role="button"
+        tabIndex={0}
+        className={`builder-element-favorite ${
+          favoriteKinds.includes(blockKind) ? "is-active" : ""
+        }`}
+        aria-label={
+          favoriteKinds.includes(blockKind)
+            ? "Remove from favorites"
+            : "Add to favorites"
+        }
+        onClick={(event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          toggleFavorite(blockKind);
+        }}
+        onKeyDown={(event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            event.stopPropagation();
+            toggleFavorite(blockKind);
+          }
+        }}
+        onMouseDown={(event) => event.stopPropagation()}
+      >
+        <Star size={14} />
+      </span>
+    </button>
   );
 
   return (
     <div className="builder-sidebar-panel">
-      <div className="builder-sidebar-panel-header">
-        <div>
-          <strong>Element Library</strong>
-          <span>Drag or click to add blocks</span>
-        </div>
-        <small>
-          {visibleElementCount}/{availableLayoutBlockKinds.length}
-        </small>
-      </div>
       <label className="builder-element-library-search">
         <Search size={15} />
         <input
           type="search"
           value={searchQuery}
           onChange={(event) => setSearchQuery(event.target.value)}
-          placeholder="Search elements"
+          placeholder={`Search ${availableLayoutBlockKinds.length} elements`}
         />
       </label>
       <div className="builder-element-library" aria-label="Element library">
+        {quickKinds.length > 0 && !normalizedQuery && (
+          <details className="builder-collapse builder-element-library-group" open>
+            <summary className="builder-element-library-group-title">
+              <span>
+                <ChevronDown size={14} />
+                Favorites & recent
+              </span>
+              <small>{quickKinds.length}</small>
+            </summary>
+            <div className="builder-element-library-group-content">
+              {quickKinds.map((blockKind) => renderKindButton(blockKind))}
+            </div>
+          </details>
+        )}
+
         {filteredGroups.length === 0 && (
           <div className="builder-empty-state builder-element-library-empty">
             <Search size={22} />
@@ -117,33 +240,7 @@ export default function ElementLibrary({
                 <small>{group.kinds.length}</small>
               </summary>
               <div className="builder-element-library-group-content">
-                {group.kinds.map((blockKind) => (
-                  <button
-                    key={blockKind}
-                    type="button"
-                    draggable
-                    onClick={() => onAddElement(blockKind)}
-                    onDragStart={(event) => {
-                      event.dataTransfer.setData(
-                        "application/x-builder-new-block",
-                        blockKind,
-                      );
-                      event.dataTransfer.setData(
-                        "text/plain",
-                        `builder-new-block:${blockKind}`,
-                      );
-                      event.dataTransfer.effectAllowed = "copy";
-                    }}
-                  >
-                    <span className="builder-element-library-icon">
-                      {onRenderLayoutBlockIcon(blockKind)}
-                    </span>
-                    <span>
-                      <strong>{layoutBlockLabels[blockKind]}</strong>
-                      <small>{layoutBlockDescriptions[blockKind]}</small>
-                    </span>
-                  </button>
-                ))}
+                {group.kinds.map((blockKind) => renderKindButton(blockKind))}
               </div>
             </details>
           );

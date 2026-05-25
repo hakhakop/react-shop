@@ -11,6 +11,7 @@ import type {
   SectionContentMode,
   SectionKind,
   SectionSpacing,
+  TypographySettings,
 } from "@/components/dashboard/builderTypes";
 import { sectionLabels } from "@/components/dashboard/builderRegistry";
 
@@ -139,6 +140,17 @@ export const defaultState: BuilderState = {
       visible: true,
     },
   ],
+};
+
+const defaultTypography: TypographySettings = {
+  variant: "body",
+  fontFamily: "inherit",
+  fontSize: "16px",
+  fontWeight: "400",
+  lineHeight: "1.4",
+  letterSpacing: "0px",
+  color: "inherit",
+  textAlign: "left",
 };
 
 export const defaultTemplateStates: Record<BuilderTemplate, BuilderState> = {
@@ -432,6 +444,7 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
           text: "Map static or dynamic content into a reusable card.",
           buttonLabel: "Learn more",
           buttonUrl: "/",
+          typography: defaultTypography,
         },
         {
           id: `${id}-2`,
@@ -441,6 +454,7 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
           text: "Control columns, spacing, images, and content.",
           buttonLabel: "Learn more",
           buttonUrl: "/",
+          typography: defaultTypography,
         },
         {
           id: `${id}-3`,
@@ -450,6 +464,7 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
           text: "Later this can read posts, products, or custom fields.",
           buttonLabel: "Learn more",
           buttonUrl: "/",
+          typography: defaultTypography,
         },
       ],
     };
@@ -615,6 +630,7 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
           title: "First slide",
           text: "Edit this slider block from the column.",
           imagePadding: "medium",
+          typography: defaultTypography,
         },
         {
           id: `${id}-slide-2`,
@@ -622,6 +638,7 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
           title: "Second slide",
           text: "Use this for campaigns, features, or visual stories.",
           imagePadding: "medium",
+          typography: defaultTypography,
         },
       ],
       carouselSettings: {
@@ -756,6 +773,7 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
     body: "Add copy, buttons, and simple content inside this column.",
     buttonLabel: "",
     buttonUrl: "",
+    typography: defaultTypography,
   };
 }
 

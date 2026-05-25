@@ -32,6 +32,12 @@ import type {
   BuilderPage,
   BuilderSection,
 } from "@/lib/builderLayouts";
+import { typographyProps, type TypographyArea } from "@/lib/builderTypography";
+import type { BuilderVisualStyle } from "@/lib/builderVisualStyle";
+import {
+  visualStyleClassName,
+  visualStyleToCss,
+} from "@/lib/builderVisualStyle";
 
 type StorefrontBuilderRendererProps = {
   layout: BuilderLayout;
@@ -248,6 +254,8 @@ function sectionStyle(section: BuilderSection): BuilderStyle {
           } satisfies BuilderStyle)
         : ({} satisfies BuilderStyle);
 
+  const visual = section.visualStyle as BuilderVisualStyle | undefined;
+
   return {
     background: section.background,
     "--builder-section-padding-top": getSpacingValue(section.topSpacing),
@@ -255,6 +263,7 @@ function sectionStyle(section: BuilderSection): BuilderStyle {
     "--builder-section-margin-top": getSpacingValue(section.topMargin),
     "--builder-section-margin-bottom": getSpacingValue(section.bottomMargin),
     ...schemeVars,
+    ...visualStyleToCss(visual),
   } as BuilderStyle;
 }
 
@@ -265,7 +274,10 @@ function sectionClassName(section: BuilderSection, extra = "") {
       ? section.contentMode
       : "boxed";
   const scheme = resolveSectionColorScheme(section);
-  return `shop-builder-section shop-builder-section--${mode} shop-builder-section--content-${contentMode} shop-builder-section--scheme-${scheme} ${extra}`.trim();
+  const visualClass = visualStyleClassName(
+    section.visualStyle as BuilderVisualStyle | undefined,
+  );
+  return `shop-builder-section shop-builder-section--${mode} shop-builder-section--content-${contentMode} shop-builder-section--scheme-${scheme} ${visualClass} ${extra}`.trim();
 }
 
 function SectionFrame({
@@ -330,25 +342,41 @@ function HeroSection({
     <SectionFrame section={section} extra="shop-builder-hero">
       <div data-gsap-hero-item>
         {section.eyebrow && (
-          <p className="shop-builder-eyebrow">{section.eyebrow}</p>
+          <Typog
+            as="p"
+            className="shop-builder-eyebrow"
+            typography={section.typography}
+          >
+            {section.eyebrow}
+          </Typog>
         )}
-        <h1 className="shop-builder-title">
+        <Typog
+          as="h1"
+          className="shop-builder-title"
+          typography={section.typography}
+        >
           {isProductTemplate ? product?.name : section.title}
-        </h1>
+        </Typog>
         {(isProductTemplate ? product?.priceFormatted : section.body) && (
-          <p className="shop-builder-body">
+          <Typog
+            as="p"
+            className="shop-builder-body"
+            typography={section.typography}
+          >
             {isProductTemplate ? product?.priceFormatted : section.body}
-          </p>
+          </Typog>
         )}
         {section.buttonLabel && section.buttonUrl && (
-          <a
+          <Typog
+            as="a"
             className="shop-builder-cta"
             href={section.buttonUrl}
             target={section.buttonTarget === "_blank" ? "_blank" : undefined}
             rel={section.buttonTarget === "_blank" ? "noreferrer" : undefined}
+            typography={section.typography}
           >
             {section.buttonLabel}
-          </a>
+          </Typog>
         )}
       </div>
       {isProductTemplate && product?.imageUrl ? (
@@ -524,6 +552,7 @@ async function ContentProductsBlock({ block }: { block: BuilderLayoutBlock }) {
       <ProductCarousel
         products={products}
         preset={block.panelStyle ?? block.cardPreset ?? "standard"}
+        typography={block.typography}
       />
     );
   }
@@ -568,6 +597,7 @@ function GridCards({
     text?: string;
     buttonLabel?: string;
     buttonUrl?: string;
+    typography?: BuilderLayoutBlock["typography"];
   }>;
 }) {
   const limit = Math.max(1, (block.columns ?? 3) * (block.gridRows ?? 1));
@@ -595,17 +625,22 @@ function GridCards({
             {block.gridShowEyebrow !== false && item.eyebrow && (
               <span>{item.eyebrow}</span>
             )}
-            {item.title && <h3>{item.title}</h3>}
+            {item.title && <Typog as="h3" typography={item.typography ?? block.typography}>{item.title}</Typog>}
             {block.gridShowMeta !== false && item.meta && (
               <small>{item.meta}</small>
             )}
-            {block.gridShowText !== false && item.text && <p>{item.text}</p>}
+            {block.gridShowText !== false && item.text && <Typog as="p" typography={item.typography ?? block.typography}>{item.text}</Typog>}
             {block.gridShowButton !== false &&
               item.buttonLabel &&
               item.buttonUrl && (
-                <a className="shop-builder-cta" href={item.buttonUrl}>
+                <Typog
+                  as="a"
+                  className="shop-builder-cta"
+                  href={item.buttonUrl}
+                  typography={item.typography ?? block.typography}
+                >
                   {item.buttonLabel}
-                </a>
+                </Typog>
               )}
           </div>
         </article>
@@ -654,13 +689,15 @@ async function ContentGridBlock({ block }: { block: BuilderLayoutBlock }) {
 
 function ProductSummaryBlock({
   product,
+  typography,
 }: {
   product: StorefrontBuilderProduct;
+  typography?: any;
 }) {
   return (
     <div className="shop-builder-product-summary">
       <div className="product-header-row">
-        <h3>{product.name}</h3>
+        <Typog as="h3" typography={typography}>{product.name}</Typog>
         <WishlistToggle
           id={product.id}
           slug={product.slug}
@@ -726,7 +763,7 @@ function ProductDynamicBlock({
         <div className="shop-builder-premium-product-copy">
           <span>Featured Product</span>
           <div className="product-header-row">
-            <h3>{product.name}</h3>
+            <Typog as="h3" typography={block?.typography}>{product.name}</Typog>
             <WishlistToggle
               id={product.id}
               slug={product.slug}
@@ -761,8 +798,8 @@ function ProductDynamicBlock({
   if (kind === "productInfoStack") {
     return (
       <div className="shop-builder-product-info-stack">
-        <div className="product-header-row">
-          <h3>{product.name}</h3>
+          <div className="product-header-row">
+          <Typog as="h3" typography={block?.typography}>{product.name}</Typog>
           <WishlistToggle
             id={product.id}
             slug={product.slug}
@@ -797,7 +834,7 @@ function ProductDynamicBlock({
     return (
       <div className="shop-builder-product-purchase-panel">
         <span>Ready to order</span>
-        <h3>{product.name}</h3>
+        <Typog as="h3" typography={block?.typography}>{product.name}</Typog>
         {product.priceFormatted && (
           <div className="shop-builder-product-price">
             {product.priceFormatted}
@@ -851,7 +888,7 @@ function ProductDynamicBlock({
   if (kind === "productTitle") {
     return (
       <div className="product-header-row">
-        <h3>{product.name}</h3>
+        <Typog as="h3" typography={block?.typography}>{product.name}</Typog>
         <WishlistToggle
           id={product.id}
           slug={product.slug}
@@ -968,7 +1005,7 @@ function ContentLayoutBlock({
   if (product && block.id?.includes("product-summary")) {
     return (
       <div className="shop-builder-column-block shop-builder-column-block--product-summary">
-        <ProductSummaryBlock product={product} />
+        <ProductSummaryBlock product={product} typography={block.typography} />
       </div>
     );
   }
@@ -1008,8 +1045,8 @@ function ContentLayoutBlock({
 
     return (
       <div className="shop-builder-column-block shop-builder-column-block--slider">
-        {block.title && <h3>{block.title}</h3>}
-        {block.body && <p>{block.body}</p>}
+        {block.title && <Typog as="h3" typography={block.typography}>{block.title}</Typog>}
+        {block.body && <Typog as="p" typography={block.typography}>{block.body}</Typog>}
         <CarouselBlock
           block={{
             __typename: "PageBuilderLayoutPageBuilderCarouselLayoutLayout",
@@ -1025,8 +1062,8 @@ function ContentLayoutBlock({
   if (block.kind === "embed") {
     return (
       <div className="shop-builder-column-block shop-builder-column-block--embed">
-        {block.title && <h3>{block.title}</h3>}
-        {block.body && <p>{block.body}</p>}
+        {block.title && <Typog as="h3" typography={block.typography}>{block.title}</Typog>}
+        {block.body && <Typog as="p" typography={block.typography}>{block.body}</Typog>}
         <EmbedSectionClient
           mode={block.embedMode}
           code={block.embedCode}
@@ -1066,8 +1103,8 @@ function ContentLayoutBlock({
 
     return (
       <div className="shop-builder-column-block shop-builder-column-block--badges">
-        {block.title && <h3>{block.title}</h3>}
-        {block.body && <p>{block.body}</p>}
+        {block.title && <Typog as="h3" typography={block.typography}>{block.title}</Typog>}
+        {block.body && <Typog as="p" typography={block.typography}>{block.body}</Typog>}
         <div
           className="shop-builder-column-badges"
           style={
@@ -1079,8 +1116,8 @@ function ContentLayoutBlock({
           {badges.map((badge, index) => (
             <article key={badge.id ?? index}>
               {badge.label && <span>{badge.label}</span>}
-              {badge.title && <strong>{badge.title}</strong>}
-              {badge.body && <p>{badge.body}</p>}
+              {badge.title && <Typog as="strong" typography={block.typography}>{badge.title}</Typog>}
+              {badge.body && <Typog as="p" typography={block.typography}>{badge.body}</Typog>}
             </article>
           ))}
         </div>
@@ -1091,7 +1128,7 @@ function ContentLayoutBlock({
   if (block.kind === "products") {
     return (
       <div className="shop-builder-column-block shop-builder-column-block--products">
-        {block.title && <h3>{block.title}</h3>}
+        {block.title && <Typog as="h3" typography={block.typography}>{block.title}</Typog>}
         <Suspense fallback={<ProductsSkeleton />}>
           <ContentProductsBlock block={block} />
         </Suspense>
@@ -1113,8 +1150,8 @@ function ContentLayoutBlock({
     return (
       <div className="shop-builder-column-block shop-builder-column-block--icon">
         <GoodieIcon iconName={block.iconName} />
-        {block.title && <h3>{block.title}</h3>}
-        {block.body && <p>{block.body}</p>}
+        {block.title && <Typog as="h3" typography={block.typography}>{block.title}</Typog>}
+        {block.body && <Typog as="p" typography={block.typography}>{block.body}</Typog>}
       </div>
     );
   }
@@ -1122,7 +1159,7 @@ function ContentLayoutBlock({
   if (block.kind === "list") {
     return (
       <div className="shop-builder-column-block shop-builder-column-block--list">
-        {block.title && <h3>{block.title}</h3>}
+        {block.title && <Typog as="h3" typography={block.typography}>{block.title}</Typog>}
         <ul>
           {(block.items ?? []).map((item) => (
             <li key={item}>
@@ -1139,8 +1176,8 @@ function ContentLayoutBlock({
     return (
       <div className="shop-builder-column-block shop-builder-column-block--date-picker">
         <CalendarDays size={24} />
-        {block.title && <h3>{block.title}</h3>}
-        {block.body && <p>{block.body}</p>}
+        {block.title && <Typog as="h3" typography={block.typography}>{block.title}</Typog>}
+        {block.body && <Typog as="p" typography={block.typography}>{block.body}</Typog>}
         <label>
           <span>{block.dateLabel ?? "Preferred date"}</span>
           <input type="date" />
@@ -1153,14 +1190,14 @@ function ContentLayoutBlock({
     return page === "page:cart" ? (
       pageContent ?? (
         <div className="shop-builder-column-block shop-builder-column-block--text">
-          <h3>Cart content</h3>
-          <p>The live cart UI will render here.</p>
+          <Typog as="h3">Cart content</Typog>
+          <Typog as="p">The live cart UI will render here.</Typog>
         </div>
       )
     ) : (
       <div className="shop-builder-column-block shop-builder-column-block--text">
-        <h3>Cart content</h3>
-        <p>Use this block on the Cart page.</p>
+        <Typog as="h3">Cart content</Typog>
+        <Typog as="p">Use this block on the Cart page.</Typog>
       </div>
     );
   }
@@ -1169,14 +1206,14 @@ function ContentLayoutBlock({
     return page === "page:checkout" ? (
       pageContent ?? (
         <div className="shop-builder-column-block shop-builder-column-block--text">
-          <h3>Checkout content</h3>
-          <p>The live checkout UI will render here.</p>
+          <Typog as="h3">Checkout content</Typog>
+          <Typog as="p">The live checkout UI will render here.</Typog>
         </div>
       )
     ) : (
       <div className="shop-builder-column-block shop-builder-column-block--text">
-        <h3>Checkout content</h3>
-        <p>Use this block on the Checkout page.</p>
+        <Typog as="h3">Checkout content</Typog>
+        <Typog as="p">Use this block on the Checkout page.</Typog>
       </div>
     );
   }
@@ -1185,14 +1222,14 @@ function ContentLayoutBlock({
     return page === "page:my-account" ? (
       pageContent ?? (
         <div className="shop-builder-column-block shop-builder-column-block--text">
-          <h3>My account content</h3>
-          <p>The live account UI will render here.</p>
+          <Typog as="h3">My account content</Typog>
+          <Typog as="p">The live account UI will render here.</Typog>
         </div>
       )
     ) : (
       <div className="shop-builder-column-block shop-builder-column-block--text">
-        <h3>My account content</h3>
-        <p>Use this block on the My Account page.</p>
+        <Typog as="h3">My account content</Typog>
+        <Typog as="p">Use this block on the My Account page.</Typog>
       </div>
     );
   }
@@ -1200,13 +1237,26 @@ function ContentLayoutBlock({
   if (block.kind === "hero") {
     return (
       <div className="shop-builder-column-block shop-builder-column-block--hero">
-        {block.eyebrow && <span>{block.eyebrow}</span>}
-        {block.title && <h3>{block.title}</h3>}
-        {block.body && <p>{block.body}</p>}
+        {block.eyebrow && (
+          <Typog
+            as="span"
+            className="shop-builder-eyebrow"
+            typography={block.typography}
+          >
+            {block.eyebrow}
+          </Typog>
+        )}
+        {block.title && <Typog as="h3" typography={block.typography}>{block.title}</Typog>}
+        {block.body && <Typog as="p" typography={block.typography}>{block.body}</Typog>}
         {block.buttonLabel && block.buttonUrl && (
-          <a className="shop-builder-cta" href={block.buttonUrl}>
+          <Typog
+            as="a"
+            className="shop-builder-cta"
+            href={block.buttonUrl}
+            typography={block.typography}
+          >
             {block.buttonLabel}
-          </a>
+          </Typog>
         )}
       </div>
     );
@@ -1217,13 +1267,18 @@ function ContentLayoutBlock({
       <div className="shop-builder-column-block shop-builder-column-block--promo-strip">
         <div>
           {block.eyebrow && <span>{block.eyebrow}</span>}
-          {block.title && <h3>{block.title}</h3>}
-          {block.body && <p>{block.body}</p>}
+          {block.title && <Typog as="h3" typography={block.typography}>{block.title}</Typog>}
+          {block.body && <Typog as="p" typography={block.typography}>{block.body}</Typog>}
         </div>
         {block.buttonLabel && block.buttonUrl && (
-          <a className="shop-builder-cta" href={block.buttonUrl}>
+          <Typog
+            as="a"
+            className="shop-builder-cta"
+            href={block.buttonUrl}
+            typography={block.typography}
+          >
             {block.buttonLabel}
-          </a>
+          </Typog>
         )}
       </div>
     );
@@ -1242,12 +1297,17 @@ function ContentLayoutBlock({
         )}
         <div>
           {block.eyebrow && <span>{block.eyebrow}</span>}
-          {block.title && <h3>{block.title}</h3>}
-          {block.body && <p>{block.body}</p>}
+          {block.title && <Typog as="h3" typography={block.typography}>{block.title}</Typog>}
+          {block.body && <Typog as="p" typography={block.typography}>{block.body}</Typog>}
           {block.buttonLabel && block.buttonUrl && (
-            <a className="shop-builder-cta" href={block.buttonUrl}>
+            <Typog
+              as="a"
+              className="shop-builder-cta"
+              href={block.buttonUrl}
+              typography={block.typography}
+            >
               {block.buttonLabel}
-            </a>
+            </Typog>
           )}
         </div>
       </div>
@@ -1257,12 +1317,17 @@ function ContentLayoutBlock({
   return (
     <div className="shop-builder-column-block shop-builder-column-block--text">
       {block.eyebrow && <span>{block.eyebrow}</span>}
-      {block.title && <h3>{block.title}</h3>}
-      {block.body && <p>{block.body}</p>}
+      {block.title && <Typog as="h3" typography={block.typography}>{block.title}</Typog>}
+      {block.body && <Typog as="p" typography={block.typography}>{block.body}</Typog>}
       {block.buttonLabel && block.buttonUrl && (
-        <a className="shop-builder-cta" href={block.buttonUrl}>
+        <Typog
+          as="a"
+          className="shop-builder-cta"
+          href={block.buttonUrl}
+          typography={block.typography}
+        >
           {block.buttonLabel}
-        </a>
+        </Typog>
       )}
     </div>
   );
@@ -1271,23 +1336,68 @@ function ContentLayoutBlock({
 function blockSurfaceStyle(
   block: BuilderLayoutBlock,
 ): CSSProperties | undefined {
+  const visual = block.visualStyle as BuilderVisualStyle | undefined;
+  const visualCss = visualStyleToCss(visual);
+  const legacy: BuilderStyle = {};
+
   if (block.elementBackgroundMode === "transparent") {
-    return { "--builder-element-bg": "transparent" } as CSSProperties;
+    legacy["--builder-element-bg"] = "transparent";
+  } else if (
+    block.elementBackgroundMode === "custom" &&
+    block.elementBackground
+  ) {
+    legacy["--builder-element-bg"] = block.elementBackground;
   }
-  if (block.elementBackgroundMode === "custom" && block.elementBackground) {
-    return { "--builder-element-bg": block.elementBackground } as CSSProperties;
+
+  if (!Object.keys(visualCss).length && !Object.keys(legacy).length) {
+    return undefined;
   }
-  return undefined;
+
+  return { ...legacy, ...visualCss };
 }
 
 function blockShellClassName(block: BuilderLayoutBlock) {
+  const visualClass = visualStyleClassName(
+    block.visualStyle as BuilderVisualStyle | undefined,
+  );
   return `shop-builder-element-shell shop-card-preset--${
     block.panelStyle ?? "default"
   } is-padding-${
     block.elementPadding ?? "none"
   } is-align-${
     block.elementAlign ?? "left"
-  }`;
+  } ${visualClass}`.trim();
+}
+
+function Typog({ as: As = "div", typography, className, children, ...props }: any) {
+  const tp = typographyProps(
+    typography,
+    inferTypographyArea(String(As), className),
+  );
+  const Tag = As as any;
+  const combined = [className, tp.className].filter(Boolean).join(" ");
+  return (
+    <Tag className={combined || undefined} style={tp.style} {...props}>
+      {children}
+    </Tag>
+  );
+}
+
+function inferTypographyArea(
+  tagName: string,
+  className?: string,
+): TypographyArea {
+  const tag = tagName.toLowerCase();
+  const classHint = String(className || "").toLowerCase();
+
+  if (classHint.includes("eyebrow")) return "eyebrow";
+  if (classHint.includes("cta") || tag === "a" || tag === "button") {
+    return "button";
+  }
+  if (/^h[1-6]$/.test(tag) || tag === "strong" || tag === "em") {
+    return "title";
+  }
+  return "body";
 }
 
 function ContentLayoutSection({

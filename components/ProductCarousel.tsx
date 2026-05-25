@@ -8,11 +8,13 @@ import ProductCard from "./ProductCard";
 type ProductCarouselProps = {
   products: ProductNode[];
   preset: string;
+  typography?: any;
 };
 
 export default function ProductCarousel({
   products,
   preset,
+  typography,
 }: ProductCarouselProps) {
   const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: true,
@@ -39,7 +41,7 @@ export default function ProductCarousel({
         <div className="product-carousel__container">
           {products.map((p) => (
             <div className="product-carousel__slide" key={p.id}>
-              <ProductCard product={p} preset={preset} />
+              <ProductCard product={p} preset={preset} typography={typography} />
             </div>
           ))}
         </div>

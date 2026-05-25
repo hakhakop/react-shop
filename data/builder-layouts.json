@@ -25,6 +25,120 @@
     },
     "sections": [
       {
+        "id": "contentLayout-mpjr1ee9-698de",
+        "kind": "contentLayout",
+        "title": "",
+        "background": "#ffffff",
+        "backgroundMode": "boxed",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "topSpacing": "inherit",
+        "bottomSpacing": "inherit",
+        "topMargin": "inherit",
+        "bottomMargin": "inherit",
+        "visible": true,
+        "eyebrow": "",
+        "body": "",
+        "layout": "whole",
+        "layoutColumns": 1,
+        "layoutItems": [
+          {
+            "id": "layout-item-mpjr1ee9-1",
+            "blocks": [
+              {
+                "id": "hero-block-mpjr1xel-o798r",
+                "kind": "hero",
+                "eyebrow": "Featured",
+                "title": "Ողջույն...",
+                "body": "Գեղեցիկ React կայքեր WordPress կառավարմամբ և հոսթինգով միասին",
+                "buttonLabel": "Learn more",
+                "buttonUrl": "/",
+                "typography": {
+                  "title": {
+                    "fontSize": "64",
+                    "fontWeight": "800",
+                    "variant": "subheading",
+                    "color": "#11e88b",
+                    "textAlign": "center"
+                  },
+                  "body": {
+                    "color": "#b3b3b3",
+                    "fontSize": "28",
+                    "textAlign": "center"
+                  },
+                  "button": {
+                    "textAlign": "center"
+                  }
+                },
+                "panelStyle": "dark",
+                "elementAlign": "center"
+              }
+            ]
+          }
+        ],
+        "layoutRows": 1,
+        "typography": {
+          "title": {
+            "fontSize": "64",
+            "textAlign": "center"
+          }
+        },
+        "visualStyle": {
+          "background": {
+            "type": "color",
+            "color": "#2b2b2b"
+          }
+        }
+      },
+      {
+        "id": "contentLayout-mpjkrynd-6j2w5",
+        "kind": "contentLayout",
+        "title": "",
+        "background": "#24241f",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "topSpacing": "inherit",
+        "bottomSpacing": "inherit",
+        "topMargin": "inherit",
+        "bottomMargin": "inherit",
+        "visible": true,
+        "eyebrow": "",
+        "body": "",
+        "layout": "whole",
+        "layoutColumns": 1,
+        "layoutItems": [
+          {
+            "id": "layout-item-mpjkrynd-1",
+            "blocks": [
+              {
+                "id": "products-block-mpjksd9r-36hp4",
+                "kind": "products",
+                "title": "Products",
+                "source": "all",
+                "layoutVariant": "grid",
+                "columns": 4,
+                "gridLimit": 12,
+                "filterPosition": "top",
+                "cardStyle": "none",
+                "cardPreset": "standard",
+                "typography": {
+                  "textAlign": "justify",
+                  "variant": "body",
+                  "fontWeight": "500",
+                  "fontSize": "24px"
+                },
+                "gridGap": "small",
+                "gridMargin": "none",
+                "imagePadding": "none",
+                "cardPadding": "small"
+              }
+            ]
+          }
+        ],
+        "layoutRows": 1
+      },
+      {
         "id": "webpages-capability-hero",
         "kind": "contentLayout",
         "title": "",
@@ -54,7 +168,26 @@
                 "body": "A premium React frontend connected to WordPress content, WooCommerce products, cart, checkout, account tools, dashboard editing, hosting, and support.",
                 "buttonLabel": "Explore the live shop",
                 "buttonUrl": "/shop",
-                "elementPadding": "large"
+                "elementPadding": "large",
+                "typography": {
+                  "textAlign": "justify",
+                  "textTransform": "uppercase",
+                  "textDecoration": "underline",
+                  "color": "#ff0000",
+                  "title": {
+                    "textAlign": "left",
+                    "textTransform": "capitalize",
+                    "textDecoration": "underline",
+                    "color": "#d1d1d1",
+                    "fontWeight": "500"
+                  },
+                  "body": {
+                    "color": "#d4d4d4"
+                  }
+                },
+                "panelStyle": "flat-dark",
+                "elementBackgroundMode": "custom",
+                "elementBackground": "#111111"
               },
               {
                 "id": "webpages-capability-hero-proof",
@@ -194,10 +327,10 @@
         "title": "Live WooCommerce shop grid",
         "eyebrow": "Commerce preview",
         "body": "Real imported products, prices, options, wishlist, and add-to-cart behavior rendered through the React frontend.",
-        "background": "#ffffff",
+        "background": "#24241f",
         "backgroundMode": "boxed",
         "contentMode": "boxed",
-        "colorScheme": "light",
+        "colorScheme": "inherit",
         "topSpacing": "large",
         "bottomSpacing": "large",
         "columns": 4,
@@ -427,9 +560,42 @@
         "ctaLabel": "Request a website plan",
         "ctaUrl": "/client",
         "visible": true
+      },
+      {
+        "id": "contentLayout-mpk2kf7x-xww56",
+        "kind": "contentLayout",
+        "title": "",
+        "background": "#111111",
+        "backgroundMode": "boxed",
+        "contentMode": "narrow",
+        "colorScheme": "inherit",
+        "topSpacing": "inherit",
+        "bottomSpacing": "inherit",
+        "topMargin": "inherit",
+        "bottomMargin": "inherit",
+        "visible": true,
+        "eyebrow": "",
+        "body": "",
+        "layout": "whole",
+        "layoutColumns": 1,
+        "layoutItems": [
+          {
+            "id": "layout-item-mpk2kf7x-1",
+            "blocks": [
+              {
+                "id": "fluentForm-block-mpk2khtk-03q5s",
+                "kind": "fluentForm",
+                "title": "Contact Form",
+                "body": "Rendered from Fluent Forms in WordPress.",
+                "fluentFormId": "1"
+              }
+            ]
+          }
+        ],
+        "layoutRows": 1
       }
     ],
-    "updatedAt": "2026-05-24T07:39:41.656Z"
+    "updatedAt": "2026-05-24T18:30:09.129Z"
   },
   "shop": {
     "version": 1,
@@ -1921,7 +2087,7 @@
                 "kind": "hero",
                 "eyebrow": "Maison Webpages",
                 "title": "New silhouettes for the modern city wardrobe.",
-                "body": "A refined fashion storefront demo shaped for editorial storytelling, clean commerce, and imported WooCommerce product data.",
+                "body": "A refined fashiojkkjkn storefront demo shapednjh for editorial storytelling, clean commerce, and imported WojkjkloCommerce produjhjhct data.",
                 "buttonLabel": "Shop new arrivals",
                 "buttonUrl": "/shop",
                 "elementPadding": "large"
@@ -2266,7 +2432,7 @@
         "visible": true
       }
     ],
-    "updatedAt": "2026-05-23T22:50:18.184Z"
+    "updatedAt": "2026-05-24T12:11:25.132Z"
   },
   "page:demos": {
     "version": 1,
