@@ -39,8 +39,7 @@
         "visible": true,
         "eyebrow": "",
         "body": "",
-        "layout": "whole",
-        "layoutColumns": 1,
+        "layoutColumns": 2,
         "layoutItems": [
           {
             "id": "layout-item-mpjr1ee9-1",
@@ -48,7 +47,7 @@
               {
                 "id": "hero-block-mpjr1xel-o798r",
                 "kind": "hero",
-                "eyebrow": "Featured",
+                "eyebrow": "",
                 "title": "Ողջույն...",
                 "body": "Գեղեցիկ React կայքեր WordPress կառավարմամբ և հոսթինգով միասին",
                 "buttonLabel": "Learn more",
@@ -70,8 +69,37 @@
                     "textAlign": "center"
                   }
                 },
-                "panelStyle": "dark",
+                "panelStyle": "default",
                 "elementAlign": "center"
+              }
+            ]
+          },
+          {
+            "id": "layout-item-mpkurqja",
+            "blocks": [
+              {
+                "id": "panel-block-mpkusmg2-yrm1k",
+                "kind": "panel",
+                "eyebrow": "",
+                "title": "",
+                "body": "Արագ, ժամանակակից և հարմարավետ կայքեր՝ առցանց խանութի, բովանդակության կառավարման և ամբողջական տեխնիկական սպասարկման հնարավորությամբ։",
+                "buttonLabel": "",
+                "buttonUrl": "/",
+                "imageUrl": "",
+                "imageAlt": "",
+                "typography": {
+                  "title": {
+                    "fontSize": "26"
+                  },
+                  "body": {
+                    "fontSize": "26",
+                    "color": "#ffffff",
+                    "textAlign": "right"
+                  }
+                },
+                "panelStyle": "clean-shadow",
+                "elementBackgroundMode": "transparent",
+                "elementPadding": "medium"
               }
             ]
           }
@@ -595,7 +623,7 @@
         "layoutRows": 1
       }
     ],
-    "updatedAt": "2026-05-24T18:30:09.129Z"
+    "updatedAt": "2026-05-25T07:07:18.998Z"
   },
   "shop": {
     "version": 1,
