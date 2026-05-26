@@ -189,10 +189,9 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
         ["typography", "Typography"],
         ["advanced", "Advanced"],
       ]
-      : [
+    : [
         ["section", "Section"],
         ["style", "Style"],
-        ["typography", "Typography"],
         ["advanced", "Advanced"],
       ];
 
@@ -277,6 +276,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
   const isElementContentTab = inspectorTab === "content";
   const isElementSettingsTab = inspectorTab === "settings";
   const isElementTypographyTab = inspectorTab === "typography";
+  const showLegacySectionContentControls: boolean = false;
   const currentRowLayoutPreset = getBuilderRowLayoutPreset(
     selectedSection?.kind === "contentLayout" ? selectedSection.layout : null,
   );
@@ -379,81 +379,6 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
             </div>
           )}
 
-          {!selectedLayoutBlock && inspectorTab === "typography" && (
-            <details className="builder-collapse" open>
-              <summary>
-                <InspectorGroupSummary
-                  title="Section Typography"
-                  description="Tune the section title, body, button, and eyebrow text."
-                  meta={sectionLabels[selectedSection.kind]}
-                />
-              </summary>
-
-              <div className="builder-element-typography-panel">
-                <div className="builder-style-preset-row builder-typography-area-tabs">
-                  {(
-                    [
-                      ["title", "Title"],
-                      ["body", "Body"],
-                      ["button", "Button"],
-                      ["eyebrow", "Eyebrow"],
-                    ] as const
-                  ).map(([area, label]) => (
-                    <button
-                      key={area}
-                      type="button"
-                      className={
-                        activeTypographyArea === area ? "is-active" : ""
-                      }
-                      onClick={() =>
-                        setActiveTypographyAreaState({
-                          area,
-                          blockKey: null,
-                        })
-                      }
-                    >
-                      {label}
-                    </button>
-                  ))}
-                </div>
-                <div className="builder-typography-area-panel">
-                  <span className="builder-typography-area-label">
-                    {activeTypographyArea === "title"
-                      ? "Title typography"
-                      : activeTypographyArea === "body"
-                        ? "Body typography"
-                        : activeTypographyArea === "button"
-                          ? "Button typography"
-                          : "Eyebrow typography"}
-                  </span>
-                  <TypographyPanel
-                    value={
-                      activeTypographyArea === "title"
-                        ? (selectedSection.typography as any)?.title ??
-                          (typeof selectedSection.typography === "object" &&
-                          !(selectedSection.typography as any)?.title
-                            ? (selectedSection.typography as any)
-                            : undefined)
-                        : activeTypographyArea === "body"
-                          ? (selectedSection.typography as any)?.body
-                          : activeTypographyArea === "button"
-                            ? (selectedSection.typography as any)?.button
-                            : (selectedSection.typography as any)?.eyebrow
-                    }
-                    onChange={(t) =>
-                      updateSelected({
-                        typography: {
-                          ...((selectedSection.typography as any) ?? {}),
-                          [activeTypographyArea]: t,
-                        },
-                      })
-                    }
-                  />
-                </div>
-              </div>
-            </details>
-          )}
-
           {((!selectedLayoutBlock && inspectorTab === "section") ||
             (selectedLayoutBlock &&
               selectedSection.kind === "contentLayout" &&
@@ -490,42 +415,6 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                     : "closed"}
                 </small>
               </summary>
-              {inspectorTab === "section" &&
-                !selectedLayoutBlock &&
-                selectedSection.kind !== "contentLayout" && (
-                  <>
-                    <details className="builder-collapse" open>
-                      <summary>
-                        <InspectorGroupSummary
-                          title="Basic Content"
-                          description="Edit title and eyebrow text for this section."
-                          meta={sectionLabels[selectedSection.kind]}
-                        />
-                      </summary>
-
-                      <label className="builder-field">
-                        <span>Section Title</span>
-                        <input
-                          value={selectedSection.title}
-                          onChange={(event) =>
-                            updateSelected({ title: event.target.value })
-                          }
-                        />
-                      </label>
-
-                      <label className="builder-field">
-                        <span>Eyebrow</span>
-                        <input
-                          value={selectedSection.eyebrow ?? ""}
-                          onChange={(event) =>
-                            updateSelected({ eyebrow: event.target.value })
-                          }
-                        />
-                      </label>
-                    </details>
-                  </>
-                )}
-
               {inspectorTab === "section" && !selectedLayoutBlock && (
                 <>
                   <details
@@ -763,8 +652,8 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
 
               {((inspectorTab === "section" &&
                 !selectedLayoutBlock &&
-                selectedSection.kind !== "hero" &&
-                selectedSection.kind !== "promo") ||
+                (selectedSection.kind === "contentLayout" ||
+                  showLegacySectionContentControls)) ||
                 ((isElementContentTab ||
                   isElementSettingsTab ||
                   isElementTypographyTab) &&
@@ -4004,7 +3893,8 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
 
 
 
-                    {!selectedLayoutBlock &&
+                    {showLegacySectionContentControls &&
+                      !selectedLayoutBlock &&
                       selectedSection.kind === "productArchive" && (
                         <>
                           <div className="builder-two-column">
@@ -4330,7 +4220,8 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                         </>
                       )}
 
-                    {selectedSection.kind === "badgeGrid" && (
+                    {showLegacySectionContentControls &&
+                      selectedSection.kind === "badgeGrid" && (
                       <>
                         <label className="builder-field">
                           <span>Columns</span>
@@ -4398,7 +4289,8 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                       </>
                     )}
 
-                    {selectedSection.kind === "embed" && (
+                    {showLegacySectionContentControls &&
+                      selectedSection.kind === "embed" && (
                       <>
                         <label className="builder-field">
                           <span>Embed Mode</span>
@@ -4463,7 +4355,8 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                       </>
                     )}
 
-                    {selectedSection.kind === "slider" && (
+                    {showLegacySectionContentControls &&
+                      selectedSection.kind === "slider" && (
                       <>
                         <details className="builder-collapse" open>
                           <summary>

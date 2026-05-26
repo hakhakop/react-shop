@@ -47,7 +47,14 @@
       "submenuLayout": "grid",
       "submenuColumns": 3,
       "badgeText": null
+    },
+    "cG9zdDo1NTA3": {
+      "showHeading": false,
+      "icon": "home",
+      "submenuLayout": "list",
+      "submenuColumns": 3,
+      "badgeText": null
     }
   },
-  "updatedAt": "2026-05-25T06:45:04.046Z"
+  "updatedAt": "2026-05-26T07:06:16.387Z"
 }

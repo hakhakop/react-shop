@@ -1,5 +1,631 @@
 [
   {
+    "id": "home",
+    "title": "Home",
+    "description": "Saved from Home",
+    "sourcePage": "home",
+    "design": {
+      "preset": "princity",
+      "colorScheme": "auto",
+      "pageBackground": "#f4f2ec",
+      "textColor": "#111111",
+      "mutedTextColor": "#5f5c55",
+      "accentColor": "#d8ff65",
+      "surfaceColor": "#ebe8df",
+      "buttonBackground": "#111111",
+      "buttonTextColor": "#ffffff",
+      "radius": "8px",
+      "sectionMaxWidth": "1560px",
+      "sectionGutter": "44px",
+      "headingFontFamily": "inherit",
+      "headingSize": "clamp(46px, 7.6vw, 124px)",
+      "headingWeight": "820",
+      "headingLineHeight": "0.9",
+      "headingColor": "#111111"
+    },
+    "sections": [
+      {
+        "id": "contentLayout-mpjr1ee9-698de",
+        "kind": "contentLayout",
+        "title": "",
+        "background": "#ffffff",
+        "backgroundMode": "boxed",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "topSpacing": "inherit",
+        "bottomSpacing": "inherit",
+        "topMargin": "inherit",
+        "bottomMargin": "inherit",
+        "visible": true,
+        "eyebrow": "",
+        "body": "",
+        "layoutColumns": 2,
+        "layoutItems": [
+          {
+            "id": "layout-item-mpjr1ee9-1",
+            "blocks": [
+              {
+                "id": "hero-block-mpjr1xel-o798r",
+                "kind": "hero",
+                "eyebrow": "",
+                "title": "Ողջույն...",
+                "body": "Գեղեցիկ React կայքեր WordPress կառավարմամբ և հոսթինգով միասին",
+                "buttonLabel": "Learn more",
+                "buttonUrl": "/",
+                "typography": {
+                  "title": {
+                    "fontSize": "64",
+                    "fontWeight": "800",
+                    "variant": "subheading",
+                    "color": "#11e88b",
+                    "textAlign": "center"
+                  },
+                  "body": {
+                    "color": "#b3b3b3",
+                    "fontSize": "28",
+                    "textAlign": "center"
+                  },
+                  "button": {
+                    "textAlign": "center"
+                  }
+                },
+                "panelStyle": "default",
+                "elementAlign": "center"
+              }
+            ]
+          },
+          {
+            "id": "layout-item-mpkurqja",
+            "blocks": [
+              {
+                "id": "panel-block-mpkusmg2-yrm1k",
+                "kind": "panel",
+                "eyebrow": "",
+                "title": "",
+                "body": "Արագ, ժամանակակից և հարմարավետ կայքեր՝ առցանց խանութի, բովանդակության կառավարման և ամբողջական տեխնիկական սպասարկման հնարավորությամբ։",
+                "buttonLabel": "",
+                "buttonUrl": "/",
+                "imageUrl": "",
+                "imageAlt": "",
+                "typography": {
+                  "title": {
+                    "fontSize": "26"
+                  },
+                  "body": {
+                    "fontSize": "26",
+                    "color": "#ffffff",
+                    "textAlign": "right"
+                  }
+                },
+                "panelStyle": "clean-shadow",
+                "elementBackgroundMode": "transparent",
+                "elementPadding": "medium"
+              }
+            ]
+          }
+        ],
+        "layoutRows": 1,
+        "typography": {
+          "title": {
+            "fontSize": "64",
+            "textAlign": "center"
+          }
+        },
+        "visualStyle": {
+          "background": {
+            "type": "color",
+            "color": "#2b2b2b"
+          }
+        }
+      },
+      {
+        "id": "contentLayout-mpjkrynd-6j2w5",
+        "kind": "contentLayout",
+        "title": "",
+        "background": "#24241f",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "topSpacing": "inherit",
+        "bottomSpacing": "inherit",
+        "topMargin": "inherit",
+        "bottomMargin": "inherit",
+        "visible": true,
+        "eyebrow": "",
+        "body": "",
+        "layout": "whole",
+        "layoutColumns": 1,
+        "layoutItems": [
+          {
+            "id": "layout-item-mpjkrynd-1",
+            "blocks": [
+              {
+                "id": "products-block-mpjksd9r-36hp4",
+                "kind": "products",
+                "title": "Products",
+                "source": "all",
+                "layoutVariant": "grid",
+                "columns": 4,
+                "gridLimit": 12,
+                "filterPosition": "top",
+                "cardStyle": "none",
+                "cardPreset": "standard",
+                "typography": {
+                  "textAlign": "justify",
+                  "variant": "body",
+                  "fontWeight": "500",
+                  "fontSize": "24px"
+                },
+                "gridGap": "small",
+                "gridMargin": "none",
+                "imagePadding": "none",
+                "cardPadding": "small"
+              }
+            ]
+          }
+        ],
+        "layoutRows": 1
+      },
+      {
+        "id": "webpages-capability-hero",
+        "kind": "contentLayout",
+        "title": "",
+        "eyebrow": "",
+        "body": "",
+        "background": "#f4f2ec",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "light",
+        "topSpacing": "large",
+        "bottomSpacing": "medium",
+        "topMargin": "inherit",
+        "bottomMargin": "inherit",
+        "visible": true,
+        "layout": "thirds-2-1",
+        "layoutColumns": 2,
+        "layoutRows": 1,
+        "layoutItems": [
+          {
+            "id": "webpages-capability-hero-copy",
+            "blocks": [
+              {
+                "id": "webpages-capability-hero-title",
+                "kind": "hero",
+                "eyebrow": "WebPages React commerce system",
+                "title": "Beautiful React Websites with WordPress CMS & WooCommerce built in.",
+                "body": "A premium React frontend connected to WordPress content, WooCommerce products, cart, checkout, account tools, dashboard editing, hosting, and support.",
+                "buttonLabel": "Explore the live shop",
+                "buttonUrl": "/shop",
+                "elementPadding": "large",
+                "typography": {
+                  "textAlign": "justify",
+                  "textTransform": "uppercase",
+                  "textDecoration": "underline",
+                  "color": "#ff0000",
+                  "title": {
+                    "textAlign": "left",
+                    "textTransform": "capitalize",
+                    "textDecoration": "underline",
+                    "color": "#d1d1d1",
+                    "fontWeight": "500"
+                  },
+                  "body": {
+                    "color": "#d4d4d4"
+                  }
+                },
+                "panelStyle": "flat-dark",
+                "elementBackgroundMode": "custom",
+                "elementBackground": "#111111"
+              },
+              {
+                "id": "webpages-capability-hero-proof",
+                "kind": "badgeGrid",
+                "title": "",
+                "body": "",
+                "columns": 4,
+                "elementBackgroundMode": "transparent",
+                "badges": [
+                  {
+                    "id": "webpages-proof-react",
+                    "label": "React",
+                    "title": "Modern frontend",
+                    "body": "Fast, polished pages with app-like interaction."
+                  },
+                  {
+                    "id": "webpages-proof-woo",
+                    "label": "Woo",
+                    "title": "Live commerce",
+                    "body": "Products, cart, checkout, account, and orders."
+                  },
+                  {
+                    "id": "webpages-proof-wp",
+                    "label": "CMS",
+                    "title": "WordPress editing",
+                    "body": "Menus, media, pages, forms, and product content."
+                  },
+                  {
+                    "id": "webpages-proof-host",
+                    "label": "Host",
+                    "title": "Managed hosting",
+                    "body": "A simpler path from build to launch."
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "webpages-capability-hero-stack",
+            "blocks": [
+              {
+                "id": "webpages-capability-hero-panels",
+                "kind": "grid",
+                "gridSource": "static",
+                "columns": 1,
+                "gridRows": 4,
+                "gridGap": "small",
+                "gridMargin": "none",
+                "cardPadding": "medium",
+                "gridImagePadding": "frameless",
+                "gridContentPadding": "large",
+                "gridImageFrame": "none",
+                "gridShowImage": false,
+                "gridShowEyebrow": true,
+                "gridShowMeta": true,
+                "gridShowText": true,
+                "gridShowButton": false,
+                "gridItems": [
+                  {
+                    "id": "webpages-stack-1",
+                    "eyebrow": "01",
+                    "title": "Storefront pages",
+                    "meta": "React frontend",
+                    "text": "Homepage, shop archive, product pages, search, account, cart, and checkout can live in one polished frontend."
+                  },
+                  {
+                    "id": "webpages-stack-2",
+                    "eyebrow": "02",
+                    "title": "Product selling flow",
+                    "meta": "WooCommerce",
+                    "text": "Product cards, options, add to cart, mini cart, checkout, and customer account logic stay connected."
+                  },
+                  {
+                    "id": "webpages-stack-3",
+                    "eyebrow": "03",
+                    "title": "Content control",
+                    "meta": "WordPress CMS",
+                    "text": "Clients keep the familiar WordPress admin for products, menus, media, pages, forms, and content."
+                  },
+                  {
+                    "id": "webpages-stack-4",
+                    "eyebrow": "04",
+                    "title": "Visual editing",
+                    "meta": "Dashboard builder",
+                    "text": "Reusable sections and templates let the site keep evolving without rebuilding the architecture."
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "webpages-capability-cards",
+        "kind": "badgeGrid",
+        "title": "What clients get in one website system.",
+        "eyebrow": "Capabilities",
+        "body": "The public site feels modern and fast, while the business still manages content and commerce through WordPress and WooCommerce.",
+        "background": "#111111",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "dark",
+        "topSpacing": "large",
+        "bottomSpacing": "large",
+        "columns": 4,
+        "badges": [
+          {
+            "id": "webpages-card-react",
+            "label": "01",
+            "title": "React frontend",
+            "body": "Premium presentation, responsive layouts, smooth interactions, and flexible page templates."
+          },
+          {
+            "id": "webpages-card-shop",
+            "label": "02",
+            "title": "WooCommerce shop",
+            "body": "Product archive, product detail pages, wishlist, cart, checkout, and customer accounts."
+          },
+          {
+            "id": "webpages-card-cms",
+            "label": "03",
+            "title": "WordPress CMS",
+            "body": "Menus, media, product data, forms, content, and business editing stay in WordPress."
+          },
+          {
+            "id": "webpages-card-builder",
+            "label": "04",
+            "title": "Dashboard builder",
+            "body": "Create pages, adjust layouts, reuse templates, and tune the storefront visually."
+          }
+        ],
+        "visible": true
+      },
+      {
+        "id": "webpages-live-shop-grid",
+        "kind": "productArchive",
+        "title": "Live WooCommerce shop grid",
+        "eyebrow": "Commerce preview",
+        "body": "Real imported products, prices, options, wishlist, and add-to-cart behavior rendered through the React frontend.",
+        "background": "#24241f",
+        "backgroundMode": "boxed",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "topSpacing": "large",
+        "bottomSpacing": "large",
+        "columns": 4,
+        "filterPosition": "hidden",
+        "cardStyle": "flat",
+        "cardPreset": "minimal",
+        "gridGap": "large",
+        "cardPadding": "none",
+        "imagePadding": "medium",
+        "addToCartStyle": "dark",
+        "addToCartSize": "compact",
+        "addToCartPosition": "under-price",
+        "addToCartVisibility": "always",
+        "addToCartDisplay": "button",
+        "source": "all",
+        "gridLimit": 8,
+        "layoutVariant": "grid",
+        "visible": true
+      },
+      {
+        "id": "webpages-product-page-preview",
+        "kind": "contentLayout",
+        "title": "Product pages that feel like a brand experience.",
+        "eyebrow": "Product detail preview",
+        "body": "The same system supports beautiful product pages with gallery, options, add to cart, product details, related browsing, and checkout flow.",
+        "background": "#f1eee7",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "light",
+        "topSpacing": "large",
+        "bottomSpacing": "large",
+        "visible": true,
+        "layout": "thirds-1-2",
+        "layoutColumns": 2,
+        "layoutRows": 1,
+        "layoutItems": [
+          {
+            "id": "webpages-product-preview-copy",
+            "blocks": [
+              {
+                "id": "webpages-product-preview-panel",
+                "kind": "panel",
+                "eyebrow": "Product page system",
+                "title": "Gallery, price, product options, add to cart, wishlist, and checkout stay connected.",
+                "body": "Use WooCommerce for product management and React for the customer experience. Product pages can be designed as templates and still use live WooCommerce data.",
+                "buttonLabel": "Open a product page",
+                "buttonUrl": "/product/biker-ankle-boots",
+                "elementBackgroundMode": "transparent",
+                "elementPadding": "large"
+              },
+              {
+                "id": "webpages-product-preview-list",
+                "kind": "list",
+                "title": "Included product flow",
+                "items": [
+                  "Product gallery and image handling",
+                  "Variant/options selection",
+                  "Add to cart and mini cart",
+                  "Cart, checkout, and account pages"
+                ],
+                "elementPadding": "medium"
+              }
+            ]
+          },
+          {
+            "id": "webpages-product-preview-visual",
+            "blocks": [
+              {
+                "id": "webpages-product-preview-card",
+                "kind": "grid",
+                "gridSource": "products",
+                "columns": 2,
+                "gridRows": 1,
+                "gridGap": "medium",
+                "gridMargin": "none",
+                "cardPadding": "medium",
+                "gridImagePadding": "frameless",
+                "gridContentPadding": "medium",
+                "gridImageFrame": "soft",
+                "gridShowImage": true,
+                "gridShowEyebrow": true,
+                "gridShowMeta": true,
+                "gridShowText": true,
+                "gridShowButton": true
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "webpages-how-it-works",
+        "kind": "badgeGrid",
+        "title": "From idea to live website without splitting the stack.",
+        "eyebrow": "How it works",
+        "body": "A clear service path for clients who want a modern website, practical editing, commerce, hosting, and support together.",
+        "background": "#ffffff",
+        "backgroundMode": "boxed",
+        "contentMode": "boxed",
+        "colorScheme": "light",
+        "topSpacing": "large",
+        "bottomSpacing": "large",
+        "columns": 4,
+        "badges": [
+          {
+            "id": "webpages-flow-plan",
+            "label": "01",
+            "title": "Choose plan",
+            "body": "Pick the website and hosting package for the launch."
+          },
+          {
+            "id": "webpages-flow-build",
+            "label": "02",
+            "title": "Build design",
+            "body": "Shape homepage, shop archive, product pages, and content sections."
+          },
+          {
+            "id": "webpages-flow-manage",
+            "label": "03",
+            "title": "Manage content",
+            "body": "Use WordPress for products, pages, menus, forms, and media."
+          },
+          {
+            "id": "webpages-flow-sell",
+            "label": "04",
+            "title": "Sell online",
+            "body": "Use WooCommerce checkout, cart, customer accounts, and orders."
+          }
+        ],
+        "visible": true
+      },
+      {
+        "id": "webpages-hosting-pricing",
+        "kind": "contentLayout",
+        "title": "",
+        "eyebrow": "",
+        "body": "",
+        "background": "#111111",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "dark",
+        "topSpacing": "large",
+        "bottomSpacing": "large",
+        "visible": true,
+        "layout": "halves",
+        "layoutColumns": 2,
+        "layoutRows": 1,
+        "layoutItems": [
+          {
+            "id": "webpages-hosting-copy",
+            "blocks": [
+              {
+                "id": "webpages-hosting-title",
+                "kind": "hero",
+                "eyebrow": "Hosting + care",
+                "title": "Website, CMS, commerce, hosting, and support in one plan.",
+                "body": "Clients do not need to assemble React hosting, WordPress maintenance, WooCommerce setup, SSL, updates, and support separately.",
+                "buttonLabel": "Plans coming soon",
+                "buttonUrl": "#webpages-final-cta",
+                "elementPadding": "large"
+              }
+            ]
+          },
+          {
+            "id": "webpages-hosting-grid",
+            "blocks": [
+              {
+                "id": "webpages-hosting-cards",
+                "kind": "grid",
+                "gridSource": "static",
+                "columns": 2,
+                "gridRows": 2,
+                "gridGap": "medium",
+                "gridMargin": "none",
+                "cardPadding": "medium",
+                "gridImagePadding": "frameless",
+                "gridContentPadding": "large",
+                "gridImageFrame": "none",
+                "gridShowImage": false,
+                "gridShowEyebrow": true,
+                "gridShowMeta": false,
+                "gridShowText": true,
+                "gridShowButton": false,
+                "gridItems": [
+                  {
+                    "id": "webpages-hosting-ssl",
+                    "eyebrow": "01",
+                    "title": "Managed hosting",
+                    "text": "A production-ready home for the React frontend and CMS connection."
+                  },
+                  {
+                    "id": "webpages-hosting-cms",
+                    "eyebrow": "02",
+                    "title": "WordPress care",
+                    "text": "Keep CMS, products, pages, menus, forms, and media running cleanly."
+                  },
+                  {
+                    "id": "webpages-hosting-commerce",
+                    "eyebrow": "03",
+                    "title": "Commerce setup",
+                    "text": "WooCommerce product and checkout flow connected to the frontend."
+                  },
+                  {
+                    "id": "webpages-hosting-support",
+                    "eyebrow": "04",
+                    "title": "Support available",
+                    "text": "Help with updates, page edits, improvements, and launch needs."
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "webpages-final-cta",
+        "kind": "promo",
+        "title": "Start your modern WebPages site.",
+        "eyebrow": "React + WordPress + WooCommerce",
+        "body": "A premium React website with WordPress CMS, WooCommerce selling tools, dashboard editing, hosting, and support included.",
+        "background": "#d8ff65",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "light",
+        "topSpacing": "large",
+        "bottomSpacing": "large",
+        "promoVariant": "accent",
+        "ctaLabel": "Request a website plan",
+        "ctaUrl": "/client",
+        "visible": true
+      },
+      {
+        "id": "contentLayout-mpk2kf7x-xww56",
+        "kind": "contentLayout",
+        "title": "",
+        "background": "#111111",
+        "backgroundMode": "boxed",
+        "contentMode": "narrow",
+        "colorScheme": "inherit",
+        "topSpacing": "inherit",
+        "bottomSpacing": "inherit",
+        "topMargin": "inherit",
+        "bottomMargin": "inherit",
+        "visible": true,
+        "eyebrow": "",
+        "body": "",
+        "layout": "whole",
+        "layoutColumns": 1,
+        "layoutItems": [
+          {
+            "id": "layout-item-mpk2kf7x-1",
+            "blocks": [
+              {
+                "id": "fluentForm-block-mpk2khtk-03q5s",
+                "kind": "fluentForm",
+                "title": "Contact Form",
+                "body": "Rendered from Fluent Forms in WordPress.",
+                "fluentFormId": "1"
+              }
+            ]
+          }
+        ],
+        "layoutRows": 1
+      }
+    ],
+    "updatedAt": "2026-05-26T05:41:57.441Z"
+  },
+  {
     "id": "webpages-react-service",
     "title": "WebPages React Service",
     "description": "Premium service homepage for React websites with WordPress CMS, WooCommerce, hosting, and support.",

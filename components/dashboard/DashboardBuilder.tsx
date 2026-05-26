@@ -1418,18 +1418,6 @@ export default function DashboardBuilder({
     }));
   };
 
-  const updateSectionById = (
-    sectionId: string,
-    patch: Partial<BuilderSection>,
-  ) => {
-    setBuilderState((current) => ({
-      ...current,
-      sections: current.sections.map((section) =>
-        section.id === sectionId ? { ...section, ...patch } : section,
-      ),
-    }));
-  };
-
   const updateLayoutBlockByKey = (
     sectionId: string,
     columnKey: string,
@@ -4374,7 +4362,6 @@ export default function DashboardBuilder({
             onCreateBlock={createLayoutBlockAtDrop}
             onDuplicateBlock={duplicateLayoutBlock}
             onDeleteBlock={deleteLayoutBlock}
-            onUpdateSection={updateSectionById}
             onUpdateBlock={updateLayoutBlockByKey}
             onUpdateGridItem={updateGridItemByKey}
             onUploadGridItemImage={uploadGridItemImage}
@@ -4567,7 +4554,6 @@ function PreviewCanvas({
   onCreateBlock,
   onDuplicateBlock,
   onDeleteBlock,
-  onUpdateSection,
   onUpdateBlock,
   onUpdateGridItem,
   onUploadGridItemImage,
@@ -4624,7 +4610,6 @@ function PreviewCanvas({
     columnKey: string;
     blockKey: string;
   }) => void;
-  onUpdateSection: (sectionId: string, patch: Partial<BuilderSection>) => void;
   onUpdateBlock: (
     sectionId: string,
     columnKey: string,
@@ -4957,7 +4942,6 @@ function PreviewCanvas({
                   onCreateBlock={onCreateBlock}
                   onDuplicateBlock={onDuplicateBlock}
                   onDeleteBlock={onDeleteBlock}
-                  onUpdateSection={onUpdateSection}
                   onUpdateBlock={onUpdateBlock}
                   onUpdateGridItem={onUpdateGridItem}
                   onUploadGridItemImage={onUploadGridItemImage}
@@ -5378,7 +5362,6 @@ function PreviewSection({
   onCreateBlock,
   onDuplicateBlock,
   onDeleteBlock,
-  onUpdateSection,
   onUpdateBlock,
   onUpdateGridItem,
   onUploadGridItemImage,
@@ -5422,7 +5405,6 @@ function PreviewSection({
     columnKey: string;
     blockKey: string;
   }) => void;
-  onUpdateSection: (sectionId: string, patch: Partial<BuilderSection>) => void;
   onUpdateBlock: (
     sectionId: string,
     columnKey: string,
@@ -5449,29 +5431,29 @@ function PreviewSection({
       <div className="shop-builder-section-content builder-preview-hero-inner">
         <div>
           {section.eyebrow && (
-            <InlineEditableText
+            <DashboardTypog
               as="p"
               className="shop-builder-eyebrow"
-              value={section.eyebrow}
               typography={section.typography}
-              onChange={(eyebrow) => onUpdateSection(section.id, { eyebrow })}
-            />
+            >
+              {section.eyebrow}
+            </DashboardTypog>
           )}
-          <InlineEditableText
+          <DashboardTypog
             as="h2"
             className="shop-builder-title"
-            value={section.title}
             typography={section.typography}
-            onChange={(title) => onUpdateSection(section.id, { title })}
-          />
+          >
+            {section.title}
+          </DashboardTypog>
           {section.body && (
-            <InlineEditableText
+            <DashboardTypog
               as="p"
               className="shop-builder-body"
-              value={section.body}
               typography={section.typography}
-              onChange={(body) => onUpdateSection(section.id, { body })}
-            />
+            >
+              {section.body}
+            </DashboardTypog>
           )}
           {section.buttonLabel && section.buttonUrl && (
             <DashboardTypog
@@ -5721,31 +5703,31 @@ function PreviewSection({
         {(section.eyebrow || section.title || section.body) && (
           <div className="shop-builder-content-layout-heading">
             {section.eyebrow && (
-              <InlineEditableText
+              <DashboardTypog
                 as="p"
                 className="shop-builder-eyebrow"
-                value={section.eyebrow}
                 typography={section.typography}
-                onChange={(eyebrow) => onUpdateSection(section.id, { eyebrow })}
-              />
+              >
+                {section.eyebrow}
+              </DashboardTypog>
             )}
             {section.title && (
-              <InlineEditableText
+              <DashboardTypog
                 as="h2"
                 className="shop-builder-title"
-                value={section.title}
                 typography={section.typography}
-                onChange={(title) => onUpdateSection(section.id, { title })}
-              />
+              >
+                {section.title}
+              </DashboardTypog>
             )}
             {section.body && (
-              <InlineEditableText
+              <DashboardTypog
                 as="p"
                 className="shop-builder-body"
-                value={section.body}
                 typography={section.typography}
-                onChange={(body) => onUpdateSection(section.id, { body })}
-              />
+              >
+                {section.body}
+              </DashboardTypog>
             )}
           </div>
         )}

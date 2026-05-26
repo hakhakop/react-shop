@@ -58,6 +58,10 @@
   animation: none;
 }
 
+.shop-builder-main[data-gsap-home] {
+  padding-top: 0;
+}
+
 .shop-builder-section--full {
   width: 100vw;
   margin-left: 50%;
