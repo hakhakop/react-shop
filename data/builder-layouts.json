@@ -56,9 +56,9 @@
                 "id": "webpages-am-hero-title",
                 "kind": "hero",
                 "eyebrow": "WebPages React System",
-                "title": "Ժամանակակից React կայքեր՝ WordPress կառավարմամբ",
-                "body": "WooCommerce հնարավորություններով և հոսթինգով միասին։ Մեկ միասնական համակարգ՝ գեղեցիկ frontend, հարմար dashboard, WordPress բովանդակություն, վաճառք, checkout, account և տեխնիկական սպասարկում։",
-                "buttonLabel": "Դիտել հնարավորությունները",
+                "title": "Շուտով՝ ժամանակակից React կայքեր՝ WordPress կառավարմամբ",
+                "body": "WooCommerce հնարավորություններով և հոսթինգով միասին։ Մեկ համակարգ՝ պրեմիում frontend, հարմար dashboard, WordPress բովանդակություն, վաճառք, checkout, account և տեխնիկական սպասարկում։",
+                "buttonLabel": "Տեսնել հնարավորությունները",
                 "buttonUrl": "#capabilities",
                 "panelStyle": "default",
                 "elementPadding": "large",
@@ -127,7 +127,7 @@
               {
                 "id": "webpages-am-hero-demo-grid",
                 "kind": "grid",
-                "title": "System preview",
+                "title": "WebPages preview",
                 "gridSource": "static",
                 "columns": 1,
                 "gridRows": 3,
@@ -144,9 +144,9 @@
                   {
                     "id": "hero-demo-dashboard",
                     "eyebrow": "Dashboard",
-                    "title": "Բաժինները կառուցվում են builder-ով",
+                    "title": "Կառուցվում է builder-ով",
                     "meta": "Editable sections",
-                    "text": "Hero, cards, sliders, product grids և CTA բաժիններ՝ նույն dashboard-ից։",
+                    "text": "Hero, cards, sliders, product previews և CTA բաժիններ՝ նույն dashboard-ից։",
                     "typography": {
                       "title": {
                         "fontSize": "clamp(24px, 2.4vw, 42px)",
@@ -162,7 +162,7 @@
                   {
                     "id": "hero-demo-commerce",
                     "eyebrow": "Commerce",
-                    "title": "WooCommerce հոսքը մնում է կենդանի",
+                    "title": "WooCommerce-ը մնում է կենդանի",
                     "meta": "Shop ready",
                     "text": "Shop, product page, add to cart, cart, checkout և account էջերը պահպանված են։",
                     "typography": {
@@ -179,7 +179,7 @@
                   },
                   {
                     "id": "hero-demo-launch",
-                    "eyebrow": "Launch",
+                    "eyebrow": "Hosting",
                     "title": "Կայք + հոսթինգ՝ մեկ լուծումով",
                     "meta": "Coming packages",
                     "text": "Փաթեթները նախատեսված են կայքը արագ գործարկելու և հետո զարգացնելու համար։",
@@ -227,7 +227,7 @@
                 "id": "webpages-am-how-it-works-heading-block",
                 "kind": "hero",
                 "eyebrow": "Workflow",
-                "title": "Ինչպես է աշխատում համակարգը",
+                "title": "Ինչպես է աշխատում",
                 "body": "Frontend-ը մնում է արագ և գեղեցիկ, իսկ կառավարումը՝ ծանոթ ու գործնական WordPress միջավայրում։",
                 "buttonLabel": "",
                 "buttonUrl": "",
@@ -312,8 +312,8 @@
                 "id": "capabilities-heading-block",
                 "kind": "hero",
                 "eyebrow": "Capabilities",
-                "title": "Ինչ կարող է ստեղծել այս builder-ը",
-                "body": "Սա template չէ. սա համակարգ է, որով կարելի է կառուցել տարբեր էջեր, ապրանքային ցուցադրություններ և landing բաժիններ՝ նույն reusable logic-ով։",
+                "title": "Հնարավորություններ",
+                "body": "Սա պատրաստի demo խանութ չէ․ սա reusable համակարգ է, որով կարելի է կառուցել տարբեր էջեր, landing բաժիններ և WooCommerce ցուցադրումներ։",
                 "buttonLabel": "",
                 "buttonUrl": "",
                 "panelStyle": "default",
@@ -473,143 +473,6 @@
         ]
       },
       {
-        "id": "webpages-am-component-examples",
-        "kind": "contentLayout",
-        "title": "",
-        "eyebrow": "",
-        "body": "",
-        "background": "#fffaf0",
-        "backgroundMode": "boxed",
-        "contentMode": "boxed",
-        "colorScheme": "light",
-        "topSpacing": "large",
-        "bottomSpacing": "large",
-        "topMargin": "inherit",
-        "bottomMargin": "inherit",
-        "visible": true,
-        "layout": "thirds-1-2",
-        "layoutColumns": 2,
-        "layoutRows": 1,
-        "layoutItems": [
-          {
-            "id": "component-examples-copy",
-            "blocks": [
-              {
-                "id": "webpages-am-component-examples-heading-block",
-                "kind": "hero",
-                "eyebrow": "Builder blocks",
-                "title": "Component examples",
-                "body": "Այս բաժինը հենց dashboard-ի block-երով է հավաքված՝ slider, cards և service panel logic-ով։",
-                "buttonLabel": "",
-                "buttonUrl": "",
-                "panelStyle": "default",
-                "elementBackgroundMode": "transparent",
-                "elementPadding": "none",
-                "typography": {
-                  "title": {
-                    "fontSize": "clamp(42px, 6vw, 96px)",
-                    "fontWeight": "820",
-                    "lineHeight": "0.92"
-                  },
-                  "body": {
-                    "fontSize": "18px",
-                    "lineHeight": "1.65"
-                  }
-                }
-              },
-              {
-                "id": "component-examples-panel",
-                "kind": "panel",
-                "eyebrow": "Reusable sections",
-                "title": "Մի բաժինը կարող է դառնալ hero, feature row, pricing teaser կամ product preview։",
-                "body": "Կառուցվածքը editable է dashboard-ից, իսկ frontend-ը պահում է նույն premium rhythm-ը։",
-                "buttonLabel": "Բացել dashboard",
-                "buttonUrl": "/dashboard",
-                "panelStyle": "clean-shadow",
-                "elementPadding": "large",
-                "typography": {
-                  "title": {
-                    "fontSize": "clamp(24px, 2.4vw, 42px)",
-                    "fontWeight": "760",
-                    "lineHeight": "1"
-                  },
-                  "body": {
-                    "fontSize": "16px",
-                    "lineHeight": "1.6"
-                  }
-                }
-              },
-              {
-                "id": "component-examples-list",
-                "kind": "list",
-                "title": "Օրինակ block-եր",
-                "items": [
-                  "Hero content",
-                  "Carousel / slider",
-                  "Product grid",
-                  "Category cards",
-                  "CTA strip",
-                  "Form embed"
-                ],
-                "panelStyle": "flat-white",
-                "elementPadding": "medium"
-              }
-            ]
-          },
-          {
-            "id": "component-examples-slider-column",
-            "blocks": [
-              {
-                "id": "component-examples-slider",
-                "kind": "slider",
-                "title": "Showcase slider",
-                "body": "Փափուկ carousel՝ նույն builder block-ից։",
-                "panelStyle": "flat-white",
-                "elementPadding": "medium",
-                "slides": [
-                  {
-                    "id": "slide-hero",
-                    "badge": "Hero",
-                    "title": "Cinematic opening",
-                    "subtitle": "Large typography",
-                    "text": "Մեծ, մաքուր բացման բաժիններ՝ brand message-ի համար։",
-                    "imagePadding": "medium"
-                  },
-                  {
-                    "id": "slide-shop",
-                    "badge": "Shop",
-                    "title": "WooCommerce ready",
-                    "subtitle": "Products and cart",
-                    "text": "Ապրանքների ցուցադրում, զամբյուղ և checkout՝ նույն համակարգում։",
-                    "imagePadding": "medium"
-                  },
-                  {
-                    "id": "slide-dashboard",
-                    "badge": "Builder",
-                    "title": "Editable sections",
-                    "subtitle": "Dashboard workflow",
-                    "text": "Կայքը կարելի է զարգացնել reusable բաժիններով՝ առանց frontend-ը կոտրելու։",
-                    "imagePadding": "medium"
-                  }
-                ],
-                "carouselSettings": {
-                  "variant": "basic",
-                  "loop": true,
-                  "autoplay": true,
-                  "autoplayDelayMs": 4200,
-                  "align": "start",
-                  "dragFree": false,
-                  "cardsPerView": 1,
-                  "showArrows": true,
-                  "showDots": true,
-                  "pauseOnHover": true
-                }
-              }
-            ]
-          }
-        ]
-      },
-      {
         "id": "webpages-am-shop-showcase",
         "kind": "contentLayout",
         "title": "",
@@ -634,11 +497,11 @@
               {
                 "id": "webpages-am-shop-showcase-heading-block",
                 "kind": "hero",
-                "eyebrow": "Live products",
-                "title": "WooCommerce shop showcase",
-                "body": "Ապրանքային բաժինը օգտագործում է իրական WooCommerce տվյալներ՝ պահպանելով cart, checkout և account հոսքը։",
-                "buttonLabel": "",
-                "buttonUrl": "",
+                "eyebrow": "Shop preview",
+                "title": "Խանութի նախադիտում",
+                "body": "Homepage-ում ցուցադրում ենք միայն ընտրված ապրանքների compact preview-ը։ Ամբողջական ֆիլտրերով խանութը մնում է /shop էջում։",
+                "buttonLabel": "Բացել ամբողջ խանութը",
+                "buttonUrl": "/shop",
                 "panelStyle": "default",
                 "elementBackgroundMode": "transparent",
                 "elementPadding": "none",
@@ -657,15 +520,15 @@
               {
                 "id": "webpages-am-shop-showcase-products-block",
                 "kind": "products",
-                "title": "",
-                "source": "all",
+                "title": "Ընտրված ապրանքներ",
+                "source": "featured",
                 "layoutVariant": "grid",
                 "columns": 4,
-                "gridLimit": 8,
-                "filterPosition": "top",
-                "cardStyle": "none",
+                "gridLimit": 4,
+                "filterPosition": "hidden",
+                "cardStyle": "soft",
                 "cardPreset": "minimal",
-                "gridGap": "small",
+                "gridGap": "medium",
                 "cardPadding": "small",
                 "imagePadding": "none",
                 "addToCartStyle": "dark",
@@ -682,7 +545,7 @@
         ]
       },
       {
-        "id": "webpages-am-dashboard-message",
+        "id": "webpages-am-builder-message",
         "kind": "contentLayout",
         "title": "",
         "eyebrow": "",
@@ -707,8 +570,8 @@
                 "id": "webpages-am-dashboard-message-heading-block",
                 "kind": "hero",
                 "eyebrow": "Editable system",
-                "title": "Dashboard-ը պահում է կայքը կենդանի",
-                "body": "Բաժինները, քարտերը, slider-ները, WooCommerce ցուցադրումները և CTA-ները նախատեսված են կրկնակի օգտագործման համար։",
+                "title": "Կառուցված է reusable բաժիններով",
+                "body": "Էջի բոլոր կարևոր մասերը editable blocks են, իսկ sections-ը մնում են մաքուր layout containers։",
                 "buttonLabel": "",
                 "buttonUrl": "",
                 "panelStyle": "default",
@@ -878,7 +741,7 @@
                 "id": "packages-heading-block",
                 "kind": "hero",
                 "eyebrow": "Coming soon",
-                "title": "Website + Hosting փաթեթներ",
+                "title": "Կայք + Հոսթինգ փաթեթներ",
                 "body": "Փաթեթները նախատեսված են նրանց համար, ովքեր ուզում են ոչ միայն կայք, այլ ամբողջական գործարկման և սպասարկման հիմք։",
                 "buttonLabel": "",
                 "buttonUrl": "",
@@ -1028,7 +891,7 @@
         ]
       }
     ],
-    "updatedAt": "2026-05-26T06:30:28.203Z"
+    "updatedAt": "2026-05-26T15:04:22.745Z"
   },
   "shop": {
     "version": 1,
