@@ -23,8 +23,14 @@ export type BuilderHeaderIconId =
   | "search";
 export type BuilderHeaderIconVariant = "muted" | "solid" | "ghost" | "icon";
 export type BuilderHeaderActiveIndicator = "underline" | "princity" | "none";
+export type BuilderHeaderBackgroundMode = "default" | "none";
 export type BuilderShellSettings = {
   headerVisible: boolean;
+  topToolbarVisible: boolean;
+  topToolbarText: string;
+  topToolbarPhone: string;
+  topToolbarMeta: string;
+  headerBackgroundMode: BuilderHeaderBackgroundMode;
   headerLayout: BuilderHeaderLayout;
   headerBrandMode: BuilderHeaderBrandMode;
   headerBrandText: string;
@@ -200,6 +206,7 @@ export type BuilderLayoutBlock = {
   gridLimit?: number;
   source?: "all" | "featured" | "category";
   categoryId?: string;
+  hiddenCategorySlugs?: string[];
   layoutVariant?: "grid" | "carousel";
   badges?: BuilderSection["badges"];
   slides?: BuilderSection["slides"];
@@ -295,6 +302,7 @@ export type BuilderSection = {
   addToCartDisplay?: "button" | "icon";
   source?: "all" | "featured" | "category";
   categoryId?: string;
+  hiddenCategorySlugs?: string[];
   gridLimit?: number;
   layoutVariant?: "grid" | "carousel";
   promoVariant?: "default" | "accent" | "soft";
@@ -341,6 +349,16 @@ export type BuilderSection = {
     autoplayDelayMs?: number;
     align?: "center" | "start";
     dragFree?: boolean;
+    effect?: "slide" | "fade";
+    spaceBetween?: number;
+    coverflowRotate?: number;
+    coverflowDepth?: number;
+    coverflowStretch?: number;
+    cardsRotate?: boolean;
+    cardsShadows?: boolean;
+    creativePreset?: "soft-stack" | "deep" | "scale";
+    fadeCrossFade?: boolean;
+    freeModeMomentum?: boolean;
     cardsPerView?: number;
     showArrows?: boolean;
     showDots?: boolean;

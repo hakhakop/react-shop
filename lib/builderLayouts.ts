@@ -67,6 +67,7 @@ export type BuilderLayoutBlock = {
   imagePadding?: string;
   source?: string;
   categoryId?: string;
+  hiddenCategorySlugs?: string[];
   layoutVariant?: string;
   badges?: {
     id?: string;
@@ -93,6 +94,16 @@ export type BuilderLayoutBlock = {
     autoplayDelayMs?: number;
     align?: string;
     dragFree?: boolean;
+    effect?: string;
+    spaceBetween?: number;
+    coverflowRotate?: number;
+    coverflowDepth?: number;
+    coverflowStretch?: number;
+    cardsRotate?: boolean;
+    cardsShadows?: boolean;
+    creativePreset?: string;
+    fadeCrossFade?: boolean;
+    freeModeMomentum?: boolean;
     cardsPerView?: number;
     showArrows?: boolean;
     showDots?: boolean;
@@ -170,6 +181,7 @@ export type BuilderSection = {
   addToCartDisplay?: string;
   source?: string;
   categoryId?: string;
+  hiddenCategorySlugs?: string[];
   gridLimit?: number;
   layoutVariant?: string;
   promoVariant?: string;

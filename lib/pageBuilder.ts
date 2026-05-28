@@ -109,6 +109,20 @@ export interface CarouselLayoutBlock extends SectionSettings {
     autoplayDelayMs?: number | null;
     align?: string | null;
     dragFree?: boolean | null;
+    effect?: string | null;
+    spaceBetween?: number | null;
+    coverflowRotate?: number | null;
+    coverflowDepth?: number | null;
+    coverflowStretch?: number | null;
+    cardsRotate?: boolean | null;
+    cardsShadows?: boolean | null;
+    creativePreset?: string | null;
+    fadeCrossFade?: boolean | null;
+    freeModeMomentum?: boolean | null;
+    cardsPerView?: number | null;
+    showArrows?: boolean | null;
+    showDots?: boolean | null;
+    pauseOnHover?: boolean | null;
   } | null;
 }
 

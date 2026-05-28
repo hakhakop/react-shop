@@ -129,6 +129,21 @@ export default async function HeaderShell({ layoutOverride }: HeaderShellProps) 
     ),
   );
   const shellSettings = (shellSettingsRaw || {}) as Partial<BuilderShellSettings>;
+  const topToolbarVisible = shellSettings.topToolbarVisible !== false;
+  const effectiveTopBarText =
+    typeof shellSettings.topToolbarText === "string"
+      ? shellSettings.topToolbarText
+      : topBarText;
+  const effectiveSupportPhone =
+    typeof shellSettings.topToolbarPhone === "string"
+      ? shellSettings.topToolbarPhone
+      : supportPhone;
+  const effectiveToolbarMeta =
+    typeof shellSettings.topToolbarMeta === "string"
+      ? shellSettings.topToolbarMeta
+      : currencyLabel;
+  const effectiveHeaderBackgroundMode =
+    shellSettings.headerBackgroundMode === "none" ? "none" : "default";
   const effectiveLogoUrl = shellSettings.headerLogoUrl || logoUrl;
   const effectiveBrandText =
     shellSettings.headerBrandText ||
@@ -148,6 +163,17 @@ export default async function HeaderShell({ layoutOverride }: HeaderShellProps) 
   const effectiveActiveIndicator =
     shellSettings.headerActiveIndicator ||
     (layout === "princity" ? "princity" : "underline");
+  const headerClassName = [
+    layout === "pill" || layout === "princity" ? "site-header--pill" : "",
+    serviceHomepageMode ? "site-header--service" : "",
+    topToolbarVisible ? "" : "site-header--toolbar-hidden",
+    effectiveHeaderBackgroundMode === "none"
+      ? "site-header--no-background"
+      : "",
+    `site-header--indicator-${effectiveActiveIndicator}`,
+  ]
+    .filter(Boolean)
+    .join(" ");
   const showLogo =
     Boolean(effectiveLogoUrl) &&
     (effectiveBrandMode === "logo" || effectiveBrandMode === "both");
@@ -251,31 +277,54 @@ export default async function HeaderShell({ layoutOverride }: HeaderShellProps) 
       />
     </>
   );
+  const renderTopToolbar = () => {
+    if (
+      !topToolbarVisible ||
+      (!effectiveTopBarText && !effectiveSupportPhone && !effectiveToolbarMeta)
+    ) {
+      return null;
+    }
+
+    return (
+      <div className="site-header-top">
+        <div className="site-header-top-inner">
+          <div className="site-header-top-left">
+            {effectiveTopBarText && <span>{effectiveTopBarText}</span>}
+          </div>
+          <div className="site-header-top-right">
+            {effectiveSupportPhone && <span>Call: {effectiveSupportPhone}</span>}
+            {effectiveToolbarMeta && <span>{effectiveToolbarMeta}</span>}
+          </div>
+        </div>
+      </div>
+    );
+  };
+  const renderPrincityTopToolbar = () => {
+    if (
+      !topToolbarVisible ||
+      (!effectiveTopBarText && !effectiveSupportPhone && !effectiveToolbarMeta)
+    ) {
+      return null;
+    }
+
+    return (
+      <div className="site-header-princity-meta-row">
+        <span>{effectiveTopBarText || "Modern commerce by Webpages"}</span>
+        <span>{[effectiveSupportPhone, effectiveToolbarMeta].filter(Boolean).join("   ")}</span>
+      </div>
+    );
+  };
 
    return (
     <HeaderFrame
       accentColor={accentColor}
       mode={layout === "pill" || layout === "princity" ? "none" : "sticky"}
-      className={`${layout === "pill" || layout === "princity" ? "site-header--pill" : ""}${
-        serviceHomepageMode ? " site-header--service" : ""
-      } site-header--indicator-${effectiveActiveIndicator}`.trim()}
+      className={headerClassName}
     >
       {/* LAYOUT 2: TWO-ROW (ACF = centered) */}
       {layout === "two-row" && (
         <>
-          {(topBarText || supportPhone || currencyLabel) && (
-            <div className="site-header-top">
-              <div className="site-header-top-inner">
-                <div className="site-header-top-left">
-                  {topBarText && <span>{topBarText}</span>}
-                </div>
-                <div className="site-header-top-right">
-                  {supportPhone && <span>Call: {supportPhone}</span>}
-                  {currencyLabel && <span>{currencyLabel}</span>}
-                </div>
-              </div>
-            </div>
-          )}
+          {renderTopToolbar()}
 
           <div className="site-header-main">
             <div className="site-header-main-inner">
@@ -309,19 +358,7 @@ export default async function HeaderShell({ layoutOverride }: HeaderShellProps) 
           >
 
             {/* Top bar row only while at top */}
-            {(topBarText || supportPhone || currencyLabel) && (
-              <div className="site-header-top">
-                <div className="site-header-top-inner">
-                  <div className="site-header-top-left">
-                    {topBarText && <span>{topBarText}</span>}
-                  </div>
-                  <div className="site-header-top-right">
-                    {supportPhone && <span>Call: {supportPhone}</span>}
-                    {currencyLabel && <span>{currencyLabel}</span>}
-                  </div>
-                </div>
-              </div>
-            )}
+            {renderTopToolbar()}
 
             {/* Main bar: normal at top, becomes floating pill when scrolled */}
             <div className="site-header-main site-header-pill-main">
@@ -358,18 +395,7 @@ export default async function HeaderShell({ layoutOverride }: HeaderShellProps) 
             className="site-header-princity-shell"
             suppressHydrationWarning
           >
-            <div className="site-header-princity-meta-row">
-              <span>
-                {serviceHomepageMode
-                  ? "Beautiful React websites with WordPress CMS and hosting included"
-                  : topBarText || "Modern commerce by Webpages"}
-              </span>
-              <span>
-                {serviceHomepageMode
-                  ? "Plans coming soon"
-                  : [supportPhone, currencyLabel].filter(Boolean).join("   ")}
-              </span>
-            </div>
+            {renderPrincityTopToolbar()}
 
             <div className="site-header-princity">
               <div className="site-header-princity-inner">

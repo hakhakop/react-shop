@@ -9,14 +9,23 @@ import type { CategoryTreeItem } from "../lib/categories";
 type CategoryBarProps = {
   categoryTree: CategoryTreeItem[];
   countsBySlug: Record<string, number>;
+  hiddenCategorySlugs?: string[];
 };
 
 export default function CategoryBar({
   categoryTree,
   countsBySlug,
+  hiddenCategorySlugs = [],
 }: CategoryBarProps) {
   const [openSlug, setOpenSlug] = useState<string | null>(null);
   const barRef = useRef<HTMLDivElement | null>(null);
+  const hiddenSlugs = new Set(hiddenCategorySlugs);
+  const visibleCategoryTree = categoryTree
+    .filter((root) => !hiddenSlugs.has(root.slug))
+    .map((root) => ({
+      ...root,
+      children: root.children.filter((child) => !hiddenSlugs.has(child.slug)),
+    }));
 
   // Close when clicking outside
   useEffect(() => {
@@ -71,7 +80,7 @@ export default function CategoryBar({
 
   return (
     <div className="category-bar" ref={barRef}>
-      {categoryTree.map((root) => {
+      {visibleCategoryTree.map((root) => {
         const hasChildren = root.children && root.children.length > 0;
         const isOpen = openSlug === root.slug;
         const rootCount = countsBySlug[root.slug] ?? 0;

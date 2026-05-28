@@ -54,6 +54,7 @@ import type {
   BuilderColorScheme,
   BuilderDesign,
   BuilderHeaderActiveIndicator,
+  BuilderHeaderBackgroundMode,
   BuilderHeaderLayout,
   BuilderHeaderBrandMode,
   BuilderHeaderIconId,
@@ -118,6 +119,11 @@ const STORAGE_CUSTOM_PAGES = "react-shop-visual-builder-pages-v1";
 
 const defaultShellSettings: BuilderShellSettings = {
   headerVisible: true,
+  topToolbarVisible: true,
+  topToolbarText: "Fast support & setup by Webpages",
+  topToolbarPhone: "+374 xx xx xx",
+  topToolbarMeta: "AMD ֏",
+  headerBackgroundMode: "default",
   headerLayout: "wordpress",
   headerBrandMode: "logo",
   headerBrandText: "WebPages",
@@ -2977,6 +2983,7 @@ export default function DashboardBuilder({
       layoutBlockLabels={layoutBlockLabels}
       openLayoutItemId={openLayoutItemId}
       openSlideId={openSlideId}
+      previewCategoryTree={previewCategoryTree}
       sectionBackgroundPresets={sectionBackgroundPresets}
       sectionColorModeLabel={sectionColorModeLabel}
       sectionLabels={sectionLabels}
@@ -3298,6 +3305,84 @@ export default function DashboardBuilder({
               }
             />
             <span>Show website header</span>
+          </label>
+
+          <div className="builder-card-title">
+            <strong>Top Toolbar</strong>
+            <span>message + meta</span>
+          </div>
+
+          <label className="builder-check">
+            <input
+              type="checkbox"
+              checked={shellSettings.topToolbarVisible}
+              onChange={(event) =>
+                updateShellSettings({
+                  topToolbarVisible: event.target.checked,
+                })
+              }
+            />
+            <span>Show top toolbar</span>
+          </label>
+
+          <label className="builder-field">
+            <span>Toolbar Text</span>
+            <input
+              type="text"
+              value={shellSettings.topToolbarText}
+              onChange={(event) =>
+                updateShellSettings({
+                  topToolbarText: event.target.value,
+                })
+              }
+              placeholder="Fast support & setup by Webpages"
+            />
+          </label>
+
+          <div className="builder-two-column">
+            <label className="builder-field">
+              <span>Phone / Support</span>
+              <input
+                type="text"
+                value={shellSettings.topToolbarPhone}
+                onChange={(event) =>
+                  updateShellSettings({
+                    topToolbarPhone: event.target.value,
+                  })
+                }
+                placeholder="+374 xx xx xx"
+              />
+            </label>
+
+            <label className="builder-field">
+              <span>Right Meta</span>
+              <input
+                type="text"
+                value={shellSettings.topToolbarMeta}
+                onChange={(event) =>
+                  updateShellSettings({
+                    topToolbarMeta: event.target.value,
+                  })
+                }
+                placeholder="AMD ֏"
+              />
+            </label>
+          </div>
+
+          <label className="builder-field">
+            <span>Header Background</span>
+            <select
+              value={shellSettings.headerBackgroundMode}
+              onChange={(event) =>
+                updateShellSettings({
+                  headerBackgroundMode: event.target
+                    .value as BuilderHeaderBackgroundMode,
+                })
+              }
+            >
+              <option value="default">Default background</option>
+              <option value="none">No background</option>
+            </select>
           </label>
 
           <label className="builder-field">
@@ -3982,6 +4067,84 @@ export default function DashboardBuilder({
                     }
                   />
                   <span>Show website header</span>
+                </label>
+
+                <div className="builder-card-title">
+                  <strong>Top Toolbar</strong>
+                  <span>message + meta</span>
+                </div>
+
+                <label className="builder-check">
+                  <input
+                    type="checkbox"
+                    checked={shellSettings.topToolbarVisible}
+                    onChange={(event) =>
+                      updateShellSettings({
+                        topToolbarVisible: event.target.checked,
+                      })
+                    }
+                  />
+                  <span>Show top toolbar</span>
+                </label>
+
+                <label className="builder-field">
+                  <span>Toolbar Text</span>
+                  <input
+                    type="text"
+                    value={shellSettings.topToolbarText}
+                    onChange={(event) =>
+                      updateShellSettings({
+                        topToolbarText: event.target.value,
+                      })
+                    }
+                    placeholder="Fast support & setup by Webpages"
+                  />
+                </label>
+
+                <div className="builder-two-column">
+                  <label className="builder-field">
+                    <span>Phone / Support</span>
+                    <input
+                      type="text"
+                      value={shellSettings.topToolbarPhone}
+                      onChange={(event) =>
+                        updateShellSettings({
+                          topToolbarPhone: event.target.value,
+                        })
+                      }
+                      placeholder="+374 xx xx xx"
+                    />
+                  </label>
+
+                  <label className="builder-field">
+                    <span>Right Meta</span>
+                    <input
+                      type="text"
+                      value={shellSettings.topToolbarMeta}
+                      onChange={(event) =>
+                        updateShellSettings({
+                          topToolbarMeta: event.target.value,
+                        })
+                      }
+                      placeholder="AMD ֏"
+                    />
+                  </label>
+                </div>
+
+                <label className="builder-field">
+                  <span>Header Background</span>
+                  <select
+                    value={shellSettings.headerBackgroundMode}
+                    onChange={(event) =>
+                      updateShellSettings({
+                        headerBackgroundMode: event.target
+                          .value as BuilderHeaderBackgroundMode,
+                      })
+                    }
+                  >
+                    <option value="default">Default background</option>
+                    <option value="none">No background</option>
+                  </select>
                 </label>
 
                 <label className="builder-field">
@@ -5498,6 +5661,8 @@ function PreviewSection({
               addToCartPosition={section.addToCartPosition}
               addToCartVisibility={section.addToCartVisibility}
               addToCartDisplay={section.addToCartDisplay}
+              hiddenCategorySlugs={section.hiddenCategorySlugs}
+              categoryTree={previewCategoryTree}
               typography={section.typography}
             />
           )
@@ -6279,6 +6444,7 @@ function PreviewSection({
                             <CategoryBar
                               categoryTree={previewCategoryTree}
                               countsBySlug={previewCategoryCounts}
+                              hiddenCategorySlugs={block.hiddenCategorySlugs}
                             />
                           ) : (
                             <div className="shop-builder-filter-pills">
@@ -6370,6 +6536,8 @@ function PreviewSection({
                                   addToCartPosition={block.addToCartPosition}
                                   addToCartVisibility={block.addToCartVisibility}
                                   addToCartDisplay={block.addToCartDisplay}
+                                  hiddenCategorySlugs={block.hiddenCategorySlugs}
+                                  categoryTree={previewCategoryTree}
                                   typography={block.typography}
                                 />
                               </div>

@@ -17,6 +17,12 @@ export type ProductNode = {
   name: string;
   image?: WPImage | null;
   price?: string | null;
+  productCategories?: {
+    nodes: {
+      name: string;
+      slug: string;
+    }[];
+  } | null;
   attributes?: {
     nodes: {
       name: string;
@@ -43,6 +49,14 @@ const PRODUCTS_QUERY = `
         image {
           sourceUrl
           altText
+        }
+        ... on Product {
+          productCategories {
+            nodes {
+              name
+              slug
+            }
+          }
         }
         ... on SimpleProduct {
           price(format: RAW)
@@ -120,6 +134,14 @@ const CATEGORY_PRODUCTS_QUERY = `
           sourceUrl
           altText
         }
+        ... on Product {
+          productCategories {
+            nodes {
+              name
+              slug
+            }
+          }
+        }
         ... on SimpleProduct {
           price(format: RAW)
           attributes {
@@ -189,6 +211,14 @@ const FEATURED_PRODUCTS_QUERY = `
           sourceUrl
           altText
         }
+        ... on Product {
+          productCategories {
+            nodes {
+              name
+              slug
+            }
+          }
+        }
         ... on SimpleProduct {
           price(format: RAW)
           attributes {
@@ -226,6 +256,14 @@ const CATEGORY_ID_PRODUCTS_QUERY = `
           sourceUrl
           altText
         }
+        ... on Product {
+          productCategories {
+            nodes {
+              name
+              slug
+            }
+          }
+        }
         ... on SimpleProduct {
           price(format: RAW)
           attributes {
@@ -262,6 +300,14 @@ const ALL_PRODUCTS_QUERY = `
         image {
           sourceUrl
           altText
+        }
+        ... on Product {
+          productCategories {
+            nodes {
+              name
+              slug
+            }
+          }
         }
         ... on SimpleProduct {
           price(format: RAW)

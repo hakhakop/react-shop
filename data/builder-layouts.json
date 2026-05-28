@@ -145,7 +145,7 @@
                     "id": "hero-demo-dashboard",
                     "eyebrow": "Dashboard",
                     "title": "Կառուցվում է builder-ով",
-                    "meta": "Editable sections",
+                    "meta": "Փոփոխվող հատվածներ",
                     "text": "Hero, cards, sliders, product previews և CTA բաժիններ՝ նույն dashboard-ից։",
                     "typography": {
                       "title": {
@@ -162,7 +162,7 @@
                   {
                     "id": "hero-demo-commerce",
                     "eyebrow": "Commerce",
-                    "title": "WooCommerce-ը մնում է կենդանի",
+                    "title": "WooCommerce-ը մնում է լայվ",
                     "meta": "Shop ready",
                     "text": "Shop, product page, add to cart, cart, checkout և account էջերը պահպանված են։",
                     "typography": {
@@ -473,6 +473,447 @@
         ]
       },
       {
+        "id": "webpages-builder-in-action",
+        "kind": "contentLayout",
+        "title": "",
+        "eyebrow": "",
+        "body": "",
+        "background": "#f4f1ea",
+        "backgroundMode": "boxed",
+        "contentMode": "boxed",
+        "colorScheme": "light",
+        "topSpacing": "large",
+        "bottomSpacing": "large",
+        "topMargin": "inherit",
+        "bottomMargin": "inherit",
+        "visible": true,
+        "layout": "whole",
+        "layoutColumns": 1,
+        "layoutRows": 1,
+        "layoutItems": [
+          {
+            "id": "webpages-builder-in-action-column",
+            "blocks": [
+              {
+                "id": "webpages-builder-in-action-heading",
+                "kind": "hero",
+                "eyebrow": "Builder in Action",
+                "title": "Builder-ը և լայվ կայքը նույն համակարգի երկու կողմերն են",
+                "body": "Ձախում՝ dashboard/editor տրամաբանությունը, աջում՝ visitor-ի տեսած մաքուր React frontend-ը։ Բովանդակությունը խմբագրվում է blocks-ով, իսկ layout-ը մնում է sections-ի մեջ։",
+                "buttonLabel": "Բացել dashboard-ը",
+                "buttonUrl": "/dashboard?page=home",
+                "panelStyle": "default",
+                "elementBackgroundMode": "transparent",
+                "elementPadding": "none",
+                "typography": {
+                  "title": {
+                    "fontSize": "clamp(36px, 4.8vw, 76px)",
+                    "fontWeight": "800",
+                    "lineHeight": "0.92"
+                  },
+                  "body": {
+                    "fontSize": "18px",
+                    "lineHeight": "1.65"
+                  }
+                }
+              },
+              {
+                "id": "webpages-builder-in-action-grid",
+                "kind": "grid",
+                "gridSource": "static",
+                "columns": 2,
+                "gridRows": 1,
+                "gridGap": "medium",
+                "gridMargin": "medium",
+                "gridImagePadding": "frameless",
+                "gridContentPadding": "large",
+                "gridImageFrame": "soft",
+                "gridShowImage": true,
+                "gridShowEyebrow": true,
+                "gridShowMeta": true,
+                "gridShowText": true,
+                "gridShowButton": true,
+                "panelStyle": "clean-shadow",
+                "gridItems": [
+                  {
+                    "id": "builder-action-dashboard",
+                    "eyebrow": "Editor preview",
+                    "title": "Dashboard / Builder",
+                    "meta": "Sections + elements",
+                    "text": "Մաքուր section containers, ընտրվող columns, reusable blocks, typography և style controls՝ առանց երկրորդ menu/shop համակարգ ստեղծելու։",
+                    "imageUrl": "/uploads/builder/6-moypvvtc.jpg",
+                    "imageAlt": "Dashboard / Builder",
+                    "buttonLabel": "Բացել builder-ը",
+                    "buttonUrl": "/dashboard?page=home",
+                    "typography": {
+                      "title": {
+                        "fontSize": "clamp(24px, 2.4vw, 42px)",
+                        "fontWeight": "760",
+                        "lineHeight": "1"
+                      },
+                      "body": {
+                        "fontSize": "16px",
+                        "lineHeight": "1.6"
+                      }
+                    }
+                  },
+                  {
+                    "id": "builder-action-live",
+                    "eyebrow": "Live website preview",
+                    "title": "React frontend",
+                    "meta": "Visitor experience",
+                    "text": "Նույն տվյալները render են լինում որպես արագ, գեղեցիկ, mobile-ready React էջ՝ header, cart, account և WooCommerce հոսքով։",
+                    "imageUrl": "/uploads/builder/4-moyq2jzb.jpg",
+                    "imageAlt": "React frontend",
+                    "buttonLabel": "Տեսնել shop-ը",
+                    "buttonUrl": "/shop",
+                    "typography": {
+                      "title": {
+                        "fontSize": "clamp(24px, 2.4vw, 42px)",
+                        "fontWeight": "760",
+                        "lineHeight": "1"
+                      },
+                      "body": {
+                        "fontSize": "16px",
+                        "lineHeight": "1.6"
+                      }
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "webpages-swiper-showcase",
+        "kind": "contentLayout",
+        "title": "",
+        "eyebrow": "",
+        "body": "",
+        "background": "#0d0d0d",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "dark",
+        "topSpacing": "large",
+        "bottomSpacing": "large",
+        "topMargin": "inherit",
+        "bottomMargin": "inherit",
+        "visible": true,
+        "layout": "whole",
+        "layoutColumns": 1,
+        "layoutRows": 1,
+        "layoutItems": [
+          {
+            "id": "webpages-swiper-showcase-column",
+            "blocks": [
+              {
+                "id": "webpages-swiper-showcase-heading",
+                "kind": "hero",
+                "eyebrow": "Visual showcase",
+                "title": "Swiper ցուցադրություն՝ էջերի, ապրանքների և բաղադրիչների համար",
+                "body": "Սա homepage-ի visual demo շերտն է՝ ցույց տալու, թե ինչպես կարող են product highlights, landing visuals և service cards շարժվել premium slider-ով։",
+                "buttonLabel": "",
+                "buttonUrl": "",
+                "panelStyle": "default",
+                "elementBackgroundMode": "transparent",
+                "elementPadding": "none",
+                "typography": {
+                  "title": {
+                    "fontSize": "clamp(36px, 4.8vw, 76px)",
+                    "fontWeight": "840",
+                    "lineHeight": "0.92"
+                  },
+                  "body": {
+                    "fontSize": "18px",
+                    "lineHeight": "1.65"
+                  }
+                }
+              },
+              {
+                "id": "webpages-swiper-showcase-slider",
+                "kind": "slider",
+                "title": "Visual showcase",
+                "body": "",
+                "panelStyle": "default",
+                "elementBackgroundMode": "transparent",
+                "elementPadding": "none",
+                "slides": [
+                  {
+                    "id": "swiper-slide-builder",
+                    "badge": "Builder",
+                    "title": "Dashboard-ից կառուցվող բաժիններ",
+                    "subtitle": "Layout-ը sections-ում, content-ը blocks-ում",
+                    "text": "Կառուցեք hero, cards, CTA և shop preview՝ նույն reusable համակարգով։",
+                    "imageUrl": "/uploads/builder/6-moypvvtc.jpg",
+                    "imageAlt": "Builder dashboard preview",
+                    "buttonLabel": "Բացել dashboard",
+                    "buttonUrl": "/dashboard?page=home",
+                    "imagePadding": "frameless"
+                  },
+                  {
+                    "id": "swiper-slide-shop",
+                    "badge": "WooCommerce",
+                    "title": "Ապրանքների գեղեցիկ ներկայացում",
+                    "subtitle": "Product grid + product page + cart",
+                    "text": "Homepage-ում compact preview, իսկ /shop-ում ամբողջական archive և commerce flow։",
+                    "imageUrl": "/uploads/builder/4-moyq2jzb.jpg",
+                    "imageAlt": "Shop product preview",
+                    "buttonLabel": "Բացել shop",
+                    "buttonUrl": "/shop",
+                    "imagePadding": "frameless"
+                  },
+                  {
+                    "id": "swiper-slide-product",
+                    "badge": "Product Page",
+                    "title": "Ապրանքի էջ՝ React template-ով",
+                    "subtitle": "Gallery, options, add to cart",
+                    "text": "Single product template-ը շարունակում է մնալ customizable builder-ի միջոցով։",
+                    "imageUrl": "/uploads/builder/1-moypxh75.jpg",
+                    "imageAlt": "Product page preview",
+                    "buttonLabel": "Տեսնել ապրանքներ",
+                    "buttonUrl": "/shop",
+                    "imagePadding": "frameless"
+                  },
+                  {
+                    "id": "swiper-slide-hosting",
+                    "badge": "Hosting",
+                    "title": "Կայք + հոսթինգ՝ մեկ փաթեթում",
+                    "subtitle": "Launch-ready system",
+                    "text": "Համակարգը պատրաստ է ներկայացնել service packages, forms և հետագա growth բաժիններ։",
+                    "imageUrl": "/uploads/builder/3-moypxdcd.jpg",
+                    "imageAlt": "Hosting package visual",
+                    "buttonLabel": "Փաթեթներ",
+                    "buttonUrl": "#packages",
+                    "imagePadding": "frameless"
+                  }
+                ],
+                "carouselSettings": {
+                  "variant": "showcase",
+                  "loop": true,
+                  "autoplay": true,
+                  "autoplayDelayMs": 4200,
+                  "align": "start",
+                  "dragFree": true,
+                  "cardsPerView": 3,
+                  "showArrows": true,
+                  "showDots": true,
+                  "pauseOnHover": true,
+                  "effect": "fade"
+                }
+              }
+            ]
+          }
+        ],
+        "visualStyle": {
+          "background": {
+            "type": "gradient",
+            "gradient": "radial-gradient(circle at 12% 10%, rgba(216,255,101,0.16), transparent 32%), radial-gradient(circle at 92% 18%, rgba(255,255,255,0.08), transparent 28%), #0d0d0d"
+          }
+        }
+      },
+      {
+        "id": "webpages-component-gallery",
+        "kind": "contentLayout",
+        "title": "",
+        "eyebrow": "",
+        "body": "",
+        "background": "#fffaf0",
+        "backgroundMode": "boxed",
+        "contentMode": "boxed",
+        "colorScheme": "light",
+        "topSpacing": "large",
+        "bottomSpacing": "large",
+        "topMargin": "inherit",
+        "bottomMargin": "inherit",
+        "visible": true,
+        "layout": "whole",
+        "layoutColumns": 1,
+        "layoutRows": 1,
+        "layoutItems": [
+          {
+            "id": "webpages-component-gallery-column",
+            "blocks": [
+              {
+                "id": "webpages-component-gallery-heading",
+                "kind": "hero",
+                "eyebrow": "Component gallery",
+                "title": "Reusable բաժիններ, որոնք կարելի է հավաքել dashboard-ից",
+                "body": "Սրանք այն հիմնական blocks-ն են, որոնցով homepage-ը, shop landing-ը և service էջերը կարող են արագ հավաքվել՝ առանց frontend logic-ը կրկնօրինակելու։",
+                "buttonLabel": "",
+                "buttonUrl": "",
+                "panelStyle": "default",
+                "elementBackgroundMode": "transparent",
+                "elementPadding": "none",
+                "typography": {
+                  "title": {
+                    "fontSize": "clamp(36px, 4.8vw, 76px)",
+                    "fontWeight": "840",
+                    "lineHeight": "0.92"
+                  },
+                  "body": {
+                    "fontSize": "18px",
+                    "lineHeight": "1.65"
+                  }
+                }
+              },
+              {
+                "id": "webpages-component-gallery-grid",
+                "kind": "grid",
+                "gridSource": "static",
+                "columns": 3,
+                "gridRows": 2,
+                "gridGap": "medium",
+                "gridMargin": "medium",
+                "gridImagePadding": "small",
+                "gridContentPadding": "large",
+                "gridImageFrame": "soft",
+                "gridShowImage": true,
+                "gridShowEyebrow": true,
+                "gridShowMeta": true,
+                "gridShowText": true,
+                "gridShowButton": true,
+                "panelStyle": "clean-shadow",
+                "gridItems": [
+                  {
+                    "id": "component-slideshow",
+                    "eyebrow": "01",
+                    "title": "Slideshow",
+                    "meta": "Swiper / carousel",
+                    "text": "Hero stories, campaign visuals և featured blocks՝ շարժվող, բայց հանգիստ ռիթմով։",
+                    "imageUrl": "/uploads/builder/3-moypxdcd.jpg",
+                    "imageAlt": "Slideshow",
+                    "buttonLabel": "Տեսնել showcase",
+                    "buttonUrl": "#webpages-swiper-showcase",
+                    "typography": {
+                      "title": {
+                        "fontSize": "clamp(24px, 2.4vw, 42px)",
+                        "fontWeight": "760",
+                        "lineHeight": "1"
+                      },
+                      "body": {
+                        "fontSize": "16px",
+                        "lineHeight": "1.6"
+                      }
+                    }
+                  },
+                  {
+                    "id": "component-product-grid",
+                    "eyebrow": "02",
+                    "title": "Product Grid",
+                    "meta": "WooCommerce data",
+                    "text": "Ընտրված կամ ամբողջական ապրանքային ցուցադրումներ՝ product cards-ով։",
+                    "imageUrl": "/uploads/builder/4-moyq2jzb.jpg",
+                    "imageAlt": "Product Grid",
+                    "buttonLabel": "Բացել shop",
+                    "buttonUrl": "/shop",
+                    "typography": {
+                      "title": {
+                        "fontSize": "clamp(24px, 2.4vw, 42px)",
+                        "fontWeight": "760",
+                        "lineHeight": "1"
+                      },
+                      "body": {
+                        "fontSize": "16px",
+                        "lineHeight": "1.6"
+                      }
+                    }
+                  },
+                  {
+                    "id": "component-product-page",
+                    "eyebrow": "03",
+                    "title": "Product Page",
+                    "meta": "Single template",
+                    "text": "Gallery, price, options, wishlist և add-to-cart՝ reusable product template-ի մեջ։",
+                    "imageUrl": "/uploads/builder/1-moypxh75.jpg",
+                    "imageAlt": "Product Page",
+                    "buttonLabel": "Ապրանքներ",
+                    "buttonUrl": "/shop",
+                    "typography": {
+                      "title": {
+                        "fontSize": "clamp(24px, 2.4vw, 42px)",
+                        "fontWeight": "760",
+                        "lineHeight": "1"
+                      },
+                      "body": {
+                        "fontSize": "16px",
+                        "lineHeight": "1.6"
+                      }
+                    }
+                  },
+                  {
+                    "id": "component-category-cards",
+                    "eyebrow": "04",
+                    "title": "Category Cards",
+                    "meta": "Cards / taxonomy",
+                    "text": "Կատեգորիաներ, service paths կամ feature groups՝ card gallery տեսքով։",
+                    "imageUrl": "/uploads/builder/6-moypvvtc.jpg",
+                    "imageAlt": "Category Cards",
+                    "buttonLabel": "Հնարավորություններ",
+                    "buttonUrl": "#capabilities",
+                    "typography": {
+                      "title": {
+                        "fontSize": "clamp(24px, 2.4vw, 42px)",
+                        "fontWeight": "760",
+                        "lineHeight": "1"
+                      },
+                      "body": {
+                        "fontSize": "16px",
+                        "lineHeight": "1.6"
+                      }
+                    }
+                  },
+                  {
+                    "id": "component-cta",
+                    "eyebrow": "05",
+                    "title": "CTA",
+                    "meta": "Conversion blocks",
+                    "text": "Offer strips, final actions և package teasers՝ արագ editable blocks-ով։",
+                    "imageUrl": "/uploads/builder/3-moypxdcd.jpg",
+                    "imageAlt": "CTA",
+                    "buttonLabel": "Փաթեթներ",
+                    "buttonUrl": "#packages",
+                    "typography": {
+                      "title": {
+                        "fontSize": "clamp(24px, 2.4vw, 42px)",
+                        "fontWeight": "760",
+                        "lineHeight": "1"
+                      },
+                      "body": {
+                        "fontSize": "16px",
+                        "lineHeight": "1.6"
+                      }
+                    }
+                  },
+                  {
+                    "id": "component-dashboard",
+                    "eyebrow": "06",
+                    "title": "Builder Dashboard",
+                    "meta": "Editor controls",
+                    "text": "Section layout + element content բաժանում՝ հստակ և կառավարելի dashboard-ում։",
+                    "imageUrl": "/uploads/builder/6-moypvvtc.jpg",
+                    "imageAlt": "Builder Dashboard",
+                    "buttonLabel": "Բացել builder",
+                    "buttonUrl": "/dashboard?page=home",
+                    "typography": {
+                      "title": {
+                        "fontSize": "clamp(24px, 2.4vw, 42px)",
+                        "fontWeight": "760",
+                        "lineHeight": "1"
+                      },
+                      "body": {
+                        "fontSize": "16px",
+                        "lineHeight": "1.6"
+                      }
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
         "id": "webpages-am-shop-showcase",
         "kind": "contentLayout",
         "title": "",
@@ -526,7 +967,7 @@
                 "columns": 4,
                 "gridLimit": 4,
                 "filterPosition": "hidden",
-                "cardStyle": "soft",
+                "cardStyle": "none",
                 "cardPreset": "minimal",
                 "gridGap": "medium",
                 "cardPadding": "small",
@@ -891,7 +1332,7 @@
         ]
       }
     ],
-    "updatedAt": "2026-05-26T15:04:22.745Z"
+    "updatedAt": "2026-05-27T06:26:35.548Z"
   },
   "shop": {
     "version": 1,
@@ -918,125 +1359,33 @@
     },
     "sections": [
       {
-        "id": "contentLayout-mp3wu3yn-k7p8b",
+        "id": "contentLayout-mpnqitz6-2mns0",
         "kind": "contentLayout",
         "title": "",
-        "background": "#111111",
-        "backgroundMode": "full",
-        "contentMode": "full",
-        "colorScheme": "dark",
+        "background": "#24241f",
+        "backgroundMode": "boxed",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "topSpacing": "inherit",
+        "bottomSpacing": "inherit",
+        "topMargin": "inherit",
+        "bottomMargin": "inherit",
         "visible": true,
         "eyebrow": "",
         "body": "",
+        "layout": "whole",
         "layoutColumns": 1,
         "layoutItems": [
           {
-            "id": "layout-item-1",
+            "id": "layout-item-mpnqitz6-1",
             "blocks": [
               {
-                "id": "breadcrumbs-block-mp3wufxj-vt904",
-                "kind": "breadcrumbs",
-                "title": "Breadcrumbs",
-                "body": "Dynamic navigation path for the current page."
-              }
-            ]
-          }
-        ],
-        "topSpacing": "small",
-        "bottomSpacing": "small"
-      },
-      {
-        "id": "contentLayout-mp78agi9-hh0o9",
-        "kind": "contentLayout",
-        "title": "Blank Grid",
-        "background": "#ffffff",
-        "backgroundMode": "boxed",
-        "contentMode": "boxed",
-        "colorScheme": "inherit",
-        "topSpacing": "inherit",
-        "bottomSpacing": "inherit",
-        "topMargin": "inherit",
-        "bottomMargin": "inherit",
-        "visible": true,
-        "eyebrow": "Section",
-        "body": "",
-        "layoutColumns": 2,
-        "layoutItems": [
-          {
-            "id": "layout-item-mp78agi9-1",
-            "blocks": []
-          },
-          {
-            "id": "layout-item-mp78agi9-2",
-            "blocks": []
-          },
-          {
-            "id": "layout-item-mp78agi9-3",
-            "blocks": []
-          },
-          {
-            "id": "layout-item-mp78agi9-4",
-            "blocks": []
-          },
-          {
-            "id": "layout-item-mp78agi9-5",
-            "blocks": []
-          },
-          {
-            "id": "layout-item-mp78agi9-6",
-            "blocks": []
-          },
-          {
-            "id": "layout-item-mp78agi9-7",
-            "blocks": []
-          },
-          {
-            "id": "layout-item-mp78agi9-8",
-            "blocks": []
-          }
-        ],
-        "layoutRows": 4
-      },
-      {
-        "id": "contentLayout-mp785wm9-v1ak7",
-        "kind": "contentLayout",
-        "title": "",
-        "background": "#ffffff",
-        "backgroundMode": "boxed",
-        "contentMode": "boxed",
-        "colorScheme": "inherit",
-        "topSpacing": "inherit",
-        "bottomSpacing": "inherit",
-        "topMargin": "inherit",
-        "bottomMargin": "inherit",
-        "visible": true,
-        "eyebrow": "",
-        "body": "",
-        "layoutColumns": 2,
-        "layoutItems": [
-          {
-            "id": "layout-item-mp785wm9-1",
-            "blocks": [
-              {
-                "id": "datePicker-block-mp7a0585-h9zt8",
-                "kind": "datePicker",
-                "title": "Choose a date",
-                "dateLabel": "Preferred date",
-                "body": "Useful for delivery, booking, or consultation flows."
-              }
-            ]
-          },
-          {
-            "id": "layout-item-mp785wm9-2",
-            "blocks": [
-              {
-                "id": "list-block-mp7a8zky-8p8n3",
-                "kind": "list",
-                "title": "Feature List",
-                "items": [
-                  "Fast setup",
-                  "Reusable layouts",
-                  "Live visual editing"
+                "id": "categoryFilters-block-mpnqivv5-dxr9u",
+                "kind": "categoryFilters",
+                "title": "Category Filters",
+                "body": "Dynamic WooCommerce category pills.",
+                "hiddenCategorySlugs": [
+                  "uncategorized"
                 ]
               }
             ]
@@ -1045,127 +1394,49 @@
         "layoutRows": 1
       },
       {
-        "id": "contentLayout-mp3wje4b-nq5wb",
+        "id": "contentLayout-mpnq7bn6-jl8dc",
         "kind": "contentLayout",
         "title": "",
-        "background": "#ffffff",
+        "background": "#111111",
         "backgroundMode": "boxed",
         "contentMode": "boxed",
         "colorScheme": "inherit",
+        "topSpacing": "inherit",
+        "bottomSpacing": "inherit",
+        "topMargin": "inherit",
+        "bottomMargin": "inherit",
         "visible": true,
         "eyebrow": "",
         "body": "",
+        "layout": "whole",
         "layoutColumns": 1,
         "layoutItems": [
           {
-            "id": "layout-item-mp3wsp1z",
+            "id": "layout-item-mpnq7bn6-1",
             "blocks": [
               {
-                "id": "categoryFilters-block-mp3wjxco-2c13r",
-                "kind": "categoryFilters",
-                "title": "Category Filters",
-                "body": "Dynamic WooCommerce category pills."
+                "id": "products-block-mpnq7mmr-t8lb3",
+                "kind": "products",
+                "title": "Products",
+                "source": "all",
+                "layoutVariant": "grid",
+                "columns": 4,
+                "gridLimit": 12,
+                "filterPosition": "top",
+                "cardStyle": "none",
+                "cardPreset": "standard",
+                "imagePadding": "none",
+                "cardPadding": "none"
               }
             ]
           }
-        ]
-      },
-      {
-        "id": "client-filters-1",
-        "kind": "filters",
-        "title": "",
-        "background": "#f7f7f4",
-        "filterPosition": "top",
-        "visible": true,
-        "bottomSpacing": "large",
-        "topSpacing": "large"
-      },
-      {
-        "id": "slider-moy4k9cz-kpkac",
-        "kind": "slider",
-        "title": "Featured Slider",
-        "background": "#ffffff",
-        "visible": true,
-        "body": "A swipeable section powered by the existing Embla carousel.",
-        "slides": [
-          {
-            "id": "slide-1",
-            "badge": "New",
-            "title": "Modern commerce layouts",
-            "text": "Use sliders for hero stories, campaigns, or featured collections.",
-            "buttonLabel": "Shop now",
-            "buttonUrl": "/shop"
-          },
-          {
-            "id": "slide-2",
-            "badge": "Client",
-            "title": "Design per client",
-            "text": "Publish unique storefront sections without touching code.",
-            "buttonLabel": "View page",
-            "buttonUrl": "/client"
-          },
-          {
-            "id": "slide-3",
-            "badge": "Fast",
-            "title": "Preview and publish",
-            "text": "Keep drafts local, then publish layout JSON when ready."
-          }
         ],
-        "carouselSettings": {
-          "variant": "hero",
-          "loop": true,
-          "autoplay": true,
-          "autoplayDelayMs": 5000,
-          "cardsPerView": 1,
-          "showArrows": true,
-          "showDots": true
-        }
+        "layoutRows": 1
       },
       {
-        "id": "hero-mozndqy8-yyjq0",
-        "kind": "hero",
-        "title": "Hero",
-        "background": "#f7f7f4",
-        "backgroundMode": "full",
-        "contentMode": "boxed",
-        "colorScheme": "inherit",
-        "visible": true,
-        "eyebrow": "Featured page",
-        "body": "Edit this section and preview the page instantly.",
-        "layout": "split",
-        "topSpacing": "medium",
-        "bottomSpacing": "medium",
-        "buttonLabel": "Open shop",
-        "buttonUrl": "/shop"
-      },
-      {
-        "id": "productArchive-moznozrp-17tmq",
-        "kind": "productArchive",
-        "title": "Product Grid",
-        "background": "#111111",
-        "backgroundMode": "boxed",
-        "contentMode": "full",
-        "colorScheme": "dark",
-        "visible": true,
-        "columns": 4,
-        "filterPosition": "left",
-        "cardStyle": "none",
-        "cardPreset": "standard",
-        "source": "all",
-        "gridLimit": 12,
-        "layoutVariant": "grid",
-        "addToCartSize": "compact",
-        "addToCartStyle": "blue",
-        "gridGap": "small",
-        "cardPadding": "small",
-        "imagePadding": "none",
-        "addToCartDisplay": "icon",
-        "addToCartPosition": "under-wishlist"
-      },
-      {
-        "id": "contentLayout-mp7vxi05-1id5q",
+        "id": "contentLayout-mpnqb6ry-onf5w",
         "kind": "contentLayout",
-        "title": "Blank Grid",
+        "title": "",
         "background": "#ffffff",
         "backgroundMode": "boxed",
         "contentMode": "boxed",
@@ -1175,94 +1446,35 @@
         "topMargin": "inherit",
         "bottomMargin": "inherit",
         "visible": true,
-        "eyebrow": "Section",
+        "eyebrow": "",
         "body": "",
+        "layout": "whole",
         "layoutColumns": 1,
         "layoutItems": [
           {
-            "id": "layout-item-mp7vxi05-1",
+            "id": "layout-item-mpnqb6ry-1",
             "blocks": [
               {
-                "id": "icon-block-mp7vxnrb-qqcza",
-                "kind": "icon",
-                "iconName": "sparkles",
-                "title": "Icon Feature",
-                "body": "Use a small visual cue for services, promises, or highlights."
+                "id": "products-block-mpnqaue4-5rfx2",
+                "kind": "products",
+                "title": "Products",
+                "source": "all",
+                "layoutVariant": "grid",
+                "columns": 4,
+                "gridLimit": 12,
+                "filterPosition": "left",
+                "cardStyle": "none",
+                "cardPreset": "standard",
+                "imagePadding": "none",
+                "cardPadding": "none"
               }
             ]
           }
         ],
         "layoutRows": 1
-      },
-      {
-        "id": "slider-mozoub17-c6b2n",
-        "kind": "slider",
-        "title": "Featured Slider",
-        "background": "#ffffff",
-        "backgroundMode": "boxed",
-        "contentMode": "full",
-        "colorScheme": "inherit",
-        "visible": true,
-        "body": "A swipeable section powered by the existing Embla carousel.",
-        "slides": [
-          {
-            "id": "slide-1",
-            "badge": "New",
-            "title": "Modern commerce layouts",
-            "text": "Use sliders for hero stories, campaigns, or featured collections.",
-            "imageAlt": "Modern storefront slide",
-            "imagePadding": "medium",
-            "buttonLabel": "Shop now",
-            "buttonUrl": "/shop"
-          },
-          {
-            "id": "slide-2",
-            "badge": "Client",
-            "title": "Design per client",
-            "text": "Publish unique storefront sections without touching code.",
-            "imageAlt": "Client design slide",
-            "imagePadding": "medium",
-            "buttonLabel": "View page",
-            "buttonUrl": "/client"
-          },
-          {
-            "id": "slide-3",
-            "badge": "Fast",
-            "title": "Preview and publish",
-            "text": "Keep drafts local, then publish layout JSON when ready.",
-            "imageAlt": "Preview builder slide",
-            "imagePadding": "medium"
-          }
-        ],
-        "carouselSettings": {
-          "variant": "hero",
-          "loop": true,
-          "autoplay": true,
-          "autoplayDelayMs": 5000,
-          "align": "center",
-          "dragFree": false,
-          "cardsPerView": 1,
-          "showArrows": true,
-          "showDots": true,
-          "pauseOnHover": true
-        }
-      },
-      {
-        "id": "promo-mp3v4ipw-wgrk6",
-        "kind": "promo",
-        "title": "Free setup for new clients",
-        "background": "#111111",
-        "backgroundMode": "full",
-        "contentMode": "boxed",
-        "colorScheme": "inherit",
-        "visible": true,
-        "body": "Use promo strips for seasonal offers, service notes, or client messages.",
-        "promoVariant": "default",
-        "ctaLabel": "View offer",
-        "ctaUrl": "/shop"
       }
     ],
-    "updatedAt": "2026-05-24T05:39:16.530Z"
+    "updatedAt": "2026-05-27T07:29:55.327Z"
   },
   "client": {
     "version": 1,
@@ -1480,36 +1692,44 @@
       "buttonTextColor": "#ffffff",
       "radius": "8px",
       "sectionMaxWidth": "1640px",
-      "sectionGutter": "48px"
+      "sectionGutter": "48px",
+      "headingFontFamily": "inherit",
+      "headingSize": "clamp(42px, 8vw, 126px)",
+      "headingWeight": "760",
+      "headingLineHeight": "0.92"
     },
     "sections": [
       {
-        "id": "template-category-hero",
-        "kind": "hero",
-        "title": "Category Template",
-        "eyebrow": "WooCommerce category",
-        "body": "Default layout for every product category archive.",
-        "background": "#f7f7f4",
-        "backgroundMode": "full",
-        "contentMode": "boxed",
-        "colorScheme": "inherit",
-        "layout": "split",
-        "topSpacing": "medium",
-        "bottomSpacing": "small",
-        "buttonLabel": "Shop all",
-        "buttonUrl": "/shop",
-        "visible": true
-      },
-      {
-        "id": "recentlyViewed-mp0sp01l-v8tsp",
-        "kind": "recentlyViewed",
-        "title": "Recently Viewed",
+        "id": "contentLayout-mpnqxqd0-dvnxk",
+        "kind": "contentLayout",
+        "title": "",
         "background": "#ffffff",
         "backgroundMode": "boxed",
-        "contentMode": "full",
+        "contentMode": "boxed",
         "colorScheme": "inherit",
+        "topSpacing": "inherit",
+        "bottomSpacing": "inherit",
+        "topMargin": "inherit",
+        "bottomMargin": "inherit",
         "visible": true,
-        "layout": "carousel"
+        "eyebrow": "",
+        "body": "",
+        "layout": "whole",
+        "layoutColumns": 1,
+        "layoutItems": [
+          {
+            "id": "layout-item-mpnqxqd0-1",
+            "blocks": [
+              {
+                "id": "categoryFilters-block-mpnqz4r9-k7f0t",
+                "kind": "categoryFilters",
+                "title": "Category Filters",
+                "body": "Dynamic WooCommerce category pills."
+              }
+            ]
+          }
+        ],
+        "layoutRows": 1
       },
       {
         "id": "template-category-products",
@@ -1527,9 +1747,20 @@
         "gridLimit": 12,
         "layoutVariant": "grid",
         "visible": true
+      },
+      {
+        "id": "recentlyViewed-mp0sp01l-v8tsp",
+        "kind": "recentlyViewed",
+        "title": "Recently Viewed",
+        "background": "#ffffff",
+        "backgroundMode": "boxed",
+        "contentMode": "full",
+        "colorScheme": "inherit",
+        "visible": true,
+        "layout": "carousel"
       }
     ],
-    "updatedAt": "2026-05-11T06:02:48.655Z"
+    "updatedAt": "2026-05-27T07:33:23.450Z"
   },
   "product-single": {
     "version": 1,
@@ -1790,26 +2021,47 @@
       "buttonTextColor": "#ffffff",
       "radius": "8px",
       "sectionMaxWidth": "1640px",
-      "sectionGutter": "48px"
+      "sectionGutter": "48px",
+      "headingFontFamily": "inherit",
+      "headingSize": "clamp(42px, 8vw, 126px)",
+      "headingWeight": "760",
+      "headingLineHeight": "0.92"
     },
     "sections": [
       {
-        "id": "page:checkout-hero",
-        "kind": "hero",
-        "title": "Checkout",
-        "eyebrow": "Builder page",
-        "body": "A custom React page created from the visual dashboard.",
-        "background": "#f7f7f4",
+        "id": "contentLayout-mpmy6h4q-jkrtu",
+        "kind": "contentLayout",
+        "title": "",
+        "background": "#ffffff",
         "backgroundMode": "boxed",
         "contentMode": "boxed",
         "colorScheme": "inherit",
-        "layout": "split",
-        "topSpacing": "medium",
-        "bottomSpacing": "medium",
-        "visible": true
+        "topSpacing": "inherit",
+        "bottomSpacing": "inherit",
+        "topMargin": "inherit",
+        "bottomMargin": "inherit",
+        "visible": true,
+        "eyebrow": "",
+        "body": "",
+        "layout": "whole",
+        "layoutColumns": 1,
+        "layoutItems": [
+          {
+            "id": "layout-item-mpmy6h4q-1",
+            "blocks": [
+              {
+                "id": "checkoutContent-block-mpmy70dx-gieno",
+                "kind": "checkoutContent",
+                "title": "Checkout Content",
+                "body": "Live checkout UI rendered from the React storefront."
+              }
+            ]
+          }
+        ],
+        "layoutRows": 1
       }
     ],
-    "updatedAt": "2026-05-14T14:10:11.919Z"
+    "updatedAt": "2026-05-26T18:07:41.872Z"
   },
   "page:hello": {
     "version": 1,

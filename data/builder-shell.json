@@ -1,5 +1,9 @@
 {
   "headerVisible": true,
+  "topToolbarVisible": false,
+  "topToolbarText": "Fast support & setup by Webpages",
+  "topToolbarPhone": "+374 xx xx xx",
+  "topToolbarMeta": "AMD ֏",
   "headerLayout": "princity",
   "headerBrandMode": "logo",
   "headerBrandText": "WebPages",
@@ -29,7 +33,7 @@
     },
     "cG9zdDo4MQ==": {
       "showHeading": false,
-      "icon": "bag",
+      "icon": null,
       "submenuLayout": "list",
       "submenuColumns": 3,
       "badgeText": null
@@ -50,11 +54,11 @@
     },
     "cG9zdDo1NTA3": {
       "showHeading": false,
-      "icon": "home",
+      "icon": null,
       "submenuLayout": "list",
       "submenuColumns": 3,
       "badgeText": null
     }
   },
-  "updatedAt": "2026-05-26T07:06:16.387Z"
+  "updatedAt": "2026-05-27T07:04:21.385Z"
 }

@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import { getCategoryTree } from "@/lib/categories";
 import { getProducts } from "@/lib/products";
 import CategoryWithFilters from "@/components/CategoryWithFilters";
 import Breadcrumbs from "@/components/Breadcrumbs";
@@ -15,8 +16,11 @@ export const metadata = {
 };
 
 async function ShopProductsSection() {
-  const products = await getProducts();
-  return <CategoryWithFilters products={products} />;
+  const [products, categoryTree] = await Promise.all([
+    getProducts(),
+    getCategoryTree().catch(() => []),
+  ]);
+  return <CategoryWithFilters products={products} categoryTree={categoryTree} />;
 }
 
 function ShopProductsSkeleton() {

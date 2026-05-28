@@ -17,6 +17,7 @@ export type BuilderHeaderIconId =
   | "search";
 export type BuilderHeaderIconVariant = "muted" | "solid" | "ghost" | "icon";
 export type BuilderHeaderActiveIndicator = "underline" | "princity" | "none";
+export type BuilderHeaderBackgroundMode = "default" | "none";
 
 export type BuilderMenuPresentation = {
   showHeading: boolean;
@@ -30,6 +31,11 @@ export type BuilderMenuPresentationMap = Record<string, BuilderMenuPresentation>
 
 export type BuilderShellSettings = {
   headerVisible: boolean;
+  topToolbarVisible: boolean;
+  topToolbarText: string;
+  topToolbarPhone: string;
+  topToolbarMeta: string;
+  headerBackgroundMode: BuilderHeaderBackgroundMode;
   headerLayout: BuilderHeaderLayout;
   headerBrandMode: BuilderHeaderBrandMode;
   headerBrandText: string;
@@ -54,6 +60,11 @@ const DATA_FILE = path.join(DATA_DIR, "builder-shell.json");
 
 export const defaultBuilderShellSettings: BuilderShellSettings = {
   headerVisible: true,
+  topToolbarVisible: true,
+  topToolbarText: "Fast support & setup by Webpages",
+  topToolbarPhone: "+374 xx xx xx",
+  topToolbarMeta: "AMD ֏",
+  headerBackgroundMode: "default",
   headerLayout: "wordpress",
   headerBrandMode: "logo",
   headerBrandText: "WebPages",
@@ -100,6 +111,12 @@ function normalizeHeaderActiveIndicator(
     : "underline";
 }
 
+function normalizeHeaderBackgroundMode(
+  value: unknown,
+): BuilderHeaderBackgroundMode {
+  return value === "none" ? "none" : "default";
+}
+
 function normalizeHeaderIconOrder(value: unknown): BuilderHeaderIconId[] {
   const allowed = new Set<BuilderHeaderIconId>([
     "wishlist",
@@ -126,6 +143,10 @@ function normalizeOptionalString(value: unknown) {
   return typeof value === "string" && value.trim().length > 0
     ? value.trim()
     : null;
+}
+
+function normalizeToolbarString(value: unknown, fallback: string) {
+  return typeof value === "string" ? value.trim() : fallback;
 }
 
 function normalizeHeaderLogoMaxWidth(value: unknown) {
@@ -198,6 +219,25 @@ export function normalizeBuilderShellSettings(
       typeof value?.headerVisible === "boolean"
         ? value.headerVisible
         : defaultBuilderShellSettings.headerVisible,
+    topToolbarVisible:
+      typeof value?.topToolbarVisible === "boolean"
+        ? value.topToolbarVisible
+        : defaultBuilderShellSettings.topToolbarVisible,
+    topToolbarText: normalizeToolbarString(
+      value?.topToolbarText,
+      defaultBuilderShellSettings.topToolbarText,
+    ),
+    topToolbarPhone: normalizeToolbarString(
+      value?.topToolbarPhone,
+      defaultBuilderShellSettings.topToolbarPhone,
+    ),
+    topToolbarMeta: normalizeToolbarString(
+      value?.topToolbarMeta,
+      defaultBuilderShellSettings.topToolbarMeta,
+    ),
+    headerBackgroundMode: normalizeHeaderBackgroundMode(
+      value?.headerBackgroundMode,
+    ),
     headerLayout: normalizeHeaderLayout(value?.headerLayout),
     headerBrandMode: normalizeHeaderBrandMode(value?.headerBrandMode),
     headerBrandText:

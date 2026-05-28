@@ -164,6 +164,33 @@
   height: calc(var(--header-topbar-h) + var(--header-main-h));
 }
 
+.site-header--toolbar-hidden {
+  --header-pill-top-at-top: 18px;
+  --header-pill-top-scrolled: 18px;
+}
+
+.site-header--toolbar-hidden .site-header-pill-spacer {
+  height: calc(var(--header-main-h) + 36px);
+}
+
+.site-header.site-header--no-background {
+  background: transparent !important;
+  border-bottom-color: transparent !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+}
+
+.site-header--no-background .site-header-top,
+.site-header--no-background .site-header-main,
+.site-header--no-background .site-header-main-inner,
+.site-header--no-background .site-header-pill-main,
+.site-header--no-background .site-header-pill-inner {
+  background: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+}
+
 
 /* Dark theme header + toggle */
 
@@ -1111,6 +1138,11 @@
   border-bottom-color: transparent;
 }
 
+.site-header--toolbar-hidden #site-header-pill.site-header-princity-shell .site-header-princity,
+.site-header--toolbar-hidden #site-header-pill.site-header-princity-shell[data-scrolled="true"] .site-header-princity {
+  top: 18px !important;
+}
+
 #site-header-pill.site-header-princity-shell[data-scrolled="true"] .site-header-princity-meta-row {
   opacity: 0;
   transform: translateY(-6px);
@@ -1125,6 +1157,10 @@
 
 .site-header-princity-spacer {
   height: 124px;
+}
+
+.site-header--toolbar-hidden .site-header-princity-spacer {
+  height: 120px;
 }
 
 .site-header-princity {
@@ -1167,6 +1203,16 @@
   overflow: visible;
   position: relative;
   z-index: 1001;
+}
+
+.site-header--no-background .site-header-princity-meta-row,
+.site-header--no-background #site-header-pill.site-header-princity-shell .site-header-princity,
+.site-header--no-background .site-header-princity-inner,
+.site-header--no-background #site-header-pill.site-header-princity-shell[data-scrolled="true"] .site-header-princity-inner {
+  background: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
 }
 
 #site-header-pill.site-header-princity-shell[data-scrolled="true"] .site-header-princity-left,
@@ -1759,6 +1805,12 @@ body[data-storefront-preset="princity"] .product-attribute-label {
 [data-theme="dark"] body[data-storefront-preset="princity"] .shop-top-attribute-dropdown button:hover,
 [data-theme="dark"] body[data-storefront-preset="princity"] .shop-top-attribute-dropdown button.is-selected {
   background: #202020;
+}
+
+[data-theme="dark"] body[data-storefront-preset="princity"] .shop-top-attribute-dropdown button.is-selected {
+  background: #2563eb;
+  border-color: #60a5fa;
+  color: #ffffff;
 }
 
 [data-theme="dark"] body[data-storefront-preset="princity"] .shop-top-price-dropdown input {

@@ -22,10 +22,13 @@ import {
 } from "lucide-react";
 import WishlistToggle from "./WishlistToggle";
 import AddToCartButton from "./AddToCartButton";
+import type { CategoryTreeItem } from "../lib/categories";
 import type { ProductNode } from "../lib/products";
 
 type Props = {
   products: ProductNode[];
+  categoryTree?: CategoryTreeItem[];
+  activeCategorySlug?: string | null;
   typography?: any;
   columns?: number | null;
   filterPosition?: "left" | "top" | "drawer" | "hidden" | string | null;
@@ -41,6 +44,15 @@ type Props = {
   addToCartPosition?: string | null;
   addToCartVisibility?: string | null;
   addToCartDisplay?: string | null;
+  hiddenCategorySlugs?: string[] | null;
+};
+
+type CategoryFilterNode = {
+  slug: string;
+  label: string;
+  depth: number;
+  ancestors: string[];
+  children: CategoryFilterNode[];
 };
 
 function toNumberPrice(price: string | null | undefined): number {
@@ -185,6 +197,8 @@ function normalizeAttributeNode(
 
 export default function CategoryWithFilters({
   products,
+  categoryTree = [],
+  activeCategorySlug,
   columns,
   filterPosition = "left",
   cardStyle = "flat",
@@ -199,6 +213,7 @@ export default function CategoryWithFilters({
   addToCartPosition,
   addToCartVisibility,
   addToCartDisplay,
+  hiddenCategorySlugs,
   typography,
 }: Props) {
   const [searchTerm, setSearchTerm] = useState("");
@@ -211,6 +226,12 @@ export default function CategoryWithFilters({
   const [selectedAttributes, setSelectedAttributes] = useState<
     Record<string, string[]>
   >({});
+  const [selectedCategories, setSelectedCategories] = useState<string[]>(
+    activeCategorySlug ? [activeCategorySlug] : [],
+  );
+  const [openCategorySlugs, setOpenCategorySlugs] = useState<Set<string>>(
+    () => new Set(activeCategorySlug ? [activeCategorySlug] : []),
+  );
   const [openTopFacet, setOpenTopFacet] = useState<string | null>(null);
   const topFiltersRef = useRef<HTMLDivElement | null>(null);
 
@@ -388,6 +409,78 @@ export default function CategoryWithFilters({
       .sort((a, b) => a.label.localeCompare(b.label));
   }, [products]);
 
+  const categoryOptions = useMemo(() => {
+    const hiddenSlugs = new Set(hiddenCategorySlugs ?? []);
+    const map = new Map<string, string>();
+
+    for (const product of products) {
+      for (const category of product.productCategories?.nodes ?? []) {
+        if (!category.slug || hiddenSlugs.has(category.slug)) continue;
+        map.set(category.slug, category.name || category.slug);
+      }
+    }
+
+    return Array.from(map.entries())
+      .map(([slug, label]) => ({ slug, label }))
+      .sort((a, b) => a.label.localeCompare(b.label));
+  }, [hiddenCategorySlugs, products]);
+  const categoryOptionSlugs = useMemo(
+    () => new Set(categoryOptions.map((category) => category.slug)),
+    [categoryOptions],
+  );
+  const categoryFilterTree = useMemo<CategoryFilterNode[]>(() => {
+    if (categoryTree.length === 0) {
+      return categoryOptions.map((category) => ({
+        slug: category.slug,
+        label: category.label,
+        depth: 0,
+        ancestors: [],
+        children: [],
+      }));
+    }
+
+    const hiddenSlugs = new Set(hiddenCategorySlugs ?? []);
+    const buildNodes = (
+      nodes: CategoryTreeItem[],
+      depth = 0,
+      ancestors: string[] = [],
+    ): CategoryFilterNode[] =>
+      nodes.flatMap((category) => {
+        if (hiddenSlugs.has(category.slug)) return [];
+        const children = buildNodes(category.children, depth + 1, [
+          ...ancestors,
+          category.slug,
+        ]);
+        const shouldInclude =
+          categoryOptionSlugs.has(category.slug) || children.length > 0;
+        if (!shouldInclude) return [];
+        return [
+          {
+            slug: category.slug,
+            label: category.name,
+            depth,
+            ancestors,
+            children,
+          },
+        ];
+      });
+
+    return buildNodes(categoryTree);
+  }, [categoryOptionSlugs, categoryOptions, categoryTree, hiddenCategorySlugs]);
+  const categoryDescendantsBySlug = useMemo(() => {
+    const map = new Map<string, string[]>();
+    const collect = (node: CategoryFilterNode): string[] => {
+      const descendants = node.children.flatMap((child) => [
+        child.slug,
+        ...collect(child),
+      ]);
+      map.set(node.slug, descendants);
+      return descendants;
+    };
+    categoryFilterTree.forEach(collect);
+    return map;
+  }, [categoryFilterTree]);
+
   const hasAttributeFilters = useMemo(
     () => Object.keys(selectedAttributes).length > 0,
     [selectedAttributes],
@@ -429,12 +522,101 @@ export default function CategoryWithFilters({
     });
   }
 
+  function toggleCategory(slug: string) {
+    setCurrentPage(1);
+    setSelectedCategories((current) =>
+      current.includes(slug)
+        ? current.filter((item) => item !== slug)
+        : [...current, slug],
+    );
+  }
+
+  function toggleCategoryGroup(slug: string) {
+    setOpenCategorySlugs((current) => {
+      const next = new Set(current);
+      if (next.has(slug)) {
+        next.delete(slug);
+      } else {
+        next.add(slug);
+      }
+      return next;
+    });
+  }
+
+  function isCategoryActive(node: CategoryFilterNode) {
+    if (selectedCategories.includes(node.slug)) return true;
+    return node.ancestors.some((ancestor) => selectedCategories.includes(ancestor));
+  }
+
+  function categoryHasActiveDescendant(node: CategoryFilterNode): boolean {
+    return node.children.some(
+      (child) => isCategoryActive(child) || categoryHasActiveDescendant(child),
+    );
+  }
+
+  function renderCategoryTree(nodes: CategoryFilterNode[], mode: "top" | "side") {
+    return nodes.map((node) => {
+      const hasChildren = node.children.length > 0;
+      const isDirectSelected = selectedCategories.includes(node.slug);
+      const isOpen =
+        openCategorySlugs.has(node.slug) ||
+        isDirectSelected ||
+        categoryHasActiveDescendant(node);
+      const isActive = isCategoryActive(node);
+
+      return (
+        <div
+          key={node.slug}
+          className={`shop-category-filter-node is-depth-${node.depth} ${
+            hasChildren ? "has-children" : ""
+          } ${isOpen ? "is-open" : ""}`}
+        >
+          <div
+            className="shop-category-filter-row"
+            style={
+              {
+                "--category-filter-depth": node.depth,
+              } as CSSProperties
+            }
+          >
+            {hasChildren && (
+              <button
+                type="button"
+                className="shop-category-filter-toggle"
+                onClick={() => toggleCategoryGroup(node.slug)}
+                aria-label={`${isOpen ? "Collapse" : "Expand"} ${node.label}`}
+                aria-expanded={isOpen}
+              >
+                <ChevronRight size={14} aria-hidden="true" />
+              </button>
+            )}
+            <button
+              type="button"
+              className={`${isActive ? "is-selected" : ""} ${
+                isActive && !isDirectSelected ? "is-parent-selected" : ""
+              }`}
+              onClick={() => toggleCategory(node.slug)}
+            >
+              {node.label}
+            </button>
+          </div>
+          {hasChildren && isOpen && (
+            <div className={`shop-category-filter-children is-${mode}`}>
+              {renderCategoryTree(node.children, mode)}
+            </div>
+          )}
+        </div>
+      );
+    });
+  }
+
   function resetFilters() {
     setSearchTerm("");
     setMinPrice("");
     setMaxPrice("");
     setSortBy("default");
     setSelectedAttributes({});
+    setSelectedCategories([]);
     setCurrentPage(1);
   }
 
@@ -499,6 +681,23 @@ export default function CategoryWithFilters({
       });
     }
 
+    if (selectedCategories.length > 0) {
+      items = items.filter((product) => {
+        const productCategorySlugs =
+          product.productCategories?.nodes.map((category) => category.slug) ??
+          [];
+        return selectedCategories.some((slug) => {
+          const acceptedSlugs = [
+            slug,
+            ...(categoryDescendantsBySlug.get(slug) ?? []),
+          ];
+          return acceptedSlugs.some((acceptedSlug) =>
+            productCategorySlugs.includes(acceptedSlug),
+          );
+        });
+      });
+    }
+
     // sorting
     if (sortBy === "price-asc") {
       items.sort((a, b) => toNumberPrice(a.price) - toNumberPrice(b.price));
@@ -517,6 +716,8 @@ export default function CategoryWithFilters({
     sortBy,
     hasAttributeFilters,
     selectedAttributes,
+    categoryDescendantsBySlug,
+    selectedCategories,
   ]);
 
   // pagination derived from filtered products
@@ -540,6 +741,7 @@ export default function CategoryWithFilters({
   );
   const activeFilterCount =
     selectedAttributeCount +
+    selectedCategories.length +
     (searchTerm.trim() ? 1 : 0) +
     (minPrice || maxPrice ? 1 : 0);
   return (
@@ -561,6 +763,33 @@ export default function CategoryWithFilters({
       >
         {isTopFilterLayout ? (
           <div className="shop-top-attribute-filters" ref={topFiltersRef}>
+            {categoryFilterTree.length > 0 && (
+              <div
+                className={`shop-top-attribute-filter ${
+                  openTopFacet === "__categories" ? "is-open" : ""
+                }`}
+              >
+                <button
+                  type="button"
+                  className="shop-top-attribute-trigger"
+                  onClick={() =>
+                    setOpenTopFacet((current) =>
+                      current === "__categories" ? null : "__categories",
+                    )
+                  }
+                >
+                  <span>Categories</span>
+                  {selectedCategories.length > 0 && (
+                    <strong>{selectedCategories.length}</strong>
+                  )}
+                </button>
+
+                <div className="shop-top-attribute-dropdown shop-category-filter-menu">
+                  {renderCategoryTree(categoryFilterTree, "top")}
+                </div>
+              </div>
+            )}
+
             {attributeFacets.map((facet) => {
               const selectedForFacet = selectedAttributes[facet.key] ?? [];
               const isOpen = openTopFacet === facet.key;
@@ -785,6 +1014,15 @@ export default function CategoryWithFilters({
                 </select>
               </div>
             </div>
+
+            {categoryFilterTree.length > 0 && (
+              <div className="shop-filter-group">
+                <label>Categories</label>
+                <div className="shop-filter-chip-row shop-category-filter-tree">
+                  {renderCategoryTree(categoryFilterTree, "side")}
+                </div>
+              </div>
+            )}
 
             {/* Attribute filters */}
             {attributeFacets.length > 0 && (

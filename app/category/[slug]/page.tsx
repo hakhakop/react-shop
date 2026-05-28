@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getCategoryTree } from "@/lib/categories";
 import {
   getCategoryProductsBySlug,
   ProductNode,
@@ -40,9 +41,10 @@ export default async function CategoryPage({
   }
 
   const products: ProductNode[] = category.products;
-  const [specificTemplateLayout, defaultTemplateLayout] = await Promise.all([
+  const [specificTemplateLayout, defaultTemplateLayout, categoryTree] = await Promise.all([
     getPublishedBuilderLayout("product-category-specific"),
     getPublishedBuilderLayout("product-category"),
+    getCategoryTree().catch(() => []),
   ]);
   const specificTemplateMatches = specificTemplateLayout?.sections.some(
     (section) => section.source === "category" && section.categoryId === slug
@@ -63,6 +65,8 @@ export default async function CategoryPage({
           { label: category.name },
         ]}
         products={products}
+        categoryTree={categoryTree}
+        activeCategorySlug={slug}
       />
     );
   }
@@ -87,7 +91,11 @@ export default async function CategoryPage({
       </p>
 
       {products.length === 0 ? null : (
-        <CategoryWithFilters products={products} />
+        <CategoryWithFilters
+          products={products}
+          categoryTree={categoryTree}
+          activeCategorySlug={slug}
+        />
       )}
     </main>
   );

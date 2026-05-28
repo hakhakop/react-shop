@@ -1,5 +1,18 @@
+"use client";
+
 import React from "react";
 import Image from "next/image";
+import {
+  Autoplay,
+  EffectCards,
+  EffectCoverflow,
+  EffectCreative,
+  EffectFade,
+  FreeMode,
+  Navigation,
+  Pagination,
+} from "swiper/modules";
+import { Swiper, SwiperSlide } from "swiper/react";
 import { EmblaCarousel } from "../ui/EmblaCarousel";
 import type { CarouselLayoutBlock } from "../../lib/pageBuilder";
 
@@ -23,6 +36,16 @@ export type CarouselSettings = {
   autoplayDelayMs?: number | string;
   align?: ("center" | "start") | string | string[];
   dragFree?: boolean;
+  effect?: "slide" | "fade" | string | null;
+  spaceBetween?: number | string | null;
+  coverflowRotate?: number | string | null;
+  coverflowDepth?: number | string | null;
+  coverflowStretch?: number | string | null;
+  cardsRotate?: boolean | "true" | "false" | 1 | 0 | null;
+  cardsShadows?: boolean | "true" | "false" | 1 | 0 | null;
+  creativePreset?: "soft-stack" | "deep" | "scale" | string | null;
+  fadeCrossFade?: boolean | "true" | "false" | 1 | 0 | null;
+  freeModeMomentum?: boolean | "true" | "false" | 1 | 0 | null;
   /** Optional: how many cards should be visible in one viewport on desktop */
   cardsPerView?: number | null;
   showArrows?: boolean | "true" | "false" | 1 | 0 | null;
@@ -54,6 +77,8 @@ export default function CarouselBlock({
     Array.isArray(settings?.variant)
       ? settings.variant[0] ?? "basic"
       : settings?.variant ?? "basic";
+  const swiperVariant =
+    normalizedVariant === "swiper-showcase" ? "showcase" : normalizedVariant;
 
   const normalizedAlign = (() => {
     const raw = Array.isArray(settings?.align)
@@ -96,6 +121,167 @@ export default function CarouselBlock({
   // Clamp autoplay delay so it never becomes "crazy fast"
   const rawDelay = Number(settings?.autoplayDelayMs ?? 5000);
   const autoplayDelayMs = Math.min(Math.max(rawDelay || 5000, 2000), 30000);
+  const rawSpaceBetween = Number(settings?.spaceBetween ?? 24);
+  const spaceBetween = Math.min(Math.max(rawSpaceBetween || 24, 0), 80);
+  const numberSetting = (
+    value: number | string | null | undefined,
+    fallback: number,
+    min: number,
+    max: number,
+  ) => Math.min(Math.max(Number(value ?? fallback) || fallback, min), max);
+  const booleanSetting = (
+    value: boolean | "true" | "false" | 1 | 0 | null | undefined,
+    fallback: boolean,
+  ) => {
+    if (value === undefined || value === null) return fallback;
+    if (typeof value === "boolean") return value;
+    if (typeof value === "number") return value === 1;
+    return value === "true";
+  };
+  const swiperEffect = (() => {
+    if (swiperVariant === "coverflow") return "coverflow";
+    if (swiperVariant === "cards") return "cards";
+    if (swiperVariant === "creative") return "creative";
+    if (swiperVariant === "fade" || settings?.effect === "fade") return "fade";
+    return "slide";
+  })();
+  const singleSlideEffect = ["cards", "creative", "fade"].includes(swiperEffect);
+  const swiperSlidesPerView = singleSlideEffect ? 1 : cardsPerView;
+  const usesSwiper = [
+    "hero",
+    "showcase",
+    "coverflow",
+    "cards",
+    "creative",
+    "fade",
+    "free-mode",
+  ].includes(swiperVariant);
+  const creativeEffect = (() => {
+    switch (settings?.creativePreset) {
+      case "deep":
+        return {
+          prev: { translate: ["-120%", 0, -520], rotate: [0, 0, -18], opacity: 0.35 },
+          next: { translate: ["120%", 0, -520], rotate: [0, 0, 18], opacity: 0.35 },
+        };
+      case "scale":
+        return {
+          prev: { translate: ["-72%", 0, -260], scale: 0.78, opacity: 0.45 },
+          next: { translate: ["72%", 0, -260], scale: 0.78, opacity: 0.45 },
+        };
+      case "soft-stack":
+      default:
+        return {
+          prev: { translate: ["-18%", 0, -180], scale: 0.88, opacity: 0.55 },
+          next: { translate: ["18%", 0, -180], scale: 0.88, opacity: 0.55 },
+        };
+    }
+  })();
+
+  if (usesSwiper) {
+    return (
+      <div
+        className={`shop-builder-swiper shop-builder-swiper--${swiperVariant} ${className ?? ""}`.trim()}
+      >
+        <Swiper
+          modules={[
+            Autoplay,
+            EffectCards,
+            EffectCoverflow,
+            EffectCreative,
+            EffectFade,
+            FreeMode,
+            Navigation,
+            Pagination,
+          ]}
+          slidesPerView={1}
+          spaceBetween={spaceBetween}
+          effect={swiperEffect}
+          centeredSlides={swiperVariant === "coverflow"}
+          freeMode={
+            swiperVariant === "free-mode"
+              ? {
+                  enabled: true,
+                  momentum: booleanSetting(settings?.freeModeMomentum, true),
+                }
+              : false
+          }
+          coverflowEffect={{
+            rotate: numberSetting(settings?.coverflowRotate, 34, -90, 90),
+            depth: numberSetting(settings?.coverflowDepth, 140, 0, 500),
+            stretch: numberSetting(settings?.coverflowStretch, 0, -120, 120),
+            modifier: 1,
+            slideShadows: true,
+          }}
+          cardsEffect={{
+            rotate: booleanSetting(settings?.cardsRotate, true),
+            slideShadows: booleanSetting(settings?.cardsShadows, true),
+          }}
+          creativeEffect={creativeEffect}
+          fadeEffect={{ crossFade: booleanSetting(settings?.fadeCrossFade, true) }}
+          loop={slides.length > swiperSlidesPerView && (settings?.loop ?? true)}
+          autoplay={
+            autoplay
+              ? {
+                  delay: autoplayDelayMs,
+                  disableOnInteraction: false,
+                  pauseOnMouseEnter: settings?.pauseOnHover !== false,
+                }
+              : false
+          }
+          navigation={settings?.showArrows !== false}
+          pagination={
+            settings?.showDots === false ? false : { clickable: true }
+          }
+          breakpoints={{
+            860: {
+              slidesPerView:
+                swiperVariant === "coverflow"
+                  ? Math.min(cardsPerView || 1, 3)
+                  : Math.min(swiperSlidesPerView || 1, 3),
+              spaceBetween,
+            },
+            1180: {
+              slidesPerView:
+                swiperVariant === "coverflow"
+                  ? Math.min(cardsPerView || 1, 4)
+                  : Math.min(swiperSlidesPerView || 1, 4),
+              spaceBetween,
+            },
+          }}
+        >
+          {slides.map((slide) => (
+            <SwiperSlide key={slide.id}>
+              <article className="shop-builder-swiper-card">
+                {slide.imageUrl ? (
+                  <div className="shop-builder-swiper-media">
+                    <Image
+                      src={slide.imageUrl}
+                      alt={slide.imageAlt ?? ""}
+                      fill
+                      className="object-cover"
+                      sizes="(min-width: 1180px) 33vw, (min-width: 860px) 50vw, 100vw"
+                    />
+                  </div>
+                ) : (
+                  <div className="shop-builder-swiper-media shop-builder-swiper-media--empty" />
+                )}
+                <div className="shop-builder-swiper-copy">
+                  {slide.badge && <span>{slide.badge}</span>}
+                  {slide.title && <h3>{slide.title}</h3>}
+                  {(slide.subtitle || slide.text) && (
+                    <p>{slide.subtitle || slide.text}</p>
+                  )}
+                  {slide.buttonLabel && slide.buttonUrl && (
+                    <a href={slide.buttonUrl}>{slide.buttonLabel}</a>
+                  )}
+                </div>
+              </article>
+            </SwiperSlide>
+          ))}
+        </Swiper>
+      </div>
+    );
+  }
 
   return (
     <div className={`relative w-full ${className ?? ""}`.trim()}>

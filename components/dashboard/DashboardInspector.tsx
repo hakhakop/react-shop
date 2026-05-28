@@ -43,6 +43,7 @@ import {
 import TypographyPanel from "@/components/dashboard/TypographyPanel";
 import StyleTabPanel from "@/components/dashboard/style/StyleTabPanel";
 import type { BuilderVisualStyle } from "@/lib/builderVisualStyle";
+import type { CategoryTreeItem } from "@/lib/categories";
 
 // Inspector handlers mirror the lifted builder callbacks during this JSX-only extraction.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -68,6 +69,7 @@ type DashboardInspectorProps = {
   layoutBlockLabels: Record<LayoutBlockKind, string>;
   openLayoutItemId: string | null;
   openSlideId: string | null;
+  previewCategoryTree: CategoryTreeItem[];
   sectionBackgroundPresets: readonly BackgroundPreset[];
   sectionColorModeLabel: (section: BuilderSection) => string;
   sectionLabels: Record<SectionKind, string>;
@@ -155,8 +157,19 @@ function InspectorGroupSummary({
   );
 }
 
+function flattenCategoryTree(
+  categoryTree: CategoryTreeItem[],
+  depth = 0,
+): { label: string; slug: string }[] {
+  return categoryTree.flatMap((category) => [
+    { label: `${"— ".repeat(depth)}${category.name}`, slug: category.slug },
+    ...flattenCategoryTree(category.children, depth + 1),
+  ]);
+}
+
 export default function DashboardInspector(props: DashboardInspectorProps) {
   const [isLayoutPickerOpen, setLayoutPickerOpen] = useState(false);
+  const [categoryHideSearch, setCategoryHideSearch] = useState("");
   const [activeTypographyAreaState, setActiveTypographyAreaState] = useState<{
     area: "title" | "body" | "button" | "eyebrow";
     blockKey: string | null;
@@ -167,6 +180,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
   const {
     builderJson, copied, elementBackgroundPresets, getLayoutItemBlocks,
     inspectorOpen, inspectorTab, layoutBlockLabels, openLayoutItemId, openSlideId,
+    previewCategoryTree,
     sectionBackgroundPresets, sectionColorModeLabel, sectionLabels,
     sectionSettingsOpen, sectionStructureOpen, selectedLayoutBlock,
     selectedLayoutBlockKey, selectedLayoutColumnKey, selectedSection, uploadingNestedSlide, uploadingSlide,
@@ -194,6 +208,102 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
         ["style", "Style"],
         ["advanced", "Advanced"],
       ];
+  const categoryFilterOptions = flattenCategoryTree(previewCategoryTree);
+  const filteredCategoryFilterOptions = categoryFilterOptions.filter(
+    (category) => {
+      const query = categoryHideSearch.trim().toLowerCase();
+      if (!query) return true;
+      return (
+        category.label.toLowerCase().includes(query) ||
+        category.slug.toLowerCase().includes(query)
+      );
+    },
+  );
+  const renderCategoryVisibilityControl = ({
+    hiddenSlugs,
+    onChange,
+    description = "Hide categories only for this element.",
+  }: {
+    hiddenSlugs?: string[];
+    onChange: (hiddenSlugs: string[]) => void;
+    description?: string;
+  }) => (
+    <div className="builder-category-visibility-card">
+      <div className="builder-category-visibility-head">
+        <div>
+          <strong>Category Visibility</strong>
+          <span>{description}</span>
+        </div>
+        <small>
+          {(hiddenSlugs ?? []).length > 0
+            ? `${(hiddenSlugs ?? []).length} hidden`
+            : "All visible"}
+        </small>
+      </div>
+      {categoryFilterOptions.length > 0 ? (
+        <>
+          <input
+            className="builder-category-search"
+            type="search"
+            value={categoryHideSearch}
+            onChange={(event) => setCategoryHideSearch(event.target.value)}
+            placeholder="Search categories..."
+          />
+          <div className="builder-category-hide-list">
+            {filteredCategoryFilterOptions.map((category) => {
+              const currentHiddenSlugs = hiddenSlugs ?? [];
+              const isHidden = currentHiddenSlugs.includes(category.slug);
+
+              return (
+                <label
+                  key={category.slug}
+                  className={`builder-category-hide-option ${
+                    isHidden ? "is-hidden" : ""
+                  }`}
+                >
+                  <input
+                    type="checkbox"
+                    checked={isHidden}
+                    onChange={(event) => {
+                      const nextHidden = event.target.checked
+                        ? [...currentHiddenSlugs, category.slug]
+                        : currentHiddenSlugs.filter(
+                            (slug) => slug !== category.slug,
+                          );
+                      onChange([...new Set(nextHidden)]);
+                    }}
+                  />
+                  <span className="builder-category-hide-copy">
+                    <strong>{category.label}</strong>
+                    <em>{category.slug}</em>
+                  </span>
+                  <span className="builder-category-hide-status">
+                    {isHidden ? "Hidden" : "Visible"}
+                  </span>
+                </label>
+              );
+            })}
+            {filteredCategoryFilterOptions.length === 0 && (
+              <div className="builder-category-hide-empty">
+                No matching categories.
+              </div>
+            )}
+          </div>
+          {(hiddenSlugs ?? []).length > 0 && (
+            <button
+              type="button"
+              className="builder-category-clear-hidden"
+              onClick={() => onChange([])}
+            >
+              Show all categories
+            </button>
+          )}
+        </>
+      ) : (
+        <small>Categories will appear here when dashboard preview data loads.</small>
+      )}
+    </div>
+  );
 
   useEffect(() => {
     if (!selectedLayoutBlock) return;
@@ -2109,6 +2219,21 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                   </option>
                                                 </select>
                                               </label>
+                                              {renderCategoryVisibilityControl({
+                                                hiddenSlugs:
+                                                  block.hiddenCategorySlugs,
+                                                description:
+                                                  "Hide categories from this product archive filter UI.",
+                                                onChange: (hiddenSlugs) =>
+                                                  updateSelectedLayoutBlock(
+                                                    index,
+                                                    blockIndex,
+                                                    {
+                                                      hiddenCategorySlugs:
+                                                        hiddenSlugs,
+                                                    },
+                                                  ),
+                                              })}
                                               <label className="builder-field">
                                                 <span>Card Style</span>
                                                 <select
@@ -2702,6 +2827,21 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                   }
                                                 />
                                               </label>
+                                              {block.kind ===
+                                                "categoryFilters" &&
+                                                renderCategoryVisibilityControl({
+                                                  hiddenSlugs:
+                                                    block.hiddenCategorySlugs,
+                                                  onChange: (hiddenSlugs) =>
+                                                    updateSelectedLayoutBlock(
+                                                      index,
+                                                      blockIndex,
+                                                      {
+                                                        hiddenCategorySlugs:
+                                                          hiddenSlugs,
+                                                      },
+                                                    ),
+                                                })}
                                             </>
                                           ) : block.kind?.startsWith(
                                               "product",
@@ -2786,13 +2926,66 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                   }
                                                 />
                                               </label>
+                                              <label className="builder-field">
+                                                <span>Swiper Variant</span>
+                                                <select
+                                                  value={
+                                                    block.carouselSettings
+                                                      ?.variant ===
+                                                    "swiper-showcase"
+                                                      ? "showcase"
+                                                      : block.carouselSettings
+                                                          ?.variant ??
+                                                        "showcase"
+                                                  }
+                                                  onChange={(event) =>
+                                                    updateSelectedLayoutBlock(
+                                                      index,
+                                                      blockIndex,
+                                                      {
+                                                        carouselSettings: {
+                                                          ...(block.carouselSettings ??
+                                                            {}),
+                                                          variant:
+                                                            event.target.value,
+                                                        },
+                                                      },
+                                                    )
+                                                  }
+                                                >
+                                                  <option value="basic">
+                                                    Basic
+                                                  </option>
+                                                  <option value="hero">
+                                                    Hero
+                                                  </option>
+                                                  <option value="showcase">
+                                                    Showcase
+                                                  </option>
+                                                  <option value="coverflow">
+                                                    Coverflow
+                                                  </option>
+                                                  <option value="cards">
+                                                    Cards
+                                                  </option>
+                                                  <option value="creative">
+                                                    Creative
+                                                  </option>
+                                                  <option value="fade">
+                                                    Fade
+                                                  </option>
+                                                  <option value="free-mode">
+                                                    Free mode
+                                                  </option>
+                                                </select>
+                                              </label>
                                               <div className="builder-two-column">
                                                 <label className="builder-field">
                                                   <span>Cards Per View</span>
                                                   <input
                                                     type="number"
                                                     min={1}
-                                                    max={3}
+                                                    max={4}
                                                     value={
                                                       block.carouselSettings
                                                         ?.cardsPerView ?? 1
@@ -2815,6 +3008,71 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                       )
                                                     }
                                                   />
+                                                </label>
+                                                <label className="builder-field">
+                                                  <span>Spacing</span>
+                                                  <input
+                                                    type="number"
+                                                    min={0}
+                                                    max={80}
+                                                    step={2}
+                                                    value={
+                                                      block.carouselSettings
+                                                        ?.spaceBetween ?? 24
+                                                    }
+                                                    onChange={(event) =>
+                                                      updateSelectedLayoutBlock(
+                                                        index,
+                                                        blockIndex,
+                                                        {
+                                                          carouselSettings: {
+                                                            ...(block.carouselSettings ??
+                                                              {}),
+                                                            spaceBetween:
+                                                              Number(
+                                                                event.target
+                                                                  .value,
+                                                              ),
+                                                          },
+                                                        },
+                                                      )
+                                                    }
+                                                  />
+                                                </label>
+                                              </div>
+                                              <div className="builder-two-column">
+                                                <label className="builder-field">
+                                                  <span>Effect</span>
+                                                  <select
+                                                    value={
+                                                      block.carouselSettings
+                                                        ?.effect ?? "slide"
+                                                    }
+                                                    onChange={(event) =>
+                                                      updateSelectedLayoutBlock(
+                                                        index,
+                                                        blockIndex,
+                                                        {
+                                                          carouselSettings: {
+                                                            ...(block.carouselSettings ??
+                                                              {}),
+                                                            effect:
+                                                              event.target
+                                                                .value as NonNullable<
+                                                                BuilderLayoutBlock["carouselSettings"]
+                                                              >["effect"],
+                                                          },
+                                                        },
+                                                      )
+                                                    }
+                                                  >
+                                                    <option value="slide">
+                                                      Slide
+                                                    </option>
+                                                    <option value="fade">
+                                                      Fade
+                                                    </option>
+                                                  </select>
                                                 </label>
                                                 <label className="builder-field">
                                                   <span>Autoplay Delay</span>
@@ -2851,6 +3109,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                               <div className="builder-slider-options">
                                                 {[
                                                   ["autoplay", "Autoplay"],
+                                                  ["loop", "Loop"],
                                                   ["showArrows", "Arrows"],
                                                   ["showDots", "Dots"],
                                                   ["dragFree", "Drag free"],
@@ -2898,6 +3157,253 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                   </label>
                                                 ))}
                                               </div>
+                                              {((block.carouselSettings
+                                                ?.variant ===
+                                              "swiper-showcase"
+                                                ? "showcase"
+                                                : block.carouselSettings
+                                                    ?.variant) ===
+                                                "coverflow" && (
+                                                <div className="builder-two-column">
+                                                  <label className="builder-field">
+                                                    <span>Coverflow Rotate</span>
+                                                    <input
+                                                      type="number"
+                                                      min={-90}
+                                                      max={90}
+                                                      value={
+                                                        block.carouselSettings
+                                                          ?.coverflowRotate ??
+                                                        34
+                                                      }
+                                                      onChange={(event) =>
+                                                        updateSelectedLayoutBlock(
+                                                          index,
+                                                          blockIndex,
+                                                          {
+                                                            carouselSettings: {
+                                                              ...(block.carouselSettings ??
+                                                                {}),
+                                                              coverflowRotate:
+                                                                Number(
+                                                                  event.target
+                                                                    .value,
+                                                                ),
+                                                            },
+                                                          },
+                                                        )
+                                                      }
+                                                    />
+                                                  </label>
+                                                  <label className="builder-field">
+                                                    <span>Coverflow Depth</span>
+                                                    <input
+                                                      type="number"
+                                                      min={0}
+                                                      max={500}
+                                                      step={10}
+                                                      value={
+                                                        block.carouselSettings
+                                                          ?.coverflowDepth ??
+                                                        140
+                                                      }
+                                                      onChange={(event) =>
+                                                        updateSelectedLayoutBlock(
+                                                          index,
+                                                          blockIndex,
+                                                          {
+                                                            carouselSettings: {
+                                                              ...(block.carouselSettings ??
+                                                                {}),
+                                                              coverflowDepth:
+                                                                Number(
+                                                                  event.target
+                                                                    .value,
+                                                                ),
+                                                            },
+                                                          },
+                                                        )
+                                                      }
+                                                    />
+                                                  </label>
+                                                  <label className="builder-field">
+                                                    <span>Coverflow Stretch</span>
+                                                    <input
+                                                      type="number"
+                                                      min={-120}
+                                                      max={120}
+                                                      step={5}
+                                                      value={
+                                                        block.carouselSettings
+                                                          ?.coverflowStretch ??
+                                                        0
+                                                      }
+                                                      onChange={(event) =>
+                                                        updateSelectedLayoutBlock(
+                                                          index,
+                                                          blockIndex,
+                                                          {
+                                                            carouselSettings: {
+                                                              ...(block.carouselSettings ??
+                                                                {}),
+                                                              coverflowStretch:
+                                                                Number(
+                                                                  event.target
+                                                                    .value,
+                                                                ),
+                                                            },
+                                                          },
+                                                        )
+                                                      }
+                                                    />
+                                                  </label>
+                                                </div>
+                                              ))}
+                                              {(block.carouselSettings
+                                                ?.variant === "cards" && (
+                                                <div className="builder-slider-options">
+                                                  {[
+                                                    ["cardsRotate", "Rotate"],
+                                                    [
+                                                      "cardsShadows",
+                                                      "Shadows",
+                                                    ],
+                                                  ].map(([key, label]) => (
+                                                    <label
+                                                      key={key}
+                                                      className="builder-check"
+                                                    >
+                                                      <input
+                                                        type="checkbox"
+                                                        checked={Boolean(
+                                                          block
+                                                            .carouselSettings?.[
+                                                            key as keyof NonNullable<
+                                                              BuilderLayoutBlock["carouselSettings"]
+                                                            >
+                                                          ] ?? true,
+                                                        )}
+                                                        onChange={(event) =>
+                                                          updateSelectedLayoutBlock(
+                                                            index,
+                                                            blockIndex,
+                                                            {
+                                                              carouselSettings:
+                                                                {
+                                                                  ...(block.carouselSettings ??
+                                                                    {}),
+                                                                  [key]:
+                                                                    event
+                                                                      .target
+                                                                      .checked,
+                                                                },
+                                                            },
+                                                          )
+                                                        }
+                                                      />
+                                                      <span>{label}</span>
+                                                    </label>
+                                                  ))}
+                                                </div>
+                                              ))}
+                                              {block.carouselSettings
+                                                ?.variant === "creative" && (
+                                                <label className="builder-field">
+                                                  <span>Creative Preset</span>
+                                                  <select
+                                                    value={
+                                                      block.carouselSettings
+                                                        ?.creativePreset ??
+                                                      "soft-stack"
+                                                    }
+                                                    onChange={(event) =>
+                                                      updateSelectedLayoutBlock(
+                                                        index,
+                                                        blockIndex,
+                                                        {
+                                                          carouselSettings: {
+                                                            ...(block.carouselSettings ??
+                                                              {}),
+                                                            creativePreset:
+                                                              event.target
+                                                                .value as NonNullable<
+                                                                BuilderLayoutBlock["carouselSettings"]
+                                                              >["creativePreset"],
+                                                          },
+                                                        },
+                                                      )
+                                                    }
+                                                  >
+                                                    <option value="soft-stack">
+                                                      Soft stack
+                                                    </option>
+                                                    <option value="deep">
+                                                      Deep perspective
+                                                    </option>
+                                                    <option value="scale">
+                                                      Scale
+                                                    </option>
+                                                  </select>
+                                                </label>
+                                              )}
+                                              {block.carouselSettings
+                                                ?.variant === "fade" && (
+                                                <label className="builder-check">
+                                                  <input
+                                                    type="checkbox"
+                                                    checked={
+                                                      block.carouselSettings
+                                                        ?.fadeCrossFade ?? true
+                                                    }
+                                                    onChange={(event) =>
+                                                      updateSelectedLayoutBlock(
+                                                        index,
+                                                        blockIndex,
+                                                        {
+                                                          carouselSettings: {
+                                                            ...(block.carouselSettings ??
+                                                              {}),
+                                                            fadeCrossFade:
+                                                              event.target
+                                                                .checked,
+                                                          },
+                                                        },
+                                                      )
+                                                    }
+                                                  />
+                                                  <span>Crossfade</span>
+                                                </label>
+                                              )}
+                                              {block.carouselSettings
+                                                ?.variant ===
+                                                "free-mode" && (
+                                                <label className="builder-check">
+                                                  <input
+                                                    type="checkbox"
+                                                    checked={
+                                                      block.carouselSettings
+                                                        ?.freeModeMomentum ??
+                                                      true
+                                                    }
+                                                    onChange={(event) =>
+                                                      updateSelectedLayoutBlock(
+                                                        index,
+                                                        blockIndex,
+                                                        {
+                                                          carouselSettings: {
+                                                            ...(block.carouselSettings ??
+                                                              {}),
+                                                            freeModeMomentum:
+                                                              event.target
+                                                                .checked,
+                                                          },
+                                                        },
+                                                      )
+                                                    }
+                                                  />
+                                                  <span>Momentum scroll</span>
+                                                </label>
+                                              )}
                                               <div className="builder-section-heading">
                                                 <span>Slider Slides</span>
                                                 <span>
@@ -3995,6 +4501,16 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                               <option value="hidden">Hidden</option>
                             </select>
                           </label>
+
+                          {renderCategoryVisibilityControl({
+                            hiddenSlugs: selectedSection.hiddenCategorySlugs,
+                            description:
+                              "Hide categories from this product archive filter UI.",
+                            onChange: (hiddenSlugs) =>
+                              updateSelected({
+                                hiddenCategorySlugs: hiddenSlugs,
+                              }),
+                          })}
 
                           <label className="builder-field">
                             <span>Card Style</span>

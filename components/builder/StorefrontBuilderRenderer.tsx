@@ -23,6 +23,7 @@ import ProductOptionsSelector from "@/components/ProductOptionsSelector";
 import RecentlyViewedStrip from "@/components/RecentlyViewedStrip";
 import WishlistToggle from "@/components/WishlistToggle";
 import { getCategoryTree } from "@/lib/categories";
+import type { CategoryTreeItem } from "@/lib/categories";
 import { getProductCategories, type ProductCategory } from "@/lib/navigation";
 import { getProductsForGrid, type ProductNode } from "@/lib/products";
 import type {
@@ -45,6 +46,8 @@ type StorefrontBuilderRendererProps = {
   pageLabel?: string;
   breadcrumbItems?: { label: string; href?: string }[];
   products?: ProductNode[];
+  categoryTree?: CategoryTreeItem[];
+  activeCategorySlug?: string | null;
   product?: StorefrontBuilderProduct;
   pageContent?: ReactNode;
 };
@@ -166,9 +169,13 @@ function designClassName(layout: BuilderLayout) {
 async function BuilderProductsSection({
   section,
   products: productsOverride,
+  categoryTree,
+  activeCategorySlug,
 }: {
   section: BuilderSection;
   products?: ProductNode[];
+  categoryTree?: CategoryTreeItem[];
+  activeCategorySlug?: string | null;
 }) {
   const pageSize =
     typeof section.gridLimit === "number" && section.gridLimit >= 4
@@ -195,6 +202,8 @@ async function BuilderProductsSection({
       />
     );
   }
+  const resolvedCategoryTree =
+    categoryTree ?? (await getCategoryTree().catch(() => []));
 
   return (
     <CategoryWithFilters
@@ -212,6 +221,9 @@ async function BuilderProductsSection({
       addToCartPosition={section.addToCartPosition}
       addToCartVisibility={section.addToCartVisibility}
       addToCartDisplay={section.addToCartDisplay}
+      hiddenCategorySlugs={section.hiddenCategorySlugs}
+      categoryTree={resolvedCategoryTree}
+      activeCategorySlug={activeCategorySlug}
     />
   );
 }
@@ -291,6 +303,7 @@ function SectionFrame({
 }) {
   return (
     <section
+      id={section.id}
       className={sectionClassName(section, extra)}
       style={sectionStyle(section)}
       data-gsap-section={section.kind === "hero" ? "hero" : section.kind}
@@ -510,7 +523,11 @@ function getContentLayoutBlocks(
   return [];
 }
 
-async function CategoryFiltersBlock() {
+async function CategoryFiltersBlock({
+  hiddenCategorySlugs = [],
+}: {
+  hiddenCategorySlugs?: string[];
+}) {
   const [flatCategories, categoryTree] = await Promise.all([
     getProductCategories(),
     getCategoryTree().catch(() => []),
@@ -522,7 +539,11 @@ async function CategoryFiltersBlock() {
   });
 
   return categoryTree.length > 0 ? (
-    <CategoryBar categoryTree={categoryTree} countsBySlug={countsBySlug} />
+    <CategoryBar
+      categoryTree={categoryTree}
+      countsBySlug={countsBySlug}
+      hiddenCategorySlugs={hiddenCategorySlugs}
+    />
   ) : (
     <div className="shop-builder-filter-pills">
       <span>Women</span>
@@ -533,7 +554,15 @@ async function CategoryFiltersBlock() {
   );
 }
 
-async function ContentProductsBlock({ block }: { block: BuilderLayoutBlock }) {
+async function ContentProductsBlock({
+  block,
+  categoryTree,
+  activeCategorySlug,
+}: {
+  block: BuilderLayoutBlock;
+  categoryTree?: CategoryTreeItem[];
+  activeCategorySlug?: string | null;
+}) {
   const limit =
     typeof block.gridLimit === "number" && block.gridLimit >= 2
       ? Math.min(Math.round(block.gridLimit), 12)
@@ -556,6 +585,8 @@ async function ContentProductsBlock({ block }: { block: BuilderLayoutBlock }) {
       />
     );
   }
+  const resolvedCategoryTree =
+    categoryTree ?? (await getCategoryTree().catch(() => []));
 
   return (
     <div
@@ -577,6 +608,9 @@ async function ContentProductsBlock({ block }: { block: BuilderLayoutBlock }) {
         addToCartPosition={block.addToCartPosition}
         addToCartVisibility={block.addToCartVisibility}
         addToCartDisplay={block.addToCartDisplay}
+        hiddenCategorySlugs={block.hiddenCategorySlugs}
+        categoryTree={resolvedCategoryTree}
+        activeCategorySlug={activeCategorySlug}
       />
     </div>
   );
@@ -959,12 +993,16 @@ function ContentLayoutBlock({
   breadcrumbItems,
   page,
   pageContent,
+  categoryTree,
+  activeCategorySlug,
 }: {
   block: BuilderLayoutBlock;
   product?: StorefrontBuilderProduct;
   breadcrumbItems: { label: string; href?: string }[];
   page: BuilderLayoutKey;
   pageContent?: ReactNode;
+  categoryTree?: CategoryTreeItem[];
+  activeCategorySlug?: string | null;
 }) {
   if (block.kind === "breadcrumbs") {
     return (
@@ -984,7 +1022,7 @@ function ContentLayoutBlock({
             </div>
           }
         >
-          <CategoryFiltersBlock />
+          <CategoryFiltersBlock hiddenCategorySlugs={block.hiddenCategorySlugs} />
         </Suspense>
       </div>
     );
@@ -1130,7 +1168,11 @@ function ContentLayoutBlock({
       <div className="shop-builder-column-block shop-builder-column-block--products">
         {block.title && <Typog as="h3" typography={block.typography}>{block.title}</Typog>}
         <Suspense fallback={<ProductsSkeleton />}>
-          <ContentProductsBlock block={block} />
+          <ContentProductsBlock
+            block={block}
+            categoryTree={categoryTree}
+            activeCategorySlug={activeCategorySlug}
+          />
         </Suspense>
       </div>
     );
@@ -1406,12 +1448,16 @@ function ContentLayoutSection({
   breadcrumbItems,
   page,
   pageContent,
+  categoryTree,
+  activeCategorySlug,
 }: {
   section: BuilderSection;
   product?: StorefrontBuilderProduct;
   breadcrumbItems: { label: string; href?: string }[];
   page: BuilderLayoutKey;
   pageContent?: ReactNode;
+  categoryTree?: CategoryTreeItem[];
+  activeCategorySlug?: string | null;
 }) {
   const items = section.layoutItems?.length
     ? section.layoutItems
@@ -1474,6 +1520,8 @@ function ContentLayoutSection({
                     breadcrumbItems={breadcrumbItems}
                     page={page}
                     pageContent={pageContent}
+                    categoryTree={categoryTree}
+                    activeCategorySlug={activeCategorySlug}
                   />
                 </div>
               ))}
@@ -1542,6 +1590,8 @@ function EmbedSection({ section }: { section: BuilderSection }) {
 function BuilderSectionRenderer({
   section,
   products,
+  categoryTree,
+  activeCategorySlug,
   product,
   breadcrumbItems,
   page,
@@ -1549,6 +1599,8 @@ function BuilderSectionRenderer({
 }: {
   section: BuilderSection;
   products?: ProductNode[];
+  categoryTree?: CategoryTreeItem[];
+  activeCategorySlug?: string | null;
   product?: StorefrontBuilderProduct;
   breadcrumbItems: { label: string; href?: string }[];
   page: BuilderLayoutKey;
@@ -1572,7 +1624,12 @@ function BuilderSectionRenderer({
     return (
       <SectionFrame section={section} extra="shop-builder-products">
         <Suspense fallback={<ProductsSkeleton />}>
-          <BuilderProductsSection section={section} products={products} />
+          <BuilderProductsSection
+            section={section}
+            products={products}
+            categoryTree={categoryTree}
+            activeCategorySlug={activeCategorySlug}
+          />
         </Suspense>
       </SectionFrame>
     );
@@ -1598,6 +1655,8 @@ function BuilderSectionRenderer({
         breadcrumbItems={breadcrumbItems}
         page={page}
         pageContent={pageContent}
+        categoryTree={categoryTree}
+        activeCategorySlug={activeCategorySlug}
       />
     );
   }
@@ -1619,6 +1678,8 @@ export default function StorefrontBuilderRenderer({
   pageLabel,
   breadcrumbItems,
   products,
+  categoryTree,
+  activeCategorySlug,
   product,
   pageContent,
 }: StorefrontBuilderRendererProps) {
@@ -1654,6 +1715,8 @@ export default function StorefrontBuilderRenderer({
             key={section.id}
             section={section}
             products={products}
+            categoryTree={categoryTree}
+            activeCategorySlug={activeCategorySlug}
             product={product}
             breadcrumbItems={resolvedBreadcrumbItems}
             page={page}
