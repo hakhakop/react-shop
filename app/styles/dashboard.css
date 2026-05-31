@@ -3691,11 +3691,18 @@ body[data-storefront-preset="princity"]
   position: absolute;
   left: 0;
   top: 2px;
-  color: var(--builder-preview-active-muted, #6a6a63);
+  color: rgba(255, 255, 255, 0.95);
   font-size: 12px;
   font-weight: 900;
   line-height: 1;
   letter-spacing: 0;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 3px 6px;
+  border-radius: 4px;
+  opacity: 0.5;
+  transition: opacity 100ms ease, background-color 100ms ease, color 100ms ease, transform 100ms ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .builder-preview-block-tools {
@@ -5581,7 +5588,10 @@ body[data-storefront-preset="princity"]
 .builder-preview-layout-block:hover .builder-preview-drag-handle,
 .builder-preview-layout-block:focus-within .builder-preview-drag-handle,
 .builder-preview-layout-block.is-selected-block .builder-preview-drag-handle {
-  opacity: 0.28;
+  opacity: 1;
+  background: rgba(13, 115, 255, 0.2);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
 }
 
 /* ── RichTextEditor ────────────────────────────── */

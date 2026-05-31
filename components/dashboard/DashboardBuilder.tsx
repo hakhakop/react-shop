@@ -39,7 +39,12 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import type { CSSProperties } from "react";
+import type {
+  CSSProperties,
+  FocusEvent as ReactFocusEvent,
+  KeyboardEvent as ReactKeyboardEvent,
+  MouseEvent as ReactMouseEvent,
+} from "react";
 import { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import { createPortal } from "react-dom";
 import CarouselBlock, {
@@ -507,6 +512,16 @@ const previewButtonsStyle = (layout?: "inline" | "stacked", align?: "left" | "ce
   alignItems: "center",
 });
 
+const HAS_RICH_TEXT_HTML = /<[a-z][\s\S]*>/i;
+
+function isRichPreviewText(value: string | null | undefined) {
+  return typeof value === "string" && HAS_RICH_TEXT_HTML.test(value);
+}
+
+function getRichTextSafeTag(tag: string) {
+  return tag === "p" ? "div" : tag;
+}
+
 function DashboardTypog({
   as: As = "div",
   typography,
@@ -520,10 +535,16 @@ function DashboardTypog({
     inferTypographyArea(String(As), className),
   );
   const combined = [className, tp.className].filter(Boolean).join(" ");
-  const isRich = typeof children === "string" && children.includes("<");
+  const isRich = isRichPreviewText(children);
   if (isRich) {
+    const RichTag = getRichTextSafeTag(String(As)) as any;
     return (
-      <Tag className={combined || undefined} style={tp.style} {...props} dangerouslySetInnerHTML={{ __html: children }} />
+      <RichTag
+        className={combined || undefined}
+        style={tp.style}
+        {...props}
+        dangerouslySetInnerHTML={{ __html: children }}
+      />
     );
   }
   return (
@@ -552,8 +573,8 @@ function inferTypographyArea(
 
 function BodyText({ children, className }: { children: string | null | undefined; className?: string }) {
   if (!children) return null;
-  if (children.includes("<")) {
-    return <p className={className} dangerouslySetInnerHTML={{ __html: children }} />;
+  if (isRichPreviewText(children)) {
+    return <div className={className} dangerouslySetInnerHTML={{ __html: children }} />;
   }
   return <p className={className}>{children}</p>;
 }
@@ -6380,36 +6401,50 @@ function InlineEditableText({
   typography?: any;
 }) {
   const tp = typographyProps(typography, inferTypographyArea(Tag, className));
+  const isRich = isRichPreviewText(value);
+  const EditableTag = (isRich ? getRichTextSafeTag(Tag) : Tag) as any;
+  const stopInlineEvent = (event: ReactMouseEvent<HTMLElement>) => {
+    event.stopPropagation();
+  };
+  const handleBlur = (event: ReactFocusEvent<HTMLElement>) => {
+    const nextValue = isRich
+      ? event.currentTarget.innerHTML.trim()
+      : (event.currentTarget.textContent?.trim() ?? "");
+    if (nextValue !== value) onChange(nextValue);
+  };
+  const handleKeyDown = (event: ReactKeyboardEvent<HTMLElement>) => {
+    event.stopPropagation();
+    if (event.key === "Enter" && Tag !== "p") {
+      event.preventDefault();
+      event.currentTarget.blur();
+    }
+    if (event.key === "Escape") {
+      event.preventDefault();
+      if (isRich) {
+        event.currentTarget.innerHTML = value;
+      } else {
+        event.currentTarget.textContent = value;
+      }
+      event.currentTarget.blur();
+    }
+  };
 
   return (
-    <Tag
+    <EditableTag
       className={["builder-inline-editable", className, tp.className]
         .filter(Boolean)
         .join(" ")}
       style={tp.style}
       contentEditable
       suppressContentEditableWarning
-      onClick={(event) => event.stopPropagation()}
-      onMouseDown={(event) => event.stopPropagation()}
-      onBlur={(event) => {
-        const nextValue = event.currentTarget.textContent?.trim() ?? "";
-        if (nextValue !== value) onChange(nextValue);
-      }}
-      onKeyDown={(event) => {
-        event.stopPropagation();
-        if (event.key === "Enter" && Tag !== "p") {
-          event.preventDefault();
-          event.currentTarget.blur();
-        }
-        if (event.key === "Escape") {
-          event.preventDefault();
-          event.currentTarget.textContent = value;
-          event.currentTarget.blur();
-        }
-      }}
+      {...(isRich ? { dangerouslySetInnerHTML: { __html: value } } : {})}
+      onClick={stopInlineEvent}
+      onMouseDown={stopInlineEvent}
+      onBlur={handleBlur}
+      onKeyDown={handleKeyDown}
     >
-      {value}
-    </Tag>
+      {isRich ? null : value}
+    </EditableTag>
   );
 }
 

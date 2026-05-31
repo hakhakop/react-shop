@@ -39,7 +39,6 @@ export const layoutBlockLabels: Record<LayoutBlockKind, string> = {
   promoStrip: "Promo Strip",
   grid: "Grid",
   heading: "Heading",
-  hero: "Hero",
   image: "Image",
   panel: "Panel",
   table: "Table",
