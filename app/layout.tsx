@@ -197,7 +197,7 @@ export default async function RootLayout({
 
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className="body-root" data-storefront-preset={storefrontPreset}>
+      <body className="body-root" data-storefront-preset={storefrontPreset} suppressHydrationWarning>
         {/* Theme-driven CSS variables for product cards and images */}
         <style
           dangerouslySetInnerHTML={{

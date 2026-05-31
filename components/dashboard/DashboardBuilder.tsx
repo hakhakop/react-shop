@@ -2,9 +2,11 @@
 
 import {
   ArrowDown,
+  ArrowRight,
   ArrowUp,
   CalendarDays,
   Check,
+  CircleCheck,
   CloudUpload,
   Code2,
   Copy,
@@ -22,9 +24,11 @@ import {
   Plus,
   ShoppingBag,
   LockKeyhole,
+  Redo2,
   Settings2,
   Undo2,
   Sparkles,
+  Star,
   ShieldCheck,
   SquareMousePointer,
   TextCursorInput,
@@ -36,7 +40,7 @@ import {
 import Image from "next/image";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import type { CSSProperties } from "react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import { createPortal } from "react-dom";
 import CarouselBlock, {
   type CarouselSlide,
@@ -493,6 +497,16 @@ function readableSchemeForColor(color: string): SectionColorScheme {
   return luminance < 0.48 ? "dark" : "light";
 }
 
+const previewButtonsStyle = (layout?: "inline" | "stacked", align?: "left" | "center" | "right"): CSSProperties => ({
+  display: "flex",
+  width: "100%",
+  flexDirection: layout === "stacked" ? "column" : "row",
+  flexWrap: "wrap",
+  gap: "0.75rem",
+  justifyContent: align === "center" ? "center" : align === "right" ? "flex-end" : "flex-start",
+  alignItems: "center",
+});
+
 function DashboardTypog({
   as: As = "div",
   typography,
@@ -506,6 +520,12 @@ function DashboardTypog({
     inferTypographyArea(String(As), className),
   );
   const combined = [className, tp.className].filter(Boolean).join(" ");
+  const isRich = typeof children === "string" && children.includes("<");
+  if (isRich) {
+    return (
+      <Tag className={combined || undefined} style={tp.style} {...props} dangerouslySetInnerHTML={{ __html: children }} />
+    );
+  }
   return (
     <Tag className={combined || undefined} style={tp.style} {...props}>
       {children}
@@ -528,6 +548,14 @@ function inferTypographyArea(
     return "title";
   }
   return "body";
+}
+
+function BodyText({ children, className }: { children: string | null | undefined; className?: string }) {
+  if (!children) return null;
+  if (children.includes("<")) {
+    return <p className={className} dangerouslySetInnerHTML={{ __html: children }} />;
+  }
+  return <p className={className}>{children}</p>;
 }
 
 function getDefaultStateForKey(key: BuilderLayoutKey): BuilderState {
@@ -850,7 +878,8 @@ export default function DashboardBuilder({
   const [sidebarResizing, setSidebarResizing] = useState(false);
   const [previewScale, setPreviewScale] = useState(1);
   const [previewCanvasWidth, setPreviewCanvasWidth] = useState(1180);
-  const [sidebarTab, setSidebarTab] = useState<SidebarTab>("elements");
+  const [sidebarTab, setSidebarTab] = useState<SidebarTab>("settings");
+  const [panelForceToggler, setPanelForceToggler] = useState(0);
   const [shellSettings, setShellSettings] =
     useState<BuilderShellSettings>(defaultShellSettings);
   const [shellStatus, setShellStatus] = useState(
@@ -898,6 +927,7 @@ export default function DashboardBuilder({
     null,
   );
   const undoHistoryRef = useRef<BuilderState[]>([]);
+  const redoHistoryRef = useRef<BuilderState[]>([]);
   const skipUndoCaptureRef = useRef(false);
   const [committedBuilderStateSignature, setCommittedBuilderStateSignature] =
     useState("");
@@ -1003,12 +1033,10 @@ export default function DashboardBuilder({
     } catch {
       localPages = [];
     }
-    window.queueMicrotask(() => {
-      setCustomPages(localPages);
-      setBuilderState(draft);
-      setSelectedId(draft.sections[0]?.id ?? "");
-      setDraftReady(true);
-    });
+    setCustomPages(localPages);
+    setBuilderState(draft);
+    setSelectedId(draft.sections[0]?.id ?? "");
+    setDraftReady(true);
   }, []);
 
   useEffect(() => {
@@ -1016,15 +1044,17 @@ export default function DashboardBuilder({
     setMenuIconSearch("");
   }, [selectedMenuItemId]);
 
+  const updatePreviewViewport = useCallback(() => {
+    const shell = previewShellRef.current;
+    if (!shell) return;
+    const shellWidth = shell.clientWidth || window.innerWidth;
+    setPreviewCanvasWidth(shellWidth);
+    setPreviewScale(1);
+  }, []);
+
   useEffect(() => {
     const shell = previewShellRef.current;
     if (!shell) return;
-
-    const updatePreviewViewport = () => {
-      const shellWidth = shell.clientWidth || window.innerWidth;
-      setPreviewCanvasWidth(shellWidth);
-      setPreviewScale(1);
-    };
 
     updatePreviewViewport();
     const observer = new ResizeObserver(updatePreviewViewport);
@@ -1035,7 +1065,7 @@ export default function DashboardBuilder({
       observer.disconnect();
       window.removeEventListener("resize", updatePreviewViewport);
     };
-  }, [device, sidebarCollapsed, sidebarWidth]);
+  }, [device, sidebarCollapsed, sidebarWidth, updatePreviewViewport]);
 
   useEffect(() => {
     const updatePreviewHeaderPill = () => {
@@ -1314,6 +1344,7 @@ export default function DashboardBuilder({
       return;
     }
 
+    redoHistoryRef.current = [];
     history.push(structuredClone(builderState));
     if (history.length > 80) history.shift();
   }, [builderState, draftReady]);
@@ -1491,6 +1522,487 @@ export default function DashboardBuilder({
     }));
   };
 
+  const deleteGridItemByKey = (
+    sectionId: string,
+    columnKey: string,
+    blockKey: string,
+    itemIndex: number,
+  ) => {
+    setBuilderState((current) => ({
+      ...current,
+      sections: current.sections.map((section) => {
+        if (section.id !== sectionId) return section;
+        return {
+          ...section,
+          layoutItems: (section.layoutItems ?? []).map((item, columnIndex) => {
+            const itemKey = item.id ?? `layout-item-${columnIndex}`;
+            if (itemKey !== columnKey) return item;
+            return {
+              ...item,
+              blocks: getLayoutItemBlocks(item).map((block, blockIndex) => {
+                const currentBlockKey =
+                  block.id ?? `${itemKey}-block-${blockIndex}`;
+                if (currentBlockKey !== blockKey) return block;
+                return {
+                  ...block,
+                  gridItems: (block.gridItems ?? []).filter(
+                    (_, index) => index !== itemIndex,
+                  ),
+                };
+              }),
+            };
+          }),
+        };
+      }),
+    }));
+  };
+
+  const duplicateGridItemByKey = (
+    sectionId: string,
+    columnKey: string,
+    blockKey: string,
+    itemIndex: number,
+  ) => {
+    setBuilderState((current) => ({
+      ...current,
+      sections: current.sections.map((section) => {
+        if (section.id !== sectionId) return section;
+        return {
+          ...section,
+          layoutItems: (section.layoutItems ?? []).map((item, columnIndex) => {
+            const itemKey = item.id ?? `layout-item-${columnIndex}`;
+            if (itemKey !== columnKey) return item;
+            return {
+              ...item,
+              blocks: getLayoutItemBlocks(item).map((block, blockIndex) => {
+                const currentBlockKey =
+                  block.id ?? `${itemKey}-block-${blockIndex}`;
+                if (currentBlockKey !== blockKey) return block;
+                const gridItems = [...(block.gridItems ?? [])];
+                const source = gridItems[itemIndex];
+                if (!source) return block;
+                gridItems.splice(itemIndex + 1, 0, {
+                  ...source,
+                  id: `grid-${Date.now().toString(36)}`,
+                });
+                return { ...block, gridItems };
+              }),
+            };
+          }),
+        };
+      }),
+    }));
+  };
+
+  const deleteBadgeByKey = (
+    sectionId: string,
+    columnKey: string,
+    blockKey: string,
+    badgeIndex: number,
+  ) => {
+    setBuilderState((current) => ({
+      ...current,
+      sections: current.sections.map((section) => {
+        if (section.id !== sectionId) return section;
+        return {
+          ...section,
+          layoutItems: (section.layoutItems ?? []).map((item, columnIndex) => {
+            const itemKey = item.id ?? `layout-item-${columnIndex}`;
+            if (itemKey !== columnKey) return item;
+            return {
+              ...item,
+              blocks: getLayoutItemBlocks(item).map((block, blockIndex) => {
+                const currentBlockKey =
+                  block.id ?? `${itemKey}-block-${blockIndex}`;
+                if (currentBlockKey !== blockKey) return block;
+                return {
+                  ...block,
+                  badges: (block.badges ?? []).filter(
+                    (_, index) => index !== badgeIndex,
+                  ),
+                };
+              }),
+            };
+          }),
+        };
+      }),
+    }));
+  };
+
+  const duplicateBadgeByKey = (
+    sectionId: string,
+    columnKey: string,
+    blockKey: string,
+    badgeIndex: number,
+  ) => {
+    setBuilderState((current) => ({
+      ...current,
+      sections: current.sections.map((section) => {
+        if (section.id !== sectionId) return section;
+        return {
+          ...section,
+          layoutItems: (section.layoutItems ?? []).map((item, columnIndex) => {
+            const itemKey = item.id ?? `layout-item-${columnIndex}`;
+            if (itemKey !== columnKey) return item;
+            return {
+              ...item,
+              blocks: getLayoutItemBlocks(item).map((block, blockIndex) => {
+                const currentBlockKey =
+                  block.id ?? `${itemKey}-block-${blockIndex}`;
+                if (currentBlockKey !== blockKey) return block;
+                const badges = [...(block.badges ?? [])];
+                const source = badges[badgeIndex];
+                if (!source) return block;
+                badges.splice(badgeIndex + 1, 0, {
+                  ...source,
+                  id: `badge-${Date.now().toString(36)}`,
+                });
+                return { ...block, badges };
+              }),
+            };
+          }),
+        };
+      }),
+    }));
+  };
+
+  const moveGridItemByKey = (
+    sectionId: string,
+    columnKey: string,
+    blockKey: string,
+    fromIndex: number,
+    toIndex: number,
+  ) => {
+    if (fromIndex === toIndex) return;
+    setBuilderState((current) => ({
+      ...current,
+      sections: current.sections.map((section) => {
+        if (section.id !== sectionId) return section;
+        return {
+          ...section,
+          layoutItems: (section.layoutItems ?? []).map((item, columnIndex) => {
+            const itemKey = item.id ?? `layout-item-${columnIndex}`;
+            if (itemKey !== columnKey) return item;
+            return {
+              ...item,
+              blocks: getLayoutItemBlocks(item).map((block, blockIndex) => {
+                const currentBlockKey =
+                  block.id ?? `${itemKey}-block-${blockIndex}`;
+                if (currentBlockKey !== blockKey) return block;
+                const gridItems = [...(block.gridItems ?? [])];
+                const [moved] = gridItems.splice(fromIndex, 1);
+                gridItems.splice(toIndex, 0, moved);
+                return { ...block, gridItems };
+              }),
+            };
+          }),
+        };
+      }),
+    }));
+  };
+
+  const moveBadgeByKey = (
+    sectionId: string,
+    columnKey: string,
+    blockKey: string,
+    fromIndex: number,
+    toIndex: number,
+  ) => {
+    if (fromIndex === toIndex) return;
+    setBuilderState((current) => ({
+      ...current,
+      sections: current.sections.map((section) => {
+        if (section.id !== sectionId) return section;
+        return {
+          ...section,
+          layoutItems: (section.layoutItems ?? []).map((item, columnIndex) => {
+            const itemKey = item.id ?? `layout-item-${columnIndex}`;
+            if (itemKey !== columnKey) return item;
+            return {
+              ...item,
+              blocks: getLayoutItemBlocks(item).map((block, blockIndex) => {
+                const currentBlockKey =
+                  block.id ?? `${itemKey}-block-${blockIndex}`;
+                if (currentBlockKey !== blockKey) return block;
+                const badges = [...(block.badges ?? [])];
+                const [moved] = badges.splice(fromIndex, 1);
+                badges.splice(toIndex, 0, moved);
+                return { ...block, badges };
+              }),
+            };
+          }),
+        };
+      }),
+    }));
+  };
+
+  const moveButtonByKey = (
+    sectionId: string,
+    columnKey: string,
+    blockKey: string,
+    fromIndex: number,
+    toIndex: number,
+  ) => {
+    if (fromIndex === toIndex) return;
+    setBuilderState((current) => ({
+      ...current,
+      sections: current.sections.map((section) => {
+        if (section.id !== sectionId) return section;
+        return {
+          ...section,
+          layoutItems: (section.layoutItems ?? []).map((item, columnIndex) => {
+            const itemKey = item.id ?? `layout-item-${columnIndex}`;
+            if (itemKey !== columnKey) return item;
+            return {
+              ...item,
+              blocks: getLayoutItemBlocks(item).map((block, blockIndex) => {
+                const currentBlockKey =
+                  block.id ?? `${itemKey}-block-${blockIndex}`;
+                if (currentBlockKey !== blockKey) return block;
+                const buttons = [...(block.buttons ?? [])];
+                const [moved] = buttons.splice(fromIndex, 1);
+                buttons.splice(toIndex, 0, moved);
+                return { ...block, buttons };
+              }),
+            };
+          }),
+        };
+      }),
+    }));
+  };
+
+  const moveListItemByKey = (
+    sectionId: string,
+    columnKey: string,
+    blockKey: string,
+    fromIndex: number,
+    toIndex: number,
+  ) => {
+    if (fromIndex === toIndex) return;
+    setBuilderState((current) => ({
+      ...current,
+      sections: current.sections.map((section) => {
+        if (section.id !== sectionId) return section;
+        return {
+          ...section,
+          layoutItems: (section.layoutItems ?? []).map((item, columnIndex) => {
+            const itemKey = item.id ?? `layout-item-${columnIndex}`;
+            if (itemKey !== columnKey) return item;
+            return {
+              ...item,
+              blocks: getLayoutItemBlocks(item).map((block, blockIndex) => {
+                const currentBlockKey =
+                  block.id ?? `${itemKey}-block-${blockIndex}`;
+                if (currentBlockKey !== blockKey) return block;
+                const items = [...(block.items ?? [])];
+                const [moved] = items.splice(fromIndex, 1);
+                items.splice(toIndex, 0, moved);
+                return { ...block, items };
+              }),
+            };
+          }),
+        };
+      }),
+    }));
+  };
+
+  const deleteButtonByKey = (
+    sectionId: string,
+    columnKey: string,
+    blockKey: string,
+    buttonIndex: number,
+  ) => {
+    setBuilderState((current) => ({
+      ...current,
+      sections: current.sections.map((section) => {
+        if (section.id !== sectionId) return section;
+        return {
+          ...section,
+          layoutItems: (section.layoutItems ?? []).map((item, columnIndex) => {
+            const itemKey = item.id ?? `layout-item-${columnIndex}`;
+            if (itemKey !== columnKey) return item;
+            return {
+              ...item,
+              blocks: getLayoutItemBlocks(item).map((block, blockIndex) => {
+                const currentBlockKey =
+                  block.id ?? `${itemKey}-block-${blockIndex}`;
+                if (currentBlockKey !== blockKey) return block;
+                return {
+                  ...block,
+                  buttons: (block.buttons ?? []).filter(
+                    (_, index) => index !== buttonIndex,
+                  ),
+                };
+              }),
+            };
+          }),
+        };
+      }),
+    }));
+  };
+
+  const duplicateButtonByKey = (
+    sectionId: string,
+    columnKey: string,
+    blockKey: string,
+    buttonIndex: number,
+  ) => {
+    setBuilderState((current) => ({
+      ...current,
+      sections: current.sections.map((section) => {
+        if (section.id !== sectionId) return section;
+        return {
+          ...section,
+          layoutItems: (section.layoutItems ?? []).map((item, columnIndex) => {
+            const itemKey = item.id ?? `layout-item-${columnIndex}`;
+            if (itemKey !== columnKey) return item;
+            return {
+              ...item,
+              blocks: getLayoutItemBlocks(item).map((block, blockIndex) => {
+                const currentBlockKey =
+                  block.id ?? `${itemKey}-block-${blockIndex}`;
+                if (currentBlockKey !== blockKey) return block;
+                const buttons = [...(block.buttons ?? [])];
+                const source = buttons[buttonIndex];
+                if (!source) return block;
+                buttons.splice(buttonIndex + 1, 0, {
+                  ...source,
+                  id: `button-${Date.now().toString(36)}`,
+                });
+                return { ...block, buttons };
+              }),
+            };
+          }),
+        };
+      }),
+    }));
+  };
+
+  const deleteListItemByKey = (
+    sectionId: string,
+    columnKey: string,
+    blockKey: string,
+    itemIndex: number,
+  ) => {
+    setBuilderState((current) => ({
+      ...current,
+      sections: current.sections.map((section) => {
+        if (section.id !== sectionId) return section;
+        return {
+          ...section,
+          layoutItems: (section.layoutItems ?? []).map((item, columnIndex) => {
+            const itemKey = item.id ?? `layout-item-${columnIndex}`;
+            if (itemKey !== columnKey) return item;
+            return {
+              ...item,
+              blocks: getLayoutItemBlocks(item).map((block, blockIndex) => {
+                const currentBlockKey =
+                  block.id ?? `${itemKey}-block-${blockIndex}`;
+                if (currentBlockKey !== blockKey) return block;
+                return {
+                  ...block,
+                  items: (block.items ?? []).filter(
+                    (_, index) => index !== itemIndex,
+                  ),
+                };
+              }),
+            };
+          }),
+        };
+      }),
+    }));
+  };
+
+  const duplicateListItemByKey = (
+    sectionId: string,
+    columnKey: string,
+    blockKey: string,
+    itemIndex: number,
+  ) => {
+    setBuilderState((current) => ({
+      ...current,
+      sections: current.sections.map((section) => {
+        if (section.id !== sectionId) return section;
+        return {
+          ...section,
+          layoutItems: (section.layoutItems ?? []).map((item, columnIndex) => {
+            const itemKey = item.id ?? `layout-item-${columnIndex}`;
+            if (itemKey !== columnKey) return item;
+            return {
+              ...item,
+              blocks: getLayoutItemBlocks(item).map((block, blockIndex) => {
+                const currentBlockKey =
+                  block.id ?? `${itemKey}-block-${blockIndex}`;
+                if (currentBlockKey !== blockKey) return block;
+                const items = [...(block.items ?? [])];
+                const source = items[itemIndex];
+                if (!source) return block;
+                items.splice(itemIndex + 1, 0, source);
+                return { ...block, items };
+              }),
+            };
+          }),
+        };
+      }),
+    }));
+  };
+
+  const deleteSectionBadgeByKey = (
+    sectionId: string,
+    badgeIndex: number,
+  ) => {
+    setBuilderState((current) => ({
+      ...current,
+      sections: current.sections.map((section) => {
+        if (section.id !== sectionId) return section;
+        return {
+          ...section,
+          badges: (section.badges ?? []).filter(
+            (_, index) => index !== badgeIndex,
+          ),
+        };
+      }),
+    }));
+  };
+
+  const duplicateSectionBadgeByKey = (
+    sectionId: string,
+    badgeIndex: number,
+  ) => {
+    setBuilderState((current) => ({
+      ...current,
+      sections: current.sections.map((section) => {
+        if (section.id !== sectionId) return section;
+        const badges = [...(section.badges ?? [])];
+        const source = badges[badgeIndex];
+        if (!source) return section;
+        badges.splice(badgeIndex + 1, 0, {
+          ...source,
+          id: `badge-${Date.now().toString(36)}`,
+        });
+        return { ...section, badges };
+      }),
+    }));
+  };
+
+  const moveSectionBadgeByKey = (
+    sectionId: string,
+    fromIndex: number,
+    toIndex: number,
+  ) => {
+    if (fromIndex === toIndex) return;
+    setBuilderState((current) => ({
+      ...current,
+      sections: current.sections.map((section) => {
+        if (section.id !== sectionId) return section;
+        const badges = [...(section.badges ?? [])];
+        const [moved] = badges.splice(fromIndex, 1);
+        badges.splice(toIndex, 0, moved);
+        return { ...section, badges };
+      }),
+    }));
+  };
+
   const updateDesign = (patch: Partial<BuilderDesign>) => {
     setBuilderState((current) => ({
       ...current,
@@ -1506,6 +2018,11 @@ export default function DashboardBuilder({
       ...current,
       design: designPresets[preset],
     }));
+  };
+
+  const openElementsPanel = () => {
+    setSidebarTab("elements");
+    setPanelForceToggler((prev) => prev + 1);
   };
 
   const selectSection = (sectionId: string) => {
@@ -1952,6 +2469,69 @@ export default function DashboardBuilder({
       gridItems: (block.gridItems ?? []).filter(
         (_, index) => index !== itemIndex,
       ),
+    };
+    layoutItems[columnIndex] = { ...item, blocks };
+    updateSelected({ layoutItems });
+  };
+
+  const addSelectedLayoutBlockButton = (
+    columnIndex: number,
+    blockIndex: number,
+  ) => {
+    if (!selectedSection) return;
+    const layoutItems = [...(selectedSection.layoutItems ?? [])];
+    const item = layoutItems[columnIndex] ?? {};
+    const blocks = [...getLayoutItemBlocks(item)];
+    const block = blocks[blockIndex] ?? {};
+    const buttons = block.buttons ?? [];
+    blocks[blockIndex] = {
+      ...block,
+      buttons: [
+        ...buttons,
+        {
+          id: `btn-${Date.now().toString(36)}-${buttons.length}`,
+          label: "New Button",
+          url: "/",
+          target: "_self",
+          style: "primary",
+        },
+      ],
+    };
+    layoutItems[columnIndex] = { ...item, blocks };
+    updateSelected({ layoutItems });
+  };
+
+  const updateSelectedLayoutBlockButton = (
+    columnIndex: number,
+    blockIndex: number,
+    buttonIndex: number,
+    patch: NonNullable<BuilderLayoutBlock["buttons"]>[number],
+  ) => {
+    if (!selectedSection) return;
+    const layoutItems = [...(selectedSection.layoutItems ?? [])];
+    const item = layoutItems[columnIndex] ?? {};
+    const blocks = [...getLayoutItemBlocks(item)];
+    const block = blocks[blockIndex] ?? {};
+    const buttons = [...(block.buttons ?? [])];
+    buttons[buttonIndex] = { ...(buttons[buttonIndex] ?? {}), ...patch };
+    blocks[blockIndex] = { ...block, buttons };
+    layoutItems[columnIndex] = { ...item, blocks };
+    updateSelected({ layoutItems });
+  };
+
+  const deleteSelectedLayoutBlockButton = (
+    columnIndex: number,
+    blockIndex: number,
+    buttonIndex: number,
+  ) => {
+    if (!selectedSection) return;
+    const layoutItems = [...(selectedSection.layoutItems ?? [])];
+    const item = layoutItems[columnIndex] ?? {};
+    const blocks = [...getLayoutItemBlocks(item)];
+    const block = blocks[blockIndex] ?? {};
+    blocks[blockIndex] = {
+      ...block,
+      buttons: (block.buttons ?? []).filter((_, index) => index !== buttonIndex),
     };
     layoutItems[columnIndex] = { ...item, blocks };
     updateSelected({ layoutItems });
@@ -2586,6 +3166,9 @@ export default function DashboardBuilder({
       return;
     }
 
+    const current = history[history.length - 1];
+    redoHistoryRef.current.push(structuredClone(current));
+
     history.pop();
     const nextState = structuredClone(history[history.length - 1]);
     skipUndoCaptureRef.current = true;
@@ -2596,13 +3179,31 @@ export default function DashboardBuilder({
     setPublishStatus("Undid last change");
   };
 
+  const redoBuilder = () => {
+    const redoHistory = redoHistoryRef.current;
+    if (redoHistory.length === 0) {
+      setPublishStatus("Nothing to redo");
+      return;
+    }
+
+    const current = undoHistoryRef.current[undoHistoryRef.current.length - 1];
+    const nextState = structuredClone(redoHistory.pop()!);
+    undoHistoryRef.current.push(structuredClone(nextState));
+    skipUndoCaptureRef.current = true;
+    setBuilderState(nextState);
+    setSelectedId(nextState.sections[0]?.id ?? "");
+    setSelectedLayoutColumnKey(null);
+    setSelectedLayoutBlockKey(null);
+    setPublishStatus("Redid last change");
+  };
+
   const copyJson = async () => {
     await navigator.clipboard.writeText(builderJson);
     setCopied(true);
     window.setTimeout(() => setCopied(false), 1400);
   };
 
-  const loadPublishedLayout = async () => {
+  const loadPublishedLayout = useCallback(async () => {
     setPublishStatus("Reading published layout...");
     const response = await fetch(
       `/api/builder-layouts?key=${builderState.page}`,
@@ -2619,6 +3220,8 @@ export default function DashboardBuilder({
     const payload = (await response.json()) as {
       layout?: BuilderState | null;
     };
+
+    const currentSignature = JSON.stringify(builderState);
 
     if (!payload.layout?.sections?.length) {
       setPublishStatus("No published layout yet");
@@ -2637,19 +3240,25 @@ export default function DashboardBuilder({
       },
       sections: payload.layout.sections,
     };
+
+    const nextSignature = JSON.stringify(nextPublishedState);
+    if (nextSignature === currentSignature) {
+      setCommittedBuilderStateSignature(nextSignature);
+      setPublishStatus("Local draft matches published");
+      return;
+    }
+
     undoHistoryRef.current = [structuredClone(nextPublishedState)];
-    setCommittedBuilderStateSignature(JSON.stringify(nextPublishedState));
+    setCommittedBuilderStateSignature(nextSignature);
     setBuilderState(nextPublishedState);
     setSelectedId(payload.layout.sections[0]?.id ?? "");
     setPublishStatus("Published layout loaded");
-  };
+  }, [builderState.page, builderState.targetType, builderState.template]);
 
   useEffect(() => {
     if (!draftReady) return;
     void loadPublishedLayout();
-    // Published content is the source of truth when switching editable targets.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [builderState.page, draftReady]);
+  }, [builderState.page, draftReady, loadPublishedLayout]);
 
   const publishLayout = async () => {
     setPublishStatus("Publishing layout...");
@@ -2677,6 +3286,16 @@ export default function DashboardBuilder({
       setPublishCelebration(false);
     }, 2800);
   };
+
+  const previewButtonsStyle = (layout?: "inline" | "stacked", align?: "left" | "center" | "right"): CSSProperties => ({
+  display: "flex",
+  width: "100%",
+    flexDirection: layout === "stacked" ? "column" : "row",
+    flexWrap: "wrap",
+    gap: "0.75rem",
+    justifyContent: align === "center" ? "center" : align === "right" ? "flex-end" : "flex-start",
+    alignItems: "center",
+  });
 
   const saveShellSettings = async (
     nextSettings: BuilderShellSettings,
@@ -2997,6 +3616,7 @@ export default function DashboardBuilder({
       uploadingSlide={uploadingSlide}
       addSelectedLayoutBlockBadge={addSelectedLayoutBlockBadge}
       addSelectedLayoutBlockGridItem={addSelectedLayoutBlockGridItem}
+      addSelectedLayoutBlockButton={addSelectedLayoutBlockButton}
       addSelectedLayoutBlockSlide={addSelectedLayoutBlockSlide}
       addSelectedLayoutItem={addSelectedLayoutItem}
       addSelectedSlide={addSelectedSlide}
@@ -3004,6 +3624,7 @@ export default function DashboardBuilder({
       deleteSelected={deleteSelected}
       deleteSelectedLayoutBlock={deleteSelectedLayoutBlock}
       deleteSelectedLayoutBlockBadge={deleteSelectedLayoutBlockBadge}
+      deleteSelectedLayoutBlockButton={deleteSelectedLayoutBlockButton}
       deleteSelectedLayoutBlockGridItem={deleteSelectedLayoutBlockGridItem}
       deleteSelectedLayoutBlockSlide={deleteSelectedLayoutBlockSlide}
       deleteSelectedLayoutItem={deleteSelectedLayoutItem}
@@ -3021,6 +3642,7 @@ export default function DashboardBuilder({
       updateSelected={updateSelected}
       updateSelectedBadge={updateSelectedBadge}
       updateSelectedLayoutBlock={updateSelectedLayoutBlock}
+      updateSelectedLayoutBlockButton={updateSelectedLayoutBlockButton}
       updateSelectedLayoutBlockBadge={updateSelectedLayoutBlockBadge}
       updateSelectedLayoutBlockGridItem={updateSelectedLayoutBlockGridItem}
       updateSelectedLayoutBlockSlide={updateSelectedLayoutBlockSlide}
@@ -3730,6 +4352,9 @@ export default function DashboardBuilder({
               <Undo2 size={15} />
               Undo
             </button>
+            <button type="button" onClick={redoBuilder} title="Redo last change">
+              <Redo2 size={15} />
+            </button>
             <button type="button" className="is-primary" onClick={publishLayout}>
               <CloudUpload size={15} />
               Publish
@@ -3793,6 +4418,7 @@ export default function DashboardBuilder({
         onSetSidebarTab={setSidebarTab}
         onStartSidebarResize={startSidebarResize}
         onSwitchBuilderTarget={switchBuilderTarget}
+        openElementsPanelKey={panelForceToggler}
         filteredMenuIcons={filteredMenuIcons}
         getMenuIconLabel={getMenuIconLabel}
         menuIconPickerOpen={menuIconPickerOpen}
@@ -4527,11 +5153,28 @@ export default function DashboardBuilder({
             onDeleteBlock={deleteLayoutBlock}
             onUpdateBlock={updateLayoutBlockByKey}
             onUpdateGridItem={updateGridItemByKey}
+            onDeleteGridItem={deleteGridItemByKey}
+            onDuplicateGridItem={duplicateGridItemByKey}
+            onMoveGridItem={moveGridItemByKey}
+            onMoveBadge={moveBadgeByKey}
+            onMoveButton={moveButtonByKey}
+            onMoveListItem={moveListItemByKey}
+            onDeleteBadge={deleteBadgeByKey}
+            onDuplicateBadge={duplicateBadgeByKey}
+            onDeleteButton={deleteButtonByKey}
+            onDuplicateButton={duplicateButtonByKey}
+            onDeleteListItem={deleteListItemByKey}
+            onDuplicateListItem={duplicateListItemByKey}
+            onDeleteSectionBadge={deleteSectionBadgeByKey}
+            onDuplicateSectionBadge={duplicateSectionBadgeByKey}
+            onMoveSectionBadge={moveSectionBadgeByKey}
             onUploadGridItemImage={uploadGridItemImage}
             onAddWireframe={addWireframeNear}
             onMoveSection={moveSection}
             onDuplicateSection={duplicateSection}
             onDeleteSection={deleteSection}
+            onSetSidebarTab={setSidebarTab}
+            onOpenElementsPanel={openElementsPanel}
           />
         </div>
       </main>
@@ -4594,6 +5237,89 @@ function WordPressMediaPicker({
   onSelect: (media: WordPressMediaItem) => void;
   onClose: () => void;
 }) {
+  const [pasting, setPasting] = useState(false);
+  const [pasteStatus, setPasteStatus] = useState<string | null>(null);
+  const pasteZoneRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) {
+      setPasting(false);
+      setPasteStatus(null);
+    }
+  }, [open]);
+
+  const handlePaste = useCallback(async (event: React.ClipboardEvent) => {
+    const items = event.clipboardData?.items;
+    if (!items) return;
+
+    let imageFile: File | null = null;
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i];
+      if (item.type.startsWith("image/")) {
+        const blob = item.getAsFile();
+        if (blob) {
+          const ext = blob.type.split("/")[1] || "png";
+          imageFile = new File([blob], `pasted-image.${ext}`, { type: blob.type });
+          break;
+        }
+      }
+    }
+
+    if (!imageFile) {
+      setPasteStatus("No image found in clipboard");
+      return;
+    }
+
+    setPasting(true);
+    setPasteStatus("Uploading pasted image...");
+
+    try {
+      const formData = new FormData();
+      formData.append("file", imageFile);
+
+      const response = await fetch("/api/builder-uploads", {
+        method: "POST",
+        body: formData,
+      });
+      const payload = (await response.json()) as {
+        url?: string;
+        error?: string;
+      };
+
+      if (!response.ok || !payload.url) {
+        setPasteStatus(payload.error ?? "Upload failed");
+        return;
+      }
+
+      onSelect({
+        id: Date.now(),
+        title: imageFile.name,
+        altText: "Pasted from clipboard",
+        sourceUrl: payload.url,
+        thumbnailUrl: payload.url,
+        mimeType: imageFile.type,
+      });
+    } catch {
+      setPasteStatus("Upload failed");
+    } finally {
+      setPasting(false);
+    }
+  }, [onSelect]);
+
+  useEffect(() => {
+    const handleGlobalPaste = (event: ClipboardEvent) => {
+      if (!open) return;
+      if (pasteZoneRef.current?.contains(event.target as Node)) return;
+      const items = event.clipboardData?.items;
+      if (!items) return;
+      for (let i = 0; i < items.length; i++) {
+        if (items[i].type.startsWith("image/")) return;
+      }
+    };
+    document.addEventListener("paste", handleGlobalPaste);
+    return () => document.removeEventListener("paste", handleGlobalPaste);
+  }, [open]);
+
   if (!open) return null;
 
   return (
@@ -4620,6 +5346,25 @@ function WordPressMediaPicker({
             onChange={(event) => onSearchChange(event.target.value)}
           />
           {loading && <span>Loading...</span>}
+        </div>
+
+        <div
+          ref={pasteZoneRef}
+          className={`builder-media-paste-zone ${pasting ? "is-pasting" : ""}`}
+          tabIndex={0}
+          onPaste={handlePaste}
+          onFocus={(e) => {
+            e.currentTarget.style.borderColor = "rgba(13,115,255,0.5)";
+          }}
+          onBlur={(e) => {
+            e.currentTarget.style.borderColor = "";
+          }}
+        >
+          <CloudUpload size={20} />
+          <span>
+            {pasteStatus ??
+              "Paste an image from clipboard (Ctrl+V / Cmd+V)"}
+          </span>
         </div>
 
         <div className="builder-media-grid">
@@ -4719,12 +5464,30 @@ function PreviewCanvas({
   onDeleteBlock,
   onUpdateBlock,
   onUpdateGridItem,
+  onDeleteGridItem,
+  onDuplicateGridItem,
+  onMoveGridItem,
+  onMoveBadge,
+  onMoveButton,
+  onMoveListItem,
+  onDeleteBadge,
+  onDuplicateBadge,
+  onDeleteButton,
+  onDuplicateButton,
+  onDeleteListItem,
+  onDuplicateListItem,
+  onDeleteSectionBadge,
+  onDuplicateSectionBadge,
+  onMoveSectionBadge,
   onUploadGridItemImage,
   onAddWireframe,
   onMoveSection,
   onDuplicateSection,
   onDeleteSection,
+  onSetSidebarTab,
+  onOpenElementsPanel,
 }: {
+
   sections: BuilderSection[];
   previewProducts: ProductNode[];
   previewCategoryTree: CategoryTreeItem[];
@@ -4786,6 +5549,58 @@ function PreviewCanvas({
     itemIndex: number,
     patch: NonNullable<BuilderLayoutBlock["gridItems"]>[number],
   ) => void;
+  onDeleteGridItem: (
+    sectionId: string,
+    columnKey: string,
+    blockKey: string,
+    itemIndex: number,
+  ) => void;
+  onDuplicateGridItem: (
+    sectionId: string,
+    columnKey: string,
+    blockKey: string,
+    itemIndex: number,
+  ) => void;
+  onMoveGridItem: (
+    sectionId: string,
+    columnKey: string,
+    blockKey: string,
+    fromIndex: number,
+    toIndex: number,
+  ) => void;
+  onMoveBadge: (
+    sectionId: string,
+    columnKey: string,
+    blockKey: string,
+    fromIndex: number,
+    toIndex: number,
+  ) => void;
+  onMoveButton: (
+    sectionId: string,
+    columnKey: string,
+    blockKey: string,
+    fromIndex: number,
+    toIndex: number,
+  ) => void;
+  onMoveListItem: (
+    sectionId: string,
+    columnKey: string,
+    blockKey: string,
+    fromIndex: number,
+    toIndex: number,
+  ) => void;
+  onDeleteBadge: (
+    sectionId: string,
+    columnKey: string,
+    blockKey: string,
+    badgeIndex: number,
+  ) => void;
+  onDuplicateBadge: (
+    sectionId: string,
+    columnKey: string,
+    blockKey: string,
+    badgeIndex: number,
+  ) => void;
   onUploadGridItemImage: (
     sectionId: string,
     columnKey: string,
@@ -4803,7 +5618,48 @@ function PreviewCanvas({
   onMoveSection: (sectionId: string, direction: -1 | 1) => void;
   onDuplicateSection: (sectionId: string) => void;
   onDeleteSection: (sectionId: string) => void;
+  onSetSidebarTab: (tab: SidebarTab) => void;
+  onOpenElementsPanel: () => void;
+  onDeleteButton: (
+    sectionId: string,
+    columnKey: string,
+    blockKey: string,
+    buttonIndex: number,
+  ) => void;
+  onDuplicateButton: (
+    sectionId: string,
+    columnKey: string,
+    blockKey: string,
+    buttonIndex: number,
+  ) => void;
+  onDeleteListItem: (
+    sectionId: string,
+    columnKey: string,
+    blockKey: string,
+    itemIndex: number,
+  ) => void;
+  onDuplicateListItem: (
+    sectionId: string,
+    columnKey: string,
+    blockKey: string,
+    itemIndex: number,
+  ) => void;
+  onDeleteSectionBadge: (
+    sectionId: string,
+    badgeIndex: number,
+  ) => void;
+  onDuplicateSectionBadge: (
+    sectionId: string,
+    badgeIndex: number,
+  ) => void;
+  onMoveSectionBadge: (
+    sectionId: string,
+    fromIndex: number,
+    toIndex: number,
+  ) => void;
 }) {
+  const [sectionDragOverId, setSectionDragOverId] = useState<string | null>(null);
+  const sectionDragClearTimer = useRef<number | null>(null);
   const [insertTarget, setInsertTarget] = useState<{
     sectionId: string | null;
     placement: "above" | "below";
@@ -4910,9 +5766,7 @@ function PreviewCanvas({
           <button
             type="button"
             className="builder-preview-empty-add"
-            onClick={() =>
-              setInsertTarget({ sectionId: null, placement: "below" })
-            }
+            onClick={onOpenElementsPanel}
           >
             <Plus size={16} />
             Add section
@@ -4950,7 +5804,7 @@ function PreviewCanvas({
                   section.contentMode ?? "boxed"
                 } builder-preview-section--scheme-${resolveSectionColorScheme(section)} ${
                   isSelected ? "is-selected" : ""
-                } ${visualStyleClassName(section.visualStyle)} ${draggingSectionId === section.id ? "is-dragging" : ""}`}
+                 } ${visualStyleClassName(section.visualStyle)} ${draggingSectionId === section.id ? "is-dragging" : ""} ${sectionDragOverId === section.id ? "is-drag-over" : ""}`}
                 style={
                   {
                     background: section.background,
@@ -4990,18 +5844,51 @@ function PreviewCanvas({
                   event.dataTransfer.effectAllowed = "move";
                   onDragStart(section.id);
                 }}
+                onDragEnter={(event) => {
+                  const types = Array.from(event.dataTransfer.types);
+                  if (
+                    types.includes("text/plain") &&
+                    !types.includes("application/x-builder-block") &&
+                    !types.includes("application/x-builder-new-block")
+                  ) {
+                    event.preventDefault();
+                    if (sectionDragClearTimer.current !== null) {
+                      clearTimeout(sectionDragClearTimer.current);
+                      sectionDragClearTimer.current = null;
+                    }
+                    setSectionDragOverId(section.id);
+                  }
+                }}
+                onDragLeave={() => {
+                  sectionDragClearTimer.current = window.setTimeout(() => {
+                    sectionDragClearTimer.current = null;
+                    setSectionDragOverId(null);
+                  }, 50);
+                }}
                 onDragOver={(event) => {
                   event.preventDefault();
                   event.dataTransfer.dropEffect = "move";
                 }}
                 onDrop={(event) => {
+                  if (sectionDragClearTimer.current !== null) {
+                    clearTimeout(sectionDragClearTimer.current);
+                    sectionDragClearTimer.current = null;
+                  }
                   event.preventDefault();
                   const sourceId = event.dataTransfer.getData("text/plain");
                   if (sourceId.startsWith("builder-block:")) return;
                   onReorder(sourceId, section.id);
                   onDragEnd();
+                  setSectionDragOverId(null);
                 }}
-                onDragEnd={onDragEnd}
+                onDragEnd={() => {
+                  if (sectionDragClearTimer.current !== null) {
+                    clearTimeout(sectionDragClearTimer.current);
+                    sectionDragClearTimer.current = null;
+                  }
+                  setSectionDragOverId(null);
+                  onDragEnd();
+                }}
               >
                 <div
                   className={`builder-preview-section-tools ${
@@ -5107,7 +5994,24 @@ function PreviewCanvas({
                   onDeleteBlock={onDeleteBlock}
                   onUpdateBlock={onUpdateBlock}
                   onUpdateGridItem={onUpdateGridItem}
+                  onDeleteGridItem={onDeleteGridItem}
+                  onDuplicateGridItem={onDuplicateGridItem}
+                  onMoveGridItem={onMoveGridItem}
+                  onMoveBadge={onMoveBadge}
+                  onMoveButton={onMoveButton}
+                  onMoveListItem={onMoveListItem}
+                  onDeleteBadge={onDeleteBadge}
+                  onDuplicateBadge={onDuplicateBadge}
+                  onDeleteButton={onDeleteButton}
+                  onDuplicateButton={onDuplicateButton}
+                  onDeleteListItem={onDeleteListItem}
+                  onDuplicateListItem={onDuplicateListItem}
+                  onDeleteSectionBadge={onDeleteSectionBadge}
+                  onDuplicateSectionBadge={onDuplicateSectionBadge}
+                  onMoveSectionBadge={onMoveSectionBadge}
                   onUploadGridItemImage={onUploadGridItemImage}
+                  onSetSidebarTab={onSetSidebarTab}
+                  onOpenElementsPanel={onOpenElementsPanel}
                 />
               </div>
             );
@@ -5527,7 +6431,24 @@ function PreviewSection({
   onDeleteBlock,
   onUpdateBlock,
   onUpdateGridItem,
+  onDeleteGridItem,
+  onDuplicateGridItem,
+  onMoveGridItem,
+  onMoveBadge,
+  onMoveButton,
+  onMoveListItem,
+  onDeleteBadge,
+  onDuplicateBadge,
+  onDeleteButton,
+  onDuplicateButton,
+  onDeleteListItem,
+  onDuplicateListItem,
+  onDeleteSectionBadge,
+  onDuplicateSectionBadge,
+  onMoveSectionBadge,
   onUploadGridItemImage,
+  onSetSidebarTab,
+  onOpenElementsPanel,
 }: {
   section: BuilderSection;
   previewProducts: ProductNode[];
@@ -5581,6 +6502,58 @@ function PreviewSection({
     itemIndex: number,
     patch: NonNullable<BuilderLayoutBlock["gridItems"]>[number],
   ) => void;
+  onDeleteGridItem: (
+    sectionId: string,
+    columnKey: string,
+    blockKey: string,
+    itemIndex: number,
+  ) => void;
+  onDuplicateGridItem: (
+    sectionId: string,
+    columnKey: string,
+    blockKey: string,
+    itemIndex: number,
+  ) => void;
+  onMoveGridItem: (
+    sectionId: string,
+    columnKey: string,
+    blockKey: string,
+    fromIndex: number,
+    toIndex: number,
+  ) => void;
+  onMoveBadge: (
+    sectionId: string,
+    columnKey: string,
+    blockKey: string,
+    fromIndex: number,
+    toIndex: number,
+  ) => void;
+  onMoveButton: (
+    sectionId: string,
+    columnKey: string,
+    blockKey: string,
+    fromIndex: number,
+    toIndex: number,
+  ) => void;
+  onMoveListItem: (
+    sectionId: string,
+    columnKey: string,
+    blockKey: string,
+    fromIndex: number,
+    toIndex: number,
+  ) => void;
+  onDeleteBadge: (
+    sectionId: string,
+    columnKey: string,
+    blockKey: string,
+    badgeIndex: number,
+  ) => void;
+  onDuplicateBadge: (
+    sectionId: string,
+    columnKey: string,
+    blockKey: string,
+    badgeIndex: number,
+  ) => void;
   onUploadGridItemImage: (
     sectionId: string,
     columnKey: string,
@@ -5588,7 +6561,55 @@ function PreviewSection({
     itemIndex: number,
     file: File | null,
   ) => void;
+  onDeleteButton: (
+    sectionId: string,
+    columnKey: string,
+    blockKey: string,
+    buttonIndex: number,
+  ) => void;
+  onDuplicateButton: (
+    sectionId: string,
+    columnKey: string,
+    blockKey: string,
+    buttonIndex: number,
+  ) => void;
+  onDeleteListItem: (
+    sectionId: string,
+    columnKey: string,
+    blockKey: string,
+    itemIndex: number,
+  ) => void;
+  onDuplicateListItem: (
+    sectionId: string,
+    columnKey: string,
+    blockKey: string,
+    itemIndex: number,
+  ) => void;
+  onDeleteSectionBadge: (
+    sectionId: string,
+    badgeIndex: number,
+  ) => void;
+  onDuplicateSectionBadge: (
+    sectionId: string,
+    badgeIndex: number,
+  ) => void;
+  onMoveSectionBadge: (
+    sectionId: string,
+    fromIndex: number,
+    toIndex: number,
+  ) => void;
+  onSetSidebarTab: (tab: SidebarTab) => void;
+  onOpenElementsPanel: () => void;
 }) {
+  const dragClearTimer = useRef<number | null>(null);
+  const [dragOverKey, setDragOverKey] = useState<string | null>(null);
+  const [draggingItem, setDraggingItem] = useState<{
+    kind: "grid" | "badge" | "button" | "list" | "sectionBadge";
+    blockKey: string;
+    fromIndex: number;
+  } | null>(null);
+  const [dropHoverIndex, setDropHoverIndex] = useState<number | null>(null);
+
   if (section.kind === "hero") {
     return (
       <div className="shop-builder-section-content builder-preview-hero-inner">
@@ -5811,9 +6832,7 @@ function PreviewSection({
             {section.title?.trim() ? (
               <h2 className="shop-builder-title">{section.title}</h2>
             ) : null}
-            {section.body?.trim() ? (
-              <p className="shop-builder-body">{section.body}</p>
-            ) : null}
+            <BodyText className="shop-builder-body">{section.body?.trim() ? section.body : null}</BodyText>
           </div>
         )}
         <CarouselBlock
@@ -5834,7 +6853,7 @@ function PreviewSection({
             {section.embedMode === "code" ? "custom code" : "iframe"} embed
           </p>
           <h2 className="shop-builder-title">{section.title}</h2>
-          {section.body && <p className="shop-builder-body">{section.body}</p>}
+          {section.body && <BodyText className="shop-builder-body">{section.body}</BodyText>}
         </div>
         <div
           className="shop-builder-embed-empty builder-preview-embed-frame"
@@ -5928,10 +6947,33 @@ function PreviewSection({
                   selectedLayoutColumnKey === columnKey
                     ? "is-selected-column"
                     : ""
+                } ${
+                  dragOverKey === `col:${columnKey}` ? "is-drag-over" : ""
                 }`}
                 onClick={(event) => {
                   event.stopPropagation();
                   onSelectColumn(section.id, columnKey);
+                }}
+                onDragEnter={(event) => {
+                  const types = Array.from(event.dataTransfer.types);
+                  if (
+                    types.includes("application/x-builder-block") ||
+                    types.includes("application/x-builder-new-block")
+                  ) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    if (dragClearTimer.current !== null) {
+                      clearTimeout(dragClearTimer.current);
+                      dragClearTimer.current = null;
+                    }
+                    setDragOverKey(`col:${columnKey}`);
+                  }
+                }}
+                onDragLeave={() => {
+                  dragClearTimer.current = window.setTimeout(() => {
+                    dragClearTimer.current = null;
+                    setDragOverKey(null);
+                  }, 50);
                 }}
                 onDragOver={(event) => {
                   const types = Array.from(event.dataTransfer.types);
@@ -5949,6 +6991,11 @@ function PreviewSection({
                   }
                 }}
                 onDrop={(event) => {
+                  if (dragClearTimer.current !== null) {
+                    clearTimeout(dragClearTimer.current);
+                    dragClearTimer.current = null;
+                  }
+                  setDragOverKey(null);
                   const newBlockKind = event.dataTransfer.getData(
                     "application/x-builder-new-block",
                   ) as LayoutBlockKind;
@@ -5994,6 +7041,10 @@ function PreviewSection({
                     className="builder-preview-drop-zone"
                     aria-label={`Drop element into column ${index + 1}`}
                     title={`Drop element into column ${index + 1}`}
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      onOpenElementsPanel();
+                    }}
                   >
                     <Plus size={16} />
                   </div>
@@ -6016,6 +7067,8 @@ function PreviewSection({
                         draggingLayoutBlockKey === blockKey
                           ? "is-dragging-block"
                           : ""
+                      } ${
+                        dragOverKey === `blk:${blockKey}` ? "is-drag-over" : ""
                       } is-padding-${block.elementPadding ?? "none"} is-align-${
                         block.elementAlign ?? "left"
                       } ${visualStyleClassName(block.visualStyle)}`}
@@ -6054,6 +7107,26 @@ function PreviewSection({
                         event.dataTransfer.effectAllowed = "move";
                         onBlockDragStart(blockKey);
                       }}
+                      onDragEnter={(event) => {
+                        const types = Array.from(event.dataTransfer.types);
+                        if (
+                          types.includes("application/x-builder-block") ||
+                          types.includes("application/x-builder-new-block")
+                        ) {
+                          event.stopPropagation();
+                          if (dragClearTimer.current !== null) {
+                            clearTimeout(dragClearTimer.current);
+                            dragClearTimer.current = null;
+                          }
+                          setDragOverKey(`blk:${blockKey}`);
+                        }
+                      }}
+                      onDragLeave={() => {
+                        dragClearTimer.current = window.setTimeout(() => {
+                          dragClearTimer.current = null;
+                          setDragOverKey(null);
+                        }, 50);
+                      }}
                       onDragOver={(event) => {
                         const types = Array.from(event.dataTransfer.types);
                         if (
@@ -6070,6 +7143,11 @@ function PreviewSection({
                         }
                       }}
                       onDrop={(event) => {
+                        if (dragClearTimer.current !== null) {
+                          clearTimeout(dragClearTimer.current);
+                          dragClearTimer.current = null;
+                        }
+                        setDragOverKey(null);
                         const newBlockKind = event.dataTransfer.getData(
                           "application/x-builder-new-block",
                         ) as LayoutBlockKind;
@@ -6108,7 +7186,14 @@ function PreviewSection({
                         }
                         onBlockDragEnd();
                       }}
-                      onDragEnd={onBlockDragEnd}
+                      onDragEnd={() => {
+                        if (dragClearTimer.current !== null) {
+                          clearTimeout(dragClearTimer.current);
+                          dragClearTimer.current = null;
+                        }
+                        setDragOverKey(null);
+                        onBlockDragEnd();
+                      }}
                     >
                       <div
                         className="builder-preview-block-tools"
@@ -6167,6 +7252,103 @@ function PreviewSection({
                           block={block}
                           product={previewProduct}
                         />
+                      ) : block.kind === "button" ? (
+                        <div className="shop-builder-column-block shop-builder-column-block--button">
+                          <div 
+                            className={`shop-builder-buttons shop-builder-buttons--${block.buttonsLayout ?? "inline"}`}
+                            style={previewButtonsStyle(block.buttonsLayout, block.elementAlign)}
+                          >
+                            {block.buttonLabel && (
+                              <DashboardTypog
+                                as="span"
+                                className="builder-preview-cta"
+                                typography={block.typography}
+                              >
+                                {block.buttonLabel}
+                              </DashboardTypog>
+                            )}
+                            {(block.buttons ?? []).map((btn, btnIdx) => (
+                              <div
+                                key={btn.id ?? btnIdx}
+                                className={`builder-preview-button-item ${draggingItem?.kind === "button" && draggingItem?.fromIndex === btnIdx && draggingItem?.blockKey === blockKey ? "is-dragging" : ""} ${draggingItem?.kind === "button" && dropHoverIndex === btnIdx ? "is-drag-over" : ""}`}
+                                draggable
+                                onDragStart={(event) => {
+                                  event.stopPropagation();
+                                  event.dataTransfer.setData("text/plain", `button:${blockKey}:${btnIdx}`);
+                                  event.dataTransfer.effectAllowed = "move";
+                                  setDraggingItem({ kind: "button", blockKey, fromIndex: btnIdx });
+                                }}
+                                onDragOver={(event) => {
+                                  if (!draggingItem || draggingItem.kind !== "button" || draggingItem.blockKey !== blockKey) return;
+                                  if (draggingItem.fromIndex === btnIdx) {
+                                    setDropHoverIndex(null);
+                                    return;
+                                  }
+                                  event.preventDefault();
+                                  event.dataTransfer.dropEffect = "move";
+                                  if (dropHoverIndex !== btnIdx) {
+                                    setDropHoverIndex(btnIdx);
+                                  }
+                                }}
+                                onDragLeave={() => {
+                                  if (dropHoverIndex === btnIdx) {
+                                    setDropHoverIndex(null);
+                                  }
+                                }}
+                                onDrop={(event) => {
+                                  event.preventDefault();
+                                  event.stopPropagation();
+                                  setDropHoverIndex(null);
+                                  if (!draggingItem || draggingItem.kind !== "button" || draggingItem.blockKey !== blockKey) return;
+                                  if (draggingItem.fromIndex === btnIdx) {
+                                    setDraggingItem(null);
+                                    return;
+                                  }
+                                  onMoveButton(section.id, columnKey, blockKey, draggingItem.fromIndex, btnIdx);
+                                  setDraggingItem(null);
+                                }}
+                                onDragEnd={() => {
+                                  setDraggingItem(null);
+                                  setDropHoverIndex(null);
+                                }}
+                                style={{ position: "relative", display: "inline-flex", alignItems: "center", gap: "4px" }}
+                              >
+                                <div className="builder-preview-button-tools">
+                                  <button
+                                    type="button"
+                                    onMouseDown={(e) => e.stopPropagation()}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      onDuplicateButton(section.id, columnKey, blockKey, btnIdx);
+                                    }}
+                                    title="Duplicate button"
+                                  >
+                                    <Copy size={12} />
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onMouseDown={(e) => e.stopPropagation()}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      onDeleteButton(section.id, columnKey, blockKey, btnIdx);
+                                    }}
+                                    title="Delete button"
+                                  >
+                                    <Trash2 size={12} />
+                                  </button>
+                                </div>
+                                <span className="builder-preview-button-drag-handle" aria-hidden="true">⠿</span>
+                                <DashboardTypog
+                                  as="span"
+                                  className={`builder-preview-cta builder-preview-cta--${btn.style ?? "primary"}`}
+                                  typography={block.typography}
+                                >
+                                  {btn.label || "Button"}
+                                </DashboardTypog>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
                       ) : block.kind === "icon" ? (
                         <div className="builder-preview-goodie builder-preview-goodie-icon">
                           {getPreviewGoodieIcon(block.iconName)}
@@ -6195,9 +7377,86 @@ function PreviewSection({
                             </DashboardTypog>
                           )}
                           <ul>
-                            {(block.items ?? []).map((item) => (
-                              <li key={item}>
-                                <Check size={14} />
+                            {(block.items ?? []).map((item, index) => (
+                              <li
+                                key={`${item}-${index}`}
+                                className={`builder-preview-list-item ${draggingItem?.kind === "list" && draggingItem?.fromIndex === index && draggingItem?.blockKey === blockKey ? "is-dragging" : ""} ${draggingItem?.kind === "list" && dropHoverIndex === index ? "is-drag-over" : ""}`}
+                                draggable
+                                onDragStart={(event) => {
+                                  event.stopPropagation();
+                                  event.dataTransfer.setData("text/plain", `list:${blockKey}:${index}`);
+                                  event.dataTransfer.effectAllowed = "move";
+                                  setDraggingItem({ kind: "list", blockKey, fromIndex: index });
+                                }}
+                                onDragOver={(event) => {
+                                  if (!draggingItem || draggingItem.kind !== "list" || draggingItem.blockKey !== blockKey) return;
+                                  if (draggingItem.fromIndex === index) {
+                                    setDropHoverIndex(null);
+                                    return;
+                                  }
+                                  event.preventDefault();
+                                  event.dataTransfer.dropEffect = "move";
+                                  if (dropHoverIndex !== index) {
+                                    setDropHoverIndex(index);
+                                  }
+                                }}
+                                onDragLeave={() => {
+                                  if (dropHoverIndex === index) {
+                                    setDropHoverIndex(null);
+                                  }
+                                }}
+                                onDrop={(event) => {
+                                  event.preventDefault();
+                                  event.stopPropagation();
+                                  setDropHoverIndex(null);
+                                  if (!draggingItem || draggingItem.kind !== "list" || draggingItem.blockKey !== blockKey) return;
+                                  if (draggingItem.fromIndex === index) {
+                                    setDraggingItem(null);
+                                    return;
+                                  }
+                                  onMoveListItem(section.id, columnKey, blockKey, draggingItem.fromIndex, index);
+                                  setDraggingItem(null);
+                                }}
+                                onDragEnd={() => {
+                                  setDraggingItem(null);
+                                  setDropHoverIndex(null);
+                                }}
+                                style={{ position: "relative", display: "flex", alignItems: "center", gap: "4px" }}
+                              >
+                                <div className="builder-preview-list-item-tools">
+                                  <button
+                                    type="button"
+                                    onMouseDown={(e) => e.stopPropagation()}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      onDuplicateListItem(section.id, columnKey, blockKey, index);
+                                    }}
+                                    title="Duplicate list item"
+                                  >
+                                    <Copy size={12} />
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onMouseDown={(e) => e.stopPropagation()}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      onDeleteListItem(section.id, columnKey, blockKey, index);
+                                    }}
+                                    title="Delete list item"
+                                  >
+                                    <Trash2 size={12} />
+                                  </button>
+                                </div>
+                                <span className="builder-preview-list-item-drag-handle" aria-hidden="true">⠿</span>
+                                {{
+                                  check: <Check size={14} />,
+                                  circleCheck: <CircleCheck size={14} />,
+                                  arrowRight: <ArrowRight size={14} />,
+                                  star: <Star size={14} />,
+                                  heart: <Heart size={14} />,
+                                  sparkles: <Sparkles size={14} />,
+                                  shield: <ShieldCheck size={14} />,
+                                }[block.listIcon ?? "check"] ?? <Check size={14} />}
                                 <DashboardTypog
                                   as="span"
                                   typography={block.typography}
@@ -6207,6 +7466,19 @@ function PreviewSection({
                               </li>
                             ))}
                           </ul>
+                        </div>
+                      ) : block.kind === "heading" ? (
+                        <div className="shop-builder-column-block shop-builder-column-block--heading">
+                          <DashboardTypog
+                            as={block.headingLevel ?? "h2"}
+                            typography={block.typography}
+                            style={{
+                              textAlign: block.headingAlign ?? "left",
+                              margin: 0,
+                            }}
+                          >
+                            {block.headingText ?? "Your Heading Text"}
+                          </DashboardTypog>
                         </div>
                       ) : block.kind === "datePicker" ? (
                         <div className="builder-preview-goodie builder-preview-goodie-date">
@@ -6268,15 +7540,31 @@ function PreviewSection({
                               }
                             />
                           )}
-                          {block.buttonLabel && (
-                            <DashboardTypog
-                              as="span"
-                              className="builder-preview-cta"
-                              typography={block.typography}
-                            >
-                              {block.buttonLabel}
-                            </DashboardTypog>
-                          )}
+                          <div 
+                            className={`shop-builder-buttons shop-builder-buttons--${block.buttonsLayout ?? "inline"}`}
+                            style={previewButtonsStyle(block.buttonsLayout, block.elementAlign)}
+                          >
+                            {block.buttonLabel && (
+                              <DashboardTypog
+                                as="span"
+                                className="builder-preview-cta"
+                                typography={block.typography}
+                              >
+                                {block.buttonLabel}
+                              </DashboardTypog>
+                            )}
+                            {(block.buttons ?? []).map((btn, btnIdx) => (
+                              <DashboardTypog
+                                key={btn.id ?? btnIdx}
+                                as="span"
+                                className={`builder-preview-cta builder-preview-cta--${btn.style ?? "primary"}`}
+                              style={{ display: "inline-flex" }}
+                                typography={block.typography}
+                              >
+                                {btn.label || "Button"}
+                              </DashboardTypog>
+                            ))}
+                          </div>
                         </div>
                       ) : block.kind === "promoStrip" ? (
                         <div className="shop-builder-column-block shop-builder-column-block--promo-strip">
@@ -6328,6 +7616,10 @@ function PreviewSection({
                               />
                             )}
                           </div>
+                        <div 
+                          className={`shop-builder-buttons shop-builder-buttons--${block.buttonsLayout ?? "inline"}`}
+                          style={previewButtonsStyle(block.buttonsLayout, block.elementAlign)}
+                        >
                           {block.buttonLabel && (
                             <DashboardTypog
                               as="span"
@@ -6337,6 +7629,18 @@ function PreviewSection({
                               {block.buttonLabel}
                             </DashboardTypog>
                           )}
+                          {(block.buttons ?? []).map((btn, btnIdx) => (
+                            <DashboardTypog
+                              key={btn.id ?? btnIdx}
+                              as="span"
+                              className={`builder-preview-cta builder-preview-cta--${btn.style ?? "primary"}`}
+                              style={{ display: "inline-flex" }}
+                              typography={block.typography}
+                            >
+                              {btn.label || "Button"}
+                            </DashboardTypog>
+                          ))}
+                        </div>
                         </div>
                       ) : block.kind === "panel" ? (
                         <div className="shop-builder-column-block shop-builder-column-block--panel">
@@ -6395,6 +7699,10 @@ function PreviewSection({
                                 }
                               />
                             )}
+                          <div 
+                            className={`shop-builder-buttons shop-builder-buttons--${block.buttonsLayout ?? "inline"}`}
+                            style={previewButtonsStyle(block.buttonsLayout, block.elementAlign)}
+                          >
                             {block.buttonLabel && (
                               <DashboardTypog
                                 as="span"
@@ -6404,11 +7712,30 @@ function PreviewSection({
                                 {block.buttonLabel}
                               </DashboardTypog>
                             )}
+                            {(block.buttons ?? []).map((btn, btnIdx) => (
+                              <DashboardTypog
+                                key={btn.id ?? btnIdx}
+                                as="span"
+                                className={`builder-preview-cta builder-preview-cta--${btn.style ?? "primary"}`}
+                              style={{ display: "inline-flex" }}
+                                typography={block.typography}
+                              >
+                                {btn.label || "Button"}
+                              </DashboardTypog>
+                            ))}
+                          </div>
                           </div>
                         </div>
                       ) : block.kind === "image" ? (
                         <div className="shop-builder-column-block shop-builder-column-block--image">
-                          <div className="shop-builder-panel-media">
+                          <div
+                            className="shop-builder-panel-media"
+                            style={{
+                              textAlign: block.imageAlignment ?? "center",
+                              maxWidth: block.imageMaxWidth ? `${block.imageMaxWidth}px` : undefined,
+                              marginInline: "auto",
+                            }}
+                          >
                             {block.imageUrl ? (
                               <Image
                                 src={block.imageUrl}
@@ -6419,6 +7746,7 @@ function PreviewSection({
                                   width: "100%",
                                   height: "100%",
                                   objectFit: "cover",
+                                  borderRadius: block.imageBorderRadius ? `${block.imageBorderRadius}px` : undefined,
                                 }}
                               />
                             ) : (
@@ -6427,6 +7755,11 @@ function PreviewSection({
                               </div>
                             )}
                           </div>
+                          {block.imageCaption && (
+                            <p style={{ textAlign: "center", fontSize: "0.85em", opacity: 0.7, marginTop: 4 }}>
+                              {block.imageCaption}
+                            </p>
+                          )}
                           {block.title && (
                             <DashboardTypog as="h3" typography={block.typography}>
                               {block.title}
@@ -6437,6 +7770,34 @@ function PreviewSection({
                               {block.body}
                             </DashboardTypog>
                           )}
+                        </div>
+                      ) : block.kind === "table" ? (
+                        <div className="shop-builder-column-block shop-builder-column-block--table">
+                          <div style={{ overflowX: "auto" }}>
+                            <table
+                              className={`builder-preview-table builder-preview-table--${block.tableStyle ?? "striped"}`}
+                              style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.9em" }}
+                            >
+                              {(block.tableHeadings ?? []).length > 0 && (
+                                <thead>
+                                  <tr>
+                                    {(block.tableHeadings ?? []).map((heading, hIdx) => (
+                                      <th key={hIdx}>{heading}</th>
+                                    ))}
+                                  </tr>
+                                </thead>
+                              )}
+                              <tbody>
+                                {(block.tableRows ?? []).map((row, rIdx) => (
+                                  <tr key={rIdx}>
+                                    {row.map((cell, cIdx) => (
+                                      <td key={cIdx}>{cell}</td>
+                                    ))}
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
                         </div>
                       ) : block.kind === "categoryFilters" ? (
                         <div className="shop-builder-column-block shop-builder-column-block--category-filters">
@@ -6610,12 +7971,114 @@ function PreviewSection({
                                   key={
                                     item.id ?? `${blockKey}-grid-${itemIndex}`
                                   }
+                                  draggable={block.gridSource !== "products"}
                                   className={`shop-builder-grid-card is-image-${
                                     block.gridImagePadding ?? "frameless"
                                   } is-content-${block.gridContentPadding ?? "medium"} is-frame-${
                                     block.gridImageFrame ?? "none"
+                                  } ${
+                                    draggingItem?.blockKey === blockKey && draggingItem?.fromIndex === itemIndex
+                                      ? "is-dragging-grid"
+                                      : ""
+                                  } ${
+                                    draggingItem && dropHoverIndex === itemIndex && draggingItem.blockKey === blockKey
+                                      ? "is-drag-over-grid"
+                                      : ""
                                   }`}
+                                  onDragStart={(event) => {
+                                    if (block.gridSource === "products") return;
+                                    event.stopPropagation();
+                                    event.dataTransfer.setData(
+                                      "text/plain",
+                                      `grid-item:${blockKey}:${itemIndex}`,
+                                    );
+                                    event.dataTransfer.effectAllowed = "move";
+                                    setDraggingItem({ kind: "grid", blockKey, fromIndex: itemIndex });
+                                  }}
+                                  onDragOver={(event) => {
+                                    if (!draggingItem || draggingItem.kind !== "grid" || draggingItem.blockKey !== blockKey) return;
+                                    if (draggingItem.fromIndex === itemIndex) {
+                                      setDropHoverIndex(null);
+                                      return;
+                                    }
+                                    event.preventDefault();
+                                    event.dataTransfer.dropEffect = "move";
+                                    if (dropHoverIndex !== itemIndex) {
+                                      setDropHoverIndex(itemIndex);
+                                    }
+                                  }}
+                                  onDragLeave={() => {
+                                    if (dropHoverIndex === itemIndex) {
+                                      setDropHoverIndex(null);
+                                    }
+                                  }}
+                                  onDrop={(event) => {
+                                    event.preventDefault();
+                                    event.stopPropagation();
+                                    setDropHoverIndex(null);
+                                    if (!draggingItem || draggingItem.kind !== "grid" || draggingItem.blockKey !== blockKey) return;
+                                    if (draggingItem.fromIndex === itemIndex) {
+                                      setDraggingItem(null);
+                                      return;
+                                    }
+                                    onMoveGridItem(
+                                      section.id,
+                                      columnKey,
+                                      blockKey,
+                                      draggingItem.fromIndex,
+                                      itemIndex,
+                                    );
+                                    setDraggingItem(null);
+                                  }}
+                                  onDragEnd={() => {
+                                    setDraggingItem(null);
+                                    setDropHoverIndex(null);
+                                  }}
                                 >
+                                  {block.gridSource !== "products" && (
+                                    <>
+                                      <div className="builder-preview-grid-item-tools">
+                                        <button
+                                          type="button"
+                                          onMouseDown={(event) => event.stopPropagation()}
+                                          onClick={(event) => {
+                                            event.stopPropagation();
+                                            onDuplicateGridItem(
+                                              section.id,
+                                              columnKey,
+                                              blockKey,
+                                              itemIndex,
+                                            );
+                                          }}
+                                          title="Duplicate item"
+                                        >
+                                          <Copy size={12} />
+                                        </button>
+                                        <button
+                                          type="button"
+                                          onMouseDown={(event) => event.stopPropagation()}
+                                          onClick={(event) => {
+                                            event.stopPropagation();
+                                            onDeleteGridItem(
+                                              section.id,
+                                              columnKey,
+                                              blockKey,
+                                              itemIndex,
+                                            );
+                                          }}
+                                          title="Delete item"
+                                        >
+                                          <Trash2 size={12} />
+                                        </button>
+                                      </div>
+                                      <span
+                                        className="builder-preview-grid-drag-handle"
+                                        aria-hidden="true"
+                                      >
+                                        ::
+                                      </span>
+                                    </>
+                                  )}
                                   {block.gridShowImage !== false && (
                                     <div
                                       className={`shop-builder-grid-image ${
@@ -6820,7 +8283,88 @@ function PreviewSection({
                                 key={
                                   badge.id ?? `${blockKey}-badge-${badgeIndex}`
                                 }
+                                className={`shop-builder-badge-card ${draggingItem?.kind === "badge" && draggingItem?.fromIndex === badgeIndex && draggingItem?.blockKey === blockKey ? "is-dragging" : ""} ${draggingItem?.kind === "badge" && dropHoverIndex === badgeIndex ? "is-drag-over" : ""}`}
+                                draggable
+                                onDragStart={(event) => {
+                                  event.stopPropagation();
+                                  event.dataTransfer.setData("text/plain", `badge:${blockKey}:${badgeIndex}`);
+                                  event.dataTransfer.effectAllowed = "move";
+                                  setDraggingItem({ kind: "badge", blockKey, fromIndex: badgeIndex });
+                                }}
+                                onDragOver={(event) => {
+                                  if (!draggingItem || draggingItem.kind !== "badge" || draggingItem.blockKey !== blockKey) return;
+                                  if (draggingItem.fromIndex === badgeIndex) {
+                                    setDropHoverIndex(null);
+                                    return;
+                                  }
+                                  event.preventDefault();
+                                  event.dataTransfer.dropEffect = "move";
+                                  if (dropHoverIndex !== badgeIndex) {
+                                    setDropHoverIndex(badgeIndex);
+                                  }
+                                }}
+                                onDragLeave={() => {
+                                  if (dropHoverIndex === badgeIndex) {
+                                    setDropHoverIndex(null);
+                                  }
+                                }}
+                                onDrop={(event) => {
+                                  event.preventDefault();
+                                  event.stopPropagation();
+                                  setDropHoverIndex(null);
+                                  if (!draggingItem || draggingItem.kind !== "badge" || draggingItem.blockKey !== blockKey) return;
+                                  if (draggingItem.fromIndex === badgeIndex) {
+                                    setDraggingItem(null);
+                                    return;
+                                  }
+                                  onMoveBadge(section.id, columnKey, blockKey, draggingItem.fromIndex, badgeIndex);
+                                  setDraggingItem(null);
+                                }}
+                                onDragEnd={() => {
+                                  setDraggingItem(null);
+                                  setDropHoverIndex(null);
+                                }}
                               >
+                                <div className="builder-preview-badge-tools">
+                                  <button
+                                    type="button"
+                                    onMouseDown={(event) => event.stopPropagation()}
+                                    onClick={(event) => {
+                                      event.stopPropagation();
+                                      onDuplicateBadge(
+                                        section.id,
+                                        columnKey,
+                                        blockKey,
+                                        badgeIndex,
+                                      );
+                                    }}
+                                    title="Duplicate badge"
+                                  >
+                                    <Copy size={12} />
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onMouseDown={(event) => event.stopPropagation()}
+                                    onClick={(event) => {
+                                      event.stopPropagation();
+                                      onDeleteBadge(
+                                        section.id,
+                                        columnKey,
+                                        blockKey,
+                                        badgeIndex,
+                                      );
+                                    }}
+                                    title="Delete badge"
+                                  >
+                                    <Trash2 size={12} />
+                                  </button>
+                                </div>
+                                <span
+                                  className="builder-preview-badge-drag-handle"
+                                  aria-hidden="true"
+                                >
+                                  ::
+                                </span>
                                 {badge.label && (
                                   <DashboardTypog
                                     as="span"
@@ -6904,11 +8448,26 @@ function PreviewSection({
                           {block.kind === "breadcrumbs" && (
                             <span>Dynamic navigation path</span>
                           )}
-                          {block.buttonLabel && (
-                            <span className="builder-preview-cta">
-                              {block.buttonLabel}
-                            </span>
-                          )}
+                          <div 
+                            className={`shop-builder-buttons shop-builder-buttons--${block.buttonsLayout ?? "inline"}`}
+                            style={previewButtonsStyle(block.buttonsLayout, block.elementAlign)}
+                          >
+                            {block.buttonLabel && (
+                              <span className="builder-preview-cta">
+                                {block.buttonLabel}
+                              </span>
+                            )}
+                            {(block.buttons ?? []).map((btn, btnIdx) => (
+                              <DashboardTypog
+                                key={btn.id ?? btnIdx}
+                                as="span"
+                                className={`builder-preview-cta builder-preview-cta--${btn.style ?? "primary"}`}
+                              style={{ display: "inline-flex" }}
+                              >
+                                {btn.label || "Button"}
+                              </DashboardTypog>
+                            ))}
+                          </div>
                         </>
                       )}
                     </div>
@@ -6930,7 +8489,7 @@ function PreviewSection({
             <p className="shop-builder-eyebrow">{section.eyebrow}</p>
           )}
           <h2 className="shop-builder-title">{section.title}</h2>
-          {section.body && <p className="shop-builder-body">{section.body}</p>}
+          {section.body && <BodyText className="shop-builder-body">{section.body}</BodyText>}
         </div>
         <div
           className="shop-builder-badges builder-preview-badges"
@@ -6944,11 +8503,76 @@ function PreviewSection({
           {(section.badges ?? []).map((badge, index) => (
             <article
               key={badge.id ?? index}
-              className="shop-builder-badge-card"
+              className={`shop-builder-badge-card ${draggingItem?.kind === "sectionBadge" && draggingItem?.fromIndex === index && draggingItem?.blockKey === section.id ? "is-dragging" : ""} ${draggingItem?.kind === "sectionBadge" && dropHoverIndex === index ? "is-drag-over" : ""}`}
+              draggable
+              onDragStart={(event) => {
+                event.stopPropagation();
+                event.dataTransfer.setData("text/plain", `sectionBadge:${section.id}:${index}`);
+                event.dataTransfer.effectAllowed = "move";
+                setDraggingItem({ kind: "sectionBadge", blockKey: section.id, fromIndex: index });
+              }}
+              onDragOver={(event) => {
+                if (!draggingItem || draggingItem.kind !== "sectionBadge" || draggingItem.blockKey !== section.id) return;
+                if (draggingItem.fromIndex === index) {
+                  setDropHoverIndex(null);
+                  return;
+                }
+                event.preventDefault();
+                event.dataTransfer.dropEffect = "move";
+                if (dropHoverIndex !== index) {
+                  setDropHoverIndex(index);
+                }
+              }}
+              onDragLeave={() => {
+                if (dropHoverIndex === index) {
+                  setDropHoverIndex(null);
+                }
+              }}
+              onDrop={(event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                setDropHoverIndex(null);
+                if (!draggingItem || draggingItem.kind !== "sectionBadge" || draggingItem.blockKey !== section.id) return;
+                if (draggingItem.fromIndex === index) {
+                  setDraggingItem(null);
+                  return;
+                }
+                onMoveSectionBadge(section.id, draggingItem.fromIndex, index);
+                setDraggingItem(null);
+              }}
+              onDragEnd={() => {
+                setDraggingItem(null);
+                setDropHoverIndex(null);
+              }}
             >
+              <div className="builder-preview-section-badge-tools">
+                <button
+                  type="button"
+                  onMouseDown={(e) => e.stopPropagation()}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onDuplicateSectionBadge(section.id, index);
+                  }}
+                  title="Duplicate badge"
+                >
+                  <Copy size={12} />
+                </button>
+                <button
+                  type="button"
+                  onMouseDown={(e) => e.stopPropagation()}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onDeleteSectionBadge(section.id, index);
+                  }}
+                  title="Delete badge"
+                >
+                  <Trash2 size={12} />
+                </button>
+              </div>
+              <span className="builder-preview-section-badge-drag-handle" aria-hidden="true">⠿</span>
               {badge.label && <span>{badge.label}</span>}
               {badge.title && <h3>{badge.title}</h3>}
-              {badge.body && <p>{badge.body}</p>}
+              <BodyText>{badge.body}</BodyText>
             </article>
           ))}
         </div>
@@ -6968,7 +8592,7 @@ function PreviewSection({
           Promo
         </p>
         <h2 className="shop-builder-title">{section.title}</h2>
-        {section.body && <p className="shop-builder-body">{section.body}</p>}
+        {section.body && <BodyText className="shop-builder-body">{section.body}</BodyText>}
       </div>
       {section.ctaLabel && (
         <span className="shop-builder-cta shop-builder-cta--light">

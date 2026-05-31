@@ -44,7 +44,11 @@ function loadInitialWishlist(): WishlistItem[] {
 }
 
 export function WishlistProvider({ children }: { children: ReactNode }) {
-  const [items, setItems] = useState<WishlistItem[]>(loadInitialWishlist);
+  const [items, setItems] = useState<WishlistItem[]>([]);
+
+  useEffect(() => {
+    setItems(loadInitialWishlist());
+  }, []);
 
   // Persist to localStorage whenever items change
   useEffect(() => {

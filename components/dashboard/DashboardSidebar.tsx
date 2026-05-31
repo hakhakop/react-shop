@@ -76,6 +76,7 @@ type DashboardSidebarProps = {
   onSetSidebarTab: Dispatch<SetStateAction<SidebarTab>>;
   onStartSidebarResize: (clientX: number) => void;
   onSwitchBuilderTarget: (nextKey: BuilderLayoutKey) => void;
+  openElementsPanelKey: number;
 };
 
 export default function DashboardSidebar({
@@ -122,6 +123,7 @@ export default function DashboardSidebar({
   onSetSidebarTab,
   onStartSidebarResize,
   onSwitchBuilderTarget,
+  openElementsPanelKey,
 }: DashboardSidebarProps) {
   const [nestedOpen, setNestedOpen] = useState(false);
 
@@ -130,6 +132,13 @@ export default function DashboardSidebar({
     const frame = window.requestAnimationFrame(() => setNestedOpen(true));
     return () => window.cancelAnimationFrame(frame);
   }, [selectedLayoutBlockKey, sidebarTab]);
+
+  useEffect(() => {
+    if (openElementsPanelKey === 0) return;
+    onSetSidebarTab("elements");
+    const frame = window.requestAnimationFrame(() => setNestedOpen(true));
+    return () => window.cancelAnimationFrame(frame);
+  }, [openElementsPanelKey]);
 
   const sidebarPanels: {
     tab: SidebarTab;

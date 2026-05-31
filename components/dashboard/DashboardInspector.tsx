@@ -13,6 +13,7 @@ import {
   Trash2,
   X,
 } from "lucide-react";
+import RichTextEditor from "./RichTextEditor";
 import {
   useEffect,
   useState,
@@ -82,6 +83,7 @@ type DashboardInspectorProps = {
   uploadingNestedSlide: string | null;
   uploadingSlide: number | null;
   addSelectedLayoutBlockBadge: LooseHandler;
+  addSelectedLayoutBlockButton: LooseHandler;
   addSelectedLayoutBlockGridItem: LooseHandler;
   addSelectedLayoutBlockSlide: LooseHandler;
   addSelectedLayoutItem: LooseHandler;
@@ -89,6 +91,7 @@ type DashboardInspectorProps = {
   copyJson: LooseHandler;
   deleteSelected: LooseHandler;
   deleteSelectedLayoutBlock: LooseHandler;
+  deleteSelectedLayoutBlockButton: LooseHandler;
   deleteSelectedLayoutBlockBadge: LooseHandler;
   deleteSelectedLayoutBlockGridItem: LooseHandler;
   deleteSelectedLayoutBlockSlide: LooseHandler;
@@ -107,6 +110,7 @@ type DashboardInspectorProps = {
   updateSelected: (patch: Partial<BuilderSection>) => void;
   updateSelectedBadge: LooseHandler;
   updateSelectedLayoutBlock: LooseHandler;
+  updateSelectedLayoutBlockButton: LooseHandler;
   updateSelectedLayoutBlockBadge: LooseHandler;
   updateSelectedLayoutBlockGridItem: LooseHandler;
   updateSelectedLayoutBlockSlide: LooseHandler;
@@ -180,6 +184,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
   const {
     builderJson, copied, elementBackgroundPresets, getLayoutItemBlocks,
     inspectorOpen, inspectorTab, layoutBlockLabels, openLayoutItemId, openSlideId,
+    addSelectedLayoutBlockButton, deleteSelectedLayoutBlockButton, updateSelectedLayoutBlockButton,
     previewCategoryTree,
     sectionBackgroundPresets, sectionColorModeLabel, sectionLabels,
     sectionSettingsOpen, sectionStructureOpen, selectedLayoutBlock,
@@ -1322,7 +1327,89 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                           {isSelectedBlock &&
                                             isElementContentTab && (
                                             <>
-                                          {block.kind === "embed" ? (
+                                          {block.kind === "button" ? (
+                                            <>
+                                              <div className="builder-section-heading">
+                                                <span>Layout</span>
+                                              </div>
+                                              <label className="builder-field">
+                                                <span>Buttons orientation</span>
+                                                <select
+                                                  value={block.buttonsLayout ?? "inline"}
+                                                  onChange={(e) => updateSelectedLayoutBlock(index, blockIndex, { buttonsLayout: e.target.value as any })}
+                                                >
+                                                  <option value="inline">Inline (Side by side)</option>
+                                                  <option value="stacked">Stacked (Vertical)</option>
+                                                </select>
+                                              </label>
+
+                                              <div className="builder-section-heading">
+                                                <span>Buttons</span>
+                                                <span>{block.buttons?.length ?? 0}</span>
+                                              </div>
+                                              <button
+                                                type="button"
+                                                className="builder-inline-add"
+                                                onClick={() => addSelectedLayoutBlockButton(index, blockIndex)}
+                                              >
+                                                <Plus size={15} />
+                                                Add button
+                                              </button>
+                                              {(block.buttons ?? []).map((btn, btnIndex) => (
+                                                <div key={btn.id ?? btnIndex} className="builder-nested-card is-open">
+                                                  <div className="builder-nested-card-header">
+                                                    <span>Button {btnIndex + 1}</span>
+                                                    <button
+                                                      type="button"
+                                                      onClick={() => deleteSelectedLayoutBlockButton(index, blockIndex, btnIndex)}
+                                                      title="Delete button"
+                                                    >
+                                                      <Trash2 size={14} />
+                                                    </button>
+                                                  </div>
+                                                  <div className="builder-nested-card-body">
+                                                    <label className="builder-field">
+                                                      <span>Label</span>
+                                                      <input
+                                                        value={btn.label ?? ""}
+                                                        onChange={(e) => updateSelectedLayoutBlockButton(index, blockIndex, btnIndex, { label: e.target.value })}
+                                                      />
+                                                    </label>
+                                                    <label className="builder-field">
+                                                      <span>URL</span>
+                                                      <input
+                                                        value={btn.url ?? ""}
+                                                        onChange={(e) => updateSelectedLayoutBlockButton(index, blockIndex, btnIndex, { url: e.target.value })}
+                                                      />
+                                                    </label>
+                                                    <label className="builder-field">
+                                                      <span>Target</span>
+                                                      <select
+                                                        value={btn.target ?? "_self"}
+                                                        onChange={(e) => updateSelectedLayoutBlockButton(index, blockIndex, btnIndex, { target: e.target.value as any })}
+                                                      >
+                                                        <option value="_self">Same tab</option>
+                                                        <option value="_blank">New tab</option>
+                                                      </select>
+                                                    </label>
+                                                    <label className="builder-field">
+                                                      <span>Style</span>
+                                                      <select
+                                                        value={btn.style ?? "primary"}
+                                                        onChange={(e) => updateSelectedLayoutBlockButton(index, blockIndex, btnIndex, { style: e.target.value as any })}
+                                                      >
+                                                        <option value="primary">Solid Primary</option>
+                                                        <option value="secondary">Secondary</option>
+                                                        <option value="outline">Outline</option>
+                                                        <option value="ghost">Ghost</option>
+                                                        <option value="light">Light</option>
+                                                      </select>
+                                                    </label>
+                                                  </div>
+                                                </div>
+                                              ))}
+                                            </>
+                                          ) : block.kind === "embed" ? (
                                             <>
                                               <label className="builder-field">
                                                 <span>Block Title</span>
@@ -1958,24 +2045,14 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                           </label>
                                                           <label className="builder-field">
                                                             <span>Text</span>
-                                                            <textarea
-                                                              rows={3}
-                                                              value={
-                                                                gridItem.text ??
-                                                                ""
-                                                              }
-                                                              onChange={(
-                                                                event,
-                                                              ) =>
+                                                            <RichTextEditor
+                                                              value={gridItem.text ?? ""}
+                                                              onChange={(value) =>
                                                                 updateSelectedLayoutBlockGridItem(
                                                                   index,
                                                                   blockIndex,
                                                                   gridItemIndex,
-                                                                  {
-                                                                    text: event
-                                                                      .target
-                                                                      .value,
-                                                                  },
+                                                                  { text: value },
                                                                 )
                                                               }
                                                             />
@@ -2911,17 +2988,13 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                               </label>
                                               <label className="builder-field">
                                                 <span>Body</span>
-                                                <textarea
-                                                  rows={3}
+                                                <RichTextEditor
                                                   value={block.body ?? ""}
-                                                  onChange={(event) =>
+                                                  onChange={(value) =>
                                                     updateSelectedLayoutBlock(
                                                       index,
                                                       blockIndex,
-                                                      {
-                                                        body: event.target
-                                                          .value,
-                                                      },
+                                                      { body: value },
                                                     )
                                                   }
                                                 />
@@ -3533,24 +3606,14 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                             <span>
                                                               Slide Text
                                                             </span>
-                                                            <textarea
-                                                              rows={3}
-                                                              value={
-                                                                slide.text ??
-                                                                ""
-                                                              }
-                                                              onChange={(
-                                                                event,
-                                                              ) =>
+                                                            <RichTextEditor
+                                                              value={slide.text ?? ""}
+                                                              onChange={(value) =>
                                                                 updateSelectedLayoutBlockSlide(
                                                                   index,
                                                                   blockIndex,
                                                                   slideIndex,
-                                                                  {
-                                                                    text: event
-                                                                      .target
-                                                                      .value,
-                                                                  },
+                                                                  { text: value },
                                                                 )
                                                               }
                                                             />
@@ -3814,17 +3877,13 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                               </label>
                                               <label className="builder-field">
                                                 <span>Text</span>
-                                                <textarea
-                                                  rows={3}
+                                                <RichTextEditor
                                                   value={block.body ?? ""}
-                                                  onChange={(event) =>
+                                                  onChange={(value) =>
                                                     updateSelectedLayoutBlock(
                                                       index,
                                                       blockIndex,
-                                                      {
-                                                        body: event.target
-                                                          .value,
-                                                      },
+                                                      { body: value },
                                                     )
                                                   }
                                                 />
@@ -3849,31 +3908,119 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                 />
                                               </label>
                                               <label className="builder-field">
-                                                <span>Items</span>
-                                                <textarea
-                                                  rows={5}
-                                                  value={(
-                                                    block.items ?? []
-                                                  ).join("\n")}
+                                                <span>Icon type</span>
+                                                <select
+                                                  value={block.listIcon ?? "check"}
                                                   onChange={(event) =>
                                                     updateSelectedLayoutBlock(
                                                       index,
                                                       blockIndex,
-                                                      {
-                                                        items:
-                                                          event.target.value
-                                                            .split("\n")
-                                                            .map((item) =>
-                                                              item.trim(),
-                                                            )
-                                                            .filter(Boolean),
-                                                      },
+                                                      { listIcon: event.target.value as any },
                                                     )
                                                   }
-                                                />
+                                                >
+                                                  <option value="check">Check</option>
+                                                  <option value="circleCheck">Circle Check</option>
+                                                  <option value="arrowRight">Arrow Right</option>
+                                                  <option value="star">Star</option>
+                                                  <option value="heart">Heart</option>
+                                                  <option value="sparkles">Sparkles</option>
+                                                  <option value="shield">Shield</option>
+                                                </select>
                                               </label>
-                                            </>
-                                          ) : block.kind === "datePicker" ? (
+                                              <div className="builder-section-heading">
+                                                <span>List Items ({block.items?.length ?? 0})</span>
+                                              </div>
+                                              {(block.items ?? []).map((item, itemIdx) => (
+                                                <label key={itemIdx} className="builder-field">
+                                                  <span>Item {itemIdx + 1}</span>
+                                                  <div style={{ display: "flex", gap: 4 }}>
+                                                    <input
+                                                      value={item}
+                                                      onChange={(event) => {
+                                                        const items = [...(block.items ?? [])];
+                                                        items[itemIdx] = event.target.value;
+                                                        updateSelectedLayoutBlock(index, blockIndex, { items });
+                                                      }}
+                                                    />
+                                                    <button
+                                                      type="button"
+                                                      className="builder-inline-delete"
+                                                      onClick={() => {
+                                                        const items = (block.items ?? []).filter((_, i) => i !== itemIdx);
+                                                        updateSelectedLayoutBlock(index, blockIndex, { items });
+                                                      }}
+                                                    >
+                                                      <Trash2 size={14} />
+                                                    </button>
+                                                  </div>
+                                                </label>
+                                              ))}
+                                              <button
+                                                type="button"
+                                                className="builder-inline-add"
+                                                onClick={() => {
+                                                  const items = [...(block.items ?? []), `Item ${(block.items ?? []).length + 1}`];
+                                                  updateSelectedLayoutBlock(index, blockIndex, { items });
+                                                }}
+                                              >
+                                                <Plus size={15} /> Add item
+                                              </button>
+                                              </>
+                                            ) : block.kind === "heading" ? (
+                                              <>
+                                                <label className="builder-field">
+                                                  <span>Heading Text</span>
+                                                  <input
+                                                    value={block.headingText ?? ""}
+                                                    onChange={(event) =>
+                                                      updateSelectedLayoutBlock(
+                                                        index,
+                                                        blockIndex,
+                                                        { headingText: event.target.value },
+                                                      )
+                                                    }
+                                                  />
+                                                </label>
+                                                <label className="builder-field">
+                                                  <span>Level</span>
+                                                  <select
+                                                    value={block.headingLevel ?? "h2"}
+                                                    onChange={(event) =>
+                                                      updateSelectedLayoutBlock(
+                                                        index,
+                                                        blockIndex,
+                                                        { headingLevel: event.target.value as "h1" | "h2" | "h3" | "h4" | "h5" | "h6" },
+                                                      )
+                                                    }
+                                                  >
+                                                    <option value="h1">H1</option>
+                                                    <option value="h2">H2</option>
+                                                    <option value="h3">H3</option>
+                                                    <option value="h4">H4</option>
+                                                    <option value="h5">H5</option>
+                                                    <option value="h6">H6</option>
+                                                  </select>
+                                                </label>
+                                                <label className="builder-field">
+                                                  <span>Alignment</span>
+                                                  <select
+                                                    value={block.headingAlign ?? "left"}
+                                                    onChange={(event) =>
+                                                      updateSelectedLayoutBlock(
+                                                        index,
+                                                        blockIndex,
+                                                        { headingAlign: event.target.value as "left" | "center" | "right" },
+                                                      )
+                                                    }
+                                                  >
+                                                    <option value="left">Left</option>
+                                                    <option value="center">Center</option>
+                                                    <option value="right">Right</option>
+                                                  </select>
+                                                </label>
+                                              </>
+                                            ) : block.kind === "datePicker" ? (
                                             <>
                                               <label className="builder-field">
                                                 <span>Title</span>
@@ -3947,17 +4094,13 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                               </label>
                                               <label className="builder-field">
                                                 <span>Body</span>
-                                                <textarea
-                                                  rows={3}
+                                                <RichTextEditor
                                                   value={block.body ?? ""}
-                                                  onChange={(event) =>
+                                                  onChange={(value) =>
                                                     updateSelectedLayoutBlock(
                                                       index,
                                                       blockIndex,
-                                                      {
-                                                        body: event.target
-                                                          .value,
-                                                      },
+                                                      { body: value },
                                                     )
                                                   }
                                                 />
@@ -4074,21 +4217,14 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                       </label>
                                                       <label className="builder-field">
                                                         <span>Text</span>
-                                                        <textarea
-                                                          rows={3}
-                                                          value={
-                                                            badge.body ?? ""
-                                                          }
-                                                          onChange={(event) =>
+                                                        <RichTextEditor
+                                                          value={badge.body ?? ""}
+                                                          onChange={(value) =>
                                                             updateSelectedLayoutBlockBadge(
                                                               index,
                                                               blockIndex,
                                                               badgeIndex,
-                                                              {
-                                                                body: event
-                                                                  .target
-                                                                  .value,
-                                                              },
+                                                              { body: value },
                                                             )
                                                           }
                                                         />
@@ -4186,17 +4322,13 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                               </label>
                                               <label className="builder-field">
                                                 <span>Body</span>
-                                                <textarea
-                                                  rows={4}
+                                                <RichTextEditor
                                                   value={block.body ?? ""}
-                                                  onChange={(event) =>
+                                                  onChange={(value) =>
                                                     updateSelectedLayoutBlock(
                                                       index,
                                                       blockIndex,
-                                                      {
-                                                        body: event.target
-                                                          .value,
-                                                      },
+                                                      { body: value },
                                                     )
                                                   }
                                                 />
@@ -4292,6 +4424,151 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                   }
                                                 />
                                               </label>
+                                              <label className="builder-field">
+                                                <span>Alignment</span>
+                                                <select
+                                                  value={block.imageAlignment ?? "center"}
+                                                  onChange={(event) =>
+                                                    updateSelectedLayoutBlock(
+                                                      index,
+                                                      blockIndex,
+                                                      { imageAlignment: event.target.value as "left" | "center" | "right" },
+                                                    )
+                                                  }
+                                                >
+                                                  <option value="left">Left</option>
+                                                  <option value="center">Center</option>
+                                                  <option value="right">Right</option>
+                                                </select>
+                                              </label>
+                                              <label className="builder-field">
+                                                <span>Max Width (px)</span>
+                                                <input
+                                                  type="number"
+                                                  min={100}
+                                                  max={2000}
+                                                  value={block.imageMaxWidth ?? 1200}
+                                                  onChange={(event) =>
+                                                    updateSelectedLayoutBlock(
+                                                      index,
+                                                      blockIndex,
+                                                      { imageMaxWidth: Number(event.target.value) || undefined },
+                                                    )
+                                                  }
+                                                />
+                                              </label>
+                                              <label className="builder-field">
+                                                <span>Border Radius (px)</span>
+                                                <input
+                                                  type="number"
+                                                  min={0}
+                                                  max={100}
+                                                  value={block.imageBorderRadius ?? 0}
+                                                  onChange={(event) =>
+                                                    updateSelectedLayoutBlock(
+                                                      index,
+                                                      blockIndex,
+                                                      { imageBorderRadius: Number(event.target.value) || undefined },
+                                                    )
+                                                  }
+                                                />
+                                              </label>
+                                              <label className="builder-field">
+                                                <span>Caption</span>
+                                                <input
+                                                  value={block.imageCaption ?? ""}
+                                                  onChange={(event) =>
+                                                    updateSelectedLayoutBlock(
+                                                      index,
+                                                      blockIndex,
+                                                      { imageCaption: event.target.value },
+                                                    )
+                                                  }
+                                                />
+                                              </label>
+                                            </>
+                                          ) : block.kind === "table" ? (
+                                            <>
+                                              <div className="builder-section-heading">
+                                                <span>Layout</span>
+                                              </div>
+                                              <label className="builder-field">
+                                                <span>Table style</span>
+                                                <select
+                                                  value={block.tableStyle ?? "striped"}
+                                                  onChange={(event) =>
+                                                    updateSelectedLayoutBlock(
+                                                      index,
+                                                      blockIndex,
+                                                      { tableStyle: event.target.value as "striped" | "bordered" | "plain" },
+                                                    )
+                                                  }
+                                                >
+                                                  <option value="striped">Striped rows</option>
+                                                  <option value="bordered">Bordered</option>
+                                                  <option value="plain">Plain</option>
+                                                </select>
+                                              </label>
+                                              <div style={{ display: "flex", gap: 8 }}>
+                                                <label className="builder-field" style={{ flex: 1 }}>
+                                                  <span>Columns</span>
+                                                  <input
+                                                    type="number"
+                                                    min={1}
+                                                    max={10}
+                                                    value={(block.tableHeadings ?? []).length || 1}
+                                                    onChange={(event) => {
+                                                      const newCount = Math.max(1, Number(event.target.value) || 1);
+                                                      const headings = [...(block.tableHeadings ?? [])];
+                                                      const rows = (block.tableRows ?? []).map((r) => [...r]);
+                                                      while (headings.length < newCount) headings.push(`Column ${headings.length + 1}`);
+                                                      while (headings.length > newCount) headings.pop();
+                                                      for (let r = 0; r < rows.length; r++) {
+                                                        while (rows[r].length < newCount) rows[r].push(`Cell ${String.fromCharCode(65 + rows[r].length)}`);
+                                                        while (rows[r].length > newCount) rows[r].pop();
+                                                      }
+                                                      updateSelectedLayoutBlock(index, blockIndex, { tableHeadings: headings, tableRows: rows });
+                                                    }}
+                                                  />
+                                                </label>
+                                                <label className="builder-field" style={{ flex: 1 }}>
+                                                  <span>Rows</span>
+                                                  <input
+                                                    type="number"
+                                                    min={0}
+                                                    max={20}
+                                                    value={block.tableRows?.length ?? 0}
+                                                    onChange={(event) => {
+                                                      const newCount = Math.max(0, Number(event.target.value) || 0);
+                                                      const colCount = (block.tableHeadings ?? []).length || 3;
+                                                      const rows = (block.tableRows ?? []).map((r) => [...r]);
+                                                      while (rows.length < newCount) rows.push(Array.from({ length: colCount }, (_, i) => `Cell ${String.fromCharCode(65 + i)}`));
+                                                      while (rows.length > newCount) rows.pop();
+                                                      updateSelectedLayoutBlock(index, blockIndex, { tableRows: rows });
+                                                    }}
+                                                  />
+                                                </label>
+                                              </div>
+                                              {(block.tableHeadings ?? []).length > 0 && (
+                                                <>
+                                                  <div className="builder-section-heading">
+                                                    <span>Headings</span>
+                                                  </div>
+                                                  {(block.tableHeadings ?? []).map((heading, hIdx) => (
+                                                    <label key={hIdx} className="builder-field">
+                                                      <span>Col {hIdx + 1}</span>
+                                                      <input
+                                                        value={heading}
+                                                        onChange={(event) => {
+                                                          const headings = [...(block.tableHeadings ?? [])];
+                                                          headings[hIdx] = event.target.value;
+                                                          updateSelectedLayoutBlock(index, blockIndex, { tableHeadings: headings });
+                                                        }}
+                                                      />
+                                                    </label>
+                                                  ))}
+                                                </>
+                                              )}
                                             </>
                                           ) : (
                                             <>
@@ -4329,17 +4606,13 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                               </label>
                                               <label className="builder-field">
                                                 <span>Body</span>
-                                                <textarea
-                                                  rows={4}
+                                                <RichTextEditor
                                                   value={block.body ?? ""}
-                                                  onChange={(event) =>
+                                                  onChange={(value) =>
                                                     updateSelectedLayoutBlock(
                                                       index,
                                                       blockIndex,
-                                                      {
-                                                        body: event.target
-                                                          .value,
-                                                      },
+                                                      { body: value },
                                                     )
                                                   }
                                                 />
@@ -4380,6 +4653,57 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                   }
                                                 />
                                               </label>
+
+                                              <div className="builder-section-heading">Buttons Layout</div>
+                                              <label className="builder-field">
+                                                <span>Buttons orientation</span>
+                                                <select
+                                                  value={block.buttonsLayout ?? "inline"}
+                                                  onChange={(e) => updateSelectedLayoutBlock(index, blockIndex, { buttonsLayout: e.target.value as any })}
+                                                >
+                                                  <option value="inline">Inline (Side by side)</option>
+                                                  <option value="stacked">Stacked (Vertical)</option>
+                                                </select>
+                                              </label>
+                                              <div className="builder-section-heading">Buttons</div>
+                                              <button
+                                                type="button"
+                                                className="builder-inline-add"
+                                                onClick={() => addSelectedLayoutBlockButton(index, blockIndex)}
+                                              >
+                                                <Plus size={15} />
+                                                Add button
+                                              </button>
+                                              {(block.buttons ?? []).map((btn, btnIndex) => (
+                                                <div key={btn.id ?? btnIndex} className="builder-nested-card is-open">
+                                                  <div className="builder-nested-card-header">
+                                                    <span>Button {btnIndex + 1}</span>
+                                                    <button
+                                                      type="button"
+                                                      onClick={() => deleteSelectedLayoutBlockButton(index, blockIndex, btnIndex)}
+                                                      title="Delete button"
+                                                    >
+                                                      <Trash2 size={14} />
+                                                    </button>
+                                                  </div>
+                                                  <div className="builder-nested-card-body">
+                                                    <label className="builder-field">
+                                                      <span>Label</span>
+                                                      <input
+                                                        value={btn.label ?? ""}
+                                                        onChange={(e) => updateSelectedLayoutBlockButton(index, blockIndex, btnIndex, { label: e.target.value })}
+                                                      />
+                                                    </label>
+                                                    <label className="builder-field">
+                                                      <span>URL</span>
+                                                      <input
+                                                        value={btn.url ?? ""}
+                                                        onChange={(e) => updateSelectedLayoutBlockButton(index, blockIndex, btnIndex, { url: e.target.value })}
+                                                      />
+                                                    </label>
+                                                  </div>
+                                                </div>
+                                              ))}
                                             </>
                                           )}
                                           </>
@@ -4789,12 +5113,11 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                               </label>
                               <label className="builder-field">
                                 <span>Badge Body</span>
-                                <textarea
-                                  rows={3}
+                                <RichTextEditor
                                   value={badge.body ?? ""}
-                                  onChange={(event) =>
+                                  onChange={(value) =>
                                     updateSelectedBadge(index, {
-                                      body: event.target.value,
+                                      body: value,
                                     })
                                   }
                                 />
@@ -4901,12 +5224,11 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
 
                           <label className="builder-field">
                             <span>Description</span>
-                            <textarea
-                              rows={3}
+                            <RichTextEditor
                               value={selectedSection.body ?? ""}
                               placeholder="Leave blank to hide"
-                              onChange={(event) =>
-                                updateSelected({ body: event.target.value })
+                              onChange={(value) =>
+                                updateSelected({ body: value })
                               }
                             />
                           </label>

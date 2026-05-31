@@ -544,8 +544,8 @@
   max-height: min(760px, calc(100vh - 48px));
   padding: 16px;
   display: grid;
-  grid-template-rows: auto auto minmax(0, 1fr);
-  gap: 14px;
+  grid-template-rows: auto auto auto minmax(0, 1fr);
+  gap: 12px;
   overflow: hidden;
 }
 
@@ -606,6 +606,33 @@
 .builder-media-search span {
   color: #6a6a63;
   font-size: 12px;
+}
+
+.builder-media-paste-zone {
+  margin: 0 16px;
+  padding: 14px 12px;
+  border: 2px dashed rgba(17, 17, 17, 0.14);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: rgba(17, 17, 17, 0.4);
+  font-size: 13px;
+  cursor: text;
+  transition: border-color 120ms ease, color 120ms ease, background 120ms ease;
+  outline: none;
+}
+
+.builder-media-paste-zone:hover {
+  border-color: rgba(13, 115, 255, 0.4);
+  color: rgba(17, 17, 17, 0.6);
+  background: rgba(13, 115, 255, 0.03);
+}
+
+.builder-media-paste-zone.is-pasting {
+  border-color: rgba(13, 115, 255, 0.7);
+  color: rgba(13, 115, 255, 0.8);
+  background: rgba(13, 115, 255, 0.08);
 }
 
 .builder-media-grid {
@@ -2484,6 +2511,19 @@
   opacity: 0.58;
 }
 
+.builder-preview-section.is-drag-over::before {
+  content: "";
+  position: absolute;
+  z-index: 10;
+  top: -4px;
+  left: 0;
+  right: 0;
+  height: 5px;
+  background: rgba(13, 115, 255, 0.7);
+  border-radius: 3px;
+  pointer-events: none;
+}
+
 .builder-preview-empty {
   min-height: 240px;
   display: grid;
@@ -3454,6 +3494,39 @@ body[data-storefront-preset="princity"]
   background: rgba(17, 17, 17, 0.018);
 }
 
+.builder-preview-content-layout-grid
+  article.is-drag-over
+  .builder-preview-drop-zone {
+  border-color: rgba(13, 115, 255, 0.5);
+  background: rgba(13, 115, 255, 0.06);
+  color: rgba(13, 115, 255, 0.8);
+}
+
+/* Improved drop placeholder - visible dashed zone for all dragged items */
+.builder-preview-column-block:hover .builder-preview-item-drop-placeholder,
+.builder-preview-column-block:focus-within .builder-preview-item-drop-placeholder {
+  opacity: 1;
+}
+
+.builder-preview-item-drop-placeholder {
+  min-height: 32px;
+  border: 2px dashed rgba(13, 115, 255, 0.4);
+  border-radius: 6px;
+  background: rgba(13, 115, 255, 0.06);
+  display: grid;
+  place-items: center;
+  color: rgba(13, 115, 255, 0.7);
+  font-size: 12px;
+  opacity: 0;
+  transition: opacity 120ms ease, border-color 120ms ease;
+}
+
+.builder-preview-item-drop-placeholder.is-active {
+  opacity: 1;
+  border-color: rgba(13, 115, 255, 0.8);
+  background: rgba(13, 115, 255, 0.12);
+}
+
 .builder-preview-layout-block + .builder-preview-layout-block {
   margin-top: 14px;
   padding-top: 14px;
@@ -3595,6 +3668,23 @@ body[data-storefront-preset="princity"]
 .builder-preview-layout-block.is-dragging-block {
   opacity: 0.48;
   cursor: grabbing;
+}
+
+.builder-preview-layout-block.is-drag-over {
+  position: relative;
+}
+
+.builder-preview-layout-block.is-drag-over::before {
+  content: "";
+  position: absolute;
+  z-index: 10;
+  top: -3px;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: rgba(13, 115, 255, 0.7);
+  border-radius: 2px;
+  pointer-events: none;
 }
 
 .builder-preview-drag-handle {
@@ -5492,4 +5582,134 @@ body[data-storefront-preset="princity"]
 .builder-preview-layout-block:focus-within .builder-preview-drag-handle,
 .builder-preview-layout-block.is-selected-block .builder-preview-drag-handle {
   opacity: 0.28;
+}
+
+/* ── RichTextEditor ────────────────────────────── */
+
+.richtext-editor {
+  border: 1px solid var(--builder-ui-border-strong, rgba(31, 31, 27, 0.15));
+  border-radius: var(--builder-ui-radius-sm, 8px);
+  overflow: hidden;
+  background: var(--builder-ui-panel-solid, #fff);
+}
+
+.richtext-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--builder-ui-border, rgba(31, 31, 27, 0.09));
+  background: var(--builder-ui-surface, #f7f6f1);
+}
+
+.richtext-toolbar-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  color: var(--builder-ui-muted, #6f6f66);
+  cursor: pointer;
+  transition: background 120ms ease, color 120ms ease;
+}
+
+.richtext-toolbar-btn:hover {
+  background: var(--builder-ui-surface-strong, #efeee8);
+  color: var(--builder-ui-text, #181815);
+}
+
+.richtext-toolbar-btn.is-active {
+  background: var(--builder-ui-accent-soft, rgba(20, 20, 17, 0.06));
+  color: var(--builder-ui-accent, #141411);
+}
+
+.richtext-divider {
+  width: 1px;
+  height: 18px;
+  background: var(--builder-ui-border-strong, rgba(31, 31, 27, 0.15));
+  margin: 0 4px;
+  flex-shrink: 0;
+}
+
+.richtext-toolbar-spacer {
+  flex: 1;
+}
+
+.richtext-content {
+  padding: 4px;
+}
+
+.richtext-content .ProseMirror {
+  padding: 8px 10px;
+  min-height: inherit;
+  outline: none;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--builder-ui-text, #181815);
+}
+
+.richtext-content .ProseMirror p {
+  margin: 0 0 6px;
+}
+
+.richtext-content .ProseMirror p:last-child {
+  margin-bottom: 0;
+}
+
+.richtext-content .ProseMirror h2 {
+  font-size: 16px;
+  font-weight: 660;
+  margin: 10px 0 4px;
+  line-height: 1.3;
+}
+
+.richtext-content .ProseMirror h3 {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 8px 0 4px;
+  line-height: 1.3;
+}
+
+.richtext-content .ProseMirror ul,
+.richtext-content .ProseMirror ol {
+  padding-left: 20px;
+  margin: 4px 0;
+}
+
+.richtext-content .ProseMirror li {
+  margin-bottom: 2px;
+}
+
+.richtext-content .ProseMirror blockquote {
+  border-left: 3px solid var(--builder-ui-border-strong);
+  padding-left: 10px;
+  margin: 6px 0;
+  color: var(--builder-ui-muted);
+  font-style: italic;
+}
+
+.richtext-content .ProseMirror a {
+  color: hsl(var(--primary));
+  text-decoration: underline;
+  cursor: text;
+}
+
+.richtext-content .ProseMirror p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  color: var(--builder-ui-soft-muted, #8a8a80);
+  pointer-events: none;
+  height: 0;
+}
+
+.richtext-content .ProseMirror ul {
+  list-style-type: disc;
+}
+
+.richtext-content .ProseMirror ol {
+  list-style-type: decimal;
 }

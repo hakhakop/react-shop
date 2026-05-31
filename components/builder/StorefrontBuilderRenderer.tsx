@@ -1,11 +1,14 @@
 import { Suspense } from "react";
 import type { CSSProperties, ReactNode } from "react";
 import {
+  ArrowRight,
   CalendarDays,
   Check,
+  CircleCheck,
   Heart,
   ShieldCheck,
   Sparkles,
+  Star,
   Truck,
 } from "lucide-react";
 import Breadcrumbs from "@/components/Breadcrumbs";
@@ -423,7 +426,7 @@ function PromoSection({ section }: { section: BuilderSection }) {
     >
       <div>
         <h2 className="shop-builder-title">{section.title}</h2>
-        {section.body && <p className="shop-builder-body">{section.body}</p>}
+        <BodyText className="shop-builder-body">{section.body}</BodyText>
       </div>
       {section.ctaLabel && section.ctaUrl && (
         <a
@@ -477,7 +480,7 @@ function BadgeGridSection({ section }: { section: BuilderSection }) {
           <p className="shop-builder-eyebrow">{section.eyebrow}</p>
         )}
         <h2 className="shop-builder-title">{section.title}</h2>
-        {section.body && <p className="shop-builder-body">{section.body}</p>}
+        <BodyText className="shop-builder-body">{section.body}</BodyText>
       </div>
       <div
         className="shop-builder-badges"
@@ -489,7 +492,7 @@ function BadgeGridSection({ section }: { section: BuilderSection }) {
           <article key={badge.id ?? index} className="shop-builder-badge-card">
             {badge.label && <span>{badge.label}</span>}
             {badge.title && <h3>{badge.title}</h3>}
-            {badge.body && <p>{badge.body}</p>}
+            <BodyText>{badge.body}</BodyText>
           </article>
         ))}
       </div>
@@ -1004,6 +1007,48 @@ function ContentLayoutBlock({
   categoryTree?: CategoryTreeItem[];
   activeCategorySlug?: string | null;
 }) {
+  if (block.kind === "button") {
+    return (
+      <div className="shop-builder-column-block shop-builder-column-block--button">
+        <div 
+          className={`shop-builder-buttons shop-builder-buttons--${block.buttonsLayout ?? "inline"}`}
+          style={{
+            display: "flex",
+            flexDirection: block.buttonsLayout === "stacked" ? "column" : "row",
+            flexWrap: "wrap",
+            gap: "0.75rem",
+          }}
+        >
+          {block.buttonLabel && block.buttonUrl && (
+            <Typog
+              as="a"
+              className={`shop-builder-cta shop-builder-cta--${block.buttonStyle ?? "primary"}`}
+              href={block.buttonUrl}
+              target={block.buttonTarget === "_blank" ? "_blank" : undefined}
+              rel={block.buttonTarget === "_blank" ? "noreferrer" : undefined}
+              typography={block.typography}
+            >
+              {block.buttonLabel}
+            </Typog>
+          )}
+          {(block.buttons ?? []).map((btn, btnIdx) => (
+            <Typog
+              key={btn.id ?? btnIdx}
+              as="a"
+              className={`shop-builder-cta shop-builder-cta--${btn.style ?? "primary"}`}
+              href={btn.url}
+              target={btn.target === "_blank" ? "_blank" : undefined}
+              rel={btn.target === "_blank" ? "noreferrer" : undefined}
+              typography={block.typography}
+            >
+              {btn.label}
+            </Typog>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   if (block.kind === "breadcrumbs") {
     return (
       <div className="shop-builder-column-block shop-builder-column-block--breadcrumbs">
@@ -1203,13 +1248,32 @@ function ContentLayoutBlock({
       <div className="shop-builder-column-block shop-builder-column-block--list">
         {block.title && <Typog as="h3" typography={block.typography}>{block.title}</Typog>}
         <ul>
-          {(block.items ?? []).map((item) => (
-            <li key={item}>
-              <Check size={16} />
+          {(block.items ?? []).map((item, index) => (
+            <li key={`${item}-${index}`}>
+              {{
+                check: <Check size={16} />,
+                circleCheck: <CircleCheck size={16} />,
+                arrowRight: <ArrowRight size={16} />,
+                star: <Star size={16} />,
+                heart: <Heart size={16} />,
+                sparkles: <Sparkles size={16} />,
+                shield: <ShieldCheck size={16} />,
+              }[block.listIcon ?? "check"] ?? <Check size={16} />}
               <span>{item}</span>
             </li>
           ))}
         </ul>
+      </div>
+    );
+  }
+
+  if (block.kind === "heading") {
+    const Tag = block.headingLevel ?? "h2";
+    return (
+      <div className="shop-builder-column-block shop-builder-column-block--heading">
+        <Tag style={{ textAlign: block.headingAlign ?? "left", margin: 0 }}>
+          {block.headingText ?? "Your Heading Text"}
+        </Tag>
       </div>
     );
   }
@@ -1300,6 +1364,19 @@ function ContentLayoutBlock({
             {block.buttonLabel}
           </Typog>
         )}
+        {(block.buttons ?? []).map((btn, btnIdx) => (
+          <Typog
+            key={btn.id ?? btnIdx}
+            as="a"
+            className={`shop-builder-cta shop-builder-cta--${btn.style ?? "primary"}`}
+            href={btn.url}
+            target={btn.target === "_blank" ? "_blank" : undefined}
+            rel={btn.target === "_blank" ? "noreferrer" : undefined}
+            typography={block.typography}
+          >
+            {btn.label}
+          </Typog>
+        ))}
       </div>
     );
   }
@@ -1322,6 +1399,19 @@ function ContentLayoutBlock({
             {block.buttonLabel}
           </Typog>
         )}
+        {(block.buttons ?? []).map((btn, btnIdx) => (
+          <Typog
+            key={btn.id ?? btnIdx}
+            as="a"
+            className={`shop-builder-cta shop-builder-cta--${btn.style ?? "primary"}`}
+            href={btn.url}
+            target={btn.target === "_blank" ? "_blank" : undefined}
+            rel={btn.target === "_blank" ? "noreferrer" : undefined}
+            typography={block.typography}
+          >
+            {btn.label}
+          </Typog>
+        ))}
       </div>
     );
   }
@@ -1351,6 +1441,97 @@ function ContentLayoutBlock({
               {block.buttonLabel}
             </Typog>
           )}
+        {(block.buttons ?? []).map((btn, btnIdx) => (
+          <Typog
+            key={btn.id ?? btnIdx}
+            as="a"
+            className={`shop-builder-cta shop-builder-cta--${btn.style ?? "primary"}`}
+            href={btn.url}
+            target={btn.target === "_blank" ? "_blank" : undefined}
+            rel={btn.target === "_blank" ? "noreferrer" : undefined}
+            typography={block.typography}
+          >
+            {btn.label}
+          </Typog>
+        ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (block.kind === "image") {
+    return (
+      <div className="shop-builder-column-block shop-builder-column-block--image">
+        <div
+          style={{
+            textAlign: block.imageAlignment ?? "center",
+            maxWidth: block.imageMaxWidth ? `${block.imageMaxWidth}px` : undefined,
+            marginInline: "auto",
+          }}
+        >
+          {block.imageUrl ? (
+            <img
+              src={block.imageUrl}
+              alt={block.imageAlt ?? block.title ?? ""}
+              style={{
+                width: "100%",
+                height: "auto",
+                borderRadius: block.imageBorderRadius ? `${block.imageBorderRadius}px` : undefined,
+              }}
+            />
+          ) : block.title || block.body ? null : (
+            <div className="builder-mini-empty">
+              Choose an image in the inspector.
+            </div>
+          )}
+        </div>
+        {block.imageCaption && (
+          <p style={{ textAlign: "center", fontSize: "0.85em", opacity: 0.7, marginTop: 4 }}>
+            {block.imageCaption}
+          </p>
+        )}
+        {block.title && (
+          <Typog as="h3" typography={block.typography}>
+            {block.title}
+          </Typog>
+        )}
+        {block.body && (
+          <Typog as="p" typography={block.typography}>
+            {block.body}
+          </Typog>
+        )}
+      </div>
+    );
+  }
+
+  if (block.kind === "table") {
+    const headLength = (block.tableHeadings ?? []).length;
+    return (
+      <div className="shop-builder-column-block shop-builder-column-block--table">
+        <div style={{ overflowX: "auto" }}>
+          <table
+            className={`builder-preview-table builder-preview-table--${block.tableStyle ?? "striped"}`}
+            style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.9em" }}
+          >
+            {headLength > 0 && (
+              <thead>
+                <tr>
+                  {(block.tableHeadings ?? []).map((heading, hIdx) => (
+                    <th key={hIdx}>{heading}</th>
+                  ))}
+                </tr>
+              </thead>
+            )}
+            <tbody>
+              {(block.tableRows ?? []).map((row, rIdx) => (
+                <tr key={rIdx}>
+                  {Array.from({ length: Math.max(headLength, row.length) }, (_, cIdx) => (
+                    <td key={cIdx}>{row[cIdx] ?? ""}</td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
     );
@@ -1361,16 +1542,39 @@ function ContentLayoutBlock({
       {block.eyebrow && <span>{block.eyebrow}</span>}
       {block.title && <Typog as="h3" typography={block.typography}>{block.title}</Typog>}
       {block.body && <Typog as="p" typography={block.typography}>{block.body}</Typog>}
-      {block.buttonLabel && block.buttonUrl && (
-        <Typog
-          as="a"
-          className="shop-builder-cta"
-          href={block.buttonUrl}
-          typography={block.typography}
-        >
-          {block.buttonLabel}
-        </Typog>
-      )}
+      <div 
+        className={`shop-builder-buttons shop-builder-buttons--${block.buttonsLayout ?? "inline"}`}
+        style={{
+          display: "flex",
+          flexDirection: block.buttonsLayout === "stacked" ? "column" : "row",
+          flexWrap: "wrap",
+          gap: "0.75rem",
+        }}
+      >
+        {block.buttonLabel && block.buttonUrl && (
+          <Typog
+            as="a"
+            className="shop-builder-cta"
+            href={block.buttonUrl}
+            typography={block.typography}
+          >
+            {block.buttonLabel}
+          </Typog>
+        )}
+        {(block.buttons ?? []).map((btn, btnIdx) => (
+          <Typog
+            key={btn.id ?? btnIdx}
+            as="a"
+            className={`shop-builder-cta shop-builder-cta--${btn.style ?? "primary"}`}
+            href={btn.url}
+            target={btn.target === "_blank" ? "_blank" : undefined}
+            rel={btn.target === "_blank" ? "noreferrer" : undefined}
+            typography={block.typography}
+          >
+            {btn.label}
+          </Typog>
+        ))}
+      </div>
     </div>
   );
 }
@@ -1418,11 +1622,25 @@ function Typog({ as: As = "div", typography, className, children, ...props }: an
   );
   const Tag = As as any;
   const combined = [className, tp.className].filter(Boolean).join(" ");
+  const isRich = typeof children === "string" && children.includes("<");
+  if (isRich) {
+    return (
+      <Tag className={combined || undefined} style={tp.style} {...props} dangerouslySetInnerHTML={{ __html: children }} />
+    );
+  }
   return (
     <Tag className={combined || undefined} style={tp.style} {...props}>
       {children}
     </Tag>
   );
+}
+
+function BodyText({ children, className }: { children: string | null | undefined; className?: string }) {
+  if (!children) return null;
+  if (children.includes("<")) {
+    return <p className={className} dangerouslySetInnerHTML={{ __html: children }} />;
+  }
+  return <p className={className}>{children}</p>;
 }
 
 function inferTypographyArea(
@@ -1480,7 +1698,7 @@ function ContentLayoutSection({
           {section.title && (
             <h2 className="shop-builder-title">{section.title}</h2>
           )}
-          {section.body && <p className="shop-builder-body">{section.body}</p>}
+          <BodyText className="shop-builder-body">{section.body}</BodyText>
         </div>
       )}
       <div
@@ -1552,7 +1770,7 @@ function SliderSection({ section }: { section: BuilderSection }) {
     <SectionFrame section={section} extra="shop-builder-slider">
       <div className="shop-builder-slider-heading">
         <h2 className="shop-builder-title">{section.title}</h2>
-        {section.body && <p className="shop-builder-body">{section.body}</p>}
+        <BodyText className="shop-builder-body">{section.body}</BodyText>
       </div>
       <CarouselBlock
         block={{
@@ -1574,7 +1792,7 @@ function EmbedSection({ section }: { section: BuilderSection }) {
           <p className="shop-builder-eyebrow">{section.eyebrow}</p>
         )}
         <h2 className="shop-builder-title">{section.title}</h2>
-        {section.body && <p className="shop-builder-body">{section.body}</p>}
+        <BodyText className="shop-builder-body">{section.body}</BodyText>
       </div>
       <EmbedSectionClient
         mode={section.embedMode}

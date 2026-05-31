@@ -101,10 +101,14 @@ export type SectionColorScheme = "inherit" | "light" | "dark";
 export type EmbedMode = "iframe" | "code";
 export type LayoutBlockKind =
   | "hero"
+  | "button"
   | "promoStrip"
   | "grid"
+  | "heading"
+  | "hero"
   | "image"
   | "panel"
+  | "table"
   | "text"
   | "slider"
   | "embed"
@@ -180,8 +184,26 @@ export type BuilderLayoutBlock = {
   body?: string;
   buttonLabel?: string;
   buttonUrl?: string;
+  buttonTarget?: "_self" | "_blank";
+  buttonStyle?: "primary" | "secondary" | "outline" | "ghost" | "light";
+  secondaryButtonLabel?: string;
+  secondaryButtonUrl?: string;
+  secondaryButtonTarget?: "_self" | "_blank";
+  secondaryButtonStyle?: "primary" | "secondary" | "outline" | "ghost" | "light";
+  buttonsLayout?: "inline" | "stacked";
+  buttons?: {
+    id?: string;
+    label?: string;
+    url?: string;
+    target?: "_self" | "_blank";
+    style?: "primary" | "secondary" | "outline" | "ghost" | "light";
+  }[];
   imageUrl?: string;
   imageAlt?: string;
+  imageAlignment?: "left" | "center" | "right";
+  imageMaxWidth?: number;
+  imageBorderRadius?: number;
+  imageCaption?: string;
   elementBackgroundMode?: "default" | "transparent" | "custom";
   elementBackground?: string;
   elementPadding?: "none" | "small" | "medium" | "large";
@@ -213,7 +235,14 @@ export type BuilderLayoutBlock = {
   carouselSettings?: BuilderSection["carouselSettings"];
   iconName?: "sparkles" | "heart" | "truck" | "shield";
   items?: string[];
+  listIcon?: "check" | "circleCheck" | "arrowRight" | "star" | "heart" | "sparkles" | "shield";
+  headingText?: string;
+  headingLevel?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
+  headingAlign?: "left" | "center" | "right";
   dateLabel?: string;
+  tableHeadings?: string[];
+  tableRows?: string[][];
+  tableStyle?: "striped" | "bordered" | "plain";
   gridSource?: "static" | "products";
   gridRows?: number;
   gridGap?: "none" | "small" | "medium" | "large" | "max";

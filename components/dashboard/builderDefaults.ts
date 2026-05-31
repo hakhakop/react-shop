@@ -417,6 +417,25 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
     };
   }
 
+  if (kind === "button") {
+    return {
+      id,
+      kind,
+      buttonsLayout: "inline",
+      buttons: [
+        {
+          id: `btn-${Date.now().toString(36)}`,
+          label: "Button Text",
+          url: "/",
+          target: "_self",
+          style: "primary",
+        }
+      ],
+      elementPadding: "none",
+      elementBackgroundMode: "transparent",
+    };
+  }
+
   if (kind === "grid") {
     return {
       id,
@@ -470,6 +489,17 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
     };
   }
 
+  if (kind === "heading") {
+    return {
+      id,
+      kind,
+      headingText: "Your Heading Text",
+      headingLevel: "h2",
+      headingAlign: "left",
+      typography: defaultTypography,
+    };
+  }
+
   if (kind === "image") {
     return {
       id,
@@ -478,6 +508,25 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
       body: "A simple image block for banners, artwork, and visual breaks.",
       imageUrl: "",
       imageAlt: "",
+      imageAlignment: "center",
+      imageMaxWidth: 1200,
+      imageBorderRadius: 0,
+      imageCaption: "",
+    };
+  }
+
+  if (kind === "table") {
+    return {
+      id,
+      kind,
+      title: "Table",
+      body: "An editable data table.",
+      tableHeadings: ["Column A", "Column B", "Column C"],
+      tableRows: [
+        ["Row 1 Cell A", "Row 1 Cell B", "Row 1 Cell C"],
+        ["Row 2 Cell A", "Row 2 Cell B", "Row 2 Cell C"],
+      ],
+      tableStyle: "striped",
     };
   }
 
@@ -729,6 +778,7 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
       kind,
       title: "Feature List",
       items: ["Fast setup", "Reusable layouts", "Live visual editing"],
+      listIcon: "check",
     };
   }
 

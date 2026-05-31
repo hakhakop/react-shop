@@ -35,10 +35,14 @@ export const sectionLabels: Record<SectionKind, string> = {
 
 export const layoutBlockLabels: Record<LayoutBlockKind, string> = {
   hero: "Hero",
+  button: "Button",
   promoStrip: "Promo Strip",
   grid: "Grid",
+  heading: "Heading",
+  hero: "Hero",
   image: "Image",
   panel: "Panel",
+  table: "Table",
   text: "Text",
   slider: "Swiper / Carousel",
   embed: "HTML",
@@ -67,9 +71,13 @@ export const layoutBlockLabels: Record<LayoutBlockKind, string> = {
 
 export const baseLayoutBlockKinds: LayoutBlockKind[] = [
   "hero",
+  "button",
   "promoStrip",
   "grid",
+  "heading",
+  "image",
   "panel",
+  "table",
   "text",
   "slider",
   "fluentForm",
@@ -101,11 +109,14 @@ export const productLayoutBlockKinds: LayoutBlockKind[] = [
 
 export const layoutBlockDescriptions: Record<LayoutBlockKind, string> = {
   hero: "Large intro with eyebrow, title, copy, and button.",
+  button: "A standalone call-to-action button.",
   promoStrip: "Compact announcement, offer, or callout.",
   grid: "Configurable static or dynamic card grid.",
+  heading: "A standalone heading with level and alignment options.",
   image: "Simple image block with optional caption metadata.",
   panel: "Image, eyebrow, title, copy, and button in one content block.",
   text: "Static copy, button, and small editorial content.",
+  table: "Editable data table with headers and styled rows.",
   slider: "Swiper carousel with editable slides and images.",
   embed: "Forms, chat widgets, maps, or trusted HTML.",
   fluentForm: "Render a Fluent Forms form from WordPress by form ID.",
@@ -173,10 +184,13 @@ export const layoutBlockGroups: {
     label: "Content",
     kinds: [
       "hero",
+      "button",
       "promoStrip",
       "grid",
+      "heading",
       "image",
       "panel",
+      "table",
       "text",
       "slider",
       "badgeGrid",
@@ -194,10 +208,13 @@ export const layoutBlockGroups: {
 
 export const layoutBlockIcons: Record<LayoutBlockKind, LayoutBlockIconName> = {
   hero: "sparkles",
+  button: "navigation",
   promoStrip: "sparkles",
   grid: "grid",
+  heading: "text",
   image: "image",
   panel: "sparkles",
+  table: "grid",
   text: "text",
   slider: "gallery",
   embed: "code",
