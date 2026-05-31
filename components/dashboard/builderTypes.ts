@@ -345,6 +345,8 @@ export type BuilderSection = {
   layoutRows?: number;
   layoutItems?: {
     id?: string;
+    rowId?: string;
+    rowLayout?: string;
     eyebrow?: string;
     title?: string;
     body?: string;

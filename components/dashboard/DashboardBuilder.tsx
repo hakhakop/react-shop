@@ -45,7 +45,7 @@ import type {
   KeyboardEvent as ReactKeyboardEvent,
   MouseEvent as ReactMouseEvent,
 } from "react";
-import { useEffect, useMemo, useRef, useState, useCallback } from "react";
+import { Fragment, useEffect, useMemo, useRef, useState, useCallback } from "react";
 import { createPortal } from "react-dom";
 import CarouselBlock, {
   type CarouselSlide,
@@ -511,6 +511,14 @@ const previewButtonsStyle = (layout?: "inline" | "stacked", align?: "left" | "ce
   justifyContent: align === "center" ? "center" : align === "right" ? "flex-end" : "flex-start",
   alignItems: "center",
 });
+
+const rowInsertionPresets = [
+  { key: "whole", label: "1/1", ratios: [1] },
+  { key: "halves", label: "1/2 + 1/2", ratios: [1, 1] },
+  { key: "thirds", label: "1/3 + 1/3 + 1/3", ratios: [1, 1, 1] },
+  { key: "thirds-1-2", label: "1/3 + 2/3", ratios: [1, 2] },
+  { key: "thirds-2-1", label: "2/3 + 1/3", ratios: [2, 1] },
+] as const;
 
 const HAS_RICH_TEXT_HTML = /<[a-z][\s\S]*>/i;
 
@@ -3093,6 +3101,55 @@ export default function DashboardBuilder({
     }
   };
 
+  const addRowNear = (
+    sectionId: string,
+    rowIndex: number,
+    placement: "before" | "after",
+    presetKey: string,
+  ) => {
+    const preset = rowInsertionPresets.find((item) => item.key === presetKey);
+    if (!preset) return;
+
+    const rowId = `layout-row-${Date.now().toString(36)}`;
+    const newItems: PreviewLayoutItem[] = preset.ratios.map((_, index) => ({
+      id: `${rowId}-column-${index + 1}`,
+      rowId,
+      rowLayout: preset.key,
+      blocks: [],
+    }));
+    let firstColumnKey: string | null = newItems[0]?.id ?? null;
+
+    setBuilderState((current) => ({
+      ...current,
+      sections: current.sections.map((section) => {
+        if (section.id !== sectionId || section.kind !== "contentLayout") {
+          return section;
+        }
+
+        const layoutItems = section.layoutItems ?? [];
+        const layoutRows = getPreviewLayoutRows(section, layoutItems);
+        const targetRow = layoutRows[rowIndex];
+        const insertIndex = targetRow
+          ? targetRow.startIndex + (placement === "after" ? targetRow.items.length : 0)
+          : layoutItems.length;
+        const nextLayoutItems = [...layoutItems];
+        nextLayoutItems.splice(insertIndex, 0, ...newItems);
+
+        return {
+          ...section,
+          layoutItems: nextLayoutItems,
+          layoutRows: layoutRows.length + 1,
+        };
+      }),
+    }));
+
+    setSelectedId(sectionId);
+    setSelectedLayoutColumnKey(firstColumnKey);
+    setOpenLayoutItemId(firstColumnKey);
+    setSelectedLayoutBlockKey(null);
+    setPublishStatus("Row inserted");
+  };
+
   const moveSelected = (direction: -1 | 1) => {
     moveSection(selectedId, direction);
   };
@@ -5191,6 +5248,7 @@ export default function DashboardBuilder({
             onMoveSectionBadge={moveSectionBadgeByKey}
             onUploadGridItemImage={uploadGridItemImage}
             onAddWireframe={addWireframeNear}
+            onAddRow={addRowNear}
             onMoveSection={moveSection}
             onDuplicateSection={duplicateSection}
             onDeleteSection={deleteSection}
@@ -5502,6 +5560,7 @@ function PreviewCanvas({
   onMoveSectionBadge,
   onUploadGridItemImage,
   onAddWireframe,
+  onAddRow,
   onMoveSection,
   onDuplicateSection,
   onDeleteSection,
@@ -5635,6 +5694,12 @@ function PreviewCanvas({
     targetSectionId: string,
     placement: "above" | "below",
     presetKey?: string,
+  ) => void;
+  onAddRow: (
+    sectionId: string,
+    rowIndex: number,
+    placement: "before" | "after",
+    presetKey: string,
   ) => void;
   onMoveSection: (sectionId: string, direction: -1 | 1) => void;
   onDuplicateSection: (sectionId: string) => void;
@@ -6031,6 +6096,7 @@ function PreviewCanvas({
                   onDuplicateSectionBadge={onDuplicateSectionBadge}
                   onMoveSectionBadge={onMoveSectionBadge}
                   onUploadGridItemImage={onUploadGridItemImage}
+                  onAddRow={onAddRow}
                   onSetSidebarTab={onSetSidebarTab}
                   onOpenElementsPanel={onOpenElementsPanel}
                 />
@@ -6142,6 +6208,64 @@ function getPreviewLayoutBlocks(
     ];
   }
   return [];
+}
+
+type PreviewLayoutItem = NonNullable<BuilderSection["layoutItems"]>[number];
+
+type PreviewLayoutRow = {
+  id: string;
+  items: PreviewLayoutItem[];
+  layoutKey?: string;
+  startIndex: number;
+};
+
+function getPreviewLayoutRows(
+  section: BuilderSection,
+  items: PreviewLayoutItem[],
+): PreviewLayoutRow[] {
+  if (items.length === 0) return [];
+
+  const rows: PreviewLayoutRow[] = [];
+  const fallbackPreset = getBuilderRowLayoutPreset(section.layout);
+  const fallbackColumns = Math.max(
+    fallbackPreset?.ratios.length ?? section.layoutColumns ?? 2,
+    1,
+  );
+  let index = 0;
+
+  while (index < items.length) {
+    const item = items[index];
+    const rowId = item.rowId;
+    const rowLayout = item.rowLayout ?? section.layout;
+
+    if (rowId) {
+      const rowItems: PreviewLayoutItem[] = [];
+      const startIndex = index;
+      while (index < items.length && items[index]?.rowId === rowId) {
+        rowItems.push(items[index]);
+        index += 1;
+      }
+      rows.push({
+        id: rowId,
+        items: rowItems,
+        layoutKey: rowLayout,
+        startIndex,
+      });
+      continue;
+    }
+
+    const startIndex = index;
+    const rowItems = items.slice(index, index + fallbackColumns);
+    rows.push({
+      id: `legacy-row-${startIndex}`,
+      items: rowItems,
+      layoutKey: rowLayout,
+      startIndex,
+    });
+    index += rowItems.length;
+  }
+
+  return rows;
 }
 
 function getPreviewGoodieIcon(iconName: BuilderLayoutBlock["iconName"]) {
@@ -6448,6 +6572,34 @@ function InlineEditableText({
   );
 }
 
+function RowInsertControl({
+  placement,
+  onClick,
+}: {
+  placement: "before" | "after";
+  onClick: () => void;
+}) {
+  return (
+    <div
+      className={`builder-preview-row-insert builder-preview-row-insert--${placement}`}
+      onClick={(event) => event.stopPropagation()}
+      onMouseDown={(event) => event.stopPropagation()}
+      onDragStart={(event) => event.stopPropagation()}
+    >
+      <button
+        type="button"
+        className="builder-preview-row-insert-trigger"
+        onClick={onClick}
+        aria-label={`Add row ${placement}`}
+        title={`Add row ${placement}`}
+      >
+        <Plus size={14} />
+        <span>Add Row</span>
+      </button>
+    </div>
+  );
+}
+
 function PreviewSection({
   section,
   previewProducts,
@@ -6482,6 +6634,7 @@ function PreviewSection({
   onDuplicateSectionBadge,
   onMoveSectionBadge,
   onUploadGridItemImage,
+  onAddRow,
   onSetSidebarTab,
   onOpenElementsPanel,
 }: {
@@ -6596,6 +6749,12 @@ function PreviewSection({
     itemIndex: number,
     file: File | null,
   ) => void;
+  onAddRow: (
+    sectionId: string,
+    rowIndex: number,
+    placement: "before" | "after",
+    presetKey: string,
+  ) => void;
   onDeleteButton: (
     sectionId: string,
     columnKey: string,
@@ -6644,6 +6803,75 @@ function PreviewSection({
     fromIndex: number;
   } | null>(null);
   const [dropHoverIndex, setDropHoverIndex] = useState<number | null>(null);
+  const [rowInsertTarget, setRowInsertTarget] = useState<{
+    rowIndex: number;
+    placement: "before" | "after";
+  } | null>(null);
+  const rowLayoutPicker = rowInsertTarget ? (
+    <div
+      className="builder-layout-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="builder-row-layout-picker-title"
+      onClick={() => setRowInsertTarget(null)}
+    >
+      <div
+        className="builder-layout-dialog"
+        onClick={(event) => event.stopPropagation()}
+      >
+        <div className="builder-layout-header">
+          <div>
+            <strong id="builder-row-layout-picker-title">
+              Choose row layout
+            </strong>
+            <span>
+              Insert a row {rowInsertTarget.placement} the selected row.
+            </span>
+          </div>
+          <button
+            type="button"
+            className="builder-layout-close"
+            onClick={() => setRowInsertTarget(null)}
+            aria-label="Close row layout picker"
+          >
+            <X size={15} />
+          </button>
+        </div>
+
+        <div className="builder-layout-picker-grid">
+          {rowInsertionPresets.map((preset) => (
+            <button
+              key={preset.key}
+              type="button"
+              className="builder-layout-picker-card"
+              onClick={() => {
+                onAddRow(
+                  section.id,
+                  rowInsertTarget.rowIndex,
+                  rowInsertTarget.placement,
+                  preset.key,
+                );
+                setRowInsertTarget(null);
+              }}
+            >
+              <span className="builder-layout-picker-card-copy">
+                <strong>{preset.label}</strong>
+                <small>Add row</small>
+              </span>
+              <span
+                className="builder-layout-picker-preview"
+                aria-hidden="true"
+              >
+                {preset.ratios.map((ratio, index) => (
+                  <i key={`${preset.key}-${index}`} style={{ flex: ratio }} />
+                ))}
+              </span>
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  ) : null;
 
   if (section.kind === "hero") {
     return (
@@ -6914,9 +7142,47 @@ function PreviewSection({
             body: "Choose one, two, or three columns from the dashboard.",
           },
         ];
-    const previewLayoutTemplate = getBuilderRowLayoutPreviewTemplate(
-      section.layout,
-    );
+    const layoutRows = getPreviewLayoutRows(section, items);
+    const rowMetaByColumnKey = new Map<
+      string,
+      {
+        rowIndex: number;
+        columnIndex: number;
+        isRowStart: boolean;
+        isRowEnd: boolean;
+        span: number;
+      }
+    >();
+    layoutRows.forEach((row, rowIndex) => {
+      const preset = getBuilderRowLayoutPreset(row.layoutKey);
+      const ratios =
+        preset?.ratios.length === row.items.length
+          ? preset.ratios
+          : row.items.map(() => 1);
+      const total = ratios.reduce((sum, ratio) => sum + ratio, 0) || 1;
+      let usedSpan = 0;
+
+      row.items.forEach((item, columnIndex) => {
+        const flatIndex = row.startIndex + columnIndex;
+        const columnKey = item.id ?? `layout-item-${flatIndex}`;
+        const remainingColumns = row.items.length - columnIndex - 1;
+        const span =
+          columnIndex === row.items.length - 1
+            ? Math.max(1, 12 - usedSpan)
+            : Math.min(
+                Math.max(1, Math.round((ratios[columnIndex] / total) * 12)),
+                12 - usedSpan - remainingColumns,
+              );
+        usedSpan += span;
+        rowMetaByColumnKey.set(columnKey, {
+          rowIndex,
+          columnIndex,
+          isRowStart: columnIndex === 0,
+          isRowEnd: columnIndex === row.items.length - 1,
+          span,
+        });
+      });
+    });
     return (
       <div className="shop-builder-section-content builder-preview-content-layout">
         {(section.eyebrow || section.title || section.body) && (
@@ -6956,12 +7222,13 @@ function PreviewSection({
             {
               "--builder-preview-layout-columns": section.layoutColumns ?? 2,
               "--builder-layout-columns": section.layoutColumns ?? 2,
-              gridTemplateColumns: previewLayoutTemplate ?? undefined,
+              gridTemplateColumns: "repeat(12, minmax(0, 1fr))",
             } as CSSProperties
           }
         >
           {items.map((item, index) => {
             const columnKey = item.id ?? `layout-item-${index}`;
+            const rowMeta = rowMetaByColumnKey.get(columnKey);
             const blocks = getPreviewLayoutBlocks(item);
             const cardStyle =
               blocks.find(
@@ -6974,8 +7241,19 @@ function PreviewSection({
               "default";
 
             return (
+              <Fragment key={columnKey}>
+                {rowMeta?.isRowStart && (
+                  <RowInsertControl
+                    placement="before"
+                    onClick={() =>
+                      setRowInsertTarget({
+                        rowIndex: rowMeta.rowIndex,
+                        placement: "before",
+                      })
+                    }
+                  />
+                )}
               <article
-                key={columnKey}
                 className={`shop-builder-content-layout-card shop-card-preset--${cardStyle} ${
                   blocks.length === 0 ? "is-empty-column" : ""
                 } ${
@@ -6985,6 +7263,7 @@ function PreviewSection({
                 } ${
                   dragOverKey === `col:${columnKey}` ? "is-drag-over" : ""
                 }`}
+                style={{ gridColumn: `span ${rowMeta?.span ?? 12}` }}
                 onClick={(event) => {
                   event.stopPropagation();
                   onSelectColumn(section.id, columnKey);
@@ -7069,13 +7348,14 @@ function PreviewSection({
                 }}
               >
                 <div className="builder-preview-column-label">
-                  Column {index + 1}
+                  Row {(rowMeta?.rowIndex ?? 0) + 1} / Column{" "}
+                  {(rowMeta?.columnIndex ?? index) + 1}
                 </div>
                 {blocks.length === 0 && (
                   <div
                     className="builder-preview-drop-zone"
-                    aria-label={`Drop element into column ${index + 1}`}
-                    title={`Drop element into column ${index + 1}`}
+                    aria-label={`Drop element into row ${(rowMeta?.rowIndex ?? 0) + 1}, column ${(rowMeta?.columnIndex ?? index) + 1}`}
+                    title={`Drop element into row ${(rowMeta?.rowIndex ?? 0) + 1}, column ${(rowMeta?.columnIndex ?? index) + 1}`}
                     onClick={(event) => {
                       event.stopPropagation();
                       onOpenElementsPanel();
@@ -8509,9 +8789,22 @@ function PreviewSection({
                   );
                 })}
               </article>
+                {rowMeta?.isRowEnd && (
+                  <RowInsertControl
+                    placement="after"
+                    onClick={() =>
+                      setRowInsertTarget({
+                        rowIndex: rowMeta.rowIndex,
+                        placement: "after",
+                      })
+                    }
+                  />
+                )}
+              </Fragment>
             );
           })}
         </div>
+        {rowLayoutPicker ? createPortal(rowLayoutPicker, document.body) : null}
       </div>
     );
   }

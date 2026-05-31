@@ -41,7 +41,7 @@
         "visible": true,
         "layout": "thirds-2-1",
         "layoutColumns": 2,
-        "layoutRows": 1,
+        "layoutRows": 4,
         "visualStyle": {
           "background": {
             "type": "gradient",
@@ -49,6 +49,12 @@
           }
         },
         "layoutItems": [
+          {
+            "id": "layout-row-mptvf2qp-column-1",
+            "rowId": "layout-row-mptvf2qp",
+            "rowLayout": "whole",
+            "blocks": []
+          },
           {
             "id": "webpages-am-hero-copy",
             "blocks": [
@@ -165,6 +171,18 @@
                 ]
               }
             ]
+          },
+          {
+            "id": "layout-row-mptvo8s6-column-1",
+            "rowId": "layout-row-mptvo8s6",
+            "rowLayout": "whole",
+            "blocks": []
+          },
+          {
+            "id": "layout-row-mptvp786-column-1",
+            "rowId": "layout-row-mptvp786",
+            "rowLayout": "whole",
+            "blocks": []
           }
         ]
       },
@@ -1156,7 +1174,7 @@
         ]
       }
     ],
-    "updatedAt": "2026-05-31T13:49:14.175Z"
+    "updatedAt": "2026-05-31T14:38:03.573Z"
   },
   "shop": {
     "version": 1,
@@ -1856,7 +1874,7 @@
         "id": "contentLayout-mpmy6h4q-jkrtu",
         "kind": "contentLayout",
         "title": "",
-        "background": "#ffffff",
+        "background": "#24241f",
         "backgroundMode": "boxed",
         "contentMode": "boxed",
         "colorScheme": "inherit",
@@ -1885,7 +1903,7 @@
         "layoutRows": 1
       }
     ],
-    "updatedAt": "2026-05-26T18:07:41.872Z"
+    "updatedAt": "2026-05-31T14:51:20.214Z"
   },
   "page:hello": {
     "version": 1,

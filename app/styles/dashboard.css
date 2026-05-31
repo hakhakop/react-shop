@@ -3422,6 +3422,46 @@ body[data-storefront-preset="princity"]
   gap: 16px;
 }
 
+.builder-preview-row-insert {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: center;
+  min-height: 28px;
+}
+
+.builder-preview-row-insert-trigger {
+  min-height: 26px;
+  padding: 4px 10px;
+  border: 1px dashed rgba(17, 17, 17, 0.18);
+  border-radius: 999px;
+  background: color-mix(
+    in srgb,
+    var(--builder-preview-section-surface, #f4f4ef) 78%,
+    transparent
+  );
+  color: var(
+    --builder-preview-section-text,
+    var(--builder-preview-text, #111111)
+  );
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: 0;
+  opacity: 0.72;
+  cursor: pointer;
+}
+
+.builder-preview-row-insert-trigger:hover {
+  border-color: rgba(13, 115, 255, 0.38);
+  background: rgba(13, 115, 255, 0.08);
+  color: rgba(13, 115, 255, 0.92);
+  opacity: 1;
+}
+
 .builder-preview-content-layout-grid article {
   position: relative;
   min-width: 0;
