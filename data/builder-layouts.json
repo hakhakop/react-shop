@@ -1266,7 +1266,7 @@
                 "gridLimit": 12,
                 "filterPosition": "top",
                 "cardStyle": "none",
-                "cardPreset": "standard",
+                "cardPreset": "princity-flat",
                 "imagePadding": "none",
                 "cardPadding": "none"
               }
@@ -1316,7 +1316,7 @@
         "layoutRows": 1
       }
     ],
-    "updatedAt": "2026-05-27T07:29:55.327Z"
+    "updatedAt": "2026-06-01T04:25:27.180Z"
   },
   "client": {
     "version": 1,

@@ -52,6 +52,9 @@ type LooseHandler = (...args: any[]) => void;
 type BackgroundPreset = { label: string; value: string; scheme?: string };
 const panelStyleOptions: { label: string; value: BuilderPanelStyle }[] = [
   { label: "Default", value: "default" },
+  { label: "Princity", value: "princity" },
+  { label: "Princity Flat", value: "princity-flat" },
+  { label: "Princity Line", value: "princity-line" },
   { label: "Secondary", value: "secondary" },
   { label: "Dark", value: "dark" },
   { label: "Light", value: "light" },
@@ -2364,6 +2367,15 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                 >
                                                   <option value="standard">
                                                     Standard
+                                                  </option>
+                                                  <option value="princity">
+                                                    Princity
+                                                  </option>
+                                                  <option value="princity-flat">
+                                                    Princity Flat
+                                                  </option>
+                                                  <option value="princity-line">
+                                                    Princity Line
                                                   </option>
                                                   <option value="graph">
                                                     Graph Clean
@@ -4866,6 +4878,9 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                               }
                             >
                               <option value="standard">Standard</option>
+                              <option value="princity">Princity</option>
+                              <option value="princity-flat">Princity Flat</option>
+                              <option value="princity-line">Princity Line</option>
                               <option value="graph">Graph Clean</option>
                               <option value="gallery">Gallery</option>
                               <option value="editorial">Editorial</option>

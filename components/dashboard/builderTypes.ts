@@ -48,6 +48,9 @@ export type BuilderShellSettings = {
 };
 export type BuilderPanelStyle =
   | "default"
+  | "princity"
+  | "princity-flat"
+  | "princity-line"
   | "secondary"
   | "dark"
   | "light"
@@ -224,7 +227,10 @@ export type BuilderLayoutBlock = {
     | "editorial"
     | "compact"
     | "minimal"
-    | "luxury";
+    | "luxury"
+    | "princity"
+    | "princity-flat"
+    | "princity-line";
   gridLimit?: number;
   source?: "all" | "featured" | "category";
   categoryId?: string;
@@ -320,7 +326,10 @@ export type BuilderSection = {
     | "editorial"
     | "compact"
     | "minimal"
-    | "luxury";
+    | "luxury"
+    | "princity"
+    | "princity-flat"
+    | "princity-line";
   gridGap?: "none" | "small" | "medium" | "large" | "max";
   cardPadding?: "none" | "small" | "medium" | "large" | "max";
   imagePadding?: "none" | "small" | "medium" | "large" | "max";

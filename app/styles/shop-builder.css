@@ -1138,8 +1138,81 @@
 
 .shop-card-preset--dark .shop-builder-grid-card:hover,
 .shop-card-preset--flat-dark .shop-builder-grid-card:hover,
-.shop-card-preset--flat-white .shop-builder-grid-card:hover {
+.shop-card-preset--flat-white .shop-builder-grid-card:hover,
+.shop-card-preset--princity-flat .shop-builder-grid-card:hover {
   transform: none;
+  box-shadow: none;
+}
+
+/* ── Princity presets ── */
+
+.shop-card-preset--princity .shop-builder-grid-card {
+  background: #efefe9;
+  border: none;
+  box-shadow: 0 12px 30px rgba(17, 17, 17, 0.06);
+  color: #111111;
+}
+
+.shop-card-preset--princity .shop-builder-grid-content small,
+.shop-card-preset--princity .shop-builder-grid-content p {
+  color: #5f5f58;
+}
+
+.shop-card-preset--princity .shop-builder-grid-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 18px 42px rgba(17, 17, 17, 0.1);
+}
+
+.shop-card-preset--princity-flat .shop-builder-grid-card {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  color: #111111;
+}
+
+.shop-card-preset--princity-flat .shop-builder-grid-content small,
+.shop-card-preset--princity-flat .shop-builder-grid-content p {
+  color: #5f5f58;
+}
+
+.shop-card-preset--princity-flat .shop-builder-grid-card:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.shop-card-preset--princity-line .shop-builder-grid-card {
+  background: transparent;
+  border: 1px solid rgba(17, 17, 17, 0.12);
+  box-shadow: none;
+  color: #111111;
+}
+
+.shop-card-preset--princity-line .shop-builder-grid-content small,
+.shop-card-preset--princity-line .shop-builder-grid-content p {
+  color: #5f5f58;
+}
+
+.shop-card-preset--princity-line .shop-builder-grid-card:hover {
+  transform: translateY(-2px);
+  border-color: #a4be7b;
+  box-shadow: none;
+}
+
+.shop-builder-element-shell.shop-card-preset--princity .shop-builder-column-badges article {
+  background: #efefe9;
+  border: none;
+  box-shadow: 0 12px 30px rgba(17, 17, 17, 0.06);
+}
+
+.shop-builder-element-shell.shop-card-preset--princity-flat .shop-builder-column-badges article {
+  background: #efefe9;
+  border: none;
+  box-shadow: none;
+}
+
+.shop-builder-element-shell.shop-card-preset--princity-line .shop-builder-column-badges article {
+  background: transparent;
+  border: 1px solid rgba(17, 17, 17, 0.12);
   box-shadow: none;
 }
 
@@ -1864,7 +1937,9 @@
 }
 
 .shop-builder-element-shell.shop-card-preset--flat-dark .shop-builder-column-badges article,
-.shop-builder-element-shell.shop-card-preset--flat-white .shop-builder-column-badges article {
+.shop-builder-element-shell.shop-card-preset--flat-white .shop-builder-column-badges article,
+.shop-builder-element-shell.shop-card-preset--princity-flat .shop-builder-column-badges article,
+.shop-builder-element-shell.shop-card-preset--princity-line .shop-builder-column-badges article {
   box-shadow: none;
 }
 
