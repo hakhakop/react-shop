@@ -16,6 +16,10 @@ import CarouselBlock, {
   type CarouselSlide,
 } from "@/components/blocks/CarouselBlock";
 import HomeGsapAnimations from "@/components/animations/HomeGsapAnimations";
+import BuilderScrollAnimations from "@/components/builder/BuilderScrollAnimations";
+import ScrollReveal from "@/components/builder/ScrollReveal";
+import type { ScrollRevealConfig } from "@/components/builder/ScrollReveal";
+import PrincityGradientTracker from "@/components/builder/PrincityGradientTracker";
 import CategoryWithFilters from "@/components/CategoryWithFilters";
 import CategoryBar from "@/components/CategoryBar";
 import EmbedSectionClient from "@/components/builder/EmbedSectionClient";
@@ -42,6 +46,10 @@ import {
   visualStyleClassName,
   visualStyleToCss,
 } from "@/lib/builderVisualStyle";
+import {
+  getBuilderLayoutRows,
+  getBuilderRowLayoutPreset,
+} from "@/components/dashboard/builderLayoutPresets";
 
 type StorefrontBuilderRendererProps = {
   layout: BuilderLayout;
@@ -75,6 +83,20 @@ type StorefrontBuilderProduct = {
 };
 
 type BuilderStyle = CSSProperties & Record<`--${string}`, string | undefined>;
+type BuilderAnimation = {
+  preset?: string;
+  delayMs?: number;
+  durationMs?: number;
+  easing?: "ease-out" | "ease-in-out" | "spring";
+  triggerOffset?: number;
+  playOnce?: boolean;
+  progressSmoothingMs?: number;
+  scrubDistanceVh?: number;
+  stepOffset?: number;
+  once?: boolean;
+  pauseUntilComplete?: boolean;
+  progressDirection?: "horizontal" | "vertical";
+};
 
 const pageLabels: Partial<Record<BuilderPage, string>> = {
   home: "Home",
@@ -292,7 +314,101 @@ function sectionClassName(section: BuilderSection, extra = "") {
   const visualClass = visualStyleClassName(
     section.visualStyle as BuilderVisualStyle | undefined,
   );
-  return `shop-builder-section shop-builder-section--${mode} shop-builder-section--content-${contentMode} shop-builder-section--scheme-${scheme} ${visualClass} ${extra}`.trim();
+  const srClass = isScrollRevealPreset(section.animation) ? "shop-builder-section--scroll-reveal" : "";
+  return `shop-builder-section shop-builder-section--${mode} shop-builder-section--content-${contentMode} shop-builder-section--scheme-${scheme} ${visualClass} ${animationClassName(section.animation)} ${srClass} ${extra}`.trim();
+}
+
+const scrollRevealPresets = new Set([
+  "fade-up",
+  "fade-down",
+  "fade-in",
+  "slide-left",
+  "slide-right",
+  "scale-up",
+  "zoom-in",
+  "flip-up",
+  "blur-in",
+  "stagger",
+]);
+
+const styleOnlyPresets = new Set([
+  "princity-gradient",
+]);
+
+function isScrollRevealPreset(animation?: BuilderAnimation | Record<string, unknown>) {
+  const preset =
+    animation && typeof animation.preset === "string"
+      ? animation.preset
+      : "none";
+  return scrollRevealPresets.has(preset);
+}
+
+function animationPreset(animation?: BuilderAnimation | Record<string, unknown>) {
+  const preset =
+    animation && typeof animation.preset === "string"
+      ? animation.preset
+      : "none";
+  return preset === "none" ? null : preset;
+}
+
+function animationClassName(
+  animation?: BuilderAnimation | Record<string, unknown>,
+) {
+  const preset = animationPreset(animation);
+  if (!preset) return "";
+  if (isScrollRevealPreset(animation)) return "";
+  return `shop-builder-animate--${preset}`;
+}
+
+function animationDataAttributes(
+  animation?: BuilderAnimation | Record<string, unknown>,
+) {
+  const preset = animationPreset(animation);
+
+  if (!preset || isScrollRevealPreset(animation) || styleOnlyPresets.has(preset)) {
+    return {
+      data: {},
+      style: undefined,
+    };
+  }
+
+  const delay =
+    typeof animation?.delayMs === "number" && Number.isFinite(animation.delayMs)
+      ? `${Math.max(0, animation.delayMs)}ms`
+      : undefined;
+  const progressSmoothing =
+    typeof animation?.progressSmoothingMs === "number" &&
+    Number.isFinite(animation.progressSmoothingMs)
+      ? `${Math.max(0, animation.progressSmoothingMs)}ms`
+      : undefined;
+  const scrubDistance =
+    typeof animation?.scrubDistanceVh === "number" &&
+    Number.isFinite(animation.scrubDistanceVh)
+      ? `${Math.max(40, animation.scrubDistanceVh)}vh`
+      : undefined;
+  const stepOffset =
+    typeof animation?.stepOffset === "number" &&
+    Number.isFinite(animation.stepOffset)
+      ? String(animation.stepOffset)
+      : undefined;
+  const style = {
+    ...(delay ? { "--builder-animate-delay": delay } : {}),
+    ...(progressSmoothing
+      ? { "--builder-progress-smoothing": progressSmoothing }
+      : {}),
+    ...(scrubDistance ? { "--builder-pin-distance": scrubDistance } : {}),
+  } as BuilderStyle;
+
+  return {
+    data: {
+      "data-builder-animate": preset,
+      "data-builder-animate-once": animation?.once === false ? "false" : "true",
+      "data-builder-pause": animation?.pauseUntilComplete ? "true" : undefined,
+      "data-builder-step-offset": stepOffset,
+      "data-builder-progress-direction": animation?.progressDirection === "vertical" ? "vertical" : undefined,
+    },
+    style: Object.keys(style).length ? style : undefined,
+  };
 }
 
 function SectionFrame({
@@ -304,12 +420,15 @@ function SectionFrame({
   extra?: string;
   children: ReactNode;
 }) {
+  const animationAttrs = animationDataAttributes(section.animation);
+
   return (
     <section
       id={section.id}
       className={sectionClassName(section, extra)}
-      style={sectionStyle(section)}
+      style={{ ...sectionStyle(section), ...animationAttrs.style }}
       data-gsap-section={section.kind === "hero" ? "hero" : section.kind}
+      {...animationAttrs.data}
     >
       <div
         className="shop-builder-section-content"
@@ -1612,7 +1731,7 @@ function blockShellClassName(block: BuilderLayoutBlock) {
     block.elementPadding ?? "none"
   } is-align-${
     block.elementAlign ?? "left"
-  } ${visualClass}`.trim();
+  } ${visualClass} ${animationClassName(block.animation)}`.trim();
 }
 
 function Typog({ as: As = "div", typography, className, children, ...props }: any) {
@@ -1688,6 +1807,39 @@ function ContentLayoutSection({
         },
       ];
 
+  const layoutRows = getBuilderLayoutRows(section, items);
+  const rowMetaByColumnKey = new Map<
+    string,
+    {
+      span: number;
+    }
+  >();
+
+  layoutRows.forEach((row) => {
+    const preset = getBuilderRowLayoutPreset(row.layoutKey);
+    const ratios =
+      preset?.ratios.length === row.items.length
+        ? preset.ratios
+        : row.items.map(() => 1);
+    const total = ratios.reduce((sum, ratio) => sum + ratio, 0) || 1;
+    let usedSpan = 0;
+
+    row.items.forEach((item, columnIndex) => {
+      const flatIndex = row.startIndex + columnIndex;
+      const columnKey = item.id ?? `layout-item-${flatIndex}`;
+      const remainingColumns = row.items.length - columnIndex - 1;
+      const span =
+        columnIndex === row.items.length - 1
+          ? Math.max(1, 12 - usedSpan)
+          : Math.min(
+              Math.max(1, Math.round((ratios[columnIndex] / total) * 12)),
+              12 - usedSpan - remainingColumns,
+            );
+      usedSpan += span;
+      rowMetaByColumnKey.set(columnKey, { span });
+    });
+  });
+
   return (
     <SectionFrame section={section} extra="shop-builder-content-layout">
       {(section.eyebrow || section.title || section.body) && (
@@ -1705,11 +1857,16 @@ function ContentLayoutSection({
         className="shop-builder-content-layout-grid"
         style={
           {
-            "--builder-layout-columns": section.layoutColumns ?? 2,
+            gridTemplateColumns: "repeat(12, minmax(0, 1fr))",
+            "--builder-layout-columns": 12,
           } as CSSProperties
         }
       >
         {items.map((item, index) => {
+          const columnKey = item.id ?? `layout-item-${index}`;
+          const rowMeta = rowMetaByColumnKey.get(columnKey);
+          const span = rowMeta?.span ?? 12;
+
           const blocks = getContentLayoutBlocks(item);
           const cardStyle =
             blocks.find(
@@ -1723,26 +1880,37 @@ function ContentLayoutSection({
 
           return (
             <article
-              key={item.id ?? index}
+              key={columnKey}
               className={`shop-builder-content-layout-card shop-card-preset--${cardStyle}`}
+              style={{ gridColumn: `span ${span}` }}
             >
-              {blocks.map((block, blockIndex) => (
-                <div
-                  key={block.id ?? blockIndex}
-                  className={blockShellClassName(block)}
-                  style={blockSurfaceStyle(block)}
-                >
-                  <ContentLayoutBlock
-                    block={block}
-                    product={product}
-                    breadcrumbItems={breadcrumbItems}
-                    page={page}
-                    pageContent={pageContent}
-                    categoryTree={categoryTree}
-                    activeCategorySlug={activeCategorySlug}
-                  />
-                </div>
-              ))}
+              {blocks.map((block, blockIndex) => {
+                const blockAnimationAttrs = animationDataAttributes(
+                  block.animation,
+                );
+
+                return (
+                  <div
+                    key={block.id ?? blockIndex}
+                    className={blockShellClassName(block)}
+                    style={{
+                      ...blockSurfaceStyle(block),
+                      ...blockAnimationAttrs.style,
+                    }}
+                    {...blockAnimationAttrs.data}
+                  >
+                    <ContentLayoutBlock
+                      block={block}
+                      product={product}
+                      breadcrumbItems={breadcrumbItems}
+                      page={page}
+                      pageContent={pageContent}
+                      categoryTree={categoryTree}
+                      activeCategorySlug={activeCategorySlug}
+                    />
+                  </div>
+                );
+              })}
             </article>
           );
         })}
@@ -1826,20 +1994,18 @@ function BuilderSectionRenderer({
 }) {
   if (!section.visible) return null;
 
-  if (section.kind === "hero") {
-    return <HeroSection section={section} product={product} />;
-  }
+  let content: ReactNode;
 
-  if (section.kind === "recentlyViewed") {
-    return (
+  if (section.kind === "hero") {
+    content = <HeroSection section={section} product={product} />;
+  } else if (section.kind === "recentlyViewed") {
+    content = (
       <SectionFrame section={section}>
         <RecentlyViewedStrip />
       </SectionFrame>
     );
-  }
-
-  if (section.kind === "productArchive") {
-    return (
+  } else if (section.kind === "productArchive") {
+    content = (
       <SectionFrame section={section} extra="shop-builder-products">
         <Suspense fallback={<ProductsSkeleton />}>
           <BuilderProductsSection
@@ -1851,22 +2017,14 @@ function BuilderSectionRenderer({
         </Suspense>
       </SectionFrame>
     );
-  }
-
-  if (section.kind === "filters") {
-    return <FilterPillsSection section={section} />;
-  }
-
-  if (section.kind === "promo") {
-    return <PromoSection section={section} />;
-  }
-
-  if (section.kind === "badgeGrid") {
-    return <BadgeGridSection section={section} />;
-  }
-
-  if (section.kind === "contentLayout") {
-    return (
+  } else if (section.kind === "filters") {
+    content = <FilterPillsSection section={section} />;
+  } else if (section.kind === "promo") {
+    content = <PromoSection section={section} />;
+  } else if (section.kind === "badgeGrid") {
+    content = <BadgeGridSection section={section} />;
+  } else if (section.kind === "contentLayout") {
+    content = (
       <ContentLayoutSection
         section={section}
         product={product}
@@ -1877,17 +2035,37 @@ function BuilderSectionRenderer({
         activeCategorySlug={activeCategorySlug}
       />
     );
+  } else if (section.kind === "slider") {
+    content = <SliderSection section={section} />;
+  } else if (section.kind === "embed") {
+    content = <EmbedSection section={section} />;
+  } else {
+    return null;
   }
 
-  if (section.kind === "slider") {
-    return <SliderSection section={section} />;
+  if (isScrollRevealPreset(section.animation)) {
+    const anim = section.animation as BuilderAnimation;
+    return (
+      <ScrollReveal
+        config={{
+          preset: anim.preset as ScrollRevealConfig["preset"],
+          duration: anim.durationMs,
+          delay: anim.delayMs ? anim.delayMs / 1000 : undefined,
+          easing: anim.easing,
+          playOnce: anim.playOnce,
+          triggerOffset: anim.triggerOffset,
+        }}
+      >
+        {content}
+      </ScrollReveal>
+    );
   }
 
-  if (section.kind === "embed") {
-    return <EmbedSection section={section} />;
+  if (styleOnlyPresets.has(animationPreset(section.animation) ?? "")) {
+    return <PrincityGradientTracker>{content}</PrincityGradientTracker>;
   }
 
-  return null;
+  return content;
 }
 
 export default function StorefrontBuilderRenderer({
@@ -1926,6 +2104,7 @@ export default function StorefrontBuilderRenderer({
       style={designStyle(layout)}
       data-gsap-home={isHomePage ? true : undefined}
     >
+      <BuilderScrollAnimations />
       {isHomePage && <HomeGsapAnimations />}
       <div className="shop-builder-inner">
         {layout.sections.map((section) => (

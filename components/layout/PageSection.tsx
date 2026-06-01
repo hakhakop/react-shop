@@ -56,22 +56,6 @@ function spacingToPx(size: SpacingSize): number {
   }
 }
 
-function spacingClass(prefix: "pt" | "pb", size: SpacingSize) {
-  switch (size) {
-    case "none":
-      return `${prefix}-0`;
-    case "sm":
-      return `${prefix}-6 md:${prefix}-8`;
-    case "lg":
-      return `${prefix}-16 md:${prefix}-24`;
-    case "xl":
-      return `${prefix}-20 md:${prefix}-28`;
-    case "md":
-    default:
-      return `${prefix}-10 md:${prefix}-14`;
-  }
-}
-
 function normalizeBackground(value?: string | null): BackgroundVariant {
   if (!value) return "default";
 

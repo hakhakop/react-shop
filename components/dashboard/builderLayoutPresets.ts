@@ -1,3 +1,5 @@
+import type { BuilderSection } from "@/lib/builderLayouts";
+
 export type BuilderRowLayoutPreset = {
   key: string;
   label: string;
@@ -174,4 +176,63 @@ export function getBuilderRowLayoutSummary(
     return `${fallbackColumns} columns`;
   }
   return "Choose a row layout";
+}
+
+export type LayoutItem = NonNullable<BuilderSection["layoutItems"]>[number];
+
+export type BuilderLayoutRow = {
+  id: string;
+  items: LayoutItem[];
+  layoutKey?: string;
+  startIndex: number;
+};
+
+export function getBuilderLayoutRows(
+  section: BuilderSection,
+  items: LayoutItem[],
+): BuilderLayoutRow[] {
+  if (items.length === 0) return [];
+
+  const rows: BuilderLayoutRow[] = [];
+  const fallbackPreset = getBuilderRowLayoutPreset(section.layout);
+  const fallbackColumns = Math.max(
+    fallbackPreset?.ratios.length ?? section.layoutColumns ?? 2,
+    1,
+  );
+  let index = 0;
+
+  while (index < items.length) {
+    const item = items[index];
+    if (!item) break;
+    const rowId = item.rowId;
+    const rowLayout = item.rowLayout ?? section.layout;
+
+    if (rowId) {
+      const rowItems: LayoutItem[] = [];
+      const startIndex = index;
+      while (index < items.length && items[index]?.rowId === rowId) {
+        rowItems.push(items[index]!);
+        index += 1;
+      }
+      rows.push({
+        id: rowId,
+        items: rowItems,
+        layoutKey: rowLayout,
+        startIndex,
+      });
+      continue;
+    }
+
+    const startIndex = index;
+    const rowItems = items.slice(index, index + fallbackColumns);
+    rows.push({
+      id: `legacy-row-${startIndex}`,
+      items: rowItems,
+      layoutKey: rowLayout,
+      startIndex,
+    });
+    index += rowItems.length;
+  }
+
+  return rows;
 }
