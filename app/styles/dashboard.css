@@ -3597,6 +3597,53 @@ body[data-storefront-preset="princity"]
   cursor: grab;
 }
 
+.builder-preview-layout-block[data-builder-pause="true"] {
+  min-height: calc(100svh + var(--builder-pin-distance, 120vh));
+  opacity: 1;
+  filter: none;
+  overflow: visible;
+}
+
+.builder-preview-layout-block[data-builder-pause="true"] .shop-builder-column-block {
+  position: sticky;
+  top: clamp(64px, 10vh, 118px);
+  opacity: var(--builder-pinned-progress);
+  transform: translate3d(0, calc(var(--builder-pinned-inverse) * 26px), 0);
+  transition: none;
+  will-change: opacity, transform;
+}
+
+.builder-preview-layout-block[data-builder-pause="true"][data-builder-animate="fade-in"] .shop-builder-column-block {
+  transform: none;
+}
+
+.builder-preview-layout-block[data-builder-pause="true"][data-builder-animate="slide-left"] .shop-builder-column-block {
+  transform: translate3d(calc(var(--builder-pinned-inverse) * -44px), 0, 0);
+}
+
+.builder-preview-layout-block[data-builder-pause="true"][data-builder-animate="slide-right"] .shop-builder-column-block {
+  transform: translate3d(calc(var(--builder-pinned-inverse) * 44px), 0, 0);
+}
+
+.builder-preview-layout-block[data-builder-pause="true"][data-builder-animate="scale-soft"] .shop-builder-column-block {
+  transform: scale(var(--builder-pinned-scale));
+}
+
+.builder-preview-layout-block[data-builder-pause="true"][data-builder-animate="blur-reveal"] .shop-builder-column-block {
+  filter: blur(calc(var(--builder-pinned-inverse) * 16px));
+  transform: translate3d(0, calc(var(--builder-pinned-inverse) * 18px), 0);
+}
+
+.builder-preview-layout-block[data-builder-pause="true"][data-builder-animate="stagger-up"] .shop-builder-column-block,
+.builder-preview-layout-block[data-builder-pause="true"][data-builder-animate="step-sequence"] .shop-builder-column-block,
+.builder-preview-layout-block[data-builder-pause="true"][data-builder-animate="progress-line"] .shop-builder-column-block,
+.builder-preview-layout-block[data-builder-pause="true"][data-builder-animate="scroll-progress-horizontal"] .shop-builder-column-block,
+.builder-preview-layout-block[data-builder-pause="true"][data-builder-animate="scroll-progress-vertical"] .shop-builder-column-block,
+.builder-preview-layout-block[data-builder-pause="true"][data-builder-animate="progress-line"][data-builder-progress-direction="vertical"] .shop-builder-column-block {
+  opacity: 1;
+  transform: none;
+}
+
 .builder-preview-layout-block.shop-card-preset--secondary .shop-builder-grid-card,
 .builder-preview-layout-block.shop-card-preset--secondary .shop-builder-column-badges article,
 .builder-preview-layout-block.shop-card-preset--secondary .product-card,
