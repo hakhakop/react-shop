@@ -183,6 +183,13 @@ function designStyle(layout: BuilderLayout): BuilderStyle {
     "--builder-heading-weight": design?.headingWeight,
     "--builder-heading-line-height": design?.headingLineHeight,
     "--builder-heading-color": design?.headingColor,
+    "--builder-card-bg": design?.cardBg,
+    "--builder-card-radius": design?.cardRadius,
+    "--builder-card-border": design?.cardBorder,
+    "--builder-card-shadow": design?.cardShadow,
+    "--builder-card-shadow-hover": design?.cardShadowHover,
+    "--builder-card-image-bg": design?.cardImageBg,
+    "--builder-card-image-padding": design?.cardImagePadding,
   } as BuilderStyle;
 }
 
@@ -356,7 +363,6 @@ function animationClassName(
 ) {
   const preset = animationPreset(animation);
   if (!preset) return "";
-  if (isScrollRevealPreset(animation)) return "";
   return `shop-builder-animate--${preset}`;
 }
 
@@ -365,7 +371,7 @@ function animationDataAttributes(
 ) {
   const preset = animationPreset(animation);
 
-  if (!preset || isScrollRevealPreset(animation) || styleOnlyPresets.has(preset)) {
+  if (!preset || styleOnlyPresets.has(preset)) {
     return {
       data: {},
       style: undefined,
@@ -391,20 +397,44 @@ function animationDataAttributes(
     Number.isFinite(animation.stepOffset)
       ? String(animation.stepOffset)
       : undefined;
+  const duration =
+    typeof animation?.durationMs === "number" &&
+    Number.isFinite(animation.durationMs)
+      ? `${Math.max(200, animation.durationMs * 1000)}ms`
+      : undefined;
+  const easing = animation?.easing === "ease-in-out"
+    ? "cubic-bezier(0.65, 0, 0.35, 1)"
+    : animation?.easing === "spring"
+      ? "cubic-bezier(0.34, 1.56, 0.64, 1)"
+      : undefined;
   const style = {
     ...(delay ? { "--builder-animate-delay": delay } : {}),
+    ...(duration ? { "--builder-animate-duration": duration } : {}),
+    ...(easing ? { "--builder-animate-easing": easing } : {}),
     ...(progressSmoothing
       ? { "--builder-progress-smoothing": progressSmoothing }
       : {}),
     ...(scrubDistance ? { "--builder-pin-distance": scrubDistance } : {}),
   } as BuilderStyle;
 
+  const playOnce = typeof animation?.once !== "undefined"
+    ? animation.once
+    : typeof animation?.playOnce !== "undefined"
+      ? animation.playOnce
+      : true;
+  const triggerOffset =
+    typeof animation?.triggerOffset === "number" &&
+    Number.isFinite(animation.triggerOffset)
+      ? String(animation.triggerOffset)
+      : undefined;
+
   return {
     data: {
       "data-builder-animate": preset,
-      "data-builder-animate-once": animation?.once === false ? "false" : "true",
+      "data-builder-animate-once": playOnce === false ? "false" : "true",
       "data-builder-pause": animation?.pauseUntilComplete ? "true" : undefined,
       "data-builder-step-offset": stepOffset,
+      "data-builder-trigger-offset": triggerOffset,
       "data-builder-progress-direction": animation?.progressDirection === "vertical" ? "vertical" : undefined,
     },
     style: Object.keys(style).length ? style : undefined,

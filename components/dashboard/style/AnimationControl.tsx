@@ -176,8 +176,8 @@ export default function AnimationControl({
           <label className="builder-check">
             <input
               type="checkbox"
-              checked={v.playOnce ?? true}
-              onChange={(event) => patch({ playOnce: event.target.checked })}
+              checked={v.once ?? true}
+              onChange={(event) => patch({ once: event.target.checked })}
             />
             <span>Play once</span>
           </label>

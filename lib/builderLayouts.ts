@@ -11,6 +11,9 @@ export type BuilderTemplate =
 export type BuilderLayoutKey = BuilderPage | BuilderTemplate;
 export type BuilderPanelStyle =
   | "default"
+  | "princity"
+  | "princity-flat"
+  | "princity-line"
   | "secondary"
   | "dark"
   | "light"
@@ -36,6 +39,13 @@ export type BuilderDesign = {
   headingWeight?: string;
   headingLineHeight?: string;
   headingColor?: string;
+  cardBg?: string;
+  cardRadius?: string;
+  cardBorder?: string;
+  cardShadow?: string;
+  cardShadowHover?: string;
+  cardImageBg?: string;
+  cardImagePadding?: string;
 };
 
 export type BuilderLayoutBlock = {

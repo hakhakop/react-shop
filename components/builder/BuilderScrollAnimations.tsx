@@ -85,9 +85,9 @@ export default function BuilderScrollAnimations() {
 
       pinnedProgressNodes.forEach((node) => {
         const rect = node.getBoundingClientRect();
-        const distance = Math.max(1, rect.height - viewportHeight);
-        const progress = Math.min(1, Math.max(0, -rect.top / distance));
-        const isActive = rect.top <= 0 && rect.bottom >= viewportHeight;
+        const distance = Math.max(1, rect.height + viewportHeight);
+        const progress = Math.min(1, Math.max(0, (viewportHeight - rect.top) / distance));
+        const isActive = rect.top < viewportHeight && rect.bottom > 0;
 
         node.classList.toggle("is-builder-pinned-active", isActive);
         setNodeProgress(node, progress);
@@ -124,13 +124,26 @@ export default function BuilderScrollAnimations() {
       return;
     }
 
+    const isTriggered = (entry: IntersectionObserverEntry) => {
+      const node = entry.target as HTMLElement;
+      if (entry.isIntersecting) return true;
+
+      const rawOffset = node.dataset.builderTriggerOffset;
+      const offset = rawOffset ? Number(rawOffset) : NaN;
+      if (!Number.isFinite(offset)) return false;
+
+      const vh = window.innerHeight;
+      const triggerBottom = vh * (1 - offset / 100);
+      return entry.boundingClientRect.top <= triggerBottom;
+    };
+
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           const node = entry.target as HTMLElement;
           const playOnce = node.dataset.builderAnimateOnce !== "false";
 
-          if (!entry.isIntersecting) {
+          if (!isTriggered(entry)) {
             if (!playOnce) {
               node.classList.remove("is-builder-animated-in");
             }
@@ -154,8 +167,8 @@ export default function BuilderScrollAnimations() {
         });
       },
       {
-        rootMargin: "0px 0px -12% 0px",
-        threshold: 0.16,
+        rootMargin: "0px 0px 0px 0px",
+        threshold: 0,
       },
     );
 

@@ -189,6 +189,13 @@ export type BuilderDesign = {
   headingWeight?: string;
   headingLineHeight?: string;
   headingColor?: string;
+  cardBg?: string;
+  cardRadius?: string;
+  cardBorder?: string;
+  cardShadow?: string;
+  cardShadowHover?: string;
+  cardImageBg?: string;
+  cardImagePadding?: string;
 };
 
 export type {

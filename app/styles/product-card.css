@@ -419,27 +419,27 @@
 
 .shop-card-preset--princity .product-card,
 .product-card[data-card-preset="princity"] {
-  --product-card-bg: #efefe9;
-  --product-card-border: transparent;
-  --product-card-shadow: 0 12px 30px rgba(17, 17, 17, 0.06);
-  --product-card-shadow-hover: 0 18px 42px rgba(17, 17, 17, 0.1);
-  --product-card-radius: 8px;
+  --product-card-bg: var(--builder-card-bg, #efefe9);
+  --product-card-border: var(--builder-card-border, transparent);
+  --product-card-shadow: var(--builder-card-shadow, 0 12px 30px rgba(17, 17, 17, 0.06));
+  --product-card-shadow-hover: var(--builder-card-shadow-hover, 0 18px 42px rgba(17, 17, 17, 0.1));
+  --product-card-radius: var(--builder-card-radius, 8px);
   --product-image-height: clamp(280px, 26vw, 420px);
-  --product-image-bg: #ffffff;
-  --product-image-padding: clamp(22px, 2.4vw, 36px);
+  --product-image-bg: var(--builder-card-image-bg, #ffffff);
+  --product-image-padding: var(--builder-card-image-padding, clamp(22px, 2.4vw, 36px));
 }
 
 .shop-card-preset--princity .product-card .product-title,
 .product-card[data-card-preset="princity"] .product-title,
 .shop-card-preset--princity .product-card .product-price,
 .product-card[data-card-preset="princity"] .product-price {
-  color: #111111;
+  color: var(--builder-text, #111111);
 }
 
 .shop-card-preset--princity .product-card .product-attribute-badge,
 .product-card[data-card-preset="princity"] .product-attribute-badge {
-  background: rgba(17, 17, 17, 0.06);
-  color: #111111;
+  background: color-mix(in srgb, var(--builder-text, #111111) 8%, transparent);
+  color: var(--builder-text, #111111);
 }
 
 .shop-card-preset--princity-flat .product-card,
@@ -448,48 +448,48 @@
   --product-card-border: transparent;
   --product-card-shadow: none;
   --product-card-shadow-hover: none;
-  --product-card-radius: 8px;
+  --product-card-radius: var(--builder-card-radius, 8px);
   --product-image-height: clamp(280px, 26vw, 420px);
-  --product-image-bg: #efefe9;
-  --product-image-padding: clamp(22px, 2.4vw, 36px);
+  --product-image-bg: var(--builder-card-image-bg, #efefe9);
+  --product-image-padding: var(--builder-card-image-padding, clamp(22px, 2.4vw, 36px));
 }
 
 .shop-card-preset--princity-flat .product-card .product-title,
 .product-card[data-card-preset="princity-flat"] .product-title,
 .shop-card-preset--princity-flat .product-card .product-price,
 .product-card[data-card-preset="princity-flat"] .product-price {
-  color: #111111;
+  color: var(--builder-text, #111111);
 }
 
 .shop-card-preset--princity-flat .product-card .product-attribute-badge,
 .product-card[data-card-preset="princity-flat"] .product-attribute-badge {
-  background: rgba(17, 17, 17, 0.06);
-  color: #111111;
+  background: color-mix(in srgb, var(--builder-text, #111111) 8%, transparent);
+  color: var(--builder-text, #111111);
 }
 
 .shop-card-preset--princity-line .product-card,
 .product-card[data-card-preset="princity-line"] {
   --product-card-bg: transparent;
-  --product-card-border: rgba(17, 17, 17, 0.12);
+  --product-card-border: var(--builder-card-border, rgba(17, 17, 17, 0.12));
   --product-card-shadow: none;
   --product-card-shadow-hover: none;
-  --product-card-radius: 8px;
+  --product-card-radius: var(--builder-card-radius, 8px);
   --product-image-height: clamp(280px, 26vw, 420px);
-  --product-image-bg: #efefe9;
-  --product-image-padding: clamp(22px, 2.4vw, 36px);
+  --product-image-bg: var(--builder-card-image-bg, #efefe9);
+  --product-image-padding: var(--builder-card-image-padding, clamp(22px, 2.4vw, 36px));
 }
 
 .shop-card-preset--princity-line .product-card .product-title,
 .product-card[data-card-preset="princity-line"] .product-title,
 .shop-card-preset--princity-line .product-card .product-price,
 .product-card[data-card-preset="princity-line"] .product-price {
-  color: #111111;
+  color: var(--builder-text, #111111);
 }
 
 .shop-card-preset--princity-line .product-card .product-attribute-badge,
 .product-card[data-card-preset="princity-line"] .product-attribute-badge {
-  background: rgba(17, 17, 17, 0.06);
-  color: #111111;
+  background: color-mix(in srgb, var(--builder-text, #111111) 8%, transparent);
+  color: var(--builder-text, #111111);
 }
 
 .product-card:hover {

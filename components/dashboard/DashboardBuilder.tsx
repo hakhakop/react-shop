@@ -902,7 +902,7 @@ export default function DashboardBuilder({
   const [sectionSettingsOpen, setSectionSettingsOpen] = useState(false);
   const [sectionStructureOpen, setSectionStructureOpen] = useState(false);
   const [globalStylesTab, setGlobalStylesTab] = useState<
-    "siteDesign" | "typography" | "header"
+    "siteDesign" | "cards" | "typography" | "header"
   >("siteDesign");
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [sidebarWidth, setSidebarWidth] = useState(390);
@@ -3754,6 +3754,7 @@ export default function DashboardBuilder({
         {(
           [
             ["siteDesign", "Site Design"],
+            ["cards", "Cards"],
             ["typography", "Typography"],
             ["header", "Header"],
           ] as const
@@ -3871,6 +3872,143 @@ export default function DashboardBuilder({
                 <option value="28px">Tight</option>
                 <option value="48px">Medium</option>
                 <option value="72px">Wide</option>
+              </select>
+            </label>
+          </div>
+        </div>
+      )}
+
+      {globalStylesTab === "cards" && (
+        <div className="builder-global-styles-group">
+          <div className="builder-card-title">
+            <strong>Card Preset</strong>
+            <span>{builderState.design.preset ?? "custom"}</span>
+          </div>
+
+          <div className="builder-two-column">
+            <label className="builder-field">
+              <span>Card Background</span>
+              <input
+                type="color"
+                value={builderState.design.cardBg ?? "#efefe9"}
+                onChange={(event) =>
+                  updateDesign({
+                    cardBg: event.target.value,
+                    preset: undefined,
+                  })
+                }
+              />
+            </label>
+
+            <label className="builder-field">
+              <span>Card Radius</span>
+              <select
+                value={builderState.design.cardRadius ?? "8px"}
+                onChange={(event) =>
+                  updateDesign({
+                    cardRadius: event.target.value,
+                    preset: undefined,
+                  })
+                }
+              >
+                <option value="0px">Flat</option>
+                <option value="4px">Small</option>
+                <option value="8px">Medium</option>
+                <option value="12px">Rounded</option>
+                <option value="16px">Large</option>
+              </select>
+            </label>
+          </div>
+
+          <label className="builder-field">
+            <span>Card Border</span>
+            <select
+              value={
+                builderState.design.cardBorder === "transparent"
+                  ? "transparent"
+                  : builderState.design.cardBorder ?? "transparent"
+              }
+              onChange={(event) =>
+                updateDesign({
+                  cardBorder: event.target.value,
+                  preset: undefined,
+                })
+              }
+            >
+              <option value="transparent">None</option>
+              <option value="rgba(17,17,17,0.12)">Subtle light</option>
+              <option value="rgba(17,17,17,0.2)">Soft dark</option>
+              <option value="rgba(247,247,241,0.12)">Subtle white</option>
+            </select>
+          </label>
+
+          <label className="builder-field">
+            <span>Card Shadow</span>
+            <select
+              value={builderState.design.cardShadow ?? "none"}
+              onChange={(event) =>
+                updateDesign({
+                  cardShadow: event.target.value,
+                  preset: undefined,
+                })
+              }
+            >
+              <option value="none">None</option>
+              <option value="0 8px 24px rgba(17,17,17,0.04)">Soft</option>
+              <option value="0 12px 30px rgba(17,17,17,0.06)">Medium</option>
+              <option value="0 18px 42px rgba(17,17,17,0.1)">Strong</option>
+            </select>
+          </label>
+
+          <label className="builder-field">
+            <span>Card Hover Shadow</span>
+            <select
+              value={builderState.design.cardShadowHover ?? "none"}
+              onChange={(event) =>
+                updateDesign({
+                  cardShadowHover: event.target.value,
+                  preset: undefined,
+                })
+              }
+            >
+              <option value="none">None</option>
+              <option value="0 14px 30px rgba(17,17,17,0.08)">Soft</option>
+              <option value="0 18px 42px rgba(17,17,17,0.1)">Medium</option>
+              <option value="0 24px 54px rgba(17,17,17,0.14)">Strong</option>
+            </select>
+          </label>
+
+          <div className="builder-two-column">
+            <label className="builder-field">
+              <span>Image Background</span>
+              <input
+                type="color"
+                value={builderState.design.cardImageBg ?? "#ffffff"}
+                onChange={(event) =>
+                  updateDesign({
+                    cardImageBg: event.target.value,
+                    preset: undefined,
+                  })
+                }
+              />
+            </label>
+
+            <label className="builder-field">
+              <span>Image Padding</span>
+              <select
+                value={builderState.design.cardImagePadding ?? "clamp(22px, 2.4vw, 36px)"}
+                onChange={(event) =>
+                  updateDesign({
+                    cardImagePadding: event.target.value,
+                    preset: undefined,
+                  })
+                }
+              >
+                <option value="0px">None</option>
+                <option value="clamp(6px, 1vw, 14px)">Tight</option>
+                <option value="clamp(14px, 1.5vw, 22px)">Compact</option>
+                <option value="clamp(22px, 2.4vw, 36px)">Medium</option>
+                <option value="clamp(28px, 4vw, 48px)">Large</option>
               </select>
             </label>
           </div>
@@ -6161,6 +6299,13 @@ function previewDesignStyle(design: BuilderDesign) {
     "--builder-heading-weight": design.headingWeight,
     "--builder-heading-line-height": design.headingLineHeight,
     "--builder-heading-color": design.headingColor,
+    "--builder-card-bg": design.cardBg,
+    "--builder-card-radius": design.cardRadius,
+    "--builder-card-border": design.cardBorder,
+    "--builder-card-shadow": design.cardShadow,
+    "--builder-card-shadow-hover": design.cardShadowHover,
+    "--builder-card-image-bg": design.cardImageBg,
+    "--builder-card-image-padding": design.cardImagePadding,
   } as CSSProperties;
 }
 
@@ -6253,20 +6398,40 @@ function previewAnimationAttrs(
     Number.isFinite(animation.stepOffset)
       ? String(animation.stepOffset)
       : undefined;
+  const duration =
+    typeof animation?.durationMs === "number" &&
+    Number.isFinite(animation.durationMs)
+      ? `${Math.max(200, animation.durationMs * 1000)}ms`
+      : undefined;
+  const easing = animation?.easing === "ease-in-out"
+    ? "cubic-bezier(0.65, 0, 0.35, 1)"
+    : animation?.easing === "spring"
+      ? "cubic-bezier(0.34, 1.56, 0.64, 1)"
+      : undefined;
   const style = {
     ...(delay ? { "--builder-animate-delay": delay } : {}),
+    ...(duration ? { "--builder-animate-duration": duration } : {}),
+    ...(easing ? { "--builder-animate-easing": easing } : {}),
     ...(progressSmoothing
       ? { "--builder-progress-smoothing": progressSmoothing }
       : {}),
     ...(scrubDistance ? { "--builder-pin-distance": scrubDistance } : {}),
   } as CSSProperties;
 
+  const playOnce = animation?.once ?? animation?.playOnce ?? true;
+  const triggerOffset =
+    typeof animation?.triggerOffset === "number" &&
+    Number.isFinite(animation.triggerOffset)
+      ? String(animation.triggerOffset)
+      : undefined;
+
   return {
     data: {
       "data-builder-animate": preset,
-      "data-builder-animate-once": animation?.once === false ? "false" : "true",
+      "data-builder-animate-once": playOnce === false ? "false" : "true",
       "data-builder-pause": animation?.pauseUntilComplete ? "true" : undefined,
       "data-builder-step-offset": stepOffset,
+      "data-builder-trigger-offset": triggerOffset,
       "data-builder-progress-direction": animation?.progressDirection === "vertical" ? "vertical" : undefined,
     },
     style: Object.keys(style).length ? style : undefined,

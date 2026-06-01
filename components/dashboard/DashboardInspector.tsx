@@ -378,8 +378,21 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
       typography?: BuilderLayoutBlock["typography"];
     }>,
   ) {
-    if (selectedLayoutBlock) {
-      updateSelectedLayoutBlock(patch);
+    if (selectedLayoutBlock && selectedLayoutBlockKey && selectedSection) {
+      const layoutItems = selectedSection.layoutItems ?? [];
+      for (let ci = 0; ci < layoutItems.length; ci++) {
+        const item = layoutItems[ci];
+        if (!item) continue;
+        const blocks = getLayoutItemBlocks(item);
+        for (let bi = 0; bi < blocks.length; bi++) {
+          const block = blocks[bi];
+          const blockKey = block.id ?? `${item.id ?? `item-${ci}`}-block-${bi}`;
+          if (blockKey === selectedLayoutBlockKey) {
+            updateSelectedLayoutBlock(ci, bi, patch);
+            return;
+          }
+        }
+      }
       return;
     }
     updateSelected(patch);
@@ -397,8 +410,21 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
       nextAnimation.delayMs = undefined;
     }
 
-    if (selectedLayoutBlock) {
-      updateSelectedLayoutBlock({ animation: nextAnimation });
+    if (selectedLayoutBlock && selectedLayoutBlockKey && selectedSection) {
+      const layoutItems = selectedSection.layoutItems ?? [];
+      for (let ci = 0; ci < layoutItems.length; ci++) {
+        const item = layoutItems[ci];
+        if (!item) continue;
+        const blocks = getLayoutItemBlocks(item);
+        for (let bi = 0; bi < blocks.length; bi++) {
+          const block = blocks[bi];
+          const blockKey = block.id ?? `${item.id ?? `item-${ci}`}-block-${bi}`;
+          if (blockKey === selectedLayoutBlockKey) {
+            updateSelectedLayoutBlock(ci, bi, { animation: nextAnimation });
+            return;
+          }
+        }
+      }
       return;
     }
 
@@ -1203,7 +1229,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                           )}
 
                                           {isSelectedBlock &&
-                                            isElementSettingsTab && (
+                                            isElementSettingsTab && (<>
                                           <details className="builder-collapse">
                                             <summary>
                                               <span>Element appearance</span>
@@ -1411,7 +1437,9 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                               </select>
                                             </label>
                                           </details>
-                                          )}
+
+                                            {renderAnimationControls(block)}
+                                          </>)}
 
                                           {isSelectedBlock &&
                                             isElementContentTab && (
@@ -5848,32 +5876,6 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                         section tab.
                       </span>
                     </div>
-                  </details>
-
-                  {renderAnimationControls(selectedLayoutBlock, {
-                    allowPause: true,
-                  })}
-
-                  <details className="builder-collapse">
-                    <summary>
-                      <InspectorGroupSummary
-                        title="Page JSON"
-                        description="Full builder payload for this page."
-                        meta="advanced"
-                      />
-                    </summary>
-                    <div className="builder-json-card">
-                      <span>Current JSON</span>
-                      <pre>{builderJson}</pre>
-                    </div>
-                    <button
-                      type="button"
-                      className="builder-secondary-button builder-full-button"
-                      onClick={copyJson}
-                    >
-                      <Save size={16} />
-                      {copied ? "Copied JSON" : "Export JSON"}
-                    </button>
                   </details>
                 </>
               )}
