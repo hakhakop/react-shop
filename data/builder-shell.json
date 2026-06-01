@@ -4,12 +4,13 @@
   "topToolbarText": "Fast support & setup by Webpages",
   "topToolbarPhone": "+374 xx xx xx",
   "topToolbarMeta": "AMD ֏",
+  "headerBackgroundMode": "default",
   "headerLayout": "princity",
   "headerBrandMode": "logo",
   "headerBrandText": "WebPages",
   "headerLogoUrl": "https://cms.webpages.am/wp-content/uploads/2025/11/logo-2-small.png",
   "headerLogoAlt": "WebPages logo",
-  "headerLogoMaxWidth": 160,
+  "headerLogoMaxWidth": 161,
   "headerIconVariant": "ghost",
   "headerIconOrder": [
     "search",
@@ -18,7 +19,7 @@
     "account",
     "theme"
   ],
-  "headerActiveIndicator": "underline",
+  "headerActiveIndicator": "princity",
   "sectionPaddingTop": "medium",
   "sectionPaddingBottom": "medium",
   "sectionMarginTop": "medium",
@@ -60,5 +61,5 @@
       "badgeText": null
     }
   },
-  "updatedAt": "2026-05-27T07:04:21.385Z"
+  "updatedAt": "2026-05-31T20:41:24.005Z"
 }

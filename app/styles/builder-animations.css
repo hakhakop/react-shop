@@ -1,0 +1,598 @@
+/* ============================================================
+   wc-store builder animations
+   Beautiful scroll-reveal entrance animations for sections/blocks
+   ============================================================ */
+
+/* Disable default CSS fade-up animation when ScrollReveal is active */
+.shop-builder-section--scroll-reveal > .shop-builder-section-content {
+  animation: none !important;
+}
+
+/* --- Custom easing curves --- */
+:root {
+  --bounce-ease: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --smooth-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --snap-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --soft-ease: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* --- Base state: hidden before reveal --- */
+.sr-section,
+.sr-block {
+  will-change: transform, opacity, filter;
+}
+
+/* --- Fade up (default, most versatile) --- */
+@keyframes sr-fade-up {
+  0% {
+    opacity: 0;
+    transform: translateY(40px) scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+.sr-fade-up {
+  animation: sr-fade-up 0.8s var(--snap-ease) both;
+}
+
+/* --- Fade down --- */
+@keyframes sr-fade-down {
+  0% {
+    opacity: 0;
+    transform: translateY(-32px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.sr-fade-down {
+  animation: sr-fade-down 0.7s var(--snap-ease) both;
+}
+
+/* --- Fade in (pure opacity) --- */
+@keyframes sr-fade-in {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+.sr-fade-in {
+  animation: sr-fade-in 0.6s var(--snap-ease) both;
+}
+
+/* --- Slide left --- */
+@keyframes sr-slide-left {
+  0% {
+    opacity: 0;
+    transform: translateX(-60px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+.sr-slide-left {
+  animation: sr-slide-left 0.7s var(--snap-ease) both;
+}
+
+/* --- Slide right --- */
+@keyframes sr-slide-right {
+  0% {
+    opacity: 0;
+    transform: translateX(60px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+.sr-slide-right {
+  animation: sr-slide-right 0.7s var(--snap-ease) both;
+}
+
+/* --- Scale up (subtle zoom + fade) --- */
+@keyframes sr-scale-up {
+  0% {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.sr-scale-up {
+  animation: sr-scale-up 0.8s var(--snap-ease) both;
+}
+
+/* --- Zoom in (dramatic scale from far) --- */
+@keyframes sr-zoom-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.sr-zoom-in {
+  animation: sr-zoom-in 0.9s var(--bounce-ease) both;
+}
+
+/* --- Flip up (3D X rotation) --- */
+@keyframes sr-flip-up {
+  0% {
+    opacity: 0;
+    transform: perspective(800px) rotateX(18deg) translateY(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: perspective(800px) rotateX(0) translateY(0);
+  }
+}
+.sr-flip-up {
+  animation: sr-flip-up 0.8s var(--snap-ease) both;
+}
+
+/* --- Blur reveal (editorial, elegant) --- */
+@keyframes sr-blur-in {
+  0% {
+    opacity: 0;
+    filter: blur(12px);
+    transform: scale(1.04);
+  }
+  100% {
+    opacity: 1;
+    filter: blur(0);
+    transform: scale(1);
+  }
+}
+.sr-blur-in {
+  animation: sr-blur-in 1s var(--smooth-ease) both;
+}
+
+/* --- Stagger children (for grid cards, list items, etc.) --- */
+@keyframes sr-stagger-item {
+  0% {
+    opacity: 0;
+    transform: translateY(30px) scale(0.96);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+.sr-stagger > * {
+  opacity: 0;
+  animation: sr-stagger-item 0.6s var(--snap-ease) both;
+}
+.sr-stagger > *:nth-child(1) { animation-delay: 0ms; }
+.sr-stagger > *:nth-child(2) { animation-delay: 80ms; }
+.sr-stagger > *:nth-child(3) { animation-delay: 160ms; }
+.sr-stagger > *:nth-child(4) { animation-delay: 240ms; }
+.sr-stagger > *:nth-child(5) { animation-delay: 320ms; }
+.sr-stagger > *:nth-child(6) { animation-delay: 400ms; }
+.sr-stagger > *:nth-child(7) { animation-delay: 480ms; }
+.sr-stagger > *:nth-child(8) { animation-delay: 560ms; }
+.sr-stagger > *:nth-child(9) { animation-delay: 640ms; }
+.sr-stagger > *:nth-child(10) { animation-delay: 720ms; }
+.sr-stagger > *:nth-child(11) { animation-delay: 800ms; }
+.sr-stagger > *:nth-child(12) { animation-delay: 880ms; }
+
+/* --- Highlight sweep (background gradient sweep) --- */
+@keyframes sr-highlight {
+  0% {
+    opacity: 0;
+    background-size: 200% 100%;
+    background-position: 100% 0;
+  }
+  100% {
+    opacity: 1;
+    background-position: 0 0;
+  }
+}
+.sr-highlight {
+  animation: sr-highlight 1.2s var(--smooth-ease) both;
+  background: linear-gradient(90deg, transparent 0%, transparent 40%, rgba(255,255,255,0.08) 50%, transparent 60%);
+  background-size: 200% 100%;
+}
+
+/* --- Variant: fast durations --- */
+.sr-fast {
+  animation-duration: 0.4s !important;
+}
+.sr-slow {
+  animation-duration: 1.2s !important;
+}
+
+/* --- Delay utilities --- */
+.sr-delay-100 { animation-delay: 100ms !important; }
+.sr-delay-200 { animation-delay: 200ms !important; }
+.sr-delay-300 { animation-delay: 300ms !important; }
+.sr-delay-500 { animation-delay: 500ms !important; }
+.sr-delay-700 { animation-delay: 700ms !important; }
+.sr-delay-1000 { animation-delay: 1000ms !important; }
+
+/* --- Princity Gradient (mouse-tracking text effect) --- */
+.shop-builder-animate--princity-gradient .shop-builder-section-heading,
+.shop-builder-animate--princity-gradient .shop-builder-section-subheading,
+.shop-builder-animate--princity-gradient h2,
+.shop-builder-animate--princity-gradient h3,
+.shop-builder-animate--princity-gradient h4 {
+  display: inline-block;
+  background: linear-gradient(90deg, #31A5D9, #F83691, #FFB800);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-size: 200% 100%;
+  background-position: var(--gradient-pct, 50%) 50%;
+  transition: background-position 0.15s ease;
+}
+
+/* --- Reduced motion --- */
+@media (prefers-reduced-motion: reduce) {
+  .sr-section,
+  .sr-block,
+  .sr-stagger > * {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+  }
+}
+
+/* --- Backward compatibility with existing data-builder-animate --- */
+[data-builder-animate] {
+  --builder-animate-delay: 0ms;
+  --builder-animate-duration: 760ms;
+  --builder-animate-distance: 34px;
+  opacity: 0;
+  transform: translate3d(0, var(--builder-animate-distance), 0);
+  transition:
+    opacity var(--builder-animate-duration) cubic-bezier(0.16, 1, 0.3, 1) var(--builder-animate-delay),
+    transform var(--builder-animate-duration) cubic-bezier(0.16, 1, 0.3, 1) var(--builder-animate-delay),
+    filter var(--builder-animate-duration) cubic-bezier(0.16, 1, 0.3, 1) var(--builder-animate-delay);
+  will-change: opacity, transform, filter;
+}
+
+[data-builder-animate="fade-in"] { transform: none; }
+[data-builder-animate="slide-left"] { transform: translate3d(-44px, 0, 0); }
+[data-builder-animate="slide-right"] { transform: translate3d(44px, 0, 0); }
+[data-builder-animate="scale-soft"] { transform: scale(0.965); }
+[data-builder-animate="blur-reveal"] { filter: blur(16px); transform: translate3d(0, 18px, 0); }
+
+/* Don't override progress/pin and text-effect presets — they manage their own visibility */
+[data-builder-animate="stagger-up"],
+[data-builder-animate="step-sequence"],
+[data-builder-animate="progress-line"],
+[data-builder-animate="scroll-progress-horizontal"],
+[data-builder-animate="scroll-progress-vertical"],
+[data-builder-animate="princity-gradient"],
+[data-builder-pause="true"] {
+  opacity: 1;
+  transform: none;
+  filter: none;
+  transition: none;
+}
+
+[data-builder-animate].is-builder-animated-in {
+  opacity: 1;
+  filter: none;
+  transform: none;
+}
+
+/* Backward compat: full-width section variant */
+.shop-builder-section--full[data-builder-animate] {
+  transform: translateX(-50%) translate3d(0, var(--builder-animate-distance), 0);
+}
+.shop-builder-section--full[data-builder-animate="fade-in"],
+.shop-builder-section--full[data-builder-animate="stagger-up"],
+.shop-builder-section--full[data-builder-animate="step-sequence"],
+.shop-builder-section--full[data-builder-animate="progress-line"],
+.shop-builder-section--full[data-builder-animate="scroll-progress-horizontal"],
+.shop-builder-section--full[data-builder-animate="scroll-progress-vertical"],
+.shop-builder-section--full[data-builder-animate="princity-gradient"] {
+  transform: translateX(-50%);
+}
+.shop-builder-section--full[data-builder-animate="slide-left"] {
+  transform: translateX(-50%) translate3d(-44px, 0, 0);
+}
+.shop-builder-section--full[data-builder-animate="slide-right"] {
+  transform: translateX(-50%) translate3d(44px, 0, 0);
+}
+.shop-builder-section--full[data-builder-animate="scale-soft"] {
+  transform: translateX(-50%) scale(0.965);
+}
+.shop-builder-section--full[data-builder-animate="blur-reveal"] {
+  transform: translateX(-50%) translate3d(0, 18px, 0);
+}
+.shop-builder-section--full[data-builder-animate].is-builder-animated-in {
+  transform: translateX(-50%);
+}
+
+/* --- Progress line for Grid, Badge, and Column-Badge sections --- */
+
+[data-builder-animate="progress-line"] :is(
+  .shop-builder-grid,
+  .shop-builder-badges,
+  .shop-builder-column-badges
+) {
+  position: relative;
+  padding-top: 54px;
+}
+
+[data-builder-animate="progress-line"] :is(
+  .shop-builder-grid,
+  .shop-builder-badges,
+  .shop-builder-column-badges
+)::before {
+  content: "";
+  position: absolute;
+  top: 24px;
+  left: 8%;
+  right: 8%;
+  height: 2px;
+  z-index: 0;
+  background: color-mix(
+    in srgb,
+    var(--builder-section-text, currentColor) 16%,
+    transparent
+  );
+}
+
+[data-builder-animate="progress-line"] :is(
+  .shop-builder-grid,
+  .shop-builder-badges,
+  .shop-builder-column-badges
+)::after {
+  content: "";
+  position: absolute;
+  top: 24px;
+  left: 8%;
+  right: 8%;
+  height: 2px;
+  z-index: 1;
+  transform: scaleX(0);
+  transform-origin: left center;
+  background: linear-gradient(
+    90deg,
+    var(--builder-section-button-bg, var(--accent, #16f4c3)),
+    color-mix(
+      in srgb,
+      var(--builder-section-button-bg, var(--accent, #16f4c3)) 72%,
+      white
+    )
+  );
+  box-shadow: 0 0 22px color-mix(
+    in srgb,
+    var(--builder-section-button-bg, var(--accent, #16f4c3)) 28%,
+    transparent
+  );
+  transition: transform 1500ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+[data-builder-animate="progress-line"].is-builder-animated-in :is(
+  .shop-builder-grid,
+  .shop-builder-badges,
+  .shop-builder-column-badges
+)::after {
+  transform: scaleX(1);
+}
+
+[data-builder-pause="true"][data-builder-animate="progress-line"] :is(
+  .shop-builder-grid,
+  .shop-builder-badges,
+  .shop-builder-column-badges
+)::after {
+  transform: scaleX(var(--builder-scroll-progress, 0));
+  transition: transform var(--builder-progress-smoothing, 90ms) linear;
+}
+
+[data-builder-animate="progress-line"] :is(
+  .shop-builder-grid-card,
+  .shop-builder-badge-card,
+  .shop-builder-column-badges article
+) {
+  opacity: 0;
+  transform: translate3d(0, 26px, 0);
+  transition:
+    opacity 680ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 680ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: calc(var(--builder-animate-index, 0) * 130ms);
+  will-change: opacity, transform;
+  position: relative;
+  z-index: 2;
+}
+
+[data-builder-animate="progress-line"].is-builder-animated-in :is(
+  .shop-builder-grid-card,
+  .shop-builder-badge-card,
+  .shop-builder-column-badges article
+) {
+  opacity: 1;
+  transform: none;
+}
+
+[data-builder-pause="true"][data-builder-animate="progress-line"] :is(
+  .shop-builder-grid-card,
+  .shop-builder-badge-card,
+  .shop-builder-column-badges article
+) {
+  opacity: 0.42;
+  transform: translate3d(0, 14px, 0);
+  transition:
+    opacity 260ms ease,
+    transform 320ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: 0ms;
+}
+
+[data-builder-pause="true"][data-builder-animate="progress-line"] :is(
+  .shop-builder-grid-card,
+  .shop-builder-badge-card,
+  .shop-builder-column-badges article
+).is-builder-scroll-step-active {
+  opacity: 1;
+  transform: none;
+}
+
+[data-builder-animate="progress-line"] :is(
+  .shop-builder-grid-card,
+  .shop-builder-badge-card,
+  .shop-builder-column-badges article
+)::before {
+  content: "";
+  position: absolute;
+  top: -38px;
+  left: 50%;
+  width: 14px;
+  height: 14px;
+  z-index: 3;
+  border: 2px solid color-mix(
+    in srgb,
+    var(--builder-section-text, currentColor) 28%,
+    transparent
+  );
+  border-radius: 999px;
+  background: var(--builder-section-background, var(--builder-page-bg, #ffffff));
+  box-shadow: 0 0 0 8px color-mix(
+    in srgb,
+    var(--builder-section-background, var(--builder-page-bg, #ffffff)) 80%,
+    transparent
+  );
+  opacity: 0.72;
+  transform: translateX(-50%) scale(0.7);
+  transition:
+    opacity 420ms ease,
+    transform 520ms cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 420ms ease,
+    background 420ms ease;
+  transition-delay: calc(var(--builder-animate-index, 0) * 180ms + 160ms);
+}
+
+[data-builder-animate="progress-line"].is-builder-animated-in :is(
+  .shop-builder-grid-card,
+  .shop-builder-badge-card,
+  .shop-builder-column-badges article
+)::before,
+[data-builder-pause="true"][data-builder-animate="progress-line"] :is(
+  .shop-builder-grid-card,
+  .shop-builder-badge-card,
+  .shop-builder-column-badges article
+).is-builder-scroll-step-active::before {
+  opacity: 1;
+  transform: translateX(-50%) scale(1);
+  border-color: var(--builder-section-button-bg, var(--accent, #16f4c3));
+  background: var(--builder-section-button-bg, var(--accent, #16f4c3));
+}
+
+[data-builder-animate="progress-line"] :is(
+  .shop-builder-grid-card,
+  .shop-builder-badge-card,
+  .shop-builder-column-badges article
+):last-child::after {
+  content: "";
+  position: absolute;
+  top: -42px;
+  right: 4%;
+  width: 11px;
+  height: 11px;
+  z-index: 4;
+  border-top: 2px solid var(--builder-section-button-bg, var(--accent, #16f4c3));
+  border-right: 2px solid var(--builder-section-button-bg, var(--accent, #16f4c3));
+  opacity: 0;
+  transform: translateX(-10px) rotate(45deg);
+  transition:
+    opacity 360ms ease 1180ms,
+    transform 520ms cubic-bezier(0.22, 1, 0.36, 1) 1180ms;
+}
+
+[data-builder-animate="progress-line"].is-builder-animated-in :is(
+  .shop-builder-grid-card,
+  .shop-builder-badge-card,
+  .shop-builder-column-badges article
+):last-child::after,
+[data-builder-pause="true"][data-builder-animate="progress-line"] :is(
+  .shop-builder-grid-card,
+  .shop-builder-badge-card,
+  .shop-builder-column-badges article
+):last-child.is-builder-scroll-step-active::after {
+  opacity: 1;
+  transform: translateX(0) rotate(45deg);
+}
+
+@media (max-width: 900px) {
+  [data-builder-animate="progress-line"] :is(
+    .shop-builder-grid,
+    .shop-builder-badges,
+    .shop-builder-column-badges
+  ) {
+    grid-template-columns: minmax(0, 1fr) !important;
+    padding-top: 0;
+    padding-left: clamp(42px, 5vw, 68px);
+    row-gap: clamp(18px, 3vw, 30px);
+  }
+
+  [data-builder-animate="progress-line"] :is(
+    .shop-builder-grid,
+    .shop-builder-badges,
+    .shop-builder-column-badges
+  )::before,
+  [data-builder-animate="progress-line"] :is(
+    .shop-builder-grid,
+    .shop-builder-badges,
+    .shop-builder-column-badges
+  )::after {
+    top: 24px;
+    bottom: 24px;
+    left: clamp(18px, 2.8vw, 28px);
+    right: auto;
+    width: 2px;
+    height: auto;
+    transform-origin: top center;
+  }
+
+  [data-builder-animate="progress-line"] :is(
+    .shop-builder-grid,
+    .shop-builder-badges,
+    .shop-builder-column-badges
+  )::after {
+    transform: scaleY(var(--builder-scroll-progress, 0));
+  }
+
+  [data-builder-animate="progress-line"] :is(
+    .shop-builder-grid-card,
+    .shop-builder-badge-card,
+    .shop-builder-column-badges article
+  )::before {
+    top: 50%;
+    left: calc(clamp(42px, 5vw, 68px) * -1 + clamp(18px, 2.8vw, 28px));
+    transform: translate(-50%, -50%) scale(0.7);
+  }
+
+  [data-builder-animate="progress-line"] :is(
+    .shop-builder-grid-card,
+    .shop-builder-badge-card,
+    .shop-builder-column-badges article
+  ):last-child::after {
+    top: auto;
+    right: auto;
+    bottom: 4px;
+    left: calc(clamp(42px, 5vw, 68px) * -1 + clamp(18px, 2.8vw, 28px) - 5px);
+    transform: translateY(-10px) rotate(135deg);
+  }
+
+  [data-builder-animate="progress-line"].is-builder-animated-in :is(
+    .shop-builder-grid-card,
+    .shop-builder-badge-card,
+    .shop-builder-column-badges article
+  ):last-child::after,
+  [data-builder-pause="true"][data-builder-animate="progress-line"] :is(
+    .shop-builder-grid-card,
+    .shop-builder-badge-card,
+    .shop-builder-column-badges article
+  ):last-child.is-builder-scroll-step-active::after {
+    transform: translateY(0) rotate(135deg);
+  }
+}

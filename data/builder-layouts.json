@@ -25,168 +25,6 @@
     },
     "sections": [
       {
-        "id": "webpages-am-hero",
-        "kind": "contentLayout",
-        "title": "",
-        "eyebrow": "",
-        "body": "",
-        "background": "#090909",
-        "backgroundMode": "full",
-        "contentMode": "boxed",
-        "colorScheme": "dark",
-        "topSpacing": "large",
-        "bottomSpacing": "large",
-        "topMargin": "inherit",
-        "bottomMargin": "inherit",
-        "visible": true,
-        "layout": "thirds-2-1",
-        "layoutColumns": 2,
-        "layoutRows": 4,
-        "visualStyle": {
-          "background": {
-            "type": "gradient",
-            "gradient": "radial-gradient(circle at 78% 18%, rgba(216,255,101,0.2), transparent 31%), radial-gradient(circle at 10% 0%, rgba(255,255,255,0.12), transparent 28%), #090909"
-          }
-        },
-        "layoutItems": [
-          {
-            "id": "layout-row-mptvf2qp-column-1",
-            "rowId": "layout-row-mptvf2qp",
-            "rowLayout": "whole",
-            "blocks": []
-          },
-          {
-            "id": "webpages-am-hero-copy",
-            "blocks": [
-              {
-                "id": "webpages-am-hero-title",
-                "kind": "hero",
-                "eyebrow": "WebPages React System",
-                "title": "Ձեր ներկայությունը համացանցում՝ առանց բարդությունների",
-                "body": "Ստեղծեք պրոֆեսիոնալ էջ ձեր անձնական գործունեության, ծառայությունների կամ բիզնեսի համար՝ մեկ պարզ լուծմամբ։\n\nԸնտրեք ձեզ հարմար փաթեթը, տրամադրեք անհրաժեշտ տեղեկությունները, իսկ մնացածը մենք կկազմակերպենք ձեր փոխարեն։",
-                "buttonLabel": "Դիտել փաթեթները",
-                "buttonUrl": "#capabilities",
-                "panelStyle": "default",
-                "elementPadding": "large",
-                "elementBackgroundMode": "transparent",
-                "typography": {
-                  "title": {
-                    "fontSize": "clamp(38px, 4.4vw, 72px)",
-                    "fontWeight": "860",
-                    "lineHeight": "0.96",
-                    "textAlign": "left",
-                    "color": "#f7f4ec"
-                  },
-                  "body": {
-                    "fontSize": "clamp(18px, 2.1vw, 28px)",
-                    "lineHeight": "1.45",
-                    "color": "#d8d4ca"
-                  },
-                  "eyebrow": {
-                    "color": "#d8ff65",
-                    "textTransform": "uppercase",
-                    "letterSpacing": "0.16em"
-                  },
-                  "button": {
-                    "textTransform": "none"
-                  }
-                }
-              }
-            ]
-          },
-          {
-            "id": "webpages-am-hero-demo",
-            "blocks": [
-              {
-                "id": "webpages-am-hero-demo-grid",
-                "kind": "grid",
-                "title": "WebPages preview",
-                "gridSource": "static",
-                "columns": 1,
-                "gridRows": 3,
-                "gridGap": "small",
-                "gridMargin": "none",
-                "gridImagePadding": "frameless",
-                "gridContentPadding": "large",
-                "gridImageFrame": "none",
-                "gridShowImage": false,
-                "gridShowButton": false,
-                "panelStyle": "flat-dark",
-                "elementPadding": "medium",
-                "gridItems": [
-                  {
-                    "id": "hero-demo-dashboard",
-                    "eyebrow": "",
-                    "title": "Քայլ 1",
-                    "meta": "",
-                    "text": "Ընտրում եք փաթեթը",
-                    "typography": {
-                      "title": {
-                        "fontSize": "clamp(24px, 2.4vw, 42px)",
-                        "fontWeight": "760",
-                        "lineHeight": "1"
-                      },
-                      "body": {
-                        "fontSize": "16px",
-                        "lineHeight": "1.6"
-                      }
-                    }
-                  },
-                  {
-                    "id": "hero-demo-commerce",
-                    "eyebrow": "",
-                    "title": "Քայլ 2",
-                    "meta": "",
-                    "text": "Տրամադրում եք բովանդակությունը",
-                    "typography": {
-                      "title": {
-                        "fontSize": "clamp(24px, 2.4vw, 42px)",
-                        "fontWeight": "760",
-                        "lineHeight": "1"
-                      },
-                      "body": {
-                        "fontSize": "16px",
-                        "lineHeight": "1.6"
-                      }
-                    }
-                  },
-                  {
-                    "id": "hero-demo-launch",
-                    "eyebrow": "",
-                    "title": "Քայլ 3",
-                    "meta": "",
-                    "text": "Կայքը գործարկվում է",
-                    "typography": {
-                      "title": {
-                        "fontSize": "clamp(24px, 2.4vw, 42px)",
-                        "fontWeight": "760",
-                        "lineHeight": "1"
-                      },
-                      "body": {
-                        "fontSize": "16px",
-                        "lineHeight": "1.6"
-                      }
-                    }
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "id": "layout-row-mptvo8s6-column-1",
-            "rowId": "layout-row-mptvo8s6",
-            "rowLayout": "whole",
-            "blocks": []
-          },
-          {
-            "id": "layout-row-mptvp786-column-1",
-            "rowId": "layout-row-mptvp786",
-            "rowLayout": "whole",
-            "blocks": []
-          }
-        ]
-      },
-      {
         "id": "capabilities",
         "kind": "contentLayout",
         "title": "",
@@ -203,8 +41,30 @@
         "visible": true,
         "layout": "whole",
         "layoutColumns": 1,
-        "layoutRows": 1,
+        "layoutRows": 2,
         "layoutItems": [
+          {
+            "id": "layout-row-mpu9np9r-column-1",
+            "rowId": "layout-row-mpu9np9r",
+            "rowLayout": "halves",
+            "blocks": [
+              {
+                "id": "hero-block-mpu9o1n7-d8woy",
+                "kind": "hero",
+                "eyebrow": "Featured",
+                "title": "Hero Element",
+                "body": "A strong visual opening with editable copy and action.",
+                "buttonLabel": "Learn more",
+                "buttonUrl": "/"
+              }
+            ]
+          },
+          {
+            "id": "layout-row-mpu9np9r-column-2",
+            "rowId": "layout-row-mpu9np9r",
+            "rowLayout": "halves",
+            "blocks": []
+          },
           {
             "id": "capability-showcase-column",
             "blocks": [
@@ -212,7 +72,7 @@
                 "id": "capabilities-heading-block",
                 "kind": "hero",
                 "eyebrow": "Capabilities",
-                "title": "Ո՞ւմ համար է WebPages-ը",
+                "title": "Ո՞ւմ jհամար է WebPages-ը",
                 "body": "<p><strong>WebPages-ը հարմար է ինչպես անհատների, այնպես էլ տարբեր ոլորտների բիզնեսների համար։Անկախ նրանից՝ ցանկանում եք ներկայացնել ձեր ծառայությունները, ստեղծել անձնական էջ, ընդունել հայտեր կամ գործարկել առցանց խանութ, կարող եք սկսել պատրաստի և պարզ փաթեթից։</strong></p>",
                 "buttonLabel": "",
                 "buttonUrl": "",
@@ -388,7 +248,10 @@
               }
             ]
           }
-        ]
+        ],
+        "animation": {
+          "preset": "stagger-up"
+        }
       },
       {
         "id": "packages",
@@ -565,7 +428,10 @@
               }
             ]
           }
-        ]
+        ],
+        "animation": {
+          "preset": "stagger"
+        }
       },
       {
         "id": "webpages-am-how-it-works",
@@ -792,7 +658,11 @@
             ]
           }
         ],
-        "layoutRows": 1
+        "layoutRows": 1,
+        "animation": {
+          "preset": "progress-line",
+          "pauseUntilComplete": true
+        }
       },
       {
         "id": "webpages-builder-in-action",
@@ -1102,6 +972,769 @@
         "layoutRows": 1
       },
       {
+        "id": "webpages-animation-demo-intro",
+        "kind": "contentLayout",
+        "title": "Scroll animation demos",
+        "eyebrow": "Motion system",
+        "body": "Scroll down and back up to replay these builder-native motion presets. Each card names the motion it demonstrates.",
+        "background": "#0b0b0b",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "dark",
+        "topSpacing": "large",
+        "bottomSpacing": "medium",
+        "topMargin": "inherit",
+        "bottomMargin": "inherit",
+        "visible": true,
+        "layoutColumns": 3,
+        "layoutRows": 1,
+        "layoutItems": [
+          {
+            "id": "animation-fade-card",
+            "rowId": "animation-intro-row",
+            "rowLayout": "thirds",
+            "blocks": [
+              {
+                "id": "animation-fade-panel",
+                "kind": "panel",
+                "eyebrow": "01",
+                "title": "Fade up",
+                "body": "Default reveal: fades and moves gently upward.",
+                "buttonLabel": "",
+                "buttonUrl": "/",
+                "panelStyle": "flat-dark",
+                "elementPadding": "medium",
+                "elementAlign": "left",
+                "animation": {
+                  "preset": "fade-up",
+                  "delayMs": 0,
+                  "once": false
+                }
+              }
+            ]
+          },
+          {
+            "id": "animation-scale-card",
+            "rowId": "animation-intro-row",
+            "rowLayout": "thirds",
+            "blocks": [
+              {
+                "id": "animation-scale-panel",
+                "kind": "panel",
+                "eyebrow": "02",
+                "title": "Soft scale",
+                "body": "Panel reveal: scales from 96.5% to full size.",
+                "buttonLabel": "",
+                "buttonUrl": "/",
+                "panelStyle": "flat-dark",
+                "elementPadding": "medium",
+                "elementAlign": "left",
+                "animation": {
+                  "preset": "scale-soft",
+                  "delayMs": 80,
+                  "once": false
+                }
+              }
+            ]
+          },
+          {
+            "id": "animation-blur-card",
+            "rowId": "animation-intro-row",
+            "rowLayout": "thirds",
+            "blocks": [
+              {
+                "id": "animation-blur-panel",
+                "kind": "panel",
+                "eyebrow": "03",
+                "title": "Blur reveal",
+                "body": "Editorial reveal: starts blurred, then sharpens.",
+                "buttonLabel": "",
+                "buttonUrl": "/",
+                "panelStyle": "flat-dark",
+                "elementPadding": "medium",
+                "elementAlign": "left",
+                "animation": {
+                  "preset": "blur-reveal",
+                  "delayMs": 140,
+                  "once": false
+                }
+              }
+            ]
+          }
+        ],
+        "animation": {
+          "preset": "fade-up",
+          "delayMs": 0,
+          "once": false
+        }
+      },
+      {
+        "id": "webpages-animation-demo-direction",
+        "kind": "contentLayout",
+        "title": "Directional story beats",
+        "eyebrow": "Section direction",
+        "body": "The two panels enter from opposite sides, useful for before/after or problem/solution storytelling.",
+        "background": "#f5f1e8",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "light",
+        "topSpacing": "medium",
+        "bottomSpacing": "medium",
+        "topMargin": "inherit",
+        "bottomMargin": "inherit",
+        "visible": true,
+        "layoutColumns": 2,
+        "layoutRows": 1,
+        "layoutItems": [
+          {
+            "id": "animation-left-column",
+            "rowId": "animation-direction-row",
+            "rowLayout": "halves",
+            "blocks": [
+              {
+                "id": "animation-left-panel",
+                "kind": "panel",
+                "eyebrow": "Before",
+                "title": "Classic site changes feel heavy",
+                "body": "Slides in from the left. Use for the starting point, problem, or previous state.",
+                "buttonLabel": "",
+                "buttonUrl": "/",
+                "panelStyle": "flat-white",
+                "elementPadding": "medium",
+                "elementAlign": "left",
+                "animation": {
+                  "preset": "slide-left",
+                  "delayMs": 0,
+                  "once": false
+                }
+              }
+            ]
+          },
+          {
+            "id": "animation-right-column",
+            "rowId": "animation-direction-row",
+            "rowLayout": "halves",
+            "blocks": [
+              {
+                "id": "animation-right-panel",
+                "kind": "panel",
+                "eyebrow": "After",
+                "title": "React frontend stays flexible",
+                "body": "Slides in from the right. Use for the outcome, solution, or next state.",
+                "buttonLabel": "",
+                "buttonUrl": "/",
+                "panelStyle": "flat-white",
+                "elementPadding": "medium",
+                "elementAlign": "left",
+                "animation": {
+                  "preset": "slide-right",
+                  "delayMs": 100,
+                  "once": false
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "webpages-animation-demo-sequence",
+        "kind": "contentLayout",
+        "title": "Step sequence",
+        "eyebrow": "Workflow animation",
+        "body": "The cards appear in order, making the direction of a process easy to follow.",
+        "background": "#111111",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "dark",
+        "topSpacing": "medium",
+        "bottomSpacing": "medium",
+        "topMargin": "inherit",
+        "bottomMargin": "inherit",
+        "visible": true,
+        "layoutColumns": 4,
+        "layoutRows": 1,
+        "animation": {
+          "preset": "progress-line",
+          "delayMs": 0,
+          "once": false,
+          "pauseUntilComplete": true,
+          "playOnce": false
+        },
+        "layoutItems": [
+          {
+            "id": "animation-step-one",
+            "rowId": "animation-step-row",
+            "rowLayout": "quarters",
+            "blocks": [
+              {
+                "id": "animation-step-one-panel",
+                "kind": "panel",
+                "eyebrow": "01",
+                "title": "Plan",
+                "body": "Choose the page goal and content rhythm.",
+                "buttonLabel": "",
+                "buttonUrl": "/",
+                "panelStyle": "flat-dark",
+                "elementPadding": "medium",
+                "elementAlign": "left"
+              }
+            ]
+          },
+          {
+            "id": "animation-step-two",
+            "rowId": "animation-step-row",
+            "rowLayout": "quarters",
+            "blocks": [
+              {
+                "id": "animation-step-two-panel",
+                "kind": "panel",
+                "eyebrow": "02",
+                "title": "Build",
+                "body": "Compose sections, rows, and reusable elements.",
+                "buttonLabel": "",
+                "buttonUrl": "/",
+                "panelStyle": "flat-dark",
+                "elementPadding": "medium",
+                "elementAlign": "left"
+              }
+            ]
+          },
+          {
+            "id": "animation-step-three",
+            "rowId": "animation-step-row",
+            "rowLayout": "quarters",
+            "blocks": [
+              {
+                "id": "animation-step-three-panel",
+                "kind": "panel",
+                "eyebrow": "03",
+                "title": "Manage",
+                "body": "Edit content from WordPress and the dashboard.",
+                "buttonLabel": "",
+                "buttonUrl": "/",
+                "panelStyle": "flat-dark",
+                "elementPadding": "medium",
+                "elementAlign": "left"
+              }
+            ]
+          },
+          {
+            "id": "animation-step-four",
+            "rowId": "animation-step-row",
+            "rowLayout": "quarters",
+            "blocks": [
+              {
+                "id": "animation-step-four-panel",
+                "kind": "panel",
+                "eyebrow": "04",
+                "title": "Sell",
+                "body": "Connect WooCommerce products, cart, and checkout.",
+                "buttonLabel": "",
+                "buttonUrl": "/",
+                "panelStyle": "flat-dark",
+                "elementPadding": "medium",
+                "elementAlign": "left"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "webpages-animation-demo-progress",
+        "kind": "contentLayout",
+        "title": "Progress line",
+        "eyebrow": "Guided journey",
+        "body": "A directional timeline: the track fills from left to right, the dots activate step by step, and the arrow marks the destination.",
+        "background": "#ffffff",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "light",
+        "topSpacing": "medium",
+        "bottomSpacing": "medium",
+        "topMargin": "inherit",
+        "bottomMargin": "inherit",
+        "visible": true,
+        "layoutColumns": 4,
+        "layoutRows": 1,
+        "animation": {
+          "preset": "progress-line",
+          "delayMs": 0,
+          "once": false
+        },
+        "layoutItems": [
+          {
+            "id": "animation-progress-one",
+            "rowId": "animation-progress-row",
+            "rowLayout": "quarters",
+            "blocks": [
+              {
+                "id": "animation-progress-one-panel",
+                "kind": "panel",
+                "eyebrow": "Start",
+                "title": "React frontend",
+                "body": "The first dot activates as the line starts moving.",
+                "buttonLabel": "",
+                "buttonUrl": "/",
+                "panelStyle": "clean-shadow",
+                "elementPadding": "medium",
+                "elementAlign": "left"
+              }
+            ]
+          },
+          {
+            "id": "animation-progress-two",
+            "rowId": "animation-progress-row",
+            "rowLayout": "quarters",
+            "blocks": [
+              {
+                "id": "animation-progress-two-panel",
+                "kind": "panel",
+                "eyebrow": "CMS",
+                "title": "WordPress editing",
+                "body": "The line reaches the CMS step next.",
+                "buttonLabel": "",
+                "buttonUrl": "/",
+                "panelStyle": "clean-shadow",
+                "elementPadding": "medium",
+                "elementAlign": "left"
+              }
+            ]
+          },
+          {
+            "id": "animation-progress-three",
+            "rowId": "animation-progress-row",
+            "rowLayout": "quarters",
+            "blocks": [
+              {
+                "id": "animation-progress-three-panel",
+                "kind": "panel",
+                "eyebrow": "Shop",
+                "title": "WooCommerce",
+                "body": "The shop step appears as the flow continues.",
+                "buttonLabel": "",
+                "buttonUrl": "/",
+                "panelStyle": "clean-shadow",
+                "elementPadding": "medium",
+                "elementAlign": "left"
+              }
+            ]
+          },
+          {
+            "id": "animation-progress-four",
+            "rowId": "animation-progress-row",
+            "rowLayout": "quarters",
+            "blocks": [
+              {
+                "id": "animation-progress-four-panel",
+                "kind": "panel",
+                "eyebrow": "Launch",
+                "title": "Hosting included",
+                "body": "The arrow lands on launch and hosting.",
+                "buttonLabel": "",
+                "buttonUrl": "/",
+                "panelStyle": "clean-shadow",
+                "elementPadding": "medium",
+                "elementAlign": "left"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "webpages-scroll-progress-horizontal",
+        "kind": "contentLayout",
+        "title": "Scroll progress horizontal",
+        "eyebrow": "Scroll-linked motion",
+        "body": "As this section moves through the viewport, the timeline fills horizontally and each step activates based on scroll position.",
+        "background": "#0c0c0c",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "dark",
+        "topSpacing": "large",
+        "bottomSpacing": "large",
+        "topMargin": "inherit",
+        "bottomMargin": "inherit",
+        "visible": true,
+        "layoutColumns": 4,
+        "layoutRows": 1,
+        "animation": {
+          "preset": "fade-up",
+          "delayMs": 100,
+          "progressSmoothingMs": 80,
+          "scrubDistanceVh": 260,
+          "stepOffset": -20,
+          "once": false,
+          "pauseUntilComplete": false,
+          "easing": "spring",
+          "durationMs": 0.4
+        },
+        "layoutItems": [
+          {
+            "id": "scroll-horizontal-step-1",
+            "rowId": "scroll-horizontal-row",
+            "rowLayout": "quarters",
+            "blocks": [
+              {
+                "id": "scroll-horizontal-panel-1",
+                "kind": "panel",
+                "eyebrow": "01",
+                "title": "Discovery",
+                "body": "The line begins when the visitor reaches the story.",
+                "panelStyle": "clean-shadow",
+                "elementPadding": "medium",
+                "elementAlign": "left"
+              }
+            ]
+          },
+          {
+            "id": "scroll-horizontal-step-2",
+            "rowId": "scroll-horizontal-row",
+            "rowLayout": "quarters",
+            "blocks": [
+              {
+                "id": "scroll-horizontal-panel-2",
+                "kind": "panel",
+                "eyebrow": "02",
+                "title": "Design",
+                "body": "The second marker lights up as the page continues.",
+                "panelStyle": "clean-shadow",
+                "elementPadding": "medium",
+                "elementAlign": "left"
+              }
+            ]
+          },
+          {
+            "id": "scroll-horizontal-step-3",
+            "rowId": "scroll-horizontal-row",
+            "rowLayout": "quarters",
+            "blocks": [
+              {
+                "id": "scroll-horizontal-panel-3",
+                "kind": "panel",
+                "eyebrow": "03",
+                "title": "Commerce",
+                "body": "Progress reaches the shop and product experience.",
+                "panelStyle": "clean-shadow",
+                "elementPadding": "medium",
+                "elementAlign": "left"
+              }
+            ]
+          },
+          {
+            "id": "scroll-horizontal-step-4",
+            "rowId": "scroll-horizontal-row",
+            "rowLayout": "quarters",
+            "blocks": [
+              {
+                "id": "scroll-horizontal-panel-4",
+                "kind": "panel",
+                "eyebrow": "04",
+                "title": "Launch",
+                "body": "The arrow completes when the visitor reaches the end.",
+                "panelStyle": "clean-shadow",
+                "elementPadding": "medium",
+                "elementAlign": "left"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "contentLayout-mpu4riuw-qgmua",
+        "kind": "contentLayout",
+        "title": "",
+        "background": "#ffffff",
+        "backgroundMode": "boxed",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "topSpacing": "inherit",
+        "bottomSpacing": "inherit",
+        "topMargin": "inherit",
+        "bottomMargin": "inherit",
+        "visible": true,
+        "eyebrow": "",
+        "body": "",
+        "layout": "whole",
+        "layoutColumns": 1,
+        "layoutItems": [
+          {
+            "id": "layout-item-mpu4riuw-1",
+            "blocks": [
+              {
+                "id": "grid-block-mpu4rw3r-s2cex",
+                "kind": "grid",
+                "title": "Grid",
+                "gridSource": "static",
+                "columns": 3,
+                "gridRows": 1,
+                "gridGap": "medium",
+                "gridMargin": "none",
+                "gridImagePadding": "frameless",
+                "gridContentPadding": "medium",
+                "gridImageFrame": "none",
+                "gridShowImage": true,
+                "gridShowEyebrow": true,
+                "gridShowMeta": true,
+                "gridShowText": true,
+                "gridShowButton": true,
+                "gridItems": [
+                  {
+                    "id": "grid-block-mpu4rw3r-s2cex-1",
+                    "eyebrow": "01",
+                    "title": "Grid item one",
+                    "meta": "Meta",
+                    "text": "Map static or dynamic content into a reusable card.",
+                    "buttonLabel": "Learn more",
+                    "buttonUrl": "/",
+                    "typography": {
+                      "variant": "body",
+                      "fontFamily": "inherit",
+                      "fontSize": "16px",
+                      "fontWeight": "400",
+                      "lineHeight": "1.4",
+                      "letterSpacing": "0px",
+                      "color": "inherit",
+                      "textAlign": "left"
+                    }
+                  },
+                  {
+                    "id": "grid-block-mpu4rw3r-s2cex-2",
+                    "eyebrow": "02",
+                    "title": "Grid item two",
+                    "meta": "Meta",
+                    "text": "Control columns, spacing, images, and content.",
+                    "buttonLabel": "Learn more",
+                    "buttonUrl": "/",
+                    "typography": {
+                      "variant": "body",
+                      "fontFamily": "inherit",
+                      "fontSize": "16px",
+                      "fontWeight": "400",
+                      "lineHeight": "1.4",
+                      "letterSpacing": "0px",
+                      "color": "inherit",
+                      "textAlign": "left"
+                    }
+                  },
+                  {
+                    "id": "grid-block-mpu4rw3r-s2cex-3",
+                    "eyebrow": "03",
+                    "title": "Grid item three",
+                    "meta": "Meta",
+                    "text": "Later this can read posts, products, or custom fields.",
+                    "buttonLabel": "Learn more",
+                    "buttonUrl": "/",
+                    "typography": {
+                      "variant": "body",
+                      "fontFamily": "inherit",
+                      "fontSize": "16px",
+                      "fontWeight": "400",
+                      "lineHeight": "1.4",
+                      "letterSpacing": "0px",
+                      "color": "inherit",
+                      "textAlign": "left"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "layoutRows": 1,
+        "animation": {
+          "preset": "fade-up"
+        }
+      },
+      {
+        "id": "webpages-scroll-progress-vertical",
+        "kind": "contentLayout",
+        "title": "Scroll progress vertical",
+        "eyebrow": "Direction down the page",
+        "body": "A vertical scroll timeline works for longer explainers, roadmaps, onboarding flows, and step-by-step service pages.",
+        "background": "#f4efe6",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "light",
+        "topSpacing": "large",
+        "bottomSpacing": "large",
+        "topMargin": "inherit",
+        "bottomMargin": "inherit",
+        "visible": true,
+        "layoutColumns": 1,
+        "layoutRows": 4,
+        "animation": {
+          "preset": "progress-line",
+          "once": false,
+          "pauseUntilComplete": true,
+          "delayMs": 0,
+          "progressSmoothingMs": 80,
+          "scrubDistanceVh": 150,
+          "stepOffset": 10,
+          "durationMs": 0.4,
+          "easing": "spring",
+          "progressDirection": "vertical",
+          "playOnce": false
+        },
+        "layoutItems": [
+          {
+            "id": "scroll-vertical-step-1",
+            "rowId": "scroll-vertical-row-1",
+            "rowLayout": "whole",
+            "blocks": [
+              {
+                "id": "scroll-vertical-panel-1",
+                "kind": "panel",
+                "eyebrow": "Phase 01",
+                "title": "Plan the page rhythm",
+                "body": "Use this when the visitor should feel movement down through a process.",
+                "panelStyle": "flat-white",
+                "elementPadding": "medium",
+                "elementAlign": "left"
+              }
+            ]
+          },
+          {
+            "id": "scroll-vertical-step-2",
+            "rowId": "scroll-vertical-row-2",
+            "rowLayout": "whole",
+            "blocks": [
+              {
+                "id": "scroll-vertical-panel-2",
+                "kind": "panel",
+                "eyebrow": "Phase 02",
+                "title": "Build the reusable blocks",
+                "body": "Each marker activates as that part of the story becomes current.",
+                "panelStyle": "flat-white",
+                "elementPadding": "medium",
+                "elementAlign": "left"
+              }
+            ]
+          },
+          {
+            "id": "scroll-vertical-step-3",
+            "rowId": "scroll-vertical-row-3",
+            "rowLayout": "whole",
+            "blocks": [
+              {
+                "id": "scroll-vertical-panel-3",
+                "kind": "panel",
+                "eyebrow": "Phase 03",
+                "title": "Connect shop and CMS",
+                "body": "The filled line helps explain direction without adding heavy effects.",
+                "panelStyle": "flat-white",
+                "elementPadding": "medium",
+                "elementAlign": "left"
+              }
+            ]
+          },
+          {
+            "id": "scroll-vertical-step-4",
+            "rowId": "scroll-vertical-row-4",
+            "rowLayout": "whole",
+            "blocks": [
+              {
+                "id": "scroll-vertical-panel-4",
+                "kind": "panel",
+                "eyebrow": "Phase 04",
+                "title": "Launch and improve",
+                "body": "The final arrow marks the destination as the visitor reaches the end.",
+                "panelStyle": "flat-white",
+                "elementPadding": "medium",
+                "elementAlign": "left"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "webpages-animation-demo-items",
+        "kind": "contentLayout",
+        "title": "Item stagger grid",
+        "eyebrow": "Cards and collections",
+        "body": "Cards reveal one after another, which works well for features, benefits, products, and category grids.",
+        "background": "#efebe2",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "light",
+        "topSpacing": "medium",
+        "bottomSpacing": "large",
+        "topMargin": "inherit",
+        "bottomMargin": "inherit",
+        "visible": true,
+        "layoutColumns": 1,
+        "layoutRows": 1,
+        "animation": {
+          "preset": "stagger-up",
+          "delayMs": 0,
+          "once": false
+        },
+        "layoutItems": [
+          {
+            "id": "animation-stagger-grid-column",
+            "rowId": "animation-stagger-row",
+            "rowLayout": "whole",
+            "blocks": [
+              {
+                "id": "animation-stagger-grid",
+                "kind": "grid",
+                "title": "Animation presets",
+                "gridSource": "static",
+                "columns": 3,
+                "gridRows": 2,
+                "gridGap": "medium",
+                "gridMargin": "none",
+                "gridImagePadding": "frameless",
+                "gridContentPadding": "medium",
+                "gridImageFrame": "none",
+                "gridShowImage": false,
+                "gridShowEyebrow": true,
+                "gridShowMeta": false,
+                "gridShowText": true,
+                "gridShowButton": false,
+                "gridItems": [
+                  {
+                    "id": "animation-grid-1",
+                    "eyebrow": "Fade",
+                    "title": "Fade up",
+                    "text": "Default reveal for most content."
+                  },
+                  {
+                    "id": "animation-grid-2",
+                    "eyebrow": "Directional",
+                    "title": "Slide left",
+                    "text": "Show content entering from a path."
+                  },
+                  {
+                    "id": "animation-grid-3",
+                    "eyebrow": "Directional",
+                    "title": "Slide right",
+                    "text": "Pair with slide left for contrast."
+                  },
+                  {
+                    "id": "animation-grid-4",
+                    "eyebrow": "Editorial",
+                    "title": "Blur reveal",
+                    "text": "Great for premium campaign copy."
+                  },
+                  {
+                    "id": "animation-grid-5",
+                    "eyebrow": "Process",
+                    "title": "Step sequence",
+                    "text": "Describe ordered movement."
+                  },
+                  {
+                    "id": "animation-grid-6",
+                    "eyebrow": "Roadmap",
+                    "title": "Progress line",
+                    "text": "Connect multiple milestones."
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
         "id": "contact",
         "kind": "contentLayout",
         "title": "",
@@ -1174,7 +1807,7 @@
         ]
       }
     ],
-    "updatedAt": "2026-05-31T14:38:03.573Z"
+    "updatedAt": "2026-06-01T03:56:17.358Z"
   },
   "shop": {
     "version": 1,

@@ -172,6 +172,7 @@ export type BuilderLayoutBlock = {
   galleryHeight?: number;
   typography?: Record<string, unknown>;
   visualStyle?: Record<string, unknown>;
+  animation?: Record<string, unknown>;
 };
 
 export type BuilderSection = {
@@ -263,6 +264,7 @@ export type BuilderSection = {
   visible: boolean;
   typography?: Record<string, unknown>;
   visualStyle?: Record<string, unknown>;
+  animation?: Record<string, unknown>;
 };
 
 export type BuilderLayout = {

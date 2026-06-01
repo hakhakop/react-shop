@@ -23,6 +23,7 @@ import {
 } from "react";
 import type {
   BuilderLayoutBlock,
+  BuilderAnimationPreset,
   BuilderSection,
   EmbedMode,
   InspectorTab,
@@ -43,6 +44,7 @@ import {
 } from "@/components/dashboard/builderLayoutPresets";
 import TypographyPanel from "@/components/dashboard/TypographyPanel";
 import StyleTabPanel from "@/components/dashboard/style/StyleTabPanel";
+import AnimationControl from "@/components/dashboard/style/AnimationControl";
 import type { BuilderVisualStyle } from "@/lib/builderVisualStyle";
 import type { CategoryTreeItem } from "@/lib/categories";
 
@@ -58,6 +60,34 @@ const panelStyleOptions: { label: string; value: BuilderPanelStyle }[] = [
   { label: "Clean with shadow", value: "clean-shadow" },
   { label: "Flat dark", value: "flat-dark" },
   { label: "Flat white", value: "flat-white" },
+];
+
+// Kept for backward compat — the AnimationControl component
+// handles the new presets. This array is still used for old preset
+// descriptions in some inspector panels.
+const animationPresetOptions: {
+  label: string;
+  value: BuilderAnimationPreset;
+  description: string;
+}[] = [
+  { label: "None", value: "none", description: "No animation." },
+  { label: "Fade Up", value: "fade-up", description: "Slide up + fade in." },
+  { label: "Fade Down", value: "fade-down", description: "Slide down + fade in." },
+  { label: "Fade In", value: "fade-in", description: "Pure opacity fade." },
+  { label: "Slide Left", value: "slide-left", description: "Enter from left." },
+  { label: "Slide Right", value: "slide-right", description: "Enter from right." },
+  { label: "Scale Up", value: "scale-up", description: "Subtle zoom + fade." },
+  { label: "Zoom In", value: "zoom-in", description: "Dramatic zoom entrance." },
+  { label: "Flip Up", value: "flip-up", description: "3D X rotation." },
+  { label: "Blur In", value: "blur-in", description: "Blur to clear, elegant." },
+  { label: "Stagger", value: "stagger", description: "Gentle group entrance." },
+  { label: "Soft scale", value: "scale-soft", description: "Legacy: small zoom-in." },
+  { label: "Blur reveal", value: "blur-reveal", description: "Legacy: blur entrance." },
+  { label: "Stagger up", value: "stagger-up", description: "Legacy: sequential reveal." },
+  { label: "Step sequence", value: "step-sequence", description: "Legacy: slow stagger." },
+  { label: "Progress line", value: "progress-line", description: "Legacy: animated line." },
+  { label: "Scroll progress horizontal", value: "scroll-progress-horizontal", description: "Legacy: horizontal fill." },
+  { label: "Scroll progress vertical", value: "scroll-progress-vertical", description: "Legacy: vertical fill." },
 ];
 
 type DashboardInspectorProps = {
@@ -174,6 +204,7 @@ function flattenCategoryTree(
 export default function DashboardInspector(props: DashboardInspectorProps) {
   const [isLayoutPickerOpen, setLayoutPickerOpen] = useState(false);
   const [categoryHideSearch, setCategoryHideSearch] = useState("");
+  const [openNestedCardId, setOpenNestedCardId] = useState<string | null>(null);
   const [activeTypographyAreaState, setActiveTypographyAreaState] = useState<{
     area: "title" | "body" | "button" | "eyebrow";
     blockKey: string | null;
@@ -349,6 +380,57 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
       return;
     }
     updateSelected(patch);
+  }
+
+  function updateAnimationTarget(
+    patch: Partial<NonNullable<BuilderSection["animation"]>>,
+  ) {
+    const currentAnimation = selectedLayoutBlock
+      ? (selectedLayoutBlock.animation ?? {})
+      : (selectedSection?.animation ?? {});
+    const nextAnimation = { ...currentAnimation, ...patch };
+
+    if (nextAnimation.preset === "none") {
+      nextAnimation.delayMs = undefined;
+    }
+
+    if (selectedLayoutBlock) {
+      updateSelectedLayoutBlock({ animation: nextAnimation });
+      return;
+    }
+
+    updateSelected({ animation: nextAnimation });
+  }
+
+  function renderAnimationControls(
+    target: BuilderSection | BuilderLayoutBlock | null | undefined,
+    options: { allowPause?: boolean } = {},
+  ) {
+    const animation = target?.animation ?? {};
+
+    return (
+      <details className="builder-collapse" open>
+        <summary>
+          <InspectorGroupSummary
+            title="Scroll Animation"
+            description="Beautiful entrance animation on scroll."
+            meta={animation.preset && animation.preset !== "none" ? animation.preset.replace(/-/g, " ") : "None"}
+          />
+        </summary>
+        <AnimationControl
+          value={animation}
+          onChange={(next) => {
+            if (next.preset === "none") {
+              next.delayMs = undefined;
+              next.pauseUntilComplete = undefined;
+            }
+            updateAnimationTarget(next);
+          }}
+          allowPause={options.allowPause}
+          allowScrub
+        />
+      </details>
+    );
   }
 
   function pickStyleBackgroundImage() {
@@ -641,6 +723,10 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                       </select>
                     </label>
                   </details>
+
+                  {renderAnimationControls(selectedSection, {
+                    allowPause: true,
+                  })}
 
                   <details className="builder-collapse">
                     <summary>
@@ -1355,10 +1441,21 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                 <Plus size={15} />
                                                 Add button
                                               </button>
-                                              {(block.buttons ?? []).map((btn, btnIndex) => (
-                                                <div key={btn.id ?? btnIndex} className="builder-nested-card is-open">
+                                              <div className="builder-repeatable-tabs">
+                                              {(block.buttons ?? []).map((btn, btnIndex) => {
+                                                const btnKey = btn.id ?? `${blockKey}-button-${btnIndex}`;
+                                                const isButtonOpen = openNestedCardId === btnKey || (!openNestedCardId && btnIndex === 0);
+                                                return (
+                                                <div key={btnKey} className={`builder-nested-card${isButtonOpen ? " is-open" : ""}`}>
                                                   <div className="builder-nested-card-header">
-                                                    <span>Button {btnIndex + 1}</span>
+                                                    <button
+                                                      type="button"
+                                                      className="builder-slide-toggle"
+                                                      onClick={() => setOpenNestedCardId(isButtonOpen ? null : btnKey)}
+                                                    >
+                                                      <span>Button {btnIndex + 1}</span>
+                                                      <small>{btn.label || "Untitled button"}</small>
+                                                    </button>
                                                     <button
                                                       type="button"
                                                       onClick={() => deleteSelectedLayoutBlockButton(index, blockIndex, btnIndex)}
@@ -1367,6 +1464,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                       <Trash2 size={14} />
                                                     </button>
                                                   </div>
+                                                  {isButtonOpen && (
                                                   <div className="builder-nested-card-body">
                                                     <label className="builder-field">
                                                       <span>Label</span>
@@ -1406,8 +1504,11 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                       </select>
                                                     </label>
                                                   </div>
+                                                  )}
                                                 </div>
-                                              ))}
+                                                );
+                                              })}
+                                              </div>
                                             </>
                                           ) : block.kind === "embed" ? (
                                             <>
@@ -1881,26 +1982,36 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                     <Plus size={15} />
                                                     Add item
                                                   </button>
+                                                  <div className="builder-repeatable-tabs">
                                                   {(
                                                     block.gridItems ?? []
                                                   ).map(
                                                     (
                                                       gridItem,
                                                       gridItemIndex,
-                                                    ) => (
+                                                    ) => {
+                                                      const gridCardKey = `grid-${index}-${blockIndex}-${gridItemIndex}`;
+                                                      const isGridCardOpen = openNestedCardId === gridCardKey || (!openNestedCardId && gridItemIndex === 0);
+                                                      return (
                                                       <div
                                                         key={
                                                           gridItem.id ??
                                                           `${blockKey}-grid-${gridItemIndex}`
                                                         }
-                                                        className="builder-nested-card is-open"
+                                                        className={`builder-nested-card${isGridCardOpen ? " is-open" : ""}`}
                                                       >
                                                         <div className="builder-nested-card-header">
-                                                          <span>
-                                                            Item{" "}
-                                                            {gridItemIndex +
-                                                              1}
-                                                          </span>
+                                                          <button
+                                                            type="button"
+                                                            className="builder-slide-toggle"
+                                                            onClick={() => setOpenNestedCardId(isGridCardOpen ? null : gridCardKey)}
+                                                          >
+                                                            <span>
+                                                              Item{" "}
+                                                              {gridItemIndex + 1}
+                                                            </span>
+                                                            <small>{gridItem.title || "Untitled item"}</small>
+                                                          </button>
                                                           <button
                                                             type="button"
                                                             onClick={() =>
@@ -1917,6 +2028,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                             />
                                                           </button>
                                                         </div>
+                                                        {isGridCardOpen && (
                                                         <div className="builder-nested-card-body">
                                                           <label className="builder-field">
                                                             <span>
@@ -2112,9 +2224,12 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                             </label>
                                                           </div>
                                                         </div>
+                                                        )}
                                                       </div>
-                                                    ),
+                                                      );
+                                                    },
                                                   )}
+                                                  </div>
                                                 </details>
                                               )}
                                             </>
@@ -3496,13 +3611,16 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                 <Plus size={15} />
                                                 Add slide
                                               </button>
+                                              <div className="builder-repeatable-tabs">
                                               {(block.slides ?? []).map(
                                                 (slide, slideIndex) => {
                                                   const slideKey =
                                                     slide.id ??
                                                     `${blockKey}-nested-slide-${slideIndex}`;
                                                   const isSlideOpen =
-                                                    openSlideId === slideKey;
+                                                    openSlideId === slideKey ||
+                                                    (!openSlideId &&
+                                                      slideIndex === 0);
 
                                                   return (
                                                     <div
@@ -3824,6 +3942,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                   );
                                                 },
                                               )}
+                                              </div>
                                             </>
                                           ) : block.kind === "icon" ? (
                                             <>
@@ -4147,19 +4266,42 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                 <Plus size={15} />
                                                 Add badge
                                               </button>
+                                              <div className="builder-repeatable-tabs">
                                               {(block.badges ?? []).map(
-                                                (badge, badgeIndex) => (
+                                                (badge, badgeIndex) => {
+                                                  const badgeKey =
+                                                    badge.id ??
+                                                    `${blockKey}-badge-${badgeIndex}`;
+                                                  const isBadgeOpen =
+                                                    openNestedCardId === badgeKey ||
+                                                    (!openNestedCardId &&
+                                                      badgeIndex === 0);
+                                                  return (
                                                   <div
-                                                    key={
-                                                      badge.id ??
-                                                      `${blockKey}-badge-${badgeIndex}`
-                                                    }
-                                                    className="builder-nested-card is-open"
+                                                    key={badgeKey}
+                                                    className={`builder-nested-card${isBadgeOpen ? " is-open" : ""}`}
                                                   >
                                                     <div className="builder-nested-card-header">
-                                                      <span>
-                                                        Badge {badgeIndex + 1}
-                                                      </span>
+                                                      <button
+                                                        type="button"
+                                                        className="builder-slide-toggle"
+                                                        onClick={() =>
+                                                          setOpenNestedCardId(
+                                                            isBadgeOpen
+                                                              ? null
+                                                              : badgeKey,
+                                                          )
+                                                        }
+                                                      >
+                                                        <span>
+                                                          Badge {badgeIndex + 1}
+                                                        </span>
+                                                        <small>
+                                                          {badge.title ||
+                                                            badge.label ||
+                                                            "Untitled badge"}
+                                                        </small>
+                                                      </button>
                                                       <button
                                                         type="button"
                                                         onClick={() =>
@@ -4174,6 +4316,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                         <Trash2 size={14} />
                                                       </button>
                                                     </div>
+                                                    {isBadgeOpen && (
                                                     <div className="builder-nested-card-body">
                                                       <label className="builder-field">
                                                         <span>Label</span>
@@ -4230,9 +4373,12 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                         />
                                                       </label>
                                                     </div>
+                                                    )}
                                                   </div>
-                                                ),
+                                                  );
+                                                },
                                               )}
+                                              </div>
                                             </>
                                           ) : block.kind === "panel" ? (
                                             <>
@@ -4674,10 +4820,21 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                 <Plus size={15} />
                                                 Add button
                                               </button>
-                                              {(block.buttons ?? []).map((btn, btnIndex) => (
-                                                <div key={btn.id ?? btnIndex} className="builder-nested-card is-open">
+                                              <div className="builder-repeatable-tabs">
+                                              {(block.buttons ?? []).map((btn, btnIndex) => {
+                                                const btnKey = btn.id ?? `${blockKey}-button-${btnIndex}`;
+                                                const isButtonOpen = openNestedCardId === btnKey || (!openNestedCardId && btnIndex === 0);
+                                                return (
+                                                <div key={btnKey} className={`builder-nested-card${isButtonOpen ? " is-open" : ""}`}>
                                                   <div className="builder-nested-card-header">
-                                                    <span>Button {btnIndex + 1}</span>
+                                                    <button
+                                                      type="button"
+                                                      className="builder-slide-toggle"
+                                                      onClick={() => setOpenNestedCardId(isButtonOpen ? null : btnKey)}
+                                                    >
+                                                      <span>Button {btnIndex + 1}</span>
+                                                      <small>{btn.label || "Untitled button"}</small>
+                                                    </button>
                                                     <button
                                                       type="button"
                                                       onClick={() => deleteSelectedLayoutBlockButton(index, blockIndex, btnIndex)}
@@ -4686,6 +4843,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                       <Trash2 size={14} />
                                                     </button>
                                                   </div>
+                                                  {isButtonOpen && (
                                                   <div className="builder-nested-card-body">
                                                     <label className="builder-field">
                                                       <span>Label</span>
@@ -4702,8 +4860,11 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                       />
                                                     </label>
                                                   </div>
+                                                  )}
                                                 </div>
-                                              ))}
+                                                );
+                                              })}
+                                              </div>
                                             </>
                                           )}
                                           </>
@@ -5083,12 +5244,38 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                           <span>{selectedSection.badges?.length ?? 0}</span>
                         </div>
 
+                        <div className="builder-repeatable-tabs">
                         {(selectedSection.badges ?? []).map(
-                          (badge, index) => (
+                          (badge, index) => {
+                            const badgeKey = badge.id ?? `section-badge-${index}`;
+                            const isBadgeOpen =
+                              openNestedCardId === badgeKey ||
+                              (!openNestedCardId && index === 0);
+                            return (
                             <div
-                              key={badge.id ?? index}
-                              className="builder-nested-card"
+                              key={badgeKey}
+                              className={`builder-nested-card${isBadgeOpen ? " is-open" : ""}`}
                             >
+                              <div className="builder-nested-card-header">
+                                <button
+                                  type="button"
+                                  className="builder-slide-toggle"
+                                  onClick={() =>
+                                    setOpenNestedCardId(
+                                      isBadgeOpen ? null : badgeKey,
+                                    )
+                                  }
+                                >
+                                  <span>Badge {index + 1}</span>
+                                  <small>
+                                    {badge.title ||
+                                      badge.label ||
+                                      "Untitled badge"}
+                                  </small>
+                                </button>
+                              </div>
+                              {isBadgeOpen && (
+                              <div className="builder-nested-card-body">
                               <label className="builder-field">
                                 <span>Badge Label</span>
                                 <input
@@ -5118,13 +5305,17 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                   onChange={(value) =>
                                     updateSelectedBadge(index, {
                                       body: value,
-                                    })
-                                  }
-                                />
-                              </label>
+                                  })
+                                }
+                              />
+                            </label>
+                              </div>
+                              )}
                             </div>
-                          ),
+                            );
+                          },
                         )}
+                        </div>
                       </>
                     )}
 
@@ -5380,10 +5571,13 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                           Add slide
                         </button>
 
+                        <div className="builder-repeatable-tabs">
                         {(selectedSection.slides ?? []).map(
                           (slide, index) => {
                             const slideKey = slide.id ?? `slide-${index}`;
-                            const isOpen = openSlideId === slideKey;
+                            const isOpen =
+                              openSlideId === slideKey ||
+                              (!openSlideId && index === 0);
 
                             return (
                               <div
@@ -5550,7 +5744,8 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                               </div>
                             );
                           },
-                    )}
+                        )}
+                        </div>
                       </>
                     )}
                   </details>
@@ -5639,6 +5834,10 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                       </span>
                     </div>
                   </details>
+
+                  {renderAnimationControls(selectedLayoutBlock, {
+                    allowPause: true,
+                  })}
 
                   <details className="builder-collapse">
                     <summary>

@@ -2,12 +2,22 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import type { CSSProperties, ReactNode } from "react";
+import type { CSSProperties, ReactNode, MouseEvent } from "react";
 import type { MenuItem } from "../lib/navigation";
 
 interface HeaderNavProps {
   items: MenuItem[];
   presentationById?: Record<string, MenuPresentationSettings>;
+}
+
+function handleNavMouseMove(e: MouseEvent<HTMLAnchorElement>) {
+  const rect = e.currentTarget.getBoundingClientRect();
+  const x = ((e.clientX - rect.left) / rect.width) * 100;
+  e.currentTarget.style.setProperty("--gradient-pct", `${x}%`);
+}
+
+function handleNavMouseLeave(e: MouseEvent<HTMLAnchorElement>) {
+  e.currentTarget.style.removeProperty("--gradient-pct");
 }
 
 type MenuPresentationSettings = {
@@ -234,6 +244,8 @@ function renderMenuItems(
           }${isActive ? " is-active" : ""}`}
           aria-current={isActive ? "page" : undefined}
           aria-haspopup={hasChildren ? "menu" : undefined}
+          onMouseMove={handleNavMouseMove}
+          onMouseLeave={handleNavMouseLeave}
         >
           {icon && <span className="site-header-nav-icon">{icon}</span>}
           {item.label}

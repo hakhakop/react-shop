@@ -99,6 +99,40 @@ export type SectionContentMode = "full" | "boxed" | "narrow";
 export type BuilderColorScheme = "auto" | "light" | "dark";
 export type SectionColorScheme = "inherit" | "light" | "dark";
 export type EmbedMode = "iframe" | "code";
+export type BuilderAnimationPreset =
+  | "none"
+  | "fade-up"
+  | "fade-down"
+  | "fade-in"
+  | "slide-left"
+  | "slide-right"
+  | "scale-up"
+  | "zoom-in"
+  | "flip-up"
+  | "blur-in"
+  | "stagger"
+  | "scale-soft"
+  | "blur-reveal"
+  | "stagger-up"
+  | "step-sequence"
+  | "progress-line"
+  | "scroll-progress-horizontal"
+  | "scroll-progress-vertical"
+  | "princity-gradient";
+export type BuilderAnimationSettings = {
+  preset?: BuilderAnimationPreset;
+  delayMs?: number;
+  durationMs?: number;
+  easing?: "ease-out" | "ease-in-out" | "spring";
+  triggerOffset?: number;
+  playOnce?: boolean;
+  progressSmoothingMs?: number;
+  scrubDistanceVh?: number;
+  stepOffset?: number;
+  once?: boolean;
+  pauseUntilComplete?: boolean;
+  progressDirection?: "horizontal" | "vertical";
+};
 export type LayoutBlockKind =
   | "hero"
   | "button"
@@ -280,6 +314,7 @@ export type BuilderLayoutBlock = {
   galleryHeight?: number;
   typography?: TypographySettings | TypographyGroup;
   visualStyle?: BuilderVisualStyle;
+  animation?: BuilderAnimationSettings;
 };
 
 export type WordPressMediaItem = {
@@ -398,6 +433,7 @@ export type BuilderSection = {
   visible: boolean;
   typography?: TypographySettings | TypographyGroup;
   visualStyle?: BuilderVisualStyle;
+  animation?: BuilderAnimationSettings;
 };
 
 export type BuilderState = {

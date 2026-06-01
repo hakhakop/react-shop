@@ -50,6 +50,7 @@ import { createPortal } from "react-dom";
 import CarouselBlock, {
   type CarouselSlide,
 } from "@/components/blocks/CarouselBlock";
+import BuilderScrollAnimations from "@/components/builder/BuilderScrollAnimations";
 import CategoryBar from "@/components/CategoryBar";
 import CategoryWithFilters from "@/components/CategoryWithFilters";
 import FluentFormClient from "@/components/builder/FluentFormClient";
@@ -99,6 +100,7 @@ import {
   builderRowLayoutPresets,
   getBuilderRowLayoutPreset,
   getBuilderRowLayoutPreviewTemplate,
+  getBuilderLayoutRows as getPreviewLayoutRows,
 } from "@/components/dashboard/builderLayoutPresets";
 import {
   createBlockId,
@@ -960,6 +962,8 @@ export default function DashboardBuilder({
   const skipUndoCaptureRef = useRef(false);
   const [committedBuilderStateSignature, setCommittedBuilderStateSignature] =
     useState("");
+  const undoRef = useRef<() => void>(() => {});
+  const redoRef = useRef<() => void>(() => {});
 
   const selectedSection = useMemo(
     () => builderState.sections.find((section) => section.id === selectedId),
@@ -3117,7 +3121,7 @@ export default function DashboardBuilder({
       rowLayout: preset.key,
       blocks: [],
     }));
-    let firstColumnKey: string | null = newItems[0]?.id ?? null;
+    const firstColumnKey: string | null = newItems[0]?.id ?? null;
 
     setBuilderState((current) => ({
       ...current,
@@ -3246,16 +3250,19 @@ export default function DashboardBuilder({
 
     const current = history[history.length - 1];
     redoHistoryRef.current.push(structuredClone(current));
-
     history.pop();
+
     const nextState = structuredClone(history[history.length - 1]);
     skipUndoCaptureRef.current = true;
     setBuilderState(nextState);
+
+    // Reset selection to first section or clear
     setSelectedId(nextState.sections[0]?.id ?? "");
     setSelectedLayoutColumnKey(null);
     setSelectedLayoutBlockKey(null);
     setPublishStatus("Undid last change");
   };
+  undoRef.current = undoBuilder;
 
   const redoBuilder = () => {
     const redoHistory = redoHistoryRef.current;
@@ -3274,6 +3281,19 @@ export default function DashboardBuilder({
     setSelectedLayoutBlockKey(null);
     setPublishStatus("Redid last change");
   };
+  redoRef.current = redoBuilder;
+
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      const mod = e.metaKey || e.ctrlKey;
+      const isUndo = mod && e.key === "z" && !e.shiftKey;
+      const isRedo = mod && e.key === "z" && e.shiftKey;
+      if (isUndo) { e.preventDefault(); undoRef.current(); }
+      if (isRedo) { e.preventDefault(); redoRef.current(); }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, []);
 
   const copyJson = async () => {
     await navigator.clipboard.writeText(builderJson);
@@ -3364,16 +3384,6 @@ export default function DashboardBuilder({
       setPublishCelebration(false);
     }, 2800);
   };
-
-  const previewButtonsStyle = (layout?: "inline" | "stacked", align?: "left" | "center" | "right"): CSSProperties => ({
-  display: "flex",
-  width: "100%",
-    flexDirection: layout === "stacked" ? "column" : "row",
-    flexWrap: "wrap",
-    gap: "0.75rem",
-    justifyContent: align === "center" ? "center" : align === "right" ? "flex-end" : "flex-start",
-    alignItems: "center",
-  });
 
   const saveShellSettings = async (
     nextSettings: BuilderShellSettings,
@@ -5751,6 +5761,16 @@ function PreviewCanvas({
     placement: "above" | "below";
   } | null>(null);
   const visibleSections = sections.filter((section) => section.visible);
+  const animationSignature = visibleSections
+    .map((section) => {
+      const sectionAnimation = JSON.stringify(section.animation ?? {});
+      const blockAnimations = (section.layoutItems ?? [])
+        .flatMap((item) => item.blocks ?? [])
+        .map((block) => JSON.stringify(block.animation ?? {}))
+        .join("|");
+      return `${section.id}:${sectionAnimation}:${blockAnimations}`;
+    })
+    .join("||");
   const insertTargetSection =
     sections.find((section) => section.id === insertTarget?.sectionId) ?? null;
   const insertLayoutPicker = insertTarget ? (
@@ -5866,6 +5886,7 @@ function PreviewCanvas({
         } builder-preview-page`}
         style={previewDesignStyle(design)}
       >
+        <BuilderScrollAnimations key={animationSignature} />
         <div
           className="shop-builder-inner builder-preview-inner"
           aria-label={`${pageLabel} preview`}
@@ -5875,9 +5896,11 @@ function PreviewCanvas({
               (item) => item.id === section.id,
             );
             const isSelected = selectedId === section.id;
+            const animationAttrs = previewAnimationAttrs(section.animation);
 
             return (
               <div
+                id={section.id}
                 key={section.id}
                 role="button"
                 tabIndex={0}
@@ -5916,8 +5939,10 @@ function PreviewCanvas({
                     ...visualStyleToCss(
                       section.visualStyle as BuilderVisualStyle | undefined,
                     ),
+                    ...animationAttrs.style,
                   } as CSSProperties
                 }
+                {...animationAttrs.data}
                 onClick={() => onSelect(section.id)}
                 onKeyDown={(event) => {
                   if (event.key === "Enter" || event.key === " ") {
@@ -6097,7 +6122,6 @@ function PreviewCanvas({
                   onMoveSectionBadge={onMoveSectionBadge}
                   onUploadGridItemImage={onUploadGridItemImage}
                   onAddRow={onAddRow}
-                  onSetSidebarTab={onSetSidebarTab}
                   onOpenElementsPanel={onOpenElementsPanel}
                 />
               </div>
@@ -6181,7 +6205,72 @@ function getStorefrontPreviewClass(section: BuilderSection) {
 
   return `shop-builder-section shop-builder-section--${
     section.backgroundMode === "boxed" ? "boxed" : "full"
-  } shop-builder-section--content-${section.contentMode ?? "boxed"} ${kindClass}`;
+  } shop-builder-section--content-${section.contentMode ?? "boxed"} ${kindClass} ${previewAnimationClassName(section.animation)}`.trim();
+}
+
+function previewAnimationPreset(
+  animation?: BuilderSection["animation"] | BuilderLayoutBlock["animation"],
+) {
+  const preset = animation?.preset ?? "none";
+  return preset === "none" ? null : preset;
+}
+
+function previewAnimationClassName(
+  animation?: BuilderSection["animation"] | BuilderLayoutBlock["animation"],
+) {
+  const preset = previewAnimationPreset(animation);
+  return preset ? `shop-builder-animate--${preset}` : "";
+}
+
+function previewAnimationAttrs(
+  animation?: BuilderSection["animation"] | BuilderLayoutBlock["animation"],
+) {
+  const preset = previewAnimationPreset(animation);
+
+  if (!preset) {
+    return {
+      data: {},
+      style: undefined,
+    };
+  }
+
+  const delay =
+    typeof animation?.delayMs === "number" && Number.isFinite(animation.delayMs)
+      ? `${Math.max(0, animation.delayMs)}ms`
+      : undefined;
+  const progressSmoothing =
+    typeof animation?.progressSmoothingMs === "number" &&
+    Number.isFinite(animation.progressSmoothingMs)
+      ? `${Math.max(0, animation.progressSmoothingMs)}ms`
+      : undefined;
+  const scrubDistance =
+    typeof animation?.scrubDistanceVh === "number" &&
+    Number.isFinite(animation.scrubDistanceVh)
+      ? `${Math.max(40, animation.scrubDistanceVh)}vh`
+      : undefined;
+  const stepOffset =
+    typeof animation?.stepOffset === "number" &&
+    Number.isFinite(animation.stepOffset)
+      ? String(animation.stepOffset)
+      : undefined;
+  const style = {
+    ...(delay ? { "--builder-animate-delay": delay } : {}),
+    ...(progressSmoothing
+      ? { "--builder-progress-smoothing": progressSmoothing }
+      : {}),
+    ...(scrubDistance ? { "--builder-pin-distance": scrubDistance } : {}),
+  } as CSSProperties;
+
+  return {
+    data: {
+      "data-builder-animate": preset,
+      "data-builder-animate-once": animation?.once === false ? "false" : "true",
+      "data-builder-pause": animation?.pauseUntilComplete ? "true" : undefined,
+      "data-builder-step-offset": stepOffset,
+      "data-builder-progress-direction": animation?.progressDirection === "vertical" ? "vertical" : undefined,
+    },
+    style: Object.keys(style).length ? style : undefined,
+  };
 }
 
 function getPreviewLayoutBlocks(
@@ -6212,61 +6301,7 @@ function getPreviewLayoutBlocks(
 
 type PreviewLayoutItem = NonNullable<BuilderSection["layoutItems"]>[number];
 
-type PreviewLayoutRow = {
-  id: string;
-  items: PreviewLayoutItem[];
-  layoutKey?: string;
-  startIndex: number;
-};
 
-function getPreviewLayoutRows(
-  section: BuilderSection,
-  items: PreviewLayoutItem[],
-): PreviewLayoutRow[] {
-  if (items.length === 0) return [];
-
-  const rows: PreviewLayoutRow[] = [];
-  const fallbackPreset = getBuilderRowLayoutPreset(section.layout);
-  const fallbackColumns = Math.max(
-    fallbackPreset?.ratios.length ?? section.layoutColumns ?? 2,
-    1,
-  );
-  let index = 0;
-
-  while (index < items.length) {
-    const item = items[index];
-    const rowId = item.rowId;
-    const rowLayout = item.rowLayout ?? section.layout;
-
-    if (rowId) {
-      const rowItems: PreviewLayoutItem[] = [];
-      const startIndex = index;
-      while (index < items.length && items[index]?.rowId === rowId) {
-        rowItems.push(items[index]);
-        index += 1;
-      }
-      rows.push({
-        id: rowId,
-        items: rowItems,
-        layoutKey: rowLayout,
-        startIndex,
-      });
-      continue;
-    }
-
-    const startIndex = index;
-    const rowItems = items.slice(index, index + fallbackColumns);
-    rows.push({
-      id: `legacy-row-${startIndex}`,
-      items: rowItems,
-      layoutKey: rowLayout,
-      startIndex,
-    });
-    index += rowItems.length;
-  }
-
-  return rows;
-}
 
 function getPreviewGoodieIcon(iconName: BuilderLayoutBlock["iconName"]) {
   if (iconName === "heart") return <Heart size={24} />;
@@ -6635,7 +6670,6 @@ function PreviewSection({
   onMoveSectionBadge,
   onUploadGridItemImage,
   onAddRow,
-  onSetSidebarTab,
   onOpenElementsPanel,
 }: {
   section: BuilderSection;
@@ -6792,7 +6826,6 @@ function PreviewSection({
     fromIndex: number,
     toIndex: number,
   ) => void;
-  onSetSidebarTab: (tab: SidebarTab) => void;
   onOpenElementsPanel: () => void;
 }) {
   const dragClearTimer = useRef<number | null>(null);
@@ -7367,6 +7400,9 @@ function PreviewSection({
                 {blocks.map((block, blockIndex) => {
                   const blockKey =
                     block.id ?? `${columnKey}-block-${blockIndex}`;
+                  const blockAnimationAttrs = previewAnimationAttrs(
+                    block.animation,
+                  );
 
                   return (
                     <div
@@ -7386,7 +7422,7 @@ function PreviewSection({
                         dragOverKey === `blk:${blockKey}` ? "is-drag-over" : ""
                       } is-padding-${block.elementPadding ?? "none"} is-align-${
                         block.elementAlign ?? "left"
-                      } ${visualStyleClassName(block.visualStyle)}`}
+                      } ${visualStyleClassName(block.visualStyle)} ${previewAnimationClassName(block.animation)}`}
                       style={
                         {
                           "--builder-element-bg":
@@ -7398,8 +7434,10 @@ function PreviewSection({
                           ...visualStyleToCss(
                             block.visualStyle as BuilderVisualStyle | undefined,
                           ),
+                          ...blockAnimationAttrs.style,
                         } as CSSProperties
                       }
+                      {...blockAnimationAttrs.data}
                       onClick={(event) => {
                         event.stopPropagation();
                         onSelectBlock(section.id, columnKey, blockKey);
