@@ -152,6 +152,12 @@ type DashboardInspectorProps = {
   uploadSelectedSlideImage: LooseHandler;
 };
 
+function isLayoutContainerSection(section: BuilderSection | null | undefined) {
+  return (
+    section?.kind === "contentLayout" || section?.kind === "scrollPinnedDemo"
+  );
+}
+
 function BuilderImageUrlControl({
   value,
   placeholder = "https://... or /uploads/image.jpg",
@@ -482,9 +488,12 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
       },
     });
   }
+  const layoutContainerSection = isLayoutContainerSection(selectedSection)
+    ? selectedSection
+    : null;
   const selectedColumnIndex =
-    selectedSection?.kind === "contentLayout"
-      ? (selectedSection.layoutItems ?? []).findIndex(
+    layoutContainerSection
+      ? (layoutContainerSection.layoutItems ?? []).findIndex(
           (item, index) =>
             (item.id ?? `layout-item-${index}`) === selectedLayoutColumnKey,
         )
@@ -504,11 +513,11 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
   const isElementTypographyTab = inspectorTab === "typography";
   const showLegacySectionContentControls: boolean = false;
   const currentRowLayoutPreset = getBuilderRowLayoutPreset(
-    selectedSection?.kind === "contentLayout" ? selectedSection.layout : null,
+    layoutContainerSection?.layout ?? null,
   );
   const currentRowLayoutSummary = getBuilderRowLayoutSummary(
-    selectedSection?.kind === "contentLayout" ? selectedSection.layout : null,
-    selectedSection?.layoutColumns ?? null,
+    layoutContainerSection?.layout ?? null,
+    layoutContainerSection?.layoutColumns ?? null,
   );
 
   return (
@@ -607,7 +616,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
 
           {((!selectedLayoutBlock && inspectorTab === "section") ||
             (selectedLayoutBlock &&
-              selectedSection.kind === "contentLayout" &&
+              isLayoutContainerSection(selectedSection) &&
               (isElementContentTab ||
                 isElementSettingsTab ||
                 isElementTypographyTab))) && (
@@ -882,12 +891,12 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
 
               {((inspectorTab === "section" &&
                 !selectedLayoutBlock &&
-                (selectedSection.kind === "contentLayout" ||
+                (isLayoutContainerSection(selectedSection) ||
                   showLegacySectionContentControls)) ||
                 ((isElementContentTab ||
                   isElementSettingsTab ||
                   isElementTypographyTab) &&
-                  selectedSection.kind === "contentLayout" &&
+                  isLayoutContainerSection(selectedSection) &&
                   selectedLayoutBlock)) && (
                   <details
                     className={`builder-collapse ${
@@ -927,7 +936,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
 
                     {inspectorTab === "section" &&
                       !selectedLayoutBlock &&
-                      selectedSection.kind === "contentLayout" && (
+                      isLayoutContainerSection(selectedSection) && (
                         <>
                           <label className="builder-field">
                             <span>Current Row Layout</span>
@@ -1040,7 +1049,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                       isElementSettingsTab ||
                       isElementTypographyTab) &&
                       selectedLayoutBlock &&
-                      selectedSection.kind === "contentLayout" && (
+                      isLayoutContainerSection(selectedSection) && (
                       <>
                         {isElementSettingsTab ? (
                           <>
@@ -3123,7 +3132,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                 />
                                               </label>
                                             </>
-                                          ) : block.kind === "slider" ? (
+                                          ) : (block.kind === "slider" || block.kind === "scrollPinnedDemo") ? (
                                             <>
                                               <label className="builder-field">
                                                 <span>Block Title</span>
@@ -3141,6 +3150,24 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                   }
                                                 />
                                               </label>
+                                              {block.kind === "scrollPinnedDemo" && (
+                                                <label className="builder-field">
+                                                  <span>Eyebrow</span>
+                                                  <input
+                                                    value={block.eyebrow ?? ""}
+                                                    onChange={(event) =>
+                                                      updateSelectedLayoutBlock(
+                                                        index,
+                                                        blockIndex,
+                                                        {
+                                                          eyebrow:
+                                                            event.target.value,
+                                                        },
+                                                      )
+                                                    }
+                                                  />
+                                                </label>
+                                              )}
                                               <label className="builder-field">
                                                 <span>Body</span>
                                                 <RichTextEditor
@@ -3154,8 +3181,10 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                   }
                                                 />
                                               </label>
-                                              <label className="builder-field">
-                                                <span>Swiper Variant</span>
+                                              {block.kind === "slider" && (
+                                                <>
+                                                  <label className="builder-field">
+                                                    <span>Swiper Variant</span>
                                                 <select
                                                   value={
                                                     block.carouselSettings
@@ -3632,8 +3661,13 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                   <span>Momentum scroll</span>
                                                 </label>
                                               )}
-                                              <div className="builder-section-heading">
-                                                <span>Slider Slides</span>
+                                            </>)}
+                                            <div className="builder-section-heading">
+                                              <span>
+                                                {block.kind === "slider"
+                                                  ? "Slider Slides"
+                                                  : "Story Slides"}
+                                              </span>
                                                 <span>
                                                   {block.slides?.length ?? 0}
                                                 </span>
@@ -5429,7 +5463,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                     )}
 
                     {showLegacySectionContentControls &&
-                      selectedSection.kind === "slider" && (
+                      (selectedSection.kind === "slider" || selectedSection.kind === "scrollPinnedDemo") && (
                       <>
                         <details className="builder-collapse" open>
                           <summary>
@@ -5889,7 +5923,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
         </div>
       )}
 
-      {isLayoutPickerOpen && selectedSection?.kind === "contentLayout" ? (
+      {isLayoutPickerOpen && layoutContainerSection ? (
         <div
           className="builder-layout-modal"
           role="dialog"
@@ -5932,7 +5966,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                       isActive ? "is-active" : ""
                     }`}
                     onClick={() => {
-                      applyLayoutPreset(selectedSection.id, preset.key);
+                      applyLayoutPreset(layoutContainerSection.id, preset.key);
                       setLayoutPickerOpen(false);
                     }}
                   >

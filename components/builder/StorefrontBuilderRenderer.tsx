@@ -16,6 +16,7 @@ import CarouselBlock, {
   type CarouselSlide,
 } from "@/components/blocks/CarouselBlock";
 import HomeGsapAnimations from "@/components/animations/HomeGsapAnimations";
+import ScrollPinnedDemo from "@/components/animations/ScrollPinnedDemo";
 import BuilderScrollAnimations from "@/components/builder/BuilderScrollAnimations";
 import ScrollReveal from "@/components/builder/ScrollReveal";
 import type { ScrollRevealConfig } from "@/components/builder/ScrollReveal";
@@ -1291,6 +1292,14 @@ function ContentLayoutBlock({
     );
   }
 
+  if (block.kind === "scrollPinnedDemo") {
+    return (
+      <div className="shop-builder-column-block shop-builder-column-block--scroll-pinned">
+        <ScrollPinnedDemo block={block} />
+      </div>
+    );
+  }
+
   if (block.kind === "embed") {
     return (
       <div className="shop-builder-column-block shop-builder-column-block--embed">
@@ -1908,13 +1917,29 @@ function ContentLayoutSection({
             blocks[0]?.cardPreset ??
             "default";
 
+          const hasScrollPinned = blocks.some((b) => b.kind === "scrollPinnedDemo");
           return (
             <article
               key={columnKey}
-              className={`shop-builder-content-layout-card shop-card-preset--${cardStyle}`}
-              style={{ gridColumn: `span ${span}` }}
+              className={hasScrollPinned ? "w-full col-span-12" : `shop-builder-content-layout-card shop-card-preset--${cardStyle}`}
+              style={hasScrollPinned ? { gridColumn: "span 12" } : { gridColumn: `span ${span}` }}
             >
               {blocks.map((block, blockIndex) => {
+                if (block.kind === "scrollPinnedDemo") {
+                  return (
+                    <ContentLayoutBlock
+                      key={block.id ?? blockIndex}
+                      block={block}
+                      product={product}
+                      breadcrumbItems={breadcrumbItems}
+                      page={page}
+                      pageContent={pageContent}
+                      categoryTree={categoryTree}
+                      activeCategorySlug={activeCategorySlug}
+                    />
+                  );
+                }
+
                 const blockAnimationAttrs = animationDataAttributes(
                   block.animation,
                 );
@@ -2069,6 +2094,8 @@ function BuilderSectionRenderer({
     content = <SliderSection section={section} />;
   } else if (section.kind === "embed") {
     content = <EmbedSection section={section} />;
+  } else if (section.kind === "scrollPinnedDemo") {
+    content = <ScrollPinnedDemo section={section} />;
   } else {
     return null;
   }

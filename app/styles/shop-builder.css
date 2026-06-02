@@ -3120,3 +3120,54 @@
     transform: translateY(0) rotate(135deg);
   }
 }
+
+/* --- Scroll Pinned Block Styles & GSAP Fixes --- */
+
+/* Storefront: Force full bleed and center horizontally without transforms to allow GSAP pinning */
+.shop-builder-section:has(.shop-builder-column-block--scroll-pinned):not(.builder-preview-section),
+.shop-builder-section:has(.shop-builder-column-block--scroll-pinned):not(.builder-preview-section) .shop-builder-section-content,
+.shop-builder-section:has(.shop-builder-column-block--scroll-pinned):not(.builder-preview-section) .shop-builder-content-layout-grid,
+.shop-builder-section:has(.shop-builder-column-block--scroll-pinned):not(.builder-preview-section) article.w-full,
+.shop-builder-section:has(.shop-builder-column-block--scroll-pinned):not(.builder-preview-section) .shop-builder-column-block--scroll-pinned {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  max-width: none !important;
+  width: 100% !important;
+  /* Remove transforms/animations that break position: fixed of GSAP scroll pin */
+  animation: none !important;
+  transform: none !important;
+  transition: none !important;
+  perspective: none !important;
+  will-change: auto !important;
+}
+
+/* Storefront root section specific centering and full width */
+.shop-builder-section:has(.shop-builder-column-block--scroll-pinned):not(.builder-preview-section) {
+  margin-left: calc(50% - 50vw) !important;
+  width: 100vw !important;
+}
+
+/* Dashboard Preview: Keep container-query based full bleed using standard transforms */
+.builder-preview-section:has(.shop-builder-column-block--scroll-pinned) {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  width: 100cqw !important;
+  margin-left: 50% !important;
+  transform: translateX(-50%) !important;
+}
+
+.builder-preview-section:has(.shop-builder-column-block--scroll-pinned) .shop-builder-section-content {
+  max-width: none !important;
+  width: 100% !important;
+  gap: 0 !important;
+}

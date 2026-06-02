@@ -387,8 +387,7 @@
                   }
                 ],
                 "animation": {
-                  "preset": "progress-line",
-                  "pauseUntilComplete": true,
+                  "preset": "none",
                   "once": false
                 }
               },
@@ -516,10 +515,8 @@
                 "elementBackgroundMode": "transparent",
                 "elementPadding": "none",
                 "animation": {
-                  "preset": "progress-line",
-                  "delayMs": 200,
-                  "once": false,
-                  "pauseUntilComplete": true
+                  "preset": "none",
+                  "once": false
                 }
               },
               {
@@ -548,6 +545,81 @@
             ]
           }
         ]
+      },
+      {
+        "id": "contentLayout-mpwb0kb3-ptjmd",
+        "kind": "contentLayout",
+        "title": "",
+        "background": "#111111",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "topSpacing": "inherit",
+        "bottomSpacing": "inherit",
+        "topMargin": "inherit",
+        "bottomMargin": "inherit",
+        "visible": true,
+        "eyebrow": "",
+        "body": "",
+        "layout": "whole",
+        "layoutColumns": 1,
+        "layoutItems": [
+          {
+            "id": "layout-item-mpwb0kb3-1",
+            "blocks": [
+              {
+                "id": "scrollPinnedDemo-block-mpwb0s04-nnwd4",
+                "kind": "scrollPinnedDemo",
+                "title": "Scroll Pinned Storytelling",
+                "eyebrow": "Interactive Showcase",
+                "body": "Notice how the layout is locked. The scrollbar no longer moves the page vertically. Instead, it directs all energy into fueling the progressive card reveal.",
+                "elementBackground": "#0a0a0a",
+                "slides": [
+                  {
+                    "id": "scrollPinnedDemo-block-mpwb0s04-nnwd4-slide-1",
+                    "badge": "01",
+                    "title": "Layout Intercepted",
+                    "text": "GSAP ScrollTrigger sets a temporary inline position fixed to your container, creating a beautiful overlay effect without breaking page layout flow."
+                  },
+                  {
+                    "id": "scrollPinnedDemo-block-mpwb0s04-nnwd4-slide-2",
+                    "badge": "02",
+                    "title": "Timeline Scrubbing",
+                    "text": "Scrubbing maps scroll position to timeline interpolation. Scrolling backwards reverses the animation seamlessly."
+                  },
+                  {
+                    "id": "scrollPinnedDemo-block-mpwb0s04-nnwd4-slide-3",
+                    "badge": "03",
+                    "title": "Scroll Release",
+                    "text": "Once the timeline finishes, ScrollTrigger unpins the element, and the container rolls up smoothly. The user continues their journey."
+                  },
+                  {
+                    "id": "nested-slide-mpwb4uyu",
+                    "badge": "04",
+                    "title": "Slide 4",
+                    "text": "Edit this nested slider slide.",
+                    "imagePadding": "medium"
+                  },
+                  {
+                    "id": "nested-slide-mpwb4vvv",
+                    "badge": "05",
+                    "title": "Slide 5",
+                    "text": "Edit this nested slider slide.",
+                    "imagePadding": "medium"
+                  }
+                ]
+              },
+              {
+                "id": "datePicker-block-mpwb0mnn-sgyzh",
+                "kind": "datePicker",
+                "title": "Choose a date",
+                "dateLabel": "Preferred date",
+                "body": "Useful for delivery, booking, or consultation flows."
+              }
+            ]
+          }
+        ],
+        "layoutRows": 1
       },
       {
         "id": "contentLayout-mptess1t-f8n9s",
@@ -979,274 +1051,6 @@
         "layoutRows": 1
       },
       {
-        "id": "webpages-animation-demo-intro",
-        "kind": "contentLayout",
-        "title": "Scroll animation demos",
-        "eyebrow": "Motion system",
-        "body": "Scroll down and back up to replay these builder-native motion presets. Each card names the motion it demonstrates.",
-        "background": "#0b0b0b",
-        "backgroundMode": "full",
-        "contentMode": "boxed",
-        "colorScheme": "dark",
-        "topSpacing": "large",
-        "bottomSpacing": "medium",
-        "topMargin": "inherit",
-        "bottomMargin": "inherit",
-        "visible": true,
-        "layoutColumns": 3,
-        "layoutRows": 1,
-        "layoutItems": [
-          {
-            "id": "animation-fade-card",
-            "rowId": "animation-intro-row",
-            "rowLayout": "thirds",
-            "blocks": [
-              {
-                "id": "animation-fade-panel",
-                "kind": "panel",
-                "eyebrow": "01",
-                "title": "Fade up",
-                "body": "Default reveal: fades and moves gently upward.",
-                "buttonLabel": "",
-                "buttonUrl": "/",
-                "panelStyle": "flat-dark",
-                "elementPadding": "medium",
-                "elementAlign": "left",
-                "animation": {
-                  "preset": "fade-up",
-                  "delayMs": 0,
-                  "once": false
-                }
-              }
-            ]
-          },
-          {
-            "id": "animation-scale-card",
-            "rowId": "animation-intro-row",
-            "rowLayout": "thirds",
-            "blocks": [
-              {
-                "id": "animation-scale-panel",
-                "kind": "panel",
-                "eyebrow": "02",
-                "title": "Soft scale",
-                "body": "Panel reveal: scales from 96.5% to full size.",
-                "buttonLabel": "",
-                "buttonUrl": "/",
-                "panelStyle": "flat-dark",
-                "elementPadding": "medium",
-                "elementAlign": "left",
-                "animation": {
-                  "preset": "scale-soft",
-                  "delayMs": 80,
-                  "once": false
-                }
-              }
-            ]
-          },
-          {
-            "id": "animation-blur-card",
-            "rowId": "animation-intro-row",
-            "rowLayout": "thirds",
-            "blocks": [
-              {
-                "id": "animation-blur-panel",
-                "kind": "panel",
-                "eyebrow": "03",
-                "title": "Blur reveal",
-                "body": "Editorial reveal: starts blurred, then sharpens.",
-                "buttonLabel": "",
-                "buttonUrl": "/",
-                "panelStyle": "flat-dark",
-                "elementPadding": "medium",
-                "elementAlign": "left",
-                "animation": {
-                  "preset": "blur-reveal",
-                  "delayMs": 140,
-                  "once": false
-                }
-              }
-            ]
-          }
-        ],
-        "animation": {
-          "preset": "fade-up",
-          "delayMs": 0,
-          "once": false
-        }
-      },
-      {
-        "id": "webpages-animation-demo-direction",
-        "kind": "contentLayout",
-        "title": "Directional story beats",
-        "eyebrow": "Section direction",
-        "body": "The two panels enter from opposite sides, useful for before/after or problem/solution storytelling.",
-        "background": "#f5f1e8",
-        "backgroundMode": "full",
-        "contentMode": "boxed",
-        "colorScheme": "light",
-        "topSpacing": "medium",
-        "bottomSpacing": "medium",
-        "topMargin": "inherit",
-        "bottomMargin": "inherit",
-        "visible": true,
-        "layoutColumns": 2,
-        "layoutRows": 1,
-        "layoutItems": [
-          {
-            "id": "animation-left-column",
-            "rowId": "animation-direction-row",
-            "rowLayout": "halves",
-            "blocks": [
-              {
-                "id": "animation-left-panel",
-                "kind": "panel",
-                "eyebrow": "Before",
-                "title": "Classic site changes feel heavy",
-                "body": "Slides in from the left. Use for the starting point, problem, or previous state.",
-                "buttonLabel": "",
-                "buttonUrl": "/",
-                "panelStyle": "flat-white",
-                "elementPadding": "medium",
-                "elementAlign": "left",
-                "animation": {
-                  "preset": "slide-left",
-                  "delayMs": 0,
-                  "once": false
-                }
-              }
-            ]
-          },
-          {
-            "id": "animation-right-column",
-            "rowId": "animation-direction-row",
-            "rowLayout": "halves",
-            "blocks": [
-              {
-                "id": "animation-right-panel",
-                "kind": "panel",
-                "eyebrow": "After",
-                "title": "React frontend stays flexible",
-                "body": "Slides in from the right. Use for the outcome, solution, or next state.",
-                "buttonLabel": "",
-                "buttonUrl": "/",
-                "panelStyle": "flat-white",
-                "elementPadding": "medium",
-                "elementAlign": "left",
-                "animation": {
-                  "preset": "slide-right",
-                  "delayMs": 100,
-                  "once": false
-                }
-              }
-            ]
-          }
-        ]
-      },
-      {
-        "id": "webpages-animation-demo-sequence",
-        "kind": "contentLayout",
-        "title": "Step sequence",
-        "eyebrow": "Workflow animation",
-        "body": "The cards appear in order, making the direction of a process easy to follow.",
-        "background": "#111111",
-        "backgroundMode": "full",
-        "contentMode": "boxed",
-        "colorScheme": "dark",
-        "topSpacing": "medium",
-        "bottomSpacing": "medium",
-        "topMargin": "inherit",
-        "bottomMargin": "inherit",
-        "visible": true,
-        "layoutColumns": 4,
-        "layoutRows": 1,
-        "animation": {
-          "preset": "progress-line",
-          "delayMs": 0,
-          "once": false,
-          "pauseUntilComplete": true,
-          "playOnce": false
-        },
-        "layoutItems": [
-          {
-            "id": "animation-step-one",
-            "rowId": "animation-step-row",
-            "rowLayout": "quarters",
-            "blocks": [
-              {
-                "id": "animation-step-one-panel",
-                "kind": "panel",
-                "eyebrow": "01",
-                "title": "Plan",
-                "body": "Choose the page goal and content rhythm.",
-                "buttonLabel": "",
-                "buttonUrl": "/",
-                "panelStyle": "flat-dark",
-                "elementPadding": "medium",
-                "elementAlign": "left"
-              }
-            ]
-          },
-          {
-            "id": "animation-step-two",
-            "rowId": "animation-step-row",
-            "rowLayout": "quarters",
-            "blocks": [
-              {
-                "id": "animation-step-two-panel",
-                "kind": "panel",
-                "eyebrow": "02",
-                "title": "Build",
-                "body": "Compose sections, rows, and reusable elements.",
-                "buttonLabel": "",
-                "buttonUrl": "/",
-                "panelStyle": "flat-dark",
-                "elementPadding": "medium",
-                "elementAlign": "left"
-              }
-            ]
-          },
-          {
-            "id": "animation-step-three",
-            "rowId": "animation-step-row",
-            "rowLayout": "quarters",
-            "blocks": [
-              {
-                "id": "animation-step-three-panel",
-                "kind": "panel",
-                "eyebrow": "03",
-                "title": "Manage",
-                "body": "Edit content from WordPress and the dashboard.",
-                "buttonLabel": "",
-                "buttonUrl": "/",
-                "panelStyle": "flat-dark",
-                "elementPadding": "medium",
-                "elementAlign": "left"
-              }
-            ]
-          },
-          {
-            "id": "animation-step-four",
-            "rowId": "animation-step-row",
-            "rowLayout": "quarters",
-            "blocks": [
-              {
-                "id": "animation-step-four-panel",
-                "kind": "panel",
-                "eyebrow": "04",
-                "title": "Sell",
-                "body": "Connect WooCommerce products, cart, and checkout.",
-                "buttonLabel": "",
-                "buttonUrl": "/",
-                "panelStyle": "flat-dark",
-                "elementPadding": "medium",
-                "elementAlign": "left"
-              }
-            ]
-          }
-        ]
-      },
-      {
         "id": "contact",
         "kind": "contentLayout",
         "title": "",
@@ -1317,9 +1121,102 @@
             ]
           }
         ]
+      },
+      {
+        "id": "home-scroll-pinned-demo",
+        "kind": "scrollPinnedDemo",
+        "title": "Scroll Pinned Storytelling",
+        "eyebrow": "Showcase",
+        "body": "Scroll down to see the story unfold. Notice how the layout is locked. The scrollbar no longer moves the page vertically. Instead, it directs all energy into fueling the progressive card reveal on the right.",
+        "background": "#0a0a0a",
+        "backgroundMode": "full",
+        "contentMode": "full",
+        "colorScheme": "dark",
+        "visible": true,
+        "slides": [
+          {
+            "id": "pinned-slide-1",
+            "badge": "01",
+            "title": "Visual Pinning Intercepted",
+            "text": "GSAP ScrollTrigger sets a temporary inline position fixed to your container, creating a beautiful overlay effect without breaking page layout flow."
+          },
+          {
+            "id": "pinned-slide-2",
+            "badge": "02",
+            "title": "Timeline Scrubbing",
+            "text": "Scrubbing maps scroll position to timeline interpolation. Scrolling backwards reverses the animation seamlessly."
+          },
+          {
+            "id": "pinned-slide-3",
+            "badge": "03",
+            "title": "Dynamic Workspace Release",
+            "text": "Once the timeline finishes, ScrollTrigger unpins the element, and the container rolls up smoothly. The user continues their journey."
+          }
+        ],
+        "layout": "thirds-1-2",
+        "layoutColumns": 2,
+        "layoutItems": [
+          {
+            "id": "home-scroll-pinned-demo-story-copy",
+            "rowId": "home-scroll-pinned-demo-story-row",
+            "rowLayout": "thirds-1-2",
+            "blocks": [
+              {
+                "id": "home-scroll-pinned-demo-story-heading",
+                "kind": "text",
+                "eyebrow": "Showcase",
+                "title": "Scroll Pinned Storytelling",
+                "body": "Scroll down to see the story unfold. Notice how the layout is locked. The scrollbar no longer moves the page vertically. Instead, it directs all energy into fueling the progressive card reveal on the right.",
+                "elementBackgroundMode": "transparent"
+              },
+              {
+                "id": "home-scroll-pinned-demo-story-list",
+                "kind": "list",
+                "listIcon": "circleCheck",
+                "items": [
+                  "Reusable dashboard elements",
+                  "Editable card stack",
+                  "Scroll-scrubbed progress"
+                ],
+                "elementBackgroundMode": "transparent"
+              }
+            ]
+          },
+          {
+            "id": "home-scroll-pinned-demo-story-cards",
+            "rowId": "home-scroll-pinned-demo-story-row",
+            "rowLayout": "thirds-1-2",
+            "blocks": [
+              {
+                "id": "pinned-slide-1-block",
+                "kind": "panel",
+                "eyebrow": "01",
+                "title": "Visual Pinning Intercepted",
+                "body": "GSAP ScrollTrigger sets a temporary inline position fixed to your container, creating a beautiful overlay effect without breaking page layout flow.",
+                "elementBackgroundMode": "transparent"
+              },
+              {
+                "id": "pinned-slide-2-block",
+                "kind": "panel",
+                "eyebrow": "02",
+                "title": "Timeline Scrubbing",
+                "body": "Scrubbing maps scroll position to timeline interpolation. Scrolling backwards reverses the animation seamlessly.",
+                "elementBackgroundMode": "transparent"
+              },
+              {
+                "id": "pinned-slide-3-block",
+                "kind": "panel",
+                "eyebrow": "03",
+                "title": "Dynamic Workspace Release",
+                "body": "Once the timeline finishes, ScrollTrigger unpins the element, and the container rolls up smoothly. The user continues their journey.",
+                "elementBackgroundMode": "transparent"
+              }
+            ]
+          }
+        ]
       }
     ],
-    "updatedAt": "2026-06-01T05:17:27.363Z"
+    "updatedAt": "2026-06-02T07:59:55.136Z"
   },
   "shop": {
     "version": 1,

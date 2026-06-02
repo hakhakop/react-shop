@@ -58,6 +58,7 @@ import ProductCarousel from "@/components/ProductCarousel";
 import ProductOptionsSelector from "@/components/ProductOptionsSelector";
 import DashboardInspector from "@/components/dashboard/DashboardInspector";
 import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
+import ScrollPinnedDemo from "@/components/animations/ScrollPinnedDemo";
 import type {
   BuilderCustomPage,
   BuilderCustomPageKey,
@@ -720,10 +721,11 @@ function normalizeBuilderState(
 ): BuilderState {
   const key = state.page ?? fallbackKey;
   const isTemplate = key in defaultTemplateStates;
-  const sections =
+  const migratedSections =
     key === "product-single"
       ? migrateProductTemplateSections(state.sections)
       : state.sections;
+  const sections = migratedSections.map(normalizeScrollPinnedDemoSection);
   return {
     ...state,
     page: key,
@@ -739,7 +741,7 @@ function normalizeBuilderState(
 
 function migrateProductTemplateSections(sections: BuilderSection[]) {
   return sections.map((section) => {
-    if (section.kind !== "contentLayout") return section;
+    if (!isLayoutContainerSection(section)) return section;
 
     return {
       ...section,
@@ -776,6 +778,97 @@ function migrateProductTemplateSections(sections: BuilderSection[]) {
       })),
     };
   });
+}
+
+function isLayoutContainerSection(section: BuilderSection | null | undefined) {
+  return (
+    section?.kind === "contentLayout" || section?.kind === "scrollPinnedDemo"
+  );
+}
+
+function normalizeScrollPinnedDemoSection(section: BuilderSection): BuilderSection {
+  const hasEditableBlocks = (section.layoutItems ?? []).some(
+    (item) => (item.blocks ?? []).length > 0,
+  );
+  if (section.kind !== "scrollPinnedDemo" || hasEditableBlocks) {
+    return section;
+  }
+
+  const rowId = `${section.id}-story-row`;
+  const slides =
+    section.slides?.length
+      ? section.slides
+      : [
+          {
+            id: `${section.id}-story-card-1`,
+            badge: "01",
+            title: "Layout Intercepted",
+            text: "The section holds position while scroll movement drives the reveal.",
+          },
+          {
+            id: `${section.id}-story-card-2`,
+            badge: "02",
+            title: "Timeline Scrubbing",
+            text: "Each panel appears from normal reusable builder content.",
+          },
+          {
+            id: `${section.id}-story-card-3`,
+            badge: "03",
+            title: "Scroll Release",
+            text: "After the stack completes, the page resumes normal scrolling.",
+          },
+        ];
+
+  return {
+    ...section,
+    layout: section.layout ?? "thirds-1-2",
+    layoutColumns: section.layoutColumns ?? 2,
+    layoutItems: [
+      {
+        id: `${section.id}-story-copy`,
+        rowId,
+        rowLayout: "thirds-1-2",
+        blocks: [
+          {
+            id: `${section.id}-story-heading`,
+            kind: "text",
+            eyebrow: section.eyebrow,
+            title: section.title,
+            body: section.body,
+            elementBackgroundMode: "transparent",
+          },
+          {
+            id: `${section.id}-story-list`,
+            kind: "list",
+            listIcon: "circleCheck",
+            items: [
+              "Reusable dashboard elements",
+              "Editable card stack",
+              "Scroll-scrubbed progress",
+            ],
+            elementBackgroundMode: "transparent",
+          },
+        ],
+      },
+      {
+        id: `${section.id}-story-cards`,
+        rowId,
+        rowLayout: "thirds-1-2",
+        blocks: slides.map((slide, index) => ({
+          id: `${slide.id ?? `${section.id}-story-card-${index + 1}`}-block`,
+          kind: "panel",
+          eyebrow: slide.badge ?? `0${index + 1}`,
+          title: slide.title,
+          body: slide.text,
+          buttonLabel: slide.buttonLabel,
+          buttonUrl: slide.buttonUrl,
+          imageUrl: slide.imageUrl,
+          imageAlt: slide.imageAlt,
+          elementBackgroundMode: "transparent",
+        })),
+      },
+    ],
+  };
 }
 
 function createProductDynamicBlock(
@@ -970,7 +1063,7 @@ export default function DashboardBuilder({
     [builderState.sections, selectedId],
   );
   const selectedLayoutBlock = useMemo(() => {
-    if (!selectedSection || selectedSection.kind !== "contentLayout")
+    if (!selectedSection || !isLayoutContainerSection(selectedSection))
       return null;
     for (const item of selectedSection.layoutItems ?? []) {
       const block = (item.blocks ?? []).find(
@@ -2067,7 +2160,7 @@ export default function DashboardBuilder({
     setInspectorTab("section");
     setSectionSettingsOpen(true);
     setSectionStructureOpen(false);
-    if (section?.kind === "contentLayout") {
+    if (section && isLayoutContainerSection(section)) {
       const firstColumn = section.layoutItems?.[0]?.id ?? null;
       setSelectedLayoutColumnKey((current) =>
         section.layoutItems?.some(
@@ -2245,7 +2338,7 @@ export default function DashboardBuilder({
     setBuilderState((current) => ({
       ...current,
       sections: current.sections.map((section) => {
-        if (section.id !== sectionId || section.kind !== "contentLayout") {
+        if (section.id !== sectionId || !isLayoutContainerSection(section)) {
           return section;
         }
 
@@ -2598,7 +2691,7 @@ export default function DashboardBuilder({
     setBuilderState((current) => ({
       ...current,
       sections: current.sections.map((section) => {
-        if (section.id !== sectionId || section.kind !== "contentLayout") {
+        if (section.id !== sectionId || !isLayoutContainerSection(section)) {
           return section;
         }
 
@@ -2639,7 +2732,7 @@ export default function DashboardBuilder({
     setBuilderState((current) => ({
       ...current,
       sections: current.sections.map((section) => {
-        if (section.id !== sectionId || section.kind !== "contentLayout") {
+        if (section.id !== sectionId || !isLayoutContainerSection(section)) {
           return section;
         }
 
@@ -2685,7 +2778,7 @@ export default function DashboardBuilder({
       let movingBlock: BuilderLayoutBlock | null = null;
       const targetSection = current.sections.find(
         (section) =>
-          section.id === targetSectionId && section.kind === "contentLayout",
+          section.id === targetSectionId && isLayoutContainerSection(section),
       );
       const hasTargetColumn = (targetSection?.layoutItems ?? []).some(
         (item, index) =>
@@ -2695,7 +2788,7 @@ export default function DashboardBuilder({
       if (!hasTargetColumn) return current;
 
       const sectionsWithoutBlock = current.sections.map((section) => {
-        if (section.id !== sectionId || section.kind !== "contentLayout") {
+        if (section.id !== sectionId || !isLayoutContainerSection(section)) {
           return section;
         }
 
@@ -2734,7 +2827,7 @@ export default function DashboardBuilder({
         sections: sectionsWithoutBlock.map((section) => {
           if (
             section.id !== targetSectionId ||
-            section.kind !== "contentLayout"
+            !isLayoutContainerSection(section)
           ) {
             return section;
           }
@@ -2792,7 +2885,7 @@ export default function DashboardBuilder({
     setBuilderState((current) => ({
       ...current,
       sections: current.sections.map((section) => {
-        if (section.id !== sectionId || section.kind !== "contentLayout") {
+        if (section.id !== sectionId || !isLayoutContainerSection(section)) {
           return section;
         }
 
@@ -2836,7 +2929,7 @@ export default function DashboardBuilder({
   const addElementFromLibrary = (kind: LayoutBlockKind) => {
     let targetSection = selectedSection;
 
-    if (!targetSection || targetSection.kind !== "contentLayout") {
+    if (!targetSection || !isLayoutContainerSection(targetSection)) {
       const nextSection = createWireframeSection(1, 1);
       setBuilderState((current) => {
         const selectedIndex = current.sections.findIndex(
@@ -3094,7 +3187,7 @@ export default function DashboardBuilder({
       return { ...current, sections: nextSections };
     });
     setSelectedId(nextSection.id);
-    if (nextSection.kind === "contentLayout") {
+    if (isLayoutContainerSection(nextSection)) {
       const firstColumn = nextSection.layoutItems?.[0]?.id ?? null;
       setSelectedLayoutColumnKey(firstColumn);
       setOpenLayoutItemId(firstColumn);
@@ -3126,7 +3219,7 @@ export default function DashboardBuilder({
     setBuilderState((current) => ({
       ...current,
       sections: current.sections.map((section) => {
-        if (section.id !== sectionId || section.kind !== "contentLayout") {
+        if (section.id !== sectionId || !isLayoutContainerSection(section)) {
           return section;
         }
 
@@ -3327,17 +3420,20 @@ export default function DashboardBuilder({
       return;
     }
 
-    const nextPublishedState = {
-      page: payload.layout.page,
-      targetType:
-        payload.layout.targetType ?? builderState.targetType ?? "page",
-      template: payload.layout.template,
-      design: {
-        ...defaultDesign,
-        ...(payload.layout.design ?? {}),
+    const nextPublishedState = normalizeBuilderState(
+      {
+        page: payload.layout.page,
+        targetType:
+          payload.layout.targetType ?? builderState.targetType ?? "page",
+        template: payload.layout.template,
+        design: {
+          ...defaultDesign,
+          ...(payload.layout.design ?? {}),
+        },
+        sections: payload.layout.sections,
       },
-      sections: payload.layout.sections,
-    };
+      builderState.page,
+    );
 
     const nextSignature = JSON.stringify(nextPublishedState);
     if (nextSignature === currentSignature) {
@@ -3349,7 +3445,7 @@ export default function DashboardBuilder({
     undoHistoryRef.current = [structuredClone(nextPublishedState)];
     setCommittedBuilderStateSignature(nextSignature);
     setBuilderState(nextPublishedState);
-    setSelectedId(payload.layout.sections[0]?.id ?? "");
+    setSelectedId(nextPublishedState.sections[0]?.id ?? "");
     setPublishStatus("Published layout loaded");
   }, [builderState.page, builderState.targetType, builderState.template]);
 
@@ -6340,13 +6436,15 @@ function getStorefrontPreviewClass(section: BuilderSection) {
               }`
             : section.kind === "badgeGrid"
               ? "shop-builder-badge-grid"
-              : section.kind === "contentLayout"
+              : isLayoutContainerSection(section)
                 ? "shop-builder-content-layout"
                 : section.kind === "slider"
                   ? "shop-builder-slider"
-                  : section.kind === "embed"
-                    ? "shop-builder-embed"
-                    : "";
+                  : section.kind === "scrollPinnedDemo"
+                    ? "shop-builder-scroll-pinned"
+                    : section.kind === "embed"
+                      ? "shop-builder-embed"
+                      : "";
 
   return `shop-builder-section shop-builder-section--${
     section.backgroundMode === "boxed" ? "boxed" : "full"
@@ -7305,7 +7403,20 @@ function PreviewSection({
     );
   }
 
-  if (section.kind === "embed") {
+  if (section.kind === "scrollPinnedDemo") {
+    const previewSection = normalizeScrollPinnedDemoSection(section);
+    return (
+      <div className="shop-builder-section-content builder-preview-scroll-pinned">
+        <ScrollPinnedDemo section={previewSection} isPreview={true} />
+      </div>
+    );
+  }
+
+
+
+
+
+if (section.kind === "embed") {
     return (
       <div className="shop-builder-section-content builder-preview-embed">
         <div className="shop-builder-embed-heading">
@@ -7328,7 +7439,7 @@ function PreviewSection({
     );
   }
 
-  if (section.kind === "contentLayout") {
+  if (isLayoutContainerSection(section)) {
     const previewProduct = getPreviewProductModel(previewProducts);
     const items = section.layoutItems?.length
       ? section.layoutItems
@@ -7438,6 +7549,7 @@ function PreviewSection({
               blocks[0]?.cardPreset ??
               "default";
 
+            const hasScrollPinned = blocks.some((b) => b.kind === "scrollPinnedDemo");
             return (
               <Fragment key={columnKey}>
                 {rowMeta?.isRowStart && (
@@ -7452,7 +7564,13 @@ function PreviewSection({
                   />
                 )}
               <article
-                className={`shop-builder-content-layout-card shop-card-preset--${cardStyle} ${
+                className={hasScrollPinned ? `w-full col-span-12 ${
+                  selectedLayoutColumnKey === columnKey
+                    ? "is-selected-column"
+                    : ""
+                } ${
+                  dragOverKey === `col:${columnKey}` ? "is-drag-over" : ""
+                }` : `shop-builder-content-layout-card shop-card-preset--${cardStyle} ${
                   blocks.length === 0 ? "is-empty-column" : ""
                 } ${
                   selectedLayoutColumnKey === columnKey
@@ -7461,8 +7579,14 @@ function PreviewSection({
                 } ${
                   dragOverKey === `col:${columnKey}` ? "is-drag-over" : ""
                 }`}
-                style={{ gridColumn: `span ${rowMeta?.span ?? 12}` }}
+                style={hasScrollPinned ? { gridColumn: "span 12" } : { gridColumn: `span ${rowMeta?.span ?? 12}` }}
                 onClick={(event) => {
+                  if (
+                    event.target instanceof HTMLElement &&
+                    event.target.closest(".builder-preview-layout-block")
+                  ) {
+                    return;
+                  }
                   event.stopPropagation();
                   onSelectColumn(section.id, columnKey);
                 }}
@@ -7575,7 +7699,11 @@ function PreviewSection({
                       draggable
                       className={`builder-preview-layout-block is-${
                         block.kind ?? "text"
-                      } shop-card-preset--${block.panelStyle ?? "default"} ${
+                      } ${
+                        block.kind === "scrollPinnedDemo"
+                          ? ""
+                          : `shop-card-preset--${block.panelStyle ?? "default"} is-padding-${block.elementPadding ?? "none"} is-align-${block.elementAlign ?? "left"} ${visualStyleClassName(block.visualStyle)}`
+                      } ${
                         selectedLayoutBlockKey === blockKey
                           ? "is-selected-block"
                           : ""
@@ -7585,9 +7713,7 @@ function PreviewSection({
                           : ""
                       } ${
                         dragOverKey === `blk:${blockKey}` ? "is-drag-over" : ""
-                      } is-padding-${block.elementPadding ?? "none"} is-align-${
-                        block.elementAlign ?? "left"
-                      } ${visualStyleClassName(block.visualStyle)} ${previewAnimationClassName(block.animation)}`}
+                      } ${previewAnimationClassName(block.animation)}`}
                       style={
                         {
                           "--builder-element-bg":
@@ -7603,6 +7729,10 @@ function PreviewSection({
                         } as CSSProperties
                       }
                       {...blockAnimationAttrs.data}
+                      onMouseDown={(event) => {
+                        event.stopPropagation();
+                        onSelectBlock(section.id, columnKey, blockKey);
+                      }}
                       onClick={(event) => {
                         event.stopPropagation();
                         onSelectBlock(section.id, columnKey, blockKey);
@@ -8333,6 +8463,10 @@ function PreviewSection({
                               <span>Accessories</span>
                             </div>
                           )}
+                        </div>
+                      ) : block.kind === "scrollPinnedDemo" ? (
+                        <div className="shop-builder-column-block shop-builder-column-block--scroll-pinned">
+                          <ScrollPinnedDemo block={block} isPreview={true} />
                         </div>
                       ) : block.kind === "slider" ? (
                         <div className="shop-builder-column-block shop-builder-column-block--slider">

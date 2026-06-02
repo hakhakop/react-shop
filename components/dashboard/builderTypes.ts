@@ -73,7 +73,8 @@ export type SectionKind =
   | "slider"
   | "badgeGrid"
   | "contentLayout"
-  | "embed";
+  | "embed"
+  | "scrollPinnedDemo";
 export type PreviewDevice = "desktop" | "tablet" | "mobile";
 export type GlobalSectionSpacing = "none" | "small" | "medium" | "large";
 export type SectionSpacing = "inherit" | GlobalSectionSpacing;
@@ -157,6 +158,7 @@ export type LayoutBlockKind =
   | "products"
   | "categoryFilters"
   | "breadcrumbs"
+  | "scrollPinnedDemo"
   | "productHero"
   | "productInfoStack"
   | "productPurchasePanel"

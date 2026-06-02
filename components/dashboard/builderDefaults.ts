@@ -687,6 +687,37 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
     };
   }
 
+  if (kind === "scrollPinnedDemo") {
+    return {
+      id,
+      kind,
+      title: "Scroll Pinned Storytelling",
+      eyebrow: "Interactive Showcase",
+      body: "Notice how the layout is locked. The scrollbar no longer moves the page vertically. Instead, it directs all energy into fueling the progressive card reveal.",
+      elementBackground: "#0a0a0a",
+      slides: [
+        {
+          id: `${id}-slide-1`,
+          badge: "01",
+          title: "Layout Intercepted",
+          text: "GSAP ScrollTrigger sets a temporary inline position fixed to your container, creating a beautiful overlay effect without breaking page layout flow.",
+        },
+        {
+          id: `${id}-slide-2`,
+          badge: "02",
+          title: "Timeline Scrubbing",
+          text: "Scrubbing maps scroll position to timeline interpolation. Scrolling backwards reverses the animation seamlessly.",
+        },
+        {
+          id: `${id}-slide-3`,
+          badge: "03",
+          title: "Scroll Release",
+          text: "Once the timeline finishes, ScrollTrigger unpins the element, and the container rolls up smoothly. The user continues their journey.",
+        },
+      ],
+    };
+  }
+
   if (kind === "slider") {
     return {
       id,
@@ -1053,6 +1084,38 @@ export function createSection(kind: SectionKind): BuilderSection {
       embedUrl: "",
       embedCode: "",
       embedHeight: 420,
+    };
+  }
+
+  if (kind === "scrollPinnedDemo") {
+    return {
+      ...base,
+      title: "Scroll Pinned Storytelling",
+      eyebrow: "Interactive Showcase",
+      body: "Notice how the layout is locked. The scrollbar no longer moves the page vertically. Instead, it directs all energy into fueling the progressive card reveal.",
+      background: "#0a0a0a",
+      backgroundMode: "full",
+      contentMode: "full",
+      slides: [
+        {
+          id: `slide-1-${Date.now().toString(36)}`,
+          badge: "01",
+          title: "Layout Intercepted",
+          text: "GSAP ScrollTrigger sets a temporary inline position fixed to your container, creating a beautiful overlay effect without breaking page layout flow.",
+        },
+        {
+          id: `slide-2-${Date.now().toString(36)}`,
+          badge: "02",
+          title: "Timeline Scrubbing",
+          text: "Scrubbing maps scroll position to timeline interpolation. Scrolling backwards reverses the animation seamlessly.",
+        },
+        {
+          id: `slide-3-${Date.now().toString(36)}`,
+          badge: "03",
+          title: "Scroll Release",
+          text: "Once the timeline finishes, ScrollTrigger unpins the element, and the container rolls up smoothly. The user continues their journey.",
+        },
+      ],
     };
   }
 

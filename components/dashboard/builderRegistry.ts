@@ -31,6 +31,7 @@ export const sectionLabels: Record<SectionKind, string> = {
   badgeGrid: "Badge Grid",
   contentLayout: "Content Layout",
   embed: "Embed / Code",
+  scrollPinnedDemo: "Pinned Story",
 };
 
 export const layoutBlockLabels: Record<LayoutBlockKind, string> = {
@@ -44,6 +45,7 @@ export const layoutBlockLabels: Record<LayoutBlockKind, string> = {
   table: "Table",
   text: "Text",
   slider: "Swiper / Carousel",
+  scrollPinnedDemo: "Scroll Pinned Demo",
   embed: "HTML",
   fluentForm: "Fluent Form",
   badgeGrid: "Badges",
@@ -79,6 +81,7 @@ export const baseLayoutBlockKinds: LayoutBlockKind[] = [
   "table",
   "text",
   "slider",
+  "scrollPinnedDemo",
   "fluentForm",
   "embed",
   "badgeGrid",
@@ -117,6 +120,7 @@ export const layoutBlockDescriptions: Record<LayoutBlockKind, string> = {
   text: "Static copy, button, and small editorial content.",
   table: "Editable data table with headers and styled rows.",
   slider: "Swiper carousel with editable slides and images.",
+  scrollPinnedDemo: "An elegant storytelling block with scroll pinning.",
   embed: "Forms, chat widgets, maps, or trusted HTML.",
   fluentForm: "Render a Fluent Forms form from WordPress by form ID.",
   badgeGrid: "Compact promises, services, or feature badges.",
@@ -192,6 +196,7 @@ export const layoutBlockGroups: {
       "table",
       "text",
       "slider",
+      "scrollPinnedDemo",
       "badgeGrid",
       "icon",
       "list",
@@ -216,6 +221,7 @@ export const layoutBlockIcons: Record<LayoutBlockKind, LayoutBlockIconName> = {
   table: "grid",
   text: "text",
   slider: "gallery",
+  scrollPinnedDemo: "gallery",
   embed: "code",
   fluentForm: "text",
   badgeGrid: "grid",
