@@ -568,6 +568,13 @@
             "id": "layout-item-mpwb0kb3-1",
             "blocks": [
               {
+                "id": "datePicker-block-mpwb0mnn-sgyzh",
+                "kind": "datePicker",
+                "title": "Choose a date",
+                "dateLabel": "Preferred date",
+                "body": "Useful for delivery, booking, or consultation flows."
+              },
+              {
                 "id": "scrollPinnedDemo-block-mpwb0s04-nnwd4",
                 "kind": "scrollPinnedDemo",
                 "title": "Scroll Pinned Storytelling",
@@ -578,43 +585,29 @@
                   {
                     "id": "scrollPinnedDemo-block-mpwb0s04-nnwd4-slide-1",
                     "badge": "01",
-                    "title": "Layout Intercepted",
-                    "text": "GSAP ScrollTrigger sets a temporary inline position fixed to your container, creating a beautiful overlay effect without breaking page layout flow."
+                    "title": "Ընտրում եք փաթեթը",
+                    "text": "<p>Ընտրեք ձեր նպատակին և բյուջեին համապատասխան տարբերակը։</p>"
                   },
                   {
                     "id": "scrollPinnedDemo-block-mpwb0s04-nnwd4-slide-2",
                     "badge": "02",
-                    "title": "Timeline Scrubbing",
-                    "text": "Scrubbing maps scroll position to timeline interpolation. Scrolling backwards reverses the animation seamlessly."
+                    "title": " Տրամադրեք տեղեկատվությունը",
+                    "text": "<p>Ուղարկեք տեքստերը, նկարները և անհրաժեշտ տվյալները։</p>"
                   },
                   {
                     "id": "scrollPinnedDemo-block-mpwb0s04-nnwd4-slide-3",
                     "badge": "03",
-                    "title": "Scroll Release",
-                    "text": "Once the timeline finishes, ScrollTrigger unpins the element, and the container rolls up smoothly. The user continues their journey."
+                    "title": "Մենք պատրաստում ենք կայքը",
+                    "text": "<p>Կազմավորում ենք էջերը, դիզայնը և անհրաժեշտ գործառույթները։</p>"
                   },
                   {
                     "id": "nested-slide-mpwb4uyu",
                     "badge": "04",
-                    "title": "Slide 4",
-                    "text": "Edit this nested slider slide.",
-                    "imagePadding": "medium"
-                  },
-                  {
-                    "id": "nested-slide-mpwb4vvv",
-                    "badge": "05",
-                    "title": "Slide 5",
-                    "text": "Edit this nested slider slide.",
+                    "title": "Կայքը պատրաստ է",
+                    "text": "<p>Ստանում եք պատրաստ կայք և կարող եք սկսել օգտագործել այն։</p>",
                     "imagePadding": "medium"
                   }
                 ]
-              },
-              {
-                "id": "datePicker-block-mpwb0mnn-sgyzh",
-                "kind": "datePicker",
-                "title": "Choose a date",
-                "dateLabel": "Preferred date",
-                "body": "Useful for delivery, booking, or consultation flows."
               }
             ]
           }
@@ -1216,7 +1209,7 @@
         ]
       }
     ],
-    "updatedAt": "2026-06-02T07:59:55.136Z"
+    "updatedAt": "2026-06-02T14:44:59.626Z"
   },
   "shop": {
     "version": 1,
