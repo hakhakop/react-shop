@@ -68,31 +68,46 @@ export function typographyProps(
   const style: CSSProperties = {};
 
   if (resolved.variant) {
-    if (resolved.variant === "heading") {
-      style.fontSize = "clamp(42px, 8vw, 126px)";
-      style.fontWeight = 760;
-      style.lineHeight = "0.92";
-      style.letterSpacing = "0";
-    }
+    const isHeadingArea = area === "title" || area === "eyebrow";
+    const isHeadingVariant = resolved.variant === "heading" || resolved.variant === "subheading";
+    const isBodyArea = area === "body" || !area;
+    const isBodyVariant = resolved.variant === "body";
+    const isButtonArea = area === "button";
+    const isButtonVariant = resolved.variant === "button";
 
-    if (resolved.variant === "subheading") {
-      style.fontSize = "clamp(24px, 3vw, 44px)";
-      style.fontWeight = 700;
-      style.lineHeight = "1";
-      style.letterSpacing = "0";
-    }
+    const shouldApplyVariant =
+      (isHeadingArea && isHeadingVariant) ||
+      (isBodyArea && isBodyVariant) ||
+      (isButtonArea && isButtonVariant) ||
+      (!isHeadingArea && !isButtonArea);
 
-    if (resolved.variant === "body") {
-      style.fontSize = "16px";
-      style.fontWeight = 400;
-      style.lineHeight = "1.7";
-    }
+    if (shouldApplyVariant) {
+      if (resolved.variant === "heading") {
+        style.fontSize = "clamp(42px, 8vw, 126px)";
+        style.fontWeight = 760;
+        style.lineHeight = "0.92";
+        style.letterSpacing = "0";
+      }
 
-    if (resolved.variant === "button") {
-      style.fontSize = "14px";
-      style.fontWeight = 720;
-      style.lineHeight = "1";
-      style.letterSpacing = "0";
+      if (resolved.variant === "subheading") {
+        style.fontSize = "clamp(24px, 3vw, 44px)";
+        style.fontWeight = 700;
+        style.lineHeight = "1";
+        style.letterSpacing = "0";
+      }
+
+      if (resolved.variant === "body") {
+        style.fontSize = "16px";
+        style.fontWeight = 400;
+        style.lineHeight = "1.7";
+      }
+
+      if (resolved.variant === "button") {
+        style.fontSize = "14px";
+        style.fontWeight = 720;
+        style.lineHeight = "1";
+        style.letterSpacing = "0";
+      }
     }
   }
 

@@ -1,4 +1,5 @@
 .shop-builder-main {
+  display: flow-root;
   width: 100%;
   padding: 28px 0 52px;
   background: var(--builder-page-bg, transparent);
@@ -115,6 +116,20 @@
   font-weight: var(--builder-heading-weight, 760);
   line-height: var(--builder-heading-line-height, 0.92);
   letter-spacing: 0;
+}
+.typewriter-outer {
+  font-size: inherit;
+  font-family: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+}
+
+.typewriter-inner {
+  font-size: inherit !important;
+  font-family: inherit !important;
+  font-weight: inherit !important;
+  line-height: inherit !important;
+  letter-spacing: inherit !important;
 }
 
 .shop-builder-body {
@@ -3171,3 +3186,392 @@
   width: 100% !important;
   gap: 0 !important;
 }
+
+/* ==========================================
+   ANTIGRAVITY HERO THEME VARIANT
+   ========================================== */
+
+.shop-builder-section--effect-antigravity,
+.shop-builder-hero--antigravity {
+  background-color: #030303 !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.shop-builder-section--effect-antigravity::before,
+.shop-builder-hero--antigravity::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: 
+    radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.08), transparent 40%),
+    radial-gradient(circle at 90% 80%, rgba(168, 85, 247, 0.08), transparent 40%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.antigravity-grid-overlay {
+  position: absolute;
+  inset: 0;
+  background-image: 
+    linear-gradient(rgba(99, 102, 241, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(99, 102, 241, 0.03) 1px, transparent 1px);
+  background-size: 45px 45px;
+  background-position: center;
+  transform: perspective(600px) rotateX(60deg) translateY(-25%) scale(1.6);
+  opacity: 0.9;
+  pointer-events: none;
+  z-index: 1;
+  animation: antigravityGridMove 25s linear infinite;
+}
+
+@keyframes antigravityGridMove {
+  0% { background-position: 0 0; }
+  100% { background-position: 0 900px; }
+}
+
+.shop-builder-title--gradient {
+  background-image: linear-gradient(135deg, #ffffff 15%, #60a5fa 65%, #c084fc 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  text-fill-color: transparent !important;
+  filter: drop-shadow(0 2px 8px rgba(96, 165, 250, 0.12));
+}
+
+.shop-builder-cta--antigravity {
+  background: rgba(255, 255, 255, 0.06) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.shop-builder-cta--antigravity:hover {
+  background: rgba(255, 255, 255, 0.12) !important;
+  border-color: rgba(99, 102, 241, 0.4) !important;
+  box-shadow: 0 0 20px rgba(99, 102, 241, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
+  transform: translateY(-2px) scale(1.02) !important;
+}
+
+.shop-builder-hero-media--antigravity {
+  background: none !important;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 2;
+  min-height: 380px !important;
+}
+
+.antigravity-mock-ide {
+  width: 100%;
+  max-width: 520px;
+  background: rgba(10, 10, 10, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 16px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 1px 1px rgba(255, 255, 255, 0.03) inset;
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  overflow: hidden;
+  font-family: Menlo, Monaco, Consolas, "Fira Code", monospace;
+  text-align: left;
+}
+
+.ide-tabbar {
+  display: flex;
+  background: rgba(16, 16, 16, 0.85);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  padding: 0 12px;
+}
+
+.ide-tab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 14px;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.4);
+  border-right: 1px solid rgba(255, 255, 255, 0.02);
+  cursor: default;
+}
+
+.ide-tab.active {
+  color: #ffffff;
+  background: rgba(10, 10, 10, 0.75);
+  border-bottom: 2px solid #6366f1;
+}
+
+.ide-tab-icon {
+  font-size: 12px;
+}
+
+.ide-editor {
+  display: flex;
+  padding: 14px;
+  font-size: 11px;
+  line-height: 1.6;
+  min-height: 270px;
+}
+
+.ide-lines {
+  text-align: right;
+  color: rgba(255, 255, 255, 0.12);
+  padding-right: 12px;
+  user-select: none;
+  border-right: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.ide-line-number {
+  height: 18px;
+}
+
+.ide-code {
+  padding-left: 12px;
+  color: #e2e8f0;
+  flex-grow: 1;
+  overflow-x: auto;
+}
+
+.ide-terminal {
+  margin-top: 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
+  padding-top: 10px;
+  max-height: 120px;
+  overflow-y: auto;
+  font-size: 10.5px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.terminal-row {
+  font-family: inherit;
+  white-space: nowrap;
+  animation: terminalFadeIn 0.25s ease forwards;
+}
+
+@keyframes terminalFadeIn {
+  from { opacity: 0; transform: translateY(3px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ==========================================
+   Antigravity Block-level variant
+   (hero blocks inside contentLayout sections)
+   ========================================== */
+
+.shop-builder-hero--antigravity-block {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: clamp(24px, 3vw, 48px);
+  padding: clamp(40px, 5vw, 80px) clamp(32px, 4vw, 64px) !important;
+  border-radius: 20px;
+  position: relative;
+  min-height: 420px;
+  color: #ffffff !important;
+}
+
+.shop-builder-hero--antigravity-block .shop-builder-eyebrow {
+  color: rgba(99, 102, 241, 0.9) !important;
+  text-transform: uppercase;
+  font-size: 11px !important;
+  letter-spacing: 2.5px;
+  font-weight: 600;
+}
+
+.shop-builder-hero--antigravity-block .shop-builder-hero-content-left {
+  position: relative;
+  z-index: 2;
+}
+
+.shop-builder-hero--antigravity-block p {
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+
+@media (max-width: 768px) {
+  .shop-builder-hero--antigravity-block {
+    grid-template-columns: 1fr;
+    padding: 32px 24px !important;
+    min-height: auto;
+  }
+}
+
+@keyframes pulseCursor {
+  from, to { border-color: transparent }
+  50% { border-color: rgb(129, 140, 248) }
+}
+
+.animate-pulse-cursor {
+  animation: pulseCursor 0.8s step-end infinite;
+}
+
+/* ==========================================
+   PREMIUM CUSTOM STYLES & OPTIONS FOR BUILDER
+   ========================================== */
+
+/* Buttons */
+.shop-builder-cta--neon-glow {
+  background: rgba(99, 102, 241, 0.08) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(99, 102, 241, 0.4) !important;
+  box-shadow: 0 0 12px rgba(99, 102, 241, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  backdrop-filter: blur(8px) !important;
+}
+
+.shop-builder-cta--neon-glow:hover {
+  background: rgba(99, 102, 241, 0.2) !important;
+  border-color: #a855f7 !important;
+  box-shadow: 0 0 22px rgba(168, 85, 247, 0.5), 0 0 8px rgba(99, 102, 241, 0.25) !important;
+  transform: translateY(-2px) scale(1.02);
+}
+
+.shop-builder-cta--cyber-glitch {
+  position: relative;
+  background: #0f0f15 !important;
+  color: #00ffcc !important;
+  border: 1px solid #00ffcc !important;
+  font-family: 'Courier New', Courier, monospace !important;
+  font-weight: bold !important;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  box-shadow: 3px 3px 0px #ff0055 !important;
+  transition: all 0.2s ease !important;
+}
+
+.shop-builder-cta--cyber-glitch:hover {
+  box-shadow: 0px 0px 0px #ff0055 !important;
+  transform: translate(3px, 3px);
+  color: #ff0055 !important;
+  border-color: #ff0055 !important;
+}
+
+.shop-builder-cta--glassmorphic {
+  background: rgba(255, 255, 255, 0.03) !important;
+  color: #f3f4f6 !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.03) !important;
+  transition: all 0.3s ease !important;
+}
+
+.shop-builder-cta--glassmorphic:hover {
+  background: rgba(255, 255, 255, 0.07) !important;
+  border-color: rgba(255, 255, 255, 0.25) !important;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3), 0 0 12px rgba(255, 255, 255, 0.08) !important;
+  transform: translateY(-1px);
+}
+
+/* Cards */
+.shop-builder-card--neon-border {
+  background: rgba(12, 12, 18, 0.6) !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4) !important;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.shop-builder-card--neon-border:hover {
+  border-color: rgba(99, 102, 241, 0.35) !important;
+  box-shadow: 0 0 20px rgba(99, 102, 241, 0.12), 0 4px 25px rgba(0, 0, 0, 0.5) !important;
+}
+
+.shop-builder-card--glass-morph {
+  background: rgba(18, 18, 24, 0.35) !important;
+  backdrop-filter: blur(18px) !important;
+  -webkit-backdrop-filter: blur(18px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.06) !important;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3) !important;
+  transition: all 0.3s ease !important;
+}
+
+.shop-builder-card--glass-morph:hover {
+  background: rgba(255, 255, 255, 0.03) !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+.shop-builder-card--cyber-grid {
+  background: rgba(8, 8, 12, 0.8) !important;
+  border: 1px solid rgba(99, 102, 241, 0.15) !important;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease !important;
+}
+
+.shop-builder-card--cyber-grid::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: 
+    linear-gradient(rgba(99, 102, 241, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(99, 102, 241, 0.025) 1px, transparent 1px);
+  background-size: 16px 16px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.shop-builder-card--cyber-grid:hover {
+  border-color: rgba(168, 85, 247, 0.3) !important;
+}
+
+/* Gradients */
+.text-gradient--indigo-purple {
+  background-image: linear-gradient(135deg, #a5b4fc 0%, #6366f1 50%, #a855f7 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  display: inline-block;
+}
+
+.text-gradient--cyan-blue {
+  background-image: linear-gradient(135deg, #22d3ee 0%, #06b6d4 50%, #2563eb 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  display: inline-block;
+}
+
+.text-gradient--emerald-teal {
+  background-image: linear-gradient(135deg, #34d399 0%, #10b981 50%, #0d9488 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  display: inline-block;
+}
+
+.text-gradient--sunset-orange {
+  background-image: linear-gradient(135deg, #fb923c 0%, #f97316 50%, #ec4899 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  display: inline-block;
+}
+
+.text-gradient--indigo-purple-cyan {
+  background-image: linear-gradient(135deg, #60a5fa 0%, #818cf8 50%, #c084fc 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  display: inline-block;
+}
+
+.text-gradient--sunset-pink {
+  background-image: linear-gradient(135deg, #fb923c 0%, #ec4899 50%, #a855f7 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  display: inline-block;
+}
+
+.text-gradient--gold-amber {
+  background-image: linear-gradient(135deg, #facc15 0%, #f59e0b 50%, #f97316 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  display: inline-block;
+}
+

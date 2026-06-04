@@ -32,12 +32,11 @@
     },
     "sections": [
       {
-        "id": "capabilities",
+        "id": "antigravity-demo-section-1",
         "kind": "contentLayout",
+        "visible": true,
         "title": "",
-        "eyebrow": "",
-        "body": "",
-        "background": "#ffffff",
+        "background": "",
         "backgroundMode": "full",
         "contentMode": "boxed",
         "colorScheme": "inherit",
@@ -45,210 +44,87 @@
         "bottomSpacing": "large",
         "topMargin": "inherit",
         "bottomMargin": "inherit",
-        "visible": true,
         "layout": "whole",
         "layoutColumns": 1,
         "layoutRows": 2,
+        "backgroundEffect": "none",
+        "antigravitySpeed": 1.5,
+        "antigravityParticleCount": 185,
+        "antigravityColor": "#a855f7",
+        "antigravityGridDensity": "medium",
+        "antigravityInteractive": true,
+        "antigravityShowGrid": true,
+        "antigravityShowParticles": true,
+        "antigravityGridMoveSpeed": 1.2,
+        "antigravityGlowIntensity": 1.5,
+        "antigravityVisualMode": "full",
         "layoutItems": [
           {
-            "id": "layout-row-mpu9np9r-column-1",
-            "rowId": "layout-row-mpu9np9r",
-            "rowLayout": "halves",
-            "blocks": []
-          },
-          {
-            "id": "layout-row-mpu9np9r-column-2",
-            "rowId": "layout-row-mpu9np9r",
-            "rowLayout": "halves",
-            "blocks": []
-          },
-          {
-            "id": "capability-showcase-column",
+            "id": "layout-row-demo-column-1",
+            "rowId": "layout-row-demo",
+            "rowLayout": "whole",
             "blocks": [
               {
-                "id": "capabilities-heading-block",
+                "id": "demo-hero-block-1",
                 "kind": "hero",
-                "eyebrow": "Capabilities",
-                "title": "Ո՞ւմ համար է WebPages-ը",
-                "body": "<p><strong>WebPages-ը հարմար է ինչպես անհատների, այնպես էլ տարբեր ոլորտների բիզնեսների համար։Անկախ նրանից՝ ցանկանում եք ներկայացնել ձեր ծառայությունները, ստեղծել անձնական էջ, ընդունել հայտեր կամ գործարկել առցանց խանութ, կարող եք սկսել պատրաստի և պարզ փաթեթից։</strong></p>",
-                "buttonLabel": "",
-                "buttonUrl": "",
-                "panelStyle": "default",
-                "elementBackgroundMode": "transparent",
-                "elementPadding": "none",
+                "eyebrow": "WELCOME TO ANTIGRAVITY ENGINE",
+                "title": "[Build the future with dynamic animations|interactive particles|typewriter effects|premium aesthetics]",
+                "body": "Welcome to the next generation visual builder. Craft high-performance storefronts with real-time feedback, advanced typography, and stunning visual overlays.",
+                "buttonLabel": "Launch Visual Builder",
+                "buttonUrl": "/dashboard",
+                "typewriterEnabled": true,
+                "typewriterLoop": true,
+                "typewriterSpeed": 90,
+                "typewriterDelay": 1500,
+                "typewriterUseGradient": true,
+                "typewriterGradientPreset": "custom",
+                "premiumButtonStyle": "glassmorphic",
                 "typography": {
                   "title": {
-                    "fontSize": "clamp(42px, 6vw, 96px)",
-                    "fontWeight": "820",
-                    "lineHeight": "0.92"
+                    "fontSize": "clamp(36px, 5.5vw, 80px)",
+                    "fontWeight": "800",
+                    "lineHeight": "1.0",
+                    "letterSpacing": "-0.03em"
                   },
                   "body": {
                     "fontSize": "18px",
-                    "lineHeight": "1.65"
+                    "fontWeight": "400",
+                    "lineHeight": "1.6",
+                    "color": "#a1a1aa"
+                  },
+                  "eyebrow": {
+                    "fontSize": "14px",
+                    "fontWeight": "600",
+                    "letterSpacing": "0.15em",
+                    "textTransform": "uppercase",
+                    "color": "#c084fc"
+                  },
+                  "button": {
+                    "fontSize": "15px",
+                    "fontWeight": "600"
                   }
+                },
+                "textGradientCustomStartOffset": 0,
+                "textGradientCustomStart": "#e5f1ff",
+                "textGradientCustomMiddle": "#818cf8",
+                "textGradientCustomEnd": "#c084fc",
+                "textGradientCustomMiddleOffset": 50,
+                "textGradientCustomEndOffset": 100,
+                "textGradientCustomAngle": 135,
+                "elementAlign": "center",
+                "carouselSettings": {
+                  "variant": "default"
                 }
-              },
-              {
-                "id": "capability-showcase-grid",
-                "kind": "grid",
-                "gridSource": "static",
-                "columns": 4,
-                "gridRows": 2,
-                "gridGap": "medium",
-                "gridMargin": "medium",
-                "gridImagePadding": "frameless",
-                "gridContentPadding": "large",
-                "gridImageFrame": "none",
-                "gridShowImage": false,
-                "gridShowButton": true,
-                "panelStyle": "flat-dark",
-                "gridItems": [
-                  {
-                    "id": "cap-hero",
-                    "eyebrow": "Hero / Slideshow",
-                    "title": "🏥 Բժշկական կենտրոն",
-                    "meta": "Hero reveal",
-                    "text": "Լայն typography, CTA, proof cards և slider-ային ներկայացումներ։",
-                    "buttonLabel": "Տեսնել shop-ը",
-                    "buttonUrl": "/shop",
-                    "typography": {
-                      "title": {
-                        "fontSize": "clamp(24px, 2.4vw, 42px)",
-                        "fontWeight": "760",
-                        "lineHeight": "1"
-                      },
-                      "body": {
-                        "fontSize": "16px",
-                        "lineHeight": "1.6"
-                      }
-                    }
-                  },
-                  {
-                    "id": "cap-products",
-                    "eyebrow": "Products",
-                    "title": "⚖️ Իրավաբանական ծառայություններ",
-                    "meta": "WooCommerce data",
-                    "text": "Product cards, filters, carousel և category showcase՝ իրական Woo տվյալներով։",
-                    "buttonLabel": "Shop",
-                    "buttonUrl": "/shop",
-                    "typography": {
-                      "title": {
-                        "fontSize": "clamp(24px, 2.4vw, 42px)",
-                        "fontWeight": "760",
-                        "lineHeight": "1"
-                      },
-                      "body": {
-                        "fontSize": "16px",
-                        "lineHeight": "1.6"
-                      }
-                    }
-                  },
-                  {
-                    "id": "cap-categories",
-                    "eyebrow": "Categories",
-                    "title": "💇 Գեղեցկության սրահ",
-                    "meta": "Reusable cards",
-                    "text": "Static կամ dynamic cards՝ ծառայությունների, փաթեթների կամ կատեգորիաների համար։",
-                    "buttonLabel": "Demos",
-                    "buttonUrl": "/demos",
-                    "typography": {
-                      "title": {
-                        "fontSize": "clamp(24px, 2.4vw, 42px)",
-                        "fontWeight": "760",
-                        "lineHeight": "1"
-                      },
-                      "body": {
-                        "fontSize": "16px",
-                        "lineHeight": "1.6"
-                      }
-                    }
-                  },
-                  {
-                    "id": "cap-product-page",
-                    "eyebrow": "Product page",
-                    "title": "🍽️ Ռեստորան",
-                    "meta": "Single template",
-                    "text": "Gallery, price, options, add to cart և wishlist՝ մեկ template-ի մեջ։",
-                    "buttonLabel": "Ապրանքներ",
-                    "buttonUrl": "/shop",
-                    "typography": {
-                      "title": {
-                        "fontSize": "clamp(24px, 2.4vw, 42px)",
-                        "fontWeight": "760",
-                        "lineHeight": "1"
-                      },
-                      "body": {
-                        "fontSize": "16px",
-                        "lineHeight": "1.6"
-                      }
-                    }
-                  },
-                  {
-                    "id": "cap-forms",
-                    "eyebrow": "Forms",
-                    "title": "🛒 Առցանց խանութ",
-                    "meta": "WordPress forms",
-                    "text": "Կոնտակտի և lead collection ձևերը կարող են մնալ WordPress-ում։",
-                    "buttonLabel": "Կապ",
-                    "buttonUrl": "#contact",
-                    "typography": {
-                      "title": {
-                        "fontSize": "clamp(24px, 2.4vw, 42px)",
-                        "fontWeight": "760",
-                        "lineHeight": "1"
-                      },
-                      "body": {
-                        "fontSize": "16px",
-                        "lineHeight": "1.6"
-                      }
-                    }
-                  },
-                  {
-                    "id": "cap-cta",
-                    "eyebrow": "CTA",
-                    "title": "🏠 Անձնական էջ",
-                    "meta": "Conversion blocks",
-                    "text": "Մաքուր CTA strips, badges, panels և editorial բաժիններ՝ արագ հավաքվող։",
-                    "buttonLabel": "Սկսել",
-                    "buttonUrl": "#packages",
-                    "typography": {
-                      "title": {
-                        "fontSize": "clamp(24px, 2.4vw, 42px)",
-                        "fontWeight": "760",
-                        "lineHeight": "1"
-                      },
-                      "body": {
-                        "fontSize": "16px",
-                        "lineHeight": "1.6"
-                      }
-                    }
-                  },
-                  {
-                    "id": "grid-item-mptchxbg",
-                    "eyebrow": "07",
-                    "title": "📚 Կրթական կենտրոն",
-                    "meta": "Meta",
-                    "text": "Edit this grid item.",
-                    "buttonLabel": "Learn more",
-                    "buttonUrl": "/"
-                  },
-                  {
-                    "id": "grid-item-mptcidhl",
-                    "eyebrow": "08",
-                    "title": "🏗️ Շինարարական ընկերություն",
-                    "meta": "Meta",
-                    "text": "Edit this grid item.",
-                    "buttonLabel": "Learn more",
-                    "buttonUrl": "/"
-                  }
-                ]
               }
             ]
+          },
+          {
+            "id": "layout-row-mpxscn5j-column-1",
+            "rowId": "layout-row-mpxscn5j",
+            "rowLayout": "whole",
+            "blocks": []
           }
-        ],
-        "animation": {
-          "preset": "stagger-up"
-        }
+        ]
       },
       {
         "id": "packages",
@@ -291,15 +167,25 @@
                 "elementPadding": "none",
                 "typography": {
                   "title": {
-                    "fontSize": "clamp(42px, 6vw, 96px)",
-                    "fontWeight": "820",
-                    "lineHeight": "0.92"
+                    "fontSize": "96",
+                    "fontWeight": "800",
+                    "lineHeight": "1.8"
                   },
                   "body": {
                     "fontSize": "18px",
                     "lineHeight": "1.65"
                   }
-                }
+                },
+                "typewriterEnabled": false,
+                "textGradientPreset": "custom",
+                "textGradientCustomStart": "#ffffff",
+                "textGradientCustomMiddle": "#818cf8",
+                "textGradientCustomEnd": "#c084fc",
+                "textGradientCustomStartOffset": 0,
+                "textGradientCustomMiddleOffset": 50,
+                "textGradientCustomEndOffset": 100,
+                "textGradientCustomAngle": 135,
+                "elementAlign": "center"
               },
               {
                 "id": "packages-grid",
@@ -568,13 +454,6 @@
             "id": "layout-item-mpwb0kb3-1",
             "blocks": [
               {
-                "id": "datePicker-block-mpwb0mnn-sgyzh",
-                "kind": "datePicker",
-                "title": "Choose a date",
-                "dateLabel": "Preferred date",
-                "body": "Useful for delivery, booking, or consultation flows."
-              },
-              {
                 "id": "scrollPinnedDemo-block-mpwb0s04-nnwd4",
                 "kind": "scrollPinnedDemo",
                 "title": "Scroll Pinned Storytelling",
@@ -607,7 +486,13 @@
                     "text": "<p>Ստանում եք պատրաստ կայք և կարող եք սկսել օգտագործել այն։</p>",
                     "imagePadding": "medium"
                   }
-                ]
+                ],
+                "carouselSettings": {
+                  "pinHeightFactor": 150,
+                  "variant": "perfect",
+                  "scrubSpeed": 1.2
+                },
+                "typewriterEnabled": false
               }
             ]
           }
@@ -742,10 +627,10 @@
         "title": "",
         "eyebrow": "",
         "body": "",
-        "background": "#f4f1ea",
+        "background": "#111111",
         "backgroundMode": "boxed",
         "contentMode": "boxed",
-        "colorScheme": "light",
+        "colorScheme": "inherit",
         "topSpacing": "large",
         "bottomSpacing": "large",
         "topMargin": "inherit",
@@ -953,7 +838,15 @@
                       }
                     }
                   }
-                ]
+                ],
+                "visualStyle": {
+                  "border": {
+                    "radius": "36px"
+                  },
+                  "effects": {
+                    "opacity": 81
+                  }
+                }
               }
             ]
           },
@@ -1050,13 +943,13 @@
         "eyebrow": "",
         "body": "",
         "background": "#d8ff65",
-        "backgroundMode": "boxed",
+        "backgroundMode": "full",
         "contentMode": "boxed",
         "colorScheme": "light",
         "topSpacing": "medium",
         "bottomSpacing": "medium",
         "topMargin": "inherit",
-        "bottomMargin": "inherit",
+        "bottomMargin": "none",
         "visible": true,
         "layout": "whole",
         "layoutColumns": 1,
@@ -1114,102 +1007,9 @@
             ]
           }
         ]
-      },
-      {
-        "id": "home-scroll-pinned-demo",
-        "kind": "scrollPinnedDemo",
-        "title": "Scroll Pinned Storytelling",
-        "eyebrow": "Showcase",
-        "body": "Scroll down to see the story unfold. Notice how the layout is locked. The scrollbar no longer moves the page vertically. Instead, it directs all energy into fueling the progressive card reveal on the right.",
-        "background": "#0a0a0a",
-        "backgroundMode": "full",
-        "contentMode": "full",
-        "colorScheme": "dark",
-        "visible": true,
-        "slides": [
-          {
-            "id": "pinned-slide-1",
-            "badge": "01",
-            "title": "Visual Pinning Intercepted",
-            "text": "GSAP ScrollTrigger sets a temporary inline position fixed to your container, creating a beautiful overlay effect without breaking page layout flow."
-          },
-          {
-            "id": "pinned-slide-2",
-            "badge": "02",
-            "title": "Timeline Scrubbing",
-            "text": "Scrubbing maps scroll position to timeline interpolation. Scrolling backwards reverses the animation seamlessly."
-          },
-          {
-            "id": "pinned-slide-3",
-            "badge": "03",
-            "title": "Dynamic Workspace Release",
-            "text": "Once the timeline finishes, ScrollTrigger unpins the element, and the container rolls up smoothly. The user continues their journey."
-          }
-        ],
-        "layout": "thirds-1-2",
-        "layoutColumns": 2,
-        "layoutItems": [
-          {
-            "id": "home-scroll-pinned-demo-story-copy",
-            "rowId": "home-scroll-pinned-demo-story-row",
-            "rowLayout": "thirds-1-2",
-            "blocks": [
-              {
-                "id": "home-scroll-pinned-demo-story-heading",
-                "kind": "text",
-                "eyebrow": "Showcase",
-                "title": "Scroll Pinned Storytelling",
-                "body": "Scroll down to see the story unfold. Notice how the layout is locked. The scrollbar no longer moves the page vertically. Instead, it directs all energy into fueling the progressive card reveal on the right.",
-                "elementBackgroundMode": "transparent"
-              },
-              {
-                "id": "home-scroll-pinned-demo-story-list",
-                "kind": "list",
-                "listIcon": "circleCheck",
-                "items": [
-                  "Reusable dashboard elements",
-                  "Editable card stack",
-                  "Scroll-scrubbed progress"
-                ],
-                "elementBackgroundMode": "transparent"
-              }
-            ]
-          },
-          {
-            "id": "home-scroll-pinned-demo-story-cards",
-            "rowId": "home-scroll-pinned-demo-story-row",
-            "rowLayout": "thirds-1-2",
-            "blocks": [
-              {
-                "id": "pinned-slide-1-block",
-                "kind": "panel",
-                "eyebrow": "01",
-                "title": "Visual Pinning Intercepted",
-                "body": "GSAP ScrollTrigger sets a temporary inline position fixed to your container, creating a beautiful overlay effect without breaking page layout flow.",
-                "elementBackgroundMode": "transparent"
-              },
-              {
-                "id": "pinned-slide-2-block",
-                "kind": "panel",
-                "eyebrow": "02",
-                "title": "Timeline Scrubbing",
-                "body": "Scrubbing maps scroll position to timeline interpolation. Scrolling backwards reverses the animation seamlessly.",
-                "elementBackgroundMode": "transparent"
-              },
-              {
-                "id": "pinned-slide-3-block",
-                "kind": "panel",
-                "eyebrow": "03",
-                "title": "Dynamic Workspace Release",
-                "body": "Once the timeline finishes, ScrollTrigger unpins the element, and the container rolls up smoothly. The user continues their journey.",
-                "elementBackgroundMode": "transparent"
-              }
-            ]
-          }
-        ]
       }
     ],
-    "updatedAt": "2026-06-02T14:44:59.626Z"
+    "updatedAt": "2026-06-04T05:27:29.970Z"
   },
   "shop": {
     "version": 1,
@@ -1232,7 +1032,14 @@
       "headingFontFamily": "inherit",
       "headingSize": "clamp(32px, 5vw, 76px)",
       "headingWeight": "760",
-      "headingLineHeight": "0.92"
+      "headingLineHeight": "0.92",
+      "cardBg": "#efefe9",
+      "cardRadius": "8px",
+      "cardBorder": "transparent",
+      "cardShadow": "0 12px 30px rgba(17,17,17,0.06)",
+      "cardShadowHover": "0 18px 42px rgba(17,17,17,0.1)",
+      "cardImageBg": "#ffffff",
+      "cardImagePadding": "clamp(22px, 2.4vw, 36px)"
     },
     "sections": [
       {
@@ -1298,7 +1105,7 @@
                 "source": "all",
                 "layoutVariant": "grid",
                 "columns": 4,
-                "gridLimit": 12,
+                "gridLimit": 6000,
                 "filterPosition": "top",
                 "cardStyle": "none",
                 "cardPreset": "princity-flat",
@@ -1351,7 +1158,7 @@
         "layoutRows": 1
       }
     ],
-    "updatedAt": "2026-06-01T04:25:27.180Z"
+    "updatedAt": "2026-06-02T15:10:40.626Z"
   },
   "client": {
     "version": 1,
@@ -2929,6 +2736,53 @@
                 "buttonUrl": "/fashion-store",
                 "elementBackgroundMode": "transparent",
                 "elementPadding": "large"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "page:demos-antigravity-showcase",
+        "kind": "contentLayout",
+        "title": "",
+        "eyebrow": "",
+        "body": "",
+        "background": "#030303",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "dark",
+        "topSpacing": "medium",
+        "bottomSpacing": "medium",
+        "visible": true,
+        "layout": "whole",
+        "layoutColumns": 1,
+        "layoutRows": 1,
+        "layoutItems": [
+          {
+            "id": "page:demos-antigravity-column",
+            "blocks": [
+              {
+                "id": "page:demos-antigravity-hero-block",
+                "kind": "hero",
+                "eyebrow": "Antigravity Variant",
+                "title": "Built for developers in the [agent-first era|next generation|future of code]",
+                "body": "Experience the developer-console aesthetic. Gradient typography, glassmorphism controls, and a live terminal simulation — all editable from the dashboard.",
+                "buttonLabel": "Explore variant",
+                "buttonUrl": "/dashboard?page=page:demos",
+                "carouselSettings": {
+                  "variant": "antigravity"
+                },
+                "typography": {
+                  "title": {
+                    "fontSize": "clamp(36px, 5vw, 72px)",
+                    "fontWeight": "820",
+                    "lineHeight": "0.95"
+                  },
+                  "body": {
+                    "fontSize": "17px",
+                    "lineHeight": "1.65"
+                  }
+                }
               }
             ]
           }

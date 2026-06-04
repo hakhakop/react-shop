@@ -183,6 +183,23 @@ export type BuilderLayoutBlock = {
   typography?: Record<string, unknown>;
   visualStyle?: Record<string, unknown>;
   animation?: Record<string, unknown>;
+  typewriterEnabled?: boolean;
+  typewriterSpeed?: number;
+  typewriterEraseSpeed?: number;
+  typewriterDelay?: number;
+  typewriterLoop?: boolean;
+  typewriterUseGradient?: boolean;
+  typewriterGradientPreset?: string;
+  premiumButtonStyle?: string;
+  premiumCardStyle?: string;
+  textGradientPreset?: string;
+  textGradientCustomStart?: string;
+  textGradientCustomMiddle?: string;
+  textGradientCustomEnd?: string;
+  textGradientCustomAngle?: number;
+  textGradientCustomStartOffset?: number;
+  textGradientCustomMiddleOffset?: number;
+  textGradientCustomEndOffset?: number;
 };
 
 export type BuilderSection = {
@@ -193,6 +210,18 @@ export type BuilderSection = {
   body?: string;
   background: string;
   backgroundMode?: string;
+  backgroundEffect?: string;
+  antigravitySpeed?: number;
+  antigravityParticleCount?: number;
+  antigravityColor?: string;
+  antigravityGridDensity?: string;
+  antigravityInteractive?: boolean;
+  antigravityShowGrid?: boolean;
+  antigravityShowParticles?: boolean;
+  antigravityGridMoveSpeed?: number;
+  antigravityGlowIntensity?: number;
+  antigravityVisualMode?: string;
+  antigravityInteractionScope?: string;
   contentMode?: string;
   colorScheme?: string;
   layout?: string;

@@ -423,6 +423,9 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
       body: "A strong visual opening with editable copy and action.",
       buttonLabel: "Learn more",
       buttonUrl: "/",
+      carouselSettings: {
+        variant: "default",
+      },
     };
   }
 
@@ -715,6 +718,18 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
           text: "Once the timeline finishes, ScrollTrigger unpins the element, and the container rolls up smoothly. The user continues their journey.",
         },
       ],
+      carouselSettings: {
+        variant: "perfect",
+        scrubSpeed: 1.2,
+        pinHeightFactor: 100,
+        showNavigation: true,
+      },
+      items: [
+        "Natively linked with local state settings",
+        "Fully customizable badge numbers and tags",
+        "Smooth mobile & desktop layout responsiveness",
+      ],
+      listIcon: "circleCheck",
     };
   }
 
@@ -916,6 +931,9 @@ export function createSection(kind: SectionKind): BuilderSection {
       layout: "split",
       buttonLabel: "Open shop",
       buttonUrl: "/shop",
+      carouselSettings: {
+        variant: "default",
+      },
     };
   }
 
@@ -1116,6 +1134,18 @@ export function createSection(kind: SectionKind): BuilderSection {
           text: "Once the timeline finishes, ScrollTrigger unpins the element, and the container rolls up smoothly. The user continues their journey.",
         },
       ],
+      carouselSettings: {
+        variant: "perfect",
+        scrubSpeed: 1.2,
+        pinHeightFactor: 100,
+        showNavigation: true,
+      },
+      items: [
+        "Natively linked with local state settings",
+        "Fully customizable badge numbers and tags",
+        "Smooth mobile & desktop layout responsiveness",
+      ],
+      listIcon: "circleCheck",
     };
   }
 

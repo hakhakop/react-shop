@@ -3,7 +3,16 @@
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { CheckCircle2, LayoutTemplate } from "lucide-react";
+import {
+  CheckCircle2,
+  LayoutTemplate,
+  Check,
+  ArrowRight,
+  Star,
+  Heart,
+  Sparkles,
+  Shield
+} from "lucide-react";
 import type { BuilderSection, BuilderLayoutBlock } from "@/components/dashboard/builderTypes";
 
 // Ensure ScrollTrigger is registered
@@ -19,6 +28,7 @@ export default function ScrollPinnedDemo({ section, block, isPreview = false }: 
   const [activeCardIndex, setActiveCardIndex] = useState(0);
   const triggerRef = useRef<HTMLDivElement>(null);
   const progressLineRef = useRef<HTMLDivElement>(null);
+  const scrollTriggerRef = useRef<any>(null);
 
   // Normalize data sources between section and block configurations
   const activeData = section || block;
@@ -67,11 +77,57 @@ export default function ScrollPinnedDemo({ section, block, isPreview = false }: 
   body = body || "Notice how the layout is locked. The scrollbar no longer moves the page vertically. Instead, it directs all energy into fueling the progressive card reveal on the right.";
   const background = section?.background || block?.elementBackground || "#0a0a0a";
 
-  const checklistItems = [
-    "Natively linked with local state settings",
-    "Fully customizable badge numbers and tags",
-    "Smooth mobile & desktop layout responsiveness",
-  ];
+  // Configuration options for scroll behavior and animation variations
+  const settings = activeData?.carouselSettings;
+  const variant = settings?.variant ?? "perfect";
+  const scrubSpeed = settings?.scrubSpeed ?? 1.2;
+  const pinHeightFactor = settings?.pinHeightFactor ?? 100;
+  const showNavigation = settings?.showNavigation ?? true;
+
+  const checklistItems = activeData?.items && activeData.items.length > 0
+    ? activeData.items
+    : [
+        "Natively linked with local state settings",
+        "Fully customizable badge numbers and tags",
+        "Smooth mobile & desktop layout responsiveness",
+      ];
+
+  const listIconName = activeData?.listIcon ?? "circleCheck";
+
+  const renderIcon = (colorClass: string) => {
+    const iconProps = { className: `w-5 h-5 ${colorClass} flex-shrink-0` };
+    switch (listIconName) {
+      case "check":
+        return <Check {...iconProps} />;
+      case "arrowRight":
+        return <ArrowRight {...iconProps} />;
+      case "star":
+        return <Star {...iconProps} />;
+      case "heart":
+        return <Heart {...iconProps} />;
+      case "sparkles":
+        return <Sparkles {...iconProps} />;
+      case "shield":
+        return <Shield {...iconProps} />;
+      case "circleCheck":
+      default:
+        return <CheckCircle2 {...iconProps} />;
+    }
+  };
+
+  const handleNavClick = (idx: number) => {
+    if (scrollTriggerRef.current) {
+      const st = scrollTriggerRef.current;
+      const start = st.start;
+      const end = st.end;
+      const total = end - start;
+      const targetScroll = start + (idx / slides.length) * total + 2;
+      window.scrollTo({
+        top: targetScroll,
+        behavior: "smooth"
+      });
+    }
+  };
 
   useEffect(() => {
     if (isPreview) return;
@@ -96,12 +152,18 @@ export default function ScrollPinnedDemo({ section, block, isPreview = false }: 
         scrollTrigger: {
           trigger: triggerRef.current,
           start: "top top",                     // Pins when the top of the container hits the top of the viewport
-          end: `+=${cards.length * 100}%`,       // Dynamic pinning height based on slide count
+          end: `+=${cards.length * pinHeightFactor}%`, // Dynamic pinning height based on slide count and height factor
           pin: true,                            // Locks container visual state
-          scrub: 1.2,                           // Link scroll to timeline smoothly (1.2s lag/catchup)
+          scrub: scrubSpeed,                    // Link scroll to timeline smoothly with configurable speed
           anticipatePin: 1,                     // Prevents minor pinning jumps
+          onUpdate: (self) => {
+            const idx = Math.min(Math.floor(self.progress * cards.length), cards.length - 1);
+            setActiveCardIndex(idx);
+          }
         },
       });
+
+      scrollTriggerRef.current = tl.scrollTrigger;
 
       // Dynamically chain animations for each card
       cards.forEach((card, index) => {
@@ -116,28 +178,60 @@ export default function ScrollPinnedDemo({ section, block, isPreview = false }: 
 
         // Step B: Fade out previous card if it exists
         if (index > 0) {
-          tl.to(cards[index - 1], {
-            autoAlpha: 0,
-            scale: 0.9,
-            y: -50,
-            duration: 1,
-          }, "-=1"); // Start at same time as progress bar line animation
+          if (variant === "fade") {
+            tl.to(cards[index - 1], {
+              autoAlpha: 0,
+              duration: 1,
+            }, "-=1");
+          } else if (variant === "slide") {
+            tl.to(cards[index - 1], {
+              autoAlpha: 0,
+              x: -100,
+              duration: 1,
+            }, "-=1");
+          } else { // "perfect"
+            tl.to(cards[index - 1], {
+              autoAlpha: 0,
+              scale: 0.9,
+              y: -50,
+              duration: 1,
+            }, "-=1");
+          }
         }
 
         // Step C: Fade in current card
-        tl.fromTo(
-          card,
-          { autoAlpha: 0, scale: 0.8, y: 100 },
-          { autoAlpha: 1, scale: 1, y: 0, duration: 1.5, ease: "power2.out" },
-          "-=0.5" // Overlap by 0.5s with the previous animation step
-        );
+        if (variant === "fade") {
+          tl.fromTo(
+            card,
+            { autoAlpha: 0 },
+            { autoAlpha: 1, duration: 1.2, ease: "power1.inOut" },
+            "-=0.5" // Overlap by 0.5s with the previous animation step
+          );
+        } else if (variant === "slide") {
+          tl.fromTo(
+            card,
+            { autoAlpha: 0, x: 200 },
+            { autoAlpha: 1, x: 0, duration: 1.5, ease: "power3.out" },
+            "-=0.5"
+          );
+        } else { // "perfect" (Our current perfect default variant)
+          tl.fromTo(
+            card,
+            { autoAlpha: 0, scale: 0.8, y: 100 },
+            { autoAlpha: 1, scale: 1, y: 0, duration: 1.5, ease: "power2.out" },
+            "-=0.5"
+          );
+        }
       });
 
     }, triggerRef);
 
     // 3. Cleanup on unmount
-    return () => ctx.revert();
-  }, [slides.length, isPreview]);
+    return () => {
+      ctx.revert();
+      scrollTriggerRef.current = null;
+    };
+  }, [slides.length, isPreview, variant, scrubSpeed, pinHeightFactor]);
 
   const isRichText = (val: string) => /<[a-z][\s\S]*>/i.test(val);
 
@@ -197,7 +291,7 @@ export default function ScrollPinnedDemo({ section, block, isPreview = false }: 
                 )}
 
                 <div className="flex flex-col gap-3 text-neutral-500 text-sm">
-                  {checklistItems.map((item, index) => {
+                  {checklistItems.map((item: string, index: number) => {
                     const colorClass = [
                       "text-sky-400",
                       "text-indigo-400",
@@ -205,19 +299,24 @@ export default function ScrollPinnedDemo({ section, block, isPreview = false }: 
                     ][index % 3];
                     return (
                       <div key={`${item}-${index}`} className="flex items-center gap-2">
-                        <CheckCircle2 className={`w-5 h-5 ${colorClass} flex-shrink-0`} />
+                        {renderIcon(colorClass)}
                         <span>{item}</span>
                       </div>
                     );
                   })}
                 </div>
 
-                {isPreview && (
+                {showNavigation && (
                   <div className="flex items-center gap-4 mt-2 pt-4 border-t border-neutral-800/80">
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        setActiveCardIndex(prev => Math.max(0, prev - 1));
+                        if (isPreview) {
+                          setActiveCardIndex(prev => Math.max(0, prev - 1));
+                        } else {
+                          const targetIdx = Math.max(0, activeCardIndex - 1);
+                          handleNavClick(targetIdx);
+                        }
                       }}
                       disabled={activeCardIndex === 0}
                       className="px-3 py-1.5 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-xs font-semibold disabled:opacity-40 disabled:cursor-not-allowed transition-all text-white border border-neutral-700/50"
@@ -230,7 +329,11 @@ export default function ScrollPinnedDemo({ section, block, isPreview = false }: 
                           key={idx}
                           onClick={(e) => {
                             e.stopPropagation();
-                            setActiveCardIndex(idx);
+                            if (isPreview) {
+                              setActiveCardIndex(idx);
+                            } else {
+                              handleNavClick(idx);
+                            }
                           }}
                           className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
                             idx === activeCardIndex ? "bg-sky-400 w-6" : "bg-neutral-700 hover:bg-neutral-600"
@@ -242,7 +345,12 @@ export default function ScrollPinnedDemo({ section, block, isPreview = false }: 
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        setActiveCardIndex(prev => Math.min(slides.length - 1, prev + 1));
+                        if (isPreview) {
+                          setActiveCardIndex(prev => Math.min(slides.length - 1, prev + 1));
+                        } else {
+                          const targetIdx = Math.min(slides.length - 1, activeCardIndex + 1);
+                          handleNavClick(targetIdx);
+                        }
                       }}
                       disabled={activeCardIndex === slides.length - 1}
                       className="px-3 py-1.5 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-xs font-semibold disabled:opacity-40 disabled:cursor-not-allowed transition-all text-white border border-neutral-700/50"
@@ -276,16 +384,29 @@ export default function ScrollPinnedDemo({ section, block, isPreview = false }: 
 
               const isActive = index === activeCardIndex;
 
+              let previewClasses = "";
+              if (isPreview) {
+                if (variant === "fade") {
+                  previewClasses = isActive
+                    ? "opacity-100 pointer-events-auto z-10"
+                    : "opacity-0 pointer-events-none z-0";
+                } else if (variant === "slide") {
+                  previewClasses = isActive
+                    ? "opacity-100 translate-x-0 pointer-events-auto z-10"
+                    : "opacity-0 translate-x-8 pointer-events-none z-0";
+                } else { // "perfect"
+                  previewClasses = isActive
+                    ? "opacity-100 scale-100 translate-y-0 pointer-events-auto z-10"
+                    : "opacity-0 scale-95 translate-y-8 pointer-events-none z-0";
+                }
+              }
+
               return (
                 <div 
                   key={slide.id || `pinned-slide-${index}`}
                   className={`scroll-pinned-card-item w-full max-w-[500px] bg-neutral-900/70 border border-neutral-800 backdrop-blur-xl p-8 rounded-3xl shadow-2xl flex flex-col gap-6 absolute ${
                     isPreview
-                      ? `transition-all duration-500 ease-out transform ${
-                          isActive
-                            ? "opacity-100 scale-100 translate-y-0 pointer-events-auto z-10"
-                            : "opacity-0 scale-95 translate-y-8 pointer-events-none z-0"
-                        }`
+                      ? `transition-all duration-500 ease-out transform ${previewClasses}`
                       : "opacity-0"
                   }`}
                 >

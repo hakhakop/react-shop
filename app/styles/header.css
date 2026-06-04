@@ -173,23 +173,43 @@
   height: calc(var(--header-main-h) + 36px);
 }
 
-.site-header.site-header--no-background {
+/* When NOT scrolled (top position or data-scrolled="false"), remove background/borders and position absolutely */
+.site-header.site-header--no-background:not([data-scrolled="true"]) {
+  position: absolute !important;
+  left: 0;
+  right: 0;
+  width: 100%;
   background: transparent !important;
   border-bottom-color: transparent !important;
   box-shadow: none !important;
   backdrop-filter: none !important;
 }
 
-.site-header--no-background .site-header-top,
-.site-header--no-background .site-header-main,
-.site-header--no-background .site-header-main-inner,
-.site-header--no-background .site-header-pill-main,
-.site-header--no-background .site-header-pill-inner {
+.site-header.site-header--no-background:not([data-scrolled="true"]) .site-header-top,
+.site-header.site-header--no-background:not([data-scrolled="true"]) .site-header-main,
+.site-header.site-header--no-background:not([data-scrolled="true"]) .site-header-main-inner {
   background: transparent !important;
   border-color: transparent !important;
   box-shadow: none !important;
   backdrop-filter: none !important;
 }
+
+/* For pill layouts inside no-background headers, only make transparent at top position */
+.site-header--no-background #site-header-pill:not([data-scrolled="true"]) .site-header-top,
+.site-header--no-background #site-header-pill:not([data-scrolled="true"]) .site-header-pill-main,
+.site-header--no-background #site-header-pill:not([data-scrolled="true"]) .site-header-pill-inner {
+  background: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+}
+
+/* Hide spacers in no-background mode so content starts at top of viewport */
+.site-header--no-background .site-header-pill-spacer,
+.site-header--no-background .site-header-princity-spacer {
+  display: none !important;
+}
+
 
 
 /* Dark theme header + toggle */
@@ -1177,7 +1197,10 @@
     min-height 260ms cubic-bezier(0.22, 1, 0.36, 1),
     padding 260ms cubic-bezier(0.22, 1, 0.36, 1),
     border-radius 260ms cubic-bezier(0.22, 1, 0.36, 1),
-    box-shadow 220ms ease;
+    box-shadow 220ms ease,
+    background-color 260ms ease,
+    border-color 260ms ease,
+    backdrop-filter 260ms ease;
 }
 
 #site-header-pill.site-header-princity-shell[data-scrolled="true"] .site-header-princity-inner {
@@ -1198,10 +1221,15 @@
   z-index: 1001;
 }
 
-.site-header--no-background .site-header-princity-meta-row,
-.site-header--no-background #site-header-pill.site-header-princity-shell .site-header-princity,
-.site-header--no-background .site-header-princity-inner,
-.site-header--no-background #site-header-pill.site-header-princity-shell[data-scrolled="true"] .site-header-princity-inner {
+/* For princity layout inside no-background headers, only make transparent at top position */
+.site-header--no-background .site-header-princity-meta-row {
+  background: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+}
+.site-header--no-background #site-header-pill.site-header-princity-shell:not([data-scrolled="true"]) .site-header-princity,
+.site-header--no-background #site-header-pill.site-header-princity-shell:not([data-scrolled="true"]) .site-header-princity-inner {
   background: transparent !important;
   border-color: transparent !important;
   box-shadow: none !important;

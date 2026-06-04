@@ -1,5 +1,8 @@
 import { Suspense } from "react";
 import type { CSSProperties, ReactNode } from "react";
+import AntigravityTerminal from "@/components/builder/AntigravityTerminal";
+import AntigravityCanvas from "@/components/builder/AntigravityCanvas";
+import TypewriterText from "@/components/builder/TypewriterText";
 import {
   ArrowRight,
   CalendarDays,
@@ -197,6 +200,89 @@ function designStyle(layout: BuilderLayout): BuilderStyle {
 function designClassName(layout: BuilderLayout) {
   const scheme = layout.design?.colorScheme ?? "auto";
   return `shop-builder-main shop-builder-main--scheme-${scheme}`;
+}
+
+function safeCssColor(value: string | undefined, fallback: string) {
+  const color = value?.trim();
+  if (!color) return fallback;
+
+  if (
+    /^#[0-9a-f]{3,8}$/i.test(color) ||
+    /^rgba?\([\d\s.,%+-]+\)$/i.test(color) ||
+    /^hsla?\([\d\s.,%+-]+\)$/i.test(color)
+  ) {
+    return color;
+  }
+
+  return fallback;
+}
+
+function builderPageShellCss(layout: BuilderLayout) {
+  const colors = resolveDesignColors(layout);
+  const pageBackground = safeCssColor(colors.pageBackground, "#f7f7f4");
+  const textColor = safeCssColor(colors.textColor, "#111111");
+  const mutedTextColor = safeCssColor(colors.mutedTextColor, "#5f5f58");
+  const surfaceColor = safeCssColor(colors.surfaceColor, "#efefe9");
+  const darkPageBackground = safeCssColor(
+    builderDarkScheme.pageBackground,
+    "#101010"
+  );
+  const darkTextColor = safeCssColor(builderDarkScheme.textColor, "#f7f7f1");
+  const darkMutedTextColor = safeCssColor(
+    builderDarkScheme.mutedTextColor,
+    "#c8c8be"
+  );
+  const darkSurfaceColor = safeCssColor(
+    builderDarkScheme.surfaceColor,
+    "#24241f"
+  );
+  const darkButtonBackground = safeCssColor(
+    builderDarkScheme.buttonBackground,
+    "#f7f7f1"
+  );
+  const darkButtonTextColor = safeCssColor(
+    builderDarkScheme.buttonTextColor,
+    "#101010"
+  );
+
+  return `
+body:has(.shop-builder-main[data-builder-page-root]) {
+  --page-bg: ${pageBackground};
+  --surface-main: ${pageBackground};
+  --surface-muted: ${surfaceColor};
+  --surface-soft: ${surfaceColor};
+  --text-main: ${textColor};
+  --text-muted: ${mutedTextColor};
+  background: ${pageBackground};
+  color: ${textColor};
+}
+
+body:has(.shop-builder-main[data-builder-page-root]) .site-main {
+  background: ${pageBackground};
+}
+
+[data-theme="dark"] body:has(.shop-builder-main[data-builder-page-root]) {
+  --page-bg: ${darkPageBackground};
+  --surface-main: ${darkPageBackground};
+  --surface-muted: ${darkSurfaceColor};
+  --surface-soft: ${darkSurfaceColor};
+  --text-main: ${darkTextColor};
+  --text-muted: ${darkMutedTextColor};
+  background: ${darkPageBackground};
+  color: ${darkTextColor};
+}
+
+[data-theme="dark"] body:has(.shop-builder-main[data-builder-page-root]) .site-main,
+[data-theme="dark"] body:has(.shop-builder-main[data-builder-page-root]) .shop-builder-main[data-builder-page-root] {
+  --builder-text: ${darkTextColor};
+  --builder-muted: ${darkMutedTextColor};
+  --builder-surface: ${darkSurfaceColor};
+  --builder-button-bg: ${darkButtonBackground};
+  --builder-button-text: ${darkButtonTextColor};
+  background: ${darkPageBackground} !important;
+  color: ${darkTextColor} !important;
+}
+`;
 }
 
 async function BuilderProductsSection({
@@ -452,15 +538,62 @@ function SectionFrame({
   children: ReactNode;
 }) {
   const animationAttrs = animationDataAttributes(section.animation);
+  const isAntigravity =
+    section.backgroundEffect === "antigravity" ||
+    (section.kind === "hero" && section.carouselSettings?.variant === "antigravity");
+  const isFullTheme =
+    isAntigravity &&
+    (section.antigravityVisualMode === undefined || section.antigravityVisualMode === "full");
 
   return (
     <section
       id={section.id}
-      className={sectionClassName(section, extra)}
+      className={`${sectionClassName(section, extra)} ${
+        isFullTheme
+          ? "shop-builder-section--effect-antigravity"
+          : isAntigravity
+            ? "relative overflow-hidden"
+            : ""
+      }`}
       style={{ ...sectionStyle(section), ...animationAttrs.style }}
       data-gsap-section={section.kind === "hero" ? "hero" : section.kind}
       {...animationAttrs.data}
     >
+      {isAntigravity && (
+        <>
+          <AntigravityCanvas
+            speed={section.antigravitySpeed}
+            particleCount={section.antigravityParticleCount}
+            color={section.antigravityColor}
+            gridDensity={section.antigravityGridDensity as any}
+            interactive={section.antigravityInteractive}
+            showGrid={section.antigravityShowGrid}
+            showParticles={section.antigravityShowParticles}
+            gridMoveSpeed={section.antigravityGridMoveSpeed}
+            glowIntensity={section.antigravityGlowIntensity}
+            interactionScope={section.antigravityInteractionScope as any}
+            visualMode={section.antigravityVisualMode as any}
+          />
+          {section.antigravityShowGrid !== false && (
+            <div
+              className="antigravity-grid-overlay"
+              aria-hidden="true"
+              style={
+                section.antigravityGridMoveSpeed !== undefined || section.antigravityColor
+                  ? {
+                      animationDuration: section.antigravityGridMoveSpeed === 0
+                        ? "0s"
+                        : `${25 / (section.antigravityGridMoveSpeed ?? 1.0)}s`,
+                      backgroundImage: section.antigravityColor
+                        ? `linear-gradient(${section.antigravityColor}08 1px, transparent 1px), linear-gradient(90deg, ${section.antigravityColor}08 1px, transparent 1px)`
+                        : undefined,
+                    }
+                  : undefined
+              }
+            />
+          )}
+        </>
+      )}
       <div
         className="shop-builder-section-content"
         data-gsap-stagger={
@@ -493,6 +626,7 @@ function ProductsSkeleton() {
   );
 }
 
+
 function HeroSection({
   section,
   product,
@@ -504,9 +638,14 @@ function HeroSection({
     product && section.id.includes("template-product"),
   );
 
+  const isAntigravity = section.carouselSettings?.variant === "antigravity";
+
   return (
-    <SectionFrame section={section} extra="shop-builder-hero">
-      <div data-gsap-hero-item>
+    <SectionFrame
+      section={section}
+      extra={`shop-builder-hero ${isAntigravity ? "shop-builder-hero--antigravity" : ""}`}
+    >
+      <div data-gsap-hero-item className="shop-builder-hero-content-left">
         {section.eyebrow && (
           <Typog
             as="p"
@@ -518,10 +657,16 @@ function HeroSection({
         )}
         <Typog
           as="h1"
-          className="shop-builder-title"
+          className={`shop-builder-title ${isAntigravity ? "shop-builder-title--gradient" : ""}`}
           typography={section.typography}
         >
-          {isProductTemplate ? product?.name : section.title}
+          {isProductTemplate ? (
+            product?.name
+          ) : isAntigravity && section.title ? (
+            <TypewriterText text={section.title} typography={section.typography} area="title" />
+          ) : (
+            section.title
+          )}
         </Typog>
         {(isProductTemplate ? product?.priceFormatted : section.body) && (
           <Typog
@@ -535,7 +680,7 @@ function HeroSection({
         {section.buttonLabel && section.buttonUrl && (
           <Typog
             as="a"
-            className="shop-builder-cta"
+            className={`shop-builder-cta ${isAntigravity ? "shop-builder-cta--antigravity" : ""}`}
             href={section.buttonUrl}
             target={section.buttonTarget === "_blank" ? "_blank" : undefined}
             rel={section.buttonTarget === "_blank" ? "noreferrer" : undefined}
@@ -545,7 +690,14 @@ function HeroSection({
           </Typog>
         )}
       </div>
-      {isProductTemplate && product?.imageUrl ? (
+      {isAntigravity ? (
+        <div
+          className="shop-builder-hero-media shop-builder-hero-media--antigravity"
+          data-gsap-hero-item
+        >
+          <AntigravityTerminal />
+        </div>
+      ) : isProductTemplate && product?.imageUrl ? (
         <div
           className="shop-builder-hero-media shop-builder-hero-media--image"
           role="img"
@@ -1159,9 +1311,9 @@ function ContentLayoutBlock({
 }) {
   if (block.kind === "button") {
     return (
-      <div className="shop-builder-column-block shop-builder-column-block--button">
+      <div className={`shop-builder-column-block shop-builder-column-block--button ${block.premiumCardStyle && block.premiumCardStyle !== "none" ? `shop-builder-card--${block.premiumCardStyle}` : ""}`}>
         <div 
-          className={`shop-builder-buttons shop-builder-buttons--${block.buttonsLayout ?? "inline"}`}
+          className={`shop-builder-buttons ${block.premiumButtonStyle && block.premiumButtonStyle !== "default" ? "" : `shop-builder-buttons--${block.buttonsLayout ?? "inline"}`}`}
           style={{
             display: "flex",
             flexDirection: block.buttonsLayout === "stacked" ? "column" : "row",
@@ -1172,7 +1324,11 @@ function ContentLayoutBlock({
           {block.buttonLabel && block.buttonUrl && (
             <Typog
               as="a"
-              className={`shop-builder-cta shop-builder-cta--${block.buttonStyle ?? "primary"}`}
+              className={`shop-builder-cta ${
+                block.premiumButtonStyle && block.premiumButtonStyle !== "default"
+                  ? `shop-builder-cta--${block.premiumButtonStyle}`
+                  : `shop-builder-cta--${block.buttonStyle ?? "primary"}`
+              }`}
               href={block.buttonUrl}
               target={block.buttonTarget === "_blank" ? "_blank" : undefined}
               rel={block.buttonTarget === "_blank" ? "noreferrer" : undefined}
@@ -1185,7 +1341,11 @@ function ContentLayoutBlock({
             <Typog
               key={btn.id ?? btnIdx}
               as="a"
-              className={`shop-builder-cta shop-builder-cta--${btn.style ?? "primary"}`}
+              className={`shop-builder-cta ${
+                block.premiumButtonStyle && block.premiumButtonStyle !== "default"
+                  ? `shop-builder-cta--${block.premiumButtonStyle}`
+                  : `shop-builder-cta--${btn.style ?? "primary"}`
+              }`}
               href={btn.url}
               target={btn.target === "_blank" ? "_blank" : undefined}
               rel={btn.target === "_blank" ? "noreferrer" : undefined}
@@ -1427,11 +1587,40 @@ function ContentLayoutBlock({
 
   if (block.kind === "heading") {
     const Tag = block.headingLevel ?? "h2";
+    const isGradient = block.textGradientPreset && block.textGradientPreset !== "none";
+    const isCustom = block.textGradientPreset === "custom";
+    const titleClassName = isGradient && !isCustom ? `text-gradient--${block.textGradientPreset}` : "";
+    const customStyle = isCustom ? {
+      backgroundImage: `linear-gradient(${block.textGradientCustomAngle ?? 135}deg, ${block.textGradientCustomStart ?? "#ffffff"} ${block.textGradientCustomStartOffset ?? 0}%, ${block.textGradientCustomMiddle ?? "#60a5fa"} ${block.textGradientCustomMiddleOffset ?? 50}%, ${block.textGradientCustomEnd ?? "#c084fc"} ${block.textGradientCustomEndOffset ?? 100}%)`,
+      WebkitBackgroundClip: "text",
+      WebkitTextFillColor: "transparent",
+      backgroundClip: "text",
+      display: "inline-block",
+    } : {};
     return (
-      <div className="shop-builder-column-block shop-builder-column-block--heading">
-        <Tag style={{ textAlign: block.headingAlign ?? "left", margin: 0 }}>
-          {block.headingText ?? "Your Heading Text"}
-        </Tag>
+      <div className={`shop-builder-column-block shop-builder-column-block--heading ${block.premiumCardStyle && block.premiumCardStyle !== "none" ? `shop-builder-card--${block.premiumCardStyle}` : ""}`}>
+        <Typog
+          as={Tag}
+          className={titleClassName}
+          typography={block.typography}
+          style={{ textAlign: block.headingAlign ?? "left", margin: 0, ...customStyle }}
+        >
+          {block.typewriterEnabled ? (
+            <TypewriterText
+              text={block.headingText ?? "Your Heading Text"}
+              speed={block.typewriterSpeed}
+              eraseSpeed={block.typewriterEraseSpeed}
+              delay={block.typewriterDelay}
+              loop={block.typewriterLoop}
+              useGradient={block.typewriterUseGradient}
+              gradientPreset={block.textGradientPreset ?? block.typewriterGradientPreset} customStart={block.textGradientCustomStart} customMiddle={block.textGradientCustomMiddle} customEnd={block.textGradientCustomEnd} customAngle={block.textGradientCustomAngle} customStartOffset={block.textGradientCustomStartOffset} customMiddleOffset={block.textGradientCustomMiddleOffset} customEndOffset={block.textGradientCustomEndOffset}
+              typography={block.typography}
+              area="title"
+            />
+          ) : (
+            block.headingText ?? "Your Heading Text"
+          )}
+        </Typog>
       </div>
     );
   }
@@ -1499,42 +1688,168 @@ function ContentLayoutBlock({
   }
 
   if (block.kind === "hero") {
+    const isBlockAntigravity = block.carouselSettings?.variant === "antigravity";
+    const isGradient = block.textGradientPreset && block.textGradientPreset !== "none";
+    const isCustom = block.textGradientPreset === "custom";
+    const titleClassName = isGradient && !isCustom
+      ? `text-gradient--${block.textGradientPreset}`
+      : isBlockAntigravity
+        ? "shop-builder-title--gradient"
+        : "";
+    const customStyle = isCustom ? {
+      backgroundImage: `linear-gradient(${block.textGradientCustomAngle ?? 135}deg, ${block.textGradientCustomStart ?? "#ffffff"} ${block.textGradientCustomStartOffset ?? 0}%, ${block.textGradientCustomMiddle ?? "#60a5fa"} ${block.textGradientCustomMiddleOffset ?? 50}%, ${block.textGradientCustomEnd ?? "#c084fc"} ${block.textGradientCustomEndOffset ?? 100}%)`,
+      WebkitBackgroundClip: "text",
+      WebkitTextFillColor: "transparent",
+      backgroundClip: "text",
+      display: "inline-block",
+    } : {};
+
     return (
-      <div className="shop-builder-column-block shop-builder-column-block--hero">
-        {block.eyebrow && (
-          <Typog
-            as="span"
-            className="shop-builder-eyebrow"
-            typography={block.typography}
-          >
-            {block.eyebrow}
-          </Typog>
+      <div className={`shop-builder-column-block shop-builder-column-block--hero ${isBlockAntigravity ? "shop-builder-hero--antigravity shop-builder-hero--antigravity-block" : ""} ${block.premiumCardStyle && block.premiumCardStyle !== "none" ? `shop-builder-card--${block.premiumCardStyle}` : ""}`}>
+        {isBlockAntigravity && (
+          <>
+            <AntigravityCanvas
+              speed={(block.carouselSettings as any)?.antigravitySpeed}
+              particleCount={(block.carouselSettings as any)?.antigravityParticleCount}
+              color={(block.carouselSettings as any)?.antigravityColor}
+              gridDensity={(block.carouselSettings as any)?.antigravityGridDensity as any}
+              interactive={(block.carouselSettings as any)?.antigravityInteractive}
+              showGrid={(block.carouselSettings as any)?.antigravityShowGrid}
+              showParticles={(block.carouselSettings as any)?.antigravityShowParticles}
+              gridMoveSpeed={(block.carouselSettings as any)?.antigravityGridMoveSpeed}
+              glowIntensity={(block.carouselSettings as any)?.antigravityGlowIntensity}
+            />
+            {((block.carouselSettings as any)?.antigravityShowGrid !== false) && (
+              <div 
+                className="antigravity-grid-overlay" 
+                aria-hidden="true" 
+                style={
+                  (block.carouselSettings as any)?.antigravityGridMoveSpeed !== undefined || (block.carouselSettings as any)?.antigravityColor
+                    ? {
+                        animationDuration: (block.carouselSettings as any)?.antigravityGridMoveSpeed === 0
+                          ? "0s"
+                          : `${25 / ((block.carouselSettings as any)?.antigravityGridMoveSpeed ?? 1.0)}s`,
+                        backgroundImage: (block.carouselSettings as any)?.antigravityColor
+                          ? `linear-gradient(${(block.carouselSettings as any)?.antigravityColor}08 1px, transparent 1px), linear-gradient(90deg, ${(block.carouselSettings as any)?.antigravityColor}08 1px, transparent 1px)`
+                          : undefined,
+                      }
+                    : undefined
+                }
+              />
+            )}
+          </>
         )}
-        {block.title && <Typog as="h3" typography={block.typography}>{block.title}</Typog>}
-        {block.body && <Typog as="p" typography={block.typography}>{block.body}</Typog>}
-        {block.buttonLabel && block.buttonUrl && (
-          <Typog
-            as="a"
-            className="shop-builder-cta"
-            href={block.buttonUrl}
-            typography={block.typography}
-          >
-            {block.buttonLabel}
-          </Typog>
+        <div className={isBlockAntigravity ? "shop-builder-hero-content-left" : ""}>
+          {block.eyebrow && (
+            <Typog
+              as="span"
+              className="shop-builder-eyebrow"
+              typography={block.typography}
+            >
+              {block.eyebrow}
+            </Typog>
+          )}
+          {block.title && (
+            <Typog
+              as="h3"
+              className={titleClassName}
+              typography={block.typography}
+              style={customStyle}
+            >
+              {block.typewriterEnabled ? (
+                <TypewriterText
+                  text={block.title}
+                  speed={block.typewriterSpeed}
+                  eraseSpeed={block.typewriterEraseSpeed}
+                  delay={block.typewriterDelay}
+                  loop={block.typewriterLoop}
+                  useGradient={block.typewriterUseGradient}
+                  gradientPreset={block.textGradientPreset ?? block.typewriterGradientPreset} customStart={block.textGradientCustomStart} customMiddle={block.textGradientCustomMiddle} customEnd={block.textGradientCustomEnd} customAngle={block.textGradientCustomAngle} customStartOffset={block.textGradientCustomStartOffset} customMiddleOffset={block.textGradientCustomMiddleOffset} customEndOffset={block.textGradientCustomEndOffset}
+                  typography={block.typography}
+                  area="title"
+                />
+              ) : isBlockAntigravity ? (
+                <TypewriterText
+                  text={block.title}
+                  speed={block.typewriterSpeed}
+                  eraseSpeed={block.typewriterEraseSpeed}
+                  delay={block.typewriterDelay}
+                  loop={block.typewriterLoop}
+                  useGradient={block.typewriterUseGradient}
+                  gradientPreset={block.textGradientPreset ?? block.typewriterGradientPreset}
+                  customStart={block.textGradientCustomStart}
+                  customMiddle={block.textGradientCustomMiddle}
+                  customEnd={block.textGradientCustomEnd}
+                  customAngle={block.textGradientCustomAngle} customStartOffset={block.textGradientCustomStartOffset} customMiddleOffset={block.textGradientCustomMiddleOffset} customEndOffset={block.textGradientCustomEndOffset}
+                  typography={block.typography}
+                  area="title"
+                />
+              ) : (
+                block.title
+              )}
+            </Typog>
+          )}
+          {block.body && (
+            <Typog as="p" typography={block.typography}>
+              {block.typewriterEnabled && !block.title ? (
+                <TypewriterText
+                  text={block.body}
+                  speed={block.typewriterSpeed}
+                  eraseSpeed={block.typewriterEraseSpeed}
+                  delay={block.typewriterDelay}
+                  loop={block.typewriterLoop}
+                  useGradient={block.typewriterUseGradient}
+                  gradientPreset={block.textGradientPreset ?? block.typewriterGradientPreset} customStart={block.textGradientCustomStart} customMiddle={block.textGradientCustomMiddle} customEnd={block.textGradientCustomEnd} customAngle={block.textGradientCustomAngle} customStartOffset={block.textGradientCustomStartOffset} customMiddleOffset={block.textGradientCustomMiddleOffset} customEndOffset={block.textGradientCustomEndOffset}
+                  typography={block.typography}
+                  area="body"
+                />
+              ) : (
+                block.body
+              )}
+            </Typog>
+          )}
+          {block.buttonLabel && block.buttonUrl && (
+            <Typog
+              as="a"
+              className={`shop-builder-cta ${
+                block.premiumButtonStyle && block.premiumButtonStyle !== "default"
+                  ? `shop-builder-cta--${block.premiumButtonStyle}`
+                  : isBlockAntigravity
+                    ? "shop-builder-cta--antigravity"
+                    : ""
+              }`}
+              href={block.buttonUrl}
+              typography={block.typography}
+            >
+              {block.buttonLabel}
+            </Typog>
+          )}
+          {(block.buttons ?? []).map((btn, btnIdx) => {
+            const isPremium = block.premiumButtonStyle && block.premiumButtonStyle !== "default";
+            return (
+              <Typog
+                key={btn.id ?? btnIdx}
+                as="a"
+                className={`shop-builder-cta ${
+                  isPremium
+                    ? `shop-builder-cta--${block.premiumButtonStyle}`
+                    : `shop-builder-cta--${btn.style ?? "primary"}`
+                }`}
+                href={btn.url}
+                target={btn.target === "_blank" ? "_blank" : undefined}
+                rel={btn.target === "_blank" ? "noreferrer" : undefined}
+                typography={block.typography}
+              >
+                {btn.label}
+              </Typog>
+            );
+          })}
+        </div>
+        {isBlockAntigravity && (
+          <div className="shop-builder-hero-media shop-builder-hero-media--antigravity">
+            <AntigravityTerminal />
+          </div>
         )}
-        {(block.buttons ?? []).map((btn, btnIdx) => (
-          <Typog
-            key={btn.id ?? btnIdx}
-            as="a"
-            className={`shop-builder-cta shop-builder-cta--${btn.style ?? "primary"}`}
-            href={btn.url}
-            target={btn.target === "_blank" ? "_blank" : undefined}
-            rel={btn.target === "_blank" ? "noreferrer" : undefined}
-            typography={block.typography}
-          >
-            {btn.label}
-          </Typog>
-        ))}
       </div>
     );
   }
@@ -1544,8 +1859,44 @@ function ContentLayoutBlock({
       <div className="shop-builder-column-block shop-builder-column-block--promo-strip">
         <div>
           {block.eyebrow && <span>{block.eyebrow}</span>}
-          {block.title && <Typog as="h3" typography={block.typography}>{block.title}</Typog>}
-          {block.body && <Typog as="p" typography={block.typography}>{block.body}</Typog>}
+          {block.title && (
+            <Typog as="h3" typography={block.typography}>
+              {block.typewriterEnabled ? (
+                <TypewriterText
+                  text={block.title}
+                  speed={block.typewriterSpeed}
+                  eraseSpeed={block.typewriterEraseSpeed}
+                  delay={block.typewriterDelay}
+                  loop={block.typewriterLoop}
+                  useGradient={block.typewriterUseGradient}
+                  gradientPreset={block.textGradientPreset ?? block.typewriterGradientPreset} customStart={block.textGradientCustomStart} customMiddle={block.textGradientCustomMiddle} customEnd={block.textGradientCustomEnd} customAngle={block.textGradientCustomAngle} customStartOffset={block.textGradientCustomStartOffset} customMiddleOffset={block.textGradientCustomMiddleOffset} customEndOffset={block.textGradientCustomEndOffset}
+                  typography={block.typography}
+                  area="title"
+                />
+              ) : (
+                block.title
+              )}
+            </Typog>
+          )}
+          {block.body && (
+            <Typog as="p" typography={block.typography}>
+              {block.typewriterEnabled && !block.title ? (
+                <TypewriterText
+                  text={block.body}
+                  speed={block.typewriterSpeed}
+                  eraseSpeed={block.typewriterEraseSpeed}
+                  delay={block.typewriterDelay}
+                  loop={block.typewriterLoop}
+                  useGradient={block.typewriterUseGradient}
+                  gradientPreset={block.textGradientPreset ?? block.typewriterGradientPreset} customStart={block.textGradientCustomStart} customMiddle={block.textGradientCustomMiddle} customEnd={block.textGradientCustomEnd} customAngle={block.textGradientCustomAngle} customStartOffset={block.textGradientCustomStartOffset} customMiddleOffset={block.textGradientCustomMiddleOffset} customEndOffset={block.textGradientCustomEndOffset}
+                  typography={block.typography}
+                  area="body"
+                />
+              ) : (
+                block.body
+              )}
+            </Typog>
+          )}
         </div>
         {block.buttonLabel && block.buttonUrl && (
           <Typog
@@ -1587,8 +1938,44 @@ function ContentLayoutBlock({
         )}
         <div>
           {block.eyebrow && <span>{block.eyebrow}</span>}
-          {block.title && <Typog as="h3" typography={block.typography}>{block.title}</Typog>}
-          {block.body && <Typog as="p" typography={block.typography}>{block.body}</Typog>}
+          {block.title && (
+            <Typog as="h3" typography={block.typography}>
+              {block.typewriterEnabled ? (
+                <TypewriterText
+                  text={block.title}
+                  speed={block.typewriterSpeed}
+                  eraseSpeed={block.typewriterEraseSpeed}
+                  delay={block.typewriterDelay}
+                  loop={block.typewriterLoop}
+                  useGradient={block.typewriterUseGradient}
+                  gradientPreset={block.textGradientPreset ?? block.typewriterGradientPreset} customStart={block.textGradientCustomStart} customMiddle={block.textGradientCustomMiddle} customEnd={block.textGradientCustomEnd} customAngle={block.textGradientCustomAngle} customStartOffset={block.textGradientCustomStartOffset} customMiddleOffset={block.textGradientCustomMiddleOffset} customEndOffset={block.textGradientCustomEndOffset}
+                  typography={block.typography}
+                  area="title"
+                />
+              ) : (
+                block.title
+              )}
+            </Typog>
+          )}
+          {block.body && (
+            <Typog as="p" typography={block.typography}>
+              {block.typewriterEnabled && !block.title ? (
+                <TypewriterText
+                  text={block.body}
+                  speed={block.typewriterSpeed}
+                  eraseSpeed={block.typewriterEraseSpeed}
+                  delay={block.typewriterDelay}
+                  loop={block.typewriterLoop}
+                  useGradient={block.typewriterUseGradient}
+                  gradientPreset={block.textGradientPreset ?? block.typewriterGradientPreset} customStart={block.textGradientCustomStart} customMiddle={block.textGradientCustomMiddle} customEnd={block.textGradientCustomEnd} customAngle={block.textGradientCustomAngle} customStartOffset={block.textGradientCustomStartOffset} customMiddleOffset={block.textGradientCustomMiddleOffset} customEndOffset={block.textGradientCustomEndOffset}
+                  typography={block.typography}
+                  area="body"
+                />
+              ) : (
+                block.body
+              )}
+            </Typog>
+          )}
           {block.buttonLabel && block.buttonUrl && (
             <Typog
               as="a"
@@ -1764,30 +2151,45 @@ function blockShellClassName(block: BuilderLayoutBlock) {
   const visualClass = visualStyleClassName(
     block.visualStyle as BuilderVisualStyle | undefined,
   );
+  const premiumCardClass = block.premiumCardStyle && block.premiumCardStyle !== "none"
+    ? `shop-builder-card--${block.premiumCardStyle}`
+    : "";
   return `shop-builder-element-shell shop-card-preset--${
     block.panelStyle ?? "default"
   } is-padding-${
     block.elementPadding ?? "none"
   } is-align-${
     block.elementAlign ?? "left"
-  } ${visualClass} ${animationClassName(block.animation)}`.trim();
+  } ${visualClass} ${animationClassName(block.animation)} ${premiumCardClass}`.trim();
 }
 
-function Typog({ as: As = "div", typography, className, children, ...props }: any) {
+const HAS_RICH_TEXT_HTML = /<[a-z][\s\S]*>/i;
+
+function isRichPreviewText(value: string | null | undefined) {
+  return typeof value === "string" && HAS_RICH_TEXT_HTML.test(value);
+}
+
+function getRichTextSafeTag(tag: string) {
+  return tag === "p" ? "div" : tag;
+}
+
+function Typog({ as: As = "div", typography, className, children, style, ...props }: any) {
   const tp = typographyProps(
     typography,
     inferTypographyArea(String(As), className),
   );
-  const Tag = As as any;
   const combined = [className, tp.className].filter(Boolean).join(" ");
-  const isRich = typeof children === "string" && children.includes("<");
+  const combinedStyle = { ...tp.style, ...style };
+  const isRich = isRichPreviewText(children);
   if (isRich) {
+    const Tag = getRichTextSafeTag(String(As)) as any;
     return (
-      <Tag className={combined || undefined} style={tp.style} {...props} dangerouslySetInnerHTML={{ __html: children }} />
+      <Tag className={combined || undefined} style={combinedStyle} {...props} dangerouslySetInnerHTML={{ __html: children }} />
     );
   }
+  const Tag = As as any;
   return (
-    <Tag className={combined || undefined} style={tp.style} {...props}>
+    <Tag className={combined || undefined} style={combinedStyle} {...props}>
       {children}
     </Tag>
   );
@@ -1795,8 +2197,8 @@ function Typog({ as: As = "div", typography, className, children, ...props }: an
 
 function BodyText({ children, className }: { children: string | null | undefined; className?: string }) {
   if (!children) return null;
-  if (children.includes("<")) {
-    return <p className={className} dangerouslySetInnerHTML={{ __html: children }} />;
+  if (isRichPreviewText(children)) {
+    return <div className={className} dangerouslySetInnerHTML={{ __html: children }} />;
   }
   return <p className={className}>{children}</p>;
 }
@@ -2156,28 +2558,35 @@ export default function StorefrontBuilderRenderer({
   const isHomePage = page === "home";
 
   return (
-    <main
-      className={designClassName(layout)}
-      style={designStyle(layout)}
-      data-gsap-home={isHomePage ? true : undefined}
-    >
-      <BuilderScrollAnimations />
-      {isHomePage && <HomeGsapAnimations />}
-      <div className="shop-builder-inner">
-        {layout.sections.map((section) => (
-          <BuilderSectionRenderer
-            key={section.id}
-            section={section}
-            products={products}
-            categoryTree={categoryTree}
-            activeCategorySlug={activeCategorySlug}
-            product={product}
-            breadcrumbItems={resolvedBreadcrumbItems}
-            page={page}
-            pageContent={pageContent}
-          />
-        ))}
-      </div>
-    </main>
+    <>
+      <style
+        data-builder-page-shell
+        dangerouslySetInnerHTML={{ __html: builderPageShellCss(layout) }}
+      />
+      <main
+        className={designClassName(layout)}
+        style={designStyle(layout)}
+        data-builder-page-root
+        data-gsap-home={isHomePage ? true : undefined}
+      >
+        <BuilderScrollAnimations />
+        {isHomePage && <HomeGsapAnimations />}
+        <div className="shop-builder-inner">
+          {layout.sections.map((section) => (
+            <BuilderSectionRenderer
+              key={section.id}
+              section={section}
+              products={products}
+              categoryTree={categoryTree}
+              activeCategorySlug={activeCategorySlug}
+              product={product}
+              breadcrumbItems={resolvedBreadcrumbItems}
+              page={page}
+              pageContent={pageContent}
+            />
+          ))}
+        </div>
+      </main>
+    </>
   );
 }

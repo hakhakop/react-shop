@@ -27,14 +27,25 @@ export default function HeaderFrame({
   React.useEffect(() => {
     if (mode !== "sticky") return;
 
+    const getScrollY = () => {
+      const previewShell = document.querySelector(".builder-preview-shell");
+      if (previewShell) {
+        return previewShell.scrollTop;
+      }
+      return window.scrollY;
+    };
+
     const onScroll = () => {
       // tweak the value (24) if you want stronger/weaker sensitivity
-      setScrolled(window.scrollY > 24);
+      setScrolled(getScrollY() > 24);
     };
 
     onScroll(); // run once on mount
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    
+    // Use capture: true so that we catch scroll events from any nested scrollable container,
+    // including the builder preview shell.
+    window.addEventListener("scroll", onScroll, { capture: true, passive: true });
+    return () => window.removeEventListener("scroll", onScroll, { capture: true });
   }, [mode]);
 
   const baseSticky =
@@ -54,6 +65,7 @@ export default function HeaderFrame({
     <header
       className={`${base} ${state} ${className}`}
       style={mode === "sticky" ? { borderBottomColor: accentColor } : undefined}
+      data-scrolled={mode === "sticky" ? (scrolled ? "true" : "false") : undefined}
     >
       {children}
     </header>

@@ -59,6 +59,9 @@ import ProductOptionsSelector from "@/components/ProductOptionsSelector";
 import DashboardInspector from "@/components/dashboard/DashboardInspector";
 import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
 import ScrollPinnedDemo from "@/components/animations/ScrollPinnedDemo";
+import { AntigravityTerminal } from "@/components/builder/AntigravityTerminal";
+import AntigravityCanvas from "@/components/builder/AntigravityCanvas";
+import TypewriterText from "@/components/builder/TypewriterText";
 import type {
   BuilderCustomPage,
   BuilderCustomPageKey,
@@ -492,7 +495,8 @@ function sectionColorModeLabel(section: BuilderSection) {
   return resolved === "dark" ? "auto light text" : "auto dark text";
 }
 
-function readableSchemeForColor(color: string): SectionColorScheme {
+function readableSchemeForColor(color: string | undefined): SectionColorScheme {
+  if (!color) return "inherit";
   const match = color.trim().match(/^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i);
   if (!match) return "inherit";
 
@@ -538,6 +542,7 @@ function DashboardTypog({
   typography,
   className,
   children,
+  style,
   ...props
 }: any) {
   const Tag = As as any;
@@ -546,20 +551,21 @@ function DashboardTypog({
     inferTypographyArea(String(As), className),
   );
   const combined = [className, tp.className].filter(Boolean).join(" ");
+  const combinedStyle = { ...tp.style, ...style };
   const isRich = isRichPreviewText(children);
   if (isRich) {
     const RichTag = getRichTextSafeTag(String(As)) as any;
     return (
       <RichTag
         className={combined || undefined}
-        style={tp.style}
+        style={combinedStyle}
         {...props}
         dangerouslySetInnerHTML={{ __html: children }}
       />
     );
   }
   return (
-    <Tag className={combined || undefined} style={tp.style} {...props}>
+    <Tag className={combined || undefined} style={combinedStyle} {...props}>
       {children}
     </Tag>
   );
@@ -6131,6 +6137,8 @@ function PreviewCanvas({
             );
             const isSelected = selectedId === section.id;
             const animationAttrs = previewAnimationAttrs(section.animation);
+            const isSectionAntigravity = section.backgroundEffect === "antigravity" || (section.kind === "hero" && section.carouselSettings?.variant === "antigravity");
+            const isFullTheme = isSectionAntigravity && (section.antigravityVisualMode === undefined || section.antigravityVisualMode === "full");
 
             return (
               <div
@@ -6146,8 +6154,10 @@ function PreviewCanvas({
                 } builder-preview-section--content-${
                   section.contentMode ?? "boxed"
                 } builder-preview-section--scheme-${resolveSectionColorScheme(section)} ${
+                  isFullTheme ? "shop-builder-section--effect-antigravity" : isSectionAntigravity ? "relative overflow-hidden" : ""
+                } ${
                   isSelected ? "is-selected" : ""
-                 } ${visualStyleClassName(section.visualStyle)} ${draggingSectionId === section.id ? "is-dragging" : ""} ${sectionDragOverId === section.id ? "is-drag-over" : ""}`}
+                } ${visualStyleClassName(section.visualStyle)} ${draggingSectionId === section.id ? "is-dragging" : ""} ${sectionDragOverId === section.id ? "is-drag-over" : ""}`}
                 style={
                   {
                     background: section.background,
@@ -6235,6 +6245,41 @@ function PreviewCanvas({
                   onDragEnd();
                 }}
               >
+                {isSectionAntigravity && (
+                  <>
+                    <AntigravityCanvas
+                      speed={section.antigravitySpeed}
+                      particleCount={section.antigravityParticleCount}
+                      color={section.antigravityColor}
+                      gridDensity={section.antigravityGridDensity as any}
+                      interactive={section.antigravityInteractive}
+                      showGrid={section.antigravityShowGrid}
+                      showParticles={section.antigravityShowParticles}
+                      gridMoveSpeed={section.antigravityGridMoveSpeed}
+                      glowIntensity={section.antigravityGlowIntensity}
+                      interactionScope={section.antigravityInteractionScope as any}
+                      visualMode={section.antigravityVisualMode as any}
+                    />
+                    {section.antigravityShowGrid !== false && (
+                      <div
+                        className="antigravity-grid-overlay"
+                        aria-hidden="true"
+                        style={
+                          section.antigravityGridMoveSpeed !== undefined || section.antigravityColor
+                            ? {
+                                animationDuration: section.antigravityGridMoveSpeed === 0
+                                  ? "0s"
+                                  : `${25 / (section.antigravityGridMoveSpeed ?? 1.0)}s`,
+                                backgroundImage: section.antigravityColor
+                                  ? `linear-gradient(${section.antigravityColor}08 1px, transparent 1px), linear-gradient(90deg, ${section.antigravityColor}08 1px, transparent 1px)`
+                                  : undefined,
+                              }
+                            : undefined
+                        }
+                      />
+                    )}
+                  </>
+                )}
                 <div
                   className={`builder-preview-section-tools ${
                     isSelected ? "is-selected-tools" : ""
@@ -6815,12 +6860,14 @@ function InlineEditableText({
   className,
   onChange,
   typography,
+  style,
 }: {
   as: "span" | "em" | "strong" | "p" | "h2" | "h3";
   value: string;
   className?: string;
   onChange: (value: string) => void;
   typography?: any;
+  style?: React.CSSProperties;
 }) {
   const tp = typographyProps(typography, inferTypographyArea(Tag, className));
   const isRich = isRichPreviewText(value);
@@ -6856,7 +6903,7 @@ function InlineEditableText({
       className={["builder-inline-editable", className, tp.className]
         .filter(Boolean)
         .join(" ")}
-      style={tp.style}
+      style={{ ...tp.style, ...style }}
       contentEditable
       suppressContentEditableWarning
       {...(isRich ? { dangerouslySetInnerHTML: { __html: value } } : {})}
@@ -7170,9 +7217,10 @@ function PreviewSection({
   ) : null;
 
   if (section.kind === "hero") {
+    const isAntigravity = section.carouselSettings?.variant === "antigravity";
     return (
-      <div className="shop-builder-section-content builder-preview-hero-inner">
-        <div>
+      <div className={`shop-builder-section-content builder-preview-hero-inner ${isAntigravity ? "shop-builder-hero--antigravity" : ""}`}>
+        <div className="shop-builder-hero-content-left">
           {section.eyebrow && (
             <DashboardTypog
               as="p"
@@ -7184,10 +7232,18 @@ function PreviewSection({
           )}
           <DashboardTypog
             as="h2"
-            className="shop-builder-title"
+            className={`shop-builder-title ${isAntigravity ? "shop-builder-title--gradient" : ""}`}
             typography={section.typography}
           >
-            {section.title}
+            {isAntigravity && section.title ? (
+              <TypewriterText
+                text={section.title}
+                typography={section.typography}
+                area="title"
+              />
+            ) : (
+              section.title
+            )}
           </DashboardTypog>
           {section.body && (
             <DashboardTypog
@@ -7201,17 +7257,23 @@ function PreviewSection({
           {section.buttonLabel && section.buttonUrl && (
             <DashboardTypog
               as="span"
-              className="shop-builder-cta"
+              className={`shop-builder-cta ${isAntigravity ? "shop-builder-cta--antigravity" : ""}`}
               typography={section.typography}
             >
               {section.buttonLabel}
             </DashboardTypog>
           )}
         </div>
-        <div
-          className="shop-builder-hero-media builder-preview-hero-media"
-          aria-hidden="true"
-        />
+        {isAntigravity ? (
+          <div className="shop-builder-hero-media shop-builder-hero-media--antigravity">
+            <AntigravityTerminal />
+          </div>
+        ) : (
+          <div
+            className="shop-builder-hero-media builder-preview-hero-media"
+            aria-hidden="true"
+          />
+        )}
       </div>
     );
   }
@@ -7702,7 +7764,7 @@ if (section.kind === "embed") {
                       } ${
                         block.kind === "scrollPinnedDemo"
                           ? ""
-                          : `shop-card-preset--${block.panelStyle ?? "default"} is-padding-${block.elementPadding ?? "none"} is-align-${block.elementAlign ?? "left"} ${visualStyleClassName(block.visualStyle)}`
+                          : `shop-card-preset--${block.panelStyle ?? "default"} is-padding-${block.elementPadding ?? "none"} is-align-${block.elementAlign ?? "left"} ${visualStyleClassName(block.visualStyle)} ${block.premiumCardStyle && block.premiumCardStyle !== "none" ? `shop-builder-card--${block.premiumCardStyle}` : ""}`
                       } ${
                         selectedLayoutBlockKey === blockKey
                           ? "is-selected-block"
@@ -7901,15 +7963,19 @@ if (section.kind === "embed") {
                           product={previewProduct}
                         />
                       ) : block.kind === "button" ? (
-                        <div className="shop-builder-column-block shop-builder-column-block--button">
+                        <div className={`shop-builder-column-block shop-builder-column-block--button ${block.premiumCardStyle && block.premiumCardStyle !== "none" ? `shop-builder-card--${block.premiumCardStyle}` : ""}`}>
                           <div 
-                            className={`shop-builder-buttons shop-builder-buttons--${block.buttonsLayout ?? "inline"}`}
+                            className={`shop-builder-buttons ${block.premiumButtonStyle && block.premiumButtonStyle !== "default" ? "" : `shop-builder-buttons--${block.buttonsLayout ?? "inline"}`}`}
                             style={previewButtonsStyle(block.buttonsLayout, block.elementAlign)}
                           >
                             {block.buttonLabel && (
                               <DashboardTypog
                                 as="span"
-                                className="builder-preview-cta"
+                                className={`builder-preview-cta ${
+                                  block.premiumButtonStyle && block.premiumButtonStyle !== "default"
+                                    ? `shop-builder-cta--${block.premiumButtonStyle}`
+                                    : ""
+                                }`}
                                 typography={block.typography}
                               >
                                 {block.buttonLabel}
@@ -7988,7 +8054,11 @@ if (section.kind === "embed") {
                                 <span className="builder-preview-button-drag-handle" aria-hidden="true">⠿</span>
                                 <DashboardTypog
                                   as="span"
-                                  className={`builder-preview-cta builder-preview-cta--${btn.style ?? "primary"}`}
+                                  className={`builder-preview-cta ${
+                                    block.premiumButtonStyle && block.premiumButtonStyle !== "default"
+                                      ? `shop-builder-cta--${block.premiumButtonStyle}`
+                                      : `builder-preview-cta--${btn.style ?? "primary"}`
+                                  }`}
                                   typography={block.typography}
                                 >
                                   {btn.label || "Button"}
@@ -8116,16 +8186,38 @@ if (section.kind === "embed") {
                           </ul>
                         </div>
                       ) : block.kind === "heading" ? (
-                        <div className="shop-builder-column-block shop-builder-column-block--heading">
+                        <div className={`shop-builder-column-block shop-builder-column-block--heading ${block.premiumCardStyle && block.premiumCardStyle !== "none" ? `shop-builder-card--${block.premiumCardStyle}` : ""}`}>
                           <DashboardTypog
                             as={block.headingLevel ?? "h2"}
+                            className={block.textGradientPreset && block.textGradientPreset !== "none" && block.textGradientPreset !== "custom" ? `text-gradient--${block.textGradientPreset}` : ""}
                             typography={block.typography}
                             style={{
                               textAlign: block.headingAlign ?? "left",
                               margin: 0,
+                              ...(block.textGradientPreset === "custom" ? {
+                                backgroundImage: `linear-gradient(${block.textGradientCustomAngle ?? 135}deg, ${block.textGradientCustomStart ?? "#ffffff"} ${block.textGradientCustomStartOffset ?? 0}%, ${block.textGradientCustomMiddle ?? "#60a5fa"} ${block.textGradientCustomMiddleOffset ?? 50}%, ${block.textGradientCustomEnd ?? "#c084fc"} ${block.textGradientCustomEndOffset ?? 100}%)`,
+                                WebkitBackgroundClip: "text",
+                                WebkitTextFillColor: "transparent",
+                                backgroundClip: "text",
+                                display: "inline-block",
+                              } : {})
                             }}
                           >
-                            {block.headingText ?? "Your Heading Text"}
+                            {block.typewriterEnabled ? (
+                              <TypewriterText
+                                text={block.headingText ?? "Your Heading Text"}
+                                speed={block.typewriterSpeed}
+                                eraseSpeed={block.typewriterEraseSpeed}
+                                delay={block.typewriterDelay}
+                                loop={block.typewriterLoop}
+                                useGradient={block.typewriterUseGradient}
+                                gradientPreset={block.textGradientPreset ?? block.typewriterGradientPreset} customStart={block.textGradientCustomStart} customMiddle={block.textGradientCustomMiddle} customEnd={block.textGradientCustomEnd} customAngle={block.textGradientCustomAngle} customStartOffset={block.textGradientCustomStartOffset} customMiddleOffset={block.textGradientCustomMiddleOffset} customEndOffset={block.textGradientCustomEndOffset}
+                                typography={block.typography}
+                                area="title"
+                              />
+                            ) : (
+                              block.headingText ?? "Your Heading Text"
+                            )}
                           </DashboardTypog>
                         </div>
                       ) : block.kind === "datePicker" ? (
@@ -8150,7 +8242,41 @@ if (section.kind === "embed") {
                           </label>
                         </div>
                       ) : block.kind === "hero" ? (
-                        <div className="shop-builder-column-block shop-builder-column-block--hero">
+                        <div className={`shop-builder-column-block shop-builder-column-block--hero ${block.carouselSettings?.variant === "antigravity" ? "shop-builder-hero--antigravity shop-builder-hero--antigravity-block" : ""} ${block.premiumCardStyle && block.premiumCardStyle !== "none" ? `shop-builder-card--${block.premiumCardStyle}` : ""}`}>
+                          {block.carouselSettings?.variant === "antigravity" && (
+                            <>
+                              <AntigravityCanvas
+                                speed={(block.carouselSettings as any)?.antigravitySpeed}
+                                particleCount={(block.carouselSettings as any)?.antigravityParticleCount}
+                                color={(block.carouselSettings as any)?.antigravityColor}
+                                gridDensity={(block.carouselSettings as any)?.antigravityGridDensity as any}
+                                interactive={(block.carouselSettings as any)?.antigravityInteractive}
+                                showGrid={(block.carouselSettings as any)?.antigravityShowGrid}
+                                showParticles={(block.carouselSettings as any)?.antigravityShowParticles}
+                                gridMoveSpeed={(block.carouselSettings as any)?.antigravityGridMoveSpeed}
+                                glowIntensity={(block.carouselSettings as any)?.antigravityGlowIntensity}
+                              />
+                              {((block.carouselSettings as any)?.antigravityShowGrid !== false) && (
+                                <div
+                                  className="antigravity-grid-overlay"
+                                  aria-hidden="true"
+                                  style={
+                                    (block.carouselSettings as any)?.antigravityGridMoveSpeed !== undefined || (block.carouselSettings as any)?.antigravityColor
+                                      ? {
+                                          animationDuration: (block.carouselSettings as any)?.antigravityGridMoveSpeed === 0
+                                            ? "0s"
+                                            : `${25 / ((block.carouselSettings as any)?.antigravityGridMoveSpeed ?? 1.0)}s`,
+                                          backgroundImage: (block.carouselSettings as any)?.antigravityColor
+                                            ? `linear-gradient(${(block.carouselSettings as any)?.antigravityColor}08 1px, transparent 1px), linear-gradient(90deg, ${(block.carouselSettings as any)?.antigravityColor}08 1px, transparent 1px)`
+                                            : undefined,
+                                        }
+                                      : undefined
+                                  }
+                                />
+                              )}
+                            </>
+                          )}
+                          <div className={block.carouselSettings?.variant === "antigravity" ? "shop-builder-hero-content-left" : ""}>
                           {block.eyebrow && (
                             <InlineEditableText
                               as="span"
@@ -8165,37 +8291,87 @@ if (section.kind === "embed") {
                             />
                           )}
                           {block.title && (
-                            <InlineEditableText
-                              as="h3"
-                              typography={block.typography}
-                              value={block.title}
-                              onChange={(title) =>
-                                onUpdateBlock(section.id, columnKey, blockKey, {
-                                  title,
-                                })
-                              }
-                            />
+                            (block.typewriterEnabled || block.carouselSettings?.variant === "antigravity") ? (
+                              <DashboardTypog
+                                as="h3"
+                                className={block.textGradientPreset && block.textGradientPreset !== "none" ? `text-gradient--${block.textGradientPreset}` : block.carouselSettings?.variant === "antigravity" ? "shop-builder-title--gradient" : ""}
+                                typography={block.typography}
+                              >
+                                <TypewriterText
+                                  text={block.title}
+                                  speed={block.typewriterSpeed}
+                                  eraseSpeed={block.typewriterEraseSpeed}
+                                  delay={block.typewriterDelay}
+                                  loop={block.typewriterLoop}
+                                  useGradient={block.typewriterUseGradient}
+                                  gradientPreset={block.textGradientPreset ?? block.typewriterGradientPreset} customStart={block.textGradientCustomStart} customMiddle={block.textGradientCustomMiddle} customEnd={block.textGradientCustomEnd} customAngle={block.textGradientCustomAngle} customStartOffset={block.textGradientCustomStartOffset} customMiddleOffset={block.textGradientCustomMiddleOffset} customEndOffset={block.textGradientCustomEndOffset}
+                                  typography={block.typography}
+                                  area="title"
+                                />
+                              </DashboardTypog>
+                            ) : (
+                              <InlineEditableText
+                                as="h3"
+                                className={block.textGradientPreset && block.textGradientPreset !== "none" && block.textGradientPreset !== "custom" ? `text-gradient--${block.textGradientPreset}` : block.carouselSettings?.variant === "antigravity" ? "shop-builder-title--gradient" : ""}
+                                typography={block.typography}
+                                value={block.title}
+                                onChange={(title) =>
+                                  onUpdateBlock(section.id, columnKey, blockKey, {
+                                    title,
+                                  })
+                                }
+                                style={block.textGradientPreset === "custom" ? {
+                                  backgroundImage: `linear-gradient(${block.textGradientCustomAngle ?? 135}deg, ${block.textGradientCustomStart ?? "#ffffff"} ${block.textGradientCustomStartOffset ?? 0}%, ${block.textGradientCustomMiddle ?? "#60a5fa"} ${block.textGradientCustomMiddleOffset ?? 50}%, ${block.textGradientCustomEnd ?? "#c084fc"} ${block.textGradientCustomEndOffset ?? 100}%)`,
+                                  WebkitBackgroundClip: "text",
+                                  WebkitTextFillColor: "transparent",
+                                  backgroundClip: "text",
+                                  display: "inline-block",
+                                } : undefined}
+                              />
+                            )
                           )}
-                          {block.body && (
-                            <InlineEditableText
-                              as="p"
-                              typography={block.typography}
-                              value={block.body}
-                              onChange={(body) =>
-                                onUpdateBlock(section.id, columnKey, blockKey, {
-                                  body,
-                                })
-                              }
-                            />
+                           {block.body && (
+                            block.typewriterEnabled && !block.title ? (
+                              <DashboardTypog as="p" typography={block.typography}>
+                                <TypewriterText
+                                  text={block.body}
+                                  speed={block.typewriterSpeed}
+                                  eraseSpeed={block.typewriterEraseSpeed}
+                                  delay={block.typewriterDelay}
+                                  loop={block.typewriterLoop}
+                                  useGradient={block.typewriterUseGradient}
+                                  gradientPreset={block.textGradientPreset ?? block.typewriterGradientPreset} customStart={block.textGradientCustomStart} customMiddle={block.textGradientCustomMiddle} customEnd={block.textGradientCustomEnd} customAngle={block.textGradientCustomAngle} customStartOffset={block.textGradientCustomStartOffset} customMiddleOffset={block.textGradientCustomMiddleOffset} customEndOffset={block.textGradientCustomEndOffset}
+                                  typography={block.typography}
+                                  area="body"
+                                />
+                              </DashboardTypog>
+                            ) : (
+                              <InlineEditableText
+                                as="p"
+                                typography={block.typography}
+                                value={block.body}
+                                onChange={(body) =>
+                                  onUpdateBlock(section.id, columnKey, blockKey, {
+                                    body,
+                                  })
+                                }
+                              />
+                            )
                           )}
                           <div 
-                            className={`shop-builder-buttons shop-builder-buttons--${block.buttonsLayout ?? "inline"}`}
+                            className={`shop-builder-buttons ${block.premiumButtonStyle && block.premiumButtonStyle !== "default" ? "" : `shop-builder-buttons--${block.buttonsLayout ?? "inline"}`}`}
                             style={previewButtonsStyle(block.buttonsLayout, block.elementAlign)}
                           >
                             {block.buttonLabel && (
                               <DashboardTypog
                                 as="span"
-                                className="builder-preview-cta"
+                                className={`builder-preview-cta ${
+                                  block.premiumButtonStyle && block.premiumButtonStyle !== "default"
+                                    ? `shop-builder-cta--${block.premiumButtonStyle}`
+                                    : block.carouselSettings?.variant === "antigravity"
+                                      ? "shop-builder-cta--antigravity"
+                                      : ""
+                                }`}
                                 typography={block.typography}
                               >
                                 {block.buttonLabel}
@@ -8205,14 +8381,24 @@ if (section.kind === "embed") {
                               <DashboardTypog
                                 key={btn.id ?? btnIdx}
                                 as="span"
-                                className={`builder-preview-cta builder-preview-cta--${btn.style ?? "primary"}`}
-                              style={{ display: "inline-flex" }}
+                                className={`builder-preview-cta ${
+                                  block.premiumButtonStyle && block.premiumButtonStyle !== "default"
+                                    ? `shop-builder-cta--${block.premiumButtonStyle}`
+                                    : `builder-preview-cta--${btn.style ?? "primary"}`
+                                }`}
+                                style={{ display: "inline-flex" }}
                                 typography={block.typography}
                               >
                                 {btn.label || "Button"}
                               </DashboardTypog>
                             ))}
                           </div>
+                          </div>
+                          {block.carouselSettings?.variant === "antigravity" && (
+                            <div className="shop-builder-hero-media shop-builder-hero-media--antigravity">
+                              <AntigravityTerminal />
+                            </div>
+                          )}
                         </div>
                       ) : block.kind === "promoStrip" ? (
                         <div className="shop-builder-column-block shop-builder-column-block--promo-strip">
@@ -8234,34 +8420,66 @@ if (section.kind === "embed") {
                               />
                             )}
                             {block.title && (
-                              <InlineEditableText
-                                as="h3"
-                                typography={block.typography}
-                                value={block.title}
-                                onChange={(title) =>
-                                  onUpdateBlock(
-                                    section.id,
-                                    columnKey,
-                                    blockKey,
-                                    { title },
-                                  )
-                                }
-                              />
+                              block.typewriterEnabled ? (
+                                <DashboardTypog as="h3" typography={block.typography}>
+                                  <TypewriterText
+                                    text={block.title}
+                                    speed={block.typewriterSpeed}
+                                    eraseSpeed={block.typewriterEraseSpeed}
+                                    delay={block.typewriterDelay}
+                                    loop={block.typewriterLoop}
+                                    useGradient={block.typewriterUseGradient}
+                                    gradientPreset={block.textGradientPreset ?? block.typewriterGradientPreset} customStart={block.textGradientCustomStart} customMiddle={block.textGradientCustomMiddle} customEnd={block.textGradientCustomEnd} customAngle={block.textGradientCustomAngle} customStartOffset={block.textGradientCustomStartOffset} customMiddleOffset={block.textGradientCustomMiddleOffset} customEndOffset={block.textGradientCustomEndOffset}
+                                    typography={block.typography}
+                                    area="title"
+                                  />
+                                </DashboardTypog>
+                              ) : (
+                                <InlineEditableText
+                                  as="h3"
+                                  typography={block.typography}
+                                  value={block.title}
+                                  onChange={(title) =>
+                                    onUpdateBlock(
+                                      section.id,
+                                      columnKey,
+                                      blockKey,
+                                      { title },
+                                    )
+                                  }
+                                />
+                              )
                             )}
                             {block.body && (
-                              <InlineEditableText
-                                as="p"
-                                typography={block.typography}
-                                value={block.body}
-                                onChange={(body) =>
-                                  onUpdateBlock(
-                                    section.id,
-                                    columnKey,
-                                    blockKey,
-                                    { body },
-                                  )
-                                }
-                              />
+                              block.typewriterEnabled && !block.title ? (
+                                <DashboardTypog as="p" typography={block.typography}>
+                                  <TypewriterText
+                                    text={block.body}
+                                    speed={block.typewriterSpeed}
+                                    eraseSpeed={block.typewriterEraseSpeed}
+                                    delay={block.typewriterDelay}
+                                    loop={block.typewriterLoop}
+                                    useGradient={block.typewriterUseGradient}
+                                    gradientPreset={block.textGradientPreset ?? block.typewriterGradientPreset} customStart={block.textGradientCustomStart} customMiddle={block.textGradientCustomMiddle} customEnd={block.textGradientCustomEnd} customAngle={block.textGradientCustomAngle} customStartOffset={block.textGradientCustomStartOffset} customMiddleOffset={block.textGradientCustomMiddleOffset} customEndOffset={block.textGradientCustomEndOffset}
+                                    typography={block.typography}
+                                    area="body"
+                                  />
+                                </DashboardTypog>
+                              ) : (
+                                <InlineEditableText
+                                  as="p"
+                                  typography={block.typography}
+                                  value={block.body}
+                                  onChange={(body) =>
+                                    onUpdateBlock(
+                                      section.id,
+                                      columnKey,
+                                      blockKey,
+                                      { body },
+                                    )
+                                  }
+                                />
+                              )
                             )}
                           </div>
                         <div 
@@ -8318,34 +8536,66 @@ if (section.kind === "embed") {
                               />
                             )}
                             {block.title && (
-                              <InlineEditableText
-                                as="h3"
-                                typography={block.typography}
-                                value={block.title}
-                                onChange={(title) =>
-                                  onUpdateBlock(
-                                    section.id,
-                                    columnKey,
-                                    blockKey,
-                                    { title },
-                                  )
-                                }
-                              />
+                              block.typewriterEnabled ? (
+                                <DashboardTypog as="h3" typography={block.typography}>
+                                  <TypewriterText
+                                    text={block.title}
+                                    speed={block.typewriterSpeed}
+                                    eraseSpeed={block.typewriterEraseSpeed}
+                                    delay={block.typewriterDelay}
+                                    loop={block.typewriterLoop}
+                                    useGradient={block.typewriterUseGradient}
+                                    gradientPreset={block.textGradientPreset ?? block.typewriterGradientPreset} customStart={block.textGradientCustomStart} customMiddle={block.textGradientCustomMiddle} customEnd={block.textGradientCustomEnd} customAngle={block.textGradientCustomAngle} customStartOffset={block.textGradientCustomStartOffset} customMiddleOffset={block.textGradientCustomMiddleOffset} customEndOffset={block.textGradientCustomEndOffset}
+                                    typography={block.typography}
+                                    area="title"
+                                  />
+                                </DashboardTypog>
+                              ) : (
+                                <InlineEditableText
+                                  as="h3"
+                                  typography={block.typography}
+                                  value={block.title}
+                                  onChange={(title) =>
+                                    onUpdateBlock(
+                                      section.id,
+                                      columnKey,
+                                      blockKey,
+                                      { title },
+                                    )
+                                  }
+                                />
+                              )
                             )}
                             {block.body && (
-                              <InlineEditableText
-                                as="p"
-                                typography={block.typography}
-                                value={block.body}
-                                onChange={(body) =>
-                                  onUpdateBlock(
-                                    section.id,
-                                    columnKey,
-                                    blockKey,
-                                    { body },
-                                  )
-                                }
-                              />
+                              block.typewriterEnabled && !block.title ? (
+                                <DashboardTypog as="p" typography={block.typography}>
+                                  <TypewriterText
+                                    text={block.body}
+                                    speed={block.typewriterSpeed}
+                                    eraseSpeed={block.typewriterEraseSpeed}
+                                    delay={block.typewriterDelay}
+                                    loop={block.typewriterLoop}
+                                    useGradient={block.typewriterUseGradient}
+                                    gradientPreset={block.textGradientPreset ?? block.typewriterGradientPreset} customStart={block.textGradientCustomStart} customMiddle={block.textGradientCustomMiddle} customEnd={block.textGradientCustomEnd} customAngle={block.textGradientCustomAngle} customStartOffset={block.textGradientCustomStartOffset} customMiddleOffset={block.textGradientCustomMiddleOffset} customEndOffset={block.textGradientCustomEndOffset}
+                                    typography={block.typography}
+                                    area="body"
+                                  />
+                                </DashboardTypog>
+                              ) : (
+                                <InlineEditableText
+                                  as="p"
+                                  typography={block.typography}
+                                  value={block.body}
+                                  onChange={(body) =>
+                                    onUpdateBlock(
+                                      section.id,
+                                      columnKey,
+                                      blockKey,
+                                      { body },
+                                    )
+                                  }
+                                />
+                              )
                             )}
                           <div 
                             className={`shop-builder-buttons shop-builder-buttons--${block.buttonsLayout ?? "inline"}`}
