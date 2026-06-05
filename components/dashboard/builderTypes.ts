@@ -56,7 +56,8 @@ export type BuilderPanelStyle =
   | "light"
   | "clean-shadow"
   | "flat-dark"
-  | "flat-white";
+  | "flat-white"
+  | "antigravity";
 export type MenuPresentationSettings = {
   showHeading: boolean;
   icon: string | null;
@@ -249,6 +250,7 @@ export type BuilderLayoutBlock = {
   imageAlignment?: "left" | "center" | "right";
   imageMaxWidth?: number;
   imageBorderRadius?: number;
+  borderRadius?: number;
   imageCaption?: string;
   elementBackgroundMode?: "default" | "transparent" | "custom";
   elementBackground?: string;
@@ -285,6 +287,7 @@ export type BuilderLayoutBlock = {
   iconName?: "sparkles" | "heart" | "truck" | "shield";
   items?: string[];
   listIcon?: "check" | "circleCheck" | "arrowRight" | "star" | "heart" | "sparkles" | "shield";
+  listIconColorScheme?: "default" | "gradient-cycle";
   headingText?: string;
   headingLevel?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
   headingAlign?: "left" | "center" | "right";
@@ -322,6 +325,9 @@ export type BuilderLayoutBlock = {
     buttonLabel?: string;
     buttonUrl?: string;
     typography?: TypographySettings;
+    items?: string[];
+    listIcon?: "check" | "circleCheck" | "arrowRight" | "star" | "heart" | "sparkles" | "shield";
+    listIconColorScheme?: "default" | "gradient-cycle";
   }[];
   galleryShowThumbnails?: boolean;
   galleryThumbnailPosition?: "bottom" | "left";
@@ -408,6 +414,7 @@ export type BuilderSection = {
   gridGap?: "none" | "small" | "medium" | "large" | "max";
   cardPadding?: "none" | "small" | "medium" | "large" | "max";
   imagePadding?: "none" | "small" | "medium" | "large" | "max";
+  borderRadius?: number;
   addToCartStyle?: "blue" | "dark" | "light" | "inherit";
   addToCartSize?: "compact" | "medium" | "large" | "full";
   addToCartPosition?: "below" | "under-price" | "under-wishlist";

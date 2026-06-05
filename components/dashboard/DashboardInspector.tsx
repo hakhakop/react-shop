@@ -112,6 +112,7 @@ const panelStyleOptions: { label: string; value: BuilderPanelStyle }[] = [
   { label: "Clean with shadow", value: "clean-shadow" },
   { label: "Flat dark", value: "flat-dark" },
   { label: "Flat white", value: "flat-white" },
+  { label: "Antigravity", value: "antigravity" },
 ];
 
 // Kept for backward compat — the AnimationControl component
@@ -1546,7 +1547,52 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                   ),
                                                 )}
                                               </select>
-                                            </label>
+                                            </label><label className="builder-field">
+                                               <span>Card Border Radius</span>
+                                               <select
+                                                 value={
+                                                   block.borderRadius === undefined
+                                                     ? "inherit"
+                                                     : [0, 4, 8, 12, 16, 24].includes(block.borderRadius)
+                                                       ? String(block.borderRadius)
+                                                       : "custom"
+                                                 }
+                                                 onChange={(event) => {
+                                                   const val = event.target.value;
+                                                   if (val === "inherit") {
+                                                     updateSelectedLayoutBlock(index, blockIndex, { borderRadius: undefined });
+                                                   } else if (val === "custom") {
+                                                     updateSelectedLayoutBlock(index, blockIndex, { borderRadius: 10 });
+                                                   } else {
+                                                     updateSelectedLayoutBlock(index, blockIndex, { borderRadius: Number(val) });
+                                                   }
+                                                 }}
+                                               >
+                                                 <option value="inherit">Inherit (global settings)</option>
+                                                 <option value="0">Flat (0px)</option>
+                                                 <option value="4">Small (4px)</option>
+                                                 <option value="8">Medium (8px)</option>
+                                                 <option value="12">Rounded (12px)</option>
+                                                 <option value="16">Large (16px)</option>
+                                                 <option value="24">Extra Large (24px)</option>
+                                                 <option value="custom">Custom...</option>
+                                               </select>
+                                             </label>
+                                             {block.borderRadius !== undefined && ![0, 4, 8, 12, 16, 24].includes(block.borderRadius) && (
+                                               <label className="builder-field">
+                                                 <span>Custom Radius (px)</span>
+                                                 <input
+                                                   type="number"
+                                                   min={0}
+                                                   max={100}
+                                                   value={block.borderRadius}
+                                                   onChange={(event) => {
+                                                     const val = event.target.value === "" ? 0 : Number(event.target.value);
+                                                     updateSelectedLayoutBlock(index, blockIndex, { borderRadius: val });
+                                                   }}
+                                                 />
+                                               </label>
+                                             )}
                                             <label className="builder-field">
                                               <span>Background Mode</span>
                                               <select
@@ -4024,6 +4070,117 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                   }
                                                 />
                                               </label>
+                                              {block.kind === "scrollPinnedDemo" && (
+                                                <details className="builder-collapse" open>
+                                                  <summary>
+                                                    <InspectorGroupSummary
+                                                      title="Scroll Behavior"
+                                                      description="Control scroll speed, pin duration, and animation style."
+                                                      meta={`${(block.carouselSettings as any)?.scrubSpeed ?? 1.2}× speed`}
+                                                    />
+                                                  </summary>
+
+                                                  <label className="builder-field">
+                                                    <span>Animation Variant</span>
+                                                    <select
+                                                      value={
+                                                        (block.carouselSettings as any)?.variant ??
+                                                        "perfect"
+                                                      }
+                                                      onChange={(event) =>
+                                                        updateSelectedLayoutBlock(
+                                                          index,
+                                                          blockIndex,
+                                                          {
+                                                            carouselSettings: {
+                                                              ...(block.carouselSettings ?? {}),
+                                                              variant: event.target.value,
+                                                            },
+                                                          },
+                                                        )
+                                                      }
+                                                    >
+                                                      <option value="perfect">Perfect (Stack)</option>
+                                                      <option value="fade">Fade</option>
+                                                      <option value="slide">Slide</option>
+                                                    </select>
+                                                  </label>
+
+                                                  <label className="builder-field">
+                                                    <span>Scrub Speed</span>
+                                                    <div className="builder-range-row" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                      <input
+                                                        type="range"
+                                                        min="0.1"
+                                                        max="5.0"
+                                                        step="0.1"
+                                                        style={{ flex: 1 }}
+                                                        value={(block.carouselSettings as any)?.scrubSpeed ?? 1.2}
+                                                        onChange={(event) =>
+                                                          updateSelectedLayoutBlock(
+                                                            index,
+                                                            blockIndex,
+                                                            {
+                                                              carouselSettings: {
+                                                                ...(block.carouselSettings ?? {}),
+                                                                scrubSpeed: Number(event.target.value),
+                                                              },
+                                                            },
+                                                          )
+                                                        }
+                                                      />
+                                                      <span style={{ minWidth: '40px', textAlign: 'right' }}>{((block.carouselSettings as any)?.scrubSpeed ?? 1.2).toFixed(1)}×</span>
+                                                    </div>
+                                                  </label>
+
+                                                  <label className="builder-field">
+                                                    <span>Pin Height Factor</span>
+                                                    <div className="builder-range-row" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                      <input
+                                                        type="range"
+                                                        min="20"
+                                                        max="500"
+                                                        step="10"
+                                                        style={{ flex: 1 }}
+                                                        value={(block.carouselSettings as any)?.pinHeightFactor ?? 100}
+                                                        onChange={(event) =>
+                                                          updateSelectedLayoutBlock(
+                                                            index,
+                                                            blockIndex,
+                                                            {
+                                                              carouselSettings: {
+                                                                ...(block.carouselSettings ?? {}),
+                                                                pinHeightFactor: Number(event.target.value),
+                                                              },
+                                                            },
+                                                          )
+                                                        }
+                                                      />
+                                                      <span style={{ minWidth: '40px', textAlign: 'right' }}>{(block.carouselSettings as any)?.pinHeightFactor ?? 100}%</span>
+                                                    </div>
+                                                  </label>
+
+                                                  <label className="builder-check">
+                                                    <input
+                                                      type="checkbox"
+                                                      checked={(block.carouselSettings as any)?.showNavigation ?? true}
+                                                      onChange={(event) =>
+                                                        updateSelectedLayoutBlock(
+                                                          index,
+                                                          blockIndex,
+                                                          {
+                                                            carouselSettings: {
+                                                              ...(block.carouselSettings ?? {}),
+                                                              showNavigation: event.target.checked,
+                                                            },
+                                                          },
+                                                        )
+                                                      }
+                                                    />
+                                                    <span>Show Navigation</span>
+                                                  </label>
+                                                </details>
+                                              )}
                                               {block.kind === "slider" && (
                                                 <>
                                                   <label className="builder-field">
@@ -6555,6 +6712,53 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                             </select>
                           </label>
 
+                          <label className="builder-field">
+                            <span>Card Border Radius</span>
+                            <select
+                              value={
+                                selectedSection.borderRadius === undefined
+                                  ? "inherit"
+                                  : [0, 4, 8, 12, 16, 24].includes(selectedSection.borderRadius ?? -1)
+                                    ? String(selectedSection.borderRadius)
+                                    : "custom"
+                              }
+                              onChange={(event) => {
+                                const val = event.target.value;
+                                if (val === "inherit") {
+                                  updateSelected({ borderRadius: undefined });
+                                } else if (val === "custom") {
+                                  updateSelected({ borderRadius: 10 });
+                                } else {
+                                  updateSelected({ borderRadius: Number(val) });
+                                }
+                              }}
+                            >
+                              <option value="inherit">Inherit (global settings)</option>
+                              <option value="0">Flat (0px)</option>
+                              <option value="4">Small (4px)</option>
+                              <option value="8">Medium (8px)</option>
+                              <option value="12">Rounded (12px)</option>
+                              <option value="16">Large (16px)</option>
+                              <option value="24">Extra Large (24px)</option>
+                              <option value="custom">Custom...</option>
+                            </select>
+                          </label>
+                          {selectedSection.borderRadius !== undefined && ![0, 4, 8, 12, 16, 24].includes(selectedSection.borderRadius) && (
+                            <label className="builder-field">
+                              <span>Custom Radius (px)</span>
+                              <input
+                                type="number"
+                                min={0}
+                                max={100}
+                                value={selectedSection.borderRadius}
+                                onChange={(event) => {
+                                  const val = event.target.value === "" ? 0 : Number(event.target.value);
+                                  updateSelected({ borderRadius: val });
+                                }}
+                              />
+                            </label>
+                          )}
+
                           <div className="builder-two-column">
                             <label className="builder-field">
                               <span>Grid Gap</span>
@@ -6955,6 +7159,104 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                           </button>
                         </details>
 
+                        {selectedSection.kind === "scrollPinnedDemo" && (
+                          <details className="builder-collapse" open>
+                            <summary>
+                              <InspectorGroupSummary
+                                title="Scroll Behavior"
+                                description="Control scroll speed, pin duration, and animation style."
+                                meta={`${selectedSection.carouselSettings?.scrubSpeed ?? 1.2}× speed`}
+                              />
+                            </summary>
+
+                            <label className="builder-field">
+                              <span>Animation Variant</span>
+                              <select
+                                value={
+                                  selectedSection.carouselSettings?.variant ??
+                                  "perfect"
+                                }
+                                onChange={(event) =>
+                                  updateSelected({
+                                    carouselSettings: {
+                                      ...(selectedSection.carouselSettings ?? {}),
+                                      variant: event.target.value,
+                                    },
+                                  })
+                                }
+                              >
+                                <option value="perfect">Perfect (Stack)</option>
+                                <option value="fade">Fade</option>
+                                <option value="slide">Slide</option>
+                              </select>
+                            </label>
+
+                            <label className="builder-field">
+                              <span>Scrub Speed</span>
+                              <div className="builder-range-row" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <input
+                                  type="range"
+                                  min="0.1"
+                                  max="5.0"
+                                  step="0.1"
+                                  style={{ flex: 1 }}
+                                  value={selectedSection.carouselSettings?.scrubSpeed ?? 1.2}
+                                  onChange={(event) =>
+                                    updateSelected({
+                                      carouselSettings: {
+                                        ...(selectedSection.carouselSettings ?? {}),
+                                        scrubSpeed: Number(event.target.value),
+                                      },
+                                    })
+                                  }
+                                />
+                                <span style={{ minWidth: '40px', textAlign: 'right' }}>{(selectedSection.carouselSettings?.scrubSpeed ?? 1.2).toFixed(1)}×</span>
+                              </div>
+                            </label>
+
+                            <label className="builder-field">
+                              <span>Pin Height Factor</span>
+                              <div className="builder-range-row" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <input
+                                  type="range"
+                                  min="20"
+                                  max="500"
+                                  step="10"
+                                  style={{ flex: 1 }}
+                                  value={selectedSection.carouselSettings?.pinHeightFactor ?? 100}
+                                  onChange={(event) =>
+                                    updateSelected({
+                                      carouselSettings: {
+                                        ...(selectedSection.carouselSettings ?? {}),
+                                        pinHeightFactor: Number(event.target.value),
+                                      },
+                                    })
+                                  }
+                                />
+                                <span style={{ minWidth: '40px', textAlign: 'right' }}>{selectedSection.carouselSettings?.pinHeightFactor ?? 100}%</span>
+                              </div>
+                            </label>
+
+                            <label className="builder-check">
+                              <input
+                                type="checkbox"
+                                checked={selectedSection.carouselSettings?.showNavigation ?? true}
+                                onChange={(event) =>
+                                  updateSelected({
+                                    carouselSettings: {
+                                      ...(selectedSection.carouselSettings ?? {}),
+                                      showNavigation: event.target.checked,
+                                    },
+                                  })
+                                }
+                              />
+                              <span>Show Navigation</span>
+                            </label>
+                          </details>
+                        )}
+
+                        {selectedSection.kind === "slider" && (
+                          <>
                         <label className="builder-field">
                           <span>Slider Variant</span>
                           <select
@@ -7075,6 +7377,8 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                             </label>
                           ))}
                         </div>
+                          </>
+                        )}
 
                         <div className="builder-section-heading">
                           <span>Slides</span>

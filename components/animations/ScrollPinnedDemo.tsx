@@ -37,6 +37,11 @@ export default function ScrollPinnedDemo({ section, block, isPreview = false }: 
   let body = activeData?.body;
   let slides = activeData?.slides || [];
 
+  const panelStyle = activeData?.panelStyle ?? "default";
+  const isDark = panelStyle === "default" || panelStyle === "dark" || panelStyle === "flat-dark" || panelStyle === "antigravity";
+  const textColorClass = isDark ? "text-white" : "text-neutral-900";
+  const mutedTextColorClass = isDark ? "text-neutral-400" : "text-neutral-600";
+
   // If section has normalized layoutItems, extract values from the columns/blocks
   if (section && section.layoutItems && section.layoutItems.length >= 2) {
     const leftItem = section.layoutItems[0];
@@ -126,6 +131,8 @@ export default function ScrollPinnedDemo({ section, block, isPreview = false }: 
         top: targetScroll,
         behavior: "smooth"
       });
+    } else {
+      setActiveCardIndex(idx);
     }
   };
 
@@ -160,7 +167,7 @@ export default function ScrollPinnedDemo({ section, block, isPreview = false }: 
             const idx = Math.min(Math.floor(self.progress * cards.length), cards.length - 1);
             setActiveCardIndex(idx);
           }
-        },
+        }
       });
 
       scrollTriggerRef.current = tl.scrollTrigger;
@@ -245,14 +252,13 @@ export default function ScrollPinnedDemo({ section, block, isPreview = false }: 
   }
 
   return (
-    <div className="w-full font-sans text-white antialiased" style={{ backgroundColor: background }}>
+    <div className={`w-full font-sans ${textColorClass} antialiased`}>
       {/* PINNED SECTION ZONE */}
       <section 
         ref={triggerRef} 
         className={`relative w-full flex items-center justify-center overflow-hidden py-12 ${
           isPreview ? "min-h-[500px]" : "min-h-screen"
         }`}
-        style={{ backgroundColor: background }}
       >
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,rgba(99,102,241,0.04),transparent_40%)]" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_70%,rgba(168,85,247,0.04),transparent_40%)]" />
@@ -263,7 +269,7 @@ export default function ScrollPinnedDemo({ section, block, isPreview = false }: 
           <div className="md:col-span-5 flex flex-col justify-center h-full">
             <div className="flex items-start gap-4">
               {/* Vertical Progress Bar Tracker */}
-              <div className="w-[4px] h-[240px] bg-neutral-800 rounded-full relative overflow-hidden flex-shrink-0 mt-2">
+              <div className={`w-[4px] h-[240px] ${isDark ? "bg-neutral-800" : "bg-neutral-200"} rounded-full relative overflow-hidden flex-shrink-0 mt-2`}>
                 <div 
                   ref={progressLineRef} 
                   className="absolute top-0 left-0 w-full h-[0%] bg-gradient-to-b from-sky-400 via-indigo-500 to-purple-500 rounded-full transition-all duration-300"
@@ -281,16 +287,16 @@ export default function ScrollPinnedDemo({ section, block, isPreview = false }: 
                 
                 {isRichText(body) ? (
                   <div 
-                    className="text-neutral-400 text-base md:text-lg leading-relaxed space-y-4"
+                    className={`${mutedTextColorClass} text-base md:text-lg leading-relaxed space-y-4`}
                     dangerouslySetInnerHTML={{ __html: body }}
                   />
                 ) : (
-                  <p className="text-neutral-400 text-base md:text-lg leading-relaxed">
+                  <p className={`${mutedTextColorClass} text-base md:text-lg leading-relaxed`}>
                     {body}
                   </p>
                 )}
 
-                <div className="flex flex-col gap-3 text-neutral-500 text-sm">
+                <ul className="scroll-pinned-checklist">
                   {checklistItems.map((item: string, index: number) => {
                     const colorClass = [
                       "text-sky-400",
@@ -298,28 +304,24 @@ export default function ScrollPinnedDemo({ section, block, isPreview = false }: 
                       "text-purple-400",
                     ][index % 3];
                     return (
-                      <div key={`${item}-${index}`} className="flex items-center gap-2">
+                      <li key={`${item}-${index}`} className="scroll-pinned-checklist-item">
                         {renderIcon(colorClass)}
                         <span>{item}</span>
-                      </div>
+                      </li>
                     );
                   })}
-                </div>
+                </ul>
 
                 {showNavigation && (
-                  <div className="flex items-center gap-4 mt-2 pt-4 border-t border-neutral-800/80">
+                  <div className={`flex items-center gap-4 mt-2 pt-4 border-t ${isDark ? "border-neutral-800/80" : "border-neutral-200"}`}>
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        if (isPreview) {
-                          setActiveCardIndex(prev => Math.max(0, prev - 1));
-                        } else {
-                          const targetIdx = Math.max(0, activeCardIndex - 1);
-                          handleNavClick(targetIdx);
-                        }
+                        const targetIdx = Math.max(0, activeCardIndex - 1);
+                        handleNavClick(targetIdx);
                       }}
                       disabled={activeCardIndex === 0}
-                      className="px-3 py-1.5 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-xs font-semibold disabled:opacity-40 disabled:cursor-not-allowed transition-all text-white border border-neutral-700/50"
+                      className="scroll-pinned-nav-btn px-3 py-1.5 rounded-lg text-xs font-semibold disabled:opacity-40 disabled:cursor-not-allowed transition-all border"
                     >
                       Prev
                     </button>
@@ -329,14 +331,12 @@ export default function ScrollPinnedDemo({ section, block, isPreview = false }: 
                           key={idx}
                           onClick={(e) => {
                             e.stopPropagation();
-                            if (isPreview) {
-                              setActiveCardIndex(idx);
-                            } else {
-                              handleNavClick(idx);
-                            }
+                            handleNavClick(idx);
                           }}
                           className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
-                            idx === activeCardIndex ? "bg-sky-400 w-6" : "bg-neutral-700 hover:bg-neutral-600"
+                            idx === activeCardIndex 
+                              ? "bg-sky-400 w-6" 
+                              : (isDark ? "bg-neutral-700 hover:bg-neutral-600" : "bg-neutral-300 hover:bg-neutral-400")
                           }`}
                           title={`Slide ${idx + 1}`}
                         />
@@ -345,15 +345,11 @@ export default function ScrollPinnedDemo({ section, block, isPreview = false }: 
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        if (isPreview) {
-                          setActiveCardIndex(prev => Math.min(slides.length - 1, prev + 1));
-                        } else {
-                          const targetIdx = Math.min(slides.length - 1, activeCardIndex + 1);
-                          handleNavClick(targetIdx);
-                        }
+                        const targetIdx = Math.min(slides.length - 1, activeCardIndex + 1);
+                        handleNavClick(targetIdx);
                       }}
                       disabled={activeCardIndex === slides.length - 1}
-                      className="px-3 py-1.5 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-xs font-semibold disabled:opacity-40 disabled:cursor-not-allowed transition-all text-white border border-neutral-700/50"
+                      className="scroll-pinned-nav-btn px-3 py-1.5 rounded-lg text-xs font-semibold disabled:opacity-40 disabled:cursor-not-allowed transition-all border"
                     >
                       Next
                     </button>
@@ -367,10 +363,9 @@ export default function ScrollPinnedDemo({ section, block, isPreview = false }: 
           <div 
             className="md:col-span-7 relative flex items-center justify-center min-h-[480px] w-full cursor-pointer select-none"
             onClick={(e) => {
-              if (isPreview) {
-                e.stopPropagation();
-                setActiveCardIndex((prev) => (prev + 1) % slides.length);
-              }
+              e.stopPropagation();
+              const nextIdx = (activeCardIndex + 1) % slides.length;
+              handleNavClick(nextIdx);
             }}
           >
             {slides.map((slide: any, index: number) => {
@@ -383,7 +378,6 @@ export default function ScrollPinnedDemo({ section, block, isPreview = false }: 
               ][index % 4];
 
               const isActive = index === activeCardIndex;
-
               let previewClasses = "";
               if (isPreview) {
                 if (variant === "fade") {
@@ -404,7 +398,7 @@ export default function ScrollPinnedDemo({ section, block, isPreview = false }: 
               return (
                 <div 
                   key={slide.id || `pinned-slide-${index}`}
-                  className={`scroll-pinned-card-item w-full max-w-[500px] bg-neutral-900/70 border border-neutral-800 backdrop-blur-xl p-8 rounded-3xl shadow-2xl flex flex-col gap-6 absolute ${
+                  className={`scroll-pinned-card-item scroll-pinned-card-item--${panelStyle} w-full max-w-[500px] p-8 flex flex-col gap-6 absolute ${
                     isPreview
                       ? `transition-all duration-500 ease-out transform ${previewClasses}`
                       : "opacity-0"
@@ -413,18 +407,18 @@ export default function ScrollPinnedDemo({ section, block, isPreview = false }: 
                   <div className={`w-12 h-12 rounded-2xl bg-gradient-to-tr ${gradientClass} flex items-center justify-center font-bold text-lg text-white shadow-lg`}>
                     {slideBadge}
                   </div>
-                  <h3 className="text-2xl font-bold bg-gradient-to-r from-white via-neutral-100 to-neutral-300 bg-clip-text text-transparent">
+                  <h3 className="scroll-pinned-card-title text-2xl font-bold">
                     {slide.title || "Untitled Card"}
                   </h3>
                   
                   {slide.text && (
                     isRichText(slide.text) ? (
                       <div 
-                        className="text-neutral-400 text-sm md:text-base leading-relaxed"
+                        className="scroll-pinned-card-text text-sm md:text-base leading-relaxed"
                         dangerouslySetInnerHTML={{ __html: slide.text }}
                       />
                     ) : (
-                      <p className="text-neutral-400 text-sm md:text-base leading-relaxed">
+                      <p className="scroll-pinned-card-text text-sm md:text-base leading-relaxed">
                         {slide.text}
                       </p>
                     )
@@ -432,19 +426,19 @@ export default function ScrollPinnedDemo({ section, block, isPreview = false }: 
 
                   {slide.imageUrl ? (
                     <div 
-                      className="h-[140px] rounded-2xl bg-cover bg-center border border-neutral-800"
+                      className="h-[140px] rounded-2xl bg-cover bg-center border border-neutral-800/30"
                       style={{ backgroundImage: `url(${slide.imageUrl})` }}
                     />
                   ) : (
-                    <div className="h-[120px] rounded-2xl bg-gradient-to-br from-neutral-800/10 to-transparent border border-neutral-800/40 flex items-center justify-center">
-                      <LayoutTemplate className="w-8 h-8 text-neutral-600" />
+                    <div className="scroll-pinned-card-fallback-image h-[120px] rounded-2xl flex items-center justify-center">
+                      <LayoutTemplate className="w-8 h-8 opacity-40" />
                     </div>
                   )}
 
                   {slide.buttonLabel && slide.buttonUrl && (
                     <a 
                       href={slide.buttonUrl}
-                      className="inline-flex items-center justify-center px-5 py-2.5 rounded-xl bg-white text-black font-semibold text-sm hover:bg-neutral-200 transition-colors self-start"
+                      className="scroll-pinned-card-button inline-flex items-center justify-center px-5 py-2.5 rounded-xl font-semibold text-sm transition-colors self-start"
                     >
                       {slide.buttonLabel}
                     </a>

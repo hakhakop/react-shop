@@ -19,7 +19,8 @@ export type BuilderPanelStyle =
   | "light"
   | "clean-shadow"
   | "flat-dark"
-  | "flat-white";
+  | "flat-white"
+  | "antigravity";
 
 export type BuilderDesign = {
   preset?: string;
@@ -75,6 +76,7 @@ export type BuilderLayoutBlock = {
   imageAlignment?: "left" | "center" | "right";
   imageMaxWidth?: number;
   imageBorderRadius?: number;
+  borderRadius?: number;
   imageCaption?: string;
   elementBackgroundMode?: string;
   elementBackground?: string;
@@ -140,6 +142,7 @@ export type BuilderLayoutBlock = {
   iconName?: string;
   items?: string[];
   listIcon?: string;
+  listIconColorScheme?: "default" | "gradient-cycle";
   headingText?: string;
   headingLevel?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
   headingAlign?: "left" | "center" | "right";
@@ -175,6 +178,9 @@ export type BuilderLayoutBlock = {
     buttonLabel?: string;
     buttonUrl?: string;
     typography?: Record<string, unknown>;
+    items?: string[];
+    listIcon?: "check" | "circleCheck" | "arrowRight" | "star" | "heart" | "sparkles" | "shield";
+    listIconColorScheme?: "default" | "gradient-cycle";
   }[];
   galleryShowThumbnails?: boolean;
   galleryThumbnailPosition?: string;
@@ -239,6 +245,7 @@ export type BuilderSection = {
   gridGap?: string;
   cardPadding?: string;
   imagePadding?: string;
+  borderRadius?: number;
   addToCartStyle?: string;
   addToCartSize?: string;
   addToCartPosition?: string;

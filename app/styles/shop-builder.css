@@ -267,7 +267,7 @@
   min-height: 520px;
   overflow: hidden;
   border: 1px solid color-mix(in srgb, currentColor 12%, transparent);
-  border-radius: calc(var(--builder-radius, 18px) + 10px);
+  border-radius: calc(var(--builder-card-radius, var(--builder-radius, 18px)) + 10px);
   display: grid;
   grid-template-rows: minmax(260px, 1fr) auto;
   background:
@@ -456,7 +456,7 @@
   justify-content: space-between;
   gap: 18px;
   padding: 18px;
-  border-radius: var(--builder-radius, 8px);
+  border-radius: var(--builder-card-radius, var(--builder-radius, 8px));
   background: var(
     --builder-element-bg,
     var(--builder-active-surface, var(--builder-surface, #f5f5f3))
@@ -706,7 +706,7 @@
   min-width: 0;
   position: relative;
   overflow: hidden;
-  border-radius: var(--builder-radius, 8px);
+  border-radius: var(--builder-card-radius, var(--builder-radius, 8px));
   transition:
     transform 180ms ease,
     box-shadow 180ms ease,
@@ -1350,7 +1350,7 @@
 
 .shop-builder-panel-media {
   min-height: 220px;
-  border-radius: var(--builder-radius, 8px);
+  border-radius: var(--builder-card-radius, var(--builder-radius, 8px));
   background-color: var(--builder-active-surface, var(--builder-surface, #f5f5f3));
   background-position: center;
   background-size: cover;
@@ -1405,6 +1405,22 @@
   display: flex;
   align-items: center;
   gap: 10px;
+}
+
+/* Gradient-cycle icon color scheme — matches ScrollPinnedDemo checklist */
+.shop-builder-column-block--list ul.is-icon-gradient-cycle li:nth-child(3n + 1) svg,
+ul.is-icon-gradient-cycle li:nth-child(3n + 1) svg {
+  color: #38bdf8; /* sky-400 */
+}
+
+.shop-builder-column-block--list ul.is-icon-gradient-cycle li:nth-child(3n + 2) svg,
+ul.is-icon-gradient-cycle li:nth-child(3n + 2) svg {
+  color: #818cf8; /* indigo-400 */
+}
+
+.shop-builder-column-block--list ul.is-icon-gradient-cycle li:nth-child(3n) svg,
+ul.is-icon-gradient-cycle li:nth-child(3n) svg {
+  color: #c084fc; /* purple-400 */
 }
 
 .shop-builder-column-block--date-picker label {
@@ -1463,7 +1479,7 @@
 .shop-builder-badge-card {
   min-width: 0;
   padding: clamp(18px, 2.4vw, 28px);
-  border-radius: var(--builder-radius, 8px);
+  border-radius: var(--builder-card-radius, var(--builder-radius, 8px));
   background: var(--builder-active-surface, rgba(17, 17, 17, 0.045));
   transition:
     transform 180ms ease,
@@ -1879,7 +1895,7 @@
 .shop-builder-product-purchase-panel,
 .shop-builder-product-specs-panel {
   padding: clamp(18px, 3vw, 30px);
-  border-radius: var(--builder-radius, 8px);
+  border-radius: var(--builder-card-radius, var(--builder-radius, 8px));
   background: color-mix(
     in srgb,
     var(--builder-active-surface, rgba(17, 17, 17, 0.045)) 78%,
@@ -1918,7 +1934,7 @@
 .shop-builder-column-badges article {
   min-width: 0;
   padding: 14px;
-  border-radius: var(--builder-radius, 8px);
+  border-radius: var(--builder-card-radius, var(--builder-radius, 8px));
   background: rgba(255, 255, 255, 0.48);
 }
 
@@ -3575,3 +3591,256 @@
   display: inline-block;
 }
 
+/* ── Scroll Pinned Demo: Checklist (matches list block style) ── */
+.scroll-pinned-checklist {
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+  list-style: none;
+}
+
+.scroll-pinned-checklist-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: currentColor;
+  opacity: 0.85;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.scroll-pinned-checklist-item svg {
+  flex-shrink: 0;
+}
+
+.scroll-pinned-checklist-item span {
+  display: block;
+  color: inherit;
+  font-size: inherit;
+}
+
+/* ── Scroll Pinned Demo Dynamic Cards ── */
+.scroll-pinned-card-item {
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  border-radius: var(--builder-card-radius, var(--builder-radius, 24px));
+}
+
+/* Default & Dark Theme Card */
+.scroll-pinned-card-item--default,
+.scroll-pinned-card-item--dark,
+.scroll-pinned-card-item--flat-dark {
+  background: rgba(23, 23, 23, 0.75) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4) !important;
+}
+
+.scroll-pinned-card-item--default .scroll-pinned-card-title,
+.scroll-pinned-card-item--dark .scroll-pinned-card-title,
+.scroll-pinned-card-item--flat-dark .scroll-pinned-card-title {
+  background-image: linear-gradient(135deg, #ffffff 15%, #d4d4d4 100%);
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  color: transparent !important;
+}
+
+.scroll-pinned-card-item--default .scroll-pinned-card-text,
+.scroll-pinned-card-item--dark .scroll-pinned-card-text,
+.scroll-pinned-card-item--flat-dark .scroll-pinned-card-text {
+  color: #a3a3a3 !important;
+}
+
+.scroll-pinned-card-item--default .scroll-pinned-card-button,
+.scroll-pinned-card-item--dark .scroll-pinned-card-button,
+.scroll-pinned-card-item--flat-dark .scroll-pinned-card-button {
+  background: #ffffff !important;
+  color: #000000 !important;
+}
+.scroll-pinned-card-item--default .scroll-pinned-card-button:hover,
+.scroll-pinned-card-item--dark .scroll-pinned-card-button:hover,
+.scroll-pinned-card-item--flat-dark .scroll-pinned-card-button:hover {
+  background: #e5e5e5 !important;
+}
+
+/* Light Theme Card */
+.scroll-pinned-card-item--light {
+  background: rgba(255, 255, 255, 0.9) !important;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1) !important;
+}
+
+.scroll-pinned-card-item--light .scroll-pinned-card-title {
+  background-image: linear-gradient(135deg, #171717 15%, #404040 100%);
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  color: transparent !important;
+}
+
+.scroll-pinned-card-item--light .scroll-pinned-card-text {
+  color: #525252 !important;
+}
+
+.scroll-pinned-card-item--light .scroll-pinned-card-button {
+  background: #171717 !important;
+  color: #ffffff !important;
+}
+.scroll-pinned-card-item--light .scroll-pinned-card-button:hover {
+  background: #404040 !important;
+}
+
+/* Princity (Parchment) Theme Card */
+.scroll-pinned-card-item--princity {
+  background: rgba(239, 239, 233, 0.95) !important;
+  border: 1px solid rgba(17, 17, 17, 0.1) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  box-shadow: 0 20px 40px rgba(17, 17, 17, 0.08) !important;
+}
+
+.scroll-pinned-card-item--princity .scroll-pinned-card-title {
+  background-image: linear-gradient(135deg, #111111 15%, #3f3f37 100%);
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  color: transparent !important;
+}
+
+.scroll-pinned-card-item--princity .scroll-pinned-card-text {
+  color: #5f5f58 !important;
+}
+
+.scroll-pinned-card-item--princity .scroll-pinned-card-button {
+  background: #111111 !important;
+  color: #efefe9 !important;
+}
+.scroll-pinned-card-item--princity .scroll-pinned-card-button:hover {
+  background: #3f3f37 !important;
+}
+
+/* Antigravity Theme Card */
+.scroll-pinned-card-item--antigravity {
+  background: linear-gradient(135deg, rgba(20, 10, 45, 0.8) 0%, rgba(10, 5, 25, 0.9) 100%) !important;
+  border: 1px solid rgba(129, 140, 248, 0.3) !important;
+  backdrop-filter: blur(25px) !important;
+  -webkit-backdrop-filter: blur(25px) !important;
+  box-shadow: 0 0 20px rgba(99, 102, 241, 0.2), 0 25px 50px rgba(0, 0, 0, 0.5) !important;
+}
+
+.scroll-pinned-card-item--antigravity:hover {
+  border-color: rgba(168, 85, 247, 0.6) !important;
+  box-shadow: 0 0 30px rgba(168, 85, 247, 0.35), 0 25px 55px rgba(0, 0, 0, 0.6) !important;
+}
+
+.scroll-pinned-card-item--antigravity .scroll-pinned-card-title {
+  background-image: linear-gradient(135deg, #ffffff 0%, #a5b4fc 50%, #c084fc 100%);
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  color: transparent !important;
+}
+
+.scroll-pinned-card-item--antigravity .scroll-pinned-card-text {
+  color: rgba(243, 244, 246, 0.85) !important;
+}
+
+.scroll-pinned-card-item--antigravity .scroll-pinned-card-button {
+  background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+.scroll-pinned-card-item--antigravity .scroll-pinned-card-button:hover {
+  background: linear-gradient(135deg, #4f46e5 0%, #9333ea 100%) !important;
+  box-shadow: 0 0 15px rgba(168, 85, 247, 0.4) !important;
+}
+
+/* Card Fallback Image */
+.scroll-pinned-card-item--default .scroll-pinned-card-fallback-image,
+.scroll-pinned-card-item--dark .scroll-pinned-card-fallback-image,
+.scroll-pinned-card-item--flat-dark .scroll-pinned-card-fallback-image {
+  background: rgba(255, 255, 255, 0.03) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  color: #a3a3a3 !important;
+}
+
+.scroll-pinned-card-item--light .scroll-pinned-card-fallback-image {
+  background: rgba(0, 0, 0, 0.03) !important;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  color: #737373 !important;
+}
+
+.scroll-pinned-card-item--princity .scroll-pinned-card-fallback-image {
+  background: rgba(17, 17, 17, 0.03) !important;
+  border: 1px solid rgba(17, 17, 17, 0.08) !important;
+  color: #5f5f58 !important;
+}
+
+.scroll-pinned-card-item--antigravity .scroll-pinned-card-fallback-image {
+  background: rgba(99, 102, 241, 0.08) !important;
+  border: 1px solid rgba(129, 140, 248, 0.25) !important;
+  color: #a5b4fc !important;
+}
+
+/* Navigation Buttons override matching container background context */
+.text-white .scroll-pinned-nav-btn {
+  background: #262626 !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+.text-white .scroll-pinned-nav-btn:hover:not(:disabled) {
+  background: #404040 !important;
+}
+.text-neutral-900 .scroll-pinned-nav-btn {
+  background: #f5f5f5 !important;
+  color: #171717 !important;
+  border: 1px solid rgba(0, 0, 0, 0.1) !important;
+}
+.text-neutral-900 .scroll-pinned-nav-btn:hover:not(:disabled) {
+  background: #e5e5e5 !important;
+}
+
+/* ── Antigravity Premium Preset Styles ── */
+.shop-card-preset--antigravity .shop-builder-grid-card,
+.shop-builder-element-shell.shop-card-preset--antigravity .shop-builder-column-badges article,
+.shop-card-preset--antigravity .shop-archive-card {
+  background: linear-gradient(135deg, rgba(17, 12, 38, 0.8) 0%, rgba(8, 5, 20, 0.9) 100%) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(129, 140, 248, 0.2) !important;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05) inset !important;
+  color: #f3f4f6 !important;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.shop-card-preset--antigravity .shop-builder-grid-card:hover,
+.shop-builder-element-shell.shop-card-preset--antigravity .shop-builder-column-badges article:hover,
+.shop-card-preset--antigravity .shop-archive-card:hover {
+  border-color: rgba(168, 85, 247, 0.5) !important;
+  box-shadow: 0 0 25px rgba(99, 102, 241, 0.25), 0 12px 40px rgba(0, 0, 0, 0.5) !important;
+  transform: translateY(-3px) scale(1.01) !important;
+}
+
+.shop-card-preset--antigravity .shop-builder-grid-card h3,
+.shop-card-preset--antigravity .shop-builder-grid-card h4,
+.shop-card-preset--antigravity .shop-builder-grid-card p,
+.shop-card-preset--antigravity .shop-builder-grid-card span,
+.shop-card-preset--antigravity .shop-builder-grid-content small,
+.shop-card-preset--antigravity .shop-builder-grid-content p,
+.shop-builder-element-shell.shop-card-preset--antigravity .shop-builder-column-badges article strong,
+.shop-builder-element-shell.shop-card-preset--antigravity .shop-builder-column-badges article p,
+.shop-builder-element-shell.shop-card-preset--antigravity .shop-builder-column-badges article span,
+.shop-card-preset--antigravity .shop-archive-card .product-title,
+.shop-card-preset--antigravity .shop-archive-card .product-price {
+  color: #f3f4f6 !important;
+}
+
+.shop-card-preset--antigravity .shop-archive-card .product-attribute-badge {
+  background: rgba(99, 102, 241, 0.2) !important;
+  color: #a5b4fc !important;
+  border: 1px solid rgba(99, 102, 241, 0.3) !important;
+}

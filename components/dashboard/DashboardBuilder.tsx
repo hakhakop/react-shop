@@ -128,6 +128,56 @@ import {
   visualStyleToCss,
 } from "@/lib/builderVisualStyle";
 
+function RenderDashboardChecklist({
+  items,
+  iconName = "check",
+  colorScheme = "default",
+  typography,
+}: {
+  items?: string[];
+  iconName?: string;
+  colorScheme?: string;
+  typography?: any;
+}) {
+  if (!items || items.length === 0) return null;
+  const isGradientCycle = colorScheme === "gradient-cycle";
+  return (
+    <ul 
+      className={`builder-preview-goodie-list-checklist ${isGradientCycle ? "is-icon-gradient-cycle" : ""}`}
+      style={{
+        listStyle: "none",
+        padding: 0,
+        margin: "12px 0",
+        display: "grid",
+        gap: "6px",
+      }}
+    >
+      {items.map((item, index) => (
+        <li 
+          key={`${item}-${index}`} 
+          style={{ 
+            display: "flex", 
+            alignItems: "center", 
+            gap: "8px",
+            fontSize: "13px",
+          }}
+        >
+          {{
+            check: <Check size={14} />,
+            circleCheck: <CircleCheck size={14} />,
+            arrowRight: <ArrowRight size={14} />,
+            star: <Star size={14} />,
+            heart: <Heart size={14} />,
+            sparkles: <Sparkles size={14} />,
+            shield: <ShieldCheck size={14} />,
+          }[iconName] ?? <Check size={14} />}
+          <DashboardTypog as="span" typography={typography}>{item}</DashboardTypog>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 const STORAGE_KEY = "react-shop-visual-builder-v1";
 const STORAGE_BY_KEY = "react-shop-visual-builder-drafts-v2";
 const STORAGE_CUSTOM_PAGES = "react-shop-visual-builder-pages-v1";
@@ -1205,11 +1255,18 @@ export default function DashboardBuilder({
         previewHeaderSlotRef.current?.querySelector<HTMLElement>(
           "#site-header-pill",
         );
+      const header =
+        previewHeaderSlotRef.current?.querySelector<HTMLElement>(
+          ".site-header",
+        );
       if (!pill) return;
       const shellScrollTop = previewShellRef.current?.scrollTop ?? 0;
       const isScrolled = Math.max(shellScrollTop, window.scrollY) > 56;
       pill.dataset.scrolled = isScrolled ? "true" : "false";
       pill.dataset.pillInit = "true";
+      if (header) {
+        header.dataset.scrolled = isScrolled ? "true" : "false";
+      }
     };
 
     const shell = previewShellRef.current;
@@ -3253,6 +3310,54 @@ export default function DashboardBuilder({
     setPublishStatus("Row inserted");
   };
 
+  const deleteEmptyRow = (sectionId: string, rowIndex: number) => {
+    const removedColumnKeys = new Set<string>();
+
+    setBuilderState((current) => ({
+      ...current,
+      sections: current.sections.map((section) => {
+        if (section.id !== sectionId || !isLayoutContainerSection(section)) {
+          return section;
+        }
+
+        const layoutItems = section.layoutItems ?? [];
+        const layoutRows = getPreviewLayoutRows(section, layoutItems);
+        const targetRow = layoutRows[rowIndex];
+        if (!targetRow) return section;
+
+        const isEmptyRow = targetRow.items.every(
+          (item) => (item.blocks ?? []).length === 0,
+        );
+        if (!isEmptyRow) return section;
+
+        targetRow.items.forEach((item, columnIndex) => {
+          removedColumnKeys.add(
+            item.id ?? `layout-item-${targetRow.startIndex + columnIndex}`,
+          );
+        });
+
+        return {
+          ...section,
+          layoutItems: layoutItems.filter(
+            (_, itemIndex) =>
+              itemIndex < targetRow.startIndex ||
+              itemIndex >= targetRow.startIndex + targetRow.items.length,
+          ),
+          layoutRows: Math.max(0, layoutRows.length - 1),
+        };
+      }),
+    }));
+
+    if (selectedLayoutColumnKey && removedColumnKeys.has(selectedLayoutColumnKey)) {
+      setSelectedLayoutColumnKey(null);
+      setSelectedLayoutBlockKey(null);
+    }
+    if (openLayoutItemId && removedColumnKeys.has(openLayoutItemId)) {
+      setOpenLayoutItemId(null);
+    }
+    setPublishStatus("Blank row deleted");
+  };
+
   const moveSelected = (direction: -1 | 1) => {
     moveSection(selectedId, direction);
   };
@@ -4005,21 +4110,46 @@ export default function DashboardBuilder({
             <label className="builder-field">
               <span>Card Radius</span>
               <select
-                value={builderState.design.cardRadius ?? "8px"}
-                onChange={(event) =>
-                  updateDesign({
-                    cardRadius: event.target.value,
-                    preset: undefined,
-                  })
+                value={
+                  builderState.design.cardRadius === undefined
+                    ? "8px"
+                    : ["0px", "4px", "8px", "12px", "16px", "24px"].includes(builderState.design.cardRadius)
+                      ? builderState.design.cardRadius
+                      : "custom"
                 }
+                onChange={(event) => {
+                  const val = event.target.value;
+                  if (val === "custom") {
+                    updateDesign({ cardRadius: "10px", preset: undefined });
+                  } else {
+                    updateDesign({ cardRadius: val, preset: undefined });
+                  }
+                }}
               >
-                <option value="0px">Flat</option>
-                <option value="4px">Small</option>
-                <option value="8px">Medium</option>
-                <option value="12px">Rounded</option>
-                <option value="16px">Large</option>
+                <option value="0px">Flat (0px)</option>
+                <option value="4px">Small (4px)</option>
+                <option value="8px">Medium (8px)</option>
+                <option value="12px">Rounded (12px)</option>
+                <option value="16px">Large (16px)</option>
+                <option value="24px">Extra Large (24px)</option>
+                <option value="custom">Custom...</option>
               </select>
             </label>
+            {builderState.design.cardRadius !== undefined && !["0px", "4px", "8px", "12px", "16px", "24px"].includes(builderState.design.cardRadius) && (
+              <label className="builder-field">
+                <span>Custom Radius (px/rem)</span>
+                <input
+                  type="text"
+                  value={builderState.design.cardRadius}
+                  onChange={(event) =>
+                    updateDesign({
+                      cardRadius: event.target.value,
+                      preset: undefined,
+                    })
+                  }
+                />
+              </label>
+            )}
           </div>
 
           <label className="builder-field">
@@ -5499,6 +5629,7 @@ export default function DashboardBuilder({
             onUploadGridItemImage={uploadGridItemImage}
             onAddWireframe={addWireframeNear}
             onAddRow={addRowNear}
+            onDeleteRow={deleteEmptyRow}
             onMoveSection={moveSection}
             onDuplicateSection={duplicateSection}
             onDeleteSection={deleteSection}
@@ -5811,6 +5942,7 @@ function PreviewCanvas({
   onUploadGridItemImage,
   onAddWireframe,
   onAddRow,
+  onDeleteRow,
   onMoveSection,
   onDuplicateSection,
   onDeleteSection,
@@ -5951,6 +6083,7 @@ function PreviewCanvas({
     placement: "before" | "after",
     presetKey: string,
   ) => void;
+  onDeleteRow: (sectionId: string, rowIndex: number) => void;
   onMoveSection: (sectionId: string, direction: -1 | 1) => void;
   onDuplicateSection: (sectionId: string) => void;
   onDeleteSection: (sectionId: string) => void;
@@ -6179,6 +6312,14 @@ function PreviewCanvas({
                     "--builder-section-margin-bottom": getPreviewSpacing(
                       section.bottomMargin,
                     ),
+                    "--builder-radius":
+                      section.borderRadius !== undefined
+                        ? `${section.borderRadius}px`
+                        : undefined,
+                    "--builder-card-radius":
+                      section.borderRadius !== undefined
+                        ? `${section.borderRadius}px`
+                        : undefined,
                     ...sectionSchemeStyle(section),
                     ...visualStyleToCss(
                       section.visualStyle as BuilderVisualStyle | undefined,
@@ -6401,6 +6542,7 @@ function PreviewCanvas({
                   onMoveSectionBadge={onMoveSectionBadge}
                   onUploadGridItemImage={onUploadGridItemImage}
                   onAddRow={onAddRow}
+                  onDeleteRow={onDeleteRow}
                   onOpenElementsPanel={onOpenElementsPanel}
                 />
               </div>
@@ -6920,9 +7062,11 @@ function InlineEditableText({
 function RowInsertControl({
   placement,
   onClick,
+  onDelete,
 }: {
   placement: "before" | "after";
   onClick: () => void;
+  onDelete?: () => void;
 }) {
   return (
     <div
@@ -6941,6 +7085,18 @@ function RowInsertControl({
         <Plus size={14} />
         <span>Add Row</span>
       </button>
+      {onDelete && (
+        <button
+          type="button"
+          className="builder-preview-row-delete-trigger"
+          onClick={onDelete}
+          aria-label="Delete blank row"
+          title="Delete blank row"
+        >
+          <Trash2 size={13} />
+          <span>Delete Row</span>
+        </button>
+      )}
     </div>
   );
 }
@@ -6980,6 +7136,7 @@ function PreviewSection({
   onMoveSectionBadge,
   onUploadGridItemImage,
   onAddRow,
+  onDeleteRow,
   onOpenElementsPanel,
 }: {
   section: BuilderSection;
@@ -7099,6 +7256,7 @@ function PreviewSection({
     placement: "before" | "after",
     presetKey: string,
   ) => void;
+  onDeleteRow: (sectionId: string, rowIndex: number) => void;
   onDeleteButton: (
     sectionId: string,
     columnKey: string,
@@ -7612,9 +7770,14 @@ if (section.kind === "embed") {
               "default";
 
             const hasScrollPinned = blocks.some((b) => b.kind === "scrollPinnedDemo");
+            const isEmptyRow =
+              rowMeta !== undefined &&
+              (layoutRows[rowMeta.rowIndex]?.items ?? []).every(
+                (rowItem) => (rowItem.blocks ?? []).length === 0,
+              );
             return (
               <Fragment key={columnKey}>
-                {rowMeta?.isRowStart && (
+                {rowMeta?.isRowStart && rowMeta.rowIndex === 0 && (
                   <RowInsertControl
                     placement="before"
                     onClick={() =>
@@ -7784,6 +7947,14 @@ if (section.kind === "embed") {
                               : block.elementBackgroundMode === "custom"
                                 ? (block.elementBackground ?? "#ffffff")
                                 : undefined,
+                          "--builder-radius":
+                            block.borderRadius !== undefined
+                              ? `${block.borderRadius}px`
+                              : undefined,
+                          "--builder-card-radius":
+                            block.borderRadius !== undefined
+                              ? `${block.borderRadius}px`
+                              : undefined,
                           ...visualStyleToCss(
                             block.visualStyle as BuilderVisualStyle | undefined,
                           ),
@@ -8094,7 +8265,7 @@ if (section.kind === "embed") {
                               {block.title}
                             </DashboardTypog>
                           )}
-                          <ul>
+                          <ul className={block.listIconColorScheme === "gradient-cycle" ? "is-icon-gradient-cycle" : undefined}>
                             {(block.items ?? []).map((item, index) => (
                               <li
                                 key={`${item}-${index}`}
@@ -8597,6 +8768,14 @@ if (section.kind === "embed") {
                                 />
                               )
                             )}
+                            
+                            <RenderDashboardChecklist
+                              items={block.items}
+                              iconName={block.listIcon}
+                              colorScheme={block.listIconColorScheme}
+                              typography={block.typography}
+                            />
+
                           <div 
                             className={`shop-builder-buttons shop-builder-buttons--${block.buttonsLayout ?? "inline"}`}
                             style={previewButtonsStyle(block.buttonsLayout, block.elementAlign)}
@@ -9111,6 +9290,14 @@ if (section.kind === "embed") {
                                               }
                                             />
                                           )}
+
+                                        <RenderDashboardChecklist
+                                          items={"items" in item ? item.items : undefined}
+                                          iconName={"listIcon" in item ? item.listIcon : undefined}
+                                          colorScheme={"listIconColorScheme" in item ? item.listIconColorScheme : undefined}
+                                          typography={itemTypography}
+                                        />
+
                                         {block.gridShowButton !== false &&
                                           item.buttonLabel && (
                                             <InlineEditableText
@@ -9344,6 +9531,14 @@ if (section.kind === "embed") {
                               }
                             />
                           )}
+                          
+                          <RenderDashboardChecklist
+                            items={block.items}
+                            iconName={block.listIcon}
+                            colorScheme={block.listIconColorScheme}
+                            typography={block.typography}
+                          />
+
                           {block.kind === "embed" && (
                             <span>{block.embedMode ?? "code"} block</span>
                           )}
@@ -9384,6 +9579,11 @@ if (section.kind === "embed") {
                         rowIndex: rowMeta.rowIndex,
                         placement: "after",
                       })
+                    }
+                    onDelete={
+                      isEmptyRow
+                        ? () => onDeleteRow(section.id, rowMeta.rowIndex)
+                        : undefined
                     }
                   />
                 )}

@@ -1162,3 +1162,31 @@ body[data-storefront-preset="princity"]
 [data-theme="dark"] .shop-card-style--none .shop-archive-card .product-image {
   background: #f7f7f4;
 }
+
+/* Antigravity Preset for WooCommerce Archive Cards */
+.shop-card-preset--antigravity .shop-archive-card {
+  background: linear-gradient(135deg, rgba(17, 12, 38, 0.8) 0%, rgba(8, 5, 20, 0.9) 100%) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(129, 140, 248, 0.2) !important;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05) inset !important;
+  color: #f3f4f6 !important;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.shop-card-preset--antigravity .shop-archive-card:hover {
+  border-color: rgba(168, 85, 247, 0.5) !important;
+  box-shadow: 0 0 25px rgba(99, 102, 241, 0.25), 0 12px 40px rgba(0, 0, 0, 0.5) !important;
+  transform: translateY(-3px) scale(1.01) !important;
+}
+
+.shop-card-preset--antigravity .shop-archive-card .product-title,
+.shop-card-preset--antigravity .shop-archive-card .product-price {
+  color: #f3f4f6 !important;
+}
+
+.shop-card-preset--antigravity .shop-archive-card .product-attribute-badge {
+  background: rgba(99, 102, 241, 0.2) !important;
+  color: #a5b4fc !important;
+  border: 1px solid rgba(99, 102, 241, 0.3) !important;
+}

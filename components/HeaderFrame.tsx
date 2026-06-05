@@ -25,8 +25,6 @@ export default function HeaderFrame({
   const [scrolled, setScrolled] = React.useState(false);
 
   React.useEffect(() => {
-    if (mode !== "sticky") return;
-
     const getScrollY = () => {
       const previewShell = document.querySelector(".builder-preview-shell");
       if (previewShell) {
@@ -46,7 +44,7 @@ export default function HeaderFrame({
     // including the builder preview shell.
     window.addEventListener("scroll", onScroll, { capture: true, passive: true });
     return () => window.removeEventListener("scroll", onScroll, { capture: true });
-  }, [mode]);
+  }, []);
 
   const baseSticky =
     "site-header sticky top-0 z-40 backdrop-blur-xl transition-all duration-300";
@@ -65,7 +63,7 @@ export default function HeaderFrame({
     <header
       className={`${base} ${state} ${className}`}
       style={mode === "sticky" ? { borderBottomColor: accentColor } : undefined}
-      data-scrolled={mode === "sticky" ? (scrolled ? "true" : "false") : undefined}
+      data-scrolled={scrolled ? "true" : "false"}
     >
       {children}
     </header>

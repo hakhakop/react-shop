@@ -5,30 +5,28 @@
     "page": "home",
     "targetType": "page",
     "design": {
-      "preset": "princity",
-      "colorScheme": "light",
-      "pageBackground": "#f4f1ea",
+      "colorScheme": "auto",
+      "pageBackground": "#f7f7f4",
       "textColor": "#111111",
-      "mutedTextColor": "#625f58",
-      "accentColor": "#d8ff65",
-      "surfaceColor": "#ebe7dc",
+      "mutedTextColor": "#5f5f58",
+      "accentColor": "#a4be7b",
+      "surfaceColor": "#efefe9",
       "buttonBackground": "#111111",
       "buttonTextColor": "#ffffff",
-      "radius": "16px",
-      "sectionMaxWidth": "1580px",
-      "sectionGutter": "44px",
+      "radius": "8px",
+      "sectionMaxWidth": "1640px",
+      "sectionGutter": "48px",
       "headingFontFamily": "inherit",
-      "headingSize": "clamp(48px, 7.4vw, 124px)",
-      "headingWeight": "840",
-      "headingLineHeight": "0.9",
+      "headingSize": "clamp(42px, 8vw, 126px)",
+      "headingWeight": "760",
+      "headingLineHeight": "0.92",
       "cardBg": "#efefe9",
-      "cardRadius": "4px",
+      "cardRadius": "24px",
       "cardBorder": "transparent",
       "cardShadow": "0 12px 30px rgba(17,17,17,0.06)",
       "cardShadowHover": "0 18px 42px rgba(17,17,17,0.1)",
       "cardImageBg": "#ffffff",
-      "cardImagePadding": "clamp(22px, 2.4vw, 36px)",
-      "headingColor": "#111111"
+      "cardImagePadding": "clamp(22px, 2.4vw, 36px)"
     },
     "sections": [
       {
@@ -46,7 +44,7 @@
         "bottomMargin": "inherit",
         "layout": "whole",
         "layoutColumns": 1,
-        "layoutRows": 2,
+        "layoutRows": 1,
         "backgroundEffect": "none",
         "antigravitySpeed": 1.5,
         "antigravityParticleCount": 185,
@@ -67,9 +65,9 @@
               {
                 "id": "demo-hero-block-1",
                 "kind": "hero",
-                "eyebrow": "WELCOME TO ANTIGRAVITY ENGINE",
-                "title": "[Build the future with dynamic animations|interactive particles|typewriter effects|premium aesthetics]",
-                "body": "Welcome to the next generation visual builder. Craft high-performance storefronts with real-time feedback, advanced typography, and stunning visual overlays.",
+                "eyebrow": "Բարի գալուստ webpages",
+                "title": "[Ընտրեք փաթեթը |տրամադրեք տեղեկությունը| ձեր կայքը պատրաստ է]",
+                "body": "<p><strong>Կայք, հոսթինգ և սպասարկում՝ մեկ պարզ փաթեթով</strong></p>",
                 "buttonLabel": "Launch Visual Builder",
                 "buttonUrl": "/dashboard",
                 "typewriterEnabled": true,
@@ -83,7 +81,7 @@
                   "title": {
                     "fontSize": "clamp(36px, 5.5vw, 80px)",
                     "fontWeight": "800",
-                    "lineHeight": "1.0",
+                    "lineHeight": "1.8",
                     "letterSpacing": "-0.03em"
                   },
                   "body": {
@@ -117,76 +115,30 @@
                 }
               }
             ]
-          },
-          {
-            "id": "layout-row-mpxscn5j-column-1",
-            "rowId": "layout-row-mpxscn5j",
-            "rowLayout": "whole",
-            "blocks": []
           }
         ]
       },
       {
-        "id": "packages",
+        "id": "contentLayout-mq02cfbq-x0edv",
         "kind": "contentLayout",
         "title": "",
-        "eyebrow": "",
-        "body": "",
-        "background": "#0d0d0d",
-        "backgroundMode": "full",
+        "background": "#ffffff",
+        "backgroundMode": "boxed",
         "contentMode": "boxed",
-        "colorScheme": "dark",
-        "topSpacing": "large",
-        "bottomSpacing": "large",
+        "colorScheme": "inherit",
+        "topSpacing": "inherit",
+        "bottomSpacing": "inherit",
         "topMargin": "inherit",
         "bottomMargin": "inherit",
         "visible": true,
+        "eyebrow": "",
+        "body": "",
         "layout": "whole",
         "layoutColumns": 1,
-        "layoutRows": 1,
-        "visualStyle": {
-          "background": {
-            "type": "gradient",
-            "gradient": "radial-gradient(circle at 12% 20%, rgba(216,255,101,0.16), transparent 30%), #0d0d0d"
-          }
-        },
         "layoutItems": [
           {
-            "id": "packages-grid-column",
+            "id": "layout-item-mq02cfbq-1",
             "blocks": [
-              {
-                "id": "packages-heading-block",
-                "kind": "hero",
-                "eyebrow": "Coming soon",
-                "title": "Ընտրեք ձեր փաթեթը",
-                "body": "<h2></h2><p>Սկսեք այն լուծումից, որն առավել համապատասխանում է ձեր նպատակին։<br>Հետագայում հնարավոր է ընդլայնել և զարգացնել կայքը։</p>",
-                "buttonLabel": "",
-                "buttonUrl": "",
-                "panelStyle": "default",
-                "elementBackgroundMode": "transparent",
-                "elementPadding": "none",
-                "typography": {
-                  "title": {
-                    "fontSize": "96",
-                    "fontWeight": "800",
-                    "lineHeight": "1.8"
-                  },
-                  "body": {
-                    "fontSize": "18px",
-                    "lineHeight": "1.65"
-                  }
-                },
-                "typewriterEnabled": false,
-                "textGradientPreset": "custom",
-                "textGradientCustomStart": "#ffffff",
-                "textGradientCustomMiddle": "#818cf8",
-                "textGradientCustomEnd": "#c084fc",
-                "textGradientCustomStartOffset": 0,
-                "textGradientCustomMiddleOffset": 50,
-                "textGradientCustomEndOffset": 100,
-                "textGradientCustomAngle": 135,
-                "elementAlign": "center"
-              },
               {
                 "id": "packages-grid",
                 "kind": "grid",
@@ -207,7 +159,7 @@
                     "eyebrow": "Start",
                     "title": "🌱 Start",
                     "meta": "պարզ",
-                    "text": "<p>Հարմար է սկսելու համար</p><p></p><p>✔ 1–5 էջ<br>✔ Կոնտակտային ձև<br>✔ Բջջային տարբերակ<br>✔ Կայքի տեղակայում<br>✔ Հիմնական աջակցություն</p>",
+                    "text": "<p>Հարմար է սկսելու համար</p>",
                     "buttonLabel": "Հետաքրքրում է",
                     "buttonUrl": "#contact",
                     "typography": {
@@ -220,7 +172,16 @@
                         "fontSize": "16px",
                         "lineHeight": "1.6"
                       }
-                    }
+                    },
+                    "listIcon": "circleCheck",
+                    "items": [
+                      " 1–5 էջ",
+                      "Կոնտակտային ձև",
+                      "Կայքի տեղակայում",
+                      " Կայքի տեղակայում",
+                      "Հիմնական աջակցություն"
+                    ],
+                    "listIconColorScheme": "gradient-cycle"
                   },
                   {
                     "id": "package-commerce",
@@ -275,8 +236,16 @@
                 "animation": {
                   "preset": "none",
                   "once": false
-                }
-              },
+                },
+                "elementPadding": "small"
+              }
+            ]
+          },
+          {
+            "id": "layout-row-mq02cwcw-column-1",
+            "rowId": "layout-row-mq02cwcw",
+            "rowLayout": "whole",
+            "blocks": [
               {
                 "id": "text-block-mptsb9rz-ktncj",
                 "kind": "text",
@@ -316,121 +285,7 @@
             ]
           }
         ],
-        "animation": {
-          "preset": "none"
-        }
-      },
-      {
-        "id": "webpages-am-how-it-works",
-        "kind": "contentLayout",
-        "title": "",
-        "eyebrow": "",
-        "body": "",
-        "background": "#f4f1ea",
-        "backgroundMode": "boxed",
-        "contentMode": "boxed",
-        "colorScheme": "light",
-        "topSpacing": "large",
-        "bottomSpacing": "large",
-        "topMargin": "inherit",
-        "bottomMargin": "inherit",
-        "visible": true,
-        "layout": "whole",
-        "layoutColumns": 1,
-        "layoutRows": 1,
-        "layoutItems": [
-          {
-            "id": "webpages-am-how-it-works-column-1",
-            "blocks": [
-              {
-                "id": "webpages-am-how-it-works-heading-block",
-                "kind": "hero",
-                "eyebrow": "Workflow",
-                "title": "Ինչպեսe է աշխատում",
-                "body": "Սկսելը պարզ է։ Ընտրեք փաթեթը և մնացած քայլերով մենք կուղեկցենք ձեզ։",
-                "buttonLabel": "",
-                "buttonUrl": "",
-                "panelStyle": "default",
-                "elementBackgroundMode": "transparent",
-                "elementPadding": "none",
-                "typography": {
-                  "title": {
-                    "fontSize": "clamp(36px, 4.8vw, 76px)",
-                    "fontWeight": "820",
-                    "lineHeight": "0.92"
-                  },
-                  "body": {
-                    "fontSize": "18px",
-                    "lineHeight": "1.65"
-                  }
-                }
-              },
-              {
-                "id": "webpages-am-how-it-works-badges-block",
-                "kind": "badgeGrid",
-                "title": "",
-                "body": "",
-                "columns": 4,
-                "badges": [
-                  {
-                    "id": "how-react",
-                    "label": "01",
-                    "title": "① Ընտրեք փաթեթը",
-                    "body": "<p>Ընտրեք ձեր նպատակին համապատասխան փաթեթը և սկսեք մի քանի պարզ քայլով։</p>"
-                  },
-                  {
-                    "id": "how-wordpress",
-                    "label": "02",
-                    "title": "② Տրամադրեք տեղեկատվությունը",
-                    "body": "<h3></h3><p>Ուղարկեք տեքստերը, նկարները կամ պարզապես պատմեք ինչ եք ցանկանում ստանալ։</p>"
-                  },
-                  {
-                    "id": "how-woo",
-                    "label": "03",
-                    "title": "③ Մենք պատրաստում ենք կայքը",
-                    "body": "<h3></h3><p>Կառուցում ենք էջերը, կազմակերպում բովանդակությունը և պատրաստում կայքը հրապարակման։</p>"
-                  },
-                  {
-                    "id": "how-builder",
-                    "label": "04",
-                    "title": "④ Ձեր կայքը պատրաստ է",
-                    "body": "<h3></h3><p>Ստանում եք գործող կայք, որը կարող եք օգտագործել և զարգացնել հետագայում։</p>"
-                  }
-                ],
-                "panelStyle": "default",
-                "elementBackgroundMode": "transparent",
-                "elementPadding": "none",
-                "animation": {
-                  "preset": "none",
-                  "once": false
-                }
-              },
-              {
-                "id": "text-block-mptsqlo9-zwu8p",
-                "kind": "text",
-                "eyebrow": "",
-                "title": "",
-                "body": "<p><strong>Պետք չէ տեխնիկական գիտելիքներ ունենալ։ Մենք կօգնենք ամբողջ գործընթացի ընթացքում։</strong></p>",
-                "buttonLabel": "",
-                "buttonUrl": "",
-                "typography": {
-                  "variant": "body",
-                  "fontFamily": "inherit",
-                  "fontSize": "16px",
-                  "fontWeight": "400",
-                  "lineHeight": "1.4",
-                  "letterSpacing": "0px",
-                  "color": "inherit",
-                  "textAlign": "left",
-                  "body": {
-                    "textAlign": "center"
-                  }
-                },
-                "elementAlign": "center"
-              }
-            ]
-          }
-        ]
+        "layoutRows": 2
       },
       {
         "id": "contentLayout-mpwb0kb3-ptjmd",
@@ -456,43 +311,53 @@
               {
                 "id": "scrollPinnedDemo-block-mpwb0s04-nnwd4",
                 "kind": "scrollPinnedDemo",
-                "title": "Scroll Pinned Storytelling",
+                "title": "Ինչպես է աշխատում",
                 "eyebrow": "Interactive Showcase",
-                "body": "Notice how the layout is locked. The scrollbar no longer moves the page vertically. Instead, it directs all energy into fueling the progressive card reveal.",
+                "body": "<p>Սկսելը պարզ է։ Ընտրեք փաթեթը և մնացած քայլերով մենք կուղեկցենք ձեզ։</p>",
                 "elementBackground": "#0a0a0a",
                 "slides": [
                   {
                     "id": "scrollPinnedDemo-block-mpwb0s04-nnwd4-slide-1",
                     "badge": "01",
                     "title": "Ընտրում եք փաթեթը",
-                    "text": "<p>Ընտրեք ձեր նպատակին և բյուջեին համապատասխան տարբերակը։</p>"
+                    "text": "<p>Ընտրեք ձեր նպատակին համապատասխան փաթեթը և սկսեք մի քանի պարզ քայլով։</p>"
                   },
                   {
                     "id": "scrollPinnedDemo-block-mpwb0s04-nnwd4-slide-2",
                     "badge": "02",
                     "title": " Տրամադրեք տեղեկատվությունը",
-                    "text": "<p>Ուղարկեք տեքստերը, նկարները և անհրաժեշտ տվյալները։</p>"
+                    "text": "<p>Ուղարկեք տեքստերը, նկարները կամ պարզապես պատմեք ինչ եք ցանկանում ստանալ։</p>"
                   },
                   {
                     "id": "scrollPinnedDemo-block-mpwb0s04-nnwd4-slide-3",
                     "badge": "03",
                     "title": "Մենք պատրաստում ենք կայքը",
-                    "text": "<p>Կազմավորում ենք էջերը, դիզայնը և անհրաժեշտ գործառույթները։</p>"
+                    "text": "<p>Կառուցում ենք էջերը, կազմակերպում բովանդակությունը և պատրաստում կայքը հրապարակման։</p>"
                   },
                   {
                     "id": "nested-slide-mpwb4uyu",
                     "badge": "04",
                     "title": "Կայքը պատրաստ է",
-                    "text": "<p>Ստանում եք պատրաստ կայք և կարող եք սկսել օգտագործել այն։</p>",
+                    "text": "<p>Ստանում եք գործող կայք, որը կարող եք օգտագործել և զարգացնել հետագայում։</p>",
                     "imagePadding": "medium"
                   }
                 ],
                 "carouselSettings": {
                   "pinHeightFactor": 150,
                   "variant": "perfect",
-                  "scrubSpeed": 1.2
+                  "scrubSpeed": 0.9
                 },
-                "typewriterEnabled": false
+                "typewriterEnabled": false,
+                "items": [
+                  "Feature 1",
+                  "Feature 2",
+                  "Feature 3",
+                  "Feature 4"
+                ],
+                "panelStyle": "antigravity",
+                "elementBackgroundMode": "transparent",
+                "typewriterSpeed": 250,
+                "typewriterLoop": true
               }
             ]
           }
@@ -846,7 +711,8 @@
                   "effects": {
                     "opacity": 81
                   }
-                }
+                },
+                "borderRadius": 0
               }
             ]
           },
@@ -878,6 +744,39 @@
             ]
           }
         ]
+      },
+      {
+        "id": "contentLayout-mpzkl96m-oosnk",
+        "kind": "contentLayout",
+        "title": "",
+        "background": "#111111",
+        "backgroundMode": "full",
+        "contentMode": "narrow",
+        "colorScheme": "inherit",
+        "topSpacing": "inherit",
+        "bottomSpacing": "inherit",
+        "topMargin": "inherit",
+        "bottomMargin": "inherit",
+        "visible": true,
+        "eyebrow": "",
+        "body": "",
+        "layout": "whole",
+        "layoutColumns": 1,
+        "layoutItems": [
+          {
+            "id": "layout-item-mpzkl96m-1",
+            "blocks": [
+              {
+                "id": "fluentForm-block-mpzklfs9-nmvi6",
+                "kind": "fluentForm",
+                "title": "Contact Form",
+                "body": "Rendered from Fluent Forms in WordPress.",
+                "fluentFormId": "1"
+              }
+            ]
+          }
+        ],
+        "layoutRows": 1
       },
       {
         "id": "contentLayout-mptd4qhk-5wnja",
@@ -1009,7 +908,7 @@
         ]
       }
     ],
-    "updatedAt": "2026-06-04T05:27:29.970Z"
+    "updatedAt": "2026-06-04T22:26:06.225Z"
   },
   "shop": {
     "version": 1,

@@ -386,8 +386,7 @@ function sectionStyle(section: BuilderSection): BuilderStyle {
         : ({} satisfies BuilderStyle);
 
   const visual = section.visualStyle as BuilderVisualStyle | undefined;
-
-  return {
+  const styleObj: BuilderStyle = {
     background: section.background,
     "--builder-section-padding-top": getSpacingValue(section.topSpacing),
     "--builder-section-padding-bottom": getSpacingValue(section.bottomSpacing),
@@ -395,7 +394,14 @@ function sectionStyle(section: BuilderSection): BuilderStyle {
     "--builder-section-margin-bottom": getSpacingValue(section.bottomMargin),
     ...schemeVars,
     ...visualStyleToCss(visual),
-  } as BuilderStyle;
+  };
+
+  if (section.borderRadius !== undefined) {
+    styleObj["--builder-radius"] = `${section.borderRadius}px`;
+    styleObj["--builder-card-radius"] = `${section.borderRadius}px`;
+  }
+
+  return styleObj as BuilderStyle;
 }
 
 function sectionClassName(section: BuilderSection, extra = "") {
@@ -921,6 +927,56 @@ async function ContentProductsBlock({
   );
 }
 
+function RenderChecklist({
+  items,
+  iconName = "check",
+  colorScheme = "default",
+  typography,
+}: {
+  items?: string[];
+  iconName?: string;
+  colorScheme?: string;
+  typography?: any;
+}) {
+  if (!items || items.length === 0) return null;
+  const isGradientCycle = colorScheme === "gradient-cycle";
+  return (
+    <ul 
+      className={`shop-builder-column-block--list-items ${isGradientCycle ? "is-icon-gradient-cycle" : ""}`}
+      style={{
+        listStyle: "none",
+        padding: 0,
+        margin: "1rem 0",
+        display: "grid",
+        gap: "0.5rem",
+      }}
+    >
+      {items.map((item, index) => (
+        <li 
+          key={`${item}-${index}`} 
+          style={{ 
+            display: "flex", 
+            alignItems: "center", 
+            gap: "0.5rem",
+            fontSize: "0.95rem",
+          }}
+        >
+          {{
+            check: <Check size={15} />,
+            circleCheck: <CircleCheck size={15} />,
+            arrowRight: <ArrowRight size={15} />,
+            star: <Star size={15} />,
+            heart: <Heart size={15} />,
+            sparkles: <Sparkles size={15} />,
+            shield: <ShieldCheck size={15} />,
+          }[iconName] ?? <Check size={15} />}
+          <Typog as="span" typography={typography}>{item}</Typog>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 function GridCards({
   block,
   items,
@@ -937,6 +993,9 @@ function GridCards({
     buttonLabel?: string;
     buttonUrl?: string;
     typography?: BuilderLayoutBlock["typography"];
+    items?: string[];
+    listIcon?: string;
+    listIconColorScheme?: string;
   }>;
 }) {
   const limit = Math.max(1, (block.columns ?? 3) * (block.gridRows ?? 1));
@@ -969,6 +1028,14 @@ function GridCards({
               <small>{item.meta}</small>
             )}
             {block.gridShowText !== false && item.text && <Typog as="p" typography={item.typography ?? block.typography}>{item.text}</Typog>}
+            
+            <RenderChecklist
+              items={item.items}
+              iconName={item.listIcon}
+              colorScheme={item.listIconColorScheme}
+              typography={item.typography ?? block.typography}
+            />
+
             {block.gridShowButton !== false &&
               item.buttonLabel &&
               item.buttonUrl && (
@@ -1454,7 +1521,10 @@ function ContentLayoutBlock({
 
   if (block.kind === "scrollPinnedDemo") {
     return (
-      <div className="shop-builder-column-block shop-builder-column-block--scroll-pinned">
+      <div 
+        className="shop-builder-column-block shop-builder-column-block--scroll-pinned"
+        style={blockSurfaceStyle(block)}
+      >
         <ScrollPinnedDemo block={block} />
       </div>
     );
@@ -1562,10 +1632,11 @@ function ContentLayoutBlock({
   }
 
   if (block.kind === "list") {
+    const isGradientCycle = block.listIconColorScheme === "gradient-cycle";
     return (
       <div className="shop-builder-column-block shop-builder-column-block--list">
         {block.title && <Typog as="h3" typography={block.typography}>{block.title}</Typog>}
-        <ul>
+        <ul className={isGradientCycle ? "is-icon-gradient-cycle" : undefined}>
           {(block.items ?? []).map((item, index) => (
             <li key={`${item}-${index}`}>
               {{
@@ -1976,6 +2047,14 @@ function ContentLayoutBlock({
               )}
             </Typog>
           )}
+          
+          <RenderChecklist
+            items={block.items}
+            iconName={block.listIcon}
+            colorScheme={block.listIconColorScheme}
+            typography={block.typography}
+          />
+
           {block.buttonLabel && block.buttonUrl && (
             <Typog
               as="a"
@@ -2087,6 +2166,14 @@ function ContentLayoutBlock({
       {block.eyebrow && <span>{block.eyebrow}</span>}
       {block.title && <Typog as="h3" typography={block.typography}>{block.title}</Typog>}
       {block.body && <Typog as="p" typography={block.typography}>{block.body}</Typog>}
+      
+      <RenderChecklist
+        items={block.items}
+        iconName={block.listIcon}
+        colorScheme={block.listIconColorScheme}
+        typography={block.typography}
+      />
+
       <div 
         className={`shop-builder-buttons shop-builder-buttons--${block.buttonsLayout ?? "inline"}`}
         style={{
@@ -2138,6 +2225,11 @@ function blockSurfaceStyle(
     block.elementBackground
   ) {
     legacy["--builder-element-bg"] = block.elementBackground;
+  }
+
+  if (block.borderRadius !== undefined) {
+    legacy["--builder-radius"] = `${block.borderRadius}px`;
+    legacy["--builder-card-radius"] = `${block.borderRadius}px`;
   }
 
   if (!Object.keys(visualCss).length && !Object.keys(legacy).length) {
