@@ -2802,6 +2802,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                           </button>
                                                         </div>
                                                         {isGridCardOpen && (
+                                                                                            <>
                                                         <div className="builder-nested-card-body">
                                                           <label className="builder-field">
                                                             <span>
@@ -2996,7 +2997,9 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                               />
                                                             </label>
 
-                                                          <details className="builder-collapse" style={{ marginTop: 8 }}>
+                                                          </div>
+                                                        </div>
+                                                          <details className="builder-collapse" style={{ order: 2, flex: "0 0 100%" }}>
                                                             <summary>
                                                               <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
                                                                 <strong>Checklist</strong>
@@ -3098,8 +3101,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                               <Plus size={15} /> Add item
                                                             </button>
                                                           </details>
-                                                          </div>
-                                                        </div>
+                                                                                            </>
                                                         )}
                                                       </div>
                                                       );
@@ -5095,6 +5097,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                         </button>
                                                       </div>
                                                       {isSlideOpen && (
+                                                                                          <>
                                                         <div className="builder-nested-card-body">
                                                           <label className="builder-field">
                                                             <span>
@@ -5365,7 +5368,8 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                             />
                                                           </label>
 
-                                                           <details className="builder-collapse" style={{ marginTop: 8 }}>
+                                                        </div>
+                                                           <details className="builder-collapse" style={{ order: 2, flex: "0 0 100%" }}>
                                                              <summary>
                                                                <InspectorGroupSummary
                                                                  title="Checklist"
@@ -5453,7 +5457,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                                <Plus size={15} /> Add item
                                                              </button>
                                                            </details>
-                                                        </div>
+                                                                                          </>
                                                       )}
                                                     </div>
                                                   );
@@ -6132,6 +6136,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                       </button>
                                                     </div>
                                                     {isBadgeOpen && (
+                                                                                        <>
                                                     <div className="builder-nested-card-body">
                                                       <label className="builder-field">
                                                         <span>Label</span>
@@ -6187,7 +6192,8 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                           }
                                                         />
                                                       </label>
-                                                       <details className="builder-collapse" style={{ marginTop: 8 }}>
+                                                    </div>
+                                                       <details className="builder-collapse" style={{ order: 2, flex: "0 0 100%" }}>
                                                          <summary>
                                                            <InspectorGroupSummary
                                                              title="Checklist"
@@ -6274,7 +6280,8 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                          >
                                                            <Plus size={15} /> Add item
                                                          </button>
-                                                       </details>                                                    </div>
+                                                       </details>
+                                                                                        </>
                                                     )}
                                                   </div>
                                                   );
@@ -7729,6 +7736,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                 </button>
                               </div>
                               {isBadgeOpen && (
+                                                                  <>
                               <div className="builder-nested-card-body">
                               <label className="builder-field">
                                 <span>Badge Label</span>
@@ -7763,7 +7771,8 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                 }
                               />
                             </label>
-                              <details className="builder-collapse" style={{ marginTop: 8 }}>
+                              </div>
+                              <details className="builder-collapse" style={{ order: 2, flex: "0 0 100%" }}>
                                 <summary>
                                   <InspectorGroupSummary
                                     title="Checklist"
@@ -7850,7 +7859,8 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                 >
                                   <Plus size={15} /> Add item
                                 </button>
-                              </details>                              </div>
+                              </details>
+                                                                  </>
                               )}
                             </div>
                             );
@@ -8338,6 +8348,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                 </div>
 
                                 {isOpen && (
+                                                                    <>
                                   <div className="builder-nested-card-body">
                                     <label className="builder-field">
                                       <span>Slide Badge</span>
@@ -8471,7 +8482,8 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                       />
                                     </label>
 
-                                    <details className="builder-collapse" style={{ marginTop: 8 }}>
+                                  </div>
+                                    <details className="builder-collapse" style={{ order: 2, flex: "0 0 100%" }}>
                                       <summary>
                                         <InspectorGroupSummary
                                           title="Checklist"
@@ -8558,7 +8570,8 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                       >
                                         <Plus size={15} /> Add item
                                       </button>
-                                    </details>                                  </div>
+                                    </details>
+                                                                    </>
                                 )}
                               </div>
                             );
