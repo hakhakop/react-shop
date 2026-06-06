@@ -29,7 +29,7 @@ export const sectionLabels: Record<SectionKind, string> = {
   promo: "Promo Strip",
   slider: "Swiper / Carousel",
   badgeGrid: "Badge Grid",
-  contentLayout: "Content Layout",
+  contentLayout: "Section Layout",
   embed: "Embed / Code",
   scrollPinnedDemo: "Pinned Story",
 };

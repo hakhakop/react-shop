@@ -5,7 +5,6 @@
     "page": "home",
     "targetType": "page",
     "design": {
-      "preset": "princity",
       "colorScheme": "auto",
       "pageBackground": "#f7f7f4",
       "textColor": "#111111",
@@ -40,7 +39,7 @@
         "contentMode": "boxed",
         "colorScheme": "inherit",
         "topSpacing": "large",
-        "bottomSpacing": "small",
+        "bottomSpacing": "large",
         "topMargin": "inherit",
         "bottomMargin": "inherit",
         "layout": "whole",
@@ -124,10 +123,10 @@
         "kind": "contentLayout",
         "title": "",
         "background": "#ffffff",
-        "backgroundMode": "full",
+        "backgroundMode": "boxed",
         "contentMode": "boxed",
         "colorScheme": "inherit",
-        "topSpacing": "large",
+        "topSpacing": "inherit",
         "bottomSpacing": "inherit",
         "topMargin": "inherit",
         "bottomMargin": "inherit",
@@ -153,7 +152,7 @@
                 "gridImageFrame": "none",
                 "gridShowImage": false,
                 "gridShowButton": true,
-                "panelStyle": "flat-dark",
+                "panelStyle": "dark",
                 "gridItems": [
                   {
                     "id": "package-start",
@@ -174,7 +173,7 @@
                         "lineHeight": "1.6"
                       }
                     },
-                    "listIcon": "check",
+                    "listIcon": "circleCheck",
                     "items": [
                       " 1–5 էջ",
                       "Կոնտակտային ձև",
@@ -182,15 +181,14 @@
                       " Կայքի տեղակայում",
                       "Հիմնական աջակցություն"
                     ],
-                    "listIconColorScheme": "gradient-cycle",
-                    "listIconSize": 16
+                    "listIconColorScheme": "gradient-cycle"
                   },
                   {
                     "id": "package-commerce",
                     "eyebrow": "Բիզնես",
                     "title": "🚀 Business",
                     "meta": "Բիզնես",
-                    "text": "<p>Բիզնեսի համար պատրաստ լուծում</p>",
+                    "text": "<h3></h3><p>Բիզնեսի համար պատրաստ լուծում</p><p>✔ Ամեն ինչ Start-ից<br>✔ Ավելի շատ էջեր<br>✔ Ծառայությունների ներկայացում<br>✔ Հայտերի ընդունում<br>✔ Ընդլայնված կառուցվածք</p>",
                     "buttonLabel": "Shop package",
                     "buttonUrl": "#contact",
                     "typography": {
@@ -203,24 +201,14 @@
                         "fontSize": "16px",
                         "lineHeight": "1.6"
                       }
-                    },
-                    "listIconColorScheme": "gradient-cycle",
-                    "items": [
-                      "Ամեն ինչ Start-ից",
-                      " Ավելի շատ էջեր",
-                      " Ծառայությունների ներկայացում",
-                      "Հայտերի ընդունում",
-                      "Ընդլայնված կառուցվածք"
-                    ],
-                    "listIconSize": 16,
-                    "listIcon": "check"
+                    }
                   },
                   {
                     "id": "package-growth",
                     "eyebrow": "առևտուր",
                     "title": "🛍 Store",
-                    "meta": "կեմերցիոն",
-                    "text": "<p>Խանութ Առցանց վաճառքի համար</p><p></p>",
+                    "meta": "Խանութ Առցանց վաճառքի համար",
+                    "text": "<h3></h3><p></p><p>✔ Ամեն ինչ Business-ից<br>✔ Ապրանքների ցուցադրում<br>✔ Կատեգորիաներ<br>✔ Զամբյուղ<br>✔ Պատվերների ընդունում</p>",
                     "buttonLabel": "Խոսենք",
                     "buttonUrl": "#contact",
                     "typography": {
@@ -233,15 +221,7 @@
                         "fontSize": "16px",
                         "lineHeight": "1.6"
                       }
-                    },
-                    "items": [
-                      "Ամեն ինչ Business-ից",
-                      "Ապրանքների ցուցադրում",
-                      "Կատեգորիաներ",
-                      "Զամբյուղ",
-                      "Պատվերների ընդունում"
-                    ],
-                    "listIconColorScheme": "gradient-cycle"
+                    }
                   },
                   {
                     "id": "grid-item-mptcn4jh",
@@ -315,7 +295,7 @@
         "backgroundMode": "full",
         "contentMode": "boxed",
         "colorScheme": "inherit",
-        "topSpacing": "small",
+        "topSpacing": "inherit",
         "bottomSpacing": "inherit",
         "topMargin": "inherit",
         "bottomMargin": "inherit",
@@ -377,9 +357,7 @@
                 "panelStyle": "antigravity",
                 "elementBackgroundMode": "transparent",
                 "typewriterSpeed": 250,
-                "typewriterLoop": true,
-                "listIconColorScheme": "gradient-cycle",
-                "listIcon": "check"
+                "typewriterLoop": true
               }
             ]
           }
@@ -405,37 +383,12 @@
         "layoutColumns": 1,
         "layoutItems": [
           {
-            "id": "layout-row-mq28kic8-column-1",
-            "rowId": "layout-row-mq28kic8",
-            "rowLayout": "whole",
-            "blocks": [
-              {
-                "id": "heading-block-mq28kpz1-k9hd3",
-                "kind": "heading",
-                "headingText": "ստանում էք ՝",
-                "headingLevel": "h2",
-                "headingAlign": "left",
-                "typography": {
-                  "variant": "body",
-                  "fontFamily": "inherit",
-                  "fontSize": "16px",
-                  "fontWeight": "400",
-                  "lineHeight": "1.4",
-                  "letterSpacing": "0px",
-                  "color": "inherit",
-                  "textAlign": "left"
-                },
-                "textGradientPreset": "indigo-purple-cyan"
-              }
-            ]
-          },
-          {
             "id": "layout-item-mptess1t-1",
             "blocks": [
               {
                 "id": "heading-block-mptr9rf9-s4u7w",
                 "kind": "heading",
-                "headingText": "ստանում էք ՝",
+                "headingText": "Ինչ եք ստանում (Dashboard Preview)",
                 "headingLevel": "h2",
                 "headingAlign": "left",
                 "typography": {
@@ -492,8 +445,7 @@
                     "title": "🛠 Աջակցություն",
                     "body": "<p>Օգնություն և ուղեկցում անհրաժեշտության դեպքում։</p>"
                   }
-                ],
-                "panelStyle": "dark"
+                ]
               },
               {
                 "id": "text-block-mpttc6wx-yzd73",
@@ -529,7 +481,7 @@
             ]
           }
         ],
-        "layoutRows": 2,
+        "layoutRows": 1,
         "animation": {
           "preset": "none"
         }
@@ -859,7 +811,7 @@
                   "Multiple vendors",
                   "One solution"
                 ],
-                "listIcon": "circleCheck"
+                "listIcon": "heart"
               }
             ]
           },
@@ -956,7 +908,7 @@
         ]
       }
     ],
-    "updatedAt": "2026-06-06T12:23:04.786Z"
+    "updatedAt": "2026-06-04T22:26:06.225Z"
   },
   "shop": {
     "version": 1,

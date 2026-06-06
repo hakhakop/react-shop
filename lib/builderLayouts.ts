@@ -104,6 +104,10 @@ export type BuilderLayoutBlock = {
     label?: string;
     title?: string;
     body?: string;
+    items?: string[];
+    listIcon?: string;
+    listIconColorScheme?: string;
+    listIconSize?: number;
   }[];
   slides?: {
     id?: string;
@@ -116,6 +120,10 @@ export type BuilderLayoutBlock = {
     imagePadding?: string;
     buttonLabel?: string;
     buttonUrl?: string;
+    items?: string[];
+    listIcon?: string;
+    listIconColorScheme?: string;
+    listIconSize?: number;
   }[];
   carouselSettings?: {
     variant?: string;
@@ -143,6 +151,7 @@ export type BuilderLayoutBlock = {
   items?: string[];
   listIcon?: string;
   listIconColorScheme?: "default" | "gradient-cycle";
+  listIconSize?: number;
   headingText?: string;
   headingLevel?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
   headingAlign?: "left" | "center" | "right";
@@ -181,6 +190,7 @@ export type BuilderLayoutBlock = {
     items?: string[];
     listIcon?: "check" | "circleCheck" | "arrowRight" | "star" | "heart" | "sparkles" | "shield";
     listIconColorScheme?: "default" | "gradient-cycle";
+    listIconSize?: number;
   }[];
   galleryShowThumbnails?: boolean;
   galleryThumbnailPosition?: string;
@@ -214,6 +224,10 @@ export type BuilderSection = {
   title: string;
   eyebrow?: string;
   body?: string;
+  items?: string[];
+  listIcon?: string;
+  listIconColorScheme?: string;
+  listIconSize?: number;
   background: string;
   backgroundMode?: string;
   backgroundEffect?: string;
@@ -275,12 +289,38 @@ export type BuilderSection = {
     buttonLabel?: string;
     buttonUrl?: string;
     blocks?: BuilderLayoutBlock[];
+    rowBackground?: string;
+    rowBackgroundMode?: string;
+    rowBackgroundEffect?: string;
+    rowAntigravitySpeed?: number;
+    rowAntigravityParticleCount?: number;
+    rowAntigravityColor?: string;
+    rowAntigravityGridDensity?: string;
+    rowAntigravityInteractive?: boolean;
+    rowAntigravityShowGrid?: boolean;
+    rowAntigravityShowParticles?: boolean;
+    rowAntigravityGridMoveSpeed?: number;
+    rowAntigravityGlowIntensity?: number;
+    rowAntigravityVisualMode?: string;
+    rowAntigravityInteractionScope?: string;
+    rowColorScheme?: string;
+    rowTopSpacing?: string;
+    rowBottomSpacing?: string;
+    rowTopMargin?: string;
+    rowBottomMargin?: string;
+    rowBorderRadius?: number;
+    rowVisualStyle?: Record<string, unknown>;
+    rowAnimation?: Record<string, unknown>;
   }[];
   badges?: {
     id?: string;
     label?: string;
     title?: string;
     body?: string;
+    items?: string[];
+    listIcon?: string;
+    listIconColorScheme?: string;
+    listIconSize?: number;
   }[];
   slides?: {
     id?: string;
@@ -294,6 +334,10 @@ export type BuilderSection = {
     buttonLabel?: string;
     buttonUrl?: string;
     typography?: Record<string, unknown>;
+    items?: string[];
+    listIcon?: string;
+    listIconColorScheme?: string;
+    listIconSize?: number;
   }[];
   carouselSettings?: {
     variant?: string;

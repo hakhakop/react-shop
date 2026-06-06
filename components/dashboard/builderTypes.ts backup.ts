@@ -83,8 +83,7 @@ export type SectionInspectorTab =
   | "section"
   | "style"
   | "typography"
-  | "advanced"
-  | "row";
+  | "advanced";
 export type ElementInspectorTab =
   | "content"
   | "settings"
@@ -289,7 +288,6 @@ export type BuilderLayoutBlock = {
   items?: string[];
   listIcon?: "check" | "circleCheck" | "arrowRight" | "star" | "heart" | "sparkles" | "shield";
   listIconColorScheme?: "default" | "gradient-cycle";
-  listIconSize?: number;
   headingText?: string;
   headingLevel?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
   headingAlign?: "left" | "center" | "right";
@@ -330,7 +328,6 @@ export type BuilderLayoutBlock = {
     items?: string[];
     listIcon?: "check" | "circleCheck" | "arrowRight" | "star" | "heart" | "sparkles" | "shield";
     listIconColorScheme?: "default" | "gradient-cycle";
-    listIconSize?: number;
   }[];
   galleryShowThumbnails?: boolean;
   galleryThumbnailPosition?: "bottom" | "left";
@@ -376,8 +373,6 @@ export type BuilderSection = {
   body?: string;
   items?: string[];
   listIcon?: "check" | "circleCheck" | "arrowRight" | "star" | "heart" | "sparkles" | "shield";
-  listIconColorScheme?: "default" | "gradient-cycle";
-  listIconSize?: number;
   background: string;
   backgroundMode?: SectionBackgroundMode;
   backgroundEffect?: string;
@@ -449,38 +444,12 @@ export type BuilderSection = {
     buttonLabel?: string;
     buttonUrl?: string;
     blocks?: BuilderLayoutBlock[];
-    rowBackground?: string;
-    rowBackgroundMode?: SectionBackgroundMode;
-    rowBackgroundEffect?: string;
-    rowAntigravitySpeed?: number;
-    rowAntigravityParticleCount?: number;
-    rowAntigravityColor?: string;
-    rowAntigravityGridDensity?: "compact" | "normal" | "sparse";
-    rowAntigravityInteractive?: boolean;
-    rowAntigravityShowGrid?: boolean;
-    rowAntigravityShowParticles?: boolean;
-    rowAntigravityGridMoveSpeed?: number;
-    rowAntigravityGlowIntensity?: number;
-    rowAntigravityVisualMode?: "full" | "transparent-grid" | "no-grid" | "lines-only";
-    rowAntigravityInteractionScope?: "section" | "global" | "none";
-    rowColorScheme?: SectionColorScheme;
-    rowTopSpacing?: SectionSpacing;
-    rowBottomSpacing?: SectionSpacing;
-    rowTopMargin?: SectionSpacing;
-    rowBottomMargin?: SectionSpacing;
-    rowBorderRadius?: number;
-    rowVisualStyle?: BuilderVisualStyle;
-    rowAnimation?: BuilderAnimationSettings;
   }[];
   badges?: {
     id?: string;
     label?: string;
     title?: string;
     body?: string;
-    items?: string[];
-    listIcon?: "check" | "circleCheck" | "arrowRight" | "star" | "heart" | "sparkles" | "shield";
-    listIconColorScheme?: "default" | "gradient-cycle";
-    listIconSize?: number;
   }[];
   slides?: {
     id?: string;
@@ -494,10 +463,6 @@ export type BuilderSection = {
     buttonLabel?: string;
     buttonUrl?: string;
     typography?: TypographySettings;
-    items?: string[];
-    listIcon?: "check" | "circleCheck" | "arrowRight" | "star" | "heart" | "sparkles" | "shield";
-    listIconColorScheme?: "default" | "gradient-cycle";
-    listIconSize?: number;
   }[];
   carouselSettings?: {
     variant?: string;

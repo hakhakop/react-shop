@@ -801,14 +801,6 @@ function BadgeGridSection({ section }: { section: BuilderSection }) {
             {badge.label && <span>{badge.label}</span>}
             {badge.title && <h3>{badge.title}</h3>}
             <BodyText>{badge.body}</BodyText>
-            {badge.items && badge.items.length > 0 && (
-              <RenderChecklist
-                items={badge.items}
-                iconName={badge.listIcon || "check"}
-                colorScheme={badge.listIconColorScheme || "default"}
-                iconSize={badge.listIconSize}
-              />
-            )}
           </article>
         ))}
       </div>
@@ -940,13 +932,11 @@ function RenderChecklist({
   iconName = "check",
   colorScheme = "default",
   typography,
-  iconSize = 15,
 }: {
   items?: string[];
   iconName?: string;
   colorScheme?: string;
   typography?: any;
-  iconSize?: number;
 }) {
   if (!items || items.length === 0) return null;
   const isGradientCycle = colorScheme === "gradient-cycle";
@@ -972,14 +962,14 @@ function RenderChecklist({
           }}
         >
           {{
-            check: <Check size={iconSize} />,
-            circleCheck: <CircleCheck size={iconSize} />,
-            arrowRight: <ArrowRight size={iconSize} />,
-            star: <Star size={iconSize} />,
-            heart: <Heart size={iconSize} />,
-            sparkles: <Sparkles size={iconSize} />,
-            shield: <ShieldCheck size={iconSize} />,
-          }[iconName] ?? <Check size={iconSize} />}
+            check: <Check size={15} />,
+            circleCheck: <CircleCheck size={15} />,
+            arrowRight: <ArrowRight size={15} />,
+            star: <Star size={15} />,
+            heart: <Heart size={15} />,
+            sparkles: <Sparkles size={15} />,
+            shield: <ShieldCheck size={15} />,
+          }[iconName] ?? <Check size={15} />}
           <Typog as="span" typography={typography}>{item}</Typog>
         </li>
       ))}
@@ -1006,7 +996,6 @@ function GridCards({
     items?: string[];
     listIcon?: string;
     listIconColorScheme?: string;
-    listIconSize?: number;
   }>;
 }) {
   const limit = Math.max(1, (block.columns ?? 3) * (block.gridRows ?? 1));
@@ -1045,7 +1034,6 @@ function GridCards({
               iconName={item.listIcon}
               colorScheme={item.listIconColorScheme}
               typography={item.typography ?? block.typography}
-              iconSize={item.listIconSize}
             />
 
             {block.gridShowButton !== false &&
@@ -1601,15 +1589,6 @@ function ContentLayoutBlock({
               {badge.label && <span>{badge.label}</span>}
               {badge.title && <Typog as="strong" typography={block.typography}>{badge.title}</Typog>}
               {badge.body && <Typog as="p" typography={block.typography}>{badge.body}</Typog>}
-              {badge.items && badge.items.length > 0 && (
-                <RenderChecklist
-                  items={badge.items}
-                  iconName={badge.listIcon || "check"}
-                  colorScheme={badge.listIconColorScheme || "default"}
-                  typography={block.typography}
-                  iconSize={badge.listIconSize}
-                />
-              )}
             </article>
           ))}
         </div>
@@ -1661,14 +1640,14 @@ function ContentLayoutBlock({
           {(block.items ?? []).map((item, index) => (
             <li key={`${item}-${index}`}>
               {{
-                check: <Check size={block.listIconSize ?? 16} />,
-                circleCheck: <CircleCheck size={block.listIconSize ?? 16} />,
-                arrowRight: <ArrowRight size={block.listIconSize ?? 16} />,
-                star: <Star size={block.listIconSize ?? 16} />,
-                heart: <Heart size={block.listIconSize ?? 16} />,
-                sparkles: <Sparkles size={block.listIconSize ?? 16} />,
-                shield: <ShieldCheck size={block.listIconSize ?? 16} />,
-              }[block.listIcon ?? "check"] ?? <Check size={block.listIconSize ?? 16} />}
+                check: <Check size={16} />,
+                circleCheck: <CircleCheck size={16} />,
+                arrowRight: <ArrowRight size={16} />,
+                star: <Star size={16} />,
+                heart: <Heart size={16} />,
+                sparkles: <Sparkles size={16} />,
+                shield: <ShieldCheck size={16} />,
+              }[block.listIcon ?? "check"] ?? <Check size={16} />}
               <span>{item}</span>
             </li>
           ))}
@@ -2074,7 +2053,6 @@ function ContentLayoutBlock({
             iconName={block.listIcon}
             colorScheme={block.listIconColorScheme}
             typography={block.typography}
-            iconSize={block.listIconSize}
           />
 
           {block.buttonLabel && block.buttonUrl && (
@@ -2194,7 +2172,6 @@ function ContentLayoutBlock({
         iconName={block.listIcon}
         colorScheme={block.listIconColorScheme}
         typography={block.typography}
-        iconSize={block.listIconSize}
       />
 
       <div 
@@ -2335,35 +2312,6 @@ function inferTypographyArea(
   return "body";
 }
 
-function rowStyle(rowItem: any): CSSProperties {
-  const visual = rowItem?.rowVisualStyle as BuilderVisualStyle | undefined;
-  const visualCss = visualStyleToCss(visual);
-  const styleObj: any = {};
-
-  if (rowItem?.rowBackground) {
-    styleObj.background = rowItem.rowBackground;
-  }
-  if (rowItem?.rowTopSpacing) {
-    styleObj["--builder-section-padding-top"] = getSpacingValue(rowItem.rowTopSpacing);
-  }
-  if (rowItem?.rowBottomSpacing) {
-    styleObj["--builder-section-padding-bottom"] = getSpacingValue(rowItem.rowBottomSpacing);
-  }
-  if (rowItem?.rowTopMargin) {
-    styleObj["--builder-section-margin-top"] = getSpacingValue(rowItem.rowTopMargin);
-  }
-  if (rowItem?.rowBottomMargin) {
-    styleObj["--builder-section-margin-bottom"] = getSpacingValue(rowItem.rowBottomMargin);
-  }
-  if (rowItem?.rowBorderRadius !== undefined) {
-    styleObj["--builder-radius"] = `${rowItem.rowBorderRadius}px`;
-    styleObj["--builder-card-radius"] = `${rowItem.rowBorderRadius}px`;
-    styleObj.borderRadius = `${rowItem.rowBorderRadius}px`;
-  }
-
-  return { ...styleObj, ...visualCss };
-}
-
 function ContentLayoutSection({
   section,
   product,
@@ -2438,140 +2386,81 @@ function ContentLayoutSection({
           <BodyText className="shop-builder-body">{section.body}</BodyText>
         </div>
       )}
-      <div className="shop-builder-content-layout-rows-wrapper" style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
-        {layoutRows.map((row) => {
-          const rowItem = row.items[0];
-          const isRowAntigravity = rowItem?.rowBackgroundEffect === "antigravity";
-          const isFullRowTheme = isRowAntigravity && (rowItem.rowAntigravityVisualMode === undefined || rowItem.rowAntigravityVisualMode === "full");
-          const rowAnimationAttrs = animationDataAttributes(rowItem?.rowAnimation);
+      <div
+        className="shop-builder-content-layout-grid"
+        style={
+          {
+            gridTemplateColumns: "repeat(12, minmax(0, 1fr))",
+            "--builder-layout-columns": 12,
+          } as CSSProperties
+        }
+      >
+        {items.map((item, index) => {
+          const columnKey = item.id ?? `layout-item-${index}`;
+          const rowMeta = rowMetaByColumnKey.get(columnKey);
+          const span = rowMeta?.span ?? 12;
 
+          const blocks = getContentLayoutBlocks(item);
+          const cardStyle =
+            blocks.find(
+              (block) =>
+                block.panelStyle && block.panelStyle !== "default",
+            )?.panelStyle ??
+            blocks.find((block) => block.cardPreset)?.cardPreset ??
+            blocks[0]?.panelStyle ??
+            blocks[0]?.cardPreset ??
+            "default";
+
+          const hasScrollPinned = blocks.some((b) => b.kind === "scrollPinnedDemo");
           return (
-            <div
-              key={row.id}
-              className={`shop-builder-content-row ${
-                isFullRowTheme
-                  ? "shop-builder-section--effect-antigravity"
-                  : isRowAntigravity
-                    ? "relative overflow-hidden"
-                    : ""
-              }`}
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(12, minmax(0, 1fr))",
-                gap: "28px",
-                paddingTop: "var(--builder-section-padding-top, 0px)",
-                paddingBottom: "var(--builder-section-padding-bottom, 0px)",
-                marginTop: "var(--builder-section-margin-top, 0px)",
-                marginBottom: "var(--builder-section-margin-bottom, 0px)",
-                ...rowStyle(rowItem),
-                ...rowAnimationAttrs.style,
-              }}
-              {...rowAnimationAttrs.data}
+            <article
+              key={columnKey}
+              className={hasScrollPinned ? "w-full col-span-12" : `shop-builder-content-layout-card shop-card-preset--${cardStyle}`}
+              style={hasScrollPinned ? { gridColumn: "span 12" } : { gridColumn: `span ${span}` }}
             >
-              {isRowAntigravity && (
-                <>
-                  <AntigravityCanvas
-                    speed={rowItem.rowAntigravitySpeed}
-                    particleCount={rowItem.rowAntigravityParticleCount}
-                    color={rowItem.rowAntigravityColor}
-                    gridDensity={rowItem.rowAntigravityGridDensity as any}
-                    interactive={rowItem.rowAntigravityInteractive}
-                    showGrid={rowItem.rowAntigravityShowGrid}
-                    showParticles={rowItem.rowAntigravityShowParticles}
-                    gridMoveSpeed={rowItem.rowAntigravityGridMoveSpeed}
-                    glowIntensity={rowItem.rowAntigravityGlowIntensity}
-                    interactionScope={rowItem.rowAntigravityInteractionScope as any}
-                    visualMode={rowItem.rowAntigravityVisualMode as any}
-                  />
-                  {rowItem.rowAntigravityShowGrid !== false && (
-                    <div
-                      className="antigravity-grid-overlay"
-                      aria-hidden="true"
-                      style={
-                        rowItem.rowAntigravityGridMoveSpeed !== undefined || rowItem.rowAntigravityColor
-                          ? {
-                              animationDuration: rowItem.rowAntigravityGridMoveSpeed === 0
-                                ? "0s"
-                                : `${25 / (rowItem.rowAntigravityGridMoveSpeed ?? 1.0)}s`,
-                              backgroundImage: rowItem.rowAntigravityColor
-                                ? `linear-gradient(${rowItem.rowAntigravityColor}08 1px, transparent 1px), linear-gradient(90deg, ${rowItem.rowAntigravityColor}08 1px, transparent 1px)`
-                                : undefined,
-                            }
-                          : undefined
-                      }
+              {blocks.map((block, blockIndex) => {
+                if (block.kind === "scrollPinnedDemo") {
+                  return (
+                    <ContentLayoutBlock
+                      key={block.id ?? blockIndex}
+                      block={block}
+                      product={product}
+                      breadcrumbItems={breadcrumbItems}
+                      page={page}
+                      pageContent={pageContent}
+                      categoryTree={categoryTree}
+                      activeCategorySlug={activeCategorySlug}
                     />
-                  )}
-                </>
-              )}
-              {row.items.map((item, index) => {
-                const columnKey = item.id ?? `layout-item-${row.startIndex + index}`;
-                const rowMeta = rowMetaByColumnKey.get(columnKey);
-                const span = rowMeta?.span ?? 12;
+                  );
+                }
 
-                const blocks = getContentLayoutBlocks(item);
-                const cardStyle =
-                  blocks.find(
-                    (block) =>
-                      block.panelStyle && block.panelStyle !== "default",
-                  )?.panelStyle ??
-                  blocks.find((block) => block.cardPreset)?.cardPreset ??
-                  blocks[0]?.panelStyle ??
-                  blocks[0]?.cardPreset ??
-                  "default";
+                const blockAnimationAttrs = animationDataAttributes(
+                  block.animation,
+                );
 
-                const hasScrollPinned = blocks.some((b) => b.kind === "scrollPinnedDemo");
                 return (
-                  <article
-                    key={columnKey}
-                    className={hasScrollPinned ? "w-full col-span-12" : `shop-builder-content-layout-card shop-card-preset--${cardStyle}`}
-                    style={hasScrollPinned ? { gridColumn: "span 12" } : { gridColumn: `span ${span}` }}
+                  <div
+                    key={block.id ?? blockIndex}
+                    className={blockShellClassName(block)}
+                    style={{
+                      ...blockSurfaceStyle(block),
+                      ...blockAnimationAttrs.style,
+                    }}
+                    {...blockAnimationAttrs.data}
                   >
-                    {blocks.map((block, blockIndex) => {
-                      if (block.kind === "scrollPinnedDemo") {
-                        return (
-                          <ContentLayoutBlock
-                            key={block.id ?? blockIndex}
-                            block={block}
-                            product={product}
-                            breadcrumbItems={breadcrumbItems}
-                            page={page}
-                            pageContent={pageContent}
-                            categoryTree={categoryTree}
-                            activeCategorySlug={activeCategorySlug}
-                          />
-                        );
-                      }
-
-                      const blockAnimationAttrs = animationDataAttributes(
-                        block.animation,
-                      );
-
-                      return (
-                        <div
-                          key={block.id ?? blockIndex}
-                          className={blockShellClassName(block)}
-                          style={{
-                            ...blockSurfaceStyle(block),
-                            ...blockAnimationAttrs.style,
-                          }}
-                          {...blockAnimationAttrs.data}
-                        >
-                          <ContentLayoutBlock
-                            block={block}
-                            product={product}
-                            breadcrumbItems={breadcrumbItems}
-                            page={page}
-                            pageContent={pageContent}
-                            categoryTree={categoryTree}
-                            activeCategorySlug={activeCategorySlug}
-                          />
-                        </div>
-                      );
-                    })}
-                  </article>
+                    <ContentLayoutBlock
+                      block={block}
+                      product={product}
+                      breadcrumbItems={breadcrumbItems}
+                      page={page}
+                      pageContent={pageContent}
+                      categoryTree={categoryTree}
+                      activeCategorySlug={activeCategorySlug}
+                    />
+                  </div>
                 );
               })}
-            </div>
+            </article>
           );
         })}
       </div>

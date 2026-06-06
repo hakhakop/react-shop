@@ -1,5 +1,3 @@
-import type { BuilderSection } from "@/lib/builderLayouts";
-
 export type BuilderRowLayoutPreset = {
   key: string;
   label: string;
@@ -178,7 +176,16 @@ export function getBuilderRowLayoutSummary(
   return "Choose a row layout";
 }
 
-export type LayoutItem = NonNullable<BuilderSection["layoutItems"]>[number];
+export type LayoutItem = {
+  id?: string;
+  rowId?: string;
+  rowLayout?: string;
+  // Row grouping only reads id/rowId/rowLayout, but callers keep richer row data.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  blocks?: any[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [key: string]: any;
+};
 
 export type BuilderLayoutRow = {
   id: string;
@@ -188,7 +195,7 @@ export type BuilderLayoutRow = {
 };
 
 export function getBuilderLayoutRows(
-  section: BuilderSection,
+  section: { layout?: string; layoutColumns?: number },
   items: LayoutItem[],
 ): BuilderLayoutRow[] {
   if (items.length === 0) return [];

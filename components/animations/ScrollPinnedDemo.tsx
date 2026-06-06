@@ -99,9 +99,13 @@ export default function ScrollPinnedDemo({ section, block, isPreview = false }: 
 
   const listIconName = activeData?.listIcon ?? "circleCheck";
 
-  const renderIcon = (colorClass: string) => {
-    const iconProps = { className: `w-5 h-5 ${colorClass} flex-shrink-0` };
-    switch (listIconName) {
+  const renderIcon = (iconName: string, colorClass: string, size?: number) => {
+    const iconProps = { 
+      className: `${colorClass} flex-shrink-0 ${!size ? "w-5 h-5" : ""}`,
+      style: size ? { width: `${size}px`, height: `${size}px` } : undefined,
+      size: size ?? 20
+    };
+    switch (iconName) {
       case "check":
         return <Check {...iconProps} />;
       case "arrowRight":
@@ -305,7 +309,7 @@ export default function ScrollPinnedDemo({ section, block, isPreview = false }: 
                     ][index % 3];
                     return (
                       <li key={`${item}-${index}`} className="scroll-pinned-checklist-item">
-                        {renderIcon(colorClass)}
+                        {renderIcon(listIconName, colorClass, activeData?.listIconSize)}
                         <span>{item}</span>
                       </li>
                     );
@@ -422,6 +426,27 @@ export default function ScrollPinnedDemo({ section, block, isPreview = false }: 
                         {slide.text}
                       </p>
                     )
+                  )}
+
+                  {slide.items && slide.items.length > 0 && (
+                    <ul className="scroll-pinned-checklist" style={{ marginTop: '10px' }}>
+                      {slide.items.map((item: string, itemIdx: number) => {
+                        const isGradient = slide.listIconColorScheme === "gradient-cycle";
+                        const colorClass = isGradient
+                          ? [
+                              "text-sky-400",
+                              "text-indigo-400",
+                              "text-purple-400",
+                            ][itemIdx % 3]
+                          : "text-current opacity-85";
+                        return (
+                          <li key={`${item}-${itemIdx}`} className="scroll-pinned-checklist-item">
+                            {renderIcon(slide.listIcon || "check", colorClass, slide.listIconSize)}
+                            <span>{item}</span>
+                          </li>
+                        );
+                      })}
+                    </ul>
                   )}
 
                   {slide.imageUrl ? (
