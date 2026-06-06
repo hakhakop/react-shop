@@ -2995,6 +2995,109 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                                 }
                                                               />
                                                             </label>
+
+                                                          <details className="builder-collapse" style={{ marginTop: 8 }}>
+                                                            <summary>
+                                                              <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+                                                                <strong>Checklist</strong>
+                                                                <small>{(gridItem.items ?? []).length} items</small>
+                                                              </div>
+                                                            </summary>
+                                                            <label className="builder-field">
+                                                              <span>Icon type</span>
+                                                              <select
+                                                                value={gridItem.listIcon ?? "check"}
+                                                                onChange={(event) =>
+                                                                  updateSelectedLayoutBlockGridItem(
+                                                                    index,
+                                                                    blockIndex,
+                                                                    gridItemIndex,
+                                                                    { listIcon: event.target.value as any }
+                                                                  )
+                                                                }
+                                                              >
+                                                                <option value="check">Check</option>
+                                                                <option value="circleCheck">Circle Check</option>
+                                                                <option value="arrowRight">Arrow Right</option>
+                                                                <option value="star">Star</option>
+                                                                <option value="heart">Heart</option>
+                                                                <option value="sparkles">Sparkles</option>
+                                                                <option value="shield">Shield</option>
+                                                              </select>
+                                                            </label>
+                                                            <label className="builder-field">
+                                                              <span>Icon Color Scheme</span>
+                                                              <select
+                                                                value={gridItem.listIconColorScheme ?? "default"}
+                                                                onChange={(event) =>
+                                                                  updateSelectedLayoutBlockGridItem(
+                                                                    index,
+                                                                    blockIndex,
+                                                                    gridItemIndex,
+                                                                    { listIconColorScheme: event.target.value as any }
+                                                                  )
+                                                                }
+                                                              >
+                                                                <option value="default">Default (theme color)</option>
+                                                                <option value="gradient-cycle">Gradient Cycle (sky → indigo → purple)</option>
+                                                              </select>
+                                                            </label>
+                                                            <label className="builder-field">
+                                                              <span>Icon Size (px)</span>
+                                                              <input
+                                                                type="number"
+                                                                min={8}
+                                                                max={64}
+                                                                value={gridItem.listIconSize ?? 16}
+                                                                onChange={(event) =>
+                                                                  updateSelectedLayoutBlockGridItem(
+                                                                    index,
+                                                                    blockIndex,
+                                                                    gridItemIndex,
+                                                                    { listIconSize: Number(event.target.value) }
+                                                                  )
+                                                                }
+                                                              />
+                                                            </label>
+                                                            <div className="builder-section-heading">
+                                                              <span>Checklist Items ({(gridItem.items ?? []).length})</span>
+                                                            </div>
+                                                            {(gridItem.items ?? []).map((item, itemIdx) => (
+                                                              <label key={itemIdx} className="builder-field">
+                                                                <span>Item {itemIdx + 1}</span>
+                                                                <div style={{ display: "flex", gap: 4 }}>
+                                                                  <input
+                                                                    value={item}
+                                                                    onChange={(event) => {
+                                                                      const items = [...(gridItem.items ?? [])];
+                                                                      items[itemIdx] = event.target.value;
+                                                                      updateSelectedLayoutBlockGridItem(index, blockIndex, gridItemIndex, { items });
+                                                                    }}
+                                                                  />
+                                                                  <button
+                                                                    type="button"
+                                                                    className="builder-inline-delete"
+                                                                    onClick={() => {
+                                                                      const items = (gridItem.items ?? []).filter((_, i) => i !== itemIdx);
+                                                                      updateSelectedLayoutBlockGridItem(index, blockIndex, gridItemIndex, { items });
+                                                                    }}
+                                                                  >
+                                                                    <Trash2 size={14} />
+                                                                  </button>
+                                                                </div>
+                                                              </label>
+                                                            ))}
+                                                            <button
+                                                              type="button"
+                                                              className="builder-inline-add"
+                                                              onClick={() => {
+                                                                const items = [...(gridItem.items ?? []), `Item ${(gridItem.items ?? []).length + 1}`];
+                                                                updateSelectedLayoutBlockGridItem(index, blockIndex, gridItemIndex, { items });
+                                                              }}
+                                                            >
+                                                              <Plus size={15} /> Add item
+                                                            </button>
+                                                          </details>
                                                           </div>
                                                         </div>
                                                         )}
@@ -4330,6 +4433,108 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                   </label>
                                                 </details>
                                               )}
+                                              {block.kind === "scrollPinnedDemo" && (
+                                                <details className="builder-collapse">
+                                                  <summary>
+                                                    <InspectorGroupSummary
+                                                      title="Checklist"
+                                                      description="Add checklist items to this storytelling block."
+                                                      meta={`${(block.items ?? []).length} item${(block.items ?? []).length !== 1 ? "s" : ""}`}
+                                                    />
+                                                  </summary>
+                                                  <label className="builder-field">
+                                                    <span>Icon type</span>
+                                                    <select
+                                                      value={block.listIcon ?? "check"}
+                                                      onChange={(event) =>
+                                                        updateSelectedLayoutBlock(
+                                                          index,
+                                                          blockIndex,
+                                                          { listIcon: event.target.value as any },
+                                                        )
+                                                      }
+                                                    >
+                                                      <option value="check">Check</option>
+                                                      <option value="circleCheck">Circle Check</option>
+                                                      <option value="arrowRight">Arrow Right</option>
+                                                      <option value="star">Star</option>
+                                                      <option value="heart">Heart</option>
+                                                      <option value="sparkles">Sparkles</option>
+                                                      <option value="shield">Shield</option>
+                                                    </select>
+                                                  </label>
+                                                  <label className="builder-field">
+                                                    <span>Icon Color Scheme</span>
+                                                    <select
+                                                      value={block.listIconColorScheme ?? "default"}
+                                                      onChange={(event) =>
+                                                        updateSelectedLayoutBlock(
+                                                          index,
+                                                          blockIndex,
+                                                          { listIconColorScheme: event.target.value as any },
+                                                        )
+                                                      }
+                                                    >
+                                                      <option value="default">Default (theme color)</option>
+                                                      <option value="gradient-cycle">Gradient Cycle (sky → indigo → purple)</option>
+                                                    </select>
+                                                  </label>
+                                                  <label className="builder-field">
+                                                    <span>Icon Size (px)</span>
+                                                    <input
+                                                      type="number"
+                                                      min={8}
+                                                      max={64}
+                                                      value={block.listIconSize ?? 16}
+                                                      onChange={(event) =>
+                                                        updateSelectedLayoutBlock(
+                                                          index,
+                                                          blockIndex,
+                                                          { listIconSize: Number(event.target.value) },
+                                                        )
+                                                      }
+                                                    />
+                                                  </label>
+                                                  <div className="builder-section-heading">
+                                                    <span>Checklist Items ({(block.items ?? []).length})</span>
+                                                  </div>
+                                                  {(block.items ?? []).map((item, itemIdx) => (
+                                                    <label key={itemIdx} className="builder-field">
+                                                      <span>Item {itemIdx + 1}</span>
+                                                      <div style={{ display: "flex", gap: 4 }}>
+                                                        <input
+                                                          value={item}
+                                                          onChange={(event) => {
+                                                            const items = [...(block.items ?? [])];
+                                                            items[itemIdx] = event.target.value;
+                                                            updateSelectedLayoutBlock(index, blockIndex, { items });
+                                                          }}
+                                                        />
+                                                        <button
+                                                          type="button"
+                                                          className="builder-inline-delete"
+                                                          onClick={() => {
+                                                            const items = (block.items ?? []).filter((_, i) => i !== itemIdx);
+                                                            updateSelectedLayoutBlock(index, blockIndex, { items });
+                                                          }}
+                                                        >
+                                                          <Trash2 size={14} />
+                                                        </button>
+                                                      </div>
+                                                    </label>
+                                                  ))}
+                                                  <button
+                                                    type="button"
+                                                    className="builder-inline-add"
+                                                    onClick={() => {
+                                                      const items = [...(block.items ?? []), `Item ${(block.items ?? []).length + 1}`];
+                                                      updateSelectedLayoutBlock(index, blockIndex, { items });
+                                                    }}
+                                                  >
+                                                    <Plus size={15} /> Add item
+                                                  </button>
+                                                </details>
+                                              )}
                                               {block.kind === "slider" && (
                                                 <>
                                                   <label className="builder-field">
@@ -5159,6 +5364,95 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                               }
                                                             />
                                                           </label>
+
+                                                           <details className="builder-collapse" style={{ marginTop: 8 }}>
+                                                             <summary>
+                                                               <InspectorGroupSummary
+                                                                 title="Checklist"
+                                                                 description="Add checklist items to this slide."
+                                                                 meta={`${(slide.items ?? []).length} item${(slide.items ?? []).length !== 1 ? "s" : ""}`}
+                                                               />
+                                                             </summary>
+                                                             <label className="builder-field">
+                                                               <span>Icon type</span>
+                                                               <select
+                                                                 value={slide.listIcon ?? "check"}
+                                                                 onChange={(event) =>
+                                                                   updateSelectedLayoutBlockSlide(index, blockIndex, slideIndex, { listIcon: event.target.value as any })
+                                                                 }
+                                                               >
+                                                                 <option value="check">Check</option>
+                                                                 <option value="circleCheck">Circle Check</option>
+                                                                 <option value="arrowRight">Arrow Right</option>
+                                                                 <option value="star">Star</option>
+                                                                 <option value="heart">Heart</option>
+                                                                 <option value="sparkles">Sparkles</option>
+                                                                 <option value="shield">Shield</option>
+                                                               </select>
+                                                             </label>
+                                                             <label className="builder-field">
+                                                               <span>Icon Color Scheme</span>
+                                                               <select
+                                                                 value={slide.listIconColorScheme ?? "default"}
+                                                                 onChange={(event) =>
+                                                                   updateSelectedLayoutBlockSlide(index, blockIndex, slideIndex, { listIconColorScheme: event.target.value as any })
+                                                                 }
+                                                               >
+                                                                 <option value="default">Default (theme color)</option>
+                                                                 <option value="gradient-cycle">Gradient Cycle (sky → indigo → purple)</option>
+                                                               </select>
+                                                             </label>
+                                                             <label className="builder-field">
+                                                               <span>Icon Size (px)</span>
+                                                               <input
+                                                                 type="number"
+                                                                 min={8}
+                                                                 max={64}
+                                                                 value={slide.listIconSize ?? 16}
+                                                                 onChange={(event) =>
+                                                                   updateSelectedLayoutBlockSlide(index, blockIndex, slideIndex, { listIconSize: Number(event.target.value) })
+                                                                 }
+                                                               />
+                                                             </label>
+                                                             <div className="builder-section-heading">
+                                                               <span>Checklist Items ({(slide.items ?? []).length})</span>
+                                                             </div>
+                                                             {(slide.items ?? []).map((item, itemIdx) => (
+                                                               <label key={itemIdx} className="builder-field">
+                                                                 <span>Item {itemIdx + 1}</span>
+                                                                 <div style={{ display: "flex", gap: 4 }}>
+                                                                   <input
+                                                                     value={item}
+                                                                     onChange={(event) => {
+                                                                       const items = [...(slide.items ?? [])];
+                                                                       items[itemIdx] = event.target.value;
+                                                                       updateSelectedLayoutBlockSlide(index, blockIndex, slideIndex, { items });
+                                                                     }}
+                                                                   />
+                                                                   <button
+                                                                     type="button"
+                                                                     className="builder-inline-delete"
+                                                                     onClick={() => {
+                                                                       const items = (slide.items ?? []).filter((_, i) => i !== itemIdx);
+                                                                       updateSelectedLayoutBlockSlide(index, blockIndex, slideIndex, { items });
+                                                                     }}
+                                                                   >
+                                                                     <Trash2 size={14} />
+                                                                   </button>
+                                                                 </div>
+                                                               </label>
+                                                             ))}
+                                                             <button
+                                                               type="button"
+                                                               className="builder-inline-add"
+                                                               onClick={() => {
+                                                                 const items = [...(slide.items ?? []), `Item ${(slide.items ?? []).length + 1}`];
+                                                                 updateSelectedLayoutBlockSlide(index, blockIndex, slideIndex, { items });
+                                                               }}
+                                                             >
+                                                               <Plus size={15} /> Add item
+                                                             </button>
+                                                           </details>
                                                         </div>
                                                       )}
                                                     </div>
@@ -5893,7 +6187,94 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                           }
                                                         />
                                                       </label>
-                                                    </div>
+                                                       <details className="builder-collapse" style={{ marginTop: 8 }}>
+                                                         <summary>
+                                                           <InspectorGroupSummary
+                                                             title="Checklist"
+                                                             description="Add checklist items to this badge."
+                                                             meta={`${(badge.items ?? []).length} item${(badge.items ?? []).length !== 1 ? "s" : ""}`}
+                                                           />
+                                                         </summary>
+                                                         <label className="builder-field">
+                                                           <span>Icon type</span>
+                                                           <select
+                                                             value={badge.listIcon ?? "check"}
+                                                             onChange={(event) =>
+                                                               updateSelectedLayoutBlockBadge(index, blockIndex, badgeIndex, { listIcon: event.target.value as any })
+                                                             }
+                                                           >
+                                                             <option value="check">Check</option>
+                                                             <option value="circleCheck">Circle Check</option>
+                                                             <option value="arrowRight">Arrow Right</option>
+                                                             <option value="star">Star</option>
+                                                             <option value="heart">Heart</option>
+                                                             <option value="sparkles">Sparkles</option>
+                                                             <option value="shield">Shield</option>
+                                                           </select>
+                                                         </label>
+                                                         <label className="builder-field">
+                                                           <span>Icon Color Scheme</span>
+                                                           <select
+                                                             value={badge.listIconColorScheme ?? "default"}
+                                                             onChange={(event) =>
+                                                               updateSelectedLayoutBlockBadge(index, blockIndex, badgeIndex, { listIconColorScheme: event.target.value as any })
+                                                             }
+                                                           >
+                                                             <option value="default">Default (theme color)</option>
+                                                             <option value="gradient-cycle">Gradient Cycle (sky → indigo → purple)</option>
+                                                           </select>
+                                                         </label>
+                                                         <label className="builder-field">
+                                                           <span>Icon Size (px)</span>
+                                                           <input
+                                                             type="number"
+                                                             min={8}
+                                                             max={64}
+                                                             value={badge.listIconSize ?? 16}
+                                                             onChange={(event) =>
+                                                               updateSelectedLayoutBlockBadge(index, blockIndex, badgeIndex, { listIconSize: Number(event.target.value) })
+                                                             }
+                                                           />
+                                                         </label>
+                                                         <div className="builder-section-heading">
+                                                           <span>Checklist Items ({(badge.items ?? []).length})</span>
+                                                         </div>
+                                                         {(badge.items ?? []).map((item, itemIdx) => (
+                                                           <label key={itemIdx} className="builder-field">
+                                                             <span>Item {itemIdx + 1}</span>
+                                                             <div style={{ display: "flex", gap: 4 }}>
+                                                               <input
+                                                                 value={item}
+                                                                 onChange={(event) => {
+                                                                   const items = [...(badge.items ?? [])];
+                                                                   items[itemIdx] = event.target.value;
+                                                                   updateSelectedLayoutBlockBadge(index, blockIndex, badgeIndex, { items });
+                                                                 }}
+                                                               />
+                                                               <button
+                                                                 type="button"
+                                                                 className="builder-inline-delete"
+                                                                 onClick={() => {
+                                                                   const items = (badge.items ?? []).filter((_, i) => i !== itemIdx);
+                                                                   updateSelectedLayoutBlockBadge(index, blockIndex, badgeIndex, { items });
+                                                                 }}
+                                                               >
+                                                                 <Trash2 size={14} />
+                                                               </button>
+                                                             </div>
+                                                           </label>
+                                                         ))}
+                                                         <button
+                                                           type="button"
+                                                           className="builder-inline-add"
+                                                           onClick={() => {
+                                                             const items = [...(badge.items ?? []), `Item ${(badge.items ?? []).length + 1}`];
+                                                             updateSelectedLayoutBlockBadge(index, blockIndex, badgeIndex, { items });
+                                                           }}
+                                                         >
+                                                           <Plus size={15} /> Add item
+                                                         </button>
+                                                       </details>                                                    </div>
                                                     )}
                                                   </div>
                                                   );
@@ -6036,7 +6417,107 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                   }
                                                 />
                                               </label>
-                                            </>
+
+                                               <details className="builder-collapse">
+                                                 <summary>
+                                                   <InspectorGroupSummary
+                                                     title="Checklist"
+                                                     description="Add checklist items to this panel block."
+                                                     meta={`${(block.items ?? []).length} item${(block.items ?? []).length !== 1 ? "s" : ""}`}
+                                                   />
+                                                 </summary>
+                                                 <label className="builder-field">
+                                                   <span>Icon type</span>
+                                                   <select
+                                                     value={block.listIcon ?? "check"}
+                                                     onChange={(event) =>
+                                                       updateSelectedLayoutBlock(
+                                                         index,
+                                                         blockIndex,
+                                                         { listIcon: event.target.value as any },
+                                                       )
+                                                     }
+                                                   >
+                                                     <option value="check">Check</option>
+                                                     <option value="circleCheck">Circle Check</option>
+                                                     <option value="arrowRight">Arrow Right</option>
+                                                     <option value="star">Star</option>
+                                                     <option value="heart">Heart</option>
+                                                     <option value="sparkles">Sparkles</option>
+                                                     <option value="shield">Shield</option>
+                                                   </select>
+                                                 </label>
+                                                 <label className="builder-field">
+                                                   <span>Icon Color Scheme</span>
+                                                   <select
+                                                     value={block.listIconColorScheme ?? "default"}
+                                                     onChange={(event) =>
+                                                       updateSelectedLayoutBlock(
+                                                         index,
+                                                         blockIndex,
+                                                         { listIconColorScheme: event.target.value as any },
+                                                       )
+                                                     }
+                                                   >
+                                                     <option value="default">Default (theme color)</option>
+                                                     <option value="gradient-cycle">Gradient Cycle (sky → indigo → purple)</option>
+                                                   </select>
+                                                 </label>
+                                                 <label className="builder-field">
+                                                   <span>Icon Size (px)</span>
+                                                   <input
+                                                     type="number"
+                                                     min={8}
+                                                     max={64}
+                                                     value={block.listIconSize ?? 16}
+                                                     onChange={(event) =>
+                                                       updateSelectedLayoutBlock(
+                                                         index,
+                                                         blockIndex,
+                                                         { listIconSize: Number(event.target.value) },
+                                                       )
+                                                     }
+                                                   />
+                                                 </label>
+                                                 <div className="builder-section-heading">
+                                                   <span>Checklist Items ({(block.items ?? []).length})</span>
+                                                 </div>
+                                                 {(block.items ?? []).map((item, itemIdx) => (
+                                                   <label key={itemIdx} className="builder-field">
+                                                     <span>Item {itemIdx + 1}</span>
+                                                     <div style={{ display: "flex", gap: 4 }}>
+                                                       <input
+                                                         value={item}
+                                                         onChange={(event) => {
+                                                           const items = [...(block.items ?? [])];
+                                                           items[itemIdx] = event.target.value;
+                                                           updateSelectedLayoutBlock(index, blockIndex, { items });
+                                                         }}
+                                                       />
+                                                       <button
+                                                         type="button"
+                                                         className="builder-inline-delete"
+                                                         onClick={() => {
+                                                           const items = (block.items ?? []).filter((_, i) => i !== itemIdx);
+                                                           updateSelectedLayoutBlock(index, blockIndex, { items });
+                                                         }}
+                                                       >
+                                                         <Trash2 size={14} />
+                                                       </button>
+                                                     </div>
+                                                   </label>
+                                                 ))}
+                                                 <button
+                                                   type="button"
+                                                   className="builder-inline-add"
+                                                   onClick={() => {
+                                                     const items = [...(block.items ?? []), `Item ${(block.items ?? []).length + 1}`];
+                                                     updateSelectedLayoutBlock(index, blockIndex, { items });
+                                                   }}
+                                                 >
+                                                   <Plus size={15} /> Add item
+                                                 </button>
+                                               </details>                                            </>
                                           ) : block.kind === "image" ? (
                                             <>
                                               <label className="builder-field">
@@ -6687,6 +7168,107 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                 );
                                               })}
                                               </div>
+
+                                                <details className="builder-collapse">
+                                                  <summary>
+                                                    <InspectorGroupSummary
+                                                      title="Checklist"
+                                                      description="Add checklist items to this text block."
+                                                      meta={`${(block.items ?? []).length} item${(block.items ?? []).length !== 1 ? "s" : ""}`}
+                                                    />
+                                                  </summary>
+                                                  <label className="builder-field">
+                                                    <span>Icon type</span>
+                                                    <select
+                                                      value={block.listIcon ?? "check"}
+                                                      onChange={(event) =>
+                                                        updateSelectedLayoutBlock(
+                                                          index,
+                                                          blockIndex,
+                                                          { listIcon: event.target.value as any },
+                                                        )
+                                                      }
+                                                    >
+                                                      <option value="check">Check</option>
+                                                      <option value="circleCheck">Circle Check</option>
+                                                      <option value="arrowRight">Arrow Right</option>
+                                                      <option value="star">Star</option>
+                                                      <option value="heart">Heart</option>
+                                                      <option value="sparkles">Sparkles</option>
+                                                      <option value="shield">Shield</option>
+                                                    </select>
+                                                  </label>
+                                                  <label className="builder-field">
+                                                    <span>Icon Color Scheme</span>
+                                                    <select
+                                                      value={block.listIconColorScheme ?? "default"}
+                                                      onChange={(event) =>
+                                                        updateSelectedLayoutBlock(
+                                                          index,
+                                                          blockIndex,
+                                                          { listIconColorScheme: event.target.value as any },
+                                                        )
+                                                      }
+                                                    >
+                                                      <option value="default">Default (theme color)</option>
+                                                      <option value="gradient-cycle">Gradient Cycle (sky → indigo → purple)</option>
+                                                    </select>
+                                                  </label>
+                                                  <label className="builder-field">
+                                                    <span>Icon Size (px)</span>
+                                                    <input
+                                                      type="number"
+                                                      min={8}
+                                                      max={64}
+                                                      value={block.listIconSize ?? 16}
+                                                      onChange={(event) =>
+                                                        updateSelectedLayoutBlock(
+                                                          index,
+                                                          blockIndex,
+                                                          { listIconSize: Number(event.target.value) },
+                                                        )
+                                                      }
+                                                    />
+                                                  </label>
+                                                  <div className="builder-section-heading">
+                                                    <span>Checklist Items ({(block.items ?? []).length})</span>
+                                                  </div>
+                                                  {(block.items ?? []).map((item, itemIdx) => (
+                                                    <label key={itemIdx} className="builder-field">
+                                                      <span>Item {itemIdx + 1}</span>
+                                                      <div style={{ display: "flex", gap: 4 }}>
+                                                        <input
+                                                          value={item}
+                                                          onChange={(event) => {
+                                                            const items = [...(block.items ?? [])];
+                                                            items[itemIdx] = event.target.value;
+                                                            updateSelectedLayoutBlock(index, blockIndex, { items });
+                                                          }}
+                                                        />
+                                                        <button
+                                                          type="button"
+                                                          className="builder-inline-delete"
+                                                          onClick={() => {
+                                                            const items = (block.items ?? []).filter((_, i) => i !== itemIdx);
+                                                            updateSelectedLayoutBlock(index, blockIndex, { items });
+                                                          }}
+                                                        >
+                                                          <Trash2 size={14} />
+                                                        </button>
+                                                      </div>
+                                                    </label>
+                                                  ))}
+                                                  <button
+                                                    type="button"
+                                                    className="builder-inline-add"
+                                                    onClick={() => {
+                                                      const items = [...(block.items ?? []), `Item ${(block.items ?? []).length + 1}`];
+                                                      updateSelectedLayoutBlock(index, blockIndex, { items });
+                                                    }}
+                                                  >
+                                                    <Plus size={15} /> Add item
+                                                  </button>
+                                                </details>
                                             </>
                                           )}
                                           </>
@@ -7181,7 +7763,94 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                 }
                               />
                             </label>
-                              </div>
+                              <details className="builder-collapse" style={{ marginTop: 8 }}>
+                                <summary>
+                                  <InspectorGroupSummary
+                                    title="Checklist"
+                                    description="Add checklist items to this badge."
+                                    meta={`${(badge.items ?? []).length} item${(badge.items ?? []).length !== 1 ? "s" : ""}`}
+                                  />
+                                </summary>
+                                <label className="builder-field">
+                                  <span>Icon type</span>
+                                  <select
+                                    value={badge.listIcon ?? "check"}
+                                    onChange={(event) =>
+                                      updateSelectedBadge(index, { listIcon: event.target.value as any })
+                                    }
+                                  >
+                                    <option value="check">Check</option>
+                                    <option value="circleCheck">Circle Check</option>
+                                    <option value="arrowRight">Arrow Right</option>
+                                    <option value="star">Star</option>
+                                    <option value="heart">Heart</option>
+                                    <option value="sparkles">Sparkles</option>
+                                    <option value="shield">Shield</option>
+                                  </select>
+                                </label>
+                                <label className="builder-field">
+                                  <span>Icon Color Scheme</span>
+                                  <select
+                                    value={badge.listIconColorScheme ?? "default"}
+                                    onChange={(event) =>
+                                      updateSelectedBadge(index, { listIconColorScheme: event.target.value as any })
+                                    }
+                                  >
+                                    <option value="default">Default (theme color)</option>
+                                    <option value="gradient-cycle">Gradient Cycle (sky → indigo → purple)</option>
+                                  </select>
+                                </label>
+                                <label className="builder-field">
+                                  <span>Icon Size (px)</span>
+                                  <input
+                                    type="number"
+                                    min={8}
+                                    max={64}
+                                    value={badge.listIconSize ?? 16}
+                                    onChange={(event) =>
+                                      updateSelectedBadge(index, { listIconSize: Number(event.target.value) })
+                                    }
+                                  />
+                                </label>
+                                <div className="builder-section-heading">
+                                  <span>Checklist Items ({(badge.items ?? []).length})</span>
+                                </div>
+                                {(badge.items ?? []).map((item, itemIdx) => (
+                                  <label key={itemIdx} className="builder-field">
+                                    <span>Item {itemIdx + 1}</span>
+                                    <div style={{ display: "flex", gap: 4 }}>
+                                      <input
+                                        value={item}
+                                        onChange={(event) => {
+                                          const items = [...(badge.items ?? [])];
+                                          items[itemIdx] = event.target.value;
+                                          updateSelectedBadge(index, { items });
+                                        }}
+                                      />
+                                      <button
+                                        type="button"
+                                        className="builder-inline-delete"
+                                        onClick={() => {
+                                          const items = (badge.items ?? []).filter((_, i) => i !== itemIdx);
+                                          updateSelectedBadge(index, { items });
+                                        }}
+                                      >
+                                        <Trash2 size={14} />
+                                      </button>
+                                    </div>
+                                  </label>
+                                ))}
+                                <button
+                                  type="button"
+                                  className="builder-inline-add"
+                                  onClick={() => {
+                                    const items = [...(badge.items ?? []), `Item ${(badge.items ?? []).length + 1}`];
+                                    updateSelectedBadge(index, { items });
+                                  }}
+                                >
+                                  <Plus size={15} /> Add item
+                                </button>
+                              </details>                              </div>
                               )}
                             </div>
                             );
@@ -7401,6 +8070,96 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                               />
                               <span>Show Navigation</span>
                             </label>
+                          </details>
+                        )}
+                        {selectedSection.kind === "scrollPinnedDemo" && (
+                          <details className="builder-collapse">
+                            <summary>
+                              <InspectorGroupSummary
+                                title="Checklist"
+                                description="Add checklist items to this storytelling section."
+                                meta={`${(selectedSection.items ?? []).length} item${(selectedSection.items ?? []).length !== 1 ? "s" : ""}`}
+                              />
+                            </summary>
+                            <label className="builder-field">
+                              <span>Icon type</span>
+                              <select
+                                value={selectedSection.listIcon ?? "check"}
+                                onChange={(event) =>
+                                  updateSelected({ listIcon: event.target.value as any })
+                                }
+                              >
+                                <option value="check">Check</option>
+                                <option value="circleCheck">Circle Check</option>
+                                <option value="arrowRight">Arrow Right</option>
+                                <option value="star">Star</option>
+                                <option value="heart">Heart</option>
+                                <option value="sparkles">Sparkles</option>
+                                <option value="shield">Shield</option>
+                              </select>
+                            </label>
+                            <label className="builder-field">
+                              <span>Icon Color Scheme</span>
+                              <select
+                                value={selectedSection.listIconColorScheme ?? "default"}
+                                onChange={(event) =>
+                                  updateSelected({ listIconColorScheme: event.target.value as any })
+                                }
+                              >
+                                <option value="default">Default (theme color)</option>
+                                <option value="gradient-cycle">Gradient Cycle (sky → indigo → purple)</option>
+                              </select>
+                            </label>
+                            <label className="builder-field">
+                              <span>Icon Size (px)</span>
+                              <input
+                                type="number"
+                                min={8}
+                                max={64}
+                                value={selectedSection.listIconSize ?? 16}
+                                onChange={(event) =>
+                                  updateSelected({ listIconSize: Number(event.target.value) })
+                                }
+                              />
+                            </label>
+                            <div className="builder-section-heading">
+                              <span>Checklist Items ({(selectedSection.items ?? []).length})</span>
+                            </div>
+                            {(selectedSection.items ?? []).map((item, itemIdx) => (
+                              <label key={itemIdx} className="builder-field">
+                                <span>Item {itemIdx + 1}</span>
+                                <div style={{ display: "flex", gap: 4 }}>
+                                  <input
+                                    value={item}
+                                    onChange={(event) => {
+                                      const items = [...(selectedSection.items ?? [])];
+                                      items[itemIdx] = event.target.value;
+                                      updateSelected({ items });
+                                    }}
+                                  />
+                                  <button
+                                    type="button"
+                                    className="builder-inline-delete"
+                                    onClick={() => {
+                                      const items = (selectedSection.items ?? []).filter((_, i) => i !== itemIdx);
+                                      updateSelected({ items });
+                                    }}
+                                  >
+                                    <Trash2 size={14} />
+                                  </button>
+                                </div>
+                              </label>
+                            ))}
+                            <button
+                              type="button"
+                              className="builder-inline-add"
+                              onClick={() => {
+                                const items = [...(selectedSection.items ?? []), `Item ${(selectedSection.items ?? []).length + 1}`];
+                                updateSelected({ items });
+                              }}
+                            >
+                              <Plus size={15} /> Add item
+                            </button>
                           </details>
                         )}
 
@@ -7711,7 +8470,95 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                         }
                                       />
                                     </label>
-                                  </div>
+
+                                    <details className="builder-collapse" style={{ marginTop: 8 }}>
+                                      <summary>
+                                        <InspectorGroupSummary
+                                          title="Checklist"
+                                          description="Add checklist items to this slide."
+                                          meta={`${(slide.items ?? []).length} item${(slide.items ?? []).length !== 1 ? "s" : ""}`}
+                                        />
+                                      </summary>
+                                      <label className="builder-field">
+                                        <span>Icon type</span>
+                                        <select
+                                          value={slide.listIcon ?? "check"}
+                                          onChange={(event) =>
+                                            updateSelectedSlide(index, { listIcon: event.target.value as any })
+                                          }
+                                        >
+                                          <option value="check">Check</option>
+                                          <option value="circleCheck">Circle Check</option>
+                                          <option value="arrowRight">Arrow Right</option>
+                                          <option value="star">Star</option>
+                                          <option value="heart">Heart</option>
+                                          <option value="sparkles">Sparkles</option>
+                                          <option value="shield">Shield</option>
+                                        </select>
+                                      </label>
+                                      <label className="builder-field">
+                                        <span>Icon Color Scheme</span>
+                                        <select
+                                          value={slide.listIconColorScheme ?? "default"}
+                                          onChange={(event) =>
+                                            updateSelectedSlide(index, { listIconColorScheme: event.target.value as any })
+                                          }
+                                        >
+                                          <option value="default">Default (theme color)</option>
+                                          <option value="gradient-cycle">Gradient Cycle (sky → indigo → purple)</option>
+                                        </select>
+                                      </label>
+                                      <label className="builder-field">
+                                        <span>Icon Size (px)</span>
+                                        <input
+                                          type="number"
+                                          min={8}
+                                          max={64}
+                                          value={slide.listIconSize ?? 16}
+                                          onChange={(event) =>
+                                            updateSelectedSlide(index, { listIconSize: Number(event.target.value) })
+                                          }
+                                        />
+                                      </label>
+                                      <div className="builder-section-heading">
+                                        <span>Checklist Items ({(slide.items ?? []).length})</span>
+                                      </div>
+                                      {(slide.items ?? []).map((item, itemIdx) => (
+                                        <label key={itemIdx} className="builder-field">
+                                          <span>Item {itemIdx + 1}</span>
+                                          <div style={{ display: "flex", gap: 4 }}>
+                                            <input
+                                              value={item}
+                                              onChange={(event) => {
+                                                const items = [...(slide.items ?? [])];
+                                                items[itemIdx] = event.target.value;
+                                                updateSelectedSlide(index, { items });
+                                              }}
+                                            />
+                                            <button
+                                              type="button"
+                                              className="builder-inline-delete"
+                                              onClick={() => {
+                                                const items = (slide.items ?? []).filter((_, i) => i !== itemIdx);
+                                                updateSelectedSlide(index, { items });
+                                              }}
+                                            >
+                                              <Trash2 size={14} />
+                                            </button>
+                                          </div>
+                                        </label>
+                                      ))}
+                                      <button
+                                        type="button"
+                                        className="builder-inline-add"
+                                        onClick={() => {
+                                          const items = [...(slide.items ?? []), `Item ${(slide.items ?? []).length + 1}`];
+                                          updateSelectedSlide(index, { items });
+                                        }}
+                                      >
+                                        <Plus size={15} /> Add item
+                                      </button>
+                                    </details>                                  </div>
                                 )}
                               </div>
                             );
