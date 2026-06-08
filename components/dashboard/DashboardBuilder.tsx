@@ -25,6 +25,7 @@ import {
   ShoppingBag,
   LockKeyhole,
   Redo2,
+  Save,
   Settings2,
   Undo2,
   Sparkles,
@@ -127,6 +128,31 @@ import {
   visualStyleClassName,
   visualStyleToCss,
 } from "@/lib/builderVisualStyle";
+import {
+  getSpacingOptionLabel,
+  getSpacingLabel,
+  resolveBuilderSpacing,
+  shouldShowSpacingLabel,
+} from "@/lib/builderSpacing";
+
+const BUILDER_TEMPLATE_DND_TYPE = "application/x-builder-template";
+const BUILDER_TEMPLATE_SECTION_DND_TYPE =
+  "application/x-builder-template-section";
+const BUILDER_TEMPLATE_ROW_DND_TYPE = "application/x-builder-template-row";
+const BUILDER_TEMPLATE_ELEMENT_DND_TYPE =
+  "application/x-builder-template-element";
+
+type BuilderTemplateDragType = "section" | "row" | "element";
+
+function getBuilderTemplateDragType(
+  types: Iterable<string> | ArrayLike<string>,
+) {
+  const dragTypes = Array.from(types);
+  if (dragTypes.includes(BUILDER_TEMPLATE_SECTION_DND_TYPE)) return "section";
+  if (dragTypes.includes(BUILDER_TEMPLATE_ROW_DND_TYPE)) return "row";
+  if (dragTypes.includes(BUILDER_TEMPLATE_ELEMENT_DND_TYPE)) return "element";
+  return null;
+}
 
 function RenderDashboardChecklist({
   items,
@@ -1061,8 +1087,10 @@ export default function DashboardBuilder({
   const [sidebarResizing, setSidebarResizing] = useState(false);
   const [previewScale, setPreviewScale] = useState(1);
   const [previewCanvasWidth, setPreviewCanvasWidth] = useState(1180);
+  const [spacingOverlayEnabled, setSpacingOverlayEnabled] = useState(false);
   const [sidebarTab, setSidebarTab] = useState<SidebarTab>("settings");
   const [panelForceToggler, setPanelForceToggler] = useState(0);
+  const [inspectorOpenKey, setInspectorOpenKey] = useState(0);
   const [shellSettings, setShellSettings] =
     useState<BuilderShellSettings>(defaultShellSettings);
   const [shellStatus, setShellStatus] = useState(
@@ -1081,6 +1109,10 @@ export default function DashboardBuilder({
   const [savedTemplates, setSavedTemplates] = useState<BuilderSavedTemplate[]>(
     [],
   );
+  const [renameTemplateRequest, setRenameTemplateRequest] = useState<{
+    id: string;
+    templateType: NonNullable<BuilderSavedTemplate["templateType"]>;
+  } | null>(null);
   const [templateStatus, setTemplateStatus] = useState(
     "Templates save to React",
   );
@@ -2213,8 +2245,16 @@ export default function DashboardBuilder({
   };
 
   const openElementsPanel = () => {
+    setSidebarCollapsed(false);
     setSidebarTab("elements");
     setPanelForceToggler((prev) => prev + 1);
+  };
+
+  const openInspectorPanel = () => {
+    setSidebarCollapsed(false);
+    setInspectorOpen(true);
+    setSidebarTab("inspector");
+    setInspectorOpenKey((prev) => prev + 1);
   };
 
   const selectSection = (sectionId: string) => {
@@ -2222,8 +2262,7 @@ export default function DashboardBuilder({
     setSelectedId(sectionId);
     setSelectedLayoutRowIndex(null);
     setSelectedLayoutBlockKey(null);
-    setInspectorOpen(true);
-    setSidebarTab("inspector");
+    openInspectorPanel();
     setInspectorTab("section");
     setSectionSettingsOpen(true);
     setSectionStructureOpen(false);
@@ -2256,8 +2295,7 @@ export default function DashboardBuilder({
     setSelectedLayoutBlockKey(null);
     setOpenLayoutItemId(columnKey);
     setInspectorTab("section");
-    setInspectorOpen(true);
-    setSidebarTab("inspector");
+    openInspectorPanel();
   };
 
   const selectLayoutBlock = (
@@ -2272,8 +2310,7 @@ export default function DashboardBuilder({
     setOpenLayoutItemId(columnKey);
     setSectionStructureOpen(false);
     setInspectorTab("content");
-    setInspectorOpen(true);
-    setSidebarTab("inspector");
+    openInspectorPanel();
   };
 
   const selectLayoutRow = (sectionId: string, rowIndex: number) => {
@@ -2284,8 +2321,7 @@ export default function DashboardBuilder({
     setOpenLayoutItemId(null);
     setSectionStructureOpen(false);
     setInspectorTab("row");
-    setInspectorOpen(true);
-    setSidebarTab("inspector");
+    openInspectorPanel();
   };
 
   const updateSelectedSlide = (
@@ -2799,6 +2835,60 @@ export default function DashboardBuilder({
         return { ...section, layoutItems };
       }),
     }));
+  };
+
+  const moveLayoutBlockWithinColumn = ({
+    sectionId,
+    columnKey,
+    blockKey,
+    direction,
+  }: {
+    sectionId: string;
+    columnKey: string;
+    blockKey: string;
+    direction: -1 | 1;
+  }) => {
+    setBuilderState((current) => ({
+      ...current,
+      sections: current.sections.map((section) => {
+        if (section.id !== sectionId || !isLayoutContainerSection(section)) {
+          return section;
+        }
+
+        const layoutItems = [...(section.layoutItems ?? [])];
+        const columnIndex = layoutItems.findIndex(
+          (item, index) => (item.id ?? `layout-item-${index}`) === columnKey,
+        );
+        if (columnIndex < 0) return section;
+
+        const item = layoutItems[columnIndex] ?? {};
+        const blocks = [...getLayoutItemBlocks(item)];
+        const blockIndex = blocks.findIndex(
+          (block, index) =>
+            (block.id ?? `${columnKey}-block-${index}`) === blockKey,
+        );
+        const nextIndex = blockIndex + direction;
+        if (
+          blockIndex < 0 ||
+          nextIndex < 0 ||
+          nextIndex >= blocks.length
+        ) {
+          return section;
+        }
+
+        const [movedBlock] = blocks.splice(blockIndex, 1);
+        if (!movedBlock) return section;
+        blocks.splice(nextIndex, 0, movedBlock);
+        layoutItems[columnIndex] = { ...item, blocks };
+        return { ...section, layoutItems };
+      }),
+    }));
+
+    setSelectedId(sectionId);
+    setSelectedLayoutColumnKey(columnKey);
+    setSelectedLayoutBlockKey(blockKey);
+    setOpenLayoutItemId(columnKey);
+    setPublishStatus("Element moved");
   };
 
   const deleteLayoutBlock = ({
@@ -3460,11 +3550,10 @@ export default function DashboardBuilder({
     setPublishStatus("Row layout updated");
   };
 
-  const duplicateSelectedRow = () => {
+  const updateSelectedRowStyle = (
+    patch: Partial<NonNullable<BuilderSection["layoutItems"]>[number]>,
+  ) => {
     if (!selectedSection || selectedLayoutRowIndex === null) return;
-    const rowId = `layout-row-${Date.now().toString(36)}`;
-    let nextSelectedColumnKey: string | null = null;
-
     setBuilderState((current) => ({
       ...current,
       sections: current.sections.map((section) => {
@@ -3478,6 +3567,42 @@ export default function DashboardBuilder({
         const layoutItems = section.layoutItems ?? [];
         const layoutRows = getPreviewLayoutRows(section, layoutItems);
         const targetRow = layoutRows[selectedLayoutRowIndex];
+        if (!targetRow) return section;
+        const targetItems = new Set(targetRow.items);
+
+        return {
+          ...section,
+          layoutItems: layoutItems.map((item) =>
+            targetItems.has(item) ? { ...item, ...patch } : item,
+          ),
+        };
+      }),
+    }));
+    setPublishStatus("Row spacing updated");
+  };
+
+  const duplicateSelectedRow = () => {
+    if (!selectedSection || selectedLayoutRowIndex === null) return;
+    duplicateLayoutRow(selectedSection.id, selectedLayoutRowIndex);
+  };
+
+  const duplicateLayoutRow = (sectionId: string, rowIndex: number) => {
+    const rowId = `layout-row-${Date.now().toString(36)}`;
+    let nextSelectedColumnKey: string | null = null;
+
+    setBuilderState((current) => ({
+      ...current,
+      sections: current.sections.map((section) => {
+        if (
+          section.id !== sectionId ||
+          !isLayoutContainerSection(section)
+        ) {
+          return section;
+        }
+
+        const layoutItems = section.layoutItems ?? [];
+        const layoutRows = getPreviewLayoutRows(section, layoutItems);
+        const targetRow = layoutRows[rowIndex];
         if (!targetRow) return section;
 
         const copiedItems = targetRow.items.map((item, index) => {
@@ -3507,11 +3632,55 @@ export default function DashboardBuilder({
       }),
     }));
 
-    setSelectedLayoutRowIndex(selectedLayoutRowIndex + 1);
+    setSelectedId(sectionId);
+    setSelectedLayoutRowIndex(rowIndex + 1);
     setSelectedLayoutColumnKey(nextSelectedColumnKey);
     setSelectedLayoutBlockKey(null);
     setOpenLayoutItemId(nextSelectedColumnKey);
+    setInspectorTab("row");
+    openInspectorPanel();
     setPublishStatus("Row duplicated");
+  };
+
+  const moveLayoutRow = (
+    sectionId: string,
+    rowIndex: number,
+    direction: -1 | 1,
+  ) => {
+    const targetRowIndex = rowIndex + direction;
+    setBuilderState((current) => ({
+      ...current,
+      sections: current.sections.map((section) => {
+        if (section.id !== sectionId || !isLayoutContainerSection(section)) {
+          return section;
+        }
+
+        const layoutItems = section.layoutItems ?? [];
+        const rows = getPreviewLayoutRows(section, layoutItems);
+        const row = rows[rowIndex];
+        const targetRow = rows[targetRowIndex];
+        if (!row || !targetRow) return section;
+
+        const nextRows = [...rows];
+        const [movedRow] = nextRows.splice(rowIndex, 1);
+        if (!movedRow) return section;
+        nextRows.splice(targetRowIndex, 0, movedRow);
+
+        return {
+          ...section,
+          layoutItems: nextRows.flatMap((entry) => entry.items),
+        };
+      }),
+    }));
+
+    setSelectedId(sectionId);
+    setSelectedLayoutRowIndex(targetRowIndex);
+    setSelectedLayoutColumnKey(null);
+    setSelectedLayoutBlockKey(null);
+    setOpenLayoutItemId(null);
+    setInspectorTab("row");
+    openInspectorPanel();
+    setPublishStatus("Row moved");
   };
 
   const deleteSelectedRow = () => {
@@ -3967,8 +4136,97 @@ export default function DashboardBuilder({
     setPageStatus("Page deleted");
   };
 
-  const saveCurrentPageAsTemplate = async () => {
-    const title = getLayoutLabel(builderState.page, customPages);
+  const cloneTemplateBlock = (block: BuilderLayoutBlock): BuilderLayoutBlock => {
+    const nextBlock = JSON.parse(JSON.stringify(block)) as BuilderLayoutBlock;
+    return {
+      ...nextBlock,
+      id: createBlockId((nextBlock.kind ?? "text") as LayoutBlockKind),
+    };
+  };
+
+  const cloneTemplateSection = (section: BuilderSection): BuilderSection => {
+    const nextSection = JSON.parse(JSON.stringify(section)) as BuilderSection;
+    const rowIdMap = new Map<string, string>();
+    const nextLayoutItems = (nextSection.layoutItems ?? []).map((item, index) => {
+      const itemRowId = item.rowId;
+      const nextRowId = itemRowId
+        ? (rowIdMap.get(itemRowId) ??
+          `layout-row-${Date.now().toString(36)}-${index}`)
+        : undefined;
+      if (itemRowId && nextRowId) rowIdMap.set(itemRowId, nextRowId);
+      return {
+        ...item,
+        id: `layout-item-${Date.now().toString(36)}-${index}-${Math.random()
+          .toString(36)
+          .slice(2, 6)}`,
+        rowId: nextRowId,
+        blocks: (item.blocks ?? []).map(cloneTemplateBlock),
+      };
+    });
+
+    return {
+      ...nextSection,
+      id: createId(nextSection.kind),
+      layoutItems: nextLayoutItems.length > 0 ? nextLayoutItems : nextSection.layoutItems,
+    };
+  };
+
+  const createElementTemplateSection = (
+    block: BuilderLayoutBlock,
+    title: string,
+  ): BuilderSection => {
+    const section = createWireframeSection(1, 1, "whole");
+    return {
+      ...section,
+      title,
+      layoutItems: [
+        {
+          ...(section.layoutItems?.[0] ?? {}),
+          id: `layout-item-${Date.now().toString(36)}-template-element`,
+          blocks: [cloneTemplateBlock(block)],
+        },
+      ],
+    };
+  };
+
+  const createRowTemplateSection = (
+    section: BuilderSection,
+    rowIndex: number,
+    title: string,
+  ): BuilderSection | null => {
+    if (!isLayoutContainerSection(section)) return null;
+    const rows = getPreviewLayoutRows(section, section.layoutItems ?? []);
+    const row = rows[rowIndex];
+    if (!row) return null;
+    const wrapper = createWireframeSection(row.items.length || 1, 1, row.layoutKey);
+    const rowId = `layout-row-${Date.now().toString(36)}-template`;
+    return {
+      ...wrapper,
+      title,
+      layout: row.layoutKey,
+      layoutColumns: row.items.length || 1,
+      layoutItems: row.items.map((item, index) => ({
+        ...item,
+        id: `layout-item-${Date.now().toString(36)}-row-template-${index}`,
+        rowId,
+        rowLayout: row.layoutKey,
+        blocks: (item.blocks ?? []).map(cloneTemplateBlock),
+      })),
+    };
+  };
+
+  const persistTemplate = async ({
+    title,
+    templateType,
+    sections,
+    design,
+  }: {
+    title: string;
+    templateType: NonNullable<BuilderSavedTemplate["templateType"]>;
+    sections: BuilderSection[];
+    design?: BuilderDesign;
+  }) => {
+    const pageTitle = getLayoutLabel(builderState.page, customPages);
     setTemplateStatus("Saving template...");
 
     const response = await fetch("/api/builder-templates", {
@@ -3978,22 +4236,31 @@ export default function DashboardBuilder({
       },
       body: JSON.stringify({
         title,
-        description: `Saved from ${title}`,
+        templateType,
+        description:
+          templateType === "page"
+            ? `Page template saved from ${pageTitle}`
+            : templateType === "section"
+              ? `Section template saved from ${pageTitle}`
+              : templateType === "row"
+                ? `Row template saved from ${pageTitle}`
+                : `Element template saved from ${pageTitle}`,
         sourcePage: builderState.page,
-        design: builderState.design,
-        sections: builderState.sections,
+        design,
+        sections,
       }),
     });
 
     if (!response.ok) {
       setTemplateStatus("Template save failed");
-      return;
+      return null;
     }
 
     const payload = (await response.json()) as {
       template?: BuilderSavedTemplate;
       templates?: BuilderSavedTemplate[];
     };
+    const savedTemplate = payload.template ?? null;
 
     if (payload.templates) {
       setSavedTemplates(payload.templates);
@@ -4004,7 +4271,433 @@ export default function DashboardBuilder({
       ]);
     }
 
+    if (savedTemplate) {
+      setSidebarCollapsed(false);
+      setSidebarTab("templates");
+      setRenameTemplateRequest({
+        id: savedTemplate.id,
+        templateType: savedTemplate.templateType ?? templateType,
+      });
+    }
+
     setTemplateStatus("Template saved");
+    return savedTemplate;
+  };
+
+  const saveTemplate = async (
+    templateType: NonNullable<BuilderSavedTemplate["templateType"]>,
+    customTitle?: string,
+  ) => {
+    const pageTitle = getLayoutLabel(builderState.page, customPages);
+    const title =
+      customTitle?.trim() ||
+      (templateType === "page"
+        ? pageTitle
+        : templateType === "section"
+          ? selectedSection?.title || "Saved Section"
+          : selectedLayoutBlock
+            ? layoutBlockLabels[selectedLayoutBlock.kind ?? "text"]
+            : "Saved Element");
+    const sections =
+      templateType === "page"
+        ? builderState.sections
+        : templateType === "section"
+          ? selectedSection
+            ? [selectedSection]
+            : []
+          : selectedLayoutBlock
+            ? [createElementTemplateSection(selectedLayoutBlock, title)]
+            : [];
+
+    if (sections.length === 0) {
+      setTemplateStatus(`Select a ${templateType} before saving`);
+      return null;
+    }
+
+    return persistTemplate({
+      title,
+      templateType,
+      design: templateType === "page" ? builderState.design : undefined,
+      sections,
+    });
+  };
+
+  const saveCurrentPageAsTemplate = (title?: string) => {
+    return saveTemplate("page", title);
+  };
+
+  const saveSelectedSectionAsTemplate = (title?: string) => {
+    return saveTemplate("section", title);
+  };
+
+  const saveSelectedElementAsTemplate = (title?: string) => {
+    return saveTemplate("element", title);
+  };
+
+  const saveSectionTemplateById = (sectionId: string) => {
+    const section = builderState.sections.find((item) => item.id === sectionId);
+    if (!section) {
+      setTemplateStatus("Select a section before saving");
+      return null;
+    }
+    return persistTemplate({
+      title: section.title || sectionLabels[section.kind] || "Saved Section",
+      templateType: "section",
+      sections: [section],
+    });
+  };
+
+  const saveRowTemplateByIndex = (sectionId: string, rowIndex: number) => {
+    const section = builderState.sections.find((item) => item.id === sectionId);
+    const rowSection = section
+      ? createRowTemplateSection(section, rowIndex, `Row ${rowIndex + 1}`)
+      : null;
+    if (!rowSection) {
+      setTemplateStatus("Select a row before saving");
+      return null;
+    }
+    return persistTemplate({
+      title: `Row ${rowIndex + 1}`,
+      templateType: "row",
+      sections: [rowSection],
+    });
+  };
+
+  const saveElementTemplateByKey = (
+    sectionId: string,
+    columnKey: string,
+    blockKey: string,
+  ) => {
+    const section = builderState.sections.find((item) => item.id === sectionId);
+    if (!section || !isLayoutContainerSection(section)) {
+      setTemplateStatus("Select an element before saving");
+      return null;
+    }
+    const item = (section.layoutItems ?? []).find(
+      (layoutItem, index) =>
+        (layoutItem.id ?? `layout-item-${index}`) === columnKey,
+    );
+    const block = (item?.blocks ?? []).find(
+      (entry, index) => (entry.id ?? `${columnKey}-block-${index}`) === blockKey,
+    );
+    if (!block) {
+      setTemplateStatus("Select an element before saving");
+      return null;
+    }
+    const title = layoutBlockLabels[block.kind ?? "text"] ?? "Saved Element";
+    return persistTemplate({
+      title,
+      templateType: "element",
+      sections: [createElementTemplateSection(block, title)],
+    });
+  };
+
+  const applySavedTemplate = (template: BuilderSavedTemplate) => {
+    const templateType = template.templateType ?? "page";
+    const clonedSections = template.sections.map(cloneTemplateSection);
+
+    if (templateType === "page") {
+      setBuilderState((current) => ({
+        ...current,
+        design: template.design ?? current.design,
+        sections: clonedSections,
+      }));
+      const firstSectionId = clonedSections[0]?.id ?? "";
+      setSelectedId(firstSectionId);
+      setSelectedLayoutColumnKey(null);
+      setSelectedLayoutRowIndex(null);
+      setSelectedLayoutBlockKey(null);
+      setOpenLayoutItemId(null);
+      setTemplateStatus("Page template applied");
+      return;
+    }
+
+    if (templateType === "element") {
+      const block = clonedSections
+        .flatMap((section) => section.layoutItems ?? [])
+        .flatMap((item) => item.blocks ?? [])[0];
+      if (
+        block &&
+        selectedSection &&
+        isLayoutContainerSection(selectedSection) &&
+        selectedLayoutColumnKey
+      ) {
+        setBuilderState((current) => ({
+          ...current,
+          sections: current.sections.map((section) => {
+            if (section.id !== selectedSection.id) return section;
+            return {
+              ...section,
+              layoutItems: (section.layoutItems ?? []).map((item, index) => {
+                const columnKey = item.id ?? `layout-item-${index}`;
+                if (columnKey !== selectedLayoutColumnKey) return item;
+                return {
+                  ...item,
+                  blocks: [...(item.blocks ?? []), cloneTemplateBlock(block)],
+                };
+              }),
+            };
+          }),
+        }));
+        setTemplateStatus("Element template added");
+        return;
+      }
+    }
+
+    if (
+      templateType === "row" &&
+      selectedSection &&
+      isLayoutContainerSection(selectedSection)
+    ) {
+      const rowItems =
+        clonedSections[0]?.layoutItems?.map((item, index) => ({
+          ...item,
+          id: `layout-item-${Date.now().toString(36)}-row-use-${index}`,
+          rowId: `layout-row-${Date.now().toString(36)}-use`,
+          blocks: (item.blocks ?? []).map(cloneTemplateBlock),
+        })) ?? [];
+      if (rowItems.length > 0) {
+        setBuilderState((current) => ({
+          ...current,
+          sections: current.sections.map((section) =>
+            section.id === selectedSection.id
+              ? {
+                  ...section,
+                  layoutItems: [...(section.layoutItems ?? []), ...rowItems],
+                  layoutRows: (section.layoutRows ?? 1) + 1,
+                }
+              : section,
+          ),
+        }));
+        setTemplateStatus("Row template added");
+        return;
+      }
+    }
+
+    setBuilderState((current) => ({
+      ...current,
+      sections: [...current.sections, ...clonedSections],
+    }));
+    setSelectedId(clonedSections[0]?.id ?? selectedId);
+    setSelectedLayoutColumnKey(null);
+    setSelectedLayoutRowIndex(null);
+    setSelectedLayoutBlockKey(null);
+    setOpenLayoutItemId(null);
+    setTemplateStatus(
+      templateType === "element"
+        ? "Element template added as a new section"
+        : templateType === "row"
+          ? "Row template added as a new section"
+        : "Section template added",
+    );
+  };
+
+  const getSavedTemplateById = (templateId: string) =>
+    savedTemplates.find((template) => template.id === templateId);
+
+  const createRowItemsFromTemplate = (template: BuilderSavedTemplate) => {
+    const sourceSection = template.sections[0];
+    const rowId = `layout-row-${Date.now().toString(36)}-drop`;
+    return (sourceSection?.layoutItems ?? []).map((item, index) => ({
+      ...item,
+      id: `layout-item-${Date.now().toString(36)}-row-drop-${index}-${Math.random()
+        .toString(36)
+        .slice(2, 6)}`,
+      rowId,
+      rowLayout: item.rowLayout ?? sourceSection?.layout,
+      blocks: (item.blocks ?? []).map(cloneTemplateBlock),
+    }));
+  };
+
+  const insertSectionTemplateNear = (
+    templateId: string,
+    targetSectionId: string,
+    placement: "above" | "below",
+  ) => {
+    const template = getSavedTemplateById(templateId);
+    if (!template || (template.templateType ?? "page") !== "section") {
+      setTemplateStatus("Drop section templates between sections");
+      return;
+    }
+
+    const clonedSections = template.sections.map(cloneTemplateSection);
+    setBuilderState((current) => {
+      const targetIndex = current.sections.findIndex(
+        (section) => section.id === targetSectionId,
+      );
+      const insertIndex =
+        targetIndex < 0
+          ? current.sections.length
+          : placement === "above"
+            ? targetIndex
+            : targetIndex + 1;
+      const sections = [...current.sections];
+      sections.splice(insertIndex, 0, ...clonedSections);
+      return { ...current, sections };
+    });
+    setSelectedId(clonedSections[0]?.id ?? targetSectionId);
+    setSelectedLayoutColumnKey(null);
+    setSelectedLayoutRowIndex(null);
+    setSelectedLayoutBlockKey(null);
+    setOpenLayoutItemId(null);
+    setTemplateStatus("Section template inserted");
+  };
+
+  const insertRowTemplateAt = (
+    templateId: string,
+    sectionId: string,
+    rowIndex: number,
+    placement: "before" | "after",
+  ) => {
+    const template = getSavedTemplateById(templateId);
+    if (!template || template.templateType !== "row") {
+      setTemplateStatus("Drop row templates on row borders");
+      return;
+    }
+
+    const rowItems = createRowItemsFromTemplate(template);
+    if (rowItems.length === 0) {
+      setTemplateStatus("Row template is empty");
+      return;
+    }
+
+    const nextSelectedRowIndex = placement === "before" ? rowIndex : rowIndex + 1;
+    setBuilderState((current) => ({
+      ...current,
+      sections: current.sections.map((section) => {
+        if (section.id !== sectionId || !isLayoutContainerSection(section)) {
+          return section;
+        }
+
+        const layoutItems = section.layoutItems ?? [];
+        const rows = getPreviewLayoutRows(section, layoutItems);
+        const targetRow = rows[rowIndex];
+        if (!targetRow) return section;
+        const targetItem =
+          placement === "before"
+            ? targetRow.items[0]
+            : targetRow.items[targetRow.items.length - 1];
+        const targetItemIndex = layoutItems.findIndex((item, index) => {
+          const itemKey = item.id ?? `layout-item-${index}`;
+          const targetKey = targetItem?.id;
+          return item === targetItem || (targetKey ? itemKey === targetKey : false);
+        });
+        if (targetItemIndex < 0) return section;
+        const insertIndex =
+          placement === "before" ? targetItemIndex : targetItemIndex + 1;
+        const nextLayoutItems = [...layoutItems];
+        nextLayoutItems.splice(insertIndex, 0, ...rowItems);
+        return {
+          ...section,
+          layoutItems: nextLayoutItems,
+          layoutRows: (section.layoutRows ?? rows.length) + 1,
+        };
+      }),
+    }));
+
+    setSelectedId(sectionId);
+    setSelectedLayoutRowIndex(nextSelectedRowIndex);
+    setSelectedLayoutColumnKey(rowItems[0]?.id ?? null);
+    setSelectedLayoutBlockKey(null);
+    setOpenLayoutItemId(rowItems[0]?.id ?? null);
+    setInspectorTab("row");
+    openInspectorPanel();
+    setTemplateStatus("Row template inserted");
+  };
+
+  const insertElementTemplateAt = ({
+    templateId,
+    sectionId,
+    columnKey,
+    targetBlockKey,
+  }: {
+    templateId: string;
+    sectionId: string;
+    columnKey: string;
+    targetBlockKey?: string;
+  }) => {
+    const template = getSavedTemplateById(templateId);
+    if (!template || template.templateType !== "element") {
+      setTemplateStatus("Drop element templates into columns");
+      return;
+    }
+
+    const sourceBlock = template.sections
+      .flatMap((section) => section.layoutItems ?? [])
+      .flatMap((item) => item.blocks ?? [])[0];
+    if (!sourceBlock) {
+      setTemplateStatus("Element template is empty");
+      return;
+    }
+
+    const insertedBlock = cloneTemplateBlock(sourceBlock);
+    setBuilderState((current) => ({
+      ...current,
+      sections: current.sections.map((section) => {
+        if (section.id !== sectionId || !isLayoutContainerSection(section)) {
+          return section;
+        }
+        return {
+          ...section,
+          layoutItems: (section.layoutItems ?? []).map((item, index) => {
+            const itemKey = item.id ?? `layout-item-${index}`;
+            if (itemKey !== columnKey) return item;
+            const blocks = [...(item.blocks ?? [])];
+            const targetIndex = targetBlockKey
+              ? blocks.findIndex(
+                  (block, blockIndex) =>
+                    (block.id ?? `${columnKey}-block-${blockIndex}`) ===
+                    targetBlockKey,
+                )
+              : -1;
+            blocks.splice(targetIndex >= 0 ? targetIndex : blocks.length, 0, insertedBlock);
+            return { ...item, blocks };
+          }),
+        };
+      }),
+    }));
+
+    setSelectedId(sectionId);
+    setSelectedLayoutColumnKey(columnKey);
+    setSelectedLayoutBlockKey(insertedBlock.id ?? null);
+    setOpenLayoutItemId(columnKey);
+    setInspectorTab("content");
+    openInspectorPanel();
+    setTemplateStatus("Element template inserted");
+  };
+
+  const renameSavedTemplate = async (
+    template: BuilderSavedTemplate,
+    nextTitle: string,
+  ) => {
+    const title = nextTitle.trim();
+    if (!title || title === template.title) return;
+    setTemplateStatus("Renaming template...");
+
+    const response = await fetch("/api/builder-templates", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        ...template,
+        title,
+      }),
+    });
+
+    if (!response.ok) {
+      setTemplateStatus("Template rename failed");
+      return;
+    }
+
+    const payload = (await response.json()) as {
+      template?: BuilderSavedTemplate;
+      templates?: BuilderSavedTemplate[];
+    };
+    if (payload.templates) {
+      setSavedTemplates(payload.templates);
+    }
+    setTemplateStatus("Template renamed");
   };
 
   const deleteSavedTemplate = async (id: string) => {
@@ -4054,8 +4747,9 @@ export default function DashboardBuilder({
       copied={copied}
       elementBackgroundPresets={elementBackgroundPresets}
       getLayoutItemBlocks={getLayoutItemBlocks}
-      inspectorOpen
+      inspectorOpen={inspectorOpen}
       inspectorTab={inspectorTab}
+      spacingOverlayEnabled={spacingOverlayEnabled}
       layoutBlockLabels={layoutBlockLabels}
       openLayoutItemId={openLayoutItemId}
       openSlideId={openSlideId}
@@ -4091,11 +4785,13 @@ export default function DashboardBuilder({
       duplicateSelectedRow={duplicateSelectedRow}
       applyLayoutPreset={applyContentLayoutPreset}
       applySelectedRowLayoutPreset={applySelectedRowLayoutPreset}
+      onUpdateRowStyle={updateSelectedRowStyle}
       deleteSelectedRow={deleteSelectedRow}
       moveSelected={moveSelected}
       openWordPressMediaPicker={openWordPressMediaPicker}
       setInspectorOpen={setInspectorOpen}
       setInspectorTab={setInspectorTab}
+      setSpacingOverlayEnabled={setSpacingOverlayEnabled}
       setOpenSlideId={setOpenSlideId}
       setSectionSettingsOpen={setSectionSettingsOpen}
       setSectionStructureOpen={setSectionStructureOpen}
@@ -4859,10 +5555,7 @@ export default function DashboardBuilder({
                   })
                 }
               >
-                <option value="none">None</option>
-                <option value="small">Small</option>
-                <option value="medium">Medium</option>
-                <option value="large">Large</option>
+                {renderGlobalSpacingOptions("sectionPadding")}
               </select>
             </label>
 
@@ -4877,10 +5570,7 @@ export default function DashboardBuilder({
                   })
                 }
               >
-                <option value="none">None</option>
-                <option value="small">Small</option>
-                <option value="medium">Medium</option>
-                <option value="large">Large</option>
+                {renderGlobalSpacingOptions("sectionPadding")}
               </select>
             </label>
           </div>
@@ -4897,10 +5587,7 @@ export default function DashboardBuilder({
                   })
                 }
               >
-                <option value="none">None</option>
-                <option value="small">Small</option>
-                <option value="medium">Medium</option>
-                <option value="large">Large</option>
+                {renderGlobalSpacingOptions("sectionMargin")}
               </select>
             </label>
 
@@ -4915,10 +5602,7 @@ export default function DashboardBuilder({
                   })
                 }
               >
-                <option value="none">None</option>
-                <option value="small">Small</option>
-                <option value="medium">Medium</option>
-                <option value="large">Large</option>
+                {renderGlobalSpacingOptions("sectionMargin")}
               </select>
             </label>
           </div>
@@ -5014,12 +5698,21 @@ export default function DashboardBuilder({
         menuTree={menuTree}
         newPageTitle={newPageTitle}
         inspectorSlot={inspectorPanel}
+        inspectorOpen={inspectorOpen}
+        inspectorOpenKey={inspectorOpenKey}
         pageStatus={pageStatus}
         publishStatus={publishStatus}
         selectedLayoutBlockKey={selectedLayoutBlockKey}
+        selectedSectionTitle={selectedSection?.title || selectedSection?.kind || null}
+        selectedElementLabel={
+          selectedLayoutBlock
+            ? layoutBlockLabels[selectedLayoutBlock.kind ?? "text"]
+            : null
+        }
         selectedMenuItem={selectedMenuItem}
         selectedMenuItemId={selectedMenuItemId}
         savedTemplates={savedTemplates}
+        renameTemplateRequest={renameTemplateRequest}
         sidebarTab={sidebarTab}
         templateDescriptions={templateDescriptions}
         templateLabels={templateLabels}
@@ -5034,12 +5727,17 @@ export default function DashboardBuilder({
         }}
         onRenderLayoutBlockIcon={getLayoutBlockLibraryIcon}
         onSaveCurrentPageAsTemplate={saveCurrentPageAsTemplate}
+        onSaveSelectedSectionAsTemplate={saveSelectedSectionAsTemplate}
+        onSaveSelectedElementAsTemplate={saveSelectedElementAsTemplate}
+        onApplySavedTemplate={applySavedTemplate}
+        onRenameSavedTemplate={renameSavedTemplate}
         onSetDevice={setDevice}
         onSetMenuIconPickerOpen={setMenuIconPickerOpen}
         onSetMenuIconSearch={setMenuIconSearch}
         onSetNewPageTitle={setNewPageTitle}
         onSetSelectedMenuItemId={setSelectedMenuItemId}
         onSetSidebarTab={setSidebarTab}
+        onOpenInspector={openInspectorPanel}
         onStartSidebarResize={startSidebarResize}
         onSwitchBuilderTarget={switchBuilderTarget}
         openElementsPanelKey={panelForceToggler}
@@ -5058,9 +5756,11 @@ export default function DashboardBuilder({
         <button
           type="button"
           className="builder-sidebar-open-toggle builder-icon-button"
-          onClick={() => setSidebarCollapsed(false)}
-          aria-label="Open sidebar"
-          title="Open sidebar"
+          onClick={() => {
+            openInspectorPanel();
+          }}
+          aria-label="Open inspector"
+          title="Open inspector"
         >
           <PanelRightOpen size={16} />
         </button>
@@ -5641,10 +6341,7 @@ export default function DashboardBuilder({
                         })
                       }
                     >
-                      <option value="none">None</option>
-                      <option value="small">Small</option>
-                      <option value="medium">Medium</option>
-                      <option value="large">Large</option>
+                      {renderGlobalSpacingOptions("sectionPadding")}
                     </select>
                   </label>
 
@@ -5659,10 +6356,7 @@ export default function DashboardBuilder({
                         })
                       }
                     >
-                      <option value="none">None</option>
-                      <option value="small">Small</option>
-                      <option value="medium">Medium</option>
-                      <option value="large">Large</option>
+                      {renderGlobalSpacingOptions("sectionPadding")}
                     </select>
                   </label>
                 </div>
@@ -5679,10 +6373,7 @@ export default function DashboardBuilder({
                         })
                       }
                     >
-                      <option value="none">None</option>
-                      <option value="small">Small</option>
-                      <option value="medium">Medium</option>
-                      <option value="large">Large</option>
+                      {renderGlobalSpacingOptions("sectionMargin")}
                     </select>
                   </label>
 
@@ -5697,10 +6388,7 @@ export default function DashboardBuilder({
                         })
                       }
                     >
-                      <option value="none">None</option>
-                      <option value="small">Small</option>
-                      <option value="medium">Medium</option>
-                      <option value="large">Large</option>
+                      {renderGlobalSpacingOptions("sectionMargin")}
                     </select>
                   </label>
                 </div>
@@ -5737,7 +6425,7 @@ export default function DashboardBuilder({
           ref={previewShellRef}
           className={`builder-preview-shell builder-preview-${device} builder-preview-scheme-${
             builderState.design.colorScheme ?? "auto"
-          }`}
+          }${spacingOverlayEnabled ? " is-spacing-overlay-enabled" : ""}`}
           style={
             {
               "--builder-preview-shell-bg": previewPageBackground,
@@ -5758,6 +6446,7 @@ export default function DashboardBuilder({
             pageLabel={getLayoutLabel(builderState.page, customPages)}
             design={builderState.design}
             shellSettings={shellSettings}
+            spacingOverlayEnabled={spacingOverlayEnabled}
             selectedId={selectedId}
             selectedLayoutColumnKey={selectedLayoutColumnKey}
             selectedLayoutRowIndex={selectedLayoutRowIndex}
@@ -5798,6 +6487,15 @@ export default function DashboardBuilder({
             onAddWireframe={addWireframeNear}
             onAddRow={addRowNear}
             onDeleteRow={deleteEmptyRow}
+            onDuplicateRow={duplicateLayoutRow}
+            onMoveRow={moveLayoutRow}
+            onSaveSectionTemplate={saveSectionTemplateById}
+            onSaveRowTemplate={saveRowTemplateByIndex}
+            onSaveElementTemplate={saveElementTemplateByKey}
+            onMoveBlockWithinColumn={moveLayoutBlockWithinColumn}
+            onDropSectionTemplate={insertSectionTemplateNear}
+            onDropRowTemplate={insertRowTemplateAt}
+            onDropElementTemplate={insertElementTemplateAt}
             onMoveSection={moveSection}
             onDuplicateSection={duplicateSection}
             onDeleteSection={deleteSection}
@@ -6073,6 +6771,7 @@ function PreviewCanvas({
   pageLabel,
   design,
   shellSettings,
+  spacingOverlayEnabled,
   selectedId,
   selectedLayoutColumnKey,
   selectedLayoutRowIndex,
@@ -6113,6 +6812,15 @@ function PreviewCanvas({
   onAddWireframe,
   onAddRow,
   onDeleteRow,
+  onDuplicateRow,
+  onMoveRow,
+  onSaveSectionTemplate,
+  onSaveRowTemplate,
+  onSaveElementTemplate,
+  onMoveBlockWithinColumn,
+  onDropSectionTemplate,
+  onDropRowTemplate,
+  onDropElementTemplate,
   onMoveSection,
   onDuplicateSection,
   onDeleteSection,
@@ -6127,6 +6835,7 @@ function PreviewCanvas({
   pageLabel: string;
   design: BuilderDesign;
   shellSettings: BuilderShellSettings;
+  spacingOverlayEnabled: boolean;
   selectedId: string;
   selectedLayoutColumnKey: string | null;
   selectedLayoutRowIndex: number | null;
@@ -6256,6 +6965,38 @@ function PreviewCanvas({
     presetKey: string,
   ) => void;
   onDeleteRow: (sectionId: string, rowIndex: number) => void;
+  onDuplicateRow: (sectionId: string, rowIndex: number) => void;
+  onMoveRow: (sectionId: string, rowIndex: number, direction: -1 | 1) => void;
+  onSaveSectionTemplate: (sectionId: string) => void;
+  onSaveRowTemplate: (sectionId: string, rowIndex: number) => void;
+  onSaveElementTemplate: (
+    sectionId: string,
+    columnKey: string,
+    blockKey: string,
+  ) => void;
+  onMoveBlockWithinColumn: (payload: {
+    sectionId: string;
+    columnKey: string;
+    blockKey: string;
+    direction: -1 | 1;
+  }) => void;
+  onDropSectionTemplate: (
+    templateId: string,
+    targetSectionId: string,
+    placement: "above" | "below",
+  ) => void;
+  onDropRowTemplate: (
+    templateId: string,
+    sectionId: string,
+    rowIndex: number,
+    placement: "before" | "after",
+  ) => void;
+  onDropElementTemplate: (payload: {
+    templateId: string;
+    sectionId: string;
+    columnKey: string;
+    targetBlockKey?: string;
+  }) => void;
   onMoveSection: (sectionId: string, direction: -1 | 1) => void;
   onDuplicateSection: (sectionId: string) => void;
   onDeleteSection: (sectionId: string) => void;
@@ -6300,6 +7041,8 @@ function PreviewCanvas({
   ) => void;
 }) {
   const [sectionDragOverId, setSectionDragOverId] = useState<string | null>(null);
+  const [templateDragType, setTemplateDragType] =
+    useState<BuilderTemplateDragType | null>(null);
   const sectionDragClearTimer = useRef<number | null>(null);
   const [insertTarget, setInsertTarget] = useState<{
     sectionId: string | null;
@@ -6391,7 +7134,9 @@ function PreviewCanvas({
 
   return (
     <div
-      className="builder-preview-canvas"
+      className={`builder-preview-canvas${
+        templateDragType ? ` is-dragging-template-${templateDragType}` : ""
+      }`}
       style={
         {
           "--builder-global-section-padding-top": getPreviewSpacing(
@@ -6400,14 +7145,34 @@ function PreviewCanvas({
           "--builder-global-section-padding-bottom": getPreviewSpacing(
             shellSettings.sectionPaddingBottom,
           ),
-          "--builder-global-section-margin-top": getPreviewSpacing(
+          "--builder-global-section-margin-top": getPreviewSectionMargin(
             shellSettings.sectionMarginTop,
           ),
-          "--builder-global-section-margin-bottom": getPreviewSpacing(
+          "--builder-global-section-margin-bottom": getPreviewSectionMargin(
             shellSettings.sectionMarginBottom,
           ),
         } as CSSProperties
       }
+      onDragEnter={(event) => {
+        const dragType = getBuilderTemplateDragType(event.dataTransfer.types);
+        if (!dragType) return;
+        setTemplateDragType(dragType);
+      }}
+      onDragOver={(event) => {
+        const dragType = getBuilderTemplateDragType(event.dataTransfer.types);
+        if (!dragType) return;
+        setTemplateDragType(dragType);
+      }}
+      onDragLeave={(event) => {
+        if (
+          event.relatedTarget instanceof Node &&
+          event.currentTarget.contains(event.relatedTarget)
+        ) {
+          return;
+        }
+        setTemplateDragType(null);
+      }}
+      onDrop={() => setTemplateDragType(null)}
     >
       {visibleSections.length === 0 && (
         <div className="builder-preview-empty">
@@ -6478,10 +7243,10 @@ function PreviewCanvas({
                     "--builder-section-padding-bottom": getPreviewSpacing(
                       section.bottomSpacing,
                     ),
-                    "--builder-section-margin-top": getPreviewSpacing(
+                    "--builder-section-margin-top": getPreviewSectionMargin(
                       section.topMargin,
                     ),
-                    "--builder-section-margin-bottom": getPreviewSpacing(
+                    "--builder-section-margin-bottom": getPreviewSectionMargin(
                       section.bottomMargin,
                     ),
                     "--builder-radius":
@@ -6543,7 +7308,17 @@ function PreviewCanvas({
                     sectionDragClearTimer.current = null;
                   }
                   event.preventDefault();
+                  if (event.dataTransfer.getData(BUILDER_TEMPLATE_DND_TYPE)) {
+                    setSectionDragOverId(null);
+                    onDragEnd();
+                    return;
+                  }
                   const sourceId = event.dataTransfer.getData("text/plain");
+                  if (!sourceId) {
+                    setSectionDragOverId(null);
+                    onDragEnd();
+                    return;
+                  }
                   if (sourceId.startsWith("builder-block:")) return;
                   onReorder(sourceId, section.id);
                   onDragEnd();
@@ -6557,7 +7332,14 @@ function PreviewCanvas({
                   setSectionDragOverId(null);
                   onDragEnd();
                 }}
-              >
+                >
+                {(spacingOverlayEnabled || isSelected) && (
+                  <SectionSpacingOverlay
+                    section={section}
+                    shellSettings={shellSettings}
+                    showZeroLabels={spacingOverlayEnabled}
+                  />
+                )}
                 {isSectionAntigravity && (
                   <>
                     <AntigravityCanvas
@@ -6605,6 +7387,21 @@ function PreviewCanvas({
                     <span>{sectionLabels[section.kind]}</span>
                     <button
                       type="button"
+                      onClick={() => onSelect(section.id)}
+                      aria-label="Open section settings"
+                      title="Section settings"
+                    >
+                      <Settings2 size={14} />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => onSaveSectionTemplate(section.id)}
+                      title="Save section as template"
+                    >
+                      <Save size={14} />
+                    </button>
+                    <button
+                      type="button"
                       onClick={() => onMoveSection(section.id, -1)}
                       disabled={sourceIndex <= 0}
                       title="Move section up"
@@ -6642,6 +7439,23 @@ function PreviewCanvas({
                   onClick={(event) => event.stopPropagation()}
                   onMouseDown={(event) => event.stopPropagation()}
                   onDragStart={(event) => event.stopPropagation()}
+                  onDragOver={(event) => {
+                    if (getBuilderTemplateDragType(event.dataTransfer.types) !== "section") return;
+                    event.preventDefault();
+                    event.stopPropagation();
+                    setSectionDragOverId(section.id);
+                    event.dataTransfer.dropEffect = "copy";
+                  }}
+                  onDrop={(event) => {
+                    const templateId = event.dataTransfer.getData(
+                      BUILDER_TEMPLATE_DND_TYPE,
+                    );
+                    if (!templateId) return;
+                    event.preventDefault();
+                    event.stopPropagation();
+                    setSectionDragOverId(null);
+                    onDropSectionTemplate(templateId, section.id, "above");
+                  }}
                 >
                   <button
                     type="button"
@@ -6663,6 +7477,23 @@ function PreviewCanvas({
                   onClick={(event) => event.stopPropagation()}
                   onMouseDown={(event) => event.stopPropagation()}
                   onDragStart={(event) => event.stopPropagation()}
+                  onDragOver={(event) => {
+                    if (getBuilderTemplateDragType(event.dataTransfer.types) !== "section") return;
+                    event.preventDefault();
+                    event.stopPropagation();
+                    setSectionDragOverId(section.id);
+                    event.dataTransfer.dropEffect = "copy";
+                  }}
+                  onDrop={(event) => {
+                    const templateId = event.dataTransfer.getData(
+                      BUILDER_TEMPLATE_DND_TYPE,
+                    );
+                    if (!templateId) return;
+                    event.preventDefault();
+                    event.stopPropagation();
+                    setSectionDragOverId(null);
+                    onDropSectionTemplate(templateId, section.id, "below");
+                  }}
                 >
                   <button
                     type="button"
@@ -6718,7 +7549,15 @@ function PreviewCanvas({
                   onUploadGridItemImage={onUploadGridItemImage}
                   onAddRow={onAddRow}
                   onDeleteRow={onDeleteRow}
+                  onDuplicateRow={onDuplicateRow}
+                  onMoveRow={onMoveRow}
+                  onSaveRowTemplate={onSaveRowTemplate}
+                  onSaveElementTemplate={onSaveElementTemplate}
+                  onMoveBlockWithinColumn={onMoveBlockWithinColumn}
+                  onDropRowTemplate={onDropRowTemplate}
+                  onDropElementTemplate={onDropElementTemplate}
                   onOpenElementsPanel={onOpenElementsPanel}
+                  spacingOverlayEnabled={spacingOverlayEnabled}
                 />
               </div>
             );
@@ -6768,20 +7607,24 @@ function previewDesignStyle(design: BuilderDesign) {
 }
 
 function getPreviewSpacing(value: SectionSpacing | undefined) {
-  switch (value) {
-    case "inherit":
-      return undefined;
-    case "none":
-      return "0px";
-    case "small":
-      return "clamp(18px, 3vw, 36px)";
-    case "large":
-      return "clamp(52px, 7vw, 96px)";
-    case "medium":
-      return "clamp(28px, 5vw, 72px)";
-    default:
-      return undefined;
-  }
+  if (!value || value === "inherit") return undefined;
+  return resolveBuilderSpacing(value, "sectionPadding").css;
+}
+
+function getPreviewSectionMargin(value: SectionSpacing | undefined) {
+  if (!value || value === "inherit") return undefined;
+  return resolveBuilderSpacing(value, "sectionMargin").css;
+}
+
+function renderGlobalSpacingOptions(context: "sectionPadding" | "sectionMargin") {
+  return (["none", "small", "medium", "large"] as const).map((value) => (
+    <option key={value} value={value}>
+      {value === "none"
+        ? "None"
+        : `${value[0].toUpperCase()}${value.slice(1)}`}{" "}
+      ({getSpacingOptionLabel(value, context)}px)
+    </option>
+  ));
 }
 
 function getStorefrontPreviewClass(section: BuilderSection) {
@@ -7237,18 +8080,43 @@ function InlineEditableText({
 function RowInsertControl({
   placement,
   onClick,
-  onDelete,
+  onTemplateDrop,
 }: {
-  placement: "before" | "after";
+  placement: "after";
   onClick: () => void;
-  onDelete?: () => void;
+  onTemplateDrop?: (templateId: string) => void;
 }) {
+  const [templateDragOver, setTemplateDragOver] = useState(false);
+
   return (
     <div
-      className={`builder-preview-row-insert builder-preview-row-insert--${placement}`}
+      className={`builder-preview-row-insert builder-preview-row-insert--${placement}${
+        templateDragOver ? " is-template-drag-over" : ""
+      }`}
       onClick={(event) => event.stopPropagation()}
       onMouseDown={(event) => event.stopPropagation()}
       onDragStart={(event) => event.stopPropagation()}
+      onDragEnter={(event) => {
+        if (getBuilderTemplateDragType(event.dataTransfer.types) !== "row") return;
+        event.preventDefault();
+        event.stopPropagation();
+        setTemplateDragOver(true);
+      }}
+      onDragLeave={() => setTemplateDragOver(false)}
+      onDragOver={(event) => {
+        if (getBuilderTemplateDragType(event.dataTransfer.types) !== "row") return;
+        event.preventDefault();
+        event.stopPropagation();
+        event.dataTransfer.dropEffect = "copy";
+      }}
+      onDrop={(event) => {
+        const templateId = event.dataTransfer.getData(BUILDER_TEMPLATE_DND_TYPE);
+        if (!templateId || !onTemplateDrop) return;
+        event.preventDefault();
+        event.stopPropagation();
+        setTemplateDragOver(false);
+        onTemplateDrop(templateId);
+      }}
     >
       <button
         type="button"
@@ -7260,20 +8128,211 @@ function RowInsertControl({
         <Plus size={14} />
         <span>Add Row</span>
       </button>
-      {onDelete && (
-        <button
-          type="button"
-          className="builder-preview-row-delete-trigger"
-          onClick={onDelete}
-          aria-label="Delete blank row"
-          title="Delete blank row"
-        >
-          <Trash2 size={13} />
-          <span>Delete Row</span>
-        </button>
-      )}
     </div>
   );
+}
+
+function RowLayoutToolbar({
+  rowIndex,
+  canMoveUp,
+  canMoveDown,
+  isEmpty,
+  onSettings,
+  onMoveUp,
+  onMoveDown,
+  onSave,
+  onDuplicate,
+  onDelete,
+}: {
+  rowIndex: number;
+  canMoveUp: boolean;
+  canMoveDown: boolean;
+  isEmpty: boolean;
+  onSettings: () => void;
+  onMoveUp: () => void;
+  onMoveDown: () => void;
+  onSave: () => void;
+  onDuplicate: () => void;
+  onDelete: () => void;
+}) {
+  return (
+    <div
+      className="builder-preview-row-toolbar"
+      onClick={(event) => event.stopPropagation()}
+      onMouseDown={(event) => event.stopPropagation()}
+      onDragStart={(event) => event.stopPropagation()}
+    >
+      <span>Row Layout</span>
+      <button
+        type="button"
+        onClick={onSettings}
+        aria-label={`Open row ${rowIndex + 1} settings`}
+        title={`Open row ${rowIndex + 1} settings`}
+      >
+        <Settings2 size={13} />
+      </button>
+      <button
+        type="button"
+        onClick={onMoveUp}
+        disabled={!canMoveUp}
+        aria-label={`Move row ${rowIndex + 1} up`}
+        title="Move row up"
+      >
+        <ArrowUp size={13} />
+      </button>
+      <button
+        type="button"
+        onClick={onMoveDown}
+        disabled={!canMoveDown}
+        aria-label={`Move row ${rowIndex + 1} down`}
+        title="Move row down"
+      >
+        <ArrowDown size={13} />
+      </button>
+      <button
+        type="button"
+        onClick={onSave}
+        aria-label={`Save row ${rowIndex + 1} as template`}
+        title={`Save row ${rowIndex + 1} as template`}
+      >
+        <Save size={13} />
+      </button>
+      <button
+        type="button"
+        onClick={onDuplicate}
+        aria-label={`Duplicate row ${rowIndex + 1}`}
+        title={`Duplicate row ${rowIndex + 1}`}
+      >
+        <Copy size={13} />
+      </button>
+      <button
+        type="button"
+        onClick={onDelete}
+        disabled={!isEmpty}
+        aria-label={
+          isEmpty
+            ? `Delete row ${rowIndex + 1}`
+            : `Row ${rowIndex + 1} must be empty before deleting`
+        }
+        title={isEmpty ? "Delete empty row" : "Delete is available for empty rows"}
+      >
+        <Trash2 size={13} />
+      </button>
+    </div>
+  );
+}
+
+function SectionSpacingOverlay({
+  section,
+  shellSettings,
+  showZeroLabels = false,
+}: {
+  section: BuilderSection;
+  shellSettings: BuilderShellSettings;
+  showZeroLabels?: boolean;
+}) {
+  const topMarginLabel = formatSectionSpacingLabel(
+    section.topMargin,
+    "sectionMargin",
+    shellSettings.sectionMarginTop,
+  );
+  const topPaddingLabel = formatSectionSpacingLabel(
+    section.topSpacing,
+    "sectionPadding",
+    shellSettings.sectionPaddingTop,
+  );
+  const bottomPaddingLabel = formatSectionSpacingLabel(
+    section.bottomSpacing,
+    "sectionPadding",
+    shellSettings.sectionPaddingBottom,
+  );
+  const bottomMarginLabel = formatSectionSpacingLabel(
+    section.bottomMargin,
+    "sectionMargin",
+    shellSettings.sectionMarginBottom,
+  );
+  return (
+    <div className="builder-preview-spacing-layer" aria-hidden="true">
+      <div className="builder-preview-spacing-overlay builder-preview-spacing-overlay--margin-top">
+        {shouldShowSectionSpacingLabel(section.topMargin, "sectionMargin", shellSettings.sectionMarginTop, showZeroLabels) ? (
+          <span className="builder-preview-spacing-label builder-preview-spacing-label--margin">
+            mt {topMarginLabel}
+          </span>
+        ) : null}
+      </div>
+      <div className="builder-preview-spacing-overlay builder-preview-spacing-overlay--padding-top">
+        {shouldShowSectionSpacingLabel(section.topSpacing, "sectionPadding", shellSettings.sectionPaddingTop, showZeroLabels) ? (
+          <span className="builder-preview-spacing-label">
+            pt {topPaddingLabel}
+          </span>
+        ) : null}
+      </div>
+      <div className="builder-preview-spacing-overlay builder-preview-spacing-overlay--padding-bottom">
+        {shouldShowSectionSpacingLabel(section.bottomSpacing, "sectionPadding", shellSettings.sectionPaddingBottom, showZeroLabels) ? (
+          <span className="builder-preview-spacing-label">
+            pb {bottomPaddingLabel}
+          </span>
+        ) : null}
+      </div>
+      <div className="builder-preview-spacing-overlay builder-preview-spacing-overlay--margin-bottom">
+        {shouldShowSectionSpacingLabel(section.bottomMargin, "sectionMargin", shellSettings.sectionMarginBottom, showZeroLabels) ? (
+          <span className="builder-preview-spacing-label builder-preview-spacing-label--margin">
+            mb {bottomMarginLabel}
+          </span>
+        ) : null}
+      </div>
+    </div>
+  );
+}
+
+function BoxSpacingOverlay({
+  kind,
+  paddingLabel,
+  marginLabel,
+}: {
+  kind: "column" | "element";
+  paddingLabel: string;
+  marginLabel?: string;
+}) {
+  return (
+    <div
+      className={`builder-preview-box-spacing builder-preview-box-spacing--${kind}`}
+      aria-hidden="true"
+    >
+      <span className="builder-preview-box-spacing-fill" />
+      <span className="builder-preview-spacing-label builder-preview-spacing-label--box">
+        {paddingLabel}
+      </span>
+      {marginLabel ? (
+        <span className="builder-preview-spacing-label builder-preview-spacing-label--margin builder-preview-spacing-label--box-margin">
+          {marginLabel}
+        </span>
+      ) : null}
+    </div>
+  );
+}
+
+function formatSectionSpacingLabel(
+  value: SectionSpacing | undefined,
+  context: "sectionPadding" | "sectionMargin",
+  fallback: GlobalSectionSpacing | undefined,
+) {
+  return getSpacingLabel(value ?? "inherit", context, fallback);
+}
+
+function shouldShowSectionSpacingLabel(
+  value: SectionSpacing | undefined,
+  context: "sectionPadding" | "sectionMargin",
+  fallback: GlobalSectionSpacing | undefined,
+  showZero: boolean,
+) {
+  return shouldShowSpacingLabel(value ?? "inherit", context, fallback, showZero);
+}
+
+function formatElementPaddingLabel(
+  value: BuilderLayoutBlock["elementPadding"],
+) {
+  return `p ${getSpacingLabel(value ?? "none", "elementPadding")}`;
 }
 
 function PreviewSection({
@@ -7315,7 +8374,15 @@ function PreviewSection({
   onUploadGridItemImage,
   onAddRow,
   onDeleteRow,
+  onDuplicateRow,
+  onMoveRow,
+  onSaveRowTemplate,
+  onSaveElementTemplate,
+  onMoveBlockWithinColumn,
+  onDropRowTemplate,
+  onDropElementTemplate,
   onOpenElementsPanel,
+  spacingOverlayEnabled,
 }: {
   section: BuilderSection;
   previewProducts: ProductNode[];
@@ -7438,6 +8505,32 @@ function PreviewSection({
     presetKey: string,
   ) => void;
   onDeleteRow: (sectionId: string, rowIndex: number) => void;
+  onDuplicateRow: (sectionId: string, rowIndex: number) => void;
+  onMoveRow: (sectionId: string, rowIndex: number, direction: -1 | 1) => void;
+  onSaveRowTemplate: (sectionId: string, rowIndex: number) => void;
+  onSaveElementTemplate: (
+    sectionId: string,
+    columnKey: string,
+    blockKey: string,
+  ) => void;
+  onMoveBlockWithinColumn: (payload: {
+    sectionId: string;
+    columnKey: string;
+    blockKey: string;
+    direction: -1 | 1;
+  }) => void;
+  onDropRowTemplate: (
+    templateId: string,
+    sectionId: string,
+    rowIndex: number,
+    placement: "before" | "after",
+  ) => void;
+  onDropElementTemplate: (payload: {
+    templateId: string;
+    sectionId: string;
+    columnKey: string;
+    targetBlockKey?: string;
+  }) => void;
   onDeleteButton: (
     sectionId: string,
     columnKey: string,
@@ -7476,6 +8569,7 @@ function PreviewSection({
     toIndex: number,
   ) => void;
   onOpenElementsPanel: () => void;
+  spacingOverlayEnabled: boolean;
 }) {
   const dragClearTimer = useRef<number | null>(null);
   const [dragOverKey, setDragOverKey] = useState<string | null>(null);
@@ -7960,19 +9054,33 @@ if (section.kind === "embed") {
               rowMeta !== undefined &&
               selectedSectionId === section.id &&
               selectedLayoutRowIndex === rowMeta.rowIndex;
+            const rowSpacingStyle: CSSProperties = {};
+            if (item.rowTopSpacing && item.rowTopSpacing !== "inherit") {
+              rowSpacingStyle.paddingTop = resolveBuilderSpacing(
+                item.rowTopSpacing,
+                "rowPadding",
+              ).css;
+            }
+            if (item.rowBottomSpacing && item.rowBottomSpacing !== "inherit") {
+              rowSpacingStyle.paddingBottom = resolveBuilderSpacing(
+                item.rowBottomSpacing,
+                "rowPadding",
+              ).css;
+            }
+            if (item.rowTopMargin && item.rowTopMargin !== "inherit") {
+              rowSpacingStyle.marginTop = resolveBuilderSpacing(
+                item.rowTopMargin,
+                "rowMargin",
+              ).css;
+            }
+            if (item.rowBottomMargin && item.rowBottomMargin !== "inherit") {
+              rowSpacingStyle.marginBottom = resolveBuilderSpacing(
+                item.rowBottomMargin,
+                "rowMargin",
+              ).css;
+            }
             return (
               <Fragment key={columnKey}>
-                {rowMeta?.isRowStart && rowMeta.rowIndex === 0 && (
-                  <RowInsertControl
-                    placement="before"
-                    onClick={() =>
-                      setRowInsertTarget({
-                        rowIndex: rowMeta.rowIndex,
-                        placement: "before",
-                      })
-                    }
-                  />
-                )}
               <article
                 className={hasScrollPinned ? `w-full col-span-12 ${
                   selectedLayoutColumnKey === columnKey
@@ -7993,7 +9101,14 @@ if (section.kind === "embed") {
                 } ${
                   dragOverKey === `col:${columnKey}` ? "is-drag-over" : ""
                 }`}
-                style={hasScrollPinned ? { gridColumn: "span 12" } : { gridColumn: `span ${rowMeta?.span ?? 12}` }}
+                style={
+                  hasScrollPinned
+                    ? { ...rowSpacingStyle, gridColumn: "span 12" }
+                    : {
+                        ...rowSpacingStyle,
+                        gridColumn: `span ${rowMeta?.span ?? 12}`,
+                      }
+                }
                 onClick={(event) => {
                   if (
                     event.target instanceof HTMLElement &&
@@ -8008,7 +9123,8 @@ if (section.kind === "embed") {
                   const types = Array.from(event.dataTransfer.types);
                   if (
                     types.includes("application/x-builder-block") ||
-                    types.includes("application/x-builder-new-block")
+                    types.includes("application/x-builder-new-block") ||
+                    getBuilderTemplateDragType(event.dataTransfer.types) === "element"
                   ) {
                     event.preventDefault();
                     event.stopPropagation();
@@ -8029,13 +9145,14 @@ if (section.kind === "embed") {
                   const types = Array.from(event.dataTransfer.types);
                   if (
                     types.includes("application/x-builder-block") ||
-                    types.includes("application/x-builder-new-block")
+                    types.includes("application/x-builder-new-block") ||
+                    getBuilderTemplateDragType(event.dataTransfer.types) === "element"
                   ) {
                     event.preventDefault();
                     event.stopPropagation();
                     event.dataTransfer.dropEffect = types.includes(
                       "application/x-builder-new-block",
-                    )
+                    ) || getBuilderTemplateDragType(event.dataTransfer.types) === "element"
                       ? "copy"
                       : "move";
                   }
@@ -8046,6 +9163,19 @@ if (section.kind === "embed") {
                     dragClearTimer.current = null;
                   }
                   setDragOverKey(null);
+                  const templateId = event.dataTransfer.getData(
+                    BUILDER_TEMPLATE_DND_TYPE,
+                  );
+                  if (templateId) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    onDropElementTemplate({
+                      templateId,
+                      sectionId: section.id,
+                      columnKey,
+                    });
+                    return;
+                  }
                   const newBlockKind = event.dataTransfer.getData(
                     "application/x-builder-new-block",
                   ) as LayoutBlockKind;
@@ -8083,19 +9213,32 @@ if (section.kind === "embed") {
                   onBlockDragEnd();
                 }}
               >
+                {(spacingOverlayEnabled ||
+                  isSelectedRow ||
+                  selectedLayoutColumnKey === columnKey) && (
+                  <BoxSpacingOverlay
+                    kind="column"
+                    paddingLabel={`p ${getSpacingLabel("sm", "columnPadding")}`}
+                    marginLabel={
+                      rowMeta?.isRowStart
+                        ? `row gap ${getSpacingLabel("medium", "rowGap")}`
+                        : undefined
+                    }
+                  />
+                )}
                 {rowMeta?.isRowStart && (
-                  <button
-                    type="button"
-                    className="builder-preview-row-handle"
-                    onClick={(event) => {
-                      event.stopPropagation();
-                      onSelectRow(section.id, rowMeta.rowIndex);
-                    }}
-                    aria-label={`Select row ${rowMeta.rowIndex + 1}`}
-                    title={`Select row ${rowMeta.rowIndex + 1}`}
-                  >
-                    Row {rowMeta.rowIndex + 1}
-                  </button>
+                  <RowLayoutToolbar
+                    rowIndex={rowMeta.rowIndex}
+                    canMoveUp={rowMeta.rowIndex > 0}
+                    canMoveDown={rowMeta.rowIndex < layoutRows.length - 1}
+                    isEmpty={isEmptyRow}
+                    onSettings={() => onSelectRow(section.id, rowMeta.rowIndex)}
+                    onMoveUp={() => onMoveRow(section.id, rowMeta.rowIndex, -1)}
+                    onMoveDown={() => onMoveRow(section.id, rowMeta.rowIndex, 1)}
+                    onSave={() => onSaveRowTemplate(section.id, rowMeta.rowIndex)}
+                    onDuplicate={() => onDuplicateRow(section.id, rowMeta.rowIndex)}
+                    onDelete={() => onDeleteRow(section.id, rowMeta.rowIndex)}
+                  />
                 )}
                 <div className="builder-preview-column-label">
                   Row {(rowMeta?.rowIndex ?? 0) + 1} / Column{" "}
@@ -8195,7 +9338,8 @@ if (section.kind === "embed") {
                         const types = Array.from(event.dataTransfer.types);
                         if (
                           types.includes("application/x-builder-block") ||
-                          types.includes("application/x-builder-new-block")
+                          types.includes("application/x-builder-new-block") ||
+                          getBuilderTemplateDragType(event.dataTransfer.types) === "element"
                         ) {
                           event.stopPropagation();
                           if (dragClearTimer.current !== null) {
@@ -8215,13 +9359,14 @@ if (section.kind === "embed") {
                         const types = Array.from(event.dataTransfer.types);
                         if (
                           types.includes("application/x-builder-block") ||
-                          types.includes("application/x-builder-new-block")
+                          types.includes("application/x-builder-new-block") ||
+                          getBuilderTemplateDragType(event.dataTransfer.types) === "element"
                         ) {
                           event.preventDefault();
                           event.stopPropagation();
                           event.dataTransfer.dropEffect = types.includes(
                             "application/x-builder-new-block",
-                          )
+                          ) || getBuilderTemplateDragType(event.dataTransfer.types) === "element"
                             ? "copy"
                             : "move";
                         }
@@ -8232,6 +9377,20 @@ if (section.kind === "embed") {
                           dragClearTimer.current = null;
                         }
                         setDragOverKey(null);
+                        const templateId = event.dataTransfer.getData(
+                          BUILDER_TEMPLATE_DND_TYPE,
+                        );
+                        if (templateId) {
+                          event.preventDefault();
+                          event.stopPropagation();
+                          onDropElementTemplate({
+                            templateId,
+                            sectionId: section.id,
+                            columnKey,
+                            targetBlockKey: blockKey,
+                          });
+                          return;
+                        }
                         const newBlockKind = event.dataTransfer.getData(
                           "application/x-builder-new-block",
                         ) as LayoutBlockKind;
@@ -8279,6 +9438,20 @@ if (section.kind === "embed") {
                         onBlockDragEnd();
                       }}
                     >
+                      {(spacingOverlayEnabled ||
+                        selectedLayoutBlockKey === blockKey) && (
+                        <BoxSpacingOverlay
+                          kind="element"
+                          paddingLabel={formatElementPaddingLabel(
+                            block.elementPadding,
+                          )}
+                          marginLabel={
+                            blockIndex > 0
+                              ? `mt ${getSpacingLabel("medium", "elementMargin")}`
+                              : undefined
+                          }
+                        />
+                      )}
                       <div
                         className="builder-preview-block-tools"
                         onClick={(event) => event.stopPropagation()}
@@ -8296,6 +9469,45 @@ if (section.kind === "embed") {
                           title="Edit element"
                         >
                           <Settings2 size={13} />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            onMoveBlockWithinColumn({
+                              sectionId: section.id,
+                              columnKey,
+                              blockKey,
+                              direction: -1,
+                            })
+                          }
+                          disabled={blockIndex <= 0}
+                          title="Move element up"
+                        >
+                          <ArrowUp size={13} />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            onMoveBlockWithinColumn({
+                              sectionId: section.id,
+                              columnKey,
+                              blockKey,
+                              direction: 1,
+                            })
+                          }
+                          disabled={blockIndex >= blocks.length - 1}
+                          title="Move element down"
+                        >
+                          <ArrowDown size={13} />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            onSaveElementTemplate(section.id, columnKey, blockKey)
+                          }
+                          title="Save element as template"
+                        >
+                          <Save size={13} />
                         </button>
                         <button
                           type="button"
@@ -9783,10 +10995,13 @@ if (section.kind === "embed") {
                         placement: "after",
                       })
                     }
-                    onDelete={
-                      isEmptyRow
-                        ? () => onDeleteRow(section.id, rowMeta.rowIndex)
-                        : undefined
+                    onTemplateDrop={(templateId) =>
+                      onDropRowTemplate(
+                        templateId,
+                        section.id,
+                        rowMeta.rowIndex,
+                        "after",
+                      )
                     }
                   />
                 )}

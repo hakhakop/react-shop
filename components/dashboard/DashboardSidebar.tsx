@@ -5,9 +5,11 @@ import {
   ExternalLink,
   LibraryBig,
   MonitorSmartphone,
+  Pencil,
   Plus,
   Save,
   Trash2,
+  X,
 } from "lucide-react";
 import {
   useEffect,
@@ -32,6 +34,22 @@ import type {
 import ElementLibrary from "@/components/dashboard/ElementLibrary";
 import MenuPresentationPanel from "@/components/dashboard/MenuPresentationPanel";
 
+type TemplateLibraryTab = "page" | "section" | "row" | "element";
+
+const BUILDER_TEMPLATE_DND_TYPE = "application/x-builder-template";
+const BUILDER_TEMPLATE_DND_TYPES: Record<Exclude<TemplateLibraryTab, "page">, string> = {
+  section: "application/x-builder-template-section",
+  row: "application/x-builder-template-row",
+  element: "application/x-builder-template-element",
+};
+
+const templateLibraryTabs: { value: TemplateLibraryTab; label: string }[] = [
+  { value: "page", label: "Pages" },
+  { value: "section", label: "Sections" },
+  { value: "row", label: "Rows" },
+  { value: "element", label: "Elements" },
+];
+
 type DashboardSidebarProps = {
   availableLayoutBlockKinds: LayoutBlockKind[];
   builderState: BuilderState;
@@ -45,6 +63,8 @@ type DashboardSidebarProps = {
   newPageTitle: string;
   globalStylesSlot: ReactNode;
   inspectorSlot: ReactNode;
+  inspectorOpen?: boolean;
+  inspectorOpenKey?: number;
   normalizeMenuPresentation: (value?: Partial<MenuPresentationSettings> | null) => MenuPresentationSettings;
   pageStatus: string;
   publishStatus: string;
@@ -53,9 +73,15 @@ type DashboardSidebarProps = {
   selectedMenuItem: MenuItem | null;
   selectedMenuItemId: string | null;
   selectedLayoutBlockKey: string | null;
+  selectedSectionTitle?: string | null;
+  selectedElementLabel?: string | null;
   shellSettings: { menuPresentation?: Record<string, MenuPresentationSettings> };
   sidebarTab: SidebarTab;
   savedTemplates: BuilderSavedTemplate[];
+  renameTemplateRequest?: {
+    id: string;
+    templateType: NonNullable<BuilderSavedTemplate["templateType"]>;
+  } | null;
   templateDescriptions: Record<BuilderTemplate, string>;
   templateLabels: Record<BuilderTemplate, string>;
   templateStatus: string;
@@ -67,13 +93,18 @@ type DashboardSidebarProps = {
   onDeleteSavedTemplate: (id: string) => void;
   onOpenCurrentPage: () => void;
   onRenderLayoutBlockIcon: (kind: LayoutBlockKind) => ReactNode;
-  onSaveCurrentPageAsTemplate: () => void;
+  onSaveCurrentPageAsTemplate: (title?: string) => void | Promise<unknown>;
+  onSaveSelectedSectionAsTemplate?: (title?: string) => void | Promise<unknown>;
+  onSaveSelectedElementAsTemplate?: (title?: string) => void | Promise<unknown>;
+  onApplySavedTemplate?: (template: BuilderSavedTemplate) => void;
+  onRenameSavedTemplate?: (template: BuilderSavedTemplate, title: string) => void;
   onSetDevice: Dispatch<SetStateAction<PreviewDevice>>;
   onSetMenuIconPickerOpen: Dispatch<SetStateAction<boolean>>;
   onSetMenuIconSearch: Dispatch<SetStateAction<string>>;
   onSetNewPageTitle: Dispatch<SetStateAction<string>>;
   onSetSelectedMenuItemId: Dispatch<SetStateAction<string | null>>;
   onSetSidebarTab: Dispatch<SetStateAction<SidebarTab>>;
+  onOpenInspector?: () => void;
   onStartSidebarResize: (clientX: number) => void;
   onSwitchBuilderTarget: (nextKey: BuilderLayoutKey) => void;
   openElementsPanelKey: number;
@@ -92,6 +123,8 @@ export default function DashboardSidebar({
   newPageTitle,
   globalStylesSlot,
   inspectorSlot,
+  inspectorOpen = true,
+  inspectorOpenKey = 0,
   normalizeMenuPresentation,
   pageStatus,
   publishStatus,
@@ -100,9 +133,12 @@ export default function DashboardSidebar({
   selectedMenuItem,
   selectedMenuItemId,
   selectedLayoutBlockKey,
+  selectedSectionTitle,
+  selectedElementLabel,
   shellSettings,
   sidebarTab,
   savedTemplates,
+  renameTemplateRequest,
   templateDescriptions,
   templateLabels,
   templateStatus,
@@ -115,23 +151,35 @@ export default function DashboardSidebar({
   onOpenCurrentPage,
   onRenderLayoutBlockIcon,
   onSaveCurrentPageAsTemplate,
+  onSaveSelectedSectionAsTemplate = () => undefined,
+  onSaveSelectedElementAsTemplate = () => undefined,
+  onApplySavedTemplate = () => undefined,
+  onRenameSavedTemplate = () => undefined,
   onSetDevice,
   onSetMenuIconPickerOpen,
   onSetMenuIconSearch,
   onSetNewPageTitle,
   onSetSelectedMenuItemId,
   onSetSidebarTab,
+  onOpenInspector = () => undefined,
   onStartSidebarResize,
   onSwitchBuilderTarget,
   openElementsPanelKey,
 }: DashboardSidebarProps) {
   const [nestedOpen, setNestedOpen] = useState(false);
+  const [templateDraftTitle, setTemplateDraftTitle] = useState("");
+  const [templateLibraryTab, setTemplateLibraryTab] =
+    useState<TemplateLibraryTab>("section");
+  const [renamingTemplateId, setRenamingTemplateId] = useState<string | null>(null);
+  const [renamingTemplateTitle, setRenamingTemplateTitle] = useState("");
 
   useEffect(() => {
-    if (sidebarTab !== "inspector") return;
+    if (inspectorOpenKey === 0 || sidebarTab !== "inspector" || !inspectorOpen) {
+      return;
+    }
     const frame = window.requestAnimationFrame(() => setNestedOpen(true));
     return () => window.cancelAnimationFrame(frame);
-  }, [selectedLayoutBlockKey, sidebarTab]);
+  }, [inspectorOpenKey, inspectorOpen, sidebarTab]);
 
   useEffect(() => {
     if (openElementsPanelKey === 0) return;
@@ -139,6 +187,18 @@ export default function DashboardSidebar({
     const frame = window.requestAnimationFrame(() => setNestedOpen(true));
     return () => window.cancelAnimationFrame(frame);
   }, [openElementsPanelKey]);
+
+  useEffect(() => {
+    if (!renameTemplateRequest) return;
+    const template = savedTemplates.find(
+      (item) => item.id === renameTemplateRequest.id,
+    );
+    if (!template) return;
+    setNestedOpen(true);
+    setTemplateLibraryTab(renameTemplateRequest.templateType);
+    setRenamingTemplateId(template.id);
+    setRenamingTemplateTitle(template.title);
+  }, [renameTemplateRequest, savedTemplates]);
 
   const sidebarPanels: {
     tab: SidebarTab;
@@ -191,9 +251,32 @@ export default function DashboardSidebar({
     sidebarPanels.find((panel) => panel.tab === sidebarTab) ?? sidebarPanels[0];
 
   const openPanel = (tab: SidebarTab) => {
+    if (tab === "inspector") onOpenInspector();
     onSetSidebarTab(tab);
     setNestedOpen(true);
   };
+  const templateTitleValue = templateDraftTitle.trim();
+  const saveTemplateAndClear = (kind: "page" | "section" | "element") => {
+    const nextTitle =
+      templateTitleValue ||
+      (kind === "page"
+        ? builderState.page
+        : kind === "section"
+          ? selectedSectionTitle || "Saved Section"
+          : selectedElementLabel || "Saved Element");
+
+    if (kind === "page") onSaveCurrentPageAsTemplate(nextTitle);
+    if (kind === "section") onSaveSelectedSectionAsTemplate(nextTitle);
+    if (kind === "element") onSaveSelectedElementAsTemplate(nextTitle);
+
+    setTemplateDraftTitle("");
+  };
+  const filteredTemplates = savedTemplates.filter(
+    (template) => (template.templateType ?? "page") === templateLibraryTab,
+  );
+  const selectedTemplateTabLabel =
+    templateLibraryTabs.find((tab) => tab.value === templateLibraryTab)?.label ??
+    "Templates";
 
   return (
     <aside className="builder-sidebar builder-panel">
@@ -275,7 +358,27 @@ export default function DashboardSidebar({
           />
         )}
 
-        {nestedOpen && sidebarTab === "inspector" && inspectorSlot}
+        {nestedOpen && sidebarTab === "inspector" && (
+          inspectorOpen ? (
+            inspectorSlot
+          ) : (
+            <div className="builder-sidebar-panel builder-inspector-reopen">
+              <div className="builder-sidebar-panel-header">
+                <div>
+                  <strong>Inspector</strong>
+                  <span>Section, row, and element controls are closed.</span>
+                </div>
+              </div>
+              <button
+                type="button"
+                className="builder-secondary-button builder-full-button"
+                onClick={onOpenInspector}
+              >
+                Open Inspector
+              </button>
+            </div>
+          )
+        )}
 
         {nestedOpen && sidebarTab === "globalStyles" && globalStylesSlot}
 
@@ -309,33 +412,185 @@ export default function DashboardSidebar({
         {nestedOpen && sidebarTab === "templates" && (
           <div className="builder-sidebar-panel">
             <div className="builder-sidebar-panel-header">
-              <div><strong>Templates</strong><span>Save reusable page starting points</span></div>
+              <div><strong>Templates</strong><span>Save and reuse pages, sections, and elements</span></div>
               <small>{savedTemplates.length}</small>
             </div>
             <div className="builder-card builder-pages-card">
-              <div className="builder-card-title"><strong>Open Page</strong><span>{builderState.page}</span></div>
-              <button type="button" className="builder-secondary-button builder-full-button" onClick={onSaveCurrentPageAsTemplate}>
-                <Save size={16} />
-                Save open page as template
-              </button>
+              <div className="builder-card-title"><strong>Save Reusable Template</strong><span>{builderState.page}</span></div>
+              <label className="builder-field">
+                <span>Template name</span>
+                <input
+                  type="text"
+                  value={templateDraftTitle}
+                  onChange={(event) => setTemplateDraftTitle(event.target.value)}
+                  placeholder="Optional custom name"
+                />
+              </label>
+              <div className="builder-template-save-list">
+                <button type="button" className="builder-template-save-card" onClick={() => saveTemplateAndClear("page")}>
+                  <Save size={16} />
+                  <span>
+                    <strong>Save Current Page</strong>
+                    <small>Reusable full-page layout</small>
+                  </span>
+                </button>
+                <button
+                  type="button"
+                  className="builder-template-save-card"
+                  onClick={() => saveTemplateAndClear("section")}
+                  disabled={!selectedSectionTitle}
+                  title={selectedSectionTitle ? `Save selected section: ${selectedSectionTitle}` : "Click a section in the preview first"}
+                >
+                  <Save size={16} />
+                  <span>
+                    <strong>Save Selected Section</strong>
+                    <small>{selectedSectionTitle ? selectedSectionTitle : "Click a section first"}</small>
+                  </span>
+                </button>
+                <button
+                  type="button"
+                  className="builder-template-save-card"
+                  onClick={() => saveTemplateAndClear("element")}
+                  disabled={!selectedElementLabel}
+                  title={selectedElementLabel ? `Save selected element: ${selectedElementLabel}` : "Click an element in the preview first"}
+                >
+                  <Save size={16} />
+                  <span>
+                    <strong>Save Selected Element</strong>
+                    <small>{selectedElementLabel ? selectedElementLabel : "Click an element first"}</small>
+                  </span>
+                </button>
+              </div>
               <small>{templateStatus}</small>
             </div>
-            {savedTemplates.length > 0 ? (
-              <div className="builder-pages-list">
-                {savedTemplates.map((template) => (
-                  <div key={template.id} className="builder-page-row">
-                    <button type="button" disabled>
-                      <strong>{template.title}</strong>
-                      <span>{template.sourcePage ?? "template"} · {new Date(template.updatedAt).toLocaleDateString()}</span>
-                    </button>
-                    <button type="button" className="builder-icon-button" onClick={() => onDeleteSavedTemplate(template.id)} aria-label={`Delete ${template.title}`}><Trash2 size={14} /></button>
+            <div className="builder-template-tabs" role="tablist" aria-label="Template types">
+              {templateLibraryTabs.map((tab) => {
+                const tabCount = savedTemplates.filter(
+                  (template) => (template.templateType ?? "page") === tab.value,
+                ).length;
+                return (
+                  <button
+                    key={tab.value}
+                    type="button"
+                    role="tab"
+                    aria-selected={templateLibraryTab === tab.value}
+                    className={templateLibraryTab === tab.value ? "is-active" : ""}
+                    onClick={() => {
+                      setTemplateLibraryTab(tab.value);
+                      setRenamingTemplateId(null);
+                    }}
+                  >
+                    <span>{tab.label}</span>
+                    <small>{tabCount}</small>
+                  </button>
+                );
+              })}
+            </div>
+            {filteredTemplates.length > 0 ? (
+              <div className="builder-pages-list builder-template-list">
+                {filteredTemplates.map((template) => {
+                  const templateType = template.templateType ?? "page";
+                  const canDragTemplate = templateType !== "page";
+                  const templateDragMimeType = canDragTemplate
+                    ? BUILDER_TEMPLATE_DND_TYPES[
+                        templateType as Exclude<TemplateLibraryTab, "page">
+                      ]
+                    : null;
+                  return (
+                  <div
+                    key={template.id}
+                    className="builder-page-row builder-template-row"
+                    draggable={canDragTemplate && renamingTemplateId !== template.id}
+                    onDragStart={(event) => {
+                      if (!canDragTemplate || renamingTemplateId === template.id) {
+                        event.preventDefault();
+                        return;
+                      }
+                      event.dataTransfer.setData(
+                        BUILDER_TEMPLATE_DND_TYPE,
+                        template.id,
+                      );
+                      if (templateDragMimeType) {
+                        event.dataTransfer.setData(templateDragMimeType, template.id);
+                      }
+                      event.dataTransfer.effectAllowed = "copy";
+                    }}
+                  >
+                    {renamingTemplateId === template.id ? (
+                      <>
+                        <input
+                          className="builder-template-rename-input"
+                          value={renamingTemplateTitle}
+                          onChange={(event) => setRenamingTemplateTitle(event.target.value)}
+                          onKeyDown={(event) => {
+                            if (event.key === "Enter") {
+                              onRenameSavedTemplate(template, renamingTemplateTitle);
+                              setRenamingTemplateId(null);
+                            }
+                            if (event.key === "Escape") {
+                              setRenamingTemplateId(null);
+                            }
+                          }}
+                          autoFocus
+                        />
+                        <button
+                          type="button"
+                          className="builder-icon-button"
+                          onClick={() => {
+                            onRenameSavedTemplate(template, renamingTemplateTitle);
+                            setRenamingTemplateId(null);
+                          }}
+                          aria-label={`Save new name for ${template.title}`}
+                        >
+                          <Save size={14} />
+                        </button>
+                        <button
+                          type="button"
+                          className="builder-icon-button"
+                          onClick={() => setRenamingTemplateId(null)}
+                          aria-label="Cancel rename"
+                        >
+                          <X size={14} />
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <button type="button" onClick={() => onApplySavedTemplate(template)}>
+                          <strong>{template.title}</strong>
+                          <span>
+                            {templateType.toUpperCase()} · {template.sourcePage ?? "template"} · {new Date(template.updatedAt).toLocaleDateString()}
+                          </span>
+                        </button>
+                        <button type="button" className="builder-template-use-button" onClick={() => onApplySavedTemplate(template)}>
+                          <Plus size={14} />
+                          Use
+                        </button>
+                        <button
+                          type="button"
+                          className="builder-icon-button"
+                          onClick={() => {
+                            setRenamingTemplateId(template.id);
+                            setRenamingTemplateTitle(template.title);
+                          }}
+                          aria-label={`Rename ${template.title}`}
+                        >
+                          <Pencil size={14} />
+                        </button>
+                        <button type="button" className="builder-icon-button" onClick={() => onDeleteSavedTemplate(template.id)} aria-label={`Delete ${template.title}`}><Trash2 size={14} /></button>
+                      </>
+                    )}
                   </div>
-                ))}
+                  );
+                })}
               </div>
             ) : (
               <div className="builder-template-note">
                 <LibraryBig size={16} />
-                <span>Saved templates will appear here after you save the current builder page.</span>
+                <span>
+                  {savedTemplates.length > 0
+                    ? `No ${selectedTemplateTabLabel.toLowerCase()} templates saved yet.`
+                    : "Saved templates will appear here after you save from a page, section, row, or element toolbar."}
+                </span>
               </div>
             )}
           </div>

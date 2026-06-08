@@ -4,7 +4,7 @@
   "topToolbarText": "Fast support & setup by Webpages",
   "topToolbarPhone": "+374 xx xx xx",
   "topToolbarMeta": "AMD ֏",
-  "headerBackgroundMode": "none",
+  "headerBackgroundMode": "default",
   "headerLayout": "princity",
   "headerBrandMode": "logo",
   "headerBrandText": "WebPages",
@@ -61,5 +61,5 @@
       "badgeText": null
     }
   },
-  "updatedAt": "2026-06-04T22:05:52.575Z"
+  "updatedAt": "2026-06-08T09:41:16.055Z"
 }

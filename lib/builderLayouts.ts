@@ -379,6 +379,7 @@ export type BuilderCustomPage = {
 export type BuilderSavedTemplate = {
   id: string;
   title: string;
+  templateType?: "page" | "section" | "row" | "element";
   description?: string;
   sourcePage?: BuilderLayoutKey;
   design?: BuilderDesign;

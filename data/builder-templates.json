@@ -1,33 +1,228 @@
 [
   {
-    "id": "home",
-    "title": "Home",
-    "description": "Saved from Home",
+    "id": "section-layout-mq4uq4z0-tboy",
+    "title": "Section Layout 1",
+    "templateType": "section",
+    "description": "Section template saved from Home",
     "sourcePage": "home",
-    "design": {
-      "preset": "princity",
-      "colorScheme": "auto",
-      "pageBackground": "#f4f2ec",
-      "textColor": "#111111",
-      "mutedTextColor": "#5f5c55",
-      "accentColor": "#d8ff65",
-      "surfaceColor": "#ebe8df",
-      "buttonBackground": "#111111",
-      "buttonTextColor": "#ffffff",
-      "radius": "8px",
-      "sectionMaxWidth": "1560px",
-      "sectionGutter": "44px",
-      "headingFontFamily": "inherit",
-      "headingSize": "clamp(46px, 7.6vw, 124px)",
-      "headingWeight": "820",
-      "headingLineHeight": "0.9",
-      "headingColor": "#111111"
-    },
     "sections": [
       {
-        "id": "contentLayout-mpjr1ee9-698de",
+        "id": "contentLayout-mq02cfbq-x0edv",
         "kind": "contentLayout",
         "title": "",
+        "background": "#ffffff",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "topSpacing": "large",
+        "bottomSpacing": "inherit",
+        "topMargin": "inherit",
+        "bottomMargin": "inherit",
+        "visible": true,
+        "eyebrow": "",
+        "body": "",
+        "layout": "whole",
+        "layoutColumns": 1,
+        "layoutItems": [
+          {
+            "id": "layout-item-mq02cfbq-1",
+            "blocks": [
+              {
+                "id": "packages-grid",
+                "kind": "grid",
+                "gridSource": "static",
+                "columns": 4,
+                "gridRows": 1,
+                "gridGap": "medium",
+                "gridMargin": "medium",
+                "gridImagePadding": "frameless",
+                "gridContentPadding": "large",
+                "gridImageFrame": "none",
+                "gridShowImage": false,
+                "gridShowButton": true,
+                "panelStyle": "flat-dark",
+                "gridItems": [
+                  {
+                    "id": "package-start",
+                    "eyebrow": "Start",
+                    "title": "🌱 Start",
+                    "meta": "պարզ",
+                    "text": "<p>Հարմար է սկսելու համար</p>",
+                    "buttonLabel": "Հետաքրքրում է",
+                    "buttonUrl": "#contact",
+                    "typography": {
+                      "title": {
+                        "fontSize": "clamp(24px, 2.4vw, 42px)",
+                        "fontWeight": "760",
+                        "lineHeight": "1"
+                      },
+                      "body": {
+                        "fontSize": "16px",
+                        "lineHeight": "1.6"
+                      }
+                    },
+                    "listIcon": "check",
+                    "items": [
+                      " 1–5 էջ",
+                      "Կոնտակտային ձև",
+                      "Կայքի տեղակայում",
+                      " Կայքի տեղակայում",
+                      "Հիմնական աջակցություն"
+                    ],
+                    "listIconColorScheme": "gradient-cycle",
+                    "listIconSize": 16
+                  },
+                  {
+                    "id": "package-commerce",
+                    "eyebrow": "Բիզնես",
+                    "title": "🚀 Business",
+                    "meta": "Բիզնես",
+                    "text": "<p>Բիզնեսի համար պատրաստ լուծում</p>",
+                    "buttonLabel": "Shop package",
+                    "buttonUrl": "#contact",
+                    "typography": {
+                      "title": {
+                        "fontSize": "clamp(24px, 2.4vw, 42px)",
+                        "fontWeight": "760",
+                        "lineHeight": "1"
+                      },
+                      "body": {
+                        "fontSize": "16px",
+                        "lineHeight": "1.6"
+                      }
+                    },
+                    "listIconColorScheme": "gradient-cycle",
+                    "items": [
+                      "Ամեն ինչ Start-ից",
+                      " Ավելի շատ էջեր",
+                      " Ծառայությունների ներկայացում",
+                      "Հայտերի ընդունում",
+                      "Ընդլայնված կառուցվածք"
+                    ],
+                    "listIconSize": 16,
+                    "listIcon": "check"
+                  },
+                  {
+                    "id": "package-growth",
+                    "eyebrow": "առևտուր",
+                    "title": "🛍 Store",
+                    "meta": "կեմերցիոն",
+                    "text": "<p>Խանութ Առցանց վաճառքի համար</p><p></p>",
+                    "buttonLabel": "Խոսենք",
+                    "buttonUrl": "#contact",
+                    "typography": {
+                      "title": {
+                        "fontSize": "clamp(24px, 2.4vw, 42px)",
+                        "fontWeight": "760",
+                        "lineHeight": "1"
+                      },
+                      "body": {
+                        "fontSize": "16px",
+                        "lineHeight": "1.6"
+                      }
+                    },
+                    "items": [
+                      "Ամեն ինչ Business-ից",
+                      "Ապրանքների ցուցադրում",
+                      "Կատեգորիաներ",
+                      "Զամբյուղ",
+                      "Պատվերների ընդունում"
+                    ],
+                    "listIconColorScheme": "gradient-cycle"
+                  },
+                  {
+                    "id": "grid-item-mptcn4jh",
+                    "eyebrow": "Հատուկ",
+                    "title": "✨ Custom",
+                    "meta": "Երբ պետք է ավելին",
+                    "text": "<p></p><p></p>",
+                    "buttonLabel": "Learn more",
+                    "buttonUrl": "/",
+                    "items": [
+                      "Անհատական կառուցվածք",
+                      "Հատուկ ֆունկցիաներ",
+                      "Ճկուն զարգացում"
+                    ],
+                    "listIconColorScheme": "gradient-cycle"
+                  }
+                ],
+                "animation": {
+                  "preset": "none",
+                  "once": false
+                },
+                "elementPadding": "small",
+                "visualStyle": {
+                  "padding": {
+                    "linked": true,
+                    "top": "sm",
+                    "right": "sm",
+                    "bottom": "sm",
+                    "left": "sm"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "id": "layout-row-mq02cwcw-column-1",
+            "rowId": "layout-row-mq02cwcw",
+            "rowLayout": "whole",
+            "blocks": [
+              {
+                "id": "text-block-mptsb9rz-ktncj",
+                "kind": "text",
+                "eyebrow": "",
+                "title": "",
+                "body": "<p><strong>Չգիտե՞ք որն ընտրել — սկսեք պարզ փաթեթից։</strong></p><p><strong>Միշտ հնարավոր է անցնել ավելի բարձր տարբերակի։</strong></p>",
+                "buttonLabel": "",
+                "buttonUrl": "",
+                "typography": {
+                  "variant": "body",
+                  "fontFamily": "inherit",
+                  "fontSize": "16px",
+                  "fontWeight": "400",
+                  "lineHeight": "1.4",
+                  "letterSpacing": "0px",
+                  "color": "inherit",
+                  "textAlign": "left",
+                  "body": {
+                    "textAlign": "center"
+                  },
+                  "title": {
+                    "variant": "body",
+                    "fontFamily": "inherit",
+                    "fontSize": "16px",
+                    "fontWeight": "400",
+                    "lineHeight": "1.4",
+                    "letterSpacing": "0px",
+                    "color": "inherit",
+                    "textAlign": "center",
+                    "body": {
+                      "textAlign": "left"
+                    }
+                  }
+                },
+                "elementAlign": "center"
+              }
+            ]
+          }
+        ],
+        "layoutRows": 2
+      }
+    ],
+    "updatedAt": "2026-06-08T06:50:30.475Z"
+  },
+  {
+    "id": "row-1-mq4up1pu-bm8u",
+    "title": "Row 1",
+    "templateType": "row",
+    "description": "Row template saved from Home",
+    "sourcePage": "home",
+    "sections": [
+      {
+        "id": "contentLayout-mq4up1ph-5ja78",
+        "kind": "contentLayout",
+        "title": "Row 1",
         "background": "#ffffff",
         "backgroundMode": "boxed",
         "contentMode": "boxed",
@@ -39,90 +234,734 @@
         "visible": true,
         "eyebrow": "",
         "body": "",
-        "layoutColumns": 2,
+        "layout": "whole",
+        "layoutColumns": 1,
         "layoutItems": [
           {
-            "id": "layout-item-mpjr1ee9-1",
+            "id": "layout-item-mq4up1ph-row-template-0",
             "blocks": [
               {
-                "id": "hero-block-mpjr1xel-o798r",
-                "kind": "hero",
-                "eyebrow": "",
-                "title": "Ողջույն...",
-                "body": "Գեղեցիկ React կայքեր WordPress կառավարմամբ և հոսթինգով միասին",
-                "buttonLabel": "Learn more",
-                "buttonUrl": "/",
-                "typography": {
-                  "title": {
-                    "fontSize": "64",
-                    "fontWeight": "800",
-                    "variant": "subheading",
-                    "color": "#11e88b",
-                    "textAlign": "center"
+                "id": "grid-block-mq4up1pi-5ep9j",
+                "kind": "grid",
+                "gridSource": "static",
+                "columns": 4,
+                "gridRows": 1,
+                "gridGap": "medium",
+                "gridMargin": "medium",
+                "gridImagePadding": "frameless",
+                "gridContentPadding": "large",
+                "gridImageFrame": "none",
+                "gridShowImage": false,
+                "gridShowButton": true,
+                "panelStyle": "flat-dark",
+                "gridItems": [
+                  {
+                    "id": "package-start",
+                    "eyebrow": "Start",
+                    "title": "🌱 Start",
+                    "meta": "պարզ",
+                    "text": "<p>Հարմար է սկսելու համար</p>",
+                    "buttonLabel": "Հետաքրքրում է",
+                    "buttonUrl": "#contact",
+                    "typography": {
+                      "title": {
+                        "fontSize": "clamp(24px, 2.4vw, 42px)",
+                        "fontWeight": "760",
+                        "lineHeight": "1"
+                      },
+                      "body": {
+                        "fontSize": "16px",
+                        "lineHeight": "1.6"
+                      }
+                    },
+                    "listIcon": "check",
+                    "items": [
+                      " 1–5 էջ",
+                      "Կոնտակտային ձև",
+                      "Կայքի տեղակայում",
+                      " Կայքի տեղակայում",
+                      "Հիմնական աջակցություն"
+                    ],
+                    "listIconColorScheme": "gradient-cycle",
+                    "listIconSize": 16
                   },
-                  "body": {
-                    "color": "#b3b3b3",
-                    "fontSize": "28",
-                    "textAlign": "center"
+                  {
+                    "id": "package-commerce",
+                    "eyebrow": "Բիզնես",
+                    "title": "🚀 Business",
+                    "meta": "Բիզնես",
+                    "text": "<p>Բիզնեսի համար պատրաստ լուծում</p>",
+                    "buttonLabel": "Shop package",
+                    "buttonUrl": "#contact",
+                    "typography": {
+                      "title": {
+                        "fontSize": "clamp(24px, 2.4vw, 42px)",
+                        "fontWeight": "760",
+                        "lineHeight": "1"
+                      },
+                      "body": {
+                        "fontSize": "16px",
+                        "lineHeight": "1.6"
+                      }
+                    },
+                    "listIconColorScheme": "gradient-cycle",
+                    "items": [
+                      "Ամեն ինչ Start-ից",
+                      " Ավելի շատ էջեր",
+                      " Ծառայությունների ներկայացում",
+                      "Հայտերի ընդունում",
+                      "Ընդլայնված կառուցվածք"
+                    ],
+                    "listIconSize": 16,
+                    "listIcon": "check"
                   },
-                  "button": {
-                    "textAlign": "center"
+                  {
+                    "id": "package-growth",
+                    "eyebrow": "առևտուր",
+                    "title": "🛍 Store",
+                    "meta": "կեմերցիոն",
+                    "text": "<p>Խանութ Առցանց վաճառքի համար</p><p></p>",
+                    "buttonLabel": "Խոսենք",
+                    "buttonUrl": "#contact",
+                    "typography": {
+                      "title": {
+                        "fontSize": "clamp(24px, 2.4vw, 42px)",
+                        "fontWeight": "760",
+                        "lineHeight": "1"
+                      },
+                      "body": {
+                        "fontSize": "16px",
+                        "lineHeight": "1.6"
+                      }
+                    },
+                    "items": [
+                      "Ամեն ինչ Business-ից",
+                      "Ապրանքների ցուցադրում",
+                      "Կատեգորիաներ",
+                      "Զամբյուղ",
+                      "Պատվերների ընդունում"
+                    ],
+                    "listIconColorScheme": "gradient-cycle"
+                  },
+                  {
+                    "id": "grid-item-mptcn4jh",
+                    "eyebrow": "Հատուկ",
+                    "title": "✨ Custom",
+                    "meta": "Երբ պետք է ավելին",
+                    "text": "<p></p><p></p>",
+                    "buttonLabel": "Learn more",
+                    "buttonUrl": "/",
+                    "items": [
+                      "Անհատական կառուցվածք",
+                      "Հատուկ ֆունկցիաներ",
+                      "Ճկուն զարգացում"
+                    ],
+                    "listIconColorScheme": "gradient-cycle"
                   }
+                ],
+                "animation": {
+                  "preset": "none",
+                  "once": false
                 },
-                "panelStyle": "default",
-                "elementAlign": "center"
+                "elementPadding": "small",
+                "visualStyle": {
+                  "padding": {
+                    "linked": true,
+                    "top": "sm",
+                    "right": "sm",
+                    "bottom": "sm",
+                    "left": "sm"
+                  }
+                }
               }
-            ]
-          },
+            ],
+            "rowId": "layout-row-mq4up1ph-template",
+            "rowLayout": "whole"
+          }
+        ],
+        "layoutRows": 1
+      }
+    ],
+    "updatedAt": "2026-06-08T06:49:32.658Z"
+  },
+  {
+    "id": "grid-mq4uobxs-2j97",
+    "title": "Grid 1",
+    "templateType": "element",
+    "description": "Element template saved from Home",
+    "sourcePage": "home",
+    "sections": [
+      {
+        "id": "contentLayout-mq4uobxb-trdk7",
+        "kind": "contentLayout",
+        "title": "Grid",
+        "background": "#ffffff",
+        "backgroundMode": "boxed",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "topSpacing": "inherit",
+        "bottomSpacing": "inherit",
+        "topMargin": "inherit",
+        "bottomMargin": "inherit",
+        "visible": true,
+        "eyebrow": "",
+        "body": "",
+        "layout": "whole",
+        "layoutColumns": 1,
+        "layoutItems": [
           {
-            "id": "layout-item-mpkurqja",
+            "id": "layout-item-mq4uobxb-template-element",
             "blocks": [
               {
-                "id": "panel-block-mpkusmg2-yrm1k",
-                "kind": "panel",
-                "eyebrow": "",
-                "title": "",
-                "body": "Արագ, ժամանակակից և հարմարավետ կայքեր՝ առցանց խանութի, բովանդակության կառավարման և ամբողջական տեխնիկական սպասարկման հնարավորությամբ։",
-                "buttonLabel": "",
-                "buttonUrl": "/",
-                "imageUrl": "",
-                "imageAlt": "",
-                "typography": {
-                  "title": {
-                    "fontSize": "26"
+                "id": "grid-block-mq4uobxb-rmqvq",
+                "kind": "grid",
+                "gridSource": "static",
+                "columns": 4,
+                "gridRows": 1,
+                "gridGap": "medium",
+                "gridMargin": "medium",
+                "gridImagePadding": "frameless",
+                "gridContentPadding": "large",
+                "gridImageFrame": "none",
+                "gridShowImage": false,
+                "gridShowButton": true,
+                "panelStyle": "flat-dark",
+                "gridItems": [
+                  {
+                    "id": "package-start",
+                    "eyebrow": "Start",
+                    "title": "🌱 Start",
+                    "meta": "պարզ",
+                    "text": "<p>Հարմար է սկսելու համար</p>",
+                    "buttonLabel": "Հետաքրքրում է",
+                    "buttonUrl": "#contact",
+                    "typography": {
+                      "title": {
+                        "fontSize": "clamp(24px, 2.4vw, 42px)",
+                        "fontWeight": "760",
+                        "lineHeight": "1"
+                      },
+                      "body": {
+                        "fontSize": "16px",
+                        "lineHeight": "1.6"
+                      }
+                    },
+                    "listIcon": "check",
+                    "items": [
+                      " 1–5 էջ",
+                      "Կոնտակտային ձև",
+                      "Կայքի տեղակայում",
+                      " Կայքի տեղակայում",
+                      "Հիմնական աջակցություն"
+                    ],
+                    "listIconColorScheme": "gradient-cycle",
+                    "listIconSize": 16
                   },
-                  "body": {
-                    "fontSize": "26",
-                    "color": "#ffffff",
-                    "textAlign": "right"
+                  {
+                    "id": "package-commerce",
+                    "eyebrow": "Բիզնես",
+                    "title": "🚀 Business",
+                    "meta": "Բիզնես",
+                    "text": "<p>Բիզնեսի համար պատրաստ լուծում</p>",
+                    "buttonLabel": "Shop package",
+                    "buttonUrl": "#contact",
+                    "typography": {
+                      "title": {
+                        "fontSize": "clamp(24px, 2.4vw, 42px)",
+                        "fontWeight": "760",
+                        "lineHeight": "1"
+                      },
+                      "body": {
+                        "fontSize": "16px",
+                        "lineHeight": "1.6"
+                      }
+                    },
+                    "listIconColorScheme": "gradient-cycle",
+                    "items": [
+                      "Ամեն ինչ Start-ից",
+                      " Ավելի շատ էջեր",
+                      " Ծառայությունների ներկայացում",
+                      "Հայտերի ընդունում",
+                      "Ընդլայնված կառուցվածք"
+                    ],
+                    "listIconSize": 16,
+                    "listIcon": "check"
+                  },
+                  {
+                    "id": "package-growth",
+                    "eyebrow": "առևտուր",
+                    "title": "🛍 Store",
+                    "meta": "կեմերցիոն",
+                    "text": "<p>Խանութ Առցանց վաճառքի համար</p><p></p>",
+                    "buttonLabel": "Խոսենք",
+                    "buttonUrl": "#contact",
+                    "typography": {
+                      "title": {
+                        "fontSize": "clamp(24px, 2.4vw, 42px)",
+                        "fontWeight": "760",
+                        "lineHeight": "1"
+                      },
+                      "body": {
+                        "fontSize": "16px",
+                        "lineHeight": "1.6"
+                      }
+                    },
+                    "items": [
+                      "Ամեն ինչ Business-ից",
+                      "Ապրանքների ցուցադրում",
+                      "Կատեգորիաներ",
+                      "Զամբյուղ",
+                      "Պատվերների ընդունում"
+                    ],
+                    "listIconColorScheme": "gradient-cycle"
+                  },
+                  {
+                    "id": "grid-item-mptcn4jh",
+                    "eyebrow": "Հատուկ",
+                    "title": "✨ Custom",
+                    "meta": "Երբ պետք է ավելին",
+                    "text": "<p></p><p></p>",
+                    "buttonLabel": "Learn more",
+                    "buttonUrl": "/",
+                    "items": [
+                      "Անհատական կառուցվածք",
+                      "Հատուկ ֆունկցիաներ",
+                      "Ճկուն զարգացում"
+                    ],
+                    "listIconColorScheme": "gradient-cycle"
                   }
+                ],
+                "animation": {
+                  "preset": "none",
+                  "once": false
                 },
-                "panelStyle": "clean-shadow",
-                "elementBackgroundMode": "transparent",
-                "elementPadding": "medium"
+                "elementPadding": "small",
+                "visualStyle": {
+                  "padding": {
+                    "linked": true,
+                    "top": "sm",
+                    "right": "sm",
+                    "bottom": "sm",
+                    "left": "sm"
+                  }
+                }
               }
             ]
           }
         ],
+        "layoutRows": 1
+      }
+    ],
+    "updatedAt": "2026-06-08T06:49:08.369Z"
+  },
+  {
+    "id": "home",
+    "title": "Home",
+    "templateType": "page",
+    "description": "Page template saved from Home",
+    "sourcePage": "home",
+    "design": {
+      "preset": "princity",
+      "colorScheme": "auto",
+      "pageBackground": "#f7f7f4",
+      "textColor": "#111111",
+      "mutedTextColor": "#5f5f58",
+      "accentColor": "#a4be7b",
+      "surfaceColor": "#efefe9",
+      "buttonBackground": "#111111",
+      "buttonTextColor": "#ffffff",
+      "radius": "8px",
+      "sectionMaxWidth": "1640px",
+      "sectionGutter": "48px",
+      "headingFontFamily": "inherit",
+      "headingSize": "clamp(42px, 8vw, 126px)",
+      "headingWeight": "760",
+      "headingLineHeight": "0.92",
+      "cardBg": "#efefe9",
+      "cardRadius": "24px",
+      "cardBorder": "transparent",
+      "cardShadow": "0 12px 30px rgba(17,17,17,0.06)",
+      "cardShadowHover": "0 18px 42px rgba(17,17,17,0.1)",
+      "cardImageBg": "#ffffff",
+      "cardImagePadding": "clamp(22px, 2.4vw, 36px)"
+    },
+    "sections": [
+      {
+        "id": "antigravity-demo-section-1",
+        "kind": "contentLayout",
+        "visible": true,
+        "title": "",
+        "background": "",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "topSpacing": "large",
+        "bottomSpacing": "small",
+        "topMargin": "inherit",
+        "bottomMargin": "inherit",
+        "layout": "whole",
+        "layoutColumns": 1,
         "layoutRows": 1,
-        "typography": {
-          "title": {
-            "fontSize": "64",
-            "textAlign": "center"
+        "backgroundEffect": "none",
+        "antigravitySpeed": 1.5,
+        "antigravityParticleCount": 185,
+        "antigravityColor": "#a855f7",
+        "antigravityGridDensity": "medium",
+        "antigravityInteractive": true,
+        "antigravityShowGrid": true,
+        "antigravityShowParticles": true,
+        "antigravityGridMoveSpeed": 1.2,
+        "antigravityGlowIntensity": 1.5,
+        "antigravityVisualMode": "full",
+        "layoutItems": [
+          {
+            "id": "layout-row-demo-column-1",
+            "rowId": "layout-row-demo",
+            "rowLayout": "whole",
+            "blocks": [
+              {
+                "id": "demo-hero-block-1",
+                "kind": "hero",
+                "eyebrow": "Բարի գալուստ webpages",
+                "title": "[Ընտրեք փաթեթը |տրամադրեք տեղեկությունը| ձեր կայքը պատրաստ է]",
+                "body": "<p><strong>Կայք, հոսթինգ և սպասարկում՝ մեկ պարզ փաթեթով</strong></p>",
+                "buttonLabel": "Launch Visual Builder",
+                "buttonUrl": "/dashboard",
+                "typewriterEnabled": true,
+                "typewriterLoop": true,
+                "typewriterSpeed": 90,
+                "typewriterDelay": 1500,
+                "typewriterUseGradient": true,
+                "typewriterGradientPreset": "custom",
+                "premiumButtonStyle": "glassmorphic",
+                "typography": {
+                  "title": {
+                    "fontSize": "clamp(36px, 5.5vw, 80px)",
+                    "fontWeight": "800",
+                    "lineHeight": "1.8",
+                    "letterSpacing": "-0.03em"
+                  },
+                  "body": {
+                    "fontSize": "18px",
+                    "fontWeight": "400",
+                    "lineHeight": "1.6",
+                    "color": "#a1a1aa"
+                  },
+                  "eyebrow": {
+                    "fontSize": "14px",
+                    "fontWeight": "600",
+                    "letterSpacing": "0.15em",
+                    "textTransform": "uppercase",
+                    "color": "#c084fc"
+                  },
+                  "button": {
+                    "fontSize": "15px",
+                    "fontWeight": "600"
+                  }
+                },
+                "textGradientCustomStartOffset": 0,
+                "textGradientCustomStart": "#e5f1ff",
+                "textGradientCustomMiddle": "#818cf8",
+                "textGradientCustomEnd": "#c084fc",
+                "textGradientCustomMiddleOffset": 50,
+                "textGradientCustomEndOffset": 100,
+                "textGradientCustomAngle": 135,
+                "elementAlign": "center",
+                "carouselSettings": {
+                  "variant": "default"
+                }
+              }
+            ]
           }
-        },
-        "visualStyle": {
-          "background": {
-            "type": "color",
-            "color": "#2b2b2b"
-          }
-        }
+        ]
       },
       {
-        "id": "contentLayout-mpjkrynd-6j2w5",
+        "id": "contentLayout-mq02cfbq-x0edv",
         "kind": "contentLayout",
         "title": "",
-        "background": "#24241f",
+        "background": "#ffffff",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "topSpacing": "large",
+        "bottomSpacing": "inherit",
+        "topMargin": "inherit",
+        "bottomMargin": "inherit",
+        "visible": true,
+        "eyebrow": "",
+        "body": "",
+        "layout": "whole",
+        "layoutColumns": 1,
+        "layoutItems": [
+          {
+            "id": "layout-item-mq02cfbq-1",
+            "blocks": [
+              {
+                "id": "packages-grid",
+                "kind": "grid",
+                "gridSource": "static",
+                "columns": 4,
+                "gridRows": 1,
+                "gridGap": "medium",
+                "gridMargin": "medium",
+                "gridImagePadding": "frameless",
+                "gridContentPadding": "large",
+                "gridImageFrame": "none",
+                "gridShowImage": false,
+                "gridShowButton": true,
+                "panelStyle": "flat-dark",
+                "gridItems": [
+                  {
+                    "id": "package-start",
+                    "eyebrow": "Start",
+                    "title": "🌱 Start",
+                    "meta": "պարզ",
+                    "text": "<p>Հարմար է սկսելու համար</p>",
+                    "buttonLabel": "Հետաքրքրում է",
+                    "buttonUrl": "#contact",
+                    "typography": {
+                      "title": {
+                        "fontSize": "clamp(24px, 2.4vw, 42px)",
+                        "fontWeight": "760",
+                        "lineHeight": "1"
+                      },
+                      "body": {
+                        "fontSize": "16px",
+                        "lineHeight": "1.6"
+                      }
+                    },
+                    "listIcon": "check",
+                    "items": [
+                      " 1–5 էջ",
+                      "Կոնտակտային ձև",
+                      "Կայքի տեղակայում",
+                      " Կայքի տեղակայում",
+                      "Հիմնական աջակցություն"
+                    ],
+                    "listIconColorScheme": "gradient-cycle",
+                    "listIconSize": 16
+                  },
+                  {
+                    "id": "package-commerce",
+                    "eyebrow": "Բիզնես",
+                    "title": "🚀 Business",
+                    "meta": "Բիզնես",
+                    "text": "<p>Բիզնեսի համար պատրաստ լուծում</p>",
+                    "buttonLabel": "Shop package",
+                    "buttonUrl": "#contact",
+                    "typography": {
+                      "title": {
+                        "fontSize": "clamp(24px, 2.4vw, 42px)",
+                        "fontWeight": "760",
+                        "lineHeight": "1"
+                      },
+                      "body": {
+                        "fontSize": "16px",
+                        "lineHeight": "1.6"
+                      }
+                    },
+                    "listIconColorScheme": "gradient-cycle",
+                    "items": [
+                      "Ամեն ինչ Start-ից",
+                      " Ավելի շատ էջեր",
+                      " Ծառայությունների ներկայացում",
+                      "Հայտերի ընդունում",
+                      "Ընդլայնված կառուցվածք"
+                    ],
+                    "listIconSize": 16,
+                    "listIcon": "check"
+                  },
+                  {
+                    "id": "package-growth",
+                    "eyebrow": "առևտուր",
+                    "title": "🛍 Store",
+                    "meta": "կեմերցիոն",
+                    "text": "<p>Խանութ Առցանց վաճառքի համար</p><p></p>",
+                    "buttonLabel": "Խոսենք",
+                    "buttonUrl": "#contact",
+                    "typography": {
+                      "title": {
+                        "fontSize": "clamp(24px, 2.4vw, 42px)",
+                        "fontWeight": "760",
+                        "lineHeight": "1"
+                      },
+                      "body": {
+                        "fontSize": "16px",
+                        "lineHeight": "1.6"
+                      }
+                    },
+                    "items": [
+                      "Ամեն ինչ Business-ից",
+                      "Ապրանքների ցուցադրում",
+                      "Կատեգորիաներ",
+                      "Զամբյուղ",
+                      "Պատվերների ընդունում"
+                    ],
+                    "listIconColorScheme": "gradient-cycle"
+                  },
+                  {
+                    "id": "grid-item-mptcn4jh",
+                    "eyebrow": "Հատուկ",
+                    "title": "✨ Custom",
+                    "meta": "Երբ պետք է ավելին",
+                    "text": "<p></p><p></p>",
+                    "buttonLabel": "Learn more",
+                    "buttonUrl": "/",
+                    "items": [
+                      "Անհատական կառուցվածք",
+                      "Հատուկ ֆունկցիաներ",
+                      "Ճկուն զարգացում"
+                    ],
+                    "listIconColorScheme": "gradient-cycle"
+                  }
+                ],
+                "animation": {
+                  "preset": "none",
+                  "once": false
+                },
+                "elementPadding": "small",
+                "visualStyle": {
+                  "padding": {
+                    "linked": true,
+                    "top": "sm",
+                    "right": "sm",
+                    "bottom": "sm",
+                    "left": "sm"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "id": "layout-row-mq02cwcw-column-1",
+            "rowId": "layout-row-mq02cwcw",
+            "rowLayout": "whole",
+            "blocks": [
+              {
+                "id": "text-block-mptsb9rz-ktncj",
+                "kind": "text",
+                "eyebrow": "",
+                "title": "",
+                "body": "<p><strong>Չգիտե՞ք որն ընտրել — սկսեք պարզ փաթեթից։</strong></p><p><strong>Միշտ հնարավոր է անցնել ավելի բարձր տարբերակի։</strong></p>",
+                "buttonLabel": "",
+                "buttonUrl": "",
+                "typography": {
+                  "variant": "body",
+                  "fontFamily": "inherit",
+                  "fontSize": "16px",
+                  "fontWeight": "400",
+                  "lineHeight": "1.4",
+                  "letterSpacing": "0px",
+                  "color": "inherit",
+                  "textAlign": "left",
+                  "body": {
+                    "textAlign": "center"
+                  },
+                  "title": {
+                    "variant": "body",
+                    "fontFamily": "inherit",
+                    "fontSize": "16px",
+                    "fontWeight": "400",
+                    "lineHeight": "1.4",
+                    "letterSpacing": "0px",
+                    "color": "inherit",
+                    "textAlign": "center",
+                    "body": {
+                      "textAlign": "left"
+                    }
+                  }
+                },
+                "elementAlign": "center"
+              }
+            ]
+          }
+        ],
+        "layoutRows": 2
+      },
+      {
+        "id": "contentLayout-mpwb0kb3-ptjmd",
+        "kind": "contentLayout",
+        "title": "",
+        "background": "#111111",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "topSpacing": "small",
+        "bottomSpacing": "inherit",
+        "topMargin": "inherit",
+        "bottomMargin": "inherit",
+        "visible": true,
+        "eyebrow": "",
+        "body": "",
+        "layout": "whole",
+        "layoutColumns": 1,
+        "layoutItems": [
+          {
+            "id": "layout-item-mpwb0kb3-1",
+            "blocks": [
+              {
+                "id": "scrollPinnedDemo-block-mpwb0s04-nnwd4",
+                "kind": "scrollPinnedDemo",
+                "title": "Ինչպես է աշխատում",
+                "eyebrow": "Interactive Showcase",
+                "body": "<p>Սկսելը պարզ է։ Ընտրեք փաթեթը և մնացած քայլերով մենք կուղեկցենք ձեզ։</p>",
+                "elementBackground": "#0a0a0a",
+                "slides": [
+                  {
+                    "id": "scrollPinnedDemo-block-mpwb0s04-nnwd4-slide-1",
+                    "badge": "01",
+                    "title": "Ընտրում եք փաթեթը",
+                    "text": "<p>Ընտրեք ձեր նպատակին համապատասխան փաթեթը և սկսեք մի քանի պարզ քայլով։</p>"
+                  },
+                  {
+                    "id": "scrollPinnedDemo-block-mpwb0s04-nnwd4-slide-2",
+                    "badge": "02",
+                    "title": " Տրամադրեք տեղեկատվությունը",
+                    "text": "<p>Ուղարկեք տեքստերը, նկարները կամ պարզապես պատմեք ինչ եք ցանկանում ստանալ։</p>"
+                  },
+                  {
+                    "id": "scrollPinnedDemo-block-mpwb0s04-nnwd4-slide-3",
+                    "badge": "03",
+                    "title": "Մենք պատրաստում ենք կայքը",
+                    "text": "<p>Կառուցում ենք էջերը, կազմակերպում բովանդակությունը և պատրաստում կայքը հրապարակման։</p>"
+                  },
+                  {
+                    "id": "nested-slide-mpwb4uyu",
+                    "badge": "04",
+                    "title": "Կայքը պատրաստ է",
+                    "text": "<p>Ստանում եք գործող կայք, որը կարող եք օգտագործել և զարգացնել հետագայում։</p>",
+                    "imagePadding": "medium"
+                  }
+                ],
+                "carouselSettings": {
+                  "pinHeightFactor": 150,
+                  "variant": "perfect",
+                  "scrubSpeed": 0.9
+                },
+                "typewriterEnabled": false,
+                "items": [
+                  "Feature 1",
+                  "Feature 2",
+                  "Feature 3",
+                  "Feature 4"
+                ],
+                "panelStyle": "antigravity",
+                "elementBackgroundMode": "transparent",
+                "typewriterSpeed": 250,
+                "typewriterLoop": true,
+                "listIconColorScheme": "gradient-cycle",
+                "listIcon": "check"
+              }
+            ]
+          }
+        ],
+        "layoutRows": 1
+      },
+      {
+        "id": "contentLayout-mptess1t-f8n9s",
+        "kind": "contentLayout",
+        "title": "",
+        "background": "#ffffff",
         "backgroundMode": "full",
         "contentMode": "boxed",
         "colorScheme": "inherit",
@@ -137,47 +976,195 @@
         "layoutColumns": 1,
         "layoutItems": [
           {
-            "id": "layout-item-mpjkrynd-1",
+            "id": "layout-row-mq28kic8-column-1",
+            "rowId": "layout-row-mq28kic8",
+            "rowLayout": "whole",
             "blocks": [
               {
-                "id": "products-block-mpjksd9r-36hp4",
-                "kind": "products",
-                "title": "Products",
-                "source": "all",
-                "layoutVariant": "grid",
-                "columns": 4,
-                "gridLimit": 12,
-                "filterPosition": "top",
-                "cardStyle": "none",
-                "cardPreset": "standard",
+                "id": "heading-block-mq28kpz1-k9hd3",
+                "kind": "heading",
+                "headingText": "ստանում էք ՝",
+                "headingLevel": "h2",
+                "headingAlign": "left",
                 "typography": {
-                  "textAlign": "justify",
                   "variant": "body",
-                  "fontWeight": "500",
-                  "fontSize": "24px"
+                  "fontFamily": "inherit",
+                  "fontSize": "16px",
+                  "fontWeight": "400",
+                  "lineHeight": "1.4",
+                  "letterSpacing": "0px",
+                  "color": "inherit",
+                  "textAlign": "left"
                 },
-                "gridGap": "small",
-                "gridMargin": "none",
-                "imagePadding": "none",
-                "cardPadding": "small"
+                "textGradientPreset": "indigo-purple-cyan"
+              }
+            ]
+          },
+          {
+            "id": "layout-row-mq42xo39-column-1",
+            "rowId": "layout-row-mq42xo39",
+            "rowLayout": "whole",
+            "blocks": []
+          },
+          {
+            "id": "layout-item-mptess1t-1",
+            "blocks": [
+              {
+                "id": "heading-block-mptr9rf9-s4u7w",
+                "kind": "heading",
+                "headingText": "ստանում էք ՝",
+                "headingLevel": "h2",
+                "headingAlign": "left",
+                "typography": {
+                  "variant": "body",
+                  "fontFamily": "inherit",
+                  "fontSize": "16px",
+                  "fontWeight": "400",
+                  "lineHeight": "1.4",
+                  "letterSpacing": "0px",
+                  "color": "inherit",
+                  "textAlign": "left"
+                }
+              },
+              {
+                "id": "badgeGrid-block-mptt2he4-lc9bl",
+                "kind": "badgeGrid",
+                "title": "",
+                "body": "<p>Պարզ և պատրաստ լուծում, որը կարող եք օգտագործել անմիջապես։</p>",
+                "columns": 6,
+                "badges": [
+                  {
+                    "id": "badgeGrid-block-mptt2he4-lc9bl-badge-1",
+                    "label": "01",
+                    "title": "🌐 Պատրաստ կայք",
+                    "body": "<p>Ժամանակակից և հարմար տարբերակ բոլոր սարքերի համար։</p>"
+                  },
+                  {
+                    "id": "badgeGrid-block-mptt2he4-lc9bl-badge-2",
+                    "label": "02",
+                    "title": "⚡ Արագ մեկնարկ",
+                    "body": "<p>Ժամանակակից և հարմար տարբերակ բոլոր սարքերի համար։</p>"
+                  },
+                  {
+                    "id": "nested-badge-mptt2oji",
+                    "label": "03",
+                    "title": "🧩 Հեշտ ընդլայնում",
+                    "body": "<p>Պետք չէ զբաղվել տեխնիկական կարգավորումներով։</p>"
+                  },
+                  {
+                    "id": "nested-badge-mptt3kuv",
+                    "label": "04",
+                    "title": "📈 Աճի հնարավորություն",
+                    "body": "<p>Ավելացրեք նոր էջեր և հնարավորություններ հետագայում։</p>"
+                  },
+                  {
+                    "id": "nested-badge-mptt6zv3",
+                    "label": "05",
+                    "title": "🔒 Մշտական հասանելիություն",
+                    "body": "<p>Ձեր տեղեկատվությունը հասանելի է հաճախորդներին ցանկացած պահի։</p>"
+                  },
+                  {
+                    "id": "nested-badge-mptt7t1l",
+                    "label": "06",
+                    "title": "🛠 Աջակցություն",
+                    "body": "<p>Օգնություն և ուղեկցում անհրաժեշտության դեպքում։</p>"
+                  }
+                ],
+                "panelStyle": "dark"
+              },
+              {
+                "id": "text-block-mpttc6wx-yzd73",
+                "kind": "text",
+                "eyebrow": "fgfgfggf",
+                "title": "ggggggg",
+                "body": "<p><strong>Սկսեք պարզ տարբերակից և զարգացրեք կայքը ձեր արագությամբ։</strong></p>",
+                "buttonLabel": "",
+                "buttonUrl": "",
+                "typography": {
+                  "variant": "body",
+                  "fontFamily": "inherit",
+                  "fontSize": "16px",
+                  "fontWeight": "400",
+                  "lineHeight": "1.4",
+                  "letterSpacing": "0px",
+                  "color": "inherit",
+                  "textAlign": "left",
+                  "body": {
+                    "textAlign": "center"
+                  }
+                },
+                "elementAlign": "center",
+                "textGradientPreset": "indigo-purple-cyan"
               }
             ]
           }
         ],
-        "layoutRows": 1
+        "layoutRows": 3,
+        "animation": {
+          "preset": "none"
+        }
       },
       {
-        "id": "webpages-capability-hero",
+        "id": "webpages-builder-in-action",
         "kind": "contentLayout",
         "title": "",
         "eyebrow": "",
         "body": "",
-        "background": "#f4f2ec",
+        "background": "#111111",
+        "backgroundMode": "boxed",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "topSpacing": "large",
+        "bottomSpacing": "large",
+        "topMargin": "inherit",
+        "bottomMargin": "inherit",
+        "visible": true,
+        "layout": "whole",
+        "layoutColumns": 1,
+        "layoutRows": 1,
+        "layoutItems": [
+          {
+            "id": "webpages-builder-in-action-column",
+            "blocks": [
+              {
+                "id": "webpages-builder-in-action-heading",
+                "kind": "hero",
+                "eyebrow": "Builder in Action",
+                "title": "Ստեղծված կայքեր",
+                "body": "Տարբեր ոլորտների համար իրականացված նախագծերի օրինակներ։",
+                "buttonLabel": "Built with WebPages",
+                "buttonUrl": "https://webpages.am/work",
+                "panelStyle": "default",
+                "elementBackgroundMode": "transparent",
+                "elementPadding": "none",
+                "typography": {
+                  "title": {
+                    "fontSize": "clamp(36px, 4.8vw, 76px)",
+                    "fontWeight": "800",
+                    "lineHeight": "0.92"
+                  },
+                  "body": {
+                    "fontSize": "18px",
+                    "lineHeight": "1.65"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "webpages-am-builder-message",
+        "kind": "contentLayout",
+        "title": "",
+        "eyebrow": "",
+        "body": "",
+        "background": "#efebe1",
         "backgroundMode": "full",
         "contentMode": "boxed",
         "colorScheme": "light",
         "topSpacing": "large",
-        "bottomSpacing": "medium",
+        "bottomSpacing": "large",
         "topMargin": "inherit",
         "bottomMargin": "inherit",
         "visible": true,
@@ -186,415 +1173,202 @@
         "layoutRows": 1,
         "layoutItems": [
           {
-            "id": "webpages-capability-hero-copy",
+            "id": "dashboard-message-main",
             "blocks": [
               {
-                "id": "webpages-capability-hero-title",
+                "id": "webpages-am-dashboard-message-heading-block",
                 "kind": "hero",
-                "eyebrow": "WebPages React commerce system",
-                "title": "Beautiful React Websites with WordPress CMS & WooCommerce built in.",
-                "body": "A premium React frontend connected to WordPress content, WooCommerce products, cart, checkout, account tools, dashboard editing, hosting, and support.",
-                "buttonLabel": "Explore the live shop",
-                "buttonUrl": "/shop",
-                "elementPadding": "large",
+                "eyebrow": "",
+                "title": "Հաճախ տրվող հարցեր",
+                "body": "Էջի բոլոր կարևոր մասերը editable blocks են, իսկ sections-ը մնում են մաքուր layout containers։",
+                "buttonLabel": "",
+                "buttonUrl": "",
+                "panelStyle": "default",
+                "elementBackgroundMode": "transparent",
+                "elementPadding": "none",
                 "typography": {
-                  "textAlign": "justify",
-                  "textTransform": "uppercase",
-                  "textDecoration": "underline",
-                  "color": "#ff0000",
                   "title": {
-                    "textAlign": "left",
-                    "textTransform": "capitalize",
-                    "textDecoration": "underline",
-                    "color": "#d1d1d1",
-                    "fontWeight": "500"
+                    "fontSize": "clamp(42px, 6vw, 96px)",
+                    "fontWeight": "820",
+                    "lineHeight": "0.92"
                   },
                   "body": {
-                    "color": "#d4d4d4"
+                    "fontSize": "18px",
+                    "lineHeight": "1.65"
+                  }
+                }
+              },
+              {
+                "id": "dashboard-message-grid",
+                "kind": "grid",
+                "gridSource": "static",
+                "columns": 2,
+                "gridRows": 3,
+                "gridGap": "medium",
+                "gridMargin": "none",
+                "gridImagePadding": "frameless",
+                "gridContentPadding": "large",
+                "gridImageFrame": "none",
+                "gridShowImage": false,
+                "gridShowButton": false,
+                "panelStyle": "clean-shadow",
+                "gridItems": [
+                  {
+                    "id": "dash-sections",
+                    "eyebrow": "",
+                    "title": "Որքա՞ն ժամանակ է պահանջվում կայքի պատրաստման համար։",
+                    "meta": "",
+                    "text": "<h3></h3><p>Ժամկետը կախված է ընտրված փաթեթից և տրամադրված նյութերից, սակայն գործընթացը կազմակերպված է այնպես, որ սկսելը լինի հնարավորինս պարզ։</p>",
+                    "typography": {
+                      "title": {
+                        "fontSize": "clamp(24px, 2.4vw, 42px)",
+                        "fontWeight": "760",
+                        "lineHeight": "1"
+                      },
+                      "body": {
+                        "fontSize": "16px",
+                        "lineHeight": "1.6"
+                      }
+                    }
+                  },
+                  {
+                    "id": "dash-menu",
+                    "eyebrow": "",
+                    "title": "Պե՞տք է տեխնիկական գիտելիքներ ունենամ։",
+                    "meta": "",
+                    "text": "<h3></h3><p>Ոչ։ Կարող եք պարզապես տրամադրել տեղեկատվությունը, իսկ տեխնիկական մասը կկազմակերպվի գործընթացի ընթացքում։</p>",
+                    "typography": {
+                      "title": {
+                        "fontSize": "clamp(24px, 2.4vw, 42px)",
+                        "fontWeight": "760",
+                        "lineHeight": "1"
+                      },
+                      "body": {
+                        "fontSize": "16px",
+                        "lineHeight": "1.6"
+                      }
+                    }
+                  },
+                  {
+                    "id": "dash-products",
+                    "eyebrow": "",
+                    "title": "Կարո՞ղ եմ հետագայում փոփոխություններ կատարել։",
+                    "meta": "",
+                    "text": "<h3></h3><p>Այո։ Կայքը հնարավոր է զարգացնել և ընդլայնել ըստ ձեր կարիքների։</p>",
+                    "typography": {
+                      "title": {
+                        "fontSize": "clamp(24px, 2.4vw, 42px)",
+                        "fontWeight": "760",
+                        "lineHeight": "1"
+                      },
+                      "body": {
+                        "fontSize": "16px",
+                        "lineHeight": "1.6"
+                      }
+                    }
+                  },
+                  {
+                    "id": "grid-mptttjfx",
+                    "eyebrow": "",
+                    "title": "Կարո՞ղ եմ հետագայում փոփոխություններ կատարել։",
+                    "meta": "",
+                    "text": "<h3></h3><p>Այո։ Կայքը հնարավոր է զարգացնել և ընդլայնել ըստ ձեր կարիքների։</p>",
+                    "typography": {
+                      "title": {
+                        "fontSize": "clamp(24px, 2.4vw, 42px)",
+                        "fontWeight": "760",
+                        "lineHeight": "1"
+                      },
+                      "body": {
+                        "fontSize": "16px",
+                        "lineHeight": "1.6"
+                      }
+                    }
+                  },
+                  {
+                    "id": "dash-forms",
+                    "eyebrow": "",
+                    "title": "Կարո՞ղ եմ ունենալ առցանց խանութ։",
+                    "meta": "",
+                    "text": "<h3></h3><p>Այո։ Հասանելի են նաև վաճառքի և պատվերների ընդունման տարբերակներ։</p>",
+                    "typography": {
+                      "title": {
+                        "fontSize": "clamp(24px, 2.4vw, 42px)",
+                        "fontWeight": "760",
+                        "lineHeight": "1"
+                      },
+                      "body": {
+                        "fontSize": "16px",
+                        "lineHeight": "1.6"
+                      }
+                    }
+                  },
+                  {
+                    "id": "grid-mpttu7ms",
+                    "eyebrow": "",
+                    "title": "Ի՞նչ եթե դեռ վստահ չեմ որ ինձ կայք է պետք։",
+                    "meta": "",
+                    "text": "<h3></h3><p>Կարող եք դիտել օրինակները և ընտրել այն լուծումը, որը համապատասխանում է ձեր նպատակին։</p>",
+                    "typography": {
+                      "title": {
+                        "fontSize": "clamp(24px, 2.4vw, 42px)",
+                        "fontWeight": "760",
+                        "lineHeight": "1"
+                      },
+                      "body": {
+                        "fontSize": "16px",
+                        "lineHeight": "1.6"
+                      }
+                    }
+                  }
+                ],
+                "visualStyle": {
+                  "border": {
+                    "radius": "36px"
+                  },
+                  "effects": {
+                    "opacity": 81
                   }
                 },
-                "panelStyle": "flat-dark",
-                "elementBackgroundMode": "custom",
-                "elementBackground": "#111111"
-              },
-              {
-                "id": "webpages-capability-hero-proof",
-                "kind": "badgeGrid",
-                "title": "",
-                "body": "",
-                "columns": 4,
-                "elementBackgroundMode": "transparent",
-                "badges": [
-                  {
-                    "id": "webpages-proof-react",
-                    "label": "React",
-                    "title": "Modern frontend",
-                    "body": "Fast, polished pages with app-like interaction."
-                  },
-                  {
-                    "id": "webpages-proof-woo",
-                    "label": "Woo",
-                    "title": "Live commerce",
-                    "body": "Products, cart, checkout, account, and orders."
-                  },
-                  {
-                    "id": "webpages-proof-wp",
-                    "label": "CMS",
-                    "title": "WordPress editing",
-                    "body": "Menus, media, pages, forms, and product content."
-                  },
-                  {
-                    "id": "webpages-proof-host",
-                    "label": "Host",
-                    "title": "Managed hosting",
-                    "body": "A simpler path from build to launch."
-                  }
-                ]
+                "borderRadius": 0
               }
             ]
           },
           {
-            "id": "webpages-capability-hero-stack",
+            "id": "dashboard-message-side",
             "blocks": [
               {
-                "id": "webpages-capability-hero-panels",
-                "kind": "grid",
-                "gridSource": "static",
-                "columns": 1,
-                "gridRows": 4,
-                "gridGap": "small",
-                "gridMargin": "none",
-                "cardPadding": "medium",
-                "gridImagePadding": "frameless",
-                "gridContentPadding": "large",
-                "gridImageFrame": "none",
-                "gridShowImage": false,
-                "gridShowEyebrow": true,
-                "gridShowMeta": true,
-                "gridShowText": true,
-                "gridShowButton": false,
-                "gridItems": [
-                  {
-                    "id": "webpages-stack-1",
-                    "eyebrow": "01",
-                    "title": "Storefront pages",
-                    "meta": "React frontend",
-                    "text": "Homepage, shop archive, product pages, search, account, cart, and checkout can live in one polished frontend."
-                  },
-                  {
-                    "id": "webpages-stack-2",
-                    "eyebrow": "02",
-                    "title": "Product selling flow",
-                    "meta": "WooCommerce",
-                    "text": "Product cards, options, add to cart, mini cart, checkout, and customer account logic stay connected."
-                  },
-                  {
-                    "id": "webpages-stack-3",
-                    "eyebrow": "03",
-                    "title": "Content control",
-                    "meta": "WordPress CMS",
-                    "text": "Clients keep the familiar WordPress admin for products, menus, media, pages, forms, and content."
-                  },
-                  {
-                    "id": "webpages-stack-4",
-                    "eyebrow": "04",
-                    "title": "Visual editing",
-                    "meta": "Dashboard builder",
-                    "text": "Reusable sections and templates let the site keep evolving without rebuilding the architecture."
-                  }
-                ]
-              }
-            ]
-          }
-        ]
-      },
-      {
-        "id": "webpages-capability-cards",
-        "kind": "badgeGrid",
-        "title": "What clients get in one website system.",
-        "eyebrow": "Capabilities",
-        "body": "The public site feels modern and fast, while the business still manages content and commerce through WordPress and WooCommerce.",
-        "background": "#111111",
-        "backgroundMode": "full",
-        "contentMode": "boxed",
-        "colorScheme": "dark",
-        "topSpacing": "large",
-        "bottomSpacing": "large",
-        "columns": 4,
-        "badges": [
-          {
-            "id": "webpages-card-react",
-            "label": "01",
-            "title": "React frontend",
-            "body": "Premium presentation, responsive layouts, smooth interactions, and flexible page templates."
-          },
-          {
-            "id": "webpages-card-shop",
-            "label": "02",
-            "title": "WooCommerce shop",
-            "body": "Product archive, product detail pages, wishlist, cart, checkout, and customer accounts."
-          },
-          {
-            "id": "webpages-card-cms",
-            "label": "03",
-            "title": "WordPress CMS",
-            "body": "Menus, media, product data, forms, content, and business editing stay in WordPress."
-          },
-          {
-            "id": "webpages-card-builder",
-            "label": "04",
-            "title": "Dashboard builder",
-            "body": "Create pages, adjust layouts, reuse templates, and tune the storefront visually."
-          }
-        ],
-        "visible": true
-      },
-      {
-        "id": "webpages-live-shop-grid",
-        "kind": "productArchive",
-        "title": "Live WooCommerce shop grid",
-        "eyebrow": "Commerce preview",
-        "body": "Real imported products, prices, options, wishlist, and add-to-cart behavior rendered through the React frontend.",
-        "background": "#24241f",
-        "backgroundMode": "boxed",
-        "contentMode": "boxed",
-        "colorScheme": "inherit",
-        "topSpacing": "large",
-        "bottomSpacing": "large",
-        "columns": 4,
-        "filterPosition": "hidden",
-        "cardStyle": "flat",
-        "cardPreset": "minimal",
-        "gridGap": "large",
-        "cardPadding": "none",
-        "imagePadding": "medium",
-        "addToCartStyle": "dark",
-        "addToCartSize": "compact",
-        "addToCartPosition": "under-price",
-        "addToCartVisibility": "always",
-        "addToCartDisplay": "button",
-        "source": "all",
-        "gridLimit": 8,
-        "layoutVariant": "grid",
-        "visible": true
-      },
-      {
-        "id": "webpages-product-page-preview",
-        "kind": "contentLayout",
-        "title": "Product pages that feel like a brand experience.",
-        "eyebrow": "Product detail preview",
-        "body": "The same system supports beautiful product pages with gallery, options, add to cart, product details, related browsing, and checkout flow.",
-        "background": "#f1eee7",
-        "backgroundMode": "full",
-        "contentMode": "boxed",
-        "colorScheme": "light",
-        "topSpacing": "large",
-        "bottomSpacing": "large",
-        "visible": true,
-        "layout": "thirds-1-2",
-        "layoutColumns": 2,
-        "layoutRows": 1,
-        "layoutItems": [
-          {
-            "id": "webpages-product-preview-copy",
-            "blocks": [
-              {
-                "id": "webpages-product-preview-panel",
+                "id": "dashboard-message-panel",
                 "kind": "panel",
-                "eyebrow": "Product page system",
-                "title": "Gallery, price, product options, add to cart, wishlist, and checkout stay connected.",
-                "body": "Use WooCommerce for product management and React for the customer experience. Product pages can be designed as templates and still use live WooCommerce data.",
-                "buttonLabel": "Open a product page",
-                "buttonUrl": "/product/biker-ankle-boots",
-                "elementBackgroundMode": "transparent",
-                "elementPadding": "large"
-              },
-              {
-                "id": "webpages-product-preview-list",
-                "kind": "list",
-                "title": "Included product flow",
-                "items": [
-                  "Product gallery and image handling",
-                  "Variant/options selection",
-                  "Add to cart and mini cart",
-                  "Cart, checkout, and account pages"
-                ],
-                "elementPadding": "medium"
-              }
-            ]
-          },
-          {
-            "id": "webpages-product-preview-visual",
-            "blocks": [
-              {
-                "id": "webpages-product-preview-card",
-                "kind": "grid",
-                "gridSource": "products",
-                "columns": 2,
-                "gridRows": 1,
-                "gridGap": "medium",
-                "gridMargin": "none",
-                "cardPadding": "medium",
-                "gridImagePadding": "frameless",
-                "gridContentPadding": "medium",
-                "gridImageFrame": "soft",
-                "gridShowImage": true,
-                "gridShowEyebrow": true,
-                "gridShowMeta": true,
-                "gridShowText": true,
-                "gridShowButton": true
-              }
-            ]
-          }
-        ]
-      },
-      {
-        "id": "webpages-how-it-works",
-        "kind": "badgeGrid",
-        "title": "From idea to live website without splitting the stack.",
-        "eyebrow": "How it works",
-        "body": "A clear service path for clients who want a modern website, practical editing, commerce, hosting, and support together.",
-        "background": "#ffffff",
-        "backgroundMode": "boxed",
-        "contentMode": "boxed",
-        "colorScheme": "light",
-        "topSpacing": "large",
-        "bottomSpacing": "large",
-        "columns": 4,
-        "badges": [
-          {
-            "id": "webpages-flow-plan",
-            "label": "01",
-            "title": "Choose plan",
-            "body": "Pick the website and hosting package for the launch."
-          },
-          {
-            "id": "webpages-flow-build",
-            "label": "02",
-            "title": "Build design",
-            "body": "Shape homepage, shop archive, product pages, and content sections."
-          },
-          {
-            "id": "webpages-flow-manage",
-            "label": "03",
-            "title": "Manage content",
-            "body": "Use WordPress for products, pages, menus, forms, and media."
-          },
-          {
-            "id": "webpages-flow-sell",
-            "label": "04",
-            "title": "Sell online",
-            "body": "Use WooCommerce checkout, cart, customer accounts, and orders."
-          }
-        ],
-        "visible": true
-      },
-      {
-        "id": "webpages-hosting-pricing",
-        "kind": "contentLayout",
-        "title": "",
-        "eyebrow": "",
-        "body": "",
-        "background": "#111111",
-        "backgroundMode": "full",
-        "contentMode": "boxed",
-        "colorScheme": "dark",
-        "topSpacing": "large",
-        "bottomSpacing": "large",
-        "visible": true,
-        "layout": "halves",
-        "layoutColumns": 2,
-        "layoutRows": 1,
-        "layoutItems": [
-          {
-            "id": "webpages-hosting-copy",
-            "blocks": [
-              {
-                "id": "webpages-hosting-title",
-                "kind": "hero",
-                "eyebrow": "Hosting + care",
-                "title": "Website, CMS, commerce, hosting, and support in one plan.",
-                "body": "Clients do not need to assemble React hosting, WordPress maintenance, WooCommerce setup, SSL, updates, and support separately.",
-                "buttonLabel": "Plans coming soon",
-                "buttonUrl": "#webpages-final-cta",
-                "elementPadding": "large"
-              }
-            ]
-          },
-          {
-            "id": "webpages-hosting-grid",
-            "blocks": [
-              {
-                "id": "webpages-hosting-cards",
-                "kind": "grid",
-                "gridSource": "static",
-                "columns": 2,
-                "gridRows": 2,
-                "gridGap": "medium",
-                "gridMargin": "none",
-                "cardPadding": "medium",
-                "gridImagePadding": "frameless",
-                "gridContentPadding": "large",
-                "gridImageFrame": "none",
-                "gridShowImage": false,
-                "gridShowEyebrow": true,
-                "gridShowMeta": false,
-                "gridShowText": true,
-                "gridShowButton": false,
-                "gridItems": [
-                  {
-                    "id": "webpages-hosting-ssl",
-                    "eyebrow": "01",
-                    "title": "Managed hosting",
-                    "text": "A production-ready home for the React frontend and CMS connection."
+                "eyebrow": "",
+                "title": "",
+                "body": "Չգտա՞ք ձեր հարցը — կապվեք մեզ հետ։",
+                "buttonLabel": "հետադարձ կապ",
+                "buttonUrl": "https://webpages.am/contact/",
+                "panelStyle": "dark",
+                "elementPadding": "large",
+                "typography": {
+                  "title": {
+                    "fontSize": "clamp(24px, 2.4vw, 42px)",
+                    "fontWeight": "760",
+                    "lineHeight": "1"
                   },
-                  {
-                    "id": "webpages-hosting-cms",
-                    "eyebrow": "02",
-                    "title": "WordPress care",
-                    "text": "Keep CMS, products, pages, menus, forms, and media running cleanly."
-                  },
-                  {
-                    "id": "webpages-hosting-commerce",
-                    "eyebrow": "03",
-                    "title": "Commerce setup",
-                    "text": "WooCommerce product and checkout flow connected to the frontend."
-                  },
-                  {
-                    "id": "webpages-hosting-support",
-                    "eyebrow": "04",
-                    "title": "Support available",
-                    "text": "Help with updates, page edits, improvements, and launch needs."
+                  "body": {
+                    "fontSize": "16px",
+                    "lineHeight": "1.6"
                   }
-                ]
+                }
               }
             ]
           }
         ]
       },
       {
-        "id": "webpages-final-cta",
-        "kind": "promo",
-        "title": "Start your modern WebPages site.",
-        "eyebrow": "React + WordPress + WooCommerce",
-        "body": "A premium React website with WordPress CMS, WooCommerce selling tools, dashboard editing, hosting, and support included.",
-        "background": "#d8ff65",
-        "backgroundMode": "full",
-        "contentMode": "boxed",
-        "colorScheme": "light",
-        "topSpacing": "large",
-        "bottomSpacing": "large",
-        "promoVariant": "accent",
-        "ctaLabel": "Request a website plan",
-        "ctaUrl": "/client",
-        "visible": true
-      },
-      {
-        "id": "contentLayout-mpk2kf7x-xww56",
+        "id": "contentLayout-mpzkl96m-oosnk",
         "kind": "contentLayout",
         "title": "",
         "background": "#111111",
-        "backgroundMode": "boxed",
+        "backgroundMode": "full",
         "contentMode": "narrow",
         "colorScheme": "inherit",
         "topSpacing": "inherit",
@@ -608,10 +1382,10 @@
         "layoutColumns": 1,
         "layoutItems": [
           {
-            "id": "layout-item-mpk2kf7x-1",
+            "id": "layout-item-mpzkl96m-1",
             "blocks": [
               {
-                "id": "fluentForm-block-mpk2khtk-03q5s",
+                "id": "fluentForm-block-mpzklfs9-nmvi6",
                 "kind": "fluentForm",
                 "title": "Contact Form",
                 "body": "Rendered from Fluent Forms in WordPress.",
@@ -621,1334 +1395,746 @@
           }
         ],
         "layoutRows": 1
-      }
-    ],
-    "updatedAt": "2026-05-26T05:41:57.441Z"
-  },
-  {
-    "id": "webpages-react-service",
-    "title": "WebPages React Service",
-    "description": "Premium service homepage for React websites with WordPress CMS, WooCommerce, hosting, and support.",
-    "sourcePage": "home",
-    "design": {
-      "preset": "princity",
-      "colorScheme": "auto",
-      "pageBackground": "#f5f3ee",
-      "textColor": "#111111",
-      "mutedTextColor": "#5f5c55",
-      "accentColor": "#d8ff65",
-      "surfaceColor": "#ebe8df",
-      "buttonBackground": "#111111",
-      "buttonTextColor": "#ffffff",
-      "radius": "8px",
-      "sectionMaxWidth": "1560px",
-      "sectionGutter": "44px",
-      "headingFontFamily": "inherit",
-      "headingSize": "clamp(48px, 8vw, 132px)",
-      "headingWeight": "820",
-      "headingLineHeight": "0.9",
-      "headingColor": "#111111"
-    },
-    "sections": [
+      },
       {
-        "id": "webpages-hero",
+        "id": "contentLayout-mptd4qhk-5wnja",
         "kind": "contentLayout",
         "title": "",
-        "eyebrow": "",
-        "body": "",
-        "background": "#f5f3ee",
-        "backgroundMode": "full",
-        "contentMode": "boxed",
-        "colorScheme": "light",
-        "topSpacing": "large",
-        "bottomSpacing": "medium",
-        "visible": true,
-        "layout": "thirds-2-1",
-        "layoutColumns": 2,
-        "layoutRows": 1,
-        "layoutItems": [
-          {
-            "id": "webpages-hero-copy",
-            "blocks": [
-              {
-                "id": "webpages-hero-title",
-                "kind": "hero",
-                "eyebrow": "WebPages React service",
-                "title": "Beautiful React Websites with WordPress CMS & Hosting Included",
-                "body": "Launch a premium React frontend connected to WordPress content, WooCommerce selling tools, managed hosting, and support from one place.",
-                "buttonLabel": "Start your modern website",
-                "buttonUrl": "/client",
-                "elementPadding": "large"
-              },
-              {
-                "id": "webpages-hero-proof",
-                "kind": "badgeGrid",
-                "title": "",
-                "body": "",
-                "columns": 3,
-                "elementBackgroundMode": "transparent",
-                "badges": [
-                  {
-                    "id": "webpages-hero-proof-1",
-                    "label": "React",
-                    "title": "Fast frontend",
-                    "body": "Modern app-style pages tuned for premium browsing."
-                  },
-                  {
-                    "id": "webpages-hero-proof-2",
-                    "label": "CMS",
-                    "title": "WordPress editing",
-                    "body": "Keep content, menus, products, and media manageable."
-                  },
-                  {
-                    "id": "webpages-hero-proof-3",
-                    "label": "Hosting",
-                    "title": "Managed setup",
-                    "body": "Infrastructure, publishing, and support under one service."
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "id": "webpages-hero-ui",
-            "blocks": [
-              {
-                "id": "webpages-hero-floating-panel",
-                "kind": "grid",
-                "gridSource": "static",
-                "columns": 1,
-                "gridRows": 3,
-                "gridGap": "small",
-                "gridMargin": "none",
-                "cardPadding": "medium",
-                "gridImagePadding": "frameless",
-                "gridContentPadding": "large",
-                "gridImageFrame": "none",
-                "gridShowImage": false,
-                "gridShowEyebrow": true,
-                "gridShowMeta": true,
-                "gridShowText": true,
-                "gridShowButton": false,
-                "gridItems": [
-                  {
-                    "id": "webpages-panel-1",
-                    "eyebrow": "01",
-                    "title": "React storefront",
-                    "meta": "Frontend layer",
-                    "text": "Cinematic pages, fast navigation, modern product browsing, and polished interaction states."
-                  },
-                  {
-                    "id": "webpages-panel-2",
-                    "eyebrow": "02",
-                    "title": "WordPress control room",
-                    "meta": "CMS layer",
-                    "text": "Menus, media, pages, products, forms, and content remain editable without rebuilding the site."
-                  },
-                  {
-                    "id": "webpages-panel-3",
-                    "eyebrow": "03",
-                    "title": "Hosting included",
-                    "meta": "Managed layer",
-                    "text": "Deployment, updates, performance care, and support are part of the website plan."
-                  }
-                ]
-              }
-            ]
-          }
-        ]
-      },
-      {
-        "id": "webpages-problem",
-        "kind": "badgeGrid",
-        "title": "Why classic websites feel limited",
-        "eyebrow": "The problem",
-        "body": "Most small business websites separate design, content, commerce, hosting, and support into disconnected pieces. That makes every improvement slower than it should be.",
-        "background": "#111111",
-        "backgroundMode": "full",
-        "contentMode": "boxed",
-        "colorScheme": "dark",
-        "topSpacing": "large",
-        "bottomSpacing": "large",
-        "columns": 4,
-        "badges": [
-          {
-            "id": "webpages-problem-1",
-            "label": "01",
-            "title": "Slow design changes",
-            "body": "Simple page updates become tickets, plugins, theme edits, or risky layout work."
-          },
-          {
-            "id": "webpages-problem-2",
-            "label": "02",
-            "title": "Outdated shop experience",
-            "body": "Classic commerce pages often feel heavy, generic, and disconnected from the brand."
-          },
-          {
-            "id": "webpages-problem-3",
-            "label": "03",
-            "title": "Scattered hosting/support",
-            "body": "Domain, hosting, developer, CMS, and shop issues live in different places."
-          },
-          {
-            "id": "webpages-problem-4",
-            "label": "04",
-            "title": "Hard content management",
-            "body": "Teams need a practical CMS, but customers still deserve a modern frontend."
-          }
-        ],
-        "visible": true
-      },
-      {
-        "id": "webpages-solution",
-        "kind": "contentLayout",
-        "title": "One modern website system",
-        "eyebrow": "The solution",
-        "body": "React frontend + WordPress CMS + WooCommerce + managed hosting, packaged as a clear service instead of a scattered technical puzzle.",
         "background": "#ffffff",
         "backgroundMode": "boxed",
-        "contentMode": "boxed",
-        "colorScheme": "light",
-        "topSpacing": "large",
-        "bottomSpacing": "large",
+        "contentMode": "narrow",
+        "colorScheme": "inherit",
+        "topSpacing": "inherit",
+        "bottomSpacing": "inherit",
+        "topMargin": "none",
+        "bottomMargin": "none",
         "visible": true,
-        "layout": "thirds-1-2",
-        "layoutColumns": 2,
-        "layoutRows": 1,
-        "layoutItems": [
-          {
-            "id": "webpages-solution-copy",
-            "blocks": [
-              {
-                "id": "webpages-solution-panel",
-                "kind": "panel",
-                "eyebrow": "Service stack",
-                "title": "A premium frontend with a familiar content engine behind it.",
-                "body": "Your visitors get a polished React website. Your team keeps WordPress for everyday content and WooCommerce for product management.",
-                "buttonLabel": "See the workflow",
-                "buttonUrl": "#webpages-workflow",
-                "elementBackgroundMode": "transparent",
-                "elementPadding": "large"
-              }
-            ]
-          },
-          {
-            "id": "webpages-solution-grid",
-            "blocks": [
-              {
-                "id": "webpages-solution-cards",
-                "kind": "grid",
-                "gridSource": "static",
-                "columns": 2,
-                "gridRows": 2,
-                "gridGap": "medium",
-                "gridMargin": "none",
-                "cardPadding": "medium",
-                "gridContentPadding": "large",
-                "gridShowImage": false,
-                "gridShowEyebrow": true,
-                "gridShowMeta": true,
-                "gridShowText": true,
-                "gridShowButton": false,
-                "gridItems": [
-                  {
-                    "id": "webpages-stack-react",
-                    "eyebrow": "Frontend",
-                    "title": "React",
-                    "meta": "Fast user experience",
-                    "text": "Modern page transitions, flexible layouts, and frontend polish."
-                  },
-                  {
-                    "id": "webpages-stack-wp",
-                    "eyebrow": "CMS",
-                    "title": "WordPress",
-                    "meta": "Content management",
-                    "text": "Pages, posts, menus, media, forms, and editorial control."
-                  },
-                  {
-                    "id": "webpages-stack-woo",
-                    "eyebrow": "Commerce",
-                    "title": "WooCommerce",
-                    "meta": "Online selling",
-                    "text": "Products, categories, cart, checkout, accounts, and orders."
-                  },
-                  {
-                    "id": "webpages-stack-hosting",
-                    "eyebrow": "Platform",
-                    "title": "Hosting",
-                    "meta": "Managed service",
-                    "text": "Deployment, performance care, SSL, updates, and support."
-                  }
-                ]
-              }
-            ]
-          }
-        ]
-      },
-      {
-        "id": "webpages-workflow",
-        "kind": "badgeGrid",
-        "title": "From idea to live website without the usual maze",
-        "eyebrow": "Visual workflow",
-        "body": "A clear path for clients who want a modern website without managing every technical layer themselves.",
-        "background": "#f1eee7",
-        "backgroundMode": "full",
-        "contentMode": "boxed",
-        "colorScheme": "light",
-        "topSpacing": "large",
-        "bottomSpacing": "large",
-        "columns": 4,
-        "badges": [
-          {
-            "id": "webpages-flow-1",
-            "label": "01",
-            "title": "Choose plan",
-            "body": "Pick the website and hosting package that fits your launch."
-          },
-          {
-            "id": "webpages-flow-2",
-            "label": "02",
-            "title": "Build design",
-            "body": "Shape the homepage, shop, product pages, and content sections."
-          },
-          {
-            "id": "webpages-flow-3",
-            "label": "03",
-            "title": "Manage content",
-            "body": "Use WordPress to update text, media, menus, forms, and pages."
-          },
-          {
-            "id": "webpages-flow-4",
-            "label": "04",
-            "title": "Sell online",
-            "body": "Enable WooCommerce products, cart, checkout, and customer accounts."
-          }
-        ],
-        "visible": true
-      },
-      {
-        "id": "webpages-features",
-        "kind": "contentLayout",
-        "title": "Everything needed for a modern business website",
-        "eyebrow": "Features",
-        "body": "Built for service businesses, brands, and shops that need premium presentation with practical editing and commerce tools.",
-        "background": "#ffffff",
-        "backgroundMode": "boxed",
-        "contentMode": "boxed",
-        "colorScheme": "light",
-        "topSpacing": "large",
-        "bottomSpacing": "large",
-        "visible": true,
-        "layout": "whole",
-        "layoutColumns": 1,
-        "layoutRows": 1,
-        "layoutItems": [
-          {
-            "id": "webpages-features-column",
-            "blocks": [
-              {
-                "id": "webpages-features-grid",
-                "kind": "grid",
-                "gridSource": "static",
-                "columns": 3,
-                "gridRows": 2,
-                "gridGap": "medium",
-                "gridMargin": "none",
-                "cardPadding": "medium",
-                "gridContentPadding": "large",
-                "gridShowImage": false,
-                "gridShowEyebrow": true,
-                "gridShowMeta": false,
-                "gridShowText": true,
-                "gridShowButton": false,
-                "gridItems": [
-                  {
-                    "id": "webpages-feature-react",
-                    "eyebrow": "01",
-                    "title": "React frontend",
-                    "text": "A premium, app-like customer experience for your public website."
-                  },
-                  {
-                    "id": "webpages-feature-woo",
-                    "eyebrow": "02",
-                    "title": "WooCommerce shop",
-                    "text": "Sell products with familiar WordPress commerce tools and a modern frontend."
-                  },
-                  {
-                    "id": "webpages-feature-cms",
-                    "eyebrow": "03",
-                    "title": "WordPress CMS",
-                    "text": "Edit pages, posts, menus, images, forms, and product content."
-                  },
-                  {
-                    "id": "webpages-feature-builder",
-                    "eyebrow": "04",
-                    "title": "Dashboard builder",
-                    "text": "Adjust sections, blocks, layouts, spacing, and page templates visually."
-                  },
-                  {
-                    "id": "webpages-feature-hosting",
-                    "eyebrow": "05",
-                    "title": "Hosting included",
-                    "text": "A managed deployment path with SSL, performance care, and publishing."
-                  },
-                  {
-                    "id": "webpages-feature-support",
-                    "eyebrow": "06",
-                    "title": "Support available",
-                    "text": "Help with setup, improvements, content updates, and ongoing site care."
-                  }
-                ]
-              }
-            ]
-          }
-        ]
-      },
-      {
-        "id": "webpages-pricing",
-        "kind": "contentLayout",
-        "title": "",
         "eyebrow": "",
         "body": "",
-        "background": "#111111",
-        "backgroundMode": "full",
-        "contentMode": "boxed",
-        "colorScheme": "dark",
-        "topSpacing": "large",
-        "bottomSpacing": "large",
-        "visible": true,
         "layout": "halves",
         "layoutColumns": 2,
-        "layoutRows": 1,
         "layoutItems": [
           {
-            "id": "webpages-pricing-copy",
+            "id": "layout-item-mptd4qhl-1",
             "blocks": [
               {
-                "id": "webpages-pricing-title",
-                "kind": "hero",
-                "eyebrow": "Pricing teaser",
-                "title": "Website + hosting plan",
-                "body": "A simple service package for a React website, WordPress CMS, WooCommerce-ready commerce, hosting, and support.",
-                "buttonLabel": "Coming soon",
-                "buttonUrl": "#webpages-cta",
-                "elementPadding": "large"
+                "id": "list-block-mptd5dxv-11uvy",
+                "kind": "list",
+                "title": "Traditional Way ",
+                "items": [
+                  "Find developer",
+                  "Find hosting",
+                  "Setup website",
+                  "Support",
+                  "Multiple vendors",
+                  "One solution"
+                ],
+                "listIcon": "circleCheck"
               }
             ]
           },
           {
-            "id": "webpages-pricing-panel",
+            "id": "layout-item-mptd4qhl-2",
             "blocks": [
               {
-                "id": "webpages-pricing-card",
-                "kind": "panel",
-                "eyebrow": "Coming soon",
-                "title": "One plan, one stack, one support path.",
-                "body": "Designed for businesses that want the polish of a custom React website and the practicality of WordPress management without assembling every tool separately.",
-                "buttonLabel": "Start your modern website",
-                "buttonUrl": "/client",
-                "elementBackgroundMode": "transparent",
-                "elementPadding": "large"
+                "id": "list-block-mptd5zki-7ien3",
+                "kind": "list",
+                "title": "Webpages",
+                "items": [
+                  "✓ Included",
+                  "✓ Included",
+                  "✓ Included",
+                  "✓ Included",
+                  "One solution"
+                ]
               }
             ]
           }
-        ]
+        ],
+        "layoutRows": 1
       },
       {
-        "id": "webpages-cta",
-        "kind": "promo",
-        "title": "Start your modern website",
-        "eyebrow": "WebPages",
-        "body": "Beautiful React websites with WordPress/WooCommerce CMS and hosting included.",
+        "id": "contact",
+        "kind": "contentLayout",
+        "title": "",
+        "eyebrow": "",
+        "body": "",
         "background": "#d8ff65",
         "backgroundMode": "full",
         "contentMode": "boxed",
         "colorScheme": "light",
+        "topSpacing": "medium",
+        "bottomSpacing": "medium",
+        "topMargin": "inherit",
+        "bottomMargin": "none",
+        "visible": true,
+        "layout": "whole",
+        "layoutColumns": 1,
+        "layoutRows": 1,
+        "layoutItems": [
+          {
+            "id": "contact-column-1",
+            "blocks": [
+              {
+                "id": "contact-promo-block",
+                "kind": "promoStrip",
+                "eyebrow": "",
+                "title": "Պատրա՞ստ եք սկսել",
+                "body": "Ընտրեք ձեզ հարմար տարբերակը և սկսեք ստեղծել ձեր ներկայությունը համացանցում։",
+                "buttonLabel": "Դիտել փաթեթները ",
+                "buttonUrl": "/dashboard?page=home",
+                "panelStyle": "default",
+                "elementBackgroundMode": "transparent",
+                "elementPadding": "none",
+                "typography": {
+                  "title": {
+                    "fontSize": "clamp(42px, 6vw, 96px)",
+                    "fontWeight": "820",
+                    "lineHeight": "0.92"
+                  },
+                  "body": {
+                    "fontSize": "18px",
+                    "lineHeight": "1.65"
+                  }
+                }
+              },
+              {
+                "id": "text-block-mptu2d1x-xrj2r",
+                "kind": "text",
+                "eyebrow": "",
+                "title": "",
+                "body": "Պարզ • Պրոֆեսիոնալ • Առանց բարդությունների",
+                "buttonLabel": "",
+                "buttonUrl": "",
+                "typography": {
+                  "variant": "body",
+                  "fontFamily": "inherit",
+                  "fontSize": "16px",
+                  "fontWeight": "400",
+                  "lineHeight": "1.4",
+                  "letterSpacing": "0px",
+                  "color": "inherit",
+                  "textAlign": "left",
+                  "body": {
+                    "textAlign": "center"
+                  }
+                },
+                "elementAlign": "center"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "contentLayout-mq4srns2-rsg7z",
+        "kind": "contentLayout",
+        "title": "",
+        "background": "#ffffff",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
         "topSpacing": "large",
-        "bottomSpacing": "large",
-        "promoVariant": "accent",
-        "ctaLabel": "Request a website plan",
-        "ctaUrl": "/client",
-        "visible": true
-      }
-    ],
-    "updatedAt": "2026-05-23T23:01:18.269Z"
-  },
-  {
-    "id": "fashion-store",
-    "title": "Fashion Store",
-    "description": "Premium fashion storefront demo using imported WooCommerce products.",
-    "sourcePage": "page:fashion-store",
-    "design": {
-      "preset": "editorial",
-      "colorScheme": "light",
-      "pageBackground": "#f3f0ea",
-      "textColor": "#0f0f0d",
-      "mutedTextColor": "#6a655d",
-      "accentColor": "#b7a184",
-      "surfaceColor": "#e9e4dc",
-      "buttonBackground": "#11110f",
-      "buttonTextColor": "#ffffff",
-      "radius": "4px",
-      "sectionMaxWidth": "1560px",
-      "sectionGutter": "40px",
-      "headingFontFamily": "Georgia, serif",
-      "headingSize": "clamp(44px, 8vw, 132px)",
-      "headingWeight": "700",
-      "headingLineHeight": "0.9",
-      "headingColor": "#0f0f0d"
-    },
-    "sections": [
-      {
-        "id": "page:fashion-store-cinematic-hero",
-        "kind": "contentLayout",
-        "title": "",
-        "eyebrow": "",
-        "body": "",
-        "background": "#f3f0ea",
-        "backgroundMode": "full",
-        "contentMode": "boxed",
-        "colorScheme": "light",
-        "topSpacing": "medium",
-        "bottomSpacing": "small",
+        "bottomSpacing": "inherit",
         "topMargin": "inherit",
         "bottomMargin": "inherit",
         "visible": true,
-        "layout": "halves",
-        "layoutColumns": 2,
-        "layoutRows": 1,
-        "layoutItems": [
-          {
-            "id": "page:fashion-store-hero-copy",
-            "blocks": [
-              {
-                "id": "page:fashion-store-hero-heading",
-                "kind": "hero",
-                "eyebrow": "Maison Webpages",
-                "title": "New silhouettes for the modern city wardrobe.",
-                "body": "A refined fashion storefront demo shaped for editorial storytelling, clean commerce, and imported WooCommerce product data.",
-                "buttonLabel": "Shop new arrivals",
-                "buttonUrl": "/shop",
-                "elementPadding": "large"
-              },
-              {
-                "id": "page:fashion-store-hero-points",
-                "kind": "badgeGrid",
-                "title": "",
-                "body": "",
-                "columns": 3,
-                "elementBackgroundMode": "transparent",
-                "badges": [
-                  {
-                    "id": "page:fashion-store-point-1",
-                    "label": "01",
-                    "title": "Tailored layers",
-                    "body": "Coats, blazers, and knits styled for a sharp seasonal edit."
-                  },
-                  {
-                    "id": "page:fashion-store-point-2",
-                    "label": "02",
-                    "title": "Quiet luxury",
-                    "body": "Monochrome surfaces, measured rhythm, and restrained campaign language."
-                  },
-                  {
-                    "id": "page:fashion-store-point-3",
-                    "label": "03",
-                    "title": "Commerce ready",
-                    "body": "Live products, prices, options, cart, and checkout remain untouched."
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "id": "page:fashion-store-hero-visual",
-            "blocks": [
-              {
-                "id": "page:fashion-store-hero-panel",
-                "kind": "grid",
-                "gridSource": "static",
-                "columns": 1,
-                "gridRows": 1,
-                "gridGap": "none",
-                "gridMargin": "none",
-                "cardPadding": "none",
-                "gridImagePadding": "frameless",
-                "gridContentPadding": "medium",
-                "gridImageFrame": "soft",
-                "gridShowImage": true,
-                "gridShowEyebrow": true,
-                "gridShowMeta": true,
-                "gridShowText": true,
-                "gridShowButton": false,
-                "gridItems": [
-                  {
-                    "id": "page:fashion-store-hero-image",
-                    "eyebrow": "Campaign 2026",
-                    "title": "The city edit",
-                    "meta": "Outerwear / boots / knitwear",
-                    "text": "Editorial commerce built from reusable dashboard blocks.",
-                    "imageUrl": "https://cms.webpages.am/wp-content/uploads/2025/11/cropped-image-scaled-1.png",
-                    "imageAlt": "Fashion model in tailored outerwear campaign image"
-                  }
-                ]
-              }
-            ]
-          }
-        ]
-      },
-      {
-        "id": "page:fashion-store-featured-categories",
-        "kind": "contentLayout",
-        "title": "Featured categories",
-        "eyebrow": "Shop by mood",
-        "body": "Minimal category cards keep the page commercial without losing its editorial pace.",
-        "background": "#ffffff",
-        "backgroundMode": "boxed",
-        "contentMode": "boxed",
-        "colorScheme": "light",
-        "topSpacing": "medium",
-        "bottomSpacing": "medium",
-        "visible": true,
+        "eyebrow": "",
+        "body": "",
         "layout": "whole",
         "layoutColumns": 1,
-        "layoutRows": 1,
         "layoutItems": [
           {
-            "id": "page:fashion-store-category-column",
+            "id": "layout-item-mq4srns2-0-8ul8",
             "blocks": [
               {
-                "id": "page:fashion-store-category-grid",
+                "id": "grid-block-mq4srns2-d4r87",
                 "kind": "grid",
                 "gridSource": "static",
                 "columns": 4,
                 "gridRows": 1,
                 "gridGap": "medium",
-                "gridMargin": "none",
-                "cardPadding": "none",
+                "gridMargin": "medium",
                 "gridImagePadding": "frameless",
-                "gridContentPadding": "small",
-                "gridImageFrame": "soft",
-                "gridShowImage": true,
-                "gridShowEyebrow": true,
-                "gridShowMeta": true,
-                "gridShowText": false,
+                "gridContentPadding": "large",
+                "gridImageFrame": "none",
+                "gridShowImage": false,
                 "gridShowButton": true,
+                "panelStyle": "flat-dark",
                 "gridItems": [
                   {
-                    "id": "page:fashion-store-cat-outerwear",
-                    "eyebrow": "01",
-                    "title": "Outerwear",
-                    "meta": "Coats and blazers",
-                    "buttonLabel": "Explore",
-                    "buttonUrl": "/shop",
-                    "imageUrl": "https://cms.webpages.am/wp-content/uploads/2025/11/products-post-single-breasted-blazer-suit-feature.jpg",
-                    "imageAlt": "Tailored blazer fashion product"
+                    "id": "package-start",
+                    "eyebrow": "Start",
+                    "title": "🌱 Start",
+                    "meta": "պարզ",
+                    "text": "<p>Հարմար է սկսելու համար</p>",
+                    "buttonLabel": "Հետաքրքրում է",
+                    "buttonUrl": "#contact",
+                    "typography": {
+                      "title": {
+                        "fontSize": "clamp(24px, 2.4vw, 42px)",
+                        "fontWeight": "760",
+                        "lineHeight": "1"
+                      },
+                      "body": {
+                        "fontSize": "16px",
+                        "lineHeight": "1.6"
+                      }
+                    },
+                    "listIcon": "check",
+                    "items": [
+                      " 1–5 էջ",
+                      "Կոնտակտային ձև",
+                      "Կայքի տեղակայում",
+                      " Կայքի տեղակայում",
+                      "Հիմնական աջակցություն"
+                    ],
+                    "listIconColorScheme": "gradient-cycle",
+                    "listIconSize": 16
                   },
                   {
-                    "id": "page:fashion-store-cat-footwear",
-                    "eyebrow": "02",
-                    "title": "Footwear",
-                    "meta": "Boots and leather forms",
-                    "buttonLabel": "Explore",
-                    "buttonUrl": "/shop",
-                    "imageUrl": "https://cms.webpages.am/wp-content/uploads/2025/11/products-post-brown-calfskin-boots-image-03-scaled-1.jpg",
-                    "imageAlt": "Brown leather fashion boots"
+                    "id": "package-commerce",
+                    "eyebrow": "Բիզնես",
+                    "title": "🚀 Business",
+                    "meta": "Բիզնես",
+                    "text": "<p>Բիզնեսի համար պատրաստ լուծում</p>",
+                    "buttonLabel": "Shop package",
+                    "buttonUrl": "#contact",
+                    "typography": {
+                      "title": {
+                        "fontSize": "clamp(24px, 2.4vw, 42px)",
+                        "fontWeight": "760",
+                        "lineHeight": "1"
+                      },
+                      "body": {
+                        "fontSize": "16px",
+                        "lineHeight": "1.6"
+                      }
+                    },
+                    "listIconColorScheme": "gradient-cycle",
+                    "items": [
+                      "Ամեն ինչ Start-ից",
+                      " Ավելի շատ էջեր",
+                      " Ծառայությունների ներկայացում",
+                      "Հայտերի ընդունում",
+                      "Ընդլայնված կառուցվածք"
+                    ],
+                    "listIconSize": 16,
+                    "listIcon": "check"
                   },
                   {
-                    "id": "page:fashion-store-cat-knitwear",
-                    "eyebrow": "03",
-                    "title": "Knitwear",
-                    "meta": "Soft seasonal layers",
-                    "buttonLabel": "Explore",
-                    "buttonUrl": "/shop",
-                    "imageUrl": "https://cms.webpages.am/wp-content/uploads/2025/11/products-post-turtleneck-blue-sweater-image-02-scaled-1.jpg",
-                    "imageAlt": "Blue turtleneck sweater product"
+                    "id": "package-growth",
+                    "eyebrow": "առևտուր",
+                    "title": "🛍 Store",
+                    "meta": "կեմերցիոն",
+                    "text": "<p>Խանութ Առցանց վաճառքի համար</p><p></p>",
+                    "buttonLabel": "Խոսենք",
+                    "buttonUrl": "#contact",
+                    "typography": {
+                      "title": {
+                        "fontSize": "clamp(24px, 2.4vw, 42px)",
+                        "fontWeight": "760",
+                        "lineHeight": "1"
+                      },
+                      "body": {
+                        "fontSize": "16px",
+                        "lineHeight": "1.6"
+                      }
+                    },
+                    "items": [
+                      "Ամեն ինչ Business-ից",
+                      "Ապրանքների ցուցադրում",
+                      "Կատեգորիաներ",
+                      "Զամբյուղ",
+                      "Պատվերների ընդունում"
+                    ],
+                    "listIconColorScheme": "gradient-cycle"
                   },
                   {
-                    "id": "page:fashion-store-cat-accessories",
-                    "eyebrow": "04",
-                    "title": "Accessories",
-                    "meta": "Finishing details",
-                    "buttonLabel": "Explore",
-                    "buttonUrl": "/shop",
-                    "imageUrl": "https://cms.webpages.am/wp-content/uploads/2025/11/products-post-brown-lined-boots-image-01-scaled-1.jpg",
-                    "imageAlt": "Minimal fashion product detail"
+                    "id": "grid-item-mptcn4jh",
+                    "eyebrow": "Հատուկ",
+                    "title": "✨ Custom",
+                    "meta": "Երբ պետք է ավելին",
+                    "text": "<p></p><p></p>",
+                    "buttonLabel": "Learn more",
+                    "buttonUrl": "/",
+                    "items": [
+                      "Անհատական կառուցվածք",
+                      "Հատուկ ֆունկցիաներ",
+                      "Ճկուն զարգացում"
+                    ],
+                    "listIconColorScheme": "gradient-cycle"
                   }
-                ]
-              }
-            ]
-          }
-        ]
-      },
-      {
-        "id": "page:fashion-store-editorial-split",
-        "kind": "contentLayout",
-        "title": "",
-        "eyebrow": "",
-        "body": "",
-        "background": "#11110f",
-        "backgroundMode": "full",
-        "contentMode": "boxed",
-        "colorScheme": "dark",
-        "topSpacing": "medium",
-        "bottomSpacing": "medium",
-        "visible": true,
-        "layout": "thirds-1-2",
-        "layoutColumns": 2,
-        "layoutRows": 1,
-        "layoutItems": [
-          {
-            "id": "page:fashion-store-editorial-image",
-            "blocks": [
-              {
-                "id": "page:fashion-store-editorial-image-block",
-                "kind": "image",
-                "imageUrl": "https://cms.webpages.am/wp-content/uploads/2025/11/image-9.png",
-                "imageAlt": "Modern fashion campaign editorial image",
-                "title": "Campaign visual",
-                "body": "",
-                "elementPadding": "none"
+                ],
+                "animation": {
+                  "preset": "none",
+                  "once": false
+                },
+                "elementPadding": "small",
+                "visualStyle": {
+                  "padding": {
+                    "linked": true,
+                    "top": "sm",
+                    "right": "sm",
+                    "bottom": "sm",
+                    "left": "sm"
+                  }
+                }
               }
             ]
           },
           {
-            "id": "page:fashion-store-editorial-copy",
+            "id": "layout-item-mq4srns2-1-5do5",
+            "rowId": "layout-row-mq4srns2-1",
+            "rowLayout": "whole",
             "blocks": [
               {
-                "id": "page:fashion-store-editorial-copy-block",
-                "kind": "panel",
-                "eyebrow": "Editorial note",
-                "title": "Sharp pieces, softer styling, and a storefront that lets the product breathe.",
-                "body": "Use the builder to tune image rhythm, product density, and campaign language while WooCommerce continues to power the catalog beneath the surface.",
-                "buttonLabel": "View the collection",
-                "buttonUrl": "/shop",
-                "elementBackgroundMode": "transparent",
-                "elementPadding": "large"
+                "id": "text-block-mq4srns2-4f3pf",
+                "kind": "text",
+                "eyebrow": "",
+                "title": "",
+                "body": "<p><strong>Չգիտե՞ք որն ընտրել — սկսեք պարզ փաթեթից։</strong></p><p><strong>Միշտ հնարավոր է անցնել ավելի բարձր տարբերակի։</strong></p>",
+                "buttonLabel": "",
+                "buttonUrl": "",
+                "typography": {
+                  "variant": "body",
+                  "fontFamily": "inherit",
+                  "fontSize": "16px",
+                  "fontWeight": "400",
+                  "lineHeight": "1.4",
+                  "letterSpacing": "0px",
+                  "color": "inherit",
+                  "textAlign": "left",
+                  "body": {
+                    "textAlign": "center"
+                  },
+                  "title": {
+                    "variant": "body",
+                    "fontFamily": "inherit",
+                    "fontSize": "16px",
+                    "fontWeight": "400",
+                    "lineHeight": "1.4",
+                    "letterSpacing": "0px",
+                    "color": "inherit",
+                    "textAlign": "center",
+                    "body": {
+                      "textAlign": "left"
+                    }
+                  }
+                },
+                "elementAlign": "center"
               }
             ]
           }
-        ]
+        ],
+        "layoutRows": 2
       },
       {
-        "id": "page:fashion-store-new-arrivals",
-        "kind": "productArchive",
-        "title": "New arrivals",
-        "eyebrow": "Latest edit",
-        "body": "Live WooCommerce products presented as a polished fashion grid.",
-        "background": "#f7f4ef",
-        "backgroundMode": "boxed",
-        "contentMode": "full",
-        "colorScheme": "light",
-        "topSpacing": "medium",
-        "bottomSpacing": "medium",
-        "columns": 4,
-        "filterPosition": "hidden",
-        "cardStyle": "none",
-        "cardPreset": "minimal",
-        "gridGap": "large",
-        "cardPadding": "none",
-        "imagePadding": "medium",
-        "addToCartStyle": "dark",
-        "addToCartSize": "compact",
-        "addToCartPosition": "under-price",
-        "addToCartVisibility": "hover",
-        "addToCartDisplay": "button",
-        "source": "all",
-        "gridLimit": 8,
-        "layoutVariant": "grid",
-        "visible": true
-      },
-      {
-        "id": "page:fashion-store-campaign-banner",
-        "kind": "slider",
+        "id": "contentLayout-mq4srvow-atknw",
+        "kind": "contentLayout",
         "title": "",
-        "eyebrow": "",
-        "body": "",
         "background": "#ffffff",
         "backgroundMode": "full",
         "contentMode": "boxed",
-        "colorScheme": "light",
-        "topSpacing": "small",
-        "bottomSpacing": "small",
-        "visible": true,
-        "carouselSettings": {
-          "variant": "editorial",
-          "loop": true,
-          "autoplay": false,
-          "autoplayDelayMs": 5200,
-          "align": "center",
-          "dragFree": false,
-          "cardsPerView": 1,
-          "showArrows": true,
-          "showDots": true,
-          "pauseOnHover": true
-        },
-        "slides": [
-          {
-            "id": "page:fashion-store-campaign-1",
-            "badge": "Campaign",
-            "title": "Monochrome essentials",
-            "subtitle": "A quiet wardrobe, edited for impact.",
-            "text": "Layer charcoal, ivory, and beige with sculptural boots and tailored volume.",
-            "imageUrl": "https://cms.webpages.am/wp-content/uploads/2025/11/products-post-single-breasted-blazer-suit-feature.jpg",
-            "imageAlt": "Fashion blazer campaign image",
-            "imagePadding": "frameless",
-            "buttonLabel": "Shop campaign",
-            "buttonUrl": "/shop"
-          },
-          {
-            "id": "page:fashion-store-campaign-2",
-            "badge": "Footwear",
-            "title": "Grounded in leather",
-            "subtitle": "Boots with presence.",
-            "text": "Anchor each look with polished leather forms from the imported catalog.",
-            "imageUrl": "https://cms.webpages.am/wp-content/uploads/2025/11/products-post-brown-calfskin-boots-image-03-scaled-1.jpg",
-            "imageAlt": "Brown ankle boots campaign image",
-            "imagePadding": "frameless",
-            "buttonLabel": "View footwear",
-            "buttonUrl": "/shop"
-          }
-        ]
-      },
-      {
-        "id": "page:fashion-store-product-carousel-section",
-        "kind": "contentLayout",
-        "title": "The runway shelf",
-        "eyebrow": "Product carousel",
-        "body": "A compact moving shelf for featured fashion products using the current WooCommerce catalog.",
-        "background": "#11110f",
-        "backgroundMode": "full",
-        "contentMode": "boxed",
-        "colorScheme": "dark",
-        "topSpacing": "medium",
-        "bottomSpacing": "medium",
-        "visible": true,
-        "layout": "whole",
-        "layoutColumns": 1,
-        "layoutRows": 1,
-        "layoutItems": [
-          {
-            "id": "page:fashion-store-product-carousel-column",
-            "blocks": [
-              {
-                "id": "page:fashion-store-product-carousel-block",
-                "kind": "products",
-                "title": "",
-                "body": "",
-                "layoutVariant": "carousel",
-                "source": "all",
-                "gridLimit": 8,
-                "columns": 4,
-                "cardPreset": "minimal",
-                "cardStyle": "none",
-                "gridGap": "large",
-                "imagePadding": "medium",
-                "addToCartStyle": "light",
-                "addToCartSize": "compact",
-                "addToCartPosition": "under-price",
-                "addToCartVisibility": "always"
-              }
-            ]
-          }
-        ]
-      },
-      {
-        "id": "page:fashion-store-minimal-cta",
-        "kind": "promo",
-        "title": "Build the edit. Keep the commerce live.",
-        "eyebrow": "Fashion demo",
-        "body": "A premium storefront direction for imported fashion products, ready to keep refining in the visual builder.",
-        "background": "#11110f",
-        "backgroundMode": "full",
-        "contentMode": "boxed",
-        "colorScheme": "dark",
-        "topSpacing": "medium",
-        "bottomSpacing": "medium",
-        "promoVariant": "minimal",
-        "ctaLabel": "Open the shop",
-        "ctaUrl": "/shop",
-        "visible": true
-      }
-    ],
-    "updatedAt": "2026-05-23T22:50:18.186Z"
-  },
-  {
-    "id": "furniture-store",
-    "title": "Furniture Store",
-    "description": "Saved from Furniture Store",
-    "sourcePage": "page:furniture-store",
-    "design": {
-      "preset": "editorial",
-      "colorScheme": "light",
-      "pageBackground": "#f4f1ea",
-      "textColor": "#151512",
-      "mutedTextColor": "#5f6156",
-      "accentColor": "#8d6f4f",
-      "surfaceColor": "#e9eee3",
-      "buttonBackground": "#151512",
-      "buttonTextColor": "#ffffff",
-      "radius": "8px",
-      "sectionMaxWidth": "1500px",
-      "sectionGutter": "28px",
-      "headingFontFamily": "Georgia, serif",
-      "headingSize": "clamp(34px, 5vw, 78px)",
-      "headingWeight": "700",
-      "headingLineHeight": "0.96",
-      "headingColor": "#151512"
-    },
-    "sections": [
-      {
-        "id": "page:furniture-store-premium-hero",
-        "kind": "contentLayout",
-        "title": "",
-        "eyebrow": "",
-        "body": "",
-        "background": "#f4f1ea",
-        "backgroundMode": "full",
-        "contentMode": "boxed",
-        "colorScheme": "light",
-        "topSpacing": "medium",
-        "bottomSpacing": "small",
+        "colorScheme": "inherit",
+        "topSpacing": "large",
+        "bottomSpacing": "inherit",
         "topMargin": "inherit",
         "bottomMargin": "inherit",
         "visible": true,
-        "layout": "thirds-2-1",
-        "layoutColumns": 2,
-        "layoutRows": 1,
-        "layoutItems": [
-          {
-            "id": "page:furniture-store-hero-copy",
-            "blocks": [
-              {
-                "id": "page:furniture-store-hero-copy-block",
-                "kind": "hero",
-                "eyebrow": "Furniture Store",
-                "title": "A considered home, built piece by piece.",
-                "body": "Warm furniture, grounded materials, and useful commerce sections shaped into one editable React builder template.",
-                "buttonLabel": "Shop the edit",
-                "buttonUrl": "/shop",
-                "elementPadding": "large"
-              },
-              {
-                "id": "page:furniture-store-hero-services",
-                "kind": "badgeGrid",
-                "title": "",
-                "body": "",
-                "columns": 3,
-                "elementBackgroundMode": "transparent",
-                "badges": [
-                  {
-                    "id": "page:furniture-store-hero-service-1",
-                    "label": "01",
-                    "title": "Room-first edits",
-                    "body": "Collections arranged by living, dining, bedroom, and accent needs."
-                  },
-                  {
-                    "id": "page:furniture-store-hero-service-2",
-                    "label": "02",
-                    "title": "Delivery ready",
-                    "body": "Clear service messaging beside the shopping experience."
-                  },
-                  {
-                    "id": "page:furniture-store-hero-service-3",
-                    "label": "03",
-                    "title": "Commerce native",
-                    "body": "WooCommerce product data stays live and editable."
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "id": "page:furniture-store-hero-visuals",
-            "blocks": [
-              {
-                "id": "page:furniture-store-hero-visual-grid",
-                "kind": "grid",
-                "gridSource": "static",
-                "columns": 2,
-                "gridRows": 2,
-                "gridGap": "small",
-                "gridMargin": "none",
-                "gridImagePadding": "frameless",
-                "gridContentPadding": "small",
-                "gridImageFrame": "soft",
-                "gridShowImage": true,
-                "gridShowEyebrow": true,
-                "gridShowMeta": true,
-                "gridShowText": false,
-                "gridShowButton": false,
-                "gridItems": [
-                  {
-                    "id": "page:furniture-store-hero-visual-1",
-                    "eyebrow": "Lounge",
-                    "title": "Soft seating",
-                    "meta": "Calm silhouettes",
-                    "imageUrl": "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=1200&q=85",
-                    "imageAlt": "Warm living room with sofa and table"
-                  },
-                  {
-                    "id": "page:furniture-store-hero-visual-2",
-                    "eyebrow": "Dining",
-                    "title": "Gathering tables",
-                    "meta": "Oak, linen, stone",
-                    "imageUrl": "https://images.unsplash.com/photo-1615873968403-89e068629265?auto=format&fit=crop&w=1200&q=85",
-                    "imageAlt": "Dining room with modern wooden table"
-                  },
-                  {
-                    "id": "page:furniture-store-hero-visual-3",
-                    "eyebrow": "Bedroom",
-                    "title": "Quiet storage",
-                    "meta": "Daily rituals",
-                    "imageUrl": "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=1200&q=85",
-                    "imageAlt": "Minimal bedroom interior"
-                  },
-                  {
-                    "id": "page:furniture-store-hero-visual-4",
-                    "eyebrow": "Accent",
-                    "title": "Lighting and objects",
-                    "meta": "Finishing pieces",
-                    "imageUrl": "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1200&q=85",
-                    "imageAlt": "Interior lamp and furniture detail"
-                  }
-                ]
-              }
-            ]
-          }
-        ]
-      },
-      {
-        "id": "page:furniture-store-value-cards",
-        "kind": "badgeGrid",
-        "title": "Service that feels as composed as the room.",
-        "eyebrow": "Store promises",
-        "body": "A compact value section for delivery, design support, payment confidence, and returns.",
-        "background": "#151512",
-        "backgroundMode": "full",
-        "contentMode": "boxed",
-        "colorScheme": "dark",
-        "topSpacing": "small",
-        "bottomSpacing": "small",
-        "columns": 4,
-        "badges": [
-          {
-            "id": "page:furniture-store-value-1",
-            "label": "01",
-            "title": "White-glove delivery",
-            "body": "Clear delivery guidance for larger pieces and room-ready placement."
-          },
-          {
-            "id": "page:furniture-store-value-2",
-            "label": "02",
-            "title": "Material samples",
-            "body": "Help shoppers compare finishes before choosing the full piece."
-          },
-          {
-            "id": "page:furniture-store-value-3",
-            "label": "03",
-            "title": "Design support",
-            "body": "Make space for consultation messaging without slowing shopping."
-          },
-          {
-            "id": "page:furniture-store-value-4",
-            "label": "04",
-            "title": "Secure checkout",
-            "body": "All cart, checkout, account, and order logic remains untouched."
-          }
-        ],
-        "visible": true
-      },
-      {
-        "id": "page:furniture-store-feature-panels",
-        "kind": "contentLayout",
-        "title": "Visual feature panels",
-        "eyebrow": "Room stories",
-        "body": "Editorial panels give the page rhythm between commerce sections.",
-        "background": "#ffffff",
-        "backgroundMode": "boxed",
-        "contentMode": "boxed",
-        "colorScheme": "light",
-        "topSpacing": "medium",
-        "bottomSpacing": "medium",
-        "visible": true,
-        "layout": "thirds-1-2",
-        "layoutColumns": 2,
-        "layoutRows": 1,
-        "layoutItems": [
-          {
-            "id": "page:furniture-store-feature-left",
-            "blocks": [
-              {
-                "id": "page:furniture-store-feature-panel-1",
-                "kind": "panel",
-                "eyebrow": "Studio edit",
-                "title": "Furniture that keeps the room useful.",
-                "body": "Pair large catalog moments with smaller material notes so the page feels curated, not crowded.",
-                "buttonLabel": "Explore categories",
-                "buttonUrl": "/categories",
-                "imageUrl": "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1200&q=85",
-                "imageAlt": "Modern interior studio with warm furniture",
-                "elementPadding": "small"
-              }
-            ]
-          },
-          {
-            "id": "page:furniture-store-feature-right",
-            "blocks": [
-              {
-                "id": "page:furniture-store-feature-grid",
-                "kind": "grid",
-                "gridSource": "static",
-                "columns": 2,
-                "gridRows": 1,
-                "gridGap": "medium",
-                "gridMargin": "none",
-                "gridImagePadding": "frameless",
-                "gridContentPadding": "medium",
-                "gridImageFrame": "soft",
-                "gridShowImage": true,
-                "gridShowEyebrow": true,
-                "gridShowMeta": true,
-                "gridShowText": true,
-                "gridShowButton": true,
-                "gridItems": [
-                  {
-                    "id": "page:furniture-store-feature-grid-1",
-                    "eyebrow": "Materials",
-                    "title": "Oak, linen, leather",
-                    "meta": "Natural surfaces",
-                    "text": "Use this card to tell a tactile story before the shopper reaches the grid.",
-                    "buttonLabel": "Shop materials",
-                    "buttonUrl": "/shop",
-                    "imageUrl": "https://images.unsplash.com/photo-1617103996702-96ff29b1c467?auto=format&fit=crop&w=1200&q=85",
-                    "imageAlt": "Warm material and textile detail"
-                  },
-                  {
-                    "id": "page:furniture-store-feature-grid-2",
-                    "eyebrow": "Storage",
-                    "title": "Quiet utility",
-                    "meta": "Shelves and cabinets",
-                    "text": "A commerce-friendly panel for storage, organization, and everyday pieces.",
-                    "buttonLabel": "View storage",
-                    "buttonUrl": "/shop",
-                    "imageUrl": "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=1200&q=85",
-                    "imageAlt": "Modern cabinet and shelf interior"
-                  }
-                ]
-              }
-            ]
-          }
-        ]
-      },
-      {
-        "id": "page:furniture-store-grouped-content",
-        "kind": "badgeGrid",
-        "title": "Choose by how the room should feel.",
-        "eyebrow": "Grouped guidance",
-        "body": "A tab-inspired grouped section using existing editable cards.",
-        "background": "#e8eee1",
-        "backgroundMode": "full",
-        "contentMode": "boxed",
-        "colorScheme": "light",
-        "topSpacing": "medium",
-        "bottomSpacing": "medium",
-        "columns": 3,
-        "badges": [
-          {
-            "id": "page:furniture-store-group-1",
-            "label": "Calm",
-            "title": "Low contrast, soft textures",
-            "body": "For rooms that should feel quiet, open, and slow."
-          },
-          {
-            "id": "page:furniture-store-group-2",
-            "label": "Gather",
-            "title": "Tables, chairs, storage",
-            "body": "For dining, hosting, and daily shared routines."
-          },
-          {
-            "id": "page:furniture-store-group-3",
-            "label": "Anchor",
-            "title": "Statement pieces",
-            "body": "For a sofa, cabinet, or chair that sets the tone."
-          }
-        ],
-        "visible": true
-      },
-      {
-        "id": "page:furniture-store-featured-categories",
-        "kind": "contentLayout",
-        "title": "Featured categories",
-        "eyebrow": "Shop by room",
-        "body": "Clear starting points keep the homepage useful and commerce-led.",
-        "background": "#f4f1ea",
-        "backgroundMode": "boxed",
-        "contentMode": "boxed",
-        "colorScheme": "light",
-        "topSpacing": "medium",
-        "bottomSpacing": "small",
-        "visible": true,
+        "eyebrow": "",
+        "body": "",
         "layout": "whole",
         "layoutColumns": 1,
-        "layoutRows": 1,
         "layoutItems": [
           {
-            "id": "page:furniture-store-featured-categories-column",
+            "id": "layout-item-mq4srvow-0-qrye",
             "blocks": [
               {
-                "id": "page:furniture-store-featured-category-grid",
+                "id": "grid-block-mq4srvow-lk4b1",
                 "kind": "grid",
                 "gridSource": "static",
                 "columns": 4,
                 "gridRows": 1,
                 "gridGap": "medium",
-                "gridMargin": "small",
+                "gridMargin": "medium",
                 "gridImagePadding": "frameless",
-                "gridContentPadding": "medium",
-                "gridImageFrame": "soft",
-                "gridShowImage": true,
-                "gridShowEyebrow": true,
-                "gridShowMeta": true,
-                "gridShowText": false,
+                "gridContentPadding": "large",
+                "gridImageFrame": "none",
+                "gridShowImage": false,
                 "gridShowButton": true,
+                "panelStyle": "flat-dark",
                 "gridItems": [
                   {
-                    "id": "page:furniture-store-category-1",
-                    "eyebrow": "Living",
-                    "title": "Sofas and lounge",
-                    "meta": "Soft silhouettes",
-                    "buttonLabel": "Browse",
-                    "buttonUrl": "/categories",
-                    "imageUrl": "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=1200&q=85",
-                    "imageAlt": "Living room category"
+                    "id": "package-start",
+                    "eyebrow": "Start",
+                    "title": "🌱 Start",
+                    "meta": "պարզ",
+                    "text": "<p>Հարմար է սկսելու համար</p>",
+                    "buttonLabel": "Հետաքրքրում է",
+                    "buttonUrl": "#contact",
+                    "typography": {
+                      "title": {
+                        "fontSize": "clamp(24px, 2.4vw, 42px)",
+                        "fontWeight": "760",
+                        "lineHeight": "1"
+                      },
+                      "body": {
+                        "fontSize": "16px",
+                        "lineHeight": "1.6"
+                      }
+                    },
+                    "listIcon": "check",
+                    "items": [
+                      " 1–5 էջ",
+                      "Կոնտակտային ձև",
+                      "Կայքի տեղակայում",
+                      " Կայքի տեղակայում",
+                      "Հիմնական աջակցություն"
+                    ],
+                    "listIconColorScheme": "gradient-cycle",
+                    "listIconSize": 16
                   },
                   {
-                    "id": "page:furniture-store-category-2",
-                    "eyebrow": "Dining",
-                    "title": "Dining and chairs",
-                    "meta": "Gathering pieces",
-                    "buttonLabel": "Browse",
-                    "buttonUrl": "/categories",
-                    "imageUrl": "https://images.unsplash.com/photo-1615873968403-89e068629265?auto=format&fit=crop&w=1200&q=85",
-                    "imageAlt": "Dining room category"
+                    "id": "package-commerce",
+                    "eyebrow": "Բիզնես",
+                    "title": "🚀 Business",
+                    "meta": "Բիզնես",
+                    "text": "<p>Բիզնեսի համար պատրաստ լուծում</p>",
+                    "buttonLabel": "Shop package",
+                    "buttonUrl": "#contact",
+                    "typography": {
+                      "title": {
+                        "fontSize": "clamp(24px, 2.4vw, 42px)",
+                        "fontWeight": "760",
+                        "lineHeight": "1"
+                      },
+                      "body": {
+                        "fontSize": "16px",
+                        "lineHeight": "1.6"
+                      }
+                    },
+                    "listIconColorScheme": "gradient-cycle",
+                    "items": [
+                      "Ամեն ինչ Start-ից",
+                      " Ավելի շատ էջեր",
+                      " Ծառայությունների ներկայացում",
+                      "Հայտերի ընդունում",
+                      "Ընդլայնված կառուցվածք"
+                    ],
+                    "listIconSize": 16,
+                    "listIcon": "check"
                   },
                   {
-                    "id": "page:furniture-store-category-3",
-                    "eyebrow": "Bedroom",
-                    "title": "Beds and storage",
-                    "meta": "Quiet utility",
-                    "buttonLabel": "Browse",
-                    "buttonUrl": "/categories",
-                    "imageUrl": "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=1200&q=85",
-                    "imageAlt": "Bedroom category"
+                    "id": "package-growth",
+                    "eyebrow": "առևտուր",
+                    "title": "🛍 Store",
+                    "meta": "կեմերցիոն",
+                    "text": "<p>Խանութ Առցանց վաճառքի համար</p><p></p>",
+                    "buttonLabel": "Խոսենք",
+                    "buttonUrl": "#contact",
+                    "typography": {
+                      "title": {
+                        "fontSize": "clamp(24px, 2.4vw, 42px)",
+                        "fontWeight": "760",
+                        "lineHeight": "1"
+                      },
+                      "body": {
+                        "fontSize": "16px",
+                        "lineHeight": "1.6"
+                      }
+                    },
+                    "items": [
+                      "Ամեն ինչ Business-ից",
+                      "Ապրանքների ցուցադրում",
+                      "Կատեգորիաներ",
+                      "Զամբյուղ",
+                      "Պատվերների ընդունում"
+                    ],
+                    "listIconColorScheme": "gradient-cycle"
                   },
                   {
-                    "id": "page:furniture-store-category-4",
-                    "eyebrow": "Accent",
-                    "title": "Lighting and decor",
-                    "meta": "Finishing touches",
-                    "buttonLabel": "Browse",
-                    "buttonUrl": "/categories",
-                    "imageUrl": "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1200&q=85",
-                    "imageAlt": "Accent furniture category"
+                    "id": "grid-item-mptcn4jh",
+                    "eyebrow": "Հատուկ",
+                    "title": "✨ Custom",
+                    "meta": "Երբ պետք է ավելին",
+                    "text": "<p></p><p></p>",
+                    "buttonLabel": "Learn more",
+                    "buttonUrl": "/",
+                    "items": [
+                      "Անհատական կառուցվածք",
+                      "Հատուկ ֆունկցիաներ",
+                      "Ճկուն զարգացում"
+                    ],
+                    "listIconColorScheme": "gradient-cycle"
                   }
-                ]
+                ],
+                "animation": {
+                  "preset": "none",
+                  "once": false
+                },
+                "elementPadding": "small",
+                "visualStyle": {
+                  "padding": {
+                    "linked": true,
+                    "top": "sm",
+                    "right": "sm",
+                    "bottom": "sm",
+                    "left": "sm"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "id": "layout-item-mq4srvow-1-ef7m",
+            "rowId": "layout-row-mq4srvow-1",
+            "rowLayout": "whole",
+            "blocks": [
+              {
+                "id": "text-block-mq4srvow-y9aj4",
+                "kind": "text",
+                "eyebrow": "",
+                "title": "",
+                "body": "<p><strong>Չգիտե՞ք որն ընտրել — սկսեք պարզ փաթեթից։</strong></p><p><strong>Միշտ հնարավոր է անցնել ավելի բարձր տարբերակի։</strong></p>",
+                "buttonLabel": "",
+                "buttonUrl": "",
+                "typography": {
+                  "variant": "body",
+                  "fontFamily": "inherit",
+                  "fontSize": "16px",
+                  "fontWeight": "400",
+                  "lineHeight": "1.4",
+                  "letterSpacing": "0px",
+                  "color": "inherit",
+                  "textAlign": "left",
+                  "body": {
+                    "textAlign": "center"
+                  },
+                  "title": {
+                    "variant": "body",
+                    "fontFamily": "inherit",
+                    "fontSize": "16px",
+                    "fontWeight": "400",
+                    "lineHeight": "1.4",
+                    "letterSpacing": "0px",
+                    "color": "inherit",
+                    "textAlign": "center",
+                    "body": {
+                      "textAlign": "left"
+                    }
+                  }
+                },
+                "elementAlign": "center"
               }
             ]
           }
-        ]
+        ],
+        "layoutRows": 2
       },
       {
-        "id": "page:furniture-store-product-showcase",
-        "kind": "productArchive",
-        "title": "Product showcase",
-        "eyebrow": "WooCommerce archive",
-        "body": "A GraphCommerce-inspired commerce section with clean product cards, hidden filters, and live WooCommerce data.",
+        "id": "contentLayout-mq4ssabc-pbf43",
+        "kind": "contentLayout",
+        "title": "",
         "background": "#ffffff",
         "backgroundMode": "full",
         "contentMode": "boxed",
-        "colorScheme": "light",
-        "topSpacing": "medium",
-        "bottomSpacing": "small",
-        "columns": 4,
-        "filterPosition": "hidden",
-        "cardStyle": "flat",
-        "cardPreset": "standard",
-        "gridGap": "large",
-        "cardPadding": "medium",
-        "imagePadding": "large",
-        "addToCartStyle": "inherit",
-        "addToCartSize": "medium",
-        "addToCartPosition": "under-price",
-        "addToCartVisibility": "always",
-        "addToCartDisplay": "button",
-        "source": "all",
-        "gridLimit": 8,
-        "layoutVariant": "grid",
-        "visible": true
-      },
-      {
-        "id": "page:furniture-store-product-carousel-section",
-        "kind": "contentLayout",
-        "title": "New arrivals",
-        "eyebrow": "Carousel",
-        "body": "A smaller product rail for featured or recently added catalog pieces.",
-        "background": "#151512",
-        "backgroundMode": "full",
-        "contentMode": "boxed",
-        "colorScheme": "dark",
-        "topSpacing": "medium",
-        "bottomSpacing": "medium",
+        "colorScheme": "inherit",
+        "topSpacing": "large",
+        "bottomSpacing": "inherit",
+        "topMargin": "inherit",
+        "bottomMargin": "inherit",
         "visible": true,
+        "eyebrow": "",
+        "body": "",
         "layout": "whole",
         "layoutColumns": 1,
-        "layoutRows": 1,
         "layoutItems": [
           {
-            "id": "page:furniture-store-product-carousel-column",
+            "id": "layout-item-mq4ssabb-0-58hp",
             "blocks": [
               {
-                "id": "page:furniture-store-product-carousel-block",
-                "kind": "products",
-                "title": "",
-                "source": "all",
-                "layoutVariant": "carousel",
+                "id": "grid-block-mq4ssabb-b3erx",
+                "kind": "grid",
+                "gridSource": "static",
                 "columns": 4,
-                "gridLimit": 8,
-                "filterPosition": "hidden",
-                "cardStyle": "flat",
-                "cardPreset": "standard",
-                "gridGap": "large",
-                "cardPadding": "medium",
-                "imagePadding": "large",
-                "addToCartStyle": "inherit",
-                "addToCartSize": "compact",
-                "addToCartPosition": "under-price",
-                "addToCartVisibility": "always",
-                "addToCartDisplay": "button"
+                "gridRows": 1,
+                "gridGap": "medium",
+                "gridMargin": "medium",
+                "gridImagePadding": "frameless",
+                "gridContentPadding": "large",
+                "gridImageFrame": "none",
+                "gridShowImage": false,
+                "gridShowButton": true,
+                "panelStyle": "flat-dark",
+                "gridItems": [
+                  {
+                    "id": "package-start",
+                    "eyebrow": "Start",
+                    "title": "🌱 Start",
+                    "meta": "պարզ",
+                    "text": "<p>Հարմար է սկսելու համար</p>",
+                    "buttonLabel": "Հետաքրքրում է",
+                    "buttonUrl": "#contact",
+                    "typography": {
+                      "title": {
+                        "fontSize": "clamp(24px, 2.4vw, 42px)",
+                        "fontWeight": "760",
+                        "lineHeight": "1"
+                      },
+                      "body": {
+                        "fontSize": "16px",
+                        "lineHeight": "1.6"
+                      }
+                    },
+                    "listIcon": "check",
+                    "items": [
+                      " 1–5 էջ",
+                      "Կոնտակտային ձև",
+                      "Կայքի տեղակայում",
+                      " Կայքի տեղակայում",
+                      "Հիմնական աջակցություն"
+                    ],
+                    "listIconColorScheme": "gradient-cycle",
+                    "listIconSize": 16
+                  },
+                  {
+                    "id": "package-commerce",
+                    "eyebrow": "Բիզնես",
+                    "title": "🚀 Business",
+                    "meta": "Բիզնես",
+                    "text": "<p>Բիզնեսի համար պատրաստ լուծում</p>",
+                    "buttonLabel": "Shop package",
+                    "buttonUrl": "#contact",
+                    "typography": {
+                      "title": {
+                        "fontSize": "clamp(24px, 2.4vw, 42px)",
+                        "fontWeight": "760",
+                        "lineHeight": "1"
+                      },
+                      "body": {
+                        "fontSize": "16px",
+                        "lineHeight": "1.6"
+                      }
+                    },
+                    "listIconColorScheme": "gradient-cycle",
+                    "items": [
+                      "Ամեն ինչ Start-ից",
+                      " Ավելի շատ էջեր",
+                      " Ծառայությունների ներկայացում",
+                      "Հայտերի ընդունում",
+                      "Ընդլայնված կառուցվածք"
+                    ],
+                    "listIconSize": 16,
+                    "listIcon": "check"
+                  },
+                  {
+                    "id": "package-growth",
+                    "eyebrow": "առևտուր",
+                    "title": "🛍 Store",
+                    "meta": "կեմերցիոն",
+                    "text": "<p>Խանութ Առցանց վաճառքի համար</p><p></p>",
+                    "buttonLabel": "Խոսենք",
+                    "buttonUrl": "#contact",
+                    "typography": {
+                      "title": {
+                        "fontSize": "clamp(24px, 2.4vw, 42px)",
+                        "fontWeight": "760",
+                        "lineHeight": "1"
+                      },
+                      "body": {
+                        "fontSize": "16px",
+                        "lineHeight": "1.6"
+                      }
+                    },
+                    "items": [
+                      "Ամեն ինչ Business-ից",
+                      "Ապրանքների ցուցադրում",
+                      "Կատեգորիաներ",
+                      "Զամբյուղ",
+                      "Պատվերների ընդունում"
+                    ],
+                    "listIconColorScheme": "gradient-cycle"
+                  },
+                  {
+                    "id": "grid-item-mptcn4jh",
+                    "eyebrow": "Հատուկ",
+                    "title": "✨ Custom",
+                    "meta": "Երբ պետք է ավելին",
+                    "text": "<p></p><p></p>",
+                    "buttonLabel": "Learn more",
+                    "buttonUrl": "/",
+                    "items": [
+                      "Անհատական կառուցվածք",
+                      "Հատուկ ֆունկցիաներ",
+                      "Ճկուն զարգացում"
+                    ],
+                    "listIconColorScheme": "gradient-cycle"
+                  }
+                ],
+                "animation": {
+                  "preset": "none",
+                  "once": false
+                },
+                "elementPadding": "small",
+                "visualStyle": {
+                  "padding": {
+                    "linked": true,
+                    "top": "sm",
+                    "right": "sm",
+                    "bottom": "sm",
+                    "left": "sm"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "id": "layout-item-mq4ssabb-1-mgkt",
+            "rowId": "layout-row-mq4ssabb-1",
+            "rowLayout": "whole",
+            "blocks": [
+              {
+                "id": "text-block-mq4ssabb-ly0wz",
+                "kind": "text",
+                "eyebrow": "",
+                "title": "",
+                "body": "<p><strong>Չգիտե՞ք որն ընտրել — սկսեք պարզ փաթեթից։</strong></p><p><strong>Միշտ հնարավոր է անցնել ավելի բարձր տարբերակի։</strong></p>",
+                "buttonLabel": "",
+                "buttonUrl": "",
+                "typography": {
+                  "variant": "body",
+                  "fontFamily": "inherit",
+                  "fontSize": "16px",
+                  "fontWeight": "400",
+                  "lineHeight": "1.4",
+                  "letterSpacing": "0px",
+                  "color": "inherit",
+                  "textAlign": "left",
+                  "body": {
+                    "textAlign": "center"
+                  },
+                  "title": {
+                    "variant": "body",
+                    "fontFamily": "inherit",
+                    "fontSize": "16px",
+                    "fontWeight": "400",
+                    "lineHeight": "1.4",
+                    "letterSpacing": "0px",
+                    "color": "inherit",
+                    "textAlign": "center",
+                    "body": {
+                      "textAlign": "left"
+                    }
+                  }
+                },
+                "elementAlign": "center"
               }
             ]
           }
-        ]
-      },
-      {
-        "id": "page:furniture-store-final-cta",
-        "kind": "promo",
-        "title": "Ready to build a calmer storefront?",
-        "body": "Use this reusable Furniture Store template as a public demo, then keep editing every section from the dashboard builder.",
-        "background": "#65725c",
-        "backgroundMode": "full",
-        "contentMode": "boxed",
-        "colorScheme": "dark",
-        "topSpacing": "medium",
-        "bottomSpacing": "medium",
-        "promoVariant": "default",
-        "ctaLabel": "Open the shop",
-        "ctaUrl": "/shop",
-        "visible": true
+        ],
+        "layoutRows": 2
       }
     ],
-    "updatedAt": "2026-05-23T22:10:33.971Z"
+    "updatedAt": "2026-06-08T05:56:56.962Z"
   }
 ]

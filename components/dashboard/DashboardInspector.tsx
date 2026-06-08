@@ -8,6 +8,7 @@ import {
   Layers3,
   PanelRightClose,
   Plus,
+  Ruler,
   Save,
   Settings2,
   Trash2,
@@ -47,6 +48,10 @@ import TypographyPanel from "@/components/dashboard/TypographyPanel";
 import StyleTabPanel from "@/components/dashboard/style/StyleTabPanel";
 import AnimationControl from "@/components/dashboard/style/AnimationControl";
 import type { BuilderVisualStyle } from "@/lib/builderVisualStyle";
+import {
+  getSpacingOptionLabel,
+  type BuilderSpacingContext,
+} from "@/lib/builderSpacing";
 import type { CategoryTreeItem } from "@/lib/categories";
 
 // Inspector handlers mirror the lifted builder callbacks during this JSX-only extraction.
@@ -62,6 +67,21 @@ const GRADIENT_PRESETS: Record<string, [string, string, string]> = {
   "sunset-pink": ["#fb923c", "#ec4899", "#a855f7"],
   "gold-amber": ["#facc15", "#f59e0b", "#f97316"],
 };
+
+const spacingPresetLabels: Record<"none" | "small" | "medium" | "large", string> = {
+  none: "None",
+  small: "Small",
+  medium: "Medium",
+  large: "Large",
+};
+
+function renderSpacingOptions(context: BuilderSpacingContext) {
+  return (["none", "small", "medium", "large"] as const).map((value) => (
+    <option key={value} value={value}>
+      {spacingPresetLabels[value]} ({getSpacingOptionLabel(value, context)}px)
+    </option>
+  ));
+}
 
 const getCustomGradientPatch = (
   block: any,
@@ -151,6 +171,7 @@ type DashboardInspectorProps = {
   getLayoutItemBlocks: (item: NonNullable<BuilderSection["layoutItems"]>[number]) => BuilderLayoutBlock[];
   inspectorOpen: boolean;
   inspectorTab: InspectorTab;
+  spacingOverlayEnabled?: boolean;
   layoutBlockLabels: Record<LayoutBlockKind, string>;
   openLayoutItemId: string | null;
   openSlideId: string | null;
@@ -191,6 +212,7 @@ type DashboardInspectorProps = {
   openWordPressMediaPicker: (options: { title: string; currentUrl?: string; onSelect: (media: WordPressMediaItem) => void }) => void;
   setInspectorOpen: Dispatch<SetStateAction<boolean>>;
   setInspectorTab: Dispatch<SetStateAction<InspectorTab>>;
+  setSpacingOverlayEnabled?: Dispatch<SetStateAction<boolean>>;
   setOpenSlideId: Dispatch<SetStateAction<string | null>>;
   setSectionSettingsOpen: Dispatch<SetStateAction<boolean>>;
   setSectionStructureOpen: Dispatch<SetStateAction<boolean>>;
@@ -284,6 +306,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
   const {
     builderJson, copied, elementBackgroundPresets, getLayoutItemBlocks,
     inspectorOpen, inspectorTab, layoutBlockLabels, openLayoutItemId, openSlideId,
+    spacingOverlayEnabled = false,
     addSelectedLayoutBlockButton, deleteSelectedLayoutBlockButton, updateSelectedLayoutBlockButton,
     previewCategoryTree,
     sectionBackgroundPresets, sectionColorModeLabel, sectionLabels,
@@ -298,8 +321,10 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
     applyLayoutPreset,
     applySelectedRowLayoutPreset = () => undefined,
     deleteSelectedRow = () => undefined,
+    onUpdateRowStyle = () => undefined,
     moveSelected,
     openWordPressMediaPicker, setInspectorOpen, setInspectorTab, setOpenSlideId,
+    setSpacingOverlayEnabled = () => undefined,
     setSectionSettingsOpen, setSectionStructureOpen, setSelectedLayoutBlockKey,
     updateSelected, updateSelectedBadge, updateSelectedLayoutBlock,
     updateSelectedLayoutBlockBadge, updateSelectedLayoutBlockGridItem,
@@ -619,6 +644,18 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
         </span>
         <button
           type="button"
+          className={`builder-inspector-spacing-toggle${
+            spacingOverlayEnabled ? " is-active" : ""
+          }`}
+          onClick={() => setSpacingOverlayEnabled((enabled) => !enabled)}
+          aria-pressed={spacingOverlayEnabled}
+          title="Show padding and margin guides"
+        >
+          <Ruler size={14} />
+          <span>Spacing</span>
+        </button>
+        <button
+          type="button"
           className="builder-inspector-close"
           onClick={() => setInspectorOpen(false)}
           aria-label="Close inspector"
@@ -785,6 +822,79 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                       </button>
                     );
                   })}
+                </div>
+              </details>
+
+              <details className="builder-collapse">
+                <summary>
+                  <InspectorGroupSummary
+                    title="Row Spacing"
+                    description="Padding and outside spacing for this row."
+                    meta="Inherited by row columns"
+                  />
+                </summary>
+                <div className="builder-two-column">
+                  <label className="builder-field">
+                    <span>Top Padding</span>
+                    <select
+                      value={selectedLayoutRow.items[0]?.rowTopSpacing ?? "inherit"}
+                      onChange={(event) =>
+                        onUpdateRowStyle({
+                          rowTopSpacing: event.target.value as SectionSpacing,
+                        })
+                      }
+                    >
+                      <option value="inherit">Use section</option>
+                      {renderSpacingOptions("rowPadding")}
+                    </select>
+                  </label>
+
+                  <label className="builder-field">
+                    <span>Bottom Padding</span>
+                    <select
+                      value={selectedLayoutRow.items[0]?.rowBottomSpacing ?? "inherit"}
+                      onChange={(event) =>
+                        onUpdateRowStyle({
+                          rowBottomSpacing: event.target.value as SectionSpacing,
+                        })
+                      }
+                    >
+                      <option value="inherit">Use section</option>
+                      {renderSpacingOptions("rowPadding")}
+                    </select>
+                  </label>
+                </div>
+
+                <div className="builder-two-column">
+                  <label className="builder-field">
+                    <span>Top Margin</span>
+                    <select
+                      value={selectedLayoutRow.items[0]?.rowTopMargin ?? "inherit"}
+                      onChange={(event) =>
+                        onUpdateRowStyle({
+                          rowTopMargin: event.target.value as SectionSpacing,
+                        })
+                      }
+                    >
+                      <option value="inherit">Use section</option>
+                      {renderSpacingOptions("rowMargin")}
+                    </select>
+                  </label>
+
+                  <label className="builder-field">
+                    <span>Bottom Margin</span>
+                    <select
+                      value={selectedLayoutRow.items[0]?.rowBottomMargin ?? "inherit"}
+                      onChange={(event) =>
+                        onUpdateRowStyle({
+                          rowBottomMargin: event.target.value as SectionSpacing,
+                        })
+                      }
+                    >
+                      <option value="inherit">Use section</option>
+                      {renderSpacingOptions("rowMargin")}
+                    </select>
+                  </label>
                 </div>
               </details>
 
@@ -1241,10 +1351,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                           }
                         >
                           <option value="inherit">Use global</option>
-                          <option value="none">None</option>
-                          <option value="small">Small</option>
-                          <option value="medium">Medium</option>
-                          <option value="large">Large</option>
+                          {renderSpacingOptions("sectionPadding")}
                         </select>
                       </label>
 
@@ -1260,10 +1367,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                           }
                         >
                           <option value="inherit">Use global</option>
-                          <option value="none">None</option>
-                          <option value="small">Small</option>
-                          <option value="medium">Medium</option>
-                          <option value="large">Large</option>
+                          {renderSpacingOptions("sectionPadding")}
                         </select>
                       </label>
                     </div>
@@ -1280,10 +1384,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                           }
                         >
                           <option value="inherit">Use global</option>
-                          <option value="none">None</option>
-                          <option value="small">Small</option>
-                          <option value="medium">Medium</option>
-                          <option value="large">Large</option>
+                          {renderSpacingOptions("sectionMargin")}
                         </select>
                       </label>
 
@@ -1299,10 +1400,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                           }
                         >
                           <option value="inherit">Use global</option>
-                          <option value="none">None</option>
-                          <option value="small">Small</option>
-                          <option value="medium">Medium</option>
-                          <option value="large">Large</option>
+                          {renderSpacingOptions("sectionMargin")}
                         </select>
                       </label>
                     </div>
@@ -1868,18 +1966,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                   )
                                                 }
                                               >
-                                                <option value="none">
-                                                  None
-                                                </option>
-                                                <option value="small">
-                                                  Small
-                                                </option>
-                                                <option value="medium">
-                                                  Medium
-                                                </option>
-                                                <option value="large">
-                                                  Large
-                                                </option>
+                                                {renderSpacingOptions("elementPadding")}
                                               </select>
                                             </label>
                                             <label className="builder-field">

@@ -16,6 +16,13 @@ function slugifyTemplateId(value: string) {
     .slice(0, 80);
 }
 
+function createTemplateId(title: string) {
+  const slug = slugifyTemplateId(title) || "saved-template";
+  return `${slug}-${Date.now().toString(36)}-${Math.random()
+    .toString(36)
+    .slice(2, 6)}`;
+}
+
 export async function GET() {
   const templates = await readBuilderSavedTemplates();
   return NextResponse.json({ templates });
@@ -34,13 +41,20 @@ export async function POST(request: Request) {
   }
 
   const templates = await readBuilderSavedTemplates();
-  const existing = templates.find(
-    (template) => template.title.toLowerCase() === title.toLowerCase(),
-  );
-  const fallbackId = slugifyTemplateId(title) || "saved-template";
+  const existing = body.id
+    ? templates.find((template) => template.id === body.id)
+    : undefined;
   const template: BuilderSavedTemplate = {
-    id: existing?.id ?? body.id ?? fallbackId,
+    id: existing?.id ?? body.id ?? createTemplateId(title),
     title,
+    templateType:
+      body.templateType === "section" ||
+      body.templateType === "row" ||
+      body.templateType === "element"
+        ? body.templateType
+        : body.templateType === "page"
+          ? "page"
+          : existing?.templateType,
     description: body.description?.trim() || existing?.description,
     sourcePage: body.sourcePage
       ? normalizeBuilderLayoutKey(String(body.sourcePage))
