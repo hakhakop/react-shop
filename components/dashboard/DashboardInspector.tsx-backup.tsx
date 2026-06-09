@@ -210,7 +210,6 @@ type DashboardInspectorProps = {
   deleteSelectedRow?: LooseHandler;
   moveSelected: LooseHandler;
   openWordPressMediaPicker: (options: { title: string; currentUrl?: string; onSelect: (media: WordPressMediaItem) => void }) => void;
-  onOpenGlobalSpacingSettings?: () => void;
   setInspectorOpen: Dispatch<SetStateAction<boolean>>;
   setInspectorTab: Dispatch<SetStateAction<InspectorTab>>;
   setSpacingOverlayEnabled?: Dispatch<SetStateAction<boolean>>;
@@ -324,7 +323,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
     deleteSelectedRow = () => undefined,
     onUpdateRowStyle = () => undefined,
     moveSelected,
-    openWordPressMediaPicker, onOpenGlobalSpacingSettings, setInspectorOpen, setInspectorTab, setOpenSlideId,
+    openWordPressMediaPicker, setInspectorOpen, setInspectorTab, setOpenSlideId,
     setSpacingOverlayEnabled = () => undefined,
     setSectionSettingsOpen, setSectionStructureOpen, setSelectedLayoutBlockKey,
     updateSelected, updateSelectedBadge, updateSelectedLayoutBlock,
@@ -356,16 +355,15 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
   const inspectorTabs: [InspectorTab, string][] = selectedLayoutBlock
     ? [
         ["content", "Content"],
-        ["settings", "Styling"],
+        ["settings", "Settings"],
         ["typography", "Typography"],
         ["advanced", "Advanced"],
       ]
     : selectedLayoutRow
-      ? [["row", "Row Layout"]]
+      ? [["row", "Row"]]
     : [
-        ["section", "Layout"],
-        ["spacing", "Spacing"],
-        ["style", "Styling"],
+        ["section", "Section"],
+        ["style", "Style"],
         ["typography", "Typography"],
         ["advanced", "Advanced"],
       ];
@@ -468,11 +466,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
 
   useEffect(() => {
     if (!selectedLayoutBlock) return;
-    if (
-      inspectorTab === "section" ||
-      inspectorTab === "spacing" ||
-      inspectorTab === "style"
-    ) {
+    if (inspectorTab === "section" || inspectorTab === "style") {
       setInspectorTab(inspectorTab === "style" ? "settings" : "content");
     }
   }, [inspectorTab, selectedLayoutBlock, setInspectorTab]);
@@ -630,25 +624,6 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
   const isElementContentTab = inspectorTab === "content";
   const isElementSettingsTab = inspectorTab === "settings";
   const isElementTypographyTab = inspectorTab === "typography";
-  const inspectorTitle = selectedLayoutBlock
-    ? isElementContentTab
-      ? "Element Content"
-      : isElementSettingsTab
-        ? "Element Styling"
-        : isElementTypographyTab
-          ? "Element Typography"
-          : "Element Advanced"
-    : selectedLayoutRow
-      ? "Row Layout"
-      : inspectorTab === "spacing"
-        ? "Section Spacing"
-      : inspectorTab === "style"
-        ? "Section Styling"
-        : inspectorTab === "typography"
-          ? "Section Typography"
-          : inspectorTab === "advanced"
-            ? "Section Advanced"
-            : "Section Layout";
   const showLegacySectionContentControls: boolean = true;
   const currentRowLayoutPreset = getBuilderRowLayoutPreset(
     layoutContainerSection?.layout ?? null,
@@ -664,7 +639,9 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
     >
       <div className="builder-inspector-header">
         <Settings2 size={18} />
-        <span>{inspectorTitle}</span>
+        <span>
+          {selectedLayoutBlock ? "Element Settings" : "Section Settings"}
+        </span>
         <button
           type="button"
           className={`builder-inspector-spacing-toggle${
@@ -672,7 +649,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
           }`}
           onClick={() => setSpacingOverlayEnabled((enabled) => !enabled)}
           aria-pressed={spacingOverlayEnabled}
-          title="Show spacing guides"
+          title="Show padding and margin guides"
         >
           <Ruler size={14} />
           <span>Spacing</span>
@@ -971,11 +948,11 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                     ? isElementContentTab
                       ? "Content"
                       : isElementSettingsTab
-                        ? "Styling"
+                        ? "Settings"
                         : isElementTypographyTab
                           ? "Typography"
                           : "Element"
-                    : "Section Layout"}
+                    : "Section Settings"}
                 </span>
                 <small>
                   {selectedLayoutBlock || sectionSettingsOpen
@@ -985,11 +962,78 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
               </summary>
               {inspectorTab === "section" && !selectedLayoutBlock && (
                 <>
-	                  <details className="builder-collapse" open>
-	                    <summary>
-	                      <InspectorGroupSummary
-	                        title="Layout Widths"
-	                        description="Control section width and inner content width."
+                  <details
+                    className="builder-collapse"
+                    open={Boolean(
+                      selectedLayoutBlock &&
+                        (isElementContentTab ||
+                          isElementSettingsTab ||
+                          isElementTypographyTab),
+                    )}
+                  >
+                    <summary>
+                      <InspectorGroupSummary
+                        title="Background"
+                        description="Set section background color and quick presets."
+                        meta={selectedSection.backgroundMode ?? "full"}
+                      />
+                    </summary>
+
+                    <label className="builder-field">
+                      <span>Background</span>
+                      <div className="builder-background-presets">
+                        {sectionBackgroundPresets.map((preset) => (
+                          <button
+                            key={preset.value}
+                            type="button"
+                            className={
+                              selectedSection.background?.toLowerCase() ===
+                              preset.value
+                                ? "is-active"
+                                : ""
+                            }
+                            onClick={() =>
+                              updateSelected({
+                                background: preset.value,
+                                colorScheme: "inherit",
+                              })
+                            }
+                            title={preset.label}
+                          >
+                            <span style={{ background: preset.value }} />
+                            {preset.label}
+                          </button>
+                        ))}
+                      </div>
+                      <div className="builder-color-row">
+                        <input
+                          type="color"
+                          value={selectedSection.background}
+                          onChange={(event) =>
+                            updateSelected({
+                              background: event.target.value,
+                              colorScheme: "inherit",
+                            })
+                          }
+                        />
+                        <input
+                          value={selectedSection.background}
+                          onChange={(event) =>
+                            updateSelected({
+                              background: event.target.value,
+                              colorScheme: "inherit",
+                            })
+                          }
+                        />
+                      </div>
+                    </label>
+                  </details>
+
+                  <details className="builder-collapse" open>
+                    <summary>
+                      <InspectorGroupSummary
+                        title="Layout Widths"
+                        description="Control section width and inner content width."
                         meta={selectedSection.contentMode ?? "boxed"}
                       />
                     </summary>
@@ -1024,12 +1068,345 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                         <option value="full">Full</option>
                         <option value="boxed">Boxed</option>
                         <option value="narrow">Narrow</option>
-	                      </select>
-	                    </label>
-	                  </details>
+                      </select>
+                    </label>
+                  </details>
 
-	                </>
-	              )}
+                  <details className="builder-collapse">
+                    <summary>
+                      <InspectorGroupSummary
+                        title="Background Effect"
+                        description="Vibrant and responsive visual canvas animations."
+                        meta={selectedSection.backgroundEffect ?? "none"}
+                      />
+                    </summary>
+
+                    <label className="builder-field">
+                      <span>Effect Type</span>
+                      <select
+                        value={selectedSection.backgroundEffect ?? "none"}
+                        onChange={(event) =>
+                          updateSelected({
+                            backgroundEffect: event.target.value,
+                          })
+                        }
+                      >
+                        <option value="none">No animated effect</option>
+                        <option value="antigravity">Antigravity Particle & Grid Canvas</option>
+                      </select>
+                    </label>
+
+                    {selectedSection.backgroundEffect === "antigravity" && (
+                      <div className="builder-effect-settings-subpanel" style={{ display: 'flex', flexDirection: 'column', gap: '12px', padding: '10px 0' }}>
+                        <label className="builder-field">
+                          <span>Particle Speed</span>
+                          <div className="builder-range-row" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <input
+                              type="range"
+                              min="0.1"
+                              max="5.0"
+                              step="0.1"
+                              style={{ flex: 1 }}
+                              value={selectedSection.antigravitySpeed ?? 1.0}
+                              onChange={(event) =>
+                                updateSelected({
+                                  antigravitySpeed: Number(event.target.value),
+                                })
+                              }
+                            />
+                            <span style={{ minWidth: '40px', textAlign: 'right' }}>{(selectedSection.antigravitySpeed ?? 1.0).toFixed(1)}x</span>
+                          </div>
+                        </label>
+
+                        <label className="builder-field">
+                          <span>Particle Count</span>
+                          <div className="builder-range-row" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <input
+                              type="range"
+                              min="0"
+                              max="300"
+                              step="5"
+                              style={{ flex: 1 }}
+                              value={selectedSection.antigravityParticleCount ?? 40}
+                              onChange={(event) =>
+                                updateSelected({
+                                  antigravityParticleCount: Number(event.target.value),
+                                })
+                              }
+                            />
+                            <span style={{ minWidth: '40px', textAlign: 'right' }}>{selectedSection.antigravityParticleCount ?? 40}</span>
+                          </div>
+                        </label>
+
+                        <label className="builder-field">
+                          <span>Glow Intensity</span>
+                          <div className="builder-range-row" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <input
+                              type="range"
+                              min="0.0"
+                              max="2.0"
+                              step="0.1"
+                              style={{ flex: 1 }}
+                              value={selectedSection.antigravityGlowIntensity ?? 0.4}
+                              onChange={(event) =>
+                                updateSelected({
+                                  antigravityGlowIntensity: Number(event.target.value),
+                                })
+                              }
+                            />
+                            <span style={{ minWidth: '40px', textAlign: 'right' }}>{(selectedSection.antigravityGlowIntensity ?? 0.4).toFixed(1)}</span>
+                          </div>
+                        </label>
+
+                        <label className="builder-field">
+                          <span>Grid Movement Speed</span>
+                          <div className="builder-range-row" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <input
+                              type="range"
+                              min="0.0"
+                              max="5.0"
+                              step="0.1"
+                              style={{ flex: 1 }}
+                              value={selectedSection.antigravityGridMoveSpeed ?? 1.0}
+                              onChange={(event) =>
+                                updateSelected({
+                                  antigravityGridMoveSpeed: Number(event.target.value),
+                                })
+                              }
+                            />
+                            <span style={{ minWidth: '40px', textAlign: 'right' }}>{(selectedSection.antigravityGridMoveSpeed ?? 1.0).toFixed(1)}x</span>
+                          </div>
+                        </label>
+
+                        <label className="builder-field">
+                          <span>Canvas Particle Color</span>
+                          <div className="builder-color-row" style={{ display: 'flex', gap: '8px' }}>
+                            <input
+                              type="color"
+                              value={selectedSection.antigravityColor ?? "#6366f1"}
+                              onChange={(event) =>
+                                updateSelected({
+                                  antigravityColor: event.target.value,
+                                })
+                              }
+                            />
+                            <input
+                              style={{ flex: 1 }}
+                              value={selectedSection.antigravityColor ?? "#6366f1"}
+                              onChange={(event) =>
+                                updateSelected({
+                                  antigravityColor: event.target.value,
+                                })
+                              }
+                            />
+                          </div>
+                        </label>
+
+                        <label className="builder-field">
+                          <span>Grid Density</span>
+                          <select
+                            value={selectedSection.antigravityGridDensity ?? "normal"}
+                            onChange={(event) =>
+                              updateSelected({
+                                antigravityGridDensity: event.target.value as any,
+                              })
+                            }
+                          >
+                            <option value="sparse">Sparse</option>
+                            <option value="normal">Normal</option>
+                            <option value="compact">Compact</option>
+                          </select>
+                        </label>
+
+                        <label className="builder-field">
+                          <span>Visual Mode</span>
+                          <select
+                            value={selectedSection.antigravityVisualMode ?? "full"}
+                            onChange={(event) =>
+                              updateSelected({
+                                antigravityVisualMode: event.target.value as any,
+                              })
+                            }
+                          >
+                            <option value="full">Full layout overlays</option>
+                            <option value="transparent-grid">Transparent grid lines</option>
+                            <option value="no-grid">Rising particles only (No grid)</option>
+                            <option value="lines-only">Mesh network lines only (No particles)</option>
+                          </select>
+                        </label>
+
+                        <label className="builder-field">
+                          <span>Interaction Scope</span>
+                          <select
+                            value={selectedSection.antigravityInteractionScope ?? "section"}
+                            onChange={(event) =>
+                              updateSelected({
+                                antigravityInteractionScope: event.target.value as any,
+                              })
+                            }
+                          >
+                            <option value="section">React to section mouseover</option>
+                            <option value="global">React to full screen mouseover</option>
+                            <option value="none">Disable interactive warping</option>
+                          </select>
+                        </label>
+
+                        <label className="builder-check" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <input
+                            type="checkbox"
+                            checked={selectedSection.antigravityInteractive !== false}
+                            onChange={(event) =>
+                              updateSelected({
+                                antigravityInteractive: event.target.checked,
+                              })
+                            }
+                          />
+                          <span>Mouse pointer interaction</span>
+                        </label>
+
+                        <label className="builder-check" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <input
+                            type="checkbox"
+                            checked={selectedSection.antigravityShowGrid !== false}
+                            onChange={(event) =>
+                              updateSelected({
+                                antigravityShowGrid: event.target.checked,
+                              })
+                            }
+                          />
+                          <span>Show grid overlay</span>
+                        </label>
+
+                        <label className="builder-check" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <input
+                            type="checkbox"
+                            checked={selectedSection.antigravityShowParticles !== false}
+                            onChange={(event) =>
+                              updateSelected({
+                                antigravityShowParticles: event.target.checked,
+                              })
+                            }
+                          />
+                          <span>Show floating particles</span>
+                        </label>
+                      </div>
+                    )}
+                  </details>
+
+                  {renderAnimationControls(selectedSection, {
+                    allowPause: true,
+                  })}
+
+                  <details className="builder-collapse">
+                    <summary>
+                      <InspectorGroupSummary
+                        title="Color & Spacing"
+                        description="Manage readable text mode, padding, and margins."
+                        meta={sectionColorModeLabel(selectedSection)}
+                      />
+                    </summary>
+
+                    <label className="builder-field">
+                      <span>Section Color Mode</span>
+                      <select
+                        value={selectedSection.colorScheme ?? "inherit"}
+                        onChange={(event) =>
+                          updateSelected({
+                            colorScheme: event.target
+                              .value as SectionColorScheme,
+                          })
+                        }
+                      >
+                        <option value="inherit">Auto by background</option>
+                        <option value="light">
+                          Dark text for light background
+                        </option>
+                        <option value="dark">
+                          Light text for dark background
+                        </option>
+                      </select>
+                    </label>
+
+                    <div className="builder-contrast-note">
+                      <strong>
+                        {sectionColorModeLabel(selectedSection)}
+                      </strong>
+                      <span>
+                        Auto keeps text readable against this section
+                        background. Use Light or Dark only when you want to
+                        force the look.
+                      </span>
+                    </div>
+
+                    <div className="builder-two-column">
+                      <label className="builder-field">
+                        <span>Top Padding</span>
+                        <select
+                          value={selectedSection.topSpacing ?? "inherit"}
+                          onChange={(event) =>
+                            updateSelected({
+                              topSpacing: event.target
+                                .value as SectionSpacing,
+                            })
+                          }
+                        >
+                          <option value="inherit">Use global</option>
+                          {renderSpacingOptions("sectionPadding")}
+                        </select>
+                      </label>
+
+                      <label className="builder-field">
+                        <span>Bottom Padding</span>
+                        <select
+                          value={selectedSection.bottomSpacing ?? "inherit"}
+                          onChange={(event) =>
+                            updateSelected({
+                              bottomSpacing: event.target
+                                .value as SectionSpacing,
+                            })
+                          }
+                        >
+                          <option value="inherit">Use global</option>
+                          {renderSpacingOptions("sectionPadding")}
+                        </select>
+                      </label>
+                    </div>
+
+                    <div className="builder-two-column">
+                      <label className="builder-field">
+                        <span>Top Margin</span>
+                        <select
+                          value={selectedSection.topMargin ?? "inherit"}
+                          onChange={(event) =>
+                            updateSelected({
+                              topMargin: event.target.value as SectionSpacing,
+                            })
+                          }
+                        >
+                          <option value="inherit">Use global</option>
+                          {renderSpacingOptions("sectionMargin")}
+                        </select>
+                      </label>
+
+                      <label className="builder-field">
+                        <span>Bottom Margin</span>
+                        <select
+                          value={selectedSection.bottomMargin ?? "inherit"}
+                          onChange={(event) =>
+                            updateSelected({
+                              bottomMargin: event.target
+                                .value as SectionSpacing,
+                            })
+                          }
+                        >
+                          <option value="inherit">Use global</option>
+                          {renderSpacingOptions("sectionMargin")}
+                        </select>
+                      </label>
+                    </div>
+                  </details>
+                </>
+              )}
 
               {((inspectorTab === "section" &&
                 !selectedLayoutBlock &&
@@ -1055,7 +1432,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                             ? isElementContentTab
                               ? "Element Content"
                               : isElementSettingsTab
-                                ? "Element Styling"
+                                ? "Element Settings"
                                 : "Element Typography"
                             : "Section Type Options"
                         }
@@ -1196,7 +1573,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                         {isElementSettingsTab ? (
                           <>
                             <div className="builder-element-inspector-note">
-                              <strong>Element styling</strong>
+                              <strong>Element settings</strong>
                               <span>
                                 Card style, spacing, colors, and appearance for{" "}
                                 {layoutBlockLabels[selectedLayoutBlock.kind ?? "text"]}.
@@ -8290,501 +8667,17 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                         </div>
                       </>
                     )}
-	                  </details>
-	                )}
-	        </details>
-	      )}
-
-          {inspectorTab === "spacing" && !selectedLayoutBlock && selectedSection && (
-            <div className="builder-inspector-stack">
-              <details className="builder-collapse" open>
-                <summary>
-                  <InspectorGroupSummary
-                    title="Section Spacing"
-                    description="Control the section box model: padding inside, margin outside."
-                    meta="Padding & margin"
-                  />
-                </summary>
-
-                <div className="builder-two-column">
-                  <label className="builder-field">
-                    <span>Top Padding</span>
-                    <select
-                      value={selectedSection.topSpacing ?? "inherit"}
-                      onChange={(event) =>
-                        updateSelected({
-                          topSpacing: event.target.value as SectionSpacing,
-                        })
-                      }
-                    >
-                      <option value="inherit">Use global</option>
-                      {renderSpacingOptions("sectionPadding")}
-                    </select>
-                  </label>
-
-                  <label className="builder-field">
-                    <span>Bottom Padding</span>
-                    <select
-                      value={selectedSection.bottomSpacing ?? "inherit"}
-                      onChange={(event) =>
-                        updateSelected({
-                          bottomSpacing: event.target.value as SectionSpacing,
-                        })
-                      }
-                    >
-                      <option value="inherit">Use global</option>
-                      {renderSpacingOptions("sectionPadding")}
-                    </select>
-                  </label>
-                </div>
-
-                <div className="builder-two-column">
-                  <label className="builder-field">
-                    <span>Top Margin</span>
-                    <select
-                      value={selectedSection.topMargin ?? "inherit"}
-                      onChange={(event) =>
-                        updateSelected({
-                          topMargin: event.target.value as SectionSpacing,
-                        })
-                      }
-                    >
-                      <option value="inherit">Use global</option>
-                      {renderSpacingOptions("sectionMargin")}
-                    </select>
-                  </label>
-
-                  <label className="builder-field">
-                    <span>Bottom Margin</span>
-                    <select
-                      value={selectedSection.bottomMargin ?? "inherit"}
-                      onChange={(event) =>
-                        updateSelected({
-                          bottomMargin: event.target.value as SectionSpacing,
-                        })
-                      }
-                    >
-                      <option value="inherit">Use global</option>
-                      {renderSpacingOptions("sectionMargin")}
-                    </select>
-                  </label>
-                </div>
-
-                {onOpenGlobalSpacingSettings ? (
-                  <button
-                    type="button"
-                    className="builder-secondary-button builder-full-button"
-                    onClick={onOpenGlobalSpacingSettings}
-                  >
-                    Edit global spacing defaults
-                  </button>
-                ) : null}
-              </details>
-            </div>
-          )}
-
-          {inspectorTab === "style" && !selectedLayoutBlock && selectedSection && (
-            <div className="builder-inspector-stack">
-              <details className="builder-collapse" open>
-                <summary>
-                  <InspectorGroupSummary
-                    title="Background"
-                    description="Set section background color and quick presets."
-                    meta={selectedSection.backgroundMode ?? "full"}
-                  />
-                </summary>
-
-                <label className="builder-field">
-                  <span>Background</span>
-                  <div className="builder-background-presets">
-                    {sectionBackgroundPresets.map((preset) => (
-                      <button
-                        key={preset.value}
-                        type="button"
-                        className={
-                          selectedSection.background?.toLowerCase() ===
-                          preset.value
-                            ? "is-active"
-                            : ""
-                        }
-                        onClick={() =>
-                          updateSelected({
-                            background: preset.value,
-                            colorScheme: "inherit",
-                          })
-                        }
-                        title={preset.label}
-                      >
-                        <span style={{ background: preset.value }} />
-                        {preset.label}
-                      </button>
-                    ))}
-                  </div>
-                  <div className="builder-color-row">
-                    <input
-                      type="color"
-                      value={selectedSection.background}
-                      onChange={(event) =>
-                        updateSelected({
-                          background: event.target.value,
-                          colorScheme: "inherit",
-                        })
-                      }
-                    />
-                    <input
-                      value={selectedSection.background}
-                      onChange={(event) =>
-                        updateSelected({
-                          background: event.target.value,
-                          colorScheme: "inherit",
-                        })
-                      }
-                    />
-                  </div>
-                </label>
-              </details>
-
-              <details className="builder-collapse">
-                <summary>
-                  <InspectorGroupSummary
-                    title="Background Effect"
-                    description="Vibrant and responsive visual canvas animations."
-                    meta={selectedSection.backgroundEffect ?? "none"}
-                  />
-                </summary>
-
-                <label className="builder-field">
-                  <span>Effect Type</span>
-                  <select
-                    value={selectedSection.backgroundEffect ?? "none"}
-                    onChange={(event) =>
-                      updateSelected({
-                        backgroundEffect: event.target.value,
-                      })
-                    }
-                  >
-                    <option value="none">No animated effect</option>
-                    <option value="antigravity">
-                      Antigravity Particle & Grid Canvas
-                    </option>
-                  </select>
-                </label>
-
-                {selectedSection.backgroundEffect === "antigravity" && (
-                  <div
-                    className="builder-effect-settings-subpanel"
-                    style={{
-                      display: "flex",
-                      flexDirection: "column",
-                      gap: "12px",
-                      padding: "10px 0",
-                    }}
-                  >
-                    <label className="builder-field">
-                      <span>Particle Speed</span>
-                      <div
-                        className="builder-range-row"
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "8px",
-                        }}
-                      >
-                        <input
-                          type="range"
-                          min="0.1"
-                          max="5.0"
-                          step="0.1"
-                          style={{ flex: 1 }}
-                          value={selectedSection.antigravitySpeed ?? 1.0}
-                          onChange={(event) =>
-                            updateSelected({
-                              antigravitySpeed: Number(event.target.value),
-                            })
-                          }
-                        />
-                        <span style={{ minWidth: "40px", textAlign: "right" }}>
-                          {(selectedSection.antigravitySpeed ?? 1.0).toFixed(1)}
-                          x
-                        </span>
-                      </div>
-                    </label>
-
-                    <label className="builder-field">
-                      <span>Particle Count</span>
-                      <div
-                        className="builder-range-row"
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "8px",
-                        }}
-                      >
-                        <input
-                          type="range"
-                          min="0"
-                          max="300"
-                          step="5"
-                          style={{ flex: 1 }}
-                          value={selectedSection.antigravityParticleCount ?? 40}
-                          onChange={(event) =>
-                            updateSelected({
-                              antigravityParticleCount: Number(
-                                event.target.value,
-                              ),
-                            })
-                          }
-                        />
-                        <span style={{ minWidth: "40px", textAlign: "right" }}>
-                          {selectedSection.antigravityParticleCount ?? 40}
-                        </span>
-                      </div>
-                    </label>
-
-                    <label className="builder-field">
-                      <span>Glow Intensity</span>
-                      <div
-                        className="builder-range-row"
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "8px",
-                        }}
-                      >
-                        <input
-                          type="range"
-                          min="0.0"
-                          max="2.0"
-                          step="0.1"
-                          style={{ flex: 1 }}
-                          value={selectedSection.antigravityGlowIntensity ?? 0.4}
-                          onChange={(event) =>
-                            updateSelected({
-                              antigravityGlowIntensity: Number(
-                                event.target.value,
-                              ),
-                            })
-                          }
-                        />
-                        <span style={{ minWidth: "40px", textAlign: "right" }}>
-                          {(
-                            selectedSection.antigravityGlowIntensity ?? 0.4
-                          ).toFixed(1)}
-                        </span>
-                      </div>
-                    </label>
-
-                    <label className="builder-field">
-                      <span>Grid Movement Speed</span>
-                      <div
-                        className="builder-range-row"
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "8px",
-                        }}
-                      >
-                        <input
-                          type="range"
-                          min="0.0"
-                          max="5.0"
-                          step="0.1"
-                          style={{ flex: 1 }}
-                          value={selectedSection.antigravityGridMoveSpeed ?? 1.0}
-                          onChange={(event) =>
-                            updateSelected({
-                              antigravityGridMoveSpeed: Number(
-                                event.target.value,
-                              ),
-                            })
-                          }
-                        />
-                        <span style={{ minWidth: "40px", textAlign: "right" }}>
-                          {(
-                            selectedSection.antigravityGridMoveSpeed ?? 1.0
-                          ).toFixed(1)}
-                          x
-                        </span>
-                      </div>
-                    </label>
-
-                    <label className="builder-field">
-                      <span>Canvas Particle Color</span>
-                      <div
-                        className="builder-color-row"
-                        style={{ display: "flex", gap: "8px" }}
-                      >
-                        <input
-                          type="color"
-                          value={selectedSection.antigravityColor ?? "#6366f1"}
-                          onChange={(event) =>
-                            updateSelected({
-                              antigravityColor: event.target.value,
-                            })
-                          }
-                        />
-                        <input
-                          style={{ flex: 1 }}
-                          value={selectedSection.antigravityColor ?? "#6366f1"}
-                          onChange={(event) =>
-                            updateSelected({
-                              antigravityColor: event.target.value,
-                            })
-                          }
-                        />
-                      </div>
-                    </label>
-
-                    <label className="builder-field">
-                      <span>Grid Density</span>
-                      <select
-                        value={selectedSection.antigravityGridDensity ?? "normal"}
-                        onChange={(event) =>
-                          updateSelected({
-                            antigravityGridDensity: event.target.value as any,
-                          })
-                        }
-                      >
-                        <option value="sparse">Sparse</option>
-                        <option value="normal">Normal</option>
-                        <option value="compact">Compact</option>
-                      </select>
-                    </label>
-
-                    <label className="builder-field">
-                      <span>Visual Mode</span>
-                      <select
-                        value={selectedSection.antigravityVisualMode ?? "full"}
-                        onChange={(event) =>
-                          updateSelected({
-                            antigravityVisualMode: event.target.value as any,
-                          })
-                        }
-                      >
-                        <option value="full">Full layout overlays</option>
-                        <option value="transparent-grid">
-                          Transparent grid lines
-                        </option>
-                        <option value="no-grid">
-                          Rising particles only (No grid)
-                        </option>
-                        <option value="lines-only">
-                          Mesh network lines only (No particles)
-                        </option>
-                      </select>
-                    </label>
-
-                    <label
-                      className="builder-check"
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "8px",
-                      }}
-                    >
-                      <input
-                        type="checkbox"
-                        checked={selectedSection.antigravityInteractive !== false}
-                        onChange={(event) =>
-                          updateSelected({
-                            antigravityInteractive: event.target.checked,
-                          })
-                        }
-                      />
-                      <span>Mouse pointer interaction</span>
-                    </label>
-
-                    <label
-                      className="builder-check"
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "8px",
-                      }}
-                    >
-                      <input
-                        type="checkbox"
-                        checked={selectedSection.antigravityShowGrid !== false}
-                        onChange={(event) =>
-                          updateSelected({
-                            antigravityShowGrid: event.target.checked,
-                          })
-                        }
-                      />
-                      <span>Show grid overlay</span>
-                    </label>
-
-                    <label
-                      className="builder-check"
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "8px",
-                      }}
-                    >
-                      <input
-                        type="checkbox"
-                        checked={
-                          selectedSection.antigravityShowParticles !== false
-                        }
-                        onChange={(event) =>
-                          updateSelected({
-                            antigravityShowParticles: event.target.checked,
-                          })
-                        }
-                      />
-                      <span>Show floating particles</span>
-                    </label>
-                  </div>
+                  </details>
                 )}
-              </details>
-
-              {renderAnimationControls(selectedSection, {
-                allowPause: true,
-              })}
-
-              <details className="builder-collapse" open>
-                <summary>
-                  <InspectorGroupSummary
-                    title="Color Mode"
-                    description="Manage readable text mode for this section background."
-                    meta={sectionColorModeLabel(selectedSection)}
-                  />
-                </summary>
-
-                <label className="builder-field">
-                  <span>Section Color Mode</span>
-                  <select
-                    value={selectedSection.colorScheme ?? "inherit"}
-                    onChange={(event) =>
-                      updateSelected({
-                        colorScheme: event.target.value as SectionColorScheme,
-                      })
-                    }
-                  >
-                    <option value="inherit">Auto by background</option>
-                    <option value="light">Dark text for light background</option>
-                    <option value="dark">Light text for dark background</option>
-                  </select>
-                </label>
-
-                <div className="builder-contrast-note">
-                  <strong>{sectionColorModeLabel(selectedSection)}</strong>
-                  <span>
-                    Auto keeps text readable against this section background.
-                    Use Light or Dark only when you want to force the look.
-                  </span>
-                </div>
-              </details>
-
-              <StyleTabPanel
-                target={styleTarget}
-                showSpacing={false}
-                showTypography={false}
-                onChange={updateStyleTarget}
-                onPickBackgroundImage={pickStyleBackgroundImage}
-              />
-            </div>
+            </details>
+          )}
+          {inspectorTab === "style" && !selectedLayoutBlock && selectedSection && (
+            <StyleTabPanel
+              target={styleTarget}
+              showTypography={false}
+              onChange={updateStyleTarget}
+              onPickBackgroundImage={pickStyleBackgroundImage}
+            />
           )}
 
           {inspectorTab === "typography" && !selectedLayoutBlock && selectedSection && (

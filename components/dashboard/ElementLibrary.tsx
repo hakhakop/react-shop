@@ -46,7 +46,7 @@ export default function ElementLibrary({
   const [favoriteKinds, setFavoriteKinds] = useState<LayoutBlockKind[]>([]);
   const [recentKinds, setRecentKinds] = useState<LayoutBlockKind[]>([]);
   const [openGroupIds, setOpenGroupIds] = useState<Set<string>>(
-    () => new Set(layoutBlockGroups.slice(0, 2).map((group) => group.id)),
+    () => new Set(),
   );
   const normalizedQuery = searchQuery.trim().toLowerCase();
 

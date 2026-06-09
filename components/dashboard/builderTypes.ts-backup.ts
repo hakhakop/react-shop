@@ -81,7 +81,6 @@ export type GlobalSectionSpacing = "none" | "small" | "medium" | "large";
 export type SectionSpacing = "inherit" | GlobalSectionSpacing;
 export type SectionInspectorTab =
   | "section"
-  | "spacing"
   | "style"
   | "typography"
   | "advanced"

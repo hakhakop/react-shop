@@ -39,8 +39,8 @@
         "backgroundMode": "full",
         "contentMode": "boxed",
         "colorScheme": "inherit",
-        "topSpacing": "large",
-        "bottomSpacing": "small",
+        "topSpacing": "inherit",
+        "bottomSpacing": "inherit",
         "topMargin": "inherit",
         "bottomMargin": "inherit",
         "layout": "whole",
@@ -277,7 +277,7 @@
         "backgroundMode": "full",
         "contentMode": "boxed",
         "colorScheme": "inherit",
-        "topSpacing": "large",
+        "topSpacing": "inherit",
         "bottomSpacing": "inherit",
         "topMargin": "inherit",
         "bottomMargin": "inherit",
@@ -1122,7 +1122,7 @@
         ]
       }
     ],
-    "updatedAt": "2026-06-08T10:19:31.088Z"
+    "updatedAt": "2026-06-09T06:05:23.156Z"
   },
   "shop": {
     "version": 1,

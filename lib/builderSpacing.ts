@@ -18,6 +18,22 @@ export type BuilderSpacingInput =
   | undefined
   | null;
 
+export type BuilderSpacingSource = "Local" | "Global" | "Default";
+export type ResolvedBuilderSpacing = {
+  rawValue?: string;
+  inheritedValue?: string;
+  defaultToken?: Exclude<BuilderSpacingToken, "inherit">;
+  token?: Exclude<BuilderSpacingToken, "inherit">;
+  px: number;
+  css: string;
+  label: string;
+  shortLabel: string;
+  optionLabel: string;
+  source: BuilderSpacingSource;
+  sourceLabel: BuilderSpacingSource;
+  isExplicitZero: boolean;
+};
+
 export type BuilderSpacingContext =
   | "sectionPadding"
   | "sectionMargin"
@@ -84,6 +100,23 @@ const TOKEN_LABELS: Record<Exclude<BuilderSpacingToken, "inherit">, string> = {
   "3xl": "3XL",
 };
 
+function toRawSpacingValue(token: BuilderSpacingInput) {
+  if (token === undefined || token === null) return undefined;
+  const value = String(token).trim();
+  return value.length > 0 ? value : undefined;
+}
+
+function isExplicitZeroValue(token: BuilderSpacingInput) {
+  const value = toRawSpacingValue(token)?.toLowerCase();
+  return value === "none" || value === "0" || value === "0px";
+}
+
+function parsePixelValue(value: string) {
+  if (value.trim() === "0") return 0;
+  const match = value.trim().match(/^(-?\d+(?:\.\d+)?)px$/i);
+  return match ? Number(match[1]) : null;
+}
+
 function normalizeSpacingToken(
   token: BuilderSpacingInput,
   context: BuilderSpacingContext,
@@ -92,6 +125,7 @@ function normalizeSpacingToken(
   const value = String(token).trim().toLowerCase();
   if (!value) return undefined;
   if (value === "inherit") return "inherit";
+  if (value === "0" || value === "0px") return "none";
   if (value in BUILDER_SPACING_SCALE) return value as BuilderSpacingToken;
   if (value === "small" || value === "medium" || value === "large") {
     return LEGACY_SPACING_BY_CONTEXT[context][value];
@@ -109,24 +143,70 @@ export function resolveBuilderSpacing(
   token: BuilderSpacingInput,
   context: BuilderSpacingContext,
   inheritedToken?: BuilderSpacingInput,
-) {
+): ResolvedBuilderSpacing {
+  const rawValue = toRawSpacingValue(token);
+  const inheritedValue = toRawSpacingValue(inheritedToken);
   const normalized = normalizeSpacingToken(token, context);
   const inherited = normalizeSpacingToken(inheritedToken, context);
+  const defaultToken = getDefaultSpacingToken(context);
+  const source: BuilderSpacingSource =
+    normalized && normalized !== "inherit"
+      ? "Local"
+      : inherited && inherited !== "inherit"
+        ? "Global"
+        : "Default";
   const resolvedToken =
     normalized && normalized !== "inherit"
       ? normalized
       : inherited && inherited !== "inherit"
         ? inherited
-        : getDefaultSpacingToken(context);
+        : defaultToken;
   const px = BUILDER_SPACING_SCALE[resolvedToken];
 
   return {
+    rawValue,
+    inheritedValue,
+    defaultToken,
     token: resolvedToken,
     px,
     css: `${px}px`,
     label: `${px}px`,
     shortLabel: px === 0 ? "0" : `${px}`,
     optionLabel: resolvedToken === "none" ? "0" : `${TOKEN_LABELS[resolvedToken]} ${px}`,
+    source,
+    sourceLabel: source,
+    isExplicitZero: source === "Local" && isExplicitZeroValue(token),
+  };
+}
+
+export function resolveBuilderSpacingCssValue(
+  value: string | number,
+  context: BuilderSpacingContext,
+  source: BuilderSpacingSource = "Local",
+  rawValue?: BuilderSpacingInput,
+): ResolvedBuilderSpacing {
+  const css =
+    typeof value === "number"
+      ? `${value}px`
+      : value.trim() === "0"
+        ? "0px"
+        : value.trim();
+  const parsedPx = parsePixelValue(css);
+  const px = parsedPx ?? 0;
+  const label = parsedPx !== null ? `${px}px` : css;
+
+  return {
+    rawValue: toRawSpacingValue(rawValue) ?? css,
+    defaultToken: getDefaultSpacingToken(context),
+    px,
+    css,
+    label,
+    shortLabel: parsedPx !== null ? `${px}` : css,
+    optionLabel: label,
+    source,
+    sourceLabel: source,
+    isExplicitZero:
+      source === "Local" && (isExplicitZeroValue(rawValue) || px === 0),
   };
 }
 

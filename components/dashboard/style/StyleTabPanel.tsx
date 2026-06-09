@@ -17,6 +17,7 @@ type StyleTarget = {
 
 type Props = {
   target: StyleTarget;
+  showSpacing?: boolean;
   showTypography?: boolean;
   onChange: (patch: Partial<StyleTarget>) => void;
   onPickBackgroundImage?: () => void;
@@ -24,6 +25,7 @@ type Props = {
 
 export default function StyleTabPanel({
   target,
+  showSpacing = true,
   showTypography = true,
   onChange,
   onPickBackgroundImage,
@@ -36,22 +38,24 @@ export default function StyleTabPanel({
 
   return (
     <div className="builder-style-tab">
-      <details className="builder-collapse" open>
-        <summary>
-          <span>Spacing</span>
-          <small>padding & margin</small>
-        </summary>
-        <SpacingControl
-          label="Padding"
-          value={style.padding}
-          onChange={(padding) => patchStyle({ padding })}
-        />
-        <SpacingControl
-          label="Margin"
-          value={style.margin}
-          onChange={(margin) => patchStyle({ margin })}
-        />
-      </details>
+      {showSpacing && (
+        <details className="builder-collapse" open>
+          <summary>
+            <span>Spacing</span>
+            <small>padding & margin</small>
+          </summary>
+          <SpacingControl
+            label="Padding"
+            value={style.padding}
+            onChange={(padding) => patchStyle({ padding })}
+          />
+          <SpacingControl
+            label="Margin"
+            value={style.margin}
+            onChange={(margin) => patchStyle({ margin })}
+          />
+        </details>
+      )}
 
       <details className="builder-collapse" open>
         <summary>

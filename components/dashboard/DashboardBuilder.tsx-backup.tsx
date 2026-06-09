@@ -25,7 +25,6 @@ import {
   ShoppingBag,
   LockKeyhole,
   Redo2,
-  Ruler,
   Save,
   Settings2,
   Undo2,
@@ -46,7 +45,6 @@ import type {
   FocusEvent as ReactFocusEvent,
   KeyboardEvent as ReactKeyboardEvent,
   MouseEvent as ReactMouseEvent,
-  ReactNode,
 } from "react";
 import { Fragment, useEffect, useMemo, useRef, useState, useCallback } from "react";
 import { createPortal } from "react-dom";
@@ -127,15 +125,14 @@ import type { ProductNode } from "@/lib/products";
 import type { BuilderVisualStyle } from "@/lib/builderVisualStyle";
 import { typographyProps, type TypographyArea } from "@/lib/builderTypography";
 import {
-  resolveSpacingToken,
   visualStyleClassName,
   visualStyleToCss,
 } from "@/lib/builderVisualStyle";
 import {
   getSpacingOptionLabel,
-  resolveBuilderSpacingCssValue,
+  getSpacingLabel,
   resolveBuilderSpacing,
-  type ResolvedBuilderSpacing,
+  shouldShowSpacingLabel,
 } from "@/lib/builderSpacing";
 
 const BUILDER_TEMPLATE_DND_TYPE = "application/x-builder-template";
@@ -2325,58 +2322,6 @@ export default function DashboardBuilder({
     setSectionStructureOpen(false);
     setInspectorTab("row");
     openInspectorPanel();
-  };
-
-  const openSpacingSettings = (target: SpacingInspectorTarget) => {
-    console.log("[openSpacingSettings]", JSON.stringify(target));
-    setSpacingOverlayEnabled(true);
-    setSidebarCollapsed(false);
-
-    if (target.scope === "globalSection") {
-      setSidebarTab("globalStyles");
-      setGlobalStylesTab("header");
-      return;
-    }
-
-    setSidebarTab("inspector");
-    setInspectorOpen(true);
-    setInspectorOpenKey((prev) => prev + 1);
-    setSelectedId(target.sectionId);
-    setSectionStructureOpen(false);
-
-    if (target.scope === "section") {
-      setSelectedLayoutRowIndex(null);
-      setSelectedLayoutBlockKey(null);
-      setSelectedLayoutColumnKey(null);
-      setInspectorTab("spacing");
-      setSectionSettingsOpen(true);
-      return;
-    }
-
-    if (target.scope === "row") {
-      setSelectedLayoutRowIndex(target.rowIndex);
-      setSelectedLayoutColumnKey(null);
-      setSelectedLayoutBlockKey(null);
-      setOpenLayoutItemId(null);
-      setInspectorTab("row");
-      return;
-    }
-
-    if (target.scope === "column") {
-      setSelectedLayoutRowIndex(null);
-      setSelectedLayoutColumnKey(target.columnKey);
-      setSelectedLayoutBlockKey(null);
-      setOpenLayoutItemId(target.columnKey);
-      setInspectorTab("section");
-      setSectionSettingsOpen(true);
-      return;
-    }
-
-    setSelectedLayoutRowIndex(null);
-    setSelectedLayoutColumnKey(target.columnKey);
-    setSelectedLayoutBlockKey(target.blockKey);
-    setOpenLayoutItemId(target.columnKey);
-    setInspectorTab("settings");
   };
 
   const updateSelectedSlide = (
@@ -4859,10 +4804,6 @@ export default function DashboardBuilder({
       updateSelectedLayoutBlockGridItem={updateSelectedLayoutBlockGridItem}
       updateSelectedLayoutBlockSlide={updateSelectedLayoutBlockSlide}
       updateSelectedSlide={updateSelectedSlide}
-      onOpenGlobalSpacingSettings={() => {
-        setSidebarTab("globalStyles");
-        setGlobalStylesTab("header");
-      }}
       uploadSelectedLayoutBlockSlideImage={uploadSelectedLayoutBlockSlideImage}
       uploadSelectedSlideImage={uploadSelectedSlideImage}
     />
@@ -6558,7 +6499,6 @@ export default function DashboardBuilder({
             onMoveSection={moveSection}
             onDuplicateSection={duplicateSection}
             onDeleteSection={deleteSection}
-            onOpenSpacingSettings={openSpacingSettings}
             onSetSidebarTab={setSidebarTab}
             onOpenElementsPanel={openElementsPanel}
           />
@@ -6884,7 +6824,6 @@ function PreviewCanvas({
   onMoveSection,
   onDuplicateSection,
   onDeleteSection,
-  onOpenSpacingSettings,
   onSetSidebarTab,
   onOpenElementsPanel,
 }: {
@@ -7061,7 +7000,6 @@ function PreviewCanvas({
   onMoveSection: (sectionId: string, direction: -1 | 1) => void;
   onDuplicateSection: (sectionId: string) => void;
   onDeleteSection: (sectionId: string) => void;
-  onOpenSpacingSettings: (target: SpacingInspectorTarget) => void;
   onSetSidebarTab: (tab: SidebarTab) => void;
   onOpenElementsPanel: () => void;
   onDeleteButton: (
@@ -7400,7 +7338,6 @@ function PreviewCanvas({
                     section={section}
                     shellSettings={shellSettings}
                     showZeroLabels={spacingOverlayEnabled}
-                    onOpenSpacingSettings={onOpenSpacingSettings}
                   />
                 )}
                 {isSectionAntigravity && (
@@ -7455,20 +7392,6 @@ function PreviewCanvas({
                       title="Section settings"
                     >
                       <Settings2 size={14} />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() =>
-                        onOpenSpacingSettings({
-                          scope: "section",
-                          sectionId: section.id,
-                          field: "topSpacing",
-                        })
-                      }
-                      aria-label="Open section spacing"
-                      title="Section spacing"
-                    >
-                      <Ruler size={14} />
                     </button>
                     <button
                       type="button"
@@ -7633,7 +7556,6 @@ function PreviewCanvas({
                   onMoveBlockWithinColumn={onMoveBlockWithinColumn}
                   onDropRowTemplate={onDropRowTemplate}
                   onDropElementTemplate={onDropElementTemplate}
-                  onOpenSpacingSettings={onOpenSpacingSettings}
                   onOpenElementsPanel={onOpenElementsPanel}
                   spacingOverlayEnabled={spacingOverlayEnabled}
                 />
@@ -8304,95 +8226,59 @@ function SectionSpacingOverlay({
   section,
   shellSettings,
   showZeroLabels = false,
-  onOpenSpacingSettings,
 }: {
   section: BuilderSection;
   shellSettings: BuilderShellSettings;
   showZeroLabels?: boolean;
-  onOpenSpacingSettings?: (target: SpacingInspectorTarget) => void;
 }) {
-  const topMargin = resolveSectionSpacingMeasurement(
+  const topMarginLabel = formatSectionSpacingLabel(
     section.topMargin,
     "sectionMargin",
     shellSettings.sectionMarginTop,
   );
-  const topPadding = resolveSectionSpacingMeasurement(
+  const topPaddingLabel = formatSectionSpacingLabel(
     section.topSpacing,
     "sectionPadding",
     shellSettings.sectionPaddingTop,
   );
-  const bottomPadding = resolveSectionSpacingMeasurement(
+  const bottomPaddingLabel = formatSectionSpacingLabel(
     section.bottomSpacing,
     "sectionPadding",
     shellSettings.sectionPaddingBottom,
   );
-  const bottomMargin = resolveSectionSpacingMeasurement(
+  const bottomMarginLabel = formatSectionSpacingLabel(
     section.bottomMargin,
     "sectionMargin",
     shellSettings.sectionMarginBottom,
   );
-
-  const marginTopTarget: SpacingInspectorTarget = {
-    scope: "section",
-    sectionId: section.id,
-    field: "topMargin",
-  };
-  const paddingTopTarget: SpacingInspectorTarget = {
-    scope: "section",
-    sectionId: section.id,
-    field: "topSpacing",
-  };
-  const paddingBottomTarget: SpacingInspectorTarget = {
-    scope: "section",
-    sectionId: section.id,
-    field: "bottomSpacing",
-  };
-  const marginBottomTarget: SpacingInspectorTarget = {
-    scope: "section",
-    sectionId: section.id,
-    field: "bottomMargin",
-  };
-
   return (
-    <div className="builder-preview-spacing-layer">
+    <div className="builder-preview-spacing-layer" aria-hidden="true">
       <div className="builder-preview-spacing-overlay builder-preview-spacing-overlay--margin-top">
-        {shouldShowSectionSpacingMeasurement(topMargin, showZeroLabels) ? (
-          <SpacingGuideLabel
-            className={`builder-preview-spacing-label builder-preview-spacing-label--margin builder-preview-spacing-label--source-${topMargin.source.toLowerCase()}`}
-            onClick={onOpenSpacingSettings ? () => onOpenSpacingSettings(marginTopTarget) : undefined}
-          >
-            mt {topMargin.displayLabel}
-          </SpacingGuideLabel>
+        {shouldShowSectionSpacingLabel(section.topMargin, "sectionMargin", shellSettings.sectionMarginTop, showZeroLabels) ? (
+          <span className="builder-preview-spacing-label builder-preview-spacing-label--margin">
+            mt {topMarginLabel}
+          </span>
         ) : null}
       </div>
       <div className="builder-preview-spacing-overlay builder-preview-spacing-overlay--padding-top">
-        {shouldShowSectionSpacingMeasurement(topPadding, showZeroLabels) ? (
-          <SpacingGuideLabel
-            className={`builder-preview-spacing-label builder-preview-spacing-label--padding builder-preview-spacing-label--source-${topPadding.source.toLowerCase()}`}
-            onClick={onOpenSpacingSettings ? () => onOpenSpacingSettings(paddingTopTarget) : undefined}
-          >
-            pt {topPadding.displayLabel}
-          </SpacingGuideLabel>
+        {shouldShowSectionSpacingLabel(section.topSpacing, "sectionPadding", shellSettings.sectionPaddingTop, showZeroLabels) ? (
+          <span className="builder-preview-spacing-label">
+            pt {topPaddingLabel}
+          </span>
         ) : null}
       </div>
       <div className="builder-preview-spacing-overlay builder-preview-spacing-overlay--padding-bottom">
-        {shouldShowSectionSpacingMeasurement(bottomPadding, showZeroLabels) ? (
-          <SpacingGuideLabel
-            className={`builder-preview-spacing-label builder-preview-spacing-label--padding builder-preview-spacing-label--source-${bottomPadding.source.toLowerCase()}`}
-            onClick={onOpenSpacingSettings ? () => onOpenSpacingSettings(paddingBottomTarget) : undefined}
-          >
-            pb {bottomPadding.displayLabel}
-          </SpacingGuideLabel>
+        {shouldShowSectionSpacingLabel(section.bottomSpacing, "sectionPadding", shellSettings.sectionPaddingBottom, showZeroLabels) ? (
+          <span className="builder-preview-spacing-label">
+            pb {bottomPaddingLabel}
+          </span>
         ) : null}
       </div>
       <div className="builder-preview-spacing-overlay builder-preview-spacing-overlay--margin-bottom">
-        {shouldShowSectionSpacingMeasurement(bottomMargin, showZeroLabels) ? (
-          <SpacingGuideLabel
-            className={`builder-preview-spacing-label builder-preview-spacing-label--margin builder-preview-spacing-label--source-${bottomMargin.source.toLowerCase()}`}
-            onClick={onOpenSpacingSettings ? () => onOpenSpacingSettings(marginBottomTarget) : undefined}
-          >
-            mb {bottomMargin.displayLabel}
-          </SpacingGuideLabel>
+        {shouldShowSectionSpacingLabel(section.bottomMargin, "sectionMargin", shellSettings.sectionMarginBottom, showZeroLabels) ? (
+          <span className="builder-preview-spacing-label builder-preview-spacing-label--margin">
+            mb {bottomMarginLabel}
+          </span>
         ) : null}
       </div>
     </div>
@@ -8401,412 +8287,52 @@ function SectionSpacingOverlay({
 
 function BoxSpacingOverlay({
   kind,
-  labels,
-  onOpenSpacingSettings,
+  paddingLabel,
+  marginLabel,
 }: {
   kind: "column" | "element";
-  labels: BuilderSpacingOverlayLabel[];
-  onOpenSpacingSettings?: (target: SpacingInspectorTarget) => void;
+  paddingLabel: string;
+  marginLabel?: string;
 }) {
-  if (labels.length === 0) return null;
-  const paddingInset = labels.find((label) => label.tone === "padding")
-    ?.measurement.css;
-
   return (
     <div
-      className={`builder-preview-box-spacing builder-preview-box-spacing--${kind}${
-        paddingInset ? " has-padding-guide" : ""
-      }`}
-      style={
-        paddingInset
-          ? ({
-              "--builder-spacing-padding-inset": paddingInset,
-            } as CSSProperties)
-          : undefined
-      }
+      className={`builder-preview-box-spacing builder-preview-box-spacing--${kind}`}
+      aria-hidden="true"
     >
       <span className="builder-preview-box-spacing-fill" />
-      {labels.map((label) => (
-        <SpacingGuideLabel
-          key={`${label.position}-${label.text}`}
-          className={`builder-preview-spacing-label builder-preview-spacing-label--box builder-preview-spacing-label--${label.tone} builder-preview-spacing-label--${label.position} builder-preview-spacing-label--source-${label.measurement.source.toLowerCase()}`}
-          onClick={onOpenSpacingSettings ? () => onOpenSpacingSettings(label.target) : undefined}
-        >
-          {label.text}
-        </SpacingGuideLabel>
-      ))}
+      <span className="builder-preview-spacing-label builder-preview-spacing-label--box">
+        {paddingLabel}
+      </span>
+      {marginLabel ? (
+        <span className="builder-preview-spacing-label builder-preview-spacing-label--margin builder-preview-spacing-label--box-margin">
+          {marginLabel}
+        </span>
+      ) : null}
     </div>
   );
 }
 
-function SpacingGuideLabel({
-  children,
-  className,
-  onClick,
-  tabIndex,
-}: {
-  children: ReactNode;
-  className: string;
-  onClick?: () => void;
-  tabIndex?: number;
-}) {
-  if (onClick) {
-    return (
-      <button
-        type="button"
-        className={className}
-        onClick={onClick}
-        tabIndex={tabIndex ?? 0}
-      >
-        {children}
-      </button>
-    );
-  }
-  return <span className={className}>{children}</span>;
-}
-
-type SpacingInspectorTarget =
-  | {
-      scope: "globalSection";
-      field:
-        | "sectionPaddingTop"
-        | "sectionPaddingBottom"
-        | "sectionMarginTop"
-        | "sectionMarginBottom";
-    }
-  | {
-      scope: "section";
-      sectionId: string;
-      field:
-        | "topSpacing"
-        | "bottomSpacing"
-        | "topMargin"
-        | "bottomMargin";
-    }
-  | {
-      scope: "row";
-      sectionId: string;
-      rowIndex: number;
-      field?: "rowTopSpacing" | "rowBottomSpacing" | "rowTopMargin" | "rowBottomMargin" | "rowGap";
-    }
-  | {
-      scope: "column";
-      sectionId: string;
-      columnKey: string;
-      field?: "columnPadding";
-    }
-  | {
-      scope: "element";
-      sectionId: string;
-      columnKey: string;
-      blockKey: string;
-      field?: "elementPadding" | "visualPadding" | "visualMargin" | "elementGap";
-    };
-
-type BuilderSpacingOverlayLabel = {
-  text: string;
-  measurement: ResolvedBuilderSpacing;
-  target: SpacingInspectorTarget;
-  tone: "padding" | "margin" | "gap";
-  position:
-    | "inside-top"
-    | "outside-top"
-    | "inside-bottom"
-    | "outside-bottom"
-    | "inside-right"
-    | "inside-left";
-};
-
-function resolveSectionSpacingMeasurement(
+function formatSectionSpacingLabel(
   value: SectionSpacing | undefined,
   context: "sectionPadding" | "sectionMargin",
   fallback: GlobalSectionSpacing | undefined,
 ) {
-  const resolved = resolveBuilderSpacing(value ?? "inherit", context, fallback);
-  return {
-    ...resolved,
-    displayLabel: formatSpacingMeasurement(resolved),
-  };
+  return getSpacingLabel(value ?? "inherit", context, fallback);
 }
 
-function shouldShowSectionSpacingMeasurement(
-  measurement: ReturnType<typeof resolveSectionSpacingMeasurement>,
-  showZero = false,
+function shouldShowSectionSpacingLabel(
+  value: SectionSpacing | undefined,
+  context: "sectionPadding" | "sectionMargin",
+  fallback: GlobalSectionSpacing | undefined,
+  showZero: boolean,
 ) {
-  return shouldShowSpacingMeasurement(measurement, showZero);
+  return shouldShowSpacingLabel(value ?? "inherit", context, fallback, showZero);
 }
 
-function shouldShowSpacingMeasurement(
-  measurement?: ResolvedBuilderSpacing,
-  showZero = false,
-) {
-  if (!measurement) return false;
-  return (
-    measurement.px > 0 ||
-    (measurement.isExplicitZero && measurement.source === "Local") ||
-    (showZero && measurement.px === 0 && measurement.source !== "Default")
-  );
-}
-
-function formatSpacingMeasurement(measurement: ResolvedBuilderSpacing) {
-  return `${measurement.label} · ${measurement.sourceLabel}`;
-}
-
-function spacingLabel(
-  prefix: string,
-  measurement: ResolvedBuilderSpacing | undefined,
-  tone: BuilderSpacingOverlayLabel["tone"],
-  position: BuilderSpacingOverlayLabel["position"],
-  target: SpacingInspectorTarget,
-): BuilderSpacingOverlayLabel | null {
-  if (!shouldShowSpacingMeasurement(measurement)) return null;
-  const visibleMeasurement = measurement;
-  if (!visibleMeasurement) return null;
-  return {
-    text: `${prefix} ${formatSpacingMeasurement(visibleMeasurement)}`,
-    measurement: visibleMeasurement,
-    target,
-    tone,
-    position,
-  };
-}
-
-function compactSpacingLabels(
-  labels: Array<BuilderSpacingOverlayLabel | null>,
-) {
-  return labels.filter(Boolean) as BuilderSpacingOverlayLabel[];
-}
-
-function resolveDashboardDefaultSpacing(
-  px: number,
-  context: Parameters<typeof resolveBuilderSpacingCssValue>[1],
-) {
-  return resolveBuilderSpacingCssValue(px, context, "Default");
-}
-
-function resolveLocalSpacingValue(
-  value: string | undefined,
-  context: Parameters<typeof resolveBuilderSpacingCssValue>[1],
-) {
-  if (!value || value === "inherit") return undefined;
-  const css = resolveSpacingToken(value);
-  if (!css) return undefined;
-  return resolveBuilderSpacingCssValue(css, context, "Local", value);
-}
-
-function resolveLocalTokenSpacing(
-  value: string | undefined,
-  context: Parameters<typeof resolveBuilderSpacingCssValue>[1],
-) {
-  if (!value || value === "inherit") return undefined;
-  return resolveBuilderSpacing(value, context);
-}
-
-function dashboardElementPaddingMeasurement(
+function formatElementPaddingLabel(
   value: BuilderLayoutBlock["elementPadding"],
 ) {
-  if (!value || value === "none") return undefined;
-  const px =
-    value === "small" ? 8 : value === "medium" ? 16 : value === "large" ? 24 : 0;
-  return px > 0
-    ? resolveBuilderSpacingCssValue(px, "elementPadding", "Local", value)
-    : undefined;
-}
-
-function visualSpacingSideValue(
-  sides: BuilderVisualStyle["padding"] | BuilderVisualStyle["margin"],
-  side: "top" | "right" | "bottom" | "left",
-) {
-  if (!sides) return undefined;
-  const linked = sides.linked !== false;
-  if (side === "top") return sides.top;
-  if (side === "right") return sides.right ?? (linked ? sides.top : undefined);
-  if (side === "bottom") return sides.bottom ?? (linked ? sides.top : undefined);
-  return sides.left ?? (linked ? sides.top : sides.right);
-}
-
-function visualSpacingMeasurements(
-  sides: BuilderVisualStyle["padding"] | BuilderVisualStyle["margin"],
-  context: Parameters<typeof resolveBuilderSpacingCssValue>[1],
-) {
-  const top = resolveLocalSpacingValue(visualSpacingSideValue(sides, "top"), context);
-  const right = resolveLocalSpacingValue(visualSpacingSideValue(sides, "right"), context);
-  const bottom = resolveLocalSpacingValue(visualSpacingSideValue(sides, "bottom"), context);
-  const left = resolveLocalSpacingValue(visualSpacingSideValue(sides, "left"), context);
-  return { top, right, bottom, left };
-}
-
-function boxSpacingSideLabels(
-  prefix: string,
-  tone: BuilderSpacingOverlayLabel["tone"],
-  measurements: {
-    top?: ResolvedBuilderSpacing;
-    right?: ResolvedBuilderSpacing;
-    bottom?: ResolvedBuilderSpacing;
-    left?: ResolvedBuilderSpacing;
-  },
-  target: SpacingInspectorTarget,
-) {
-  const visible = Object.values(measurements).filter(
-    (measurement): measurement is ResolvedBuilderSpacing =>
-      shouldShowSpacingMeasurement(measurement),
-  );
-  if (visible.length === 0) return [];
-  const first = visible[0];
-  const allEqual =
-    visible.length === 4 && visible.every((entry) => entry.css === first.css);
-
-  if (allEqual) {
-    return compactSpacingLabels([
-      spacingLabel(prefix, first, tone, "inside-top", target),
-    ]);
-  }
-
-  return compactSpacingLabels([
-    spacingLabel(`${prefix}t`, measurements.top, tone, "inside-top", target),
-    spacingLabel(`${prefix}r`, measurements.right, tone, "inside-right", target),
-    spacingLabel(`${prefix}b`, measurements.bottom, tone, "inside-bottom", target),
-    spacingLabel(`${prefix}l`, measurements.left, tone, "inside-left", target),
-  ]);
-}
-
-function columnSpacingOverlayLabels(
-  item: NonNullable<BuilderSection["layoutItems"]>[number],
-  sectionId: string,
-  columnKey: string,
-  rowMeta:
-    | {
-        rowIndex: number;
-        columnIndex: number;
-        span: number;
-        isRowStart: boolean;
-      }
-    | undefined,
-) {
-  const labels: Array<BuilderSpacingOverlayLabel | null> = [
-    spacingLabel(
-      "col p",
-      resolveDashboardDefaultSpacing(8, "columnPadding"),
-      "padding",
-      "inside-top",
-      { scope: "column", sectionId, columnKey, field: "columnPadding" },
-    ),
-  ];
-
-  if (rowMeta?.isRowStart && rowMeta.rowIndex > 0) {
-    labels.push(
-      spacingLabel(
-        "row gap",
-        resolveDashboardDefaultSpacing(16, "rowGap"),
-        "gap",
-        "outside-top",
-        { scope: "row", sectionId, rowIndex: rowMeta.rowIndex, field: "rowGap" },
-      ),
-    );
-  }
-
-  if (rowMeta?.isRowStart) {
-    labels.push(
-      spacingLabel(
-        "row pt",
-        resolveLocalTokenSpacing(item.rowTopSpacing, "rowPadding"),
-        "padding",
-        "inside-top",
-        { scope: "row", sectionId, rowIndex: rowMeta.rowIndex, field: "rowTopSpacing" },
-      ),
-      spacingLabel(
-        "row pb",
-        resolveLocalTokenSpacing(item.rowBottomSpacing, "rowPadding"),
-        "padding",
-        "inside-bottom",
-        { scope: "row", sectionId, rowIndex: rowMeta.rowIndex, field: "rowBottomSpacing" },
-      ),
-      spacingLabel(
-        "row mt",
-        resolveLocalTokenSpacing(item.rowTopMargin, "rowMargin"),
-        "margin",
-        "outside-top",
-        { scope: "row", sectionId, rowIndex: rowMeta.rowIndex, field: "rowTopMargin" },
-      ),
-      spacingLabel(
-        "row mb",
-        resolveLocalTokenSpacing(item.rowBottomMargin, "rowMargin"),
-        "margin",
-        "outside-bottom",
-        { scope: "row", sectionId, rowIndex: rowMeta.rowIndex, field: "rowBottomMargin" },
-      ),
-    );
-  }
-
-  return compactSpacingLabels(labels);
-}
-
-function elementSpacingOverlayLabels(
-  block: BuilderLayoutBlock,
-  blockIndex: number,
-  sectionId: string,
-  columnKey: string,
-  blockKey: string,
-) {
-  const visual = block.visualStyle as BuilderVisualStyle | undefined;
-  const labels: BuilderSpacingOverlayLabel[] = [];
-  const visualPaddingTarget: SpacingInspectorTarget = {
-    scope: "element",
-    sectionId,
-    columnKey,
-    blockKey,
-    field: "visualPadding",
-  };
-  const visualMarginTarget: SpacingInspectorTarget = {
-    scope: "element",
-    sectionId,
-    columnKey,
-    blockKey,
-    field: "visualMargin",
-  };
-  const visualPaddingLabels = boxSpacingSideLabels(
-    "p",
-    "padding",
-    visualSpacingMeasurements(visual?.padding, "elementPadding"),
-    visualPaddingTarget,
-  );
-  labels.push(
-    ...(visualPaddingLabels.length > 0
-      ? visualPaddingLabels
-      : compactSpacingLabels([
-          spacingLabel(
-            "p",
-            dashboardElementPaddingMeasurement(block.elementPadding),
-            "padding",
-            "inside-top",
-            { scope: "element", sectionId, columnKey, blockKey, field: "elementPadding" },
-          ),
-        ])),
-  );
-  labels.push(
-    ...boxSpacingSideLabels(
-      "m",
-      "margin",
-      visualSpacingMeasurements(visual?.margin, "elementMargin"),
-      visualMarginTarget,
-    ),
-  );
-
-  if (blockIndex > 0) {
-    labels.push(
-      ...compactSpacingLabels([
-        spacingLabel(
-          "gap",
-          resolveDashboardDefaultSpacing(14, "elementMargin"),
-          "gap",
-          "outside-top",
-          { scope: "element", sectionId, columnKey, blockKey, field: "elementGap" },
-        ),
-      ]),
-    );
-  }
-
-  return labels;
+  return `p ${getSpacingLabel(value ?? "none", "elementPadding")}`;
 }
 
 function PreviewSection({
@@ -8855,7 +8381,6 @@ function PreviewSection({
   onMoveBlockWithinColumn,
   onDropRowTemplate,
   onDropElementTemplate,
-  onOpenSpacingSettings,
   onOpenElementsPanel,
   spacingOverlayEnabled,
 }: {
@@ -9043,7 +8568,6 @@ function PreviewSection({
     fromIndex: number,
     toIndex: number,
   ) => void;
-  onOpenSpacingSettings: (target: SpacingInspectorTarget) => void;
   onOpenElementsPanel: () => void;
   spacingOverlayEnabled: boolean;
 }) {
@@ -9694,14 +9218,13 @@ if (section.kind === "embed") {
                   selectedLayoutColumnKey === columnKey) && (
                   <BoxSpacingOverlay
                     kind="column"
-                    labels={columnSpacingOverlayLabels(
-                      item,
-                      section.id,
-                      columnKey,
-                      rowMeta,
-                    )}
-                    onOpenSpacingSettings={onOpenSpacingSettings}
-	                  />
+                    paddingLabel={`p ${getSpacingLabel("sm", "columnPadding")}`}
+                    marginLabel={
+                      rowMeta?.isRowStart
+                        ? `row gap ${getSpacingLabel("medium", "rowGap")}`
+                        : undefined
+                    }
+                  />
                 )}
                 {rowMeta?.isRowStart && (
                   <RowLayoutToolbar
@@ -9919,15 +9442,15 @@ if (section.kind === "embed") {
                         selectedLayoutBlockKey === blockKey) && (
                         <BoxSpacingOverlay
                           kind="element"
-                          labels={elementSpacingOverlayLabels(
-                            block,
-                            blockIndex,
-                            section.id,
-                            columnKey,
-                            blockKey,
+                          paddingLabel={formatElementPaddingLabel(
+                            block.elementPadding,
                           )}
-                          onOpenSpacingSettings={onOpenSpacingSettings}
-	                        />
+                          marginLabel={
+                            blockIndex > 0
+                              ? `mt ${getSpacingLabel("medium", "elementMargin")}`
+                              : undefined
+                          }
+                        />
                       )}
                       <div
                         className="builder-preview-block-tools"
