@@ -55,6 +55,12 @@ export default function ElementLibrary({
     setRecentKinds(readStoredKinds(RECENT_KEY));
   }, []);
 
+  useEffect(() => {
+    if (!normalizedQuery) {
+      setOpenGroupIds(new Set());
+    }
+  }, [normalizedQuery]);
+
   const rememberRecent = (kind: LayoutBlockKind) => {
     setRecentKinds((current) => {
       const next = [kind, ...current.filter((entry) => entry !== kind)].slice(
@@ -85,19 +91,25 @@ export default function ElementLibrary({
     () =>
       layoutBlockGroups
         .map((group) => {
-          const kinds = group.kinds.filter((kind) => {
-            if (!availableLayoutBlockKinds.includes(kind)) return false;
-            if (!normalizedQuery) return true;
+          const kinds = group.kinds
+            .filter((kind) => {
+              if (!availableLayoutBlockKinds.includes(kind)) return false;
+              if (!normalizedQuery) return true;
 
-            const label = layoutBlockLabels[kind].toLowerCase();
-            const description = layoutBlockDescriptions[kind].toLowerCase();
-            return (
-              kind.toLowerCase().includes(normalizedQuery) ||
-              label.includes(normalizedQuery) ||
-              description.includes(normalizedQuery) ||
-              group.label.toLowerCase().includes(normalizedQuery)
-            );
-          });
+              const label = layoutBlockLabels[kind].toLowerCase();
+              const description = layoutBlockDescriptions[kind].toLowerCase();
+              return (
+                kind.toLowerCase().includes(normalizedQuery) ||
+                label.includes(normalizedQuery) ||
+                description.includes(normalizedQuery) ||
+                group.label.toLowerCase().includes(normalizedQuery)
+              );
+            })
+            .sort((a, b) => {
+              const labelA = layoutBlockLabels[a] || "";
+              const labelB = layoutBlockLabels[b] || "";
+              return labelA.localeCompare(labelB);
+            });
 
           return { ...group, kinds };
         })
@@ -119,10 +131,8 @@ export default function ElementLibrary({
 
   const toggleGroup = (groupId: string) => {
     setOpenGroupIds((current) => {
-      const next = new Set(current);
-      if (next.has(groupId)) {
-        next.delete(groupId);
-      } else {
+      const next = new Set<string>();
+      if (!current.has(groupId)) {
         next.add(groupId);
       }
       return next;

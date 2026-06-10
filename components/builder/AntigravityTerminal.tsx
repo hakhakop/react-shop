@@ -56,11 +56,11 @@ export function AntigravityTerminal() {
         <div className="ide-code">
           <span className="text-purple-400">const</span> <span className="text-blue-400">agent</span> = <span className="text-purple-400">new</span> <span className="text-emerald-400">Antigravity</span>();<br/>
           <span className="text-blue-400">agent</span>.<span className="text-yellow-400">optimizeStorefront</span>({`{`}<br/>
-          &nbsp;&nbsp;<span className="text-sky-400">style</span>: <span className="text-orange-400">"futuristic"</span>,<br/>
-          &nbsp;&nbsp;<span className="text-sky-400">layout</span>: <span className="text-orange-400">"antigravity"</span><br/>
+          &nbsp;&nbsp;<span className="text-sky-400">style</span>: <span className="text-orange-400">&quot;futuristic&quot;</span>,<br/>
+          &nbsp;&nbsp;<span className="text-sky-400">layout</span>: <span className="text-orange-400">&quot;antigravity&quot;</span><br/>
           {`});`}<br/>
           <br/>
-          <span className="text-neutral-500">// Execution logs:</span>
+          <span className="text-neutral-500">{"// Execution logs:"}</span>
           <div className="ide-terminal">
             {logs.map((log, idx) => {
               if (!log || typeof log !== "string") return null;

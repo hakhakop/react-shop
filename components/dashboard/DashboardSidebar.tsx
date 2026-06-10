@@ -4,7 +4,6 @@ import {
   ChevronLeft,
   ExternalLink,
   LibraryBig,
-  MonitorSmartphone,
   Pencil,
   Plus,
   Save,
@@ -28,7 +27,6 @@ import type {
   BuilderTemplate,
   LayoutBlockKind,
   MenuPresentationSettings,
-  PreviewDevice,
   SidebarTab,
 } from "@/components/dashboard/builderTypes";
 import ElementLibrary from "@/components/dashboard/ElementLibrary";
@@ -54,7 +52,6 @@ type DashboardSidebarProps = {
   availableLayoutBlockKinds: LayoutBlockKind[];
   builderState: BuilderState;
   customPages: BuilderCustomPage[];
-  device: PreviewDevice;
   filteredMenuIcons: readonly { name: string; label: string; keywords: string }[];
   getMenuIconLabel: (icon: string | null) => string;
   menuIconPickerOpen: boolean;
@@ -67,12 +64,10 @@ type DashboardSidebarProps = {
   inspectorOpenKey?: number;
   normalizeMenuPresentation: (value?: Partial<MenuPresentationSettings> | null) => MenuPresentationSettings;
   pageStatus: string;
-  publishStatus: string;
   renderUIKitIcon: (icon: string | null, size?: number) => ReactNode;
   resolveUIKitIconName: (icon: string | null) => string | null;
   selectedMenuItem: MenuItem | null;
   selectedMenuItemId: string | null;
-  selectedLayoutBlockKey: string | null;
   selectedSectionTitle?: string | null;
   selectedElementLabel?: string | null;
   shellSettings: { menuPresentation?: Record<string, MenuPresentationSettings> };
@@ -91,14 +86,12 @@ type DashboardSidebarProps = {
   onCreateBuilderPage: () => void;
   onDeleteBuilderPage: (key: BuilderCustomPage["key"]) => void;
   onDeleteSavedTemplate: (id: string) => void;
-  onOpenCurrentPage: () => void;
   onRenderLayoutBlockIcon: (kind: LayoutBlockKind) => ReactNode;
   onSaveCurrentPageAsTemplate: (title?: string) => void | Promise<unknown>;
   onSaveSelectedSectionAsTemplate?: (title?: string) => void | Promise<unknown>;
   onSaveSelectedElementAsTemplate?: (title?: string) => void | Promise<unknown>;
   onApplySavedTemplate?: (template: BuilderSavedTemplate) => void;
   onRenameSavedTemplate?: (template: BuilderSavedTemplate, title: string) => void;
-  onSetDevice: Dispatch<SetStateAction<PreviewDevice>>;
   onSetMenuIconPickerOpen: Dispatch<SetStateAction<boolean>>;
   onSetMenuIconSearch: Dispatch<SetStateAction<string>>;
   onSetNewPageTitle: Dispatch<SetStateAction<string>>;
@@ -114,7 +107,6 @@ export default function DashboardSidebar({
   availableLayoutBlockKinds,
   builderState,
   customPages,
-  device,
   filteredMenuIcons,
   getMenuIconLabel,
   menuIconPickerOpen,
@@ -127,12 +119,10 @@ export default function DashboardSidebar({
   inspectorOpenKey = 0,
   normalizeMenuPresentation,
   pageStatus,
-  publishStatus,
   renderUIKitIcon,
   resolveUIKitIconName,
   selectedMenuItem,
   selectedMenuItemId,
-  selectedLayoutBlockKey,
   selectedSectionTitle,
   selectedElementLabel,
   shellSettings,
@@ -148,14 +138,12 @@ export default function DashboardSidebar({
   onCreateBuilderPage,
   onDeleteBuilderPage,
   onDeleteSavedTemplate,
-  onOpenCurrentPage,
   onRenderLayoutBlockIcon,
   onSaveCurrentPageAsTemplate,
   onSaveSelectedSectionAsTemplate = () => undefined,
   onSaveSelectedElementAsTemplate = () => undefined,
   onApplySavedTemplate = () => undefined,
   onRenameSavedTemplate = () => undefined,
-  onSetDevice,
   onSetMenuIconPickerOpen,
   onSetMenuIconSearch,
   onSetNewPageTitle,
@@ -240,11 +228,7 @@ export default function DashboardSidebar({
       description: "Save reusable page starting points.",
       count: savedTemplates.length,
     },
-    {
-      tab: "settings",
-      label: "Settings",
-      description: "Preview, target, and global layout controls.",
-    },
+
   ];
 
   const activePanel =
@@ -415,6 +399,32 @@ export default function DashboardSidebar({
               <div><strong>Templates</strong><span>Save and reuse pages, sections, and elements</span></div>
               <small>{savedTemplates.length}</small>
             </div>
+
+            <div className="builder-card builder-pages-card" style={{ marginBottom: '14px' }}>
+              <div className="builder-card-title"><strong>Global Layout Target</strong></div>
+              <div className="builder-target-toggle" aria-label="Builder target type">
+                {(["page", "template"] as BuilderTargetType[]).map((targetType) => (
+                  <button key={targetType} type="button" className={(builderState.targetType ?? "page") === targetType ? "is-active" : ""} onClick={() => onSwitchBuilderTarget(targetType === "page" ? "shop" : "product-single")}>
+                    {targetType === "page" ? "Custom Pages" : "Global Templates"}
+                  </button>
+                ))}
+              </div>
+              {(builderState.targetType ?? "page") === "template" && (
+                <label className="builder-field" style={{ marginTop: '12px' }}>
+                  <span>Editing Template</span>
+                  <select value={builderState.page} onChange={(event) => onSwitchBuilderTarget(event.target.value as BuilderLayoutKey)}>
+                    {Object.entries(templateLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+                  </select>
+                </label>
+              )}
+              {(builderState.targetType ?? "page") === "template" && builderState.template && (
+                <div className="builder-template-note" style={{ marginTop: '8px' }}>
+                  <strong>{templateLabels[builderState.template]}</strong>
+                  <span>{templateDescriptions[builderState.template]}</span>
+                </div>
+              )}
+            </div>
+
             <div className="builder-card builder-pages-card">
               <div className="builder-card-title"><strong>Save Reusable Template</strong><span>{builderState.page}</span></div>
               <label className="builder-field">
@@ -593,54 +603,6 @@ export default function DashboardSidebar({
                 </span>
               </div>
             )}
-          </div>
-        )}
-
-        {nestedOpen && sidebarTab === "settings" && (
-          <div className="builder-sidebar-panel">
-            <div className="builder-sidebar-panel-header">
-              <div><strong>Settings</strong><span>Layout, preview, and publishing controls</span></div>
-              <small>{publishStatus}</small>
-            </div>
-            <div className="builder-sidebar-controls">
-              <button
-                type="button"
-                className="builder-secondary-button builder-full-button"
-                onClick={onOpenCurrentPage}
-              >
-                <ExternalLink size={16} />
-                Open Page
-              </button>
-              <div className="builder-device-toggle" aria-label="Preview device">
-                {(["desktop", "tablet", "mobile"] as PreviewDevice[]).map((item) => (
-                  <button key={item} type="button" className={device === item ? "is-active" : ""} onClick={() => onSetDevice(item)} title={`${item} preview`}>
-                    <MonitorSmartphone size={16} />
-                  </button>
-                ))}
-              </div>
-            </div>
-            <div className="builder-target-toggle" aria-label="Builder target type">
-              {(["page", "template"] as BuilderTargetType[]).map((targetType) => (
-                <button key={targetType} type="button" className={(builderState.targetType ?? "page") === targetType ? "is-active" : ""} onClick={() => onSwitchBuilderTarget(targetType === "page" ? "shop" : "product-single")}>
-                  {targetType === "page" ? "Pages" : "Templates"}
-                </button>
-              ))}
-            </div>
-            {(builderState.targetType ?? "page") === "template" && (
-              <label className="builder-field">
-                <span>Editing Template</span>
-                <select value={builderState.page} onChange={(event) => onSwitchBuilderTarget(event.target.value as BuilderLayoutKey)}>
-                  {Object.entries(templateLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
-                </select>
-              </label>
-            )}
-            {(builderState.targetType ?? "page") === "template" && builderState.template && (
-              <div className="builder-template-note">
-                <strong>{templateLabels[builderState.template]}</strong>
-                <span>{templateDescriptions[builderState.template]}</span>
-              </div>
-            )}
-            <small className="builder-sidebar-status">{publishStatus}</small>
           </div>
         )}
       </div>

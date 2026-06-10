@@ -28,6 +28,7 @@ import {
   Ruler,
   Save,
   Settings2,
+  MonitorSmartphone,
   Undo2,
   Sparkles,
   Star,
@@ -4819,6 +4820,7 @@ export default function DashboardBuilder({
 
   const inspectorPanel = (
     <DashboardInspector
+      hasSections={builderState.sections.length > 0}
       builderJson={builderJson}
       copied={copied}
       elementBackgroundPresets={elementBackgroundPresets}
@@ -5686,15 +5688,6 @@ export default function DashboardBuilder({
               </select>
             </label>
           </div>
-
-          <button
-            type="button"
-            className="builder-secondary-button builder-full-button"
-            onClick={publishShellSettings}
-          >
-            <CloudUpload size={16} />
-            Publish Global Settings
-          </button>
         </div>
       )}
     </div>
@@ -5703,14 +5696,35 @@ export default function DashboardBuilder({
   const sidebarTopActions = (
     <div className="builder-sidebar-top-action-bar" aria-label="Builder page actions">
       <div className="builder-sidebar-top-action-copy">
-        <strong>{hasPendingChanges ? "Unsaved changes" : "Saved draft"}</strong>
+        <strong>
+          {sidebarTab === "globalStyles"
+            ? "Global Styles"
+            : hasPendingChanges
+              ? "Unsaved changes"
+              : "Saved draft"}
+        </strong>
         <span>
-          {hasPendingChanges
-            ? getLayoutLabel(builderState.page, customPages)
-            : publishStatus}
+          {sidebarTab === "globalStyles"
+            ? shellStatus
+            : hasPendingChanges
+              ? getLayoutLabel(builderState.page, customPages)
+              : publishStatus}
         </span>
       </div>
       <div className="builder-sidebar-top-action-buttons">
+        <div className="builder-device-toggle" aria-label="Preview device">
+          {(["desktop", "tablet", "mobile"] as PreviewDevice[]).map((item) => (
+            <button
+              key={item}
+              type="button"
+              className={device === item ? "is-active" : ""}
+              onClick={() => setDevice(item)}
+              title={`${item} preview`}
+            >
+              <MonitorSmartphone size={15} />
+            </button>
+          ))}
+        </div>
         <button
           type="button"
           className="builder-sidebar-collapse-inline"
@@ -5734,20 +5748,32 @@ export default function DashboardBuilder({
           <ExternalLink size={15} />
           View Page
         </button>
-        {hasPendingChanges && (
-          <>
-            <button type="button" onClick={undoBuilder} title="Undo last change">
-              <Undo2 size={15} />
-              Undo
-            </button>
-            <button type="button" onClick={redoBuilder} title="Redo last change">
-              <Redo2 size={15} />
-            </button>
-            <button type="button" className="is-primary" onClick={publishLayout}>
-              <CloudUpload size={15} />
-              Publish
-            </button>
-          </>
+        {sidebarTab === "globalStyles" ? (
+          <button
+            type="button"
+            className="is-primary"
+            onClick={publishShellSettings}
+            title="Publish Global Settings"
+          >
+            <CloudUpload size={15} />
+            Publish Settings
+          </button>
+        ) : (
+          hasPendingChanges && (
+            <>
+              <button type="button" onClick={undoBuilder} title="Undo last change">
+                <Undo2 size={15} />
+                Undo
+              </button>
+              <button type="button" onClick={redoBuilder} title="Redo last change">
+                <Redo2 size={15} />
+              </button>
+              <button type="button" className="is-primary" onClick={publishLayout}>
+                <CloudUpload size={15} />
+                Publish
+              </button>
+            </>
+          )
         )}
       </div>
     </div>
@@ -5773,7 +5799,6 @@ export default function DashboardBuilder({
         availableLayoutBlockKinds={availableLayoutBlockKinds}
         builderState={builderState}
         customPages={customPages}
-        device={device}
         globalStylesSlot={globalStylesPanel}
         menuTree={menuTree}
         newPageTitle={newPageTitle}
@@ -5781,8 +5806,6 @@ export default function DashboardBuilder({
         inspectorOpen={inspectorOpen}
         inspectorOpenKey={inspectorOpenKey}
         pageStatus={pageStatus}
-        publishStatus={publishStatus}
-        selectedLayoutBlockKey={selectedLayoutBlockKey}
         selectedSectionTitle={selectedSection?.title || selectedSection?.kind || null}
         selectedElementLabel={
           selectedLayoutBlock
@@ -5802,16 +5825,12 @@ export default function DashboardBuilder({
         onCreateBuilderPage={createBuilderPage}
         onDeleteBuilderPage={deleteBuilderPage}
         onDeleteSavedTemplate={deleteSavedTemplate}
-        onOpenCurrentPage={() => {
-          window.open(currentFrontendUrl, "_blank", "noopener,noreferrer");
-        }}
         onRenderLayoutBlockIcon={getLayoutBlockLibraryIcon}
         onSaveCurrentPageAsTemplate={saveCurrentPageAsTemplate}
         onSaveSelectedSectionAsTemplate={saveSelectedSectionAsTemplate}
         onSaveSelectedElementAsTemplate={saveSelectedElementAsTemplate}
         onApplySavedTemplate={applySavedTemplate}
         onRenameSavedTemplate={renameSavedTemplate}
-        onSetDevice={setDevice}
         onSetMenuIconPickerOpen={setMenuIconPickerOpen}
         onSetMenuIconSearch={setMenuIconSearch}
         onSetNewPageTitle={setNewPageTitle}
@@ -6472,15 +6491,6 @@ export default function DashboardBuilder({
                     </select>
                   </label>
                 </div>
-
-                <button
-                  type="button"
-                  className="builder-secondary-button builder-full-button"
-                  onClick={publishShellSettings}
-                >
-                  <CloudUpload size={16} />
-                  Publish Global Settings
-                </button>
               </div>
             </div>
           </section>

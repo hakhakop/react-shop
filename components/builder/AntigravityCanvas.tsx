@@ -222,9 +222,9 @@ export default function AntigravityCanvas({
         ctx.lineWidth = 1;
 
         gridPoints.forEach((p) => {
-          let dx = mouse.x - p.baseX;
-          let dy = mouse.y - p.baseY;
-          let dist = Math.sqrt(dx * dx + dy * dy);
+          const dx = mouse.x - p.baseX;
+          const dy = mouse.y - p.baseY;
+          const dist = Math.sqrt(dx * dx + dy * dy);
 
           const maxDist = 220;
           if (mouse.active && actualInteractive && dist < maxDist) {
@@ -267,9 +267,9 @@ export default function AntigravityCanvas({
       if (mouse.active && actualInteractive) {
         // If grid lines are hidden, base coordinates can still warp/connect to mouse
         gridPoints.forEach((p) => {
-          let dx = mouse.x - p.x;
-          let dy = mouse.y - p.y;
-          let dist = Math.sqrt(dx * dx + dy * dy);
+          const dx = mouse.x - p.x;
+          const dy = mouse.y - p.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
 
           if (dist < 150) {
             ctx.strokeStyle = hexToRgba(color, 0.3 * glowIntensity * (1 - dist / 150));

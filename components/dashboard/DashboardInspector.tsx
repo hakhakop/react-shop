@@ -233,6 +233,7 @@ type DashboardInspectorProps = {
   updateSelectedSlide: LooseHandler;
   uploadSelectedLayoutBlockSlideImage: LooseHandler;
   uploadSelectedSlideImage: LooseHandler;
+  hasSections?: boolean;
 };
 
 function isLayoutContainerSection(section: BuilderSection | null | undefined) {
@@ -305,6 +306,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
     blockKey: null,
   });
   const {
+    hasSections = false,
     builderJson, copied, elementBackgroundPresets, getLayoutItemBlocks,
     inspectorOpen, inspectorTab, layoutBlockLabels, openLayoutItemId, openSlideId,
     spacingOverlayEnabled = false,
@@ -8925,7 +8927,11 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
       ) : (
         <div className="builder-empty-state">
           <Layers3 size={22} />
-          <p>Add a section to start designing.</p>
+          {hasSections ? (
+            <p>Select a section, row, or element in the preview to inspect its properties.</p>
+          ) : (
+            <p>Add a section to start designing.</p>
+          )}
         </div>
       )}
 
