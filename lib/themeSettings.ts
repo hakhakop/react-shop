@@ -1,4 +1,4 @@
-// wc-store/lib/themeSettings.ts
+// wc-store/lib/themeSettings.ts sss
 
 import { graphqlFetch } from "./graphql";
 
@@ -97,9 +97,19 @@ export function extractHeaderSettings(settings: Record<string, any>): HeaderSett
  * webpagesThemeSettingsRaw is a JSON-encoded string of all ACF option fields.
  */
 export async function getThemeSettings(): Promise<Record<string, any>> {
-  const data = await graphqlFetch<ThemeSettingsResponse>(THEME_SETTINGS_QUERY);
+  let data: ThemeSettingsResponse | null = null;
 
-  if (!data.webpagesThemeSettingsRaw) {
+  try {
+    data = await graphqlFetch<ThemeSettingsResponse>(THEME_SETTINGS_QUERY);
+  } catch (e) {
+    console.warn(
+      "WordPress theme settings are not available. Falling back to React defaults.",
+      e
+    );
+    return {};
+  }
+
+  if (!data?.webpagesThemeSettingsRaw) {
     return {};
   }
 
