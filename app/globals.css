@@ -1478,6 +1478,14 @@ a {
   letter-spacing: 0 !important;
 }
 
+/* Added rule for Products block in builder */
+.shop-builder-column-block--products .product-title {
+  font-size: clamp(15px, 1vw, 18px) !important;
+  line-height: 1.12 !important;
+  font-weight: 720 !important;
+  letter-spacing: 0 !important;
+}
+
 .builder-preview-carousel h2 {
   font-size: clamp(20px, 1.8vw, 30px) !important;
   line-height: 1.08 !important;

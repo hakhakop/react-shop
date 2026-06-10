@@ -351,6 +351,12 @@ export type BuilderLayoutBlock = {
   textGradientCustomStartOffset?: number;
   textGradientCustomMiddleOffset?: number;
   textGradientCustomEndOffset?: number;
+  pagination?: {
+    enabled: boolean;
+    perPage: number;
+    mode: "loadMore" | "pageNumbers";
+    infiniteScroll?: boolean;
+  };
 };
 
 export type WordPressMediaItem = {
@@ -518,6 +524,12 @@ export type BuilderSection = {
     pauseOnHover?: boolean;
     scrubSpeed?: number;
     pinHeightFactor?: number;
+  };
+  pagination?: {
+    enabled: boolean;
+    perPage: number;
+    mode: "loadMore" | "pageNumbers";
+    infiniteScroll?: boolean;
   };
   visible: boolean;
   typography?: TypographySettings | TypographyGroup;

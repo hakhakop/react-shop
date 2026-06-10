@@ -1261,7 +1261,7 @@
                 "source": "all",
                 "layoutVariant": "grid",
                 "columns": 4,
-                "gridLimit": 12,
+                "gridLimit": 4000,
                 "filterPosition": "left",
                 "cardStyle": "none",
                 "cardPreset": "standard",
@@ -1274,7 +1274,7 @@
         "layoutRows": 1
       }
     ],
-    "updatedAt": "2026-06-02T15:10:40.626Z"
+    "updatedAt": "2026-06-10T19:26:48.150Z"
   },
   "client": {
     "version": 1,

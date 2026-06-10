@@ -7431,6 +7431,112 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                               </div>
                             </div>
                           </details>
+
+                          <details className="builder-collapse">
+                            <summary>
+                              <span>Pagination</span>
+                              <small>
+                                {(selectedSection.pagination?.enabled ?? false)
+                                  ? `${selectedSection.pagination?.mode === "loadMore" ? "Load More" : "Page Numbers"} · ${selectedSection.pagination?.perPage ?? 12}/page`
+                                  : "Off"}
+                              </small>
+                            </summary>
+
+                            <label className="builder-field builder-toggle">
+                              <span>Pagination Enabled</span>
+                              <input
+                                type="checkbox"
+                                checked={selectedSection.pagination?.enabled ?? false}
+                                onChange={(event) =>
+                                  updateSelected({
+                                    pagination: {
+                                      ...(selectedSection.pagination ?? {
+                                        enabled: false,
+                                        perPage: 12,
+                                        mode: "pageNumbers" as const,
+                                        infiniteScroll: false,
+                                      }),
+                                      enabled: event.target.checked,
+                                    },
+                                  })
+                                }
+                              />
+                            </label>
+
+                            {(selectedSection.pagination?.enabled ?? false) && (
+                              <>
+                                <div className="builder-two-column">
+                                  <label className="builder-field">
+                                    <span>Products Per Page</span>
+                                    <input
+                                      type="number"
+                                      min={4}
+                                      max={48}
+                                      step={1}
+                                      value={selectedSection.pagination?.perPage ?? 12}
+                                      onChange={(event) =>
+                                        updateSelected({
+                                          pagination: {
+                                            ...(selectedSection.pagination ?? {
+                                              enabled: true,
+                                              perPage: 12,
+                                              mode: "pageNumbers" as const,
+                                              infiniteScroll: false,
+                                            }),
+                                            perPage: Number(event.target.value),
+                                          },
+                                        })
+                                      }
+                                    />
+                                  </label>
+
+                                  <label className="builder-field">
+                                    <span>Pagination Mode</span>
+                                    <select
+                                      value={selectedSection.pagination?.mode ?? "pageNumbers"}
+                                      onChange={(event) =>
+                                        updateSelected({
+                                          pagination: {
+                                            ...(selectedSection.pagination ?? {
+                                              enabled: true,
+                                              perPage: 12,
+                                              mode: "pageNumbers" as const,
+                                              infiniteScroll: false,
+                                            }),
+                                            mode: event.target.value as "loadMore" | "pageNumbers",
+                                          },
+                                        })
+                                      }
+                                    >
+                                      <option value="pageNumbers">Page Numbers</option>
+                                      <option value="loadMore">Load More</option>
+                                    </select>
+                                  </label>
+                                </div>
+
+                                <label className="builder-field builder-toggle">
+                                  <span>Infinite Scroll</span>
+                                  <input
+                                    type="checkbox"
+                                    checked={selectedSection.pagination?.infiniteScroll ?? false}
+                                    onChange={(event) =>
+                                      updateSelected({
+                                        pagination: {
+                                          ...(selectedSection.pagination ?? {
+                                            enabled: true,
+                                            perPage: 12,
+                                            mode: "pageNumbers" as const,
+                                            infiniteScroll: false,
+                                          }),
+                                          infiniteScroll: event.target.checked,
+                                        },
+                                      })
+                                    }
+                                  />
+                                </label>
+                              </>
+                            )}
+                          </details>
                         </>
                       )}
 
