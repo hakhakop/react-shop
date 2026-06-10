@@ -356,19 +356,26 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
   const inspectorTabs: [InspectorTab, string][] = selectedLayoutBlock
     ? [
         ["content", "Content"],
-        ["settings", "Styling"],
-        ["typography", "Typography"],
-        ["advanced", "Advanced"],
-      ]
-    : selectedLayoutRow
-      ? [["row", "Row Layout"]]
-    : [
-        ["section", "Layout"],
+        ["layout", "Layout"],
         ["spacing", "Spacing"],
         ["style", "Styling"],
         ["typography", "Typography"],
         ["advanced", "Advanced"],
-      ];
+      ]
+    : selectedLayoutRow
+      ? [
+          ["layout", "Layout"],
+          ["spacing", "Spacing"],
+          ["style", "Styling"],
+          ["advanced", "Advanced"],
+        ]
+      : [
+          ["layout", "Layout"],
+          ["spacing", "Spacing"],
+          ["style", "Styling"],
+          ["advanced", "Advanced"],
+          ["content", "Content (Legacy)"],
+        ];
   const categoryFilterOptions = flattenCategoryTree(previewCategoryTree);
   const filteredCategoryFilterOptions = categoryFilterOptions.filter(
     (category) => {
@@ -467,22 +474,19 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
   );
 
   useEffect(() => {
-    if (!selectedLayoutBlock) return;
-    if (
-      inspectorTab === "section" ||
-      inspectorTab === "spacing" ||
-      inspectorTab === "style"
-    ) {
-      setInspectorTab(inspectorTab === "style" ? "settings" : "content");
+    if (selectedLayoutBlock) {
+      return;
     }
-  }, [inspectorTab, selectedLayoutBlock, setInspectorTab]);
-
-  useEffect(() => {
-    if (selectedLayoutBlock) return;
-    if (inspectorTab === "content" || inspectorTab === "settings") {
-      setInspectorTab("section");
+    if (selectedLayoutRow) {
+      if (inspectorTab === "content" || inspectorTab === "typography") {
+        setInspectorTab("layout");
+      }
+      return;
     }
-  }, [inspectorTab, selectedLayoutBlock, setInspectorTab]);
+    if (inspectorTab === "typography") {
+      setInspectorTab("style");
+    }
+  }, [inspectorTab, selectedLayoutBlock, selectedLayoutRow, setInspectorTab]);
 
   const activeTypographyArea =
     activeTypographyAreaState.blockKey === selectedLayoutBlockKey
@@ -628,27 +632,43 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
       ? "column"
       : "section";
   const isElementContentTab = inspectorTab === "content";
-  const isElementSettingsTab = inspectorTab === "settings";
+  const isElementLayoutTab = inspectorTab === "layout";
+  const isElementSpacingTab = inspectorTab === "spacing";
+  const isElementSettingsTab = inspectorTab === "style";
   const isElementTypographyTab = inspectorTab === "typography";
+  const isElementAdvancedTab = inspectorTab === "advanced";
+
   const inspectorTitle = selectedLayoutBlock
     ? isElementContentTab
       ? "Element Content"
-      : isElementSettingsTab
-        ? "Element Styling"
-        : isElementTypographyTab
-          ? "Element Typography"
-          : "Element Advanced"
+      : isElementLayoutTab
+        ? "Element Layout"
+        : isElementSpacingTab
+          ? "Element Spacing"
+          : isElementSettingsTab
+            ? "Element Styling"
+            : isElementTypographyTab
+              ? "Element Typography"
+              : "Element Advanced"
     : selectedLayoutRow
-      ? "Row Layout"
-      : inspectorTab === "spacing"
-        ? "Section Spacing"
-      : inspectorTab === "style"
-        ? "Section Styling"
-        : inspectorTab === "typography"
-          ? "Section Typography"
-          : inspectorTab === "advanced"
-            ? "Section Advanced"
-            : "Section Layout";
+      ? inspectorTab === "layout"
+        ? "Row Layout"
+        : inspectorTab === "spacing"
+          ? "Row Spacing"
+          : inspectorTab === "style"
+            ? "Row Styling"
+            : "Row Advanced"
+      : inspectorTab === "layout"
+        ? "Section Layout"
+        : inspectorTab === "spacing"
+          ? "Section Spacing"
+          : inspectorTab === "style"
+            ? "Section Styling"
+            : inspectorTab === "typography"
+              ? "Section Typography"
+              : inspectorTab === "advanced"
+                ? "Section Advanced"
+                : "Section Layout";
   const showLegacySectionContentControls: boolean = true;
   const currentRowLayoutPreset = getBuilderRowLayoutPreset(
     layoutContainerSection?.layout ?? null,
@@ -708,7 +728,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                 type="button"
                 onClick={() => {
                   setSelectedLayoutBlockKey(null);
-                  setInspectorTab("section");
+                  setInspectorTab("layout");
                 }}
               >
                 Back to section
@@ -796,7 +816,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
             </div>
           ) : null}
 
-          {selectedLayoutRow && inspectorTab === "row" && (
+          {selectedLayoutRow && inspectorTab === "layout" && (
             <div className="builder-inspector-stack">
               <details className="builder-collapse" open>
                 <summary>
@@ -851,79 +871,6 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
               <details className="builder-collapse">
                 <summary>
                   <InspectorGroupSummary
-                    title="Row Spacing"
-                    description="Padding and outside spacing for this row."
-                    meta="Inherited by row columns"
-                  />
-                </summary>
-                <div className="builder-two-column">
-                  <label className="builder-field">
-                    <span>Top Padding</span>
-                    <select
-                      value={selectedLayoutRow.items[0]?.rowTopSpacing ?? "inherit"}
-                      onChange={(event) =>
-                        onUpdateRowStyle({
-                          rowTopSpacing: event.target.value as SectionSpacing,
-                        })
-                      }
-                    >
-                      <option value="inherit">Use section</option>
-                      {renderSpacingOptions("rowPadding")}
-                    </select>
-                  </label>
-
-                  <label className="builder-field">
-                    <span>Bottom Padding</span>
-                    <select
-                      value={selectedLayoutRow.items[0]?.rowBottomSpacing ?? "inherit"}
-                      onChange={(event) =>
-                        onUpdateRowStyle({
-                          rowBottomSpacing: event.target.value as SectionSpacing,
-                        })
-                      }
-                    >
-                      <option value="inherit">Use section</option>
-                      {renderSpacingOptions("rowPadding")}
-                    </select>
-                  </label>
-                </div>
-
-                <div className="builder-two-column">
-                  <label className="builder-field">
-                    <span>Top Margin</span>
-                    <select
-                      value={selectedLayoutRow.items[0]?.rowTopMargin ?? "inherit"}
-                      onChange={(event) =>
-                        onUpdateRowStyle({
-                          rowTopMargin: event.target.value as SectionSpacing,
-                        })
-                      }
-                    >
-                      <option value="inherit">Use section</option>
-                      {renderSpacingOptions("rowMargin")}
-                    </select>
-                  </label>
-
-                  <label className="builder-field">
-                    <span>Bottom Margin</span>
-                    <select
-                      value={selectedLayoutRow.items[0]?.rowBottomMargin ?? "inherit"}
-                      onChange={(event) =>
-                        onUpdateRowStyle({
-                          rowBottomMargin: event.target.value as SectionSpacing,
-                        })
-                      }
-                    >
-                      <option value="inherit">Use section</option>
-                      {renderSpacingOptions("rowMargin")}
-                    </select>
-                  </label>
-                </div>
-              </details>
-
-              <details className="builder-collapse">
-                <summary>
-                  <InspectorGroupSummary
                     title="Row Contents"
                     meta={`${selectedLayoutRow.items.length} column${
                       selectedLayoutRow.items.length === 1 ? "" : "s"
@@ -947,12 +894,15 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
             </div>
           )}
 
-          {((!selectedLayoutBlock && inspectorTab === "section") ||
+          {((!selectedLayoutBlock && !selectedLayoutRow && inspectorTab === "layout") ||
             (selectedLayoutBlock &&
               isLayoutContainerSection(selectedSection) &&
               (isElementContentTab ||
+                isElementLayoutTab ||
+                isElementSpacingTab ||
                 isElementSettingsTab ||
-                isElementTypographyTab))) && (
+                isElementTypographyTab ||
+                isElementAdvancedTab))) && (
             <details
               className={`builder-collapse builder-section-settings-toggle ${
                 selectedLayoutBlock ? "is-element-focus" : ""
@@ -970,11 +920,15 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                   {selectedLayoutBlock
                     ? isElementContentTab
                       ? "Content"
-                      : isElementSettingsTab
-                        ? "Styling"
-                        : isElementTypographyTab
-                          ? "Typography"
-                          : "Element"
+                      : isElementLayoutTab
+                        ? "Layout"
+                        : isElementSpacingTab
+                          ? "Spacing"
+                          : isElementSettingsTab
+                            ? "Styling"
+                            : isElementTypographyTab
+                              ? "Typography"
+                              : "Advanced"
                     : "Section Layout"}
                 </span>
                 <small>
@@ -983,7 +937,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                     : "closed"}
                 </small>
               </summary>
-              {inspectorTab === "section" && !selectedLayoutBlock && (
+              {inspectorTab === "layout" && !selectedLayoutBlock && !selectedLayoutRow && (
                 <>
 	                  <details className="builder-collapse" open>
 	                    <summary>
@@ -1031,13 +985,17 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
 	                </>
 	              )}
 
-              {((inspectorTab === "section" &&
+              {((inspectorTab === "layout" &&
                 !selectedLayoutBlock &&
+                !selectedLayoutRow &&
                 (isLayoutContainerSection(selectedSection) ||
                   showLegacySectionContentControls)) ||
                 ((isElementContentTab ||
+                  isElementLayoutTab ||
+                  isElementSpacingTab ||
                   isElementSettingsTab ||
-                  isElementTypographyTab) &&
+                  isElementTypographyTab ||
+                  isElementAdvancedTab) &&
                   isLayoutContainerSection(selectedSection) &&
                   selectedLayoutBlock)) && (
                   <details
@@ -1054,18 +1012,30 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                           selectedLayoutBlock
                             ? isElementContentTab
                               ? "Element Content"
-                              : isElementSettingsTab
-                                ? "Element Styling"
-                                : "Element Typography"
+                              : isElementLayoutTab
+                                ? "Element Layout"
+                                : isElementSpacingTab
+                                  ? "Element Spacing"
+                                  : isElementSettingsTab
+                                    ? "Element Styling"
+                                    : isElementTypographyTab
+                                      ? "Element Typography"
+                                      : "Element Advanced"
                             : "Section Type Options"
                         }
                         description={
                           selectedLayoutBlock
                             ? isElementContentTab
                               ? "Edit the selected element without leaving this section."
-                              : isElementSettingsTab
-                                ? "Tune appearance, spacing, and background for this element."
-                                : "Tune title, body, and button typography for this element."
+                              : isElementLayoutTab
+                                ? "Configure element layout, alignment, and display options."
+                                : isElementSpacingTab
+                                  ? "Tune element padding and layout spacing."
+                                  : isElementSettingsTab
+                                    ? "Tune appearance, spacing, and background for this element."
+                                    : isElementTypographyTab
+                                      ? "Tune title, body, and button typography for this element."
+                                      : "Configure animation entry, developer keys, and CSS targets."
                             : "Controls specific to the selected section type."
                         }
                         meta={sectionLabels[selectedSection.kind]}
@@ -1076,8 +1046,9 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
 
 
 
-                    {inspectorTab === "section" &&
+                    {inspectorTab === "layout" &&
                       !selectedLayoutBlock &&
+                      !selectedLayoutRow &&
                       isLayoutContainerSection(selectedSection) && (
                         <>
                           <label className="builder-field">
@@ -1188,8 +1159,11 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                       )}
 
                     {(isElementContentTab ||
+                      isElementLayoutTab ||
+                      isElementSpacingTab ||
                       isElementSettingsTab ||
-                      isElementTypographyTab) &&
+                      isElementTypographyTab ||
+                      isElementAdvancedTab) &&
                       selectedLayoutBlock &&
                       isLayoutContainerSection(selectedSection) && (
                       <>
@@ -1380,518 +1354,530 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                           )}
 
                                           {isSelectedBlock &&
-                                            isElementSettingsTab && (<>
-                                          <details className="builder-collapse">
-                                            <summary>
-                                              <span>Element appearance</span>
-                                              <small>
-                                                {block.panelStyle ??
-                                                  "default"}
-                                              </small>
-                                            </summary>
-                                            <label className="builder-field">
-                                              <span>Card Style</span>
-                                              <select
-                                                value={
-                                                  block.panelStyle ?? "default"
-                                                }
-                                                onChange={(event) =>
-                                                  updateSelectedLayoutBlock(
-                                                    index,
-                                                    blockIndex,
-                                                    {
-                                                      panelStyle: event.target
-                                                        .value as BuilderPanelStyle,
-                                                    },
-                                                  )
-                                                }
-                                              >
-                                                {panelStyleOptions.map(
-                                                  (option) => (
-                                                    <option
-                                                      key={option.value}
-                                                      value={option.value}
-                                                    >
-                                                      {option.label}
-                                                    </option>
-                                                  ),
+                                            isElementLayoutTab && (
+                                            <>
+                                              <details className="builder-collapse" open>
+                                                <summary>
+                                                  <span>Element layout</span>
+                                                  <small>
+                                                    {block.panelStyle ?? "default"}
+                                                  </small>
+                                                </summary>
+                                                <label className="builder-field">
+                                                  <span>Card Style</span>
+                                                  <select
+                                                    value={
+                                                      block.panelStyle ?? "default"
+                                                    }
+                                                    onChange={(event) =>
+                                                      updateSelectedLayoutBlock(
+                                                        index,
+                                                        blockIndex,
+                                                        {
+                                                          panelStyle: event.target
+                                                            .value as BuilderPanelStyle,
+                                                        },
+                                                      )
+                                                    }
+                                                  >
+                                                    {panelStyleOptions.map(
+                                                      (option) => (
+                                                        <option
+                                                          key={option.value}
+                                                          value={option.value}
+                                                        >
+                                                          {option.label}
+                                                        </option>
+                                                      ),
+                                                    )}
+                                                  </select>
+                                                </label>
+                                                <label className="builder-field">
+                                                  <span>Content Align</span>
+                                                  <select
+                                                    value={
+                                                      block.elementAlign ?? "left"
+                                                    }
+                                                    onChange={(event) =>
+                                                      updateSelectedLayoutBlock(
+                                                        index,
+                                                        blockIndex,
+                                                        {
+                                                          elementAlign: event
+                                                            .target
+                                                            .value as BuilderLayoutBlock["elementAlign"],
+                                                        },
+                                                      )
+                                                    }
+                                                  >
+                                                    <option value="left">Left</option>
+                                                    <option value="center">Center</option>
+                                                    <option value="right">Right</option>
+                                                  </select>
+                                                </label>
+                                              </details>
+
+                                              {block.kind === "hero" && (
+                                                <label className="builder-field">
+                                                  <span>Hero Variant</span>
+                                                  <select
+                                                    value={block.carouselSettings?.variant ?? "default"}
+                                                    onChange={(event) =>
+                                                      updateSelectedLayoutBlock(
+                                                        index,
+                                                        blockIndex,
+                                                        {
+                                                          carouselSettings: {
+                                                            ...(block.carouselSettings ?? {}),
+                                                            variant: event.target.value,
+                                                          },
+                                                        },
+                                                      )
+                                                    }
+                                                  >
+                                                    <option value="default">Default Hero Style</option>
+                                                    <option value="antigravity">Antigravity Canvas Background</option>
+                                                  </select>
+                                                </label>
+                                              )}
+                                            </>
+                                          )}
+
+                                          {isSelectedBlock &&
+                                            isElementSpacingTab && (
+                                            <>
+                                              <details className="builder-collapse" open>
+                                                <summary>
+                                                  <span>Element spacing</span>
+                                                  <small>
+                                                    {block.elementPadding ?? "none"}
+                                                  </small>
+                                                </summary>
+                                                <label className="builder-field">
+                                                  <span>Element Padding</span>
+                                                  <select
+                                                    value={
+                                                      block.elementPadding ??
+                                                      "none"
+                                                    }
+                                                    onChange={(event) =>
+                                                      updateSelectedLayoutBlock(
+                                                        index,
+                                                        blockIndex,
+                                                        {
+                                                          elementPadding: event
+                                                            .target
+                                                            .value as BuilderLayoutBlock["elementPadding"],
+                                                        },
+                                                      )
+                                                    }
+                                                  >
+                                                    {renderSpacingOptions("elementPadding")}
+                                                  </select>
+                                                </label>
+                                              </details>
+                                            </>
+                                          )}
+
+                                          {isSelectedBlock &&
+                                            isElementSettingsTab && (
+                                            <>
+                                              <details className="builder-collapse" open>
+                                                <summary>
+                                                  <span>Border radius</span>
+                                                  <small>
+                                                    {block.borderRadius === undefined
+                                                      ? "inherit"
+                                                      : block.borderRadius}
+                                                  </small>
+                                                </summary>
+                                                <label className="builder-field">
+                                                  <span>Card Border Radius</span>
+                                                  <select
+                                                    value={
+                                                      block.borderRadius === undefined
+                                                        ? "inherit"
+                                                        : [0, 4, 8, 12, 16, 24].includes(block.borderRadius)
+                                                          ? String(block.borderRadius)
+                                                          : "custom"
+                                                    }
+                                                    onChange={(event) => {
+                                                      const val = event.target.value;
+                                                      if (val === "inherit") {
+                                                        updateSelectedLayoutBlock(index, blockIndex, { borderRadius: undefined });
+                                                      } else if (val === "custom") {
+                                                        updateSelectedLayoutBlock(index, blockIndex, { borderRadius: 10 });
+                                                      } else {
+                                                        updateSelectedLayoutBlock(index, blockIndex, { borderRadius: Number(val) });
+                                                      }
+                                                    }}
+                                                  >
+                                                    <option value="inherit">Inherit (global settings)</option>
+                                                    <option value="0">Flat (0px)</option>
+                                                    <option value="4">Small (4px)</option>
+                                                    <option value="8">Medium (8px)</option>
+                                                    <option value="12">Rounded (12px)</option>
+                                                    <option value="16">Large (16px)</option>
+                                                    <option value="24">Extra Large (24px)</option>
+                                                    <option value="custom">Custom...</option>
+                                                  </select>
+                                                </label>
+                                                {block.borderRadius !== undefined && ![0, 4, 8, 12, 16, 24].includes(block.borderRadius) && (
+                                                  <label className="builder-field">
+                                                    <span>Custom Radius (px)</span>
+                                                    <input
+                                                      type="number"
+                                                      min={0}
+                                                      max={100}
+                                                      value={block.borderRadius}
+                                                      onChange={(event) => {
+                                                        const val = event.target.value === "" ? 0 : Number(event.target.value);
+                                                        updateSelectedLayoutBlock(index, blockIndex, { borderRadius: val });
+                                                      }}
+                                                    />
+                                                  </label>
                                                 )}
-                                              </select>
-                                            </label><label className="builder-field">
-                                               <span>Card Border Radius</span>
-                                               <select
-                                                 value={
-                                                   block.borderRadius === undefined
-                                                     ? "inherit"
-                                                     : [0, 4, 8, 12, 16, 24].includes(block.borderRadius)
-                                                       ? String(block.borderRadius)
-                                                       : "custom"
-                                                 }
-                                                 onChange={(event) => {
-                                                   const val = event.target.value;
-                                                   if (val === "inherit") {
-                                                     updateSelectedLayoutBlock(index, blockIndex, { borderRadius: undefined });
-                                                   } else if (val === "custom") {
-                                                     updateSelectedLayoutBlock(index, blockIndex, { borderRadius: 10 });
-                                                   } else {
-                                                     updateSelectedLayoutBlock(index, blockIndex, { borderRadius: Number(val) });
-                                                   }
-                                                 }}
-                                               >
-                                                 <option value="inherit">Inherit (global settings)</option>
-                                                 <option value="0">Flat (0px)</option>
-                                                 <option value="4">Small (4px)</option>
-                                                 <option value="8">Medium (8px)</option>
-                                                 <option value="12">Rounded (12px)</option>
-                                                 <option value="16">Large (16px)</option>
-                                                 <option value="24">Extra Large (24px)</option>
-                                                 <option value="custom">Custom...</option>
-                                               </select>
-                                             </label>
-                                             {block.borderRadius !== undefined && ![0, 4, 8, 12, 16, 24].includes(block.borderRadius) && (
-                                               <label className="builder-field">
-                                                 <span>Custom Radius (px)</span>
-                                                 <input
-                                                   type="number"
-                                                   min={0}
-                                                   max={100}
-                                                   value={block.borderRadius}
-                                                   onChange={(event) => {
-                                                     const val = event.target.value === "" ? 0 : Number(event.target.value);
-                                                     updateSelectedLayoutBlock(index, blockIndex, { borderRadius: val });
-                                                   }}
-                                                 />
-                                               </label>
-                                             )}
-                                            <label className="builder-field">
-                                              <span>Background Mode</span>
-                                              <select
-                                                value={
-                                                  block.elementBackgroundMode ??
-                                                  "default"
-                                                }
-                                                onChange={(event) =>
-                                                  updateSelectedLayoutBlock(
-                                                    index,
-                                                    blockIndex,
-                                                    {
-                                                      elementBackgroundMode:
-                                                        event.target
-                                                          .value as BuilderLayoutBlock["elementBackgroundMode"],
-                                                    },
-                                                  )
-                                                }
-                                              >
-                                                <option value="default">
-                                                  Use element default
-                                                </option>
-                                                <option value="transparent">
-                                                  Transparent
-                                                </option>
-                                                <option value="custom">
-                                                  Custom color
-                                                </option>
-                                              </select>
-                                            </label>
-                                            {block.elementBackgroundMode ===
-                                              "custom" && (
-                                              <label className="builder-field">
-                                                <span>Background</span>
-                                                <div className="builder-background-presets">
-                                                  {elementBackgroundPresets.map(
-                                                    (preset) => (
-                                                      <button
-                                                        key={preset.value}
-                                                        type="button"
-                                                        className={
-                                                          block.elementBackground?.toLowerCase() ===
-                                                          preset.value
-                                                            ? "is-active"
-                                                            : ""
+                                              </details>
+
+                                              <details className="builder-collapse" open>
+                                                <summary>
+                                                  <span>Card Background</span>
+                                                  <small>
+                                                    {block.elementBackgroundMode ?? "default"}
+                                                  </small>
+                                                </summary>
+                                                <label className="builder-field">
+                                                  <span>Background Mode</span>
+                                                  <select
+                                                    value={
+                                                      block.elementBackgroundMode ??
+                                                      "default"
+                                                    }
+                                                    onChange={(event) =>
+                                                      updateSelectedLayoutBlock(
+                                                        index,
+                                                        blockIndex,
+                                                        {
+                                                          elementBackgroundMode:
+                                                            event.target
+                                                              .value as BuilderLayoutBlock["elementBackgroundMode"],
+                                                        },
+                                                      )
+                                                    }
+                                                  >
+                                                    <option value="default">Use element default</option>
+                                                    <option value="transparent">Transparent</option>
+                                                    <option value="custom">Custom color</option>
+                                                  </select>
+                                                </label>
+                                                {block.elementBackgroundMode === "custom" && (
+                                                  <label className="builder-field">
+                                                    <span>Background</span>
+                                                    <div className="builder-background-presets">
+                                                      {elementBackgroundPresets.map(
+                                                        (preset) => (
+                                                          <button
+                                                            key={preset.value}
+                                                            type="button"
+                                                            className={
+                                                              block.elementBackground?.toLowerCase() ===
+                                                              preset.value
+                                                                ? "is-active"
+                                                                : ""
+                                                            }
+                                                            onClick={() =>
+                                                              updateSelectedLayoutBlock(
+                                                                index,
+                                                                blockIndex,
+                                                                {
+                                                                  elementBackground:
+                                                                    preset.value,
+                                                                },
+                                                              )
+                                                            }
+                                                          >
+                                                            <span
+                                                              style={{
+                                                                background:
+                                                                  preset.value,
+                                                              }}
+                                                            />
+                                                            {preset.label}
+                                                          </button>
+                                                        ),
+                                                      )}
+                                                    </div>
+                                                    <div className="builder-color-row">
+                                                      <input
+                                                        type="color"
+                                                        value={
+                                                          block.elementBackground ??
+                                                          "#ffffff"
                                                         }
-                                                        onClick={() =>
+                                                        onChange={(event) =>
                                                           updateSelectedLayoutBlock(
                                                             index,
                                                             blockIndex,
                                                             {
                                                               elementBackground:
-                                                                preset.value,
+                                                                event.target
+                                                                  .value,
+                                                            },
+                                                          )
+                                                        }
+                                                      />
+                                                      <input
+                                                        value={
+                                                          block.elementBackground ??
+                                                          "#ffffff"
+                                                        }
+                                                        onChange={(event) =>
+                                                          updateSelectedLayoutBlock(
+                                                            index,
+                                                            blockIndex,
+                                                            {
+                                                              elementBackground:
+                                                                event.target
+                                                                  .value,
+                                                            },
+                                                          )
+                                                        }
+                                                      />
+                                                    </div>
+                                                  </label>
+                                                )}
+                                              </details>
+
+                                              {block.kind === "hero" &&
+                                                block.carouselSettings?.variant === "antigravity" && (
+                                                  <details className="builder-collapse" open>
+                                                    <summary>
+                                                      <InspectorGroupSummary
+                                                        title="Antigravity Canvas settings"
+                                                        description="Control block-level particles and interactive grids."
+                                                        meta="block canvas"
+                                                      />
+                                                    </summary>
+
+                                                    <label className="builder-field">
+                                                      <span>Particle Speed</span>
+                                                      <div className="builder-range-row" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                        <input
+                                                          type="range"
+                                                          min="0.1"
+                                                          max="4.0"
+                                                          step="0.1"
+                                                          style={{ flex: 1 }}
+                                                          value={(block.carouselSettings as any)?.antigravitySpeed ?? 1.0}
+                                                          onChange={(event) =>
+                                                            updateSelectedLayoutBlock(
+                                                              index,
+                                                              blockIndex,
+                                                              {
+                                                                carouselSettings: {
+                                                                  ...(block.carouselSettings ?? {}),
+                                                                  antigravitySpeed: Number(event.target.value),
+                                                                },
+                                                              },
+                                                            )
+                                                          }
+                                                        />
+                                                        <span style={{ minWidth: '40px', textAlign: 'right' }}>{((block.carouselSettings as any)?.antigravitySpeed ?? 1.0).toFixed(1)}x</span>
+                                                      </div>
+                                                    </label>
+
+                                                    <label className="builder-field">
+                                                      <span>Particle Count</span>
+                                                      <div className="builder-range-row" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                        <input
+                                                          type="range"
+                                                          min="0"
+                                                          max="200"
+                                                          step="5"
+                                                          style={{ flex: 1 }}
+                                                          value={(block.carouselSettings as any)?.antigravityParticleCount ?? 40}
+                                                          onChange={(event) =>
+                                                            updateSelectedLayoutBlock(
+                                                              index,
+                                                              blockIndex,
+                                                              {
+                                                                carouselSettings: {
+                                                                  ...(block.carouselSettings ?? {}),
+                                                                  antigravityParticleCount: Number(event.target.value),
+                                                                },
+                                                              },
+                                                            )
+                                                          }
+                                                        />
+                                                        <span style={{ minWidth: '40px', textAlign: 'right' }}>{(block.carouselSettings as any)?.antigravityParticleCount ?? 40}</span>
+                                                      </div>
+                                                    </label>
+
+                                                    <label className="builder-field">
+                                                      <span>Glow Intensity</span>
+                                                      <div className="builder-range-row" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                        <input
+                                                          type="range"
+                                                          min="0.0"
+                                                          max="2.0"
+                                                          step="0.1"
+                                                          style={{ flex: 1 }}
+                                                          value={(block.carouselSettings as any)?.antigravityGlowIntensity ?? 0.4}
+                                                          onChange={(event) =>
+                                                            updateSelectedLayoutBlock(
+                                                              index,
+                                                              blockIndex,
+                                                              {
+                                                                carouselSettings: {
+                                                                  ...(block.carouselSettings ?? {}),
+                                                                  antigravityGlowIntensity: Number(event.target.value),
+                                                                },
+                                                              },
+                                                            )
+                                                          }
+                                                        />
+                                                        <span style={{ minWidth: '40px', textAlign: 'right' }}>{((block.carouselSettings as any)?.antigravityGlowIntensity ?? 0.4).toFixed(1)}</span>
+                                                      </div>
+                                                    </label>
+
+                                                    <label className="builder-field">
+                                                      <span>Grid Movement Speed</span>
+                                                      <div className="builder-range-row" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                        <input
+                                                          type="range"
+                                                          min="0.0"
+                                                          max="4.0"
+                                                          step="0.1"
+                                                          style={{ flex: 1 }}
+                                                          value={(block.carouselSettings as any)?.antigravityGridMoveSpeed ?? 1.0}
+                                                          onChange={(event) =>
+                                                            updateSelectedLayoutBlock(
+                                                              index,
+                                                              blockIndex,
+                                                              {
+                                                                carouselSettings: {
+                                                                  ...(block.carouselSettings ?? {}),
+                                                                  antigravityGridMoveSpeed: Number(event.target.value),
+                                                                },
+                                                              },
+                                                            )
+                                                          }
+                                                        />
+                                                        <span style={{ minWidth: '40px', textAlign: 'right' }}>{((block.carouselSettings as any)?.antigravityGridMoveSpeed ?? 1.0).toFixed(1)}x</span>
+                                                      </div>
+                                                    </label>
+
+                                                    <label className="builder-field">
+                                                      <span>Canvas Particle Color</span>
+                                                      <div className="builder-color-row" style={{ display: 'flex', gap: '8px' }}>
+                                                        <input
+                                                          type="color"
+                                                          value={(block.carouselSettings as any)?.antigravityColor ?? "#6366f1"}
+                                                          onChange={(event) =>
+                                                            updateSelectedLayoutBlock(
+                                                              index,
+                                                              blockIndex,
+                                                              {
+                                                                carouselSettings: {
+                                                                  ...(block.carouselSettings ?? {}),
+                                                                  antigravityColor: event.target.value,
+                                                                },
+                                                              },
+                                                            )
+                                                          }
+                                                        />
+                                                        <input
+                                                          style={{ flex: 1 }}
+                                                          value={(block.carouselSettings as any)?.antigravityColor ?? "#6366f1"}
+                                                          onChange={(event) =>
+                                                            updateSelectedLayoutBlock(
+                                                              index,
+                                                              blockIndex,
+                                                              {
+                                                                carouselSettings: {
+                                                                  ...(block.carouselSettings ?? {}),
+                                                                  antigravityColor: event.target.value,
+                                                                },
+                                                              },
+                                                            )
+                                                          }
+                                                        />
+                                                      </div>
+                                                    </label>
+
+                                                    <label className="builder-field">
+                                                      <span>Grid Density</span>
+                                                      <select
+                                                        value={(block.carouselSettings as any)?.antigravityGridDensity ?? "normal"}
+                                                        onChange={(event) =>
+                                                          updateSelectedLayoutBlock(
+                                                            index,
+                                                            blockIndex,
+                                                            {
+                                                              carouselSettings: {
+                                                                ...(block.carouselSettings ?? {}),
+                                                                antigravityGridDensity: event.target.value,
+                                                              },
                                                             },
                                                           )
                                                         }
                                                       >
-                                                        <span
-                                                          style={{
-                                                            background:
-                                                              preset.value,
-                                                          }}
-                                                        />
-                                                        {preset.label}
-                                                      </button>
-                                                    ),
-                                                  )}
-                                                </div>
-                                                <div className="builder-color-row">
-                                                  <input
-                                                    type="color"
-                                                    value={
-                                                      block.elementBackground ??
-                                                      "#ffffff"
-                                                    }
-                                                    onChange={(event) =>
-                                                      updateSelectedLayoutBlock(
-                                                        index,
-                                                        blockIndex,
-                                                        {
-                                                          elementBackground:
-                                                            event.target
-                                                              .value,
-                                                        },
-                                                      )
-                                                    }
-                                                  />
-                                                  <input
-                                                    value={
-                                                      block.elementBackground ??
-                                                      "#ffffff"
-                                                    }
-                                                    onChange={(event) =>
-                                                      updateSelectedLayoutBlock(
-                                                        index,
-                                                        blockIndex,
-                                                        {
-                                                          elementBackground:
-                                                            event.target
-                                                              .value,
-                                                        },
-                                                      )
-                                                    }
-                                                  />
-                                                </div>
-                                              </label>
-                                            )}
-                                            <label className="builder-field">
-                                              <span>Element Padding</span>
-                                              <select
-                                                value={
-                                                  block.elementPadding ??
-                                                  "none"
-                                                }
-                                                onChange={(event) =>
-                                                  updateSelectedLayoutBlock(
-                                                    index,
-                                                    blockIndex,
-                                                    {
-                                                      elementPadding: event
-                                                        .target
-                                                        .value as BuilderLayoutBlock["elementPadding"],
-                                                    },
-                                                  )
-                                                }
-                                              >
-                                                {renderSpacingOptions("elementPadding")}
-                                              </select>
-                                            </label>
-                                            <label className="builder-field">
-                                              <span>Content Align</span>
-                                              <select
-                                                value={
-                                                  block.elementAlign ?? "left"
-                                                }
-                                                onChange={(event) =>
-                                                  updateSelectedLayoutBlock(
-                                                    index,
-                                                    blockIndex,
-                                                    {
-                                                      elementAlign: event
-                                                        .target
-                                                        .value as BuilderLayoutBlock["elementAlign"],
-                                                    },
-                                                  )
-                                                }
-                                              >
-                                                <option value="left">
-                                                  Left
-                                                </option>
-                                                <option value="center">
-                                                  Center
-                                                </option>
-                                                <option value="right">
-                                                  Right
-                                                </option>
-                                              </select>
-                                            </label>
-                                          </details>
+                                                        <option value="sparse">Sparse</option>
+                                                        <option value="normal">Normal</option>
+                                                        <option value="compact">Compact</option>
+                                                      </select>
+                                                    </label>
 
-                                           {block.kind === "hero" && (
-                                             <label className="builder-field">
-                                               <span>Hero Variant</span>
-                                               <select
-                                                 value={block.carouselSettings?.variant ?? "default"}
-                                                 onChange={(event) =>
-                                                   updateSelectedLayoutBlock(
-                                                     index,
-                                                     blockIndex,
-                                                     {
-                                                       carouselSettings: {
-                                                         ...(block.carouselSettings ?? {}),
-                                                         variant: event.target.value,
-                                                       },
-                                                     },
-                                                   )
-                                                 }
-                                               >
-                                                 <option value="default">Default Hero Style</option>
-                                                 <option value="antigravity">Antigravity Canvas Background</option>
-                                               </select>
-                                             </label>
-                                           )}
+                                                    <label className="builder-check" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                      <input
+                                                        type="checkbox"
+                                                        checked={(block.carouselSettings as any)?.antigravityShowGrid !== false}
+                                                        onChange={(event) =>
+                                                          updateSelectedLayoutBlock(
+                                                            index,
+                                                            blockIndex,
+                                                            {
+                                                              carouselSettings: {
+                                                                ...(block.carouselSettings ?? {}),
+                                                                antigravityShowGrid: event.target.checked,
+                                                              },
+                                                            },
+                                                          )
+                                                        }
+                                                      />
+                                                      <span>Show Grid Lines</span>
+                                                    </label>
 
-                                           {block.kind === "hero" &&
-                                             block.carouselSettings?.variant === "antigravity" && (
-                                               <details className="builder-collapse" open>
-                                                 <summary>
-                                                   <InspectorGroupSummary
-                                                     title="Antigravity Canvas settings"
-                                                     description="Control block-level particles and interactive grids."
-                                                     meta="block canvas"
-                                                   />
-                                                 </summary>
+                                                    <label className="builder-check" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                      <input
+                                                        type="checkbox"
+                                                        checked={(block.carouselSettings as any)?.antigravityShowParticles !== false}
+                                                        onChange={(event) =>
+                                                          updateSelectedLayoutBlock(
+                                                            index,
+                                                            blockIndex,
+                                                            {
+                                                              carouselSettings: {
+                                                                ...(block.carouselSettings ?? {}),
+                                                                antigravityShowParticles: event.target.checked,
+                                                              },
+                                                            },
+                                                          )
+                                                        }
+                                                      />
+                                                      <span>Show Rising Particles</span>
+                                                    </label>
+                                                  </details>
+                                                )}
+                                            </>
+                                          )}
 
-                                                 <label className="builder-field">
-                                                   <span>Particle Speed</span>
-                                                   <div className="builder-range-row" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                                     <input
-                                                       type="range"
-                                                       min="0.1"
-                                                       max="4.0"
-                                                       step="0.1"
-                                                       style={{ flex: 1 }}
-                                                       value={(block.carouselSettings as any)?.antigravitySpeed ?? 1.0}
-                                                       onChange={(event) =>
-                                                         updateSelectedLayoutBlock(
-                                                           index,
-                                                           blockIndex,
-                                                           {
-                                                             carouselSettings: {
-                                                               ...(block.carouselSettings ?? {}),
-                                                               antigravitySpeed: Number(event.target.value),
-                                                             },
-                                                           },
-                                                         )
-                                                       }
-                                                     />
-                                                     <span style={{ minWidth: '40px', textAlign: 'right' }}>{((block.carouselSettings as any)?.antigravitySpeed ?? 1.0).toFixed(1)}x</span>
-                                                   </div>
-                                                 </label>
-
-                                                 <label className="builder-field">
-                                                   <span>Particle Count</span>
-                                                   <div className="builder-range-row" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                                     <input
-                                                       type="range"
-                                                       min="0"
-                                                       max="200"
-                                                       step="5"
-                                                       style={{ flex: 1 }}
-                                                       value={(block.carouselSettings as any)?.antigravityParticleCount ?? 40}
-                                                       onChange={(event) =>
-                                                         updateSelectedLayoutBlock(
-                                                           index,
-                                                           blockIndex,
-                                                           {
-                                                             carouselSettings: {
-                                                               ...(block.carouselSettings ?? {}),
-                                                               antigravityParticleCount: Number(event.target.value),
-                                                             },
-                                                           },
-                                                         )
-                                                       }
-                                                     />
-                                                     <span style={{ minWidth: '40px', textAlign: 'right' }}>{(block.carouselSettings as any)?.antigravityParticleCount ?? 40}</span>
-                                                   </div>
-                                                 </label>
-
-                                                 <label className="builder-field">
-                                                   <span>Glow Intensity</span>
-                                                   <div className="builder-range-row" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                                     <input
-                                                       type="range"
-                                                       min="0.0"
-                                                       max="2.0"
-                                                       step="0.1"
-                                                       style={{ flex: 1 }}
-                                                       value={(block.carouselSettings as any)?.antigravityGlowIntensity ?? 0.4}
-                                                       onChange={(event) =>
-                                                         updateSelectedLayoutBlock(
-                                                           index,
-                                                           blockIndex,
-                                                           {
-                                                             carouselSettings: {
-                                                               ...(block.carouselSettings ?? {}),
-                                                               antigravityGlowIntensity: Number(event.target.value),
-                                                             },
-                                                           },
-                                                         )
-                                                       }
-                                                     />
-                                                     <span style={{ minWidth: '40px', textAlign: 'right' }}>{((block.carouselSettings as any)?.antigravityGlowIntensity ?? 0.4).toFixed(1)}</span>
-                                                   </div>
-                                                 </label>
-
-                                                 <label className="builder-field">
-                                                   <span>Grid Movement Speed</span>
-                                                   <div className="builder-range-row" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                                     <input
-                                                       type="range"
-                                                       min="0.0"
-                                                       max="4.0"
-                                                       step="0.1"
-                                                       style={{ flex: 1 }}
-                                                       value={(block.carouselSettings as any)?.antigravityGridMoveSpeed ?? 1.0}
-                                                       onChange={(event) =>
-                                                         updateSelectedLayoutBlock(
-                                                           index,
-                                                           blockIndex,
-                                                           {
-                                                             carouselSettings: {
-                                                               ...(block.carouselSettings ?? {}),
-                                                               antigravityGridMoveSpeed: Number(event.target.value),
-                                                             },
-                                                           },
-                                                         )
-                                                       }
-                                                     />
-                                                     <span style={{ minWidth: '40px', textAlign: 'right' }}>{((block.carouselSettings as any)?.antigravityGridMoveSpeed ?? 1.0).toFixed(1)}x</span>
-                                                   </div>
-                                                 </label>
-
-                                                 <label className="builder-field">
-                                                   <span>Canvas Particle Color</span>
-                                                   <div className="builder-color-row" style={{ display: 'flex', gap: '8px' }}>
-                                                     <input
-                                                       type="color"
-                                                       value={(block.carouselSettings as any)?.antigravityColor ?? "#6366f1"}
-                                                       onChange={(event) =>
-                                                         updateSelectedLayoutBlock(
-                                                           index,
-                                                           blockIndex,
-                                                           {
-                                                             carouselSettings: {
-                                                               ...(block.carouselSettings ?? {}),
-                                                               antigravityColor: event.target.value,
-                                                             },
-                                                           },
-                                                         )
-                                                       }
-                                                     />
-                                                     <input
-                                                       style={{ flex: 1 }}
-                                                       value={(block.carouselSettings as any)?.antigravityColor ?? "#6366f1"}
-                                                       onChange={(event) =>
-                                                         updateSelectedLayoutBlock(
-                                                           index,
-                                                           blockIndex,
-                                                           {
-                                                             carouselSettings: {
-                                                               ...(block.carouselSettings ?? {}),
-                                                               antigravityColor: event.target.value,
-                                                             },
-                                                           },
-                                                         )
-                                                       }
-                                                     />
-                                                   </div>
-                                                 </label>
-
-                                                 <label className="builder-field">
-                                                   <span>Grid Density</span>
-                                                   <select
-                                                     value={(block.carouselSettings as any)?.antigravityGridDensity ?? "normal"}
-                                                     onChange={(event) =>
-                                                       updateSelectedLayoutBlock(
-                                                         index,
-                                                         blockIndex,
-                                                         {
-                                                           carouselSettings: {
-                                                             ...(block.carouselSettings ?? {}),
-                                                             antigravityGridDensity: event.target.value,
-                                                           },
-                                                         },
-                                                       )
-                                                     }
-                                                   >
-                                                     <option value="sparse">Sparse</option>
-                                                     <option value="normal">Normal</option>
-                                                     <option value="compact">Compact</option>
-                                                   </select>
-                                                 </label>
-
-
-                                                 <label className="builder-check" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                                   <input
-                                                     type="checkbox"
-                                                     checked={(block.carouselSettings as any)?.antigravityInteractive !== false}
-                                                     onChange={(event) =>
-                                                       updateSelectedLayoutBlock(
-                                                         index,
-                                                         blockIndex,
-                                                         {
-                                                           carouselSettings: {
-                                                             ...(block.carouselSettings ?? {}),
-                                                             antigravityInteractive: event.target.checked,
-                                                           },
-                                                         },
-                                                       )
-                                                     }
-                                                   />
-                                                   <span>Interactive Grid (Reacts to Mouse)</span>
-                                                 </label>
-
-                                                 <label className="builder-check" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                                   <input
-                                                     type="checkbox"
-                                                     checked={(block.carouselSettings as any)?.antigravityShowGrid !== false}
-                                                     onChange={(event) =>
-                                                       updateSelectedLayoutBlock(
-                                                         index,
-                                                         blockIndex,
-                                                         {
-                                                           carouselSettings: {
-                                                             ...(block.carouselSettings ?? {}),
-                                                             antigravityShowGrid: event.target.checked,
-                                                           },
-                                                         },
-                                                       )
-                                                     }
-                                                   />
-                                                   <span>Show Grid Lines</span>
-                                                 </label>
-
-                                                 <label className="builder-check" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                                   <input
-                                                     type="checkbox"
-                                                     checked={(block.carouselSettings as any)?.antigravityShowParticles !== false}
-                                                     onChange={(event) =>
-                                                       updateSelectedLayoutBlock(
-                                                         index,
-                                                         blockIndex,
-                                                         {
-                                                           carouselSettings: {
-                                                             ...(block.carouselSettings ?? {}),
-                                                             antigravityShowParticles: event.target.checked,
-                                                           },
-                                                         },
-                                                       )
-                                                     }
-                                                   />
-                                                   <span>Show Rising Particles</span>
-                                                 </label>
-                                               </details>
-                                             )}
-
-                                            {renderAnimationControls(block)}
-                                          </>)}
+                                          {isSelectedBlock &&
+                                            isElementAdvancedTab && (
+                                            <>
+                                              {renderAnimationControls(block)}
+                                            </>
+                                          )}
 
                                           {isSelectedBlock &&
                                             isElementContentTab && (

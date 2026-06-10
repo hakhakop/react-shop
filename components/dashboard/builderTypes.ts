@@ -79,19 +79,13 @@ export type SectionKind =
 export type PreviewDevice = "desktop" | "tablet" | "mobile";
 export type GlobalSectionSpacing = "none" | "small" | "medium" | "large";
 export type SectionSpacing = "inherit" | GlobalSectionSpacing;
-export type SectionInspectorTab =
-  | "section"
+export type InspectorTab =
+  | "content"
+  | "layout"
   | "spacing"
   | "style"
   | "typography"
-  | "advanced"
-  | "row";
-export type ElementInspectorTab =
-  | "content"
-  | "settings"
-  | "typography"
   | "advanced";
-export type InspectorTab = SectionInspectorTab | ElementInspectorTab;
 export type SidebarTab =
   | "elements"
   | "inspector"

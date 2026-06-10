@@ -1078,7 +1078,7 @@ export default function DashboardBuilder({
   const [draggingLayoutBlockKey, setDraggingLayoutBlockKey] = useState<
     string | null
   >(null);
-  const [inspectorTab, setInspectorTab] = useState<InspectorTab>("section");
+  const [inspectorTab, setInspectorTab] = useState<InspectorTab>("layout");
   const [inspectorOpen, setInspectorOpen] = useState(false);
   const [sectionSettingsOpen, setSectionSettingsOpen] = useState(false);
   const [sectionStructureOpen, setSectionStructureOpen] = useState(false);
@@ -1682,6 +1682,27 @@ export default function DashboardBuilder({
     }));
   };
 
+  const cycleSectionSpacing = (
+    sectionId: string,
+    field: "topSpacing" | "bottomSpacing" | "topMargin" | "bottomMargin",
+  ) => {
+    const cycleOrder: SectionSpacing[] = ["inherit", "none", "small", "medium", "large"];
+    setBuilderState((current) => ({
+      ...current,
+      sections: current.sections.map((section) => {
+        if (section.id !== sectionId) return section;
+        const currentVal = section[field] ?? "inherit";
+        const currentIndex = cycleOrder.indexOf(currentVal);
+        const nextIndex = (currentIndex + 1) % cycleOrder.length;
+        const nextVal = cycleOrder[nextIndex];
+        return {
+          ...section,
+          [field]: nextVal,
+        };
+      }),
+    }));
+  };
+
   const updateLayoutBlockByKey = (
     sectionId: string,
     columnKey: string,
@@ -2266,7 +2287,7 @@ export default function DashboardBuilder({
     setSelectedLayoutRowIndex(null);
     setSelectedLayoutBlockKey(null);
     openInspectorPanel();
-    setInspectorTab("section");
+    setInspectorTab("layout");
     setSectionSettingsOpen(true);
     setSectionStructureOpen(false);
     if (section && isLayoutContainerSection(section)) {
@@ -2297,7 +2318,7 @@ export default function DashboardBuilder({
     setSelectedLayoutColumnKey(columnKey);
     setSelectedLayoutBlockKey(null);
     setOpenLayoutItemId(columnKey);
-    setInspectorTab("section");
+    setInspectorTab("layout");
     openInspectorPanel();
   };
 
@@ -2323,7 +2344,7 @@ export default function DashboardBuilder({
     setSelectedLayoutBlockKey(null);
     setOpenLayoutItemId(null);
     setSectionStructureOpen(false);
-    setInspectorTab("row");
+    setInspectorTab("layout");
     openInspectorPanel();
   };
 
@@ -2358,7 +2379,7 @@ export default function DashboardBuilder({
       setSelectedLayoutColumnKey(null);
       setSelectedLayoutBlockKey(null);
       setOpenLayoutItemId(null);
-      setInspectorTab("row");
+      setInspectorTab("spacing");
       return;
     }
 
@@ -2367,7 +2388,7 @@ export default function DashboardBuilder({
       setSelectedLayoutColumnKey(target.columnKey);
       setSelectedLayoutBlockKey(null);
       setOpenLayoutItemId(target.columnKey);
-      setInspectorTab("section");
+      setInspectorTab("layout");
       setSectionSettingsOpen(true);
       return;
     }
@@ -2376,7 +2397,7 @@ export default function DashboardBuilder({
     setSelectedLayoutColumnKey(target.columnKey);
     setSelectedLayoutBlockKey(target.blockKey);
     setOpenLayoutItemId(target.columnKey);
-    setInspectorTab("settings");
+    setInspectorTab("spacing");
   };
 
   const updateSelectedSlide = (
@@ -3692,7 +3713,7 @@ export default function DashboardBuilder({
     setSelectedLayoutColumnKey(nextSelectedColumnKey);
     setSelectedLayoutBlockKey(null);
     setOpenLayoutItemId(nextSelectedColumnKey);
-    setInspectorTab("row");
+    setInspectorTab("layout");
     openInspectorPanel();
     setPublishStatus("Row duplicated");
   };
@@ -3733,7 +3754,7 @@ export default function DashboardBuilder({
     setSelectedLayoutColumnKey(null);
     setSelectedLayoutBlockKey(null);
     setOpenLayoutItemId(null);
-    setInspectorTab("row");
+    setInspectorTab("layout");
     openInspectorPanel();
     setPublishStatus("Row moved");
   };
@@ -4655,7 +4676,7 @@ export default function DashboardBuilder({
     setSelectedLayoutColumnKey(rowItems[0]?.id ?? null);
     setSelectedLayoutBlockKey(null);
     setOpenLayoutItemId(rowItems[0]?.id ?? null);
-    setInspectorTab("row");
+    setInspectorTab("layout");
     openInspectorPanel();
     setTemplateStatus("Row template inserted");
   };
@@ -6561,6 +6582,7 @@ export default function DashboardBuilder({
             onOpenSpacingSettings={openSpacingSettings}
             onSetSidebarTab={setSidebarTab}
             onOpenElementsPanel={openElementsPanel}
+            onCycleSectionSpacing={cycleSectionSpacing}
           />
         </div>
       </main>
@@ -6887,6 +6909,7 @@ function PreviewCanvas({
   onOpenSpacingSettings,
   onSetSidebarTab,
   onOpenElementsPanel,
+  onCycleSectionSpacing,
 }: {
 
   sections: BuilderSection[];
@@ -7100,6 +7123,10 @@ function PreviewCanvas({
     sectionId: string,
     fromIndex: number,
     toIndex: number,
+  ) => void;
+  onCycleSectionSpacing?: (
+    sectionId: string,
+    field: "topSpacing" | "bottomSpacing" | "topMargin" | "bottomMargin",
   ) => void;
 }) {
   const [sectionDragOverId, setSectionDragOverId] = useState<string | null>(null);
@@ -7401,6 +7428,7 @@ function PreviewCanvas({
                     shellSettings={shellSettings}
                     showZeroLabels={spacingOverlayEnabled}
                     onOpenSpacingSettings={onOpenSpacingSettings}
+                    onCycleSectionSpacing={onCycleSectionSpacing}
                   />
                 )}
                 {isSectionAntigravity && (
@@ -8305,11 +8333,16 @@ function SectionSpacingOverlay({
   shellSettings,
   showZeroLabels = false,
   onOpenSpacingSettings,
+  onCycleSectionSpacing,
 }: {
   section: BuilderSection;
   shellSettings: BuilderShellSettings;
   showZeroLabels?: boolean;
   onOpenSpacingSettings?: (target: SpacingInspectorTarget) => void;
+  onCycleSectionSpacing?: (
+    sectionId: string,
+    field: "topSpacing" | "bottomSpacing" | "topMargin" | "bottomMargin",
+  ) => void;
 }) {
   const topMargin = resolveSectionSpacingMeasurement(
     section.topMargin,
@@ -8359,7 +8392,14 @@ function SectionSpacingOverlay({
         {shouldShowSectionSpacingMeasurement(topMargin, showZeroLabels) ? (
           <SpacingGuideLabel
             className={`builder-preview-spacing-label builder-preview-spacing-label--margin builder-preview-spacing-label--source-${topMargin.source.toLowerCase()}`}
-            onClick={onOpenSpacingSettings ? () => onOpenSpacingSettings(marginTopTarget) : undefined}
+            style={{ left: "auto", right: "8px", bottom: "4px", top: "auto" }}
+            onClick={
+              onCycleSectionSpacing
+                ? () => onCycleSectionSpacing(section.id, "topMargin")
+                : onOpenSpacingSettings
+                  ? () => onOpenSpacingSettings(marginTopTarget)
+                  : undefined
+            }
           >
             mt {topMargin.displayLabel}
           </SpacingGuideLabel>
@@ -8369,7 +8409,14 @@ function SectionSpacingOverlay({
         {shouldShowSectionSpacingMeasurement(topPadding, showZeroLabels) ? (
           <SpacingGuideLabel
             className={`builder-preview-spacing-label builder-preview-spacing-label--padding builder-preview-spacing-label--source-${topPadding.source.toLowerCase()}`}
-            onClick={onOpenSpacingSettings ? () => onOpenSpacingSettings(paddingTopTarget) : undefined}
+            style={{ left: "auto", right: "8px", top: "4px", bottom: "auto" }}
+            onClick={
+              onCycleSectionSpacing
+                ? () => onCycleSectionSpacing(section.id, "topSpacing")
+                : onOpenSpacingSettings
+                  ? () => onOpenSpacingSettings(paddingTopTarget)
+                  : undefined
+            }
           >
             pt {topPadding.displayLabel}
           </SpacingGuideLabel>
@@ -8379,7 +8426,14 @@ function SectionSpacingOverlay({
         {shouldShowSectionSpacingMeasurement(bottomPadding, showZeroLabels) ? (
           <SpacingGuideLabel
             className={`builder-preview-spacing-label builder-preview-spacing-label--padding builder-preview-spacing-label--source-${bottomPadding.source.toLowerCase()}`}
-            onClick={onOpenSpacingSettings ? () => onOpenSpacingSettings(paddingBottomTarget) : undefined}
+            style={{ left: "8px", right: "auto", bottom: "4px", top: "auto" }}
+            onClick={
+              onCycleSectionSpacing
+                ? () => onCycleSectionSpacing(section.id, "bottomSpacing")
+                : onOpenSpacingSettings
+                  ? () => onOpenSpacingSettings(paddingBottomTarget)
+                  : undefined
+            }
           >
             pb {bottomPadding.displayLabel}
           </SpacingGuideLabel>
@@ -8389,7 +8443,14 @@ function SectionSpacingOverlay({
         {shouldShowSectionSpacingMeasurement(bottomMargin, showZeroLabels) ? (
           <SpacingGuideLabel
             className={`builder-preview-spacing-label builder-preview-spacing-label--margin builder-preview-spacing-label--source-${bottomMargin.source.toLowerCase()}`}
-            onClick={onOpenSpacingSettings ? () => onOpenSpacingSettings(marginBottomTarget) : undefined}
+            style={{ left: "8px", right: "auto", top: "4px", bottom: "auto" }}
+            onClick={
+              onCycleSectionSpacing
+                ? () => onCycleSectionSpacing(section.id, "bottomMargin")
+                : onOpenSpacingSettings
+                  ? () => onOpenSpacingSettings(marginBottomTarget)
+                  : undefined
+            }
           >
             mb {bottomMargin.displayLabel}
           </SpacingGuideLabel>
@@ -8444,11 +8505,13 @@ function SpacingGuideLabel({
   className,
   onClick,
   tabIndex,
+  style,
 }: {
   children: ReactNode;
   className: string;
   onClick?: () => void;
   tabIndex?: number;
+  style?: CSSProperties;
 }) {
   if (onClick) {
     return (
@@ -8457,12 +8520,13 @@ function SpacingGuideLabel({
         className={className}
         onClick={onClick}
         tabIndex={tabIndex ?? 0}
+        style={style}
       >
         {children}
       </button>
     );
   }
-  return <span className={className}>{children}</span>;
+  return <span className={className} style={style}>{children}</span>;
 }
 
 type SpacingInspectorTarget =
