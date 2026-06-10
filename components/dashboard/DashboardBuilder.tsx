@@ -10323,39 +10323,72 @@ if (section.kind === "embed") {
                           </ul>
                         </div>
                       ) : block.kind === "heading" ? (
-                        <div className={`shop-builder-column-block shop-builder-column-block--heading ${block.premiumCardStyle && block.premiumCardStyle !== "none" ? `shop-builder-card--${block.premiumCardStyle}` : ""}`}>
-                          <DashboardTypog
-                            as={block.headingLevel ?? "h2"}
-                            className={block.textGradientPreset && block.textGradientPreset !== "none" && block.textGradientPreset !== "custom" ? `text-gradient--${block.textGradientPreset}` : ""}
-                            typography={block.typography}
-                            style={{
-                              textAlign: block.headingAlign ?? "left",
-                              margin: 0,
-                              ...(block.textGradientPreset === "custom" ? {
-                                backgroundImage: `linear-gradient(${block.textGradientCustomAngle ?? 135}deg, ${block.textGradientCustomStart ?? "#ffffff"} ${block.textGradientCustomStartOffset ?? 0}%, ${block.textGradientCustomMiddle ?? "#60a5fa"} ${block.textGradientCustomMiddleOffset ?? 50}%, ${block.textGradientCustomEnd ?? "#c084fc"} ${block.textGradientCustomEndOffset ?? 100}%)`,
-                                WebkitBackgroundClip: "text",
-                                WebkitTextFillColor: "transparent",
-                                backgroundClip: "text",
-                                display: "inline-block",
-                              } : {})
-                            }}
-                          >
-                            {block.typewriterEnabled ? (
-                              <TypewriterText
-                                text={block.headingText ?? "Your Heading Text"}
-                                speed={block.typewriterSpeed}
-                                eraseSpeed={block.typewriterEraseSpeed}
-                                delay={block.typewriterDelay}
-                                loop={block.typewriterLoop}
-                                useGradient={block.typewriterUseGradient}
-                                gradientPreset={block.textGradientPreset ?? block.typewriterGradientPreset} customStart={block.textGradientCustomStart} customMiddle={block.textGradientCustomMiddle} customEnd={block.textGradientCustomEnd} customAngle={block.textGradientCustomAngle} customStartOffset={block.textGradientCustomStartOffset} customMiddleOffset={block.textGradientCustomMiddleOffset} customEndOffset={block.textGradientCustomEndOffset}
-                                typography={block.typography}
-                                area="title"
-                              />
-                            ) : (
-                              block.headingText ?? "Your Heading Text"
-                            )}
-                          </DashboardTypog>
+                        <div
+                          className={`shop-builder-column-block shop-builder-column-block--heading ${block.premiumCardStyle && block.premiumCardStyle !== "none" ? `shop-builder-card--${block.premiumCardStyle}` : ""}`}
+                          style={{ textAlign: block.headingAlign ?? "left" }}
+                        >
+                          {(() => {
+                            const Tag = block.headingLevel ?? "h2";
+                            const levelDefaults: Record<string, { fontSize: string; fontWeight: string; lineHeight: string }> = {
+                              h1: { fontSize: "clamp(42px, 8vw, 126px)", fontWeight: "760", lineHeight: "0.92" },
+                              h2: { fontSize: "clamp(32px, 5vw, 64px)", fontWeight: "700", lineHeight: "1.1" },
+                              h3: { fontSize: "clamp(24px, 4vw, 40px)", fontWeight: "700", lineHeight: "1.2" },
+                              h4: { fontSize: "clamp(20px, 3vw, 32px)", fontWeight: "600", lineHeight: "1.2" },
+                              h5: { fontSize: "20px", fontWeight: "600", lineHeight: "1.3" },
+                              h6: { fontSize: "16px", fontWeight: "600", lineHeight: "1.4" },
+                            };
+                            const defaultForLevel = levelDefaults[Tag] ?? levelDefaults.h2;
+
+                            const userTitleTyp = (block.typography as any)?.title ?? 
+                              (typeof block.typography === "object" && !(block.typography as any).title ? block.typography : {});
+
+                            const resolvedTypography = {
+                              variant: "heading",
+                              fontSize: userTitleTyp.fontSize || defaultForLevel.fontSize,
+                              fontWeight: userTitleTyp.fontWeight || defaultForLevel.fontWeight,
+                              lineHeight: userTitleTyp.lineHeight || defaultForLevel.lineHeight,
+                              fontFamily: userTitleTyp.fontFamily,
+                              letterSpacing: userTitleTyp.letterSpacing,
+                              color: userTitleTyp.color,
+                              textTransform: userTitleTyp.textTransform,
+                              textDecoration: userTitleTyp.textDecoration,
+                            };
+
+                            return (
+                              <DashboardTypog
+                                as={Tag}
+                                className={block.textGradientPreset && block.textGradientPreset !== "none" && block.textGradientPreset !== "custom" ? `text-gradient--${block.textGradientPreset}` : ""}
+                                typography={resolvedTypography}
+                                style={{
+                                  textAlign: block.headingAlign ?? "left",
+                                  margin: 0,
+                                  ...(block.textGradientPreset === "custom" ? {
+                                    backgroundImage: `linear-gradient(${block.textGradientCustomAngle ?? 135}deg, ${block.textGradientCustomStart ?? "#ffffff"} ${block.textGradientCustomStartOffset ?? 0}%, ${block.textGradientCustomMiddle ?? "#60a5fa"} ${block.textGradientCustomMiddleOffset ?? 50}%, ${block.textGradientCustomEnd ?? "#c084fc"} ${block.textGradientCustomEndOffset ?? 100}%)`,
+                                    WebkitBackgroundClip: "text",
+                                    WebkitTextFillColor: "transparent",
+                                    backgroundClip: "text",
+                                    display: "inline-block",
+                                  } : {})
+                                }}
+                              >
+                                {block.typewriterEnabled ? (
+                                  <TypewriterText
+                                    text={block.headingText ?? "Your Heading Text"}
+                                    speed={block.typewriterSpeed}
+                                    eraseSpeed={block.typewriterEraseSpeed}
+                                    delay={block.typewriterDelay}
+                                    loop={block.typewriterLoop}
+                                    useGradient={block.typewriterUseGradient}
+                                    gradientPreset={block.textGradientPreset ?? block.typewriterGradientPreset} customStart={block.textGradientCustomStart} customMiddle={block.textGradientCustomMiddle} customEnd={block.textGradientCustomEnd} customAngle={block.textGradientCustomAngle} customStartOffset={block.textGradientCustomStartOffset} customMiddleOffset={block.textGradientCustomMiddleOffset} customEndOffset={block.textGradientCustomEndOffset}
+                                    typography={resolvedTypography}
+                                    area="title"
+                                  />
+                                ) : (
+                                  block.headingText ?? "Your Heading Text"
+                                )}
+                              </DashboardTypog>
+                            );
+                          })()}
                         </div>
                       ) : block.kind === "datePicker" ? (
                         <div className="builder-preview-goodie builder-preview-goodie-date">

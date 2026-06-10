@@ -521,7 +521,7 @@
                 "id": "heading-block-mptr9rf9-s4u7w",
                 "kind": "heading",
                 "headingText": "Ինչ էք ստանում ",
-                "headingLevel": "h1",
+                "headingLevel": "h2",
                 "headingAlign": "center",
                 "typography": {
                   "variant": "body",
@@ -535,15 +535,14 @@
                   "title": {
                     "variant": "body",
                     "fontFamily": "inherit",
-                    "fontSize": "36px",
-                    "fontWeight": "700",
-                    "lineHeight": "1.4",
+                    "fontSize": "",
+                    "fontWeight": "800",
+                    "lineHeight": "1.8",
                     "letterSpacing": "0px",
-                    "color": "inherit",
-                    "textAlign": "center"
+                    "color": "inherit"
                   }
                 },
-                "typewriterEnabled": true,
+                "typewriterEnabled": false,
                 "textGradientPreset": "indigo-purple-cyan"
               },
               {
@@ -1126,7 +1125,7 @@
         ]
       }
     ],
-    "updatedAt": "2026-06-10T15:23:02.379Z"
+    "updatedAt": "2026-06-10T18:17:07.566Z"
   },
   "shop": {
     "version": 1,

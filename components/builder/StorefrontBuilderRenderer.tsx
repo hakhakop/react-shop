@@ -930,6 +930,7 @@ async function ContentProductsBlock({
         hiddenCategorySlugs={block.hiddenCategorySlugs}
         categoryTree={resolvedCategoryTree}
         activeCategorySlug={activeCategorySlug}
+        typography={block.typography}
       />
     </div>
   );
@@ -1679,6 +1680,31 @@ function ContentLayoutBlock({
 
   if (block.kind === "heading") {
     const Tag = block.headingLevel ?? "h2";
+    const levelDefaults: Record<string, { fontSize: string; fontWeight: string; lineHeight: string }> = {
+      h1: { fontSize: "clamp(42px, 8vw, 126px)", fontWeight: "760", lineHeight: "0.92" },
+      h2: { fontSize: "clamp(32px, 5vw, 64px)", fontWeight: "700", lineHeight: "1.1" },
+      h3: { fontSize: "clamp(24px, 4vw, 40px)", fontWeight: "700", lineHeight: "1.2" },
+      h4: { fontSize: "clamp(20px, 3vw, 32px)", fontWeight: "600", lineHeight: "1.2" },
+      h5: { fontSize: "20px", fontWeight: "600", lineHeight: "1.3" },
+      h6: { fontSize: "16px", fontWeight: "600", lineHeight: "1.4" },
+    };
+    const defaultForLevel = levelDefaults[Tag] ?? levelDefaults.h2;
+
+    const userTitleTyp = (block.typography as any)?.title ?? 
+      (typeof block.typography === "object" && !(block.typography as any).title ? block.typography : {});
+
+    const resolvedTypography = {
+      variant: "heading",
+      fontSize: userTitleTyp.fontSize || defaultForLevel.fontSize,
+      fontWeight: userTitleTyp.fontWeight || defaultForLevel.fontWeight,
+      lineHeight: userTitleTyp.lineHeight || defaultForLevel.lineHeight,
+      fontFamily: userTitleTyp.fontFamily,
+      letterSpacing: userTitleTyp.letterSpacing,
+      color: userTitleTyp.color,
+      textTransform: userTitleTyp.textTransform,
+      textDecoration: userTitleTyp.textDecoration,
+    };
+
     const isGradient = block.textGradientPreset && block.textGradientPreset !== "none";
     const isCustom = block.textGradientPreset === "custom";
     const titleClassName = isGradient && !isCustom ? `text-gradient--${block.textGradientPreset}` : "";
@@ -1690,11 +1716,14 @@ function ContentLayoutBlock({
       display: "inline-block",
     } : {};
     return (
-      <div className={`shop-builder-column-block shop-builder-column-block--heading ${block.premiumCardStyle && block.premiumCardStyle !== "none" ? `shop-builder-card--${block.premiumCardStyle}` : ""}`}>
+      <div
+        className={`shop-builder-column-block shop-builder-column-block--heading ${block.premiumCardStyle && block.premiumCardStyle !== "none" ? `shop-builder-card--${block.premiumCardStyle}` : ""}`}
+        style={{ textAlign: block.headingAlign ?? "left" }}
+      >
         <Typog
           as={Tag}
           className={titleClassName}
-          typography={block.typography}
+          typography={resolvedTypography}
           style={{ textAlign: block.headingAlign ?? "left", margin: 0, ...customStyle }}
         >
           {block.typewriterEnabled ? (
@@ -1706,7 +1735,7 @@ function ContentLayoutBlock({
               loop={block.typewriterLoop}
               useGradient={block.typewriterUseGradient}
               gradientPreset={block.textGradientPreset ?? block.typewriterGradientPreset} customStart={block.textGradientCustomStart} customMiddle={block.textGradientCustomMiddle} customEnd={block.textGradientCustomEnd} customAngle={block.textGradientCustomAngle} customStartOffset={block.textGradientCustomStartOffset} customMiddleOffset={block.textGradientCustomMiddleOffset} customEndOffset={block.textGradientCustomEndOffset}
-              typography={block.typography}
+              typography={resolvedTypography}
               area="title"
             />
           ) : (

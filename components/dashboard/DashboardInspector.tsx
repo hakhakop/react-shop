@@ -53,6 +53,26 @@ import {
   type BuilderSpacingContext,
 } from "@/lib/builderSpacing";
 import type { CategoryTreeItem } from "@/lib/categories";
+import type { TypographyArea } from "@/lib/builderTypography";
+
+const getSupportedTypographyAreas = (kind: string): readonly TypographyArea[] => {
+  if (kind === "heading") return ["title"] as const;
+  if (kind === "text") return ["body"] as const;
+  if (kind === "button") return ["button"] as const;
+  if (kind === "datePicker") return ["title", "body"] as const;
+  if (kind === "list") return ["body"] as const;
+  if (kind === "table") return ["body"] as const;
+  if (
+    kind === "image" ||
+    kind === "icon" ||
+    kind === "fluentForm" ||
+    kind === "embed" ||
+    kind === "breadcrumbs"
+  ) {
+    return [] as const;
+  }
+  return ["title", "body", "button", "eyebrow"] as const;
+};
 
 // Inspector handlers mirror the lifted builder callbacks during this JSX-only extraction.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -355,15 +375,22 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
   const isSelectedRowEmpty =
     selectedLayoutRow?.items.every((item) => (item.blocks ?? []).length === 0) ??
     false;
+  const supportedAreas = selectedLayoutBlock
+    ? getSupportedTypographyAreas(selectedLayoutBlock.kind ?? "text")
+    : [];
+  const blockTabs: [InspectorTab, string][] = [
+    ["content", "Content"],
+    ["layout", "Layout"],
+    ["spacing", "Spacing"],
+    ["style", "Styling"],
+  ];
+  if (supportedAreas.length > 0) {
+    blockTabs.push(["typography", "Typography"]);
+  }
+  blockTabs.push(["advanced", "Advanced"]);
+
   const inspectorTabs: [InspectorTab, string][] = selectedLayoutBlock
-    ? [
-        ["content", "Content"],
-        ["layout", "Layout"],
-        ["spacing", "Spacing"],
-        ["style", "Styling"],
-        ["typography", "Typography"],
-        ["advanced", "Advanced"],
-      ]
+    ? blockTabs
     : selectedLayoutRow
       ? [
           ["layout", "Layout"],
@@ -477,6 +504,10 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
 
   useEffect(() => {
     if (selectedLayoutBlock) {
+      const supported = getSupportedTypographyAreas(selectedLayoutBlock.kind ?? "text");
+      if (supported.length === 0 && inspectorTab === "typography") {
+        setInspectorTab("content");
+      }
       return;
     }
     if (selectedLayoutRow) {
@@ -491,9 +522,10 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
   }, [inspectorTab, selectedLayoutBlock, selectedLayoutRow, setInspectorTab]);
 
   const activeTypographyArea =
-    activeTypographyAreaState.blockKey === selectedLayoutBlockKey
+    activeTypographyAreaState.blockKey === selectedLayoutBlockKey &&
+    supportedAreas.includes(activeTypographyAreaState.area)
       ? activeTypographyAreaState.area
-      : "title";
+      : supportedAreas[0] ?? "title";
   const styleTarget = selectedLayoutBlock
     ? {
         visualStyle: selectedLayoutBlock.visualStyle,
@@ -1274,35 +1306,35 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                           {isSelectedBlock &&
                                             isElementTypographyTab && (
                                             <div className="builder-element-typography-panel">
-                                              <div className="builder-style-preset-row builder-typography-area-tabs">
-                                                {(
-                                                  [
-                                                    ["title", "Title"],
-                                                    ["body", "Body"],
-                                                    ["button", "Button"],
-                                                    ["eyebrow", "Eyebrow"],
-                                                  ] as const
-                                                ).map(([area, label]) => (
-                                                  <button
-                                                    key={area}
-                                                    type="button"
-                                                    className={
-                                                      activeTypographyArea === area
-                                                        ? "is-active"
-                                                        : ""
-                                                    }
-                                                    onClick={() =>
-                                                      setActiveTypographyAreaState({
-                                                        area,
-                                                        blockKey:
-                                                          selectedLayoutBlockKey,
-                                                      })
-                                                    }
-                                                  >
-                                                    {label}
-                                                  </button>
-                                                ))}
-                                              </div>
+                                              {supportedAreas.length > 1 && (
+                                                <div className="builder-style-preset-row builder-typography-area-tabs">
+                                                  {supportedAreas.map((area) => (
+                                                    <button
+                                                      key={area}
+                                                      type="button"
+                                                      className={
+                                                        activeTypographyArea === area
+                                                          ? "is-active"
+                                                          : ""
+                                                      }
+                                                      onClick={() =>
+                                                        setActiveTypographyAreaState({
+                                                          area,
+                                                          blockKey:
+                                                            selectedLayoutBlockKey,
+                                                        })
+                                                      }
+                                                    >
+                                                      {{
+                                                        title: "Title",
+                                                        body: "Body",
+                                                        button: "Button",
+                                                        eyebrow: "Eyebrow",
+                                                      }[area]}
+                                                    </button>
+                                                  ))}
+                                                </div>
+                                              )}
                                               <div className="builder-typography-area-panel">
                                                 <span className="builder-typography-area-label">
                                                   {activeTypographyArea === "title"
@@ -1315,8 +1347,8 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                         : "Eyebrow typography"}
                                                 </span>
                                                 <TypographyPanel
-                                                  value={
-                                                    activeTypographyArea === "title"
+                                                  value={{
+                                                    ...(activeTypographyArea === "title"
                                                       ? (block.typography as any)
                                                           ?.title ??
                                                         (typeof block.typography ===
@@ -1334,22 +1366,37 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                           ? (block.typography as any)
                                                               ?.button
                                                           : (block.typography as any)
-                                                              ?.eyebrow
-                                                  }
-                                                  onChange={(t) =>
+                                                              ?.eyebrow),
+                                                    ...(block.kind === "heading" && activeTypographyArea === "title"
+                                                      ? { textAlign: block.headingAlign ?? "left" }
+                                                      : {}),
+                                                  }}
+                                                  onChange={(t) => {
+                                                    const { textAlign, ...tRest } = t;
+                                                    const patch: any = {
+                                                      typography: {
+                                                        ...((block.typography as any) ??
+                                                          {}),
+                                                        [activeTypographyArea]:
+                                                          block.kind === "heading" &&
+                                                          activeTypographyArea === "title"
+                                                            ? tRest
+                                                            : t,
+                                                      },
+                                                    };
+                                                    if (
+                                                      block.kind === "heading" &&
+                                                      activeTypographyArea === "title" &&
+                                                      textAlign
+                                                    ) {
+                                                      patch.headingAlign = textAlign;
+                                                    }
                                                     updateSelectedLayoutBlock(
                                                       index,
                                                       blockIndex,
-                                                      {
-                                                        typography: {
-                                                          ...((block.typography as any) ??
-                                                            {}),
-                                                          [activeTypographyArea]:
-                                                            t,
-                                                        },
-                                                      },
-                                                    )
-                                                  }
+                                                      patch,
+                                                    );
+                                                  }}
                                                 />
                                               </div>
                                             </div>
@@ -5324,13 +5371,37 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                   <span>Level</span>
                                                   <select
                                                     value={block.headingLevel ?? "h2"}
-                                                    onChange={(event) =>
+                                                    onChange={(event) => {
+                                                      const newLevel = event.target.value as "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
+                                                      const currentTyp = block.typography ?? {};
+                                                      let updatedTyp = { ...currentTyp };
+                                                      if ((updatedTyp as any).title) {
+                                                        updatedTyp = {
+                                                          ...updatedTyp,
+                                                          title: {
+                                                            ...((updatedTyp as any).title ?? {}),
+                                                            fontSize: "",
+                                                            fontWeight: "",
+                                                            lineHeight: "",
+                                                          }
+                                                        };
+                                                      } else {
+                                                        updatedTyp = {
+                                                          ...updatedTyp,
+                                                          fontSize: "",
+                                                          fontWeight: "",
+                                                          lineHeight: "",
+                                                        };
+                                                      }
                                                       updateSelectedLayoutBlock(
                                                         index,
                                                         blockIndex,
-                                                        { headingLevel: event.target.value as "h1" | "h2" | "h3" | "h4" | "h5" | "h6" },
-                                                      )
-                                                    }
+                                                        {
+                                                          headingLevel: newLevel,
+                                                          typography: updatedTyp,
+                                                        },
+                                                      );
+                                                    }}
                                                   >
                                                     <option value="h1">H1</option>
                                                     <option value="h2">H2</option>
@@ -5339,23 +5410,6 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                     <option value="h5">H5</option>
                                                     <option value="h6">H6</option>
                                                   </select>
-                                                </label>
-                                                <label className="builder-field">
-                                                <span>Alignment</span>
-                                                <select
-                                                value={block.headingAlign ?? "left"}
-                                                onChange={(event) =>
-                                                updateSelectedLayoutBlock(
-                                                index,
-                                                blockIndex,
-                                                { headingAlign: event.target.value as "left" | "center" | "right" },
-                                                )
-                                                }
-                                                >
-                                                <option value="left">Left</option>
-                                                <option value="center">Center</option>
-                                                <option value="right">Right</option>
-                                                </select>
                                                 </label>
 
                                                 <label className="builder-field">

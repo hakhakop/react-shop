@@ -520,7 +520,13 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
       headingText: "Your Heading Text",
       headingLevel: "h2",
       headingAlign: "left",
-      typography: defaultTypography,
+      typography: {
+        ...defaultTypography,
+        variant: "heading",
+        fontSize: "",
+        fontWeight: "",
+        lineHeight: "",
+      },
     };
   }
 
