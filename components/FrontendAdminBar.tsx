@@ -9,8 +9,14 @@ const PRODUCT_EDIT_EVENT = "react-shop:product-edit-target";
 
 function isLocalHost() {
   if (typeof window === "undefined") return false;
+  const hostname = window.location.hostname;
   return (
-    ["localhost", "127.0.0.1", "::1"].includes(window.location.hostname) ||
+    process.env.NODE_ENV === "development" ||
+    ["localhost", "127.0.0.1", "::1"].includes(hostname) ||
+    hostname.endsWith(".local") ||
+    hostname.startsWith("192.168.") ||
+    hostname.startsWith("10.") ||
+    hostname.startsWith("172.") ||
     process.env.NEXT_PUBLIC_SHOW_FRONTEND_ADMIN_BAR === "true"
   );
 }

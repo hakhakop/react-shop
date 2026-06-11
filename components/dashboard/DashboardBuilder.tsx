@@ -7306,7 +7306,7 @@ function PreviewCanvas({
             );
             const isSelected = selectedId === section.id;
             const animationAttrs = previewAnimationAttrs(section.animation);
-            const isSectionAntigravity = section.backgroundEffect === "antigravity" || (section.kind === "hero" && section.carouselSettings?.variant === "antigravity");
+            const isSectionAntigravity = section.backgroundEffect === "antigravity";
             const isFullTheme = isSectionAntigravity && (section.antigravityVisualMode === undefined || section.antigravityVisualMode === "full");
 
             return (
@@ -9289,6 +9289,7 @@ function PreviewSection({
               hiddenCategorySlugs={section.hiddenCategorySlugs}
               categoryTree={previewCategoryTree}
               typography={section.typography}
+              pagination={section.pagination}
             />
           )
         ) : (
@@ -10111,7 +10112,7 @@ if (section.kind === "embed") {
                                 className={`builder-preview-cta ${
                                   block.premiumButtonStyle && block.premiumButtonStyle !== "default"
                                     ? `shop-builder-cta--${block.premiumButtonStyle}`
-                                    : ""
+                                    : `builder-preview-cta--${block.buttonStyle ?? "primary"}`
                                 }`}
                                 typography={block.typography}
                               >
@@ -10413,39 +10414,6 @@ if (section.kind === "embed") {
                         </div>
                       ) : block.kind === "hero" ? (
                         <div className={`shop-builder-column-block shop-builder-column-block--hero ${block.carouselSettings?.variant === "antigravity" ? "shop-builder-hero--antigravity shop-builder-hero--antigravity-block" : ""} ${block.premiumCardStyle && block.premiumCardStyle !== "none" ? `shop-builder-card--${block.premiumCardStyle}` : ""}`}>
-                          {block.carouselSettings?.variant === "antigravity" && (
-                            <>
-                              <AntigravityCanvas
-                                speed={(block.carouselSettings as any)?.antigravitySpeed}
-                                particleCount={(block.carouselSettings as any)?.antigravityParticleCount}
-                                color={(block.carouselSettings as any)?.antigravityColor}
-                                gridDensity={(block.carouselSettings as any)?.antigravityGridDensity as any}
-                                interactive={(block.carouselSettings as any)?.antigravityInteractive}
-                                showGrid={(block.carouselSettings as any)?.antigravityShowGrid}
-                                showParticles={(block.carouselSettings as any)?.antigravityShowParticles}
-                                gridMoveSpeed={(block.carouselSettings as any)?.antigravityGridMoveSpeed}
-                                glowIntensity={(block.carouselSettings as any)?.antigravityGlowIntensity}
-                              />
-                              {((block.carouselSettings as any)?.antigravityShowGrid !== false) && (
-                                <div
-                                  className="antigravity-grid-overlay"
-                                  aria-hidden="true"
-                                  style={
-                                    (block.carouselSettings as any)?.antigravityGridMoveSpeed !== undefined || (block.carouselSettings as any)?.antigravityColor
-                                      ? {
-                                          animationDuration: (block.carouselSettings as any)?.antigravityGridMoveSpeed === 0
-                                            ? "0s"
-                                            : `${25 / ((block.carouselSettings as any)?.antigravityGridMoveSpeed ?? 1.0)}s`,
-                                          backgroundImage: (block.carouselSettings as any)?.antigravityColor
-                                            ? `linear-gradient(${(block.carouselSettings as any)?.antigravityColor}08 1px, transparent 1px), linear-gradient(90deg, ${(block.carouselSettings as any)?.antigravityColor}08 1px, transparent 1px)`
-                                            : undefined,
-                                        }
-                                      : undefined
-                                  }
-                                />
-                              )}
-                            </>
-                          )}
                           <div className={block.carouselSettings?.variant === "antigravity" ? "shop-builder-hero-content-left" : ""}>
                           {block.eyebrow && (
                             <InlineEditableText
@@ -10540,7 +10508,7 @@ if (section.kind === "embed") {
                                     ? `shop-builder-cta--${block.premiumButtonStyle}`
                                     : block.carouselSettings?.variant === "antigravity"
                                       ? "shop-builder-cta--antigravity"
-                                      : ""
+                                      : `builder-preview-cta--${block.buttonStyle ?? "primary"}`
                                 }`}
                                 typography={block.typography}
                               >
@@ -10959,10 +10927,11 @@ if (section.kind === "embed") {
                                 } shop-card-preset--${block.panelStyle ?? "default"}`}
                               >
                                 <CategoryWithFilters
-                                  products={previewProducts.slice(
-                                    0,
-                                    block.gridLimit ?? 4,
-                                  )}
+                                  products={
+                                    (block.pagination?.enabled ?? false)
+                                      ? previewProducts
+                                      : previewProducts.slice(0, block.gridLimit ?? 4)
+                                  }
                                   columns={block.columns}
                                   filterPosition={block.filterPosition}
                                   cardStyle={block.cardStyle}
@@ -10980,6 +10949,7 @@ if (section.kind === "embed") {
                                   hiddenCategorySlugs={block.hiddenCategorySlugs}
                                   categoryTree={previewCategoryTree}
                                   typography={block.typography}
+                                  pagination={block.pagination}
                                 />
                               </div>
                             )

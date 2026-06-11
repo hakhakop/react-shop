@@ -45,6 +45,13 @@ type Props = {
   addToCartVisibility?: string | null;
   addToCartDisplay?: string | null;
   hiddenCategorySlugs?: string[] | null;
+  pagination?: {
+    enabled: boolean;
+    perPage: number;
+    mode: "pageNumbers" | "loadMore" | "infinite";
+    infiniteScroll?: boolean;
+    style?: "standard" | "solid" | "minimal" | "rounded";
+  } | null;
 };
 
 type CategoryFilterNode = {
@@ -195,6 +202,60 @@ function normalizeAttributeNode(
   };
 }
 
+const InfiniteScrollTrigger = ({
+  onLoadMore,
+  hasMore,
+}: {
+  onLoadMore: () => void;
+  hasMore: boolean;
+}) => {
+  const triggerRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (!hasMore) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          onLoadMore();
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    const currentTrigger = triggerRef.current;
+    if (currentTrigger) {
+      observer.observe(currentTrigger);
+    }
+
+    return () => {
+      if (currentTrigger) {
+        observer.unobserve(currentTrigger);
+      }
+    };
+  }, [onLoadMore, hasMore]);
+
+  return (
+    <div
+      ref={triggerRef}
+      style={{
+        height: "60px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        width: "100%",
+        marginTop: "20px",
+      }}
+    >
+      {hasMore && (
+        <div className="animate-pulse text-sm text-slate-400">
+          Loading more products...
+        </div>
+      )}
+    </div>
+  );
+};
+
 export default function CategoryWithFilters({
   products,
   categoryTree = [],
@@ -215,6 +276,7 @@ export default function CategoryWithFilters({
   addToCartDisplay,
   hiddenCategorySlugs,
   typography,
+  pagination,
 }: Props) {
   const [searchTerm, setSearchTerm] = useState("");
   const [minPrice, setMinPrice] = useState("");
@@ -237,10 +299,15 @@ export default function CategoryWithFilters({
 
   // simple client-side pagination
   const [currentPage, setCurrentPage] = useState(1);
+  const isPaginationEnabled = pagination ? pagination.enabled : true;
+  const paginationPerPage = pagination?.perPage ?? pageSize ?? 12;
   const normalizedPageSize =
-    typeof pageSize === "number" && pageSize >= 4 && pageSize <= 48
-      ? Math.round(pageSize)
+    typeof paginationPerPage === "number" && paginationPerPage >= 4 && paginationPerPage <= 48
+      ? Math.round(paginationPerPage)
       : 12;
+
+  const paginationMode = pagination?.mode ?? "pageNumbers";
+  const paginationStyle = pagination?.style ?? "standard";
 
   const [viewMode, setViewMode] = useState<"default" | "compact" | "list">(
     "default",
@@ -722,18 +789,24 @@ export default function CategoryWithFilters({
 
   // pagination derived from filtered products
   const total = filteredProducts.length;
-  const pageCount = Math.max(1, Math.ceil(total / normalizedPageSize));
-  const safePage = Math.min(currentPage, pageCount);
-  const start = (safePage - 1) * normalizedPageSize;
-  const end = start + normalizedPageSize;
-  const paginatedProducts = filteredProducts.slice(start, end);
+  const isPaginationActive = isPaginationEnabled && total > 0;
+  const pageCount = isPaginationActive ? Math.max(1, Math.ceil(total / normalizedPageSize)) : 1;
+  const safePage = isPaginationActive ? Math.min(currentPage, pageCount) : 1;
+
+  // Slice products based on mode
+  const displayStart = (paginationMode === "loadMore" || paginationMode === "infinite") ? 0 : (safePage - 1) * normalizedPageSize;
+  const end = (paginationMode === "loadMore" || paginationMode === "infinite")
+    ? Math.min(currentPage * normalizedPageSize, total)
+    : displayStart + normalizedPageSize;
+  
+  const paginatedProducts = isPaginationActive ? filteredProducts.slice(displayStart, end) : filteredProducts;
 
   function goToPage(page: number) {
     const p = Math.min(Math.max(1, page), pageCount);
     setCurrentPage(p);
   }
 
-  const showingFrom = total === 0 ? 0 : start + 1;
+  const showingFrom = total === 0 ? 0 : displayStart + 1;
   const showingTo = Math.min(end, total);
   const selectedAttributeCount = Object.values(selectedAttributes).reduce(
     (sum, values) => sum + values.length,
@@ -746,6 +819,7 @@ export default function CategoryWithFilters({
     (minPrice || maxPrice ? 1 : 0);
   return (
     <div
+      data-view-mode={viewMode}
       className={`shop-filter-layout shop-filter-layout--${normalizedFilterPosition} shop-card-style--${normalizedCardStyle} shop-card-preset--${normalizedCardPreset} shop-cart-button--${normalizedCartStyle} shop-cart-size--${normalizedCartSize} shop-cart-position--${normalizedCartPosition} shop-cart-visibility--${normalizedCartVisibility} shop-cart-display--${normalizedCartDisplay} shop-image-padding--${
         imagePadding === "frameless" || imagePadding === "none"
           ? "none"
@@ -1273,41 +1347,65 @@ export default function CategoryWithFilters({
             </div>
 
             {/* Pagination controls */}
-            {pageCount > 1 && (
-              <div className="shop-pagination">
-                <button
-                  type="button"
-                  onClick={() => goToPage(safePage - 1)}
-                  disabled={safePage === 1}
-                >
-                  <ChevronLeft size={15} aria-hidden="true" />
-                  Prev
-                </button>
-
-                {Array.from({ length: pageCount }).map((_, i) => {
-                  const pageNumber = i + 1;
-                  const active = pageNumber === safePage;
-                  return (
+            {isPaginationEnabled && pageCount > 1 && (
+              <>
+                {paginationMode === "pageNumbers" && (
+                  <div className={`shop-pagination shop-pagination--${paginationStyle}`}>
                     <button
-                      key={pageNumber}
                       type="button"
-                      className={active ? "is-active" : ""}
-                      onClick={() => goToPage(pageNumber)}
+                      className="shop-pagination-nav"
+                      onClick={() => goToPage(safePage - 1)}
+                      disabled={safePage === 1}
                     >
-                      {pageNumber}
+                      <ChevronLeft size={15} aria-hidden="true" />
+                      Prev
                     </button>
-                  );
-                })}
 
-                <button
-                  type="button"
-                  onClick={() => goToPage(safePage + 1)}
-                  disabled={safePage === pageCount}
-                >
-                  Next
-                  <ChevronRight size={15} aria-hidden="true" />
-                </button>
-              </div>
+                    {Array.from({ length: pageCount }).map((_, i) => {
+                      const pageNumber = i + 1;
+                      const active = pageNumber === safePage;
+                      return (
+                        <button
+                          key={pageNumber}
+                          type="button"
+                          className={`shop-pagination-number ${active ? "is-active" : ""}`}
+                          onClick={() => goToPage(pageNumber)}
+                        >
+                          {pageNumber}
+                        </button>
+                      );
+                    })}
+
+                    <button
+                      type="button"
+                      className="shop-pagination-nav"
+                      onClick={() => goToPage(safePage + 1)}
+                      disabled={safePage === pageCount}
+                    >
+                      Next
+                      <ChevronRight size={15} aria-hidden="true" />
+                    </button>
+                  </div>
+                )}
+
+                {paginationMode === "loadMore" && safePage < pageCount && (
+                  <div className={`shop-load-more-container shop-load-more-container--${paginationStyle}`}>
+                    <button
+                      type="button"
+                      onClick={() => goToPage(safePage + 1)}
+                    >
+                      Load More
+                    </button>
+                  </div>
+                )}
+
+                {paginationMode === "infinite" && safePage < pageCount && (
+                  <InfiniteScrollTrigger
+                    onLoadMore={() => goToPage(safePage + 1)}
+                    hasMore={safePage < pageCount}
+                  />
+                )}
+              </>
             )}
           </>
         )}

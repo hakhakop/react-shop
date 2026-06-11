@@ -1697,227 +1697,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                 )}
                                               </details>
 
-                                              {block.kind === "hero" &&
-                                                block.carouselSettings?.variant === "antigravity" && (
-                                                  <details className="builder-collapse" open>
-                                                    <summary>
-                                                      <InspectorGroupSummary
-                                                        title="Antigravity Canvas settings"
-                                                        description="Control block-level particles and interactive grids."
-                                                        meta="block canvas"
-                                                      />
-                                                    </summary>
-
-                                                    <label className="builder-field">
-                                                      <span>Particle Speed</span>
-                                                      <div className="builder-range-row" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                                        <input
-                                                          type="range"
-                                                          min="0.1"
-                                                          max="4.0"
-                                                          step="0.1"
-                                                          style={{ flex: 1 }}
-                                                          value={(block.carouselSettings as any)?.antigravitySpeed ?? 1.0}
-                                                          onChange={(event) =>
-                                                            updateSelectedLayoutBlock(
-                                                              index,
-                                                              blockIndex,
-                                                              {
-                                                                carouselSettings: {
-                                                                  ...(block.carouselSettings ?? {}),
-                                                                  antigravitySpeed: Number(event.target.value),
-                                                                },
-                                                              },
-                                                            )
-                                                          }
-                                                        />
-                                                        <span style={{ minWidth: '40px', textAlign: 'right' }}>{((block.carouselSettings as any)?.antigravitySpeed ?? 1.0).toFixed(1)}x</span>
-                                                      </div>
-                                                    </label>
-
-                                                    <label className="builder-field">
-                                                      <span>Particle Count</span>
-                                                      <div className="builder-range-row" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                                        <input
-                                                          type="range"
-                                                          min="0"
-                                                          max="200"
-                                                          step="5"
-                                                          style={{ flex: 1 }}
-                                                          value={(block.carouselSettings as any)?.antigravityParticleCount ?? 40}
-                                                          onChange={(event) =>
-                                                            updateSelectedLayoutBlock(
-                                                              index,
-                                                              blockIndex,
-                                                              {
-                                                                carouselSettings: {
-                                                                  ...(block.carouselSettings ?? {}),
-                                                                  antigravityParticleCount: Number(event.target.value),
-                                                                },
-                                                              },
-                                                            )
-                                                          }
-                                                        />
-                                                        <span style={{ minWidth: '40px', textAlign: 'right' }}>{(block.carouselSettings as any)?.antigravityParticleCount ?? 40}</span>
-                                                      </div>
-                                                    </label>
-
-                                                    <label className="builder-field">
-                                                      <span>Glow Intensity</span>
-                                                      <div className="builder-range-row" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                                        <input
-                                                          type="range"
-                                                          min="0.0"
-                                                          max="2.0"
-                                                          step="0.1"
-                                                          style={{ flex: 1 }}
-                                                          value={(block.carouselSettings as any)?.antigravityGlowIntensity ?? 0.4}
-                                                          onChange={(event) =>
-                                                            updateSelectedLayoutBlock(
-                                                              index,
-                                                              blockIndex,
-                                                              {
-                                                                carouselSettings: {
-                                                                  ...(block.carouselSettings ?? {}),
-                                                                  antigravityGlowIntensity: Number(event.target.value),
-                                                                },
-                                                              },
-                                                            )
-                                                          }
-                                                        />
-                                                        <span style={{ minWidth: '40px', textAlign: 'right' }}>{((block.carouselSettings as any)?.antigravityGlowIntensity ?? 0.4).toFixed(1)}</span>
-                                                      </div>
-                                                    </label>
-
-                                                    <label className="builder-field">
-                                                      <span>Grid Movement Speed</span>
-                                                      <div className="builder-range-row" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                                        <input
-                                                          type="range"
-                                                          min="0.0"
-                                                          max="4.0"
-                                                          step="0.1"
-                                                          style={{ flex: 1 }}
-                                                          value={(block.carouselSettings as any)?.antigravityGridMoveSpeed ?? 1.0}
-                                                          onChange={(event) =>
-                                                            updateSelectedLayoutBlock(
-                                                              index,
-                                                              blockIndex,
-                                                              {
-                                                                carouselSettings: {
-                                                                  ...(block.carouselSettings ?? {}),
-                                                                  antigravityGridMoveSpeed: Number(event.target.value),
-                                                                },
-                                                              },
-                                                            )
-                                                          }
-                                                        />
-                                                        <span style={{ minWidth: '40px', textAlign: 'right' }}>{((block.carouselSettings as any)?.antigravityGridMoveSpeed ?? 1.0).toFixed(1)}x</span>
-                                                      </div>
-                                                    </label>
-
-                                                    <label className="builder-field">
-                                                      <span>Canvas Particle Color</span>
-                                                      <div className="builder-color-row" style={{ display: 'flex', gap: '8px' }}>
-                                                        <input
-                                                          type="color"
-                                                          value={(block.carouselSettings as any)?.antigravityColor ?? "#6366f1"}
-                                                          onChange={(event) =>
-                                                            updateSelectedLayoutBlock(
-                                                              index,
-                                                              blockIndex,
-                                                              {
-                                                                carouselSettings: {
-                                                                  ...(block.carouselSettings ?? {}),
-                                                                  antigravityColor: event.target.value,
-                                                                },
-                                                              },
-                                                            )
-                                                          }
-                                                        />
-                                                        <input
-                                                          style={{ flex: 1 }}
-                                                          value={(block.carouselSettings as any)?.antigravityColor ?? "#6366f1"}
-                                                          onChange={(event) =>
-                                                            updateSelectedLayoutBlock(
-                                                              index,
-                                                              blockIndex,
-                                                              {
-                                                                carouselSettings: {
-                                                                  ...(block.carouselSettings ?? {}),
-                                                                  antigravityColor: event.target.value,
-                                                                },
-                                                              },
-                                                            )
-                                                          }
-                                                        />
-                                                      </div>
-                                                    </label>
-
-                                                    <label className="builder-field">
-                                                      <span>Grid Density</span>
-                                                      <select
-                                                        value={(block.carouselSettings as any)?.antigravityGridDensity ?? "normal"}
-                                                        onChange={(event) =>
-                                                          updateSelectedLayoutBlock(
-                                                            index,
-                                                            blockIndex,
-                                                            {
-                                                              carouselSettings: {
-                                                                ...(block.carouselSettings ?? {}),
-                                                                antigravityGridDensity: event.target.value,
-                                                              },
-                                                            },
-                                                          )
-                                                        }
-                                                      >
-                                                        <option value="sparse">Sparse</option>
-                                                        <option value="normal">Normal</option>
-                                                        <option value="compact">Compact</option>
-                                                      </select>
-                                                    </label>
-
-                                                    <label className="builder-check" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                                      <input
-                                                        type="checkbox"
-                                                        checked={(block.carouselSettings as any)?.antigravityShowGrid !== false}
-                                                        onChange={(event) =>
-                                                          updateSelectedLayoutBlock(
-                                                            index,
-                                                            blockIndex,
-                                                            {
-                                                              carouselSettings: {
-                                                                ...(block.carouselSettings ?? {}),
-                                                                antigravityShowGrid: event.target.checked,
-                                                              },
-                                                            },
-                                                          )
-                                                        }
-                                                      />
-                                                      <span>Show Grid Lines</span>
-                                                    </label>
-
-                                                    <label className="builder-check" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                                      <input
-                                                        type="checkbox"
-                                                        checked={(block.carouselSettings as any)?.antigravityShowParticles !== false}
-                                                        onChange={(event) =>
-                                                          updateSelectedLayoutBlock(
-                                                            index,
-                                                            blockIndex,
-                                                            {
-                                                              carouselSettings: {
-                                                                ...(block.carouselSettings ?? {}),
-                                                                antigravityShowParticles: event.target.checked,
-                                                              },
-                                                            },
-                                                          )
-                                                        }
-                                                      />
-                                                      <span>Show Rising Particles</span>
-                                                    </label>
-                                                  </details>
-                                                )}
+                    
                                             </>
                                           )}
 
@@ -3482,7 +3262,149 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                     </div>
                                                   </div>
                                                 </details>
+
+                                                <details className="builder-collapse">
+                                                  <summary>
+                                                    <span>Pagination</span>
+                                                    <small>
+                                                      {(block.pagination?.enabled ?? false)
+                                                        ? `${
+                                                            block.pagination?.mode === "infinite"
+                                                              ? "Infinite Scroll"
+                                                              : block.pagination?.mode === "loadMore"
+                                                                ? "Load More"
+                                                                : "Page Numbers"
+                                                          } · ${block.pagination?.perPage ?? 12}/page`
+                                                        : "Off"}
+                                                    </small>
+                                                  </summary>
+
+                                                  <label className="builder-check">
+                                                    <input
+                                                      type="checkbox"
+                                                      checked={block.pagination?.enabled ?? false}
+                                                      onChange={(event) =>
+                                                        updateSelectedLayoutBlock(
+                                                          index,
+                                                          blockIndex,
+                                                          {
+                                                            pagination: {
+                                                              ...(block.pagination ?? {
+                                                                enabled: false,
+                                                                perPage: 12,
+                                                                mode: "pageNumbers" as const,
+                                                                infiniteScroll: false,
+                                                                style: "standard" as const,
+                                                              }),
+                                                              enabled: event.target.checked,
+                                                            },
+                                                          }
+                                                        )
+                                                      }
+                                                    />
+                                                    <span>Pagination Enabled</span>
+                                                  </label>
+
+                                                  {(block.pagination?.enabled ?? false) && (
+                                                    <>
+                                                      <div className="builder-two-column">
+                                                        <label className="builder-field">
+                                                          <span>Products Per Page</span>
+                                                          <input
+                                                            type="number"
+                                                            min={4}
+                                                            max={48}
+                                                            step={1}
+                                                            value={block.pagination?.perPage ?? 12}
+                                                            onChange={(event) =>
+                                                              updateSelectedLayoutBlock(
+                                                                index,
+                                                                blockIndex,
+                                                                {
+                                                                  pagination: {
+                                                                    ...(block.pagination ?? {
+                                                                      enabled: true,
+                                                                      perPage: 12,
+                                                                      mode: "pageNumbers" as const,
+                                                                      infiniteScroll: false,
+                                                                      style: "standard" as const,
+                                                                    }),
+                                                                    perPage: Number(event.target.value),
+                                                                  },
+                                                                }
+                                                              )
+                                                            }
+                                                          />
+                                                        </label>
+
+                                                        <label className="builder-field">
+                                                          <span>Pagination Type</span>
+                                                          <select
+                                                            value={block.pagination?.mode ?? "pageNumbers"}
+                                                            onChange={(event) => {
+                                                              const typeVal = event.target.value as "pageNumbers" | "loadMore" | "infinite";
+                                                              updateSelectedLayoutBlock(
+                                                                index,
+                                                                blockIndex,
+                                                                {
+                                                                  pagination: {
+                                                                    ...(block.pagination ?? {
+                                                                      enabled: true,
+                                                                      perPage: 12,
+                                                                      mode: "pageNumbers" as const,
+                                                                      infiniteScroll: false,
+                                                                      style: "standard" as const,
+                                                                    }),
+                                                                    mode: typeVal,
+                                                                    infiniteScroll: typeVal === "infinite",
+                                                                  },
+                                                                }
+                                                              );
+                                                            }}
+                                                          >
+                                                            <option value="pageNumbers">Page Numbers</option>
+                                                            <option value="loadMore">Load More</option>
+                                                            <option value="infinite">Infinite Scroll</option>
+                                                          </select>
+                                                        </label>
+                                                      </div>
+
+                                                      <div className="builder-two-column" style={{ marginTop: "8px" }}>
+                                                        <label className="builder-field">
+                                                          <span>Pagination Style</span>
+                                                          <select
+                                                            value={block.pagination?.style ?? "standard"}
+                                                            onChange={(event) =>
+                                                              updateSelectedLayoutBlock(
+                                                                index,
+                                                                blockIndex,
+                                                                {
+                                                                  pagination: {
+                                                                    ...(block.pagination ?? {
+                                                                      enabled: true,
+                                                                      perPage: 12,
+                                                                      mode: "pageNumbers" as const,
+                                                                      infiniteScroll: false,
+                                                                      style: "standard" as const,
+                                                                    }),
+                                                                    style: event.target.value as "standard" | "solid" | "minimal" | "rounded",
+                                                                  },
+                                                                }
+                                                              )
+                                                            }
+                                                          >
+                                                            <option value="standard">Standard</option>
+                                                            <option value="solid">Solid / Filled</option>
+                                                            <option value="minimal">Minimal / Borderless</option>
+                                                            <option value="rounded">Rounded Circle</option>
+                                                          </select>
+                                                        </label>
+                                                      </div>
+                                                    </>
+                                                  )}
+                                                </details>
                                               </details>
+
                                             </>
                                           ) : block.kind ===
                                             "productGallery" ? (
@@ -7442,8 +7364,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                               </small>
                             </summary>
 
-                            <label className="builder-field builder-toggle">
-                              <span>Pagination Enabled</span>
+                            <label className="builder-check">
                               <input
                                 type="checkbox"
                                 checked={selectedSection.pagination?.enabled ?? false}
@@ -7455,12 +7376,14 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                         perPage: 12,
                                         mode: "pageNumbers" as const,
                                         infiniteScroll: false,
+                                        style: "standard" as const,
                                       }),
                                       enabled: event.target.checked,
                                     },
                                   })
                                 }
                               />
+                              <span>Pagination Enabled</span>
                             </label>
 
                             {(selectedSection.pagination?.enabled ?? false) && (
@@ -7482,6 +7405,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                               perPage: 12,
                                               mode: "pageNumbers" as const,
                                               infiniteScroll: false,
+                                              style: "standard" as const,
                                             }),
                                             perPage: Number(event.target.value),
                                           },
@@ -7491,9 +7415,38 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                   </label>
 
                                   <label className="builder-field">
-                                    <span>Pagination Mode</span>
+                                    <span>Pagination Type</span>
                                     <select
                                       value={selectedSection.pagination?.mode ?? "pageNumbers"}
+                                      onChange={(event) => {
+                                        const typeVal = event.target.value as "pageNumbers" | "loadMore" | "infinite";
+                                        updateSelected({
+                                          pagination: {
+                                            ...(selectedSection.pagination ?? {
+                                              enabled: true,
+                                              perPage: 12,
+                                              mode: "pageNumbers" as const,
+                                              infiniteScroll: false,
+                                              style: "standard" as const,
+                                            }),
+                                            mode: typeVal,
+                                            infiniteScroll: typeVal === "infinite",
+                                          },
+                                        });
+                                      }}
+                                    >
+                                      <option value="pageNumbers">Page Numbers</option>
+                                      <option value="loadMore">Load More</option>
+                                      <option value="infinite">Infinite Scroll</option>
+                                    </select>
+                                  </label>
+                                </div>
+
+                                <div className="builder-two-column" style={{ marginTop: "8px" }}>
+                                  <label className="builder-field">
+                                    <span>Pagination Style</span>
+                                    <select
+                                      value={selectedSection.pagination?.style ?? "standard"}
                                       onChange={(event) =>
                                         updateSelected({
                                           pagination: {
@@ -7502,20 +7455,22 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                               perPage: 12,
                                               mode: "pageNumbers" as const,
                                               infiniteScroll: false,
+                                              style: "standard" as const,
                                             }),
-                                            mode: event.target.value as "loadMore" | "pageNumbers",
+                                            style: event.target.value as "standard" | "solid" | "minimal" | "rounded",
                                           },
                                         })
                                       }
                                     >
-                                      <option value="pageNumbers">Page Numbers</option>
-                                      <option value="loadMore">Load More</option>
+                                      <option value="standard">Standard</option>
+                                      <option value="solid">Solid / Filled</option>
+                                      <option value="minimal">Minimal / Borderless</option>
+                                      <option value="rounded">Rounded Circle</option>
                                     </select>
                                   </label>
                                 </div>
 
-                                <label className="builder-field builder-toggle">
-                                  <span>Infinite Scroll</span>
+                                <label className="builder-check" style={{ marginTop: "8px" }}>
                                   <input
                                     type="checkbox"
                                     checked={selectedSection.pagination?.infiniteScroll ?? false}
@@ -7527,15 +7482,18 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                             perPage: 12,
                                             mode: "pageNumbers" as const,
                                             infiniteScroll: false,
+                                            style: "standard" as const,
                                           }),
                                           infiniteScroll: event.target.checked,
                                         },
                                       })
                                     }
                                   />
+                                  <span>Infinite Scroll</span>
                                 </label>
                               </>
                             )}
+
                           </details>
                         </>
                       )}

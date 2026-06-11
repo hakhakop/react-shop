@@ -3596,6 +3596,40 @@ body[data-storefront-preset="princity"]
   color: var(--builder-preview-active-button-text, #ffffff);
   font-size: 12px;
   font-weight: 700;
+  text-decoration: none;
+  border: 1px solid transparent;
+}
+
+.builder-preview-cta--primary {
+  background: var(--builder-preview-active-button-bg, #111111);
+  color: var(--builder-preview-active-button-text, #ffffff);
+  border: 1px solid transparent;
+}
+
+.builder-preview-cta--secondary {
+  background: var(--builder-preview-active-surface, #efefe9);
+  color: var(--builder-preview-active-text, #111111);
+  border: 1px solid transparent;
+}
+
+.builder-preview-cta--outline {
+  background: transparent;
+  color: var(--builder-preview-active-button-bg, #111111);
+  border: 1.5px solid var(--builder-preview-active-button-bg, #111111);
+}
+
+.builder-preview-cta--ghost {
+  background: transparent;
+  color: var(--builder-preview-active-text, #111111);
+  border: 1px solid transparent;
+}
+
+.builder-preview-cta--link {
+  background: transparent;
+  color: var(--builder-preview-active-text, #111111);
+  text-decoration: underline;
+  padding: 0;
+  border-radius: 0;
 }
 
 .builder-preview-promo .builder-preview-cta {

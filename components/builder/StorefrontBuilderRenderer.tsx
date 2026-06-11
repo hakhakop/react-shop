@@ -148,12 +148,73 @@ function readableSchemeForColor(color: string | undefined) {
   return luminance < 0.48 ? "dark" : "light";
 }
 
+function resolveColorSchemeForBackground(
+  bg: string | undefined,
+  parentScheme: "light" | "dark" = "light"
+): "light" | "dark" {
+  if (!bg) return parentScheme;
+  const color = bg.trim().toLowerCase();
+  if (color === "transparent" || color === "initial" || color === "inherit") {
+    return parentScheme;
+  }
+
+  const hexMatch = color.match(/^#([a-f\d]{3,8})$/);
+  if (hexMatch) {
+    let hex = hexMatch[1];
+    if (hex.length === 3 || hex.length === 4) {
+      hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
+    }
+    const r = parseInt(hex.substring(0, 2), 16);
+    const g = parseInt(hex.substring(2, 4), 16);
+    const b = parseInt(hex.substring(4, 6), 16);
+    const luminance = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
+    return luminance < 0.48 ? "dark" : "light";
+  }
+
+  const rgbMatch = color.match(/^rgba?\((\d+)\s*,\s*(\d+)\s*,\s*(\d+)(?:\s*,\s*([\d.]+))?\)$/);
+  if (rgbMatch) {
+    const r = parseInt(rgbMatch[1], 10);
+    const g = parseInt(rgbMatch[2], 10);
+    const b = parseInt(rgbMatch[3], 10);
+    const a = rgbMatch[4] !== undefined ? parseFloat(rgbMatch[4]) : 1;
+    if (a < 0.15) return parentScheme;
+    const luminance = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
+    return luminance < 0.48 ? "dark" : "light";
+  }
+
+  return readableSchemeForColor(bg);
+}
+
+function getContextVars(scheme: "light" | "dark", customBg?: string): Record<string, string | undefined> {
+  const schemeColors = scheme === "dark" ? builderDarkScheme : builderLightScheme;
+  const cardBorder = scheme === "dark" ? "rgba(255, 255, 255, 0.08)" : "rgba(17, 17, 17, 0.08)";
+  return {
+    "--context-bg": customBg || schemeColors.pageBackground,
+    "--context-text": schemeColors.textColor,
+    "--context-muted": schemeColors.mutedTextColor,
+    "--context-surface": schemeColors.surfaceColor,
+    "--context-button-bg": schemeColors.buttonBackground,
+    "--context-button-text": schemeColors.buttonTextColor,
+    "--context-card-bg": schemeColors.surfaceColor,
+    "--context-card-border": cardBorder,
+
+    // Legacy variables mapping for correct cascade
+    "--builder-active-text": schemeColors.textColor,
+    "--builder-active-muted": schemeColors.mutedTextColor,
+    "--builder-active-surface": schemeColors.surfaceColor,
+    "--builder-active-button-bg": schemeColors.buttonBackground,
+    "--builder-active-button-text": schemeColors.buttonTextColor,
+    "--builder-card-bg": schemeColors.surfaceColor,
+    "--builder-card-border": cardBorder,
+  };
+}
+
 function resolveSectionColorScheme(section: BuilderSection) {
   if (section.colorScheme === "dark" || section.colorScheme === "light") {
     return section.colorScheme;
   }
 
-  return readableSchemeForColor(section.background);
+  return resolveColorSchemeForBackground(section.background);
 }
 
 function resolveDesignColors(layout: BuilderLayout) {
@@ -296,11 +357,13 @@ async function BuilderProductsSection({
   categoryTree?: CategoryTreeItem[];
   activeCategorySlug?: string | null;
 }) {
-  const pageSize =
-    typeof section.gridLimit === "number" && section.gridLimit >= 4
-      ? Math.min(Math.round(section.gridLimit), 48)
-      : 24;
-  const fetchLimit = Math.max(pageSize, 48);
+  const isPaginationEnabled = section.pagination?.enabled ?? false;
+  const pageSize = isPaginationEnabled
+    ? (section.pagination?.perPage ?? 12)
+    : (typeof section.gridLimit === "number" && section.gridLimit >= 4
+        ? Math.min(Math.round(section.gridLimit), 48)
+        : 24);
+  const fetchLimit = isPaginationEnabled ? 200 : Math.max(pageSize, 48);
   const source =
     section.source === "featured" || section.source === "category"
       ? section.source
@@ -343,6 +406,7 @@ async function BuilderProductsSection({
       hiddenCategorySlugs={section.hiddenCategorySlugs}
       categoryTree={resolvedCategoryTree}
       activeCategorySlug={activeCategorySlug}
+      pagination={section.pagination}
     />
   );
 }
@@ -386,6 +450,7 @@ function sectionStyle(section: BuilderSection): BuilderStyle {
         : ({} satisfies BuilderStyle);
 
   const visual = section.visualStyle as BuilderVisualStyle | undefined;
+  const contextVars = getContextVars(colorScheme, section.background);
   const styleObj: BuilderStyle = {
     background: section.background,
     "--builder-section-padding-top": getSpacingValue(section.topSpacing),
@@ -393,6 +458,7 @@ function sectionStyle(section: BuilderSection): BuilderStyle {
     "--builder-section-margin-top": getSpacingValue(section.topMargin),
     "--builder-section-margin-bottom": getSpacingValue(section.bottomMargin),
     ...schemeVars,
+    ...contextVars,
     ...visualStyleToCss(visual),
   };
 
@@ -544,9 +610,7 @@ function SectionFrame({
   children: ReactNode;
 }) {
   const animationAttrs = animationDataAttributes(section.animation);
-  const isAntigravity =
-    section.backgroundEffect === "antigravity" ||
-    (section.kind === "hero" && section.carouselSettings?.variant === "antigravity");
+  const isAntigravity = section.backgroundEffect === "antigravity";
   const isFullTheme =
     isAntigravity &&
     (section.antigravityVisualMode === undefined || section.antigravityVisualMode === "full");
@@ -882,10 +946,13 @@ async function ContentProductsBlock({
   categoryTree?: CategoryTreeItem[];
   activeCategorySlug?: string | null;
 }) {
-  const limit =
+  const isPaginationEnabled = block.pagination?.enabled ?? false;
+  const originalLimit =
     typeof block.gridLimit === "number" && block.gridLimit >= 2
       ? Math.min(Math.round(block.gridLimit), 12)
       : 4;
+  const limit = isPaginationEnabled ? 200 : originalLimit;
+
   const products = await getProductsForGrid({
     limit,
     source:
@@ -917,7 +984,7 @@ async function ContentProductsBlock({
         filterPosition={block.filterPosition ?? "hidden"}
         cardStyle={block.cardStyle}
         cardPreset={block.panelStyle ?? block.cardPreset}
-        pageSize={limit}
+        pageSize={originalLimit}
         gridGap={block.gridGap}
         cardPadding={block.cardPadding}
         imagePadding={block.imagePadding}
@@ -931,6 +998,7 @@ async function ContentProductsBlock({
         categoryTree={resolvedCategoryTree}
         activeCategorySlug={activeCategorySlug}
         typography={block.typography}
+        pagination={block.pagination}
       />
     </div>
   );
@@ -1380,6 +1448,7 @@ function ContentLayoutBlock({
   pageContent,
   categoryTree,
   activeCategorySlug,
+  parentScheme = "light",
 }: {
   block: BuilderLayoutBlock;
   product?: StorefrontBuilderProduct;
@@ -1388,6 +1457,7 @@ function ContentLayoutBlock({
   pageContent?: ReactNode;
   categoryTree?: CategoryTreeItem[];
   activeCategorySlug?: string | null;
+  parentScheme?: "light" | "dark";
 }) {
   if (block.kind === "button") {
     return (
@@ -1536,7 +1606,7 @@ function ContentLayoutBlock({
     return (
       <div 
         className="shop-builder-column-block shop-builder-column-block--scroll-pinned"
-        style={blockSurfaceStyle(block)}
+        style={blockSurfaceStyle(block, parentScheme)}
       >
         <ScrollPinnedDemo block={block} />
       </div>
@@ -1827,39 +1897,6 @@ function ContentLayoutBlock({
 
     return (
       <div className={`shop-builder-column-block shop-builder-column-block--hero ${isBlockAntigravity ? "shop-builder-hero--antigravity shop-builder-hero--antigravity-block" : ""} ${block.premiumCardStyle && block.premiumCardStyle !== "none" ? `shop-builder-card--${block.premiumCardStyle}` : ""}`}>
-        {isBlockAntigravity && (
-          <>
-            <AntigravityCanvas
-              speed={(block.carouselSettings as any)?.antigravitySpeed}
-              particleCount={(block.carouselSettings as any)?.antigravityParticleCount}
-              color={(block.carouselSettings as any)?.antigravityColor}
-              gridDensity={(block.carouselSettings as any)?.antigravityGridDensity as any}
-              interactive={(block.carouselSettings as any)?.antigravityInteractive}
-              showGrid={(block.carouselSettings as any)?.antigravityShowGrid}
-              showParticles={(block.carouselSettings as any)?.antigravityShowParticles}
-              gridMoveSpeed={(block.carouselSettings as any)?.antigravityGridMoveSpeed}
-              glowIntensity={(block.carouselSettings as any)?.antigravityGlowIntensity}
-            />
-            {((block.carouselSettings as any)?.antigravityShowGrid !== false) && (
-              <div 
-                className="antigravity-grid-overlay" 
-                aria-hidden="true" 
-                style={
-                  (block.carouselSettings as any)?.antigravityGridMoveSpeed !== undefined || (block.carouselSettings as any)?.antigravityColor
-                    ? {
-                        animationDuration: (block.carouselSettings as any)?.antigravityGridMoveSpeed === 0
-                          ? "0s"
-                          : `${25 / ((block.carouselSettings as any)?.antigravityGridMoveSpeed ?? 1.0)}s`,
-                        backgroundImage: (block.carouselSettings as any)?.antigravityColor
-                          ? `linear-gradient(${(block.carouselSettings as any)?.antigravityColor}08 1px, transparent 1px), linear-gradient(90deg, ${(block.carouselSettings as any)?.antigravityColor}08 1px, transparent 1px)`
-                          : undefined,
-                      }
-                    : undefined
-                }
-              />
-            )}
-          </>
-        )}
         <div className={isBlockAntigravity ? "shop-builder-hero-content-left" : ""}>
           {block.eyebrow && (
             <Typog
@@ -2263,33 +2300,64 @@ function ContentLayoutBlock({
   );
 }
 
-function blockSurfaceStyle(
+function resolveBlockColorSchemeAndBg(
   block: BuilderLayoutBlock,
-): CSSProperties | undefined {
-  const visual = block.visualStyle as BuilderVisualStyle | undefined;
-  const visualCss = visualStyleToCss(visual);
-  const legacy: BuilderStyle = {};
-
+  parentScheme: "light" | "dark" = "light"
+): { scheme: "light" | "dark"; bg: string | undefined } {
+  if (block.elementBackgroundMode === "custom" && block.elementBackground) {
+    const scheme = resolveColorSchemeForBackground(block.elementBackground, parentScheme);
+    return { scheme, bg: block.elementBackground };
+  }
   if (block.elementBackgroundMode === "transparent") {
-    legacy["--builder-element-bg"] = "transparent";
-  } else if (
-    block.elementBackgroundMode === "custom" &&
-    block.elementBackground
-  ) {
-    legacy["--builder-element-bg"] = block.elementBackground;
+    return { scheme: parentScheme, bg: "transparent" };
   }
 
+  const style = block.panelStyle ?? "default";
+  if (style === "light" || style === "flat-white" || style === "clean-shadow") {
+    return { scheme: "light", bg: "#ffffff" };
+  }
+  if (style === "dark" || style === "flat-dark") {
+    return { scheme: "dark", bg: "#111111" };
+  }
+  if (style === "princity" || style === "princity-flat") {
+    return { scheme: "light", bg: "#d8ff65" };
+  }
+  if (style === "princity-line") {
+    return { scheme: "light", bg: "transparent" };
+  }
+
+  return { scheme: parentScheme, bg: undefined };
+}
+
+function blockSurfaceStyle(
+  block: BuilderLayoutBlock,
+  parentScheme: "light" | "dark" = "light"
+): CSSProperties {
+  const visual = block.visualStyle as BuilderVisualStyle | undefined;
+  const visualCss = visualStyleToCss(visual);
+
+  const { scheme, bg } = resolveBlockColorSchemeAndBg(block, parentScheme);
+  const contextVars = getContextVars(scheme, bg);
+
+  const legacy: BuilderStyle = {};
+  // Only set --builder-element-bg when the user explicitly chose a custom
+  // element background.  Panel-style presets (dark, light, princity, …)
+  // already have their own CSS card-level rules; painting the shell bg here
+  // would create a solid-color rectangle around the entire block.
+  const isCustomBg =
+    block.elementBackgroundMode === "custom" ||
+    block.elementBackgroundMode === "transparent";
+  if (bg !== undefined && isCustomBg) {
+    legacy["--builder-element-bg"] = bg;
+  }
   if (block.borderRadius !== undefined) {
     legacy["--builder-radius"] = `${block.borderRadius}px`;
     legacy["--builder-card-radius"] = `${block.borderRadius}px`;
   }
 
-  if (!Object.keys(visualCss).length && !Object.keys(legacy).length) {
-    return undefined;
-  }
-
-  return { ...legacy, ...visualCss };
+  return { ...contextVars, ...legacy, ...visualCss };
 }
+
 
 function blockShellClassName(block: BuilderLayoutBlock) {
   const visualClass = visualStyleClassName(
@@ -2364,7 +2432,7 @@ function inferTypographyArea(
   return "body";
 }
 
-function rowStyle(rowItem: any): CSSProperties {
+function rowStyle(rowItem: any, parentScheme: "light" | "dark" = "light"): CSSProperties {
   const visual = rowItem?.rowVisualStyle as BuilderVisualStyle | undefined;
   const visualCss = visualStyleToCss(visual);
   const styleObj: any = {};
@@ -2390,7 +2458,10 @@ function rowStyle(rowItem: any): CSSProperties {
     styleObj.borderRadius = `${rowItem.rowBorderRadius}px`;
   }
 
-  return { ...styleObj, ...visualCss };
+  const resolvedScheme = resolveColorSchemeForBackground(rowItem?.rowBackground, parentScheme);
+  const contextVars = getContextVars(resolvedScheme, rowItem?.rowBackground);
+
+  return { ...styleObj, ...contextVars, ...visualCss };
 }
 
 function ContentLayoutSection({
@@ -2454,6 +2525,8 @@ function ContentLayoutSection({
     });
   });
 
+  const sectionColorScheme = resolveSectionColorScheme(section);
+
   return (
     <SectionFrame section={section} extra="shop-builder-content-layout">
       {(section.eyebrow || section.title || section.body) && (
@@ -2473,6 +2546,7 @@ function ContentLayoutSection({
           const isRowAntigravity = rowItem?.rowBackgroundEffect === "antigravity";
           const isFullRowTheme = isRowAntigravity && (rowItem.rowAntigravityVisualMode === undefined || rowItem.rowAntigravityVisualMode === "full");
           const rowAnimationAttrs = animationDataAttributes(rowItem?.rowAnimation);
+          const rowColorScheme = resolveColorSchemeForBackground(rowItem?.rowBackground, sectionColorScheme);
 
           return (
             <div
@@ -2492,7 +2566,7 @@ function ContentLayoutSection({
                 paddingBottom: "var(--builder-section-padding-bottom, 0px)",
                 marginTop: "var(--builder-section-margin-top, 0px)",
                 marginBottom: "var(--builder-section-margin-bottom, 0px)",
-                ...rowStyle(rowItem),
+                ...rowStyle(rowItem, sectionColorScheme),
                 ...rowAnimationAttrs.style,
               }}
               {...rowAnimationAttrs.data}
@@ -2567,6 +2641,7 @@ function ContentLayoutSection({
                             pageContent={pageContent}
                             categoryTree={categoryTree}
                             activeCategorySlug={activeCategorySlug}
+                            parentScheme={rowColorScheme}
                           />
                         );
                       }
@@ -2580,7 +2655,7 @@ function ContentLayoutSection({
                           key={block.id ?? blockIndex}
                           className={blockShellClassName(block)}
                           style={{
-                            ...blockSurfaceStyle(block),
+                            ...blockSurfaceStyle(block, rowColorScheme),
                             ...blockAnimationAttrs.style,
                           }}
                           {...blockAnimationAttrs.data}
@@ -2593,6 +2668,7 @@ function ContentLayoutSection({
                             pageContent={pageContent}
                             categoryTree={categoryTree}
                             activeCategorySlug={activeCategorySlug}
+                            parentScheme={rowColorScheme}
                           />
                         </div>
                       );

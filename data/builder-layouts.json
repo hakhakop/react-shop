@@ -53,7 +53,7 @@
         "antigravityGridDensity": "medium",
         "antigravityInteractive": true,
         "antigravityShowGrid": true,
-        "antigravityShowParticles": true,
+        "antigravityShowParticles": false,
         "antigravityGridMoveSpeed": 1.2,
         "antigravityGlowIntensity": 1.5,
         "antigravityVisualMode": "full",
@@ -127,7 +127,7 @@
         "backgroundMode": "full",
         "contentMode": "boxed",
         "colorScheme": "inherit",
-        "topSpacing": "none",
+        "topSpacing": "inherit",
         "bottomSpacing": "inherit",
         "topMargin": "inherit",
         "bottomMargin": "inherit",
@@ -267,7 +267,12 @@
             ]
           }
         ],
-        "layoutRows": 2
+        "layoutRows": 2,
+        "backgroundEffect": "none",
+        "antigravityGridDensity": "normal",
+        "antigravityVisualMode": "no-grid",
+        "antigravityShowGrid": false,
+        "antigravityParticleCount": 300
       },
       {
         "id": "contentLayout-mq02cfbq-x0edv",
@@ -1125,7 +1130,7 @@
         ]
       }
     ],
-    "updatedAt": "2026-06-10T18:17:07.566Z"
+    "updatedAt": "2026-06-11T07:19:47.740Z"
   },
   "shop": {
     "version": 1,
@@ -1202,9 +1207,9 @@
         "contentMode": "boxed",
         "colorScheme": "inherit",
         "topSpacing": "inherit",
-        "bottomSpacing": "inherit",
+        "bottomSpacing": "medium",
         "topMargin": "inherit",
-        "bottomMargin": "inherit",
+        "bottomMargin": "small",
         "visible": true,
         "eyebrow": "",
         "body": "",
@@ -1226,7 +1231,17 @@
                 "cardStyle": "none",
                 "cardPreset": "princity-flat",
                 "imagePadding": "none",
-                "cardPadding": "none"
+                "cardPadding": "medium",
+                "pagination": {
+                  "enabled": true,
+                  "perPage": 12,
+                  "mode": "pageNumbers",
+                  "infiniteScroll": false,
+                  "style": "minimal"
+                },
+                "elementBackgroundMode": "transparent",
+                "panelStyle": "antigravity",
+                "elementPadding": "small"
               }
             ]
           }
@@ -1241,9 +1256,9 @@
         "backgroundMode": "boxed",
         "contentMode": "boxed",
         "colorScheme": "inherit",
-        "topSpacing": "inherit",
+        "topSpacing": "medium",
         "bottomSpacing": "inherit",
-        "topMargin": "inherit",
+        "topMargin": "large",
         "bottomMargin": "inherit",
         "visible": true,
         "eyebrow": "",
@@ -1264,9 +1279,17 @@
                 "gridLimit": 4000,
                 "filterPosition": "left",
                 "cardStyle": "none",
-                "cardPreset": "standard",
+                "cardPreset": "princity-flat",
                 "imagePadding": "none",
-                "cardPadding": "none"
+                "cardPadding": "small",
+                "pagination": {
+                  "enabled": true,
+                  "perPage": 12,
+                  "mode": "pageNumbers",
+                  "infiniteScroll": false,
+                  "style": "minimal"
+                },
+                "panelStyle": "princity-line"
               }
             ]
           }
@@ -1274,7 +1297,7 @@
         "layoutRows": 1
       }
     ],
-    "updatedAt": "2026-06-10T19:26:48.150Z"
+    "updatedAt": "2026-06-11T07:32:41.608Z"
   },
   "client": {
     "version": 1,
@@ -2873,6 +2896,7 @@
         "layout": "whole",
         "layoutColumns": 1,
         "layoutRows": 1,
+        "backgroundEffect": "antigravity",
         "layoutItems": [
           {
             "id": "page:demos-antigravity-column",

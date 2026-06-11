@@ -1,10 +1,16 @@
 .shop-filter-layout {
-  --shop-filter-pill-bg: var(--surface-main, #ffffff);
-  --shop-filter-pill-hover: var(--surface-muted, #f5f5f3);
-  --shop-filter-pill-border: var(--border-soft, rgba(17, 17, 17, 0.12));
-  --shop-filter-active-bg: var(--text-main, #111111);
-  --shop-filter-active-text: var(--surface-main, #ffffff);
-  --shop-filter-panel-bg: var(--surface-main, #ffffff);
+  --text-main: var(--builder-active-text, #111827);
+  --surface-main: var(--builder-active-surface, #ffffff);
+  --surface-muted: var(--builder-active-muted, #f5f5f3);
+  --border-soft: var(--builder-card-border, rgba(17, 17, 17, 0.12));
+
+  --shop-filter-pill-bg: var(--builder-active-surface, #efefe9);
+  --shop-filter-pill-hover: var(--builder-active-muted, #dfdfd9);
+  --shop-filter-pill-border: color-mix(in srgb, var(--builder-active-text, #111111) 16%, transparent);
+  --shop-filter-active-bg: var(--builder-active-text, #111111);
+  --shop-filter-active-text: var(--builder-active-button-text, #ffffff);
+  --shop-filter-panel-bg: var(--builder-card-bg, var(--builder-active-surface, #ffffff));
+
   display: grid;
   grid-template-columns: 280px minmax(0, 1fr);
   gap: 24px;
@@ -445,27 +451,147 @@ body[data-storefront-preset="princity"] .shop-top-attribute-dropdown button.is-p
   justify-content: center;
   gap: 7px;
   min-height: 36px;
-  border: 1px solid var(--border-soft, rgba(148, 163, 184, 0.32));
+  border: 1px solid var(--shop-filter-pill-border, var(--border-soft, rgba(148, 163, 184, 0.32)));
   border-radius: 999px;
-  background: color-mix(in srgb, var(--surface-main, #ffffff) 90%, transparent);
+  background: var(--shop-filter-pill-bg, color-mix(in srgb, var(--surface-main, #ffffff) 90%, transparent));
   color: var(--text-main, #111827);
   padding: 0 12px;
   font-size: 0.8rem;
   font-weight: 720;
   cursor: pointer;
+  transition:
+    transform 160ms ease,
+    border-color 160ms ease,
+    background 160ms ease,
+    color 160ms ease;
+}
+
+.shop-view-switcher button:hover,
+.shop-pagination button:not(:disabled):hover {
+  background: var(--shop-filter-pill-hover, var(--surface-muted, #dfdfd9));
+  border-color: var(--text-main, #111827);
+  transform: translateY(-1px);
 }
 
 .shop-view-switcher button.is-active,
 .shop-pagination button.is-active,
 .shop-archive-empty button {
-  border-color: var(--text-main, #111827);
-  background: var(--text-main, #111827);
-  color: var(--accent-contrast, #ffffff);
+  border-color: var(--shop-filter-active-bg, var(--text-main, #111827));
+  background: var(--shop-filter-active-bg, var(--text-main, #111827));
+  color: var(--shop-filter-active-text, var(--accent-contrast, #ffffff));
 }
 
 .shop-pagination button:disabled {
   cursor: default;
   opacity: 0.42;
+}
+
+/* Pagination Types & Styles */
+.shop-pagination.shop-pagination--solid button {
+  border-color: transparent;
+  background: var(--border-soft, rgba(148, 163, 184, 0.16)) !important;
+  color: var(--text-main, #111827) !important;
+}
+.shop-pagination.shop-pagination--solid button:hover:not(:disabled) {
+  background: var(--border-soft, rgba(148, 163, 184, 0.28)) !important;
+}
+.shop-pagination.shop-pagination--solid button.is-active {
+  border-color: var(--text-main, #111827) !important;
+  background: var(--text-main, #111827) !important;
+  color: var(--accent-contrast, #ffffff) !important;
+}
+
+.shop-pagination.shop-pagination--minimal button {
+  border-color: transparent;
+  background: transparent !important;
+  color: var(--text-muted, #667085) !important;
+  font-weight: 500;
+  box-shadow: none;
+}
+.shop-pagination.shop-pagination--minimal button:hover:not(:disabled) {
+  color: var(--text-main, #111827) !important;
+  background: var(--border-soft, rgba(148, 163, 184, 0.08)) !important;
+}
+.shop-pagination.shop-pagination--minimal button.is-active {
+  color: var(--text-main, #111827) !important;
+  background: transparent !important;
+  font-weight: 800;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.shop-pagination.shop-pagination--rounded button.shop-pagination-number {
+  border-radius: 50% !important;
+  width: 36px !important;
+  height: 36px !important;
+  padding: 0 !important;
+  min-width: 36px !important;
+}
+.shop-pagination.shop-pagination--rounded button.shop-pagination-nav {
+  border-radius: 999px !important;
+}
+
+/* Load More Button Styling */
+.shop-load-more-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 32px;
+  width: 100%;
+}
+.shop-load-more-container button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 28px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  border: 1px solid var(--border-soft, rgba(148, 163, 184, 0.32));
+  border-radius: 999px;
+  background: var(--surface-main, #ffffff);
+  color: var(--text-main, #111827);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.shop-load-more-container button:hover:not(:disabled) {
+  border-color: var(--text-main, #111827);
+  background: var(--text-main, #111827);
+  color: var(--accent-contrast, #ffffff);
+}
+.shop-load-more-container button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Load More Solid */
+.shop-load-more-container.shop-load-more-container--solid button {
+  border-color: transparent !important;
+  background: var(--text-main, #111827) !important;
+  color: var(--accent-contrast, #ffffff) !important;
+}
+.shop-load-more-container.shop-load-more-container--solid button:hover:not(:disabled) {
+  opacity: 0.9 !important;
+  background: var(--text-main, #111827) !important;
+  color: var(--accent-contrast, #ffffff) !important;
+}
+
+/* Load More Minimal */
+.shop-load-more-container.shop-load-more-container--minimal button {
+  border-color: transparent !important;
+  background: transparent !important;
+  color: var(--text-main, #111827) !important;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.shop-load-more-container.shop-load-more-container--minimal button:hover:not(:disabled) {
+  background: var(--border-soft, rgba(148, 163, 184, 0.08)) !important;
+  color: var(--text-main, #111827) !important;
+}
+
+/* Load More Rounded */
+.shop-load-more-container.shop-load-more-container--rounded button {
+  border-radius: 999px !important;
 }
 
 .shop-archive-grid {
@@ -479,6 +605,7 @@ body[data-storefront-preset="princity"] .shop-top-attribute-dropdown button.is-p
 .shop-archive-card {
   background: var(--surface-main, #ffffff);
   box-shadow: 0 16px 46px rgba(15, 23, 42, 0.07);
+  color: var(--context-text, var(--text-main, #111827));
 }
 
 .shop-archive-card .product-image {
@@ -929,8 +1056,7 @@ body[data-storefront-preset="princity"]
   }
 
   .shop-archive-grid {
-    --archive-columns: 3;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(min(var(--archive-columns, 3), 3), minmax(0, 1fr));
   }
 }
 
@@ -950,8 +1076,7 @@ body[data-storefront-preset="princity"]
   }
 
   .shop-archive-grid {
-    --archive-columns: 2;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(min(var(--archive-columns, 2), 2), minmax(0, 1fr));
   }
 }
 
@@ -971,7 +1096,6 @@ body[data-storefront-preset="princity"]
   }
 
   .shop-archive-grid {
-    --archive-columns: 1;
     grid-template-columns: minmax(0, 1fr);
   }
 
@@ -996,11 +1120,17 @@ body[data-storefront-preset="princity"]
 }
 
 [data-theme="dark"] .shop-filter-panel,
-[data-theme="dark"] .shop-archive-card,
 [data-theme="dark"] .shop-archive-empty {
   background: var(--surface-main, #0b0b0b);
   border-color: var(--border-soft, rgba(255, 255, 255, 0.12));
   box-shadow: none;
+}
+
+[data-theme="dark"] .shop-archive-card {
+  background: var(--builder-card-bg, var(--context-card-bg, var(--surface-main, #0b0b0b))) !important;
+  border-color: var(--builder-card-border, var(--context-card-border, var(--border-soft, rgba(255, 255, 255, 0.12)))) !important;
+  box-shadow: none !important;
+  color: var(--builder-active-text, var(--context-text, var(--text-main, #e5e7eb))) !important;
 }
 
 [data-theme="dark"] .shop-filter-input-wrap,
@@ -1128,7 +1258,7 @@ body[data-storefront-preset="princity"]
 }
 
 [data-theme="dark"] .shop-archive-card .product-image {
-  background: #ffffff;
+  background: var(--builder-card-image-bg, var(--builder-active-surface, var(--context-surface, rgba(255, 255, 255, 0.04))));
 }
 
 [data-theme="dark"] .shop-card-style--none .shop-archive-card,
@@ -1160,7 +1290,7 @@ body[data-storefront-preset="princity"]
 }
 
 [data-theme="dark"] .shop-card-style--none .shop-archive-card .product-image {
-  background: #f7f7f4;
+  background: transparent;
 }
 
 /* Antigravity Preset for WooCommerce Archive Cards */

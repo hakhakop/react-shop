@@ -216,6 +216,13 @@ export type BuilderLayoutBlock = {
   textGradientCustomStartOffset?: number;
   textGradientCustomMiddleOffset?: number;
   textGradientCustomEndOffset?: number;
+  pagination?: {
+    enabled: boolean;
+    perPage: number;
+    mode: "loadMore" | "pageNumbers" | "infinite";
+    infiniteScroll?: boolean;
+    style?: "standard" | "solid" | "minimal" | "rounded";
+  };
 };
 
 export type BuilderSection = {
@@ -355,6 +362,13 @@ export type BuilderSection = {
   typography?: Record<string, unknown>;
   visualStyle?: Record<string, unknown>;
   animation?: Record<string, unknown>;
+  pagination?: {
+    enabled: boolean;
+    perPage: number;
+    mode: "loadMore" | "pageNumbers" | "infinite";
+    infiniteScroll?: boolean;
+    style?: "standard" | "solid" | "minimal" | "rounded";
+  };
 };
 
 export type BuilderLayout = {

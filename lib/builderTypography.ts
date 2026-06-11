@@ -44,17 +44,42 @@ function resolveTypographyInput(
 ): TypographySettings | undefined {
   if (!typ) return undefined;
 
-  if (area && (typ as TypographyGroup)[area]) {
-    return (typ as TypographyGroup)[area];
-  }
-
   const group = typ as TypographyGroup;
-  if (group.title || group.body || group.button || group.eyebrow) {
-    if (area) return group[area];
+  const isGroup = Boolean(group.title || group.body || group.button || group.eyebrow);
+
+  if (isGroup) {
+    if (area) {
+      const specific = group[area];
+      if (specific) {
+        if (!specific.fontFamily) {
+          const fallbackFont = group.body?.fontFamily || group.title?.fontFamily;
+          if (fallbackFont) {
+            return { ...specific, fontFamily: fallbackFont };
+          }
+        }
+        return specific;
+      }
+      if (area === "button") {
+        const fallbackFont = group.body?.fontFamily || group.title?.fontFamily;
+        if (fallbackFont) {
+          return { fontFamily: fallbackFont };
+        }
+      }
+      return undefined;
+    }
     return group.title ?? group.body ?? group.button ?? group.eyebrow;
   }
 
-  return typ as TypographySettings;
+  const flatSettings = typ as TypographySettings;
+  if (area === "button") {
+    // Buttons have their own background boxes, so they must not inherit a general
+    // flat text color from section/parent container typography (which could cause
+    // contrast issues, like white text on a white button).
+    const { color, ...rest } = flatSettings;
+    return rest;
+  }
+
+  return flatSettings;
 }
 
 export function typographyProps(

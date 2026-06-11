@@ -80,7 +80,7 @@
 .wishlist-heart-icon {
   width: 20px;
   height: 20px;
-  color: #6b7280; /* gray when inactive */
+  color: var(--context-muted, #6b7280); /* gray when inactive */
   transition:
     color 0.2s ease,
     transform 0.2s ease;
@@ -88,14 +88,14 @@
 
 /* Hover state – subtle darkening */
 .wishlist-toggle-icon:hover .wishlist-heart-icon {
-  color: #111;
+  color: var(--context-text, #111);
 }
 
 /* Active state – clearly filled red heart with a small pop */
 .wishlist-toggle-icon-active .wishlist-heart-icon {
-  color: #060606;          /* Tailwind red-500 */
+  color: #db2777;          /* Tailwind pink-600 */
   transform: scale(1.15);
-  fill: rgb(9, 9, 9);
+  fill: #db2777;
 }
 
 /* Product header row (title + heart) */
@@ -118,9 +118,10 @@
 }
 
 [data-theme="dark"] .wishlist-toggle-icon .wishlist-heart-icon {
-  color: #9ca3af;
+  color: var(--context-muted, #9ca3af);
 }
 
 [data-theme="dark"] .wishlist-toggle-icon-active .wishlist-heart-icon {
-  color: #0a0a0a; /* softer red in dark mode */
+  color: #f43f5e; /* softer red in dark mode */
+  fill: #f43f5e;
 }

@@ -112,3 +112,30 @@
   font-size: 11px;
   color: #6b7280;
 }
+
+[data-theme="dark"] .category-dropdown {
+  background: var(--surface-muted, #1a1a1a);
+  border: 1px solid var(--border-soft, rgba(255, 255, 255, 0.08));
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.55);
+}
+
+[data-theme="dark"] .category-pill--child {
+  background: var(--surface-main, #111111);
+  border-color: var(--border-soft, rgba(255, 255, 255, 0.08));
+  color: var(--text-main, #e5e7eb);
+}
+
+[data-theme="dark"] .category-pill--child:hover {
+  background: var(--surface-muted, #1e1e1e);
+  color: var(--accent-contrast, #ffffff);
+}
+
+[data-theme="dark"] .category-pill-count {
+  background: var(--surface-muted, #1a1a1a);
+  border-color: var(--border-soft, rgba(255, 255, 255, 0.08));
+  color: var(--text-muted, #9ca3af);
+}
+
+[data-theme="dark"] .category-pill-wrapper.has-children .category-pill::after {
+  border-top-color: var(--text-muted, #9ca3af);
+}

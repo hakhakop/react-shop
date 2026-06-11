@@ -134,9 +134,13 @@ export default async function ProductGridBlock({
     "--product-image-padding": productSpaceToCss(block.imagePadding, "large"),
   } as CSSProperties;
 
+  const rawImagePadding = pickFirstString(block.imagePadding) ?? "large";
+  const imagePaddingKey = rawImagePadding.toLowerCase();
+  const isFrameless = imagePaddingKey === "none" || imagePaddingKey === "frameless";
+
   return (
     <div
-      className="pb-product-grid"
+      className={`pb-product-grid ${isFrameless ? "shop-image-padding--none" : ""}`}
       style={
         columnsDesktop
           ? ({

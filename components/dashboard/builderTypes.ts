@@ -354,8 +354,9 @@ export type BuilderLayoutBlock = {
   pagination?: {
     enabled: boolean;
     perPage: number;
-    mode: "loadMore" | "pageNumbers";
+    mode: "loadMore" | "pageNumbers" | "infinite";
     infiniteScroll?: boolean;
+    style?: "standard" | "solid" | "minimal" | "rounded";
   };
 };
 
@@ -528,8 +529,9 @@ export type BuilderSection = {
   pagination?: {
     enabled: boolean;
     perPage: number;
-    mode: "loadMore" | "pageNumbers";
+    mode: "loadMore" | "pageNumbers" | "infinite";
     infiniteScroll?: boolean;
+    style?: "standard" | "solid" | "minimal" | "rounded";
   };
   visible: boolean;
   typography?: TypographySettings | TypographyGroup;
