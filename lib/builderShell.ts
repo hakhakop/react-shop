@@ -17,7 +17,7 @@ export type BuilderHeaderIconId =
   | "search";
 export type BuilderHeaderIconVariant = "muted" | "solid" | "ghost" | "icon";
 export type BuilderHeaderActiveIndicator = "underline" | "princity" | "none";
-export type BuilderHeaderBackgroundMode = "default" | "none";
+export type BuilderHeaderBackgroundMode = "default" | "glass" | "accent" | "none";
 
 export type BuilderMenuPresentation = {
   showHeading: boolean;
@@ -114,7 +114,9 @@ function normalizeHeaderActiveIndicator(
 function normalizeHeaderBackgroundMode(
   value: unknown,
 ): BuilderHeaderBackgroundMode {
-  return value === "none" ? "none" : "default";
+  return value === "none" || value === "glass" || value === "accent"
+    ? value
+    : "default";
 }
 
 function normalizeHeaderIconOrder(value: unknown): BuilderHeaderIconId[] {

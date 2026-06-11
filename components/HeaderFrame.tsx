@@ -9,6 +9,7 @@ type HeaderFrameProps = {
   mode?: "sticky" | "none";
   /** Extra classes appended to the header element. */
   className?: string;
+  backgroundMode?: "default" | "glass" | "accent" | "none";
 };
 
 /**
@@ -21,6 +22,7 @@ export default function HeaderFrame({
   children,
   mode = "sticky",
   className = "",
+  backgroundMode = "default",
 }: HeaderFrameProps) {
   const [scrolled, setScrolled] = React.useState(false);
 
@@ -46,13 +48,30 @@ export default function HeaderFrame({
     return () => window.removeEventListener("scroll", onScroll, { capture: true });
   }, []);
 
-  const baseSticky =
-    "site-header sticky top-0 z-40 backdrop-blur-xl transition-all duration-300";
-  const stateSticky = scrolled
-    ? // when scrolled
-      "bg-slate-950/85 shadow-[0_22px_45px_rgba(15,23,42,0.55)] border-b border-slate-800/80"
-    : // at top
-      "bg-slate-950/35 border-b border-transparent";
+  let bgClass = "";
+  let borderClass = "";
+  let textClass = "";
+
+  if (backgroundMode === "none") {
+    bgClass = scrolled ? "bg-[var(--header-bg)]" : "bg-transparent";
+    borderClass = scrolled ? "border-[var(--header-border)]" : "border-transparent";
+  } else if (backgroundMode === "glass") {
+    bgClass = scrolled
+      ? "bg-white/90 dark:bg-slate-950/90 shadow-md"
+      : "bg-white/60 dark:bg-slate-950/60 shadow-sm";
+    borderClass = "border-[var(--header-border)]";
+  } else if (backgroundMode === "accent") {
+    bgClass = "bg-gradient-to-r from-[var(--accent)] to-[var(--accent-strong)] shadow-md";
+    borderClass = "border-transparent";
+    textClass = "text-white [&_.site-header-nav-link]:text-white/80 [&_.site-header-nav-link.is-active]:text-white [&_.site-header-brand]:text-white [&_.site-header-brand_span]:!text-white [&_.site-header-top]:text-white/70";
+  } else {
+    // default
+    bgClass = "bg-[var(--header-bg,rgba(255,255,255,0.92))]";
+    borderClass = scrolled ? "border-[var(--header-border,rgba(209,213,219,0.72))]" : "border-transparent";
+  }
+
+  const baseSticky = `site-header sticky top-0 z-40 backdrop-blur-xl transition-all duration-300 ${textClass}`;
+  const stateSticky = `${bgClass} border-b ${borderClass}`;
 
   const baseNone = "site-header";
 
@@ -62,7 +81,7 @@ export default function HeaderFrame({
   return (
     <header
       className={`${base} ${state} ${className}`}
-      style={mode === "sticky" ? { borderBottomColor: accentColor } : undefined}
+      style={mode === "sticky" ? { borderBottomColor: scrolled ? accentColor : "transparent" } : undefined}
       data-scrolled={scrolled ? "true" : "false"}
     >
       {children}

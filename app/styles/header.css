@@ -18,135 +18,159 @@
 
 /* --- PILL ON SCROLL HEADER (layout = pill / princity) --- */
 
-/* When scrolled, the main bar becomes a floating wrapper */
-/* Main wrapper is fixed in BOTH states so we can animate `top` smoothly */
+/* --- PILL REDESIGN: Always Floating Center Navigation Island --- */
+
 #site-header-pill .site-header-pill-main {
   position: fixed;
   left: 0;
   right: 0;
-  top: var(--header-pill-top-at-top);
+  top: 16px;
   z-index: 60;
-  background: transparent;
-  border-bottom: none;
+  background: transparent !important;
+  border-bottom: none !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
   transition: top 280ms cubic-bezier(0.22, 1, 0.36, 1);
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 #site-header-pill[data-scrolled="true"] .site-header-pill-main {
-  top: var(--header-pill-top-scrolled);
+  top: 12px;
 }
 
-#site-header-pill[data-scrolled="false"] .site-header-pill-main {
-  top: var(--header-pill-top-at-top);
-}
-
-/* Top state: show a normal full-width header bar (not boxed) */
-#site-header-pill[data-scrolled="false"] .site-header-pill-main {
-  background: var(--header-bg, rgba(255, 255, 255, 0.96));
-  border-bottom: 1px solid var(--header-border, rgba(209, 213, 219, 0.7));
-}
-
-[data-theme="dark"] #site-header-pill[data-scrolled="false"] .site-header-pill-main {
-  background: rgba(15, 23, 42, 0.96) !important;
-  border-bottom-color: rgba(51, 65, 85, 0.65);
-}
-.dark #site-header-pill[data-scrolled="false"] .site-header-pill-main {
-  background: rgba(15, 23, 42, 0.96) !important;
-  border-bottom-color: rgba(51, 65, 85, 0.65);
-}
-
-/* DARK MODE: ensure the full-width strip rows are dark (top state) */
-[data-theme="dark"] #site-header-pill .site-header-top,
-.dark #site-header-pill .site-header-top {
-  background: rgba(15, 23, 42, 0.96);
-  border-bottom-color: rgba(51, 65, 85, 0.65);
-}
-
-[data-theme="dark"] #site-header-pill .site-header-main,
-.dark #site-header-pill .site-header-main {
-  background: rgba(15, 23, 42, 0.96);
-  border-bottom-color: rgba(51, 65, 85, 0.65);
-}
-
-[data-theme="dark"] #site-header-pill .site-header-main-inner,
-.dark #site-header-pill .site-header-main-inner {
-  background: transparent;
-}
-
-/* Scrolled state: wrapper stays transparent; only the pill has background */
-#site-header-pill[data-scrolled="true"] .site-header-pill-main {
-  background: transparent;
-  border-bottom: none;
-}
-
-/* The pill itself */
+/* The actual floating pill box shape - beautifully styled under all modes */
 #site-header-pill .site-header-pill-inner {
-  width: min(1440px, calc(100% - 2rem));
+  width: min(calc(100% - 2.5rem), 1280px);
   margin: 0 auto;
-  padding: 1rem 2rem;
-  border-radius: 0;
-  border: 1px solid rgba(229, 231, 235, 0);
-  background: transparent; /* top state: bar background lives on the full-width wrapper */
-  backdrop-filter: none;
-  box-shadow: none;
+  padding: 0.6rem 2.2rem;
+  border-radius: 9999px;
+  border: 1px solid var(--header-border, rgba(229, 231, 235, 0.8));
+  background: var(--header-bg, rgba(255, 255, 255, 0.92));
+  backdrop-filter: blur(18px);
+  box-shadow: var(--shadow-md, 0 4px 24px rgba(15, 23, 42, 0.05));
+  transition: all 280ms cubic-bezier(0.22, 1, 0.36, 1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   gap: 2rem;
 }
 
-/* Scrolled = compact floating pill (LIGHT MODE: glass) */
+/* Scrolled compact pill */
 #site-header-pill[data-scrolled="true"] .site-header-pill-inner {
   width: fit-content;
-  padding: 0.1rem 0.9rem;
-  border-radius: 9999px;
-  border: 1px solid var(--header-border, rgba(229, 231, 235, 0.85));
-  background: color-mix(in srgb, var(--surface-main, #ffffff) 78%, transparent) !important;
-  backdrop-filter: blur(16px);
+  padding: 0.2rem 1.4rem;
   box-shadow: var(--shadow-lg, 0 18px 48px rgba(15, 23, 42, 0.18));
   gap: 1.25rem;
 }
 
-/* Scrolled pill (DARK MODE: flat, no glass, no border, no shadow) */
-[data-theme="dark"] #site-header-pill[data-scrolled="true"] .site-header-pill-inner {
-  border: none;
-  background: rgba(15, 23, 42, 0.96) !important;
-  backdrop-filter: none !important;
-  box-shadow: none;
-}
-.dark #site-header-pill[data-scrolled="true"] .site-header-pill-inner {
-  border: none;
-  background: rgba(15, 23, 42, 0.96) !important;
-  backdrop-filter: none !important;
-  box-shadow: none;
+/* DARK MODE: ensure beautiful dark glassmorphic styling, never flat solid */
+[data-theme="dark"] #site-header-pill .site-header-pill-inner,
+.dark #site-header-pill .site-header-pill-inner {
+  background: rgba(15, 23, 42, 0.88) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  backdrop-filter: blur(20px) !important;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45) !important;
 }
 
-/* DARK MODE: ensure text/icons are light on the dark pill */
-[data-theme="dark"] #site-header-pill[data-scrolled="true"] .site-header-nav-link {
+/* Dark mode text styling for links inside pill layout */
+[data-theme="dark"] #site-header-pill .site-header-nav-link,
+.dark #site-header-pill .site-header-nav-link {
   color: rgba(226, 232, 240, 0.88);
 }
-[data-theme="dark"] #site-header-pill[data-scrolled="true"] .site-header-nav-link:hover {
+
+[data-theme="dark"] #site-header-pill .site-header-nav-link:hover,
+.dark #site-header-pill .site-header-nav-link:hover {
   color: rgba(248, 250, 252, 0.96);
 }
-[data-theme="dark"] #site-header-pill[data-scrolled="true"] .site-header-nav-link.is-active,
-[data-theme="dark"] #site-header-pill[data-scrolled="true"] .site-header-nav-link[aria-current="page"],
-[data-theme="dark"] #site-header-pill[data-scrolled="true"] .site-header-nav-link[data-active="true"] {
+
+[data-theme="dark"] #site-header-pill .site-header-nav-link.is-active,
+.dark #site-header-pill .site-header-nav-link.is-active {
   color: rgba(248, 250, 252, 0.98);
 }
 
-[data-theme="dark"] #site-header-pill[data-scrolled="true"] .site-header-action-pill {
+[data-theme="dark"] #site-header-pill .site-header-action-pill,
+.dark #site-header-pill .site-header-action-pill {
   color: rgba(226, 232, 240, 0.92);
 }
-[data-theme="dark"] #site-header-pill[data-scrolled="true"] .site-header-action-pill:hover {
-  color: rgba(248, 250, 252, 0.98);
-}
 
-[data-theme="dark"] #site-header-pill[data-scrolled="true"] .site-header-action-pill svg,
-[data-theme="dark"] #site-header-pill[data-scrolled="true"] .site-header-action-pill svg * {
+[data-theme="dark"] #site-header-pill .site-header-action-pill svg,
+.dark #site-header-pill .site-header-action-pill svg * {
   fill: currentColor;
   stroke: currentColor;
 }
 
-[data-theme="dark"] #site-header-pill[data-scrolled="true"] .site-header-categories-toggle {
+/* --- Dynamic Background Mode Overrides for Pill --- */
+
+/* 1. Glassmorphism mode (extra translucent with heavier blur) */
+.site-header--background-glass #site-header-pill .site-header-pill-inner {
+  background: rgba(255, 255, 255, 0.65) !important;
+  backdrop-filter: blur(24px) !important;
+  border-color: rgba(229, 231, 235, 0.6) !important;
+  box-shadow: 0 8px 32px rgba(31, 38, 135, 0.04) !important;
+}
+
+[data-theme="dark"] .site-header--background-glass #site-header-pill .site-header-pill-inner,
+.dark .site-header--background-glass #site-header-pill .site-header-pill-inner {
+  background: rgba(15, 23, 42, 0.65) !important;
+  backdrop-filter: blur(24px) !important;
+  border-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+/* 2. Accent Gradient mode (colored gradient backdrops, automatically styles text white) */
+.site-header--background-accent #site-header-pill .site-header-pill-inner {
+  background: linear-gradient(90deg, var(--accent) 0%, var(--accent-strong) 100%) !important;
+  border-color: transparent !important;
+  box-shadow: 0 8px 32px rgba(var(--accent-rgb, 219, 39, 119), 0.2) !important;
+}
+
+.site-header--background-accent #site-header-pill .site-header-pill-inner .site-header-nav-link {
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
+.site-header--background-accent #site-header-pill .site-header-pill-inner .site-header-nav-link:hover,
+.site-header--background-accent #site-header-pill .site-header-pill-inner .site-header-nav-link.is-active,
+.site-header--background-accent #site-header-pill .site-header-pill-inner .site-header-brand,
+.site-header--background-accent #site-header-pill .site-header-pill-inner .site-header-brand span {
+  color: #ffffff !important;
+}
+
+.site-header--background-accent #site-header-pill .site-header-pill-inner .site-header-actions svg,
+.site-header--background-accent #site-header-pill .site-header-pill-inner .site-header-actions svg * {
+  stroke: #ffffff !important;
+  color: #ffffff !important;
+}
+
+.site-header--background-accent #site-header-pill .site-header-pill-inner .site-header-action-pill {
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.3) !important;
+  background: rgba(255, 255, 255, 0.15) !important;
+}
+
+.site-header--background-accent #site-header-pill .site-header-pill-inner .site-header-action-pill:hover {
+  background: rgba(255, 255, 255, 0.25) !important;
+}
+
+/* 3. Transparent Overlay mode (transparent at top, standard glassmorphic pill on scroll) */
+.site-header--background-none #site-header-pill[data-scrolled="false"] .site-header-pill-inner {
+  background: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+}
+
+.site-header--background-none #site-header-pill[data-scrolled="false"] .site-header-brand span {
+  color: var(--accent-contrast, #ffffff) !important;
+}
+
+/* 4. Default Dark Categories Toggle styling */
+[data-theme="dark"] #site-header-pill .site-header-categories-toggle,
+.dark #site-header-pill .site-header-categories-toggle {
   color: rgba(226, 232, 240, 0.88);
 }
-[data-theme="dark"] #site-header-pill[data-scrolled="true"] .site-header-categories-toggle:hover {
+[data-theme="dark"] #site-header-pill .site-header-categories-toggle:hover,
+.dark #site-header-pill .site-header-categories-toggle:hover {
   color: rgba(248, 250, 252, 0.98);
 }
 
@@ -1970,3 +1994,73 @@ body[data-storefront-preset="princity"] .category-mega-card,
     font-size: clamp(34px, 14vw, 58px);
   }
 }
+
+/* --- Dynamic Background Mode Overrides for Child Rows --- */
+
+.site-header--background-glass .site-header-top,
+.site-header--background-glass .site-header-main,
+.site-header--background-accent .site-header-top,
+.site-header--background-accent .site-header-main,
+.site-header--background-none .site-header-top,
+.site-header--background-none .site-header-main {
+  background: transparent !important;
+  border-bottom-color: transparent !important;
+  box-shadow: none !important;
+}
+
+/* --- Classic Store: Two-row Layout Styles --- */
+
+.site-header-main--two-row {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.site-header-row-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 1.25rem 2rem 0.75rem 2rem;
+}
+
+.site-header-row-bottom {
+  border-top: 1px solid var(--header-border, rgba(229, 231, 235, 0.4));
+  width: 100%;
+  transition: border-color 300ms ease;
+}
+
+.site-header-row-bottom-inner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0.6rem 2rem;
+  gap: 2rem;
+}
+
+/* In accent background mode, make the bottom row border transparent/white overlay */
+.site-header--background-accent .site-header-row-bottom {
+  border-top-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+.site-header--background-none .site-header-row-bottom {
+  border-top-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Responsive styles for two-row header */
+@media (max-width: 900px) {
+  .site-header-row-top {
+    padding: 0.8rem 1.5rem 0.5rem 1.5rem;
+  }
+  .site-header-row-bottom-inner {
+    padding: 0.4rem 1.5rem;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}
+

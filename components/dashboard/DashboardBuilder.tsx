@@ -4078,8 +4078,15 @@ export default function DashboardBuilder({
   };
 
   const applyHeaderPreset = (
-    preset: "service" | "commerce" | "classic",
+    preset: "service" | "commerce" | "classic" | "simple" | "hero" | "wordpress",
   ) => {
+    if (preset === "wordpress") {
+      updateShellSettings({
+        headerLayout: "wordpress",
+      });
+      return;
+    }
+
     if (preset === "service") {
       updateShellSettings({
         headerVisible: true,
@@ -4101,6 +4108,30 @@ export default function DashboardBuilder({
         headerBrandText: "WebPages Store",
         headerIconVariant: "ghost",
         headerIconOrder: ["search", "wishlist", "cart", "account", "theme"],
+        headerActiveIndicator: "underline",
+      });
+      return;
+    }
+
+    if (preset === "simple") {
+      updateShellSettings({
+        headerVisible: true,
+        headerLayout: "simple",
+        headerBrandMode: "logo",
+        headerIconVariant: "muted",
+        headerIconOrder: ["wishlist", "cart", "account", "theme", "search"],
+        headerActiveIndicator: "underline",
+      });
+      return;
+    }
+
+    if (preset === "hero") {
+      updateShellSettings({
+        headerVisible: true,
+        headerLayout: "hero",
+        headerBrandMode: "both",
+        headerIconVariant: "muted",
+        headerIconOrder: ["wishlist", "cart", "account", "theme", "search"],
         headerActiveIndicator: "underline",
       });
       return;
@@ -5404,40 +5435,65 @@ export default function DashboardBuilder({
                 })
               }
             >
-              <option value="default">Default background</option>
-              <option value="none">No background</option>
+              <option value="default">Default Solid</option>
+              <option value="glass">Glassmorphism (Blur)</option>
+              <option value="accent">Accent Color Gradient</option>
+              <option value="none">Transparent Overlay</option>
             </select>
           </label>
 
-          <label className="builder-field">
-            <span>Header Layout</span>
-            <select
-              value={shellSettings.headerLayout}
-              onChange={(event) =>
-                updateShellSettings({
-                  headerLayout: event.target.value as BuilderHeaderLayout,
-                })
-              }
-            >
-              <option value="wordpress">Use WordPress setting</option>
-              <option value="princity">Princity flat</option>
-              <option value="pill">Pill on scroll</option>
-              <option value="two-row">Two row</option>
-              <option value="simple">Simple</option>
-              <option value="hero">Hero</option>
-            </select>
-          </label>
-
-          <div className="builder-header-presets">
-            <button type="button" onClick={() => applyHeaderPreset("service")}>
-              Princity service
-            </button>
-            <button type="button" onClick={() => applyHeaderPreset("commerce")}>
-              Commerce pill
-            </button>
-            <button type="button" onClick={() => applyHeaderPreset("classic")}>
-              Classic store
-            </button>
+          <div className="builder-field">
+            <span>Header Style & Layout</span>
+            <div className="builder-header-presets-grid">
+              <button
+                type="button"
+                className={`builder-preset-btn ${shellSettings.headerLayout === "wordpress" ? "is-active" : ""}`}
+                onClick={() => applyHeaderPreset("wordpress")}
+              >
+                <span>WordPress Default</span>
+                <small>Fallback layout & options</small>
+              </button>
+              <button
+                type="button"
+                className={`builder-preset-btn ${shellSettings.headerLayout === "princity" ? "is-active" : ""}`}
+                onClick={() => applyHeaderPreset("service")}
+              >
+                <span>Princity Service</span>
+                <small>Flat layout, text logo</small>
+              </button>
+              <button
+                type="button"
+                className={`builder-preset-btn ${shellSettings.headerLayout === "pill" ? "is-active" : ""}`}
+                onClick={() => applyHeaderPreset("commerce")}
+              >
+                <span>Commerce Pill</span>
+                <small>Floating pill on scroll</small>
+              </button>
+              <button
+                type="button"
+                className={`builder-preset-btn ${shellSettings.headerLayout === "two-row" ? "is-active" : ""}`}
+                onClick={() => applyHeaderPreset("classic")}
+              >
+                <span>Classic Store</span>
+                <small>Traditional two-row links</small>
+              </button>
+              <button
+                type="button"
+                className={`builder-preset-btn ${shellSettings.headerLayout === "simple" ? "is-active" : ""}`}
+                onClick={() => applyHeaderPreset("simple")}
+              >
+                <span>Simple Store</span>
+                <small>Single row layout</small>
+              </button>
+              <button
+                type="button"
+                className={`builder-preset-btn ${shellSettings.headerLayout === "hero" ? "is-active" : ""}`}
+                onClick={() => applyHeaderPreset("hero")}
+              >
+                <span>Hero Spotlight</span>
+                <small>Split layout with hero banner</small>
+              </button>
+            </div>
           </div>
 
           <div className="builder-two-column">
@@ -6191,49 +6247,65 @@ export default function DashboardBuilder({
                       })
                     }
                   >
-                    <option value="default">Default background</option>
-                    <option value="none">No background</option>
+                    <option value="default">Default Solid</option>
+                    <option value="glass">Glassmorphism (Blur)</option>
+                    <option value="accent">Accent Color Gradient</option>
+                    <option value="none">Transparent Overlay</option>
                   </select>
                 </label>
 
-                <label className="builder-field">
-                  <span>Header Layout</span>
-                  <select
-                    value={shellSettings.headerLayout}
-                    onChange={(event) =>
-                      updateShellSettings({
-                        headerLayout: event.target.value as BuilderHeaderLayout,
-                      })
-                    }
-                  >
-                    <option value="wordpress">Use WordPress setting</option>
-                    <option value="princity">Princity flat</option>
-                    <option value="pill">Pill on scroll</option>
-                    <option value="two-row">Two row</option>
-                    <option value="simple">Simple</option>
-                    <option value="hero">Hero</option>
-                  </select>
-                </label>
-
-                <div className="builder-header-presets">
-                  <button
-                    type="button"
-                    onClick={() => applyHeaderPreset("service")}
-                  >
-                    Princity service
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => applyHeaderPreset("commerce")}
-                  >
-                    Commerce pill
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => applyHeaderPreset("classic")}
-                  >
-                    Classic store
-                  </button>
+                <div className="builder-field">
+                  <span>Header Style & Layout</span>
+                  <div className="builder-header-presets-grid">
+                    <button
+                      type="button"
+                      className={`builder-preset-btn ${shellSettings.headerLayout === "wordpress" ? "is-active" : ""}`}
+                      onClick={() => applyHeaderPreset("wordpress")}
+                    >
+                      <span>WordPress Default</span>
+                      <small>Fallback layout & options</small>
+                    </button>
+                    <button
+                      type="button"
+                      className={`builder-preset-btn ${shellSettings.headerLayout === "princity" ? "is-active" : ""}`}
+                      onClick={() => applyHeaderPreset("service")}
+                    >
+                      <span>Princity Service</span>
+                      <small>Flat layout, text logo</small>
+                    </button>
+                    <button
+                      type="button"
+                      className={`builder-preset-btn ${shellSettings.headerLayout === "pill" ? "is-active" : ""}`}
+                      onClick={() => applyHeaderPreset("commerce")}
+                    >
+                      <span>Commerce Pill</span>
+                      <small>Floating pill on scroll</small>
+                    </button>
+                    <button
+                      type="button"
+                      className={`builder-preset-btn ${shellSettings.headerLayout === "two-row" ? "is-active" : ""}`}
+                      onClick={() => applyHeaderPreset("classic")}
+                    >
+                      <span>Classic Store</span>
+                      <small>Traditional two-row links</small>
+                    </button>
+                    <button
+                      type="button"
+                      className={`builder-preset-btn ${shellSettings.headerLayout === "simple" ? "is-active" : ""}`}
+                      onClick={() => applyHeaderPreset("simple")}
+                    >
+                      <span>Simple Store</span>
+                      <small>Single row layout</small>
+                    </button>
+                    <button
+                      type="button"
+                      className={`builder-preset-btn ${shellSettings.headerLayout === "hero" ? "is-active" : ""}`}
+                      onClick={() => applyHeaderPreset("hero")}
+                    >
+                      <span>Hero Spotlight</span>
+                      <small>Split layout with hero banner</small>
+                    </button>
+                  </div>
                 </div>
 
                 <div className="builder-two-column">

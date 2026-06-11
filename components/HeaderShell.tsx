@@ -99,6 +99,7 @@ export default async function HeaderShell({ layoutOverride }: HeaderShellProps) 
     case "simple":
       layout = "simple";
       break;
+    case "hero":
     case "split":
       layout = "hero";
       break;
@@ -112,6 +113,7 @@ export default async function HeaderShell({ layoutOverride }: HeaderShellProps) 
     case "princity_flat":
       layout = "princity";
       break;
+    case "two-row":
     case "centered":
     default:
       layout = "two-row";
@@ -143,7 +145,7 @@ export default async function HeaderShell({ layoutOverride }: HeaderShellProps) 
       ? shellSettings.topToolbarMeta
       : currencyLabel;
   const effectiveHeaderBackgroundMode =
-    shellSettings.headerBackgroundMode === "none" ? "none" : "default";
+    shellSettings.headerBackgroundMode || "default";
   const effectiveLogoUrl = shellSettings.headerLogoUrl || logoUrl;
   const effectiveBrandText =
     shellSettings.headerBrandText ||
@@ -170,6 +172,7 @@ export default async function HeaderShell({ layoutOverride }: HeaderShellProps) 
     effectiveHeaderBackgroundMode === "none"
       ? "site-header--no-background"
       : "",
+    `site-header--background-${effectiveHeaderBackgroundMode}`,
     `site-header--indicator-${effectiveActiveIndicator}`,
   ]
     .filter(Boolean)
@@ -320,26 +323,30 @@ export default async function HeaderShell({ layoutOverride }: HeaderShellProps) 
       accentColor={accentColor}
       mode={layout === "pill" || layout === "princity" ? "none" : "sticky"}
       className={headerClassName}
+      backgroundMode={effectiveHeaderBackgroundMode as any}
     >
       {/* LAYOUT 2: TWO-ROW (ACF = centered) */}
       {layout === "two-row" && (
         <>
           {renderTopToolbar()}
 
-          <div className="site-header-main">
-            <div className="site-header-main-inner">
+          <div className="site-header-main site-header-main--two-row">
+            {/* Row 1: Brand & Logo + Actions */}
+            <div className="site-header-main-inner site-header-row-top">
               {renderLogoAndBrand()}
+              <div className="site-header-main-right">
+                {renderHeaderActions()}
+              </div>
+            </div>
 
-              <div className="site-header-main-center">
+            {/* Row 2: Navigation Menu */}
+            <div className="site-header-row-bottom">
+              <div className="site-header-row-bottom-inner">
                 <HeaderNav
                   items={itemsToRender}
                   presentationById={menuPresentation}
                 />
                 {renderCategoriesMega()}
-              </div>
-
-              <div className="site-header-main-right">
-                {renderHeaderActions()}
               </div>
             </div>
           </div>
@@ -357,8 +364,7 @@ export default async function HeaderShell({ layoutOverride }: HeaderShellProps) 
             suppressHydrationWarning
           >
 
-            {/* Top bar row only while at top */}
-            {renderTopToolbar()}
+            {/* Redesigned Pill layout has no top toolbar to maintain clean aesthetics */}
 
             {/* Main bar: normal at top, becomes floating pill when scrolled */}
             <div className="site-header-main site-header-pill-main">

@@ -11,13 +11,13 @@
   "headerLogoUrl": "https://cms.webpages.am/wp-content/uploads/2025/11/logo-2-small.png",
   "headerLogoAlt": "WebPages logo",
   "headerLogoMaxWidth": 161,
-  "headerIconVariant": "ghost",
+  "headerIconVariant": "muted",
   "headerIconOrder": [
-    "search",
     "wishlist",
     "cart",
     "account",
-    "theme"
+    "theme",
+    "search"
   ],
   "headerActiveIndicator": "princity",
   "sectionPaddingTop": "medium",
@@ -61,5 +61,5 @@
       "badgeText": null
     }
   },
-  "updatedAt": "2026-06-11T01:39:11.419Z"
+  "updatedAt": "2026-06-11T09:50:42.533Z"
 }
