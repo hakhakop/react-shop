@@ -50,13 +50,13 @@ export const BUILDER_SPACING_SCALE: Record<
   number
 > = {
   none: 0,
-  xs: 4,
-  sm: 8,
-  md: 16,
-  lg: 24,
-  xl: 32,
-  "2xl": 48,
-  "3xl": 72,
+  xs: 8,
+  sm: 16,
+  md: 32,
+  lg: 64,
+  xl: 96,
+  "2xl": 128,
+  "3xl": 192,
 };
 
 const DEFAULT_SPACING_BY_CONTEXT: Record<
@@ -89,12 +89,12 @@ const LEGACY_SPACING_BY_CONTEXT: Record<
   elementMargin: { small: "sm", medium: "md", large: "lg" },
 };
 
-const TOKEN_LABELS: Record<Exclude<BuilderSpacingToken, "inherit">, string> = {
-  none: "0",
+export const TOKEN_LABELS: Record<Exclude<BuilderSpacingToken, "inherit">, string> = {
+  none: "None",
   xs: "XS",
-  sm: "S",
-  md: "M",
-  lg: "L",
+  sm: "Small",
+  md: "Medium",
+  lg: "Large",
   xl: "XL",
   "2xl": "2XL",
   "3xl": "3XL",
@@ -146,6 +146,23 @@ export function resolveBuilderSpacing(
 ): ResolvedBuilderSpacing {
   const rawValue = toRawSpacingValue(token);
   const inheritedValue = toRawSpacingValue(inheritedToken);
+
+  // 1. Check if local is custom pixel value (e.g. "25px")
+  if (rawValue && rawValue !== "inherit") {
+    const parsed = parsePixelValue(rawValue);
+    if (parsed !== null) {
+      return resolveBuilderSpacingCssValue(rawValue, context, "Local", rawValue);
+    }
+  }
+
+  // 2. Check if local is inherit/undefined and inherited is custom pixel value
+  if ((!rawValue || rawValue === "inherit") && inheritedValue) {
+    const parsed = parsePixelValue(inheritedValue);
+    if (parsed !== null) {
+      return resolveBuilderSpacingCssValue(inheritedValue, context, "Global", inheritedValue);
+    }
+  }
+
   const normalized = normalizeSpacingToken(token, context);
   const inherited = normalizeSpacingToken(inheritedToken, context);
   const defaultToken = getDefaultSpacingToken(context);
@@ -172,7 +189,7 @@ export function resolveBuilderSpacing(
     css: `${px}px`,
     label: `${px}px`,
     shortLabel: px === 0 ? "0" : `${px}`,
-    optionLabel: resolvedToken === "none" ? "0" : `${TOKEN_LABELS[resolvedToken]} ${px}`,
+    optionLabel: `${TOKEN_LABELS[resolvedToken]} (${px}px)`,
     source,
     sourceLabel: source,
     isExplicitZero: source === "Local" && isExplicitZeroValue(token),

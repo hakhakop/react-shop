@@ -18,6 +18,10 @@ type StyleTarget = {
 type Props = {
   target: StyleTarget;
   showSpacing?: boolean;
+  showBackground?: boolean;
+  showAppearance?: boolean;
+  showLayout?: boolean;
+  showAdvanced?: boolean;
   showTypography?: boolean;
   onChange: (patch: Partial<StyleTarget>) => void;
   onPickBackgroundImage?: () => void;
@@ -26,6 +30,10 @@ type Props = {
 export default function StyleTabPanel({
   target,
   showSpacing = true,
+  showBackground = true,
+  showAppearance = true,
+  showLayout = true,
+  showAdvanced = true,
   showTypography = true,
   onChange,
   onPickBackgroundImage,
@@ -57,34 +65,72 @@ export default function StyleTabPanel({
         </details>
       )}
 
-      <details className="builder-collapse" open>
-        <summary>
-          <span>Background</span>
-          <small>color, gradient, image</small>
-        </summary>
-        <BackgroundControl
-          value={style.background}
-          onChange={(background) => patchStyle({ background })}
-          onPickImage={onPickBackgroundImage}
-        />
-      </details>
+      {showBackground && (
+        <details className="builder-collapse" open>
+          <summary>
+            <span>Background</span>
+            <small>color, gradient, image</small>
+          </summary>
+          <BackgroundControl
+            value={style.background}
+            onChange={(background) => patchStyle({ background })}
+            onPickImage={onPickBackgroundImage}
+          />
+        </details>
+      )}
 
-      <details className="builder-collapse" open>
-        <summary>
-          <span>Border & effects</span>
-          <small>radius, shadow, visibility</small>
-        </summary>
-        <BorderEffectsControl
-          border={style.border}
-          effects={style.effects}
-          visibility={style.visibility}
-          customClass={style.customClass}
-          onBorderChange={(border) => patchStyle({ border })}
-          onEffectsChange={(effects) => patchStyle({ effects })}
-          onVisibilityChange={(visibility) => patchStyle({ visibility })}
-          onCustomClassChange={(customClass) => patchStyle({ customClass })}
-        />
-      </details>
+      {showAppearance && (
+        <details className="builder-collapse" open>
+          <summary>
+            <span>Border & effects</span>
+            <small>radius, shadow, opacity</small>
+          </summary>
+          <BorderEffectsControl
+            border={style.border}
+            effects={style.effects}
+            onBorderChange={(border) => patchStyle({ border })}
+            onEffectsChange={(effects) => patchStyle({ effects })}
+            showLayout={false}
+            showVisibility={false}
+            showCustomClass={false}
+          />
+        </details>
+      )}
+
+      {showLayout && (
+        <details className="builder-collapse" open>
+          <summary>
+            <span>Dimensions & overflow</span>
+            <small>width, height, clipping</small>
+          </summary>
+          <BorderEffectsControl
+            effects={style.effects}
+            onEffectsChange={(effects) => patchStyle({ effects })}
+            showBorder={false}
+            showEffects={false}
+            showVisibility={false}
+            showCustomClass={false}
+          />
+        </details>
+      )}
+
+      {showAdvanced && (
+        <details className="builder-collapse" open>
+          <summary>
+            <span>Visibility & CSS</span>
+            <small>devices, custom class</small>
+          </summary>
+          <BorderEffectsControl
+            visibility={style.visibility}
+            customClass={style.customClass}
+            onVisibilityChange={(visibility) => patchStyle({ visibility })}
+            onCustomClassChange={(customClass) => patchStyle({ customClass })}
+            showBorder={false}
+            showEffects={false}
+            showLayout={false}
+          />
+        </details>
+      )}
 
       {showTypography && (
         <details className="builder-collapse" open>

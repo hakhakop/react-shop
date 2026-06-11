@@ -14,6 +14,10 @@ import FloatingCartSummary from "../components/FloatingCartSummary";
 import ScrollToTopButton from "../components/ScrollToTopButton";
 import FrontendAdminBar from "../components/FrontendAdminBar";
 import { getBuilderShellSettings } from "../lib/builderShell";
+import {
+  resolveBuilderSpacing,
+  type BuilderSpacingContext,
+} from "../lib/builderSpacing";
 
 export const metadata: Metadata = {
   title: "Webpages Store",
@@ -110,19 +114,10 @@ export default async function RootLayout({
     designTokens["--radius-lg"] ?? "10px"
   );
 
-  const sectionSpacingToCss = (value: string | undefined) => {
-    switch (value) {
-      case "none":
-        return "0px";
-      case "small":
-        return "clamp(18px, 3vw, 36px)";
-      case "large":
-        return "clamp(52px, 7vw, 96px)";
-      case "medium":
-      default:
-        return "clamp(28px, 5vw, 72px)";
-    }
-  };
+  const sectionSpacingToCss = (
+    value: string | undefined,
+    context: BuilderSpacingContext,
+  ) => resolveBuilderSpacing(value, context).css;
   const productCardBg = getCssValue(
     settings.product_card_background,
     designTokens["--product-card-bg"] ?? "#ffffff"
@@ -219,10 +214,10 @@ export default async function RootLayout({
   --product-image-max-height: ${productImageMaxHeight};
   --product-image-object-fit: ${productImageObjectFit};
   --product-image-aspect-ratio: ${productImageAspectRatio};
-  --builder-global-section-padding-top: ${sectionSpacingToCss(shellSettings.sectionPaddingTop)};
-  --builder-global-section-padding-bottom: ${sectionSpacingToCss(shellSettings.sectionPaddingBottom)};
-  --builder-global-section-margin-top: ${sectionSpacingToCss(shellSettings.sectionMarginTop)};
-  --builder-global-section-margin-bottom: ${sectionSpacingToCss(shellSettings.sectionMarginBottom)};
+  --builder-global-section-padding-top: ${sectionSpacingToCss(shellSettings.sectionPaddingTop, "sectionPadding")};
+  --builder-global-section-padding-bottom: ${sectionSpacingToCss(shellSettings.sectionPaddingBottom, "sectionPadding")};
+  --builder-global-section-margin-top: ${sectionSpacingToCss(shellSettings.sectionMarginTop, "sectionMargin")};
+  --builder-global-section-margin-bottom: ${sectionSpacingToCss(shellSettings.sectionMarginBottom, "sectionMargin")};
 ${explicitWordPressProductVars}
 }
             `.trim(),

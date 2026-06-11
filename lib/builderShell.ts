@@ -53,7 +53,7 @@ export type BuilderShellSettings = {
   updatedAt?: string;
 };
 
-export type BuilderSectionSpacing = "none" | "small" | "medium" | "large";
+export type BuilderSectionSpacing = string;
 
 const DATA_DIR = path.join(process.cwd(), "data");
 const DATA_FILE = path.join(DATA_DIR, "builder-shell.json");
@@ -159,11 +159,8 @@ function normalizeHeaderLogoMaxWidth(value: unknown) {
 }
 
 function normalizeSectionSpacing(value: unknown, fallback: BuilderSectionSpacing) {
-  return value === "none" ||
-    value === "small" ||
-    value === "medium" ||
-    value === "large"
-    ? value
+  return typeof value === "string" && value.trim().length > 0
+    ? value.trim()
     : fallback;
 }
 

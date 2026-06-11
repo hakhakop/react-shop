@@ -1,4 +1,8 @@
 import type { CSSProperties } from "react";
+import {
+  resolveBuilderSpacing,
+  type BuilderSpacingContext,
+} from "@/lib/builderSpacing";
 
 export type BuilderSpacingPreset =
   | "none"
@@ -7,6 +11,8 @@ export type BuilderSpacingPreset =
   | "md"
   | "lg"
   | "xl"
+  | "2xl"
+  | "3xl"
   | "inherit";
 
 export type BuilderSpacingSides = {
@@ -59,28 +65,39 @@ export type BuilderVisualStyle = {
   customClass?: string;
 };
 
-const SPACING_PRESET_PX: Record<BuilderSpacingPreset, string | undefined> = {
-  none: "0",
-  xs: "8px",
-  sm: "16px",
-  md: "32px",
-  lg: "48px",
-  xl: "72px",
-  inherit: undefined,
-};
+const BUILDER_SPACING_VALUES = new Set([
+  "none",
+  "xs",
+  "sm",
+  "md",
+  "lg",
+  "xl",
+  "2xl",
+  "3xl",
+  "small",
+  "medium",
+  "large",
+]);
 
-export function resolveSpacingToken(value?: string): string | undefined {
+export function resolveSpacingToken(
+  value?: string,
+  context: BuilderSpacingContext = "elementPadding",
+): string | undefined {
   if (!value) return undefined;
   const trimmed = value.trim();
   if (!trimmed) return undefined;
-  if (trimmed in SPACING_PRESET_PX) {
-    return SPACING_PRESET_PX[trimmed as BuilderSpacingPreset];
+  if (trimmed === "inherit") return undefined;
+  if (BUILDER_SPACING_VALUES.has(trimmed.toLowerCase())) {
+    return resolveBuilderSpacing(trimmed, context).css;
   }
   return trimmed;
 }
 
-function resolveSideValue(value?: string): string | undefined {
-  return resolveSpacingToken(value);
+function resolveSideValue(
+  value: string | undefined,
+  context: BuilderSpacingContext,
+): string | undefined {
+  return resolveSpacingToken(value, context);
 }
 
 function spacingSidesToCss(
@@ -91,13 +108,18 @@ function spacingSidesToCss(
 > {
   if (!sides) return {};
 
-  const top = resolveSideValue(sides.top);
-  const right = resolveSideValue(sides.right ?? (sides.linked ? sides.top : undefined));
+  const top = resolveSideValue(sides.top, "elementPadding");
+  const right = resolveSideValue(
+    sides.right ?? (sides.linked ? sides.top : undefined),
+    "elementPadding",
+  );
   const bottom = resolveSideValue(
     sides.bottom ?? (sides.linked ? sides.top : undefined),
+    "elementPadding",
   );
   const left = resolveSideValue(
     sides.left ?? (sides.linked ? sides.top : sides.right),
+    "elementPadding",
   );
 
   return {
@@ -112,15 +134,18 @@ export function paddingToCss(
   padding?: BuilderSpacingSides,
 ): CSSProperties {
   if (!padding) return {};
-  const top = resolveSideValue(padding.top);
+  const top = resolveSideValue(padding.top, "elementPadding");
   const right = resolveSideValue(
     padding.right ?? (padding.linked ? padding.top : undefined),
+    "elementPadding",
   );
   const bottom = resolveSideValue(
     padding.bottom ?? (padding.linked ? padding.top : undefined),
+    "elementPadding",
   );
   const left = resolveSideValue(
     padding.left ?? (padding.linked ? padding.top : padding.right),
+    "elementPadding",
   );
 
   return {
@@ -133,15 +158,18 @@ export function paddingToCss(
 
 export function marginToCss(margin?: BuilderSpacingSides): CSSProperties {
   if (!margin) return {};
-  const top = resolveSideValue(margin.top);
+  const top = resolveSideValue(margin.top, "elementMargin");
   const right = resolveSideValue(
     margin.right ?? (margin.linked ? margin.top : undefined),
+    "elementMargin",
   );
   const bottom = resolveSideValue(
     margin.bottom ?? (margin.linked ? margin.top : undefined),
+    "elementMargin",
   );
   const left = resolveSideValue(
     margin.left ?? (margin.linked ? margin.top : margin.right),
+    "elementMargin",
   );
 
   return {

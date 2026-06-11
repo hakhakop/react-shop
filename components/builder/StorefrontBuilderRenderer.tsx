@@ -54,6 +54,10 @@ import {
   getBuilderLayoutRows,
   getBuilderRowLayoutPreset,
 } from "@/components/dashboard/builderLayoutPresets";
+import {
+  resolveBuilderSpacing,
+  type BuilderSpacingContext,
+} from "@/lib/builderSpacing";
 
 type StorefrontBuilderRendererProps = {
   layout: BuilderLayout;
@@ -411,21 +415,12 @@ async function BuilderProductsSection({
   );
 }
 
-function getSpacingValue(value: string | undefined) {
-  switch (value) {
-    case "inherit":
-      return undefined;
-    case "none":
-      return "0px";
-    case "small":
-      return "clamp(18px, 3vw, 36px)";
-    case "large":
-      return "clamp(52px, 7vw, 96px)";
-    case "medium":
-      return "clamp(28px, 5vw, 72px)";
-    default:
-      return undefined;
-  }
+function getSpacingValue(
+  value: string | undefined,
+  context: BuilderSpacingContext,
+) {
+  if (!value || value === "inherit") return undefined;
+  return resolveBuilderSpacing(value, context).css;
 }
 
 function sectionStyle(section: BuilderSection): BuilderStyle {
@@ -453,10 +448,22 @@ function sectionStyle(section: BuilderSection): BuilderStyle {
   const contextVars = getContextVars(colorScheme, section.background);
   const styleObj: BuilderStyle = {
     background: section.background,
-    "--builder-section-padding-top": getSpacingValue(section.topSpacing),
-    "--builder-section-padding-bottom": getSpacingValue(section.bottomSpacing),
-    "--builder-section-margin-top": getSpacingValue(section.topMargin),
-    "--builder-section-margin-bottom": getSpacingValue(section.bottomMargin),
+    "--builder-section-padding-top": getSpacingValue(
+      section.topSpacing,
+      "sectionPadding",
+    ),
+    "--builder-section-padding-bottom": getSpacingValue(
+      section.bottomSpacing,
+      "sectionPadding",
+    ),
+    "--builder-section-margin-top": getSpacingValue(
+      section.topMargin,
+      "sectionMargin",
+    ),
+    "--builder-section-margin-bottom": getSpacingValue(
+      section.bottomMargin,
+      "sectionMargin",
+    ),
     ...schemeVars,
     ...contextVars,
     ...visualStyleToCss(visual),
@@ -2354,6 +2361,10 @@ function blockSurfaceStyle(
     legacy["--builder-radius"] = `${block.borderRadius}px`;
     legacy["--builder-card-radius"] = `${block.borderRadius}px`;
   }
+  legacy.padding = resolveBuilderSpacing(
+    block.elementPadding,
+    "elementPadding",
+  ).css;
 
   return { ...contextVars, ...legacy, ...visualCss };
 }
@@ -2440,18 +2451,22 @@ function rowStyle(rowItem: any, parentScheme: "light" | "dark" = "light"): CSSPr
   if (rowItem?.rowBackground) {
     styleObj.background = rowItem.rowBackground;
   }
-  if (rowItem?.rowTopSpacing) {
-    styleObj["--builder-section-padding-top"] = getSpacingValue(rowItem.rowTopSpacing);
-  }
-  if (rowItem?.rowBottomSpacing) {
-    styleObj["--builder-section-padding-bottom"] = getSpacingValue(rowItem.rowBottomSpacing);
-  }
-  if (rowItem?.rowTopMargin) {
-    styleObj["--builder-section-margin-top"] = getSpacingValue(rowItem.rowTopMargin);
-  }
-  if (rowItem?.rowBottomMargin) {
-    styleObj["--builder-section-margin-bottom"] = getSpacingValue(rowItem.rowBottomMargin);
-  }
+  styleObj["--builder-section-padding-top"] = resolveBuilderSpacing(
+    rowItem?.rowTopSpacing,
+    "rowPadding",
+  ).css;
+  styleObj["--builder-section-padding-bottom"] = resolveBuilderSpacing(
+    rowItem?.rowBottomSpacing,
+    "rowPadding",
+  ).css;
+  styleObj["--builder-section-margin-top"] = resolveBuilderSpacing(
+    rowItem?.rowTopMargin,
+    "rowMargin",
+  ).css;
+  styleObj["--builder-section-margin-bottom"] = resolveBuilderSpacing(
+    rowItem?.rowBottomMargin,
+    "rowMargin",
+  ).css;
   if (rowItem?.rowBorderRadius !== undefined) {
     styleObj["--builder-radius"] = `${rowItem.rowBorderRadius}px`;
     styleObj["--builder-card-radius"] = `${rowItem.rowBorderRadius}px`;
@@ -2540,7 +2555,14 @@ function ContentLayoutSection({
           <BodyText className="shop-builder-body">{section.body}</BodyText>
         </div>
       )}
-      <div className="shop-builder-content-layout-rows-wrapper" style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+      <div
+        className="shop-builder-content-layout-rows-wrapper"
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: resolveBuilderSpacing(undefined, "rowGap").css,
+        }}
+      >
         {layoutRows.map((row) => {
           const rowItem = row.items[0];
           const isRowAntigravity = rowItem?.rowBackgroundEffect === "antigravity";
@@ -2561,7 +2583,7 @@ function ContentLayoutSection({
               style={{
                 display: "grid",
                 gridTemplateColumns: "repeat(12, minmax(0, 1fr))",
-                gap: "28px",
+                gap: resolveBuilderSpacing(undefined, "columnGap").css,
                 paddingTop: "var(--builder-section-padding-top, 0px)",
                 paddingBottom: "var(--builder-section-padding-bottom, 0px)",
                 marginTop: "var(--builder-section-margin-top, 0px)",

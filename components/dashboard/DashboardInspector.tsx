@@ -51,6 +51,9 @@ import type { BuilderVisualStyle } from "@/lib/builderVisualStyle";
 import {
   getSpacingOptionLabel,
   type BuilderSpacingContext,
+  BUILDER_SPACING_SCALE,
+  TOKEN_LABELS,
+  resolveBuilderSpacing,
 } from "@/lib/builderSpacing";
 import type { CategoryTreeItem } from "@/lib/categories";
 import type { TypographyArea } from "@/lib/builderTypography";
@@ -88,19 +91,131 @@ const GRADIENT_PRESETS: Record<string, [string, string, string]> = {
   "gold-amber": ["#facc15", "#f59e0b", "#f97316"],
 };
 
-const spacingPresetLabels: Record<"none" | "small" | "medium" | "large", string> = {
-  none: "None",
-  small: "Small",
-  medium: "Medium",
-  large: "Large",
-};
+function SpacingControl({
+  id,
+  label,
+  value,
+  context,
+  allowInherit = true,
+  onChange,
+}: {
+  id: string;
+  label: string;
+  value: string | undefined;
+  context: BuilderSpacingContext;
+  allowInherit?: boolean;
+  onChange: (newValue: any) => void;
+}) {
+  const presets = ["none", "xs", "sm", "md", "lg", "xl", "2xl", "3xl"] as const;
+  
+  const isPresetToken = (val: string) => {
+    return (
+      val === "none" ||
+      val === "xs" ||
+      val === "sm" ||
+      val === "md" ||
+      val === "lg" ||
+      val === "xl" ||
+      val === "2xl" ||
+      val === "3xl" ||
+      val === "small" ||
+      val === "medium" ||
+      val === "large"
+    );
+  };
 
-function renderSpacingOptions(context: BuilderSpacingContext) {
-  return (["none", "small", "medium", "large"] as const).map((value) => (
-    <option key={value} value={value}>
-      {spacingPresetLabels[value]} ({getSpacingOptionLabel(value, context)}px)
-    </option>
-  ));
+  const isPreset = !value || value === "inherit" || isPresetToken(value);
+  const isCustom = !isPreset;
+
+  const numericMatch = value ? value.trim().match(/^(\d+)px$/i) : null;
+  const customNumericValue = numericMatch ? numericMatch[1] : "";
+
+  const handleSelectChange = (event: ChangeEvent<HTMLSelectElement>) => {
+    const val = event.target.value;
+    if (val === "custom") {
+      const currentPx = resolveBuilderSpacing(value ?? (allowInherit ? "inherit" : "sm"), context).px;
+      onChange(`${currentPx > 0 ? currentPx : 16}px`);
+    } else {
+      onChange(val);
+    }
+  };
+
+  const handleCustomNumericChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const num = event.target.value.replace(/\D/g, "");
+    onChange(num ? `${num}px` : "0px");
+  };
+
+  let selectValue = "inherit";
+  if (isCustom) {
+    selectValue = "custom";
+  } else if (value) {
+    if (value === "small") selectValue = "sm";
+    else if (value === "medium") selectValue = "md";
+    else if (value === "large") selectValue = "lg";
+    else selectValue = value;
+  } else {
+    selectValue = allowInherit ? "inherit" : "sm";
+  }
+
+  return (
+    <label className="builder-field spacing-control-wrapper" style={{ display: "block", marginBottom: "12px" }}>
+      <span style={{ display: "block", marginBottom: "4px", fontSize: "12px", fontWeight: 500, color: "var(--text-muted)" }}>{label}</span>
+      <div className="spacing-control-row" style={{ display: "flex", gap: "8px", alignItems: "center", width: "100%" }}>
+        <select
+          id={id}
+          value={selectValue}
+          onChange={handleSelectChange}
+          style={{
+            flex: 1,
+            height: "36px",
+            padding: "0 10px",
+            borderRadius: "var(--builder-ui-radius-sm)",
+            border: "1px solid var(--builder-ui-border)",
+            background: "var(--builder-ui-panel-solid)",
+            color: "var(--builder-ui-text)",
+            font: "inherit",
+          }}
+        >
+          {allowInherit && <option value="inherit">Inherit</option>}
+          {presets.map((preset) => {
+            const px = BUILDER_SPACING_SCALE[preset];
+            const labelName = TOKEN_LABELS[preset];
+            return (
+              <option key={preset} value={preset}>
+                {labelName} ({px}px)
+              </option>
+            );
+          })}
+          <option value="custom">Custom...</option>
+        </select>
+        
+        {isCustom && (
+          <div className="custom-spacing-input-wrapper" style={{ display: "flex", alignItems: "center", gap: "4px", width: "85px", flexShrink: 0 }}>
+            <input
+              type="text"
+              pattern="[0-9]*"
+              inputMode="numeric"
+              value={customNumericValue}
+              onChange={handleCustomNumericChange}
+              style={{
+                width: "100%",
+                height: "36px",
+                padding: "0 10px",
+                border: "1px solid var(--builder-ui-border)",
+                background: "var(--builder-ui-panel-solid)",
+                color: "var(--builder-ui-text)",
+                borderRadius: "var(--builder-ui-radius-sm)",
+                textAlign: "right",
+                font: "inherit",
+              }}
+              placeholder="0"
+            />
+            <span style={{ fontSize: "12px", color: "var(--text-muted)", opacity: 0.8 }}>px</span>
+          </div>
+        )}
+      </div>
+    </label>
+  );
 }
 
 const getCustomGradientPatch = (
@@ -365,6 +480,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
     : [];
   const selectedLayoutRow =
     selectedLayoutRowIndex !== null ? layoutRows[selectedLayoutRowIndex] : null;
+  const selectedRowItem = selectedLayoutRow?.items[0];
   const selectedRowLayoutPreset = getBuilderRowLayoutPreset(
     selectedLayoutRow?.layoutKey ?? null,
   );
@@ -521,6 +637,53 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
     }
   }, [inspectorTab, selectedLayoutBlock, selectedLayoutRow, setInspectorTab]);
 
+  useEffect(() => {
+    const handleFocusSpacing = (event: Event) => {
+      const customEvent = event as CustomEvent<{
+        scope: string;
+        field?: string;
+      }>;
+      if (!customEvent.detail) return;
+      const { scope, field } = customEvent.detail;
+      const targetId = `spacing-${scope}-${field}`;
+
+      console.log("[DashboardInspector] Received builder-focus-spacing event for:", targetId);
+
+      let attempts = 0;
+      const tryFocus = () => {
+        const element = document.getElementById(targetId);
+        if (element) {
+          console.log("[DashboardInspector] Found element, focusing:", targetId);
+          element.scrollIntoView({ block: "center", behavior: "smooth" });
+
+          if (element instanceof HTMLSelectElement || element instanceof HTMLInputElement) {
+            element.focus();
+            element.classList.add("pulse-highlight");
+            setTimeout(() => {
+              element.classList.remove("pulse-highlight");
+            }, 1500);
+          }
+          return true;
+        }
+        return false;
+      };
+
+      if (!tryFocus()) {
+        const interval = setInterval(() => {
+          attempts++;
+          if (tryFocus() || attempts >= 8) {
+            clearInterval(interval);
+          }
+        }, 50);
+      }
+    };
+
+    window.addEventListener("builder-focus-spacing", handleFocusSpacing);
+    return () => {
+      window.removeEventListener("builder-focus-spacing", handleFocusSpacing);
+    };
+  }, []);
+
   const activeTypographyArea =
     activeTypographyAreaState.blockKey === selectedLayoutBlockKey &&
     supportedAreas.includes(activeTypographyAreaState.area)
@@ -560,6 +723,15 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
       return;
     }
     updateSelected(patch);
+  }
+
+  function updateRowVisualStyle(patch: Partial<BuilderVisualStyle>) {
+    onUpdateRowStyle({
+      rowVisualStyle: {
+        ...((selectedRowItem?.rowVisualStyle as BuilderVisualStyle | undefined) ?? {}),
+        ...patch,
+      },
+    });
   }
 
   function updateAnimationTarget(
@@ -622,6 +794,97 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
           allowPause={options.allowPause}
           allowScrub
         />
+      </details>
+    );
+  }
+
+  function renderSectionScrollBehaviorControls() {
+    if (selectedSection?.kind !== "scrollPinnedDemo") return null;
+
+    return (
+      <details className="builder-collapse" open>
+        <summary>
+          <InspectorGroupSummary
+            title="Scroll Behavior"
+            description="Control scroll speed, pin duration, and animation style."
+            meta={`${selectedSection.carouselSettings?.scrubSpeed ?? 1.2}x speed`}
+          />
+        </summary>
+        <label className="builder-field">
+          <span>Animation Variant</span>
+          <select
+            value={selectedSection.carouselSettings?.variant ?? "perfect"}
+            onChange={(event) =>
+              updateSelected({
+                carouselSettings: {
+                  ...(selectedSection.carouselSettings ?? {}),
+                  variant: event.target.value,
+                },
+              })
+            }
+          >
+            <option value="perfect">Perfect (Stack)</option>
+            <option value="fade">Fade</option>
+            <option value="slide">Slide</option>
+          </select>
+        </label>
+        <label className="builder-field">
+          <span>Scrub Speed</span>
+          <div className="builder-range-row">
+            <input
+              type="range"
+              min="0.1"
+              max="5.0"
+              step="0.1"
+              value={selectedSection.carouselSettings?.scrubSpeed ?? 1.2}
+              onChange={(event) =>
+                updateSelected({
+                  carouselSettings: {
+                    ...(selectedSection.carouselSettings ?? {}),
+                    scrubSpeed: Number(event.target.value),
+                  },
+                })
+              }
+            />
+            <span>{(selectedSection.carouselSettings?.scrubSpeed ?? 1.2).toFixed(1)}x</span>
+          </div>
+        </label>
+        <label className="builder-field">
+          <span>Pin Height Factor</span>
+          <div className="builder-range-row">
+            <input
+              type="range"
+              min="20"
+              max="500"
+              step="10"
+              value={selectedSection.carouselSettings?.pinHeightFactor ?? 100}
+              onChange={(event) =>
+                updateSelected({
+                  carouselSettings: {
+                    ...(selectedSection.carouselSettings ?? {}),
+                    pinHeightFactor: Number(event.target.value),
+                  },
+                })
+              }
+            />
+            <span>{selectedSection.carouselSettings?.pinHeightFactor ?? 100}%</span>
+          </div>
+        </label>
+        <label className="builder-check">
+          <input
+            type="checkbox"
+            checked={selectedSection.carouselSettings?.showNavigation ?? true}
+            onChange={(event) =>
+              updateSelected({
+                carouselSettings: {
+                  ...(selectedSection.carouselSettings ?? {}),
+                  showNavigation: event.target.checked,
+                },
+              })
+            }
+          />
+          <span>Show Navigation</span>
+        </label>
       </details>
     );
   }
@@ -925,6 +1188,171 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                   ))}
                 </div>
               </details>
+
+              <StyleTabPanel
+                target={{ visualStyle: selectedRowItem?.rowVisualStyle }}
+                showSpacing={false}
+                showBackground={false}
+                showAppearance={false}
+                showAdvanced={false}
+                showTypography={false}
+                onChange={(patch) =>
+                  updateRowVisualStyle(patch.visualStyle ?? {})
+                }
+              />
+            </div>
+          )}
+
+          {selectedLayoutRow && inspectorTab === "spacing" && (
+            <div className="builder-inspector-stack">
+              <details className="builder-collapse" open>
+                <summary>
+                  <InspectorGroupSummary
+                    title="Row Spacing"
+                    description="Control padding inside this row and margin outside it."
+                    meta="Padding & margin"
+                  />
+                </summary>
+                <div className="builder-two-column">
+                  <SpacingControl
+                    id="spacing-row-rowTopSpacing"
+                    label="Top Padding"
+                    value={selectedRowItem?.rowTopSpacing}
+                    context="rowPadding"
+                    onChange={(val) => onUpdateRowStyle({ rowTopSpacing: val })}
+                  />
+                  <SpacingControl
+                    id="spacing-row-rowBottomSpacing"
+                    label="Bottom Padding"
+                    value={selectedRowItem?.rowBottomSpacing}
+                    context="rowPadding"
+                    onChange={(val) => onUpdateRowStyle({ rowBottomSpacing: val })}
+                  />
+                </div>
+                <div className="builder-two-column">
+                  <SpacingControl
+                    id="spacing-row-rowTopMargin"
+                    label="Top Margin"
+                    value={selectedRowItem?.rowTopMargin}
+                    context="rowMargin"
+                    onChange={(val) => onUpdateRowStyle({ rowTopMargin: val })}
+                  />
+                  <SpacingControl
+                    id="spacing-row-rowBottomMargin"
+                    label="Bottom Margin"
+                    value={selectedRowItem?.rowBottomMargin}
+                    context="rowMargin"
+                    onChange={(val) => onUpdateRowStyle({ rowBottomMargin: val })}
+                  />
+                </div>
+              </details>
+            </div>
+          )}
+
+          {selectedLayoutRow && inspectorTab === "style" && (
+            <div className="builder-inspector-stack">
+              <details className="builder-collapse" open>
+                <summary>
+                  <InspectorGroupSummary
+                    title="Row Surface"
+                    description="Set the row background, color mode, and corner radius."
+                    meta={selectedRowItem?.rowColorScheme ?? "inherit"}
+                  />
+                </summary>
+                <label className="builder-field">
+                  <span>Background</span>
+                  <div className="builder-color-row">
+                    <input
+                      type="color"
+                      value={
+                        selectedRowItem?.rowBackground?.startsWith("#")
+                          ? selectedRowItem.rowBackground
+                          : "#ffffff"
+                      }
+                      onChange={(event) =>
+                        onUpdateRowStyle({ rowBackground: event.target.value })
+                      }
+                    />
+                    <input
+                      value={selectedRowItem?.rowBackground ?? ""}
+                      placeholder="Transparent or CSS color"
+                      onChange={(event) =>
+                        onUpdateRowStyle({ rowBackground: event.target.value })
+                      }
+                    />
+                  </div>
+                </label>
+                <div className="builder-two-column">
+                  <label className="builder-field">
+                    <span>Color Mode</span>
+                    <select
+                      value={selectedRowItem?.rowColorScheme ?? "inherit"}
+                      onChange={(event) =>
+                        onUpdateRowStyle({
+                          rowColorScheme: event.target.value as SectionColorScheme,
+                        })
+                      }
+                    >
+                      <option value="inherit">Auto by background</option>
+                      <option value="light">Dark text</option>
+                      <option value="dark">Light text</option>
+                    </select>
+                  </label>
+                  <label className="builder-field">
+                    <span>Border Radius</span>
+                    <input
+                      type="number"
+                      min={0}
+                      max={100}
+                      value={selectedRowItem?.rowBorderRadius ?? 0}
+                      onChange={(event) =>
+                        onUpdateRowStyle({
+                          rowBorderRadius: Number(event.target.value),
+                        })
+                      }
+                    />
+                  </label>
+                </div>
+              </details>
+              <StyleTabPanel
+                target={{ visualStyle: selectedRowItem?.rowVisualStyle }}
+                showSpacing={false}
+                showLayout={false}
+                showAdvanced={false}
+                showTypography={false}
+                onChange={(patch) =>
+                  updateRowVisualStyle(patch.visualStyle ?? {})
+                }
+              />
+            </div>
+          )}
+
+          {selectedLayoutRow && inspectorTab === "advanced" && (
+            <div className="builder-inspector-stack">
+              <details className="builder-collapse" open>
+                <summary>
+                  <InspectorGroupSummary
+                    title="Row Animation"
+                    description="Configure this row's entrance animation."
+                    meta={selectedRowItem?.rowAnimation?.preset ?? "none"}
+                  />
+                </summary>
+                <AnimationControl
+                  value={selectedRowItem?.rowAnimation}
+                  onChange={(rowAnimation) => onUpdateRowStyle({ rowAnimation })}
+                />
+              </details>
+              <StyleTabPanel
+                target={{ visualStyle: selectedRowItem?.rowVisualStyle }}
+                showSpacing={false}
+                showBackground={false}
+                showAppearance={false}
+                showLayout={false}
+                showTypography={false}
+                onChange={(patch) =>
+                  updateRowVisualStyle(patch.visualStyle ?? {})
+                }
+              />
             </div>
           )}
 
@@ -1015,6 +1443,16 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
 	                      </select>
 	                    </label>
 	                  </details>
+
+                      <StyleTabPanel
+                        target={styleTarget}
+                        showSpacing={false}
+                        showBackground={false}
+                        showAppearance={false}
+                        showAdvanced={false}
+                        showTypography={false}
+                        onChange={updateStyleTarget}
+                      />
 
 	                </>
 	              )}
@@ -1206,17 +1644,50 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                             <div className="builder-element-inspector-note">
                               <strong>Element styling</strong>
                               <span>
-                                Card style, spacing, colors, and appearance for{" "}
+                                Card style, colors, and appearance for{" "}
                                 {layoutBlockLabels[selectedLayoutBlock.kind ?? "text"]}.
                               </span>
                             </div>
                             <StyleTabPanel
                               target={styleTarget}
+                              showSpacing={false}
+                              showLayout={false}
+                              showAdvanced={false}
                               showTypography={false}
                               onChange={updateStyleTarget}
                               onPickBackgroundImage={pickStyleBackgroundImage}
                             />
                           </>
+                        ) : isElementLayoutTab ? (
+                          <StyleTabPanel
+                            target={styleTarget}
+                            showSpacing={false}
+                            showBackground={false}
+                            showAppearance={false}
+                            showAdvanced={false}
+                            showTypography={false}
+                            onChange={updateStyleTarget}
+                          />
+                        ) : isElementSpacingTab ? (
+                          <StyleTabPanel
+                            target={styleTarget}
+                            showBackground={false}
+                            showAppearance={false}
+                            showLayout={false}
+                            showAdvanced={false}
+                            showTypography={false}
+                            onChange={updateStyleTarget}
+                          />
+                        ) : isElementAdvancedTab ? (
+                          <StyleTabPanel
+                            target={styleTarget}
+                            showSpacing={false}
+                            showBackground={false}
+                            showAppearance={false}
+                            showLayout={false}
+                            showTypography={false}
+                            onChange={updateStyleTarget}
+                          />
                         ) : isElementTypographyTab ? (
                           <div className="builder-element-inspector-note">
                             <strong>Typography</strong>
@@ -1404,10 +1875,174 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
 
                                           {isSelectedBlock &&
                                             isElementLayoutTab && (
+                                            <details className="builder-collapse" open>
+                                              <summary>
+                                                <span>Element Layout</span>
+                                                <small>{block.elementAlign ?? "left"}</small>
+                                              </summary>
+                                              <label className="builder-field">
+                                                <span>Content Align</span>
+                                                <select
+                                                  value={block.elementAlign ?? "left"}
+                                                  onChange={(event) =>
+                                                    updateSelectedLayoutBlock(
+                                                      index,
+                                                      blockIndex,
+                                                      {
+                                                        elementAlign: event.target
+                                                          .value as BuilderLayoutBlock["elementAlign"],
+                                                      },
+                                                    )
+                                                  }
+                                                >
+                                                  <option value="left">Left</option>
+                                                  <option value="center">Center</option>
+                                                  <option value="right">Right</option>
+                                                </select>
+                                              </label>
+
+                                              {(block.kind === "button" || block.kind === "hero") && (
+                                                <label className="builder-field">
+                                                  <span>Buttons orientation</span>
+                                                  <select
+                                                    value={block.buttonsLayout ?? "inline"}
+                                                    onChange={(event) =>
+                                                      updateSelectedLayoutBlock(
+                                                        index,
+                                                        blockIndex,
+                                                        { buttonsLayout: event.target.value as any },
+                                                      )
+                                                    }
+                                                  >
+                                                    <option value="inline">Inline (Side by side)</option>
+                                                    <option value="stacked">Stacked (Vertical)</option>
+                                                  </select>
+                                                </label>
+                                              )}
+
+                                              {block.kind === "embed" && (
+                                                <label className="builder-field">
+                                                  <span>Height</span>
+                                                  <input
+                                                    type="number"
+                                                    min={120}
+                                                    max={900}
+                                                    value={block.embedHeight ?? 260}
+                                                    onChange={(event) =>
+                                                      updateSelectedLayoutBlock(
+                                                        index,
+                                                        blockIndex,
+                                                        { embedHeight: Number(event.target.value) },
+                                                      )
+                                                    }
+                                                  />
+                                                </label>
+                                              )}
+
+                                              {block.kind === "grid" && (
+                                                <div className="builder-two-column">
+                                                  <label className="builder-field">
+                                                    <span>Columns</span>
+                                                    <input
+                                                      type="number"
+                                                      min={1}
+                                                      max={6}
+                                                      value={block.columns ?? 3}
+                                                      onChange={(event) =>
+                                                        updateSelectedLayoutBlock(
+                                                          index,
+                                                          blockIndex,
+                                                          { columns: Number(event.target.value) },
+                                                        )
+                                                      }
+                                                    />
+                                                  </label>
+                                                  <label className="builder-field">
+                                                    <span>Rows</span>
+                                                    <input
+                                                      type="number"
+                                                      min={1}
+                                                      max={6}
+                                                      value={block.gridRows ?? 1}
+                                                      onChange={(event) =>
+                                                        updateSelectedLayoutBlock(
+                                                          index,
+                                                          blockIndex,
+                                                          { gridRows: Number(event.target.value) },
+                                                        )
+                                                      }
+                                                    />
+                                                  </label>
+                                                </div>
+                                              )}
+
+                                              {block.kind === "products" && (
+                                                <div className="builder-two-column">
+                                                  <label className="builder-field">
+                                                    <span>Columns</span>
+                                                    <input
+                                                      type="number"
+                                                      min={1}
+                                                      max={4}
+                                                      value={block.columns ?? 2}
+                                                      onChange={(event) =>
+                                                        updateSelectedLayoutBlock(
+                                                          index,
+                                                          blockIndex,
+                                                          { columns: Number(event.target.value) },
+                                                        )
+                                                      }
+                                                    />
+                                                  </label>
+                                                  <label className="builder-field">
+                                                    <span>Layout Variant</span>
+                                                    <select
+                                                      value={block.layoutVariant ?? "grid"}
+                                                      onChange={(event) =>
+                                                        updateSelectedLayoutBlock(
+                                                          index,
+                                                          blockIndex,
+                                                          {
+                                                            layoutVariant: event.target
+                                                              .value as BuilderLayoutBlock["layoutVariant"],
+                                                          },
+                                                        )
+                                                      }
+                                                    >
+                                                      <option value="grid">Grid</option>
+                                                      <option value="carousel">Carousel</option>
+                                                    </select>
+                                                  </label>
+                                                </div>
+                                              )}
+
+                                              {block.kind === "badgeGrid" && (
+                                                <label className="builder-field">
+                                                  <span>Badge Columns</span>
+                                                  <input
+                                                    type="number"
+                                                    min={1}
+                                                    max={3}
+                                                    value={block.columns ?? 2}
+                                                    onChange={(event) =>
+                                                      updateSelectedLayoutBlock(
+                                                        index,
+                                                        blockIndex,
+                                                        { columns: Number(event.target.value) },
+                                                      )
+                                                    }
+                                                  />
+                                                </label>
+                                              )}
+                                            </details>
+                                          )}
+
+                                          {isSelectedBlock &&
+                                            isElementSettingsTab && (
                                             <>
                                               <details className="builder-collapse" open>
                                                 <summary>
-                                                  <span>Element layout</span>
+                                                  <span>Element appearance</span>
                                                   <small>
                                                     {block.panelStyle ?? "default"}
                                                   </small>
@@ -1439,29 +2074,6 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                         </option>
                                                       ),
                                                     )}
-                                                  </select>
-                                                </label>
-                                                <label className="builder-field">
-                                                  <span>Content Align</span>
-                                                  <select
-                                                    value={
-                                                      block.elementAlign ?? "left"
-                                                    }
-                                                    onChange={(event) =>
-                                                      updateSelectedLayoutBlock(
-                                                        index,
-                                                        blockIndex,
-                                                        {
-                                                          elementAlign: event
-                                                            .target
-                                                            .value as BuilderLayoutBlock["elementAlign"],
-                                                        },
-                                                      )
-                                                    }
-                                                  >
-                                                    <option value="left">Left</option>
-                                                    <option value="center">Center</option>
-                                                    <option value="right">Right</option>
                                                   </select>
                                                 </label>
                                               </details>
@@ -1499,31 +2111,72 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                 <summary>
                                                   <span>Element spacing</span>
                                                   <small>
-                                                    {block.elementPadding ?? "none"}
+                                                    {block.elementPadding ?? "small"}
                                                   </small>
                                                 </summary>
-                                                <label className="builder-field">
-                                                  <span>Element Padding</span>
-                                                  <select
-                                                    value={
-                                                      block.elementPadding ??
-                                                      "none"
-                                                    }
-                                                    onChange={(event) =>
+                                                  <SpacingControl
+                                                    id="spacing-element-elementPadding"
+                                                    label="Element Padding"
+                                                    value={block.elementPadding}
+                                                    context="elementPadding"
+                                                    allowInherit={false}
+                                                    onChange={(val) =>
                                                       updateSelectedLayoutBlock(
                                                         index,
                                                         blockIndex,
-                                                        {
-                                                          elementPadding: event
-                                                            .target
-                                                            .value as BuilderLayoutBlock["elementPadding"],
-                                                        },
+                                                        { elementPadding: val },
                                                       )
                                                     }
-                                                  >
-                                                    {renderSpacingOptions("elementPadding")}
-                                                  </select>
-                                                </label>
+                                                  />
+                                                {(block.kind === "grid" || block.kind === "products") && (
+                                                  <div className="builder-two-column">
+                                                    <label className="builder-field">
+                                                      <span>Grid Gap</span>
+                                                      <select
+                                                        value={block.gridGap ?? "medium"}
+                                                        onChange={(event) =>
+                                                          updateSelectedLayoutBlock(
+                                                            index,
+                                                            blockIndex,
+                                                            {
+                                                              gridGap: event.target
+                                                                .value as BuilderLayoutBlock["gridGap"],
+                                                            },
+                                                          )
+                                                        }
+                                                      >
+                                                        <option value="none">None</option>
+                                                        <option value="small">Small</option>
+                                                        <option value="medium">Medium</option>
+                                                        <option value="large">Large</option>
+                                                        {block.kind === "products" && (
+                                                          <option value="max">Max</option>
+                                                        )}
+                                                      </select>
+                                                    </label>
+                                                    <label className="builder-field">
+                                                      <span>Outer Margin</span>
+                                                      <select
+                                                        value={block.gridMargin ?? "none"}
+                                                        onChange={(event) =>
+                                                          updateSelectedLayoutBlock(
+                                                            index,
+                                                            blockIndex,
+                                                            {
+                                                              gridMargin: event.target
+                                                                .value as BuilderLayoutBlock["gridMargin"],
+                                                            },
+                                                          )
+                                                        }
+                                                      >
+                                                        <option value="none">None</option>
+                                                        <option value="small">Small</option>
+                                                        <option value="medium">Medium</option>
+                                                        <option value="large">Large</option>
+                                                      </select>
+                                                    </label>
+                                                  </div>
+                                                )}
                                               </details>
                                             </>
                                           )}
@@ -1714,20 +2367,6 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                           {block.kind === "button" ? (
                                             <>
                                               <div className="builder-section-heading">
-                                                <span>Layout</span>
-                                              </div>
-                                              <label className="builder-field">
-                                                <span>Buttons orientation</span>
-                                                <select
-                                                  value={block.buttonsLayout ?? "inline"}
-                                                  onChange={(e) => updateSelectedLayoutBlock(index, blockIndex, { buttonsLayout: e.target.value as any })}
-                                                >
-                                                  <option value="inline">Inline (Side by side)</option>
-                                                  <option value="stacked">Stacked (Vertical)</option>
-                                                </select>
-                                              </label>
-
-                                              <div className="builder-section-heading">
                                                 <span>Buttons</span>
                                                 <span>{block.buttons?.length ?? 0}</span>
                                               </div>
@@ -1896,28 +2535,6 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                   />
                                                 </label>
                                               )}
-                                              <label className="builder-field">
-                                                <span>Height</span>
-                                                <input
-                                                  type="number"
-                                                  min={120}
-                                                  max={900}
-                                                  value={
-                                                    block.embedHeight ?? 260
-                                                  }
-                                                  onChange={(event) =>
-                                                    updateSelectedLayoutBlock(
-                                                      index,
-                                                      blockIndex,
-                                                      {
-                                                        embedHeight: Number(
-                                                          event.target.value,
-                                                        ),
-                                                      },
-                                                    )
-                                                  }
-                                                />
-                                              </label>
                                             </>
                                           ) : block.kind === "fluentForm" ? (
                                             <>
@@ -1998,117 +2615,6 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                   </option>
                                                 </select>
                                               </label>
-                                              <div className="builder-two-column">
-                                                <label className="builder-field">
-                                                  <span>Columns</span>
-                                                  <input
-                                                    type="number"
-                                                    min={1}
-                                                    max={6}
-                                                    value={block.columns ?? 3}
-                                                    onChange={(event) =>
-                                                      updateSelectedLayoutBlock(
-                                                        index,
-                                                        blockIndex,
-                                                        {
-                                                          columns: Number(
-                                                            event.target
-                                                              .value,
-                                                          ),
-                                                        },
-                                                      )
-                                                    }
-                                                  />
-                                                </label>
-                                                <label className="builder-field">
-                                                  <span>Rows</span>
-                                                  <input
-                                                    type="number"
-                                                    min={1}
-                                                    max={6}
-                                                    value={
-                                                      block.gridRows ?? 1
-                                                    }
-                                                    onChange={(event) =>
-                                                      updateSelectedLayoutBlock(
-                                                        index,
-                                                        blockIndex,
-                                                        {
-                                                          gridRows: Number(
-                                                            event.target
-                                                              .value,
-                                                          ),
-                                                        },
-                                                      )
-                                                    }
-                                                  />
-                                                </label>
-                                              </div>
-                                              <div className="builder-two-column">
-                                                <label className="builder-field">
-                                                  <span>Grid Gap</span>
-                                                  <select
-                                                    value={
-                                                      block.gridGap ??
-                                                      "medium"
-                                                    }
-                                                    onChange={(event) =>
-                                                      updateSelectedLayoutBlock(
-                                                        index,
-                                                        blockIndex,
-                                                        {
-                                                          gridGap: event
-                                                            .target
-                                                            .value as BuilderLayoutBlock["gridGap"],
-                                                        },
-                                                      )
-                                                    }
-                                                  >
-                                                    <option value="small">
-                                                      Small
-                                                    </option>
-                                                    <option value="medium">
-                                                      Medium
-                                                    </option>
-                                                    <option value="large">
-                                                      Large
-                                                    </option>
-                                                  </select>
-                                                </label>
-                                                <label className="builder-field">
-                                                  <span>Outer Margin</span>
-                                                  <select
-                                                    value={
-                                                      block.gridMargin ??
-                                                      "none"
-                                                    }
-                                                    onChange={(event) =>
-                                                      updateSelectedLayoutBlock(
-                                                        index,
-                                                        blockIndex,
-                                                        {
-                                                          gridMargin: event
-                                                            .target
-                                                            .value as BuilderLayoutBlock["gridMargin"],
-                                                        },
-                                                      )
-                                                    }
-                                                  >
-                                                    <option value="none">
-                                                      None
-                                                    </option>
-                                                    <option value="small">
-                                                      Small
-                                                    </option>
-                                                    <option value="medium">
-                                                      Medium
-                                                    </option>
-                                                    <option value="large">
-                                                      Large
-                                                    </option>
-                                                  </select>
-                                                </label>
-                                              </div>
                                               <div className="builder-two-column">
                                                 <label className="builder-field">
                                                   <span>Image Padding</span>
@@ -2656,27 +3162,6 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                               </label>
                                               <div className="builder-two-column">
                                                 <label className="builder-field">
-                                                  <span>Columns</span>
-                                                  <input
-                                                    type="number"
-                                                    min={1}
-                                                    max={4}
-                                                    value={block.columns ?? 2}
-                                                    onChange={(event) =>
-                                                      updateSelectedLayoutBlock(
-                                                        index,
-                                                        blockIndex,
-                                                        {
-                                                          columns: Number(
-                                                            event.target
-                                                              .value,
-                                                          ),
-                                                        },
-                                                      )
-                                                    }
-                                                  />
-                                                </label>
-                                                <label className="builder-field">
                                                   <span>Limit</span>
                                                   <input
                                                     type="number"
@@ -2726,33 +3211,6 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                     </option>
                                                     <option value="category">
                                                       Category
-                                                    </option>
-                                                  </select>
-                                                </label>
-                                                <label className="builder-field">
-                                                  <span>Layout Variant</span>
-                                                  <select
-                                                    value={
-                                                      block.layoutVariant ??
-                                                      "grid"
-                                                    }
-                                                    onChange={(event) =>
-                                                      updateSelectedLayoutBlock(
-                                                        index,
-                                                        blockIndex,
-                                                        {
-                                                          layoutVariant: event
-                                                            .target
-                                                            .value as BuilderLayoutBlock["layoutVariant"],
-                                                        },
-                                                      )
-                                                    }
-                                                  >
-                                                    <option value="grid">
-                                                      Grid
-                                                    </option>
-                                                    <option value="carousel">
-                                                      Carousel
                                                     </option>
                                                   </select>
                                                 </label>
@@ -2919,77 +3377,6 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                 <summary>
                                                   Product Grid Spacing
                                                 </summary>
-                                                <div className="builder-two-column">
-                                                  <label className="builder-field">
-                                                    <span>Grid Gap</span>
-                                                    <select
-                                                      value={
-                                                        block.gridGap ??
-                                                        "medium"
-                                                      }
-                                                      onChange={(event) =>
-                                                        updateSelectedLayoutBlock(
-                                                          index,
-                                                          blockIndex,
-                                                          {
-                                                            gridGap: event
-                                                              .target
-                                                              .value as BuilderLayoutBlock["gridGap"],
-                                                          },
-                                                        )
-                                                      }
-                                                    >
-                                                      <option value="none">
-                                                        None
-                                                      </option>
-                                                      <option value="small">
-                                                        Small
-                                                      </option>
-                                                      <option value="medium">
-                                                        Medium
-                                                      </option>
-                                                      <option value="large">
-                                                        Large
-                                                      </option>
-                                                      <option value="max">
-                                                        Max
-                                                      </option>
-                                                    </select>
-                                                  </label>
-                                                  <label className="builder-field">
-                                                    <span>Outer Margin</span>
-                                                    <select
-                                                      value={
-                                                        block.gridMargin ??
-                                                        "none"
-                                                      }
-                                                      onChange={(event) =>
-                                                        updateSelectedLayoutBlock(
-                                                          index,
-                                                          blockIndex,
-                                                          {
-                                                            gridMargin: event
-                                                              .target
-                                                              .value as BuilderLayoutBlock["gridMargin"],
-                                                          },
-                                                        )
-                                                      }
-                                                    >
-                                                      <option value="none">
-                                                        None
-                                                      </option>
-                                                      <option value="small">
-                                                        Small
-                                                      </option>
-                                                      <option value="medium">
-                                                        Medium
-                                                      </option>
-                                                      <option value="large">
-                                                        Large
-                                                      </option>
-                                                    </select>
-                                                  </label>
-                                                </div>
                                                 <div className="builder-two-column">
                                                   <label className="builder-field">
                                                     <span>Card Padding</span>
@@ -5717,29 +6104,6 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                   }
                                                 />
                                               </label>
-                                              {block.kind === "badgeGrid" && (
-                                                <label className="builder-field">
-                                                  <span>Badge Columns</span>
-                                                  <input
-                                                    type="number"
-                                                    min={1}
-                                                    max={3}
-                                                    value={block.columns ?? 2}
-                                                    onChange={(event) =>
-                                                      updateSelectedLayoutBlock(
-                                                        index,
-                                                        blockIndex,
-                                                        {
-                                                          columns: Number(
-                                                            event.target
-                                                              .value,
-                                                          ),
-                                                        },
-                                                      )
-                                                    }
-                                                  />
-                                                </label>
-                                              )}
                                               <div className="builder-section-heading">
                                                 <span>Badges</span>
                                                 <span>
@@ -6784,17 +7148,6 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                 />
                                               </label>
 
-                                              <div className="builder-section-heading">Buttons Layout</div>
-                                              <label className="builder-field">
-                                                <span>Buttons orientation</span>
-                                                <select
-                                                  value={block.buttonsLayout ?? "inline"}
-                                                  onChange={(e) => updateSelectedLayoutBlock(index, blockIndex, { buttonsLayout: e.target.value as any })}
-                                                >
-                                                  <option value="inline">Inline (Side by side)</option>
-                                                  <option value="stacked">Stacked (Vertical)</option>
-                                                </select>
-                                              </label>
                                               <div className="builder-section-heading">Buttons</div>
                                               <button
                                                 type="button"
@@ -7804,101 +8157,6 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                         </details>
 
                         {selectedSection.kind === "scrollPinnedDemo" && (
-                          <details className="builder-collapse" open>
-                            <summary>
-                              <InspectorGroupSummary
-                                title="Scroll Behavior"
-                                description="Control scroll speed, pin duration, and animation style."
-                                meta={`${selectedSection.carouselSettings?.scrubSpeed ?? 1.2}× speed`}
-                              />
-                            </summary>
-
-                            <label className="builder-field">
-                              <span>Animation Variant</span>
-                              <select
-                                value={
-                                  selectedSection.carouselSettings?.variant ??
-                                  "perfect"
-                                }
-                                onChange={(event) =>
-                                  updateSelected({
-                                    carouselSettings: {
-                                      ...(selectedSection.carouselSettings ?? {}),
-                                      variant: event.target.value,
-                                    },
-                                  })
-                                }
-                              >
-                                <option value="perfect">Perfect (Stack)</option>
-                                <option value="fade">Fade</option>
-                                <option value="slide">Slide</option>
-                              </select>
-                            </label>
-
-                            <label className="builder-field">
-                              <span>Scrub Speed</span>
-                              <div className="builder-range-row" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                <input
-                                  type="range"
-                                  min="0.1"
-                                  max="5.0"
-                                  step="0.1"
-                                  style={{ flex: 1 }}
-                                  value={selectedSection.carouselSettings?.scrubSpeed ?? 1.2}
-                                  onChange={(event) =>
-                                    updateSelected({
-                                      carouselSettings: {
-                                        ...(selectedSection.carouselSettings ?? {}),
-                                        scrubSpeed: Number(event.target.value),
-                                      },
-                                    })
-                                  }
-                                />
-                                <span style={{ minWidth: '40px', textAlign: 'right' }}>{(selectedSection.carouselSettings?.scrubSpeed ?? 1.2).toFixed(1)}×</span>
-                              </div>
-                            </label>
-
-                            <label className="builder-field">
-                              <span>Pin Height Factor</span>
-                              <div className="builder-range-row" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                <input
-                                  type="range"
-                                  min="20"
-                                  max="500"
-                                  step="10"
-                                  style={{ flex: 1 }}
-                                  value={selectedSection.carouselSettings?.pinHeightFactor ?? 100}
-                                  onChange={(event) =>
-                                    updateSelected({
-                                      carouselSettings: {
-                                        ...(selectedSection.carouselSettings ?? {}),
-                                        pinHeightFactor: Number(event.target.value),
-                                      },
-                                    })
-                                  }
-                                />
-                                <span style={{ minWidth: '40px', textAlign: 'right' }}>{selectedSection.carouselSettings?.pinHeightFactor ?? 100}%</span>
-                              </div>
-                            </label>
-
-                            <label className="builder-check">
-                              <input
-                                type="checkbox"
-                                checked={selectedSection.carouselSettings?.showNavigation ?? true}
-                                onChange={(event) =>
-                                  updateSelected({
-                                    carouselSettings: {
-                                      ...(selectedSection.carouselSettings ?? {}),
-                                      showNavigation: event.target.checked,
-                                    },
-                                  })
-                                }
-                              />
-                              <span>Show Navigation</span>
-                            </label>
-                          </details>
-                        )}
-                        {selectedSection.kind === "scrollPinnedDemo" && (
                           <details className="builder-collapse">
                             <summary>
                               <InspectorGroupSummary
@@ -8401,7 +8659,10 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
 	        </details>
 	      )}
 
-          {inspectorTab === "spacing" && !selectedLayoutBlock && selectedSection && (
+          {inspectorTab === "spacing" &&
+            !selectedLayoutBlock &&
+            !selectedLayoutRow &&
+            selectedSection && (
             <div className="builder-inspector-stack">
               <details className="builder-collapse" open>
                 <summary>
@@ -8413,67 +8674,37 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                 </summary>
 
                 <div className="builder-two-column">
-                  <label className="builder-field">
-                    <span>Top Padding</span>
-                    <select
-                      value={selectedSection.topSpacing ?? "inherit"}
-                      onChange={(event) =>
-                        updateSelected({
-                          topSpacing: event.target.value as SectionSpacing,
-                        })
-                      }
-                    >
-                      <option value="inherit">Use global</option>
-                      {renderSpacingOptions("sectionPadding")}
-                    </select>
-                  </label>
-
-                  <label className="builder-field">
-                    <span>Bottom Padding</span>
-                    <select
-                      value={selectedSection.bottomSpacing ?? "inherit"}
-                      onChange={(event) =>
-                        updateSelected({
-                          bottomSpacing: event.target.value as SectionSpacing,
-                        })
-                      }
-                    >
-                      <option value="inherit">Use global</option>
-                      {renderSpacingOptions("sectionPadding")}
-                    </select>
-                  </label>
+                  <SpacingControl
+                    id="spacing-section-topSpacing"
+                    label="Top Padding"
+                    value={selectedSection.topSpacing}
+                    context="sectionPadding"
+                    onChange={(val) => updateSelected({ topSpacing: val })}
+                  />
+                  <SpacingControl
+                    id="spacing-section-bottomSpacing"
+                    label="Bottom Padding"
+                    value={selectedSection.bottomSpacing}
+                    context="sectionPadding"
+                    onChange={(val) => updateSelected({ bottomSpacing: val })}
+                  />
                 </div>
 
                 <div className="builder-two-column">
-                  <label className="builder-field">
-                    <span>Top Margin</span>
-                    <select
-                      value={selectedSection.topMargin ?? "inherit"}
-                      onChange={(event) =>
-                        updateSelected({
-                          topMargin: event.target.value as SectionSpacing,
-                        })
-                      }
-                    >
-                      <option value="inherit">Use global</option>
-                      {renderSpacingOptions("sectionMargin")}
-                    </select>
-                  </label>
-
-                  <label className="builder-field">
-                    <span>Bottom Margin</span>
-                    <select
-                      value={selectedSection.bottomMargin ?? "inherit"}
-                      onChange={(event) =>
-                        updateSelected({
-                          bottomMargin: event.target.value as SectionSpacing,
-                        })
-                      }
-                    >
-                      <option value="inherit">Use global</option>
-                      {renderSpacingOptions("sectionMargin")}
-                    </select>
-                  </label>
+                  <SpacingControl
+                    id="spacing-section-topMargin"
+                    label="Top Margin"
+                    value={selectedSection.topMargin}
+                    context="sectionMargin"
+                    onChange={(val) => updateSelected({ topMargin: val })}
+                  />
+                  <SpacingControl
+                    id="spacing-section-bottomMargin"
+                    label="Bottom Margin"
+                    value={selectedSection.bottomMargin}
+                    context="sectionMargin"
+                    onChange={(val) => updateSelected({ bottomMargin: val })}
+                  />
                 </div>
 
                 {onOpenGlobalSpacingSettings ? (
@@ -8489,7 +8720,10 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
             </div>
           )}
 
-          {inspectorTab === "style" && !selectedLayoutBlock && selectedSection && (
+          {inspectorTab === "style" &&
+            !selectedLayoutBlock &&
+            !selectedLayoutRow &&
+            selectedSection && (
             <div className="builder-inspector-stack">
               <details className="builder-collapse" open>
                 <summary>
@@ -8845,10 +9079,6 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                 )}
               </details>
 
-              {renderAnimationControls(selectedSection, {
-                allowPause: true,
-              })}
-
               <details className="builder-collapse" open>
                 <summary>
                   <InspectorGroupSummary
@@ -8886,6 +9116,8 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
               <StyleTabPanel
                 target={styleTarget}
                 showSpacing={false}
+                showLayout={false}
+                showAdvanced={false}
                 showTypography={false}
                 onChange={updateStyleTarget}
                 onPickBackgroundImage={pickStyleBackgroundImage}
@@ -8893,81 +9125,26 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
             </div>
           )}
 
-          {inspectorTab === "typography" && !selectedLayoutBlock && selectedSection && (
-            <div className="builder-section-typography-panel" style={{ padding: '16px 0' }}>
-              <div className="builder-element-inspector-note" style={{ marginBottom: '16px' }}>
-                <strong>Section Typography</strong>
-                <span>
-                  Edit typography settings for this section.
-                </span>
-              </div>
-              <div className="builder-style-preset-row builder-typography-area-tabs" style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginBottom: '16px' }}>
-                {(
-                  [
-                    ["title", "Title"],
-                    ["body", "Body"],
-                    ["button", "Button"],
-                    ["eyebrow", "Eyebrow"],
-                  ] as const
-                ).map(([area, label]) => (
-                  <button
-                    key={area}
-                    type="button"
-                    className={
-                      activeTypographyArea === area
-                        ? "is-active"
-                        : ""
-                    }
-                    onClick={() =>
-                      setActiveTypographyAreaState({
-                        area,
-                        blockKey: null,
-                      })
-                    }
-                    style={{ flex: '1 1 45%', padding: '6px 12px', fontSize: '12px' }}
-                  >
-                    {label}
-                  </button>
-                ))}
-              </div>
-              <div className="builder-typography-area-panel">
-                <span className="builder-typography-area-label" style={{ display: 'block', fontWeight: 600, marginBottom: '8px', textTransform: 'capitalize' }}>
-                  {activeTypographyArea === "title"
-                    ? "Title typography"
-                    : activeTypographyArea === "body"
-                      ? "Body typography"
-                      : activeTypographyArea ===
-                          "button"
-                        ? "Button typography"
-                        : "Eyebrow typography"}
-                </span>
-                <TypographyPanel
-                  value={
-                    activeTypographyArea === "title"
-                      ? (selectedSection.typography as any)?.title
-                      : activeTypographyArea === "body"
-                        ? (selectedSection.typography as any)?.body
-                        : activeTypographyArea === "button"
-                          ? (selectedSection.typography as any)?.button
-                          : (selectedSection.typography as any)?.eyebrow
-                  }
-                  onChange={(t) =>
-                    updateSelected({
-                      typography: {
-                        ...((selectedSection.typography as any) ?? {}),
-                        [activeTypographyArea]: t,
-                      },
-                    })
-                  }
-                />
-              </div>
-            </div>
-          )}
-
-          {inspectorTab === "advanced" && (
+          {inspectorTab === "advanced" && !selectedLayoutRow && (
             <>
               {!selectedLayoutBlock ? (
                 <>
+                  {renderAnimationControls(selectedSection, {
+                    allowPause: true,
+                  })}
+
+                  {renderSectionScrollBehaviorControls()}
+
+                  <StyleTabPanel
+                    target={styleTarget}
+                    showSpacing={false}
+                    showBackground={false}
+                    showAppearance={false}
+                    showLayout={false}
+                    showTypography={false}
+                    onChange={updateStyleTarget}
+                  />
+
                   <details className="builder-collapse" open>
                     <summary>
                       <InspectorGroupSummary

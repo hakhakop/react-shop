@@ -137,6 +137,9 @@ import {
   resolveBuilderSpacingCssValue,
   resolveBuilderSpacing,
   type ResolvedBuilderSpacing,
+  BUILDER_SPACING_SCALE,
+  TOKEN_LABELS,
+  type BuilderSpacingContext,
 } from "@/lib/builderSpacing";
 
 const BUILDER_TEMPLATE_DND_TYPE = "application/x-builder-template";
@@ -1687,7 +1690,7 @@ export default function DashboardBuilder({
     sectionId: string,
     field: "topSpacing" | "bottomSpacing" | "topMargin" | "bottomMargin",
   ) => {
-    const cycleOrder: SectionSpacing[] = ["inherit", "none", "small", "medium", "large"];
+    const cycleOrder: SectionSpacing[] = ["inherit", "none", "xs", "sm", "md", "lg", "xl", "2xl", "3xl"];
     setBuilderState((current) => ({
       ...current,
       sections: current.sections.map((section) => {
@@ -2356,7 +2359,7 @@ export default function DashboardBuilder({
 
     if (target.scope === "globalSection") {
       setSidebarTab("globalStyles");
-      setGlobalStylesTab("header");
+      setGlobalStylesTab("siteDesign");
       return;
     }
 
@@ -2372,33 +2375,37 @@ export default function DashboardBuilder({
       setSelectedLayoutColumnKey(null);
       setInspectorTab("spacing");
       setSectionSettingsOpen(true);
-      return;
-    }
-
-    if (target.scope === "row") {
+    } else if (target.scope === "row") {
       setSelectedLayoutRowIndex(target.rowIndex);
       setSelectedLayoutColumnKey(null);
       setSelectedLayoutBlockKey(null);
       setOpenLayoutItemId(null);
       setInspectorTab("spacing");
-      return;
-    }
-
-    if (target.scope === "column") {
+    } else if (target.scope === "column") {
       setSelectedLayoutRowIndex(null);
       setSelectedLayoutColumnKey(target.columnKey);
       setSelectedLayoutBlockKey(null);
       setOpenLayoutItemId(target.columnKey);
       setInspectorTab("layout");
       setSectionSettingsOpen(true);
-      return;
+    } else {
+      setSelectedLayoutRowIndex(null);
+      setSelectedLayoutColumnKey(target.columnKey);
+      setSelectedLayoutBlockKey(target.blockKey);
+      setOpenLayoutItemId(target.columnKey);
+      setInspectorTab("spacing");
     }
 
-    setSelectedLayoutRowIndex(null);
-    setSelectedLayoutColumnKey(target.columnKey);
-    setSelectedLayoutBlockKey(target.blockKey);
-    setOpenLayoutItemId(target.columnKey);
-    setInspectorTab("spacing");
+    // Dispatch custom event to focus the spacing field in the inspector
+    setTimeout(() => {
+      const event = new CustomEvent("builder-focus-spacing", {
+        detail: {
+          scope: target.scope,
+          field: target.field,
+        },
+      });
+      window.dispatchEvent(event);
+    }, 150);
   };
 
   const updateSelectedSlide = (
@@ -4915,7 +4922,7 @@ export default function DashboardBuilder({
       updateSelectedSlide={updateSelectedSlide}
       onOpenGlobalSpacingSettings={() => {
         setSidebarTab("globalStyles");
-        setGlobalStylesTab("header");
+        setGlobalStylesTab("siteDesign");
       }}
       uploadSelectedLayoutBlockSlideImage={uploadSelectedLayoutBlockSlideImage}
       uploadSelectedSlideImage={uploadSelectedSlideImage}
@@ -5056,6 +5063,49 @@ export default function DashboardBuilder({
                 <option value="72px">Wide</option>
               </select>
             </label>
+          </div>
+
+          <div className="builder-card-title">
+            <strong>Section Spacing</strong>
+            <span>default padding + margin</span>
+          </div>
+
+          <div className="builder-shell-note">
+            <strong>{shellStatus}</strong>
+            <span>
+              New sections inherit these spacing defaults until you override
+              them inside a section.
+            </span>
+          </div>
+
+          <div className="builder-two-column">
+            <GlobalSpacingControl
+              label="Default Top Padding"
+              value={shellSettings.sectionPaddingTop}
+              context="sectionPadding"
+              onChange={(val) => updateShellSettings({ sectionPaddingTop: val })}
+            />
+            <GlobalSpacingControl
+              label="Default Bottom Padding"
+              value={shellSettings.sectionPaddingBottom}
+              context="sectionPadding"
+              onChange={(val) => updateShellSettings({ sectionPaddingBottom: val })}
+            />
+          </div>
+
+          <div className="builder-two-column">
+            <GlobalSpacingControl
+              label="Default Top Margin"
+              value={shellSettings.sectionMarginTop}
+              context="sectionMargin"
+              onChange={(val) => updateShellSettings({ sectionMarginTop: val })}
+            />
+            <GlobalSpacingControl
+              label="Default Bottom Margin"
+              value={shellSettings.sectionMarginBottom}
+              context="sectionMargin"
+              onChange={(val) => updateShellSettings({ sectionMarginBottom: val })}
+            />
           </div>
         </div>
       )}
@@ -5671,78 +5721,6 @@ export default function DashboardBuilder({
                 </label>
               ))}
             </div>
-          </div>
-
-          <div className="builder-shell-note">
-            <strong>{shellStatus}</strong>
-            <span>
-              New sections inherit these spacing defaults until you override
-              them inside a section.
-            </span>
-          </div>
-
-          <div className="builder-two-column">
-            <label className="builder-field">
-              <span>Default Top Padding</span>
-              <select
-                value={shellSettings.sectionPaddingTop}
-                onChange={(event) =>
-                  updateShellSettings({
-                    sectionPaddingTop: event.target
-                      .value as GlobalSectionSpacing,
-                  })
-                }
-              >
-                {renderGlobalSpacingOptions("sectionPadding")}
-              </select>
-            </label>
-
-            <label className="builder-field">
-              <span>Default Bottom Padding</span>
-              <select
-                value={shellSettings.sectionPaddingBottom}
-                onChange={(event) =>
-                  updateShellSettings({
-                    sectionPaddingBottom: event.target
-                      .value as GlobalSectionSpacing,
-                  })
-                }
-              >
-                {renderGlobalSpacingOptions("sectionPadding")}
-              </select>
-            </label>
-          </div>
-
-          <div className="builder-two-column">
-            <label className="builder-field">
-              <span>Default Top Margin</span>
-              <select
-                value={shellSettings.sectionMarginTop}
-                onChange={(event) =>
-                  updateShellSettings({
-                    sectionMarginTop: event.target
-                      .value as GlobalSectionSpacing,
-                  })
-                }
-              >
-                {renderGlobalSpacingOptions("sectionMargin")}
-              </select>
-            </label>
-
-            <label className="builder-field">
-              <span>Default Bottom Margin</span>
-              <select
-                value={shellSettings.sectionMarginBottom}
-                onChange={(event) =>
-                  updateShellSettings({
-                    sectionMarginBottom: event.target
-                      .value as GlobalSectionSpacing,
-                  })
-                }
-              >
-                {renderGlobalSpacingOptions("sectionMargin")}
-              </select>
-            </label>
           </div>
         </div>
       )}
@@ -6501,67 +6479,33 @@ export default function DashboardBuilder({
                 </div>
 
                 <div className="builder-two-column">
-                  <label className="builder-field">
-                    <span>Default Top Padding</span>
-                    <select
-                      value={shellSettings.sectionPaddingTop}
-                      onChange={(event) =>
-                        updateShellSettings({
-                          sectionPaddingTop: event.target
-                            .value as GlobalSectionSpacing,
-                        })
-                      }
-                    >
-                      {renderGlobalSpacingOptions("sectionPadding")}
-                    </select>
-                  </label>
-
-                  <label className="builder-field">
-                    <span>Default Bottom Padding</span>
-                    <select
-                      value={shellSettings.sectionPaddingBottom}
-                      onChange={(event) =>
-                        updateShellSettings({
-                          sectionPaddingBottom: event.target
-                            .value as GlobalSectionSpacing,
-                        })
-                      }
-                    >
-                      {renderGlobalSpacingOptions("sectionPadding")}
-                    </select>
-                  </label>
+                  <GlobalSpacingControl
+                    label="Default Top Padding"
+                    value={shellSettings.sectionPaddingTop}
+                    context="sectionPadding"
+                    onChange={(val) => updateShellSettings({ sectionPaddingTop: val })}
+                  />
+                  <GlobalSpacingControl
+                    label="Default Bottom Padding"
+                    value={shellSettings.sectionPaddingBottom}
+                    context="sectionPadding"
+                    onChange={(val) => updateShellSettings({ sectionPaddingBottom: val })}
+                  />
                 </div>
 
                 <div className="builder-two-column">
-                  <label className="builder-field">
-                    <span>Default Top Margin</span>
-                    <select
-                      value={shellSettings.sectionMarginTop}
-                      onChange={(event) =>
-                        updateShellSettings({
-                          sectionMarginTop: event.target
-                            .value as GlobalSectionSpacing,
-                        })
-                      }
-                    >
-                      {renderGlobalSpacingOptions("sectionMargin")}
-                    </select>
-                  </label>
-
-                  <label className="builder-field">
-                    <span>Default Bottom Margin</span>
-                    <select
-                      value={shellSettings.sectionMarginBottom}
-                      onChange={(event) =>
-                        updateShellSettings({
-                          sectionMarginBottom: event.target
-                            .value as GlobalSectionSpacing,
-                        })
-                      }
-                    >
-                      {renderGlobalSpacingOptions("sectionMargin")}
-                    </select>
-                  </label>
+                  <GlobalSpacingControl
+                    label="Default Top Margin"
+                    value={shellSettings.sectionMarginTop}
+                    context="sectionMargin"
+                    onChange={(val) => updateShellSettings({ sectionMarginTop: val })}
+                  />
+                  <GlobalSpacingControl
+                    label="Default Bottom Margin"
+                    value={shellSettings.sectionMarginBottom}
+                    context="sectionMargin"
+                    onChange={(val) => updateShellSettings({ sectionMarginBottom: val })}
+                  />
                 </div>
               </div>
             </div>
@@ -7211,6 +7155,9 @@ function PreviewCanvas({
     field: "topSpacing" | "bottomSpacing" | "topMargin" | "bottomMargin",
   ) => void;
 }) {
+  const [hoveredSectionId, setHoveredSectionId] = useState<string | null>(null);
+  const [hoveredColumnKey, setHoveredColumnKey] = useState<string | null>(null);
+  const [hoveredBlockKey, setHoveredBlockKey] = useState<string | null>(null);
   const [sectionDragOverId, setSectionDragOverId] = useState<string | null>(null);
   const [templateDragType, setTemplateDragType] =
     useState<BuilderTemplateDragType | null>(null);
@@ -7377,6 +7324,7 @@ function PreviewCanvas({
               (item) => item.id === section.id,
             );
             const isSelected = selectedId === section.id;
+            const isSectionActive = isSelected && selectedLayoutRowIndex === null && selectedLayoutColumnKey === null && selectedLayoutBlockKey === null;
             const animationAttrs = previewAnimationAttrs(section.animation);
             const isSectionAntigravity = section.backgroundEffect === "antigravity";
             const isFullTheme = isSectionAntigravity && (section.antigravityVisualMode === undefined || section.antigravityVisualMode === "full");
@@ -7388,6 +7336,8 @@ function PreviewCanvas({
                 role="button"
                 tabIndex={0}
                 draggable
+                onMouseEnter={() => setHoveredSectionId(section.id)}
+                onMouseLeave={() => setHoveredSectionId(null)}
                 className={`builder-preview-section ${getStorefrontPreviewClass(
                   section,
                 )} builder-preview-${section.kind} builder-preview-section--${
@@ -7398,6 +7348,8 @@ function PreviewCanvas({
                   isFullTheme ? "shop-builder-section--effect-antigravity" : isSectionAntigravity ? "relative overflow-hidden" : ""
                 } ${
                   isSelected ? "is-selected" : ""
+                } ${
+                  hoveredSectionId === section.id ? "is-hovered" : ""
                 } ${visualStyleClassName(section.visualStyle)} ${draggingSectionId === section.id ? "is-dragging" : ""} ${sectionDragOverId === section.id ? "is-drag-over" : ""}`}
                 style={
                   {
@@ -7504,7 +7456,7 @@ function PreviewCanvas({
                   onDragEnd();
                 }}
                 >
-                {(spacingOverlayEnabled || isSelected) && (
+                {isSectionActive && (
                   <SectionSpacingOverlay
                     section={section}
                     shellSettings={shellSettings}
@@ -7804,15 +7756,125 @@ function getPreviewSectionMargin(value: SectionSpacing | undefined) {
   return resolveBuilderSpacing(value, "sectionMargin").css;
 }
 
-function renderGlobalSpacingOptions(context: "sectionPadding" | "sectionMargin") {
-  return (["none", "small", "medium", "large"] as const).map((value) => (
-    <option key={value} value={value}>
-      {value === "none"
-        ? "None"
-        : `${value[0].toUpperCase()}${value.slice(1)}`}{" "}
-      ({getSpacingOptionLabel(value, context)}px)
-    </option>
-  ));
+function GlobalSpacingControl({
+  label,
+  value,
+  context,
+  onChange,
+}: {
+  label: string;
+  value: string | undefined;
+  context: BuilderSpacingContext;
+  onChange: (newValue: any) => void;
+}) {
+  const presets = ["none", "xs", "sm", "md", "lg", "xl", "2xl", "3xl"] as const;
+
+  const isPresetToken = (val: string) => {
+    return (
+      val === "none" ||
+      val === "xs" ||
+      val === "sm" ||
+      val === "md" ||
+      val === "lg" ||
+      val === "xl" ||
+      val === "2xl" ||
+      val === "3xl" ||
+      val === "small" ||
+      val === "medium" ||
+      val === "large"
+    );
+  };
+
+  const isPreset = !value || isPresetToken(value);
+  const isCustom = !isPreset;
+
+  const numericMatch = value ? value.trim().match(/^(\d+)px$/i) : null;
+  const customNumericValue = numericMatch ? numericMatch[1] : "";
+
+  const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const val = event.target.value;
+    if (val === "custom") {
+      const currentPx = resolveBuilderSpacing(value ?? "md", context).px;
+      onChange(`${currentPx > 0 ? currentPx : 32}px`);
+    } else {
+      onChange(val);
+    }
+  };
+
+  const handleCustomNumericChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const num = event.target.value.replace(/\D/g, "");
+    onChange(num ? `${num}px` : "0px");
+  };
+
+  let selectValue = "md";
+  if (isCustom) {
+    selectValue = "custom";
+  } else if (value) {
+    if (value === "small") selectValue = "sm";
+    else if (value === "medium") selectValue = "md";
+    else if (value === "large") selectValue = "lg";
+    else selectValue = value;
+  } else {
+    selectValue = "md";
+  }
+
+  return (
+    <label className="builder-field spacing-control-wrapper" style={{ display: "block", marginBottom: "12px" }}>
+      <span style={{ display: "block", marginBottom: "4px", fontSize: "12px", fontWeight: 500, color: "var(--text-muted)" }}>{label}</span>
+      <div className="spacing-control-row" style={{ display: "flex", gap: "8px", alignItems: "center", width: "100%" }}>
+        <select
+          value={selectValue}
+          onChange={handleSelectChange}
+          style={{
+            flex: 1,
+            height: "36px",
+            padding: "0 10px",
+            borderRadius: "var(--builder-ui-radius-sm)",
+            border: "1px solid var(--builder-ui-border)",
+            background: "var(--builder-ui-panel-solid)",
+            color: "var(--builder-ui-text)",
+            font: "inherit",
+          }}
+        >
+          {presets.map((preset) => {
+            const px = BUILDER_SPACING_SCALE[preset];
+            const labelName = TOKEN_LABELS[preset];
+            return (
+              <option key={preset} value={preset}>
+                {labelName} ({px}px)
+              </option>
+            );
+          })}
+          <option value="custom">Custom...</option>
+        </select>
+        
+        {isCustom && (
+          <div className="custom-spacing-input-wrapper" style={{ display: "flex", alignItems: "center", gap: "4px", width: "85px", flexShrink: 0 }}>
+            <input
+              type="text"
+              pattern="[0-9]*"
+              inputMode="numeric"
+              value={customNumericValue}
+              onChange={handleCustomNumericChange}
+              style={{
+                width: "100%",
+                height: "36px",
+                padding: "0 10px",
+                border: "1px solid var(--builder-ui-border)",
+                background: "var(--builder-ui-panel-solid)",
+                color: "var(--builder-ui-text)",
+                borderRadius: "var(--builder-ui-radius-sm)",
+                textAlign: "right",
+                font: "inherit",
+              }}
+              placeholder="0"
+            />
+            <span style={{ fontSize: "12px", color: "var(--text-muted)", opacity: 0.8 }}>px</span>
+          </div>
+        )}
+      </div>
+    </label>
+  );
 }
 
 function getStorefrontPreviewClass(section: BuilderSection) {
@@ -8474,16 +8536,14 @@ function SectionSpacingOverlay({
         {shouldShowSectionSpacingMeasurement(topMargin, showZeroLabels) ? (
           <SpacingGuideLabel
             className={`builder-preview-spacing-label builder-preview-spacing-label--margin builder-preview-spacing-label--source-${topMargin.source.toLowerCase()}`}
-            style={{ left: "auto", right: "8px", bottom: "4px", top: "auto" }}
+            style={{ left: "8px", right: "auto", bottom: "4px", top: "auto" }}
             onClick={
-              onCycleSectionSpacing
-                ? () => onCycleSectionSpacing(section.id, "topMargin")
-                : onOpenSpacingSettings
-                  ? () => onOpenSpacingSettings(marginTopTarget)
-                  : undefined
+              onOpenSpacingSettings
+                ? () => onOpenSpacingSettings(marginTopTarget)
+                : undefined
             }
           >
-            mt {topMargin.displayLabel}
+            Section MT {topMargin.displayLabel}
           </SpacingGuideLabel>
         ) : null}
       </div>
@@ -8493,14 +8553,12 @@ function SectionSpacingOverlay({
             className={`builder-preview-spacing-label builder-preview-spacing-label--padding builder-preview-spacing-label--source-${topPadding.source.toLowerCase()}`}
             style={{ left: "auto", right: "8px", top: "4px", bottom: "auto" }}
             onClick={
-              onCycleSectionSpacing
-                ? () => onCycleSectionSpacing(section.id, "topSpacing")
-                : onOpenSpacingSettings
-                  ? () => onOpenSpacingSettings(paddingTopTarget)
-                  : undefined
+              onOpenSpacingSettings
+                ? () => onOpenSpacingSettings(paddingTopTarget)
+                : undefined
             }
           >
-            pt {topPadding.displayLabel}
+            Section PT {topPadding.displayLabel}
           </SpacingGuideLabel>
         ) : null}
       </div>
@@ -8508,16 +8566,14 @@ function SectionSpacingOverlay({
         {shouldShowSectionSpacingMeasurement(bottomPadding, showZeroLabels) ? (
           <SpacingGuideLabel
             className={`builder-preview-spacing-label builder-preview-spacing-label--padding builder-preview-spacing-label--source-${bottomPadding.source.toLowerCase()}`}
-            style={{ left: "8px", right: "auto", bottom: "4px", top: "auto" }}
+            style={{ left: "auto", right: "8px", bottom: "4px", top: "auto" }}
             onClick={
-              onCycleSectionSpacing
-                ? () => onCycleSectionSpacing(section.id, "bottomSpacing")
-                : onOpenSpacingSettings
-                  ? () => onOpenSpacingSettings(paddingBottomTarget)
-                  : undefined
+              onOpenSpacingSettings
+                ? () => onOpenSpacingSettings(paddingBottomTarget)
+                : undefined
             }
           >
-            pb {bottomPadding.displayLabel}
+            Section PB {bottomPadding.displayLabel}
           </SpacingGuideLabel>
         ) : null}
       </div>
@@ -8527,17 +8583,146 @@ function SectionSpacingOverlay({
             className={`builder-preview-spacing-label builder-preview-spacing-label--margin builder-preview-spacing-label--source-${bottomMargin.source.toLowerCase()}`}
             style={{ left: "8px", right: "auto", top: "4px", bottom: "auto" }}
             onClick={
-              onCycleSectionSpacing
-                ? () => onCycleSectionSpacing(section.id, "bottomMargin")
-                : onOpenSpacingSettings
-                  ? () => onOpenSpacingSettings(marginBottomTarget)
-                  : undefined
+              onOpenSpacingSettings
+                ? () => onOpenSpacingSettings(marginBottomTarget)
+                : undefined
             }
           >
-            mb {bottomMargin.displayLabel}
+            Section MB {bottomMargin.displayLabel}
           </SpacingGuideLabel>
         ) : null}
       </div>
+    </div>
+  );
+}
+
+function RowSpacingOverlay({
+  item,
+  sectionId,
+  rowIndex,
+  isRowStart,
+  showZeroLabels = false,
+  onOpenSpacingSettings,
+}: {
+  item: any;
+  sectionId: string;
+  rowIndex: number;
+  isRowStart: boolean;
+  showZeroLabels?: boolean;
+  onOpenSpacingSettings?: (target: SpacingInspectorTarget) => void;
+}) {
+  const topMargin = resolveBuilderSpacing(item.rowTopMargin ?? "inherit", "rowMargin");
+  const topPadding = resolveBuilderSpacing(item.rowTopSpacing ?? "inherit", "rowPadding");
+  const bottomPadding = resolveBuilderSpacing(item.rowBottomSpacing ?? "inherit", "rowPadding");
+  const bottomMargin = resolveBuilderSpacing(item.rowBottomMargin ?? "inherit", "rowMargin");
+  const rowGap = rowIndex > 0
+    ? resolveBuilderSpacing(undefined, "rowGap")
+    : undefined;
+
+  const marginTopTarget: SpacingInspectorTarget = {
+    scope: "row",
+    sectionId,
+    rowIndex,
+    field: "rowTopMargin",
+  };
+  const paddingTopTarget: SpacingInspectorTarget = {
+    scope: "row",
+    sectionId,
+    rowIndex,
+    field: "rowTopSpacing",
+  };
+  const paddingBottomTarget: SpacingInspectorTarget = {
+    scope: "row",
+    sectionId,
+    rowIndex,
+    field: "rowBottomSpacing",
+  };
+  const marginBottomTarget: SpacingInspectorTarget = {
+    scope: "row",
+    sectionId,
+    rowIndex,
+    field: "rowBottomMargin",
+  };
+
+  return (
+    <div className="builder-preview-row-spacing-layer">
+      {rowGap && isRowStart && (
+        <div
+          className="builder-preview-row-spacing-overlay builder-preview-row-spacing-overlay--gap-top"
+          style={{ height: rowGap.css, top: `-${rowGap.css}` }}
+        >
+          <SpacingGuideLabel
+            className={`builder-preview-spacing-label builder-preview-spacing-label--gap builder-preview-spacing-label--source-${rowGap.source.toLowerCase()}`}
+            style={{ left: "50%", top: "50%", transform: "translate(-50%, -50%)" }}
+          >
+            Row Gap {formatSpacingMeasurement(rowGap)}
+          </SpacingGuideLabel>
+        </div>
+      )}
+      {shouldShowSpacingMeasurement(topMargin, showZeroLabels) && (
+        <div
+          className="builder-preview-row-spacing-overlay builder-preview-row-spacing-overlay--margin-top"
+          style={{ height: topMargin.css }}
+        >
+          {isRowStart && (
+            <SpacingGuideLabel
+              className={`builder-preview-spacing-label builder-preview-spacing-label--margin builder-preview-spacing-label--source-${topMargin.source.toLowerCase()}`}
+              style={{ left: "8px", right: "auto", bottom: "4px", top: "auto" }}
+              onClick={onOpenSpacingSettings ? () => onOpenSpacingSettings(marginTopTarget) : undefined}
+            >
+              Row MT {formatSpacingMeasurement(topMargin)}
+            </SpacingGuideLabel>
+          )}
+        </div>
+      )}
+      {shouldShowSpacingMeasurement(topPadding, showZeroLabels) && (
+        <div
+          className="builder-preview-row-spacing-overlay builder-preview-row-spacing-overlay--padding-top"
+          style={{ height: topPadding.css }}
+        >
+          {isRowStart && (
+            <SpacingGuideLabel
+              className={`builder-preview-spacing-label builder-preview-spacing-label--padding builder-preview-spacing-label--source-${topPadding.source.toLowerCase()}`}
+              style={{ left: "auto", right: "8px", top: "4px", bottom: "auto" }}
+              onClick={onOpenSpacingSettings ? () => onOpenSpacingSettings(paddingTopTarget) : undefined}
+            >
+              Row PT {formatSpacingMeasurement(topPadding)}
+            </SpacingGuideLabel>
+          )}
+        </div>
+      )}
+      {shouldShowSpacingMeasurement(bottomPadding, showZeroLabels) && (
+        <div
+          className="builder-preview-row-spacing-overlay builder-preview-row-spacing-overlay--padding-bottom"
+          style={{ height: bottomPadding.css }}
+        >
+          {isRowStart && (
+            <SpacingGuideLabel
+              className={`builder-preview-spacing-label builder-preview-spacing-label--padding builder-preview-spacing-label--source-${bottomPadding.source.toLowerCase()}`}
+              style={{ left: "auto", right: "8px", bottom: "4px", top: "auto" }}
+              onClick={onOpenSpacingSettings ? () => onOpenSpacingSettings(paddingBottomTarget) : undefined}
+            >
+              Row PB {formatSpacingMeasurement(bottomPadding)}
+            </SpacingGuideLabel>
+          )}
+        </div>
+      )}
+      {shouldShowSpacingMeasurement(bottomMargin, showZeroLabels) && (
+        <div
+          className="builder-preview-row-spacing-overlay builder-preview-row-spacing-overlay--margin-bottom"
+          style={{ height: bottomMargin.css }}
+        >
+          {isRowStart && (
+            <SpacingGuideLabel
+              className={`builder-preview-spacing-label builder-preview-spacing-label--margin builder-preview-spacing-label--source-${bottomMargin.source.toLowerCase()}`}
+              style={{ left: "8px", right: "auto", top: "4px", bottom: "auto" }}
+              onClick={onOpenSpacingSettings ? () => onOpenSpacingSettings(marginBottomTarget) : undefined}
+            >
+              Row MB {formatSpacingMeasurement(bottomMargin)}
+            </SpacingGuideLabel>
+          )}
+        </div>
+      )}
     </div>
   );
 }
@@ -8573,7 +8758,11 @@ function BoxSpacingOverlay({
         <SpacingGuideLabel
           key={`${label.position}-${label.text}`}
           className={`builder-preview-spacing-label builder-preview-spacing-label--box builder-preview-spacing-label--${label.tone} builder-preview-spacing-label--${label.position} builder-preview-spacing-label--source-${label.measurement.source.toLowerCase()}`}
-          onClick={onOpenSpacingSettings ? () => onOpenSpacingSettings(label.target) : undefined}
+          onClick={
+            onOpenSpacingSettings && label.target
+              ? () => onOpenSpacingSettings(label.target as SpacingInspectorTarget)
+              : undefined
+          }
         >
           {label.text}
         </SpacingGuideLabel>
@@ -8600,7 +8789,11 @@ function SpacingGuideLabel({
       <button
         type="button"
         className={className}
-        onClick={onClick}
+        onMouseDown={(event) => event.stopPropagation()}
+        onClick={(event) => {
+          event.stopPropagation();
+          onClick();
+        }}
         tabIndex={tabIndex ?? 0}
         style={style}
       >
@@ -8652,13 +8845,14 @@ type SpacingInspectorTarget =
 type BuilderSpacingOverlayLabel = {
   text: string;
   measurement: ResolvedBuilderSpacing;
-  target: SpacingInspectorTarget;
+  target?: SpacingInspectorTarget;
   tone: "padding" | "margin" | "gap";
   position:
     | "inside-top"
     | "outside-top"
     | "inside-bottom"
     | "outside-bottom"
+    | "outside-left"
     | "inside-right"
     | "inside-left";
 };
@@ -8695,7 +8889,13 @@ function shouldShowSpacingMeasurement(
 }
 
 function formatSpacingMeasurement(measurement: ResolvedBuilderSpacing) {
-  return `${measurement.label} · ${measurement.sourceLabel}`;
+  const sourceText =
+    measurement.source === "Local"
+      ? "Local"
+      : measurement.source === "Global"
+        ? "From Global"
+        : "Default";
+  return `${measurement.label} (${sourceText})`;
 }
 
 function spacingLabel(
@@ -8703,7 +8903,7 @@ function spacingLabel(
   measurement: ResolvedBuilderSpacing | undefined,
   tone: BuilderSpacingOverlayLabel["tone"],
   position: BuilderSpacingOverlayLabel["position"],
-  target: SpacingInspectorTarget,
+  target?: SpacingInspectorTarget,
 ): BuilderSpacingOverlayLabel | null {
   if (!shouldShowSpacingMeasurement(measurement)) return null;
   const visibleMeasurement = measurement;
@@ -8723,19 +8923,12 @@ function compactSpacingLabels(
   return labels.filter(Boolean) as BuilderSpacingOverlayLabel[];
 }
 
-function resolveDashboardDefaultSpacing(
-  px: number,
-  context: Parameters<typeof resolveBuilderSpacingCssValue>[1],
-) {
-  return resolveBuilderSpacingCssValue(px, context, "Default");
-}
-
 function resolveLocalSpacingValue(
   value: string | undefined,
   context: Parameters<typeof resolveBuilderSpacingCssValue>[1],
 ) {
   if (!value || value === "inherit") return undefined;
-  const css = resolveSpacingToken(value);
+  const css = resolveSpacingToken(value, context);
   if (!css) return undefined;
   return resolveBuilderSpacingCssValue(css, context, "Local", value);
 }
@@ -8751,12 +8944,7 @@ function resolveLocalTokenSpacing(
 function dashboardElementPaddingMeasurement(
   value: BuilderLayoutBlock["elementPadding"],
 ) {
-  if (!value || value === "none") return undefined;
-  const px =
-    value === "small" ? 8 : value === "medium" ? 16 : value === "large" ? 24 : 0;
-  return px > 0
-    ? resolveBuilderSpacingCssValue(px, "elementPadding", "Local", value)
-    : undefined;
+  return resolveBuilderSpacing(value, "elementPadding");
 }
 
 function visualSpacingSideValue(
@@ -8817,9 +9005,6 @@ function boxSpacingSideLabels(
 }
 
 function columnSpacingOverlayLabels(
-  item: NonNullable<BuilderSection["layoutItems"]>[number],
-  sectionId: string,
-  columnKey: string,
   rowMeta:
     | {
         rowIndex: number;
@@ -8829,57 +9014,15 @@ function columnSpacingOverlayLabels(
       }
     | undefined,
 ) {
-  const labels: Array<BuilderSpacingOverlayLabel | null> = [
-    spacingLabel(
-      "col p",
-      resolveDashboardDefaultSpacing(8, "columnPadding"),
-      "padding",
-      "inside-top",
-      { scope: "column", sectionId, columnKey, field: "columnPadding" },
-    ),
-  ];
+  const labels: Array<BuilderSpacingOverlayLabel | null> = [];
 
-  if (rowMeta?.isRowStart && rowMeta.rowIndex > 0) {
+  if (rowMeta && rowMeta.columnIndex > 0) {
     labels.push(
       spacingLabel(
-        "row gap",
-        resolveDashboardDefaultSpacing(16, "rowGap"),
+        "Column Gap",
+        resolveBuilderSpacing(undefined, "columnGap"),
         "gap",
-        "outside-top",
-        { scope: "row", sectionId, rowIndex: rowMeta.rowIndex, field: "rowGap" },
-      ),
-    );
-  }
-
-  if (rowMeta?.isRowStart) {
-    labels.push(
-      spacingLabel(
-        "row pt",
-        resolveLocalTokenSpacing(item.rowTopSpacing, "rowPadding"),
-        "padding",
-        "inside-top",
-        { scope: "row", sectionId, rowIndex: rowMeta.rowIndex, field: "rowTopSpacing" },
-      ),
-      spacingLabel(
-        "row pb",
-        resolveLocalTokenSpacing(item.rowBottomSpacing, "rowPadding"),
-        "padding",
-        "inside-bottom",
-        { scope: "row", sectionId, rowIndex: rowMeta.rowIndex, field: "rowBottomSpacing" },
-      ),
-      spacingLabel(
-        "row mt",
-        resolveLocalTokenSpacing(item.rowTopMargin, "rowMargin"),
-        "margin",
-        "outside-top",
-        { scope: "row", sectionId, rowIndex: rowMeta.rowIndex, field: "rowTopMargin" },
-      ),
-      spacingLabel(
-        "row mb",
-        resolveLocalTokenSpacing(item.rowBottomMargin, "rowMargin"),
-        "margin",
-        "outside-bottom",
-        { scope: "row", sectionId, rowIndex: rowMeta.rowIndex, field: "rowBottomMargin" },
+        "outside-left",
       ),
     );
   }
@@ -8889,7 +9032,6 @@ function columnSpacingOverlayLabels(
 
 function elementSpacingOverlayLabels(
   block: BuilderLayoutBlock,
-  blockIndex: number,
   sectionId: string,
   columnKey: string,
   blockKey: string,
@@ -8921,7 +9063,7 @@ function elementSpacingOverlayLabels(
       ? visualPaddingLabels
       : compactSpacingLabels([
           spacingLabel(
-            "p",
+            "Element P",
             dashboardElementPaddingMeasurement(block.elementPadding),
             "padding",
             "inside-top",
@@ -8937,20 +9079,6 @@ function elementSpacingOverlayLabels(
       visualMarginTarget,
     ),
   );
-
-  if (blockIndex > 0) {
-    labels.push(
-      ...compactSpacingLabels([
-        spacingLabel(
-          "gap",
-          resolveDashboardDefaultSpacing(14, "elementMargin"),
-          "gap",
-          "outside-top",
-          { scope: "element", sectionId, columnKey, blockKey, field: "elementGap" },
-        ),
-      ]),
-    );
-  }
 
   return labels;
 }
@@ -9193,6 +9321,8 @@ function PreviewSection({
   onOpenElementsPanel: () => void;
   spacingOverlayEnabled: boolean;
 }) {
+  const [hoveredColumnKey, setHoveredColumnKey] = useState<string | null>(null);
+  const [hoveredBlockKey, setHoveredBlockKey] = useState<string | null>(null);
   const dragClearTimer = useRef<number | null>(null);
   const [dragOverKey, setDragOverKey] = useState<string | null>(null);
   const [draggingItem, setDraggingItem] = useState<{
@@ -9650,6 +9780,7 @@ if (section.kind === "embed") {
               "--builder-preview-layout-columns": section.layoutColumns ?? 2,
               "--builder-layout-columns": section.layoutColumns ?? 2,
               gridTemplateColumns: "repeat(12, minmax(0, 1fr))",
+              gap: resolveBuilderSpacing(undefined, "columnGap").css,
             } as CSSProperties
           }
         >
@@ -9668,6 +9799,16 @@ if (section.kind === "embed") {
               "default";
 
             const hasScrollPinned = blocks.some((b) => b.kind === "scrollPinnedDemo");
+            const isColumnActive =
+              selectedSectionId === section.id &&
+              selectedLayoutColumnKey === columnKey &&
+              selectedLayoutBlockKey === null;
+            const isRowActive =
+              selectedSectionId === section.id &&
+              rowMeta !== undefined &&
+              selectedLayoutRowIndex === rowMeta.rowIndex &&
+              selectedLayoutColumnKey === null &&
+              selectedLayoutBlockKey === null;
             const isEmptyRow =
               rowMeta !== undefined &&
               (layoutRows[rowMeta.rowIndex]?.items ?? []).every(
@@ -9677,38 +9818,40 @@ if (section.kind === "embed") {
               rowMeta !== undefined &&
               selectedSectionId === section.id &&
               selectedLayoutRowIndex === rowMeta.rowIndex;
+            const isHoveredRow =
+              rowMeta !== undefined &&
+              hoveredColumnKey !== null &&
+              (layoutRows[rowMeta.rowIndex]?.items ?? []).some(
+                (rowItem) => (rowItem.id ?? "") === hoveredColumnKey || (rowItem.id ?? `layout-item-${rowMeta.rowIndex * (section.layoutColumns ?? 2) + rowMeta.columnIndex}`) === hoveredColumnKey
+              );
             const rowSpacingStyle: CSSProperties = {};
-            if (item.rowTopSpacing && item.rowTopSpacing !== "inherit") {
-              rowSpacingStyle.paddingTop = resolveBuilderSpacing(
-                item.rowTopSpacing,
-                "rowPadding",
-              ).css;
-            }
-            if (item.rowBottomSpacing && item.rowBottomSpacing !== "inherit") {
-              rowSpacingStyle.paddingBottom = resolveBuilderSpacing(
-                item.rowBottomSpacing,
-                "rowPadding",
-              ).css;
-            }
-            if (item.rowTopMargin && item.rowTopMargin !== "inherit") {
-              rowSpacingStyle.marginTop = resolveBuilderSpacing(
-                item.rowTopMargin,
-                "rowMargin",
-              ).css;
-            }
-            if (item.rowBottomMargin && item.rowBottomMargin !== "inherit") {
-              rowSpacingStyle.marginBottom = resolveBuilderSpacing(
-                item.rowBottomMargin,
-                "rowMargin",
-              ).css;
-            }
+            rowSpacingStyle.paddingTop = resolveBuilderSpacing(
+              item.rowTopSpacing,
+              "rowPadding",
+            ).css;
+            rowSpacingStyle.paddingBottom = resolveBuilderSpacing(
+              item.rowBottomSpacing,
+              "rowPadding",
+            ).css;
+            rowSpacingStyle.marginTop = resolveBuilderSpacing(
+              item.rowTopMargin,
+              "rowMargin",
+            ).css;
+            rowSpacingStyle.marginBottom = resolveBuilderSpacing(
+              item.rowBottomMargin,
+              "rowMargin",
+            ).css;
             return (
               <Fragment key={columnKey}>
               <article
+                onMouseEnter={() => setHoveredColumnKey(columnKey)}
+                onMouseLeave={() => setHoveredColumnKey(null)}
                 className={hasScrollPinned ? `w-full col-span-12 ${
                   selectedLayoutColumnKey === columnKey
                     ? "is-selected-column"
                     : ""
+                } ${
+                  hoveredColumnKey === columnKey ? "is-hovered-column" : ""
                 } ${
                   isSelectedRow ? "is-selected-row" : ""
                 } ${
@@ -9719,6 +9862,8 @@ if (section.kind === "embed") {
                   selectedLayoutColumnKey === columnKey
                     ? "is-selected-column"
                     : ""
+                } ${
+                  hoveredColumnKey === columnKey ? "is-hovered-column" : ""
                 } ${
                   isSelectedRow ? "is-selected-row" : ""
                 } ${
@@ -9836,19 +9981,24 @@ if (section.kind === "embed") {
                   onBlockDragEnd();
                 }}
               >
-                {(spacingOverlayEnabled ||
-                  isSelectedRow ||
-                  selectedLayoutColumnKey === columnKey) && (
+                {(isColumnActive ||
+                  (spacingOverlayEnabled && hoveredColumnKey === columnKey)) && (
                   <BoxSpacingOverlay
                     kind="column"
-                    labels={columnSpacingOverlayLabels(
-                      item,
-                      section.id,
-                      columnKey,
-                      rowMeta,
-                    )}
+                    labels={columnSpacingOverlayLabels(rowMeta)}
                     onOpenSpacingSettings={onOpenSpacingSettings}
 	                  />
+                )}
+                {(isRowActive || (spacingOverlayEnabled && isHoveredRow)) &&
+                  rowMeta?.isRowStart && (
+                  <RowSpacingOverlay
+                    item={item}
+                    sectionId={section.id}
+                    rowIndex={rowMeta.rowIndex}
+                    isRowStart
+                    showZeroLabels={spacingOverlayEnabled}
+                    onOpenSpacingSettings={onOpenSpacingSettings}
+                  />
                 )}
                 {rowMeta?.isRowStart && (
                   <RowLayoutToolbar
@@ -9887,11 +10037,17 @@ if (section.kind === "embed") {
                   const blockAnimationAttrs = previewAnimationAttrs(
                     block.animation,
                   );
+                  const isElementActive =
+                    selectedSectionId === section.id &&
+                    selectedLayoutColumnKey === columnKey &&
+                    selectedLayoutBlockKey === blockKey;
 
                   return (
                     <div
                       key={blockKey}
                       draggable
+                      onMouseEnter={() => setHoveredBlockKey(blockKey)}
+                      onMouseLeave={() => setHoveredBlockKey(null)}
                       className={`builder-preview-layout-block is-${
                         block.kind ?? "text"
                       } ${
@@ -9902,6 +10058,8 @@ if (section.kind === "embed") {
                         selectedLayoutBlockKey === blockKey
                           ? "is-selected-block"
                           : ""
+                      } ${
+                        hoveredBlockKey === blockKey ? "is-hovered-block" : ""
                       } ${
                         draggingLayoutBlockKey === blockKey
                           ? "is-dragging-block"
@@ -9925,6 +10083,10 @@ if (section.kind === "embed") {
                             block.borderRadius !== undefined
                               ? `${block.borderRadius}px`
                               : undefined,
+                          padding: resolveBuilderSpacing(
+                            block.elementPadding,
+                            "elementPadding",
+                          ).css,
                           ...visualStyleToCss(
                             block.visualStyle as BuilderVisualStyle | undefined,
                           ),
@@ -10062,13 +10224,12 @@ if (section.kind === "embed") {
                         onBlockDragEnd();
                       }}
                     >
-                      {(spacingOverlayEnabled ||
-                        selectedLayoutBlockKey === blockKey) && (
+                      {(isElementActive ||
+                        (spacingOverlayEnabled && hoveredBlockKey === blockKey)) && (
                         <BoxSpacingOverlay
                           kind="element"
                           labels={elementSpacingOverlayLabels(
                             block,
-                            blockIndex,
                             section.id,
                             columnKey,
                             blockKey,

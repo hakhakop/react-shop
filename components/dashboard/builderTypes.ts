@@ -77,7 +77,7 @@ export type SectionKind =
   | "embed"
   | "scrollPinnedDemo";
 export type PreviewDevice = "desktop" | "tablet" | "mobile";
-export type GlobalSectionSpacing = "none" | "small" | "medium" | "large";
+export type GlobalSectionSpacing = "none" | "xs" | "sm" | "md" | "lg" | "xl" | "2xl" | "3xl" | "small" | "medium" | "large" | string;
 export type SectionSpacing = "inherit" | GlobalSectionSpacing;
 export type InspectorTab =
   | "content"
@@ -250,7 +250,7 @@ export type BuilderLayoutBlock = {
   imageCaption?: string;
   elementBackgroundMode?: "default" | "transparent" | "custom";
   elementBackground?: string;
-  elementPadding?: "none" | "small" | "medium" | "large";
+  elementPadding?: "none" | "xs" | "sm" | "md" | "lg" | "xl" | "2xl" | "3xl" | "small" | "medium" | "large" | string;
   elementAlign?: "left" | "center" | "right";
   panelStyle?: BuilderPanelStyle;
   embedMode?: EmbedMode;
