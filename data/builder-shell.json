@@ -21,7 +21,7 @@
   ],
   "headerActiveIndicator": "princity",
   "sectionPaddingTop": "medium",
-  "sectionPaddingBottom": "32px",
+  "sectionPaddingBottom": "md",
   "sectionMarginTop": "md",
   "sectionMarginBottom": "md",
   "menuPresentation": {
@@ -61,5 +61,5 @@
       "badgeText": null
     }
   },
-  "updatedAt": "2026-06-11T19:10:28.354Z"
+  "updatedAt": "2026-06-11T19:22:16.529Z"
 }
