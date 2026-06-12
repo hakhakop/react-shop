@@ -7,44 +7,24 @@ export type BuilderTemplate =
   | "search-results";
 export type BuilderLayoutKey = BuilderPage | BuilderTemplate;
 export type BuilderTargetType = "page" | "template";
-export type BuilderHeaderLayout =
-  | "wordpress"
-  | "simple"
-  | "two-row"
-  | "hero"
-  | "pill"
-  | "princity";
-export type BuilderHeaderBrandMode = "logo" | "brand" | "both";
-export type BuilderHeaderIconId =
-  | "wishlist"
-  | "cart"
-  | "account"
-  | "theme"
-  | "search";
-export type BuilderHeaderIconVariant = "muted" | "solid" | "ghost" | "icon";
-export type BuilderHeaderActiveIndicator = "underline" | "princity" | "none";
-export type BuilderHeaderBackgroundMode = "default" | "none";
-export type BuilderShellSettings = {
-  headerVisible: boolean;
-  topToolbarVisible: boolean;
-  topToolbarText: string;
-  topToolbarPhone: string;
-  topToolbarMeta: string;
-  headerBackgroundMode: BuilderHeaderBackgroundMode;
-  headerLayout: BuilderHeaderLayout;
-  headerBrandMode: BuilderHeaderBrandMode;
-  headerBrandText: string;
-  headerLogoUrl: string | null;
-  headerLogoAlt: string;
-  headerLogoMaxWidth: number;
-  headerIconVariant: BuilderHeaderIconVariant;
-  headerIconOrder: BuilderHeaderIconId[];
-  headerActiveIndicator: BuilderHeaderActiveIndicator;
-  sectionPaddingTop: GlobalSectionSpacing;
-  sectionPaddingBottom: GlobalSectionSpacing;
-  sectionMarginTop: GlobalSectionSpacing;
-  sectionMarginBottom: GlobalSectionSpacing;
-  menuPresentation: Record<string, MenuPresentationSettings>;
+import type {
+  BuilderHeaderLayout,
+  BuilderHeaderBrandMode,
+  BuilderHeaderIconId,
+  BuilderHeaderIconVariant,
+  BuilderHeaderActiveIndicator,
+  BuilderHeaderBackgroundMode,
+  BuilderShellSettings,
+} from "@/lib/builderShell";
+
+export type {
+  BuilderHeaderLayout,
+  BuilderHeaderBrandMode,
+  BuilderHeaderIconId,
+  BuilderHeaderIconVariant,
+  BuilderHeaderActiveIndicator,
+  BuilderHeaderBackgroundMode,
+  BuilderShellSettings,
 };
 export type BuilderPanelStyle =
   | "default"

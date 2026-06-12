@@ -236,6 +236,9 @@ const defaultShellSettings: BuilderShellSettings = {
   sectionMarginTop: "none",
   sectionMarginBottom: "none",
   menuPresentation: {},
+  storefrontPreset: "princity",
+  primaryColor: "#111111",
+  accentColor: "#111111",
 };
 
 const defaultMenuPresentation: MenuPresentationSettings = {
@@ -580,16 +583,77 @@ function sectionColorModeLabel(section: BuilderSection) {
 
 function readableSchemeForColor(color: string | undefined): SectionColorScheme {
   if (!color) return "inherit";
-  const match = color.trim().match(/^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i);
-  if (!match) return "inherit";
+  const bg = color.trim().toLowerCase();
+  if (bg === "transparent" || bg === "initial" || bg === "inherit") {
+    return "inherit";
+  }
 
-  const [, r, g, b] = match;
-  const luminance =
-    (0.2126 * parseInt(r, 16) +
-      0.7152 * parseInt(g, 16) +
-      0.0722 * parseInt(b, 16)) /
-    255;
-  return luminance < 0.48 ? "dark" : "light";
+  // Handle CSS Gradients by extracting hex/rgb colors and averaging their luminance
+  if (bg.includes("gradient")) {
+    const hexes = bg.match(/#[a-f\d]{3,8}/g) || [];
+    const rgbs = bg.match(/rgba?\(\d+\s*,\s*\d+\s*,\s*\d+/g) || [];
+    let totalLuminance = 0;
+    let count = 0;
+
+    for (const hex of hexes) {
+      let h = hex.substring(1);
+      if (h.length === 3 || h.length === 4) {
+        h = h[0] + h[0] + h[1] + h[1] + h[2] + h[2];
+      }
+      if (h.length === 6 || h.length === 8) {
+        const r = parseInt(h.substring(0, 2), 16);
+        const g = parseInt(h.substring(2, 4), 16);
+        const b = parseInt(h.substring(4, 6), 16);
+        totalLuminance += (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
+        count++;
+      }
+    }
+
+    for (const rgb of rgbs) {
+      const match = rgb.match(/(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/);
+      if (match) {
+        const r = parseInt(match[1], 10);
+        const g = parseInt(match[2], 10);
+        const b = parseInt(match[3], 10);
+        totalLuminance += (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
+        count++;
+      }
+    }
+
+    if (count > 0) {
+      return (totalLuminance / count) < 0.48 ? "dark" : "light";
+    }
+  }
+
+  // Handle Hex
+  const hexMatch = bg.match(/^#?([a-f\d]{3,8})$/);
+  if (hexMatch) {
+    let hex = hexMatch[1];
+    if (hex.length === 3 || hex.length === 4) {
+      hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
+    }
+    if (hex.length === 6 || hex.length === 8) {
+      const r = parseInt(hex.substring(0, 2), 16);
+      const g = parseInt(hex.substring(2, 4), 16);
+      const b = parseInt(hex.substring(4, 6), 16);
+      const luminance = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
+      return luminance < 0.48 ? "dark" : "light";
+    }
+  }
+
+  // Handle RGB
+  const rgbMatch = bg.match(/^rgba?\((\d+)\s*,\s*(\d+)\s*,\s*(\d+)(?:\s*,\s*([\d.]+))?\)$/);
+  if (rgbMatch) {
+    const r = parseInt(rgbMatch[1], 10);
+    const g = parseInt(rgbMatch[2], 10);
+    const b = parseInt(rgbMatch[3], 10);
+    const a = rgbMatch[4] !== undefined ? parseFloat(rgbMatch[4]) : 1;
+    if (a < 0.15) return "inherit";
+    const luminance = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
+    return luminance < 0.48 ? "dark" : "light";
+  }
+
+  return "inherit";
 }
 
 const previewButtonsStyle = (layout?: "inline" | "stacked", align?: "left" | "center" | "right"): CSSProperties => ({
@@ -5074,6 +5138,57 @@ export default function DashboardBuilder({
           </div>
 
           <div className="builder-card-title">
+            <strong>Storefront Styling</strong>
+            <span>global styling + colors</span>
+          </div>
+
+          <label className="builder-field">
+            <span>Storefront Style Preset</span>
+            <select
+              value={shellSettings.storefrontPreset}
+              onChange={(event) =>
+                updateShellSettings({
+                  storefrontPreset: event.target.value,
+                })
+              }
+            >
+              <option value="minimal">Minimal (Dark gray, round buttons)</option>
+              <option value="soft">Soft (Sage tones, medium round buttons)</option>
+              <option value="elevated">Elevated (Slate tones, large card shadows)</option>
+              <option value="boutique">Boutique (Red accents, square buttons)</option>
+              <option value="princity">Princity (Pure white, bold borders)</option>
+            </select>
+          </label>
+
+          <div className="builder-design-grid">
+            <label className="builder-swatch-field">
+              <span>Primary Color</span>
+              <input
+                type="color"
+                value={shellSettings.primaryColor || "#111111"}
+                onChange={(event) =>
+                  updateShellSettings({
+                    primaryColor: event.target.value,
+                  })
+                }
+              />
+            </label>
+
+            <label className="builder-swatch-field">
+              <span>Accent Color</span>
+              <input
+                type="color"
+                value={shellSettings.accentColor || "#111111"}
+                onChange={(event) =>
+                  updateShellSettings({
+                    accentColor: event.target.value,
+                  })
+                }
+              />
+            </label>
+          </div>
+
+          <div className="builder-card-title">
             <strong>Section Spacing</strong>
             <span>default padding + margin</span>
           </div>
@@ -7334,6 +7449,12 @@ function PreviewCanvas({
             const isSelected = selectedId === section.id;
             const isSectionActive = isSelected && selectedLayoutRowIndex === null && selectedLayoutColumnKey === null && selectedLayoutBlockKey === null;
             const animationAttrs = previewAnimationAttrs(section.animation);
+            const isAnimatedBg =
+              section.backgroundEffect === "antigravity" ||
+              section.backgroundEffect === "aurora" ||
+              section.backgroundEffect === "constellation" ||
+              section.backgroundEffect === "waves" ||
+              section.backgroundEffect === "flowfield";
             const isSectionAntigravity = section.backgroundEffect === "antigravity";
             const isFullTheme = isSectionAntigravity && (section.antigravityVisualMode === undefined || section.antigravityVisualMode === "full");
 
@@ -7353,7 +7474,7 @@ function PreviewCanvas({
                 } builder-preview-section--content-${
                   section.contentMode ?? "boxed"
                 } builder-preview-section--scheme-${resolveSectionColorScheme(section)} ${
-                  isFullTheme ? "shop-builder-section--effect-antigravity" : isSectionAntigravity ? "relative overflow-hidden" : ""
+                  isFullTheme ? "shop-builder-section--effect-antigravity" : isAnimatedBg ? "relative overflow-hidden" : ""
                 } ${
                   isSelected ? "is-selected" : ""
                 } ${
@@ -7473,7 +7594,7 @@ function PreviewCanvas({
                     onCycleSectionSpacing={onCycleSectionSpacing}
                   />
                 )}
-                {isSectionAntigravity && (
+                {isAnimatedBg && (
                   <>
                     <AntigravityCanvas
                       speed={section.antigravitySpeed}
@@ -7487,8 +7608,9 @@ function PreviewCanvas({
                       glowIntensity={section.antigravityGlowIntensity}
                       interactionScope={section.antigravityInteractionScope as any}
                       visualMode={section.antigravityVisualMode as any}
+                      effectType={section.backgroundEffect}
                     />
-                    {section.antigravityShowGrid !== false && (
+                    {isSectionAntigravity && section.antigravityShowGrid !== false && (
                       <div
                         className="antigravity-grid-overlay"
                         aria-hidden="true"

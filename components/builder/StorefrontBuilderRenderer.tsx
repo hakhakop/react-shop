@@ -162,6 +162,43 @@ function resolveColorSchemeForBackground(
     return parentScheme;
   }
 
+  // Handle CSS Gradients by extracting hex/rgb colors and averaging their luminance
+  if (color.includes("gradient")) {
+    const hexes = color.match(/#[a-f\d]{3,8}/g) || [];
+    const rgbs = color.match(/rgba?\(\d+\s*,\s*\d+\s*,\s*\d+/g) || [];
+    let totalLuminance = 0;
+    let count = 0;
+
+    for (const hex of hexes) {
+      let h = hex.substring(1);
+      if (h.length === 3 || h.length === 4) {
+        h = h[0] + h[0] + h[1] + h[1] + h[2] + h[2];
+      }
+      if (h.length === 6 || h.length === 8) {
+        const r = parseInt(h.substring(0, 2), 16);
+        const g = parseInt(h.substring(2, 4), 16);
+        const b = parseInt(h.substring(4, 6), 16);
+        totalLuminance += (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
+        count++;
+      }
+    }
+
+    for (const rgb of rgbs) {
+      const match = rgb.match(/(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/);
+      if (match) {
+        const r = parseInt(match[1], 10);
+        const g = parseInt(match[2], 10);
+        const b = parseInt(match[3], 10);
+        totalLuminance += (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
+        count++;
+      }
+    }
+
+    if (count > 0) {
+      return (totalLuminance / count) < 0.48 ? "dark" : "light";
+    }
+  }
+
   const hexMatch = color.match(/^#([a-f\d]{3,8})$/);
   if (hexMatch) {
     let hex = hexMatch[1];
@@ -617,6 +654,12 @@ function SectionFrame({
   children: ReactNode;
 }) {
   const animationAttrs = animationDataAttributes(section.animation);
+  const isAnimatedBg =
+    section.backgroundEffect === "antigravity" ||
+    section.backgroundEffect === "aurora" ||
+    section.backgroundEffect === "constellation" ||
+    section.backgroundEffect === "waves" ||
+    section.backgroundEffect === "flowfield";
   const isAntigravity = section.backgroundEffect === "antigravity";
   const isFullTheme =
     isAntigravity &&
@@ -628,7 +671,7 @@ function SectionFrame({
       className={`${sectionClassName(section, extra)} ${
         isFullTheme
           ? "shop-builder-section--effect-antigravity"
-          : isAntigravity
+          : isAnimatedBg
             ? "relative overflow-hidden"
             : ""
       }`}
@@ -636,7 +679,7 @@ function SectionFrame({
       data-gsap-section={section.kind === "hero" ? "hero" : section.kind}
       {...animationAttrs.data}
     >
-      {isAntigravity && (
+      {isAnimatedBg && (
         <>
           <AntigravityCanvas
             speed={section.antigravitySpeed}
@@ -650,8 +693,9 @@ function SectionFrame({
             glowIntensity={section.antigravityGlowIntensity}
             interactionScope={section.antigravityInteractionScope as any}
             visualMode={section.antigravityVisualMode as any}
+            effectType={section.backgroundEffect}
           />
-          {section.antigravityShowGrid !== false && (
+          {isAntigravity && section.antigravityShowGrid !== false && (
             <div
               className="antigravity-grid-overlay"
               aria-hidden="true"
@@ -2565,6 +2609,12 @@ function ContentLayoutSection({
       >
         {layoutRows.map((row) => {
           const rowItem = row.items[0];
+          const isRowAnimatedBg =
+            rowItem?.rowBackgroundEffect === "antigravity" ||
+            rowItem?.rowBackgroundEffect === "aurora" ||
+            rowItem?.rowBackgroundEffect === "constellation" ||
+            rowItem?.rowBackgroundEffect === "waves" ||
+            rowItem?.rowBackgroundEffect === "flowfield";
           const isRowAntigravity = rowItem?.rowBackgroundEffect === "antigravity";
           const isFullRowTheme = isRowAntigravity && (rowItem.rowAntigravityVisualMode === undefined || rowItem.rowAntigravityVisualMode === "full");
           const rowAnimationAttrs = animationDataAttributes(rowItem?.rowAnimation);
@@ -2576,7 +2626,7 @@ function ContentLayoutSection({
               className={`shop-builder-content-row ${
                 isFullRowTheme
                   ? "shop-builder-section--effect-antigravity"
-                  : isRowAntigravity
+                  : isRowAnimatedBg
                     ? "relative overflow-hidden"
                     : ""
               }`}
@@ -2593,7 +2643,7 @@ function ContentLayoutSection({
               }}
               {...rowAnimationAttrs.data}
             >
-              {isRowAntigravity && (
+              {isRowAnimatedBg && (
                 <>
                   <AntigravityCanvas
                     speed={rowItem.rowAntigravitySpeed}
@@ -2607,8 +2657,9 @@ function ContentLayoutSection({
                     glowIntensity={rowItem.rowAntigravityGlowIntensity}
                     interactionScope={rowItem.rowAntigravityInteractionScope as any}
                     visualMode={rowItem.rowAntigravityVisualMode as any}
+                    effectType={rowItem.rowBackgroundEffect}
                   />
-                  {rowItem.rowAntigravityShowGrid !== false && (
+                  {isRowAntigravity && rowItem.rowAntigravityShowGrid !== false && (
                     <div
                       className="antigravity-grid-overlay"
                       aria-hidden="true"

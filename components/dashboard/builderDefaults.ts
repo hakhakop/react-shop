@@ -102,9 +102,18 @@ export const sectionBackgroundPresets = [
   { label: "White", value: "#ffffff", scheme: "light" },
   { label: "Soft", value: "#f7f7f4", scheme: "light" },
   { label: "Warm", value: "#f0ece5", scheme: "light" },
+  { label: "Sage", value: "#e2e8df", scheme: "light" },
   { label: "Mint", value: "#eef5e8", scheme: "light" },
+  { label: "Clay", value: "#f2e9e1", scheme: "light" },
+  { label: "Nordic Mist", value: "linear-gradient(135deg, #e0e0e0 0%, #f5f5f7 100%)", scheme: "light" },
+  { label: "Aurora Glow", value: "linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%)", scheme: "light" },
+  { label: "Sunset Glow", value: "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)", scheme: "dark" },
+  { label: "Cyberpunk", value: "linear-gradient(135deg, #2b1055 0%, #7597de 100%)", scheme: "dark" },
+  { label: "Deep Ocean", value: "linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%)", scheme: "dark" },
+  { label: "Ocean", value: "#0a192f", scheme: "dark" },
   { label: "Ink", value: "#111111", scheme: "dark" },
   { label: "Charcoal", value: "#24241f", scheme: "dark" },
+  { label: "Mesh Dark", value: "linear-gradient(135deg, #1f1f1a 0%, #111111 100%)", scheme: "dark" },
 ] as const;
 
 export const defaultState: BuilderState = {

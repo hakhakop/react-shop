@@ -4,7 +4,7 @@
   "topToolbarText": "Fast support & setup by Webpages",
   "topToolbarPhone": "+374 xx xx xx",
   "topToolbarMeta": "AMD ֏",
-  "headerBackgroundMode": "default",
+  "headerBackgroundMode": "none",
   "headerLayout": "princity",
   "headerBrandMode": "logo",
   "headerBrandText": "WebPages",
@@ -20,8 +20,8 @@
     "search"
   ],
   "headerActiveIndicator": "princity",
-  "sectionPaddingTop": "lg",
-  "sectionPaddingBottom": "lg",
+  "sectionPaddingTop": "64px",
+  "sectionPaddingBottom": "128px",
   "sectionMarginTop": "lg",
   "sectionMarginBottom": "lg",
   "menuPresentation": {
@@ -61,5 +61,5 @@
       "badgeText": null
     }
   },
-  "updatedAt": "2026-06-12T06:22:41.852Z"
+  "updatedAt": "2026-06-12T21:20:34.844Z"
 }

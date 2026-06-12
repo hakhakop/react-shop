@@ -50,6 +50,9 @@ export type BuilderShellSettings = {
   sectionMarginTop: BuilderSectionSpacing;
   sectionMarginBottom: BuilderSectionSpacing;
   menuPresentation: BuilderMenuPresentationMap;
+  storefrontPreset: string;
+  primaryColor: string;
+  accentColor: string;
   updatedAt?: string;
 };
 
@@ -79,6 +82,9 @@ export const defaultBuilderShellSettings: BuilderShellSettings = {
   sectionMarginTop: "none",
   sectionMarginBottom: "none",
   menuPresentation: {},
+  storefrontPreset: "princity",
+  primaryColor: "#111111",
+  accentColor: "#111111",
 };
 
 function normalizeHeaderLayout(value: unknown): BuilderHeaderLayout {
@@ -211,6 +217,11 @@ function normalizeMenuPresentationMap(
 export function normalizeBuilderShellSettings(
   value: Partial<BuilderShellSettings> | null | undefined
 ): BuilderShellSettings {
+  const allowedPresets = ["minimal", "soft", "elevated", "boutique", "princity"];
+  const preset = typeof value?.storefrontPreset === "string" && allowedPresets.includes(value.storefrontPreset.trim().toLowerCase())
+    ? value.storefrontPreset.trim().toLowerCase()
+    : defaultBuilderShellSettings.storefrontPreset;
+
   return {
     ...defaultBuilderShellSettings,
     ...(value ?? {}),
@@ -269,6 +280,13 @@ export function normalizeBuilderShellSettings(
       defaultBuilderShellSettings.sectionMarginBottom
     ),
     menuPresentation: normalizeMenuPresentationMap(value?.menuPresentation),
+    storefrontPreset: preset,
+    primaryColor: typeof value?.primaryColor === "string" && value.primaryColor.trim().length > 0
+      ? value.primaryColor.trim()
+      : defaultBuilderShellSettings.primaryColor,
+    accentColor: typeof value?.accentColor === "string" && value.accentColor.trim().length > 0
+      ? value.accentColor.trim()
+      : defaultBuilderShellSettings.accentColor,
   };
 }
 

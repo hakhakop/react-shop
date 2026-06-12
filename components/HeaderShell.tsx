@@ -45,14 +45,15 @@ export default async function HeaderShell({ layoutOverride }: HeaderShellProps) 
     ]);
 
   const settings = (settingsRaw || {}) as Record<string, unknown>;
+  const shellSettings = (shellSettingsRaw || {}) as Partial<BuilderShellSettings>;
 
   const headerSettings: HeaderSettings = settings.headerSettings
     ? (settings.headerSettings as HeaderSettings)
     : extractHeaderSettings(settings);
 
-  // Colors
-  const primaryColor = asString(settings.primary_color, "#111827") || "#111827";
-  const accentColor = asString(settings.accent_color, "#ec4899") || "#ec4899";
+  // Colors: prioritize React shellSettings over ACF options
+  const primaryColor = asString(shellSettings.primaryColor) || asString(settings.primary_color) || "#111827";
+  const accentColor = asString(shellSettings.accentColor) || asString(settings.accent_color) || "#ec4899";
 
   // Logo resolution: accept URL string or ACF image object
   const logoField =
@@ -130,7 +131,6 @@ export default async function HeaderShell({ layoutOverride }: HeaderShellProps) 
       ),
     ),
   );
-  const shellSettings = (shellSettingsRaw || {}) as Partial<BuilderShellSettings>;
   const topToolbarVisible = shellSettings.topToolbarVisible !== false;
   const effectiveTopBarText =
     typeof shellSettings.topToolbarText === "string"

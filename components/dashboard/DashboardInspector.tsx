@@ -8759,7 +8759,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                         type="button"
                         className={
                           selectedSection.background?.toLowerCase() ===
-                          preset.value
+                          preset.value.toLowerCase()
                             ? "is-active"
                             : ""
                         }
@@ -8809,7 +8809,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                   />
                 </summary>
 
-                <label className="builder-field">
+                 <label className="builder-field">
                   <span>Effect Type</span>
                   <select
                     value={selectedSection.backgroundEffect ?? "none"}
@@ -8823,10 +8823,22 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                     <option value="antigravity">
                       Antigravity Particle & Grid Canvas
                     </option>
+                    <option value="aurora">
+                      Aurora Mesh Gradient Glow
+                    </option>
+                    <option value="constellation">
+                      Interactive Starfield Constellations
+                    </option>
+                    <option value="waves">
+                      Animated Sine Wave Ripples
+                    </option>
+                    <option value="flowfield">
+                      Vector Flow Field Particles
+                    </option>
                   </select>
                 </label>
 
-                {selectedSection.backgroundEffect === "antigravity" && (
+                {selectedSection.backgroundEffect && selectedSection.backgroundEffect !== "none" && (
                   <div
                     className="builder-effect-settings-subpanel"
                     style={{
@@ -8837,7 +8849,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                     }}
                   >
                     <label className="builder-field">
-                      <span>Particle Speed</span>
+                      <span>Animation Speed</span>
                       <div
                         className="builder-range-row"
                         style={{
@@ -8866,36 +8878,40 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                       </div>
                     </label>
 
-                    <label className="builder-field">
-                      <span>Particle Count</span>
-                      <div
-                        className="builder-range-row"
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "8px",
-                        }}
-                      >
-                        <input
-                          type="range"
-                          min="0"
-                          max="300"
-                          step="5"
-                          style={{ flex: 1 }}
-                          value={selectedSection.antigravityParticleCount ?? 40}
-                          onChange={(event) =>
-                            updateSelected({
-                              antigravityParticleCount: Number(
-                                event.target.value,
-                              ),
-                            })
-                          }
-                        />
-                        <span style={{ minWidth: "40px", textAlign: "right" }}>
-                          {selectedSection.antigravityParticleCount ?? 40}
-                        </span>
-                      </div>
-                    </label>
+                    {(selectedSection.backgroundEffect === "antigravity" ||
+                      selectedSection.backgroundEffect === "constellation" ||
+                      selectedSection.backgroundEffect === "flowfield") && (
+                      <label className="builder-field">
+                        <span>Particle Count</span>
+                        <div
+                          className="builder-range-row"
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "8px",
+                          }}
+                        >
+                          <input
+                            type="range"
+                            min="0"
+                            max="300"
+                            step="5"
+                            style={{ flex: 1 }}
+                            value={selectedSection.antigravityParticleCount ?? 40}
+                            onChange={(event) =>
+                              updateSelected({
+                                antigravityParticleCount: Number(
+                                  event.target.value,
+                                ),
+                              })
+                            }
+                          />
+                          <span style={{ minWidth: "40px", textAlign: "right" }}>
+                            {selectedSection.antigravityParticleCount ?? 40}
+                          </span>
+                        </div>
+                      </label>
+                    )}
 
                     <label className="builder-field">
                       <span>Glow Intensity</span>
@@ -8930,42 +8946,44 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                       </div>
                     </label>
 
-                    <label className="builder-field">
-                      <span>Grid Movement Speed</span>
-                      <div
-                        className="builder-range-row"
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "8px",
-                        }}
-                      >
-                        <input
-                          type="range"
-                          min="0.0"
-                          max="5.0"
-                          step="0.1"
-                          style={{ flex: 1 }}
-                          value={selectedSection.antigravityGridMoveSpeed ?? 1.0}
-                          onChange={(event) =>
-                            updateSelected({
-                              antigravityGridMoveSpeed: Number(
-                                event.target.value,
-                              ),
-                            })
-                          }
-                        />
-                        <span style={{ minWidth: "40px", textAlign: "right" }}>
-                          {(
-                            selectedSection.antigravityGridMoveSpeed ?? 1.0
-                          ).toFixed(1)}
-                          x
-                        </span>
-                      </div>
-                    </label>
+                    {selectedSection.backgroundEffect === "antigravity" && (
+                      <label className="builder-field">
+                        <span>Grid Movement Speed</span>
+                        <div
+                          className="builder-range-row"
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "8px",
+                          }}
+                        >
+                          <input
+                            type="range"
+                            min="0.0"
+                            max="5.0"
+                            step="0.1"
+                            style={{ flex: 1 }}
+                            value={selectedSection.antigravityGridMoveSpeed ?? 1.0}
+                            onChange={(event) =>
+                              updateSelected({
+                                antigravityGridMoveSpeed: Number(
+                                  event.target.value,
+                                ),
+                              })
+                            }
+                          />
+                          <span style={{ minWidth: "40px", textAlign: "right" }}>
+                            {(
+                              selectedSection.antigravityGridMoveSpeed ?? 1.0
+                            ).toFixed(1)}
+                            x
+                          </span>
+                        </div>
+                      </label>
+                    )}
 
                     <label className="builder-field">
-                      <span>Canvas Particle Color</span>
+                      <span>Canvas Effect Color</span>
                       <div
                         className="builder-color-row"
                         style={{ display: "flex", gap: "8px" }}
@@ -8991,106 +9009,118 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                       </div>
                     </label>
 
-                    <label className="builder-field">
-                      <span>Grid Density</span>
-                      <select
-                        value={selectedSection.antigravityGridDensity ?? "normal"}
-                        onChange={(event) =>
-                          updateSelected({
-                            antigravityGridDensity: event.target.value as any,
-                          })
-                        }
+                    {selectedSection.backgroundEffect === "antigravity" && (
+                      <>
+                        <label className="builder-field">
+                          <span>Grid Density</span>
+                          <select
+                            value={selectedSection.antigravityGridDensity ?? "normal"}
+                            onChange={(event) =>
+                              updateSelected({
+                                antigravityGridDensity: event.target.value as any,
+                              })
+                            }
+                          >
+                            <option value="sparse">Sparse</option>
+                            <option value="normal">Normal</option>
+                            <option value="compact">Compact</option>
+                          </select>
+                        </label>
+
+                        <label className="builder-field">
+                          <span>Visual Mode</span>
+                          <select
+                            value={selectedSection.antigravityVisualMode ?? "full"}
+                            onChange={(event) =>
+                              updateSelected({
+                                antigravityVisualMode: event.target.value as any,
+                              })
+                            }
+                          >
+                            <option value="full">Full layout overlays</option>
+                            <option value="transparent-grid">
+                              Transparent grid lines
+                            </option>
+                            <option value="no-grid">
+                              Rising particles only (No grid)
+                            </option>
+                            <option value="lines-only">
+                              Mesh network lines only (No particles)
+                            </option>
+                          </select>
+                        </label>
+                      </>
+                    )}
+
+                    {(selectedSection.backgroundEffect === "antigravity" ||
+                      selectedSection.backgroundEffect === "constellation" ||
+                      selectedSection.backgroundEffect === "flowfield") && (
+                      <label
+                        className="builder-check"
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "8px",
+                        }}
                       >
-                        <option value="sparse">Sparse</option>
-                        <option value="normal">Normal</option>
-                        <option value="compact">Compact</option>
-                      </select>
-                    </label>
+                        <input
+                          type="checkbox"
+                          checked={selectedSection.antigravityInteractive !== false}
+                          onChange={(event) =>
+                            updateSelected({
+                              antigravityInteractive: event.target.checked,
+                            })
+                          }
+                        />
+                        <span>Mouse pointer interaction</span>
+                      </label>
+                    )}
 
-                    <label className="builder-field">
-                      <span>Visual Mode</span>
-                      <select
-                        value={selectedSection.antigravityVisualMode ?? "full"}
-                        onChange={(event) =>
-                          updateSelected({
-                            antigravityVisualMode: event.target.value as any,
-                          })
-                        }
-                      >
-                        <option value="full">Full layout overlays</option>
-                        <option value="transparent-grid">
-                          Transparent grid lines
-                        </option>
-                        <option value="no-grid">
-                          Rising particles only (No grid)
-                        </option>
-                        <option value="lines-only">
-                          Mesh network lines only (No particles)
-                        </option>
-                      </select>
-                    </label>
+                    {selectedSection.backgroundEffect === "antigravity" && (
+                      <>
+                        <label
+                          className="builder-check"
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "8px",
+                          }}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={selectedSection.antigravityShowGrid !== false}
+                            onChange={(event) =>
+                              updateSelected({
+                                antigravityShowGrid: event.target.checked,
+                              })
+                            }
+                          />
+                          <span>Show grid overlay</span>
+                        </label>
 
-                    <label
-                      className="builder-check"
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "8px",
-                      }}
-                    >
-                      <input
-                        type="checkbox"
-                        checked={selectedSection.antigravityInteractive !== false}
-                        onChange={(event) =>
-                          updateSelected({
-                            antigravityInteractive: event.target.checked,
-                          })
-                        }
-                      />
-                      <span>Mouse pointer interaction</span>
-                    </label>
-
-                    <label
-                      className="builder-check"
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "8px",
-                      }}
-                    >
-                      <input
-                        type="checkbox"
-                        checked={selectedSection.antigravityShowGrid !== false}
-                        onChange={(event) =>
-                          updateSelected({
-                            antigravityShowGrid: event.target.checked,
-                          })
-                        }
-                      />
-                      <span>Show grid overlay</span>
-                    </label>
-
-                    <label
-                      className="builder-check"
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "8px",
-                      }}
-                    >
-                      <input
-                        type="checkbox"
-                        checked={
-                          selectedSection.antigravityShowParticles !== false
-                        }
-                        onChange={(event) =>
-                          updateSelected({
-                            antigravityShowParticles: event.target.checked,
-                          })
-                        }
-                      />
-                      <span>Show floating particles</span>
-                    </label>
+                        <label
+                          className="builder-check"
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "8px",
+                          }}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={
+                              selectedSection.antigravityShowParticles !== false
+                            }
+                            onChange={(event) =>
+                              updateSelected({
+                                antigravityShowParticles: event.target.checked,
+                              })
+                            }
+                          />
+                          <span>Show floating particles</span>
+                        </label>
+                      </>
+                    )}
                   </div>
                 )}
               </details>

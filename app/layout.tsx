@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 
-import { getThemeSettings } from "../lib/themeSettings";
+import { getThemeSettings, presetMap } from "../lib/themeSettings";
 import { CartProvider } from "../components/CartProvider";
 import { ToastProvider } from "../components/ToastProvider";
 import { ThemeProvider } from "../components/ThemeProvider";
@@ -38,12 +38,39 @@ export default async function RootLayout({
   // All ACF options from WordPress (via webpagesThemeSettingsRaw)
   const settings = (themeSettingsRaw || {}) as Record<string, any>;
 
-  const designTokens = (settings.designTokens ?? {}) as Record<string, string>;
+  // Prioritize React shellSettings for storefrontPreset, falling back to ACF settings
+  const storefrontPreset = String(shellSettings.storefrontPreset || settings.storefrontPreset || "minimal");
+
+  // Get active design tokens for this preset
+  const chosenTokens = presetMap[storefrontPreset] || presetMap["minimal"];
+
+  // Prioritize brand colors from React shellSettings, falling back to ACF options
+  const primaryColor = shellSettings.primaryColor || settings.primary_color || null;
+  const accentColor = shellSettings.accentColor || settings.accent_color || null;
+
+  // Enrich chosen preset tokens with active brand colors
+  const designTokens = {
+    ...chosenTokens,
+    ...(primaryColor
+      ? {
+          "--color-primary": primaryColor,
+          "--primary-strong": primaryColor,
+        }
+      : {}),
+    ...(accentColor
+      ? {
+          "--color-accent": accentColor,
+          "--accent": accentColor,
+          "--accent-strong": accentColor,
+          "--price-border": accentColor,
+          "--price-color": accentColor,
+        }
+      : {}),
+  } as Record<string, string>;
 
   const designTokensCss = Object.entries(designTokens)
     .map(([key, value]) => `${key}: ${value};`)
     .join("\n  ");
-  const storefrontPreset = String(settings.storefrontPreset ?? "minimal");
 
   const getCssValue = (value: unknown, fallback: string): string => {
     if (value === undefined || value === null) return fallback;

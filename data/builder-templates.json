@@ -1,5 +1,296 @@
 [
   {
+    "id": "product-single-mqaprmnx-zjf7",
+    "title": "product-single",
+    "templateType": "page",
+    "description": "Page template saved from Single Product",
+    "sourcePage": "product-single",
+    "design": {
+      "preset": "princity",
+      "colorScheme": "auto",
+      "pageBackground": "#f7f7f4",
+      "textColor": "#111111",
+      "mutedTextColor": "#5f5f58",
+      "accentColor": "#a4be7b",
+      "surfaceColor": "#efefe9",
+      "buttonBackground": "#111111",
+      "buttonTextColor": "#ffffff",
+      "radius": "8px",
+      "sectionMaxWidth": "1640px",
+      "sectionGutter": "48px",
+      "headingFontFamily": "inherit",
+      "headingSize": "clamp(42px, 8vw, 126px)",
+      "headingWeight": "760",
+      "headingLineHeight": "0.92",
+      "cardBg": "#efefe9",
+      "cardRadius": "8px",
+      "cardBorder": "transparent",
+      "cardShadow": "0 12px 30px rgba(17,17,17,0.06)",
+      "cardShadowHover": "0 18px 42px rgba(17,17,17,0.1)",
+      "cardImageBg": "#ffffff",
+      "cardImagePadding": "clamp(22px, 2.4vw, 36px)"
+    },
+    "sections": [
+      {
+        "id": "template-product-layout",
+        "kind": "contentLayout",
+        "title": "",
+        "eyebrow": "",
+        "body": "Use this section to shape gallery, information, and related content zones.",
+        "background": "#111111",
+        "backgroundMode": "boxed",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "layoutColumns": 2,
+        "layoutItems": [
+          {
+            "id": "template-product-media",
+            "blocks": [
+              {
+                "id": "template-product-gallery",
+                "kind": "productGallery",
+                "title": "Product Gallery",
+                "body": "Dynamic field: current product gallery.",
+                "galleryThumbnailPosition": "left",
+                "galleryHeight": 600
+              }
+            ]
+          },
+          {
+            "id": "template-product-summary",
+            "blocks": [
+              {
+                "id": "template-product-title",
+                "kind": "productTitle",
+                "title": "Product Title",
+                "body": "Dynamic field: current product title."
+              },
+              {
+                "id": "template-product-price",
+                "kind": "productPrice",
+                "title": "Product Price",
+                "body": "Dynamic field: current product price."
+              },
+              {
+                "id": "template-product-cart",
+                "kind": "productAddToCart",
+                "title": "Add To Cart",
+                "body": "Dynamic WooCommerce add-to-cart button."
+              },
+              {
+                "id": "template-product-attributes",
+                "kind": "productAttributes",
+                "title": "Product Attributes",
+                "body": "Dynamic field: size, color, material, and other attributes."
+              },
+              {
+                "id": "template-product-description",
+                "kind": "productDescription",
+                "title": "Product Description",
+                "body": "Dynamic field: current product description."
+              }
+            ]
+          }
+        ],
+        "visible": true
+      },
+      {
+        "id": "template-product-recent",
+        "kind": "recentlyViewed",
+        "title": "Recently Viewed",
+        "background": "#ffffff",
+        "backgroundMode": "boxed",
+        "contentMode": "full",
+        "colorScheme": "inherit",
+        "layout": "carousel",
+        "visible": true
+      }
+    ],
+    "updatedAt": "2026-06-12T09:18:12.093Z"
+  },
+  {
+    "id": "contentlayout-mqaprir4-7xpl",
+    "title": "contentLayout",
+    "templateType": "section",
+    "description": "Section template saved from Single Product",
+    "sourcePage": "product-single",
+    "sections": [
+      {
+        "id": "template-product-layout",
+        "kind": "contentLayout",
+        "title": "",
+        "eyebrow": "",
+        "body": "Use this section to shape gallery, information, and related content zones.",
+        "background": "#111111",
+        "backgroundMode": "boxed",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "layoutColumns": 2,
+        "layoutItems": [
+          {
+            "id": "template-product-media",
+            "blocks": [
+              {
+                "id": "template-product-gallery",
+                "kind": "productGallery",
+                "title": "Product Gallery",
+                "body": "Dynamic field: current product gallery.",
+                "galleryThumbnailPosition": "left",
+                "galleryHeight": 600
+              }
+            ]
+          },
+          {
+            "id": "template-product-summary",
+            "blocks": [
+              {
+                "id": "template-product-title",
+                "kind": "productTitle",
+                "title": "Product Title",
+                "body": "Dynamic field: current product title."
+              },
+              {
+                "id": "template-product-price",
+                "kind": "productPrice",
+                "title": "Product Price",
+                "body": "Dynamic field: current product price."
+              },
+              {
+                "id": "template-product-cart",
+                "kind": "productAddToCart",
+                "title": "Add To Cart",
+                "body": "Dynamic WooCommerce add-to-cart button."
+              },
+              {
+                "id": "template-product-attributes",
+                "kind": "productAttributes",
+                "title": "Product Attributes",
+                "body": "Dynamic field: size, color, material, and other attributes."
+              },
+              {
+                "id": "template-product-description",
+                "kind": "productDescription",
+                "title": "Product Description",
+                "body": "Dynamic field: current product description."
+              }
+            ]
+          }
+        ],
+        "visible": true
+      }
+    ],
+    "updatedAt": "2026-06-12T09:18:07.024Z"
+  },
+  {
+    "id": "product-single-mqaprhnv-u66c",
+    "title": "product-single",
+    "templateType": "page",
+    "description": "Page template saved from Single Product",
+    "sourcePage": "product-single",
+    "design": {
+      "preset": "princity",
+      "colorScheme": "auto",
+      "pageBackground": "#f7f7f4",
+      "textColor": "#111111",
+      "mutedTextColor": "#5f5f58",
+      "accentColor": "#a4be7b",
+      "surfaceColor": "#efefe9",
+      "buttonBackground": "#111111",
+      "buttonTextColor": "#ffffff",
+      "radius": "8px",
+      "sectionMaxWidth": "1640px",
+      "sectionGutter": "48px",
+      "headingFontFamily": "inherit",
+      "headingSize": "clamp(42px, 8vw, 126px)",
+      "headingWeight": "760",
+      "headingLineHeight": "0.92",
+      "cardBg": "#efefe9",
+      "cardRadius": "8px",
+      "cardBorder": "transparent",
+      "cardShadow": "0 12px 30px rgba(17,17,17,0.06)",
+      "cardShadowHover": "0 18px 42px rgba(17,17,17,0.1)",
+      "cardImageBg": "#ffffff",
+      "cardImagePadding": "clamp(22px, 2.4vw, 36px)"
+    },
+    "sections": [
+      {
+        "id": "template-product-layout",
+        "kind": "contentLayout",
+        "title": "",
+        "eyebrow": "",
+        "body": "Use this section to shape gallery, information, and related content zones.",
+        "background": "#111111",
+        "backgroundMode": "boxed",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "layoutColumns": 2,
+        "layoutItems": [
+          {
+            "id": "template-product-media",
+            "blocks": [
+              {
+                "id": "template-product-gallery",
+                "kind": "productGallery",
+                "title": "Product Gallery",
+                "body": "Dynamic field: current product gallery.",
+                "galleryThumbnailPosition": "left",
+                "galleryHeight": 600
+              }
+            ]
+          },
+          {
+            "id": "template-product-summary",
+            "blocks": [
+              {
+                "id": "template-product-title",
+                "kind": "productTitle",
+                "title": "Product Title",
+                "body": "Dynamic field: current product title."
+              },
+              {
+                "id": "template-product-price",
+                "kind": "productPrice",
+                "title": "Product Price",
+                "body": "Dynamic field: current product price."
+              },
+              {
+                "id": "template-product-cart",
+                "kind": "productAddToCart",
+                "title": "Add To Cart",
+                "body": "Dynamic WooCommerce add-to-cart button."
+              },
+              {
+                "id": "template-product-attributes",
+                "kind": "productAttributes",
+                "title": "Product Attributes",
+                "body": "Dynamic field: size, color, material, and other attributes."
+              },
+              {
+                "id": "template-product-description",
+                "kind": "productDescription",
+                "title": "Product Description",
+                "body": "Dynamic field: current product description."
+              }
+            ]
+          }
+        ],
+        "visible": true
+      },
+      {
+        "id": "template-product-recent",
+        "kind": "recentlyViewed",
+        "title": "Recently Viewed",
+        "background": "#ffffff",
+        "backgroundMode": "boxed",
+        "contentMode": "full",
+        "colorScheme": "inherit",
+        "layout": "carousel",
+        "visible": true
+      }
+    ],
+    "updatedAt": "2026-06-12T09:18:05.611Z"
+  },
+  {
     "id": "section-layout-mqako2lm-m5hh",
     "title": "Section Layout",
     "templateType": "section",
