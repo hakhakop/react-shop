@@ -23,6 +23,10 @@ type Props = {
   showLayout?: boolean;
   showAdvanced?: boolean;
   showTypography?: boolean;
+  spacingControlIds?: {
+    padding?: string;
+    margin?: string;
+  };
   onChange: (patch: Partial<StyleTarget>) => void;
   onPickBackgroundImage?: () => void;
 };
@@ -35,6 +39,7 @@ export default function StyleTabPanel({
   showLayout = true,
   showAdvanced = true,
   showTypography = true,
+  spacingControlIds,
   onChange,
   onPickBackgroundImage,
 }: Props) {
@@ -53,11 +58,13 @@ export default function StyleTabPanel({
             <small>padding & margin</small>
           </summary>
           <SpacingControl
+            id={spacingControlIds?.padding}
             label="Padding"
             value={style.padding}
             onChange={(padding) => patchStyle({ padding })}
           />
           <SpacingControl
+            id={spacingControlIds?.margin}
             label="Margin"
             value={style.margin}
             onChange={(margin) => patchStyle({ margin })}

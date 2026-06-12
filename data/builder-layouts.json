@@ -115,7 +115,9 @@
                   "variant": "default"
                 }
               }
-            ]
+            ],
+            "rowTopMargin": "inherit",
+            "rowBottomSpacing": "md"
           }
         ]
       },
@@ -159,7 +161,8 @@
                   }
                 }
               }
-            ]
+            ],
+            "rowTopMargin": "md"
           },
           {
             "id": "layout-item-mq4z4n9g-1",
@@ -293,31 +296,23 @@
         "layoutColumns": 1,
         "layoutItems": [
           {
-            "id": "layout-row-mq50dcgi-column-1",
-            "rowId": "layout-row-mq50dcgi",
-            "rowLayout": "whole",
+            "id": "layout-item-mq02cfbq-1",
             "blocks": [
               {
-                "id": "hero-block-mq50dh70-168qg",
+                "id": "hero-block-mq9wbhgw-7kgn1",
                 "kind": "hero",
                 "eyebrow": "Featured",
                 "title": "Ընտրեք ձեր փաթեթը",
-                "body": "<p>Սկսեք այն լուծումից, որն առավել համապատասխանում է ձեր նպատակին։Հետագայում հնարավոր է ընդլայնել և զարգացնել կայքը։<strong> </strong></p>",
+                "body": "Սկսեք այն լուծումից, որն առավել համապատասխանում է ձեր նպատակին։Հետագայում հնարավոր է ընդլայնել և զարգացնել կայքը։",
                 "buttonLabel": "Learn more",
                 "buttonUrl": "/",
                 "carouselSettings": {
                   "variant": "default"
                 },
-                "elementPadding": "medium",
                 "animation": {
-                  "preset": "fade-up"
+                  "preset": "none"
                 }
-              }
-            ]
-          },
-          {
-            "id": "layout-item-mq02cfbq-1",
-            "blocks": [
+              },
               {
                 "id": "packages-grid",
                 "kind": "grid",
@@ -438,7 +433,7 @@
                   }
                 ],
                 "animation": {
-                  "preset": "none",
+                  "preset": "princity-gradient",
                   "once": false
                 },
                 "elementPadding": "small",
@@ -499,7 +494,7 @@
             ]
           }
         ],
-        "layoutRows": 3
+        "layoutRows": 2
       },
       {
         "id": "contentLayout-mptess1t-f8n9s",
@@ -718,8 +713,8 @@
         "backgroundMode": "full",
         "contentMode": "boxed",
         "colorScheme": "inherit",
-        "topSpacing": "large",
-        "bottomSpacing": "large",
+        "topSpacing": "inherit",
+        "bottomSpacing": "inherit",
         "topMargin": "inherit",
         "bottomMargin": "inherit",
         "visible": true,
@@ -740,7 +735,7 @@
                 "buttonUrl": "",
                 "panelStyle": "default",
                 "elementBackgroundMode": "transparent",
-                "elementPadding": "none",
+                "elementPadding": "md",
                 "typography": {
                   "title": {
                     "fontSize": "clamp(42px, 6vw, 96px)",
@@ -1130,7 +1125,7 @@
         ]
       }
     ],
-    "updatedAt": "2026-06-11T07:19:47.740Z"
+    "updatedAt": "2026-06-12T07:55:21.484Z"
   },
   "shop": {
     "version": 1,

@@ -15,12 +15,13 @@ const PRESETS: { label: string; value: BuilderSpacingPreset }[] = [
 ];
 
 type Props = {
+  id?: string;
   label: string;
   value?: BuilderSpacingSides;
   onChange: (value: BuilderSpacingSides) => void;
 };
 
-export default function SpacingControl({ label, value, onChange }: Props) {
+export default function SpacingControl({ id, label, value, onChange }: Props) {
   const v = value ?? { linked: true };
   const linked = v.linked !== false;
 
@@ -40,7 +41,7 @@ export default function SpacingControl({ label, value, onChange }: Props) {
   }
 
   return (
-    <div className="builder-style-spacing">
+    <div id={id} className="builder-style-spacing" tabIndex={id ? -1 : undefined}>
       <div className="builder-style-spacing-header">
         <strong>{label}</strong>
         <label className="builder-check builder-style-link-toggle">

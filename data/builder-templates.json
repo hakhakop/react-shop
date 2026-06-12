@@ -1,5 +1,48 @@
 [
   {
+    "id": "section-layout-mqako2lm-m5hh",
+    "title": "Section Layout",
+    "templateType": "section",
+    "description": "Section template saved from Home",
+    "sourcePage": "home",
+    "sections": [
+      {
+        "id": "contentLayout-mpzkl96m-oosnk",
+        "kind": "contentLayout",
+        "title": "",
+        "background": "#ffffff",
+        "backgroundMode": "full",
+        "contentMode": "narrow",
+        "colorScheme": "inherit",
+        "topSpacing": "inherit",
+        "bottomSpacing": "inherit",
+        "topMargin": "inherit",
+        "bottomMargin": "inherit",
+        "visible": true,
+        "eyebrow": "",
+        "body": "",
+        "layout": "whole",
+        "layoutColumns": 1,
+        "layoutItems": [
+          {
+            "id": "layout-item-mpzkl96m-1",
+            "blocks": [
+              {
+                "id": "fluentForm-block-mpzklfs9-nmvi6",
+                "kind": "fluentForm",
+                "title": "Contact Form",
+                "body": "Rendered from Fluent Forms in WordPress.",
+                "fluentFormId": "1"
+              }
+            ]
+          }
+        ],
+        "layoutRows": 1
+      }
+    ],
+    "updatedAt": "2026-06-12T06:55:28.042Z"
+  },
+  {
     "id": "section-layout-mq4uq4z0-tboy",
     "title": "Section Layout 1",
     "templateType": "section",

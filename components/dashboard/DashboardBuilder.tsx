@@ -1095,6 +1095,11 @@ export default function DashboardBuilder({
   const [previewScale, setPreviewScale] = useState(1);
   const [previewCanvasWidth, setPreviewCanvasWidth] = useState(1180);
   const [spacingOverlayEnabled, setSpacingOverlayEnabled] = useState(false);
+  const [spacingFocusRequest, setSpacingFocusRequest] = useState<{
+    id: number;
+    scope: string;
+    field?: string;
+  } | null>(null);
   const [sidebarTab, setSidebarTab] = useState<SidebarTab>("settings");
   const [panelForceToggler, setPanelForceToggler] = useState(0);
   const [inspectorOpenKey, setInspectorOpenKey] = useState(0);
@@ -1110,6 +1115,7 @@ export default function DashboardBuilder({
   const [menuIconSearch, setMenuIconSearch] = useState("");
   const publishCelebrationTimer = useRef<number | null>(null);
   const shellAutoSaveTimer = useRef<number | null>(null);
+  const spacingFocusRequestId = useRef(0);
   const [customPages, setCustomPages] = useState<BuilderCustomPage[]>([]);
   const [newPageTitle, setNewPageTitle] = useState("");
   const [pageStatus, setPageStatus] = useState("Builder pages save to React");
@@ -2353,7 +2359,6 @@ export default function DashboardBuilder({
   };
 
   const openSpacingSettings = (target: SpacingInspectorTarget) => {
-    console.log("[openSpacingSettings]", JSON.stringify(target));
     setSpacingOverlayEnabled(true);
     setSidebarCollapsed(false);
 
@@ -2396,17 +2401,19 @@ export default function DashboardBuilder({
       setInspectorTab("spacing");
     }
 
-    // Dispatch custom event to focus the spacing field in the inspector
-    setTimeout(() => {
-      const event = new CustomEvent("builder-focus-spacing", {
-        detail: {
-          scope: target.scope,
-          field: target.field,
-        },
-      });
-      window.dispatchEvent(event);
-    }, 150);
+    setSpacingFocusRequest({
+      id: ++spacingFocusRequestId.current,
+      scope: target.scope,
+      field: target.field,
+    });
   };
+
+  useEffect(() => {
+    if (!spacingFocusRequest || spacingFocusRequest.scope === "globalSection") {
+      return;
+    }
+    setInspectorTab(spacingFocusRequest.scope === "column" ? "layout" : "spacing");
+  }, [spacingFocusRequest]);
 
   const updateSelectedSlide = (
     index: number,
@@ -4865,6 +4872,7 @@ export default function DashboardBuilder({
       getLayoutItemBlocks={getLayoutItemBlocks}
       inspectorOpen={inspectorOpen}
       inspectorTab={inspectorTab}
+      spacingFocusRequest={spacingFocusRequest}
       spacingOverlayEnabled={spacingOverlayEnabled}
       layoutBlockLabels={layoutBlockLabels}
       openLayoutItemId={openLayoutItemId}
@@ -8543,7 +8551,7 @@ function SectionSpacingOverlay({
                 : undefined
             }
           >
-            Section MT {topMargin.displayLabel}
+            MT {topMargin.displayLabel}
           </SpacingGuideLabel>
         ) : null}
       </div>
@@ -8558,7 +8566,7 @@ function SectionSpacingOverlay({
                 : undefined
             }
           >
-            Section PT {topPadding.displayLabel}
+            PT {topPadding.displayLabel}
           </SpacingGuideLabel>
         ) : null}
       </div>
@@ -8573,7 +8581,7 @@ function SectionSpacingOverlay({
                 : undefined
             }
           >
-            Section PB {bottomPadding.displayLabel}
+            PB {bottomPadding.displayLabel}
           </SpacingGuideLabel>
         ) : null}
       </div>
@@ -8588,7 +8596,7 @@ function SectionSpacingOverlay({
                 : undefined
             }
           >
-            Section MB {bottomMargin.displayLabel}
+            MB {bottomMargin.displayLabel}
           </SpacingGuideLabel>
         ) : null}
       </div>
@@ -8655,7 +8663,7 @@ function RowSpacingOverlay({
             className={`builder-preview-spacing-label builder-preview-spacing-label--gap builder-preview-spacing-label--source-${rowGap.source.toLowerCase()}`}
             style={{ left: "50%", top: "50%", transform: "translate(-50%, -50%)" }}
           >
-            Row Gap {formatSpacingMeasurement(rowGap)}
+            Gap {formatSpacingMeasurement(rowGap)}
           </SpacingGuideLabel>
         </div>
       )}
@@ -8670,7 +8678,7 @@ function RowSpacingOverlay({
               style={{ left: "8px", right: "auto", bottom: "4px", top: "auto" }}
               onClick={onOpenSpacingSettings ? () => onOpenSpacingSettings(marginTopTarget) : undefined}
             >
-              Row MT {formatSpacingMeasurement(topMargin)}
+              MT {formatSpacingMeasurement(topMargin)}
             </SpacingGuideLabel>
           )}
         </div>
@@ -8683,10 +8691,10 @@ function RowSpacingOverlay({
           {isRowStart && (
             <SpacingGuideLabel
               className={`builder-preview-spacing-label builder-preview-spacing-label--padding builder-preview-spacing-label--source-${topPadding.source.toLowerCase()}`}
-              style={{ left: "auto", right: "8px", top: "4px", bottom: "auto" }}
+              style={{ left: "8px", right: "auto", top: "4px", bottom: "auto" }}
               onClick={onOpenSpacingSettings ? () => onOpenSpacingSettings(paddingTopTarget) : undefined}
             >
-              Row PT {formatSpacingMeasurement(topPadding)}
+              PT {formatSpacingMeasurement(topPadding)}
             </SpacingGuideLabel>
           )}
         </div>
@@ -8699,10 +8707,10 @@ function RowSpacingOverlay({
           {isRowStart && (
             <SpacingGuideLabel
               className={`builder-preview-spacing-label builder-preview-spacing-label--padding builder-preview-spacing-label--source-${bottomPadding.source.toLowerCase()}`}
-              style={{ left: "auto", right: "8px", bottom: "4px", top: "auto" }}
+              style={{ left: "8px", right: "auto", bottom: "4px", top: "auto" }}
               onClick={onOpenSpacingSettings ? () => onOpenSpacingSettings(paddingBottomTarget) : undefined}
             >
-              Row PB {formatSpacingMeasurement(bottomPadding)}
+              PB {formatSpacingMeasurement(bottomPadding)}
             </SpacingGuideLabel>
           )}
         </div>
@@ -8718,7 +8726,7 @@ function RowSpacingOverlay({
               style={{ left: "8px", right: "auto", top: "4px", bottom: "auto" }}
               onClick={onOpenSpacingSettings ? () => onOpenSpacingSettings(marginBottomTarget) : undefined}
             >
-              Row MB {formatSpacingMeasurement(bottomMargin)}
+              MB {formatSpacingMeasurement(bottomMargin)}
             </SpacingGuideLabel>
           )}
         </div>
@@ -8789,10 +8797,14 @@ function SpacingGuideLabel({
       <button
         type="button"
         className={className}
-        onMouseDown={(event) => event.stopPropagation()}
-        onClick={(event) => {
+        onMouseDown={(event) => {
+          event.preventDefault();
           event.stopPropagation();
           onClick();
+        }}
+        onClick={(event) => {
+          event.stopPropagation();
+          if (event.detail === 0) onClick();
         }}
         tabIndex={tabIndex ?? 0}
         style={style}
@@ -8801,7 +8813,11 @@ function SpacingGuideLabel({
       </button>
     );
   }
-  return <span className={className} style={style}>{children}</span>;
+  return (
+    <span className={`${className} is-informational`} style={style}>
+      {children}
+    </span>
+  );
 }
 
 type SpacingInspectorTarget =
@@ -8853,6 +8869,7 @@ type BuilderSpacingOverlayLabel = {
     | "inside-bottom"
     | "outside-bottom"
     | "outside-left"
+    | "outside-right"
     | "inside-right"
     | "inside-left";
 };
@@ -8893,9 +8910,9 @@ function formatSpacingMeasurement(measurement: ResolvedBuilderSpacing) {
     measurement.source === "Local"
       ? "Local"
       : measurement.source === "Global"
-        ? "From Global"
+        ? "Global"
         : "Default";
-  return `${measurement.label} (${sourceText})`;
+  return `${measurement.label} · ${sourceText}`;
 }
 
 function spacingLabel(
@@ -8989,18 +9006,31 @@ function boxSpacingSideLabels(
   const first = visible[0];
   const allEqual =
     visible.length === 4 && visible.every((entry) => entry.css === first.css);
+  const positions = tone === "margin"
+    ? {
+        top: "outside-top" as const,
+        right: "outside-right" as const,
+        bottom: "outside-bottom" as const,
+        left: "outside-left" as const,
+      }
+    : {
+        top: "inside-top" as const,
+        right: "inside-right" as const,
+        bottom: "inside-bottom" as const,
+        left: "inside-left" as const,
+      };
 
   if (allEqual) {
     return compactSpacingLabels([
-      spacingLabel(prefix, first, tone, "inside-top", target),
+      spacingLabel(prefix, first, tone, positions.top, target),
     ]);
   }
 
   return compactSpacingLabels([
-    spacingLabel(`${prefix}t`, measurements.top, tone, "inside-top", target),
-    spacingLabel(`${prefix}r`, measurements.right, tone, "inside-right", target),
-    spacingLabel(`${prefix}b`, measurements.bottom, tone, "inside-bottom", target),
-    spacingLabel(`${prefix}l`, measurements.left, tone, "inside-left", target),
+    spacingLabel(`${prefix}t`, measurements.top, tone, positions.top, target),
+    spacingLabel(`${prefix}r`, measurements.right, tone, positions.right, target),
+    spacingLabel(`${prefix}b`, measurements.bottom, tone, positions.bottom, target),
+    spacingLabel(`${prefix}l`, measurements.left, tone, positions.left, target),
   ]);
 }
 
@@ -9818,12 +9848,6 @@ if (section.kind === "embed") {
               rowMeta !== undefined &&
               selectedSectionId === section.id &&
               selectedLayoutRowIndex === rowMeta.rowIndex;
-            const isHoveredRow =
-              rowMeta !== undefined &&
-              hoveredColumnKey !== null &&
-              (layoutRows[rowMeta.rowIndex]?.items ?? []).some(
-                (rowItem) => (rowItem.id ?? "") === hoveredColumnKey || (rowItem.id ?? `layout-item-${rowMeta.rowIndex * (section.layoutColumns ?? 2) + rowMeta.columnIndex}`) === hoveredColumnKey
-              );
             const rowSpacingStyle: CSSProperties = {};
             rowSpacingStyle.paddingTop = resolveBuilderSpacing(
               item.rowTopSpacing,
@@ -9981,16 +10005,14 @@ if (section.kind === "embed") {
                   onBlockDragEnd();
                 }}
               >
-                {(isColumnActive ||
-                  (spacingOverlayEnabled && hoveredColumnKey === columnKey)) && (
+                {isColumnActive && (
                   <BoxSpacingOverlay
                     kind="column"
                     labels={columnSpacingOverlayLabels(rowMeta)}
                     onOpenSpacingSettings={onOpenSpacingSettings}
 	                  />
                 )}
-                {(isRowActive || (spacingOverlayEnabled && isHoveredRow)) &&
-                  rowMeta?.isRowStart && (
+                {isRowActive && rowMeta?.isRowStart && (
                   <RowSpacingOverlay
                     item={item}
                     sectionId={section.id}
@@ -10224,8 +10246,7 @@ if (section.kind === "embed") {
                         onBlockDragEnd();
                       }}
                     >
-                      {(isElementActive ||
-                        (spacingOverlayEnabled && hoveredBlockKey === blockKey)) && (
+                      {isElementActive && (
                         <BoxSpacingOverlay
                           kind="element"
                           labels={elementSpacingOverlayLabels(

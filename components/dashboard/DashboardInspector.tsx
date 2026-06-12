@@ -306,6 +306,11 @@ type DashboardInspectorProps = {
   getLayoutItemBlocks: (item: NonNullable<BuilderSection["layoutItems"]>[number]) => BuilderLayoutBlock[];
   inspectorOpen: boolean;
   inspectorTab: InspectorTab;
+  spacingFocusRequest?: {
+    id: number;
+    scope: string;
+    field?: string;
+  } | null;
   spacingOverlayEnabled?: boolean;
   layoutBlockLabels: Record<LayoutBlockKind, string>;
   openLayoutItemId: string | null;
@@ -444,6 +449,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
     hasSections = false,
     builderJson, copied, elementBackgroundPresets, getLayoutItemBlocks,
     inspectorOpen, inspectorTab, layoutBlockLabels, openLayoutItemId, openSlideId,
+    spacingFocusRequest = null,
     spacingOverlayEnabled = false,
     addSelectedLayoutBlockButton, deleteSelectedLayoutBlockButton, updateSelectedLayoutBlockButton,
     previewCategoryTree,
@@ -638,51 +644,44 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
   }, [inspectorTab, selectedLayoutBlock, selectedLayoutRow, setInspectorTab]);
 
   useEffect(() => {
-    const handleFocusSpacing = (event: Event) => {
-      const customEvent = event as CustomEvent<{
-        scope: string;
-        field?: string;
-      }>;
-      if (!customEvent.detail) return;
-      const { scope, field } = customEvent.detail;
-      const targetId = `spacing-${scope}-${field}`;
+    if (!spacingFocusRequest?.field) return;
 
-      console.log("[DashboardInspector] Received builder-focus-spacing event for:", targetId);
+    const targetId = `spacing-${spacingFocusRequest.scope}-${spacingFocusRequest.field}`;
+    let attempts = 0;
+    let retryTimer: number | undefined;
+    let highlightTimer: number | undefined;
 
-      let attempts = 0;
-      const tryFocus = () => {
-        const element = document.getElementById(targetId);
-        if (element) {
-          console.log("[DashboardInspector] Found element, focusing:", targetId);
-          element.scrollIntoView({ block: "center", behavior: "smooth" });
-
-          if (element instanceof HTMLSelectElement || element instanceof HTMLInputElement) {
-            element.focus();
-            element.classList.add("pulse-highlight");
-            setTimeout(() => {
-              element.classList.remove("pulse-highlight");
-            }, 1500);
-          }
-          return true;
-        }
-        return false;
-      };
-
-      if (!tryFocus()) {
-        const interval = setInterval(() => {
-          attempts++;
-          if (tryFocus() || attempts >= 8) {
-            clearInterval(interval);
-          }
-        }, 50);
+    const tryFocus = () => {
+      const element = document.getElementById(targetId);
+      if (!element) {
+        attempts += 1;
+        if (attempts < 12) retryTimer = window.setTimeout(tryFocus, 50);
+        return;
       }
+
+      element.scrollIntoView({ block: "center", behavior: "smooth" });
+      const focusTarget =
+        element instanceof HTMLSelectElement ||
+        element instanceof HTMLInputElement ||
+        element instanceof HTMLButtonElement
+          ? element
+          : element.querySelector<HTMLElement>(
+              "input:not(:disabled), select:not(:disabled), button:not(:disabled)",
+            ) ?? element;
+      focusTarget.focus({ preventScroll: true });
+      element.classList.add("pulse-highlight");
+      highlightTimer = window.setTimeout(() => {
+        element.classList.remove("pulse-highlight");
+      }, 1500);
     };
 
-    window.addEventListener("builder-focus-spacing", handleFocusSpacing);
+    // Let selection and tab changes commit before targeting the final control node.
+    retryTimer = window.setTimeout(tryFocus, 80);
     return () => {
-      window.removeEventListener("builder-focus-spacing", handleFocusSpacing);
+      if (retryTimer !== undefined) window.clearTimeout(retryTimer);
+      if (highlightTimer !== undefined) window.clearTimeout(highlightTimer);
     };
-  }, []);
+  }, [spacingFocusRequest]);
 
   const activeTypographyArea =
     activeTypographyAreaState.blockKey === selectedLayoutBlockKey &&
@@ -1003,6 +1002,19 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
           <PanelRightClose size={16} />
         </button>
       </div>
+      {spacingOverlayEnabled ? (
+        <div
+          className="builder-inspector-spacing-legend"
+          role="status"
+          aria-label="Spacing guide legend"
+        >
+          <strong>Canvas guides</strong>
+          <span className="is-padding"><i />Padding</span>
+          <span className="is-margin"><i />Margin</span>
+          <span className="is-gap"><i />Gap</span>
+          <span className="is-local"><i />Local</span>
+        </div>
+      ) : null}
       {selectedSection ? (
         <>
           <div className="builder-inspector-context">
@@ -1671,6 +1683,10 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                         ) : isElementSpacingTab ? (
                           <StyleTabPanel
                             target={styleTarget}
+                            spacingControlIds={{
+                              padding: "spacing-element-visualPadding",
+                              margin: "spacing-element-visualMargin",
+                            }}
                             showBackground={false}
                             showAppearance={false}
                             showLayout={false}
