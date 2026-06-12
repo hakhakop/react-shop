@@ -137,7 +137,7 @@ export default async function RootLayout({
 
   // Product card look
   const productCardRadius = toCssSize(
-    settings.product_card_radius,
+    shellSettings.productCardRadius || settings.product_card_radius,
     designTokens["--radius-lg"] ?? "10px"
   );
 
@@ -146,62 +146,71 @@ export default async function RootLayout({
     context: BuilderSpacingContext,
   ) => resolveBuilderSpacing(value, context).css;
   const productCardBg = getCssValue(
-    settings.product_card_background,
+    shellSettings.productCardBg || settings.product_card_background,
     designTokens["--product-card-bg"] ?? "#ffffff"
   );
   const productCardShadow = getCssValue(
-    settings.product_card_shadow,
+    shellSettings.productCardShadow || settings.product_card_shadow,
     designTokens["--shadow-sm"] ?? "0 0 0 rgba(15, 23, 42, 0)"
   );
   const productCardShadowHover = getCssValue(
-    settings.product_card_shadow_hover,
+    shellSettings.productCardShadowHover || settings.product_card_shadow_hover,
     designTokens["--shadow-lg"] ?? "0 18px 40px rgba(15, 23, 42, 0.14)"
   );
 
   // Product card sizing
   const productCardMinHeight = toCssSize(
-    settings.product_card_height,
-    "0"
+    shellSettings.productCardMinHeight || settings.product_card_height,
+    "0px"
   );
   const productCardMaxWidth = toCssSize(
-    settings.product_card_width,
+    shellSettings.productCardMaxWidth || settings.product_card_width,
     "100%"
   );
 
   // Product image sizing
   const productImageWidth = toCssSize(
-    settings.product_image_width,
+    shellSettings.productImageWidth || settings.product_image_width,
     "100%"
   );
   const productImageHeight = toCssSize(
-    settings.product_image_height,
+    shellSettings.productImageHeight || settings.product_image_height,
     "260px"
   );
   const productImageMaxWidth = toCssSize(
-    settings.product_image_max_width,
+    shellSettings.productImageMaxWidth || settings.product_image_max_width,
     "100%"
   );
   const productImageMaxHeight = toCssSize(
-    settings.product_image_max_height,
+    shellSettings.productImageMaxHeight || settings.product_image_max_height,
     "100%"
   );
   const productImageAspectRatio = normalizeAspectRatio(
-    settings.product_image_aspect_ratio,
+    shellSettings.productImageAspectRatio || settings.product_image_aspect_ratio,
     "auto"
   );
 
   const productImageNoPadding =
-    settings.product_image_no_padding === true ||
-    settings.product_image_no_padding === 1 ||
-    settings.product_image_no_padding === "1" ||
-    settings.disable_image_padding === true ||
-    settings.disable_image_padding === 1 ||
-    settings.disable_image_padding === "1";
+    shellSettings.productImageNoPadding === true ||
+    (shellSettings.productImageNoPadding === undefined && (
+      settings.product_image_no_padding === true ||
+      settings.product_image_no_padding === 1 ||
+      settings.product_image_no_padding === "1" ||
+      settings.disable_image_padding === true ||
+      settings.disable_image_padding === 1 ||
+      settings.disable_image_padding === "1"
+    ));
+
+  const productImagePadding = toCssSize(
+    shellSettings.productImagePadding || (productImageNoPadding ? "0px" : null),
+    "clamp(22px, 2.4vw, 36px)"
+  );
 
   const productImageObjectFit = normalizeObjectFit(
-    settings.product_image_fit ??
-      settings.product_image_object_fit ??
-      settings.image_fit_mode ??
+    shellSettings.productImageObjectFit ||
+      settings.product_image_fit ||
+      settings.product_image_object_fit ||
+      settings.image_fit_mode ||
       settings.product_image_mode,
     productImageNoPadding ? "cover" : "contain"
   );
@@ -219,7 +228,11 @@ export default async function RootLayout({
 
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className="body-root" data-storefront-preset={storefrontPreset} suppressHydrationWarning>
+      <body
+        className={`body-root ${productImageNoPadding ? "shop-image-padding--none" : ""}`}
+        data-storefront-preset={storefrontPreset}
+        suppressHydrationWarning
+      >
         {/* Theme-driven CSS variables for product cards and images */}
         <style
           dangerouslySetInnerHTML={{
@@ -241,6 +254,7 @@ export default async function RootLayout({
   --product-image-max-height: ${productImageMaxHeight};
   --product-image-object-fit: ${productImageObjectFit};
   --product-image-aspect-ratio: ${productImageAspectRatio};
+  --product-image-padding: ${productImagePadding};
   --builder-global-section-padding-top: ${sectionSpacingToCss(shellSettings.sectionPaddingTop, "sectionPadding")};
   --builder-global-section-padding-bottom: ${sectionSpacingToCss(shellSettings.sectionPaddingBottom, "sectionPadding")};
   --builder-global-section-margin-top: ${sectionSpacingToCss(shellSettings.sectionMarginTop, "sectionMargin")};

@@ -239,6 +239,24 @@ const defaultShellSettings: BuilderShellSettings = {
   storefrontPreset: "princity",
   primaryColor: "#111111",
   accentColor: "#111111",
+  productCardRadius: "10px",
+  productCardBg: "#ffffff",
+  productCardShadow: "0 0 0 rgba(15, 23, 42, 0)",
+  productCardShadowHover: "0 18px 40px rgba(15, 23, 42, 0.14)",
+  productCardMinHeight: "0px",
+  productCardMaxWidth: "100%",
+  productImageWidth: "100%",
+  productImageHeight: "260px",
+  productImageMaxWidth: "100%",
+  productImageMaxHeight: "100%",
+  productImageAspectRatio: "auto",
+  productImageNoPadding: false,
+  productImagePadding: "clamp(22px, 2.4vw, 36px)",
+  productImageObjectFit: "contain",
+  menuItems: [
+    { id: "home", label: "Home", url: "/" },
+    { id: "shop", label: "Shop", url: "/shop" },
+  ],
 };
 
 const defaultMenuPresentation: MenuPresentationSettings = {
@@ -1107,11 +1125,11 @@ function getPreviewProductModel(previewProducts: ProductNode[]) {
 }
 
 export type DashboardBuilderProps = {
-  menuTree: MenuItem[];
+  menuTree?: MenuItem[];
 };
 
 export default function DashboardBuilder({
-  menuTree,
+  menuTree = [],
 }: DashboardBuilderProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -1181,6 +1199,7 @@ export default function DashboardBuilder({
   const shellAutoSaveTimer = useRef<number | null>(null);
   const spacingFocusRequestId = useRef(0);
   const [customPages, setCustomPages] = useState<BuilderCustomPage[]>([]);
+  const [publishedKeys, setPublishedKeys] = useState<string[]>([]);
   const [newPageTitle, setNewPageTitle] = useState("");
   const [pageStatus, setPageStatus] = useState("Builder pages save to React");
   const [savedTemplates, setSavedTemplates] = useState<BuilderSavedTemplate[]>(
@@ -1444,12 +1463,14 @@ export default function DashboardBuilder({
         if (!response.ok) return;
         const payload = (await response.json()) as {
           pages?: BuilderCustomPage[];
+          publishedKeys?: string[];
         };
         const pages = (payload.pages ?? []).filter((page) =>
           isBuilderCustomPageKey(page.key),
         );
         if (!cancelled) {
           setCustomPages(pages);
+          setPublishedKeys(payload.publishedKeys ?? []);
           window.localStorage.setItem(
             STORAGE_CUSTOM_PAGES,
             JSON.stringify(pages),
@@ -4069,6 +4090,10 @@ export default function DashboardBuilder({
 
     setCommittedBuilderStateSignature(JSON.stringify(builderState));
     setPublishStatus("Published layout saved");
+    setPublishedKeys((current) => {
+      if (current.includes(builderState.page)) return current;
+      return [...current, builderState.page];
+    });
     setPublishCelebration(true);
     if (publishCelebrationTimer.current) {
       window.clearTimeout(publishCelebrationTimer.current);
@@ -4297,6 +4322,7 @@ export default function DashboardBuilder({
 
     const nextPages = customPages.filter((page) => page.key !== key);
     setCustomPages(nextPages);
+    setPublishedKeys((current) => current.filter((k) => k !== key));
     window.localStorage.setItem(
       STORAGE_CUSTOM_PAGES,
       JSON.stringify(nextPages),
@@ -5236,8 +5262,8 @@ export default function DashboardBuilder({
       {globalStylesTab === "cards" && (
         <div className="builder-global-styles-group">
           <div className="builder-card-title">
-            <strong>Card Preset</strong>
-            <span>{builderState.design.preset ?? "custom"}</span>
+            <strong>Product Card Design</strong>
+            <span>Style, colors, and shadows</span>
           </div>
 
           <div className="builder-two-column">
@@ -5245,11 +5271,10 @@ export default function DashboardBuilder({
               <span>Card Background</span>
               <input
                 type="color"
-                value={builderState.design.cardBg ?? "#efefe9"}
+                value={shellSettings.productCardBg || "#ffffff"}
                 onChange={(event) =>
-                  updateDesign({
-                    cardBg: event.target.value,
-                    preset: undefined,
+                  updateShellSettings({
+                    productCardBg: event.target.value,
                   })
                 }
               />
@@ -5259,18 +5284,16 @@ export default function DashboardBuilder({
               <span>Card Radius</span>
               <select
                 value={
-                  builderState.design.cardRadius === undefined
-                    ? "8px"
-                    : ["0px", "4px", "8px", "12px", "16px", "24px"].includes(builderState.design.cardRadius)
-                      ? builderState.design.cardRadius
-                      : "custom"
+                  ["0px", "4px", "8px", "12px", "16px", "24px"].includes(shellSettings.productCardRadius)
+                    ? shellSettings.productCardRadius
+                    : "custom"
                 }
                 onChange={(event) => {
                   const val = event.target.value;
                   if (val === "custom") {
-                    updateDesign({ cardRadius: "10px", preset: undefined });
+                    updateShellSettings({ productCardRadius: "10px" });
                   } else {
-                    updateDesign({ cardRadius: val, preset: undefined });
+                    updateShellSettings({ productCardRadius: val });
                   }
                 }}
               >
@@ -5283,115 +5306,278 @@ export default function DashboardBuilder({
                 <option value="custom">Custom...</option>
               </select>
             </label>
-            {builderState.design.cardRadius !== undefined && !["0px", "4px", "8px", "12px", "16px", "24px"].includes(builderState.design.cardRadius) && (
-              <label className="builder-field">
-                <span>Custom Radius (px/rem)</span>
-                <input
-                  type="text"
-                  value={builderState.design.cardRadius}
-                  onChange={(event) =>
-                    updateDesign({
-                      cardRadius: event.target.value,
-                      preset: undefined,
-                    })
-                  }
-                />
-              </label>
-            )}
           </div>
 
-          <label className="builder-field">
-            <span>Card Border</span>
-            <select
-              value={
-                builderState.design.cardBorder === "transparent"
-                  ? "transparent"
-                  : builderState.design.cardBorder ?? "transparent"
-              }
-              onChange={(event) =>
-                updateDesign({
-                  cardBorder: event.target.value,
-                  preset: undefined,
-                })
-              }
-            >
-              <option value="transparent">None</option>
-              <option value="rgba(17,17,17,0.12)">Subtle light</option>
-              <option value="rgba(17,17,17,0.2)">Soft dark</option>
-              <option value="rgba(247,247,241,0.12)">Subtle white</option>
-            </select>
-          </label>
+          {!["0px", "4px", "8px", "12px", "16px", "24px"].includes(shellSettings.productCardRadius) && (
+            <label className="builder-field">
+              <span>Custom Card Radius (px/rem)</span>
+              <input
+                type="text"
+                value={shellSettings.productCardRadius}
+                onChange={(event) =>
+                  updateShellSettings({
+                    productCardRadius: event.target.value,
+                  })
+                }
+              />
+            </label>
+          )}
 
           <label className="builder-field">
             <span>Card Shadow</span>
             <select
-              value={builderState.design.cardShadow ?? "none"}
+              value={shellSettings.productCardShadow || "0 0 0 rgba(15, 23, 42, 0)"}
               onChange={(event) =>
-                updateDesign({
-                  cardShadow: event.target.value,
-                  preset: undefined,
+                updateShellSettings({
+                  productCardShadow: event.target.value,
                 })
               }
             >
-              <option value="none">None</option>
-              <option value="0 8px 24px rgba(17,17,17,0.04)">Soft</option>
-              <option value="0 12px 30px rgba(17,17,17,0.06)">Medium</option>
-              <option value="0 18px 42px rgba(17,17,17,0.1)">Strong</option>
+              <option value="0 0 0 rgba(15, 23, 42, 0)">None</option>
+              <option value="0 4px 12px rgba(15, 23, 42, 0.05)">Subtle (0 4px 12px)</option>
+              <option value="0 8px 24px rgba(15, 23, 42, 0.06)">Soft (0 8px 24px)</option>
+              <option value="0 12px 30px rgba(15, 23, 42, 0.08)">Medium (0 12px 30px)</option>
+              <option value="0 18px 42px rgba(15, 23, 42, 0.12)">Strong (0 18px 42px)</option>
             </select>
           </label>
 
           <label className="builder-field">
             <span>Card Hover Shadow</span>
             <select
-              value={builderState.design.cardShadowHover ?? "none"}
+              value={shellSettings.productCardShadowHover || "0 18px 40px rgba(15, 23, 42, 0.14)"}
               onChange={(event) =>
-                updateDesign({
-                  cardShadowHover: event.target.value,
-                  preset: undefined,
+                updateShellSettings({
+                  productCardShadowHover: event.target.value,
                 })
               }
             >
-              <option value="none">None</option>
-              <option value="0 14px 30px rgba(17,17,17,0.08)">Soft</option>
-              <option value="0 18px 42px rgba(17,17,17,0.1)">Medium</option>
-              <option value="0 24px 54px rgba(17,17,17,0.14)">Strong</option>
+              <option value="0 0 0 rgba(15, 23, 42, 0)">None</option>
+              <option value="0 12px 24px rgba(15, 23, 42, 0.08)">Soft (0 12px 24px)</option>
+              <option value="0 18px 40px rgba(15, 23, 42, 0.14)">Medium (0 18px 40px)</option>
+              <option value="0 24px 54px rgba(15, 23, 42, 0.18)">Strong (0 24px 54px)</option>
             </select>
           </label>
 
+          <div className="builder-card-title">
+            <strong>Card Sizing</strong>
+            <span>Width and height constraints</span>
+          </div>
+
           <div className="builder-two-column">
             <label className="builder-field">
-              <span>Image Background</span>
+              <span>Card Min Height</span>
               <input
-                type="color"
-                value={builderState.design.cardImageBg ?? "#ffffff"}
+                type="text"
+                value={shellSettings.productCardMinHeight}
                 onChange={(event) =>
-                  updateDesign({
-                    cardImageBg: event.target.value,
-                    preset: undefined,
+                  updateShellSettings({
+                    productCardMinHeight: event.target.value,
                   })
                 }
+                placeholder="e.g. 0px, 320px"
               />
             </label>
 
             <label className="builder-field">
-              <span>Image Padding</span>
-              <select
-                value={builderState.design.cardImagePadding ?? "clamp(22px, 2.4vw, 36px)"}
+              <span>Card Max Width</span>
+              <input
+                type="text"
+                value={shellSettings.productCardMaxWidth}
                 onChange={(event) =>
-                  updateDesign({
-                    cardImagePadding: event.target.value,
-                    preset: undefined,
+                  updateShellSettings({
+                    productCardMaxWidth: event.target.value,
                   })
                 }
-              >
-                <option value="0px">None</option>
-                <option value="clamp(6px, 1vw, 14px)">Tight</option>
-                <option value="clamp(14px, 1.5vw, 22px)">Compact</option>
-                <option value="clamp(22px, 2.4vw, 36px)">Medium</option>
-                <option value="clamp(28px, 4vw, 48px)">Large</option>
-              </select>
+                placeholder="e.g. 100%, 300px"
+              />
             </label>
           </div>
+
+          <div className="builder-card-title">
+            <strong>Product Image Settings</strong>
+            <span>Image sizing and fit</span>
+          </div>
+
+          <div className="builder-two-column">
+            <label className="builder-field">
+              <span>Image Width</span>
+              <input
+                type="text"
+                value={shellSettings.productImageWidth}
+                onChange={(event) =>
+                  updateShellSettings({
+                    productImageWidth: event.target.value,
+                  })
+                }
+                placeholder="e.g. 100%"
+              />
+            </label>
+
+            <label className="builder-field">
+              <span>Image Height</span>
+              <input
+                type="text"
+                value={shellSettings.productImageHeight}
+                onChange={(event) =>
+                  updateShellSettings({
+                    productImageHeight: event.target.value,
+                  })
+                }
+                placeholder="e.g. 260px"
+              />
+            </label>
+          </div>
+
+          <div className="builder-two-column">
+            <label className="builder-field">
+              <span>Image Max Width</span>
+              <input
+                type="text"
+                value={shellSettings.productImageMaxWidth}
+                onChange={(event) =>
+                  updateShellSettings({
+                    productImageMaxWidth: event.target.value,
+                  })
+                }
+                placeholder="e.g. 100%"
+              />
+            </label>
+
+            <label className="builder-field">
+              <span>Image Max Height</span>
+              <input
+                type="text"
+                value={shellSettings.productImageMaxHeight}
+                onChange={(event) =>
+                  updateShellSettings({
+                    productImageMaxHeight: event.target.value,
+                  })
+                }
+                placeholder="e.g. 100%"
+              />
+            </label>
+          </div>
+
+          <label className="builder-field">
+            <span>Image Aspect Ratio</span>
+            <select
+              value={
+                ["auto", "1 / 1", "4 / 3", "16 / 9", "3 / 2"].includes(shellSettings.productImageAspectRatio)
+                  ? shellSettings.productImageAspectRatio
+                  : "custom"
+              }
+              onChange={(event) => {
+                const val = event.target.value;
+                if (val === "custom") {
+                  updateShellSettings({ productImageAspectRatio: "4 / 5" });
+                } else {
+                  updateShellSettings({ productImageAspectRatio: val });
+                }
+              }}
+            >
+              <option value="auto">Auto (from file)</option>
+              <option value="1 / 1">Square (1:1)</option>
+              <option value="4 / 3">Standard (4:3)</option>
+              <option value="16 / 9">Widescreen (16:9)</option>
+              <option value="3 / 2">Classic (3:2)</option>
+              <option value="custom">Custom...</option>
+            </select>
+          </label>
+
+          {!["auto", "1 / 1", "4 / 3", "16 / 9", "3 / 2"].includes(shellSettings.productImageAspectRatio) && (
+            <label className="builder-field">
+              <span>Custom Aspect Ratio (e.g. 4/5)</span>
+              <input
+                type="text"
+                value={shellSettings.productImageAspectRatio}
+                onChange={(event) =>
+                  updateShellSettings({
+                    productImageAspectRatio: event.target.value,
+                  })
+                }
+              />
+            </label>
+          )}
+
+          <label className="builder-field">
+            <span>Image Object Fit</span>
+            <select
+              value={shellSettings.productImageObjectFit}
+              onChange={(event) =>
+                updateShellSettings({
+                  productImageObjectFit: event.target.value,
+                })
+              }
+            >
+              <option value="contain">Contain (shrink to fit)</option>
+              <option value="cover">Cover (fill & crop)</option>
+              <option value="fill">Fill (stretch to fit)</option>
+              <option value="none">None (original size)</option>
+              <option value="scale-down">Scale Down</option>
+            </select>
+          </label>
+
+          <label className="builder-field">
+            <span>Image Padding</span>
+            <select
+              value={
+                ["0px", "clamp(6px, 1vw, 14px)", "clamp(14px, 1.5vw, 22px)", "clamp(22px, 2.4vw, 36px)", "clamp(28px, 4vw, 48px)"].includes(shellSettings.productImagePadding)
+                  ? shellSettings.productImagePadding
+                  : "custom"
+              }
+              onChange={(event) => {
+                const val = event.target.value;
+                if (val === "custom") {
+                  updateShellSettings({
+                    productImagePadding: "20px",
+                    productImageNoPadding: false
+                  });
+                } else {
+                  updateShellSettings({
+                    productImagePadding: val,
+                    productImageNoPadding: val === "0px"
+                  });
+                }
+              }}
+            >
+              <option value="0px">None (0px)</option>
+              <option value="clamp(6px, 1vw, 14px)">Tight (Tight padding)</option>
+              <option value="clamp(14px, 1.5vw, 22px)">Compact (Compact padding)</option>
+              <option value="clamp(22px, 2.4vw, 36px)">Medium (Medium padding)</option>
+              <option value="clamp(28px, 4vw, 48px)">Large (Large padding)</option>
+              <option value="custom">Custom...</option>
+            </select>
+          </label>
+
+          {!["0px", "clamp(6px, 1vw, 14px)", "clamp(14px, 1.5vw, 22px)", "clamp(22px, 2.4vw, 36px)", "clamp(28px, 4vw, 48px)"].includes(shellSettings.productImagePadding) && (
+            <label className="builder-field">
+              <span>Custom Image Padding (e.g. 10px)</span>
+              <input
+                type="text"
+                value={shellSettings.productImagePadding}
+                onChange={(event) =>
+                  updateShellSettings({
+                    productImagePadding: event.target.value,
+                    productImageNoPadding: event.target.value.trim() === "0px"
+                  })
+                }
+              />
+            </label>
+          )}
+
+          <label className="builder-check">
+            <input
+              type="checkbox"
+              checked={shellSettings.productImageNoPadding}
+              onChange={(event) =>
+                updateShellSettings({
+                  productImageNoPadding: event.target.checked,
+                  productImagePadding: event.target.checked ? "0px" : "clamp(22px, 2.4vw, 36px)"
+                })
+              }
+            />
+            <span>Disable image padding completely</span>
+          </label>
         </div>
       )}
 
@@ -5956,8 +6142,8 @@ export default function DashboardBuilder({
         availableLayoutBlockKinds={availableLayoutBlockKinds}
         builderState={builderState}
         customPages={customPages}
+        publishedKeys={publishedKeys}
         globalStylesSlot={globalStylesPanel}
-        menuTree={menuTree}
         newPageTitle={newPageTitle}
         inspectorSlot={inspectorPanel}
         inspectorOpen={inspectorOpen}
@@ -5969,8 +6155,6 @@ export default function DashboardBuilder({
             ? layoutBlockLabels[selectedLayoutBlock.kind ?? "text"]
             : null
         }
-        selectedMenuItem={selectedMenuItem}
-        selectedMenuItemId={selectedMenuItemId}
         savedTemplates={savedTemplates}
         renameTemplateRequest={renameTemplateRequest}
         sidebarTab={sidebarTab}
@@ -5988,24 +6172,14 @@ export default function DashboardBuilder({
         onSaveSelectedElementAsTemplate={saveSelectedElementAsTemplate}
         onApplySavedTemplate={applySavedTemplate}
         onRenameSavedTemplate={renameSavedTemplate}
-        onSetMenuIconPickerOpen={setMenuIconPickerOpen}
-        onSetMenuIconSearch={setMenuIconSearch}
         onSetNewPageTitle={setNewPageTitle}
-        onSetSelectedMenuItemId={setSelectedMenuItemId}
         onSetSidebarTab={setSidebarTab}
         onOpenInspector={openInspectorPanel}
         onStartSidebarResize={startSidebarResize}
         onSwitchBuilderTarget={switchBuilderTarget}
         openElementsPanelKey={panelForceToggler}
-        filteredMenuIcons={filteredMenuIcons}
-        getMenuIconLabel={getMenuIconLabel}
-        menuIconPickerOpen={menuIconPickerOpen}
-        menuIconSearch={menuIconSearch}
-        normalizeMenuPresentation={normalizeMenuPresentation}
-        renderUIKitIcon={renderUIKitIcon}
-        resolveUIKitIconName={resolveUIKitIconName}
         shellSettings={shellSettings}
-        updateMenuPresentation={updateMenuPresentation}
+        onUpdateShellSettings={updateShellSettings}
       />
 
       {sidebarCollapsed && (

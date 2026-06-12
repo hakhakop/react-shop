@@ -3,9 +3,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { graphqlFetch } from "../../lib/graphql";
 import Breadcrumbs from "../../components/Breadcrumbs";
-import PageRenderer from "../../components/PageRenderer";
 import StorefrontBuilderRenderer from "../../components/builder/StorefrontBuilderRenderer";
-import { mapPageBuilder } from "../../lib/pageBuilder";
 import {
   getPublishedBuilderLayout,
   readBuilderCustomPages,
@@ -21,9 +19,6 @@ type PageByUriResult = {
     title: string;
     uri?: string | null;
     content?: string | null;
-    pageBuilderLayout?: {
-      pageBuilder?: any[] | null;
-    } | null;
   } | null;
 };
 
@@ -91,221 +86,17 @@ export default async function WPPage({
   let data: PageByUriResult;
 
   try {
-    // Preferred query: assumes ACF-based section settings are exposed to WPGraphQL
     data = await graphqlFetch<PageByUriResult>(`
       query {
         pageBy(uri: "${uri}") {
           title
           uri
           content
-          pageBuilderLayout {
-            pageBuilder {
-              __typename
-              fieldGroupName
-
-              ... on PageBuilderLayoutPageBuilderHeroLayout {
-                sectionBackground
-                sectionTopSpacing
-                sectionBottomSpacing
-
-                primaryButtonLink {
-                  url
-                  title
-                  target
-                }
-              }
-
-              ... on PageBuilderLayoutPageBuilderProductGridLayout {
-                sectionSettings {
-                  sectionBackground
-                  sectionTopSpacing
-                  sectionBottomSpacing
-                }
-
-                cardPreset
-                columnsDesktop
-                gridLimit
-                source
-                layoutVariant
-                category {
-                  nodes {
-                    databaseId
-                    name
-                    slug
-                  }
-                }
-              }
-
-              ... on PageBuilderLayoutPageBuilderPromoStripLayout {
-                sectionBackground
-                sectionTopSpacing
-                sectionBottomSpacing
-
-                psText
-                psSubtext
-                psCtaLabel
-                psCtaUrl
-                psVariant
-              }
-
-              ... on PageBuilderLayoutPageBuilderBadgeGridLayoutLayout {
-                bgColumnsDesktop: columnsOnDesktop
-                bgItems: bgitems {
-                  bgId: bgid
-                  bgLabel: bglabel
-                  bgTitle: bgtitle
-                  bgBody: bgbody
-                }
-              }
-
-              ... on PageBuilderLayoutPageBuilderCarouselLayoutLayout {
-                sectionSettings {
-                  sectionBackground
-                  sectionTopSpacing
-                  sectionBottomSpacing
-                }
-
-                carouselSettings: carouselsettings {
-                  variant
-                  loop
-                  autoplay
-                  autoplayDelayMs
-                  align
-                  dragFree
-                  cardsPerView
-                  showArrows
-                  showDots
-                  pauseOnHover
-                }
-
-                slides {
-                  slideId
-                  title
-                  subtitle
-                  text
-                  buttonLabel
-                  buttonUrl
-                  badge
-                }
-              }
-            }
-          }
         }
       }
     `);
   } catch (error: any) {
-    const message = error instanceof Error ? error.message : String(error);
-
-    // Fallback: if ACF section fields are not present in the schema yet,
-    // re-run a simpler query without sectionBackground/sectionTopSpacing/sectionBottomSpacing.
-    if (
-      message.includes('Cannot query field "sectionBackground"') ||
-      message.includes("sectionTopSpacing") ||
-      message.includes("sectionBottomSpacing")
-    ) {
-      data = await graphqlFetch<PageByUriResult>(`
-        query {
-          pageBy(uri: "${uri}") {
-            title
-            uri
-            content
-            pageBuilderLayout {
-              pageBuilder {
-                __typename
-                fieldGroupName
-
-                ... on PageBuilderLayoutPageBuilderHeroLayout {
-                  primaryButtonLink {
-                    url
-                    title
-                    target
-                  }
-                }
-
-                ... on PageBuilderLayoutPageBuilderProductGridLayout {
-                  sectionSettings {
-                    sectionBackground
-                    sectionTopSpacing
-                    sectionBottomSpacing
-                  }
-
-                  cardPreset
-                  columnsDesktop
-                  gridLimit
-                  source
-                  layoutVariant
-                  category {
-                    nodes {
-                      databaseId
-                      name
-                      slug
-                    }
-                  }
-                }
-
-                ... on PageBuilderLayoutPageBuilderPromoStripLayout {
-                  psText
-                  psSubtext
-                  psCtaLabel
-                  psCtaUrl
-                  psVariant
-                }
-
-                ... on PageBuilderLayoutPageBuilderBadgeGridLayoutLayout {
-                  bgColumnsDesktop: columnsOnDesktop
-                  bgItems: bgitems {
-                    bgId: bgid
-                    bgLabel: bglabel
-                    bgTitle: bgtitle
-                    bgBody: bgbody
-                  }
-                }
-
-              ... on PageBuilderLayoutPageBuilderCarouselLayoutLayout {
-                sectionSettings {
-                  sectionBackground
-                  sectionTopSpacing
-                  sectionBottomSpacing
-                }
-
-                carouselSettings: carouselsettings {
-                  variant
-                  loop
-                  autoplay
-                  autoplayDelayMs
-                  align
-                  dragFree
-                  cardsPerView
-                  showArrows
-                  showDots
-                  pauseOnHover
-                }
-
-                slides {
-                  slideId
-                  image {
-                    node {
-                      sourceUrl
-                      altText
-                    }
-                  }
-                  title
-                  subtitle
-                  text
-                  buttonLabel
-                  buttonUrl
-                  badge
-                }
-              }
-              }
-            }
-          }
-        }
-      `);
-    } else {
-      // If it's some other GraphQL error, rethrow so we see it.
-      throw error;
-    }
+    throw error;
   }
 
   const page = data.pageBy;
@@ -324,8 +115,6 @@ export default async function WPPage({
     );
   }
 
-  const blocks = mapPageBuilder(page.pageBuilderLayout);
-
   return (
     <main className="page">
       <Breadcrumbs
@@ -337,14 +126,10 @@ export default async function WPPage({
 
       <h1 className="page-title">{page.title}</h1>
 
-      {blocks.length > 0 ? (
-        <PageRenderer blocks={blocks} />
-      ) : (
-        <article
-          className="prose"
-          dangerouslySetInnerHTML={{ __html: page.content ?? "" }}
-        />
-      )}
+      <article
+        className="prose"
+        dangerouslySetInnerHTML={{ __html: page.content ?? "" }}
+      />
     </main>
   );
 }

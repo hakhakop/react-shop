@@ -28,9 +28,10 @@ import type {
   LayoutBlockKind,
   MenuPresentationSettings,
   SidebarTab,
+  BuilderShellSettings,
 } from "@/components/dashboard/builderTypes";
 import ElementLibrary from "@/components/dashboard/ElementLibrary";
-import MenuPresentationPanel from "@/components/dashboard/MenuPresentationPanel";
+import ReactMenuEditorPanel from "@/components/dashboard/ReactMenuEditorPanel";
 
 type TemplateLibraryTab = "page" | "section" | "row" | "element";
 
@@ -48,29 +49,29 @@ const templateLibraryTabs: { value: TemplateLibraryTab; label: string }[] = [
   { value: "element", label: "Elements" },
 ];
 
+const corePages = [
+  { key: "home", title: "Home", slug: "" },
+  { key: "shop", title: "Shop", slug: "shop" },
+  { key: "client", title: "Client Page", slug: "client" },
+  { key: "page:cart", title: "Cart", slug: "cart" },
+  { key: "page:checkout", title: "Checkout", slug: "checkout" },
+  { key: "page:my-account", title: "My Account", slug: "my-account" },
+] as const;
+
 type DashboardSidebarProps = {
   availableLayoutBlockKinds: LayoutBlockKind[];
   builderState: BuilderState;
   customPages: BuilderCustomPage[];
-  filteredMenuIcons: readonly { name: string; label: string; keywords: string }[];
-  getMenuIconLabel: (icon: string | null) => string;
-  menuIconPickerOpen: boolean;
-  menuIconSearch: string;
-  menuTree: MenuItem[];
+  publishedKeys: string[];
   newPageTitle: string;
   globalStylesSlot: ReactNode;
   inspectorSlot: ReactNode;
   inspectorOpen?: boolean;
   inspectorOpenKey?: number;
-  normalizeMenuPresentation: (value?: Partial<MenuPresentationSettings> | null) => MenuPresentationSettings;
   pageStatus: string;
-  renderUIKitIcon: (icon: string | null, size?: number) => ReactNode;
-  resolveUIKitIconName: (icon: string | null) => string | null;
-  selectedMenuItem: MenuItem | null;
-  selectedMenuItemId: string | null;
   selectedSectionTitle?: string | null;
   selectedElementLabel?: string | null;
-  shellSettings: { menuPresentation?: Record<string, MenuPresentationSettings> };
+  shellSettings: BuilderShellSettings;
   sidebarTab: SidebarTab;
   savedTemplates: BuilderSavedTemplate[];
   renameTemplateRequest?: {
@@ -80,7 +81,7 @@ type DashboardSidebarProps = {
   templateDescriptions: Record<BuilderTemplate, string>;
   templateLabels: Record<BuilderTemplate, string>;
   templateStatus: string;
-  updateMenuPresentation: (itemId: string, patch: Partial<MenuPresentationSettings>) => void;
+  onUpdateShellSettings: (patch: Partial<BuilderShellSettings>) => void;
   topActionsSlot?: ReactNode;
   onAddElementFromLibrary: (kind: LayoutBlockKind) => void;
   onCreateBuilderPage: () => void;
@@ -92,10 +93,7 @@ type DashboardSidebarProps = {
   onSaveSelectedElementAsTemplate?: (title?: string) => void | Promise<unknown>;
   onApplySavedTemplate?: (template: BuilderSavedTemplate) => void;
   onRenameSavedTemplate?: (template: BuilderSavedTemplate, title: string) => void;
-  onSetMenuIconPickerOpen: Dispatch<SetStateAction<boolean>>;
-  onSetMenuIconSearch: Dispatch<SetStateAction<string>>;
   onSetNewPageTitle: Dispatch<SetStateAction<string>>;
-  onSetSelectedMenuItemId: Dispatch<SetStateAction<string | null>>;
   onSetSidebarTab: Dispatch<SetStateAction<SidebarTab>>;
   onOpenInspector?: () => void;
   onStartSidebarResize: (clientX: number) => void;
@@ -107,22 +105,13 @@ export default function DashboardSidebar({
   availableLayoutBlockKinds,
   builderState,
   customPages,
-  filteredMenuIcons,
-  getMenuIconLabel,
-  menuIconPickerOpen,
-  menuIconSearch,
-  menuTree,
+  publishedKeys,
   newPageTitle,
   globalStylesSlot,
   inspectorSlot,
   inspectorOpen = true,
   inspectorOpenKey = 0,
-  normalizeMenuPresentation,
   pageStatus,
-  renderUIKitIcon,
-  resolveUIKitIconName,
-  selectedMenuItem,
-  selectedMenuItemId,
   selectedSectionTitle,
   selectedElementLabel,
   shellSettings,
@@ -133,7 +122,6 @@ export default function DashboardSidebar({
   templateLabels,
   templateStatus,
   topActionsSlot,
-  updateMenuPresentation,
   onAddElementFromLibrary,
   onCreateBuilderPage,
   onDeleteBuilderPage,
@@ -144,15 +132,13 @@ export default function DashboardSidebar({
   onSaveSelectedElementAsTemplate = () => undefined,
   onApplySavedTemplate = () => undefined,
   onRenameSavedTemplate = () => undefined,
-  onSetMenuIconPickerOpen,
-  onSetMenuIconSearch,
   onSetNewPageTitle,
-  onSetSelectedMenuItemId,
   onSetSidebarTab,
   onOpenInspector = () => undefined,
   onStartSidebarResize,
   onSwitchBuilderTarget,
   openElementsPanelKey,
+  onUpdateShellSettings,
 }: DashboardSidebarProps) {
   const [nestedOpen, setNestedOpen] = useState(false);
   const [templateDraftTitle, setTemplateDraftTitle] = useState("");
@@ -213,14 +199,14 @@ export default function DashboardSidebar({
     {
       tab: "menu",
       label: "Menu",
-      description: "Tune WordPress menu presentation.",
-      count: menuTree.length,
+      description: "Manage React menu items.",
+      count: shellSettings.menuItems?.length ?? 0,
     },
     {
       tab: "pages",
       label: "Pages",
       description: "Create and switch editable builder pages.",
-      count: customPages.length,
+      count: corePages.length + customPages.length,
     },
     {
       tab: "templates",
@@ -323,22 +309,10 @@ export default function DashboardSidebar({
         )}
 
         {nestedOpen && sidebarTab === "menu" && (
-          <MenuPresentationPanel
-            filteredMenuIcons={filteredMenuIcons}
-            getMenuIconLabel={getMenuIconLabel}
-            menuIconPickerOpen={menuIconPickerOpen}
-            menuIconSearch={menuIconSearch}
-            menuTree={menuTree}
-            normalizeMenuPresentation={normalizeMenuPresentation}
-            renderUIKitIcon={renderUIKitIcon}
-            resolveUIKitIconName={resolveUIKitIconName}
-            selectedMenuItem={selectedMenuItem}
-            selectedMenuItemId={selectedMenuItemId}
-            shellSettings={shellSettings}
-            updateMenuPresentation={updateMenuPresentation}
-            onSetMenuIconPickerOpen={onSetMenuIconPickerOpen}
-            onSetMenuIconSearch={onSetMenuIconSearch}
-            onSetSelectedMenuItemId={onSetSelectedMenuItemId}
+          <ReactMenuEditorPanel
+            menuItems={shellSettings.menuItems ?? []}
+            onChangeMenuItems={(newItems) => onUpdateShellSettings({ menuItems: newItems })}
+            customPages={customPages}
           />
         )}
 
@@ -369,26 +343,135 @@ export default function DashboardSidebar({
         {nestedOpen && sidebarTab === "pages" && (
           <div className="builder-sidebar-panel">
             <div className="builder-sidebar-panel-header">
-              <div><strong>Builder Pages</strong><span>Create and switch between editable pages</span></div>
-              <small>{customPages.length}</small>
-            </div>
-            <div className="builder-card builder-pages-card">
-              <div className="builder-card-title"><strong>Pages</strong><span>{customPages.length}</span></div>
-              <div className="builder-page-create">
-                <input type="text" value={newPageTitle} onChange={(event) => onSetNewPageTitle(event.target.value)} placeholder="Page title" />
-                <button type="button" className="builder-icon-button" onClick={onCreateBuilderPage} aria-label="Create builder page"><Plus size={15} /></button>
+              <div>
+                <strong>Builder Pages</strong>
+                <span>Manage React-owned storefront pages</span>
               </div>
-              {customPages.length > 0 && (
-                <div className="builder-pages-list">
-                  {customPages.map((page) => (
-                    <div key={page.key} className={`builder-page-row${builderState.page === page.key ? " is-active" : ""}`}>
-                      <button type="button" onClick={() => onSwitchBuilderTarget(page.key)}><strong>{page.title}</strong><span>/{page.slug}</span></button>
-                      <button type="button" className="builder-icon-button" onClick={() => onDeleteBuilderPage(page.key)} aria-label={`Delete ${page.title}`}><Trash2 size={14} /></button>
+              <small>{corePages.length + customPages.length}</small>
+            </div>
+
+            {/* Core Storefront Pages */}
+            <div className="builder-card builder-pages-card" style={{ marginBottom: "14px" }}>
+              <div className="builder-card-title">
+                <strong>Core Storefront Pages</strong>
+                <span>{corePages.length}</span>
+              </div>
+              <div className="builder-pages-list">
+                {corePages.map((page) => {
+                  const isActive = builderState.page === page.key;
+                  const isPublished = publishedKeys.includes(page.key);
+                  return (
+                    <div key={page.key} className={`builder-page-row${isActive ? " is-active" : ""}`}>
+                      <button type="button" onClick={() => onSwitchBuilderTarget(page.key)}>
+                        <strong>{page.title}</strong>
+                        <span>{page.slug ? `/${page.slug}` : "/"}</span>
+                      </button>
+                      <span
+                        className={`builder-page-status ${isPublished ? "is-published" : "is-draft"}`}
+                        style={{
+                          fontSize: "10px",
+                          padding: "2px 6px",
+                          borderRadius: "4px",
+                          backgroundColor: isActive
+                            ? "rgba(255, 255, 255, 0.25)"
+                            : "rgba(164, 190, 123, 0.15)",
+                          color: isActive
+                            ? "#ffffff"
+                            : (isPublished ? "#91ad68" : "var(--builder-ui-muted)"),
+                          border: `1px solid ${isActive
+                            ? "rgba(255, 255, 255, 0.4)"
+                            : "rgba(164, 190, 123, 0.3)"}`,
+                          textTransform: "uppercase",
+                          fontWeight: "bold",
+                          letterSpacing: "0.05em",
+                          marginLeft: "auto",
+                          marginRight: "4px",
+                        }}
+                      >
+                        {isPublished ? "Published" : "Draft"}
+                      </span>
                     </div>
-                  ))}
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Custom Pages */}
+            <div className="builder-card builder-pages-card">
+              <div className="builder-card-title">
+                <strong>Custom Pages</strong>
+                <span>{customPages.length}</span>
+              </div>
+              <div className="builder-page-create">
+                <input
+                  type="text"
+                  value={newPageTitle}
+                  onChange={(event) => onSetNewPageTitle(event.target.value)}
+                  placeholder="New page title"
+                />
+                <button
+                  type="button"
+                  className="builder-icon-button"
+                  onClick={onCreateBuilderPage}
+                  aria-label="Create custom page"
+                >
+                  <Plus size={15} />
+                </button>
+              </div>
+              {customPages.length > 0 ? (
+                <div className="builder-pages-list" style={{ marginTop: "10px" }}>
+                  {customPages.map((page) => {
+                    const isActive = builderState.page === page.key;
+                    const isPublished = publishedKeys.includes(page.key);
+                    return (
+                      <div key={page.key} className={`builder-page-row${isActive ? " is-active" : ""}`}>
+                        <button type="button" onClick={() => onSwitchBuilderTarget(page.key)}>
+                          <strong>{page.title}</strong>
+                          <span>/{page.slug}</span>
+                        </button>
+                        <span
+                          className={`builder-page-status ${isPublished ? "is-published" : "is-draft"}`}
+                          style={{
+                            fontSize: "10px",
+                            padding: "2px 6px",
+                            borderRadius: "4px",
+                            backgroundColor: isActive
+                              ? "rgba(255, 255, 255, 0.25)"
+                              : "rgba(164, 190, 123, 0.15)",
+                            color: isActive
+                              ? "#ffffff"
+                              : (isPublished ? "#91ad68" : "var(--builder-ui-muted)"),
+                            border: `1px solid ${isActive
+                              ? "rgba(255, 255, 255, 0.4)"
+                              : "rgba(164, 190, 123, 0.3)"}`,
+                            textTransform: "uppercase",
+                            fontWeight: "bold",
+                            letterSpacing: "0.05em",
+                            marginLeft: "auto",
+                            marginRight: "4px",
+                          }}
+                        >
+                          {isPublished ? "Published" : "Draft"}
+                        </span>
+                        <button
+                          type="button"
+                          className="builder-icon-button"
+                          onClick={() => onDeleteBuilderPage(page.key)}
+                          aria-label={`Delete ${page.title}`}
+                          style={{ flexShrink: 0 }}
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div style={{ padding: "12px 4px", fontSize: "12px", color: "var(--builder-ui-muted)", textAlign: "center" }}>
+                  No custom pages created yet.
                 </div>
               )}
-              <small>{pageStatus}</small>
+              <small style={{ display: "block", marginTop: "10px" }}>{pageStatus}</small>
             </div>
           </div>
         )}

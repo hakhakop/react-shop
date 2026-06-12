@@ -29,6 +29,13 @@ export type BuilderMenuPresentation = {
 
 export type BuilderMenuPresentationMap = Record<string, BuilderMenuPresentation>;
 
+export type ReactMenuItem = {
+  id: string;
+  label: string;
+  url: string;
+  parentId?: string | null;
+};
+
 export type BuilderShellSettings = {
   headerVisible: boolean;
   topToolbarVisible: boolean;
@@ -53,6 +60,21 @@ export type BuilderShellSettings = {
   storefrontPreset: string;
   primaryColor: string;
   accentColor: string;
+  productCardRadius: string;
+  productCardBg: string;
+  productCardShadow: string;
+  productCardShadowHover: string;
+  productCardMinHeight: string;
+  productCardMaxWidth: string;
+  productImageWidth: string;
+  productImageHeight: string;
+  productImageMaxWidth: string;
+  productImageMaxHeight: string;
+  productImageAspectRatio: string;
+  productImageNoPadding: boolean;
+  productImagePadding: string;
+  productImageObjectFit: string;
+  menuItems: ReactMenuItem[];
   updatedAt?: string;
 };
 
@@ -85,6 +107,24 @@ export const defaultBuilderShellSettings: BuilderShellSettings = {
   storefrontPreset: "princity",
   primaryColor: "#111111",
   accentColor: "#111111",
+  productCardRadius: "10px",
+  productCardBg: "#ffffff",
+  productCardShadow: "0 0 0 rgba(15, 23, 42, 0)",
+  productCardShadowHover: "0 18px 40px rgba(15, 23, 42, 0.14)",
+  productCardMinHeight: "0px",
+  productCardMaxWidth: "100%",
+  productImageWidth: "100%",
+  productImageHeight: "260px",
+  productImageMaxWidth: "100%",
+  productImageMaxHeight: "100%",
+  productImageAspectRatio: "auto",
+  productImageNoPadding: false,
+  productImagePadding: "clamp(22px, 2.4vw, 36px)",
+  productImageObjectFit: "contain",
+  menuItems: [
+    { id: "home", label: "Home", url: "/" },
+    { id: "shop", label: "Shop", url: "/shop" },
+  ],
 };
 
 function normalizeHeaderLayout(value: unknown): BuilderHeaderLayout {
@@ -287,7 +327,122 @@ export function normalizeBuilderShellSettings(
     accentColor: typeof value?.accentColor === "string" && value.accentColor.trim().length > 0
       ? value.accentColor.trim()
       : defaultBuilderShellSettings.accentColor,
+    productCardRadius: normalizeSizeString(
+      value?.productCardRadius,
+      defaultBuilderShellSettings.productCardRadius
+    ),
+    productCardBg: normalizeColorString(
+      value?.productCardBg,
+      defaultBuilderShellSettings.productCardBg
+    ),
+    productCardShadow: normalizeOptionalString(value?.productCardShadow) ?? defaultBuilderShellSettings.productCardShadow,
+    productCardShadowHover: normalizeOptionalString(value?.productCardShadowHover) ?? defaultBuilderShellSettings.productCardShadowHover,
+    productCardMinHeight: normalizeSizeString(
+      value?.productCardMinHeight,
+      defaultBuilderShellSettings.productCardMinHeight
+    ),
+    productCardMaxWidth: normalizeSizeString(
+      value?.productCardMaxWidth,
+      defaultBuilderShellSettings.productCardMaxWidth
+    ),
+    productImageWidth: normalizeSizeString(
+      value?.productImageWidth,
+      defaultBuilderShellSettings.productImageWidth
+    ),
+    productImageHeight: normalizeSizeString(
+      value?.productImageHeight,
+      defaultBuilderShellSettings.productImageHeight
+    ),
+    productImageMaxWidth: normalizeSizeString(
+      value?.productImageMaxWidth,
+      defaultBuilderShellSettings.productImageMaxWidth
+    ),
+    productImageMaxHeight: normalizeSizeString(
+      value?.productImageMaxHeight,
+      defaultBuilderShellSettings.productImageMaxHeight
+    ),
+    productImageAspectRatio: normalizeAspectRatio(
+      value?.productImageAspectRatio,
+      defaultBuilderShellSettings.productImageAspectRatio
+    ),
+    productImageNoPadding: typeof value?.productImageNoPadding === "boolean"
+      ? value.productImageNoPadding
+      : defaultBuilderShellSettings.productImageNoPadding,
+    productImagePadding: normalizeOptionalString(value?.productImagePadding) ?? defaultBuilderShellSettings.productImagePadding,
+    productImageObjectFit: normalizeObjectFit(
+      value?.productImageObjectFit,
+      defaultBuilderShellSettings.productImageObjectFit
+    ),
+    menuItems: normalizeMenuItems(value?.menuItems),
   };
+}
+
+function normalizeMenuItems(value: unknown): ReactMenuItem[] {
+  if (!Array.isArray(value)) {
+    return defaultBuilderShellSettings.menuItems;
+  }
+
+  const normalized: ReactMenuItem[] = [];
+
+  for (const item of value) {
+    if (!item || typeof item !== "object") continue;
+    const raw = item as Record<string, unknown>;
+    const id = typeof raw.id === "string" ? raw.id.trim() : "";
+    const label = typeof raw.label === "string" ? raw.label.trim() : "";
+    const url = typeof raw.url === "string" ? raw.url.trim() : "";
+    const parentId = typeof raw.parentId === "string" ? raw.parentId.trim() : null;
+
+    if (id && label && url) {
+      normalized.push({
+        id,
+        label,
+        url,
+        parentId: parentId || null,
+      });
+    }
+  }
+
+  return normalized.length > 0 ? normalized : defaultBuilderShellSettings.menuItems;
+}
+
+function normalizeSizeString(value: unknown, fallback: string): string {
+  if (value === undefined || value === null) return fallback;
+  const raw = String(value).trim();
+  if (!raw) return fallback;
+  return /^\d+(\.\d+)?$/.test(raw) ? `${raw}px` : raw;
+}
+
+function normalizeColorString(value: unknown, fallback: string): string {
+  if (value === undefined || value === null) return fallback;
+  const raw = String(value).trim();
+  if (!raw) return fallback;
+  return raw.startsWith("#") || raw.startsWith("rgb") || raw.startsWith("hsl") || raw === "transparent" ? raw : fallback;
+}
+
+function normalizeAspectRatio(value: unknown, fallback: string): string {
+  if (value === undefined || value === null) return fallback;
+  const raw = String(value).trim();
+  if (!raw) return fallback;
+  const match = raw.match(/^(\d+)\s*[/:-]\s*(\d+)$/);
+  if (match) {
+    return `${match[1]} / ${match[2]}`;
+  }
+  return raw;
+}
+
+function normalizeObjectFit(value: unknown, fallback: string): string {
+  if (value === undefined || value === null) return fallback;
+  const raw = String(value).trim().toLowerCase();
+  if (
+    raw === "contain" ||
+    raw === "cover" ||
+    raw === "fill" ||
+    raw === "none" ||
+    raw === "scale-down"
+  ) {
+    return raw;
+  }
+  return fallback;
 }
 
 export async function getBuilderShellSettings(): Promise<BuilderShellSettings> {

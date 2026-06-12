@@ -7,7 +7,7 @@ import {
   extractHeaderSettings,
   type HeaderSettings,
 } from "../lib/themeSettings";
-import { getMainMenuItems, type MenuItem } from "../lib/navigation";
+import { type MenuItem } from "../lib/navigation";
 import HeaderActions from "./HeaderActions";
 import HeaderCategoriesDropdown from "./HeaderCategoriesDropdown";
 import CategoryMegaMenu from "./CategoryMegaMenu";
@@ -19,6 +19,7 @@ import {
   type BuilderHeaderLayout,
   type BuilderMenuPresentationMap,
   type BuilderShellSettings,
+  type ReactMenuItem,
 } from "../lib/builderShell";
 import {
   getPublishedBuilderLayout,
@@ -34,11 +35,10 @@ type HeaderShellProps = {
 };
 
 export default async function HeaderShell({ layoutOverride }: HeaderShellProps) {
-  // Load theme settings and main menu in parallel
-  const [settingsRaw, menuItemsRaw, builderPages, shellSettingsRaw, homeLayout] =
+  // Load theme settings and custom pages in parallel
+  const [settingsRaw, builderPages, shellSettingsRaw, homeLayout] =
     await Promise.all([
       getThemeSettings().catch(() => ({})),
-      getMainMenuItems(),
       readBuilderCustomPages(),
       getBuilderShellSettings(),
       getPublishedBuilderLayout("home").catch(() => null),
@@ -186,54 +186,44 @@ export default async function HeaderShell({ layoutOverride }: HeaderShellProps) 
       effectiveBrandMode === "both" ||
       !showLogo);
 
-  // Menu items (from WPGraphQL) with fallback
-  const menuItems = (Array.isArray(menuItemsRaw)
-    ? (menuItemsRaw as MenuItem[])
-    : []) as MenuItem[];
+  // Helper to build hierarchy from flat ReactMenuItems
+  const buildReactMenuTree = (items: ReactMenuItem[]): MenuItem[] => {
+    const byId = new Map<string, MenuItem>();
+    const roots: MenuItem[] = [];
 
-  const demoPageKeys = new Set([
-    "page:demos",
-    "page:furniture-store",
-    "page:fashion-store",
-  ]);
-  const demoChildOrder = ["page:furniture-store", "page:fashion-store"];
-  const demoChildren = demoChildOrder
-    .map((key) => builderPages.find((page) => page.key === key))
-    .filter(Boolean)
-    .map((page) => ({
-      id: page!.key,
-      label: page!.title,
-      url: `/${page!.slug}`,
-      path: `/${page!.slug}`,
-    }));
-  const demosPage = builderPages.find((page) => page.key === "page:demos");
-  const builderPageItems: MenuItem[] = builderPages
-    .filter((page) => !demoPageKeys.has(page.key))
-    .map((page) => ({
-      id: page.key,
-      label: page.title,
-      url: `/${page.slug}`,
-      path: `/${page.slug}`,
-    }));
+    for (const item of items) {
+      byId.set(item.id, {
+        id: item.id,
+        label: item.label,
+        url: item.url,
+        path: item.url,
+        parentId: item.parentId || null,
+        children: [],
+      });
+    }
 
-  if (demoChildren.length > 0) {
-    builderPageItems.push({
-      id: demosPage?.key ?? "builder-demos",
-      label: demosPage?.title ?? "Demos",
-      url: demosPage ? `/${demosPage.slug}` : "#",
-      path: demosPage ? `/${demosPage.slug}` : "#",
-      children: demoChildren,
-    });
-  }
+    for (const item of byId.values()) {
+      const parentId = item.parentId ?? null;
+      if (parentId && byId.has(parentId)) {
+        byId.get(parentId)!.children!.push(item);
+      } else {
+        roots.push(item);
+      }
+    }
 
-  const itemsToRender =
-    menuItems.length > 0
-      ? [...menuItems, ...builderPageItems]
-      : [
-          { id: "home", label: "Home", url: "/", path: "/" },
-          { id: "shop", label: "Shop", url: "/shop", path: "/shop" },
-          ...builderPageItems,
-        ];
+    return roots;
+  };
+
+  // Prioritize React shellSettings.menuItems first, with static defaults if empty
+  const reactMenuItems = shellSettings.menuItems;
+  const hasReactMenuItems = Array.isArray(reactMenuItems) && reactMenuItems.length > 0;
+
+  const itemsToRender = hasReactMenuItems
+    ? buildReactMenuTree(reactMenuItems)
+    : [
+        { id: "home", label: "Home", url: "/", path: "/" },
+        { id: "shop", label: "Shop", url: "/shop", path: "/shop" },
+      ];
 
   const menuPresentation = (
     (shellSettingsRaw || {}) as { menuPresentation?: BuilderMenuPresentationMap }

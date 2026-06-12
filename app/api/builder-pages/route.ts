@@ -3,6 +3,7 @@ import {
   isBuilderCustomPageKey,
   readBuilderCustomPages,
   writeBuilderCustomPages,
+  readBuilderLayoutStore,
   type BuilderCustomPage,
   type BuilderCustomPageKey,
 } from "@/lib/builderLayouts";
@@ -22,6 +23,7 @@ function slugify(value: string) {
 
 function uniqueSlug(baseSlug: string, pages: BuilderCustomPage[]) {
   const reserved = new Set([
+    "home",
     "cart",
     "categories",
     "checkout",
@@ -45,8 +47,11 @@ function uniqueSlug(baseSlug: string, pages: BuilderCustomPage[]) {
 }
 
 export async function GET() {
+  const store = await readBuilderLayoutStore();
+  const publishedKeys = Object.keys(store);
   return NextResponse.json({
     pages: await readBuilderCustomPages(),
+    publishedKeys,
   });
 }
 

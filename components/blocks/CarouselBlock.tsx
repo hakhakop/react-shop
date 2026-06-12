@@ -14,7 +14,6 @@ import {
 } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { EmblaCarousel } from "../ui/EmblaCarousel";
-import type { CarouselLayoutBlock } from "../../lib/pageBuilder";
 
 export type CarouselSlide = {
   id: string;
@@ -54,7 +53,7 @@ export type CarouselSettings = {
 };
 
 type CarouselBlockProps = {
-  block?: CarouselLayoutBlock;
+  block?: any;
   slides: CarouselSlide[];
   settings?: CarouselSettings;
   className?: string;
