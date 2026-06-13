@@ -488,7 +488,7 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
           style: "primary",
         }
       ],
-      elementPadding: "none",
+      elementPadding: "inherit",
       elementBackgroundMode: "transparent",
     };
   }
@@ -502,7 +502,7 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
       columns: 3,
       gridRows: 1,
       gridGap: "medium",
-      gridMargin: "none",
+      gridMargin: "inherit",
       gridImagePadding: "frameless",
       gridContentPadding: "medium",
       gridImageFrame: "none",

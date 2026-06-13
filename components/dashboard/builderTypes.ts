@@ -15,6 +15,7 @@ import type {
   BuilderHeaderActiveIndicator,
   BuilderHeaderBackgroundMode,
   BuilderShellSettings,
+  BuilderHeaderTextMode,
 } from "@/lib/builderShell";
 
 export type {
@@ -25,6 +26,7 @@ export type {
   BuilderHeaderActiveIndicator,
   BuilderHeaderBackgroundMode,
   BuilderShellSettings,
+  BuilderHeaderTextMode,
 };
 export type BuilderPanelStyle =
   | "default"
@@ -275,7 +277,7 @@ export type BuilderLayoutBlock = {
   gridSource?: "static" | "products";
   gridRows?: number;
   gridGap?: "none" | "small" | "medium" | "large" | "max";
-  gridMargin?: "none" | "small" | "medium" | "large";
+  gridMargin?: "inherit" | "none" | "small" | "medium" | "large";
   cardPadding?: "none" | "small" | "medium" | "large" | "max";
   imagePadding?: "none" | "small" | "medium" | "large" | "max";
   gridImagePadding?: "frameless" | "small" | "medium" | "max";

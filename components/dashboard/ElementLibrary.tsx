@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronDown, Search, Star } from "lucide-react";
+import { ChevronDown, GripVertical, Search, Star } from "lucide-react";
 import type { ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
 import type { LayoutBlockKind } from "@/components/dashboard/builderTypes";
@@ -12,6 +12,7 @@ import {
 
 const FAVORITES_KEY = "react-shop-builder-favorite-blocks";
 const RECENT_KEY = "react-shop-builder-recent-blocks";
+const GROUPS_ORDER_KEY = "react-shop-builder-element-groups-order";
 const MAX_RECENT = 8;
 
 type ElementLibraryProps = {
@@ -45,6 +46,9 @@ export default function ElementLibrary({
   const [searchQuery, setSearchQuery] = useState("");
   const [favoriteKinds, setFavoriteKinds] = useState<LayoutBlockKind[]>([]);
   const [recentKinds, setRecentKinds] = useState<LayoutBlockKind[]>([]);
+  const [groupIdsOrder, setGroupIdsOrder] = useState<string[]>([]);
+  const [draggingGroupId, setDraggingGroupId] = useState<string | null>(null);
+  const [dragOverGroupId, setDragOverGroupId] = useState<string | null>(null);
   const [openGroupIds, setOpenGroupIds] = useState<Set<string>>(
     () => new Set(),
   );
@@ -53,6 +57,16 @@ export default function ElementLibrary({
   useEffect(() => {
     setFavoriteKinds(readStoredKinds(FAVORITES_KEY));
     setRecentKinds(readStoredKinds(RECENT_KEY));
+
+    const storedOrder = readStoredKinds(GROUPS_ORDER_KEY) as unknown as string[];
+    const defaultIds = layoutBlockGroups.map((g) => g.id);
+    if (storedOrder && storedOrder.length > 0) {
+      const existingStored = storedOrder.filter((id) => defaultIds.includes(id));
+      const missing = defaultIds.filter((id) => !existingStored.includes(id));
+      setGroupIdsOrder([...existingStored, ...missing]);
+    } else {
+      setGroupIdsOrder(defaultIds);
+    }
   }, []);
 
   useEffect(() => {
@@ -116,6 +130,16 @@ export default function ElementLibrary({
         .filter((group) => group.kinds.length > 0),
     [availableLayoutBlockKinds, normalizedQuery],
   );
+
+  const orderedGroups = useMemo(() => {
+    if (groupIdsOrder.length === 0) return filteredGroups;
+    const orderMap = new Map(groupIdsOrder.map((id, index) => [id, index]));
+    return [...filteredGroups].sort((a, b) => {
+      const indexA = orderMap.get(a.id) ?? 999;
+      const indexB = orderMap.get(b.id) ?? 999;
+      return indexA - indexB;
+    });
+  }, [filteredGroups, groupIdsOrder]);
 
   const quickKinds = useMemo(() => {
     const merged = [...favoriteKinds, ...recentKinds];
@@ -229,21 +253,66 @@ export default function ElementLibrary({
           </div>
         )}
 
-        {filteredGroups.map((group) => {
+        {orderedGroups.map((group) => {
+          const isDragging = draggingGroupId === group.id;
+          const isDragOver = dragOverGroupId === group.id;
           return (
             <details
               key={group.id}
-              className="builder-collapse builder-element-library-group"
+              className={`builder-collapse builder-element-library-group ${
+                isDragging ? "is-dragging" : ""
+              } ${isDragOver ? "is-drag-over" : ""}`}
               open={normalizedQuery.length > 0 || openGroupIds.has(group.id)}
             >
               <summary
                 className="builder-element-library-group-title"
+                draggable
+                onDragStart={(event) => {
+                  setDraggingGroupId(group.id);
+                  event.dataTransfer.setData("application/x-builder-group", group.id);
+                  event.dataTransfer.effectAllowed = "move";
+                }}
+                onDragOver={(event) => {
+                  if (draggingGroupId && draggingGroupId !== group.id) {
+                    event.preventDefault();
+                    setDragOverGroupId(group.id);
+                  }
+                }}
+                onDragLeave={() => {
+                  if (dragOverGroupId === group.id) {
+                    setDragOverGroupId(null);
+                  }
+                }}
+                onDrop={(event) => {
+                  event.preventDefault();
+                  const draggedId = event.dataTransfer.getData("application/x-builder-group");
+                  if (draggedId && draggedId !== group.id) {
+                    setGroupIdsOrder((current) => {
+                      const next = [...current];
+                      const draggedIndex = next.indexOf(draggedId);
+                      const targetIndex = next.indexOf(group.id);
+                      if (draggedIndex !== -1 && targetIndex !== -1) {
+                        next.splice(draggedIndex, 1);
+                        next.splice(targetIndex, 0, draggedId);
+                        writeStoredKinds(GROUPS_ORDER_KEY, next as any);
+                      }
+                      return next;
+                    });
+                  }
+                  setDraggingGroupId(null);
+                  setDragOverGroupId(null);
+                }}
+                onDragEnd={() => {
+                  setDraggingGroupId(null);
+                  setDragOverGroupId(null);
+                }}
                 onClick={(event) => {
                   event.preventDefault();
                   toggleGroup(group.id);
                 }}
               >
                 <span>
+                  <GripVertical size={13} className="builder-group-drag-handle" style={{ marginRight: "2px" }} />
                   <ChevronDown size={14} />
                   {group.label}
                 </span>

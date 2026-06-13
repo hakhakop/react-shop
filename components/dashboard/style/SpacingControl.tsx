@@ -4,8 +4,13 @@ import type {
   BuilderSpacingPreset,
   BuilderSpacingSides,
 } from "@/lib/builderVisualStyle";
+import {
+  resolveBuilderSpacing,
+  type BuilderSpacingContext,
+} from "@/lib/builderSpacing";
 
 const PRESETS: { label: string; value: BuilderSpacingPreset }[] = [
+  { label: "Global", value: "inherit" },
   { label: "None", value: "none" },
   { label: "XS", value: "xs" },
   { label: "SM", value: "sm" },
@@ -14,16 +19,40 @@ const PRESETS: { label: string; value: BuilderSpacingPreset }[] = [
   { label: "XL", value: "xl" },
 ];
 
+function normalizedPreset(value?: string) {
+  if (value === "small") return "sm";
+  if (value === "medium") return "md";
+  if (value === "large") return "lg";
+  return value;
+}
+
 type Props = {
   id?: string;
   label: string;
   value?: BuilderSpacingSides;
+  inheritedValue?: BuilderSpacingSides;
+  context?: BuilderSpacingContext;
   onChange: (value: BuilderSpacingSides) => void;
 };
 
-export default function SpacingControl({ id, label, value, onChange }: Props) {
+export default function SpacingControl({
+  id,
+  label,
+  value,
+  inheritedValue,
+  context = "elementPadding",
+  onChange,
+}: Props) {
   const v = value ?? { linked: true };
   const linked = v.linked !== false;
+  const globalSides = inheritedValue
+    ? (["top", "right", "bottom", "left"] as const)
+        .map((side) => {
+          const raw = inheritedValue[side] ?? inheritedValue.top;
+          return `${side.charAt(0).toUpperCase()} ${resolveBuilderSpacing(undefined, context, raw).label}`;
+        })
+        .join(" · ")
+    : null;
 
   function patch(patch: Partial<BuilderSpacingSides>) {
     onChange({ ...v, ...patch });
@@ -65,7 +94,7 @@ export default function SpacingControl({ id, label, value, onChange }: Props) {
           <button
             key={preset.value}
             type="button"
-            className={v.top === preset.value ? "is-active" : ""}
+            className={(normalizedPreset(v.top) ?? "inherit") === preset.value ? "is-active" : ""}
             onClick={() =>
               linked
                 ? patch({
@@ -81,6 +110,11 @@ export default function SpacingControl({ id, label, value, onChange }: Props) {
           </button>
         ))}
       </div>
+      {globalSides ? (
+        <small className="builder-style-spacing-source">
+          Global: {globalSides}
+        </small>
+      ) : null}
       <div className="builder-style-side-grid">
         {(["top", "right", "bottom", "left"] as const).map((side) => (
           <label key={side}>

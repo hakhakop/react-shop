@@ -6,6 +6,7 @@ import {
   ArrowDown,
   ChevronLeft,
   ChevronRight,
+  GripVertical,
   Plus,
   Trash2,
   FolderTree,
@@ -113,9 +114,74 @@ export default function ReactMenuEditorPanel({
   customPages,
 }: ReactMenuEditorPanelProps) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [draggingMenuId, setDraggingMenuId] = useState<string | null>(null);
+  const [dragOverMenuId, setDragOverMenuId] = useState<string | null>(null);
 
   const treeItems = useMemo(() => buildMenuTree(menuItems), [menuItems]);
   const flattenedNodes = useMemo(() => getFlattenedNodes(treeItems), [treeItems]);
+
+  const isDescendant = (parentCandidateId: string, childCandidateId: string): boolean => {
+    let parentId = menuItems.find((x) => x.id === childCandidateId)?.parentId || null;
+    while (parentId) {
+      if (parentId === parentCandidateId) return true;
+      parentId = menuItems.find((x) => x.id === parentId)?.parentId || null;
+    }
+    return false;
+  };
+
+  const handleDropReorder = (draggedId: string, targetId: string) => {
+    if (draggedId === targetId) return;
+    if (isDescendant(draggedId, targetId)) return;
+
+    const tree = buildMenuTree(menuItems);
+    
+    // 1. Find and remove the dragged item from the tree
+    let draggedNode: TreeItem | null = null;
+    
+    function removeNode(list: TreeItem[]): boolean {
+      const idx = list.findIndex((x) => x.id === draggedId);
+      if (idx !== -1) {
+        draggedNode = list[idx];
+        list.splice(idx, 1);
+        return true;
+      }
+      for (const node of list) {
+        if (node.children && removeNode(node.children)) {
+          return true;
+        }
+      }
+      return false;
+    }
+    
+    removeNode(tree);
+    if (!draggedNode) return;
+
+    // 2. Find the target node in the tree and insert the dragged node as its sibling
+    let inserted = false;
+    
+    function insertAsSibling(list: TreeItem[]): boolean {
+      const idx = list.findIndex((x) => x.id === targetId);
+      if (idx !== -1) {
+        const targetNode = list[idx];
+        draggedNode!.parentId = targetNode.parentId;
+        list.splice(idx, 0, draggedNode!);
+        inserted = true;
+        return true;
+      }
+      for (const node of list) {
+        if (node.children && insertAsSibling(node.children)) {
+          return true;
+        }
+      }
+      return false;
+    }
+    
+    insertAsSibling(tree);
+    
+    if (inserted) {
+      onChangeMenuItems(flattenMenuTree(tree));
+    }
+  };
 
   const coreRoutes = useMemo(() => [
     { label: "Home", url: "/" },
@@ -343,7 +409,10 @@ export default function ReactMenuEditorPanel({
 
   const handleDestinationChange = (urlVal: string) => {
     if (!selectedItem) return;
-    if (urlVal === "custom") return;
+    if (urlVal === "custom") {
+      handleUpdateItem(selectedItem.id, { url: "" });
+      return;
+    }
 
     const matched = allDestinations.find((dest) => dest.url === urlVal);
     if (matched) {
@@ -387,10 +456,44 @@ export default function ReactMenuEditorPanel({
         <div className="builder-menu-tree" style={{ display: "grid", gap: "8px" }}>
           {flattenedNodes.map((node) => {
             const isSelected = selectedId === node.id;
+            const isDragging = draggingMenuId === node.id;
+            const isDragOver = dragOverMenuId === node.id;
             return (
               <div
                 key={node.id}
-                className="builder-menu-row"
+                className={`builder-menu-row ${isDragging ? "is-dragging" : ""} ${
+                  isDragOver ? "is-drag-over" : ""
+                }`}
+                draggable
+                onDragStart={(event) => {
+                  setDraggingMenuId(node.id);
+                  event.dataTransfer.setData("application/x-builder-menu-item", node.id);
+                  event.dataTransfer.effectAllowed = "move";
+                }}
+                onDragOver={(event) => {
+                  if (draggingMenuId && draggingMenuId !== node.id && !isDescendant(draggingMenuId, node.id)) {
+                    event.preventDefault();
+                    setDragOverMenuId(node.id);
+                  }
+                }}
+                onDragLeave={() => {
+                  if (dragOverMenuId === node.id) {
+                    setDragOverMenuId(null);
+                  }
+                }}
+                onDrop={(event) => {
+                  event.preventDefault();
+                  const draggedId = event.dataTransfer.getData("application/x-builder-menu-item");
+                  if (draggedId && draggedId !== node.id) {
+                    handleDropReorder(draggedId, node.id);
+                  }
+                  setDraggingMenuId(null);
+                  setDragOverMenuId(null);
+                }}
+                onDragEnd={() => {
+                  setDraggingMenuId(null);
+                  setDragOverMenuId(null);
+                }}
                 style={{
                   marginLeft: `${node.depth * 16}px`,
                   display: "grid",
@@ -405,6 +508,14 @@ export default function ReactMenuEditorPanel({
                     width: "100%",
                   }}
                 >
+                  <GripVertical
+                    size={14}
+                    className="builder-group-drag-handle"
+                    style={{
+                      cursor: "grab",
+                      flexShrink: 0,
+                    }}
+                  />
                   <button
                     type="button"
                     className={`builder-menu-row-button ${isSelected ? "is-active" : ""}`}

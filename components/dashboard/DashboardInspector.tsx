@@ -47,7 +47,10 @@ import {
 import TypographyPanel from "@/components/dashboard/TypographyPanel";
 import StyleTabPanel from "@/components/dashboard/style/StyleTabPanel";
 import AnimationControl from "@/components/dashboard/style/AnimationControl";
-import type { BuilderVisualStyle } from "@/lib/builderVisualStyle";
+import {
+  legacySpacingToSides,
+  type BuilderVisualStyle,
+} from "@/lib/builderVisualStyle";
 import {
   getSpacingOptionLabel,
   type BuilderSpacingContext,
@@ -57,6 +60,7 @@ import {
 } from "@/lib/builderSpacing";
 import type { CategoryTreeItem } from "@/lib/categories";
 import type { TypographyArea } from "@/lib/builderTypography";
+import type { BuilderShellSettings } from "@/lib/builderShell";
 
 const getSupportedTypographyAreas = (kind: string): readonly TypographyArea[] => {
   if (kind === "heading") return ["title"] as const;
@@ -96,6 +100,7 @@ function SpacingControl({
   label,
   value,
   context,
+  inheritedValue,
   allowInherit = true,
   onChange,
 }: {
@@ -103,6 +108,7 @@ function SpacingControl({
   label: string;
   value: string | undefined;
   context: BuilderSpacingContext;
+  inheritedValue?: string;
   allowInherit?: boolean;
   onChange: (newValue: any) => void;
 }) {
@@ -133,7 +139,11 @@ function SpacingControl({
   const handleSelectChange = (event: ChangeEvent<HTMLSelectElement>) => {
     const val = event.target.value;
     if (val === "custom") {
-      const currentPx = resolveBuilderSpacing(value ?? (allowInherit ? "inherit" : "sm"), context).px;
+      const currentPx = resolveBuilderSpacing(
+        value ?? (allowInherit ? "inherit" : "sm"),
+        context,
+        inheritedValue,
+      ).px;
       onChange(`${currentPx > 0 ? currentPx : 16}px`);
     } else {
       onChange(val);
@@ -176,7 +186,11 @@ function SpacingControl({
             font: "inherit",
           }}
         >
-          {allowInherit && <option value="inherit">Inherit</option>}
+          {allowInherit && (
+            <option value="inherit">
+              Global ({resolveBuilderSpacing(undefined, context, inheritedValue).label})
+            </option>
+          )}
           {presets.map((preset) => {
             const px = BUILDER_SPACING_SCALE[preset];
             const labelName = TOKEN_LABELS[preset];
@@ -326,6 +340,7 @@ type DashboardInspectorProps = {
   selectedLayoutBlock: BuilderLayoutBlock | null;
   selectedLayoutBlockKey: string | null;
   selectedSection: BuilderSection | undefined;
+  shellSettings: BuilderShellSettings;
   uploadingNestedSlide: string | null;
   uploadingSlide: number | null;
   addSelectedLayoutBlockBadge: LooseHandler;
@@ -350,7 +365,7 @@ type DashboardInspectorProps = {
   deleteSelectedRow?: LooseHandler;
   moveSelected: LooseHandler;
   openWordPressMediaPicker: (options: { title: string; currentUrl?: string; onSelect: (media: WordPressMediaItem) => void }) => void;
-  onOpenGlobalSpacingSettings?: () => void;
+  onOpenGlobalSpacingSettings?: (scope: "section" | "row" | "element") => void;
   setInspectorOpen: Dispatch<SetStateAction<boolean>>;
   setInspectorTab: Dispatch<SetStateAction<InspectorTab>>;
   setSpacingOverlayEnabled?: Dispatch<SetStateAction<boolean>>;
@@ -455,7 +470,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
     previewCategoryTree,
     sectionBackgroundPresets, sectionColorModeLabel, sectionLabels,
     sectionSettingsOpen, sectionStructureOpen, selectedLayoutBlock,
-    selectedLayoutBlockKey, selectedLayoutColumnKey, selectedLayoutRowIndex, selectedSection, uploadingNestedSlide, uploadingSlide,
+    selectedLayoutBlockKey, selectedLayoutColumnKey, selectedLayoutRowIndex, selectedSection, shellSettings, uploadingNestedSlide, uploadingSlide,
     addSelectedLayoutBlockBadge, addSelectedLayoutBlockGridItem,
     addSelectedLayoutBlockSlide, addSelectedLayoutItem, addSelectedSlide, copyJson,
     deleteSelected, deleteSelectedLayoutBlock, deleteSelectedLayoutBlockBadge,
@@ -688,9 +703,23 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
     supportedAreas.includes(activeTypographyAreaState.area)
       ? activeTypographyAreaState.area
       : supportedAreas[0] ?? "title";
+  const selectedBlockVisualStyle = selectedLayoutBlock
+    ? (selectedLayoutBlock.visualStyle as BuilderVisualStyle | undefined)
+    : undefined;
   const styleTarget = selectedLayoutBlock
     ? {
-        visualStyle: selectedLayoutBlock.visualStyle,
+        visualStyle: {
+          ...selectedBlockVisualStyle,
+          padding:
+            selectedBlockVisualStyle?.padding ??
+            legacySpacingToSides(selectedLayoutBlock.elementPadding),
+          margin:
+            selectedBlockVisualStyle?.margin ??
+            (selectedLayoutBlock.kind === "grid" ||
+            selectedLayoutBlock.kind === "products"
+              ? legacySpacingToSides(selectedLayoutBlock.gridMargin)
+              : undefined),
+        },
         typography: selectedLayoutBlock.typography,
       }
     : {
@@ -1231,6 +1260,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                     label="Top Padding"
                     value={selectedRowItem?.rowTopSpacing}
                     context="rowPadding"
+                    inheritedValue={shellSettings.rowPaddingTop}
                     onChange={(val) => onUpdateRowStyle({ rowTopSpacing: val })}
                   />
                   <SpacingControl
@@ -1238,6 +1268,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                     label="Bottom Padding"
                     value={selectedRowItem?.rowBottomSpacing}
                     context="rowPadding"
+                    inheritedValue={shellSettings.rowPaddingBottom}
                     onChange={(val) => onUpdateRowStyle({ rowBottomSpacing: val })}
                   />
                 </div>
@@ -1247,6 +1278,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                     label="Top Margin"
                     value={selectedRowItem?.rowTopMargin}
                     context="rowMargin"
+                    inheritedValue={shellSettings.rowMarginTop}
                     onChange={(val) => onUpdateRowStyle({ rowTopMargin: val })}
                   />
                   <SpacingControl
@@ -1254,9 +1286,25 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                     label="Bottom Margin"
                     value={selectedRowItem?.rowBottomMargin}
                     context="rowMargin"
+                    inheritedValue={shellSettings.rowMarginBottom}
                     onChange={(val) => onUpdateRowStyle({ rowBottomMargin: val })}
                   />
                 </div>
+                <div className="builder-shell-note">
+                  <strong>Row Gap</strong>
+                  <span>
+                    {resolveBuilderSpacing(undefined, "rowGap", shellSettings.rowGap).label} · Global
+                  </span>
+                </div>
+                {onOpenGlobalSpacingSettings ? (
+                  <button
+                    type="button"
+                    className="builder-secondary-button builder-full-button"
+                    onClick={() => onOpenGlobalSpacingSettings("row")}
+                  >
+                    Edit global row spacing
+                  </button>
+                ) : null}
               </details>
             </div>
           )}
@@ -1681,19 +1729,44 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                             onChange={updateStyleTarget}
                           />
                         ) : isElementSpacingTab ? (
-                          <StyleTabPanel
-                            target={styleTarget}
-                            spacingControlIds={{
-                              padding: "spacing-element-visualPadding",
-                              margin: "spacing-element-visualMargin",
-                            }}
-                            showBackground={false}
-                            showAppearance={false}
-                            showLayout={false}
-                            showAdvanced={false}
-                            showTypography={false}
-                            onChange={updateStyleTarget}
-                          />
+                          <>
+                            <StyleTabPanel
+                              target={styleTarget}
+                              inheritedSpacing={{
+                                padding: {
+                                  top: shellSettings.elementPaddingTop,
+                                  right: shellSettings.elementPaddingRight,
+                                  bottom: shellSettings.elementPaddingBottom,
+                                  left: shellSettings.elementPaddingLeft,
+                                },
+                                margin: {
+                                  top: shellSettings.elementMarginTop,
+                                  right: shellSettings.elementMarginRight,
+                                  bottom: shellSettings.elementMarginBottom,
+                                  left: shellSettings.elementMarginLeft,
+                                },
+                              }}
+                              spacingControlIds={{
+                                padding: "spacing-element-visualPadding",
+                                margin: "spacing-element-visualMargin",
+                              }}
+                              showBackground={false}
+                              showAppearance={false}
+                              showLayout={false}
+                              showAdvanced={false}
+                              showTypography={false}
+                              onChange={updateStyleTarget}
+                            />
+                            {onOpenGlobalSpacingSettings ? (
+                              <button
+                                type="button"
+                                className="builder-secondary-button builder-full-button"
+                                onClick={() => onOpenGlobalSpacingSettings("element")}
+                              >
+                                Edit global element spacing
+                              </button>
+                            ) : null}
+                          </>
                         ) : isElementAdvancedTab ? (
                           <StyleTabPanel
                             target={styleTarget}
@@ -2123,31 +2196,15 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                           {isSelectedBlock &&
                                             isElementSpacingTab && (
                                             <>
-                                              <details className="builder-collapse" open>
-                                                <summary>
-                                                  <span>Element spacing</span>
-                                                  <small>
-                                                    {block.elementPadding ?? "small"}
-                                                  </small>
-                                                </summary>
-                                                  <SpacingControl
-                                                    id="spacing-element-elementPadding"
-                                                    label="Element Padding"
-                                                    value={block.elementPadding}
-                                                    context="elementPadding"
-                                                    allowInherit={false}
-                                                    onChange={(val) =>
-                                                      updateSelectedLayoutBlock(
-                                                        index,
-                                                        blockIndex,
-                                                        { elementPadding: val },
-                                                      )
-                                                    }
-                                                  />
-                                                {(block.kind === "grid" || block.kind === "products") && (
+                                              {(block.kind === "grid" || block.kind === "products") && (
+                                                <details className="builder-collapse" open>
+                                                  <summary>
+                                                    <span>Internal spacing</span>
+                                                    <small>items & cards</small>
+                                                  </summary>
                                                   <div className="builder-two-column">
                                                     <label className="builder-field">
-                                                      <span>Grid Gap</span>
+                                                      <span>Item Gap</span>
                                                       <select
                                                         value={block.gridGap ?? "medium"}
                                                         onChange={(event) =>
@@ -2170,30 +2227,78 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                         )}
                                                       </select>
                                                     </label>
-                                                    <label className="builder-field">
-                                                      <span>Outer Margin</span>
+                                                    {block.kind === "products" ? (
+                                                      <label className="builder-field">
+                                                        <span>Card Padding</span>
+                                                        <select
+                                                          value={block.cardPadding ?? "medium"}
+                                                          onChange={(event) =>
+                                                            updateSelectedLayoutBlock(index, blockIndex, {
+                                                              cardPadding: event.target.value as BuilderLayoutBlock["cardPadding"],
+                                                            })
+                                                          }
+                                                        >
+                                                          <option value="none">None</option>
+                                                          <option value="small">Small</option>
+                                                          <option value="medium">Medium</option>
+                                                          <option value="large">Large</option>
+                                                          <option value="max">Max</option>
+                                                        </select>
+                                                      </label>
+                                                    ) : (
+                                                      <label className="builder-field">
+                                                        <span>Content Padding</span>
+                                                        <select
+                                                          value={block.gridContentPadding ?? "medium"}
+                                                          onChange={(event) =>
+                                                            updateSelectedLayoutBlock(index, blockIndex, {
+                                                              gridContentPadding: event.target.value as BuilderLayoutBlock["gridContentPadding"],
+                                                            })
+                                                          }
+                                                        >
+                                                          <option value="none">None</option>
+                                                          <option value="small">Small</option>
+                                                          <option value="medium">Medium</option>
+                                                          <option value="large">Large</option>
+                                                        </select>
+                                                      </label>
+                                                    )}
+                                                  </div>
+                                                  <label className="builder-field">
+                                                    <span>Image Padding</span>
+                                                    {block.kind === "products" ? (
                                                       <select
-                                                        value={block.gridMargin ?? "none"}
+                                                        value={block.imagePadding ?? "large"}
                                                         onChange={(event) =>
-                                                          updateSelectedLayoutBlock(
-                                                            index,
-                                                            blockIndex,
-                                                            {
-                                                              gridMargin: event.target
-                                                                .value as BuilderLayoutBlock["gridMargin"],
-                                                            },
-                                                          )
+                                                          updateSelectedLayoutBlock(index, blockIndex, {
+                                                            imagePadding: event.target.value as BuilderLayoutBlock["imagePadding"],
+                                                          })
                                                         }
                                                       >
-                                                        <option value="none">None</option>
+                                                        <option value="none">Frameless</option>
                                                         <option value="small">Small</option>
                                                         <option value="medium">Medium</option>
                                                         <option value="large">Large</option>
+                                                        <option value="max">Max</option>
                                                       </select>
-                                                    </label>
-                                                  </div>
-                                                )}
-                                              </details>
+                                                    ) : (
+                                                      <select
+                                                        value={block.gridImagePadding ?? "frameless"}
+                                                        onChange={(event) =>
+                                                          updateSelectedLayoutBlock(index, blockIndex, {
+                                                            gridImagePadding: event.target.value as BuilderLayoutBlock["gridImagePadding"],
+                                                          })
+                                                        }
+                                                      >
+                                                        <option value="frameless">Frameless</option>
+                                                        <option value="small">Small</option>
+                                                        <option value="medium">Medium</option>
+                                                        <option value="max">Max</option>
+                                                      </select>
+                                                    )}
+                                                  </label>
+                                                </details>
+                                              )}
                                             </>
                                           )}
 
@@ -2631,74 +2736,6 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                   </option>
                                                 </select>
                                               </label>
-                                              <div className="builder-two-column">
-                                                <label className="builder-field">
-                                                  <span>Image Padding</span>
-                                                  <select
-                                                    value={
-                                                      block.gridImagePadding ??
-                                                      "frameless"
-                                                    }
-                                                    onChange={(event) =>
-                                                      updateSelectedLayoutBlock(
-                                                        index,
-                                                        blockIndex,
-                                                        {
-                                                          gridImagePadding:
-                                                            event.target
-                                                              .value as BuilderLayoutBlock["gridImagePadding"],
-                                                        },
-                                                      )
-                                                    }
-                                                  >
-                                                    <option value="frameless">
-                                                      Frameless
-                                                    </option>
-                                                    <option value="small">
-                                                      Small
-                                                    </option>
-                                                    <option value="medium">
-                                                      Medium
-                                                    </option>
-                                                    <option value="max">
-                                                      Max
-                                                    </option>
-                                                  </select>
-                                                </label>
-                                                <label className="builder-field">
-                                                  <span>Content Padding</span>
-                                                  <select
-                                                    value={
-                                                      block.gridContentPadding ??
-                                                      "medium"
-                                                    }
-                                                    onChange={(event) =>
-                                                      updateSelectedLayoutBlock(
-                                                        index,
-                                                        blockIndex,
-                                                        {
-                                                          gridContentPadding:
-                                                            event.target
-                                                              .value as BuilderLayoutBlock["gridContentPadding"],
-                                                        },
-                                                      )
-                                                    }
-                                                  >
-                                                    <option value="none">
-                                                      None
-                                                    </option>
-                                                    <option value="small">
-                                                      Small
-                                                    </option>
-                                                    <option value="medium">
-                                                      Medium
-                                                    </option>
-                                                    <option value="large">
-                                                      Large
-                                                    </option>
-                                                  </select>
-                                                </label>
-                                              </div>
                                               <label className="builder-field">
                                                 <span>Image Frame</span>
                                                 <select
@@ -3391,82 +3428,8 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                 open
                                               >
                                                 <summary>
-                                                  Product Grid Spacing
+                                                  Product Appearance
                                                 </summary>
-                                                <div className="builder-two-column">
-                                                  <label className="builder-field">
-                                                    <span>Card Padding</span>
-                                                    <select
-                                                      value={
-                                                        block.cardPadding ??
-                                                        "medium"
-                                                      }
-                                                      onChange={(event) =>
-                                                        updateSelectedLayoutBlock(
-                                                          index,
-                                                          blockIndex,
-                                                          {
-                                                            cardPadding: event
-                                                              .target
-                                                              .value as BuilderLayoutBlock["cardPadding"],
-                                                          },
-                                                        )
-                                                      }
-                                                    >
-                                                      <option value="none">
-                                                        None
-                                                      </option>
-                                                      <option value="small">
-                                                        Small
-                                                      </option>
-                                                      <option value="medium">
-                                                        Medium
-                                                      </option>
-                                                      <option value="large">
-                                                        Large
-                                                      </option>
-                                                      <option value="max">
-                                                        Max
-                                                      </option>
-                                                    </select>
-                                                  </label>
-                                                  <label className="builder-field">
-                                                    <span>Image Padding</span>
-                                                    <select
-                                                      value={
-                                                        block.imagePadding ??
-                                                        "large"
-                                                      }
-                                                      onChange={(event) =>
-                                                        updateSelectedLayoutBlock(
-                                                          index,
-                                                          blockIndex,
-                                                          {
-                                                            imagePadding:
-                                                              event.target
-                                                                .value as BuilderLayoutBlock["imagePadding"],
-                                                          },
-                                                        )
-                                                      }
-                                                    >
-                                                      <option value="none">
-                                                        Frameless
-                                                      </option>
-                                                      <option value="small">
-                                                        Small
-                                                      </option>
-                                                      <option value="medium">
-                                                        Medium
-                                                      </option>
-                                                      <option value="large">
-                                                        Large
-                                                      </option>
-                                                      <option value="max">
-                                                        Max
-                                                      </option>
-                                                    </select>
-                                                  </label>
-                                                </div>
                                                 <label className="builder-field">
                                                   <span>Image Frame</span>
                                                   <select
@@ -8695,6 +8658,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                     label="Top Padding"
                     value={selectedSection.topSpacing}
                     context="sectionPadding"
+                    inheritedValue={shellSettings.sectionPaddingTop}
                     onChange={(val) => updateSelected({ topSpacing: val })}
                   />
                   <SpacingControl
@@ -8702,6 +8666,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                     label="Bottom Padding"
                     value={selectedSection.bottomSpacing}
                     context="sectionPadding"
+                    inheritedValue={shellSettings.sectionPaddingBottom}
                     onChange={(val) => updateSelected({ bottomSpacing: val })}
                   />
                 </div>
@@ -8712,6 +8677,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                     label="Top Margin"
                     value={selectedSection.topMargin}
                     context="sectionMargin"
+                    inheritedValue={shellSettings.sectionMarginTop}
                     onChange={(val) => updateSelected({ topMargin: val })}
                   />
                   <SpacingControl
@@ -8719,6 +8685,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                     label="Bottom Margin"
                     value={selectedSection.bottomMargin}
                     context="sectionMargin"
+                    inheritedValue={shellSettings.sectionMarginBottom}
                     onChange={(val) => updateSelected({ bottomMargin: val })}
                   />
                 </div>
@@ -8727,7 +8694,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                   <button
                     type="button"
                     className="builder-secondary-button builder-full-button"
-                    onClick={onOpenGlobalSpacingSettings}
+                    onClick={() => onOpenGlobalSpacingSettings("section")}
                   >
                     Edit global spacing defaults
                   </button>
@@ -8823,6 +8790,9 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                     <option value="antigravity">
                       Antigravity Particle & Grid Canvas
                     </option>
+                    <option value="antigravity2">
+                      Antigravity 2 (Floating Pill Sphere)
+                    </option>
                     <option value="aurora">
                       Aurora Mesh Gradient Glow
                     </option>
@@ -8834,6 +8804,18 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                     </option>
                     <option value="flowfield">
                       Vector Flow Field Particles
+                    </option>
+                    <option value="webgl_waves">
+                      WebGL 3D Wave Terrain
+                    </option>
+                    <option value="webgl_flowfield">
+                      WebGL Particle Flow Storm
+                    </option>
+                    <option value="webgl_cybergrid">
+                      WebGL Cyber Grid (Tron)
+                    </option>
+                    <option value="webgl_fluid">
+                      WebGL Interactive Fluid
                     </option>
                   </select>
                 </label>
@@ -8879,8 +8861,10 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                     </label>
 
                     {(selectedSection.backgroundEffect === "antigravity" ||
+                      selectedSection.backgroundEffect === "antigravity2" ||
                       selectedSection.backgroundEffect === "constellation" ||
-                      selectedSection.backgroundEffect === "flowfield") && (
+                      selectedSection.backgroundEffect === "flowfield" ||
+                      selectedSection.backgroundEffect === "webgl_flowfield") && (
                       <label className="builder-field">
                         <span>Particle Count</span>
                         <div
@@ -9053,8 +9037,13 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                     )}
 
                     {(selectedSection.backgroundEffect === "antigravity" ||
+                      selectedSection.backgroundEffect === "antigravity2" ||
                       selectedSection.backgroundEffect === "constellation" ||
-                      selectedSection.backgroundEffect === "flowfield") && (
+                      selectedSection.backgroundEffect === "flowfield" ||
+                      selectedSection.backgroundEffect === "webgl_waves" ||
+                      selectedSection.backgroundEffect === "webgl_flowfield" ||
+                      selectedSection.backgroundEffect === "webgl_cybergrid" ||
+                      selectedSection.backgroundEffect === "webgl_fluid") && (
                       <label
                         className="builder-check"
                         style={{

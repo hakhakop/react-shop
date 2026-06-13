@@ -5,6 +5,7 @@
   "topToolbarPhone": "+374 xx xx xx",
   "topToolbarMeta": "AMD ֏",
   "headerBackgroundMode": "none",
+  "headerTextMode": "auto",
   "headerLayout": "princity",
   "headerBrandMode": "logo",
   "headerBrandText": "WebPages",
@@ -20,10 +21,23 @@
     "search"
   ],
   "headerActiveIndicator": "princity",
-  "sectionPaddingTop": "64px",
-  "sectionPaddingBottom": "128px",
+  "sectionPaddingTop": "lg",
+  "sectionPaddingBottom": "lg",
   "sectionMarginTop": "lg",
   "sectionMarginBottom": "lg",
+  "rowPaddingTop": "md",
+  "rowPaddingBottom": "md",
+  "rowMarginTop": "md",
+  "rowMarginBottom": "md",
+  "rowGap": "lg",
+  "elementPaddingTop": "md",
+  "elementPaddingRight": "md",
+  "elementPaddingBottom": "md",
+  "elementPaddingLeft": "md",
+  "elementMarginTop": "md",
+  "elementMarginRight": "md",
+  "elementMarginBottom": "md",
+  "elementMarginLeft": "md",
   "menuPresentation": {
     "cG9zdDo1MzQ2": {
       "showHeading": false,
@@ -86,21 +100,21 @@
       "parentId": null
     },
     {
-      "id": "shop",
-      "label": "Shop",
-      "url": "/shop",
-      "parentId": null
-    },
-    {
       "id": "menu_6hb0ecunh",
       "label": "Checkout",
       "url": "/checkout",
       "parentId": null
     },
     {
+      "id": "shop",
+      "label": "Shop",
+      "url": "/shop",
+      "parentId": null
+    },
+    {
       "id": "menu_s2il6v58h",
       "label": "Builder",
-      "url": "/",
+      "url": "/builder",
       "parentId": null
     },
     {
@@ -134,5 +148,5 @@
       "parentId": "menu_sbyhyzc43"
     }
   ],
-  "updatedAt": "2026-06-12T22:45:30.554Z"
+  "updatedAt": "2026-06-13T14:14:56.791Z"
 }

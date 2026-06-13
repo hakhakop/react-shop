@@ -17,6 +17,10 @@ type StyleTarget = {
 
 type Props = {
   target: StyleTarget;
+  inheritedSpacing?: {
+    padding?: BuilderVisualStyle["padding"];
+    margin?: BuilderVisualStyle["margin"];
+  };
   showSpacing?: boolean;
   showBackground?: boolean;
   showAppearance?: boolean;
@@ -33,6 +37,7 @@ type Props = {
 
 export default function StyleTabPanel({
   target,
+  inheritedSpacing,
   showSpacing = true,
   showBackground = true,
   showAppearance = true,
@@ -61,12 +66,16 @@ export default function StyleTabPanel({
             id={spacingControlIds?.padding}
             label="Padding"
             value={style.padding}
+            inheritedValue={inheritedSpacing?.padding}
+            context="elementPadding"
             onChange={(padding) => patchStyle({ padding })}
           />
           <SpacingControl
             id={spacingControlIds?.margin}
             label="Margin"
             value={style.margin}
+            inheritedValue={inheritedSpacing?.margin}
+            context="elementMargin"
             onChange={(margin) => patchStyle({ margin })}
           />
         </details>

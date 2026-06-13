@@ -2,6 +2,8 @@ import type { CSSProperties } from "react";
 import {
   resolveBuilderSpacing,
   type BuilderSpacingContext,
+  getDefaultSpacingToken,
+  BUILDER_SPACING_SCALE,
 } from "@/lib/builderSpacing";
 
 export type BuilderSpacingPreset =
@@ -64,6 +66,31 @@ export type BuilderVisualStyle = {
   visibility?: BuilderVisibilityStyle;
   customClass?: string;
 };
+
+export function hasBuilderVisualSpacing(sides?: BuilderSpacingSides) {
+  return Boolean(
+    sides &&
+      [sides.top, sides.right, sides.bottom, sides.left].some(
+        (value) =>
+          typeof value === "string" &&
+          value.trim() !== "" &&
+          value.trim().toLowerCase() !== "inherit",
+      ),
+  );
+}
+
+export function legacySpacingToSides(
+  value?: string,
+): BuilderSpacingSides | undefined {
+  if (!value || value === "inherit") return undefined;
+  return {
+    top: value,
+    right: value,
+    bottom: value,
+    left: value,
+    linked: true,
+  };
+}
 
 const BUILDER_SPACING_VALUES = new Set([
   "none",
@@ -132,51 +159,75 @@ function spacingSidesToCss(
 
 export function paddingToCss(
   padding?: BuilderSpacingSides,
+  context: BuilderSpacingContext = "elementPadding",
 ): CSSProperties {
   if (!padding) return {};
-  const top = resolveSideValue(padding.top, "elementPadding");
-  const right = resolveSideValue(
+
+  const prefix = context.replace(/([A-Z])/g, "-$1").toLowerCase();
+  const defaultPx = BUILDER_SPACING_SCALE[getDefaultSpacingToken(context)];
+
+  const getSideValue = (side: "top" | "right" | "bottom" | "left", value?: string) => {
+    const resolved = resolveSideValue(value, context);
+    if (resolved !== undefined) return resolved;
+    return `var(--builder-global-${prefix}-${side}, ${defaultPx}px)`;
+  };
+
+  const top = getSideValue("top", padding.top);
+  const right = getSideValue(
+    "right",
     padding.right ?? (padding.linked ? padding.top : undefined),
-    "elementPadding",
   );
-  const bottom = resolveSideValue(
+  const bottom = getSideValue(
+    "bottom",
     padding.bottom ?? (padding.linked ? padding.top : undefined),
-    "elementPadding",
   );
-  const left = resolveSideValue(
+  const left = getSideValue(
+    "left",
     padding.left ?? (padding.linked ? padding.top : padding.right),
-    "elementPadding",
   );
 
   return {
-    ...(top !== undefined ? { paddingTop: top } : {}),
-    ...(right !== undefined ? { paddingRight: right } : {}),
-    ...(bottom !== undefined ? { paddingBottom: bottom } : {}),
-    ...(left !== undefined ? { paddingLeft: left } : {}),
+    paddingTop: top,
+    paddingRight: right,
+    paddingBottom: bottom,
+    paddingLeft: left,
   };
 }
 
-export function marginToCss(margin?: BuilderSpacingSides): CSSProperties {
+export function marginToCss(
+  margin?: BuilderSpacingSides,
+  context: BuilderSpacingContext = "elementMargin",
+): CSSProperties {
   if (!margin) return {};
-  const top = resolveSideValue(margin.top, "elementMargin");
-  const right = resolveSideValue(
+
+  const prefix = context.replace(/([A-Z])/g, "-$1").toLowerCase();
+  const defaultPx = BUILDER_SPACING_SCALE[getDefaultSpacingToken(context)];
+
+  const getSideValue = (side: "top" | "right" | "bottom" | "left", value?: string) => {
+    const resolved = resolveSideValue(value, context);
+    if (resolved !== undefined) return resolved;
+    return `var(--builder-global-${prefix}-${side}, ${defaultPx}px)`;
+  };
+
+  const top = getSideValue("top", margin.top);
+  const right = getSideValue(
+    "right",
     margin.right ?? (margin.linked ? margin.top : undefined),
-    "elementMargin",
   );
-  const bottom = resolveSideValue(
+  const bottom = getSideValue(
+    "bottom",
     margin.bottom ?? (margin.linked ? margin.top : undefined),
-    "elementMargin",
   );
-  const left = resolveSideValue(
+  const left = getSideValue(
+    "left",
     margin.left ?? (margin.linked ? margin.top : margin.right),
-    "elementMargin",
   );
 
   return {
-    ...(top !== undefined ? { marginTop: top } : {}),
-    ...(right !== undefined ? { marginRight: right } : {}),
-    ...(bottom !== undefined ? { marginBottom: bottom } : {}),
-    ...(left !== undefined ? { marginLeft: left } : {}),
+    marginTop: top,
+    marginRight: right,
+    marginBottom: bottom,
+    marginLeft: left,
   };
 }
 
@@ -243,12 +294,16 @@ export function effectsToCss(effects?: BuilderEffectsStyle): CSSProperties {
   return css;
 }
 
-export function visualStyleToCss(style?: BuilderVisualStyle): CSSProperties {
+export function visualStyleToCss(
+  style?: BuilderVisualStyle,
+  paddingContext: BuilderSpacingContext = "elementPadding",
+  marginContext: BuilderSpacingContext = "elementMargin",
+): CSSProperties {
   if (!style) return {};
 
   return {
-    ...paddingToCss(style.padding),
-    ...marginToCss(style.margin),
+    ...paddingToCss(style.padding, paddingContext),
+    ...marginToCss(style.margin, marginContext),
     ...backgroundToCss(style.background),
     ...borderToCss(style.border),
     ...effectsToCss(style.effects),

@@ -73,6 +73,7 @@ import type {
   BuilderDesign,
   BuilderHeaderActiveIndicator,
   BuilderHeaderBackgroundMode,
+  BuilderHeaderTextMode,
   BuilderHeaderLayout,
   BuilderHeaderBrandMode,
   BuilderHeaderIconId,
@@ -128,6 +129,7 @@ import type { ProductNode } from "@/lib/products";
 import type { BuilderVisualStyle } from "@/lib/builderVisualStyle";
 import { typographyProps, type TypographyArea } from "@/lib/builderTypography";
 import {
+  hasBuilderVisualSpacing,
   resolveSpacingToken,
   visualStyleClassName,
   visualStyleToCss,
@@ -140,6 +142,7 @@ import {
   BUILDER_SPACING_SCALE,
   TOKEN_LABELS,
   type BuilderSpacingContext,
+  getDefaultSpacingToken,
 } from "@/lib/builderSpacing";
 
 const BUILDER_TEMPLATE_DND_TYPE = "application/x-builder-template";
@@ -222,6 +225,7 @@ const defaultShellSettings: BuilderShellSettings = {
   topToolbarPhone: "+374 xx xx xx",
   topToolbarMeta: "AMD ֏",
   headerBackgroundMode: "default",
+  headerTextMode: "auto",
   headerLayout: "wordpress",
   headerBrandMode: "logo",
   headerBrandText: "WebPages",
@@ -235,6 +239,19 @@ const defaultShellSettings: BuilderShellSettings = {
   sectionPaddingBottom: "medium",
   sectionMarginTop: "none",
   sectionMarginBottom: "none",
+  rowPaddingTop: "md",
+  rowPaddingBottom: "md",
+  rowMarginTop: "none",
+  rowMarginBottom: "none",
+  rowGap: "lg",
+  elementPaddingTop: "sm",
+  elementPaddingRight: "sm",
+  elementPaddingBottom: "sm",
+  elementPaddingLeft: "sm",
+  elementMarginTop: "none",
+  elementMarginRight: "none",
+  elementMarginBottom: "none",
+  elementMarginLeft: "none",
   menuPresentation: {},
   storefrontPreset: "princity",
   primaryColor: "#111111",
@@ -1169,8 +1186,11 @@ export default function DashboardBuilder({
   const [sectionSettingsOpen, setSectionSettingsOpen] = useState(false);
   const [sectionStructureOpen, setSectionStructureOpen] = useState(false);
   const [globalStylesTab, setGlobalStylesTab] = useState<
-    "siteDesign" | "cards" | "typography" | "header"
+    "siteDesign" | "spacing" | "cards" | "typography" | "header"
   >("siteDesign");
+  const [globalSpacingFocus, setGlobalSpacingFocus] = useState<
+    "section" | "row" | "element" | null
+  >(null);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [sidebarWidth, setSidebarWidth] = useState(390);
   const [sidebarResizing, setSidebarResizing] = useState(false);
@@ -2449,7 +2469,8 @@ export default function DashboardBuilder({
 
     if (target.scope === "globalSection") {
       setSidebarTab("globalStyles");
-      setGlobalStylesTab("siteDesign");
+      setGlobalStylesTab("spacing");
+      setGlobalSpacingFocus("section");
       return;
     }
 
@@ -2499,6 +2520,21 @@ export default function DashboardBuilder({
     }
     setInspectorTab(spacingFocusRequest.scope === "column" ? "layout" : "spacing");
   }, [spacingFocusRequest]);
+
+  useEffect(() => {
+    if (globalStylesTab !== "spacing" || !globalSpacingFocus) return;
+    const timer = window.setTimeout(() => {
+      const target = document.getElementById(
+        `global-spacing-${globalSpacingFocus}`,
+      );
+      if (!target) return;
+      target.scrollIntoView({ block: "start", behavior: "smooth" });
+      target.classList.add("pulse-highlight");
+      window.setTimeout(() => target.classList.remove("pulse-highlight"), 1500);
+      setGlobalSpacingFocus(null);
+    }, 80);
+    return () => window.clearTimeout(timer);
+  }, [globalSpacingFocus, globalStylesTab]);
 
   const updateSelectedSlide = (
     index: number,
@@ -4348,6 +4384,25 @@ export default function DashboardBuilder({
     setPageStatus("Page deleted");
   };
 
+  const handleReorderCustomPages = async (nextPages: BuilderCustomPage[]) => {
+    setCustomPages(nextPages);
+    window.localStorage.setItem(
+      STORAGE_CUSTOM_PAGES,
+      JSON.stringify(nextPages),
+    );
+    try {
+      await fetch("/api/builder-pages", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ pages: nextPages }),
+      });
+    } catch (err) {
+      console.error("Failed to persist custom pages order on server:", err);
+    }
+  };
+
   const cloneTemplateBlock = (block: BuilderLayoutBlock): BuilderLayoutBlock => {
     const nextBlock = JSON.parse(JSON.stringify(block)) as BuilderLayoutBlock;
     return {
@@ -4978,6 +5033,7 @@ export default function DashboardBuilder({
       selectedLayoutBlock={selectedLayoutBlock}
       selectedLayoutBlockKey={selectedLayoutBlockKey}
       selectedSection={selectedSection}
+      shellSettings={shellSettings}
       uploadingNestedSlide={uploadingNestedSlide}
       uploadingSlide={uploadingSlide}
       addSelectedLayoutBlockBadge={addSelectedLayoutBlockBadge}
@@ -5018,9 +5074,10 @@ export default function DashboardBuilder({
       updateSelectedLayoutBlockGridItem={updateSelectedLayoutBlockGridItem}
       updateSelectedLayoutBlockSlide={updateSelectedLayoutBlockSlide}
       updateSelectedSlide={updateSelectedSlide}
-      onOpenGlobalSpacingSettings={() => {
+      onOpenGlobalSpacingSettings={(scope) => {
         setSidebarTab("globalStyles");
-        setGlobalStylesTab("siteDesign");
+        setGlobalStylesTab("spacing");
+        setGlobalSpacingFocus(scope);
       }}
       uploadSelectedLayoutBlockSlideImage={uploadSelectedLayoutBlockSlideImage}
       uploadSelectedSlideImage={uploadSelectedSlideImage}
@@ -5041,6 +5098,7 @@ export default function DashboardBuilder({
         {(
           [
             ["siteDesign", "Site Design"],
+            ["spacing", "Spacing"],
             ["cards", "Cards"],
             ["typography", "Typography"],
             ["header", "Header"],
@@ -5214,48 +5272,68 @@ export default function DashboardBuilder({
             </label>
           </div>
 
-          <div className="builder-card-title">
-            <strong>Section Spacing</strong>
-            <span>default padding + margin</span>
-          </div>
+        </div>
+      )}
 
+      {globalStylesTab === "spacing" && (
+        <div className="builder-global-styles-group builder-global-spacing-tab">
           <div className="builder-shell-note">
             <strong>{shellStatus}</strong>
             <span>
-              New sections inherit these spacing defaults until you override
-              them inside a section.
+              Sections, rows, and elements inherit these defaults until spacing
+              is overridden locally.
             </span>
           </div>
 
-          <div className="builder-two-column">
-            <GlobalSpacingControl
-              label="Default Top Padding"
-              value={shellSettings.sectionPaddingTop}
-              context="sectionPadding"
-              onChange={(val) => updateShellSettings({ sectionPaddingTop: val })}
-            />
-            <GlobalSpacingControl
-              label="Default Bottom Padding"
-              value={shellSettings.sectionPaddingBottom}
-              context="sectionPadding"
-              onChange={(val) => updateShellSettings({ sectionPaddingBottom: val })}
-            />
-          </div>
+          <section id="global-spacing-section" className="builder-global-spacing-group" tabIndex={-1}>
+            <div className="builder-card-title">
+              <strong>Section Spacing</strong>
+              <span>default padding + margin</span>
+            </div>
+            <div className="builder-two-column">
+              <GlobalSpacingControl label="Default Top Padding" value={shellSettings.sectionPaddingTop} context="sectionPadding" onChange={(val) => updateShellSettings({ sectionPaddingTop: val })} />
+              <GlobalSpacingControl label="Default Bottom Padding" value={shellSettings.sectionPaddingBottom} context="sectionPadding" onChange={(val) => updateShellSettings({ sectionPaddingBottom: val })} />
+            </div>
+            <div className="builder-two-column">
+              <GlobalSpacingControl label="Default Top Margin" value={shellSettings.sectionMarginTop} context="sectionMargin" onChange={(val) => updateShellSettings({ sectionMarginTop: val })} />
+              <GlobalSpacingControl label="Default Bottom Margin" value={shellSettings.sectionMarginBottom} context="sectionMargin" onChange={(val) => updateShellSettings({ sectionMarginBottom: val })} />
+            </div>
+          </section>
 
-          <div className="builder-two-column">
-            <GlobalSpacingControl
-              label="Default Top Margin"
-              value={shellSettings.sectionMarginTop}
-              context="sectionMargin"
-              onChange={(val) => updateShellSettings({ sectionMarginTop: val })}
-            />
-            <GlobalSpacingControl
-              label="Default Bottom Margin"
-              value={shellSettings.sectionMarginBottom}
-              context="sectionMargin"
-              onChange={(val) => updateShellSettings({ sectionMarginBottom: val })}
-            />
-          </div>
+          <section id="global-spacing-row" className="builder-global-spacing-group" tabIndex={-1}>
+            <div className="builder-card-title">
+              <strong>Row Spacing</strong>
+              <span>default padding, margin + gap</span>
+            </div>
+            <div className="builder-two-column">
+              <GlobalSpacingControl label="Row Padding Top" value={shellSettings.rowPaddingTop} context="rowPadding" onChange={(val) => updateShellSettings({ rowPaddingTop: val })} />
+              <GlobalSpacingControl label="Row Padding Bottom" value={shellSettings.rowPaddingBottom} context="rowPadding" onChange={(val) => updateShellSettings({ rowPaddingBottom: val })} />
+            </div>
+            <div className="builder-two-column">
+              <GlobalSpacingControl label="Row Margin Top" value={shellSettings.rowMarginTop} context="rowMargin" onChange={(val) => updateShellSettings({ rowMarginTop: val })} />
+              <GlobalSpacingControl label="Row Margin Bottom" value={shellSettings.rowMarginBottom} context="rowMargin" onChange={(val) => updateShellSettings({ rowMarginBottom: val })} />
+            </div>
+            <GlobalSpacingControl label="Gap Between Rows" value={shellSettings.rowGap} context="rowGap" onChange={(val) => updateShellSettings({ rowGap: val })} />
+          </section>
+
+          <section id="global-spacing-element" className="builder-global-spacing-group" tabIndex={-1}>
+            <div className="builder-card-title">
+              <strong>Element Spacing</strong>
+              <span>default padding + margin on every side</span>
+            </div>
+            <div className="builder-two-column">
+              <GlobalSpacingControl label="Padding Top" value={shellSettings.elementPaddingTop} context="elementPadding" onChange={(val) => updateShellSettings({ elementPaddingTop: val })} />
+              <GlobalSpacingControl label="Padding Right" value={shellSettings.elementPaddingRight} context="elementPadding" onChange={(val) => updateShellSettings({ elementPaddingRight: val })} />
+              <GlobalSpacingControl label="Padding Bottom" value={shellSettings.elementPaddingBottom} context="elementPadding" onChange={(val) => updateShellSettings({ elementPaddingBottom: val })} />
+              <GlobalSpacingControl label="Padding Left" value={shellSettings.elementPaddingLeft} context="elementPadding" onChange={(val) => updateShellSettings({ elementPaddingLeft: val })} />
+            </div>
+            <div className="builder-two-column">
+              <GlobalSpacingControl label="Margin Top" value={shellSettings.elementMarginTop} context="elementMargin" onChange={(val) => updateShellSettings({ elementMarginTop: val })} />
+              <GlobalSpacingControl label="Margin Right" value={shellSettings.elementMarginRight} context="elementMargin" onChange={(val) => updateShellSettings({ elementMarginRight: val })} />
+              <GlobalSpacingControl label="Margin Bottom" value={shellSettings.elementMarginBottom} context="elementMargin" onChange={(val) => updateShellSettings({ elementMarginBottom: val })} />
+              <GlobalSpacingControl label="Margin Left" value={shellSettings.elementMarginLeft} context="elementMargin" onChange={(val) => updateShellSettings({ elementMarginLeft: val })} />
+            </div>
+          </section>
         </div>
       )}
 
@@ -5801,6 +5879,22 @@ export default function DashboardBuilder({
             </select>
           </label>
 
+          <label className="builder-field">
+            <span>Header Text Mode</span>
+            <select
+              value={shellSettings.headerTextMode || "auto"}
+              onChange={(event) =>
+                updateShellSettings({
+                  headerTextMode: event.target.value as BuilderHeaderTextMode,
+                })
+              }
+            >
+              <option value="auto">Auto</option>
+              <option value="light">Light</option>
+              <option value="dark">Dark</option>
+            </select>
+          </label>
+
           <div className="builder-field">
             <span>Header Style & Layout</span>
             <div className="builder-header-presets-grid">
@@ -6142,6 +6236,7 @@ export default function DashboardBuilder({
         availableLayoutBlockKinds={availableLayoutBlockKinds}
         builderState={builderState}
         customPages={customPages}
+        onReorderCustomPages={handleReorderCustomPages}
         publishedKeys={publishedKeys}
         globalStylesSlot={globalStylesPanel}
         newPageTitle={newPageTitle}
@@ -6529,6 +6624,22 @@ export default function DashboardBuilder({
                   </select>
                 </label>
 
+                <label className="builder-field">
+                  <span>Header Text Mode</span>
+                  <select
+                    value={shellSettings.headerTextMode || "auto"}
+                    onChange={(event) =>
+                      updateShellSettings({
+                        headerTextMode: event.target.value as BuilderHeaderTextMode,
+                      })
+                    }
+                  >
+                    <option value="auto">Auto</option>
+                    <option value="light">Light</option>
+                    <option value="dark">Dark</option>
+                  </select>
+                </label>
+
                 <div className="builder-field">
                   <span>Header Style & Layout</span>
                   <div className="builder-header-presets-grid">
@@ -6767,43 +6878,6 @@ export default function DashboardBuilder({
                   </div>
                 </div>
 
-                <div className="builder-shell-note">
-                  <strong>{shellStatus}</strong>
-                  <span>
-                    New sections inherit these spacing defaults until you
-                    override them inside a section.
-                  </span>
-                </div>
-
-                <div className="builder-two-column">
-                  <GlobalSpacingControl
-                    label="Default Top Padding"
-                    value={shellSettings.sectionPaddingTop}
-                    context="sectionPadding"
-                    onChange={(val) => updateShellSettings({ sectionPaddingTop: val })}
-                  />
-                  <GlobalSpacingControl
-                    label="Default Bottom Padding"
-                    value={shellSettings.sectionPaddingBottom}
-                    context="sectionPadding"
-                    onChange={(val) => updateShellSettings({ sectionPaddingBottom: val })}
-                  />
-                </div>
-
-                <div className="builder-two-column">
-                  <GlobalSpacingControl
-                    label="Default Top Margin"
-                    value={shellSettings.sectionMarginTop}
-                    context="sectionMargin"
-                    onChange={(val) => updateShellSettings({ sectionMarginTop: val })}
-                  />
-                  <GlobalSpacingControl
-                    label="Default Bottom Margin"
-                    value={shellSettings.sectionMarginBottom}
-                    context="sectionMargin"
-                    onChange={(val) => updateShellSettings({ sectionMarginBottom: val })}
-                  />
-                </div>
               </div>
             </div>
           </section>
@@ -7554,17 +7628,73 @@ function PreviewCanvas({
       }`}
       style={
         {
-          "--builder-global-section-padding-top": getPreviewSpacing(
+          "--builder-global-section-padding-top": resolveBuilderSpacing(
             shellSettings.sectionPaddingTop,
-          ),
-          "--builder-global-section-padding-bottom": getPreviewSpacing(
+            "sectionPadding",
+          ).css,
+          "--builder-global-section-padding-bottom": resolveBuilderSpacing(
             shellSettings.sectionPaddingBottom,
-          ),
-          "--builder-global-section-margin-top": getPreviewSectionMargin(
+            "sectionPadding",
+          ).css,
+          "--builder-global-section-margin-top": resolveBuilderSpacing(
             shellSettings.sectionMarginTop,
-          ),
-          "--builder-global-section-margin-bottom": getPreviewSectionMargin(
+            "sectionMargin",
+          ).css,
+          "--builder-global-section-margin-bottom": resolveBuilderSpacing(
             shellSettings.sectionMarginBottom,
+            "sectionMargin",
+          ).css,
+          "--builder-global-row-padding-top": getPreviewRowSpacing(
+            shellSettings.rowPaddingTop,
+            "rowPadding",
+          ),
+          "--builder-global-row-padding-bottom": getPreviewRowSpacing(
+            shellSettings.rowPaddingBottom,
+            "rowPadding",
+          ),
+          "--builder-global-row-margin-top": getPreviewRowSpacing(
+            shellSettings.rowMarginTop,
+            "rowMargin",
+          ),
+          "--builder-global-row-margin-bottom": getPreviewRowSpacing(
+            shellSettings.rowMarginBottom,
+            "rowMargin",
+          ),
+          "--builder-global-row-gap": getPreviewRowSpacing(
+            shellSettings.rowGap,
+            "rowGap",
+          ),
+          "--builder-global-element-padding-top": getPreviewElementSpacing(
+            shellSettings.elementPaddingTop,
+            "elementPadding",
+          ),
+          "--builder-global-element-padding-right": getPreviewElementSpacing(
+            shellSettings.elementPaddingRight,
+            "elementPadding",
+          ),
+          "--builder-global-element-padding-bottom": getPreviewElementSpacing(
+            shellSettings.elementPaddingBottom,
+            "elementPadding",
+          ),
+          "--builder-global-element-padding-left": getPreviewElementSpacing(
+            shellSettings.elementPaddingLeft,
+            "elementPadding",
+          ),
+          "--builder-global-element-margin-top": getPreviewElementSpacing(
+            shellSettings.elementMarginTop,
+            "elementMargin",
+          ),
+          "--builder-global-element-margin-right": getPreviewElementSpacing(
+            shellSettings.elementMarginRight,
+            "elementMargin",
+          ),
+          "--builder-global-element-margin-bottom": getPreviewElementSpacing(
+            shellSettings.elementMarginBottom,
+            "elementMargin",
+          ),
+          "--builder-global-element-margin-left": getPreviewElementSpacing(
+            shellSettings.elementMarginLeft,
+            "elementMargin",
           ),
         } as CSSProperties
       }
@@ -7955,6 +8085,7 @@ function PreviewCanvas({
                 </div>
                 <PreviewSection
                   section={section}
+                  shellSettings={shellSettings}
                   previewProducts={previewProducts}
                   previewCategoryTree={previewCategoryTree}
                   previewCategoryCounts={previewCategoryCounts}
@@ -8060,6 +8191,20 @@ function getPreviewSectionMargin(value: SectionSpacing | undefined) {
   return resolveBuilderSpacing(value, "sectionMargin").css;
 }
 
+function getPreviewElementSpacing(
+  value: string | undefined,
+  context: "elementPadding" | "elementMargin",
+) {
+  return resolveBuilderSpacing(value, context).css;
+}
+
+function getPreviewRowSpacing(
+  value: string | undefined,
+  context: "rowPadding" | "rowMargin" | "rowGap",
+) {
+  return resolveBuilderSpacing(value, context).css;
+}
+
 function GlobalSpacingControl({
   label,
   value,
@@ -8098,7 +8243,8 @@ function GlobalSpacingControl({
   const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const val = event.target.value;
     if (val === "custom") {
-      const currentPx = resolveBuilderSpacing(value ?? "md", context).px;
+      const defaultToken = getDefaultSpacingToken(context);
+      const currentPx = resolveBuilderSpacing(value ?? defaultToken, context).px;
       onChange(`${currentPx > 0 ? currentPx : 32}px`);
     } else {
       onChange(val);
@@ -8110,7 +8256,8 @@ function GlobalSpacingControl({
     onChange(num ? `${num}px` : "0px");
   };
 
-  let selectValue = "md";
+  const defaultVal = getDefaultSpacingToken(context);
+  let selectValue: string = defaultVal;
   if (isCustom) {
     selectValue = "custom";
   } else if (value) {
@@ -8119,7 +8266,7 @@ function GlobalSpacingControl({
     else if (value === "large") selectValue = "lg";
     else selectValue = value;
   } else {
-    selectValue = "md";
+    selectValue = defaultVal;
   }
 
   return (
@@ -8902,6 +9049,7 @@ function SectionSpacingOverlay({
 
 function RowSpacingOverlay({
   item,
+  shellSettings,
   sectionId,
   rowIndex,
   isRowStart,
@@ -8909,18 +9057,19 @@ function RowSpacingOverlay({
   onOpenSpacingSettings,
 }: {
   item: any;
+  shellSettings: BuilderShellSettings;
   sectionId: string;
   rowIndex: number;
   isRowStart: boolean;
   showZeroLabels?: boolean;
   onOpenSpacingSettings?: (target: SpacingInspectorTarget) => void;
 }) {
-  const topMargin = resolveBuilderSpacing(item.rowTopMargin ?? "inherit", "rowMargin");
-  const topPadding = resolveBuilderSpacing(item.rowTopSpacing ?? "inherit", "rowPadding");
-  const bottomPadding = resolveBuilderSpacing(item.rowBottomSpacing ?? "inherit", "rowPadding");
-  const bottomMargin = resolveBuilderSpacing(item.rowBottomMargin ?? "inherit", "rowMargin");
+  const topMargin = resolveBuilderSpacing(item.rowTopMargin ?? "inherit", "rowMargin", shellSettings.rowMarginTop);
+  const topPadding = resolveBuilderSpacing(item.rowTopSpacing ?? "inherit", "rowPadding", shellSettings.rowPaddingTop);
+  const bottomPadding = resolveBuilderSpacing(item.rowBottomSpacing ?? "inherit", "rowPadding", shellSettings.rowPaddingBottom);
+  const bottomMargin = resolveBuilderSpacing(item.rowBottomMargin ?? "inherit", "rowMargin", shellSettings.rowMarginBottom);
   const rowGap = rowIndex > 0
-    ? resolveBuilderSpacing(undefined, "rowGap")
+    ? resolveBuilderSpacing(undefined, "rowGap", shellSettings.rowGap)
     : undefined;
 
   const marginTopTarget: SpacingInspectorTarget = {
@@ -9260,6 +9409,38 @@ function dashboardElementPaddingMeasurement(
   return resolveBuilderSpacing(value, "elementPadding");
 }
 
+function dashboardElementBoxStyle(block: BuilderLayoutBlock): CSSProperties {
+  const visual = block.visualStyle as BuilderVisualStyle | undefined;
+  const style: CSSProperties = {};
+
+  if (!hasBuilderVisualSpacing(visual?.padding)) {
+    if (block.elementPadding && block.elementPadding !== "inherit") {
+      const padding = resolveBuilderSpacing(
+        block.elementPadding,
+        "elementPadding",
+      ).css;
+      style.padding = padding;
+    } else {
+      style.paddingTop = "var(--builder-global-element-padding-top, 16px)";
+      style.paddingRight = "var(--builder-global-element-padding-right, 16px)";
+      style.paddingBottom = "var(--builder-global-element-padding-bottom, 16px)";
+      style.paddingLeft = "var(--builder-global-element-padding-left, 16px)";
+    }
+  }
+
+  if (
+    !hasBuilderVisualSpacing(visual?.margin) &&
+    (!block.gridMargin || block.gridMargin === "inherit")
+  ) {
+    style.marginTop = "var(--builder-global-element-margin-top, 0px)";
+    style.marginRight = "var(--builder-global-element-margin-right, 0px)";
+    style.marginBottom = "var(--builder-global-element-margin-bottom, 0px)";
+    style.marginLeft = "var(--builder-global-element-margin-left, 0px)";
+  }
+
+  return style;
+}
+
 function visualSpacingSideValue(
   sides: BuilderVisualStyle["padding"] | BuilderVisualStyle["margin"],
   side: "top" | "right" | "bottom" | "left",
@@ -9281,6 +9462,19 @@ function visualSpacingMeasurements(
   const bottom = resolveLocalSpacingValue(visualSpacingSideValue(sides, "bottom"), context);
   const left = resolveLocalSpacingValue(visualSpacingSideValue(sides, "left"), context);
   return { top, right, bottom, left };
+}
+
+function inheritedElementSpacingMeasurements(
+  shellSettings: BuilderShellSettings,
+  context: "elementPadding" | "elementMargin",
+) {
+  const prefix = context === "elementPadding" ? "elementPadding" : "elementMargin";
+  return {
+    top: resolveBuilderSpacing(undefined, context, shellSettings[`${prefix}Top`]),
+    right: resolveBuilderSpacing(undefined, context, shellSettings[`${prefix}Right`]),
+    bottom: resolveBuilderSpacing(undefined, context, shellSettings[`${prefix}Bottom`]),
+    left: resolveBuilderSpacing(undefined, context, shellSettings[`${prefix}Left`]),
+  };
 }
 
 function boxSpacingSideLabels(
@@ -9358,6 +9552,7 @@ function columnSpacingOverlayLabels(
 
 function elementSpacingOverlayLabels(
   block: BuilderLayoutBlock,
+  shellSettings: BuilderShellSettings,
   sectionId: string,
   columnKey: string,
   blockKey: string,
@@ -9384,33 +9579,65 @@ function elementSpacingOverlayLabels(
     visualSpacingMeasurements(visual?.padding, "elementPadding"),
     visualPaddingTarget,
   );
-  labels.push(
-    ...(visualPaddingLabels.length > 0
+  const legacyPaddingIsLocal = Boolean(
+    block.elementPadding && block.elementPadding !== "inherit",
+  );
+  labels.push(...(
+    visualPaddingLabels.length > 0
       ? visualPaddingLabels
-      : compactSpacingLabels([
-          spacingLabel(
-            "Element P",
-            dashboardElementPaddingMeasurement(block.elementPadding),
+      : legacyPaddingIsLocal
+        ? compactSpacingLabels([
+            spacingLabel(
+              "Element P",
+              dashboardElementPaddingMeasurement(block.elementPadding),
+              "padding",
+              "inside-top",
+              visualPaddingTarget,
+            ),
+          ])
+        : boxSpacingSideLabels(
+            "p",
             "padding",
-            "inside-top",
-            { scope: "element", sectionId, columnKey, blockKey, field: "elementPadding" },
-          ),
-        ])),
+            inheritedElementSpacingMeasurements(shellSettings, "elementPadding"),
+            visualPaddingTarget,
+          )
+  ));
+  const visualMarginLabels = boxSpacingSideLabels(
+    "m",
+    "margin",
+    visualSpacingMeasurements(visual?.margin, "elementMargin"),
+    visualMarginTarget,
   );
-  labels.push(
-    ...boxSpacingSideLabels(
-      "m",
-      "margin",
-      visualSpacingMeasurements(visual?.margin, "elementMargin"),
-      visualMarginTarget,
-    ),
+  const legacyMarginIsLocal = Boolean(
+    block.gridMargin && block.gridMargin !== "inherit",
   );
+  labels.push(...(
+    visualMarginLabels.length > 0
+      ? visualMarginLabels
+      : legacyMarginIsLocal
+        ? compactSpacingLabels([
+            spacingLabel(
+              "Element M",
+              resolveBuilderSpacing(block.gridMargin, "elementMargin"),
+              "margin",
+              "outside-top",
+              visualMarginTarget,
+            ),
+          ])
+        : boxSpacingSideLabels(
+            "m",
+            "margin",
+            inheritedElementSpacingMeasurements(shellSettings, "elementMargin"),
+            visualMarginTarget,
+          )
+  ));
 
   return labels;
 }
 
 function PreviewSection({
   section,
+  shellSettings,
   previewProducts,
   previewCategoryTree,
   previewCategoryCounts,
@@ -9460,6 +9687,7 @@ function PreviewSection({
   spacingOverlayEnabled,
 }: {
   section: BuilderSection;
+  shellSettings: BuilderShellSettings;
   previewProducts: ProductNode[];
   previewCategoryTree: CategoryTreeItem[];
   previewCategoryCounts: Record<string, number>;
@@ -10106,7 +10334,8 @@ if (section.kind === "embed") {
               "--builder-preview-layout-columns": section.layoutColumns ?? 2,
               "--builder-layout-columns": section.layoutColumns ?? 2,
               gridTemplateColumns: "repeat(12, minmax(0, 1fr))",
-              gap: resolveBuilderSpacing(undefined, "columnGap").css,
+              columnGap: resolveBuilderSpacing(undefined, "columnGap").css,
+              rowGap: "var(--builder-global-row-gap, 64px)",
             } as CSSProperties
           }
         >
@@ -10145,22 +10374,18 @@ if (section.kind === "embed") {
               selectedSectionId === section.id &&
               selectedLayoutRowIndex === rowMeta.rowIndex;
             const rowSpacingStyle: CSSProperties = {};
-            rowSpacingStyle.paddingTop = resolveBuilderSpacing(
-              item.rowTopSpacing,
-              "rowPadding",
-            ).css;
-            rowSpacingStyle.paddingBottom = resolveBuilderSpacing(
-              item.rowBottomSpacing,
-              "rowPadding",
-            ).css;
-            rowSpacingStyle.marginTop = resolveBuilderSpacing(
-              item.rowTopMargin,
-              "rowMargin",
-            ).css;
-            rowSpacingStyle.marginBottom = resolveBuilderSpacing(
-              item.rowBottomMargin,
-              "rowMargin",
-            ).css;
+            rowSpacingStyle.paddingTop = item.rowTopSpacing && item.rowTopSpacing !== "inherit"
+              ? resolveBuilderSpacing(item.rowTopSpacing, "rowPadding").css
+              : "var(--builder-global-row-padding-top, 32px)";
+            rowSpacingStyle.paddingBottom = item.rowBottomSpacing && item.rowBottomSpacing !== "inherit"
+              ? resolveBuilderSpacing(item.rowBottomSpacing, "rowPadding").css
+              : "var(--builder-global-row-padding-bottom, 32px)";
+            rowSpacingStyle.marginTop = item.rowTopMargin && item.rowTopMargin !== "inherit"
+              ? resolveBuilderSpacing(item.rowTopMargin, "rowMargin").css
+              : "var(--builder-global-row-margin-top, 0px)";
+            rowSpacingStyle.marginBottom = item.rowBottomMargin && item.rowBottomMargin !== "inherit"
+              ? resolveBuilderSpacing(item.rowBottomMargin, "rowMargin").css
+              : "var(--builder-global-row-margin-bottom, 0px)";
             return (
               <Fragment key={columnKey}>
               <article
@@ -10311,6 +10536,7 @@ if (section.kind === "embed") {
                 {isRowActive && rowMeta?.isRowStart && (
                   <RowSpacingOverlay
                     item={item}
+                    shellSettings={shellSettings}
                     sectionId={section.id}
                     rowIndex={rowMeta.rowIndex}
                     isRowStart
@@ -10371,7 +10597,7 @@ if (section.kind === "embed") {
                       } ${
                         block.kind === "scrollPinnedDemo"
                           ? ""
-                          : `shop-card-preset--${block.panelStyle ?? "default"} is-padding-${block.elementPadding ?? "none"} is-align-${block.elementAlign ?? "left"} ${visualStyleClassName(block.visualStyle)} ${block.premiumCardStyle && block.premiumCardStyle !== "none" ? `shop-builder-card--${block.premiumCardStyle}` : ""}`
+                          : `shop-card-preset--${block.panelStyle ?? "default"} is-padding-${hasBuilderVisualSpacing(block.visualStyle?.padding) || !block.elementPadding || block.elementPadding === "inherit" ? "none" : block.elementPadding} is-align-${block.elementAlign ?? "left"} ${visualStyleClassName(block.visualStyle)} ${block.premiumCardStyle && block.premiumCardStyle !== "none" ? `shop-builder-card--${block.premiumCardStyle}` : ""}`
                       } ${
                         selectedLayoutBlockKey === blockKey
                           ? "is-selected-block"
@@ -10401,10 +10627,7 @@ if (section.kind === "embed") {
                             block.borderRadius !== undefined
                               ? `${block.borderRadius}px`
                               : undefined,
-                          padding: resolveBuilderSpacing(
-                            block.elementPadding,
-                            "elementPadding",
-                          ).css,
+                          ...dashboardElementBoxStyle(block),
                           ...visualStyleToCss(
                             block.visualStyle as BuilderVisualStyle | undefined,
                           ),
@@ -10547,6 +10770,7 @@ if (section.kind === "embed") {
                           kind="element"
                           labels={elementSpacingOverlayLabels(
                             block,
+                            shellSettings,
                             section.id,
                             columnKey,
                             blockKey,
@@ -11473,7 +11697,11 @@ if (section.kind === "embed") {
                             ) : (
                               <div
                                 className={`shop-builder-grid--margin-${
-                                  block.gridMargin ?? "none"
+                                  hasBuilderVisualSpacing(block.visualStyle?.margin)
+                                    ? "none"
+                                    : block.gridMargin && block.gridMargin !== "inherit"
+                                      ? block.gridMargin
+                                      : "none"
                                 } shop-card-preset--${block.panelStyle ?? "default"}`}
                               >
                                 <CategoryWithFilters
@@ -11525,7 +11753,7 @@ if (section.kind === "embed") {
                           <div
                             className={`shop-builder-grid shop-builder-grid--gap-${
                               block.gridGap ?? "medium"
-                            } shop-builder-grid--margin-${block.gridMargin ?? "none"} shop-card-preset--${block.panelStyle ?? "default"}`}
+                            } shop-builder-grid--margin-${hasBuilderVisualSpacing(block.visualStyle?.margin) || !block.gridMargin || block.gridMargin === "inherit" ? "none" : block.gridMargin} shop-card-preset--${block.panelStyle ?? "default"}`}
                             style={
                               {
                                 "--shop-builder-grid-columns":

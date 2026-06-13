@@ -47,6 +47,7 @@ import type {
 import { typographyProps, type TypographyArea } from "@/lib/builderTypography";
 import type { BuilderVisualStyle } from "@/lib/builderVisualStyle";
 import {
+  hasBuilderVisualSpacing,
   visualStyleClassName,
   visualStyleToCss,
 } from "@/lib/builderVisualStyle";
@@ -656,10 +657,15 @@ function SectionFrame({
   const animationAttrs = animationDataAttributes(section.animation);
   const isAnimatedBg =
     section.backgroundEffect === "antigravity" ||
+    section.backgroundEffect === "antigravity2" ||
     section.backgroundEffect === "aurora" ||
     section.backgroundEffect === "constellation" ||
     section.backgroundEffect === "waves" ||
-    section.backgroundEffect === "flowfield";
+    section.backgroundEffect === "flowfield" ||
+    section.backgroundEffect === "webgl_waves" ||
+    section.backgroundEffect === "webgl_flowfield" ||
+    section.backgroundEffect === "webgl_cybergrid" ||
+    section.backgroundEffect === "webgl_fluid";
   const isAntigravity = section.backgroundEffect === "antigravity";
   const isFullTheme =
     isAntigravity &&
@@ -1027,7 +1033,7 @@ async function ContentProductsBlock({
 
   return (
     <div
-      className={`shop-builder-grid--margin-${block.gridMargin ?? "none"} shop-card-preset--${block.panelStyle ?? "default"}`}
+      className={`shop-builder-grid--margin-${blockLegacyGridMargin(block)} shop-card-preset--${block.panelStyle ?? "default"}`}
     >
       <CategoryWithFilters
         products={products}
@@ -1132,7 +1138,7 @@ function GridCards({
   const limit = Math.max(1, (block.columns ?? 3) * (block.gridRows ?? 1));
   return (
     <div
-      className={`shop-builder-grid shop-builder-grid--gap-${block.gridGap ?? "medium"} shop-builder-grid--margin-${block.gridMargin ?? "none"} shop-card-preset--${block.panelStyle ?? "default"}`}
+      className={`shop-builder-grid shop-builder-grid--gap-${block.gridGap ?? "medium"} shop-builder-grid--margin-${blockLegacyGridMargin(block)} shop-card-preset--${block.panelStyle ?? "default"}`}
       style={
         { "--shop-builder-grid-columns": block.columns ?? 3 } as CSSProperties
       }
@@ -2405,10 +2411,28 @@ function blockSurfaceStyle(
     legacy["--builder-radius"] = `${block.borderRadius}px`;
     legacy["--builder-card-radius"] = `${block.borderRadius}px`;
   }
-  legacy.padding = resolveBuilderSpacing(
-    block.elementPadding,
-    "elementPadding",
-  ).css;
+  if (!hasBuilderVisualSpacing(visual?.padding)) {
+    if (block.elementPadding && block.elementPadding !== "inherit") {
+      legacy.padding = resolveBuilderSpacing(
+        block.elementPadding,
+        "elementPadding",
+      ).css;
+    } else {
+      legacy.paddingTop = "var(--builder-global-element-padding-top, 16px)";
+      legacy.paddingRight = "var(--builder-global-element-padding-right, 16px)";
+      legacy.paddingBottom = "var(--builder-global-element-padding-bottom, 16px)";
+      legacy.paddingLeft = "var(--builder-global-element-padding-left, 16px)";
+    }
+  }
+  if (
+    !hasBuilderVisualSpacing(visual?.margin) &&
+    (!block.gridMargin || block.gridMargin === "inherit")
+  ) {
+    legacy.marginTop = "var(--builder-global-element-margin-top, 0px)";
+    legacy.marginRight = "var(--builder-global-element-margin-right, 0px)";
+    legacy.marginBottom = "var(--builder-global-element-margin-bottom, 0px)";
+    legacy.marginLeft = "var(--builder-global-element-margin-left, 0px)";
+  }
 
   return { ...contextVars, ...legacy, ...visualCss };
 }
@@ -2424,10 +2448,26 @@ function blockShellClassName(block: BuilderLayoutBlock) {
   return `shop-builder-element-shell shop-card-preset--${
     block.panelStyle ?? "default"
   } is-padding-${
-    block.elementPadding ?? "none"
+    hasBuilderVisualSpacing(
+      (block.visualStyle as BuilderVisualStyle | undefined)?.padding,
+    )
+      ? "none"
+      : block.elementPadding && block.elementPadding !== "inherit"
+        ? block.elementPadding
+        : "none"
   } is-align-${
     block.elementAlign ?? "left"
   } ${visualClass} ${animationClassName(block.animation)} ${premiumCardClass}`.trim();
+}
+
+function blockLegacyGridMargin(block: BuilderLayoutBlock) {
+  return hasBuilderVisualSpacing(
+    (block.visualStyle as BuilderVisualStyle | undefined)?.margin,
+  )
+    ? "none"
+    : block.gridMargin && block.gridMargin !== "inherit"
+      ? block.gridMargin
+      : "none";
 }
 
 const HAS_RICH_TEXT_HTML = /<[a-z][\s\S]*>/i;
@@ -2495,22 +2535,22 @@ function rowStyle(rowItem: any, parentScheme: "light" | "dark" = "light"): CSSPr
   if (rowItem?.rowBackground) {
     styleObj.background = rowItem.rowBackground;
   }
-  styleObj["--builder-section-padding-top"] = resolveBuilderSpacing(
-    rowItem?.rowTopSpacing,
-    "rowPadding",
-  ).css;
-  styleObj["--builder-section-padding-bottom"] = resolveBuilderSpacing(
-    rowItem?.rowBottomSpacing,
-    "rowPadding",
-  ).css;
-  styleObj["--builder-section-margin-top"] = resolveBuilderSpacing(
-    rowItem?.rowTopMargin,
-    "rowMargin",
-  ).css;
-  styleObj["--builder-section-margin-bottom"] = resolveBuilderSpacing(
-    rowItem?.rowBottomMargin,
-    "rowMargin",
-  ).css;
+  styleObj["--builder-section-padding-top"] =
+    rowItem?.rowTopSpacing && rowItem.rowTopSpacing !== "inherit"
+      ? resolveBuilderSpacing(rowItem.rowTopSpacing, "rowPadding").css
+      : "var(--builder-global-row-padding-top, 32px)";
+  styleObj["--builder-section-padding-bottom"] =
+    rowItem?.rowBottomSpacing && rowItem.rowBottomSpacing !== "inherit"
+      ? resolveBuilderSpacing(rowItem.rowBottomSpacing, "rowPadding").css
+      : "var(--builder-global-row-padding-bottom, 32px)";
+  styleObj["--builder-section-margin-top"] =
+    rowItem?.rowTopMargin && rowItem.rowTopMargin !== "inherit"
+      ? resolveBuilderSpacing(rowItem.rowTopMargin, "rowMargin").css
+      : "var(--builder-global-row-margin-top, 0px)";
+  styleObj["--builder-section-margin-bottom"] =
+    rowItem?.rowBottomMargin && rowItem.rowBottomMargin !== "inherit"
+      ? resolveBuilderSpacing(rowItem.rowBottomMargin, "rowMargin").css
+      : "var(--builder-global-row-margin-bottom, 0px)";
   if (rowItem?.rowBorderRadius !== undefined) {
     styleObj["--builder-radius"] = `${rowItem.rowBorderRadius}px`;
     styleObj["--builder-card-radius"] = `${rowItem.rowBorderRadius}px`;
@@ -2604,17 +2644,22 @@ function ContentLayoutSection({
         style={{
           display: "flex",
           flexDirection: "column",
-          gap: resolveBuilderSpacing(undefined, "rowGap").css,
+          gap: "var(--builder-global-row-gap, 64px)",
         }}
       >
         {layoutRows.map((row) => {
           const rowItem = row.items[0];
           const isRowAnimatedBg =
             rowItem?.rowBackgroundEffect === "antigravity" ||
+            rowItem?.rowBackgroundEffect === "antigravity2" ||
             rowItem?.rowBackgroundEffect === "aurora" ||
             rowItem?.rowBackgroundEffect === "constellation" ||
             rowItem?.rowBackgroundEffect === "waves" ||
-            rowItem?.rowBackgroundEffect === "flowfield";
+            rowItem?.rowBackgroundEffect === "flowfield" ||
+            rowItem?.rowBackgroundEffect === "webgl_waves" ||
+            rowItem?.rowBackgroundEffect === "webgl_flowfield" ||
+            rowItem?.rowBackgroundEffect === "webgl_cybergrid" ||
+            rowItem?.rowBackgroundEffect === "webgl_fluid";
           const isRowAntigravity = rowItem?.rowBackgroundEffect === "antigravity";
           const isFullRowTheme = isRowAntigravity && (rowItem.rowAntigravityVisualMode === undefined || rowItem.rowAntigravityVisualMode === "full");
           const rowAnimationAttrs = animationDataAttributes(rowItem?.rowAnimation);

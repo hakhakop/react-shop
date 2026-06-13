@@ -16,5 +16,11 @@
     "title": "Furniture Store",
     "slug": "furniture-store",
     "updatedAt": "2026-05-23T21:38:58.696Z"
+  },
+  {
+    "key": "page:builder",
+    "title": "Builder",
+    "slug": "builder",
+    "updatedAt": "2026-06-13T12:23:20.441Z"
   }
 ]

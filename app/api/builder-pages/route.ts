@@ -88,3 +88,20 @@ export async function DELETE(request: NextRequest) {
 
   return NextResponse.json({ pages: nextPages });
 }
+
+export async function PUT(request: NextRequest) {
+  try {
+    const body = (await request.json()) as {
+      pages?: BuilderCustomPage[];
+    };
+
+    if (!body.pages || !Array.isArray(body.pages)) {
+      return NextResponse.json({ error: "Invalid pages data." }, { status: 400 });
+    }
+
+    await writeBuilderCustomPages(body.pages);
+    return NextResponse.json({ pages: body.pages });
+  } catch (err: any) {
+    return NextResponse.json({ error: err.message }, { status: 500 });
+  }
+}

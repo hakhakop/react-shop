@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+// Force HMR reload for category layout alignment styling modifications
 
 import { getThemeSettings, presetMap } from "../lib/themeSettings";
 import { CartProvider } from "../components/CartProvider";
@@ -259,6 +260,19 @@ export default async function RootLayout({
   --builder-global-section-padding-bottom: ${sectionSpacingToCss(shellSettings.sectionPaddingBottom, "sectionPadding")};
   --builder-global-section-margin-top: ${sectionSpacingToCss(shellSettings.sectionMarginTop, "sectionMargin")};
   --builder-global-section-margin-bottom: ${sectionSpacingToCss(shellSettings.sectionMarginBottom, "sectionMargin")};
+  --builder-global-row-padding-top: ${sectionSpacingToCss(shellSettings.rowPaddingTop, "rowPadding")};
+  --builder-global-row-padding-bottom: ${sectionSpacingToCss(shellSettings.rowPaddingBottom, "rowPadding")};
+  --builder-global-row-margin-top: ${sectionSpacingToCss(shellSettings.rowMarginTop, "rowMargin")};
+  --builder-global-row-margin-bottom: ${sectionSpacingToCss(shellSettings.rowMarginBottom, "rowMargin")};
+  --builder-global-row-gap: ${sectionSpacingToCss(shellSettings.rowGap, "rowGap")};
+  --builder-global-element-padding-top: ${sectionSpacingToCss(shellSettings.elementPaddingTop, "elementPadding")};
+  --builder-global-element-padding-right: ${sectionSpacingToCss(shellSettings.elementPaddingRight, "elementPadding")};
+  --builder-global-element-padding-bottom: ${sectionSpacingToCss(shellSettings.elementPaddingBottom, "elementPadding")};
+  --builder-global-element-padding-left: ${sectionSpacingToCss(shellSettings.elementPaddingLeft, "elementPadding")};
+  --builder-global-element-margin-top: ${sectionSpacingToCss(shellSettings.elementMarginTop, "elementMargin")};
+  --builder-global-element-margin-right: ${sectionSpacingToCss(shellSettings.elementMarginRight, "elementMargin")};
+  --builder-global-element-margin-bottom: ${sectionSpacingToCss(shellSettings.elementMarginBottom, "elementMargin")};
+  --builder-global-element-margin-left: ${sectionSpacingToCss(shellSettings.elementMarginLeft, "elementMargin")};
 ${explicitWordPressProductVars}
 }
             `.trim(),

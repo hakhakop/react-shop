@@ -35,28 +35,28 @@
         "kind": "contentLayout",
         "visible": true,
         "title": "",
-        "background": "linear-gradient(135deg, #1f1f1a 0%, #111111 100%)",
+        "background": "#ffffff",
         "backgroundMode": "full",
         "contentMode": "boxed",
         "colorScheme": "inherit",
-        "topSpacing": "inherit",
-        "bottomSpacing": "inherit",
+        "topSpacing": "3xl",
+        "bottomSpacing": "3xl",
         "topMargin": "none",
         "bottomMargin": "none",
         "layout": "whole",
         "layoutColumns": 1,
         "layoutRows": 1,
-        "backgroundEffect": "waves",
-        "antigravitySpeed": 2.7,
-        "antigravityParticleCount": 300,
+        "backgroundEffect": "antigravity2",
+        "antigravitySpeed": 1.8,
+        "antigravityParticleCount": 260,
         "antigravityColor": "#a855f7",
         "antigravityGridDensity": "medium",
         "antigravityInteractive": true,
-        "antigravityShowGrid": true,
-        "antigravityShowParticles": false,
-        "antigravityGridMoveSpeed": 1.2,
-        "antigravityGlowIntensity": 2,
-        "antigravityVisualMode": "full",
+        "antigravityShowGrid": false,
+        "antigravityShowParticles": true,
+        "antigravityGridMoveSpeed": 0.6,
+        "antigravityGlowIntensity": 1.2,
+        "antigravityVisualMode": "no-grid",
         "layoutItems": [
           {
             "id": "layout-row-demo-column-1",
@@ -116,10 +116,16 @@
                 }
               }
             ],
-            "rowTopMargin": "inherit",
-            "rowBottomSpacing": "md"
+            "rowTopMargin": "md",
+            "rowBottomSpacing": "md",
+            "rowBottomMargin": "md"
           }
-        ]
+        ],
+        "visualStyle": {
+          "effects": {
+            "minHeight": ""
+          }
+        }
       },
       {
         "id": "contentLayout-mq4z4n9g-2ttwl",
@@ -129,10 +135,10 @@
         "backgroundMode": "full",
         "contentMode": "boxed",
         "colorScheme": "inherit",
-        "topSpacing": "inherit",
-        "bottomSpacing": "inherit",
+        "topSpacing": "sm",
+        "bottomSpacing": "sm",
         "topMargin": "none",
-        "bottomMargin": "inherit",
+        "bottomMargin": "sm",
         "visible": true,
         "eyebrow": "",
         "body": "",
@@ -159,7 +165,8 @@
                   "body": {
                     "fontWeight": "600"
                   }
-                }
+                },
+                "elementAlign": "center"
               }
             ],
             "rowTopMargin": "md"
@@ -1125,7 +1132,7 @@
         ]
       }
     ],
-    "updatedAt": "2026-06-12T21:33:02.716Z"
+    "updatedAt": "2026-06-13T13:57:00.051Z"
   },
   "shop": {
     "version": 1,
@@ -3024,31 +3031,16 @@
     },
     "sections": [
       {
-        "id": "page:builder-hero",
-        "kind": "hero",
-        "title": "Builder",
-        "eyebrow": "Builder page",
-        "body": "A custom React page created from the visual dashboard.",
-        "background": "#f7f7f4",
+        "id": "contentLayout-mqcfe9b9-8cly1",
+        "kind": "contentLayout",
+        "title": "",
+        "background": "#ffffff",
         "backgroundMode": "full",
         "contentMode": "boxed",
         "colorScheme": "inherit",
-        "layout": "split",
-        "topSpacing": "medium",
-        "bottomSpacing": "medium",
-        "visible": true
-      },
-      {
-        "id": "contentLayout-mqbint76-robfw",
-        "kind": "contentLayout",
-        "title": "",
-        "background": "#ffffff",
-        "backgroundMode": "boxed",
-        "contentMode": "boxed",
-        "colorScheme": "inherit",
         "topSpacing": "inherit",
         "bottomSpacing": "inherit",
-        "topMargin": "inherit",
+        "topMargin": "none",
         "bottomMargin": "inherit",
         "visible": true,
         "eyebrow": "",
@@ -3057,66 +3049,10 @@
         "layoutColumns": 1,
         "layoutItems": [
           {
-            "id": "layout-item-mqbint76-1",
+            "id": "layout-item-mqcfe9b9-1",
             "blocks": [
               {
-                "id": "hero-block-mqbio3h0-wmbv7",
-                "kind": "hero",
-                "eyebrow": "Featured",
-                "title": "Hero Element",
-                "body": "A strong visual opening with editable copy and action.",
-                "buttonLabel": "Learn more",
-                "buttonUrl": "/",
-                "carouselSettings": {
-                  "variant": "default"
-                }
-              }
-            ]
-          }
-        ],
-        "layoutRows": 1
-      },
-      {
-        "id": "contentLayout-mqbio7bm-q7720",
-        "kind": "contentLayout",
-        "title": "",
-        "background": "#ffffff",
-        "backgroundMode": "boxed",
-        "contentMode": "boxed",
-        "colorScheme": "inherit",
-        "topSpacing": "inherit",
-        "bottomSpacing": "inherit",
-        "topMargin": "inherit",
-        "bottomMargin": "inherit",
-        "visible": true,
-        "eyebrow": "",
-        "body": "",
-        "layout": "whole",
-        "layoutColumns": 1,
-        "layoutItems": [
-          {
-            "id": "layout-item-mqbio7bm-1",
-            "blocks": [
-              {
-                "id": "panel-block-mqbio92b-5ys46",
-                "kind": "panel",
-                "eyebrow": "Panel",
-                "title": "Content Panel",
-                "body": "Add image, title, text, and action in one flexible element.",
-                "buttonLabel": "Learn more",
-                "buttonUrl": "/",
-                "imageUrl": "",
-                "imageAlt": ""
-              }
-            ]
-          },
-          {
-            "id": "layout-row-mqbiocrc-column-1",
-            "rowId": "layout-row-mqbiocrc",
-            "rowLayout": "whole",
-            "blocks": [
-              {
-                "id": "heading-block-mqbioe2k-br5cp",
+                "id": "heading-block-mqcfe9b9-aig8f",
                 "kind": "heading",
                 "headingText": "Your Heading Text",
                 "headingLevel": "h2",
@@ -3133,43 +3069,11 @@
                 }
               }
             ]
-          },
-          {
-            "id": "layout-row-mqbiogwy-column-1",
-            "rowId": "layout-row-mqbiogwy",
-            "rowLayout": "whole",
-            "blocks": [
-              {
-                "id": "icon-block-mqbioijb-3n0mo",
-                "kind": "icon",
-                "iconName": "sparkles",
-                "title": "Icon Feature",
-                "body": "Use a small visual cue for services, promises, or highlights."
-              }
-            ]
-          },
-          {
-            "id": "layout-row-mqbiolci-column-1",
-            "rowId": "layout-row-mqbiolci",
-            "rowLayout": "whole",
-            "blocks": [
-              {
-                "id": "list-block-mqbionc0-9xuz6",
-                "kind": "list",
-                "title": "Feature List",
-                "items": [
-                  "Fast setup",
-                  "Reusable layouts",
-                  "Live visual editing"
-                ],
-                "listIcon": "check"
-              }
-            ]
           }
         ],
-        "layoutRows": 4
+        "layoutRows": 1
       }
     ],
-    "updatedAt": "2026-06-12T22:47:52.494Z"
+    "updatedAt": "2026-06-13T14:04:13.694Z"
   }
 }

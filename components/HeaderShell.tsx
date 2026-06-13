@@ -146,6 +146,8 @@ export default async function HeaderShell({ layoutOverride }: HeaderShellProps) 
       : currencyLabel;
   const effectiveHeaderBackgroundMode =
     shellSettings.headerBackgroundMode || "default";
+  const effectiveHeaderTextMode =
+    shellSettings.headerTextMode || "auto";
   const effectiveLogoUrl = shellSettings.headerLogoUrl || logoUrl;
   const effectiveBrandText =
     shellSettings.headerBrandText ||
@@ -314,6 +316,7 @@ export default async function HeaderShell({ layoutOverride }: HeaderShellProps) 
       mode={layout === "pill" || layout === "princity" ? "none" : "sticky"}
       className={headerClassName}
       backgroundMode={effectiveHeaderBackgroundMode as any}
+      textMode={effectiveHeaderTextMode}
     >
       {/* LAYOUT 2: TWO-ROW (ACF = centered) */}
       {layout === "two-row" && (

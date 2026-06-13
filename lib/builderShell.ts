@@ -18,6 +18,7 @@ export type BuilderHeaderIconId =
 export type BuilderHeaderIconVariant = "muted" | "solid" | "ghost" | "icon";
 export type BuilderHeaderActiveIndicator = "underline" | "princity" | "none";
 export type BuilderHeaderBackgroundMode = "default" | "glass" | "accent" | "none";
+export type BuilderHeaderTextMode = "auto" | "light" | "dark";
 
 export type BuilderMenuPresentation = {
   showHeading: boolean;
@@ -43,6 +44,7 @@ export type BuilderShellSettings = {
   topToolbarPhone: string;
   topToolbarMeta: string;
   headerBackgroundMode: BuilderHeaderBackgroundMode;
+  headerTextMode: BuilderHeaderTextMode;
   headerLayout: BuilderHeaderLayout;
   headerBrandMode: BuilderHeaderBrandMode;
   headerBrandText: string;
@@ -56,6 +58,19 @@ export type BuilderShellSettings = {
   sectionPaddingBottom: BuilderSectionSpacing;
   sectionMarginTop: BuilderSectionSpacing;
   sectionMarginBottom: BuilderSectionSpacing;
+  rowPaddingTop: BuilderSectionSpacing;
+  rowPaddingBottom: BuilderSectionSpacing;
+  rowMarginTop: BuilderSectionSpacing;
+  rowMarginBottom: BuilderSectionSpacing;
+  rowGap: BuilderSectionSpacing;
+  elementPaddingTop: BuilderSectionSpacing;
+  elementPaddingRight: BuilderSectionSpacing;
+  elementPaddingBottom: BuilderSectionSpacing;
+  elementPaddingLeft: BuilderSectionSpacing;
+  elementMarginTop: BuilderSectionSpacing;
+  elementMarginRight: BuilderSectionSpacing;
+  elementMarginBottom: BuilderSectionSpacing;
+  elementMarginLeft: BuilderSectionSpacing;
   menuPresentation: BuilderMenuPresentationMap;
   storefrontPreset: string;
   primaryColor: string;
@@ -90,6 +105,7 @@ export const defaultBuilderShellSettings: BuilderShellSettings = {
   topToolbarPhone: "+374 xx xx xx",
   topToolbarMeta: "AMD ֏",
   headerBackgroundMode: "default",
+  headerTextMode: "auto",
   headerLayout: "wordpress",
   headerBrandMode: "logo",
   headerBrandText: "WebPages",
@@ -103,6 +119,19 @@ export const defaultBuilderShellSettings: BuilderShellSettings = {
   sectionPaddingBottom: "medium",
   sectionMarginTop: "none",
   sectionMarginBottom: "none",
+  rowPaddingTop: "md",
+  rowPaddingBottom: "md",
+  rowMarginTop: "none",
+  rowMarginBottom: "none",
+  rowGap: "lg",
+  elementPaddingTop: "sm",
+  elementPaddingRight: "sm",
+  elementPaddingBottom: "sm",
+  elementPaddingLeft: "sm",
+  elementMarginTop: "none",
+  elementMarginRight: "none",
+  elementMarginBottom: "none",
+  elementMarginLeft: "none",
   menuPresentation: {},
   storefrontPreset: "princity",
   primaryColor: "#111111",
@@ -163,6 +192,10 @@ function normalizeHeaderBackgroundMode(
   return value === "none" || value === "glass" || value === "accent"
     ? value
     : "default";
+}
+
+function normalizeHeaderTextMode(value: unknown): BuilderHeaderTextMode {
+  return value === "light" || value === "dark" ? value : "auto";
 }
 
 function normalizeHeaderIconOrder(value: unknown): BuilderHeaderIconId[] {
@@ -288,6 +321,7 @@ export function normalizeBuilderShellSettings(
     headerBackgroundMode: normalizeHeaderBackgroundMode(
       value?.headerBackgroundMode,
     ),
+    headerTextMode: normalizeHeaderTextMode(value?.headerTextMode),
     headerLayout: normalizeHeaderLayout(value?.headerLayout),
     headerBrandMode: normalizeHeaderBrandMode(value?.headerBrandMode),
     headerBrandText:
@@ -318,6 +352,58 @@ export function normalizeBuilderShellSettings(
     sectionMarginBottom: normalizeSectionSpacing(
       value?.sectionMarginBottom,
       defaultBuilderShellSettings.sectionMarginBottom
+    ),
+    rowPaddingTop: normalizeSectionSpacing(
+      value?.rowPaddingTop,
+      defaultBuilderShellSettings.rowPaddingTop
+    ),
+    rowPaddingBottom: normalizeSectionSpacing(
+      value?.rowPaddingBottom,
+      defaultBuilderShellSettings.rowPaddingBottom
+    ),
+    rowMarginTop: normalizeSectionSpacing(
+      value?.rowMarginTop,
+      defaultBuilderShellSettings.rowMarginTop
+    ),
+    rowMarginBottom: normalizeSectionSpacing(
+      value?.rowMarginBottom,
+      defaultBuilderShellSettings.rowMarginBottom
+    ),
+    rowGap: normalizeSectionSpacing(
+      value?.rowGap,
+      defaultBuilderShellSettings.rowGap
+    ),
+    elementPaddingTop: normalizeSectionSpacing(
+      value?.elementPaddingTop,
+      defaultBuilderShellSettings.elementPaddingTop
+    ),
+    elementPaddingRight: normalizeSectionSpacing(
+      value?.elementPaddingRight,
+      defaultBuilderShellSettings.elementPaddingRight
+    ),
+    elementPaddingBottom: normalizeSectionSpacing(
+      value?.elementPaddingBottom,
+      defaultBuilderShellSettings.elementPaddingBottom
+    ),
+    elementPaddingLeft: normalizeSectionSpacing(
+      value?.elementPaddingLeft,
+      defaultBuilderShellSettings.elementPaddingLeft
+    ),
+    elementMarginTop: normalizeSectionSpacing(
+      value?.elementMarginTop,
+      defaultBuilderShellSettings.elementMarginTop
+    ),
+    elementMarginRight: normalizeSectionSpacing(
+      value?.elementMarginRight,
+      defaultBuilderShellSettings.elementMarginRight
+    ),
+    elementMarginBottom: normalizeSectionSpacing(
+      value?.elementMarginBottom,
+      defaultBuilderShellSettings.elementMarginBottom
+    ),
+    elementMarginLeft: normalizeSectionSpacing(
+      value?.elementMarginLeft,
+      defaultBuilderShellSettings.elementMarginLeft
     ),
     menuPresentation: normalizeMenuPresentationMap(value?.menuPresentation),
     storefrontPreset: preset,
@@ -392,11 +478,11 @@ function normalizeMenuItems(value: unknown): ReactMenuItem[] {
     const url = typeof raw.url === "string" ? raw.url.trim() : "";
     const parentId = typeof raw.parentId === "string" ? raw.parentId.trim() : null;
 
-    if (id && label && url) {
+    if (id && label) {
       normalized.push({
         id,
         label,
-        url,
+        url: url || "",
         parentId: parentId || null,
       });
     }

@@ -3,6 +3,7 @@
 import {
   ChevronLeft,
   ExternalLink,
+  GripVertical,
   LibraryBig,
   Pencil,
   Plus,
@@ -13,6 +14,7 @@ import {
 import {
   useEffect,
   useState,
+  useMemo,
   type Dispatch,
   type ReactNode,
   type SetStateAction,
@@ -99,6 +101,7 @@ type DashboardSidebarProps = {
   onStartSidebarResize: (clientX: number) => void;
   onSwitchBuilderTarget: (nextKey: BuilderLayoutKey) => void;
   openElementsPanelKey: number;
+  onReorderCustomPages?: (newPages: BuilderCustomPage[]) => void;
 };
 
 export default function DashboardSidebar({
@@ -139,6 +142,7 @@ export default function DashboardSidebar({
   onSwitchBuilderTarget,
   openElementsPanelKey,
   onUpdateShellSettings,
+  onReorderCustomPages,
 }: DashboardSidebarProps) {
   const [nestedOpen, setNestedOpen] = useState(false);
   const [templateDraftTitle, setTemplateDraftTitle] = useState("");
@@ -146,6 +150,40 @@ export default function DashboardSidebar({
     useState<TemplateLibraryTab>("section");
   const [renamingTemplateId, setRenamingTemplateId] = useState<string | null>(null);
   const [renamingTemplateTitle, setRenamingTemplateTitle] = useState("");
+
+  const [corePagesOrder, setCorePagesOrder] = useState<string[]>([]);
+  const [draggingCorePageKey, setDraggingCorePageKey] = useState<string | null>(null);
+  const [dragOverCorePageKey, setDragOverCorePageKey] = useState<string | null>(null);
+
+  const [draggingCustomPageKey, setDraggingCustomPageKey] = useState<string | null>(null);
+  const [dragOverCustomPageKey, setDragOverCustomPageKey] = useState<string | null>(null);
+
+  useEffect(() => {
+    const defaultKeys = corePages.map((p) => p.key);
+    try {
+      const stored = window.localStorage.getItem("react-shop-builder-core-pages-order");
+      if (stored) {
+        const parsed = JSON.parse(stored) as string[];
+        const existingStored = parsed.filter((k) => defaultKeys.includes(k as any));
+        const missing = defaultKeys.filter((k) => !existingStored.includes(k));
+        setCorePagesOrder([...existingStored, ...missing]);
+      } else {
+        setCorePagesOrder(defaultKeys as string[]);
+      }
+    } catch {
+      setCorePagesOrder(defaultKeys as string[]);
+    }
+  }, []);
+
+  const orderedCorePages = useMemo(() => {
+    if (corePagesOrder.length === 0) return [...corePages];
+    const orderMap = new Map(corePagesOrder.map((key, index) => [key, index]));
+    return [...corePages].sort((a, b) => {
+      const indexA = orderMap.get(a.key) ?? 999;
+      const indexB = orderMap.get(b.key) ?? 999;
+      return indexA - indexB;
+    });
+  }, [corePagesOrder]);
 
   useEffect(() => {
     if (inspectorOpenKey === 0 || sidebarTab !== "inspector" || !inspectorOpen) {
@@ -357,12 +395,60 @@ export default function DashboardSidebar({
                 <span>{corePages.length}</span>
               </div>
               <div className="builder-pages-list">
-                {corePages.map((page) => {
+                {orderedCorePages.map((page) => {
                   const isActive = builderState.page === page.key;
                   const isPublished = publishedKeys.includes(page.key);
+                  const isDragging = draggingCorePageKey === page.key;
+                  const isDragOver = dragOverCorePageKey === page.key;
                   return (
-                    <div key={page.key} className={`builder-page-row${isActive ? " is-active" : ""}`}>
-                      <button type="button" onClick={() => onSwitchBuilderTarget(page.key)}>
+                    <div
+                      key={page.key}
+                      className={`builder-page-row${isActive ? " is-active" : ""}${
+                        isDragging ? " is-dragging" : ""
+                      }${isDragOver ? " is-drag-over" : ""}`}
+                      draggable
+                      onDragStart={(event) => {
+                        setDraggingCorePageKey(page.key);
+                        event.dataTransfer.setData("application/x-builder-core-page-key", page.key);
+                        event.dataTransfer.effectAllowed = "move";
+                      }}
+                      onDragOver={(event) => {
+                        if (draggingCorePageKey && draggingCorePageKey !== page.key) {
+                          event.preventDefault();
+                          setDragOverCorePageKey(page.key);
+                        }
+                      }}
+                      onDragLeave={() => {
+                        if (dragOverCorePageKey === page.key) {
+                          setDragOverCorePageKey(null);
+                        }
+                      }}
+                      onDrop={(event) => {
+                        event.preventDefault();
+                        const draggedKey = event.dataTransfer.getData("application/x-builder-core-page-key");
+                        if (draggedKey && draggedKey !== page.key) {
+                          setCorePagesOrder((current) => {
+                            const next = [...current];
+                            const draggedIndex = next.indexOf(draggedKey);
+                            const targetIndex = next.indexOf(page.key);
+                            if (draggedIndex !== -1 && targetIndex !== -1) {
+                              next.splice(draggedIndex, 1);
+                              next.splice(targetIndex, 0, draggedKey);
+                              window.localStorage.setItem("react-shop-builder-core-pages-order", JSON.stringify(next));
+                            }
+                            return next;
+                          });
+                        }
+                        setDraggingCorePageKey(null);
+                        setDragOverCorePageKey(null);
+                      }}
+                      onDragEnd={() => {
+                        setDraggingCorePageKey(null);
+                        setDragOverCorePageKey(null);
+                      }}
+                    >
+                      <GripVertical size={13} className="builder-group-drag-handle" style={{ marginRight: "2px", flexShrink: 0 }} />
+                      <button type="button" className="builder-page-title-button" onClick={() => onSwitchBuilderTarget(page.key)}>
                         <strong>{page.title}</strong>
                         <span>{page.slug ? `/${page.slug}` : "/"}</span>
                       </button>
@@ -423,9 +509,55 @@ export default function DashboardSidebar({
                   {customPages.map((page) => {
                     const isActive = builderState.page === page.key;
                     const isPublished = publishedKeys.includes(page.key);
+                    const isDragging = draggingCustomPageKey === page.key;
+                    const isDragOver = dragOverCustomPageKey === page.key;
                     return (
-                      <div key={page.key} className={`builder-page-row${isActive ? " is-active" : ""}`}>
-                        <button type="button" onClick={() => onSwitchBuilderTarget(page.key)}>
+                      <div
+                        key={page.key}
+                        className={`builder-page-row${isActive ? " is-active" : ""}${
+                          isDragging ? " is-dragging" : ""
+                        }${isDragOver ? " is-drag-over" : ""}`}
+                        draggable
+                        onDragStart={(event) => {
+                          setDraggingCustomPageKey(page.key);
+                          event.dataTransfer.setData("application/x-builder-custom-page-key", page.key);
+                          event.dataTransfer.effectAllowed = "move";
+                        }}
+                        onDragOver={(event) => {
+                          if (draggingCustomPageKey && draggingCustomPageKey !== page.key) {
+                            event.preventDefault();
+                            setDragOverCustomPageKey(page.key);
+                          }
+                        }}
+                        onDragLeave={() => {
+                          if (dragOverCustomPageKey === page.key) {
+                            setDragOverCustomPageKey(null);
+                          }
+                        }}
+                        onDrop={(event) => {
+                          event.preventDefault();
+                          const draggedKey = event.dataTransfer.getData("application/x-builder-custom-page-key");
+                          if (draggedKey && draggedKey !== page.key) {
+                            const next = [...customPages];
+                            const draggedIndex = next.findIndex((p) => p.key === draggedKey);
+                            const targetIndex = next.findIndex((p) => p.key === page.key);
+                            if (draggedIndex !== -1 && targetIndex !== -1) {
+                              const draggedPage = next[draggedIndex];
+                              next.splice(draggedIndex, 1);
+                              next.splice(targetIndex, 0, draggedPage);
+                              onReorderCustomPages?.(next);
+                            }
+                          }
+                          setDraggingCustomPageKey(null);
+                          setDragOverCustomPageKey(null);
+                        }}
+                        onDragEnd={() => {
+                          setDraggingCustomPageKey(null);
+                          setDragOverCustomPageKey(null);
+                        }}
+                      >
+                        <GripVertical size={13} className="builder-group-drag-handle" style={{ marginRight: "2px", flexShrink: 0 }} />
+                        <button type="button" className="builder-page-title-button" onClick={() => onSwitchBuilderTarget(page.key)}>
                           <strong>{page.title}</strong>
                           <span>/{page.slug}</span>
                         </button>

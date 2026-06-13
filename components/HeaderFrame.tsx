@@ -10,6 +10,7 @@ type HeaderFrameProps = {
   /** Extra classes appended to the header element. */
   className?: string;
   backgroundMode?: "default" | "glass" | "accent" | "none";
+  textMode?: "auto" | "light" | "dark";
 };
 
 /**
@@ -23,8 +24,10 @@ export default function HeaderFrame({
   mode = "sticky",
   className = "",
   backgroundMode = "default",
+  textMode = "auto",
 }: HeaderFrameProps) {
   const [scrolled, setScrolled] = React.useState(false);
+  const [detectedTextMode, setDetectedTextMode] = React.useState<"light" | "dark" | null>(null);
 
   React.useEffect(() => {
     const getScrollY = () => {
@@ -47,6 +50,52 @@ export default function HeaderFrame({
     window.addEventListener("scroll", onScroll, { capture: true, passive: true });
     return () => window.removeEventListener("scroll", onScroll, { capture: true });
   }, []);
+
+  React.useEffect(() => {
+    if (textMode !== "auto") {
+      setDetectedTextMode(null);
+      return;
+    }
+
+    const updateAutoScheme = () => {
+      const firstSection = document.querySelector(".shop-builder-section");
+      if (firstSection) {
+        if (firstSection.classList.contains("shop-builder-section--scheme-dark")) {
+          setDetectedTextMode("light");
+          return;
+        } else if (firstSection.classList.contains("shop-builder-section--scheme-light")) {
+          setDetectedTextMode("dark");
+          return;
+        }
+      }
+
+      // Fallback: detect theme from document/body/root
+      const isDark = document.documentElement.classList.contains("dark") ||
+                     document.documentElement.getAttribute("data-theme") === "dark" ||
+                     document.body.classList.contains("dark");
+      setDetectedTextMode(isDark ? "light" : "dark");
+    };
+
+    updateAutoScheme();
+
+    const observer = new MutationObserver(() => {
+      updateAutoScheme();
+    });
+
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ["class", "data-theme"]
+    });
+
+    window.addEventListener("scroll", updateAutoScheme, { passive: true });
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("scroll", updateAutoScheme);
+    };
+  }, [textMode]);
 
   let bgClass = "";
   let borderClass = "";
@@ -78,11 +127,14 @@ export default function HeaderFrame({
   const base = mode === "sticky" ? baseSticky : baseNone;
   const state = mode === "sticky" ? stateSticky : "";
 
+  const resolvedTextMode = textMode === "auto" ? (detectedTextMode || "auto") : textMode;
+
   return (
     <header
       className={`${base} ${state} ${className}`}
       style={mode === "sticky" ? { borderBottomColor: scrolled ? accentColor : "transparent" } : undefined}
       data-scrolled={scrolled ? "true" : "false"}
+      data-header-text-mode={resolvedTextMode}
     >
       {children}
     </header>
