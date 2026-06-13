@@ -7358,7 +7358,11 @@ article.is-selected-column > .builder-preview-box-spacing,
   left: 8px !important;
 }
 
-.builder-preview-row-spacing-overlay--padding-top .builder-preview-spacing-label,
+.builder-preview-row-spacing-overlay--padding-top .builder-preview-spacing-label {
+  left: 8px !important;
+  right: auto !important;
+}
+
 .builder-preview-row-spacing-overlay--padding-bottom .builder-preview-spacing-label {
   left: auto !important;
   right: 8px !important;

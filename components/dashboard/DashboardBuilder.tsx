@@ -41,6 +41,7 @@ import {
   X,
 } from "lucide-react";
 import Image from "next/image";
+import { useTheme } from "@/components/ThemeProvider";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import type {
   CSSProperties,
@@ -598,17 +599,21 @@ function sectionSchemeStyle(section: BuilderSection) {
 
 function resolveSectionColorScheme(
   section: BuilderSection,
+  layoutScheme: "light" | "dark" = "light",
 ): Exclude<SectionColorScheme, "inherit"> {
   if (section.colorScheme === "dark" || section.colorScheme === "light") {
     return section.colorScheme;
   }
 
   const readable = readableSchemeForColor(section.background);
-  return readable === "inherit" ? "light" : readable;
+  return readable === "inherit" ? layoutScheme : readable;
 }
 
-function sectionColorModeLabel(section: BuilderSection) {
-  const resolved = resolveSectionColorScheme(section);
+function sectionColorModeLabel(
+  section: BuilderSection,
+  layoutScheme: "light" | "dark" = "light",
+) {
+  const resolved = resolveSectionColorScheme(section, layoutScheme);
   if (section.colorScheme === "dark" || section.colorScheme === "light") {
     return resolved === "dark" ? "forced light text" : "forced dark text";
   }
@@ -1149,9 +1154,15 @@ export default function DashboardBuilder({
   menuTree = [],
 }: DashboardBuilderProps) {
   const router = useRouter();
+  const { theme } = useTheme();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [builderState, setBuilderState] = useState<BuilderState>(defaultState);
+  const layoutScheme =
+    builderState.design.colorScheme === "dark" ||
+    (builderState.design.colorScheme === "auto" && theme === "dark")
+      ? "dark"
+      : "light";
   const [selectedId, setSelectedId] = useState(
     defaultState.sections[0]?.id ?? "",
   );
@@ -1371,6 +1382,28 @@ export default function DashboardBuilder({
     setSelectedId(draft.sections[0]?.id ?? "");
     setDraftReady(true);
   }, []);
+
+  useEffect(() => {
+    const scheme = builderState.design.colorScheme ?? "auto";
+    if (scheme === "dark") {
+      document.documentElement.dataset.theme = "dark";
+      document.documentElement.classList.add("dark");
+    } else if (scheme === "light") {
+      document.documentElement.dataset.theme = "light";
+      document.documentElement.classList.remove("dark");
+    } else {
+      // Revert to visitor theme preference
+      const stored = window.localStorage.getItem("wc-store-theme");
+      const prefersDark = window.matchMedia?.("(prefers-color-scheme: dark)")?.matches;
+      const theme = stored === "dark" || (!stored && prefersDark) ? "dark" : "light";
+      document.documentElement.dataset.theme = theme;
+      if (theme === "dark") {
+        document.documentElement.classList.add("dark");
+      } else {
+        document.documentElement.classList.remove("dark");
+      }
+    }
+  }, [builderState.design.colorScheme]);
 
   useEffect(() => {
     setMenuIconPickerOpen(false);
@@ -5024,7 +5057,7 @@ export default function DashboardBuilder({
       openSlideId={openSlideId}
       previewCategoryTree={previewCategoryTree}
       sectionBackgroundPresets={sectionBackgroundPresets}
-      sectionColorModeLabel={sectionColorModeLabel}
+      sectionColorModeLabel={(sec) => sectionColorModeLabel(sec, layoutScheme)}
       sectionLabels={sectionLabels}
       sectionSettingsOpen={sectionSettingsOpen}
       sectionStructureOpen={sectionStructureOpen}
@@ -5900,14 +5933,6 @@ export default function DashboardBuilder({
             <div className="builder-header-presets-grid">
               <button
                 type="button"
-                className={`builder-preset-btn ${shellSettings.headerLayout === "wordpress" ? "is-active" : ""}`}
-                onClick={() => applyHeaderPreset("wordpress")}
-              >
-                <span>WordPress Default</span>
-                <small>Fallback layout & options</small>
-              </button>
-              <button
-                type="button"
                 className={`builder-preset-btn ${shellSettings.headerLayout === "princity" ? "is-active" : ""}`}
                 onClick={() => applyHeaderPreset("service")}
               >
@@ -6643,14 +6668,6 @@ export default function DashboardBuilder({
                 <div className="builder-field">
                   <span>Header Style & Layout</span>
                   <div className="builder-header-presets-grid">
-                    <button
-                      type="button"
-                      className={`builder-preset-btn ${shellSettings.headerLayout === "wordpress" ? "is-active" : ""}`}
-                      onClick={() => applyHeaderPreset("wordpress")}
-                    >
-                      <span>WordPress Default</span>
-                      <small>Fallback layout & options</small>
-                    </button>
                     <button
                       type="button"
                       className={`builder-preset-btn ${shellSettings.headerLayout === "princity" ? "is-active" : ""}`}
@@ -7526,6 +7543,13 @@ function PreviewCanvas({
     field: "topSpacing" | "bottomSpacing" | "topMargin" | "bottomMargin",
   ) => void;
 }) {
+  const { theme } = useTheme();
+  const layoutScheme =
+    design.colorScheme === "dark" ||
+    (design.colorScheme === "auto" && theme === "dark")
+      ? "dark"
+      : "light";
+
   const [hoveredSectionId, setHoveredSectionId] = useState<string | null>(null);
   const [hoveredColumnKey, setHoveredColumnKey] = useState<string | null>(null);
   const [hoveredBlockKey, setHoveredBlockKey] = useState<string | null>(null);
@@ -7755,10 +7779,15 @@ function PreviewCanvas({
             const animationAttrs = previewAnimationAttrs(section.animation);
             const isAnimatedBg =
               section.backgroundEffect === "antigravity" ||
+              section.backgroundEffect === "antigravity2" ||
               section.backgroundEffect === "aurora" ||
               section.backgroundEffect === "constellation" ||
               section.backgroundEffect === "waves" ||
-              section.backgroundEffect === "flowfield";
+              section.backgroundEffect === "flowfield" ||
+              section.backgroundEffect === "webgl_waves" ||
+              section.backgroundEffect === "webgl_flowfield" ||
+              section.backgroundEffect === "webgl_cybergrid" ||
+              section.backgroundEffect === "webgl_fluid";
             const isSectionAntigravity = section.backgroundEffect === "antigravity";
             const isFullTheme = isSectionAntigravity && (section.antigravityVisualMode === undefined || section.antigravityVisualMode === "full");
 
@@ -7777,7 +7806,7 @@ function PreviewCanvas({
                   section.backgroundMode === "boxed" ? "boxed" : "full"
                 } builder-preview-section--content-${
                   section.contentMode ?? "boxed"
-                } builder-preview-section--scheme-${resolveSectionColorScheme(section)} ${
+                } builder-preview-section--scheme-${resolveSectionColorScheme(section, layoutScheme)} ${
                   isFullTheme ? "shop-builder-section--effect-antigravity" : isAnimatedBg ? "relative overflow-hidden" : ""
                 } ${
                   isSelected ? "is-selected" : ""
@@ -10025,6 +10054,19 @@ function PreviewSection({
             <ProductCarousel
               products={previewProducts.slice(0, section.gridLimit ?? 8)}
               preset={section.cardPreset ?? "standard"}
+              cardStyle={section.cardStyle}
+              cardTheme={undefined}
+              gridImageFrame={undefined}
+              imagePadding={section.imagePadding}
+              imageFit={section.imageFit}
+              imageRatio={section.imageRatio}
+              borderRadius={section.borderRadius}
+              addToCartStyle={section.addToCartStyle}
+              addToCartSize={section.addToCartSize}
+              addToCartDisplay={section.addToCartDisplay}
+              addToCartVisibility={section.addToCartVisibility}
+              addToCartPosition={section.addToCartPosition}
+              typography={section.typography}
             />
           ) : (
             <CategoryWithFilters
@@ -10037,6 +10079,8 @@ function PreviewSection({
               gridGap={section.gridGap}
               cardPadding={section.cardPadding}
               imagePadding={section.imagePadding}
+              imageFit={section.imageFit}
+              imageRatio={section.imageRatio}
               addToCartStyle={section.addToCartStyle}
               addToCartSize={section.addToCartSize}
               addToCartPosition={section.addToCartPosition}
@@ -11683,54 +11727,92 @@ if (section.kind === "embed") {
                             </DashboardTypog>
                           )}
                           {previewProducts.length > 0 ? (
-                            block.layoutVariant === "carousel" ? (
-                              <ProductCarousel
-                                products={previewProducts.slice(
-                                  0,
-                                  block.gridLimit ?? 8,
-                                )}
-                                preset={
-                                  block.panelStyle ?? block.cardPreset ?? "standard"
-                                }
-                                typography={block.typography}
-                              />
-                            ) : (
-                              <div
-                                className={`shop-builder-grid--margin-${
-                                  hasBuilderVisualSpacing(block.visualStyle?.margin)
-                                    ? "none"
-                                    : block.gridMargin && block.gridMargin !== "inherit"
-                                      ? block.gridMargin
-                                      : "none"
-                                } shop-card-preset--${block.panelStyle ?? "default"}`}
-                              >
-                                <CategoryWithFilters
-                                  products={
-                                    (block.pagination?.enabled ?? false)
-                                      ? previewProducts
-                                      : previewProducts.slice(0, block.gridLimit ?? 4)
-                                  }
-                                  columns={block.columns}
-                                  filterPosition={block.filterPosition}
-                                  cardStyle={block.cardStyle}
-                                  cardPreset={block.panelStyle ?? block.cardPreset}
-                                  pageSize={block.gridLimit}
-                                  gridGap={block.gridGap}
-                                  cardPadding={block.cardPadding}
-                                  imagePadding={block.imagePadding}
-                                  imageFrame={block.gridImageFrame}
-                                  addToCartStyle={block.addToCartStyle}
-                                  addToCartSize={block.addToCartSize}
-                                  addToCartPosition={block.addToCartPosition}
-                                  addToCartVisibility={block.addToCartVisibility}
-                                  addToCartDisplay={block.addToCartDisplay}
-                                  hiddenCategorySlugs={block.hiddenCategorySlugs}
-                                  categoryTree={previewCategoryTree}
-                                  typography={block.typography}
-                                  pagination={block.pagination}
-                                />
+                            (() => {
+                              const cardBorderRadiusStyle =
+                                block.borderRadius !== undefined
+                                  ? {
+                                      "--builder-card-radius": `${block.borderRadius}px`,
+                                      "--product-card-radius": `${block.borderRadius}px`,
+                                    }
+                                  : {};
+
+                              const cardBackgroundStyle =
+                                block.elementBackgroundMode === "custom" && block.elementBackground
+                                  ? { "--builder-card-bg": block.elementBackground }
+                                  : block.elementBackgroundMode === "transparent"
+                                    ? { "--builder-card-bg": "transparent" }
+                                    : {};
+
+                              const productStyleProps = {
+                                ...cardBorderRadiusStyle,
+                                ...cardBackgroundStyle,
+                              } as React.CSSProperties;
+
+                              return block.layoutVariant === "carousel" ? (
+                                <div style={productStyleProps}>
+                                  <ProductCarousel
+                                    products={previewProducts.slice(
+                                      0,
+                                      block.gridLimit ?? 8,
+                                    )}
+                                    preset={block.cardPreset ?? "standard"}
+                                    cardStyle={block.cardStyle}
+                                    cardTheme={block.panelStyle}
+                                    gridImageFrame={block.gridImageFrame}
+                                    imagePadding={block.imagePadding}
+                                    imageFit={block.imageFit}
+                                    imageRatio={block.imageRatio}
+                                    borderRadius={block.borderRadius}
+                                    addToCartStyle={block.addToCartStyle}
+                                    addToCartSize={block.addToCartSize}
+                                    addToCartDisplay={block.addToCartDisplay}
+                                    addToCartVisibility={block.addToCartVisibility}
+                                    addToCartPosition={block.addToCartPosition}
+                                    typography={block.typography}
+                                  />
+                                </div>
+                              ) : (
+                                <div
+                                  className={`shop-builder-grid--margin-${
+                                    hasBuilderVisualSpacing(block.visualStyle?.margin)
+                                      ? "none"
+                                      : block.gridMargin && block.gridMargin !== "inherit"
+                                        ? block.gridMargin
+                                        : "none"
+                                  } shop-card-preset--${block.panelStyle ?? "default"}`}
+                                  style={productStyleProps}
+                                >
+                                  <CategoryWithFilters
+                                    products={
+                                      (block.pagination?.enabled ?? false)
+                                        ? previewProducts
+                                        : previewProducts.slice(0, block.gridLimit ?? 4)
+                                    }
+                                    columns={block.columns}
+                                    filterPosition={block.filterPosition}
+                                    cardStyle={block.cardStyle}
+                                    cardPreset={block.cardPreset}
+                                    cardTheme={block.panelStyle}
+                                    pageSize={block.gridLimit}
+                                    gridGap={block.gridGap}
+                                    cardPadding={block.cardPadding}
+                                    imagePadding={block.imagePadding}
+                                    imageFit={block.imageFit}
+                                    imageRatio={block.imageRatio}
+                                    imageFrame={block.gridImageFrame}
+                                    addToCartStyle={block.addToCartStyle}
+                                    addToCartSize={block.addToCartSize}
+                                    addToCartPosition={block.addToCartPosition}
+                                    addToCartVisibility={block.addToCartVisibility}
+                                    addToCartDisplay={block.addToCartDisplay}
+                                    hiddenCategorySlugs={block.hiddenCategorySlugs}
+                                    categoryTree={previewCategoryTree}
+                                    typography={block.typography}
+                                    pagination={block.pagination}
+                                  />
                               </div>
-                            )
+                              );
+                            })()
                           ) : (
                             <div
                               className={`builder-preview-products shop-card-preset--${block.panelStyle ?? "default"}`}

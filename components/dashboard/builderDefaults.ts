@@ -910,6 +910,7 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
       filterPosition: "left",
       cardStyle: "flat",
       cardPreset: "standard",
+      panelStyle: "default",
     };
   }
 

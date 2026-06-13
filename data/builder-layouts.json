@@ -1201,7 +1201,7 @@
         "layoutRows": 1
       },
       {
-        "id": "contentLayout-mpnq7bn6-jl8dc",
+        "id": "contentLayout-mqcpe2nr-yz507",
         "kind": "contentLayout",
         "title": "",
         "background": "#111111",
@@ -1209,9 +1209,9 @@
         "contentMode": "boxed",
         "colorScheme": "inherit",
         "topSpacing": "inherit",
-        "bottomSpacing": "medium",
+        "bottomSpacing": "inherit",
         "topMargin": "inherit",
-        "bottomMargin": "small",
+        "bottomMargin": "inherit",
         "visible": true,
         "eyebrow": "",
         "body": "",
@@ -1219,31 +1219,29 @@
         "layoutColumns": 1,
         "layoutItems": [
           {
-            "id": "layout-item-mpnq7bn6-1",
+            "id": "layout-item-mqcpe2nr-1",
             "blocks": [
               {
-                "id": "products-block-mpnq7mmr-t8lb3",
+                "id": "products-block-mqcpe91s-l5ljv",
                 "kind": "products",
                 "title": "Products",
                 "source": "all",
                 "layoutVariant": "grid",
                 "columns": 4,
-                "gridLimit": 6000,
-                "filterPosition": "top",
+                "gridLimit": 12,
+                "filterPosition": "left",
                 "cardStyle": "none",
                 "cardPreset": "princity-flat",
+                "panelStyle": "dark",
+                "cardPadding": "small",
                 "imagePadding": "none",
-                "cardPadding": "medium",
-                "pagination": {
-                  "enabled": true,
-                  "perPage": 12,
-                  "mode": "pageNumbers",
-                  "infiniteScroll": false,
-                  "style": "minimal"
-                },
                 "elementBackgroundMode": "transparent",
-                "panelStyle": "antigravity",
-                "elementPadding": "small"
+                "imageFit": "cover",
+                "imageRatio": "4:5",
+                "addToCartDisplay": "button",
+                "addToCartSize": "compact",
+                "addToCartPosition": "below",
+                "addToCartStyle": "blue"
               }
             ]
           }
@@ -1299,7 +1297,7 @@
         "layoutRows": 1
       }
     ],
-    "updatedAt": "2026-06-11T07:32:41.608Z"
+    "updatedAt": "2026-06-13T19:02:16.220Z"
   },
   "client": {
     "version": 1,

@@ -227,7 +227,29 @@ function resolveColorSchemeForBackground(
   return readableSchemeForColor(bg);
 }
 
-function getContextVars(scheme: "light" | "dark", customBg?: string): Record<string, string | undefined> {
+function getContextVars(scheme: "light" | "dark" | "auto", customBg?: string): Record<string, string | undefined> {
+  if (scheme === "auto") {
+    return {
+      "--context-bg": customBg || "transparent",
+      "--context-text": "var(--builder-text)",
+      "--context-muted": "var(--builder-muted)",
+      "--context-surface": "var(--builder-surface)",
+      "--context-button-bg": "var(--builder-button-bg)",
+      "--context-button-text": "var(--builder-button-text)",
+      "--context-card-bg": "var(--builder-card-bg)",
+      "--context-card-border": "var(--builder-card-border)",
+
+      // Legacy variables mapping for correct cascade
+      "--builder-active-text": "var(--builder-text)",
+      "--builder-active-muted": "var(--builder-muted)",
+      "--builder-active-surface": "var(--builder-surface)",
+      "--builder-active-button-bg": "var(--builder-button-bg)",
+      "--builder-active-button-text": "var(--builder-button-text)",
+      "--builder-card-bg": "var(--builder-card-bg)",
+      "--builder-card-border": "var(--builder-card-border)",
+    };
+  }
+
   const schemeColors = scheme === "dark" ? builderDarkScheme : builderLightScheme;
   const cardBorder = scheme === "dark" ? "rgba(255, 255, 255, 0.08)" : "rgba(17, 17, 17, 0.08)";
   return {
@@ -251,12 +273,23 @@ function getContextVars(scheme: "light" | "dark", customBg?: string): Record<str
   };
 }
 
-function resolveSectionColorScheme(section: BuilderSection) {
+function resolveSectionColorScheme(
+  section: BuilderSection,
+  layoutScheme: "light" | "dark" | "auto" = "light",
+): "light" | "dark" | "auto" {
   if (section.colorScheme === "dark" || section.colorScheme === "light") {
     return section.colorScheme;
   }
 
-  return resolveColorSchemeForBackground(section.background);
+  const bg = section.background?.trim().toLowerCase();
+  if (!bg || bg === "transparent" || bg === "initial" || bg === "inherit") {
+    return layoutScheme;
+  }
+
+  return resolveColorSchemeForBackground(
+    section.background,
+    layoutScheme === "auto" ? "light" : layoutScheme,
+  );
 }
 
 function resolveDesignColors(layout: BuilderLayout) {
@@ -423,6 +456,19 @@ async function BuilderProductsSection({
       <ProductCarousel
         products={products.slice(0, pageSize)}
         preset={section.cardPreset ?? "standard"}
+        cardStyle={section.cardStyle}
+        cardTheme={undefined}
+        gridImageFrame={undefined}
+        imagePadding={section.imagePadding}
+        imageFit={section.imageFit}
+        imageRatio={section.imageRatio}
+        borderRadius={section.borderRadius}
+        addToCartStyle={section.addToCartStyle}
+        addToCartSize={section.addToCartSize}
+        addToCartDisplay={section.addToCartDisplay}
+        addToCartVisibility={section.addToCartVisibility}
+        addToCartPosition={section.addToCartPosition}
+        typography={section.typography}
       />
     );
   }
@@ -440,6 +486,8 @@ async function BuilderProductsSection({
       gridGap={section.gridGap}
       cardPadding={section.cardPadding}
       imagePadding={section.imagePadding}
+      imageFit={section.imageFit}
+      imageRatio={section.imageRatio}
       addToCartStyle={section.addToCartStyle}
       addToCartSize={section.addToCartSize}
       addToCartPosition={section.addToCartPosition}
@@ -461,8 +509,11 @@ function getSpacingValue(
   return resolveBuilderSpacing(value, context).css;
 }
 
-function sectionStyle(section: BuilderSection): BuilderStyle {
-  const colorScheme = resolveSectionColorScheme(section);
+function sectionStyle(
+  section: BuilderSection,
+  layoutScheme: "light" | "dark" | "auto" = "light",
+): BuilderStyle {
+  const colorScheme = resolveSectionColorScheme(section, layoutScheme);
   const schemeVars =
     colorScheme === "dark"
       ? ({
@@ -515,13 +566,17 @@ function sectionStyle(section: BuilderSection): BuilderStyle {
   return styleObj as BuilderStyle;
 }
 
-function sectionClassName(section: BuilderSection, extra = "") {
+function sectionClassName(
+  section: BuilderSection,
+  layoutScheme: "light" | "dark" | "auto" = "light",
+  extra = "",
+) {
   const mode = section.backgroundMode === "boxed" ? "boxed" : "full";
   const contentMode =
     section.contentMode === "full" || section.contentMode === "narrow"
       ? section.contentMode
       : "boxed";
-  const scheme = resolveSectionColorScheme(section);
+  const scheme = resolveSectionColorScheme(section, layoutScheme);
   const visualClass = visualStyleClassName(
     section.visualStyle as BuilderVisualStyle | undefined,
   );
@@ -647,10 +702,12 @@ function animationDataAttributes(
 
 function SectionFrame({
   section,
+  layoutScheme = "light",
   extra,
   children,
 }: {
   section: BuilderSection;
+  layoutScheme?: "light" | "dark" | "auto";
   extra?: string;
   children: ReactNode;
 }) {
@@ -674,14 +731,14 @@ function SectionFrame({
   return (
     <section
       id={section.id}
-      className={`${sectionClassName(section, extra)} ${
+      className={`${sectionClassName(section, layoutScheme, extra)} ${
         isFullTheme
           ? "shop-builder-section--effect-antigravity"
           : isAnimatedBg
             ? "relative overflow-hidden"
             : ""
       }`}
-      style={{ ...sectionStyle(section), ...animationAttrs.style }}
+      style={{ ...sectionStyle(section, layoutScheme), ...animationAttrs.style }}
       data-gsap-section={section.kind === "hero" ? "hero" : section.kind}
       {...animationAttrs.data}
     >
@@ -757,9 +814,11 @@ function ProductsSkeleton() {
 function HeroSection({
   section,
   product,
+  layoutScheme = "light",
 }: {
   section: BuilderSection;
   product?: StorefrontBuilderProduct;
+  layoutScheme?: "light" | "dark" | "auto";
 }) {
   const isProductTemplate = Boolean(
     product && section.id.includes("template-product"),
@@ -770,14 +829,15 @@ function HeroSection({
   return (
     <SectionFrame
       section={section}
+      layoutScheme={layoutScheme}
       extra={`shop-builder-hero ${isAntigravity ? "shop-builder-hero--antigravity" : ""}`}
     >
       <div data-gsap-hero-item className="shop-builder-hero-content-left">
         {section.eyebrow && (
           <Typog
-            as="p"
-            className="shop-builder-eyebrow"
-            typography={section.typography}
+             as="p"
+             className="shop-builder-eyebrow"
+             typography={section.typography}
           >
             {section.eyebrow}
           </Typog>
@@ -845,10 +905,17 @@ function HeroSection({
   );
 }
 
-function PromoSection({ section }: { section: BuilderSection }) {
+function PromoSection({
+  section,
+  layoutScheme = "light",
+}: {
+  section: BuilderSection;
+  layoutScheme?: "light" | "dark" | "auto";
+}) {
   return (
     <SectionFrame
       section={section}
+      layoutScheme={layoutScheme}
       extra={`shop-builder-promo shop-builder-promo--${
         section.promoVariant ?? "default"
       }`}
@@ -869,16 +936,32 @@ function PromoSection({ section }: { section: BuilderSection }) {
   );
 }
 
-async function FilterPillsSection({ section }: { section: BuilderSection }) {
+async function FilterPillsSection({
+  section,
+  layoutScheme = "light",
+}: {
+  section: BuilderSection;
+  layoutScheme?: "light" | "dark" | "auto";
+}) {
   return (
-    <SectionFrame section={section} extra="shop-builder-filters">
+    <SectionFrame
+      section={section}
+      layoutScheme={layoutScheme}
+      extra="shop-builder-filters"
+    >
       {section.title && <h2 className="shop-builder-title">{section.title}</h2>}
       <CategoryFiltersBlock />
     </SectionFrame>
   );
 }
 
-function BadgeGridSection({ section }: { section: BuilderSection }) {
+function BadgeGridSection({
+  section,
+  layoutScheme = "light",
+}: {
+  section: BuilderSection;
+  layoutScheme?: "light" | "dark" | "auto";
+}) {
   const badges = section.badges?.length
     ? section.badges
     : [
@@ -903,7 +986,11 @@ function BadgeGridSection({ section }: { section: BuilderSection }) {
       ];
 
   return (
-    <SectionFrame section={section} extra="shop-builder-badge-grid">
+    <SectionFrame
+      section={section}
+      layoutScheme={layoutScheme}
+      extra="shop-builder-badge-grid"
+    >
       <div>
         {section.eyebrow && (
           <p className="shop-builder-eyebrow">{section.eyebrow}</p>
@@ -1019,13 +1106,47 @@ async function ContentProductsBlock({
     categoryId: block.categoryId,
   });
 
+  const cardBorderRadiusStyle =
+    block.borderRadius !== undefined
+      ? {
+          "--builder-card-radius": `${block.borderRadius}px`,
+          "--product-card-radius": `${block.borderRadius}px`,
+        }
+      : {};
+
+  const cardBackgroundStyle =
+    block.elementBackgroundMode === "custom" && block.elementBackground
+      ? { "--builder-card-bg": block.elementBackground }
+      : block.elementBackgroundMode === "transparent"
+        ? { "--builder-card-bg": "transparent" }
+        : {};
+
+  const productStyleProps = {
+    ...cardBorderRadiusStyle,
+    ...cardBackgroundStyle,
+  } as React.CSSProperties;
+
   if (block.layoutVariant === "carousel") {
     return (
-      <ProductCarousel
-        products={products}
-        preset={block.panelStyle ?? block.cardPreset ?? "standard"}
-        typography={block.typography}
-      />
+      <div style={productStyleProps}>
+        <ProductCarousel
+          products={products}
+          preset={block.cardPreset ?? "standard"}
+          cardStyle={block.cardStyle}
+          cardTheme={block.panelStyle}
+          gridImageFrame={block.gridImageFrame}
+          imagePadding={block.imagePadding}
+          imageFit={block.imageFit}
+          imageRatio={block.imageRatio}
+          borderRadius={block.borderRadius}
+          addToCartStyle={block.addToCartStyle}
+          addToCartSize={block.addToCartSize}
+          addToCartDisplay={block.addToCartDisplay}
+          addToCartVisibility={block.addToCartVisibility}
+          addToCartPosition={block.addToCartPosition}
+          typography={block.typography}
+        />
+      </div>
     );
   }
   const resolvedCategoryTree =
@@ -1034,17 +1155,21 @@ async function ContentProductsBlock({
   return (
     <div
       className={`shop-builder-grid--margin-${blockLegacyGridMargin(block)} shop-card-preset--${block.panelStyle ?? "default"}`}
+      style={productStyleProps}
     >
       <CategoryWithFilters
         products={products}
         columns={block.columns}
         filterPosition={block.filterPosition ?? "hidden"}
         cardStyle={block.cardStyle}
-        cardPreset={block.panelStyle ?? block.cardPreset}
+        cardPreset={block.cardPreset}
+        cardTheme={block.panelStyle}
         pageSize={originalLimit}
         gridGap={block.gridGap}
         cardPadding={block.cardPadding}
         imagePadding={block.imagePadding}
+        imageFit={block.imageFit}
+        imageRatio={block.imageRatio}
         imageFrame={block.gridImageFrame}
         addToCartStyle={block.addToCartStyle}
         addToCartSize={block.addToCartSize}
@@ -2527,7 +2652,7 @@ function inferTypographyArea(
   return "body";
 }
 
-function rowStyle(rowItem: any, parentScheme: "light" | "dark" = "light"): CSSProperties {
+function rowStyle(rowItem: any, parentScheme: "light" | "dark" | "auto" = "light"): CSSProperties {
   const visual = rowItem?.rowVisualStyle as BuilderVisualStyle | undefined;
   const visualCss = visualStyleToCss(visual);
   const styleObj: any = {};
@@ -2557,7 +2682,10 @@ function rowStyle(rowItem: any, parentScheme: "light" | "dark" = "light"): CSSPr
     styleObj.borderRadius = `${rowItem.rowBorderRadius}px`;
   }
 
-  const resolvedScheme = resolveColorSchemeForBackground(rowItem?.rowBackground, parentScheme);
+  const resolvedScheme = resolveColorSchemeForBackground(
+    rowItem?.rowBackground,
+    parentScheme === "auto" ? "light" : parentScheme,
+  );
   const contextVars = getContextVars(resolvedScheme, rowItem?.rowBackground);
 
   return { ...styleObj, ...contextVars, ...visualCss };
@@ -2571,6 +2699,7 @@ function ContentLayoutSection({
   pageContent,
   categoryTree,
   activeCategorySlug,
+  layoutScheme = "light",
 }: {
   section: BuilderSection;
   product?: StorefrontBuilderProduct;
@@ -2579,6 +2708,7 @@ function ContentLayoutSection({
   pageContent?: ReactNode;
   categoryTree?: CategoryTreeItem[];
   activeCategorySlug?: string | null;
+  layoutScheme?: "light" | "dark" | "auto";
 }) {
   const items = section.layoutItems?.length
     ? section.layoutItems
@@ -2624,10 +2754,14 @@ function ContentLayoutSection({
     });
   });
 
-  const sectionColorScheme = resolveSectionColorScheme(section);
+  const sectionColorScheme = resolveSectionColorScheme(section, layoutScheme);
 
   return (
-    <SectionFrame section={section} extra="shop-builder-content-layout">
+    <SectionFrame
+      section={section}
+      layoutScheme={layoutScheme}
+      extra="shop-builder-content-layout"
+    >
       {(section.eyebrow || section.title || section.body) && (
         <div className="shop-builder-content-layout-heading">
           {section.eyebrow && (
@@ -2663,7 +2797,7 @@ function ContentLayoutSection({
           const isRowAntigravity = rowItem?.rowBackgroundEffect === "antigravity";
           const isFullRowTheme = isRowAntigravity && (rowItem.rowAntigravityVisualMode === undefined || rowItem.rowAntigravityVisualMode === "full");
           const rowAnimationAttrs = animationDataAttributes(rowItem?.rowAnimation);
-          const rowColorScheme = resolveColorSchemeForBackground(rowItem?.rowBackground, sectionColorScheme);
+          const rowColorScheme = resolveColorSchemeForBackground(rowItem?.rowBackground, sectionColorScheme === "auto" ? "light" : sectionColorScheme);
 
           return (
             <div
@@ -2802,7 +2936,13 @@ function ContentLayoutSection({
   );
 }
 
-function SliderSection({ section }: { section: BuilderSection }) {
+function SliderSection({
+  section,
+  layoutScheme = "light",
+}: {
+  section: BuilderSection;
+  layoutScheme?: "light" | "dark" | "auto";
+}) {
   const slides: CarouselSlide[] =
     section.slides?.map((slide, index) => ({
       id: slide.id ?? `${section.id}-slide-${index}`,
@@ -2818,7 +2958,11 @@ function SliderSection({ section }: { section: BuilderSection }) {
     })) ?? [];
 
   return (
-    <SectionFrame section={section} extra="shop-builder-slider">
+    <SectionFrame
+      section={section}
+      layoutScheme={layoutScheme}
+      extra="shop-builder-slider"
+    >
       <div className="shop-builder-slider-heading">
         <h2 className="shop-builder-title">{section.title}</h2>
         <BodyText className="shop-builder-body">{section.body}</BodyText>
@@ -2835,9 +2979,19 @@ function SliderSection({ section }: { section: BuilderSection }) {
   );
 }
 
-function EmbedSection({ section }: { section: BuilderSection }) {
+function EmbedSection({
+  section,
+  layoutScheme = "light",
+}: {
+  section: BuilderSection;
+  layoutScheme?: "light" | "dark" | "auto";
+}) {
   return (
-    <SectionFrame section={section} extra="shop-builder-embed">
+    <SectionFrame
+      section={section}
+      layoutScheme={layoutScheme}
+      extra="shop-builder-embed"
+    >
       <div className="shop-builder-embed-heading">
         {section.eyebrow && (
           <p className="shop-builder-eyebrow">{section.eyebrow}</p>
@@ -2865,6 +3019,7 @@ function BuilderSectionRenderer({
   breadcrumbItems,
   page,
   pageContent,
+  layoutScheme = "light",
 }: {
   section: BuilderSection;
   products?: ProductNode[];
@@ -2874,22 +3029,23 @@ function BuilderSectionRenderer({
   breadcrumbItems: { label: string; href?: string }[];
   page: BuilderLayoutKey;
   pageContent?: ReactNode;
+  layoutScheme?: "light" | "dark" | "auto";
 }) {
   if (!section.visible) return null;
 
   let content: ReactNode;
 
   if (section.kind === "hero") {
-    content = <HeroSection section={section} product={product} />;
+    content = <HeroSection section={section} product={product} layoutScheme={layoutScheme} />;
   } else if (section.kind === "recentlyViewed") {
     content = (
-      <SectionFrame section={section}>
+      <SectionFrame section={section} layoutScheme={layoutScheme}>
         <RecentlyViewedStrip />
       </SectionFrame>
     );
   } else if (section.kind === "productArchive") {
     content = (
-      <SectionFrame section={section} extra="shop-builder-products">
+      <SectionFrame section={section} layoutScheme={layoutScheme} extra="shop-builder-products">
         <Suspense fallback={<ProductsSkeleton />}>
           <BuilderProductsSection
             section={section}
@@ -2901,11 +3057,11 @@ function BuilderSectionRenderer({
       </SectionFrame>
     );
   } else if (section.kind === "filters") {
-    content = <FilterPillsSection section={section} />;
+    content = <FilterPillsSection section={section} layoutScheme={layoutScheme} />;
   } else if (section.kind === "promo") {
-    content = <PromoSection section={section} />;
+    content = <PromoSection section={section} layoutScheme={layoutScheme} />;
   } else if (section.kind === "badgeGrid") {
-    content = <BadgeGridSection section={section} />;
+    content = <BadgeGridSection section={section} layoutScheme={layoutScheme} />;
   } else if (section.kind === "contentLayout") {
     content = (
       <ContentLayoutSection
@@ -2916,12 +3072,13 @@ function BuilderSectionRenderer({
         pageContent={pageContent}
         categoryTree={categoryTree}
         activeCategorySlug={activeCategorySlug}
+        layoutScheme={layoutScheme}
       />
     );
   } else if (section.kind === "slider") {
-    content = <SliderSection section={section} />;
+    content = <SliderSection section={section} layoutScheme={layoutScheme} />;
   } else if (section.kind === "embed") {
-    content = <EmbedSection section={section} />;
+    content = <EmbedSection section={section} layoutScheme={layoutScheme} />;
   } else if (section.kind === "scrollPinnedDemo") {
     content = <ScrollPinnedDemo section={section} />;
   } else {
@@ -2982,9 +3139,31 @@ export default function StorefrontBuilderRenderer({
       : [{ label: "Home", href: "/" }, { label }]);
 
   const isHomePage = page === "home";
+  const designColorScheme = layout.design?.colorScheme;
+  const layoutScheme: "light" | "dark" | "auto" =
+    designColorScheme === "dark" || designColorScheme === "light" || designColorScheme === "auto"
+      ? designColorScheme
+      : "auto";
 
   return (
     <>
+      <script
+        key={layout.design?.colorScheme ?? "auto"}
+        dangerouslySetInnerHTML={{
+          __html: `
+            (function() {
+              const scheme = ${JSON.stringify(layout.design?.colorScheme ?? "auto")};
+              if (scheme === "dark") {
+                document.documentElement.dataset.theme = "dark";
+                document.documentElement.classList.add("dark");
+              } else if (scheme === "light") {
+                document.documentElement.dataset.theme = "light";
+                document.documentElement.classList.remove("dark");
+              }
+            })();
+          `.trim()
+        }}
+      />
       <style
         data-builder-page-shell
         dangerouslySetInnerHTML={{ __html: builderPageShellCss(layout) }}
@@ -3009,6 +3188,7 @@ export default function StorefrontBuilderRenderer({
               breadcrumbItems={resolvedBreadcrumbItems}
               page={page}
               pageContent={pageContent}
+              layoutScheme={layoutScheme}
             />
           ))}
         </div>

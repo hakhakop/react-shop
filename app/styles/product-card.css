@@ -25,6 +25,7 @@
 .product-image {
   width: var(--product-image-width, 100%);
   height: var(--product-image-height, 260px);
+  aspect-ratio: var(--product-image-aspect-ratio, auto);
   border-radius: calc(var(--product-card-radius, var(--radius-lg, 12px)) - 2px);
   background: var(--product-image-bg, #ffffff);
   overflow: hidden;
@@ -280,7 +281,7 @@
 
 .shop-card-preset--gallery .product-image,
 .product-card[data-card-preset="gallery"] .product-image {
-  aspect-ratio: 4 / 5;
+  aspect-ratio: var(--product-image-aspect-ratio, 4 / 5);
 }
 
 .shop-card-preset--editorial .product-card,
@@ -568,6 +569,54 @@
 .product-card[data-card-preset="princity-line"] .product-attribute-badge {
   background: color-mix(in srgb, var(--builder-text, #111111) 8%, transparent);
   color: var(--builder-text, #111111);
+}
+
+/* Explicit card themes win over composition presets. */
+.product-card[data-card-theme="dark"] {
+  --context-text: #f7f7f1;
+  --context-muted: #b8b8b0;
+  --context-surface: #24241f;
+  --context-card-bg: #151513;
+  --context-card-border: rgba(255, 255, 255, 0.12);
+  --builder-active-text: var(--context-text);
+  --builder-active-muted: var(--context-muted);
+  --builder-active-surface: var(--context-surface);
+  --builder-card-bg: var(--context-card-bg);
+  --builder-card-border: var(--context-card-border);
+  --product-card-bg: var(--context-card-bg);
+  --product-card-border: var(--context-card-border);
+  color: var(--context-text);
+}
+
+.product-card[data-card-theme="dark"] .product-title,
+.product-card[data-card-theme="dark"] .product-price {
+  color: var(--context-text);
+}
+
+.product-card[data-card-theme="dark"] .product-attribute-badge {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--context-text);
+}
+
+.product-card[data-card-theme="light"] {
+  --context-text: #111111;
+  --context-muted: #5f5f58;
+  --context-surface: #efefe9;
+  --context-card-bg: #ffffff;
+  --context-card-border: rgba(17, 17, 17, 0.12);
+  --builder-active-text: var(--context-text);
+  --builder-active-muted: var(--context-muted);
+  --builder-active-surface: var(--context-surface);
+  --builder-card-bg: var(--context-card-bg);
+  --builder-card-border: var(--context-card-border);
+  --product-card-bg: var(--context-card-bg);
+  --product-card-border: var(--context-card-border);
+  color: var(--context-text);
+}
+
+.product-card[data-card-theme="light"] .product-title,
+.product-card[data-card-theme="light"] .product-price {
+  color: var(--context-text);
 }
 
 .product-card:hover {

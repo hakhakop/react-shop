@@ -170,7 +170,6 @@ export default function ElementLibrary({
       draggable
       onClick={() => addElement(blockKind)}
       onDragStart={(event) => {
-        rememberRecent(blockKind);
         event.dataTransfer.setData(
           "application/x-builder-new-block",
           blockKind,
@@ -181,6 +180,7 @@ export default function ElementLibrary({
         );
         event.dataTransfer.effectAllowed = "copy";
       }}
+      onDragEnd={() => rememberRecent(blockKind)}
     >
       <span className="builder-element-library-icon">
         {onRenderLayoutBlockIcon(blockKind)}

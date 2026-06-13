@@ -12,6 +12,11 @@ import type {
   TypographyGroup,
   TypographySettings,
 } from "@/lib/builderTypography";
+import {
+  getProductImageStyleVars,
+  type ProductImageFit,
+  type ProductImageRatio,
+} from "@/lib/productCardImage";
 
 const MotionDiv = motion.div;
 
@@ -70,11 +75,35 @@ function QuickViewPortal({ children }: { children: ReactNode }) {
 
 export default function ProductCard({
   product,
-  preset, // currently just passed through if needed later
+  preset,
+  cardStyle,
+  cardTheme,
+  gridImageFrame,
+  imagePadding,
+  imageFit,
+  imageRatio,
+  borderRadius,
+  addToCartStyle,
+  addToCartSize,
+  addToCartDisplay,
+  addToCartVisibility,
+  addToCartPosition,
   typography,
 }: {
   product: BasicProduct;
   preset?: string;
+  cardStyle?: string | null;
+  cardTheme?: string | null;
+  gridImageFrame?: string | null;
+  imagePadding?: string | null;
+  imageFit?: ProductImageFit | null;
+  imageRatio?: ProductImageRatio | null;
+  borderRadius?: number | null;
+  addToCartStyle?: string | null;
+  addToCartSize?: string | null;
+  addToCartDisplay?: string | null;
+  addToCartVisibility?: string | null;
+  addToCartPosition?: string | null;
   typography?: TypographySettings | TypographyGroup;
 }) {
 
@@ -129,10 +158,108 @@ export default function ProductCard({
 
   const [isQuickViewOpen, setIsQuickViewOpen] = useState(false);
 
+  const normalizedCardPreset = preset ?? "standard";
+  const normalizedCardTheme = cardTheme ?? "default";
+
+  const normalizedCartStyle =
+    addToCartStyle === "dark" ||
+    addToCartStyle === "light" ||
+    addToCartStyle === "inherit"
+      ? addToCartStyle
+      : "blue";
+
+  const normalizedCartSize =
+    addToCartSize === "compact" ||
+    addToCartSize === "large" ||
+    addToCartSize === "full"
+      ? addToCartSize
+      : "medium";
+
+  const normalizedCartPosition =
+    addToCartPosition === "under-price" ||
+    addToCartPosition === "under-wishlist"
+      ? addToCartPosition
+      : "below";
+
+  const normalizedCartDisplay = addToCartDisplay === "icon" ? "icon" : "button";
+
+  const sizeStyle: React.CSSProperties =
+    normalizedCartDisplay === "icon"
+      ? {
+          width: 42,
+          minWidth: 42,
+          height: 42,
+          minHeight: 42,
+          padding: 0,
+          fontSize: 0,
+        }
+      : normalizedCartSize === "compact"
+        ? { minWidth: 96, minHeight: 32, padding: "0 14px", fontSize: 11 }
+        : normalizedCartSize === "large"
+          ? { minWidth: 168, minHeight: 48, padding: "0 28px", fontSize: 13 }
+          : normalizedCartSize === "full"
+            ? { width: "100%", minHeight: 54, padding: "0 24px", fontSize: 13 }
+            : { minWidth: 128, minHeight: 38, padding: "0 20px", fontSize: 12 };
+
+  const colorStyle: React.CSSProperties =
+    normalizedCartStyle === "dark"
+      ? { background: "#111111", borderColor: "#111111", color: "#ffffff" }
+      : normalizedCartStyle === "light"
+        ? {
+            background: "#ffffff",
+            borderColor: "rgba(17, 17, 17, 0.14)",
+            color: "#111111",
+            boxShadow: "inset 0 0 0 1px rgba(17, 17, 17, 0.08)",
+          }
+        : normalizedCartStyle === "inherit"
+          ? {
+              background:
+                "var(--builder-active-button-bg, var(--text-main, #111111))",
+              borderColor:
+                "var(--builder-active-button-bg, var(--text-main, #111111))",
+              color: "var(--builder-active-button-text, #ffffff)",
+            }
+          : { background: "#0d7cff", borderColor: "#0d7cff", color: "#ffffff" };
+
+  const cartButtonStyle = {
+    ...sizeStyle,
+    ...colorStyle,
+    borderRadius: 999,
+    fontWeight: 800,
+    letterSpacing: "0.06em",
+    boxShadow: colorStyle.boxShadow ?? "none",
+  };
+
+  const cardStyleVars = {
+    ...getProductImageStyleVars(imageFit, imageRatio),
+    ...(borderRadius !== undefined && borderRadius !== null
+      ? {
+          "--builder-card-radius": `${borderRadius}px`,
+          "--product-card-radius": `${borderRadius}px`,
+        }
+      : {}),
+  } as React.CSSProperties;
+
+  const cartAction = (
+    <div className="product-card-actions-row">
+      <AddToCartButton
+        id={product.id}
+        slug={product.slug}
+        name={product.name}
+        priceNumber={priceNumber}
+        imageUrl={imageUrl}
+        style={cartButtonStyle}
+        display={normalizedCartDisplay}
+      />
+    </div>
+  );
+
   return (
     <MotionDiv
-      className="product-card"
-      data-card-preset={preset}
+      className="product-card shop-archive-card"
+      data-card-preset={normalizedCardPreset}
+      data-card-theme={normalizedCardTheme}
+      style={cardStyleVars}
       transition={{ type: "spring", stiffness: 260, damping: 22 }}
     >
       <div className="product-card-inner">
@@ -144,6 +271,8 @@ export default function ProductCard({
             name={product.name}
             imageUrl={imageUrl}
           />
+
+          {normalizedCartPosition === "under-wishlist" && cartAction}
 
           <button
             type="button"
@@ -187,6 +316,8 @@ export default function ProductCard({
             {formattedPrice && (
               <div className="product-price">{formattedPrice}</div>
             )}
+
+            {normalizedCartPosition === "under-price" && cartAction}
           </div>
 
           {attributes.length > 0 && (
@@ -203,15 +334,7 @@ export default function ProductCard({
           )}
         </Link>
 
-        <div className="product-card-actions-row">
-          <AddToCartButton
-            id={product.id}
-            slug={product.slug}
-            name={product.name}
-            priceNumber={priceNumber}
-            imageUrl={imageUrl}
-          />
-        </div>
+        {normalizedCartPosition === "below" && cartAction}
       </div>
 
       {/* Quick View modal in a portal (overlays whole page) */}

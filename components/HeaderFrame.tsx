@@ -60,10 +60,16 @@ export default function HeaderFrame({
     const updateAutoScheme = () => {
       const firstSection = document.querySelector(".shop-builder-section");
       if (firstSection) {
-        if (firstSection.classList.contains("shop-builder-section--scheme-dark")) {
+        if (
+          firstSection.classList.contains("shop-builder-section--scheme-dark") ||
+          firstSection.classList.contains("builder-preview-section--scheme-dark")
+        ) {
           setDetectedTextMode("light");
           return;
-        } else if (firstSection.classList.contains("shop-builder-section--scheme-light")) {
+        } else if (
+          firstSection.classList.contains("shop-builder-section--scheme-light") ||
+          firstSection.classList.contains("builder-preview-section--scheme-light")
+        ) {
           setDetectedTextMode("dark");
           return;
         }

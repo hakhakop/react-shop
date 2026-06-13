@@ -24,6 +24,11 @@ import WishlistToggle from "./WishlistToggle";
 import AddToCartButton from "./AddToCartButton";
 import type { CategoryTreeItem } from "../lib/categories";
 import type { ProductNode } from "../lib/products";
+import {
+  getProductImageStyleVars,
+  type ProductImageFit,
+  type ProductImageRatio,
+} from "@/lib/productCardImage";
 
 type Props = {
   products: ProductNode[];
@@ -34,10 +39,13 @@ type Props = {
   filterPosition?: "left" | "top" | "drawer" | "hidden" | string | null;
   cardStyle?: "flat" | "soft" | "lined" | string | null;
   cardPreset?: string | null;
+  cardTheme?: string | null;
   pageSize?: number | null;
   gridGap?: string | null;
   cardPadding?: string | null;
   imagePadding?: string | null;
+  imageFit?: ProductImageFit | null;
+  imageRatio?: ProductImageRatio | null;
   imageFrame?: string | null;
   addToCartStyle?: string | null;
   addToCartSize?: string | null;
@@ -264,10 +272,13 @@ export default function CategoryWithFilters({
   filterPosition = "left",
   cardStyle = "flat",
   cardPreset = "standard",
+  cardTheme = "default",
   pageSize,
   gridGap,
   cardPadding,
   imagePadding,
+  imageFit,
+  imageRatio,
   imageFrame,
   addToCartStyle,
   addToCartSize,
@@ -333,15 +344,50 @@ export default function CategoryWithFilters({
     cardPreset === "compact" ||
     cardPreset === "minimal" ||
     cardPreset === "luxury" ||
-    cardPreset === "default" ||
+    cardPreset === "princity" ||
+    cardPreset === "princity-flat" ||
+    cardPreset === "princity-line" ||
     cardPreset === "secondary" ||
     cardPreset === "dark" ||
     cardPreset === "light" ||
     cardPreset === "clean-shadow" ||
     cardPreset === "flat-dark" ||
-    cardPreset === "flat-white"
+    cardPreset === "flat-white" ||
+    cardPreset === "antigravity"
       ? cardPreset
       : "standard";
+
+  let normalizedCardTheme =
+    cardTheme === "princity" ||
+    cardTheme === "princity-flat" ||
+    cardTheme === "princity-line" ||
+    cardTheme === "secondary" ||
+    cardTheme === "dark" ||
+    cardTheme === "light" ||
+    cardTheme === "clean-shadow" ||
+    cardTheme === "flat-dark" ||
+    cardTheme === "flat-white" ||
+    cardTheme === "antigravity"
+      ? cardTheme
+      : "default";
+
+  if (normalizedCardTheme === "default") {
+    if (
+      normalizedCardPreset === "princity" ||
+      normalizedCardPreset === "princity-flat" ||
+      normalizedCardPreset === "princity-line" ||
+      normalizedCardPreset === "secondary" ||
+      normalizedCardPreset === "dark" ||
+      normalizedCardPreset === "light" ||
+      normalizedCardPreset === "clean-shadow" ||
+      normalizedCardPreset === "flat-dark" ||
+      normalizedCardPreset === "flat-white" ||
+      normalizedCardPreset === "antigravity" ||
+      normalizedCardPreset === "luxury"
+    ) {
+      normalizedCardTheme = normalizedCardPreset;
+    }
+  }
   const normalizedCartStyle =
     addToCartStyle === "dark" ||
     addToCartStyle === "light" ||
@@ -820,7 +866,8 @@ export default function CategoryWithFilters({
   return (
     <div
       data-view-mode={viewMode}
-      className={`shop-filter-layout shop-filter-layout--${normalizedFilterPosition} shop-card-style--${normalizedCardStyle} shop-card-preset--${normalizedCardPreset} shop-cart-button--${normalizedCartStyle} shop-cart-size--${normalizedCartSize} shop-cart-position--${normalizedCartPosition} shop-cart-visibility--${normalizedCartVisibility} shop-cart-display--${normalizedCartDisplay} shop-image-padding--${
+      data-card-theme={normalizedCardTheme}
+      className={`shop-filter-layout shop-filter-layout--${normalizedFilterPosition} shop-card-style--${normalizedCardStyle} shop-card-preset--${normalizedCardPreset} ${normalizedCardTheme && normalizedCardTheme !== "default" ? `shop-card-preset--${normalizedCardTheme}` : ""} shop-cart-button--${normalizedCartStyle} shop-cart-size--${normalizedCartSize} shop-cart-position--${normalizedCartPosition} shop-cart-visibility--${normalizedCartVisibility} shop-cart-display--${normalizedCartDisplay} shop-image-padding--${
         imagePadding === "frameless" || imagePadding === "none"
           ? "none"
           : imagePadding || "large"
@@ -1243,6 +1290,8 @@ export default function CategoryWithFilters({
                       viewMode === "list" ? "shop-archive-card--list" : ""
                     }`}
                     data-card-preset={normalizedCardPreset}
+                    data-card-theme={normalizedCardTheme}
+                    style={getProductImageStyleVars(imageFit, imageRatio)}
                   >
                     <div className="product-card-top-right">
                       <WishlistToggle

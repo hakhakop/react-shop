@@ -280,6 +280,8 @@ export type BuilderLayoutBlock = {
   gridMargin?: "inherit" | "none" | "small" | "medium" | "large";
   cardPadding?: "none" | "small" | "medium" | "large" | "max";
   imagePadding?: "none" | "small" | "medium" | "large" | "max";
+  imageFit?: "contain" | "cover" | "fill";
+  imageRatio?: "auto" | "square" | "4:5" | "3:4";
   gridImagePadding?: "frameless" | "small" | "medium" | "max";
   gridContentPadding?: "none" | "small" | "medium" | "large";
   gridImageFrame?: "none" | "soft";
@@ -403,6 +405,8 @@ export type BuilderSection = {
   gridGap?: "none" | "small" | "medium" | "large" | "max";
   cardPadding?: "none" | "small" | "medium" | "large" | "max";
   imagePadding?: "none" | "small" | "medium" | "large" | "max";
+  imageFit?: "contain" | "cover" | "fill";
+  imageRatio?: "auto" | "square" | "4:5" | "3:4";
   borderRadius?: number;
   addToCartStyle?: "blue" | "dark" | "light" | "inherit";
   addToCartSize?: "compact" | "medium" | "large" | "full";

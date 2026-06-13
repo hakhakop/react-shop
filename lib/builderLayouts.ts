@@ -95,6 +95,8 @@ export type BuilderLayoutBlock = {
   gridLimit?: number;
   cardPadding?: string;
   imagePadding?: string;
+  imageFit?: "contain" | "cover" | "fill";
+  imageRatio?: "auto" | "square" | "4:5" | "3:4";
   source?: string;
   categoryId?: string;
   hiddenCategorySlugs?: string[];
@@ -266,6 +268,8 @@ export type BuilderSection = {
   gridGap?: string;
   cardPadding?: string;
   imagePadding?: string;
+  imageFit?: "contain" | "cover" | "fill";
+  imageRatio?: "auto" | "square" | "4:5" | "3:4";
   borderRadius?: number;
   addToCartStyle?: string;
   addToCartSize?: string;

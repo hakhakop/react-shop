@@ -1293,6 +1293,161 @@ body[data-storefront-preset="princity"]
   background: transparent;
 }
 
+/* Products theme contract: inherited dark mode and explicit Dark use the same
+   readable neutral palette. Explicit branded themes keep their own colors. */
+[data-theme="dark"] .shop-filter-layout[data-card-theme="default"],
+.shop-filter-layout[data-card-theme="dark"] {
+  --text-main: #f7f7f1;
+  --text-muted: #b8b8b0;
+  --surface-main: #151513;
+  --surface-muted: #24241f;
+  --border-soft: rgba(255, 255, 255, 0.14);
+  --shop-filter-panel-bg: #151513;
+  --shop-filter-pill-bg: #24241f;
+  --shop-filter-pill-hover: #30302b;
+  --shop-filter-pill-border: rgba(255, 255, 255, 0.14);
+  --shop-filter-active-bg: #f7f7f1;
+  --shop-filter-active-text: #111111;
+}
+
+.shop-filter-layout[data-card-theme="light"] {
+  --text-main: #111111;
+  --text-muted: #5f5f58;
+  --surface-main: #ffffff;
+  --surface-muted: #efefe9;
+  --border-soft: rgba(17, 17, 17, 0.12);
+  --shop-filter-panel-bg: #ffffff;
+  --shop-filter-pill-bg: #efefe9;
+  --shop-filter-pill-hover: #dfdfd9;
+  --shop-filter-pill-border: rgba(17, 17, 17, 0.14);
+  --shop-filter-active-bg: #111111;
+  --shop-filter-active-text: #ffffff;
+}
+
+[data-theme="dark"]
+  .shop-filter-layout:is(
+    [data-card-theme="princity"],
+    [data-card-theme="princity-flat"],
+    [data-card-theme="princity-line"],
+    [data-card-theme="secondary"],
+    [data-card-theme="clean-shadow"],
+    [data-card-theme="flat-white"]
+  ) {
+  --text-main: #111111;
+  --text-muted: #5f5f58;
+  --surface-main: #efefe9;
+  --surface-muted: #dfdfd9;
+  --border-soft: rgba(17, 17, 17, 0.14);
+  --shop-filter-pill-border: rgba(17, 17, 17, 0.14);
+  --shop-filter-active-bg: #111111;
+  --shop-filter-active-text: #ffffff;
+}
+
+[data-theme="dark"]
+  .shop-filter-layout:is(
+    [data-card-theme="flat-dark"]
+  ) {
+  --text-main: #f7f7f1;
+  --text-muted: #b8b8b0;
+  --surface-main: #151513;
+  --surface-muted: #24241f;
+  --border-soft: rgba(255, 255, 255, 0.14);
+  --shop-filter-panel-bg: #151513;
+  --shop-filter-pill-bg: #24241f;
+  --shop-filter-pill-hover: #30302b;
+  --shop-filter-pill-border: rgba(255, 255, 255, 0.14);
+  --shop-filter-active-bg: #f7f7f1;
+  --shop-filter-active-text: #111111;
+}
+
+[data-theme="dark"] .shop-filter-layout[data-card-theme="default"] .shop-filter-panel,
+.shop-filter-layout[data-card-theme="dark"] .shop-filter-panel,
+.shop-filter-layout[data-card-theme="light"] .shop-filter-panel {
+  border-color: var(--shop-filter-pill-border);
+  background: var(--shop-filter-panel-bg);
+  color: var(--text-main);
+}
+
+[data-theme="dark"] .shop-filter-layout[data-card-theme="default"]
+  :is(.shop-filter-title, .shop-filter-subtitle, .shop-filter-group label,
+    .shop-filter-facet-label, .shop-filter-summary),
+.shop-filter-layout[data-card-theme="dark"]
+  :is(.shop-filter-title, .shop-filter-subtitle, .shop-filter-group label,
+    .shop-filter-facet-label, .shop-filter-summary),
+.shop-filter-layout[data-card-theme="light"]
+  :is(.shop-filter-title, .shop-filter-subtitle, .shop-filter-group label,
+    .shop-filter-facet-label, .shop-filter-summary) {
+  color: var(--text-main);
+}
+
+[data-theme="dark"] .shop-filter-layout[data-card-theme="default"]
+  :is(.shop-filter-input-wrap, .shop-filter-select-wrap, .shop-filter-price-grid input,
+    .shop-filter-chip-row button),
+.shop-filter-layout[data-card-theme="dark"]
+  :is(.shop-filter-input-wrap, .shop-filter-select-wrap, .shop-filter-price-grid input,
+    .shop-filter-chip-row button),
+.shop-filter-layout[data-card-theme="light"]
+  :is(.shop-filter-input-wrap, .shop-filter-select-wrap, .shop-filter-price-grid input,
+    .shop-filter-chip-row button) {
+  border-color: var(--shop-filter-pill-border);
+  background: var(--shop-filter-pill-bg);
+  color: var(--text-main);
+}
+
+[data-theme="dark"] .shop-filter-layout[data-card-theme="default"]
+  :is(.shop-filter-input-wrap input, .shop-filter-select-wrap select,
+    .shop-filter-price-grid input),
+.shop-filter-layout[data-card-theme="dark"]
+  :is(.shop-filter-input-wrap input, .shop-filter-select-wrap select,
+    .shop-filter-price-grid input),
+.shop-filter-layout[data-card-theme="light"]
+  :is(.shop-filter-input-wrap input, .shop-filter-select-wrap select,
+    .shop-filter-price-grid input) {
+  color: var(--text-main);
+}
+
+[data-theme="dark"] .shop-filter-layout[data-card-theme="default"]
+  .shop-filter-chip-row button:is(:hover, .is-selected),
+.shop-filter-layout[data-card-theme="dark"]
+  .shop-filter-chip-row button:is(:hover, .is-selected),
+.shop-filter-layout[data-card-theme="light"]
+  .shop-filter-chip-row button:is(:hover, .is-selected) {
+  border-color: var(--shop-filter-active-bg);
+  background: var(--shop-filter-active-bg);
+  color: var(--shop-filter-active-text);
+}
+
+[data-theme="dark"] .shop-filter-layout[data-card-theme="default"] .shop-archive-card,
+[data-theme="dark"] .product-carousel[data-card-theme="default"] .shop-archive-card,
+.shop-filter-layout[data-card-theme="dark"] .shop-archive-card,
+.product-carousel[data-card-theme="dark"] .shop-archive-card {
+  --context-text: #f7f7f1;
+  --context-muted: #b8b8b0;
+  --context-surface: #24241f;
+  --context-card-bg: #151513;
+  --context-card-border: rgba(255, 255, 255, 0.12);
+  --builder-active-text: var(--context-text);
+  --builder-active-muted: var(--context-muted);
+  --builder-active-surface: var(--context-surface);
+  --builder-card-bg: var(--context-card-bg);
+  --builder-card-border: var(--context-card-border);
+  --builder-card-image-bg: var(--context-surface);
+  --product-card-bg: var(--context-card-bg);
+  --product-card-border: var(--context-card-border);
+  color: var(--context-text);
+}
+
+[data-theme="dark"] .shop-filter-layout[data-card-theme="default"]
+  .shop-archive-card :is(.product-title, .product-price),
+[data-theme="dark"] .product-carousel[data-card-theme="default"]
+  .shop-archive-card :is(.product-title, .product-price),
+.shop-filter-layout[data-card-theme="dark"]
+  .shop-archive-card :is(.product-title, .product-price),
+.product-carousel[data-card-theme="dark"]
+  .shop-archive-card :is(.product-title, .product-price) {
+  color: var(--context-text);
+}
+
 /* Antigravity Preset for WooCommerce Archive Cards */
 .shop-card-preset--antigravity .shop-archive-card {
   background: linear-gradient(135deg, rgba(17, 12, 38, 0.8) 0%, rgba(8, 5, 20, 0.9) 100%) !important;

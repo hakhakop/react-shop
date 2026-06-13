@@ -1,27 +1,46 @@
 .product-carousel {
   position: relative;
   width: 100%;
+  min-width: 0;
+  container-name: product-carousel;
+  container-type: inline-size;
+  --product-carousel-gap: clamp(12px, 1.5vw, 20px);
 }
 
 .product-carousel__viewport {
+  width: 100%;
+  min-width: 0;
   overflow: hidden;
 }
 
 .product-carousel__container {
   display: flex;
+  gap: var(--product-carousel-gap);
+  min-width: 0;
+  touch-action: pan-y pinch-zoom;
 }
 
 .product-carousel__slide {
-  flex: 0 0 80%;
-  max-width: 80%;
-  padding-right: 1rem;
+  flex: 0 0 min(84%, 320px);
+  min-width: 0;
+  max-width: none;
 }
 
-/* Desktop: 4 cards visible, for example */
-@media (min-width: 1024px) {
+@container product-carousel (min-width: 560px) {
   .product-carousel__slide {
-    flex: 0 0 25%;
-    max-width: 25%;
+    flex-basis: calc((100% - var(--product-carousel-gap)) / 2);
+  }
+}
+
+@container product-carousel (min-width: 840px) {
+  .product-carousel__slide {
+    flex-basis: calc((100% - (2 * var(--product-carousel-gap))) / 3);
+  }
+}
+
+@container product-carousel (min-width: 1120px) {
+  .product-carousel__slide {
+    flex-basis: calc((100% - (3 * var(--product-carousel-gap))) / 4);
   }
 }
 
