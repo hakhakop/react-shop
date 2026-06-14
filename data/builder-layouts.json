@@ -197,7 +197,7 @@
                   {
                     "id": "grid-item-mq4zvogn",
                     "eyebrow": "01",
-                    "title": "🏥 Բժշկական կենտրոն",
+                    "title": "Բժշկական կենտրոն",
                     "meta": "Meta",
                     "text": "<p>Լայն typography, CTA, proof cards և slider-ային ներկայացումներ։</p><p></p><p></p>",
                     "buttonLabel": "Learn more",
@@ -271,7 +271,7 @@
                 "typography": {
                   "title": {
                     "fontWeight": "800",
-                    "fontSize": "36",
+                    "fontSize": "28",
                     "color": "#ffffff"
                   }
                 }
@@ -280,11 +280,13 @@
           }
         ],
         "layoutRows": 2,
-        "backgroundEffect": "none",
+        "backgroundEffect": "webgl_waves",
         "antigravityGridDensity": "normal",
         "antigravityVisualMode": "no-grid",
         "antigravityShowGrid": false,
-        "antigravityParticleCount": 300
+        "antigravityParticleCount": 300,
+        "antigravitySpeed": 0.1,
+        "antigravityGlowIntensity": 0.2
       },
       {
         "id": "contentLayout-mq02cfbq-x0edv",
@@ -313,14 +315,15 @@
                 "eyebrow": "Featured",
                 "title": "Ընտրեք ձեր փաթեթը",
                 "body": "Սկսեք այն լուծումից, որն առավել համապատասխանում է ձեր նպատակին։Հետագայում հնարավոր է ընդլայնել և զարգացնել կայքը։",
-                "buttonLabel": "Learn more",
-                "buttonUrl": "/",
+                "buttonLabel": "",
+                "buttonUrl": "",
                 "carouselSettings": {
                   "variant": "default"
                 },
                 "animation": {
                   "preset": "none"
-                }
+                },
+                "elementAlign": "center"
               },
               {
                 "id": "packages-grid",
@@ -1134,7 +1137,7 @@
         ]
       }
     ],
-    "updatedAt": "2026-06-14T05:50:10.363Z"
+    "updatedAt": "2026-06-14T07:58:14.040Z"
   },
   "shop": {
     "version": 1,
