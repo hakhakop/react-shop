@@ -39,8 +39,8 @@
         "backgroundMode": "full",
         "contentMode": "boxed",
         "colorScheme": "inherit",
-        "topSpacing": "3xl",
-        "bottomSpacing": "3xl",
+        "topSpacing": "inherit",
+        "bottomSpacing": "inherit",
         "topMargin": "none",
         "bottomMargin": "none",
         "layout": "whole",
@@ -125,7 +125,9 @@
           "effects": {
             "minHeight": ""
           }
-        }
+        },
+        "contentVerticalAlign": "center",
+        "sectionHeight": "viewport"
       },
       {
         "id": "contentLayout-mq4z4n9g-2ttwl",
@@ -135,10 +137,10 @@
         "backgroundMode": "full",
         "contentMode": "boxed",
         "colorScheme": "inherit",
-        "topSpacing": "sm",
-        "bottomSpacing": "sm",
+        "topSpacing": "inherit",
+        "bottomSpacing": "inherit",
         "topMargin": "none",
-        "bottomMargin": "sm",
+        "bottomMargin": "none",
         "visible": true,
         "eyebrow": "",
         "body": "",
@@ -169,7 +171,7 @@
                 "elementAlign": "center"
               }
             ],
-            "rowTopMargin": "md"
+            "rowTopMargin": "inherit"
           },
           {
             "id": "layout-item-mq4z4n9g-1",
@@ -294,8 +296,8 @@
         "colorScheme": "inherit",
         "topSpacing": "inherit",
         "bottomSpacing": "inherit",
-        "topMargin": "inherit",
-        "bottomMargin": "inherit",
+        "topMargin": "none",
+        "bottomMargin": "none",
         "visible": true,
         "eyebrow": "",
         "body": "",
@@ -513,8 +515,8 @@
         "colorScheme": "inherit",
         "topSpacing": "inherit",
         "bottomSpacing": "inherit",
-        "topMargin": "inherit",
-        "bottomMargin": "inherit",
+        "topMargin": "none",
+        "bottomMargin": "none",
         "visible": true,
         "eyebrow": "",
         "body": "",
@@ -722,8 +724,8 @@
         "colorScheme": "inherit",
         "topSpacing": "inherit",
         "bottomSpacing": "inherit",
-        "topMargin": "inherit",
-        "bottomMargin": "inherit",
+        "topMargin": "none",
+        "bottomMargin": "none",
         "visible": true,
         "layout": "thirds-2-1",
         "layoutColumns": 2,
@@ -1132,7 +1134,7 @@
         ]
       }
     ],
-    "updatedAt": "2026-06-13T13:57:00.051Z"
+    "updatedAt": "2026-06-14T05:50:10.363Z"
   },
   "shop": {
     "version": 1,
@@ -1519,7 +1521,14 @@
       "headingFontFamily": "inherit",
       "headingSize": "clamp(42px, 8vw, 126px)",
       "headingWeight": "760",
-      "headingLineHeight": "0.92"
+      "headingLineHeight": "0.92",
+      "cardBg": "#efefe9",
+      "cardRadius": "8px",
+      "cardBorder": "transparent",
+      "cardShadow": "0 12px 30px rgba(17,17,17,0.06)",
+      "cardShadowHover": "0 18px 42px rgba(17,17,17,0.1)",
+      "cardImageBg": "#ffffff",
+      "cardImagePadding": "clamp(22px, 2.4vw, 36px)"
     },
     "sections": [
       {
@@ -1555,21 +1564,47 @@
         "layoutRows": 1
       },
       {
-        "id": "template-category-products",
-        "kind": "productArchive",
-        "title": "Category Products",
+        "id": "contentLayout-mqdb2y1v-9rq7o",
+        "kind": "contentLayout",
+        "title": "",
         "background": "#ffffff",
         "backgroundMode": "boxed",
-        "contentMode": "full",
+        "contentMode": "boxed",
         "colorScheme": "inherit",
-        "columns": 4,
-        "filterPosition": "left",
-        "cardStyle": "flat",
-        "cardPreset": "standard",
-        "source": "category",
-        "gridLimit": 12,
-        "layoutVariant": "grid",
-        "visible": true
+        "topSpacing": "inherit",
+        "bottomSpacing": "inherit",
+        "topMargin": "inherit",
+        "bottomMargin": "inherit",
+        "visible": true,
+        "eyebrow": "",
+        "body": "",
+        "layout": "whole",
+        "layoutColumns": 1,
+        "layoutItems": [
+          {
+            "id": "layout-item-mqdb2y1v-1",
+            "blocks": [
+              {
+                "id": "products-block-mqdb339g-l350t",
+                "kind": "products",
+                "title": "Products",
+                "source": "all",
+                "layoutVariant": "grid",
+                "columns": 4,
+                "gridLimit": 12,
+                "filterPosition": "left",
+                "cardStyle": "flat",
+                "cardPreset": "standard",
+                "panelStyle": "default",
+                "imageFit": "cover",
+                "imageRatio": "3:4",
+                "cardPadding": "small",
+                "imagePadding": "none"
+              }
+            ]
+          }
+        ],
+        "layoutRows": 1
       },
       {
         "id": "recentlyViewed-mp0sp01l-v8tsp",
@@ -1583,7 +1618,7 @@
         "layout": "carousel"
       }
     ],
-    "updatedAt": "2026-05-27T07:33:23.450Z"
+    "updatedAt": "2026-06-14T04:51:31.251Z"
   },
   "product-single": {
     "version": 1,

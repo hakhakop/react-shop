@@ -581,7 +581,9 @@ function sectionClassName(
     section.visualStyle as BuilderVisualStyle | undefined,
   );
   const srClass = isScrollRevealPreset(section.animation) ? "shop-builder-section--scroll-reveal" : "";
-  return `shop-builder-section shop-builder-section--${mode} shop-builder-section--content-${contentMode} shop-builder-section--scheme-${scheme} ${visualClass} ${animationClassName(section.animation)} ${srClass} ${extra}`.trim();
+  const heightClass = `shop-builder-section--height-${section.sectionHeight ?? "auto"}`;
+  const verticalAlignClass = `shop-builder-section--align-${section.contentVerticalAlign ?? "top"}`;
+  return `shop-builder-section shop-builder-section--${mode} shop-builder-section--content-${contentMode} shop-builder-section--scheme-${scheme} ${heightClass} ${verticalAlignClass} ${visualClass} ${animationClassName(section.animation)} ${srClass} ${extra}`.trim();
 }
 
 const scrollRevealPresets = new Set([

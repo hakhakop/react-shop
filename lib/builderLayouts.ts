@@ -252,6 +252,8 @@ export type BuilderSection = {
   antigravityVisualMode?: string;
   antigravityInteractionScope?: string;
   contentMode?: string;
+  sectionHeight?: "auto" | "viewport" | "viewport-80";
+  contentVerticalAlign?: "top" | "center" | "bottom";
   colorScheme?: string;
   layout?: string;
   topSpacing?: string;

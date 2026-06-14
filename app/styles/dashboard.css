@@ -2866,6 +2866,11 @@
     background-color 160ms ease;
 }
 
+.builder-preview-section.shop-builder-section--height-viewport,
+.builder-preview-section.shop-builder-section--height-viewport-80 {
+  display: flex;
+}
+
 .builder-preview-canvas .shop-builder-section--full {
   width: 100cqw;
   margin-left: 50%;
@@ -5854,6 +5859,34 @@ body[data-storefront-preset="princity"]
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
+}
+
+.builder-style-side-controls {
+  display: grid;
+  gap: 8px;
+}
+
+.builder-style-side-control {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr);
+  gap: 8px;
+  align-items: center;
+}
+
+.builder-style-side-control:has(input) {
+  grid-template-columns: 64px minmax(0, 1fr) minmax(84px, 0.72fr);
+}
+
+.builder-style-side-control > span {
+  color: var(--builder-ui-muted);
+  font-size: 11px;
+  text-transform: capitalize;
+}
+
+.builder-style-side-control select,
+.builder-style-side-control input {
+  min-width: 0;
+  width: 100%;
 }
 
 .builder-style-side-grid label,

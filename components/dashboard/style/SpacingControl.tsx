@@ -5,7 +5,9 @@ import type {
   BuilderSpacingSides,
 } from "@/lib/builderVisualStyle";
 import {
+  BUILDER_SPACING_SCALE,
   resolveBuilderSpacing,
+  TOKEN_LABELS,
   type BuilderSpacingContext,
 } from "@/lib/builderSpacing";
 
@@ -17,13 +19,23 @@ const PRESETS: { label: string; value: BuilderSpacingPreset }[] = [
   { label: "MD", value: "md" },
   { label: "LG", value: "lg" },
   { label: "XL", value: "xl" },
+  { label: "2XL", value: "2xl" },
+  { label: "3XL", value: "3xl" },
 ];
+
+const SIDES = ["top", "right", "bottom", "left"] as const;
+type SpacingSide = (typeof SIDES)[number];
 
 function normalizedPreset(value?: string) {
   if (value === "small") return "sm";
   if (value === "medium") return "md";
   if (value === "large") return "lg";
   return value;
+}
+
+function isPresetValue(value?: string) {
+  const normalized = normalizedPreset(value);
+  return PRESETS.some((preset) => preset.value === normalized);
 }
 
 type Props = {
@@ -46,7 +58,7 @@ export default function SpacingControl({
   const v = value ?? { linked: true };
   const linked = v.linked !== false;
   const globalSides = inheritedValue
-    ? (["top", "right", "bottom", "left"] as const)
+    ? SIDES
         .map((side) => {
           const raw = inheritedValue[side] ?? inheritedValue.top;
           return `${side.charAt(0).toUpperCase()} ${resolveBuilderSpacing(undefined, context, raw).label}`;
@@ -59,7 +71,7 @@ export default function SpacingControl({
   }
 
   function setSide(
-    side: "top" | "right" | "bottom" | "left",
+    side: SpacingSide,
     next: string,
   ) {
     if (linked) {
@@ -67,6 +79,65 @@ export default function SpacingControl({
       return;
     }
     patch({ [side]: next });
+  }
+
+  function inheritedSideValue(side: SpacingSide) {
+    return inheritedValue?.[side] ?? inheritedValue?.top;
+  }
+
+  function selectValue(side: SpacingSide) {
+    const raw = linked ? v.top : v[side];
+    const normalized = normalizedPreset(raw ?? "inherit");
+    return isPresetValue(normalized) ? normalized : "custom";
+  }
+
+  function chooseValue(side: SpacingSide, next: string) {
+    if (next !== "custom") {
+      setSide(side, next);
+      return;
+    }
+
+    const current = linked ? v.top : v[side];
+    if (current && !isPresetValue(current)) return;
+    const resolved = resolveBuilderSpacing(
+      current ?? "inherit",
+      context,
+      inheritedSideValue(side),
+    );
+    setSide(side, `${resolved.px}px`);
+  }
+
+  function renderSideControl(side: SpacingSide, sideLabel: string) {
+    const raw = linked ? v.top : v[side];
+    const selectedValue = selectValue(side);
+
+    return (
+      <div key={side} className="builder-style-side-control">
+        <span>{sideLabel}</span>
+        <select
+          value={selectedValue}
+          aria-label={`${label} ${sideLabel} preset`}
+          onChange={(event) => chooseValue(side, event.target.value)}
+        >
+          {PRESETS.map((preset) => (
+            <option key={preset.value} value={preset.value}>
+              {preset.value === "inherit"
+                ? `Global (${resolveBuilderSpacing(undefined, context, inheritedSideValue(side)).label})`
+                : `${TOKEN_LABELS[preset.value]} (${BUILDER_SPACING_SCALE[preset.value]}px)`}
+            </option>
+          ))}
+          <option value="custom">Custom</option>
+        </select>
+        {selectedValue === "custom" ? (
+          <input
+            value={raw ?? ""}
+            aria-label={`${label} ${sideLabel} custom value`}
+            placeholder="24px"
+            onChange={(event) => setSide(side, event.target.value)}
+          />
+        ) : null}
+      </div>
+    );
   }
 
   return (
@@ -77,56 +148,29 @@ export default function SpacingControl({
           <input
             type="checkbox"
             checked={linked}
-            onChange={(event) =>
+            onChange={(event) => {
+              const nextLinked = event.target.checked;
+              const top = v.top ?? "inherit";
               patch({
-                linked: event.target.checked,
-                right: event.target.checked ? v.top : v.right,
-                bottom: event.target.checked ? v.top : v.bottom,
-                left: event.target.checked ? v.top : v.left,
-              })
-            }
+                linked: nextLinked,
+                right: nextLinked ? top : (v.right ?? top),
+                bottom: nextLinked ? top : (v.bottom ?? top),
+                left: nextLinked ? top : (v.left ?? top),
+              });
+            }}
           />
           <span>Link sides</span>
         </label>
-      </div>
-      <div className="builder-style-preset-row">
-        {PRESETS.map((preset) => (
-          <button
-            key={preset.value}
-            type="button"
-            className={(normalizedPreset(v.top) ?? "inherit") === preset.value ? "is-active" : ""}
-            onClick={() =>
-              linked
-                ? patch({
-                    top: preset.value,
-                    right: preset.value,
-                    bottom: preset.value,
-                    left: preset.value,
-                  })
-                : patch({ top: preset.value })
-            }
-          >
-            {preset.label}
-          </button>
-        ))}
       </div>
       {globalSides ? (
         <small className="builder-style-spacing-source">
           Global: {globalSides}
         </small>
       ) : null}
-      <div className="builder-style-side-grid">
-        {(["top", "right", "bottom", "left"] as const).map((side) => (
-          <label key={side}>
-            <span>{side}</span>
-            <input
-              value={v[side] ?? ""}
-              placeholder="md or 24px"
-              onChange={(event) => setSide(side, event.target.value)}
-              disabled={linked && side !== "top"}
-            />
-          </label>
-        ))}
+      <div className="builder-style-side-controls">
+        {linked
+          ? renderSideControl("top", "All sides")
+          : SIDES.map((side) => renderSideControl(side, side))}
       </div>
     </div>
   );

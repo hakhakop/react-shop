@@ -25,7 +25,6 @@ import {
   ShoppingBag,
   LockKeyhole,
   Redo2,
-  Ruler,
   Save,
   Settings2,
   MonitorSmartphone,
@@ -2430,34 +2429,15 @@ export default function DashboardBuilder({
   };
 
   const selectSection = (sectionId: string) => {
-    const section = builderState.sections.find((item) => item.id === sectionId);
     setSelectedId(sectionId);
     setSelectedLayoutRowIndex(null);
+    setSelectedLayoutColumnKey(null);
     setSelectedLayoutBlockKey(null);
+    setOpenLayoutItemId(null);
     openInspectorPanel();
     setInspectorTab("layout");
     setSectionSettingsOpen(true);
     setSectionStructureOpen(false);
-    if (section && isLayoutContainerSection(section)) {
-      const firstColumn = section.layoutItems?.[0]?.id ?? null;
-      setSelectedLayoutColumnKey((current) =>
-        section.layoutItems?.some(
-          (item, index) => (item.id ?? `layout-item-${index}`) === current,
-        )
-          ? current
-          : firstColumn,
-      );
-      setOpenLayoutItemId((current) =>
-        section.layoutItems?.some(
-          (item, index) => (item.id ?? `layout-item-${index}`) === current,
-        )
-          ? current
-          : firstColumn,
-      );
-    } else {
-      setSelectedLayoutColumnKey(null);
-      setSelectedLayoutBlockKey(null);
-    }
   };
 
   const selectLayoutColumn = (sectionId: string, columnKey: string) => {
@@ -7983,20 +7963,6 @@ function PreviewCanvas({
                     </button>
                     <button
                       type="button"
-                      onClick={() =>
-                        onOpenSpacingSettings({
-                          scope: "section",
-                          sectionId: section.id,
-                          field: "topSpacing",
-                        })
-                      }
-                      aria-label="Open section spacing"
-                      title="Section spacing"
-                    >
-                      <Ruler size={14} />
-                    </button>
-                    <button
-                      type="button"
                       onClick={() => onSaveSectionTemplate(section.id)}
                       title="Save section as template"
                     >
@@ -8383,7 +8349,11 @@ function getStorefrontPreviewClass(section: BuilderSection) {
 
   return `shop-builder-section shop-builder-section--${
     section.backgroundMode === "boxed" ? "boxed" : "full"
-  } shop-builder-section--content-${section.contentMode ?? "boxed"} ${kindClass} ${previewAnimationClassName(section.animation)}`.trim();
+  } shop-builder-section--content-${section.contentMode ?? "boxed"} shop-builder-section--height-${
+    section.sectionHeight ?? "auto"
+  } shop-builder-section--align-${
+    section.contentVerticalAlign ?? "top"
+  } ${kindClass} ${previewAnimationClassName(section.animation)}`.trim();
 }
 
 function previewAnimationPreset(

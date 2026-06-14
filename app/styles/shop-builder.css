@@ -81,6 +81,51 @@
   margin: 0 auto;
 }
 
+.shop-builder-section--height-viewport,
+.shop-builder-section--height-viewport-80 {
+  display: flex;
+  flex-direction: column;
+}
+
+.shop-builder-section--height-viewport {
+  min-height: 100svh;
+}
+
+.shop-builder-section--height-viewport-80 {
+  min-height: 80svh;
+}
+
+.shop-builder-section--height-viewport.shop-builder-section--align-top
+  > .shop-builder-section-content,
+.shop-builder-section--height-viewport-80.shop-builder-section--align-top
+  > .shop-builder-section-content {
+  margin-top: 0;
+  margin-bottom: auto;
+}
+
+.shop-builder-section--height-viewport.shop-builder-section--align-center
+  > .shop-builder-section-content,
+.shop-builder-section--height-viewport-80.shop-builder-section--align-center
+  > .shop-builder-section-content {
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
+.shop-builder-section--height-viewport.shop-builder-section--align-bottom
+  > .shop-builder-section-content,
+.shop-builder-section--height-viewport-80.shop-builder-section--align-bottom
+  > .shop-builder-section-content {
+  margin-top: auto;
+  margin-bottom: 0;
+}
+
+/* Sticky animation positioning remains authoritative for pinned sections. */
+.shop-builder-section[data-builder-pause="true"]
+  > .shop-builder-section-content {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
 .shop-builder-section--content-boxed .shop-builder-section-content {
   max-width: var(--builder-max-width, 1640px);
 }

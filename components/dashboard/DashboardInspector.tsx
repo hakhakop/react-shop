@@ -33,8 +33,10 @@ import type {
   SectionKind,
   SlideImagePadding,
   SectionBackgroundMode,
+  SectionContentVerticalAlign,
   SectionColorScheme,
   SectionContentMode,
+  SectionHeight,
   SectionSpacing,
   WordPressMediaItem,
 } from "@/components/dashboard/builderTypes";
@@ -1509,6 +1511,42 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                         <option value="narrow">Narrow</option>
 	                      </select>
 	                    </label>
+
+                    <div className="builder-two-column">
+                      <label className="builder-field">
+                        <span>Section Height</span>
+                        <select
+                          value={selectedSection.sectionHeight ?? "auto"}
+                          onChange={(event) =>
+                            updateSelected({
+                              sectionHeight: event.target.value as SectionHeight,
+                            })
+                          }
+                        >
+                          <option value="auto">Auto</option>
+                          <option value="viewport">Viewport (100svh)</option>
+                          <option value="viewport-80">Viewport -20% (80svh)</option>
+                        </select>
+                      </label>
+
+                      <label className="builder-field">
+                        <span>Vertical Alignment</span>
+                        <select
+                          value={selectedSection.contentVerticalAlign ?? "top"}
+                          onChange={(event) =>
+                            updateSelected({
+                              contentVerticalAlign: event.target
+                                .value as SectionContentVerticalAlign,
+                            })
+                          }
+                        >
+                          <option value="top">Top</option>
+                          <option value="center">Center</option>
+                          <option value="bottom">Bottom</option>
+                        </select>
+                        <small>Applies when the section has extra height.</small>
+                      </label>
+                    </div>
 	                  </details>
 
                       <StyleTabPanel

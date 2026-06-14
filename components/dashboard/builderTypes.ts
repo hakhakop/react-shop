@@ -79,6 +79,8 @@ export type SidebarTab =
 export type SlideImagePadding = "frameless" | "small" | "medium" | "max";
 export type SectionBackgroundMode = "full" | "boxed";
 export type SectionContentMode = "full" | "boxed" | "narrow";
+export type SectionHeight = "auto" | "viewport" | "viewport-80";
+export type SectionContentVerticalAlign = "top" | "center" | "bottom";
 export type BuilderColorScheme = "auto" | "light" | "dark";
 export type SectionColorScheme = "inherit" | "light" | "dark";
 export type EmbedMode = "iframe" | "code";
@@ -379,6 +381,8 @@ export type BuilderSection = {
   antigravityVisualMode?: "full" | "transparent-grid" | "no-grid" | "lines-only";
   antigravityInteractionScope?: "section" | "global" | "none";
   contentMode?: SectionContentMode;
+  sectionHeight?: SectionHeight;
+  contentVerticalAlign?: SectionContentVerticalAlign;
   colorScheme?: SectionColorScheme;
   layout?: string;
   topSpacing?: SectionSpacing;
