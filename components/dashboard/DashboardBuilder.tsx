@@ -6914,6 +6914,7 @@ export default function DashboardBuilder({
           />
           <PreviewCanvas
             sections={builderState.sections}
+            page={builderState.page}
             previewProducts={previewProducts}
             previewCategoryTree={previewCategoryTree}
             previewCategoryCounts={previewCategoryCounts}
@@ -7241,6 +7242,7 @@ function WordPressMediaPicker({
 
 function PreviewCanvas({
   sections,
+  page,
   previewProducts,
   previewCategoryTree,
   previewCategoryCounts,
@@ -7307,6 +7309,7 @@ function PreviewCanvas({
 }: {
 
   sections: BuilderSection[];
+  page: BuilderLayoutKey;
   previewProducts: ProductNode[];
   previewCategoryTree: CategoryTreeItem[];
   previewCategoryCounts: Record<string, number>;
@@ -7744,6 +7747,8 @@ function PreviewCanvas({
           design.colorScheme ?? "auto"
         } builder-preview-page`}
         style={previewDesignStyle(design)}
+        data-builder-page-root
+        data-gsap-home={page === "home" ? true : undefined}
       >
         <BuilderScrollAnimations key={animationSignature} />
         <div

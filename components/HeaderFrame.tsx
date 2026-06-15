@@ -2,6 +2,12 @@
 
 import * as React from "react";
 
+import {
+  resolveEffectiveHeaderTextMode,
+  type EffectiveHeaderBackgroundContext,
+  type EffectiveHeaderTextMode,
+} from "@/lib/headerBackgroundContext";
+
 type HeaderFrameProps = {
   accentColor: string;
   children: React.ReactNode;
@@ -26,8 +32,12 @@ export default function HeaderFrame({
   backgroundMode = "default",
   textMode = "auto",
 }: HeaderFrameProps) {
+  const headerRef = React.useRef<HTMLElement>(null);
   const [scrolled, setScrolled] = React.useState(false);
-  const [detectedTextMode, setDetectedTextMode] = React.useState<"light" | "dark" | null>(null);
+  const [autoTextState, setAutoTextState] = React.useState<{
+    context: EffectiveHeaderBackgroundContext;
+    textMode: EffectiveHeaderTextMode;
+  } | null>(null);
 
   React.useEffect(() => {
     const getScrollY = () => {
@@ -53,55 +63,136 @@ export default function HeaderFrame({
 
   React.useEffect(() => {
     if (textMode !== "auto") {
-      setDetectedTextMode(null);
+      setAutoTextState(null);
       return;
     }
 
-    const updateAutoScheme = () => {
-      const firstSection = document.querySelector(".shop-builder-section");
-      if (firstSection) {
-        if (
-          firstSection.classList.contains("shop-builder-section--scheme-dark") ||
-          firstSection.classList.contains("builder-preview-section--scheme-dark")
-        ) {
-          setDetectedTextMode("light");
-          return;
-        } else if (
-          firstSection.classList.contains("shop-builder-section--scheme-light") ||
-          firstSection.classList.contains("builder-preview-section--scheme-light")
-        ) {
-          setDetectedTextMode("dark");
-          return;
-        }
-      }
+    const themeTextMode = (): EffectiveHeaderTextMode => {
+      const isDark =
+        document.documentElement.classList.contains("dark") ||
+        document.documentElement.getAttribute("data-theme") === "dark" ||
+        document.body.classList.contains("dark");
+      return isDark ? "light" : "dark";
+    };
 
-      // Fallback: detect theme from document/body/root
-      const isDark = document.documentElement.classList.contains("dark") ||
-                     document.documentElement.getAttribute("data-theme") === "dark" ||
-                     document.body.classList.contains("dark");
-      setDetectedTextMode(isDark ? "light" : "dark");
+    const textModeFromClasses = (
+      element: HTMLElement | null,
+      darkClass: string,
+      lightClass: string,
+    ): EffectiveHeaderTextMode | null => {
+      if (element?.classList.contains(darkClass)) return "light";
+      if (element?.classList.contains(lightClass)) return "dark";
+      return null;
+    };
+
+    const textModeFromBackground = (
+      element: HTMLElement | null,
+    ): EffectiveHeaderTextMode | null => {
+      if (!element) return null;
+      const color = window.getComputedStyle(element).backgroundColor;
+      const match = color.match(
+        /^rgba?\(\s*([\d.]+)[,\s]+([\d.]+)[,\s]+([\d.]+)(?:\s*[,/]\s*([\d.]+))?\s*\)$/,
+      );
+      if (!match) return null;
+
+      const alpha = match[4] === undefined ? 1 : Number(match[4]);
+      if (!Number.isFinite(alpha) || alpha < 0.15) return null;
+
+      const red = Number(match[1]);
+      const green = Number(match[2]);
+      const blue = Number(match[3]);
+      const luminance = (0.2126 * red + 0.7152 * green + 0.0722 * blue) / 255;
+      return luminance < 0.48 ? "light" : "dark";
+    };
+
+    const updateAutoScheme = () => {
+      const header = headerRef.current;
+      const previewShell = header?.closest<HTMLElement>(".builder-preview-shell");
+      const searchRoot: ParentNode = previewShell ?? document;
+      const pageRoot = searchRoot.querySelector<HTMLElement>(
+        "[data-builder-page-root]",
+      );
+      const firstSection = pageRoot?.querySelector<HTMLElement>(
+        ".shop-builder-section",
+      ) ?? null;
+      const fallbackTextMode = themeTextMode();
+      const pageTextMode =
+        textModeFromClasses(
+          pageRoot,
+          "shop-builder-main--scheme-dark",
+          "shop-builder-main--scheme-light",
+        ) ??
+        textModeFromBackground(pageRoot) ??
+        fallbackTextMode;
+      const sectionTextMode =
+        textModeFromClasses(
+          firstSection,
+          "shop-builder-section--scheme-dark",
+          "shop-builder-section--scheme-light",
+        ) ??
+        textModeFromClasses(
+          firstSection,
+          "builder-preview-section--scheme-dark",
+          "builder-preview-section--scheme-light",
+        ) ??
+        textModeFromBackground(firstSection) ??
+        pageTextMode;
+      const headerSurface =
+        header?.querySelector<HTMLElement>(".site-header-pill-inner") ??
+        header?.querySelector<HTMLElement>(".site-header-princity") ??
+        header?.querySelector<HTMLElement>(".site-header-main") ??
+        header;
+      const headerTextMode =
+        backgroundMode === "accent"
+          ? "light"
+          : textModeFromBackground(headerSurface) ?? fallbackTextMode;
+      const firstSectionTouchesPageTop = Boolean(
+        pageRoot &&
+          firstSection &&
+          firstSection.getBoundingClientRect().top <=
+            pageRoot.getBoundingClientRect().top + 1,
+      );
+
+      const nextState = resolveEffectiveHeaderTextMode({
+        configuredTextMode: textMode,
+        backgroundMode,
+        firstSectionTouchesPageTop,
+        headerTextMode,
+        pageTextMode,
+        sectionTextMode,
+      });
+      setAutoTextState((current) =>
+        current?.context === nextState.context &&
+        current.textMode === nextState.textMode
+          ? current
+          : nextState,
+      );
     };
 
     updateAutoScheme();
 
-    const observer = new MutationObserver(() => {
-      updateAutoScheme();
-    });
+    let frameId = 0;
+    const scheduleUpdate = () => {
+      window.cancelAnimationFrame(frameId);
+      frameId = window.requestAnimationFrame(updateAutoScheme);
+    };
+    const observer = new MutationObserver(scheduleUpdate);
 
     observer.observe(document.body, {
       childList: true,
       subtree: true,
       attributes: true,
-      attributeFilter: ["class", "data-theme"]
+      attributeFilter: ["class", "data-theme", "style"],
     });
 
-    window.addEventListener("scroll", updateAutoScheme, { passive: true });
+    window.addEventListener("resize", scheduleUpdate, { passive: true });
 
     return () => {
+      window.cancelAnimationFrame(frameId);
       observer.disconnect();
-      window.removeEventListener("scroll", updateAutoScheme);
+      window.removeEventListener("resize", scheduleUpdate);
     };
-  }, [textMode]);
+  }, [backgroundMode, textMode]);
 
   let bgClass = "";
   let borderClass = "";
@@ -133,14 +224,19 @@ export default function HeaderFrame({
   const base = mode === "sticky" ? baseSticky : baseNone;
   const state = mode === "sticky" ? stateSticky : "";
 
-  const resolvedTextMode = textMode === "auto" ? (detectedTextMode || "auto") : textMode;
+  const resolvedTextMode =
+    textMode === "auto" ? (autoTextState?.textMode ?? "auto") : textMode;
 
   return (
     <header
+      ref={headerRef}
       className={`${base} ${state} ${className}`}
       style={mode === "sticky" ? { borderBottomColor: scrolled ? accentColor : "transparent" } : undefined}
       data-scrolled={scrolled ? "true" : "false"}
       data-header-text-mode={resolvedTextMode}
+      data-header-background-context={
+        textMode === "auto" ? autoTextState?.context : undefined
+      }
     >
       {children}
     </header>

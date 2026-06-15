@@ -2582,6 +2582,11 @@
   min-height: 100%;
 }
 
+.builder-preview-shell:has(.site-header--background-none)
+  .builder-preview-page {
+  padding-top: 0;
+}
+
 .builder-preview-desktop .builder-preview-canvas {
   width: 100%;
   transform: none;

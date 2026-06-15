@@ -2865,6 +2865,13 @@
       "headingSize": "clamp(42px, 7vw, 112px)",
       "headingWeight": "820",
       "headingLineHeight": "0.92",
+      "cardBg": "#efefe9",
+      "cardRadius": "8px",
+      "cardBorder": "transparent",
+      "cardShadow": "0 12px 30px rgba(17,17,17,0.06)",
+      "cardShadowHover": "0 18px 42px rgba(17,17,17,0.1)",
+      "cardImageBg": "#ffffff",
+      "cardImagePadding": "clamp(22px, 2.4vw, 36px)",
       "headingColor": "#111111"
     },
     "sections": [
@@ -2916,7 +2923,9 @@
               }
             ]
           }
-        ]
+        ],
+        "bottomMargin": "none",
+        "topMargin": "none"
       },
       {
         "id": "page:demos-antigravity-showcase",
@@ -3033,7 +3042,7 @@
         ]
       }
     ],
-    "updatedAt": "2026-05-24T05:26:31.182Z"
+    "updatedAt": "2026-06-15T12:09:05.060Z"
   },
   "page:builder": {
     "version": 1,

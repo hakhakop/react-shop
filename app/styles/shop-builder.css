@@ -65,6 +65,11 @@
   padding-top: 0;
 }
 
+body:has(.site-header--background-none)
+  .shop-builder-main[data-builder-page-root] {
+  padding-top: 0;
+}
+
 .shop-builder-section--full {
   width: 100vw;
   margin-left: 50%;
