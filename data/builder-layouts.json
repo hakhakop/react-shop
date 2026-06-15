@@ -69,8 +69,8 @@
                 "eyebrow": "Բարի գալուստ webpages",
                 "title": "[Ընտրեք փաթեթը |տրամադրեք տեղեկությունը| ձեր կայքը պատրաստ է]",
                 "body": "<p><strong>Կայք, հոսթինգ և սպասարկում՝ մեկ պարզ փաթեթով</strong></p>",
-                "buttonLabel": "Launch Visual Builder",
-                "buttonUrl": "/dashboard",
+                "buttonLabel": "Բաժանորդագրվել",
+                "buttonUrl": "https://webpages.am/subscription/",
                 "typewriterEnabled": true,
                 "typewriterLoop": true,
                 "typewriterSpeed": 90,
@@ -1137,7 +1137,7 @@
         ]
       }
     ],
-    "updatedAt": "2026-06-14T07:58:14.040Z"
+    "updatedAt": "2026-06-15T10:17:16.266Z"
   },
   "shop": {
     "version": 1,
