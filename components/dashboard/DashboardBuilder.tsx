@@ -1280,6 +1280,9 @@ export default function DashboardBuilder({
     () => builderState.sections.find((section) => section.id === selectedId),
     [builderState.sections, selectedId],
   );
+  const selectedSectionIsFirstVisible =
+    builderState.sections.find((section) => section.visible)?.id ===
+    selectedSection?.id;
   const selectedLayoutBlock = useMemo(() => {
     if (!selectedSection || !isLayoutContainerSection(selectedSection))
       return null;
@@ -5047,6 +5050,7 @@ export default function DashboardBuilder({
       selectedLayoutBlock={selectedLayoutBlock}
       selectedLayoutBlockKey={selectedLayoutBlockKey}
       selectedSection={selectedSection}
+      selectedSectionIsFirstVisible={selectedSectionIsFirstVisible}
       shellSettings={shellSettings}
       uploadingNestedSlide={uploadingNestedSlide}
       uploadingSlide={uploadingSlide}
@@ -7751,7 +7755,11 @@ function PreviewCanvas({
         } builder-preview-page`}
         style={previewDesignStyle(design)}
         data-builder-page-root
+        data-builder-page={page}
         data-gsap-home={page === "home" ? true : undefined}
+        data-overlap-header={
+          visibleSections[0]?.pullUnderHeader ? "true" : undefined
+        }
       >
         <BuilderScrollAnimations key={animationSignature} />
         <div
@@ -11840,6 +11848,8 @@ if (section.kind === "embed") {
                                     .join(", "),
                                   buttonLabel: "View product",
                                   buttonUrl: `/product/${product.slug}`,
+                                  buttonStyle: "primary" as const,
+                                  buttonAlign: "left" as const,
                                 }))
                               : (block.gridItems ?? [])
                             )
@@ -12109,23 +12119,27 @@ if (section.kind === "embed") {
 
                                         {block.gridShowButton !== false &&
                                           item.buttonLabel && (
-                                            <InlineEditableText
-                                              as="span"
-                                              className="builder-preview-cta"
-                                              typography={itemTypography}
-                                              value={item.buttonLabel}
-                                              onChange={(buttonLabel) =>
-                                                onUpdateGridItem(
-                                                  section.id,
-                                                  columnKey,
-                                                  blockKey,
-                                                  itemIndex,
-                                                  {
-                                                    buttonLabel,
-                                                  },
-                                                )
-                                              }
-                                            />
+                                            <div
+                                              className={`shop-builder-grid-button shop-builder-grid-button--${item.buttonAlign ?? "left"}`}
+                                            >
+                                              <InlineEditableText
+                                                as="span"
+                                                className={`builder-preview-cta builder-preview-cta--${item.buttonStyle ?? "primary"}`}
+                                                typography={itemTypography}
+                                                value={item.buttonLabel}
+                                                onChange={(buttonLabel) =>
+                                                  onUpdateGridItem(
+                                                    section.id,
+                                                    columnKey,
+                                                    blockKey,
+                                                    itemIndex,
+                                                    {
+                                                      buttonLabel,
+                                                    },
+                                                  )
+                                                }
+                                              />
+                                            </div>
                                           )}
                                       </>
                                     ) : (
@@ -12143,9 +12157,15 @@ if (section.kind === "embed") {
                                           item.text && <p>{item.text}</p>}
                                         {block.gridShowButton !== false &&
                                           item.buttonLabel && (
-                                            <span className="builder-preview-cta">
-                                              {item.buttonLabel}
-                                            </span>
+                                            <div
+                                              className={`shop-builder-grid-button shop-builder-grid-button--${item.buttonAlign ?? "left"}`}
+                                            >
+                                              <span
+                                                className={`builder-preview-cta builder-preview-cta--${item.buttonStyle ?? "primary"}`}
+                                              >
+                                                {item.buttonLabel}
+                                              </span>
+                                            </div>
                                           )}
                                       </>
                                     )}

@@ -1257,6 +1257,8 @@ function GridCards({
     text?: string;
     buttonLabel?: string;
     buttonUrl?: string;
+    buttonStyle?: "primary" | "secondary" | "outline" | "ghost" | "link";
+    buttonAlign?: "left" | "center" | "right";
     typography?: BuilderLayoutBlock["typography"];
     items?: string[];
     listIcon?: string;
@@ -1306,14 +1308,18 @@ function GridCards({
             {block.gridShowButton !== false &&
               item.buttonLabel &&
               item.buttonUrl && (
-                <Typog
-                  as="a"
-                  className="shop-builder-cta"
-                  href={item.buttonUrl}
-                  typography={item.typography ?? block.typography}
+                <div
+                  className={`shop-builder-grid-button shop-builder-grid-button--${item.buttonAlign ?? "left"}`}
                 >
-                  {item.buttonLabel}
-                </Typog>
+                  <Typog
+                    as="a"
+                    className={`shop-builder-cta shop-builder-cta--${item.buttonStyle ?? "primary"}`}
+                    href={item.buttonUrl}
+                    typography={item.typography ?? block.typography}
+                  >
+                    {item.buttonLabel}
+                  </Typog>
+                </div>
               )}
           </div>
         </article>
@@ -3148,6 +3154,8 @@ export default function StorefrontBuilderRenderer({
     designColorScheme === "dark" || designColorScheme === "light" || designColorScheme === "auto"
       ? designColorScheme
       : "auto";
+  const firstVisibleSection = layout.sections.find((section) => section.visible);
+  const pullUnderHeader = firstVisibleSection?.pullUnderHeader === true;
 
   return (
     <>
@@ -3177,6 +3185,7 @@ export default function StorefrontBuilderRenderer({
         style={designStyle(layout)}
         data-builder-page-root
         data-gsap-home={isHomePage ? true : undefined}
+        data-overlap-header={pullUnderHeader ? "true" : undefined}
       >
         <BuilderScrollAnimations />
         {isHomePage && <HomeGsapAnimations />}

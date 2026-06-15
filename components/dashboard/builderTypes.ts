@@ -307,6 +307,8 @@ export type BuilderLayoutBlock = {
     text?: string;
     buttonLabel?: string;
     buttonUrl?: string;
+    buttonStyle?: "primary" | "secondary" | "outline" | "ghost" | "link";
+    buttonAlign?: "left" | "center" | "right";
     typography?: TypographySettings;
     items?: string[];
     listIcon?: "check" | "circleCheck" | "arrowRight" | "star" | "heart" | "sparkles" | "shield";
@@ -383,6 +385,7 @@ export type BuilderSection = {
   contentMode?: SectionContentMode;
   sectionHeight?: SectionHeight;
   contentVerticalAlign?: SectionContentVerticalAlign;
+  pullUnderHeader?: boolean;
   colorScheme?: SectionColorScheme;
   layout?: string;
   topSpacing?: SectionSpacing;

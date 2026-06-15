@@ -95,7 +95,7 @@
   "menuItems": [
     {
       "id": "home",
-      "label": "Home",
+      "label": "Գլխավոր",
       "url": "/",
       "parentId": null
     },
@@ -148,5 +148,5 @@
       "parentId": "menu_sbyhyzc43"
     }
   ],
-  "updatedAt": "2026-06-14T04:47:20.806Z"
+  "updatedAt": "2026-06-15T13:17:39.702Z"
 }

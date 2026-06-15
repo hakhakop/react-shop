@@ -957,6 +957,7 @@ export function createSection(kind: SectionKind): BuilderSection {
     bottomSpacing: "inherit" as SectionSpacing,
     topMargin: "inherit" as SectionSpacing,
     bottomMargin: "inherit" as SectionSpacing,
+    pullUnderHeader: false,
     visible: true,
   };
 

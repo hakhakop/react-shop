@@ -342,6 +342,7 @@ type DashboardInspectorProps = {
   selectedLayoutBlock: BuilderLayoutBlock | null;
   selectedLayoutBlockKey: string | null;
   selectedSection: BuilderSection | undefined;
+  selectedSectionIsFirstVisible?: boolean;
   shellSettings: BuilderShellSettings;
   uploadingNestedSlide: string | null;
   uploadingSlide: number | null;
@@ -472,7 +473,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
     previewCategoryTree,
     sectionBackgroundPresets, sectionColorModeLabel, sectionLabels,
     sectionSettingsOpen, sectionStructureOpen, selectedLayoutBlock,
-    selectedLayoutBlockKey, selectedLayoutColumnKey, selectedLayoutRowIndex, selectedSection, shellSettings, uploadingNestedSlide, uploadingSlide,
+    selectedLayoutBlockKey, selectedLayoutColumnKey, selectedLayoutRowIndex, selectedSection, selectedSectionIsFirstVisible = false, shellSettings, uploadingNestedSlide, uploadingSlide,
     addSelectedLayoutBlockBadge, addSelectedLayoutBlockGridItem,
     addSelectedLayoutBlockSlide, addSelectedLayoutItem, addSelectedSlide, copyJson,
     deleteSelected, deleteSelectedLayoutBlock, deleteSelectedLayoutBlockBadge,
@@ -1378,9 +1379,10 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                         })
                       }
                     />
-                  </label>
-                </div>
-              </details>
+                      </label>
+                    </div>
+
+		                  </details>
               <StyleTabPanel
                 target={{ visualStyle: selectedRowItem?.rowVisualStyle }}
                 showSpacing={false}
@@ -1547,7 +1549,26 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                         <small>Applies when the section has extra height.</small>
                       </label>
                     </div>
-	                  </details>
+
+                    <label className="builder-check">
+                      <input
+                        type="checkbox"
+                        checked={selectedSection.pullUnderHeader ?? false}
+                        disabled={!selectedSectionIsFirstVisible}
+                        onChange={(event) =>
+                          updateSelected({
+                            pullUnderHeader: event.target.checked,
+                          })
+                        }
+                      />
+                      <span>Pull underneath header</span>
+                      <small>
+                        {selectedSectionIsFirstVisible
+                          ? "Start this section behind a transparent header."
+                          : "Available when this is the first visible section."}
+                      </small>
+                    </label>
+		                  </details>
 
                       <StyleTabPanel
                         target={styleTarget}
@@ -3533,7 +3554,62 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                                 }
                                                               />
                                                             </label>
-
+                                                          </div>
+                                                          <div className="builder-two-column">
+                                                            <label className="builder-field">
+                                                              <span>
+                                                                Button Style
+                                                              </span>
+                                                              <select
+                                                                value={
+                                                                  gridItem.buttonStyle ??
+                                                                  "primary"
+                                                                }
+                                                                onChange={(event) =>
+                                                                  updateSelectedLayoutBlockGridItem(
+                                                                    index,
+                                                                    blockIndex,
+                                                                    gridItemIndex,
+                                                                    {
+                                                                      buttonStyle:
+                                                                        event.target.value as NonNullable<typeof gridItem.buttonStyle>,
+                                                                    },
+                                                                  )
+                                                                }
+                                                              >
+                                                                <option value="primary">Primary</option>
+                                                                <option value="secondary">Secondary</option>
+                                                                <option value="outline">Outline</option>
+                                                                <option value="ghost">Ghost</option>
+                                                                <option value="link">Text link</option>
+                                                              </select>
+                                                            </label>
+                                                            <label className="builder-field">
+                                                              <span>
+                                                                Button Alignment
+                                                              </span>
+                                                              <select
+                                                                value={
+                                                                  gridItem.buttonAlign ??
+                                                                  "left"
+                                                                }
+                                                                onChange={(event) =>
+                                                                  updateSelectedLayoutBlockGridItem(
+                                                                    index,
+                                                                    blockIndex,
+                                                                    gridItemIndex,
+                                                                    {
+                                                                      buttonAlign:
+                                                                        event.target.value as NonNullable<typeof gridItem.buttonAlign>,
+                                                                    },
+                                                                  )
+                                                                }
+                                                              >
+                                                                <option value="left">Left</option>
+                                                                <option value="center">Center</option>
+                                                                <option value="right">Right</option>
+                                                              </select>
+                                                            </label>
                                                           </div>
                                                         </div>
                                                           <details className="builder-collapse" style={{ order: 2, flex: "0 0 100%" }}>

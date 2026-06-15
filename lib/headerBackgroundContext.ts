@@ -8,6 +8,7 @@ export type EffectiveHeaderTextMode = "light" | "dark";
 
 type ResolveHeaderBackgroundContextInput = {
   backgroundMode: BuilderHeaderBackgroundMode;
+  firstSectionOverlapEnabled: boolean;
   firstSectionTouchesPageTop: boolean;
 };
 
@@ -20,10 +21,13 @@ type ResolveHeaderTextModeInput = ResolveHeaderBackgroundContextInput & {
 
 export function resolveHeaderBackgroundContext({
   backgroundMode,
+  firstSectionOverlapEnabled,
   firstSectionTouchesPageTop,
 }: ResolveHeaderBackgroundContextInput): EffectiveHeaderBackgroundContext {
   if (backgroundMode !== "none") return "header";
-  return firstSectionTouchesPageTop ? "section" : "page";
+  if (!firstSectionOverlapEnabled) return "page";
+  if (!firstSectionTouchesPageTop) return "page";
+  return "section";
 }
 
 export function resolveEffectiveHeaderTextMode({

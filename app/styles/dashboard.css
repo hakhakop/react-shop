@@ -2582,11 +2582,6 @@
   min-height: 100%;
 }
 
-.builder-preview-shell:has(.site-header--background-none)
-  .builder-preview-page {
-  padding-top: 0;
-}
-
 .builder-preview-desktop .builder-preview-canvas {
   width: 100%;
   transform: none;
@@ -2601,6 +2596,7 @@
   position: sticky;
   z-index: 1200;
   top: 0;
+  flex: 0 0 auto;
   min-height: 0;
   pointer-events: none;
   overflow: visible;
@@ -6272,13 +6268,15 @@ body[data-storefront-preset="princity"]
 }
 
 /* Collapse slot height and remove background/borders when transparent header is at top */
-.builder-preview-header-slot:has(.site-header--no-background:not([data-scrolled="true"])) {
+.builder-preview-shell:has(.builder-preview-page[data-overlap-header="true"])
+  .builder-preview-header-slot:has(.site-header--no-background:not([data-scrolled="true"])) {
   min-height: 0 !important;
   background: transparent !important;
   border-bottom: none !important;
 }
 
-.builder-preview-header-slot .site-header--no-background:not([data-scrolled="true"]) {
+.builder-preview-shell:has(.builder-preview-page[data-overlap-header="true"])
+  .builder-preview-header-slot .site-header--no-background:not([data-scrolled="true"]) {
   position: absolute !important;
   left: 0;
   right: 0;
@@ -6289,9 +6287,12 @@ body[data-storefront-preset="princity"]
   backdrop-filter: none !important;
 }
 
-.builder-preview-header-slot .site-header--no-background:not([data-scrolled="true"]) .site-header-top,
-.builder-preview-header-slot .site-header--no-background:not([data-scrolled="true"]) .site-header-main,
-.builder-preview-header-slot
+.builder-preview-shell:has(.builder-preview-page[data-overlap-header="true"])
+  .builder-preview-header-slot .site-header--no-background:not([data-scrolled="true"]) .site-header-top,
+.builder-preview-shell:has(.builder-preview-page[data-overlap-header="true"])
+  .builder-preview-header-slot .site-header--no-background:not([data-scrolled="true"]) .site-header-main,
+.builder-preview-shell:has(.builder-preview-page[data-overlap-header="true"])
+  .builder-preview-header-slot
   .site-header--no-background:not([data-scrolled="true"])
   .site-header-main-inner {
   background: transparent !important;
@@ -6324,8 +6325,10 @@ body[data-storefront-preset="princity"]
   backdrop-filter: none !important;
 }
 
-.builder-preview-header-slot .site-header--no-background .site-header-pill-spacer,
-.builder-preview-header-slot .site-header--no-background .site-header-princity-spacer {
+.builder-preview-shell:has(.builder-preview-page[data-overlap-header="true"])
+  .builder-preview-header-slot .site-header--no-background .site-header-pill-spacer,
+.builder-preview-shell:has(.builder-preview-page[data-overlap-header="true"])
+  .builder-preview-header-slot .site-header--no-background .site-header-princity-spacer {
   display: none !important;
 }
 

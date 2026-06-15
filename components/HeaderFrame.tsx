@@ -38,6 +38,7 @@ export default function HeaderFrame({
     context: EffectiveHeaderBackgroundContext;
     textMode: EffectiveHeaderTextMode;
   } | null>(null);
+  const [overlapHeader, setOverlapHeader] = React.useState(false);
 
   React.useEffect(() => {
     const getScrollY = () => {
@@ -59,6 +60,28 @@ export default function HeaderFrame({
     // including the builder preview shell.
     window.addEventListener("scroll", onScroll, { capture: true, passive: true });
     return () => window.removeEventListener("scroll", onScroll, { capture: true });
+  }, []);
+
+  React.useEffect(() => {
+    const updateOverlapState = () => {
+      const header = headerRef.current;
+      const previewShell = header?.closest<HTMLElement>(".builder-preview-shell");
+      const searchRoot: ParentNode = previewShell ?? document;
+      const pageRoot = searchRoot.querySelector<HTMLElement>(
+        "[data-builder-page-root]",
+      );
+      setOverlapHeader(pageRoot?.dataset.overlapHeader === "true");
+    };
+
+    updateOverlapState();
+    const observer = new MutationObserver(updateOverlapState);
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ["data-overlap-header"],
+    });
+    return () => observer.disconnect();
   }, []);
 
   React.useEffect(() => {
@@ -117,12 +140,15 @@ export default function HeaderFrame({
       ) ?? null;
       const fallbackTextMode = themeTextMode();
       const pageTextMode =
+        textModeFromBackground(pageRoot) ??
+        textModeFromBackground(previewShell ?? null) ??
+        textModeFromBackground(document.body) ??
+        textModeFromBackground(document.documentElement) ??
         textModeFromClasses(
           pageRoot,
           "shop-builder-main--scheme-dark",
           "shop-builder-main--scheme-light",
         ) ??
-        textModeFromBackground(pageRoot) ??
         fallbackTextMode;
       const sectionTextMode =
         textModeFromClasses(
@@ -149,13 +175,17 @@ export default function HeaderFrame({
       const firstSectionTouchesPageTop = Boolean(
         pageRoot &&
           firstSection &&
-          firstSection.getBoundingClientRect().top <=
-            pageRoot.getBoundingClientRect().top + 1,
+          firstSection.getBoundingClientRect().top -
+            pageRoot.getBoundingClientRect().top <=
+            1,
       );
+      const firstSectionOverlapEnabled =
+        pageRoot?.dataset.overlapHeader === "true";
 
       const nextState = resolveEffectiveHeaderTextMode({
         configuredTextMode: textMode,
         backgroundMode,
+        firstSectionOverlapEnabled,
         firstSectionTouchesPageTop,
         headerTextMode,
         pageTextMode,
@@ -182,7 +212,12 @@ export default function HeaderFrame({
       childList: true,
       subtree: true,
       attributes: true,
-      attributeFilter: ["class", "data-theme", "style"],
+      attributeFilter: [
+        "class",
+        "data-overlap-header",
+        "data-theme",
+        "style",
+      ],
     });
 
     window.addEventListener("resize", scheduleUpdate, { passive: true });
@@ -233,6 +268,7 @@ export default function HeaderFrame({
       className={`${base} ${state} ${className}`}
       style={mode === "sticky" ? { borderBottomColor: scrolled ? accentColor : "transparent" } : undefined}
       data-scrolled={scrolled ? "true" : "false"}
+      data-overlap-header={overlapHeader ? "true" : "false"}
       data-header-text-mode={resolvedTextMode}
       data-header-background-context={
         textMode === "auto" ? autoTextState?.context : undefined

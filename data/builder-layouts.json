@@ -127,7 +127,8 @@
           }
         },
         "contentVerticalAlign": "center",
-        "sectionHeight": "viewport"
+        "sectionHeight": "viewport",
+        "pullUnderHeader": true
       },
       {
         "id": "contentLayout-mq4z4n9g-2ttwl",
@@ -346,8 +347,8 @@
                     "title": "🌱 Start",
                     "meta": "պարզ",
                     "text": "<p>Հարմար է սկսելու համար</p>",
-                    "buttonLabel": "Հետաքրքրում է",
-                    "buttonUrl": "#contact",
+                    "buttonLabel": "Բաժանորդագրվել",
+                    "buttonUrl": "https://webpages.am/subscription/",
                     "typography": {
                       "title": {
                         "fontSize": "clamp(24px, 2.4vw, 42px)",
@@ -368,7 +369,9 @@
                       "Հիմնական աջակցություն"
                     ],
                     "listIconColorScheme": "gradient-cycle",
-                    "listIconSize": 16
+                    "listIconSize": 16,
+                    "buttonStyle": "outline",
+                    "buttonAlign": "center"
                   },
                   {
                     "id": "package-commerce",
@@ -376,8 +379,8 @@
                     "title": "🚀 Business",
                     "meta": "Բիզնես",
                     "text": "<p>Բիզնեսի համար պատրաստ լուծում</p>",
-                    "buttonLabel": "Shop package",
-                    "buttonUrl": "#contact",
+                    "buttonLabel": "Բաժանորդագրվել",
+                    "buttonUrl": "https://webpages.am/subscription/",
                     "typography": {
                       "title": {
                         "fontSize": "clamp(24px, 2.4vw, 42px)",
@@ -398,7 +401,9 @@
                       "Ընդլայնված կառուցվածք"
                     ],
                     "listIconSize": 16,
-                    "listIcon": "check"
+                    "listIcon": "check",
+                    "buttonStyle": "outline",
+                    "buttonAlign": "center"
                   },
                   {
                     "id": "package-growth",
@@ -406,8 +411,8 @@
                     "title": "🛍 Store",
                     "meta": "կեմերցիոն",
                     "text": "<p>Խանութ Առցանց վաճառքի համար</p><p></p>",
-                    "buttonLabel": "Խոսենք",
-                    "buttonUrl": "#contact",
+                    "buttonLabel": "Բաժանորդագրվել",
+                    "buttonUrl": "https://webpages.am/subscription/",
                     "typography": {
                       "title": {
                         "fontSize": "clamp(24px, 2.4vw, 42px)",
@@ -426,7 +431,9 @@
                       "Զամբյուղ",
                       "Պատվերների ընդունում"
                     ],
-                    "listIconColorScheme": "gradient-cycle"
+                    "listIconColorScheme": "gradient-cycle",
+                    "buttonStyle": "outline",
+                    "buttonAlign": "center"
                   },
                   {
                     "id": "grid-item-mptcn4jh",
@@ -434,14 +441,16 @@
                     "title": "✨ Custom",
                     "meta": "Երբ պետք է ավելին",
                     "text": "<p></p><p></p>",
-                    "buttonLabel": "Learn more",
-                    "buttonUrl": "/",
+                    "buttonLabel": "Բաժանորդագրվել",
+                    "buttonUrl": "https://webpages.am/subscription/",
                     "items": [
                       "Անհատական կառուցվածք",
                       "Հատուկ ֆունկցիաներ",
                       "Ճկուն զարգացում"
                     ],
-                    "listIconColorScheme": "gradient-cycle"
+                    "listIconColorScheme": "gradient-cycle",
+                    "buttonStyle": "outline",
+                    "buttonAlign": "center"
                   }
                 ],
                 "animation": {
@@ -1137,7 +1146,7 @@
         ]
       }
     ],
-    "updatedAt": "2026-06-15T10:17:16.266Z"
+    "updatedAt": "2026-06-15T13:17:13.952Z"
   },
   "shop": {
     "version": 1,
@@ -2925,7 +2934,8 @@
           }
         ],
         "bottomMargin": "none",
-        "topMargin": "none"
+        "topMargin": "none",
+        "pullUnderHeader": false
       },
       {
         "id": "page:demos-antigravity-showcase",
@@ -3042,7 +3052,7 @@
         ]
       }
     ],
-    "updatedAt": "2026-06-15T12:09:05.060Z"
+    "updatedAt": "2026-06-15T12:45:45.662Z"
   },
   "page:builder": {
     "version": 1,

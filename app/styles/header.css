@@ -198,7 +198,7 @@
 }
 
 /* When NOT scrolled (top position or data-scrolled="false"), remove background/borders and position absolutely */
-.site-header.site-header--no-background:not([data-scrolled="true"]) {
+.site-header[data-overlap-header="true"].site-header--no-background:not([data-scrolled="true"]) {
   position: absolute !important;
   left: 0;
   right: 0;
@@ -209,9 +209,9 @@
   backdrop-filter: none !important;
 }
 
-.site-header.site-header--no-background:not([data-scrolled="true"]) .site-header-top,
-.site-header.site-header--no-background:not([data-scrolled="true"]) .site-header-main,
-.site-header.site-header--no-background:not([data-scrolled="true"]) .site-header-main-inner {
+.site-header[data-overlap-header="true"].site-header--no-background:not([data-scrolled="true"]) .site-header-top,
+.site-header[data-overlap-header="true"].site-header--no-background:not([data-scrolled="true"]) .site-header-main,
+.site-header[data-overlap-header="true"].site-header--no-background:not([data-scrolled="true"]) .site-header-main-inner {
   background: transparent !important;
   border-color: transparent !important;
   box-shadow: none !important;
@@ -229,8 +229,8 @@
 }
 
 /* Hide spacers in no-background mode so content starts at top of viewport */
-.site-header--no-background .site-header-pill-spacer,
-.site-header--no-background .site-header-princity-spacer {
+.site-header[data-overlap-header="true"].site-header--no-background .site-header-pill-spacer,
+.site-header[data-overlap-header="true"].site-header--no-background .site-header-princity-spacer {
   display: none !important;
 }
 
@@ -2249,4 +2249,3 @@ body[data-storefront-preset="princity"] .category-mega-card,
   color: rgba(15, 23, 42, 0.75) !important;
   border-color: rgba(15, 23, 42, 0.12) !important;
 }
-

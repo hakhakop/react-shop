@@ -2,7 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import type { CSSProperties, ReactNode, MouseEvent } from "react";
+import {
+  useEffect,
+  useState,
+  type CSSProperties,
+  type MouseEvent,
+  type ReactNode,
+} from "react";
 import type { MenuItem } from "../lib/navigation";
 
 interface HeaderNavProps {
@@ -132,29 +138,48 @@ function normalizePath(input?: string | null): string {
   return trimmed === "" ? "/" : trimmed;
 }
 
-function getDashboardEditHref(href: string, currentPath: string): string {
-  if (currentPath !== "/dashboard" || href === "#") return href;
-
+function getDashboardPageKey(href: string): string | null {
+  if (href === "#") return null;
   const itemPath = normalizePath(href);
-  const reservedPaths = new Set([
-    "/cart",
-    "/categories",
-    "/checkout",
-    "/dashboard",
-    "/my-account",
-    "/product",
-    "/search",
-    "/wishlist",
-  ]);
-
-  if (itemPath === "/") return "/dashboard?page=home";
-  if (itemPath === "/shop") return "/dashboard?page=shop";
-  if (itemPath === "/client") return "/dashboard?page=client";
-  if (!reservedPaths.has(itemPath) && /^\/[a-z0-9]+(?:-[a-z0-9]+)*$/.test(itemPath)) {
-    return `/dashboard?page=page:${itemPath.slice(1)}`;
+  if (itemPath === "/") return "home";
+  if (itemPath === "/shop") return "shop";
+  if (itemPath === "/client") return "client";
+  if (itemPath === "/cart") return "page:cart";
+  if (itemPath === "/checkout") return "page:checkout";
+  if (itemPath === "/my-account") return "page:my-account";
+  if (itemPath === "/search") return "search-results";
+  if (itemPath === "/categories" || itemPath.startsWith("/category/")) {
+    return "product-category";
   }
+  if (itemPath === "/product" || itemPath.startsWith("/product/")) {
+    return "product-single";
+  }
+  if (/^\/[a-z0-9]+(?:-[a-z0-9]+)*$/.test(itemPath)) {
+    return `page:${itemPath.slice(1)}`;
+  }
+  return null;
+}
 
-  return href;
+function getDashboardEditHref(href: string, dashboardMode: boolean): string {
+  if (!dashboardMode) return href;
+  const pageKey = getDashboardPageKey(href);
+  return pageKey ? `/dashboard?page=${pageKey}` : href;
+}
+
+function getDashboardActivePath(pageKey: string | null): string {
+  if (!pageKey || pageKey === "home") return "/";
+  if (pageKey === "shop") return "/shop";
+  if (pageKey === "client") return "/client";
+  if (pageKey === "product-single") return "/product";
+  if (
+    pageKey === "product-category" ||
+    pageKey === "product-category-specific"
+  ) {
+    return "/categories";
+  }
+  if (pageKey === "search-results") return "/search";
+  if (pageKey.startsWith("page:")) return `/${pageKey.slice(5)}`;
+  return "/";
 }
 
 function normalizeMenuPresentation(
@@ -206,13 +231,14 @@ function itemHasActiveDescendant(
 function renderMenuItems(
   items: MenuItem[],
   currentPath: string,
+  dashboardMode: boolean,
   presentationById?: Record<string, MenuPresentationSettings>,
   level = 0
 ): ReactNode {
   return items.map((item) => {
     const href = item.path || item.url || "#";
     const isSectionLink = href.includes("#");
-    const dashboardHref = getDashboardEditHref(href, currentPath);
+    const dashboardHref = getDashboardEditHref(href, dashboardMode);
     const itemPath =
       href === "#" ? "#" : normalizePath(item.path || item.url || href);
     const isActive =
@@ -275,6 +301,7 @@ function renderMenuItems(
               {renderMenuItems(
                 children,
                 currentPath,
+                dashboardMode,
                 presentationById,
                 level + 1,
               )}
@@ -291,11 +318,50 @@ export default function HeaderNav({
   presentationById,
 }: HeaderNavProps) {
   const rawPathname = usePathname();
-  const currentPath = normalizePath(rawPathname || "/");
+  const dashboardMode = rawPathname === "/dashboard";
+  const [dashboardPageKey, setDashboardPageKey] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!dashboardMode) {
+      setDashboardPageKey(null);
+      return;
+    }
+
+    const updateDashboardPage = () => {
+      const previewPage = document.querySelector<HTMLElement>(
+        ".builder-preview-page[data-builder-page]",
+      );
+      const query = new URLSearchParams(window.location.search);
+      setDashboardPageKey(
+        previewPage?.dataset.builderPage ??
+          query.get("page") ??
+          query.get("template"),
+      );
+    };
+
+    updateDashboardPage();
+    const observer = new MutationObserver(updateDashboardPage);
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ["data-builder-page"],
+    });
+    window.addEventListener("popstate", updateDashboardPage);
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("popstate", updateDashboardPage);
+    };
+  }, [dashboardMode]);
+
+  const currentPath = dashboardMode
+    ? getDashboardActivePath(dashboardPageKey)
+    : normalizePath(rawPathname || "/");
 
   return (
     <nav className="site-header-nav">
-      {renderMenuItems(items, currentPath, presentationById)}
+      {renderMenuItems(items, currentPath, dashboardMode, presentationById)}
     </nav>
   );
 }
