@@ -14,6 +14,7 @@ import RecentlyViewedProvider from "../components/RecentlyViewedProvider";
 import FloatingCartSummary from "../components/FloatingCartSummary";
 import ScrollToTopButton from "../components/ScrollToTopButton";
 import FrontendAdminBar from "../components/FrontendAdminBar";
+import ProductCategoryFilterProvider from "../components/ProductCategoryFilterProvider";
 import { getBuilderShellSettings } from "../lib/builderShell";
 import {
   resolveBuilderSpacing,
@@ -284,6 +285,7 @@ ${explicitWordPressProductVars}
             <CartProvider>
               <WishlistProvider>
                 <SearchProvider>
+                  <ProductCategoryFilterProvider>
                    <RecentlyViewedProvider>
                   {shellSettings.headerVisible && (
                     <HeaderShell layoutOverride={shellSettings.headerLayout} />
@@ -312,6 +314,7 @@ ${explicitWordPressProductVars}
                     </div>
                   </footer>
                   </RecentlyViewedProvider>
+                  </ProductCategoryFilterProvider>
                 </SearchProvider>
               </WishlistProvider>
             </CartProvider>

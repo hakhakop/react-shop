@@ -1,10 +1,13 @@
 "use client";
 
 import useEmblaCarousel from "embla-carousel-react";
-import { useCallback } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import type { ProductNode } from "../lib/products"; // adjust import if needed
+import type { CategoryTreeItem } from "../lib/categories";
 import ProductCard from "./ProductCard";
 import type { ProductImageFit, ProductImageRatio } from "@/lib/productCardImage";
+import { useProductCategoryFilter } from "./ProductCategoryFilterProvider";
+import { productMatchesCategorySelection } from "@/lib/productCategoryFilter";
 
 type ProductCarouselProps = {
   products: ProductNode[];
@@ -22,6 +25,7 @@ type ProductCarouselProps = {
   addToCartVisibility?: string | null;
   addToCartPosition?: string | null;
   typography?: any;
+  categoryTree?: CategoryTreeItem[];
 };
 
 export default function ProductCarousel({
@@ -40,7 +44,9 @@ export default function ProductCarousel({
   addToCartVisibility,
   addToCartPosition,
   typography,
+  categoryTree = [],
 }: ProductCarouselProps) {
+  const categoryFilter = useProductCategoryFilter();
   const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: true,
     align: "start",
@@ -56,7 +62,25 @@ export default function ProductCarousel({
     emblaApi.scrollNext();
   }, [emblaApi]);
 
-  if (!products || products.length === 0) {
+  const visibleProducts = useMemo(
+    () =>
+      products.filter((product) =>
+        productMatchesCategorySelection(
+          product,
+          categoryFilter?.activeCategorySlug ?? null,
+          categoryTree,
+        ),
+      ),
+    [categoryFilter?.activeCategorySlug, categoryTree, products],
+  );
+
+  useEffect(() => {
+    if (!emblaApi) return;
+    emblaApi.reInit();
+    emblaApi.scrollTo(0);
+  }, [emblaApi, visibleProducts]);
+
+  if (!visibleProducts || visibleProducts.length === 0) {
     return null;
   }
 
@@ -180,7 +204,7 @@ export default function ProductCarousel({
     >
       <div className="product-carousel__viewport" ref={emblaRef}>
         <div className="product-carousel__container">
-          {products.map((p) => (
+          {visibleProducts.map((p) => (
             <div className="product-carousel__slide" key={p.id}>
               <ProductCard
                 product={p}

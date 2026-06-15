@@ -469,6 +469,7 @@ async function BuilderProductsSection({
         addToCartVisibility={section.addToCartVisibility}
         addToCartPosition={section.addToCartPosition}
         typography={section.typography}
+        categoryTree={categoryTree}
       />
     );
   }
@@ -1147,6 +1148,7 @@ async function ContentProductsBlock({
           addToCartVisibility={block.addToCartVisibility}
           addToCartPosition={block.addToCartPosition}
           typography={block.typography}
+          categoryTree={categoryTree}
         />
       </div>
     );

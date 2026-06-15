@@ -29,6 +29,7 @@ import {
   type ProductImageFit,
   type ProductImageRatio,
 } from "@/lib/productCardImage";
+import { useProductCategoryFilter } from "./ProductCategoryFilterProvider";
 
 type Props = {
   products: ProductNode[];
@@ -289,6 +290,7 @@ export default function CategoryWithFilters({
   typography,
   pagination,
 }: Props) {
+  const globalCategoryFilter = useProductCategoryFilter();
   const [searchTerm, setSearchTerm] = useState("");
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
@@ -299,9 +301,14 @@ export default function CategoryWithFilters({
   const [selectedAttributes, setSelectedAttributes] = useState<
     Record<string, string[]>
   >({});
-  const [selectedCategories, setSelectedCategories] = useState<string[]>(
+  const [localSelectedCategories, setLocalSelectedCategories] = useState<string[]>(
     activeCategorySlug ? [activeCategorySlug] : [],
   );
+  const selectedCategories = globalCategoryFilter
+    ? globalCategoryFilter.activeCategorySlug
+      ? [globalCategoryFilter.activeCategorySlug]
+      : []
+    : localSelectedCategories;
   const [openCategorySlugs, setOpenCategorySlugs] = useState<Set<string>>(
     () => new Set(activeCategorySlug ? [activeCategorySlug] : []),
   );
@@ -637,7 +644,13 @@ export default function CategoryWithFilters({
 
   function toggleCategory(slug: string) {
     setCurrentPage(1);
-    setSelectedCategories((current) =>
+    if (globalCategoryFilter) {
+      globalCategoryFilter.setActiveCategorySlug(
+        globalCategoryFilter.activeCategorySlug === slug ? null : slug,
+      );
+      return;
+    }
+    setLocalSelectedCategories((current) =>
       current.includes(slug)
         ? current.filter((item) => item !== slug)
         : [...current, slug],
@@ -729,7 +742,11 @@ export default function CategoryWithFilters({
     setMaxPrice("");
     setSortBy("default");
     setSelectedAttributes({});
-    setSelectedCategories([]);
+    if (globalCategoryFilter) {
+      globalCategoryFilter.clearActiveCategory();
+    } else {
+      setLocalSelectedCategories([]);
+    }
     setCurrentPage(1);
   }
 

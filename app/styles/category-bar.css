@@ -27,12 +27,27 @@
 
   cursor: pointer;
   text-decoration: none;
+  font: inherit;
 
   transition:
     background-color 0.15s ease-out,
     border-color 0.15s ease-out,
     color 0.15s ease-out,
     transform 0.12s ease-out;
+}
+
+.category-pill.is-active,
+.category-pill-wrapper.is-active > .category-pill {
+  border-color: var(--accent, #db2777);
+  background: var(--accent, #db2777);
+  color: var(--accent-contrast, #ffffff);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #db2777) 18%, transparent);
+}
+
+.category-pill.is-active .category-pill-count {
+  border-color: color-mix(in srgb, currentColor 30%, transparent);
+  background: color-mix(in srgb, currentColor 14%, transparent);
+  color: currentColor;
 }
 
 .category-pill:hover {

@@ -57,6 +57,7 @@ import CarouselBlock, {
 import BuilderScrollAnimations from "@/components/builder/BuilderScrollAnimations";
 import CategoryBar from "@/components/CategoryBar";
 import CategoryWithFilters from "@/components/CategoryWithFilters";
+import ProductCategoryFilterProvider from "@/components/ProductCategoryFilterProvider";
 import FluentFormClient from "@/components/builder/FluentFormClient";
 import ProductCarousel from "@/components/ProductCarousel";
 import ProductOptionsSelector from "@/components/ProductOptionsSelector";
@@ -6912,6 +6913,7 @@ export default function DashboardBuilder({
             ref={previewHeaderSlotRef}
             className="builder-preview-header-slot"
           />
+          <ProductCategoryFilterProvider key={builderState.page}>
           <PreviewCanvas
             sections={builderState.sections}
             page={builderState.page}
@@ -6979,6 +6981,7 @@ export default function DashboardBuilder({
             onOpenElementsPanel={openElementsPanel}
             onCycleSectionSpacing={cycleSectionSpacing}
           />
+          </ProductCategoryFilterProvider>
         </div>
       </main>
 
@@ -10042,6 +10045,7 @@ function PreviewSection({
               addToCartVisibility={section.addToCartVisibility}
               addToCartPosition={section.addToCartPosition}
               typography={section.typography}
+              categoryTree={previewCategoryTree}
             />
           ) : (
             <CategoryWithFilters
@@ -11744,6 +11748,7 @@ if (section.kind === "embed") {
                                     addToCartVisibility={block.addToCartVisibility}
                                     addToCartPosition={block.addToCartPosition}
                                     typography={block.typography}
+                                    categoryTree={previewCategoryTree}
                                   />
                                 </div>
                               ) : (
