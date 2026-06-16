@@ -1007,9 +1007,9 @@
               {
                 "id": "fluentForm-block-mpzklfs9-nmvi6",
                 "kind": "fluentForm",
-                "title": "Contact Form",
+                "title": "Բաժանորդագրվել",
                 "body": "Rendered from Fluent Forms in WordPress.",
-                "fluentFormId": "1"
+                "fluentFormId": "3"
               }
             ]
           }
@@ -1040,16 +1040,17 @@
               {
                 "id": "list-block-mptd5dxv-11uvy",
                 "kind": "list",
-                "title": "Traditional Way ",
+                "title": "Տրադիցիոն կայքի կառուցում",
                 "items": [
-                  "Find developer",
-                  "Find hosting",
-                  "Setup website",
-                  "Support",
-                  "Multiple vendors",
-                  "One solution"
+                  "Գտնել ծրագրավորող",
+                  "Ստեղծել կայքը",
+                  "Գտնել հոսթինգ ծառայություն",
+                  "Պատվիրել հետագա սպասարկում և աջակցություն",
+                  "Բազմաթիվ մատակարարներ",
+                  "Մեծ սկզբնական ներդրում",
+                  "Տարբեր լուծումներ"
                 ],
-                "listIcon": "circleCheck"
+                "listIcon": "check"
               }
             ]
           },
@@ -1059,13 +1060,14 @@
               {
                 "id": "list-block-mptd5zki-7ien3",
                 "kind": "list",
-                "title": "Webpages",
+                "title": "Webpages բաժանորդագրություն",
                 "items": [
-                  "✓ Included",
-                  "✓ Included",
-                  "✓ Included",
-                  "✓ Included",
-                  "One solution"
+                  " Ներառված է",
+                  "Ներառված է",
+                  "Ներառված է",
+                  "Ներառված է",
+                  "Չի պահանջում",
+                  "Մեկ լուծում"
                 ]
               }
             ]
@@ -1146,7 +1148,7 @@
         ]
       }
     ],
-    "updatedAt": "2026-06-15T13:17:13.952Z"
+    "updatedAt": "2026-06-16T05:52:27.670Z"
   },
   "shop": {
     "version": 1,
@@ -1179,41 +1181,6 @@
       "cardImagePadding": "clamp(22px, 2.4vw, 36px)"
     },
     "sections": [
-      {
-        "id": "contentLayout-mpnqitz6-2mns0",
-        "kind": "contentLayout",
-        "title": "",
-        "background": "#24241f",
-        "backgroundMode": "boxed",
-        "contentMode": "boxed",
-        "colorScheme": "inherit",
-        "topSpacing": "inherit",
-        "bottomSpacing": "inherit",
-        "topMargin": "inherit",
-        "bottomMargin": "inherit",
-        "visible": true,
-        "eyebrow": "",
-        "body": "",
-        "layout": "whole",
-        "layoutColumns": 1,
-        "layoutItems": [
-          {
-            "id": "layout-item-mpnqitz6-1",
-            "blocks": [
-              {
-                "id": "categoryFilters-block-mpnqivv5-dxr9u",
-                "kind": "categoryFilters",
-                "title": "Category Filters",
-                "body": "Dynamic WooCommerce category pills.",
-                "hiddenCategorySlugs": [
-                  "uncategorized"
-                ]
-              }
-            ]
-          }
-        ],
-        "layoutRows": 1
-      },
       {
         "id": "contentLayout-mqcpe2nr-yz507",
         "kind": "contentLayout",
@@ -1291,7 +1258,7 @@
                 "layoutVariant": "grid",
                 "columns": 4,
                 "gridLimit": 4000,
-                "filterPosition": "left",
+                "filterPosition": "top",
                 "cardStyle": "none",
                 "cardPreset": "princity-flat",
                 "imagePadding": "none",
@@ -1303,7 +1270,8 @@
                   "infiniteScroll": false,
                   "style": "minimal"
                 },
-                "panelStyle": "princity-line"
+                "panelStyle": "light",
+                "imageFit": "cover"
               }
             ]
           }
@@ -1311,7 +1279,7 @@
         "layoutRows": 1
       }
     ],
-    "updatedAt": "2026-06-13T19:02:16.220Z"
+    "updatedAt": "2026-06-15T18:27:52.250Z"
   },
   "client": {
     "version": 1,
@@ -1544,42 +1512,10 @@
     },
     "sections": [
       {
-        "id": "contentLayout-mpnqxqd0-dvnxk",
-        "kind": "contentLayout",
-        "title": "",
-        "background": "#ffffff",
-        "backgroundMode": "boxed",
-        "contentMode": "boxed",
-        "colorScheme": "inherit",
-        "topSpacing": "inherit",
-        "bottomSpacing": "inherit",
-        "topMargin": "inherit",
-        "bottomMargin": "inherit",
-        "visible": true,
-        "eyebrow": "",
-        "body": "",
-        "layout": "whole",
-        "layoutColumns": 1,
-        "layoutItems": [
-          {
-            "id": "layout-item-mpnqxqd0-1",
-            "blocks": [
-              {
-                "id": "categoryFilters-block-mpnqz4r9-k7f0t",
-                "kind": "categoryFilters",
-                "title": "Category Filters",
-                "body": "Dynamic WooCommerce category pills."
-              }
-            ]
-          }
-        ],
-        "layoutRows": 1
-      },
-      {
         "id": "contentLayout-mqdb2y1v-9rq7o",
         "kind": "contentLayout",
         "title": "",
-        "background": "#ffffff",
+        "background": "#111111",
         "backgroundMode": "boxed",
         "contentMode": "boxed",
         "colorScheme": "inherit",
@@ -1630,7 +1566,7 @@
         "layout": "carousel"
       }
     ],
-    "updatedAt": "2026-06-14T04:51:31.251Z"
+    "updatedAt": "2026-06-15T17:31:27.744Z"
   },
   "product-single": {
     "version": 1,

@@ -1,11 +1,5 @@
 [
   {
-    "key": "page:demos",
-    "title": "Demos",
-    "slug": "demos",
-    "updatedAt": "2026-05-24T05:26:31.182Z"
-  },
-  {
     "key": "page:fashion-store",
     "title": "Fashion Store",
     "slug": "fashion-store",
@@ -16,6 +10,12 @@
     "title": "Furniture Store",
     "slug": "furniture-store",
     "updatedAt": "2026-05-23T21:38:58.696Z"
+  },
+  {
+    "key": "page:demos",
+    "title": "Demos",
+    "slug": "demos",
+    "updatedAt": "2026-05-24T05:26:31.182Z"
   },
   {
     "key": "page:builder",

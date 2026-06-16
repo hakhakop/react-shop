@@ -1,21 +1,33 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getWordPressBaseUrl } from "@/lib/wordpressUrl";
+import { getFluentFormsBaseUrl } from "@/lib/wordpressUrl";
 
 type FluentFormResponse = {
   html?: string;
   scripts?: string[];
   styles?: string[];
+  inlineScripts?: string[];
 };
+
+function uniqueAssets(values: unknown[]) {
+  return Array.from(
+    new Set(
+      values.filter(
+        (value): value is string =>
+          typeof value === "string" && value.trim().length > 0
+      )
+    )
+  );
+}
 
 export async function GET(request: NextRequest) {
   const formId = request.nextUrl.searchParams.get("formId")?.trim();
-  const wordpressBaseUrl = getWordPressBaseUrl();
+  const wordpressBaseUrl = getFluentFormsBaseUrl();
 
   if (!wordpressBaseUrl) {
     return NextResponse.json(
       {
         message:
-          "WordPress URL is not configured. Add WORDPRESS_SITE_URL or WC_API_URL.",
+          "Fluent Forms WordPress URL is not configured. Add FLUENT_FORMS_SITE_URL, WORDPRESS_SITE_URL, or WC_API_URL.",
       },
       { status: 500 }
     );
@@ -53,10 +65,46 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    const html = payload?.html ?? "";
+    const rendersPhoneField = /class=["'][^"']*ff-el-phone/i.test(html);
+    const expectsPhoneField = /["']phone["']\s*:\s*\{/i.test(html);
+    const providedScripts = Array.isArray(payload?.scripts)
+      ? payload.scripts
+      : [];
+    const providedStyles = Array.isArray(payload?.styles) ? payload.styles : [];
+    const coreStyles = [
+      `${wordpressBaseUrl}/wp-content/plugins/fluentform/assets/css/fluent-forms-public.css`,
+      `${wordpressBaseUrl}/wp-content/plugins/fluentform/assets/css/fluentform-public-default.css`,
+    ];
+    const phoneStyles = rendersPhoneField
+      ? [
+          `${wordpressBaseUrl}/wp-content/plugins/fluentformpro/public/libs/intl-tel-input/css/intlTelInput.min.css`,
+        ]
+      : [];
+    const phoneScripts = rendersPhoneField
+      ? [
+          `${wordpressBaseUrl}/wp-content/plugins/fluentformpro/public/libs/intl-tel-input/js/intlTelInputWithUtils.min.js`,
+        ]
+      : [];
+
     return NextResponse.json({
-      html: payload?.html ?? "",
-      scripts: Array.isArray(payload?.scripts) ? payload.scripts : [],
-      styles: Array.isArray(payload?.styles) ? payload.styles : [],
+      html,
+      scripts: uniqueAssets(
+        providedScripts.length ? providedScripts : phoneScripts
+      ),
+      styles: uniqueAssets(
+        providedStyles.length
+          ? providedStyles
+          : [...coreStyles, ...phoneStyles]
+      ),
+      inlineScripts: Array.isArray(payload?.inlineScripts)
+        ? payload.inlineScripts
+        : [],
+      sourceUrl: wordpressBaseUrl,
+      diagnostics: {
+        expectsPhoneField,
+        rendersPhoneField,
+      },
     });
   } catch {
     return NextResponse.json(

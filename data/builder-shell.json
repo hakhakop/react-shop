@@ -100,40 +100,40 @@
       "parentId": null
     },
     {
-      "id": "menu_6hb0ecunh",
-      "label": "Checkout",
-      "url": "/checkout",
-      "parentId": null
-    },
-    {
-      "id": "shop",
-      "label": "Shop",
-      "url": "/shop",
-      "parentId": null
-    },
-    {
-      "id": "menu_s2il6v58h",
-      "label": "Builder",
-      "url": "/builder",
+      "id": "menu_sbyhyzc43",
+      "label": "Օրինակներ",
+      "url": "/demos",
       "parentId": null
     },
     {
       "id": "menu_c8gxt1zuo",
       "label": "Cart",
       "url": "/cart",
-      "parentId": null
+      "parentId": "menu_sbyhyzc43"
     },
     {
       "id": "menu_xrvt3q0ps",
       "label": "My Account",
       "url": "/my-account",
-      "parentId": null
+      "parentId": "menu_sbyhyzc43"
     },
     {
-      "id": "menu_sbyhyzc43",
-      "label": "Demos",
-      "url": "/demos",
-      "parentId": null
+      "id": "menu_s2il6v58h",
+      "label": "Builder",
+      "url": "/builder",
+      "parentId": "menu_sbyhyzc43"
+    },
+    {
+      "id": "menu_6hb0ecunh",
+      "label": "Վճարում",
+      "url": "/checkout",
+      "parentId": "menu_sbyhyzc43"
+    },
+    {
+      "id": "shop",
+      "label": "Խանութ",
+      "url": "/shop",
+      "parentId": "menu_sbyhyzc43"
     },
     {
       "id": "menu_07porwk43",
@@ -148,5 +148,5 @@
       "parentId": "menu_sbyhyzc43"
     }
   ],
-  "updatedAt": "2026-06-15T13:17:39.702Z"
+  "updatedAt": "2026-06-15T17:22:39.578Z"
 }

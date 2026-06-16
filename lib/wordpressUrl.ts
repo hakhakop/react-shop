@@ -18,6 +18,13 @@ export function getWordPressBaseUrl() {
   }
 }
 
+export function getFluentFormsBaseUrl() {
+  const explicit = process.env.FLUENT_FORMS_SITE_URL;
+  if (explicit) return explicit.replace(/\/$/, "");
+
+  return getWordPressBaseUrl();
+}
+
 export function getWooAccountUrl(path = "") {
   const baseUrl = getWordPressBaseUrl();
   if (!baseUrl) return null;

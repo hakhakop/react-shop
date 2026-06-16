@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getWordPressBaseUrl } from "@/lib/wordpressUrl";
+import { getFluentFormsBaseUrl } from "@/lib/wordpressUrl";
 
 type FluentFormSubmitRequest = {
   formId?: string | number;
@@ -7,13 +7,13 @@ type FluentFormSubmitRequest = {
 };
 
 export async function POST(request: NextRequest) {
-  const wordpressBaseUrl = getWordPressBaseUrl();
+  const wordpressBaseUrl = getFluentFormsBaseUrl();
 
   if (!wordpressBaseUrl) {
     return NextResponse.json(
       {
         message:
-          "WordPress URL is not configured. Add WORDPRESS_SITE_URL or WC_API_URL.",
+          "Fluent Forms WordPress URL is not configured. Add FLUENT_FORMS_SITE_URL, WORDPRESS_SITE_URL, or WC_API_URL.",
       },
       { status: 500 }
     );
