@@ -218,6 +218,7 @@ export type BuilderLayoutBlock = {
   secondaryButtonTarget?: "_self" | "_blank";
   secondaryButtonStyle?: "primary" | "secondary" | "outline" | "ghost" | "light";
   buttonsLayout?: "inline" | "stacked";
+  buttonGap?: string;
   buttons?: {
     id?: string;
     label?: string;
@@ -225,6 +226,19 @@ export type BuilderLayoutBlock = {
     target?: "_self" | "_blank";
     style?: "primary" | "secondary" | "outline" | "ghost" | "light";
   }[];
+  buttonBg?: string;
+  buttonTextColor?: string;
+  buttonBorderRadius?: string;
+  buttonBorderWidth?: string;
+  buttonBorderColor?: string;
+  buttonPaddingY?: string;
+  buttonPaddingX?: string;
+  buttonFontWeight?: string;
+  buttonLetterSpacing?: string;
+  buttonHoverBg?: string;
+  buttonHoverTextColor?: string;
+  buttonHoverBorderColor?: string;
+  buttonHoverEffect?: "none" | "lift" | "grow" | "inherit";
   imageUrl?: string;
   imageAlt?: string;
   imageAlignment?: "left" | "center" | "right";

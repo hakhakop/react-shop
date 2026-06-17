@@ -142,11 +142,12 @@ export default function ProductCarousel({
   }
 
   const normalizedCartStyle =
+    addToCartStyle === "blue" ||
     addToCartStyle === "dark" ||
     addToCartStyle === "light" ||
     addToCartStyle === "inherit"
       ? addToCartStyle
-      : "blue";
+      : "inherit";
 
   const normalizedCartSize =
     addToCartSize === "compact" ||

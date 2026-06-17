@@ -64,6 +64,7 @@ export type BuilderLayoutBlock = {
   secondaryButtonTarget?: string;
   secondaryButtonStyle?: string;
   buttonsLayout?: "inline" | "stacked";
+  buttonGap?: string;
   buttons?: {
     id?: string;
     label?: string;
@@ -71,6 +72,19 @@ export type BuilderLayoutBlock = {
     target?: string;
     style?: string;
   }[];
+  buttonBg?: string;
+  buttonTextColor?: string;
+  buttonBorderRadius?: string;
+  buttonBorderWidth?: string;
+  buttonBorderColor?: string;
+  buttonPaddingY?: string;
+  buttonPaddingX?: string;
+  buttonFontWeight?: string;
+  buttonLetterSpacing?: string;
+  buttonHoverBg?: string;
+  buttonHoverTextColor?: string;
+  buttonHoverBorderColor?: string;
+  buttonHoverEffect?: string;
   imageUrl?: string;
   imageAlt?: string;
   imageAlignment?: "left" | "center" | "right";

@@ -145,6 +145,18 @@ import {
   type BuilderSpacingContext,
   getDefaultSpacingToken,
 } from "@/lib/builderSpacing";
+import {
+  BUILDER_BUTTON_PRESETS,
+  builderButtonCssVars,
+  builderButtonOverrideCssVars,
+  builderButtonPresetFields,
+  buttonColorInputValue,
+  getBuilderButtonPresetKey,
+} from "@/lib/builderButtons";
+import {
+  getBuilderImageAspectRatio,
+  getBuilderImageObjectFit,
+} from "@/lib/builderImages";
 
 const BUILDER_TEMPLATE_DND_TYPE = "application/x-builder-template";
 const BUILDER_TEMPLATE_SECTION_DND_TYPE =
@@ -271,6 +283,19 @@ const defaultShellSettings: BuilderShellSettings = {
   productImageNoPadding: false,
   productImagePadding: "clamp(22px, 2.4vw, 36px)",
   productImageObjectFit: "contain",
+  buttonBg: "",
+  buttonTextColor: "",
+  buttonBorderRadius: "999px",
+  buttonBorderWidth: "0px",
+  buttonBorderColor: "transparent",
+  buttonPaddingY: "11px",
+  buttonPaddingX: "18px",
+  buttonFontWeight: "720",
+  buttonLetterSpacing: "0px",
+  buttonHoverBg: "",
+  buttonHoverTextColor: "",
+  buttonHoverBorderColor: "transparent",
+  buttonHoverEffect: "lift",
   menuItems: [
     { id: "home", label: "Home", url: "/" },
     { id: "shop", label: "Shop", url: "/shop" },
@@ -696,12 +721,16 @@ function readableSchemeForColor(color: string | undefined): SectionColorScheme {
   return "inherit";
 }
 
-const previewButtonsStyle = (layout?: "inline" | "stacked", align?: "left" | "center" | "right"): CSSProperties => ({
+const previewButtonsStyle = (
+  layout?: "inline" | "stacked",
+  align?: "left" | "center" | "right",
+  gap?: string,
+): CSSProperties => ({
   display: "flex",
   width: "100%",
   flexDirection: layout === "stacked" ? "column" : "row",
   flexWrap: "wrap",
-  gap: "0.75rem",
+  gap: gap || "0.75rem",
   justifyContent: align === "center" ? "center" : align === "right" ? "flex-end" : "flex-start",
   alignItems: "center",
 });
@@ -724,6 +753,20 @@ function getRichTextSafeTag(tag: string) {
   return tag === "p" ? "div" : tag;
 }
 
+function buttonTypographyStyle(
+  className: string | undefined,
+  style: CSSProperties | undefined,
+) {
+  if (!style || !String(className || "").includes("cta")) return style;
+  const buttonSafeStyle = { ...style };
+  delete buttonSafeStyle.color;
+  return buttonSafeStyle;
+}
+
+function blockButtonCssVars(block: BuilderLayoutBlock): CSSProperties {
+  return builderButtonOverrideCssVars(block);
+}
+
 function DashboardTypog({
   as: As = "div",
   typography,
@@ -738,7 +781,7 @@ function DashboardTypog({
     inferTypographyArea(String(As), className),
   );
   const combined = [className, tp.className].filter(Boolean).join(" ");
-  const combinedStyle = { ...tp.style, ...style };
+  const combinedStyle = buttonTypographyStyle(combined, { ...tp.style, ...style });
   const isRich = isRichPreviewText(children);
   if (isRich) {
     const RichTag = getRichTextSafeTag(String(As)) as any;
@@ -1197,7 +1240,7 @@ export default function DashboardBuilder({
   const [sectionSettingsOpen, setSectionSettingsOpen] = useState(false);
   const [sectionStructureOpen, setSectionStructureOpen] = useState(false);
   const [globalStylesTab, setGlobalStylesTab] = useState<
-    "siteDesign" | "spacing" | "cards" | "typography" | "header"
+    "siteDesign" | "spacing" | "cards" | "typography" | "header" | "buttons"
   >("siteDesign");
   const [globalSpacingFocus, setGlobalSpacingFocus] = useState<
     "section" | "row" | "element" | null
@@ -5118,6 +5161,7 @@ export default function DashboardBuilder({
             ["siteDesign", "Site Design"],
             ["spacing", "Spacing"],
             ["cards", "Cards"],
+            ["buttons", "Buttons"],
             ["typography", "Typography"],
             ["header", "Header"],
           ] as const
@@ -5674,6 +5718,312 @@ export default function DashboardBuilder({
             />
             <span>Disable image padding completely</span>
           </label>
+        </div>
+      )}
+
+      {globalStylesTab === "buttons" && (
+        <div className="builder-global-styles-group">
+          <div className="builder-card-title">
+            <strong>Button Preset</strong>
+            <span>applies to inherited element buttons</span>
+          </div>
+          <div className="builder-header-presets-grid">
+            {BUILDER_BUTTON_PRESETS.map((preset) => {
+              const activePreset = getBuilderButtonPresetKey(shellSettings);
+              return (
+                <button
+                  key={preset.key}
+                  type="button"
+                  className={`builder-preset-btn${activePreset === preset.key ? " is-active" : ""}`}
+                  onClick={() => updateShellSettings(builderButtonPresetFields(preset.key))}
+                >
+                  <span>{preset.label}</span>
+                  <small>{preset.description}</small>
+                </button>
+              );
+            })}
+          </div>
+          <div className="builder-button-preview-row">
+            <span
+              className="builder-preview-cta builder-preview-cta--primary"
+              style={builderButtonCssVars(shellSettings)}
+            >
+              Button preview
+            </span>
+          </div>
+
+          <details className="builder-collapse">
+            <summary>
+              <span>Fine tune button style</span>
+              <small>optional custom values</small>
+            </summary>
+          <div className="builder-card-title">
+            <strong>Button Core Style</strong>
+            <span>colors + borders</span>
+          </div>
+
+          <div className="builder-two-column">
+            <label className="builder-field">
+              <span>Background</span>
+              <input
+                type="color"
+                value={buttonColorInputValue(shellSettings.buttonBg, "#111111")}
+                onChange={(event) =>
+                  updateShellSettings({
+                    buttonBg: event.target.value,
+                  })
+                }
+              />
+            </label>
+
+            <label className="builder-field">
+              <span>Text Color</span>
+              <input
+                type="color"
+                value={buttonColorInputValue(shellSettings.buttonTextColor, "#ffffff")}
+                onChange={(event) =>
+                  updateShellSettings({
+                    buttonTextColor: event.target.value,
+                  })
+                }
+              />
+            </label>
+          </div>
+
+          <div className="builder-two-column">
+            <label className="builder-field">
+              <span>Border Radius</span>
+              <select
+                value={
+                  ["0px", "4px", "8px", "12px", "16px", "999px"].includes(shellSettings.buttonBorderRadius)
+                    ? shellSettings.buttonBorderRadius
+                    : "custom"
+                }
+                onChange={(event) => {
+                  const val = event.target.value;
+                  if (val === "custom") {
+                    updateShellSettings({ buttonBorderRadius: "10px" });
+                  } else {
+                    updateShellSettings({ buttonBorderRadius: val });
+                  }
+                }}
+              >
+                <option value="0px">Flat (0px)</option>
+                <option value="4px">Small (4px)</option>
+                <option value="8px">Medium (8px)</option>
+                <option value="12px">Rounded (12px)</option>
+                <option value="16px">Large (16px)</option>
+                <option value="999px">Pill (999px)</option>
+                <option value="custom">Custom...</option>
+              </select>
+            </label>
+
+            <label className="builder-field">
+              <span>Border Width</span>
+              <select
+                value={
+                  ["0px", "1px", "2px", "3px", "4px"].includes(shellSettings.buttonBorderWidth)
+                    ? shellSettings.buttonBorderWidth
+                    : "custom"
+                }
+                onChange={(event) => {
+                  const val = event.target.value;
+                  if (val === "custom") {
+                    updateShellSettings({ buttonBorderWidth: "1.5px" });
+                  } else {
+                    updateShellSettings({ buttonBorderWidth: val });
+                  }
+                }}
+              >
+                <option value="0px">None (0px)</option>
+                <option value="1px">Thin (1px)</option>
+                <option value="2px">Medium (2px)</option>
+                <option value="3px">Thick (3px)</option>
+                <option value="custom">Custom...</option>
+              </select>
+            </label>
+          </div>
+
+          {!["0px", "4px", "8px", "12px", "16px", "999px"].includes(shellSettings.buttonBorderRadius) && (
+            <label className="builder-field">
+              <span>Custom Border Radius (px/rem)</span>
+              <input
+                type="text"
+                value={shellSettings.buttonBorderRadius}
+                onChange={(event) =>
+                  updateShellSettings({
+                    buttonBorderRadius: event.target.value,
+                  })
+                }
+              />
+            </label>
+          )}
+
+          {!["0px", "1px", "2px", "3px", "4px"].includes(shellSettings.buttonBorderWidth) && (
+            <label className="builder-field">
+              <span>Custom Border Width (px/rem)</span>
+              <input
+                type="text"
+                value={shellSettings.buttonBorderWidth}
+                onChange={(event) =>
+                  updateShellSettings({
+                    buttonBorderWidth: event.target.value,
+                  })
+                }
+              />
+            </label>
+          )}
+
+          <label className="builder-field">
+            <span>Border Color</span>
+            <input
+              type="color"
+              value={buttonColorInputValue(shellSettings.buttonBorderColor, "#111111")}
+              onChange={(event) =>
+                updateShellSettings({
+                  buttonBorderColor: event.target.value,
+                })
+              }
+            />
+          </label>
+
+          <div className="builder-card-title">
+            <strong>Sizing & Spacing</strong>
+            <span>paddings + text options</span>
+          </div>
+
+          <div className="builder-two-column">
+            <label className="builder-field">
+              <span>Padding Y (vertical)</span>
+              <input
+                type="text"
+                value={shellSettings.buttonPaddingY}
+                onChange={(event) =>
+                  updateShellSettings({
+                    buttonPaddingY: event.target.value,
+                  })
+                }
+                placeholder="e.g. 11px"
+              />
+            </label>
+
+            <label className="builder-field">
+              <span>Padding X (horizontal)</span>
+              <input
+                type="text"
+                value={shellSettings.buttonPaddingX}
+                onChange={(event) =>
+                  updateShellSettings({
+                    buttonPaddingX: event.target.value,
+                  })
+                }
+                placeholder="e.g. 18px"
+              />
+            </label>
+          </div>
+
+          <div className="builder-two-column">
+            <label className="builder-field">
+              <span>Font Weight</span>
+              <select
+                value={shellSettings.buttonFontWeight || "720"}
+                onChange={(event) =>
+                  updateShellSettings({
+                    buttonFontWeight: event.target.value,
+                  })
+                }
+              >
+                <option value="400">Normal (400)</option>
+                <option value="500">Medium (500)</option>
+                <option value="600">Semibold (600)</option>
+                <option value="700">Bold (700)</option>
+                <option value="720">Heavy (720)</option>
+                <option value="800">Extra Bold (800)</option>
+              </select>
+            </label>
+
+            <label className="builder-field">
+              <span>Letter Spacing</span>
+              <select
+                value={shellSettings.buttonLetterSpacing || "0px"}
+                onChange={(event) =>
+                  updateShellSettings({
+                    buttonLetterSpacing: event.target.value,
+                  })
+                }
+              >
+                <option value="0px">None (0px)</option>
+                <option value="0.02em">Tight (0.02em)</option>
+                <option value="0.05em">Medium (0.05em)</option>
+                <option value="0.1em">Wide (0.1em)</option>
+              </select>
+            </label>
+          </div>
+
+          <div className="builder-card-title">
+            <strong>Hover Behavior</strong>
+            <span>actions + animations</span>
+          </div>
+
+          <div className="builder-two-column">
+            <label className="builder-field">
+              <span>Hover Background</span>
+              <input
+                type="color"
+                value={buttonColorInputValue(shellSettings.buttonHoverBg, "#111111")}
+                onChange={(event) =>
+                  updateShellSettings({
+                    buttonHoverBg: event.target.value,
+                  })
+                }
+              />
+            </label>
+
+            <label className="builder-field">
+              <span>Hover Text</span>
+              <input
+                type="color"
+                value={buttonColorInputValue(shellSettings.buttonHoverTextColor, "#ffffff")}
+                onChange={(event) =>
+                  updateShellSettings({
+                    buttonHoverTextColor: event.target.value,
+                  })
+                }
+              />
+            </label>
+          </div>
+
+          <div className="builder-two-column">
+            <label className="builder-field">
+              <span>Hover Border</span>
+              <input
+                type="color"
+                value={buttonColorInputValue(shellSettings.buttonHoverBorderColor, "#111111")}
+                onChange={(event) =>
+                  updateShellSettings({
+                    buttonHoverBorderColor: event.target.value,
+                  })
+                }
+              />
+            </label>
+
+            <label className="builder-field">
+              <span>Hover Action</span>
+              <select
+                value={shellSettings.buttonHoverEffect || "lift"}
+                onChange={(event) =>
+                  updateShellSettings({
+                    buttonHoverEffect: event.target.value as "none" | "lift" | "grow",
+                  })
+                }
+              >
+                <option value="none">None (Stay static)</option>
+                <option value="lift">Lift Up (Hover translation + shadow)</option>
+                <option value="grow">Grow (Slightly scale up)</option>
+              </select>
+            </label>
+          </div>
+          </details>
         </div>
       )}
 
@@ -7710,6 +8060,7 @@ function PreviewCanvas({
             shellSettings.elementMarginLeft,
             "elementMargin",
           ),
+          ...builderButtonCssVars(shellSettings),
         } as CSSProperties
       }
       onDragEnter={(event) => {
@@ -8746,6 +9097,13 @@ function InlineEditableText({
   style?: React.CSSProperties;
 }) {
   const tp = typographyProps(typography, inferTypographyArea(Tag, className));
+  const combinedClassName = ["builder-inline-editable", className, tp.className]
+    .filter(Boolean)
+    .join(" ");
+  const combinedStyle = buttonTypographyStyle(combinedClassName, {
+    ...tp.style,
+    ...style,
+  });
   const isRich = isRichPreviewText(value);
   const EditableTag = (isRich ? getRichTextSafeTag(Tag) : Tag) as any;
   const stopInlineEvent = (event: ReactMouseEvent<HTMLElement>) => {
@@ -8776,10 +9134,8 @@ function InlineEditableText({
 
   return (
     <EditableTag
-      className={["builder-inline-editable", className, tp.className]
-        .filter(Boolean)
-        .join(" ")}
-      style={{ ...tp.style, ...style }}
+      className={combinedClassName}
+      style={combinedStyle}
       contentEditable
       suppressContentEditableWarning
       {...(isRich ? { dangerouslySetInnerHTML: { __html: value } } : {})}
@@ -10658,6 +11014,7 @@ if (section.kind === "embed") {
                             block.borderRadius !== undefined
                               ? `${block.borderRadius}px`
                               : undefined,
+                          ...blockButtonCssVars(block),
                           ...dashboardElementBoxStyle(block),
                           ...visualStyleToCss(
                             block.visualStyle as BuilderVisualStyle | undefined,
@@ -10909,7 +11266,7 @@ if (section.kind === "embed") {
                         <div className={`shop-builder-column-block shop-builder-column-block--button ${block.premiumCardStyle && block.premiumCardStyle !== "none" ? `shop-builder-card--${block.premiumCardStyle}` : ""}`}>
                           <div 
                             className={`shop-builder-buttons ${block.premiumButtonStyle && block.premiumButtonStyle !== "default" ? "" : `shop-builder-buttons--${block.buttonsLayout ?? "inline"}`}`}
-                            style={previewButtonsStyle(block.buttonsLayout, block.elementAlign)}
+                            style={previewButtonsStyle(block.buttonsLayout, block.elementAlign, block.buttonGap)}
                           >
                             {block.buttonLabel && (
                               <DashboardTypog
@@ -11303,7 +11660,7 @@ if (section.kind === "embed") {
                           )}
                           <div 
                             className={`shop-builder-buttons ${block.premiumButtonStyle && block.premiumButtonStyle !== "default" ? "" : `shop-builder-buttons--${block.buttonsLayout ?? "inline"}`}`}
-                            style={previewButtonsStyle(block.buttonsLayout, block.elementAlign)}
+                            style={previewButtonsStyle(block.buttonsLayout, block.elementAlign, block.buttonGap)}
                           >
                             {block.buttonLabel && (
                               <DashboardTypog
@@ -11427,7 +11784,7 @@ if (section.kind === "embed") {
                           </div>
                         <div 
                           className={`shop-builder-buttons shop-builder-buttons--${block.buttonsLayout ?? "inline"}`}
-                          style={previewButtonsStyle(block.buttonsLayout, block.elementAlign)}
+                          style={previewButtonsStyle(block.buttonsLayout, block.elementAlign, block.buttonGap)}
                         >
                           {block.buttonLabel && (
                             <DashboardTypog
@@ -11550,7 +11907,7 @@ if (section.kind === "embed") {
 
                           <div 
                             className={`shop-builder-buttons shop-builder-buttons--${block.buttonsLayout ?? "inline"}`}
-                            style={previewButtonsStyle(block.buttonsLayout, block.elementAlign)}
+                            style={previewButtonsStyle(block.buttonsLayout, block.elementAlign, block.buttonGap)}
                           >
                             {block.buttonLabel && (
                               <DashboardTypog
@@ -11576,50 +11933,55 @@ if (section.kind === "embed") {
                           </div>
                         </div>
                       ) : block.kind === "image" ? (
-                        <div className="shop-builder-column-block shop-builder-column-block--image">
-                          <div
-                            className="shop-builder-panel-media"
-                            style={{
-                              textAlign: block.imageAlignment ?? "center",
-                              maxWidth: block.imageMaxWidth ? `${block.imageMaxWidth}px` : undefined,
-                              marginInline: "auto",
-                            }}
-                          >
-                            {block.imageUrl ? (
-                              <Image
-                                src={block.imageUrl}
-                                alt={block.imageAlt ?? block.title ?? ""}
-                                width={1200}
-                                height={800}
+                        (() => {
+                          const imageAspectRatio = getBuilderImageAspectRatio(block.imageRatio);
+                          const imageObjectFit = getBuilderImageObjectFit(block.imageFit);
+                          const imageRadius = `${block.imageBorderRadius ?? 12}px`;
+
+                          return (
+                            <div className="shop-builder-column-block shop-builder-column-block--image">
+                              <figure
+                                className="shop-builder-image-figure"
                                 style={{
-                                  width: "100%",
-                                  height: "100%",
-                                  objectFit: "cover",
-                                  borderRadius: block.imageBorderRadius ? `${block.imageBorderRadius}px` : undefined,
+                                  textAlign: block.imageAlignment ?? "center",
+                                  maxWidth: block.imageMaxWidth ? `${block.imageMaxWidth}px` : undefined,
+                                  marginInline: "auto",
                                 }}
-                              />
-                            ) : (
-                              <div className="builder-mini-empty">
-                                Choose an image in the inspector.
-                              </div>
-                            )}
-                          </div>
-                          {block.imageCaption && (
-                            <p style={{ textAlign: "center", fontSize: "0.85em", opacity: 0.7, marginTop: 4 }}>
-                              {block.imageCaption}
-                            </p>
-                          )}
-                          {block.title && (
-                            <DashboardTypog as="h3" typography={block.typography}>
-                              {block.title}
-                            </DashboardTypog>
-                          )}
-                          {block.body && (
-                            <DashboardTypog as="p" typography={block.typography}>
-                              {block.body}
-                            </DashboardTypog>
-                          )}
-                        </div>
+                              >
+                                <div
+                                  className="shop-builder-image-media"
+                                  style={{
+                                    aspectRatio: imageAspectRatio,
+                                    borderRadius: imageRadius,
+                                  }}
+                                >
+                                  {block.imageUrl ? (
+                                    <Image
+                                      src={block.imageUrl}
+                                      alt={block.imageAlt ?? ""}
+                                      width={1200}
+                                      height={800}
+                                      style={{
+                                        width: "100%",
+                                        height: imageAspectRatio ? "100%" : "auto",
+                                        objectFit: imageObjectFit,
+                                      }}
+                                    />
+                                  ) : (
+                                    <div className="builder-mini-empty builder-mini-empty--image">
+                                      Choose an image in the inspector.
+                                    </div>
+                                  )}
+                                </div>
+                                {block.imageCaption && (
+                                  <figcaption>
+                                    {block.imageCaption}
+                                  </figcaption>
+                                )}
+                              </figure>
+                            </div>
+                          );
+                        })()
                       ) : block.kind === "table" ? (
                         <div className="shop-builder-column-block shop-builder-column-block--table">
                           <div style={{ overflowX: "auto" }}>
@@ -12376,7 +12738,7 @@ if (section.kind === "embed") {
                           )}
                           <div 
                             className={`shop-builder-buttons shop-builder-buttons--${block.buttonsLayout ?? "inline"}`}
-                            style={previewButtonsStyle(block.buttonsLayout, block.elementAlign)}
+                            style={previewButtonsStyle(block.buttonsLayout, block.elementAlign, block.buttonGap)}
                           >
                             {block.buttonLabel && (
                               <span className="builder-preview-cta">

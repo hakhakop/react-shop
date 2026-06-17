@@ -162,11 +162,12 @@ export default function ProductCard({
   const normalizedCardTheme = cardTheme ?? "default";
 
   const normalizedCartStyle =
+    addToCartStyle === "blue" ||
     addToCartStyle === "dark" ||
     addToCartStyle === "light" ||
     addToCartStyle === "inherit"
       ? addToCartStyle
-      : "blue";
+      : "inherit";
 
   const normalizedCartSize =
     addToCartSize === "compact" ||
@@ -213,20 +214,21 @@ export default function ProductCard({
           }
         : normalizedCartStyle === "inherit"
           ? {
-              background:
-                "var(--builder-active-button-bg, var(--text-main, #111111))",
-              borderColor:
-                "var(--builder-active-button-bg, var(--text-main, #111111))",
-              color: "var(--builder-active-button-text, #ffffff)",
+              background: "var(--button-bg, var(--builder-active-button-bg, var(--text-main, #111111)))",
+              borderColor: "var(--button-border-color, var(--button-bg, var(--builder-active-button-bg, var(--text-main, #111111))))",
+              color: "var(--button-text-color, var(--builder-active-button-text, #ffffff))",
             }
           : { background: "#0d7cff", borderColor: "#0d7cff", color: "#ffffff" };
 
   const cartButtonStyle = {
     ...sizeStyle,
     ...colorStyle,
-    borderRadius: 999,
-    fontWeight: 800,
-    letterSpacing: "0.06em",
+    borderRadius:
+      normalizedCartStyle === "inherit" ? "var(--button-radius, 999px)" : 999,
+    fontWeight:
+      normalizedCartStyle === "inherit" ? "var(--button-font-weight, 800)" : 800,
+    letterSpacing:
+      normalizedCartStyle === "inherit" ? "var(--button-letter-spacing, 0.06em)" : "0.06em",
     boxShadow: colorStyle.boxShadow ?? "none",
   };
 

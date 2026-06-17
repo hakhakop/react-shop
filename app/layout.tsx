@@ -20,6 +20,7 @@ import {
   resolveBuilderSpacing,
   type BuilderSpacingContext,
 } from "../lib/builderSpacing";
+import { normalizeButtonStyleFields } from "../lib/builderButtons";
 
 export const metadata: Metadata = {
   title: "Webpages Store",
@@ -217,6 +218,24 @@ export default async function RootLayout({
     productImageNoPadding ? "cover" : "contain"
   );
 
+  const buttonStyle = normalizeButtonStyleFields(shellSettings, {
+    buttonBg: primaryColor || settings.primary_color || "#111111",
+    buttonHoverBg: primaryColor || settings.primary_color || "#111111",
+  });
+  const buttonBorderRadius = toCssSize(buttonStyle.buttonBorderRadius, "999px");
+  const buttonBorderWidth = toCssSize(buttonStyle.buttonBorderWidth, "0px");
+  const buttonPaddingY = toCssSize(buttonStyle.buttonPaddingY, "11px");
+  const buttonPaddingX = toCssSize(buttonStyle.buttonPaddingX, "18px");
+  const buttonHoverEffect = buttonStyle.buttonHoverEffect || "lift";
+  const buttonHoverTransform =
+    buttonHoverEffect === "lift"
+      ? "translateY(-2px)"
+      : buttonHoverEffect === "grow"
+        ? "scale(1.04)"
+        : "none";
+  const buttonHoverShadow =
+    buttonHoverEffect === "lift" ? "0 16px 34px rgba(17, 17, 17, 0.16)" : "none";
+
   const explicitWordPressProductVars = [
     optionalCssVar("--wp-product-card-bg", settings.product_card_background),
     optionalCssVar("--wp-product-card-shadow", settings.product_card_shadow),
@@ -241,6 +260,21 @@ export default async function RootLayout({
             __html: `
 :root {
   ${designTokensCss}
+
+  --button-bg: ${buttonStyle.buttonBg};
+  --button-text-color: ${buttonStyle.buttonTextColor};
+  --button-radius: ${buttonBorderRadius};
+  --button-border-width: ${buttonBorderWidth};
+  --button-border-color: ${buttonStyle.buttonBorderColor};
+  --button-padding-y: ${buttonPaddingY};
+  --button-padding-x: ${buttonPaddingX};
+  --button-font-weight: ${buttonStyle.buttonFontWeight};
+  --button-letter-spacing: ${buttonStyle.buttonLetterSpacing};
+  --button-hover-bg: ${buttonStyle.buttonHoverBg};
+  --button-hover-text-color: ${buttonStyle.buttonHoverTextColor};
+  --button-hover-border-color: ${buttonStyle.buttonHoverBorderColor};
+  --button-hover-transform: ${buttonHoverTransform};
+  --button-hover-shadow: ${buttonHoverShadow};
 
   --product-card-radius: ${productCardRadius};
   --product-card-bg: ${productCardBg};

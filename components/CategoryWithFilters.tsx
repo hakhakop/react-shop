@@ -154,20 +154,18 @@ function getCartButtonStyle({
           }
         : style === "inherit"
           ? {
-              background:
-                "var(--builder-active-button-bg, var(--text-main, #111111))",
-              borderColor:
-                "var(--builder-active-button-bg, var(--text-main, #111111))",
-              color: "var(--builder-active-button-text, #ffffff)",
+              background: "var(--button-bg, var(--builder-active-button-bg, var(--text-main, #111111)))",
+              borderColor: "var(--button-border-color, var(--button-bg, var(--builder-active-button-bg, var(--text-main, #111111))))",
+              color: "var(--button-text-color, var(--builder-active-button-text, #ffffff))",
             }
           : { background: "#0d7cff", borderColor: "#0d7cff", color: "#ffffff" };
 
   return {
     ...sizeStyle,
     ...colorStyle,
-    borderRadius: 999,
-    fontWeight: 800,
-    letterSpacing: "0.06em",
+    borderRadius: style === "inherit" ? "var(--button-radius, 999px)" : 999,
+    fontWeight: style === "inherit" ? "var(--button-font-weight, 800)" : 800,
+    letterSpacing: style === "inherit" ? "var(--button-letter-spacing, 0.06em)" : "0.06em",
     boxShadow: colorStyle.boxShadow ?? "none",
   };
 }
@@ -396,11 +394,12 @@ export default function CategoryWithFilters({
     }
   }
   const normalizedCartStyle =
+    addToCartStyle === "blue" ||
     addToCartStyle === "dark" ||
     addToCartStyle === "light" ||
     addToCartStyle === "inherit"
       ? addToCartStyle
-      : "blue";
+      : "inherit";
   const normalizedCartSize =
     addToCartSize === "compact" ||
     addToCartSize === "large" ||

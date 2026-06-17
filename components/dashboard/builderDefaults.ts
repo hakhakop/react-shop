@@ -567,13 +567,15 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
     return {
       id,
       kind,
-      title: "Image",
-      body: "A simple image block for banners, artwork, and visual breaks.",
+      title: "",
+      body: "",
       imageUrl: "",
       imageAlt: "",
       imageAlignment: "center",
       imageMaxWidth: 1200,
-      imageBorderRadius: 0,
+      imageBorderRadius: 12,
+      imageFit: "cover",
+      imageRatio: "auto",
       imageCaption: "",
     };
   }

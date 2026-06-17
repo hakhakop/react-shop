@@ -59,6 +59,11 @@ import {
   resolveBuilderSpacing,
   type BuilderSpacingContext,
 } from "@/lib/builderSpacing";
+import { builderButtonOverrideCssVars } from "@/lib/builderButtons";
+import {
+  getBuilderImageAspectRatio,
+  getBuilderImageObjectFit,
+} from "@/lib/builderImages";
 
 type StorefrontBuilderRendererProps = {
   layout: BuilderLayout;
@@ -1660,7 +1665,7 @@ function ContentLayoutBlock({
             display: "flex",
             flexDirection: block.buttonsLayout === "stacked" ? "column" : "row",
             flexWrap: "wrap",
-            gap: "0.75rem",
+            gap: block.buttonGap || "0.75rem",
           }}
         >
           {block.buttonLabel && block.buttonUrl && (
@@ -2364,46 +2369,47 @@ function ContentLayoutBlock({
   }
 
   if (block.kind === "image") {
+    const imageAspectRatio = getBuilderImageAspectRatio(block.imageRatio);
+    const imageObjectFit = getBuilderImageObjectFit(block.imageFit);
+    const imageRadius = `${block.imageBorderRadius ?? 12}px`;
+
+    if (!block.imageUrl) {
+      return null;
+    }
+
     return (
       <div className="shop-builder-column-block shop-builder-column-block--image">
-        <div
+        <figure
+          className="shop-builder-image-figure"
           style={{
             textAlign: block.imageAlignment ?? "center",
             maxWidth: block.imageMaxWidth ? `${block.imageMaxWidth}px` : undefined,
             marginInline: "auto",
           }}
         >
-          {block.imageUrl ? (
+          <div
+            className="shop-builder-image-media"
+            style={{
+              aspectRatio: imageAspectRatio,
+              borderRadius: imageRadius,
+            }}
+          >
             <img
               src={block.imageUrl}
-              alt={block.imageAlt ?? block.title ?? ""}
+              alt={block.imageAlt ?? ""}
               style={{
                 width: "100%",
-                height: "auto",
-                borderRadius: block.imageBorderRadius ? `${block.imageBorderRadius}px` : undefined,
+                height: imageAspectRatio ? "100%" : "auto",
+                objectFit: imageObjectFit,
               }}
             />
-          ) : block.title || block.body ? null : (
-            <div className="builder-mini-empty">
-              Choose an image in the inspector.
-            </div>
-          )}
-        </div>
+          </div>
         {block.imageCaption && (
-          <p style={{ textAlign: "center", fontSize: "0.85em", opacity: 0.7, marginTop: 4 }}>
+          <figcaption>
             {block.imageCaption}
-          </p>
+          </figcaption>
         )}
-        {block.title && (
-          <Typog as="h3" typography={block.typography}>
-            {block.title}
-          </Typog>
-        )}
-        {block.body && (
-          <Typog as="p" typography={block.typography}>
-            {block.body}
-          </Typog>
-        )}
+        </figure>
       </div>
     );
   }
@@ -2461,7 +2467,7 @@ function ContentLayoutBlock({
           display: "flex",
           flexDirection: block.buttonsLayout === "stacked" ? "column" : "row",
           flexWrap: "wrap",
-          gap: "0.75rem",
+          gap: block.buttonGap || "0.75rem",
         }}
       >
         {block.buttonLabel && block.buttonUrl && (
@@ -2569,6 +2575,8 @@ function blockSurfaceStyle(
     legacy.marginLeft = "var(--builder-global-element-margin-left, 0px)";
   }
 
+  Object.assign(legacy, builderButtonOverrideCssVars(block));
+
   return { ...contextVars, ...legacy, ...visualCss };
 }
 
@@ -2615,13 +2623,23 @@ function getRichTextSafeTag(tag: string) {
   return tag === "p" ? "div" : tag;
 }
 
+function buttonTypographyStyle(
+  className: string | undefined,
+  style: CSSProperties | undefined,
+) {
+  if (!style || !String(className || "").includes("cta")) return style;
+  const buttonSafeStyle = { ...style };
+  delete buttonSafeStyle.color;
+  return buttonSafeStyle;
+}
+
 function Typog({ as: As = "div", typography, className, children, style, ...props }: any) {
   const tp = typographyProps(
     typography,
     inferTypographyArea(String(As), className),
   );
   const combined = [className, tp.className].filter(Boolean).join(" ");
-  const combinedStyle = { ...tp.style, ...style };
+  const combinedStyle = buttonTypographyStyle(combined, { ...tp.style, ...style });
   const isRich = isRichPreviewText(children);
   if (isRich) {
     const Tag = getRichTextSafeTag(String(As)) as any;

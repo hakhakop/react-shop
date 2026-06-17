@@ -64,6 +64,20 @@
             "rowLayout": "whole",
             "blocks": [
               {
+                "id": "image-block-mqho93e8-k93hf",
+                "kind": "image",
+                "title": "Image",
+                "body": "A simple image block for banners, artwork, and visual breaks.",
+                "imageUrl": "https://cms.webpages.am/wp-content/uploads/2026/06/logo-2-1-scaled.png",
+                "imageAlt": "logo-2 (1)",
+                "imageAlignment": "center",
+                "imageMaxWidth": 600,
+                "imageBorderRadius": 0,
+                "imageCaption": "",
+                "panelStyle": "dark",
+                "borderRadius": 10
+              },
+              {
                 "id": "demo-hero-block-1",
                 "kind": "hero",
                 "eyebrow": "Բարի գալուստ webpages",
@@ -113,12 +127,17 @@
                 "elementAlign": "center",
                 "carouselSettings": {
                   "variant": "default"
-                }
+                },
+                "borderRadius": 24,
+                "buttons": [],
+                "buttonPaddingX": "60px"
               }
             ],
             "rowTopMargin": "md",
             "rowBottomSpacing": "md",
-            "rowBottomMargin": "md"
+            "rowBottomMargin": "md",
+            "rowBorderRadius": 0,
+            "rowColorScheme": "inherit"
           }
         ],
         "visualStyle": {
@@ -169,7 +188,29 @@
                     "fontWeight": "600"
                   }
                 },
-                "elementAlign": "center"
+                "elementAlign": "center",
+                "buttonBg": "#111111",
+                "buttonTextColor": "#ffffff",
+                "buttonBorderRadius": "999px",
+                "buttonBorderWidth": "0px",
+                "buttonBorderColor": "transparent",
+                "buttonPaddingY": "11px",
+                "buttonPaddingX": "18px",
+                "buttonFontWeight": "720",
+                "buttonLetterSpacing": "0px",
+                "buttonHoverBg": "#000000",
+                "buttonHoverTextColor": "#ffffff",
+                "buttonHoverBorderColor": "transparent",
+                "buttonHoverEffect": "lift",
+                "buttons": [
+                  {
+                    "id": "btn-mqgzx5wm-0",
+                    "label": "New Button",
+                    "url": "/",
+                    "target": "_self",
+                    "style": "primary"
+                  }
+                ]
               }
             ],
             "rowTopMargin": "inherit"
@@ -202,7 +243,8 @@
                     "meta": "Meta",
                     "text": "<p>Լայն typography, CTA, proof cards և slider-ային ներկայացումներ։</p><p></p><p></p>",
                     "buttonLabel": "Learn more",
-                    "buttonUrl": "/"
+                    "buttonUrl": "/",
+                    "buttonStyle": "primary"
                   },
                   {
                     "id": "grid-item-mq4zx3az",
@@ -370,7 +412,7 @@
                     ],
                     "listIconColorScheme": "gradient-cycle",
                     "listIconSize": 16,
-                    "buttonStyle": "outline",
+                    "buttonStyle": "primary",
                     "buttonAlign": "center"
                   },
                   {
@@ -1148,7 +1190,7 @@
         ]
       }
     ],
-    "updatedAt": "2026-06-16T05:52:27.670Z"
+    "updatedAt": "2026-06-17T06:38:40.106Z"
   },
   "shop": {
     "version": 1,
@@ -3043,6 +3085,56 @@
             "id": "layout-item-mqcfe9b9-1",
             "blocks": [
               {
+                "id": "button-block-mqh0a11e-otja3",
+                "kind": "button",
+                "buttonsLayout": "inline",
+                "buttons": [
+                  {
+                    "id": "btn-mqh0a11e",
+                    "label": "Button Text",
+                    "url": "/",
+                    "target": "_self",
+                    "style": "primary"
+                  },
+                  {
+                    "id": "btn-mqh0aaa5-1",
+                    "label": "New Button",
+                    "url": "/",
+                    "target": "_self",
+                    "style": "primary"
+                  },
+                  {
+                    "id": "btn-mqh0aaoe-2",
+                    "label": "New Button",
+                    "url": "/",
+                    "target": "_self",
+                    "style": "primary"
+                  },
+                  {
+                    "id": "btn-mqh0ab1t-3",
+                    "label": "New Button",
+                    "url": "/",
+                    "target": "_self",
+                    "style": "primary"
+                  }
+                ],
+                "elementPadding": "inherit",
+                "elementBackgroundMode": "transparent",
+                "buttonBg": "transparent",
+                "buttonTextColor": "#111111",
+                "buttonBorderRadius": "999px",
+                "buttonBorderWidth": "1.5px",
+                "buttonBorderColor": "#111111",
+                "buttonPaddingY": "10px",
+                "buttonPaddingX": "18px",
+                "buttonFontWeight": "700",
+                "buttonLetterSpacing": "0px",
+                "buttonHoverBg": "#111111",
+                "buttonHoverTextColor": "#ffffff",
+                "buttonHoverBorderColor": "#111111",
+                "buttonHoverEffect": "lift"
+              },
+              {
                 "id": "heading-block-mqcfe9b9-aig8f",
                 "kind": "heading",
                 "headingText": "Your Heading Text",
@@ -3065,6 +3157,6 @@
         "layoutRows": 1
       }
     ],
-    "updatedAt": "2026-06-13T14:04:13.694Z"
+    "updatedAt": "2026-06-16T18:59:20.577Z"
   }
 }

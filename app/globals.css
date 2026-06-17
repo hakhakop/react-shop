@@ -286,27 +286,32 @@ body {
   align-items: center;
   justify-content: center;
   gap: 4px;
-  padding: 6px 12px;
+  padding: var(--button-padding-y, 6px) var(--button-padding-x, 12px);
   border-radius: var(--button-radius, 999px);
   font-size: 13px;
   cursor: pointer;
-  border: 1px solid transparent;
-  background: var(--surface-muted, #e5e7eb);
-  color: var(--text-main, #111827);
+  border: var(--button-border-width, 1px) solid var(--button-border-color, transparent);
+  background: var(--button-bg, var(--surface-muted, #e5e7eb));
+  color: var(--button-text-color, var(--text-main, #111827));
+  font-weight: var(--button-font-weight, normal);
+  letter-spacing: var(--button-letter-spacing, normal);
   transition: background 0.16s ease, border-color 0.16s ease,
     box-shadow 0.16s ease, transform 0.16s ease;
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, var(--accent, #ec4899), var(--accent-strong, #db2777));
-  border-color: var(--accent-strong, rgba(219, 39, 119, 0.9));
-  color: var(--accent-contrast, #ffffff);
+  background: var(--button-bg, linear-gradient(135deg, var(--accent, #ec4899), var(--accent-strong, #db2777)));
+  border-color: var(--button-border-color, var(--accent-strong, rgba(219, 39, 119, 0.9)));
+  color: var(--button-text-color, var(--accent-contrast, #ffffff));
   box-shadow: var(--shadow-md, 0 12px 30px rgba(219, 39, 119, 0.28));
 }
 
 .btn-primary:hover {
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-lg, 0 16px 38px rgba(219, 39, 119, 0.34));
+  transform: var(--button-hover-transform, translateY(-1px));
+  box-shadow: var(--button-hover-shadow, var(--shadow-lg, 0 16px 38px rgba(219, 39, 119, 0.34)));
+  background: var(--button-hover-bg, var(--button-bg, linear-gradient(135deg, var(--accent, #ec4899), var(--accent-strong, #db2777))));
+  color: var(--button-hover-text-color, var(--button-text-color, var(--accent-contrast, #ffffff)));
+  border-color: var(--button-hover-border-color, var(--button-border-color, var(--accent-strong, rgba(219, 39, 119, 0.9))));
 }
 
 .btn-disabled {

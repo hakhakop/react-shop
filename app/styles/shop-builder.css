@@ -36,8 +36,8 @@
   color: var(--builder-section-text, var(--builder-text, #111111));
   --builder-active-muted: var(--builder-section-muted, var(--builder-muted, #55554f));
   --builder-active-surface: var(--builder-section-surface, var(--builder-surface, #f5f5f3));
-  --builder-active-button-bg: var(--builder-section-button-bg, var(--builder-button-bg, #111111));
-  --builder-active-button-text: var(--builder-section-button-text, var(--builder-button-text, #ffffff));
+  --builder-active-button-bg: var(--button-bg, var(--builder-section-button-bg, var(--builder-button-bg, #111111)));
+  --builder-active-button-text: var(--button-text-color, var(--builder-section-button-text, var(--builder-button-text, #ffffff)));
   overflow-x: clip;
 }
 
@@ -192,25 +192,33 @@
 .shop-builder-cta {
   width: fit-content;
   margin-top: 24px;
-  padding: 11px 18px;
-  border-radius: var(--builder-radius, 999px);
+  padding: var(--button-padding-y, 11px) var(--button-padding-x, 18px);
+  border-radius: var(--button-radius, var(--builder-radius, 999px));
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: var(--builder-active-button-bg, #111111);
-  color: var(--builder-active-button-text, #ffffff);
+  background: var(--button-bg, var(--builder-active-button-bg, #111111));
+  color: var(--button-text-color, var(--builder-active-button-text, #ffffff));
+  border: var(--button-border-width, 0px) solid var(--button-border-color, transparent);
   font-size: 14px;
-  font-weight: 720;
+  font-weight: var(--button-font-weight, 720);
+  letter-spacing: var(--button-letter-spacing, 0px);
   text-decoration: none;
   transition:
     transform 180ms ease,
     box-shadow 180ms ease,
+    background-color 180ms ease,
+    color 180ms ease,
+    border-color 180ms ease,
     opacity 180ms ease;
 }
 
 .shop-builder-cta:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 16px 34px rgba(17, 17, 17, 0.16);
+  transform: var(--button-hover-transform, translateY(-2px));
+  box-shadow: var(--button-hover-shadow, 0 16px 34px rgba(17, 17, 17, 0.16));
+  background: var(--button-hover-bg, var(--button-bg, var(--builder-active-button-bg, #111111)));
+  color: var(--button-hover-text-color, var(--button-text-color, var(--builder-active-button-text, #ffffff)));
+  border-color: var(--button-hover-border-color, var(--button-border-color, transparent));
 }
 
 .shop-builder-cta--light {
@@ -219,50 +227,54 @@
 }
 
 .shop-builder-cta--primary {
-  background: var(--builder-active-button-bg, #111111);
-  color: var(--builder-active-button-text, #ffffff);
-  border: 1px solid transparent;
+  background: var(--button-bg, var(--builder-active-button-bg, #111111));
+  color: var(--button-text-color, var(--builder-active-button-text, #ffffff));
+  border: var(--button-border-width, 0px) solid var(--button-border-color, transparent);
 }
 
 .shop-builder-cta--primary:hover {
   opacity: 0.9;
+  background: var(--button-hover-bg, var(--button-bg, var(--builder-active-button-bg, #111111)));
+  color: var(--button-hover-text-color, var(--button-text-color, var(--builder-active-button-text, #ffffff)));
+  border-color: var(--button-hover-border-color, var(--button-border-color, transparent));
 }
 
 .shop-builder-cta--secondary {
-  background: var(--builder-active-surface, #efefe9);
-  color: var(--builder-active-text, #111111);
-  border: 1px solid transparent;
+  background: color-mix(in srgb, var(--button-bg, var(--builder-active-button-bg, #111111)) 10%, var(--builder-active-surface, #efefe9));
+  color: var(--button-bg, var(--builder-active-button-bg, #111111));
+  border: var(--button-border-width, 1px) solid color-mix(in srgb, var(--button-bg, var(--builder-active-button-bg, #111111)) 24%, transparent);
 }
 
 .shop-builder-cta--secondary:hover {
-  background: var(--builder-active-muted, #dfdfd9);
+  background: color-mix(in srgb, var(--button-hover-bg, var(--button-bg, var(--builder-active-button-bg, #111111))) 16%, var(--builder-active-surface, #efefe9));
+  color: var(--button-hover-bg, var(--button-bg, var(--builder-active-button-bg, #111111)));
   opacity: 0.95;
 }
 
 .shop-builder-cta--outline {
   background: transparent;
-  color: var(--builder-active-button-bg, #111111);
-  border: 1.5px solid var(--builder-active-button-bg, #111111);
+  color: var(--button-bg, var(--builder-active-button-bg, #111111));
+  border: var(--button-border-width, 1.5px) solid var(--button-bg, var(--builder-active-button-bg, #111111));
 }
 
 .shop-builder-cta--outline:hover {
-  background: var(--builder-active-button-bg, #111111);
-  color: var(--builder-active-button-text, #ffffff);
+  background: var(--button-bg, var(--builder-active-button-bg, #111111));
+  color: var(--button-text-color, var(--builder-active-button-text, #ffffff));
 }
 
 .shop-builder-cta--ghost {
   background: transparent;
-  color: var(--builder-active-text, #111111);
+  color: var(--button-bg, var(--builder-active-button-bg, #111111));
   border: 1px solid transparent;
 }
 
 .shop-builder-cta--ghost:hover {
-  background: var(--builder-active-surface, rgba(17, 17, 17, 0.05));
+  background: color-mix(in srgb, var(--button-bg, var(--builder-active-button-bg, #111111)) 10%, transparent);
 }
 
 .shop-builder-cta--link {
   background: transparent;
-  color: var(--builder-active-text, #111111);
+  color: var(--button-bg, var(--builder-active-button-bg, #111111));
   text-decoration: underline;
   padding: 0;
   border-radius: 0;
@@ -444,13 +456,30 @@
 .shop-builder-swiper-copy a {
   width: fit-content;
   margin-top: 8px;
-  border-radius: 999px;
-  padding: 10px 15px;
-  background: var(--builder-active-button-bg, #111111);
-  color: var(--builder-active-button-text, #ffffff);
+  border-radius: var(--button-radius, var(--builder-radius, 999px));
+  padding: var(--button-padding-y, 10px) var(--button-padding-x, 15px);
+  background: var(--button-bg, var(--builder-active-button-bg, #111111));
+  color: var(--button-text-color, var(--builder-active-button-text, #ffffff));
+  border: var(--button-border-width, 0px) solid var(--button-border-color, transparent);
   font-size: 13px;
-  font-weight: 800;
+  font-weight: var(--button-font-weight, 800);
+  letter-spacing: var(--button-letter-spacing, 0px);
   text-decoration: none;
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    background-color 180ms ease,
+    color 180ms ease,
+    border-color 180ms ease,
+    opacity 180ms ease;
+}
+
+.shop-builder-swiper-copy a:hover {
+  transform: var(--button-hover-transform, translateY(-2px));
+  box-shadow: var(--button-hover-shadow, 0 16px 34px rgba(17, 17, 17, 0.16));
+  background: var(--button-hover-bg, var(--button-bg, var(--builder-active-button-bg, #111111)));
+  color: var(--button-hover-text-color, var(--button-text-color, var(--builder-active-button-text, #ffffff)));
+  border-color: var(--button-hover-border-color, var(--button-border-color, transparent));
 }
 
 .shop-builder-swiper--hero .shop-builder-swiper-card,
@@ -689,26 +718,32 @@
 .shop-builder-fluent-form .ff-btn-submit {
   min-height: 46px;
   width: 100%;
-  border: 0;
-  border-radius: var(--button-radius, 999px);
-  padding: 0 22px;
-  color: var(--builder-active-button-text, #ffffff);
-  background: var(--builder-active-button-bg, #111111);
+  border: var(--button-border-width, 0px) solid var(--button-border-color, transparent);
+  border-radius: var(--button-radius, var(--builder-radius, 999px));
+  padding: var(--button-padding-y, 0px) var(--button-padding-x, 22px);
+  color: var(--button-text-color, var(--builder-active-button-text, #ffffff));
+  background: var(--button-bg, var(--builder-active-button-bg, #111111));
   font: inherit;
   font-size: 0.82rem;
-  font-weight: 750;
-  letter-spacing: 0;
+  font-weight: var(--button-font-weight, 750);
+  letter-spacing: var(--button-letter-spacing, 0px);
   text-transform: uppercase;
   cursor: pointer;
   transition:
-    opacity 160ms ease,
-    transform 160ms ease,
-    box-shadow 160ms ease;
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    background-color 180ms ease,
+    color 180ms ease,
+    border-color 180ms ease,
+    opacity 180ms ease;
 }
 
 .shop-builder-fluent-form .ff-btn-submit:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.14);
+  transform: var(--button-hover-transform, translateY(-1px));
+  box-shadow: var(--button-hover-shadow, 0 12px 28px rgba(0, 0, 0, 0.14));
+  background: var(--button-hover-bg, var(--button-bg, var(--builder-active-button-bg, #111111)));
+  color: var(--button-hover-text-color, var(--button-text-color, var(--builder-active-button-text, #ffffff)));
+  border-color: var(--button-hover-border-color, var(--button-border-color, transparent));
 }
 
 .shop-builder-fluent-form .ff-btn-submit:disabled {
@@ -1492,9 +1527,26 @@
   gap: 10px;
 }
 
-.shop-builder-column-block--image h3,
-.shop-builder-column-block--image p {
+.shop-builder-image-figure {
   margin: 0;
+  width: 100%;
+}
+
+.shop-builder-image-media {
+  width: 100%;
+  overflow: hidden;
+  background: transparent;
+}
+
+.shop-builder-image-media img {
+  display: block;
+}
+
+.shop-builder-image-figure figcaption {
+  margin-top: 8px;
+  color: var(--builder-active-muted, var(--builder-muted, #5f5f58));
+  font-size: 0.85em;
+  line-height: 1.4;
 }
 
 .shop-builder-column-block--icon svg {

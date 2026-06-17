@@ -89,6 +89,19 @@ export type BuilderShellSettings = {
   productImageNoPadding: boolean;
   productImagePadding: string;
   productImageObjectFit: string;
+  buttonBg: string;
+  buttonTextColor: string;
+  buttonBorderRadius: string;
+  buttonBorderWidth: string;
+  buttonBorderColor: string;
+  buttonPaddingY: string;
+  buttonPaddingX: string;
+  buttonFontWeight: string;
+  buttonLetterSpacing: string;
+  buttonHoverBg: string;
+  buttonHoverTextColor: string;
+  buttonHoverBorderColor: string;
+  buttonHoverEffect: "none" | "lift" | "grow";
   menuItems: ReactMenuItem[];
   updatedAt?: string;
 };
@@ -150,6 +163,19 @@ export const defaultBuilderShellSettings: BuilderShellSettings = {
   productImageNoPadding: false,
   productImagePadding: "clamp(22px, 2.4vw, 36px)",
   productImageObjectFit: "contain",
+  buttonBg: "",
+  buttonTextColor: "",
+  buttonBorderRadius: "999px",
+  buttonBorderWidth: "0px",
+  buttonBorderColor: "transparent",
+  buttonPaddingY: "11px",
+  buttonPaddingX: "18px",
+  buttonFontWeight: "720",
+  buttonLetterSpacing: "0px",
+  buttonHoverBg: "",
+  buttonHoverTextColor: "",
+  buttonHoverBorderColor: "transparent",
+  buttonHoverEffect: "lift",
   menuItems: [
     { id: "home", label: "Home", url: "/" },
     { id: "shop", label: "Shop", url: "/shop" },
@@ -459,6 +485,19 @@ export function normalizeBuilderShellSettings(
       value?.productImageObjectFit,
       defaultBuilderShellSettings.productImageObjectFit
     ),
+    buttonBg: normalizeColorString(value?.buttonBg, ""),
+    buttonTextColor: normalizeColorString(value?.buttonTextColor, ""),
+    buttonBorderRadius: normalizeSizeString(value?.buttonBorderRadius, defaultBuilderShellSettings.buttonBorderRadius),
+    buttonBorderWidth: normalizeSizeString(value?.buttonBorderWidth, defaultBuilderShellSettings.buttonBorderWidth),
+    buttonBorderColor: normalizeColorString(value?.buttonBorderColor, defaultBuilderShellSettings.buttonBorderColor),
+    buttonPaddingY: normalizeSizeString(value?.buttonPaddingY, defaultBuilderShellSettings.buttonPaddingY),
+    buttonPaddingX: normalizeSizeString(value?.buttonPaddingX, defaultBuilderShellSettings.buttonPaddingX),
+    buttonFontWeight: typeof value?.buttonFontWeight === "string" ? value.buttonFontWeight.trim() : defaultBuilderShellSettings.buttonFontWeight,
+    buttonLetterSpacing: typeof value?.buttonLetterSpacing === "string" ? value.buttonLetterSpacing.trim() : defaultBuilderShellSettings.buttonLetterSpacing,
+    buttonHoverBg: normalizeColorString(value?.buttonHoverBg, ""),
+    buttonHoverTextColor: normalizeColorString(value?.buttonHoverTextColor, ""),
+    buttonHoverBorderColor: normalizeColorString(value?.buttonHoverBorderColor, defaultBuilderShellSettings.buttonHoverBorderColor),
+    buttonHoverEffect: (value?.buttonHoverEffect === "none" || value?.buttonHoverEffect === "lift" || value?.buttonHoverEffect === "grow") ? value.buttonHoverEffect : defaultBuilderShellSettings.buttonHoverEffect,
     menuItems: normalizeMenuItems(value?.menuItems),
   };
 }
