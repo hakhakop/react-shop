@@ -91,6 +91,15 @@ const getSupportedTypographyAreas = (kind: string): readonly TypographyArea[] =>
   return ["title", "body", "button", "eyebrow"] as const;
 };
 
+const isCardStyleBlock = (kind?: LayoutBlockKind) =>
+  kind === "grid" ||
+  kind === "panel" ||
+  kind === "products" ||
+  kind === "badgeGrid" ||
+  kind === "list" ||
+  kind === "productPurchasePanel" ||
+  kind === "productSpecsPanel";
+
 // Inspector handlers mirror the lifted builder callbacks during this JSX-only extraction.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type LooseHandler = (...args: any[]) => void;
@@ -1894,8 +1903,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                               </span>
                             </div>
                             )}
-                            {selectedLayoutBlock.kind !== "products" &&
-                              selectedLayoutBlock.kind !== "image" && (
+                            {selectedLayoutBlock.kind !== "image" && (
                               <StyleTabPanel
                                 target={styleTarget}
                                 showSpacing={false}
@@ -1903,6 +1911,9 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                 showLayout={false}
                                 showAdvanced={false}
                                 showTypography={false}
+                                showCardParts={isCardStyleBlock(
+                                  selectedLayoutBlock.kind,
+                                )}
                                 onChange={updateStyleTarget}
                                 onPickBackgroundImage={pickStyleBackgroundImage}
                               />
@@ -2157,7 +2168,8 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                           {isSelectedBlock &&
                                             isElementLayoutTab && (
                                             <>
-                                              {block.kind !== "products" && block.kind !== "image" && (
+                                              {block.kind !== "products" &&
+                                                block.kind !== "image" && (
                                                 <details className="builder-collapse" open>
                                                   <summary>
                                                     <span>Element Layout</span>
@@ -2412,7 +2424,9 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                           {isSelectedBlock &&
                                             isElementSettingsTab && (
                                             <>
-                                              {block.kind !== "products" && block.kind !== "image" && (
+                                              {block.kind !== "products" &&
+                                                block.kind !== "image" &&
+                                                !isCardStyleBlock(block.kind) && (
                                                 <details className="builder-collapse" open>
                                                   <summary>
                                                     <span>Element appearance</span>

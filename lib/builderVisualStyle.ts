@@ -57,6 +57,51 @@ export type BuilderVisibilityStyle = {
   mobile?: boolean;
 };
 
+export type BuilderCardPreset =
+  | "none"
+  | "soft"
+  | "elevated"
+  | "glass"
+  | "outline"
+  | "gradient"
+  | "dark"
+  | "image-overlay";
+
+export type BuilderHoverPreset =
+  | "none"
+  | "lift-soft"
+  | "lift-strong"
+  | "image-zoom"
+  | "glow-subtle"
+  | "press-down"
+  | "shadow-grow";
+
+export type BuilderCardPartStyle = {
+  preset?: BuilderCardPreset;
+  hoverPreset?: BuilderHoverPreset;
+  imageRadius?: string;
+  imageRatio?: "auto" | "square" | "4:5" | "3:4" | "16:9";
+  imageFit?: "cover" | "contain" | "fill";
+  imageOverlay?: "none" | "soft" | "dark" | "gradient";
+  titleSize?: string;
+  titleWeight?: string;
+  titleColor?: string;
+  titleAlign?: "left" | "center" | "right";
+  titleMargin?: string;
+  metaSize?: string;
+  metaColor?: string;
+  metaTransform?: "none" | "uppercase";
+  metaSpacing?: string;
+  contentSize?: string;
+  contentColor?: string;
+  contentLineHeight?: string;
+  contentMaxWidth?: string;
+  buttonAlign?: "left" | "center" | "right";
+  buttonMargin?: string;
+  cardGap?: string;
+  cardPadding?: string;
+};
+
 export type BuilderVisualStyle = {
   padding?: BuilderSpacingSides;
   margin?: BuilderSpacingSides;
@@ -64,6 +109,7 @@ export type BuilderVisualStyle = {
   border?: BuilderBorderStyle;
   effects?: BuilderEffectsStyle;
   visibility?: BuilderVisibilityStyle;
+  card?: BuilderCardPartStyle;
   customClass?: string;
 };
 
@@ -294,6 +340,60 @@ export function effectsToCss(effects?: BuilderEffectsStyle): CSSProperties {
   return css;
 }
 
+function cardStyleToCss(card?: BuilderCardPartStyle): CSSProperties {
+  if (!card) return {};
+  const css: CSSProperties & Record<string, string> = {};
+
+  const ratioMap: Record<NonNullable<BuilderCardPartStyle["imageRatio"]>, string> = {
+    auto: "",
+    square: "1 / 1",
+    "4:5": "4 / 5",
+    "3:4": "3 / 4",
+    "16:9": "16 / 9",
+  };
+
+  if (card.imageRadius) css["--builder-card-image-radius"] = card.imageRadius;
+  if (card.imageRatio && ratioMap[card.imageRatio]) {
+    css["--builder-card-image-ratio"] = ratioMap[card.imageRatio];
+  }
+  if (card.imageFit) {
+    css["--builder-card-image-fit"] =
+      card.imageFit === "fill" ? "fill" : card.imageFit;
+    css["--builder-card-bg-image-fit"] =
+      card.imageFit === "fill" ? "100% 100%" : card.imageFit;
+  }
+  if (card.titleSize) css["--builder-card-title-size"] = card.titleSize;
+  if (card.titleWeight) css["--builder-card-title-weight"] = card.titleWeight;
+  if (card.titleColor) css["--builder-card-title-color"] = card.titleColor;
+  if (card.titleAlign) css["--builder-card-title-align"] = card.titleAlign;
+  if (card.titleMargin) css["--builder-card-title-margin"] = card.titleMargin;
+  if (card.metaSize) css["--builder-card-meta-size"] = card.metaSize;
+  if (card.metaColor) css["--builder-card-meta-color"] = card.metaColor;
+  if (card.metaTransform) css["--builder-card-meta-transform"] = card.metaTransform;
+  if (card.metaSpacing) css["--builder-card-meta-spacing"] = card.metaSpacing;
+  if (card.contentSize) css["--builder-card-content-size"] = card.contentSize;
+  if (card.contentColor) css["--builder-card-content-color"] = card.contentColor;
+  if (card.contentLineHeight) {
+    css["--builder-card-content-line-height"] = card.contentLineHeight;
+  }
+  if (card.contentMaxWidth) {
+    css["--builder-card-content-max-width"] = card.contentMaxWidth;
+  }
+  if (card.buttonAlign) {
+    css["--builder-card-button-align"] =
+      card.buttonAlign === "center"
+        ? "center"
+        : card.buttonAlign === "right"
+          ? "flex-end"
+          : "flex-start";
+  }
+  if (card.buttonMargin) css["--builder-card-button-margin"] = card.buttonMargin;
+  if (card.cardGap) css["--builder-card-gap"] = card.cardGap;
+  if (card.cardPadding) css["--builder-card-padding"] = card.cardPadding;
+
+  return css;
+}
+
 export function visualStyleToCss(
   style?: BuilderVisualStyle,
   paddingContext: BuilderSpacingContext = "elementPadding",
@@ -307,6 +407,7 @@ export function visualStyleToCss(
     ...backgroundToCss(style.background),
     ...borderToCss(style.border),
     ...effectsToCss(style.effects),
+    ...cardStyleToCss(style.card),
   };
 }
 
@@ -320,6 +421,15 @@ export function visualStyleClassName(style?: BuilderVisualStyle): string {
         .split(/\s+/)
         .filter(Boolean),
     );
+  }
+  if (style.card?.preset) {
+    classes.push(`builder-card-preset--${style.card.preset}`);
+  }
+  if (style.card?.hoverPreset) {
+    classes.push(`builder-hover-preset--${style.card.hoverPreset}`);
+  }
+  if (style.card?.imageOverlay && style.card.imageOverlay !== "none") {
+    classes.push(`builder-image-overlay--${style.card.imageOverlay}`);
   }
   if (style.visibility?.desktop === false) {
     classes.push("builder-hide-desktop");

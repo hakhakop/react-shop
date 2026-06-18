@@ -7,21 +7,27 @@ import type {
 import {
   BUILDER_SPACING_SCALE,
   resolveBuilderSpacing,
-  TOKEN_LABELS,
   type BuilderSpacingContext,
 } from "@/lib/builderSpacing";
 
 const PRESETS: { label: string; value: BuilderSpacingPreset }[] = [
   { label: "Global", value: "inherit" },
   { label: "None", value: "none" },
-  { label: "XS", value: "xs" },
-  { label: "SM", value: "sm" },
-  { label: "MD", value: "md" },
-  { label: "LG", value: "lg" },
-  { label: "XL", value: "xl" },
-  { label: "2XL", value: "2xl" },
-  { label: "3XL", value: "3xl" },
+  { label: "Tight", value: "sm" },
+  { label: "Default", value: "md" },
+  { label: "Comfort", value: "lg" },
+  { label: "Roomy", value: "xl" },
+  { label: "Spacious", value: "2xl" },
+  { label: "Hero", value: "3xl" },
 ];
+
+const LEGACY_PRESETS: { label: string; value: BuilderSpacingPreset }[] = [
+  { label: "Tiny", value: "xs" },
+];
+
+function presetPx(value: BuilderSpacingPreset) {
+  return value === "inherit" ? null : BUILDER_SPACING_SCALE[value];
+}
 
 const SIDES = ["top", "right", "bottom", "left"] as const;
 type SpacingSide = (typeof SIDES)[number];
@@ -35,7 +41,9 @@ function normalizedPreset(value?: string) {
 
 function isPresetValue(value?: string) {
   const normalized = normalizedPreset(value);
-  return PRESETS.some((preset) => preset.value === normalized);
+  return [...PRESETS, ...LEGACY_PRESETS].some(
+    (preset) => preset.value === normalized,
+  );
 }
 
 type Props = {
@@ -110,6 +118,9 @@ export default function SpacingControl({
   function renderSideControl(side: SpacingSide, sideLabel: string) {
     const raw = linked ? v.top : v[side];
     const selectedValue = selectValue(side);
+    const legacyPreset = LEGACY_PRESETS.find(
+      (preset) => preset.value === selectedValue,
+    );
 
     return (
       <div key={side} className="builder-style-side-control">
@@ -123,9 +134,14 @@ export default function SpacingControl({
             <option key={preset.value} value={preset.value}>
               {preset.value === "inherit"
                 ? `Global (${resolveBuilderSpacing(undefined, context, inheritedSideValue(side)).label})`
-                : `${TOKEN_LABELS[preset.value]} (${BUILDER_SPACING_SCALE[preset.value]}px)`}
+                : `${preset.label} · ${presetPx(preset.value)}px`}
             </option>
           ))}
+          {legacyPreset ? (
+            <option value={legacyPreset.value}>
+              {legacyPreset.label} · {presetPx(legacyPreset.value)}px
+            </option>
+          ) : null}
           <option value="custom">Custom</option>
         </select>
         {selectedValue === "custom" ? (

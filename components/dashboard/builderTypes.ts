@@ -370,6 +370,12 @@ export type WordPressMediaItem = {
   sourceUrl: string;
   thumbnailUrl: string;
   date?: string;
+  filename?: string;
+  caption?: string;
+  description?: string;
+  width?: number;
+  height?: number;
+  fileSize?: number;
 };
 
 export type BuilderSection = {

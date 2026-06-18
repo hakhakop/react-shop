@@ -63,6 +63,7 @@ import ProductCarousel from "@/components/ProductCarousel";
 import ProductOptionsSelector from "@/components/ProductOptionsSelector";
 import DashboardInspector from "@/components/dashboard/DashboardInspector";
 import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
+import MediaManager from "@/components/dashboard/media/MediaManager";
 import ScrollPinnedDemo from "@/components/animations/ScrollPinnedDemo";
 import { AntigravityTerminal } from "@/components/builder/AntigravityTerminal";
 import AntigravityCanvas from "@/components/builder/AntigravityCanvas";
@@ -1296,16 +1297,6 @@ export default function DashboardBuilder({
   const [mediaPickerOpen, setMediaPickerOpen] = useState(false);
   const [mediaPickerTitle, setMediaPickerTitle] = useState("WordPress Media");
   const [mediaPickerCurrentUrl, setMediaPickerCurrentUrl] = useState("");
-  const [mediaSearch, setMediaSearch] = useState("");
-  const [mediaItems, setMediaItems] = useState<WordPressMediaItem[]>([]);
-  const [mediaLoading, setMediaLoading] = useState(false);
-  const [mediaStatus, setMediaStatus] = useState(
-    "Browse images from WordPress",
-  );
-  const [mediaPage, setMediaPage] = useState(1);
-  const [mediaTotalItems, setMediaTotalItems] = useState(0);
-  const [mediaTotalPages, setMediaTotalPages] = useState(1);
-  const mediaPerPage = 60;
   const previewHeaderSlotRef = useRef<HTMLDivElement>(null);
   const previewShellRef = useRef<HTMLDivElement>(null);
   const mediaSelectRef = useRef<((media: WordPressMediaItem) => void) | null>(
@@ -1384,13 +1375,6 @@ export default function DashboardBuilder({
       );
     });
   }, [menuIconSearch]);
-
-  const mediaRangeStart =
-    mediaTotalItems === 0 ? 0 : (mediaPage - 1) * mediaPerPage + 1;
-  const mediaRangeEnd = Math.min(
-    mediaPage * mediaPerPage,
-    mediaTotalItems,
-  );
 
   const builderJson = useMemo(
     () =>
@@ -1775,77 +1759,6 @@ export default function DashboardBuilder({
     if (committedBuilderStateSignature) return;
     setCommittedBuilderStateSignature(JSON.stringify(builderState));
   }, [builderState, committedBuilderStateSignature, draftReady]);
-
-  useEffect(() => {
-    if (!mediaPickerOpen) return;
-
-    const controller = new AbortController();
-    const timer = window.setTimeout(async () => {
-      setMediaLoading(true);
-      setMediaItems([]);
-      setMediaTotalItems(0);
-      setMediaTotalPages(1);
-      setMediaStatus("Loading WordPress media...");
-
-      try {
-        const searchTerm = mediaSearch.trim();
-        const params = new URLSearchParams({
-          page: String(mediaPage),
-          perPage: String(mediaPerPage),
-        });
-        if (searchTerm) params.set("search", searchTerm);
-
-        const apiResponse = await fetch(`/api/wordpress-media?${params}`, {
-          cache: "no-store",
-          signal: controller.signal,
-        });
-        const payload = (await apiResponse.json()) as
-          | {
-              media?: WordPressMediaItem[];
-              total?: number;
-              totalPages?: number;
-              hasNextPage?: boolean;
-              page?: number;
-              message?: string;
-            }
-          | undefined;
-
-        if (!apiResponse.ok) {
-          setMediaStatus(payload?.message ?? "WordPress media could not load");
-          return;
-        }
-
-        const nextItems = payload?.media ?? [];
-        const nextTotal = payload?.total ?? nextItems.length;
-        const nextTotalPages = payload?.totalPages ?? 1;
-        setMediaItems(nextItems);
-        setMediaTotalItems(nextTotal);
-        setMediaTotalPages(nextTotalPages);
-        setMediaStatus(
-          nextItems.length
-            ? `Showing ${Math.min(
-                (mediaPage - 1) * mediaPerPage + 1,
-                nextTotal,
-              )}-${Math.min(mediaPage * mediaPerPage, nextTotal)} of ${nextTotal}`
-            : "No WordPress images matched this search",
-        );
-      } catch (error) {
-        if ((error as Error).name !== "AbortError") {
-          setMediaItems([]);
-          setMediaTotalItems(0);
-          setMediaTotalPages(1);
-          setMediaStatus("WordPress media could not load");
-        }
-      } finally {
-        if (!controller.signal.aborted) setMediaLoading(false);
-      }
-    }, 120);
-
-    return () => {
-      window.clearTimeout(timer);
-      controller.abort();
-    };
-  }, [mediaPickerOpen, mediaPage, mediaSearch]);
 
   const switchBuilderTarget = (
     nextKey: BuilderLayoutKey,
@@ -3465,22 +3378,12 @@ export default function DashboardBuilder({
     mediaSelectRef.current = onSelect;
     setMediaPickerTitle(title);
     setMediaPickerCurrentUrl(currentUrl ?? "");
-    setMediaPage(1);
     setMediaPickerOpen(true);
   };
 
   const closeWordPressMediaPicker = () => {
     setMediaPickerOpen(false);
     mediaSelectRef.current = null;
-  };
-
-  const handleMediaSearchChange = (value: string) => {
-    setMediaPage(1);
-    setMediaSearch(value);
-  };
-
-  const goToMediaPage = (nextPage: number) => {
-    setMediaPage(Math.max(nextPage, 1));
   };
 
   const selectWordPressMedia = (media: WordPressMediaItem) => {
@@ -3574,39 +3477,24 @@ export default function DashboardBuilder({
     }
   };
 
-  const uploadGridItemImage = async (
+  const pickGridItemImage = (
     sectionId: string,
     columnKey: string,
     blockKey: string,
     itemIndex: number,
-    file: File | null,
+    currentUrl?: string,
   ) => {
-    if (!file) return;
-    setPublishStatus("Uploading grid image...");
-
-    try {
-      const formData = new FormData();
-      formData.append("file", file);
-      const response = await fetch("/api/builder-uploads", {
-        method: "POST",
-        body: formData,
-      });
-      const payload = (await response.json()) as {
-        url?: string;
-        error?: string;
-      };
-      if (!response.ok || !payload.url) {
-        setPublishStatus(payload.error ?? "Image upload failed");
-        return;
-      }
-      updateGridItemByKey(sectionId, columnKey, blockKey, itemIndex, {
-        imageUrl: payload.url,
-        imageAlt: file.name,
-      });
-      setPublishStatus("Grid image uploaded");
-    } catch {
-      setPublishStatus("Image upload failed");
-    }
+    openWordPressMediaPicker({
+      title: "Choose grid item image",
+      currentUrl,
+      onSelect: (media) => {
+        updateGridItemByKey(sectionId, columnKey, blockKey, itemIndex, {
+          imageUrl: media.sourceUrl,
+          imageAlt: media.altText || media.title || media.filename || "",
+        });
+        setPublishStatus("Grid image selected");
+      },
+    });
   };
 
   const addWireframeNear = (
@@ -7314,7 +7202,7 @@ export default function DashboardBuilder({
             onDeleteSectionBadge={deleteSectionBadgeByKey}
             onDuplicateSectionBadge={duplicateSectionBadgeByKey}
             onMoveSectionBadge={moveSectionBadgeByKey}
-            onUploadGridItemImage={uploadGridItemImage}
+            onUploadGridItemImage={pickGridItemImage}
             onAddWireframe={addWireframeNear}
             onAddRow={addRowNear}
             onDeleteRow={deleteEmptyRow}
@@ -7339,260 +7227,14 @@ export default function DashboardBuilder({
         </div>
       </main>
 
-      <WordPressMediaPicker
+      <MediaManager
         open={mediaPickerOpen}
         title={mediaPickerTitle}
         currentUrl={mediaPickerCurrentUrl}
-        search={mediaSearch}
-        items={mediaItems}
-        loading={mediaLoading}
-        status={mediaStatus}
-        page={mediaPage}
-        totalItems={mediaTotalItems}
-        totalPages={mediaTotalPages}
-        rangeStart={mediaRangeStart}
-        rangeEnd={mediaRangeEnd}
-        onPageChange={goToMediaPage}
-        onSearchChange={handleMediaSearchChange}
         onSelect={selectWordPressMedia}
         onClose={closeWordPressMediaPicker}
       />
 
-    </div>
-  );
-}
-
-function WordPressMediaPicker({
-  open,
-  title,
-  currentUrl,
-  search,
-  items,
-  loading,
-  status,
-  page,
-  totalItems,
-  totalPages,
-  rangeStart,
-  rangeEnd,
-  onSearchChange,
-  onPageChange,
-  onSelect,
-  onClose,
-}: {
-  open: boolean;
-  title: string;
-  currentUrl: string;
-  search: string;
-  items: WordPressMediaItem[];
-  loading: boolean;
-  status: string;
-  page: number;
-  totalItems: number;
-  totalPages: number;
-  rangeStart: number;
-  rangeEnd: number;
-  onSearchChange: (value: string) => void;
-  onPageChange: (page: number) => void;
-  onSelect: (media: WordPressMediaItem) => void;
-  onClose: () => void;
-}) {
-  const [pasting, setPasting] = useState(false);
-  const [pasteStatus, setPasteStatus] = useState<string | null>(null);
-  const pasteZoneRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!open) {
-      setPasting(false);
-      setPasteStatus(null);
-    }
-  }, [open]);
-
-  const handlePaste = useCallback(async (event: React.ClipboardEvent) => {
-    const items = event.clipboardData?.items;
-    if (!items) return;
-
-    let imageFile: File | null = null;
-    for (let i = 0; i < items.length; i++) {
-      const item = items[i];
-      if (item.type.startsWith("image/")) {
-        const blob = item.getAsFile();
-        if (blob) {
-          const ext = blob.type.split("/")[1] || "png";
-          imageFile = new File([blob], `pasted-image.${ext}`, { type: blob.type });
-          break;
-        }
-      }
-    }
-
-    if (!imageFile) {
-      setPasteStatus("No image found in clipboard");
-      return;
-    }
-
-    setPasting(true);
-    setPasteStatus("Uploading pasted image...");
-
-    try {
-      const formData = new FormData();
-      formData.append("file", imageFile);
-
-      const response = await fetch("/api/builder-uploads", {
-        method: "POST",
-        body: formData,
-      });
-      const payload = (await response.json()) as {
-        url?: string;
-        error?: string;
-      };
-
-      if (!response.ok || !payload.url) {
-        setPasteStatus(payload.error ?? "Upload failed");
-        return;
-      }
-
-      onSelect({
-        id: Date.now(),
-        title: imageFile.name,
-        altText: "Pasted from clipboard",
-        sourceUrl: payload.url,
-        thumbnailUrl: payload.url,
-        mimeType: imageFile.type,
-      });
-    } catch {
-      setPasteStatus("Upload failed");
-    } finally {
-      setPasting(false);
-    }
-  }, [onSelect]);
-
-  useEffect(() => {
-    const handleGlobalPaste = (event: ClipboardEvent) => {
-      if (!open) return;
-      if (pasteZoneRef.current?.contains(event.target as Node)) return;
-      const items = event.clipboardData?.items;
-      if (!items) return;
-      for (let i = 0; i < items.length; i++) {
-        if (items[i].type.startsWith("image/")) return;
-      }
-    };
-    document.addEventListener("paste", handleGlobalPaste);
-    return () => document.removeEventListener("paste", handleGlobalPaste);
-  }, [open]);
-
-  if (!open) return null;
-
-  return (
-    <div className="builder-media-modal" role="dialog" aria-modal="true">
-      <div className="builder-media-dialog builder-panel">
-        <div className="builder-media-header">
-          <div>
-            <strong>{title}</strong>
-            <span>{status}</span>
-          </div>
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label="Close media library"
-          >
-            <X size={16} />
-          </button>
-        </div>
-
-        <div className="builder-media-search">
-          <input
-            value={search}
-            placeholder="Search WordPress media"
-            onChange={(event) => onSearchChange(event.target.value)}
-          />
-          {loading && <span>Loading...</span>}
-        </div>
-
-        <div
-          ref={pasteZoneRef}
-          className={`builder-media-paste-zone ${pasting ? "is-pasting" : ""}`}
-          tabIndex={0}
-          onPaste={handlePaste}
-          onFocus={(e) => {
-            e.currentTarget.style.borderColor = "rgba(13,115,255,0.5)";
-          }}
-          onBlur={(e) => {
-            e.currentTarget.style.borderColor = "";
-          }}
-        >
-          <CloudUpload size={20} />
-          <span>
-            {pasteStatus ??
-              "Paste an image from clipboard (Ctrl+V / Cmd+V)"}
-          </span>
-        </div>
-
-        <div className="builder-media-grid">
-          {items.map((item) => {
-            const isSelected = currentUrl === item.sourceUrl;
-            return (
-              <button
-                key={item.id}
-                type="button"
-                className={isSelected ? "is-selected" : ""}
-                onClick={() => onSelect(item)}
-              >
-                <span className="builder-media-thumb">
-                  {item.thumbnailUrl ? (
-                    <Image
-                      src={item.thumbnailUrl}
-                      alt={item.altText || item.title}
-                      width={240}
-                      height={180}
-                      unoptimized
-                    />
-                  ) : (
-                    <ImageIcon size={22} />
-                  )}
-                </span>
-                <span>{item.title}</span>
-              </button>
-            );
-          })}
-        </div>
-
-        <div className="builder-media-footer">
-          <button
-            type="button"
-            className="builder-secondary-button"
-            onClick={() => onPageChange(page - 1)}
-            disabled={loading || page <= 1}
-          >
-            Previous
-          </button>
-          <div className="builder-media-page-indicator">
-            <strong>
-              Showing {rangeStart}-{rangeEnd} of {totalItems}
-            </strong>
-            <span>
-              Page {page} of {Math.max(totalPages, 1)}
-            </span>
-          </div>
-          <button
-            type="button"
-            className="builder-secondary-button"
-            onClick={() => onPageChange(page + 1)}
-            disabled={loading || page >= totalPages}
-          >
-            Next
-          </button>
-        </div>
-
-        {!loading && items.length === 0 && (
-          <div className="builder-media-empty">
-            <ImageIcon size={22} />
-            <strong>No images found</strong>
-            <span>
-              Try another search or check that WordPress media is public.
-            </span>
-          </div>
-        )}
-      </div>
     </div>
   );
 }
@@ -7787,7 +7429,7 @@ function PreviewCanvas({
     columnKey: string,
     blockKey: string,
     itemIndex: number,
-    file: File | null,
+    currentUrl?: string,
   ) => void;
   onAddWireframe: (
     columns: number,
@@ -10170,7 +9812,7 @@ function PreviewSection({
     columnKey: string,
     blockKey: string,
     itemIndex: number,
-    file: File | null,
+    currentUrl?: string,
   ) => void;
   onAddRow: (
     sectionId: string,
@@ -11809,129 +11451,167 @@ if (section.kind === "embed") {
                         </div>
                         </div>
                       ) : block.kind === "panel" ? (
-                        <div className="shop-builder-column-block shop-builder-column-block--panel">
-                          {block.imageUrl && (
-                            <div
-                              className="shop-builder-panel-media"
-                              style={{
-                                backgroundImage: `url(${block.imageUrl})`,
-                              }}
-                            />
-                          )}
-                          <div>
-                            {block.eyebrow && (
-                              <InlineEditableText
-                                as="span"
-                                className="shop-builder-eyebrow"
-                                typography={block.typography}
-                                value={block.eyebrow}
-                                onChange={(eyebrow) =>
-                                  onUpdateBlock(
-                                    section.id,
-                                    columnKey,
-                                    blockKey,
-                                    { eyebrow },
-                                  )
-                                }
-                              />
-                            )}
-                            {block.title && (
-                              block.typewriterEnabled ? (
-                                <DashboardTypog as="h3" typography={block.typography}>
-                                  <TypewriterText
-                                    text={block.title}
-                                    speed={block.typewriterSpeed}
-                                    eraseSpeed={block.typewriterEraseSpeed}
-                                    delay={block.typewriterDelay}
-                                    loop={block.typewriterLoop}
-                                    useGradient={block.typewriterUseGradient}
-                                    gradientPreset={block.textGradientPreset ?? block.typewriterGradientPreset} customStart={block.textGradientCustomStart} customMiddle={block.textGradientCustomMiddle} customEnd={block.textGradientCustomEnd} customAngle={block.textGradientCustomAngle} customStartOffset={block.textGradientCustomStartOffset} customMiddleOffset={block.textGradientCustomMiddleOffset} customEndOffset={block.textGradientCustomEndOffset}
-                                    typography={block.typography}
-                                    area="title"
-                                  />
-                                </DashboardTypog>
-                              ) : (
-                                <InlineEditableText
-                                  as="h3"
-                                  typography={block.typography}
-                                  value={block.title}
-                                  onChange={(title) =>
-                                    onUpdateBlock(
-                                      section.id,
-                                      columnKey,
-                                      blockKey,
-                                      { title },
-                                    )
-                                  }
-                                />
-                              )
-                            )}
-                            {block.body && (
-                              block.typewriterEnabled && !block.title ? (
-                                <DashboardTypog as="p" typography={block.typography}>
-                                  <TypewriterText
-                                    text={block.body}
-                                    speed={block.typewriterSpeed}
-                                    eraseSpeed={block.typewriterEraseSpeed}
-                                    delay={block.typewriterDelay}
-                                    loop={block.typewriterLoop}
-                                    useGradient={block.typewriterUseGradient}
-                                    gradientPreset={block.textGradientPreset ?? block.typewriterGradientPreset} customStart={block.textGradientCustomStart} customMiddle={block.textGradientCustomMiddle} customEnd={block.textGradientCustomEnd} customAngle={block.textGradientCustomAngle} customStartOffset={block.textGradientCustomStartOffset} customMiddleOffset={block.textGradientCustomMiddleOffset} customEndOffset={block.textGradientCustomEndOffset}
-                                    typography={block.typography}
-                                    area="body"
-                                  />
-                                </DashboardTypog>
-                              ) : (
-                                <InlineEditableText
-                                  as="p"
-                                  typography={block.typography}
-                                  value={block.body}
-                                  onChange={(body) =>
-                                    onUpdateBlock(
-                                      section.id,
-                                      columnKey,
-                                      blockKey,
-                                      { body },
-                                    )
-                                  }
-                                />
-                              )
-                            )}
-                            
-                            <RenderDashboardChecklist
-                              items={block.items}
-                              iconName={block.listIcon}
-                              colorScheme={block.listIconColorScheme}
-                              typography={block.typography}
-                            />
+                        (() => {
+                          const panelTitleStyle = {
+                            color: "var(--builder-card-title-color, inherit)",
+                            fontSize: "var(--builder-card-title-size, inherit)",
+                            fontWeight: "var(--builder-card-title-weight, inherit)",
+                            textAlign:
+                              "var(--builder-card-title-align, inherit)" as React.CSSProperties["textAlign"],
+                            margin: "var(--builder-card-title-margin, 0)",
+                          } as React.CSSProperties;
+                          const panelMetaStyle = {
+                            color: "var(--builder-card-meta-color, inherit)",
+                            fontSize: "var(--builder-card-meta-size, inherit)",
+                            textTransform:
+                              "var(--builder-card-meta-transform, none)" as React.CSSProperties["textTransform"],
+                            marginTop: "var(--builder-card-meta-spacing, 0)",
+                          } as React.CSSProperties;
+                          const panelBodyStyle = {
+                            color: "var(--builder-card-content-color, inherit)",
+                            fontSize: "var(--builder-card-content-size, inherit)",
+                            lineHeight: "var(--builder-card-content-line-height, inherit)",
+                            maxWidth: "var(--builder-card-content-max-width, none)",
+                          } as React.CSSProperties;
 
-                          <div 
-                            className={`shop-builder-buttons shop-builder-buttons--${block.buttonsLayout ?? "inline"}`}
-                            style={previewButtonsStyle(block.buttonsLayout, block.elementAlign, block.buttonGap)}
-                          >
-                            {block.buttonLabel && (
-                              <DashboardTypog
-                                as="span"
-                                className="builder-preview-cta"
-                                typography={block.typography}
+                          return (
+                            <div className="shop-builder-column-block shop-builder-column-block--panel">
+                              {block.imageUrl && (
+                                <div
+                                  className="shop-builder-panel-media"
+                                  style={{
+                                    backgroundImage: `url(${block.imageUrl})`,
+                                  }}
+                                />
+                              )}
+                              <div>
+                                {block.eyebrow && (
+                                  <InlineEditableText
+                                    as="span"
+                                    className="shop-builder-eyebrow shop-builder-panel-meta"
+                                    typography={block.typography}
+                                    style={panelMetaStyle}
+                                    value={block.eyebrow}
+                                    onChange={(eyebrow) =>
+                                      onUpdateBlock(
+                                        section.id,
+                                        columnKey,
+                                        blockKey,
+                                        { eyebrow },
+                                      )
+                                    }
+                                  />
+                                )}
+                                {block.title && (
+                                  block.typewriterEnabled ? (
+                                    <DashboardTypog as="h3" typography={block.typography} style={panelTitleStyle}>
+                                      <TypewriterText
+                                        text={block.title}
+                                        speed={block.typewriterSpeed}
+                                        eraseSpeed={block.typewriterEraseSpeed}
+                                        delay={block.typewriterDelay}
+                                        loop={block.typewriterLoop}
+                                        useGradient={block.typewriterUseGradient}
+                                        gradientPreset={block.textGradientPreset ?? block.typewriterGradientPreset} customStart={block.textGradientCustomStart} customMiddle={block.textGradientCustomMiddle} customEnd={block.textGradientCustomEnd} customAngle={block.textGradientCustomAngle} customStartOffset={block.textGradientCustomStartOffset} customMiddleOffset={block.textGradientCustomMiddleOffset} customEndOffset={block.textGradientCustomEndOffset}
+                                        typography={block.typography}
+                                        area="title"
+                                      />
+                                    </DashboardTypog>
+                                  ) : (
+                                    <InlineEditableText
+                                      as="h3"
+                                      typography={block.typography}
+                                      style={panelTitleStyle}
+                                      value={block.title}
+                                      onChange={(title) =>
+                                        onUpdateBlock(
+                                          section.id,
+                                          columnKey,
+                                          blockKey,
+                                          { title },
+                                        )
+                                      }
+                                    />
+                                  )
+                                )}
+                                {block.body && (
+                                  block.typewriterEnabled && !block.title ? (
+                                    <DashboardTypog as="p" typography={block.typography} style={panelBodyStyle}>
+                                      <TypewriterText
+                                        text={block.body}
+                                        speed={block.typewriterSpeed}
+                                        eraseSpeed={block.typewriterEraseSpeed}
+                                        delay={block.typewriterDelay}
+                                        loop={block.typewriterLoop}
+                                        useGradient={block.typewriterUseGradient}
+                                        gradientPreset={block.textGradientPreset ?? block.typewriterGradientPreset} customStart={block.textGradientCustomStart} customMiddle={block.textGradientCustomMiddle} customEnd={block.textGradientCustomEnd} customAngle={block.textGradientCustomAngle} customStartOffset={block.textGradientCustomStartOffset} customMiddleOffset={block.textGradientCustomMiddleOffset} customEndOffset={block.textGradientCustomEndOffset}
+                                        typography={block.typography}
+                                        area="body"
+                                      />
+                                    </DashboardTypog>
+                                  ) : (
+                                    <InlineEditableText
+                                      as="p"
+                                      typography={block.typography}
+                                      style={panelBodyStyle}
+                                      value={block.body}
+                                      onChange={(body) =>
+                                        onUpdateBlock(
+                                          section.id,
+                                          columnKey,
+                                          blockKey,
+                                          { body },
+                                        )
+                                      }
+                                    />
+                                  )
+                                )}
+                                
+                                <RenderDashboardChecklist
+                                  items={block.items}
+                                  iconName={block.listIcon}
+                                  colorScheme={block.listIconColorScheme}
+                                  typography={block.typography}
+                                />
+
+                              <div 
+                                className={`shop-builder-buttons shop-builder-buttons--${block.buttonsLayout ?? "inline"}`}
+                                style={{
+                                  ...previewButtonsStyle(block.buttonsLayout, block.elementAlign, block.buttonGap),
+                                  justifyContent: `var(--builder-card-button-align, ${
+                                    block.elementAlign === "center"
+                                      ? "center"
+                                      : block.elementAlign === "right"
+                                        ? "flex-end"
+                                        : "flex-start"
+                                  })`,
+                                }}
                               >
-                                {block.buttonLabel}
-                              </DashboardTypog>
-                            )}
-                            {(block.buttons ?? []).map((btn, btnIdx) => (
-                              <DashboardTypog
-                                key={btn.id ?? btnIdx}
-                                as="span"
-                                className={`builder-preview-cta builder-preview-cta--${btn.style ?? "primary"}`}
-                              style={{ display: "inline-flex" }}
-                                typography={block.typography}
-                              >
-                                {btn.label || "Button"}
-                              </DashboardTypog>
-                            ))}
-                          </div>
-                          </div>
-                        </div>
+                                {block.buttonLabel && (
+                                  <DashboardTypog
+                                    as="span"
+                                    className="builder-preview-cta"
+                                    typography={block.typography}
+                                  >
+                                    {block.buttonLabel}
+                                  </DashboardTypog>
+                                )}
+                                {(block.buttons ?? []).map((btn, btnIdx) => (
+                                  <DashboardTypog
+                                    key={btn.id ?? btnIdx}
+                                    as="span"
+                                    className={`builder-preview-cta builder-preview-cta--${btn.style ?? "primary"}`}
+                                  style={{ display: "inline-flex" }}
+                                    typography={block.typography}
+                                  >
+                                    {btn.label || "Button"}
+                                  </DashboardTypog>
+                                ))}
+                              </div>
+                              </div>
+                            </div>
+                          );
+                        })()
                       ) : block.kind === "image" ? (
                         (() => {
                           const imageAspectRatio = getBuilderImageAspectRatio(block.imageRatio);
@@ -12095,10 +11775,16 @@ if (section.kind === "embed") {
                               const productStyleProps = {
                                 ...cardBorderRadiusStyle,
                                 ...cardBackgroundStyle,
+                                ...visualStyleToCss(
+                                  block.visualStyle as BuilderVisualStyle | undefined,
+                                ),
                               } as React.CSSProperties;
+                              const productVisualClass = visualStyleClassName(
+                                block.visualStyle as BuilderVisualStyle | undefined,
+                              );
 
                               return block.layoutVariant === "carousel" ? (
-                                <div style={productStyleProps}>
+                                <div className={productVisualClass} style={productStyleProps}>
                                   <ProductCarousel
                                     products={previewProducts.slice(
                                       0,
@@ -12129,7 +11815,7 @@ if (section.kind === "embed") {
                                       : block.gridMargin && block.gridMargin !== "inherit"
                                         ? block.gridMargin
                                         : "none"
-                                  } shop-card-preset--${block.panelStyle ?? "default"}`}
+                                  } shop-card-preset--${block.panelStyle ?? "default"} ${productVisualClass}`}
                                   style={productStyleProps}
                                 >
                                   <CategoryWithFilters
@@ -12185,11 +11871,14 @@ if (section.kind === "embed") {
                           <div
                             className={`shop-builder-grid shop-builder-grid--gap-${
                               block.gridGap ?? "medium"
-                            } shop-builder-grid--margin-${hasBuilderVisualSpacing(block.visualStyle?.margin) || !block.gridMargin || block.gridMargin === "inherit" ? "none" : block.gridMargin} shop-card-preset--${block.panelStyle ?? "default"}`}
+                            } shop-builder-grid--margin-${hasBuilderVisualSpacing(block.visualStyle?.margin) || !block.gridMargin || block.gridMargin === "inherit" ? "none" : block.gridMargin} shop-card-preset--${block.panelStyle ?? "default"} ${visualStyleClassName(block.visualStyle as BuilderVisualStyle | undefined)}`}
                             style={
                               {
                                 "--shop-builder-grid-columns":
                                   block.columns ?? 3,
+                                ...visualStyleToCss(
+                                  block.visualStyle as BuilderVisualStyle | undefined,
+                                ),
                               } as CSSProperties
                             }
                           >
@@ -12227,6 +11916,18 @@ if (section.kind === "embed") {
                                   ("typography" in item
                                     ? item.typography
                                     : undefined) ?? block.typography;
+                                const gridTitleStyle = {
+                                  color:
+                                    "var(--builder-card-title-color, inherit)",
+                                  fontSize:
+                                    "var(--builder-card-title-size, inherit)",
+                                  fontWeight:
+                                    "var(--builder-card-title-weight, inherit)",
+                                  textAlign:
+                                    "var(--builder-card-title-align, inherit)" as CSSProperties["textAlign"],
+                                  margin:
+                                    "var(--builder-card-title-margin, 0)",
+                                } as CSSProperties;
 
                                 return (
                                 <article
@@ -12360,11 +12061,19 @@ if (section.kind === "embed") {
                                         <span>No image</span>
                                       ) : null}
                                       {block.gridSource !== "products" && (
-                                        <label
+                                        <button
+                                          type="button"
                                           className="builder-preview-image-upload"
-                                          onClick={(event) =>
-                                            event.stopPropagation()
-                                          }
+                                          onClick={(event) => {
+                                            event.stopPropagation();
+                                            onUploadGridItemImage(
+                                              section.id,
+                                              columnKey,
+                                              blockKey,
+                                              itemIndex,
+                                              item.imageUrl,
+                                            );
+                                          }}
                                         >
                                           <ImageIcon size={14} />
                                           <span>
@@ -12372,20 +12081,7 @@ if (section.kind === "embed") {
                                               ? "Change image"
                                               : "Select image"}
                                           </span>
-                                          <input
-                                            type="file"
-                                            accept="image/*"
-                                            onChange={(event) =>
-                                              onUploadGridItemImage(
-                                                section.id,
-                                                columnKey,
-                                                blockKey,
-                                                itemIndex,
-                                                event.target.files?.[0] ?? null,
-                                              )
-                                            }
-                                          />
-                                        </label>
+                                        </button>
                                       )}
                                     </div>
                                   )}
@@ -12417,6 +12113,7 @@ if (section.kind === "embed") {
                                             as="h3"
                                             className="shop-builder-title"
                                             typography={itemTypography}
+                                            style={gridTitleStyle}
                                             value={item.title}
                                             onChange={(title) =>
                                               onUpdateGridItem(
@@ -12510,7 +12207,11 @@ if (section.kind === "embed") {
                                           item.eyebrow && (
                                             <span>{item.eyebrow}</span>
                                           )}
-                                        {item.title && <h3>{item.title}</h3>}
+                                        {item.title && (
+                                          <h3 style={gridTitleStyle}>
+                                            {item.title}
+                                          </h3>
+                                        )}
                                         {block.gridShowMeta !== false &&
                                           item.meta && (
                                             <small>{item.meta}</small>

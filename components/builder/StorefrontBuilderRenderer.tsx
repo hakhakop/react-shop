@@ -1132,11 +1132,15 @@ async function ContentProductsBlock({
   const productStyleProps = {
     ...cardBorderRadiusStyle,
     ...cardBackgroundStyle,
+    ...visualStyleToCss(block.visualStyle as BuilderVisualStyle | undefined),
   } as React.CSSProperties;
+  const productVisualClass = visualStyleClassName(
+    block.visualStyle as BuilderVisualStyle | undefined,
+  );
 
   if (block.layoutVariant === "carousel") {
     return (
-      <div style={productStyleProps}>
+      <div className={productVisualClass} style={productStyleProps}>
         <ProductCarousel
           products={products}
           preset={block.cardPreset ?? "standard"}
@@ -1163,7 +1167,7 @@ async function ContentProductsBlock({
 
   return (
     <div
-      className={`shop-builder-grid--margin-${blockLegacyGridMargin(block)} shop-card-preset--${block.panelStyle ?? "default"}`}
+      className={`shop-builder-grid--margin-${blockLegacyGridMargin(block)} shop-card-preset--${block.panelStyle ?? "default"} ${productVisualClass}`}
       style={productStyleProps}
     >
       <CategoryWithFilters
@@ -1272,11 +1276,27 @@ function GridCards({
   }>;
 }) {
   const limit = Math.max(1, (block.columns ?? 3) * (block.gridRows ?? 1));
+  const visualClass = visualStyleClassName(
+    block.visualStyle as BuilderVisualStyle | undefined,
+  );
+  const gridTitleStyle = {
+    color: "var(--builder-card-title-color, inherit)",
+    fontSize: "var(--builder-card-title-size, inherit)",
+    fontWeight: "var(--builder-card-title-weight, inherit)",
+    textAlign:
+      "var(--builder-card-title-align, inherit)" as CSSProperties["textAlign"],
+    margin: "var(--builder-card-title-margin, 0)",
+  } as CSSProperties;
   return (
     <div
-      className={`shop-builder-grid shop-builder-grid--gap-${block.gridGap ?? "medium"} shop-builder-grid--margin-${blockLegacyGridMargin(block)} shop-card-preset--${block.panelStyle ?? "default"}`}
+      className={`shop-builder-grid shop-builder-grid--gap-${block.gridGap ?? "medium"} shop-builder-grid--margin-${blockLegacyGridMargin(block)} shop-card-preset--${block.panelStyle ?? "default"} ${visualClass}`}
       style={
-        { "--shop-builder-grid-columns": block.columns ?? 3 } as CSSProperties
+        {
+          "--shop-builder-grid-columns": block.columns ?? 3,
+          ...visualStyleToCss(
+            block.visualStyle as BuilderVisualStyle | undefined,
+          ),
+        } as CSSProperties
       }
     >
       {items.slice(0, limit).map((item) => (
@@ -1296,7 +1316,15 @@ function GridCards({
             {block.gridShowEyebrow !== false && item.eyebrow && (
               <span>{item.eyebrow}</span>
             )}
-            {item.title && <Typog as="h3" typography={item.typography ?? block.typography}>{item.title}</Typog>}
+            {item.title && (
+              <Typog
+                as="h3"
+                typography={item.typography ?? block.typography}
+                style={gridTitleStyle}
+              >
+                {item.title}
+              </Typog>
+            )}
             {block.gridShowMeta !== false && item.meta && (
               <small>{item.meta}</small>
             )}
@@ -2281,6 +2309,27 @@ function ContentLayoutBlock({
   }
 
   if (block.kind === "panel") {
+    const panelTitleStyle = {
+      color: "var(--builder-card-title-color, inherit)",
+      fontSize: "var(--builder-card-title-size, inherit)",
+      fontWeight: "var(--builder-card-title-weight, inherit)",
+      textAlign:
+        "var(--builder-card-title-align, inherit)" as CSSProperties["textAlign"],
+      margin: "var(--builder-card-title-margin, 0)",
+    } as CSSProperties;
+    const panelMetaStyle = {
+      color: "var(--builder-card-meta-color, inherit)",
+      fontSize: "var(--builder-card-meta-size, inherit)",
+      textTransform:
+        "var(--builder-card-meta-transform, none)" as CSSProperties["textTransform"],
+      marginTop: "var(--builder-card-meta-spacing, 0)",
+    } as CSSProperties;
+    const panelBodyStyle = {
+      color: "var(--builder-card-content-color, inherit)",
+      fontSize: "var(--builder-card-content-size, inherit)",
+      lineHeight: "var(--builder-card-content-line-height, inherit)",
+      maxWidth: "var(--builder-card-content-max-width, none)",
+    } as CSSProperties;
     return (
       <div className="shop-builder-column-block shop-builder-column-block--panel">
         {block.imageUrl && (
@@ -2292,9 +2341,13 @@ function ContentLayoutBlock({
           />
         )}
         <div>
-          {block.eyebrow && <span>{block.eyebrow}</span>}
+          {block.eyebrow && (
+            <span className="shop-builder-panel-meta" style={panelMetaStyle}>
+              {block.eyebrow}
+            </span>
+          )}
           {block.title && (
-            <Typog as="h3" typography={block.typography}>
+            <Typog as="h3" typography={block.typography} style={panelTitleStyle}>
               {block.typewriterEnabled ? (
                 <TypewriterText
                   text={block.title}
@@ -2313,7 +2366,7 @@ function ContentLayoutBlock({
             </Typog>
           )}
           {block.body && (
-            <Typog as="p" typography={block.typography}>
+            <Typog as="p" typography={block.typography} style={panelBodyStyle}>
               {block.typewriterEnabled && !block.title ? (
                 <TypewriterText
                   text={block.body}

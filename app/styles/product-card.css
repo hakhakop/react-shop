@@ -57,10 +57,17 @@
   height: 100%;
   max-width: var(--product-image-max-width, 100%);
   max-height: var(--product-image-max-height, 100%);
-  object-fit: var(--product-image-object-fit, contain);
+  object-fit: var(--builder-card-image-fit, var(--product-image-object-fit, contain));
   transition:
     transform 0.22s ease-out,
     filter 0.22s ease-out;
+}
+
+.product-image {
+  position: relative;
+  aspect-ratio: var(--builder-card-image-ratio, auto);
+  border-radius: var(--builder-card-image-radius, inherit);
+  overflow: hidden;
 }
 
 .product-card:hover .product-image img {
@@ -79,12 +86,13 @@
 }
 
 .product-title {
-  font-size: clamp(15px, 1vw, 18px);
+  font-size: var(--builder-card-title-size, clamp(15px, 1vw, 18px));
   line-height: 1.12;
-  font-weight: 720;
-  color: var(--context-text, var(--text-main, #111827));
-  margin: 0;
+  font-weight: var(--builder-card-title-weight, 720);
+  color: var(--builder-card-title-color, var(--context-text, var(--text-main, #111827)));
+  margin: var(--builder-card-title-margin, 0);
   letter-spacing: 0;
+  text-align: var(--builder-card-title-align, inherit);
 }
 
 .product-title-2lines {
@@ -107,6 +115,9 @@
 
   background: transparent;
   border: 0;
+  color: var(--builder-card-meta-color, inherit);
+  font-size: var(--builder-card-meta-size, inherit);
+  text-transform: var(--builder-card-meta-transform, none);
 
   font-size: clamp(15px, 1vw, 18px);
   font-weight: 720;
@@ -200,6 +211,7 @@
 
   --product-card-bg: var(--builder-card-bg, var(--context-card-bg, var(--surface-main, #ffffff)));
   --product-card-border: var(--builder-card-border, var(--context-card-border, rgba(148, 163, 184, 0.22)));
+  --product-card-padding: var(--builder-card-padding, clamp(14px, 1.5vw, 22px));
 
   border-radius: var(--product-card-radius, var(--radius-md, 10px));
   border: 1px solid var(--product-card-border);
