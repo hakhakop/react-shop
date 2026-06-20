@@ -1,5 +1,160 @@
 [
   {
+    "id": "contentlayout-mqm1w72l-ydty",
+    "title": "contentLayout",
+    "templateType": "section",
+    "description": "Section template saved from Home",
+    "sourcePage": "home",
+    "sections": [
+      {
+        "id": "antigravity-demo-section-1",
+        "kind": "contentLayout",
+        "visible": true,
+        "title": "",
+        "background": "#ffffff",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "topSpacing": "inherit",
+        "bottomSpacing": "inherit",
+        "topMargin": "none",
+        "bottomMargin": "none",
+        "layout": "whole",
+        "layoutColumns": 1,
+        "layoutRows": 1,
+        "backgroundEffect": "antigravity2",
+        "antigravitySpeed": 1.8,
+        "antigravityParticleCount": 260,
+        "antigravityColor": "#a855f7",
+        "antigravityGridDensity": "medium",
+        "antigravityInteractive": true,
+        "antigravityShowGrid": false,
+        "antigravityShowParticles": true,
+        "antigravityGridMoveSpeed": 0.6,
+        "antigravityGlowIntensity": 1.2,
+        "antigravityVisualMode": "no-grid",
+        "layoutItems": [
+          {
+            "id": "layout-row-mqkhhnsa-column-1",
+            "rowId": "layout-row-mqkhhnsa",
+            "rowLayout": "whole",
+            "blocks": [
+              {
+                "id": "image-block-mqho93e8-k93hf",
+                "kind": "image",
+                "title": "Image",
+                "body": "A simple image block for banners, artwork, and visual breaks.",
+                "imageUrl": "https://cms.webpages.am/wp-content/uploads/2026/06/logo-2-1-scaled.png",
+                "imageAlt": "logo-2 (1)",
+                "imageAlignment": "center",
+                "imageMaxWidth": 300,
+                "imageBorderRadius": 0,
+                "imageCaption": "",
+                "panelStyle": "dark",
+                "borderRadius": 10,
+                "visualStyle": {
+                  "padding": {
+                    "linked": true,
+                    "top": "none",
+                    "right": "none",
+                    "bottom": "none",
+                    "left": "none"
+                  },
+                  "margin": {
+                    "linked": true,
+                    "top": "none",
+                    "right": "none",
+                    "bottom": "none",
+                    "left": "none"
+                  }
+                }
+              },
+              {
+                "id": "hero-block-mqkhhqgx-m82o9",
+                "kind": "hero",
+                "eyebrow": "Բարի գալուստ webpages",
+                "title": "[Ընտրեք փաթեթը |տրամադրեք տեղեկությունը| ձեր կայքը պատրաստ է]",
+                "body": "Կայք, հոսթինգ և սպասարկում՝ մեկ պարզ փաթեթով",
+                "buttonLabel": "Բաժանորդագրվել",
+                "buttonUrl": "/",
+                "carouselSettings": {
+                  "variant": "default"
+                },
+                "elementAlign": "center",
+                "typewriterEnabled": true,
+                "typography": {
+                  "title": {
+                    "lineHeight": "1.8",
+                    "fontSize": "clamp(36px, 5.5vw, 80px)",
+                    "fontWeight": "800",
+                    "letterSpacing": ""
+                  },
+                  "eyebrow": {
+                    "fontSize": "14px",
+                    "textTransform": "uppercase",
+                    "color": "#c084fc",
+                    "fontWeight": "600",
+                    "letterSpacing": "0.15rem",
+                    "lineHeight": ""
+                  }
+                },
+                "buttonBg": "var(--builder-preview-section-button-bg, var(--builder-section-button-bg, var(--builder-button-bg, #111111)))",
+                "buttonTextColor": "var(--builder-preview-section-button-text, var(--builder-section-button-text, var(--builder-button-text, #ffffff)))",
+                "buttonBorderRadius": "999px",
+                "buttonBorderWidth": "0px",
+                "buttonBorderColor": "transparent",
+                "buttonPaddingY": "11px",
+                "buttonPaddingX": "18px",
+                "buttonFontWeight": "720",
+                "buttonLetterSpacing": "0px",
+                "buttonHoverBg": "var(--builder-preview-section-button-bg, var(--builder-section-button-bg, var(--builder-button-bg, #111111)))",
+                "buttonHoverTextColor": "var(--builder-preview-section-button-text, var(--builder-section-button-text, var(--builder-button-text, #ffffff)))",
+                "buttonHoverBorderColor": "transparent",
+                "buttonHoverEffect": "lift",
+                "typewriterUseGradient": true,
+                "typewriterSpeed": 60,
+                "typewriterLoop": true,
+                "textGradientPreset": "custom",
+                "textGradientCustomStartOffset": 0,
+                "textGradientCustomStart": "#c1dbfb",
+                "textGradientCustomMiddle": "#818cf8",
+                "textGradientCustomEnd": "#c084fc",
+                "textGradientCustomMiddleOffset": 63,
+                "textGradientCustomEndOffset": 100,
+                "textGradientCustomAngle": 100,
+                "visualStyle": {
+                  "padding": {
+                    "linked": true,
+                    "top": "none",
+                    "right": "none",
+                    "bottom": "none",
+                    "left": "none"
+                  },
+                  "margin": {
+                    "linked": true,
+                    "top": "none",
+                    "right": "none",
+                    "bottom": "none",
+                    "left": "none"
+                  }
+                }
+              }
+            ]
+          }
+        ],
+        "visualStyle": {
+          "effects": {
+            "minHeight": ""
+          }
+        },
+        "contentVerticalAlign": "center",
+        "sectionHeight": "viewport",
+        "pullUnderHeader": true
+      }
+    ],
+    "updatedAt": "2026-06-20T07:43:08.493Z"
+  },
+  {
     "id": "section-layout-mqic57en-s3db",
     "title": "Section Layout",
     "templateType": "section",

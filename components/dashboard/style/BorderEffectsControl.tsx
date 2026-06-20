@@ -13,6 +13,31 @@ const SHADOW_PRESETS = [
   { label: "Strong", value: "0 24px 60px rgba(0,0,0,0.18)" },
 ];
 
+function StyleChipGroup<T extends string>({
+  value,
+  options,
+  onChange,
+}: {
+  value: T;
+  options: readonly { label: string; value: T }[];
+  onChange: (value: T) => void;
+}) {
+  return (
+    <div className="builder-style-chip-row">
+      {options.map((option) => (
+        <button
+          key={option.value || option.label}
+          type="button"
+          className={option.value === value ? "is-active" : ""}
+          onClick={() => onChange(option.value)}
+        >
+          {option.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 type Props = {
   border?: BuilderBorderStyle;
   effects?: BuilderEffectsStyle;
@@ -66,20 +91,21 @@ export default function BorderEffectsControl({
             </label>
             <label>
               <span>Style</span>
-              <select
+              <StyleChipGroup
                 value={b.style ?? "solid"}
-                onChange={(event) =>
+                options={[
+                  { label: "None", value: "none" },
+                  { label: "Solid", value: "solid" },
+                  { label: "Dashed", value: "dashed" },
+                  { label: "Dotted", value: "dotted" },
+                ]}
+                onChange={(value) =>
                   onBorderChange?.({
                     ...b,
-                    style: event.target.value as BuilderBorderStyle["style"],
+                    style: value as BuilderBorderStyle["style"],
                   })
                 }
-              >
-                <option value="none">None</option>
-                <option value="solid">Solid</option>
-                <option value="dashed">Dashed</option>
-                <option value="dotted">Dotted</option>
-              </select>
+              />
             </label>
           </div>
           <div className="builder-style-two-col">
@@ -124,23 +150,20 @@ export default function BorderEffectsControl({
           </label>
           <label>
             <span>Box shadow</span>
-            <select
+            <StyleChipGroup
               value={
                 SHADOW_PRESETS.find((preset) => preset.value === e.boxShadow)
                   ?.value ?? "__custom"
               }
-              onChange={(event) => {
-                if (event.target.value === "__custom") return;
-                onEffectsChange?.({ ...e, boxShadow: event.target.value });
+              options={[
+                ...SHADOW_PRESETS,
+                { label: "Custom", value: "__custom" },
+              ]}
+              onChange={(value) => {
+                if (value === "__custom") return;
+                onEffectsChange?.({ ...e, boxShadow: value });
               }}
-            >
-              {SHADOW_PRESETS.map((preset) => (
-                <option key={preset.label} value={preset.value || "__none"}>
-                  {preset.label}
-                </option>
-              ))}
-              <option value="__custom">Custom</option>
-            </select>
+            />
           </label>
           <input
             value={e.boxShadow ?? ""}
@@ -179,20 +202,21 @@ export default function BorderEffectsControl({
           </div>
           <label>
             <span>Overflow</span>
-            <select
+            <StyleChipGroup
               value={e.overflow ?? "visible"}
-              onChange={(event) =>
+              options={[
+                { label: "Visible", value: "visible" },
+                { label: "Hidden", value: "hidden" },
+                { label: "Auto", value: "auto" },
+                { label: "Scroll", value: "scroll" },
+              ]}
+              onChange={(value) =>
                 onEffectsChange?.({
                   ...e,
-                  overflow: event.target.value as BuilderEffectsStyle["overflow"],
+                  overflow: value as BuilderEffectsStyle["overflow"],
                 })
               }
-            >
-              <option value="visible">Visible</option>
-              <option value="hidden">Hidden</option>
-              <option value="auto">Auto</option>
-              <option value="scroll">Scroll</option>
-            </select>
+            />
           </label>
         </div>
       )}

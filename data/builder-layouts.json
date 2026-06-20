@@ -59,8 +59,8 @@
         "antigravityVisualMode": "no-grid",
         "layoutItems": [
           {
-            "id": "layout-row-demo-column-1",
-            "rowId": "layout-row-demo",
+            "id": "layout-row-mqkhhnsa-column-1",
+            "rowId": "layout-row-mqkhhnsa",
             "rowLayout": "whole",
             "blocks": [
               {
@@ -75,69 +75,95 @@
                 "imageBorderRadius": 0,
                 "imageCaption": "",
                 "panelStyle": "dark",
-                "borderRadius": 10
+                "borderRadius": 10,
+                "visualStyle": {
+                  "padding": {
+                    "linked": true,
+                    "top": "none",
+                    "right": "none",
+                    "bottom": "none",
+                    "left": "none"
+                  },
+                  "margin": {
+                    "linked": true,
+                    "top": "none",
+                    "right": "none",
+                    "bottom": "none",
+                    "left": "none"
+                  }
+                }
               },
               {
-                "id": "demo-hero-block-1",
+                "id": "hero-block-mqkhhqgx-m82o9",
                 "kind": "hero",
                 "eyebrow": "Բարի գալուստ webpages",
                 "title": "[Ընտրեք փաթեթը |տրամադրեք տեղեկությունը| ձեր կայքը պատրաստ է]",
-                "body": "<p><strong>Կայք, հոսթինգ և սպասարկում՝ մեկ պարզ փաթեթով</strong></p>",
+                "body": "Կայք, հոսթինգ և սպասարկում՝ մեկ պարզ փաթեթով",
                 "buttonLabel": "Բաժանորդագրվել",
-                "buttonUrl": "https://webpages.am/subscription/",
-                "typewriterEnabled": true,
-                "typewriterLoop": true,
-                "typewriterSpeed": 90,
-                "typewriterDelay": 1500,
-                "typewriterUseGradient": true,
-                "typewriterGradientPreset": "custom",
-                "premiumButtonStyle": "glassmorphic",
-                "typography": {
-                  "title": {
-                    "fontSize": "clamp(36px, 5.5vw, 80px)",
-                    "fontWeight": "800",
-                    "lineHeight": "1.8",
-                    "letterSpacing": "-0.03em"
-                  },
-                  "body": {
-                    "fontSize": "18px",
-                    "fontWeight": "400",
-                    "lineHeight": "1.6",
-                    "color": "#a1a1aa"
-                  },
-                  "eyebrow": {
-                    "fontSize": "14px",
-                    "fontWeight": "600",
-                    "letterSpacing": "0.15em",
-                    "textTransform": "uppercase",
-                    "color": "#c084fc"
-                  },
-                  "button": {
-                    "fontSize": "15px",
-                    "fontWeight": "600"
-                  }
-                },
-                "textGradientCustomStartOffset": 0,
-                "textGradientCustomStart": "#e5f1ff",
-                "textGradientCustomMiddle": "#818cf8",
-                "textGradientCustomEnd": "#c084fc",
-                "textGradientCustomMiddleOffset": 50,
-                "textGradientCustomEndOffset": 100,
-                "textGradientCustomAngle": 135,
-                "elementAlign": "center",
+                "buttonUrl": "/",
                 "carouselSettings": {
                   "variant": "default"
                 },
-                "borderRadius": 24,
-                "buttons": [],
-                "buttonPaddingX": "60px"
+                "elementAlign": "center",
+                "typewriterEnabled": true,
+                "typography": {
+                  "title": {
+                    "lineHeight": "1.8",
+                    "fontSize": "clamp(36px, 5.5vw, 80px)",
+                    "fontWeight": "800",
+                    "letterSpacing": ""
+                  },
+                  "eyebrow": {
+                    "fontSize": "14px",
+                    "textTransform": "uppercase",
+                    "color": "#c084fc",
+                    "fontWeight": "600",
+                    "letterSpacing": "0.15rem",
+                    "lineHeight": ""
+                  }
+                },
+                "buttonBg": "var(--builder-preview-section-button-bg, var(--builder-section-button-bg, var(--builder-button-bg, #111111)))",
+                "buttonTextColor": "var(--builder-preview-section-button-text, var(--builder-section-button-text, var(--builder-button-text, #ffffff)))",
+                "buttonBorderRadius": "999px",
+                "buttonBorderWidth": "0px",
+                "buttonBorderColor": "transparent",
+                "buttonPaddingY": "11px",
+                "buttonPaddingX": "18px",
+                "buttonFontWeight": "720",
+                "buttonLetterSpacing": "0px",
+                "buttonHoverBg": "var(--builder-preview-section-button-bg, var(--builder-section-button-bg, var(--builder-button-bg, #111111)))",
+                "buttonHoverTextColor": "var(--builder-preview-section-button-text, var(--builder-section-button-text, var(--builder-button-text, #ffffff)))",
+                "buttonHoverBorderColor": "transparent",
+                "buttonHoverEffect": "lift",
+                "typewriterUseGradient": true,
+                "typewriterSpeed": 60,
+                "typewriterLoop": true,
+                "textGradientPreset": "custom",
+                "textGradientCustomStartOffset": 0,
+                "textGradientCustomStart": "#c1dbfb",
+                "textGradientCustomMiddle": "#818cf8",
+                "textGradientCustomEnd": "#c084fc",
+                "textGradientCustomMiddleOffset": 63,
+                "textGradientCustomEndOffset": 100,
+                "textGradientCustomAngle": 100,
+                "visualStyle": {
+                  "padding": {
+                    "linked": true,
+                    "top": "none",
+                    "right": "none",
+                    "bottom": "none",
+                    "left": "none"
+                  },
+                  "margin": {
+                    "linked": true,
+                    "top": "none",
+                    "right": "none",
+                    "bottom": "none",
+                    "left": "none"
+                  }
+                }
               }
-            ],
-            "rowTopMargin": "md",
-            "rowBottomSpacing": "md",
-            "rowBottomMargin": "md",
-            "rowBorderRadius": 0,
-            "rowColorScheme": "inherit"
+            ]
           }
         ],
         "visualStyle": {
@@ -153,7 +179,7 @@
         "id": "contentLayout-mq4z4n9g-2ttwl",
         "kind": "contentLayout",
         "title": "",
-        "background": "#ffffff",
+        "background": "#111111",
         "backgroundMode": "full",
         "contentMode": "boxed",
         "colorScheme": "inherit",
@@ -316,6 +342,19 @@
                     "fontWeight": "800",
                     "fontSize": "28",
                     "color": "#ffffff"
+                  }
+                },
+                "visualStyle": {
+                  "margin": {
+                    "top": "none",
+                    "right": "none",
+                    "bottom": "none",
+                    "left": "none",
+                    "linked": true
+                  },
+                  "card": {
+                    "titleSize": "1.75rem",
+                    "titleWeight": "800"
                   }
                 }
               }
@@ -507,6 +546,17 @@
                     "right": "sm",
                     "bottom": "sm",
                     "left": "sm"
+                  },
+                  "margin": {
+                    "top": "medium",
+                    "right": "medium",
+                    "bottom": "medium",
+                    "left": "medium",
+                    "linked": true
+                  },
+                  "card": {
+                    "titleWeight": "800",
+                    "titleSize": "2.5rem"
                   }
                 },
                 "elementBackgroundMode": "default"
@@ -1200,7 +1250,7 @@
         ]
       }
     ],
-    "updatedAt": "2026-06-18T09:20:48.255Z"
+    "updatedAt": "2026-06-19T05:47:37.011Z"
   },
   "shop": {
     "version": 1,
