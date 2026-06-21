@@ -297,7 +297,7 @@ export default function BuilderWireframePanel({
             const rows = getBuilderLayoutRows(section, section.layoutItems ?? []);
 
             return (
-              <div className="builder-wireframe-section" key={section.id}>
+              <div className={`builder-wireframe-section${sectionSelected ? " is-selected" : ""}`} key={section.id}>
                 <div className="builder-wireframe-rowline">
                   <button
                     type="button"
@@ -426,8 +426,11 @@ export default function BuilderWireframePanel({
                           (item) => (item.blocks ?? []).length === 0,
                         );
 
+                        const preset = getBuilderRowLayoutPreset(row.layoutKey ?? null);
+                        const totalRatio = preset ? preset.ratios.reduce((a, b) => a + b, 0) : row.items.length;
+
                         return (
-                          <div className="builder-wireframe-row" key={row.id}>
+                          <div className={`builder-wireframe-row${rowSelected ? " is-selected" : ""}`} key={row.id}>
                             <div className="builder-wireframe-rowline">
                               <button
                                 type="button"
@@ -452,7 +455,16 @@ export default function BuilderWireframePanel({
                                   className="builder-wireframe-label-wrap"
                                   title={`Row ${rowIndex + 1} (${rowSummary(row, rowIndex)})`}
                                 >
-                                  <strong>Row {rowIndex + 1}</strong>
+                                  <div className="builder-wireframe-row-label-row">
+                                    <strong>Row {rowIndex + 1}</strong>
+                                    <div className="builder-wireframe-row-preview" aria-hidden="true">
+                                      {preset ? preset.ratios.map((r, idx) => (
+                                        <div key={idx} style={{ flexGrow: r }} className="builder-wireframe-row-preview-col" />
+                                      )) : (
+                                        <div style={{ flexGrow: 1 }} className="builder-wireframe-row-preview-col" />
+                                      )}
+                                    </div>
+                                  </div>
                                   <small>{rowSummary(row, rowIndex)}</small>
                                 </span>
 
@@ -531,10 +543,14 @@ export default function BuilderWireframePanel({
                                     selectedLayoutRowIndex === null;
                                   const blocks = item.blocks ?? [];
 
+                                  const ratio = preset?.ratios?.[columnIndex] ?? 1;
+                                  const widthPercent = totalRatio > 0 ? Math.round((ratio / totalRatio) * 100) : 100;
+
                                   return (
                                     <div
-                                      className="builder-wireframe-column"
+                                      className={`builder-wireframe-column${columnSelected ? " is-selected" : ""}`}
                                       key={columnKey}
+                                      style={{ flex: `${ratio} ${ratio} 0%`, minWidth: 0 }}
                                     >
                                       <button
                                         type="button"
@@ -553,12 +569,11 @@ export default function BuilderWireframePanel({
                                           className="builder-wireframe-label-wrap"
                                           title={`${columnTitle(item, columnIndex)} (Column ${columnIndex + 1})`}
                                         >
-                                          <strong>{columnTitle(item, columnIndex)}</strong>
-                                          <small>Column {columnIndex + 1}</small>
+                                          <strong>{item.title || `Col ${columnIndex + 1}`}</strong>
                                         </span>
 
                                         <span className="builder-wireframe-meta">
-                                          <span className="builder-wireframe-badge builder-wireframe-badge--column">COL</span>
+                                          <span className="builder-wireframe-badge builder-wireframe-badge--column-pct">{widthPercent}%</span>
                                           <em className="builder-wireframe-count">{blocks.length}</em>
                                         </span>
                                       </button>
@@ -567,16 +582,13 @@ export default function BuilderWireframePanel({
                                         {blocks.length === 0 ? (
                                           <button
                                             type="button"
-                                            className="builder-wireframe-item builder-wireframe-item--empty"
+                                            className="builder-wireframe-item builder-wireframe-item--empty-compact"
                                             onClick={() =>
                                               onSelectColumn(section.id, columnKey)
                                             }
+                                            title="Empty column. Click to select."
                                           >
-                                            <Box size={12} className="builder-wireframe-icon" />
-                                            <span className="builder-wireframe-label-wrap">
-                                              <strong>Empty</strong>
-                                              <small>No elements</small>
-                                            </span>
+                                            <span className="builder-wireframe-empty-label">Empty</span>
                                           </button>
                                         ) : (
                                           blocks.map((block, blockIndex) => {
@@ -612,9 +624,8 @@ export default function BuilderWireframePanel({
                                                   title={blockTitleFull(block, blockIndex)}
                                                 >
                                                   <strong>
-                                                    {blockTitle(block, blockIndex)}
+                                                    {layoutBlockLabels[(block.kind ?? "text") as LayoutBlockKind] ?? block.kind ?? "Element"}
                                                   </strong>
-                                                  <small>Element</small>
                                                 </span>
 
                                                 <span className="builder-wireframe-meta">
