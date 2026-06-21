@@ -97,6 +97,25 @@ type StorefrontBuilderProduct = {
 };
 
 type BuilderStyle = CSSProperties & Record<`--${string}`, string | undefined>;
+
+function cssSpacingValue(value: string | null | undefined) {
+  const trimmed = (value ?? "").toString().trim();
+  if (!trimmed) return null;
+  if (/^\d+(\.\d+)?$/.test(trimmed)) return `${trimmed}px`;
+  if (/^-?\d+(\.\d+)?(px|rem|em|%|vw|vh|svh|dvh)$/.test(trimmed)) return trimmed;
+  if (/^clamp\([^)]+\)$/.test(trimmed)) return trimmed;
+  return null;
+}
+
+function gridSpacingClass(
+  value: string | null | undefined,
+  presets: readonly string[],
+  fallback: string,
+) {
+  const key = (value || fallback).toString().trim().toLowerCase();
+  return presets.includes(key) ? key : "custom";
+}
+
 type BuilderAnimation = {
   preset?: string;
   delayMs?: number;
@@ -1287,12 +1306,33 @@ function GridCards({
       "var(--builder-card-title-align, inherit)" as CSSProperties["textAlign"],
     margin: "var(--builder-card-title-margin, 0)",
   } as CSSProperties;
+  const gridGapClass = gridSpacingClass(
+    block.gridGap,
+    ["none", "small", "medium", "large", "max"],
+    "medium",
+  );
+  const gridGapCustom = gridGapClass === "custom" ? cssSpacingValue(block.gridGap) : null;
+  const imagePaddingClass = gridSpacingClass(
+    block.gridImagePadding,
+    ["frameless", "none", "small", "medium", "max"],
+    "frameless",
+  );
+  const imagePaddingCustom =
+    imagePaddingClass === "custom" ? cssSpacingValue(block.gridImagePadding) : null;
+  const contentPaddingClass = gridSpacingClass(
+    block.gridContentPadding,
+    ["none", "small", "medium", "large"],
+    "medium",
+  );
+  const contentPaddingCustom =
+    contentPaddingClass === "custom" ? cssSpacingValue(block.gridContentPadding) : null;
   return (
     <div
-      className={`shop-builder-grid shop-builder-grid--gap-${block.gridGap ?? "medium"} shop-builder-grid--margin-${blockLegacyGridMargin(block)} shop-card-preset--${block.panelStyle ?? "default"} ${visualClass}`}
+      className={`shop-builder-grid shop-builder-grid--gap-${gridGapClass} shop-builder-grid--margin-${blockLegacyGridMargin(block)} shop-card-preset--${block.panelStyle ?? "default"} ${visualClass}`}
       style={
         {
           "--shop-builder-grid-columns": block.columns ?? 3,
+          ...(gridGapCustom ? { "--shop-builder-grid-gap": gridGapCustom } : {}),
           ...visualStyleToCss(
             block.visualStyle as BuilderVisualStyle | undefined,
           ),
@@ -1302,7 +1342,17 @@ function GridCards({
       {items.slice(0, limit).map((item) => (
         <article
           key={item.id}
-          className={`shop-builder-grid-card is-image-${block.gridImagePadding ?? "frameless"} is-content-${block.gridContentPadding ?? "medium"} is-frame-${block.gridImageFrame ?? "none"}`}
+          className={`shop-builder-grid-card is-image-${imagePaddingClass} is-content-${contentPaddingClass} is-frame-${block.gridImageFrame ?? "none"}`}
+          style={
+            {
+              ...(imagePaddingCustom
+                ? { "--shop-builder-grid-image-padding": imagePaddingCustom }
+                : {}),
+              ...(contentPaddingCustom
+                ? { "--shop-builder-grid-content-padding": contentPaddingCustom }
+                : {}),
+            } as CSSProperties
+          }
         >
           {block.gridShowImage !== false && item.imageUrl && (
             <div className="shop-builder-grid-image">

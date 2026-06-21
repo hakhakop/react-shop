@@ -161,7 +161,16 @@
                     "bottom": "none",
                     "left": "none"
                   }
-                }
+                },
+                "buttons": [
+                  {
+                    "id": "btn-mqni2j4d-0",
+                    "label": "New Button",
+                    "url": "/",
+                    "target": "_self",
+                    "style": "primary"
+                  }
+                ]
               }
             ]
           }
@@ -1250,7 +1259,7 @@
         ]
       }
     ],
-    "updatedAt": "2026-06-19T05:47:37.011Z"
+    "updatedAt": "2026-06-21T08:04:00.948Z"
   },
   "shop": {
     "version": 1,
@@ -5477,5 +5486,154 @@
       }
     ],
     "updatedAt": "2026-06-17T17:19:12.815Z"
+  },
+  "page:demo-2": {
+    "version": 1,
+    "key": "page:demo-2",
+    "page": "page:demo-2",
+    "targetType": "page",
+    "design": {
+      "preset": "princity",
+      "colorScheme": "auto",
+      "pageBackground": "#f7f7f4",
+      "textColor": "#111111",
+      "mutedTextColor": "#5f5f58",
+      "accentColor": "#a4be7b",
+      "surfaceColor": "#efefe9",
+      "buttonBackground": "#111111",
+      "buttonTextColor": "#ffffff",
+      "radius": "8px",
+      "sectionMaxWidth": "1640px",
+      "sectionGutter": "48px",
+      "headingFontFamily": "inherit",
+      "headingSize": "clamp(42px, 8vw, 126px)",
+      "headingWeight": "760",
+      "headingLineHeight": "0.92",
+      "cardBg": "#efefe9",
+      "cardRadius": "8px",
+      "cardBorder": "transparent",
+      "cardShadow": "0 12px 30px rgba(17,17,17,0.06)",
+      "cardShadowHover": "0 18px 42px rgba(17,17,17,0.1)",
+      "cardImageBg": "#ffffff",
+      "cardImagePadding": "clamp(22px, 2.4vw, 36px)"
+    },
+    "sections": [
+      {
+        "id": "contentLayout-mqnhhji8-ecxnk",
+        "kind": "contentLayout",
+        "title": "",
+        "background": "#ffffff",
+        "backgroundMode": "boxed",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "topSpacing": "inherit",
+        "bottomSpacing": "inherit",
+        "topMargin": "inherit",
+        "bottomMargin": "inherit",
+        "pullUnderHeader": false,
+        "visible": true,
+        "eyebrow": "",
+        "body": "",
+        "layout": "whole",
+        "layoutColumns": 1,
+        "layoutItems": [
+          {
+            "id": "layout-item-mqnhhji8-1",
+            "blocks": [
+              {
+                "id": "hero-block-mqnhhji9-3dxac",
+                "kind": "hero",
+                "eyebrow": "Featured",
+                "title": "Իմ Վեբկայքը",
+                "body": "A strong visual opening with editable copy and action.",
+                "buttonLabel": "Learn more",
+                "buttonUrl": "/",
+                "carouselSettings": {
+                  "variant": "default"
+                },
+                "elementAlign": "center",
+                "typewriterEnabled": true,
+                "typography": {
+                  "title": {
+                    "fontSize": "80",
+                    "lineHeight": "1.8",
+                    "fontWeight": "700"
+                  }
+                },
+                "buttonBg": "transparent",
+                "buttonTextColor": "var(--builder-preview-section-button-bg, var(--builder-section-button-bg, var(--builder-button-bg, #111111)))",
+                "buttonBorderRadius": "999px",
+                "buttonBorderWidth": "1.5px",
+                "buttonBorderColor": "var(--builder-preview-section-button-bg, var(--builder-section-button-bg, var(--builder-button-bg, #111111)))",
+                "buttonPaddingY": "10px",
+                "buttonPaddingX": "18px",
+                "buttonFontWeight": "700",
+                "buttonLetterSpacing": "0px",
+                "buttonHoverBg": "var(--builder-preview-section-button-bg, var(--builder-section-button-bg, var(--builder-button-bg, #111111)))",
+                "buttonHoverTextColor": "var(--builder-preview-section-button-text, var(--builder-section-button-text, var(--builder-button-text, #ffffff)))",
+                "buttonHoverBorderColor": "var(--builder-preview-section-button-bg, var(--builder-section-button-bg, var(--builder-button-bg, #111111)))",
+                "buttonHoverEffect": "lift",
+                "typewriterUseGradient": true,
+                "typewriterSpeed": 120,
+                "typewriterEraseSpeed": 80,
+                "textGradientPreset": "custom",
+                "typewriterLoop": true,
+                "textGradientCustomMiddleOffset": 78,
+                "textGradientCustomStart": "#60a5fa",
+                "textGradientCustomMiddle": "#818cf8",
+                "textGradientCustomEnd": "#c084fc",
+                "textGradientCustomStartOffset": 0,
+                "textGradientCustomEndOffset": 37,
+                "textGradientCustomAngle": 40
+              }
+            ]
+          }
+        ],
+        "layoutRows": 1
+      },
+      {
+        "id": "contentLayout-mqnhjiea-6pp2n",
+        "kind": "contentLayout",
+        "title": "",
+        "background": "#ffffff",
+        "backgroundMode": "boxed",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "topSpacing": "inherit",
+        "bottomSpacing": "inherit",
+        "topMargin": "inherit",
+        "bottomMargin": "inherit",
+        "pullUnderHeader": false,
+        "visible": true,
+        "eyebrow": "",
+        "body": "",
+        "layout": "whole",
+        "layoutColumns": 1,
+        "layoutItems": [
+          {
+            "id": "layout-item-mqnhjiea-1",
+            "blocks": [
+              {
+                "id": "products-block-mqnhjlqd-z6c2y",
+                "kind": "products",
+                "title": "Products",
+                "source": "all",
+                "layoutVariant": "grid",
+                "columns": 4,
+                "gridLimit": 12,
+                "filterPosition": "left",
+                "cardStyle": "flat",
+                "cardPreset": "minimal",
+                "panelStyle": "dark",
+                "imagePadding": "none",
+                "imageFit": "cover"
+              }
+            ]
+          }
+        ],
+        "layoutRows": 1
+      }
+    ],
+    "updatedAt": "2026-06-21T07:55:27.387Z"
   }
 }

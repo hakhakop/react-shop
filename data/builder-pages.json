@@ -28,5 +28,11 @@
     "title": "New Home",
     "slug": "new-home",
     "updatedAt": "2026-06-17T17:18:42.422Z"
+  },
+  {
+    "key": "page:demo-2",
+    "title": "Demo 2",
+    "slug": "demo-2",
+    "updatedAt": "2026-06-21T06:12:43.357Z"
   }
 ]

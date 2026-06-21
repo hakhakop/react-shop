@@ -829,18 +829,27 @@
 .shop-builder-grid {
   display: grid;
   grid-template-columns: repeat(var(--shop-builder-grid-columns, 3), minmax(0, 1fr));
+  gap: var(--shop-builder-grid-gap, 18px);
+}
+
+.shop-builder-grid--gap-none {
+  --shop-builder-grid-gap: 0px;
 }
 
 .shop-builder-grid--gap-small {
-  gap: 10px;
+  --shop-builder-grid-gap: 10px;
 }
 
 .shop-builder-grid--gap-medium {
-  gap: 18px;
+  --shop-builder-grid-gap: 18px;
 }
 
 .shop-builder-grid--gap-large {
-  gap: 28px;
+  --shop-builder-grid-gap: 28px;
+}
+
+.shop-builder-grid--gap-max {
+  --shop-builder-grid-gap: 40px;
 }
 
 .shop-builder-grid--margin-none {
@@ -1653,15 +1662,19 @@
 }
 
 .shop-builder-grid-card.is-image-small .shop-builder-grid-image {
-  padding: 10px;
+  padding: var(--shop-builder-grid-image-padding, 12px);
 }
 
 .shop-builder-grid-card.is-image-medium .shop-builder-grid-image {
-  padding: 18px;
+  padding: var(--shop-builder-grid-image-padding, 24px);
 }
 
 .shop-builder-grid-card.is-image-max .shop-builder-grid-image {
-  padding: 28px;
+  padding: var(--shop-builder-grid-image-padding, 48px);
+}
+
+.shop-builder-grid-card.is-image-custom .shop-builder-grid-image {
+  padding: var(--shop-builder-grid-image-padding, 24px);
 }
 
 .shop-builder-grid-image img {
@@ -1672,7 +1685,8 @@
 
 .shop-builder-grid-card.is-image-small .shop-builder-grid-image img,
 .shop-builder-grid-card.is-image-medium .shop-builder-grid-image img,
-.shop-builder-grid-card.is-image-max .shop-builder-grid-image img {
+.shop-builder-grid-card.is-image-max .shop-builder-grid-image img,
+.shop-builder-grid-card.is-image-custom .shop-builder-grid-image img {
   object-fit: var(--builder-card-image-fit, contain);
 }
 
@@ -1686,15 +1700,19 @@
 }
 
 .shop-builder-grid-card.is-content-small .shop-builder-grid-content {
-  padding: var(--builder-card-padding, 10px);
+  padding: var(--shop-builder-grid-content-padding, var(--builder-card-padding, 12px));
 }
 
 .shop-builder-grid-card.is-content-medium .shop-builder-grid-content {
-  padding: var(--builder-card-padding, 16px);
+  padding: var(--shop-builder-grid-content-padding, var(--builder-card-padding, 20px));
 }
 
 .shop-builder-grid-card.is-content-large .shop-builder-grid-content {
-  padding: var(--builder-card-padding, 24px);
+  padding: var(--shop-builder-grid-content-padding, var(--builder-card-padding, 32px));
+}
+
+.shop-builder-grid-card.is-content-custom .shop-builder-grid-content {
+  padding: var(--shop-builder-grid-content-padding, var(--builder-card-padding, 20px));
 }
 
 .shop-builder-grid-content h3,

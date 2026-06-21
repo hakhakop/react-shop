@@ -84,14 +84,15 @@ function productSpaceToCss(value: string | null | undefined, fallback: string) {
     case "none":
       return "0px";
     case "small":
-      return "clamp(6px, 0.7vw, 10px)";
+      return "12px";
     case "large":
-      return "clamp(28px, 3vw, 46px)";
+      return "40px";
     case "max":
-      return "clamp(44px, 5vw, 76px)";
+      return "64px";
     case "medium":
+      return "24px";
     default:
-      return "clamp(16px, 1.8vw, 26px)";
+      return cssSpacingValue(key) ?? "clamp(16px, 1.8vw, 26px)";
   }
 }
 
@@ -104,15 +105,25 @@ function productGridGapToCss(
     case "none":
       return "0px";
     case "small":
-      return "clamp(10px, 1vw, 14px)";
+      return "12px";
     case "large":
-      return "clamp(18px, 1.8vw, 26px)";
+      return "40px";
     case "max":
-      return "clamp(24px, 2.4vw, 34px)";
+      return "56px";
     case "medium":
+      return "24px";
     default:
-      return "clamp(14px, 1.4vw, 20px)";
+      return cssSpacingValue(key) ?? "clamp(14px, 1.4vw, 20px)";
   }
+}
+
+function cssSpacingValue(value: string) {
+  const trimmed = value.trim();
+  if (!trimmed) return null;
+  if (/^\d+(\.\d+)?$/.test(trimmed)) return `${trimmed}px`;
+  if (/^-?\d+(\.\d+)?(px|rem|em|%|vw|vh|svh|dvh)$/.test(trimmed)) return trimmed;
+  if (/^clamp\([^)]+\)$/.test(trimmed)) return trimmed;
+  return null;
 }
 
 function getCartButtonStyle({
