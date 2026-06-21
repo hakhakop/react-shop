@@ -14,7 +14,7 @@ import {
   Boxes,
   LayoutTemplate,
   Sliders,
-  History,
+  FileText,
   Settings,
   Menu,
 } from "lucide-react";
@@ -306,7 +306,7 @@ export default function DashboardSidebar({
     { tab: "elements" as SidebarTab, label: "Blocks", icon: <Boxes size={18} /> },
     { tab: "templates" as SidebarTab, label: "Layouts", icon: <LayoutTemplate size={18} /> },
     { tab: "globalStyles" as SidebarTab, label: "Global", icon: <Sliders size={18} /> },
-    { tab: "pages" as SidebarTab, label: "History", icon: <History size={18} /> },
+    { tab: "pages" as SidebarTab, label: "Pages", icon: <FileText size={18} /> },
     { tab: "inspector" as SidebarTab, label: "Inspector", icon: <Settings size={18} /> },
     { tab: "menu" as SidebarTab, label: "Menu", icon: <Menu size={18} /> },
   ];
@@ -345,16 +345,6 @@ export default function DashboardSidebar({
         {topActionsSlot ? (
           <div className="builder-sidebar-top-actions">{topActionsSlot}</div>
         ) : null}
-
-        <div className="builder-sidebar-nested-header">
-          <div>
-            <strong>{activePanel.label}</strong>
-            <span>{activePanel.description}</span>
-          </div>
-          {typeof activePanel.count === "number" ? (
-            <small>{activePanel.count}</small>
-          ) : null}
-        </div>
 
         <div className="builder-sidebar-content">
           {sidebarTab === "elements" && (
@@ -401,14 +391,6 @@ export default function DashboardSidebar({
 
           {sidebarTab === "pages" && (
             <div className="builder-sidebar-panel">
-              <div className="builder-sidebar-panel-header">
-                <div>
-                  <strong>Builder Pages</strong>
-                  <span>Manage React-owned storefront pages</span>
-                </div>
-                <small>{corePages.length + customPages.length}</small>
-              </div>
-
               {/* Core Storefront Pages */}
               <div className="builder-card builder-pages-card" style={{ marginBottom: "14px" }}>
                 <div className="builder-card-title">
@@ -631,11 +613,6 @@ export default function DashboardSidebar({
 
           {sidebarTab === "templates" && (
             <div className="builder-sidebar-panel">
-              <div className="builder-sidebar-panel-header">
-                <div><strong>Templates</strong><span>Save and reuse pages, sections, and elements</span></div>
-                <small>{savedTemplates.length}</small>
-              </div>
-
               <div className="builder-card builder-pages-card" style={{ marginBottom: '14px' }}>
                 <div className="builder-card-title"><strong>Global Layout Target</strong></div>
                 <div className="builder-target-toggle" aria-label="Builder target type">

@@ -1104,103 +1104,100 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
     <aside
       className={`builder-inspector builder-panel ${inspectorOpen ? "is-open" : ""}`}
     >
-      <div className="builder-inspector-header">
-        <Settings2 size={18} />
-        <span>{inspectorTitle}</span>
-        <button
-          type="button"
-          className={`builder-inspector-spacing-toggle${
-            spacingOverlayEnabled ? " is-active" : ""
-          }`}
-          onClick={() => setSpacingOverlayEnabled((enabled) => !enabled)}
-          aria-pressed={spacingOverlayEnabled}
-          title="Show spacing guides"
-        >
-          <Ruler size={14} />
-          <span>Spacing</span>
-        </button>
-        <button
-          type="button"
-          className="builder-inspector-close"
-          onClick={() => setInspectorOpen(false)}
-          aria-label="Close inspector"
-        >
-          <PanelRightClose size={16} />
-        </button>
-      </div>
-      {spacingOverlayEnabled ? (
-        <div
-          className="builder-inspector-spacing-legend"
-          role="status"
-          aria-label="Spacing guide legend"
-        >
-          <span className="is-padding"><i />Padding</span>
-          <span className="is-margin"><i />Margin</span>
-          <span className="is-gap"><i />Gap</span>
-          <span className="is-local"><i />Local</span>
-        </div>
-      ) : null}
-      {selectedSection ? (
-        <>
-          <div className="builder-inspector-context">
-            <div className="builder-inspector-context-title-row">
-              <span className="builder-inspector-context-type">
-                {selectedLayoutBlock
-                  ? "Element"
-                  : selectedLayoutRow
-                    ? "Row Layout"
-                    : "Section"}
-              </span>
-              {selectedLayoutBlock && (
-                <button
-                  type="button"
-                  className="builder-inspector-back-btn"
-                  onClick={() => {
-                    setSelectedLayoutBlockKey(null);
-                    setInspectorTab("layout");
-                  }}
-                >
-                  Back to section
-                </button>
-              )}
+      {!selectedSection ? (
+        <div className="builder-inspector-header-consolidated">
+          <div className="builder-inspector-header-row">
+            <div className="builder-inspector-header-title-wrap">
+              <strong>Inspector</strong>
             </div>
-            <div className="builder-inspector-context-name">
-              {selectedLayoutBlock
-                ? layoutBlockLabels[selectedLayoutBlock.kind ?? "text"]
-                : selectedLayoutRow
-                  ? `Row ${(selectedLayoutRowIndex ?? 0) + 1}`
-                  : sectionLabels[selectedSection.kind]}
-            </div>
-            <div className="builder-inspector-selection-trail" aria-label="Selection trail">
-              <span className={activeTrailLevel === "section" ? "is-active" : ""}>
-                {sectionLabels[selectedSection.kind]}
-              </span>
-              {selectedLayoutRow && (
-                <>
-                  <i aria-hidden="true">→</i>
-                  <span className={activeTrailLevel === "row" ? "is-active" : ""}>
-                    Row {(selectedLayoutRowIndex ?? 0) + 1}
-                  </span>
-                </>
-              )}
-              {selectedColumnIndex >= 0 && (
-                <>
-                  <i aria-hidden="true">→</i>
-                  <span className={activeTrailLevel === "column" ? "is-active" : ""}>
-                    Col {selectedColumnIndex + 1}
-                  </span>
-                </>
-              )}
-              {selectedLayoutBlock && (
-                <>
-                  <i aria-hidden="true">→</i>
-                  <span className={activeTrailLevel === "element" ? "is-active" : ""}>
-                    {selectedElementLabel}
-                  </span>
-                </>
-              )}
+            <div className="builder-inspector-header-actions">
+              <button
+                type="button"
+                className="builder-inspector-close"
+                onClick={() => setInspectorOpen(false)}
+                aria-label="Close inspector"
+              >
+                <PanelRightClose size={14} />
+              </button>
             </div>
           </div>
+          <div className="builder-inspector-empty-state">
+            <span>Select a section, row, or element to begin editing.</span>
+          </div>
+        </div>
+      ) : (
+        <>
+          <div className="builder-inspector-header-consolidated">
+            <div className="builder-inspector-header-row">
+              <div className="builder-inspector-header-title-wrap">
+                <strong>
+                  {selectedLayoutBlock
+                    ? `${selectedElementLabel} · Element`
+                    : selectedLayoutRow
+                      ? `Row ${(selectedLayoutRowIndex ?? 0) + 1} · Row`
+                      : `${sectionLabels[selectedSection.kind] || selectedSection.title || "Section"} · Section`}
+                </strong>
+                {selectedLayoutBlock && (
+                  <button
+                    type="button"
+                    className="builder-inspector-back-btn"
+                    onClick={() => {
+                      setSelectedLayoutBlockKey(null);
+                      setInspectorTab("layout");
+                    }}
+                  >
+                    Back to section
+                  </button>
+                )}
+              </div>
+
+              <div className="builder-inspector-header-actions">
+                <button
+                  type="button"
+                  className={`builder-inspector-spacing-toggle${
+                    spacingOverlayEnabled ? " is-active" : ""
+                  }`}
+                  onClick={() => setSpacingOverlayEnabled((enabled) => !enabled)}
+                  aria-pressed={spacingOverlayEnabled}
+                  title="Show spacing guides"
+                >
+                  <Ruler size={13} />
+                  <span>Spacing</span>
+                </button>
+                <button
+                  type="button"
+                  className="builder-inspector-close"
+                  onClick={() => setInspectorOpen(false)}
+                  aria-label="Close inspector"
+                >
+                  <PanelRightClose size={14} />
+                </button>
+              </div>
+            </div>
+
+            <div className="builder-inspector-breadcrumb-row" aria-label="Selection path">
+              <span>
+                {sectionLabels[selectedSection.kind] || selectedSection.title || "Section"}
+                {selectedLayoutRow && ` > Row ${(selectedLayoutRowIndex ?? 0) + 1}`}
+                {selectedColumnIndex >= 0 && ` > Col ${selectedColumnIndex + 1}`}
+                {selectedLayoutBlock && ` > ${selectedElementLabel}`}
+              </span>
+            </div>
+
+            {spacingOverlayEnabled && (
+              <div
+                className="builder-inspector-spacing-legend"
+                role="status"
+                aria-label="Spacing guide legend"
+              >
+                <span className="is-padding"><i />Padding</span>
+                <span className="is-margin"><i />Margin</span>
+                <span className="is-gap"><i />Gap</span>
+                <span className="is-local"><i />Local</span>
+              </div>
+            )}
+          </div>
+
           <div className="builder-inspector-tabs" aria-label="Inspector tabs">
             {inspectorTabs.map(([tab, label]) => (
               <button
@@ -10090,15 +10087,6 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
             </>
           )}
         </>
-      ) : (
-        <div className="builder-empty-state">
-          <Layers3 size={22} />
-          {hasSections ? (
-            <p>Select a section, row, or element in the preview to inspect its properties.</p>
-          ) : (
-            <p>Add a section to start designing.</p>
-          )}
-        </div>
       )}
 
       {isLayoutPickerOpen && layoutContainerSection ? (

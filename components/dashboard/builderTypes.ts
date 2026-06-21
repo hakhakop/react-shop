@@ -73,6 +73,7 @@ export type SidebarTab =
   | "elements"
   | "inspector"
   | "globalStyles"
+  | "history"
   | "menu"
   | "pages"
   | "templates"

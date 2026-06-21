@@ -260,25 +260,23 @@ export default function BuilderWireframePanel({
 
   return (
     <div className="builder-sidebar-panel builder-wireframe-panel">
-      <div className="builder-sidebar-panel-header">
-        <div>
-          <strong>Page Structure</strong>
-          <span>Navigate and manage your page.</span>
+      <div className="builder-wireframe-header-consolidated">
+        <div className="builder-wireframe-header-row">
+          <div className="builder-wireframe-header-title-wrap">
+            <FileText size={13} className="builder-wireframe-icon builder-wireframe-icon--page" />
+            <strong>{pageLabel}</strong>
+          </div>
+          <span className="builder-wireframe-badge builder-wireframe-badge--page">PAGE</span>
         </div>
-        <small>{sections.length}</small>
+        <div className="builder-wireframe-header-row builder-wireframe-header-row--sub">
+          <span>Current page structure</span>
+          <small>
+            {sections.length} {sections.length === 1 ? "section" : "sections"}
+          </small>
+        </div>
       </div>
 
       <div className="builder-wireframe-tree" role="tree" aria-label="Page structure">
-        <div className="builder-wireframe-page">
-          <FileText size={14} className="builder-wireframe-icon builder-wireframe-icon--page" />
-          <div className="builder-wireframe-label-wrap">
-            <strong>{pageLabel}</strong>
-            <span>{page}</span>
-          </div>
-          <span className="builder-wireframe-meta">
-            <span className="builder-wireframe-badge builder-wireframe-badge--page">PAGE</span>
-          </span>
-        </div>
 
         {sections.length === 0 ? (
           <div className="builder-wireframe-empty">

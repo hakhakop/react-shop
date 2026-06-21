@@ -81,6 +81,7 @@ function navigationReducer(state: NavigationState, action: NavigationAction): Na
         elements: "Elements",
         inspector: "Inspector",
         globalStyles: "Global Styles",
+        history: "History",
         menu: "Menu",
         pages: "Pages",
         templates: "Templates",

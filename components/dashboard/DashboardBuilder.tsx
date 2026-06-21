@@ -29,6 +29,7 @@ import {
   Settings2,
   MonitorSmartphone,
   Undo2,
+  Sliders,
   Sparkles,
   Star,
   ShieldCheck,
@@ -5079,14 +5080,6 @@ export default function DashboardBuilder({
 
   const globalStylesPanel = (
     <div className="builder-sidebar-panel builder-sidebar-global-styles">
-      <div className="builder-sidebar-panel-header">
-        <div>
-          <strong>Global Styles</strong>
-          <span>Site design, typography, header, and spacing</span>
-        </div>
-        <small>{shellStatus}</small>
-      </div>
-
       <div className="builder-global-style-tabs" aria-label="Global style sections">
         {(
           [
@@ -5272,7 +5265,7 @@ export default function DashboardBuilder({
       {globalStylesTab === "spacing" && (
         <div className="builder-global-styles-group builder-global-spacing-tab">
           <div className="builder-shell-note">
-            <strong>{shellStatus}</strong>
+            <strong>Spacing Defaults</strong>
             <span>
               Sections, rows, and elements inherit these defaults until spacing
               is overridden locally.
@@ -6426,11 +6419,16 @@ export default function DashboardBuilder({
     <div className="builder-sidebar-top-action-bar" aria-label="Builder page actions">
       <div className="builder-sidebar-top-action-copy">
         <strong>
-          {sidebarTab === "globalStyles"
-            ? "Global Styles"
-            : hasPendingChanges
-              ? "Unsaved changes"
-              : "Saved draft"}
+          {sidebarTab === "globalStyles" ? (
+            <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
+              <Sliders size={12} className="builder-wireframe-icon" style={{ flexShrink: 0 }} />
+              Global Styles
+            </span>
+          ) : hasPendingChanges ? (
+            "Unsaved changes"
+          ) : (
+            "Saved draft"
+          )}
         </strong>
         <span>
           {sidebarTab === "globalStyles"

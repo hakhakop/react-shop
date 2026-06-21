@@ -432,11 +432,6 @@ export default function ReactMenuEditorPanel({
 
   return (
     <div className="builder-sidebar-panel" style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
-      <div className="builder-shell-note">
-        <strong>React Menu Editor</strong>
-        <span>Manage the visual structure of your website navigation.</span>
-      </div>
-
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <h4 style={{ margin: 0, fontSize: "12px", textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--builder-ui-muted)" }}>
           Navigation Structure
