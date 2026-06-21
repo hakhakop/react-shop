@@ -1134,7 +1134,6 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
           role="status"
           aria-label="Spacing guide legend"
         >
-          <strong>Canvas guides</strong>
           <span className="is-padding"><i />Padding</span>
           <span className="is-margin"><i />Margin</span>
           <span className="is-gap"><i />Gap</span>
@@ -1144,48 +1143,63 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
       {selectedSection ? (
         <>
           <div className="builder-inspector-context">
-            <strong>
-              {selectedLayoutBlock
-                ? "Element"
-                : selectedLayoutRow
-                  ? "Row Layout"
-                  : "Section"}
-            </strong>
-            <span>
+            <div className="builder-inspector-context-title-row">
+              <span className="builder-inspector-context-type">
+                {selectedLayoutBlock
+                  ? "Element"
+                  : selectedLayoutRow
+                    ? "Row Layout"
+                    : "Section"}
+              </span>
+              {selectedLayoutBlock && (
+                <button
+                  type="button"
+                  className="builder-inspector-back-btn"
+                  onClick={() => {
+                    setSelectedLayoutBlockKey(null);
+                    setInspectorTab("layout");
+                  }}
+                >
+                  Back to section
+                </button>
+              )}
+            </div>
+            <div className="builder-inspector-context-name">
               {selectedLayoutBlock
                 ? layoutBlockLabels[selectedLayoutBlock.kind ?? "text"]
                 : selectedLayoutRow
                   ? `Row ${(selectedLayoutRowIndex ?? 0) + 1}`
-                : sectionLabels[selectedSection.kind]}
-            </span>
-            {selectedLayoutBlock && (
-              <button
-                type="button"
-                onClick={() => {
-                  setSelectedLayoutBlockKey(null);
-                  setInspectorTab("layout");
-                }}
-              >
-                Back to section
-              </button>
-            )}
-          </div>
-          <div className="builder-inspector-selection-trail" aria-label="Selection trail">
-            <span className={activeTrailLevel === "section" ? "is-active" : ""}>
-              Section: {sectionLabels[selectedSection.kind]}
-            </span>
-            <i aria-hidden="true">→</i>
-            <span className={activeTrailLevel === "row" ? "is-active" : ""}>
-              Row: {selectedLayoutRow ? (selectedLayoutRowIndex ?? 0) + 1 : "None"}
-            </span>
-            <i aria-hidden="true">→</i>
-            <span className={activeTrailLevel === "column" ? "is-active" : ""}>
-              Column: {selectedColumnLabel}
-            </span>
-            <i aria-hidden="true">→</i>
-            <span className={activeTrailLevel === "element" ? "is-active" : ""}>
-              Element: {selectedElementLabel}
-            </span>
+                  : sectionLabels[selectedSection.kind]}
+            </div>
+            <div className="builder-inspector-selection-trail" aria-label="Selection trail">
+              <span className={activeTrailLevel === "section" ? "is-active" : ""}>
+                {sectionLabels[selectedSection.kind]}
+              </span>
+              {selectedLayoutRow && (
+                <>
+                  <i aria-hidden="true">→</i>
+                  <span className={activeTrailLevel === "row" ? "is-active" : ""}>
+                    Row {(selectedLayoutRowIndex ?? 0) + 1}
+                  </span>
+                </>
+              )}
+              {selectedColumnIndex >= 0 && (
+                <>
+                  <i aria-hidden="true">→</i>
+                  <span className={activeTrailLevel === "column" ? "is-active" : ""}>
+                    Col {selectedColumnIndex + 1}
+                  </span>
+                </>
+              )}
+              {selectedLayoutBlock && (
+                <>
+                  <i aria-hidden="true">→</i>
+                  <span className={activeTrailLevel === "element" ? "is-active" : ""}>
+                    {selectedElementLabel}
+                  </span>
+                </>
+              )}
+            </div>
           </div>
           <div className="builder-inspector-tabs" aria-label="Inspector tabs">
             {inspectorTabs.map(([tab, label]) => (
