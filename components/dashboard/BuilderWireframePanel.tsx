@@ -86,13 +86,55 @@ function blockTitle(block: BuilderLayoutBlock, index: number) {
     layoutBlockLabels[(block.kind ?? "text") as LayoutBlockKind] ??
     block.kind ??
     "Element";
-  const name =
+  let name =
     block.title ||
     block.headingText ||
     block.buttonLabel ||
     block.embedUrl ||
     block.fluentFormId ||
     null;
+
+  if (name) {
+    if (typeof name !== "string") {
+      try {
+        name = JSON.stringify(name);
+      } catch {
+        name = String(name);
+      }
+    }
+    name = name.replace(/<[^>]*>/g, "");
+    if (name.length > 40) {
+      name = name.substring(0, 40) + "...";
+    }
+  }
+
+  return name ? `${label}: ${name}` : `${label} ${index + 1}`;
+}
+
+function blockTitleFull(block: BuilderLayoutBlock, index: number) {
+  const label =
+    layoutBlockLabels[(block.kind ?? "text") as LayoutBlockKind] ??
+    block.kind ??
+    "Element";
+  let name =
+    block.title ||
+    block.headingText ||
+    block.buttonLabel ||
+    block.embedUrl ||
+    block.fluentFormId ||
+    null;
+
+  if (name) {
+    if (typeof name !== "string") {
+      try {
+        name = JSON.stringify(name);
+      } catch {
+        name = String(name);
+      }
+    }
+    name = name.replace(/<[^>]*>/g, "");
+  }
+
   return name ? `${label}: ${name}` : `${label} ${index + 1}`;
 }
 
@@ -276,7 +318,14 @@ export default function BuilderWireframePanel({
                   >
                     <GripVertical size={11} className="builder-wireframe-grip" />
                     <Layers3 size={13} className="builder-wireframe-icon builder-wireframe-icon--section" />
-                    <span className="builder-wireframe-label-wrap">
+                    <span
+                      className="builder-wireframe-label-wrap"
+                      title={
+                        section.title ||
+                        sectionLabels[section.kind] ||
+                        `Section ${sectionIndex + 1}`
+                      }
+                    >
                       <strong>
                         {section.title ||
                           sectionLabels[section.kind] ||
@@ -399,7 +448,10 @@ export default function BuilderWireframePanel({
                               >
                                 <GripVertical size={11} className="builder-wireframe-grip" />
                                 <Rows3 size={13} className="builder-wireframe-icon builder-wireframe-icon--row" />
-                                <span className="builder-wireframe-label-wrap">
+                                <span
+                                  className="builder-wireframe-label-wrap"
+                                  title={`Row ${rowIndex + 1} (${rowSummary(row, rowIndex)})`}
+                                >
                                   <strong>Row {rowIndex + 1}</strong>
                                   <small>{rowSummary(row, rowIndex)}</small>
                                 </span>
@@ -497,7 +549,10 @@ export default function BuilderWireframePanel({
                                       >
                                         <GripVertical size={11} className="builder-wireframe-grip" />
                                         <Columns3 size={13} className="builder-wireframe-icon builder-wireframe-icon--column" />
-                                        <span className="builder-wireframe-label-wrap">
+                                        <span
+                                          className="builder-wireframe-label-wrap"
+                                          title={`${columnTitle(item, columnIndex)} (Column ${columnIndex + 1})`}
+                                        >
                                           <strong>{columnTitle(item, columnIndex)}</strong>
                                           <small>Column {columnIndex + 1}</small>
                                         </span>
@@ -552,7 +607,10 @@ export default function BuilderWireframePanel({
                                               >
                                                 <GripVertical size={11} className="builder-wireframe-grip" />
                                                 {getBlockIcon(block.kind ?? "text")}
-                                                <span className="builder-wireframe-label-wrap">
+                                                <span
+                                                  className="builder-wireframe-label-wrap"
+                                                  title={blockTitleFull(block, blockIndex)}
+                                                >
                                                   <strong>
                                                     {blockTitle(block, blockIndex)}
                                                   </strong>

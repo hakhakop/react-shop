@@ -10023,3 +10023,107 @@ article.is-selected-column > .builder-preview-box-spacing,
   pointer-events: none;
   user-select: none;
 }
+
+/* ==========================================================================
+   Structure/Wireframe Panel Overflow Fix
+   ========================================================================== */
+
+.builder-dashboard .builder-wireframe-panel {
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow-x: hidden !important;
+  box-sizing: border-box !important;
+}
+
+/* Force box-sizing and min-width: 0 on all layout tree components */
+.builder-dashboard .builder-wireframe-panel,
+.builder-dashboard .builder-wireframe-section,
+.builder-dashboard .builder-wireframe-row,
+.builder-dashboard .builder-wireframe-rowline,
+.builder-dashboard .builder-wireframe-column,
+.builder-dashboard .builder-wireframe-children,
+.builder-dashboard .builder-wireframe-item,
+.builder-dashboard .builder-wireframe-label-wrap,
+.builder-dashboard .builder-wireframe-meta,
+.builder-dashboard .builder-wireframe-badge,
+.builder-dashboard .builder-wireframe-panel * {
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+}
+
+.builder-dashboard .builder-wireframe-section,
+.builder-dashboard .builder-wireframe-row,
+.builder-dashboard .builder-wireframe-column,
+.builder-dashboard .builder-wireframe-item {
+  max-width: 100% !important;
+  width: 100% !important;
+}
+
+/* Reduce nested card left indentation to avoid horizontal overflow on deep elements */
+.builder-dashboard .builder-wireframe-children {
+  margin-left: 4px !important;
+  padding-left: 8px !important;
+  border-left: 1px dashed rgba(255, 255, 255, 0.12) !important;
+}
+
+.builder-dashboard .builder-wireframe-children--columns {
+  margin-left: 4px !important;
+}
+
+.builder-dashboard .builder-wireframe-children--blocks {
+  margin-left: 4px !important;
+  gap: 4px !important;
+}
+
+/* Adjust connector lines position for the reduced indentation */
+.builder-dashboard .builder-wireframe-column::before,
+.builder-dashboard .builder-wireframe-rowline::before,
+.builder-dashboard .builder-wireframe-item--block::before {
+  left: -8px !important;
+  width: 8px !important;
+}
+
+/* Label text wrap constraints: allow it to expand/shrink but always contain text */
+.builder-dashboard .builder-wireframe-label-wrap {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.builder-dashboard .builder-wireframe-label-wrap strong,
+.builder-dashboard .builder-wireframe-label-wrap small {
+  max-width: 100% !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+  display: block !important;
+}
+
+/* Metadata and badge sizing: do not shrink badges, let labels yield space */
+.builder-dashboard .builder-wireframe-meta {
+  flex: 0 0 auto !important;
+  flex-shrink: 0 !important;
+  margin-left: auto !important;
+}
+
+.builder-dashboard .builder-wireframe-badge {
+  flex: 0 0 auto !important;
+  flex-shrink: 0 !important;
+}
+
+/* Hover Action Overlays background masking to cover overlapping text */
+.builder-dashboard .builder-wireframe-actions {
+  background: transparent;
+  transition: all 0.12s ease;
+  flex-shrink: 0 !important;
+}
+
+.builder-dashboard .builder-wireframe-item:hover .builder-wireframe-actions {
+  background: var(--builder-ui-panel-solid) !important;
+  box-shadow: -8px 0 8px var(--builder-ui-panel-solid) !important;
+  padding-left: 6px !important;
+  padding-right: 4px !important;
+}
