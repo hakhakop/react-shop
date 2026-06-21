@@ -7,7 +7,7 @@
   "headerBackgroundMode": "none",
   "headerTextMode": "auto",
   "headerLayout": "princity",
-  "headerBrandMode": "brand",
+  "headerBrandMode": "logo",
   "headerBrandText": "WebPages",
   "headerLogoUrl": "https://cms.webpages.am/wp-content/uploads/2025/11/logo-2-small.png",
   "headerLogoAlt": "WebPages logo",
@@ -143,12 +143,6 @@
       "parentId": "menu_sbyhyzc43"
     },
     {
-      "id": "shop",
-      "label": "Խանութ",
-      "url": "/shop",
-      "parentId": "menu_sbyhyzc43"
-    },
-    {
       "id": "menu_07porwk43",
       "label": "Fashion Store",
       "url": "/fashion-store",
@@ -159,7 +153,13 @@
       "label": "Furniture Store",
       "url": "/furniture-store",
       "parentId": "menu_sbyhyzc43"
+    },
+    {
+      "id": "shop",
+      "label": "Խանութ",
+      "url": "/shop",
+      "parentId": null
     }
   ],
-  "updatedAt": "2026-06-21T11:46:58.545Z"
+  "updatedAt": "2026-06-21T14:35:37.297Z"
 }

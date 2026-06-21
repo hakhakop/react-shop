@@ -15,6 +15,7 @@ import {
   LayoutTemplate,
   Sliders,
   FileText,
+  History,
   Settings,
   Menu,
 } from "lucide-react";
@@ -307,6 +308,7 @@ export default function DashboardSidebar({
     { tab: "templates" as SidebarTab, label: "Layouts", icon: <LayoutTemplate size={18} /> },
     { tab: "globalStyles" as SidebarTab, label: "Global", icon: <Sliders size={18} /> },
     { tab: "pages" as SidebarTab, label: "Pages", icon: <FileText size={18} /> },
+    { tab: "history" as SidebarTab, label: "History", icon: <History size={18} /> },
     { tab: "inspector" as SidebarTab, label: "Inspector", icon: <Settings size={18} /> },
     { tab: "menu" as SidebarTab, label: "Menu", icon: <Menu size={18} /> },
   ];
@@ -607,6 +609,19 @@ export default function DashboardSidebar({
                   </div>
                 )}
                 <small style={{ display: "block", marginTop: "10px" }}>{pageStatus}</small>
+              </div>
+            </div>
+          )}
+
+          {sidebarTab === "history" && (
+            <div className="builder-sidebar-panel">
+              <div className="builder-card">
+                <div className="builder-card-title">
+                  <strong>History</strong>
+                </div>
+                <div style={{ padding: "12px 4px", fontSize: "12px", color: "var(--builder-ui-muted)" }}>
+                  Version history and restore points will appear here.
+                </div>
               </div>
             </div>
           )}
