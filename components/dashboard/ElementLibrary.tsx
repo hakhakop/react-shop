@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronDown, GripVertical, Search, Star } from "lucide-react";
+import { ChevronDown, GripVertical, Search, Star, X } from "lucide-react";
 import type { ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
 import type { LayoutBlockKind } from "@/components/dashboard/builderTypes";
@@ -38,6 +38,30 @@ function writeStoredKinds(key: string, kinds: LayoutBlockKind[]) {
   window.localStorage.setItem(key, JSON.stringify(kinds));
 }
 
+const escapeRegExp = (text: string) => {
+  return text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+};
+
+const HighlightedText = ({ text, query }: { text: string; query: string }) => {
+  if (!query.trim()) return <>{text}</>;
+  const escaped = escapeRegExp(query.trim());
+  const regex = new RegExp(`(${escaped})`, "gi");
+  const parts = text.split(regex);
+  return (
+    <>
+      {parts.map((part, index) =>
+        part.toLowerCase() === query.trim().toLowerCase() ? (
+          <mark key={index} className="builder-search-highlight">
+            {part}
+          </mark>
+        ) : (
+          part
+        )
+      )}
+    </>
+  );
+};
+
 export default function ElementLibrary({
   availableLayoutBlockKinds,
   onAddElement,
@@ -68,12 +92,6 @@ export default function ElementLibrary({
       setGroupIdsOrder(defaultIds);
     }
   }, []);
-
-  useEffect(() => {
-    if (!normalizedQuery) {
-      setOpenGroupIds(new Set());
-    }
-  }, [normalizedQuery]);
 
   const rememberRecent = (kind: LayoutBlockKind) => {
     setRecentKinds((current) => {
@@ -141,22 +159,37 @@ export default function ElementLibrary({
     });
   }, [filteredGroups, groupIdsOrder]);
 
-  const quickKinds = useMemo(() => {
-    const merged = [...favoriteKinds, ...recentKinds];
-    return merged.filter(
-      (kind, index) =>
+  const favoriteKindsList = useMemo(() => {
+    return favoriteKinds.filter(
+      (kind) =>
         availableLayoutBlockKinds.includes(kind) &&
-        merged.indexOf(kind) === index &&
         (!normalizedQuery ||
           layoutBlockLabels[kind].toLowerCase().includes(normalizedQuery) ||
           kind.toLowerCase().includes(normalizedQuery)),
     );
-  }, [availableLayoutBlockKinds, favoriteKinds, normalizedQuery, recentKinds]);
+  }, [availableLayoutBlockKinds, favoriteKinds, normalizedQuery]);
+
+  const recentKindsList = useMemo(() => {
+    return recentKinds.filter(
+      (kind) =>
+        availableLayoutBlockKinds.includes(kind) &&
+        !favoriteKinds.includes(kind) &&
+        (!normalizedQuery ||
+          layoutBlockLabels[kind].toLowerCase().includes(normalizedQuery) ||
+          kind.toLowerCase().includes(normalizedQuery)),
+    );
+  }, [availableLayoutBlockKinds, recentKinds, favoriteKinds, normalizedQuery]);
+
+  const totalResultsCount = useMemo(() => {
+    return filteredGroups.reduce((acc, g) => acc + g.kinds.length, 0);
+  }, [filteredGroups]);
 
   const toggleGroup = (groupId: string) => {
     setOpenGroupIds((current) => {
-      const next = new Set<string>();
-      if (!current.has(groupId)) {
+      const next = new Set(current);
+      if (next.has(groupId)) {
+        next.delete(groupId);
+      } else {
         next.add(groupId);
       }
       return next;
@@ -164,11 +197,10 @@ export default function ElementLibrary({
   };
 
   const renderKindButton = (blockKind: LayoutBlockKind) => (
-    <button
+    <div
       key={blockKind}
-      type="button"
+      className="builder-element-library-card"
       draggable
-      onClick={() => addElement(blockKind)}
       onDragStart={(event) => {
         event.dataTransfer.setData(
           "application/x-builder-new-block",
@@ -181,17 +213,10 @@ export default function ElementLibrary({
         event.dataTransfer.effectAllowed = "copy";
       }}
       onDragEnd={() => rememberRecent(blockKind)}
+      onClick={() => addElement(blockKind)}
     >
-      <span className="builder-element-library-icon">
-        {onRenderLayoutBlockIcon(blockKind)}
-      </span>
-      <span>
-        <strong>{layoutBlockLabels[blockKind]}</strong>
-        <small>{layoutBlockDescriptions[blockKind]}</small>
-      </span>
-      <span
-        role="button"
-        tabIndex={0}
+      <button
+        type="button"
         className={`builder-element-favorite ${
           favoriteKinds.includes(blockKind) ? "is-active" : ""
         }`}
@@ -205,43 +230,96 @@ export default function ElementLibrary({
           event.stopPropagation();
           toggleFavorite(blockKind);
         }}
-        onKeyDown={(event) => {
-          if (event.key === "Enter" || event.key === " ") {
-            event.preventDefault();
-            event.stopPropagation();
-            toggleFavorite(blockKind);
-          }
-        }}
         onMouseDown={(event) => event.stopPropagation()}
       >
-        <Star size={14} />
-      </span>
-    </button>
+        <Star size={12} fill={favoriteKinds.includes(blockKind) ? "currentColor" : "none"} />
+      </button>
+
+      <div className="builder-element-library-card-icon">
+        {onRenderLayoutBlockIcon(blockKind)}
+      </div>
+
+      <div className="builder-element-library-card-info">
+        <strong>
+          <HighlightedText text={layoutBlockLabels[blockKind]} query={searchQuery} />
+        </strong>
+        {layoutBlockDescriptions[blockKind] && (
+          <small>
+            <HighlightedText text={layoutBlockDescriptions[blockKind]} query={searchQuery} />
+          </small>
+        )}
+      </div>
+
+      <div className="builder-element-library-card-hover-action">
+        <span>+ Add Block</span>
+      </div>
+    </div>
   );
 
   return (
     <div className="builder-sidebar-panel">
-      <label className="builder-element-library-search">
-        <Search size={15} />
-        <input
-          type="search"
-          value={searchQuery}
-          onChange={(event) => setSearchQuery(event.target.value)}
-          placeholder={`Search ${availableLayoutBlockKinds.length} elements`}
-        />
-      </label>
+      <div className="builder-element-library-search-wrapper">
+        <label className="builder-element-library-search">
+          <Search size={15} />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(event) => setSearchQuery(event.target.value)}
+            placeholder={`Search ${availableLayoutBlockKinds.length} elements...`}
+          />
+          {searchQuery && (
+            <button
+              type="button"
+              className="builder-search-clear"
+              onClick={() => setSearchQuery("")}
+              aria-label="Clear search"
+            >
+              <X size={14} />
+            </button>
+          )}
+        </label>
+        {searchQuery && (
+          <div className="builder-search-results-info">
+            Found {totalResultsCount} matching elements
+          </div>
+        )}
+      </div>
+
       <div className="builder-element-library" aria-label="Element library">
-        {quickKinds.length > 0 && !normalizedQuery && (
+        {(!normalizedQuery || favoriteKindsList.length > 0) && (
           <details className="builder-collapse builder-element-library-group" open>
             <summary className="builder-element-library-group-title">
               <span>
                 <ChevronDown size={14} />
-                Favorites & recent
+                Favorites
               </span>
-              <small>{quickKinds.length}</small>
+              <small>{favoriteKindsList.length}</small>
             </summary>
             <div className="builder-element-library-group-content">
-              {quickKinds.map((blockKind) => renderKindButton(blockKind))}
+              {favoriteKindsList.length > 0 ? (
+                favoriteKindsList.map((blockKind) => renderKindButton(blockKind))
+              ) : (
+                <div className="builder-favorites-empty-state">
+                  <Star size={20} className="builder-empty-star-icon" />
+                  <strong>No Favorites Yet</strong>
+                  <span>Click the star on any element to pin it here.</span>
+                </div>
+              )}
+            </div>
+          </details>
+        )}
+
+        {recentKindsList.length > 0 && !normalizedQuery && (
+          <details className="builder-collapse builder-element-library-group" open>
+            <summary className="builder-element-library-group-title">
+              <span>
+                <ChevronDown size={14} />
+                Recently Used
+              </span>
+              <small>{recentKindsList.length}</small>
+            </summary>
+            <div className="builder-element-library-group-content">
+              {recentKindsList.map((blockKind) => renderKindButton(blockKind))}
             </div>
           </details>
         )}
@@ -249,20 +327,22 @@ export default function ElementLibrary({
         {filteredGroups.length === 0 && (
           <div className="builder-empty-state builder-element-library-empty">
             <Search size={22} />
-            <p>No elements match this search.</p>
+            <strong>No matching elements</strong>
+            <span>Try another search term.</span>
           </div>
         )}
 
         {orderedGroups.map((group) => {
           const isDragging = draggingGroupId === group.id;
           const isDragOver = dragOverGroupId === group.id;
+          const isOpen = normalizedQuery.length > 0 || openGroupIds.has(group.id);
           return (
             <details
               key={group.id}
               className={`builder-collapse builder-element-library-group ${
                 isDragging ? "is-dragging" : ""
               } ${isDragOver ? "is-drag-over" : ""}`}
-              open={normalizedQuery.length > 0 || openGroupIds.has(group.id)}
+              open={isOpen}
             >
               <summary
                 className="builder-element-library-group-title"

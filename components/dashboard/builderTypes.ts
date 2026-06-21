@@ -69,6 +69,7 @@ export type InspectorTab =
   | "typography"
   | "advanced";
 export type SidebarTab =
+  | "builder"
   | "elements"
   | "inspector"
   | "globalStyles"
@@ -292,14 +293,14 @@ export type BuilderLayoutBlock = {
   tableStyle?: "striped" | "bordered" | "plain";
   gridSource?: "static" | "products";
   gridRows?: number;
-  gridGap?: "none" | "small" | "medium" | "large" | "max";
+  gridGap?: "none" | "small" | "medium" | "large" | "max" | string;
   gridMargin?: "inherit" | "none" | "small" | "medium" | "large";
-  cardPadding?: "none" | "small" | "medium" | "large" | "max";
-  imagePadding?: "none" | "small" | "medium" | "large" | "max";
+  cardPadding?: "none" | "small" | "medium" | "large" | "max" | string;
+  imagePadding?: "none" | "small" | "medium" | "large" | "max" | string;
   imageFit?: "contain" | "cover" | "fill";
   imageRatio?: "auto" | "square" | "4:5" | "3:4";
-  gridImagePadding?: "frameless" | "small" | "medium" | "max";
-  gridContentPadding?: "none" | "small" | "medium" | "large";
+  gridImagePadding?: "frameless" | "small" | "medium" | "max" | string;
+  gridContentPadding?: "none" | "small" | "medium" | "large" | string;
   gridImageFrame?: "none" | "soft";
   addToCartStyle?: "blue" | "dark" | "light" | "inherit";
   addToCartSize?: "compact" | "medium" | "large" | "full";
@@ -429,9 +430,9 @@ export type BuilderSection = {
     | "princity"
     | "princity-flat"
     | "princity-line";
-  gridGap?: "none" | "small" | "medium" | "large" | "max";
-  cardPadding?: "none" | "small" | "medium" | "large" | "max";
-  imagePadding?: "none" | "small" | "medium" | "large" | "max";
+  gridGap?: "none" | "small" | "medium" | "large" | "max" | string;
+  cardPadding?: "none" | "small" | "medium" | "large" | "max" | string;
+  imagePadding?: "none" | "small" | "medium" | "large" | "max" | string;
   imageFit?: "contain" | "cover" | "fill";
   imageRatio?: "auto" | "square" | "4:5" | "3:4";
   borderRadius?: number;

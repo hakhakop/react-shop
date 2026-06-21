@@ -10,6 +10,13 @@ import {
   Save,
   Trash2,
   X,
+  Layers3,
+  Boxes,
+  LayoutTemplate,
+  Sliders,
+  History,
+  Settings,
+  Menu,
 } from "lucide-react";
 import {
   useEffect,
@@ -66,6 +73,7 @@ type DashboardSidebarProps = {
   customPages: BuilderCustomPage[];
   publishedKeys: string[];
   newPageTitle: string;
+  builderSlot: ReactNode;
   globalStylesSlot: ReactNode;
   inspectorSlot: ReactNode;
   inspectorOpen?: boolean;
@@ -110,6 +118,7 @@ export default function DashboardSidebar({
   customPages,
   publishedKeys,
   newPageTitle,
+  builderSlot,
   globalStylesSlot,
   inspectorSlot,
   inspectorOpen = true,
@@ -219,6 +228,12 @@ export default function DashboardSidebar({
     count?: number;
   }[] = [
     {
+      tab: "builder",
+      label: "Builder",
+      description: "Navigate the page wireframe tree.",
+      count: builderState.sections.length,
+    },
+    {
       tab: "elements",
       label: "Elements",
       description: "Add blocks to the selected layout column.",
@@ -286,40 +301,52 @@ export default function DashboardSidebar({
     templateLibraryTabs.find((tab) => tab.value === templateLibraryTab)?.label ??
     "Templates";
 
+  const leftNavTabs = [
+    { tab: "builder" as SidebarTab, label: "Structure", icon: <Layers3 size={18} /> },
+    { tab: "elements" as SidebarTab, label: "Blocks", icon: <Boxes size={18} /> },
+    { tab: "templates" as SidebarTab, label: "Layouts", icon: <LayoutTemplate size={18} /> },
+    { tab: "globalStyles" as SidebarTab, label: "Global", icon: <Sliders size={18} /> },
+    { tab: "pages" as SidebarTab, label: "History", icon: <History size={18} /> },
+    { tab: "inspector" as SidebarTab, label: "Inspector", icon: <Settings size={18} /> },
+    { tab: "menu" as SidebarTab, label: "Menu", icon: <Menu size={18} /> },
+  ];
+
   return (
     <aside className="builder-sidebar builder-panel">
-      {topActionsSlot ? (
-        <div className="builder-sidebar-top-actions">{topActionsSlot}</div>
-      ) : null}
-
-      {!nestedOpen ? (
-        <div className="builder-sidebar-home" aria-label="Builder menu">
-          {sidebarPanels.map((panel) => (
-            <button
-              key={panel.tab}
-              type="button"
-              className={sidebarTab === panel.tab ? "is-active" : ""}
-              onClick={() => openPanel(panel.tab)}
-            >
-              <span>
-                <strong>{panel.label}</strong>
-                <small>{panel.description}</small>
-              </span>
-              {typeof panel.count === "number" ? <em>{panel.count}</em> : null}
-            </button>
-          ))}
+      {/* Persistent narrow left nav */}
+      <div className="builder-sidebar-left-nav">
+        <div className="builder-sidebar-logo">
+          BUILDER
         </div>
-      ) : (
+        <div className="builder-sidebar-nav-tiles">
+          {leftNavTabs.map((item) => {
+            const isActive = sidebarTab === item.tab;
+            return (
+              <button
+                key={item.tab}
+                type="button"
+                className={`builder-sidebar-nav-tile${isActive ? " is-active" : ""}`}
+                onClick={() => {
+                  if (item.tab === "inspector") onOpenInspector();
+                  onSetSidebarTab(item.tab);
+                  setNestedOpen(true);
+                }}
+              >
+                {item.icon}
+                <span>{item.label}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Right content panel container */}
+      <div className="builder-sidebar-panel-container">
+        {topActionsSlot ? (
+          <div className="builder-sidebar-top-actions">{topActionsSlot}</div>
+        ) : null}
+
         <div className="builder-sidebar-nested-header">
-          <button
-            type="button"
-            className="builder-icon-button"
-            onClick={() => setNestedOpen(false)}
-            aria-label="Back to builder menu"
-            title="Back to builder menu"
-          >
-            <ChevronLeft size={16} />
-          </button>
           <div>
             <strong>{activePanel.label}</strong>
             <span>{activePanel.description}</span>
@@ -328,189 +355,72 @@ export default function DashboardSidebar({
             <small>{activePanel.count}</small>
           ) : null}
         </div>
-      )}
 
-      <div className={`builder-sidebar-content${nestedOpen ? "" : " is-menu-screen"}`}>
-        {!nestedOpen && (
-          <div className="builder-sidebar-menu-hint">
-            <LibraryBig size={16} />
-            <span>Choose a panel above. Element settings and inspector controls open one level deeper.</span>
-          </div>
-        )}
+        <div className="builder-sidebar-content">
+          {sidebarTab === "elements" && (
+            <ElementLibrary
+              availableLayoutBlockKinds={availableLayoutBlockKinds}
+              onAddElement={onAddElementFromLibrary}
+              onRenderLayoutBlockIcon={onRenderLayoutBlockIcon}
+            />
+          )}
 
-        {nestedOpen && sidebarTab === "elements" && (
-          <ElementLibrary
-            availableLayoutBlockKinds={availableLayoutBlockKinds}
-            onAddElement={onAddElementFromLibrary}
-            onRenderLayoutBlockIcon={onRenderLayoutBlockIcon}
-          />
-        )}
+          {sidebarTab === "builder" && builderSlot}
 
-        {nestedOpen && sidebarTab === "menu" && (
-          <ReactMenuEditorPanel
-            menuItems={shellSettings.menuItems ?? []}
-            onChangeMenuItems={(newItems) => onUpdateShellSettings({ menuItems: newItems })}
-            customPages={customPages}
-          />
-        )}
+          {sidebarTab === "menu" && (
+            <ReactMenuEditorPanel
+              menuItems={shellSettings.menuItems ?? []}
+              onChangeMenuItems={(newItems) => onUpdateShellSettings({ menuItems: newItems })}
+              customPages={customPages}
+            />
+          )}
 
-        {nestedOpen && sidebarTab === "inspector" && (
-          inspectorOpen ? (
-            inspectorSlot
-          ) : (
-            <div className="builder-sidebar-panel builder-inspector-reopen">
-              <div className="builder-sidebar-panel-header">
-                <div>
-                  <strong>Inspector</strong>
-                  <span>Section, row, and element controls are closed.</span>
+          {sidebarTab === "inspector" && (
+            inspectorOpen ? (
+              inspectorSlot
+            ) : (
+              <div className="builder-sidebar-panel builder-inspector-reopen">
+                <div className="builder-sidebar-panel-header">
+                  <div>
+                    <strong>Inspector</strong>
+                    <span>Section, row, and element controls are closed.</span>
+                  </div>
                 </div>
-              </div>
-              <button
-                type="button"
-                className="builder-secondary-button builder-full-button"
-                onClick={onOpenInspector}
-              >
-                Open Inspector
-              </button>
-            </div>
-          )
-        )}
-
-        {nestedOpen && sidebarTab === "globalStyles" && globalStylesSlot}
-
-        {nestedOpen && sidebarTab === "pages" && (
-          <div className="builder-sidebar-panel">
-            <div className="builder-sidebar-panel-header">
-              <div>
-                <strong>Builder Pages</strong>
-                <span>Manage React-owned storefront pages</span>
-              </div>
-              <small>{corePages.length + customPages.length}</small>
-            </div>
-
-            {/* Core Storefront Pages */}
-            <div className="builder-card builder-pages-card" style={{ marginBottom: "14px" }}>
-              <div className="builder-card-title">
-                <strong>Core Storefront Pages</strong>
-                <span>{corePages.length}</span>
-              </div>
-              <div className="builder-pages-list">
-                {orderedCorePages.map((page) => {
-                  const isActive = builderState.page === page.key;
-                  const isPublished = publishedKeys.includes(page.key);
-                  const isDragging = draggingCorePageKey === page.key;
-                  const isDragOver = dragOverCorePageKey === page.key;
-                  return (
-                    <div
-                      key={page.key}
-                      className={`builder-page-row${isActive ? " is-active" : ""}${
-                        isDragging ? " is-dragging" : ""
-                      }${isDragOver ? " is-drag-over" : ""}`}
-                      draggable
-                      onDragStart={(event) => {
-                        setDraggingCorePageKey(page.key);
-                        event.dataTransfer.setData("application/x-builder-core-page-key", page.key);
-                        event.dataTransfer.effectAllowed = "move";
-                      }}
-                      onDragOver={(event) => {
-                        if (draggingCorePageKey && draggingCorePageKey !== page.key) {
-                          event.preventDefault();
-                          setDragOverCorePageKey(page.key);
-                        }
-                      }}
-                      onDragLeave={() => {
-                        if (dragOverCorePageKey === page.key) {
-                          setDragOverCorePageKey(null);
-                        }
-                      }}
-                      onDrop={(event) => {
-                        event.preventDefault();
-                        const draggedKey = event.dataTransfer.getData("application/x-builder-core-page-key");
-                        if (draggedKey && draggedKey !== page.key) {
-                          setCorePagesOrder((current) => {
-                            const next = [...current];
-                            const draggedIndex = next.indexOf(draggedKey);
-                            const targetIndex = next.indexOf(page.key);
-                            if (draggedIndex !== -1 && targetIndex !== -1) {
-                              next.splice(draggedIndex, 1);
-                              next.splice(targetIndex, 0, draggedKey);
-                              window.localStorage.setItem("react-shop-builder-core-pages-order", JSON.stringify(next));
-                            }
-                            return next;
-                          });
-                        }
-                        setDraggingCorePageKey(null);
-                        setDragOverCorePageKey(null);
-                      }}
-                      onDragEnd={() => {
-                        setDraggingCorePageKey(null);
-                        setDragOverCorePageKey(null);
-                      }}
-                    >
-                      <GripVertical size={13} className="builder-group-drag-handle" style={{ marginRight: "2px", flexShrink: 0 }} />
-                      <button type="button" className="builder-page-title-button" onClick={() => onSwitchBuilderTarget(page.key)}>
-                        <strong>{page.title}</strong>
-                        <span>{page.slug ? `/${page.slug}` : "/"}</span>
-                      </button>
-                      <span
-                        className={`builder-page-status ${isPublished ? "is-published" : "is-draft"}`}
-                        style={{
-                          fontSize: "10px",
-                          padding: "2px 6px",
-                          borderRadius: "4px",
-                          backgroundColor: isActive
-                            ? "rgba(255, 255, 255, 0.25)"
-                            : "rgba(164, 190, 123, 0.15)",
-                          color: isActive
-                            ? "#ffffff"
-                            : (isPublished ? "#91ad68" : "var(--builder-ui-muted)"),
-                          border: `1px solid ${isActive
-                            ? "rgba(255, 255, 255, 0.4)"
-                            : "rgba(164, 190, 123, 0.3)"}`,
-                          textTransform: "uppercase",
-                          fontWeight: "bold",
-                          letterSpacing: "0.05em",
-                          marginLeft: "auto",
-                          marginRight: "4px",
-                        }}
-                      >
-                        {isPublished ? "Published" : "Draft"}
-                      </span>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Custom Pages */}
-            <div className="builder-card builder-pages-card">
-              <div className="builder-card-title">
-                <strong>Custom Pages</strong>
-                <span>{customPages.length}</span>
-              </div>
-              <div className="builder-page-create">
-                <input
-                  type="text"
-                  value={newPageTitle}
-                  onChange={(event) => onSetNewPageTitle(event.target.value)}
-                  placeholder="New page title"
-                />
                 <button
                   type="button"
-                  className="builder-icon-button"
-                  onClick={onCreateBuilderPage}
-                  aria-label="Create custom page"
+                  className="builder-secondary-button builder-full-button"
+                  onClick={onOpenInspector}
                 >
-                  <Plus size={15} />
+                  Open Inspector
                 </button>
               </div>
-              {customPages.length > 0 ? (
-                <div className="builder-pages-list" style={{ marginTop: "10px" }}>
-                  {customPages.map((page) => {
+            )
+          )}
+
+          {sidebarTab === "globalStyles" && globalStylesSlot}
+
+          {sidebarTab === "pages" && (
+            <div className="builder-sidebar-panel">
+              <div className="builder-sidebar-panel-header">
+                <div>
+                  <strong>Builder Pages</strong>
+                  <span>Manage React-owned storefront pages</span>
+                </div>
+                <small>{corePages.length + customPages.length}</small>
+              </div>
+
+              {/* Core Storefront Pages */}
+              <div className="builder-card builder-pages-card" style={{ marginBottom: "14px" }}>
+                <div className="builder-card-title">
+                  <strong>Core Storefront Pages</strong>
+                  <span>{corePages.length}</span>
+                </div>
+                <div className="builder-pages-list">
+                  {orderedCorePages.map((page) => {
                     const isActive = builderState.page === page.key;
                     const isPublished = publishedKeys.includes(page.key);
-                    const isDragging = draggingCustomPageKey === page.key;
-                    const isDragOver = dragOverCustomPageKey === page.key;
+                    const isDragging = draggingCorePageKey === page.key;
+                    const isDragOver = dragOverCorePageKey === page.key;
                     return (
                       <div
                         key={page.key}
@@ -519,47 +429,49 @@ export default function DashboardSidebar({
                         }${isDragOver ? " is-drag-over" : ""}`}
                         draggable
                         onDragStart={(event) => {
-                          setDraggingCustomPageKey(page.key);
-                          event.dataTransfer.setData("application/x-builder-custom-page-key", page.key);
+                          setDraggingCorePageKey(page.key);
+                          event.dataTransfer.setData("application/x-builder-core-page-key", page.key);
                           event.dataTransfer.effectAllowed = "move";
                         }}
                         onDragOver={(event) => {
-                          if (draggingCustomPageKey && draggingCustomPageKey !== page.key) {
+                          if (draggingCorePageKey && draggingCorePageKey !== page.key) {
                             event.preventDefault();
-                            setDragOverCustomPageKey(page.key);
+                            setDragOverCorePageKey(page.key);
                           }
                         }}
                         onDragLeave={() => {
-                          if (dragOverCustomPageKey === page.key) {
-                            setDragOverCustomPageKey(null);
+                          if (dragOverCorePageKey === page.key) {
+                            setDragOverCorePageKey(null);
                           }
                         }}
                         onDrop={(event) => {
                           event.preventDefault();
-                          const draggedKey = event.dataTransfer.getData("application/x-builder-custom-page-key");
+                          const draggedKey = event.dataTransfer.getData("application/x-builder-core-page-key");
                           if (draggedKey && draggedKey !== page.key) {
-                            const next = [...customPages];
-                            const draggedIndex = next.findIndex((p) => p.key === draggedKey);
-                            const targetIndex = next.findIndex((p) => p.key === page.key);
-                            if (draggedIndex !== -1 && targetIndex !== -1) {
-                              const draggedPage = next[draggedIndex];
-                              next.splice(draggedIndex, 1);
-                              next.splice(targetIndex, 0, draggedPage);
-                              onReorderCustomPages?.(next);
-                            }
+                            setCorePagesOrder((current) => {
+                              const next = [...current];
+                              const draggedIndex = next.indexOf(draggedKey);
+                              const targetIndex = next.indexOf(page.key);
+                              if (draggedIndex !== -1 && targetIndex !== -1) {
+                                next.splice(draggedIndex, 1);
+                                next.splice(targetIndex, 0, draggedKey);
+                                window.localStorage.setItem("react-shop-builder-core-pages-order", JSON.stringify(next));
+                              }
+                              return next;
+                            });
                           }
-                          setDraggingCustomPageKey(null);
-                          setDragOverCustomPageKey(null);
+                          setDraggingCorePageKey(null);
+                          setDragOverCorePageKey(null);
                         }}
                         onDragEnd={() => {
-                          setDraggingCustomPageKey(null);
-                          setDragOverCustomPageKey(null);
+                          setDraggingCorePageKey(null);
+                          setDragOverCorePageKey(null);
                         }}
                       >
                         <GripVertical size={13} className="builder-group-drag-handle" style={{ marginRight: "2px", flexShrink: 0 }} />
                         <button type="button" className="builder-page-title-button" onClick={() => onSwitchBuilderTarget(page.key)}>
                           <strong>{page.title}</strong>
-                          <span>/{page.slug}</span>
+                          <span>{page.slug ? `/${page.slug}` : "/"}</span>
                         </button>
                         <span
                           className={`builder-page-status ${isPublished ? "is-published" : "is-draft"}`}
@@ -585,242 +497,353 @@ export default function DashboardSidebar({
                         >
                           {isPublished ? "Published" : "Draft"}
                         </span>
-                        <button
-                          type="button"
-                          className="builder-icon-button"
-                          onClick={() => onDeleteBuilderPage(page.key)}
-                          aria-label={`Delete ${page.title}`}
-                          style={{ flexShrink: 0 }}
-                        >
-                          <Trash2 size={14} />
-                        </button>
                       </div>
                     );
                   })}
                 </div>
-              ) : (
-                <div style={{ padding: "12px 4px", fontSize: "12px", color: "var(--builder-ui-muted)", textAlign: "center" }}>
-                  No custom pages created yet.
-                </div>
-              )}
-              <small style={{ display: "block", marginTop: "10px" }}>{pageStatus}</small>
-            </div>
-          </div>
-        )}
-
-        {nestedOpen && sidebarTab === "templates" && (
-          <div className="builder-sidebar-panel">
-            <div className="builder-sidebar-panel-header">
-              <div><strong>Templates</strong><span>Save and reuse pages, sections, and elements</span></div>
-              <small>{savedTemplates.length}</small>
-            </div>
-
-            <div className="builder-card builder-pages-card" style={{ marginBottom: '14px' }}>
-              <div className="builder-card-title"><strong>Global Layout Target</strong></div>
-              <div className="builder-target-toggle" aria-label="Builder target type">
-                {(["page", "template"] as BuilderTargetType[]).map((targetType) => (
-                  <button key={targetType} type="button" className={(builderState.targetType ?? "page") === targetType ? "is-active" : ""} onClick={() => onSwitchBuilderTarget(targetType === "page" ? "shop" : "product-single")}>
-                    {targetType === "page" ? "Custom Pages" : "Global Templates"}
-                  </button>
-                ))}
               </div>
-              {(builderState.targetType ?? "page") === "template" && (
-                <label className="builder-field" style={{ marginTop: '12px' }}>
-                  <span>Editing Template</span>
-                  <select value={builderState.page} onChange={(event) => onSwitchBuilderTarget(event.target.value as BuilderLayoutKey)}>
-                    {Object.entries(templateLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
-                  </select>
-                </label>
-              )}
-              {(builderState.targetType ?? "page") === "template" && builderState.template && (
-                <div className="builder-template-note" style={{ marginTop: '8px' }}>
-                  <strong>{templateLabels[builderState.template]}</strong>
-                  <span>{templateDescriptions[builderState.template]}</span>
-                </div>
-              )}
-            </div>
 
-            <div className="builder-card builder-pages-card">
-              <div className="builder-card-title"><strong>Save Reusable Template</strong><span>{builderState.page}</span></div>
-              <label className="builder-field">
-                <span>Template name</span>
-                <input
-                  type="text"
-                  value={templateDraftTitle}
-                  onChange={(event) => setTemplateDraftTitle(event.target.value)}
-                  placeholder="Optional custom name"
-                />
-              </label>
-              <div className="builder-template-save-list">
-                <button type="button" className="builder-template-save-card" onClick={() => saveTemplateAndClear("page")}>
-                  <Save size={16} />
-                  <span>
-                    <strong>Save Current Page</strong>
-                    <small>Reusable full-page layout</small>
-                  </span>
-                </button>
-                <button
-                  type="button"
-                  className="builder-template-save-card"
-                  onClick={() => saveTemplateAndClear("section")}
-                  disabled={!selectedSectionTitle}
-                  title={selectedSectionTitle ? `Save selected section: ${selectedSectionTitle}` : "Click a section in the preview first"}
-                >
-                  <Save size={16} />
-                  <span>
-                    <strong>Save Selected Section</strong>
-                    <small>{selectedSectionTitle ? selectedSectionTitle : "Click a section first"}</small>
-                  </span>
-                </button>
-                <button
-                  type="button"
-                  className="builder-template-save-card"
-                  onClick={() => saveTemplateAndClear("element")}
-                  disabled={!selectedElementLabel}
-                  title={selectedElementLabel ? `Save selected element: ${selectedElementLabel}` : "Click an element in the preview first"}
-                >
-                  <Save size={16} />
-                  <span>
-                    <strong>Save Selected Element</strong>
-                    <small>{selectedElementLabel ? selectedElementLabel : "Click an element first"}</small>
-                  </span>
-                </button>
-              </div>
-              <small>{templateStatus}</small>
-            </div>
-            <div className="builder-template-tabs" role="tablist" aria-label="Template types">
-              {templateLibraryTabs.map((tab) => {
-                const tabCount = savedTemplates.filter(
-                  (template) => (template.templateType ?? "page") === tab.value,
-                ).length;
-                return (
+              {/* Custom Pages */}
+              <div className="builder-card builder-pages-card">
+                <div className="builder-card-title">
+                  <strong>Custom Pages</strong>
+                  <span>{customPages.length}</span>
+                </div>
+                <div className="builder-page-create">
+                  <input
+                    type="text"
+                    value={newPageTitle}
+                    onChange={(event) => onSetNewPageTitle(event.target.value)}
+                    placeholder="New page title"
+                  />
                   <button
-                    key={tab.value}
                     type="button"
-                    role="tab"
-                    aria-selected={templateLibraryTab === tab.value}
-                    className={templateLibraryTab === tab.value ? "is-active" : ""}
-                    onClick={() => {
-                      setTemplateLibraryTab(tab.value);
-                      setRenamingTemplateId(null);
-                    }}
+                    className="builder-icon-button"
+                    onClick={onCreateBuilderPage}
+                    aria-label="Create custom page"
                   >
-                    <span>{tab.label}</span>
-                    <small>{tabCount}</small>
+                    <Plus size={15} />
                   </button>
-                );
-              })}
-            </div>
-            {filteredTemplates.length > 0 ? (
-              <div className="builder-pages-list builder-template-list">
-                {filteredTemplates.map((template) => {
-                  const templateType = template.templateType ?? "page";
-                  const canDragTemplate = templateType !== "page";
-                  const templateDragMimeType = canDragTemplate
-                    ? BUILDER_TEMPLATE_DND_TYPES[
-                        templateType as Exclude<TemplateLibraryTab, "page">
-                      ]
-                    : null;
-                  return (
-                  <div
-                    key={template.id}
-                    className="builder-page-row builder-template-row"
-                    draggable={canDragTemplate && renamingTemplateId !== template.id}
-                    onDragStart={(event) => {
-                      if (!canDragTemplate || renamingTemplateId === template.id) {
-                        event.preventDefault();
-                        return;
-                      }
-                      event.dataTransfer.setData(
-                        BUILDER_TEMPLATE_DND_TYPE,
-                        template.id,
-                      );
-                      if (templateDragMimeType) {
-                        event.dataTransfer.setData(templateDragMimeType, template.id);
-                      }
-                      event.dataTransfer.effectAllowed = "copy";
-                    }}
-                  >
-                    {renamingTemplateId === template.id ? (
-                      <>
-                        <input
-                          className="builder-template-rename-input"
-                          value={renamingTemplateTitle}
-                          onChange={(event) => setRenamingTemplateTitle(event.target.value)}
-                          onKeyDown={(event) => {
-                            if (event.key === "Enter") {
-                              onRenameSavedTemplate(template, renamingTemplateTitle);
-                              setRenamingTemplateId(null);
-                            }
-                            if (event.key === "Escape") {
-                              setRenamingTemplateId(null);
+                </div>
+                {customPages.length > 0 ? (
+                  <div className="builder-pages-list" style={{ marginTop: "10px" }}>
+                    {customPages.map((page) => {
+                      const isActive = builderState.page === page.key;
+                      const isPublished = publishedKeys.includes(page.key);
+                      const isDragging = draggingCustomPageKey === page.key;
+                      const isDragOver = dragOverCustomPageKey === page.key;
+                      return (
+                        <div
+                          key={page.key}
+                          className={`builder-page-row${isActive ? " is-active" : ""}${
+                            isDragging ? " is-dragging" : ""
+                          }${isDragOver ? " is-drag-over" : ""}`}
+                          draggable
+                          onDragStart={(event) => {
+                            setDraggingCustomPageKey(page.key);
+                            event.dataTransfer.setData("application/x-builder-custom-page-key", page.key);
+                            event.dataTransfer.effectAllowed = "move";
+                          }}
+                          onDragOver={(event) => {
+                            if (draggingCustomPageKey && draggingCustomPageKey !== page.key) {
+                              event.preventDefault();
+                              setDragOverCustomPageKey(page.key);
                             }
                           }}
-                          autoFocus
-                        />
-                        <button
-                          type="button"
-                          className="builder-icon-button"
-                          onClick={() => {
-                            onRenameSavedTemplate(template, renamingTemplateTitle);
-                            setRenamingTemplateId(null);
+                          onDragLeave={() => {
+                            if (dragOverCustomPageKey === page.key) {
+                              setDragOverCustomPageKey(null);
+                            }
                           }}
-                          aria-label={`Save new name for ${template.title}`}
+                          onDrop={(event) => {
+                            event.preventDefault();
+                            const draggedKey = event.dataTransfer.getData("application/x-builder-custom-page-key");
+                            if (draggedKey && draggedKey !== page.key) {
+                              const next = [...customPages];
+                              const draggedIndex = next.findIndex((p) => p.key === draggedKey);
+                              const targetIndex = next.findIndex((p) => p.key === page.key);
+                              if (draggedIndex !== -1 && targetIndex !== -1) {
+                                const draggedPage = next[draggedIndex];
+                                next.splice(draggedIndex, 1);
+                                next.splice(targetIndex, 0, draggedPage);
+                                onReorderCustomPages?.(next);
+                              }
+                            }
+                            setDraggingCustomPageKey(null);
+                            setDragOverCustomPageKey(null);
+                          }}
+                          onDragEnd={() => {
+                            setDraggingCustomPageKey(null);
+                            setDragOverCustomPageKey(null);
+                          }}
                         >
-                          <Save size={14} />
-                        </button>
-                        <button
-                          type="button"
-                          className="builder-icon-button"
-                          onClick={() => setRenamingTemplateId(null)}
-                          aria-label="Cancel rename"
-                        >
-                          <X size={14} />
-                        </button>
-                      </>
-                    ) : (
-                      <>
-                        <button type="button" onClick={() => onApplySavedTemplate(template)}>
-                          <strong>{template.title}</strong>
-                          <span>
-                            {templateType.toUpperCase()} · {template.sourcePage ?? "template"} · {new Date(template.updatedAt).toLocaleDateString()}
+                          <GripVertical size={13} className="builder-group-drag-handle" style={{ marginRight: "2px", flexShrink: 0 }} />
+                          <button type="button" className="builder-page-title-button" onClick={() => onSwitchBuilderTarget(page.key)}>
+                            <strong>{page.title}</strong>
+                            <span>/{page.slug}</span>
+                          </button>
+                          <span
+                            className={`builder-page-status ${isPublished ? "is-published" : "is-draft"}`}
+                            style={{
+                              fontSize: "10px",
+                              padding: "2px 6px",
+                              borderRadius: "4px",
+                              backgroundColor: isActive
+                                ? "rgba(255, 255, 255, 0.25)"
+                                : "rgba(164, 190, 123, 0.15)",
+                              color: isActive
+                                ? "#ffffff"
+                                : (isPublished ? "#91ad68" : "var(--builder-ui-muted)"),
+                              border: `1px solid ${isActive
+                                ? "rgba(255, 255, 255, 0.4)"
+                                : "rgba(164, 190, 123, 0.3)"}`,
+                              textTransform: "uppercase",
+                              fontWeight: "bold",
+                              letterSpacing: "0.05em",
+                              marginLeft: "auto",
+                              marginRight: "4px",
+                            }}
+                          >
+                            {isPublished ? "Published" : "Draft"}
                           </span>
-                        </button>
-                        <button type="button" className="builder-template-use-button" onClick={() => onApplySavedTemplate(template)}>
-                          <Plus size={14} />
-                          Use
-                        </button>
-                        <button
-                          type="button"
-                          className="builder-icon-button"
-                          onClick={() => {
-                            setRenamingTemplateId(template.id);
-                            setRenamingTemplateTitle(template.title);
-                          }}
-                          aria-label={`Rename ${template.title}`}
-                        >
-                          <Pencil size={14} />
-                        </button>
-                        <button type="button" className="builder-icon-button" onClick={() => onDeleteSavedTemplate(template.id)} aria-label={`Delete ${template.title}`}><Trash2 size={14} /></button>
-                      </>
-                    )}
+                          <button
+                            type="button"
+                            className="builder-icon-button"
+                            onClick={() => onDeleteBuilderPage(page.key)}
+                            aria-label={`Delete ${page.title}`}
+                            style={{ flexShrink: 0 }}
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        </div>
+                      );
+                    })}
                   </div>
+                ) : (
+                  <div style={{ padding: "12px 4px", fontSize: "12px", color: "var(--builder-ui-muted)", textAlign: "center" }}>
+                    No custom pages created yet.
+                  </div>
+                )}
+                <small style={{ display: "block", marginTop: "10px" }}>{pageStatus}</small>
+              </div>
+            </div>
+          )}
+
+          {sidebarTab === "templates" && (
+            <div className="builder-sidebar-panel">
+              <div className="builder-sidebar-panel-header">
+                <div><strong>Templates</strong><span>Save and reuse pages, sections, and elements</span></div>
+                <small>{savedTemplates.length}</small>
+              </div>
+
+              <div className="builder-card builder-pages-card" style={{ marginBottom: '14px' }}>
+                <div className="builder-card-title"><strong>Global Layout Target</strong></div>
+                <div className="builder-target-toggle" aria-label="Builder target type">
+                  {(["page", "template"] as BuilderTargetType[]).map((targetType) => (
+                    <button key={targetType} type="button" className={(builderState.targetType ?? "page") === targetType ? "is-active" : ""} onClick={() => onSwitchBuilderTarget(targetType === "page" ? "shop" : "product-single")}>
+                      {targetType === "page" ? "Custom Pages" : "Global Templates"}
+                    </button>
+                  ))}
+                </div>
+                {(builderState.targetType ?? "page") === "template" && (
+                  <label className="builder-field" style={{ marginTop: '12px' }}>
+                    <span>Editing Template</span>
+                    <select value={builderState.page} onChange={(event) => onSwitchBuilderTarget(event.target.value as BuilderLayoutKey)}>
+                      {Object.entries(templateLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+                    </select>
+                  </label>
+                )}
+                {(builderState.targetType ?? "page") === "template" && builderState.template && (
+                  <div className="builder-template-note" style={{ marginTop: '8px' }}>
+                    <strong>{templateLabels[builderState.template]}</strong>
+                    <span>{templateDescriptions[builderState.template]}</span>
+                  </div>
+                )}
+              </div>
+
+              <div className="builder-card builder-pages-card">
+                <div className="builder-card-title"><strong>Save Reusable Template</strong><span>{builderState.page}</span></div>
+                <label className="builder-field">
+                  <span>Template name</span>
+                  <input
+                    type="text"
+                    value={templateDraftTitle}
+                    onChange={(event) => setTemplateDraftTitle(event.target.value)}
+                    placeholder="Optional custom name"
+                  />
+                </label>
+                <div className="builder-template-save-list">
+                  <button type="button" className="builder-template-save-card" onClick={() => saveTemplateAndClear("page")}>
+                    <Save size={16} />
+                    <span>
+                      <strong>Save Current Page</strong>
+                      <small>Reusable full-page layout</small>
+                    </span>
+                  </button>
+                  <button
+                    type="button"
+                    className="builder-template-save-card"
+                    onClick={() => saveTemplateAndClear("section")}
+                    disabled={!selectedSectionTitle}
+                    title={selectedSectionTitle ? `Save selected section: ${selectedSectionTitle}` : "Click a section in the preview first"}
+                  >
+                    <Save size={16} />
+                    <span>
+                      <strong>Save Selected Section</strong>
+                      <small>{selectedSectionTitle ? selectedSectionTitle : "Click a section first"}</small>
+                    </span>
+                  </button>
+                  <button
+                    type="button"
+                    className="builder-template-save-card"
+                    onClick={() => saveTemplateAndClear("element")}
+                    disabled={!selectedElementLabel}
+                    title={selectedElementLabel ? `Save selected element: ${selectedElementLabel}` : "Click an element in the preview first"}
+                  >
+                    <Save size={16} />
+                    <span>
+                      <strong>Save Selected Element</strong>
+                      <small>{selectedElementLabel ? selectedElementLabel : "Click an element first"}</small>
+                    </span>
+                  </button>
+                </div>
+                <small>{templateStatus}</small>
+              </div>
+              <div className="builder-template-tabs" role="tablist" aria-label="Template types">
+                {templateLibraryTabs.map((tab) => {
+                  const tabCount = savedTemplates.filter(
+                    (template) => (template.templateType ?? "page") === tab.value,
+                  ).length;
+                  return (
+                    <button
+                      key={tab.value}
+                      type="button"
+                      role="tab"
+                      aria-selected={templateLibraryTab === tab.value}
+                      className={templateLibraryTab === tab.value ? "is-active" : ""}
+                      onClick={() => {
+                        setTemplateLibraryTab(tab.value);
+                        setRenamingTemplateId(null);
+                      }}
+                    >
+                      <span>{tab.label}</span>
+                      <small>{tabCount}</small>
+                    </button>
                   );
                 })}
               </div>
-            ) : (
-              <div className="builder-template-note">
-                <LibraryBig size={16} />
-                <span>
-                  {savedTemplates.length > 0
-                    ? `No ${selectedTemplateTabLabel.toLowerCase()} templates saved yet.`
-                    : "Saved templates will appear here after you save from a page, section, row, or element toolbar."}
-                </span>
-              </div>
-            )}
-          </div>
-        )}
+              {filteredTemplates.length > 0 ? (
+                <div className="builder-pages-list builder-template-list">
+                  {filteredTemplates.map((template) => {
+                    const templateType = template.templateType ?? "page";
+                    const canDragTemplate = templateType !== "page";
+                    const templateDragMimeType = canDragTemplate
+                      ? BUILDER_TEMPLATE_DND_TYPES[
+                          templateType as Exclude<TemplateLibraryTab, "page">
+                        ]
+                      : null;
+                    return (
+                    <div
+                      key={template.id}
+                      className="builder-page-row builder-template-row"
+                      draggable={canDragTemplate && renamingTemplateId !== template.id}
+                      onDragStart={(event) => {
+                        if (!canDragTemplate || renamingTemplateId === template.id) {
+                          event.preventDefault();
+                          return;
+                        }
+                        event.dataTransfer.setData(
+                          BUILDER_TEMPLATE_DND_TYPE,
+                          template.id,
+                        );
+                        if (templateDragMimeType) {
+                          event.dataTransfer.setData(templateDragMimeType, template.id);
+                        }
+                        event.dataTransfer.effectAllowed = "copy";
+                      }}
+                    >
+                      {renamingTemplateId === template.id ? (
+                        <>
+                          <input
+                            className="builder-template-rename-input"
+                            value={renamingTemplateTitle}
+                            onChange={(event) => setRenamingTemplateTitle(event.target.value)}
+                            onKeyDown={(event) => {
+                              if (event.key === "Enter") {
+                                onRenameSavedTemplate(template, renamingTemplateTitle);
+                                setRenamingTemplateId(null);
+                              }
+                              if (event.key === "Escape") {
+                                setRenamingTemplateId(null);
+                              }
+                            }}
+                            autoFocus
+                          />
+                          <button
+                            type="button"
+                            className="builder-icon-button"
+                            onClick={() => {
+                              onRenameSavedTemplate(template, renamingTemplateTitle);
+                              setRenamingTemplateId(null);
+                            }}
+                            aria-label={`Save new name for ${template.title}`}
+                          >
+                            <Save size={14} />
+                          </button>
+                          <button
+                            type="button"
+                            className="builder-icon-button"
+                            onClick={() => setRenamingTemplateId(null)}
+                            aria-label="Cancel rename"
+                          >
+                            <X size={14} />
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          <button type="button" onClick={() => onApplySavedTemplate(template)}>
+                            <strong>{template.title}</strong>
+                            <span>
+                              {templateType.toUpperCase()} · {template.sourcePage ?? "template"} · {new Date(template.updatedAt).toLocaleDateString()}
+                            </span>
+                          </button>
+                          <button type="button" className="builder-template-use-button" onClick={() => onApplySavedTemplate(template)}>
+                            <Plus size={14} />
+                            Use
+                          </button>
+                          <button
+                            type="button"
+                            className="builder-icon-button"
+                            onClick={() => {
+                              setRenamingTemplateId(template.id);
+                              setRenamingTemplateTitle(template.title);
+                            }}
+                            aria-label={`Rename ${template.title}`}
+                          >
+                            <Pencil size={14} />
+                          </button>
+                          <button type="button" className="builder-icon-button" onClick={() => onDeleteSavedTemplate(template.id)} aria-label={`Delete ${template.title}`}><Trash2 size={14} /></button>
+                        </>
+                      )}
+                    </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="builder-template-note">
+                  <LibraryBig size={16} />
+                  <span>
+                    {savedTemplates.length > 0
+                      ? `No ${selectedTemplateTabLabel.toLowerCase()} templates saved yet.`
+                      : "Saved templates will appear here after you save from a page, section, row, or element toolbar."}
+                  </span>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
       </div>
+
       <button
         type="button"
         className="builder-sidebar-resize-handle"

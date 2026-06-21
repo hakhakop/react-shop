@@ -12,6 +12,7 @@ import GlobalCardsPanel from "./GlobalCardsPanel";
 import GlobalButtonsPanel from "./GlobalButtonsPanel";
 import GlobalTypographyPanel from "./GlobalTypographyPanel";
 import GlobalHeaderPanel from "./GlobalHeaderPanel";
+import { Palette, Ruler, ShoppingBag, ToggleLeft, Type, LayoutGrid } from "lucide-react";
 
 type GlobalStylesPanelProps = GlobalStylesContextType;
 
@@ -63,36 +64,42 @@ export default function GlobalStylesPanel(props: GlobalStylesPanelProps) {
             id: "global-site-design",
             label: "Site Design",
             description: "Color scheme, page background, radius & presets",
+            icon: <Palette size={16} />,
             onClick: () => push({ id: "global-site-design", label: "Site Design" }),
           },
           {
             id: "global-spacing",
             label: "Spacing & Defaults",
             description: "Default padding and margins for sections, rows, and elements",
+            icon: <Ruler size={16} />,
             onClick: () => push({ id: "global-spacing", label: "Spacing Defaults" }),
           },
           {
             id: "global-cards",
             label: "Product Cards",
             description: "Styling, spacing, and aspect ratios of product lists",
+            icon: <ShoppingBag size={16} />,
             onClick: () => push({ id: "global-cards", label: "Product Cards" }),
           },
           {
             id: "global-buttons",
             label: "Button Presets",
             description: "Global button borders, hover actions & fine-tuning",
+            icon: <ToggleLeft size={16} />,
             onClick: () => push({ id: "global-buttons", label: "Button Presets" }),
           },
           {
             id: "global-typography",
             label: "Typography",
             description: "Global font styles, weights, and line heights for headings",
+            icon: <Type size={16} />,
             onClick: () => push({ id: "global-typography", label: "Typography" }),
           },
           {
             id: "global-header",
             label: "Header Settings",
             description: "Header layout, brand modes, logo, active indicator & icons",
+            icon: <LayoutGrid size={16} />,
             onClick: () => push({ id: "global-header", label: "Header Settings" }),
           },
         ]}

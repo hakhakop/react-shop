@@ -11,26 +11,37 @@ export default function SiteDesignPanel() {
   return (
     <div className="builder-global-styles-group">
       <div className="builder-card-title">
-        <strong>Site Design</strong>
-        <span>{design.preset ?? "custom"}</span>
+        <strong>Design Preset</strong>
+        <span>website presets</span>
       </div>
 
-      <label className="builder-field">
-        <span>Design Preset</span>
-        <InspectorChoiceGroup
-          value={design.preset ?? "princity"}
-          options={[
-            { label: "Princity", value: "princity" },
-            { label: "Editorial", value: "editorial" },
-            { label: "Contrast", value: "contrast" },
-          ]}
-          onChange={(value) =>
-            applyDesignPreset(value as NonNullable<BuilderDesign["preset"]>)
-          }
-        />
-      </label>
+      <div className="builder-preset-cards-grid">
+        {[
+          { id: "princity", label: "Princity", description: "Clean modern design", colors: ["#ffffff", "#111111", "#6366f1"] },
+          { id: "editorial", label: "Editorial", description: "Elegant classic serif", colors: ["#fafaf9", "#292524", "#e0f2fe"] },
+          { id: "contrast", label: "Contrast", description: "Stark bold borders", colors: ["#000000", "#ffffff", "#ffffff"] }
+        ].map((p) => {
+          const isActive = (design.preset ?? "princity") === p.id;
+          return (
+            <button
+              key={p.id}
+              type="button"
+              className={`builder-preset-card${isActive ? " is-active" : ""}`}
+              onClick={() => applyDesignPreset(p.id as any)}
+            >
+              <div className="builder-preset-card-preview">
+                {p.colors.map((c, i) => (
+                  <span key={i} style={{ backgroundColor: c }} />
+                ))}
+              </div>
+              <strong>{p.label}</strong>
+              <small>{p.description}</small>
+            </button>
+          );
+        })}
+      </div>
 
-      <label className="builder-field">
+      <label className="builder-field" style={{ marginTop: "14px" }}>
         <span>Website Color Mode</span>
         <InspectorChoiceGroup
           value={design.colorScheme ?? "auto"}
@@ -48,6 +59,11 @@ export default function SiteDesignPanel() {
         />
       </label>
 
+      <div className="builder-card-title" style={{ marginTop: "16px" }}>
+        <strong>Website Colors</strong>
+        <span>page base palette</span>
+      </div>
+
       <div className="builder-design-grid">
         {[
           ["pageBackground", "Page"],
@@ -56,27 +72,36 @@ export default function SiteDesignPanel() {
           ["accentColor", "Accent"],
           ["surfaceColor", "Surface"],
           ["buttonBackground", "Button"],
-        ].map(([key, label]) => (
-          <label key={key} className="builder-swatch-field">
-            <span>{label}</span>
-            <input
-              type="color"
-              value={
-                (design[key as keyof BuilderDesign] as string) ??
-                "#ffffff"
-              }
-              onChange={(event) =>
-                updateDesign({
-                  [key]: event.target.value,
-                  preset: undefined,
-                } as Partial<BuilderDesign>)
-              }
-            />
-          </label>
-        ))}
+        ].map(([key, label]) => {
+          const colorVal = (design[key as keyof BuilderDesign] as string) ?? "#ffffff";
+          return (
+            <label key={key} className="builder-swatch-field">
+              <span>{label}</span>
+              <div className="builder-swatch-color-preview-wrapper">
+                <span
+                  className="builder-swatch-color-preview"
+                  style={{ backgroundColor: colorVal }}
+                />
+                <span className="builder-swatch-color-value">
+                  {colorVal}
+                </span>
+                <input
+                  type="color"
+                  value={colorVal}
+                  onChange={(event) =>
+                    updateDesign({
+                      [key]: event.target.value,
+                      preset: undefined,
+                    } as Partial<BuilderDesign>)
+                  }
+                />
+              </div>
+            </label>
+          );
+        })}
       </div>
 
-      <div className="builder-two-column">
+      <div className="builder-two-column" style={{ marginTop: "10px" }}>
         <label className="builder-field">
           <span>Radius</span>
           <InspectorChoiceGroup
@@ -116,55 +141,72 @@ export default function SiteDesignPanel() {
         </label>
       </div>
 
-      <div className="builder-card-title">
-        <strong>Storefront Styling</strong>
-        <span>global styling + colors</span>
+      <div className="builder-card-title" style={{ marginTop: "20px" }}>
+        <strong>Storefront Presets</strong>
+        <span>global style presets</span>
       </div>
 
-      <label className="builder-field">
-        <span>Storefront Style Preset</span>
-        <select
-          value={shellSettings.storefrontPreset}
-          onChange={(event) =>
-            updateShellSettings({
-              storefrontPreset: event.target.value,
-            })
-          }
-        >
-          <option value="minimal">Minimal (Dark gray, round buttons)</option>
-          <option value="soft">Soft (Sage tones, medium round buttons)</option>
-          <option value="elevated">Elevated (Slate tones, large card shadows)</option>
-          <option value="boutique">Boutique (Red accents, square buttons)</option>
-          <option value="princity">Princity (Pure white, bold borders)</option>
-        </select>
-      </label>
+      <div className="builder-storefront-presets-grid">
+        {[
+          { id: "minimal", label: "Minimal", desc: "Dark gray, rounded buttons", colors: ["#1f2937", "#f3f4f6"] },
+          { id: "soft", label: "Soft", desc: "Sage tones, medium rounded", colors: ["#6b7280", "#ecfdf5"] },
+          { id: "elevated", label: "Elevated", desc: "Slate tones, card shadows", colors: ["#4b5563", "#f9fafb"] },
+          { id: "boutique", label: "Boutique", desc: "Red accents, square buttons", colors: ["#ef4444", "#ffffff"] },
+          { id: "princity", label: "Princity", desc: "Pure white, bold borders", colors: ["#111111", "#ffffff"] }
+        ].map((p) => {
+          const isActive = shellSettings.storefrontPreset === p.id;
+          return (
+            <button
+              key={p.id}
+              type="button"
+              className={`builder-storefront-preset-card${isActive ? " is-active" : ""}`}
+              onClick={() => updateShellSettings({ storefrontPreset: p.id })}
+            >
+              <div className="builder-storefront-preset-card-head">
+                <strong>{p.label}</strong>
+                <div className="builder-storefront-preset-colors">
+                  {p.colors.map((c, idx) => (
+                    <span key={idx} style={{ backgroundColor: c }} />
+                  ))}
+                </div>
+              </div>
+              <small>{p.desc}</small>
+            </button>
+          );
+        })}
+      </div>
+
+      <div className="builder-card-title" style={{ marginTop: "16px" }}>
+        <strong>Storefront Colors</strong>
+        <span>theme overrides</span>
+      </div>
 
       <div className="builder-design-grid">
-        <label className="builder-swatch-field">
-          <span>Primary Color</span>
-          <input
-            type="color"
-            value={shellSettings.primaryColor || "#111111"}
-            onChange={(event) =>
-              updateShellSettings({
-                primaryColor: event.target.value,
-              })
-            }
-          />
-        </label>
-
-        <label className="builder-swatch-field">
-          <span>Accent Color</span>
-          <input
-            type="color"
-            value={shellSettings.accentColor || "#111111"}
-            onChange={(event) =>
-              updateShellSettings({
-                accentColor: event.target.value,
-              })
-            }
-          />
-        </label>
+        {[
+          ["primaryColor", "Primary", shellSettings.primaryColor || "#111111", (val: string) => updateShellSettings({ primaryColor: val })],
+          ["accentColor", "Accent", shellSettings.accentColor || "#111111", (val: string) => updateShellSettings({ accentColor: val })]
+        ].map(([key, label, value, onChange]) => {
+          const colorVal = value as string;
+          return (
+            <label key={key as string} className="builder-swatch-field">
+              <span>{label as string}</span>
+              <div className="builder-swatch-color-preview-wrapper">
+                <span
+                  className="builder-swatch-color-preview"
+                  style={{ backgroundColor: colorVal }}
+                />
+                <span className="builder-swatch-color-value">
+                  {colorVal}
+                </span>
+                <input
+                  type="color"
+                  value={colorVal}
+                  onChange={(event) => (onChange as Function)(event.target.value)}
+                />
+              </div>
+            </label>
+          );
+        })}
       </div>
     </div>
   );

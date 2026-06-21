@@ -8,9 +8,69 @@ export default function GlobalTypographyPanel() {
 
   return (
     <div className="builder-global-styles-group">
-      <div className="builder-card-title">
-        <strong>Typography</strong>
-        <span>headings</span>
+      {/* Live Typography Preview Card */}
+      <div className="builder-typography-preview-card">
+        <div className="builder-preview-label">Typography Preview</div>
+        <div className="builder-preview-canvas">
+          {/* Heading 1 Preview */}
+          <div className="builder-preview-item">
+            <span className="builder-preview-item-label">Heading 1 (H1)</span>
+            <h1 style={{
+              fontFamily: design.headingFontFamily ?? 'inherit',
+              fontWeight: design.headingWeight ?? '700',
+              lineHeight: design.headingLineHeight ?? '1.1',
+              color: design.headingColor ?? design.textColor ?? '#f4f4f5',
+            }}>
+              Aa Bb Cc 123
+            </h1>
+          </div>
+
+          {/* Heading 2 Preview */}
+          <div className="builder-preview-item">
+            <span className="builder-preview-item-label">Heading 2 (H2)</span>
+            <h2 style={{
+              fontFamily: design.headingFontFamily ?? 'inherit',
+              fontWeight: design.headingWeight ?? '700',
+              lineHeight: design.headingLineHeight ?? '1.1',
+              color: design.headingColor ?? design.textColor ?? '#f4f4f5',
+            }}>
+              The Quick Brown Fox
+            </h2>
+          </div>
+
+          {/* Body Paragraph Preview */}
+          <div className="builder-preview-item">
+            <span className="builder-preview-item-label">Body Paragraph</span>
+            <p style={{
+              color: design.textColor ?? '#e4e4e7',
+            }}>
+              Jumps over the lazy dog. Designers love typography preview features in visual builders.
+            </p>
+          </div>
+
+          {/* Small Text & Link Text Preview */}
+          <div className="builder-preview-footer">
+            <div className="builder-preview-footer-left">
+              <span className="builder-preview-item-label">Small Text</span>
+              <span className="builder-preview-small-text" style={{ color: design.mutedTextColor ?? '#a1a1aa' }}>
+                Storefront v1.0.3
+              </span>
+            </div>
+            <div className="builder-preview-footer-right">
+              <span className="builder-preview-item-label">Link Text</span>
+              <a href="#" onClick={(e) => e.preventDefault()} style={{
+                color: design.accentColor ?? '#6366f1',
+              }}>
+                View products →
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="builder-card-title" style={{ marginTop: "16px" }}>
+        <strong>Typography Settings</strong>
+        <span>headings & defaults</span>
       </div>
 
       <label className="builder-field">
@@ -94,25 +154,37 @@ export default function GlobalTypographyPanel() {
       <div className="builder-two-column">
         <label className="builder-swatch-field">
           <span>Heading Color</span>
-          <input
-            type="color"
-            value={
-              design.headingColor ??
-              design.textColor ??
-              "#111111"
-            }
-            onChange={(event) =>
-              updateDesign({
-                headingColor: event.target.value,
-                preset: undefined,
-              })
-            }
-          />
+          <div className="builder-swatch-color-preview-wrapper">
+            <span
+              className="builder-swatch-color-preview"
+              style={{
+                backgroundColor: design.headingColor ?? design.textColor ?? "#111111"
+              }}
+            />
+            <span className="builder-swatch-color-value">
+              {design.headingColor ?? design.textColor ?? "#111111"}
+            </span>
+            <input
+              type="color"
+              value={
+                design.headingColor ??
+                design.textColor ??
+                "#111111"
+              }
+              onChange={(event) =>
+                updateDesign({
+                  headingColor: event.target.value,
+                  preset: undefined,
+                })
+              }
+            />
+          </div>
         </label>
 
         <button
           type="button"
           className="builder-secondary-button builder-typography-reset"
+          style={{ height: "32px", alignSelf: "end", fontSize: "11px", minHeight: "32px", padding: "0 8px" }}
           onClick={() =>
             updateDesign({
               headingColor: undefined,

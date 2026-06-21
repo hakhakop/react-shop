@@ -63,6 +63,7 @@ import ProductCarousel from "@/components/ProductCarousel";
 import ProductOptionsSelector from "@/components/ProductOptionsSelector";
 import DashboardInspector from "@/components/dashboard/DashboardInspector";
 import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
+import BuilderWireframePanel from "@/components/dashboard/BuilderWireframePanel";
 import MediaManager from "@/components/dashboard/media/MediaManager";
 import ScrollPinnedDemo from "@/components/animations/ScrollPinnedDemo";
 import { AntigravityTerminal } from "@/components/builder/AntigravityTerminal";
@@ -766,6 +767,24 @@ function buttonTypographyStyle(
 
 function blockButtonCssVars(block: BuilderLayoutBlock): CSSProperties {
   return builderButtonOverrideCssVars(block);
+}
+
+function cssSpacingValue(value: string | null | undefined) {
+  const trimmed = (value ?? "").toString().trim();
+  if (!trimmed) return null;
+  if (/^\d+(\.\d+)?$/.test(trimmed)) return `${trimmed}px`;
+  if (/^-?\d+(\.\d+)?(px|rem|em|%|vw|vh|svh|dvh)$/.test(trimmed)) return trimmed;
+  if (/^clamp\([^)]+\)$/.test(trimmed)) return trimmed;
+  return null;
+}
+
+function gridSpacingClass(
+  value: string | null | undefined,
+  presets: readonly string[],
+  fallback: string,
+) {
+  const key = (value || fallback).toString().trim().toLowerCase();
+  return presets.includes(key) ? key : "custom";
 }
 
 function DashboardTypog({
@@ -5033,6 +5052,31 @@ export default function DashboardBuilder({
     />
   );
 
+  const builderWireframePanel = (
+    <BuilderWireframePanel
+      page={builderState.page}
+      pageLabel={getLayoutLabel(builderState.page, customPages)}
+      sections={builderState.sections}
+      selectedSectionId={selectedId}
+      selectedLayoutRowIndex={selectedLayoutRowIndex}
+      selectedLayoutColumnKey={selectedLayoutColumnKey}
+      selectedLayoutBlockKey={selectedLayoutBlockKey}
+      onSelectSection={selectSection}
+      onSelectRow={selectLayoutRow}
+      onSelectColumn={selectLayoutColumn}
+      onSelectBlock={selectLayoutBlock}
+      onMoveSection={moveSection}
+      onDuplicateSection={duplicateSection}
+      onDeleteSection={deleteSection}
+      onMoveRow={moveLayoutRow}
+      onDuplicateRow={duplicateLayoutRow}
+      onDeleteRow={deleteEmptyRow}
+      onMoveBlock={moveLayoutBlockWithinColumn}
+      onDuplicateBlock={duplicateLayoutBlock}
+      onDeleteBlock={deleteLayoutBlock}
+    />
+  );
+
   const globalStylesPanel = (
     <div className="builder-sidebar-panel builder-sidebar-global-styles">
       <div className="builder-sidebar-panel-header">
@@ -6486,6 +6530,7 @@ export default function DashboardBuilder({
         customPages={customPages}
         onReorderCustomPages={handleReorderCustomPages}
         publishedKeys={publishedKeys}
+        builderSlot={builderWireframePanel}
         globalStylesSlot={globalStylesPanel}
         newPageTitle={newPageTitle}
         inspectorSlot={inspectorPanel}
@@ -11867,15 +11912,44 @@ if (section.kind === "embed") {
                           )}
                         </div>
                       ) : block.kind === "grid" ? (
+                        (() => {
+                          const gridGapClass = gridSpacingClass(
+                            block.gridGap,
+                            ["none", "small", "medium", "large", "max"],
+                            "medium",
+                          );
+                          const gridGapCustom =
+                            gridGapClass === "custom" ? cssSpacingValue(block.gridGap) : null;
+                          const imagePaddingClass = gridSpacingClass(
+                            block.gridImagePadding,
+                            ["frameless", "none", "small", "medium", "max"],
+                            "frameless",
+                          );
+                          const imagePaddingCustom =
+                            imagePaddingClass === "custom"
+                              ? cssSpacingValue(block.gridImagePadding)
+                              : null;
+                          const contentPaddingClass = gridSpacingClass(
+                            block.gridContentPadding,
+                            ["none", "small", "medium", "large"],
+                            "medium",
+                          );
+                          const contentPaddingCustom =
+                            contentPaddingClass === "custom"
+                              ? cssSpacingValue(block.gridContentPadding)
+                              : null;
+
+                          return (
                         <div className="shop-builder-column-block shop-builder-column-block--grid">
                           <div
-                            className={`shop-builder-grid shop-builder-grid--gap-${
-                              block.gridGap ?? "medium"
-                            } shop-builder-grid--margin-${hasBuilderVisualSpacing(block.visualStyle?.margin) || !block.gridMargin || block.gridMargin === "inherit" ? "none" : block.gridMargin} shop-card-preset--${block.panelStyle ?? "default"} ${visualStyleClassName(block.visualStyle as BuilderVisualStyle | undefined)}`}
+                            className={`shop-builder-grid shop-builder-grid--gap-${gridGapClass} shop-builder-grid--margin-${hasBuilderVisualSpacing(block.visualStyle?.margin) || !block.gridMargin || block.gridMargin === "inherit" ? "none" : block.gridMargin} shop-card-preset--${block.panelStyle ?? "default"} ${visualStyleClassName(block.visualStyle as BuilderVisualStyle | undefined)}`}
                             style={
                               {
                                 "--shop-builder-grid-columns":
                                   block.columns ?? 3,
+                                ...(gridGapCustom
+                                  ? { "--shop-builder-grid-gap": gridGapCustom }
+                                  : {}),
                                 ...visualStyleToCss(
                                   block.visualStyle as BuilderVisualStyle | undefined,
                                 ),
@@ -11935,9 +12009,7 @@ if (section.kind === "embed") {
                                     item.id ?? `${blockKey}-grid-${itemIndex}`
                                   }
                                   draggable={block.gridSource !== "products"}
-                                  className={`shop-builder-grid-card is-image-${
-                                    block.gridImagePadding ?? "frameless"
-                                  } is-content-${block.gridContentPadding ?? "medium"} is-frame-${
+                                  className={`shop-builder-grid-card is-image-${imagePaddingClass} is-content-${contentPaddingClass} is-frame-${
                                     block.gridImageFrame ?? "none"
                                   } ${
                                     draggingItem?.blockKey === blockKey && draggingItem?.fromIndex === itemIndex
@@ -11948,6 +12020,16 @@ if (section.kind === "embed") {
                                       ? "is-drag-over-grid"
                                       : ""
                                   }`}
+                                  style={
+                                    {
+                                      ...(imagePaddingCustom
+                                        ? { "--shop-builder-grid-image-padding": imagePaddingCustom }
+                                        : {}),
+                                      ...(contentPaddingCustom
+                                        ? { "--shop-builder-grid-content-padding": contentPaddingCustom }
+                                        : {}),
+                                    } as CSSProperties
+                                  }
                                   onDragStart={(event) => {
                                     if (block.gridSource === "products") return;
                                     event.stopPropagation();
@@ -12238,6 +12320,8 @@ if (section.kind === "embed") {
                               })}
                           </div>
                         </div>
+                          );
+                        })()
                       ) : block.kind === "badgeGrid" ? (
                         <div className="shop-builder-column-block shop-builder-column-block--badges">
                           {block.title && (
