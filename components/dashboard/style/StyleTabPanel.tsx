@@ -47,6 +47,7 @@ type StyleTarget = {
   elementBackground?: string;
   imageFit?: string;
   imageRatio?: string;
+  imagePadding?: string;
   addToCartStyle?: string;
   addToCartSize?: string;
   addToCartDisplay?: string;
@@ -720,6 +721,31 @@ export default function StyleTabPanel({
                       { label: "Portrait (3:4)", value: "3:4" },
                     ]}
                     onChange={(val) => onChange({ imageRatio: val })}
+                  />
+                </div>
+                <div className="builder-field">
+                  <span>Image Padding</span>
+                  <InspectorChoiceGroup
+                    value={target.imagePadding ?? "large"}
+                    options={[
+                      { label: "Frameless", value: "none" },
+                      { label: "Inset 12", value: "small" },
+                      { label: "Padded 24", value: "medium" },
+                      { label: "Roomy 40", value: "large" },
+                      { label: "Hero 64", value: "max" },
+                    ]}
+                    onChange={(val) => onChange({ imagePadding: val })}
+                  />
+                </div>
+                <div className="builder-field">
+                  <span>Image Frame</span>
+                  <InspectorChoiceGroup
+                    value={target.gridImageFrame ?? "none"}
+                    options={[
+                      { label: "None", value: "none" },
+                      { label: "Soft", value: "soft" },
+                    ]}
+                    onChange={(val) => onChange({ gridImageFrame: val })}
                   />
                 </div>
               </div>

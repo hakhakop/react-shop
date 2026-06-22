@@ -1317,7 +1317,7 @@
                 "filterPosition": "left",
                 "cardStyle": "flat",
                 "cardPreset": "editorial",
-                "panelStyle": "princity",
+                "panelStyle": "default",
                 "cardPadding": "small",
                 "imagePadding": "none",
                 "elementBackgroundMode": "default",
@@ -1398,7 +1398,7 @@
         "layoutRows": 1
       }
     ],
-    "updatedAt": "2026-06-21T20:10:48.270Z"
+    "updatedAt": "2026-06-22T19:15:32.721Z"
   },
   "client": {
     "version": 1,
@@ -5527,10 +5527,10 @@
     },
     "sections": [
       {
-        "id": "contentLayout-mqnhhji8-ecxnk",
+        "id": "contentLayout-mqpiy6t8-o9fyk",
         "kind": "contentLayout",
         "title": "",
-        "background": "#ffffff",
+        "background": "#111111",
         "backgroundMode": "boxed",
         "contentMode": "boxed",
         "colorScheme": "inherit",
@@ -5546,64 +5546,41 @@
         "layoutColumns": 1,
         "layoutItems": [
           {
-            "id": "layout-item-mqnhhji8-1",
+            "id": "layout-item-mqpiy6t8-1",
             "blocks": [
               {
-                "id": "hero-block-mqnhhji9-3dxac",
+                "id": "hero-block-mqpiy6t8-be41f",
                 "kind": "hero",
                 "eyebrow": "Featured",
-                "title": "Իմ Վեբկայքը",
+                "title": "Իմ նոր Վեբ Էջը",
                 "body": "A strong visual opening with editable copy and action.",
                 "buttonLabel": "Learn more",
                 "buttonUrl": "/",
                 "carouselSettings": {
                   "variant": "default"
                 },
-                "elementAlign": "center",
+                "textGradientPreset": "sunset-pink",
                 "typewriterEnabled": true,
                 "typography": {
                   "title": {
-                    "fontSize": "80",
-                    "lineHeight": "1.8",
-                    "fontWeight": "700"
+                    "fontSize": "80px",
+                    "fontWeight": "700",
+                    "lineHeight": "1.8"
                   }
                 },
-                "buttonBg": "transparent",
-                "buttonTextColor": "var(--builder-preview-section-button-bg, var(--builder-section-button-bg, var(--builder-button-bg, #111111)))",
-                "buttonBorderRadius": "999px",
-                "buttonBorderWidth": "1.5px",
-                "buttonBorderColor": "var(--builder-preview-section-button-bg, var(--builder-section-button-bg, var(--builder-button-bg, #111111)))",
-                "buttonPaddingY": "10px",
-                "buttonPaddingX": "18px",
-                "buttonFontWeight": "700",
-                "buttonLetterSpacing": "0px",
-                "buttonHoverBg": "var(--builder-preview-section-button-bg, var(--builder-section-button-bg, var(--builder-button-bg, #111111)))",
-                "buttonHoverTextColor": "var(--builder-preview-section-button-text, var(--builder-section-button-text, var(--builder-button-text, #ffffff)))",
-                "buttonHoverBorderColor": "var(--builder-preview-section-button-bg, var(--builder-section-button-bg, var(--builder-button-bg, #111111)))",
-                "buttonHoverEffect": "lift",
-                "typewriterUseGradient": true,
-                "typewriterSpeed": 120,
-                "typewriterEraseSpeed": 80,
-                "textGradientPreset": "custom",
-                "typewriterLoop": true,
-                "textGradientCustomMiddleOffset": 78,
-                "textGradientCustomStart": "#60a5fa",
-                "textGradientCustomMiddle": "#818cf8",
-                "textGradientCustomEnd": "#c084fc",
-                "textGradientCustomStartOffset": 0,
-                "textGradientCustomEndOffset": 37,
-                "textGradientCustomAngle": 40
+                "elementAlign": "center"
               }
             ]
           }
         ],
-        "layoutRows": 1
+        "layoutRows": 1,
+        "backgroundEffect": "antigravity2"
       },
       {
-        "id": "contentLayout-mqnhjiea-6pp2n",
+        "id": "contentLayout-mqpizs5d-1beuk",
         "kind": "contentLayout",
         "title": "",
-        "background": "#ffffff",
+        "background": "#111111",
         "backgroundMode": "boxed",
         "contentMode": "boxed",
         "colorScheme": "inherit",
@@ -5619,10 +5596,10 @@
         "layoutColumns": 1,
         "layoutItems": [
           {
-            "id": "layout-item-mqnhjiea-1",
+            "id": "layout-item-mqpizs5d-1",
             "blocks": [
               {
-                "id": "products-block-mqnhjlqd-z6c2y",
+                "id": "products-block-mqpizuwn-xoucc",
                 "kind": "products",
                 "title": "Products",
                 "source": "all",
@@ -5631,10 +5608,11 @@
                 "gridLimit": 12,
                 "filterPosition": "left",
                 "cardStyle": "flat",
-                "cardPreset": "minimal",
-                "panelStyle": "dark",
-                "imagePadding": "none",
-                "imageFit": "cover"
+                "cardPreset": "standard",
+                "panelStyle": "default",
+                "imageFit": "cover",
+                "imageRatio": "4:5",
+                "imagePadding": "none"
               }
             ]
           }
@@ -5642,6 +5620,6 @@
         "layoutRows": 1
       }
     ],
-    "updatedAt": "2026-06-21T07:55:27.387Z"
+    "updatedAt": "2026-06-22T18:05:38.195Z"
   }
 }

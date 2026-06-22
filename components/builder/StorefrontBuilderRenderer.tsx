@@ -513,6 +513,7 @@ async function BuilderProductsSection({
       imagePadding={section.imagePadding}
       imageFit={section.imageFit}
       imageRatio={section.imageRatio}
+      borderRadius={section.borderRadius}
       addToCartStyle={section.addToCartStyle}
       addToCartSize={section.addToCartSize}
       addToCartPosition={section.addToCartPosition}
@@ -1236,6 +1237,7 @@ async function ContentProductsBlock({
         imageFit={block.imageFit}
         imageRatio={block.imageRatio}
         imageFrame={block.gridImageFrame}
+        borderRadius={block.borderRadius}
         addToCartStyle={block.addToCartStyle}
         addToCartSize={block.addToCartSize}
         addToCartPosition={block.addToCartPosition}

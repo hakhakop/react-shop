@@ -824,6 +824,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
         elementBackground: selectedLayoutBlock.elementBackground,
         imageFit: selectedLayoutBlock.imageFit,
         imageRatio: selectedLayoutBlock.imageRatio,
+        imagePadding: selectedLayoutBlock.imagePadding,
         addToCartStyle: selectedLayoutBlock.addToCartStyle,
         addToCartSize: selectedLayoutBlock.addToCartSize,
         addToCartDisplay: selectedLayoutBlock.addToCartDisplay,
@@ -848,6 +849,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
       elementBackground?: string;
       imageFit?: string;
       imageRatio?: string;
+      imagePadding?: string;
       addToCartStyle?: string;
       addToCartSize?: string;
       addToCartDisplay?: string;

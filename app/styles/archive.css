@@ -933,7 +933,7 @@ body[data-storefront-preset="princity"]
 
 .shop-card-preset--graph.shop-card-style--none .shop-archive-card,
 .shop-card-preset--graph.shop-card-style--flat .shop-archive-card {
-  --product-card-radius: 8px;
+  --product-card-radius: var(--builder-card-radius, 8px);
   --product-image-height: clamp(360px, 31vw, 560px);
   --product-image-padding: clamp(28px, 4vw, 64px);
 }

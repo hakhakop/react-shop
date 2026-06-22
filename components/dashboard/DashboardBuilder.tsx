@@ -1286,7 +1286,7 @@ export default function DashboardBuilder({
   const [globalSpacingFocus, setGlobalSpacingFocus] = useState<
     "section" | "row" | "element" | null
   >(null);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
   const [sidebarWidth, setSidebarWidth] = useState(390);
   const [sidebarResizing, setSidebarResizing] = useState(false);
   const [previewScale, setPreviewScale] = useState(1);
@@ -6600,21 +6600,9 @@ export default function DashboardBuilder({
         openElementsPanelKey={panelForceToggler}
         shellSettings={shellSettings}
         onUpdateShellSettings={updateShellSettings}
+        sidebarCollapsed={sidebarCollapsed}
+        onSetSidebarCollapsed={setSidebarCollapsed}
       />
-
-      {sidebarCollapsed && (
-        <button
-          type="button"
-          className="builder-sidebar-open-toggle builder-icon-button"
-          onClick={() => {
-            openInspectorPanel();
-          }}
-          aria-label="Open inspector"
-          title="Open inspector"
-        >
-          <PanelRightOpen size={16} />
-        </button>
-      )}
 
       <main className="builder-workspace">
         {false && (
@@ -10130,6 +10118,7 @@ function PreviewSection({
               imagePadding={section.imagePadding}
               imageFit={section.imageFit}
               imageRatio={section.imageRatio}
+              borderRadius={section.borderRadius}
               addToCartStyle={section.addToCartStyle}
               addToCartSize={section.addToCartSize}
               addToCartPosition={section.addToCartPosition}
@@ -11900,6 +11889,7 @@ if (section.kind === "embed") {
                                     imageFit={block.imageFit}
                                     imageRatio={block.imageRatio}
                                     imageFrame={block.gridImageFrame}
+                                    borderRadius={block.borderRadius}
                                     addToCartStyle={block.addToCartStyle}
                                     addToCartSize={block.addToCartSize}
                                     addToCartPosition={block.addToCartPosition}

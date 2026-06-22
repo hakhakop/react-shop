@@ -189,11 +189,16 @@
 }
 
 .builder-dashboard.is-sidebar-collapsed {
-  grid-template-columns: minmax(0, 1fr);
+  grid-template-columns: 64px minmax(0, 1fr);
 }
 
 .builder-dashboard.is-sidebar-collapsed .builder-sidebar {
-  display: none;
+  --builder-sidebar-width: 64px !important;
+}
+
+.builder-dashboard.is-sidebar-collapsed .builder-sidebar-panel-container,
+.builder-dashboard.is-sidebar-collapsed .builder-sidebar-resize-handle {
+  display: none !important;
 }
 
 .builder-sidebar-open-toggle {
@@ -205,7 +210,7 @@
 }
 
 .builder-dashboard.is-sidebar-collapsed .builder-workspace {
-  grid-column: 1 / -1;
+  grid-column: 2 / -1;
 }
 
 .builder-sidebar-top {

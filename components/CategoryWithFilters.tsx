@@ -48,6 +48,7 @@ type Props = {
   imageFit?: ProductImageFit | null;
   imageRatio?: ProductImageRatio | null;
   imageFrame?: string | null;
+  borderRadius?: number | null;
   addToCartStyle?: string | null;
   addToCartSize?: string | null;
   addToCartPosition?: string | null;
@@ -290,6 +291,7 @@ export default function CategoryWithFilters({
   imageFit,
   imageRatio,
   imageFrame,
+  borderRadius,
   addToCartStyle,
   addToCartSize,
   addToCartPosition,
@@ -1310,6 +1312,16 @@ export default function CategoryWithFilters({
                   </div>
                 );
 
+                 const cardStyleVars = {
+                  ...getProductImageStyleVars(imageFit, imageRatio),
+                  ...(borderRadius !== undefined && borderRadius !== null
+                    ? {
+                        "--builder-card-radius": `${borderRadius}px`,
+                        "--product-card-radius": `${borderRadius}px`,
+                      }
+                    : {}),
+                } as React.CSSProperties;
+
                 return (
                   <div
                     key={p.id}
@@ -1318,7 +1330,7 @@ export default function CategoryWithFilters({
                     }`}
                     data-card-preset={normalizedCardPreset}
                     data-card-theme={normalizedCardTheme}
-                    style={getProductImageStyleVars(imageFit, imageRatio)}
+                    style={cardStyleVars}
                   >
                     <div className="product-card-top-right">
                       <WishlistToggle

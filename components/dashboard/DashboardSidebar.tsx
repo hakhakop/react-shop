@@ -109,8 +109,10 @@ type DashboardSidebarProps = {
   onOpenInspector?: () => void;
   onStartSidebarResize: (clientX: number) => void;
   onSwitchBuilderTarget: (nextKey: BuilderLayoutKey) => void;
-  openElementsPanelKey: number;
   onReorderCustomPages?: (newPages: BuilderCustomPage[]) => void;
+  openElementsPanelKey: number;
+  sidebarCollapsed?: boolean;
+  onSetSidebarCollapsed?: (collapsed: boolean) => void;
 };
 
 export default function DashboardSidebar({
@@ -153,6 +155,8 @@ export default function DashboardSidebar({
   openElementsPanelKey,
   onUpdateShellSettings,
   onReorderCustomPages,
+  sidebarCollapsed = true,
+  onSetSidebarCollapsed,
 }: DashboardSidebarProps) {
   const [nestedOpen, setNestedOpen] = useState(false);
   const [templateDraftTitle, setTemplateDraftTitle] = useState("");
@@ -322,16 +326,23 @@ export default function DashboardSidebar({
         </div>
         <div className="builder-sidebar-nav-tiles">
           {leftNavTabs.map((item) => {
-            const isActive = sidebarTab === item.tab;
+            const isActive = sidebarTab === item.tab && !sidebarCollapsed;
             return (
               <button
                 key={item.tab}
                 type="button"
                 className={`builder-sidebar-nav-tile${isActive ? " is-active" : ""}`}
                 onClick={() => {
-                  if (item.tab === "inspector") onOpenInspector();
-                  onSetSidebarTab(item.tab);
-                  setNestedOpen(true);
+                  if (sidebarCollapsed) {
+                    if (item.tab === "inspector") onOpenInspector();
+                    onSetSidebarTab(item.tab);
+                    onSetSidebarCollapsed?.(false);
+                  } else if (sidebarTab === item.tab) {
+                    onSetSidebarCollapsed?.(true);
+                  } else {
+                    if (item.tab === "inspector") onOpenInspector();
+                    onSetSidebarTab(item.tab);
+                  }
                 }}
               >
                 {item.icon}
