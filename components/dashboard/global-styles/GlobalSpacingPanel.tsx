@@ -9,6 +9,7 @@ import {
   type BuilderSpacingContext,
   getDefaultSpacingToken,
 } from "@/lib/builderSpacing";
+import { Sliders } from "lucide-react";
 
 interface GlobalSpacingControlProps {
   label: string;
@@ -47,17 +48,6 @@ function GlobalSpacingControl({
   const numericMatch = value ? value.trim().match(/^(\d+)px$/i) : null;
   const customNumericValue = numericMatch ? numericMatch[1] : "";
 
-  const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const val = event.target.value;
-    if (val === "custom") {
-      const defaultToken = getDefaultSpacingToken(context);
-      const currentPx = resolveBuilderSpacing(value ?? defaultToken, context).px;
-      onChange(`${currentPx > 0 ? currentPx : 32}px`);
-    } else {
-      onChange(val);
-    }
-  };
-
   const handleCustomNumericChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const num = event.target.value.replace(/\D/g, "");
     onChange(num ? `${num}px` : "0px");
@@ -76,41 +66,60 @@ function GlobalSpacingControl({
     selectValue = defaultVal;
   }
 
+  const handleChipClick = (presetValue: string) => {
+    if (presetValue === "custom") {
+      const currentPx = resolveBuilderSpacing(value ?? defaultVal, context).px;
+      onChange(`${currentPx > 0 ? currentPx : 32}px`);
+    } else {
+      onChange(presetValue);
+    }
+  };
+
   return (
-    <label className="builder-field spacing-control-wrapper">
-      <span>{label}</span>
+    <div className="builder-field spacing-control-wrapper">
+      <span className="builder-style-side-label-wrapper">{label}</span>
       <div className="spacing-control-row">
-        <select
-          value={selectValue}
-          onChange={handleSelectChange}
-        >
+        <div className="builder-style-chips-row">
           {presets.map((preset) => {
+            const isSelected = selectValue === preset;
             const px = BUILDER_SPACING_SCALE[preset];
             const labelName = TOKEN_LABELS[preset];
+            const displayLabel = `${labelName === "None" ? "None" : labelName} ${px}px`;
             return (
-              <option key={preset} value={preset}>
-                {labelName} ({px}px)
-              </option>
+              <button
+                key={preset}
+                type="button"
+                className={`builder-style-chip${isSelected ? " is-active" : ""}`}
+                onClick={() => handleChipClick(preset)}
+              >
+                {displayLabel}
+              </button>
             );
           })}
-          <option value="custom">Custom...</option>
-        </select>
-        
-        {isCustom && (
-          <div className="custom-spacing-input-wrapper">
-            <input
-              type="text"
-              pattern="[0-9]*"
-              inputMode="numeric"
-              value={customNumericValue}
-              onChange={handleCustomNumericChange}
-              placeholder="0"
-            />
-            <span className="custom-spacing-unit">px</span>
-          </div>
-        )}
+          <button
+            type="button"
+            className={`builder-style-chip builder-style-chip--custom${selectValue === "custom" ? " is-active" : ""}`}
+            onClick={() => handleChipClick("custom")}
+          >
+            <Sliders size={11} style={{ marginRight: "4px" }} />
+            Custom
+          </button>
+          {isCustom && (
+            <div className="custom-spacing-input-wrapper">
+              <input
+                type="text"
+                pattern="[0-9]*"
+                inputMode="numeric"
+                value={customNumericValue}
+                onChange={handleCustomNumericChange}
+                placeholder="0"
+              />
+              <span className="custom-spacing-unit">px</span>
+            </div>
+          )}
+        </div>
       </div>
-    </label>
+    </div>
   );
 }
 

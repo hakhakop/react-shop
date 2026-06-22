@@ -1077,6 +1077,39 @@ function getContentLayoutBlocks(
   return [];
 }
 
+function getBlockButtonItems(block: BuilderLayoutBlock) {
+  const items: {
+    key: string;
+    label: string;
+    url: string;
+    target?: "_self" | "_blank" | string;
+    style?: string;
+  }[] = [];
+
+  if (block.buttonLabel && block.buttonUrl) {
+    items.push({
+      key: "primary",
+      label: block.buttonLabel,
+      url: block.buttonUrl,
+      target: block.buttonTarget,
+      style: block.buttonStyle ?? "primary",
+    });
+  }
+
+  (block.buttons ?? []).forEach((button, index) => {
+    if (!button.label || !button.url) return;
+    items.push({
+      key: button.id ?? `button-${index}`,
+      label: button.label,
+      url: button.url,
+      target: button.target,
+      style: button.style ?? "primary",
+    });
+  });
+
+  return items;
+}
+
 async function CategoryFiltersBlock({
   hiddenCategorySlugs = [],
 }: {
@@ -1741,10 +1774,13 @@ function ContentLayoutBlock({
           className={`shop-builder-buttons ${block.premiumButtonStyle && block.premiumButtonStyle !== "default" ? "" : `shop-builder-buttons--${block.buttonsLayout ?? "inline"}`}`}
           style={{
             display: "flex",
+            width: "fit-content",
+            maxWidth: "100%",
             flexDirection: block.buttonsLayout === "stacked" ? "column" : "row",
             flexWrap: "wrap",
-            gap: block.buttonGap || "0.75rem",
-          }}
+            "--button-group-gap": block.buttonGap || "0.75rem",
+            gap: "var(--button-group-gap, 0.75rem)",
+          } as CSSProperties}
         >
           {block.buttonLabel && block.buttonUrl && (
             <Typog
@@ -2169,6 +2205,7 @@ function ContentLayoutBlock({
       backgroundClip: "text",
       display: "inline-block",
     } : {};
+    const buttonItems = getBlockButtonItems(block);
 
     return (
       <div className={`shop-builder-column-block shop-builder-column-block--hero ${isBlockAntigravity ? "shop-builder-hero--antigravity shop-builder-hero--antigravity-block" : ""} ${block.premiumCardStyle && block.premiumCardStyle !== "none" ? `shop-builder-card--${block.premiumCardStyle}` : ""}`}>
@@ -2241,42 +2278,48 @@ function ContentLayoutBlock({
               )}
             </Typog>
           )}
-          {block.buttonLabel && block.buttonUrl && (
-            <Typog
-              as="a"
-              className={`shop-builder-cta ${
+          {buttonItems.length > 0 && (
+            <div
+              className={`shop-builder-buttons ${
                 block.premiumButtonStyle && block.premiumButtonStyle !== "default"
-                  ? `shop-builder-cta--${block.premiumButtonStyle}`
-                  : isBlockAntigravity
-                    ? "shop-builder-cta--antigravity"
-                    : ""
+                  ? ""
+                  : `shop-builder-buttons--${block.buttonsLayout ?? "inline"}`
               }`}
-              href={block.buttonUrl}
-              typography={block.typography}
+              style={{
+                display: "flex",
+                width: "fit-content",
+                maxWidth: "100%",
+                flexDirection: block.buttonsLayout === "stacked" ? "column" : "row",
+                flexWrap: "wrap",
+                "--button-group-gap": block.buttonGap || "0.75rem",
+                gap: "var(--button-group-gap, 0.75rem)",
+              } as CSSProperties}
             >
-              {block.buttonLabel}
-            </Typog>
+              {buttonItems.map((button) => {
+                const isPremium =
+                  block.premiumButtonStyle && block.premiumButtonStyle !== "default";
+                return (
+                  <Typog
+                    key={button.key}
+                    as="a"
+                    className={`shop-builder-cta ${
+                      isPremium
+                        ? `shop-builder-cta--${block.premiumButtonStyle}`
+                        : isBlockAntigravity
+                          ? "shop-builder-cta--antigravity"
+                          : `shop-builder-cta--${button.style ?? "primary"}`
+                    }`}
+                    href={button.url}
+                    target={button.target === "_blank" ? "_blank" : undefined}
+                    rel={button.target === "_blank" ? "noreferrer" : undefined}
+                    typography={block.typography}
+                  >
+                    {button.label}
+                  </Typog>
+                );
+              })}
+            </div>
           )}
-          {(block.buttons ?? []).map((btn, btnIdx) => {
-            const isPremium = block.premiumButtonStyle && block.premiumButtonStyle !== "default";
-            return (
-              <Typog
-                key={btn.id ?? btnIdx}
-                as="a"
-                className={`shop-builder-cta ${
-                  isPremium
-                    ? `shop-builder-cta--${block.premiumButtonStyle}`
-                    : `shop-builder-cta--${btn.style ?? "primary"}`
-                }`}
-                href={btn.url}
-                target={btn.target === "_blank" ? "_blank" : undefined}
-                rel={btn.target === "_blank" ? "noreferrer" : undefined}
-                typography={block.typography}
-              >
-                {btn.label}
-              </Typog>
-            );
-          })}
         </div>
         {isBlockAntigravity && (
           <div className="shop-builder-hero-media shop-builder-hero-media--antigravity">
@@ -2568,10 +2611,13 @@ function ContentLayoutBlock({
         className={`shop-builder-buttons shop-builder-buttons--${block.buttonsLayout ?? "inline"}`}
         style={{
           display: "flex",
+          width: "fit-content",
+          maxWidth: "100%",
           flexDirection: block.buttonsLayout === "stacked" ? "column" : "row",
           flexWrap: "wrap",
-          gap: block.buttonGap || "0.75rem",
-        }}
+          "--button-group-gap": block.buttonGap || "0.75rem",
+          gap: "var(--button-group-gap, 0.75rem)",
+        } as CSSProperties}
       >
         {block.buttonLabel && block.buttonUrl && (
           <Typog

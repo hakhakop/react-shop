@@ -13,6 +13,7 @@ export type TypographySettings = {
   textTransform?: "none" | "uppercase" | "lowercase" | "capitalize";
   textDecoration?: "none" | "underline" | "line-through";
   variant?: TypographyVariant;
+  textShadow?: string;
 };
 
 export type TypographyGroup = {
@@ -227,6 +228,10 @@ export function typographyProps(
     } else {
       style.fontFamily = resolved.fontFamily;
     }
+  }
+
+  if (resolved.textShadow) {
+    style.textShadow = resolved.textShadow;
   }
 
   return {

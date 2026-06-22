@@ -109,9 +109,10 @@
                 "typography": {
                   "title": {
                     "lineHeight": "1.8",
-                    "fontSize": "clamp(36px, 5.5vw, 80px)",
+                    "fontSize": "64px",
                     "fontWeight": "800",
-                    "letterSpacing": ""
+                    "letterSpacing": "0px",
+                    "textDecoration": "none"
                   },
                   "eyebrow": {
                     "fontSize": "14px",
@@ -149,17 +150,17 @@
                 "visualStyle": {
                   "padding": {
                     "linked": true,
-                    "top": "none",
-                    "right": "none",
-                    "bottom": "none",
-                    "left": "none"
+                    "top": "md",
+                    "right": "md",
+                    "bottom": "md",
+                    "left": "md"
                   },
                   "margin": {
                     "linked": true,
-                    "top": "none",
-                    "right": "none",
-                    "bottom": "none",
-                    "left": "none"
+                    "top": "0px",
+                    "right": "0px",
+                    "bottom": "0px",
+                    "left": "0px"
                   }
                 },
                 "buttons": [
@@ -188,7 +189,7 @@
         "id": "contentLayout-mq4z4n9g-2ttwl",
         "kind": "contentLayout",
         "title": "",
-        "background": "#111111",
+        "background": "#ffffff",
         "backgroundMode": "full",
         "contentMode": "boxed",
         "colorScheme": "inherit",
@@ -213,7 +214,7 @@
                 "eyebrow": "Featured",
                 "title": "Ո՞ւմ համար է WebPages-ը",
                 "body": "WebPages-ը հարմար է ինչպես անհատների, այնպես էլ տարբեր ոլորտների բիզնեսների համար։Անկախ նրանից՝ ցանկանում եք ներկայացնել ձեր ծառայությունները, ստեղծել անձնական էջ, ընդունել հայտեր կամ գործարկել առցանց խանութ, կարող եք սկսել պատրաստի և պարզ փաթեթից։",
-                "buttonLabel": "Learn more",
+                "buttonLabel": "",
                 "buttonUrl": "/",
                 "carouselSettings": {
                   "variant": "default"
@@ -237,15 +238,7 @@
                 "buttonHoverTextColor": "#ffffff",
                 "buttonHoverBorderColor": "transparent",
                 "buttonHoverEffect": "lift",
-                "buttons": [
-                  {
-                    "id": "btn-mqgzx5wm-0",
-                    "label": "New Button",
-                    "url": "/",
-                    "target": "_self",
-                    "style": "primary"
-                  }
-                ]
+                "buttons": []
               }
             ],
             "rowTopMargin": "inherit"
@@ -1259,7 +1252,7 @@
         ]
       }
     ],
-    "updatedAt": "2026-06-21T14:24:54.994Z"
+    "updatedAt": "2026-06-21T16:26:50.379Z"
   },
   "shop": {
     "version": 1,
@@ -1322,18 +1315,33 @@
                 "columns": 4,
                 "gridLimit": 12,
                 "filterPosition": "left",
-                "cardStyle": "none",
-                "cardPreset": "princity-flat",
-                "panelStyle": "dark",
+                "cardStyle": "flat",
+                "cardPreset": "editorial",
+                "panelStyle": "princity",
                 "cardPadding": "small",
                 "imagePadding": "none",
-                "elementBackgroundMode": "transparent",
+                "elementBackgroundMode": "default",
                 "imageFit": "cover",
-                "imageRatio": "4:5",
+                "imageRatio": "3:4",
                 "addToCartDisplay": "button",
                 "addToCartSize": "compact",
                 "addToCartPosition": "below",
-                "addToCartStyle": "blue"
+                "addToCartStyle": "blue",
+                "visualStyle": {
+                  "card": {
+                    "cardPadding": "12px",
+                    "metaTransform": "none"
+                  }
+                },
+                "gridImageFrame": "none",
+                "borderRadius": 12,
+                "pagination": {
+                  "enabled": true,
+                  "perPage": 12,
+                  "mode": "pageNumbers",
+                  "infiniteScroll": false,
+                  "style": "minimal"
+                }
               }
             ]
           }
@@ -1390,7 +1398,7 @@
         "layoutRows": 1
       }
     ],
-    "updatedAt": "2026-06-15T18:27:52.250Z"
+    "updatedAt": "2026-06-21T20:10:48.270Z"
   },
   "client": {
     "version": 1,

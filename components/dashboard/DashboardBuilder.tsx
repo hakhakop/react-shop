@@ -36,9 +36,11 @@ import {
   SquareMousePointer,
   TextCursorInput,
   Truck,
-  Trash2,
   UserRound,
+  Trash2,
   X,
+  Sun,
+  Moon,
 } from "lucide-react";
 import Image from "next/image";
 import { useTheme } from "@/components/ThemeProvider";
@@ -730,13 +732,17 @@ const previewButtonsStyle = (
   gap?: string,
 ): CSSProperties => ({
   display: "flex",
-  width: "100%",
+  width: "fit-content",
+  maxWidth: "100%",
+  marginLeft: align === "center" || align === "right" ? "auto" : undefined,
+  marginRight: align === "center" ? "auto" : undefined,
   flexDirection: layout === "stacked" ? "column" : "row",
   flexWrap: "wrap",
-  gap: gap || "0.75rem",
+  "--button-group-gap": gap || "0.75rem",
+  gap: "var(--button-group-gap, 0.75rem)",
   justifyContent: align === "center" ? "center" : align === "right" ? "flex-end" : "flex-start",
   alignItems: "center",
-});
+} as CSSProperties);
 
 const rowInsertionPresets = [
   { key: "whole", label: "1/1", ratios: [1] },
@@ -1222,6 +1228,20 @@ export default function DashboardBuilder({
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [builderState, setBuilderState] = useState<BuilderState>(defaultState);
+  const [dashboardTheme, setDashboardTheme] = useState<"light" | "dark">("dark");
+
+  useEffect(() => {
+    const saved = localStorage.getItem("builder-dashboard-theme");
+    if (saved === "light" || saved === "dark") {
+      setDashboardTheme(saved as "light" | "dark");
+    }
+  }, []);
+
+  const handleToggleTheme = () => {
+    const nextTheme = dashboardTheme === "light" ? "dark" : "light";
+    setDashboardTheme(nextTheme);
+    localStorage.setItem("builder-dashboard-theme", nextTheme);
+  };
   const layoutScheme =
     builderState.design.colorScheme === "dark" ||
     (builderState.design.colorScheme === "auto" && theme === "dark")
@@ -5048,6 +5068,10 @@ export default function DashboardBuilder({
         setGlobalStylesTab("spacing");
         setGlobalSpacingFocus(scope);
       }}
+      onOpenGlobalTypographySettings={() => {
+        setSidebarTab("globalStyles");
+        setGlobalStylesTab("typography");
+      }}
       uploadSelectedLayoutBlockSlideImage={uploadSelectedLayoutBlockSlideImage}
       uploadSelectedSlideImage={uploadSelectedSlideImage}
     />
@@ -6467,6 +6491,15 @@ export default function DashboardBuilder({
         </button>
         <button
           type="button"
+          className="builder-theme-toggle"
+          onClick={handleToggleTheme}
+          title={`Switch to ${dashboardTheme === "light" ? "dark" : "light"} mode`}
+          aria-label={`Switch to ${dashboardTheme === "light" ? "dark" : "light"} mode`}
+        >
+          {dashboardTheme === "light" ? <Moon size={15} /> : <Sun size={15} />}
+        </button>
+        <button
+          type="button"
           onClick={() => {
             window.open(currentFrontendUrl, "_blank", "noopener,noreferrer");
           }}
@@ -6513,6 +6546,7 @@ export default function DashboardBuilder({
       }${sidebarResizing ? " is-sidebar-resizing" : ""} builder-preview-scheme-${
         builderState.design.colorScheme ?? "auto"
       }`}
+      data-theme={dashboardTheme}
       style={
         {
           "--builder-dashboard-bg":
@@ -8287,17 +8321,6 @@ function GlobalSpacingControl({
   const numericMatch = value ? value.trim().match(/^(\d+)px$/i) : null;
   const customNumericValue = numericMatch ? numericMatch[1] : "";
 
-  const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const val = event.target.value;
-    if (val === "custom") {
-      const defaultToken = getDefaultSpacingToken(context);
-      const currentPx = resolveBuilderSpacing(value ?? defaultToken, context).px;
-      onChange(`${currentPx > 0 ? currentPx : 32}px`);
-    } else {
-      onChange(val);
-    }
-  };
-
   const handleCustomNumericChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const num = event.target.value.replace(/\D/g, "");
     onChange(num ? `${num}px` : "0px");
@@ -8316,62 +8339,60 @@ function GlobalSpacingControl({
     selectValue = defaultVal;
   }
 
+  const handleChipClick = (presetValue: string) => {
+    if (presetValue === "custom") {
+      const currentPx = resolveBuilderSpacing(value ?? defaultVal, context).px;
+      onChange(`${currentPx > 0 ? currentPx : 32}px`);
+    } else {
+      onChange(presetValue);
+    }
+  };
+
   return (
-    <label className="builder-field spacing-control-wrapper" style={{ display: "block", marginBottom: "12px" }}>
-      <span style={{ display: "block", marginBottom: "4px", fontSize: "12px", fontWeight: 500, color: "var(--text-muted)" }}>{label}</span>
+    <div className="builder-field spacing-control-wrapper" style={{ display: "block", marginBottom: "12px" }}>
+      <span style={{ display: "block", marginBottom: "4px", fontSize: "12px", fontWeight: 500, color: "var(--builder-ui-muted)" }}>{label}</span>
       <div className="spacing-control-row" style={{ display: "flex", gap: "8px", alignItems: "center", width: "100%" }}>
-        <select
-          value={selectValue}
-          onChange={handleSelectChange}
-          style={{
-            flex: 1,
-            height: "36px",
-            padding: "0 10px",
-            borderRadius: "var(--builder-ui-radius-sm)",
-            border: "1px solid var(--builder-ui-border)",
-            background: "var(--builder-ui-panel-solid)",
-            color: "var(--builder-ui-text)",
-            font: "inherit",
-          }}
-        >
+        <div className="builder-style-chips-row">
           {presets.map((preset) => {
+            const isSelected = selectValue === preset;
             const px = BUILDER_SPACING_SCALE[preset];
             const labelName = TOKEN_LABELS[preset];
+            const displayLabel = `${labelName === "None" ? "None" : labelName} ${px}px`;
             return (
-              <option key={preset} value={preset}>
-                {labelName} ({px}px)
-              </option>
+              <button
+                key={preset}
+                type="button"
+                className={`builder-style-chip${isSelected ? " is-active" : ""}`}
+                onClick={() => handleChipClick(preset)}
+              >
+                {displayLabel}
+              </button>
             );
           })}
-          <option value="custom">Custom...</option>
-        </select>
-        
-        {isCustom && (
-          <div className="custom-spacing-input-wrapper" style={{ display: "flex", alignItems: "center", gap: "4px", width: "85px", flexShrink: 0 }}>
-            <input
-              type="text"
-              pattern="[0-9]*"
-              inputMode="numeric"
-              value={customNumericValue}
-              onChange={handleCustomNumericChange}
-              style={{
-                width: "100%",
-                height: "36px",
-                padding: "0 10px",
-                border: "1px solid var(--builder-ui-border)",
-                background: "var(--builder-ui-panel-solid)",
-                color: "var(--builder-ui-text)",
-                borderRadius: "var(--builder-ui-radius-sm)",
-                textAlign: "right",
-                font: "inherit",
-              }}
-              placeholder="0"
-            />
-            <span style={{ fontSize: "12px", color: "var(--text-muted)", opacity: 0.8 }}>px</span>
-          </div>
-        )}
+          <button
+            type="button"
+            className={`builder-style-chip builder-style-chip--custom${selectValue === "custom" ? " is-active" : ""}`}
+            onClick={() => handleChipClick("custom")}
+          >
+            <Sliders size={11} style={{ marginRight: "4px" }} />
+            Custom
+          </button>
+          {isCustom && (
+            <div className="custom-spacing-input-wrapper">
+              <input
+                type="text"
+                pattern="[0-9]*"
+                inputMode="numeric"
+                value={customNumericValue}
+                onChange={handleCustomNumericChange}
+                placeholder="0"
+              />
+              <span className="custom-spacing-unit">px</span>
+            </div>
+          )}
+        </div>
       </div>
-    </label>
+    </div>
   );
 }
 

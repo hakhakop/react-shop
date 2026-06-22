@@ -1,7 +1,7 @@
 "use client";
 
 import React, { ChangeEvent } from "react";
-import { GalleryHorizontal } from "lucide-react";
+import { GalleryHorizontal, Sliders } from "lucide-react";
 import {
   resolveBuilderSpacing,
   BUILDER_SPACING_SCALE,
@@ -52,20 +52,6 @@ export function SpacingControl({
   const numericMatch = value ? value.trim().match(/^(\d+)px$/i) : null;
   const customNumericValue = numericMatch ? numericMatch[1] : "";
 
-  const handleSelectChange = (event: ChangeEvent<HTMLSelectElement>) => {
-    const val = event.target.value;
-    if (val === "custom") {
-      const currentPx = resolveBuilderSpacing(
-        value ?? (allowInherit ? "inherit" : "sm"),
-        context,
-        inheritedValue,
-      ).px;
-      onChange(`${currentPx > 0 ? currentPx : 16}px`);
-    } else {
-      onChange(val);
-    }
-  };
-
   const handleCustomNumericChange = (event: ChangeEvent<HTMLInputElement>) => {
     const num = event.target.value.replace(/\D/g, "");
     onChange(num ? `${num}px` : "0px");
@@ -83,32 +69,59 @@ export function SpacingControl({
     selectValue = allowInherit ? "inherit" : "sm";
   }
 
+  const handleChipClick = (presetValue: string) => {
+    if (presetValue === "custom") {
+      const currentPx = resolveBuilderSpacing(
+        value ?? (allowInherit ? "inherit" : "sm"),
+        context,
+        inheritedValue,
+      ).px;
+      onChange(`${currentPx > 0 ? currentPx : 16}px`);
+    } else {
+      onChange(presetValue);
+    }
+  };
+
   return (
-    <label className="builder-field spacing-control-wrapper">
-      <span>{label}</span>
+    <div className="builder-field spacing-control-wrapper" id={id}>
+      <span className="builder-style-side-label-wrapper">{label}</span>
       <div className="spacing-control-row">
-        <select
-          id={id}
-          value={selectValue}
-          onChange={handleSelectChange}
-        >
+        <div className="builder-style-chips-row">
           {allowInherit && (
-            <option value="inherit">
-              Global ({resolveBuilderSpacing(undefined, context, inheritedValue).label})
-            </option>
+            <button
+              type="button"
+              className={`builder-style-chip${selectValue === "inherit" ? " is-active" : ""}`}
+              onClick={() => handleChipClick("inherit")}
+              title={`Inherit global: ${resolveBuilderSpacing(undefined, context, inheritedValue).label}`}
+            >
+              Global
+            </button>
           )}
           {presets.map((preset) => {
+            const isSelected = selectValue === preset;
             const px = BUILDER_SPACING_SCALE[preset];
             const labelName = TOKEN_LABELS[preset];
+            const displayLabel = `${labelName === "None" ? "None" : labelName} ${px}px`;
             return (
-              <option key={preset} value={preset}>
-                {labelName} ({px}px)
-              </option>
+              <button
+                key={preset}
+                type="button"
+                className={`builder-style-chip${isSelected ? " is-active" : ""}`}
+                onClick={() => handleChipClick(preset)}
+              >
+                {displayLabel}
+              </button>
             );
           })}
-          <option value="custom">Custom...</option>
-        </select>
-        
+          <button
+            type="button"
+            className={`builder-style-chip builder-style-chip--custom${selectValue === "custom" ? " is-active" : ""}`}
+            onClick={() => handleChipClick("custom")}
+          >
+            <Sliders size={11} style={{ marginRight: "4px" }} />
+            Custom
+          </button>
+        </div>
         {isCustom && (
           <div className="custom-spacing-input-wrapper">
             <input
@@ -119,11 +132,11 @@ export function SpacingControl({
               onChange={handleCustomNumericChange}
               placeholder="0"
             />
-            <span>px</span>
+            <span className="custom-spacing-unit">px</span>
           </div>
         )}
       </div>
-    </label>
+    </div>
   );
 }
 

@@ -83,12 +83,13 @@ export default function ButtonStyleOverridesPanel() {
               })
             }
           >
-            <option value="0.25rem">Extra tight</option>
+            <option value="0.25rem">Touching</option>
             <option value="0.5rem">Tight</option>
             <option value="0.75rem">Default</option>
-            <option value="1rem">Comfortable</option>
-            <option value="1.5rem">Spacious</option>
-            <option value="2rem">Wide</option>
+            <option value="1.5rem">Comfortable</option>
+            <option value="3rem">Spacious</option>
+            <option value="5rem">Wide</option>
+            <option value="8rem">Separated</option>
           </select>
         </label>
 

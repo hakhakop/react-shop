@@ -53,11 +53,13 @@ export default function ElementAlignPanel() {
                 <InspectorChoiceGroup
                   value={block.buttonGap ?? "0.75rem"}
                   options={[
+                    { label: "Touching", value: "0.25rem" },
                     { label: "Tight", value: "0.5rem" },
                     { label: "Default", value: "0.75rem" },
-                    { label: "Comfort", value: "1rem" },
-                    { label: "Spacious", value: "1.5rem" },
-                    { label: "Wide", value: "2rem" },
+                    { label: "Comfort", value: "1.5rem" },
+                    { label: "Spacious", value: "3rem" },
+                    { label: "Wide", value: "5rem" },
+                    { label: "Separated", value: "8rem" },
                   ]}
                   onChange={(value) =>
                     updateSelectedLayoutBlockByKey({
