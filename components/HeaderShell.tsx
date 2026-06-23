@@ -338,6 +338,8 @@ export default async function HeaderShell({ layoutOverride }: HeaderShellProps) 
                 <HeaderNav
                   items={itemsToRender}
                   presentationById={menuPresentation}
+                  categories={<CategoryMegaMenu />}
+                  serviceHomepageMode={serviceHomepageMode}
                 />
                 {renderCategoriesMega()}
               </div>
@@ -368,6 +370,8 @@ export default async function HeaderShell({ layoutOverride }: HeaderShellProps) 
                   <HeaderNav
                     items={itemsToRender}
                     presentationById={menuPresentation}
+                    categories={<CategoryMegaMenu />}
+                    serviceHomepageMode={serviceHomepageMode}
                   />
                   {renderCategoriesMega()}
                 </div>
@@ -406,6 +410,8 @@ export default async function HeaderShell({ layoutOverride }: HeaderShellProps) 
                   <HeaderNav
                     items={itemsToRender}
                     presentationById={menuPresentation}
+                    categories={<CategoryMegaMenu />}
+                    serviceHomepageMode={serviceHomepageMode}
                   />
                   {renderCategoriesMega()}
                 </div>
@@ -431,6 +437,8 @@ export default async function HeaderShell({ layoutOverride }: HeaderShellProps) 
               <HeaderNav
                 items={itemsToRender}
                 presentationById={menuPresentation}
+                categories={<CategoryMegaMenu />}
+                serviceHomepageMode={serviceHomepageMode}
               />
               {renderCategoriesMega()}
             </div>
@@ -474,6 +482,8 @@ export default async function HeaderShell({ layoutOverride }: HeaderShellProps) 
               <HeaderNav
                 items={itemsToRender}
                 presentationById={menuPresentation}
+                categories={<CategoryMegaMenu />}
+                serviceHomepageMode={serviceHomepageMode}
               />
               {renderCategoriesMega()}
             </div>

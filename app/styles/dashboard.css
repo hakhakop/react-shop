@@ -7939,6 +7939,16 @@ body[data-storefront-preset="princity"]
   overflow: visible;
 }
 
+.builder-preview-viewport-container {
+  width: var(--builder-preview-canvas-width, 100%) !important;
+  max-width: 100% !important;
+  margin: 0 auto !important;
+  transform: scale(var(--builder-preview-scale, 1)) !important;
+  transform-origin: top center !important;
+  transition: transform 0.2s ease, width 0.2s ease !important;
+  position: relative !important;
+}
+
 .builder-preview-header-slot {
   width: 100%;
   container-type: inline-size;
