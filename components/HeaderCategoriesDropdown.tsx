@@ -16,7 +16,12 @@ export default function HeaderCategoriesDropdown({
   children,
 }: HeaderCategoriesDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [isHoverEnabled, setIsHoverEnabled] = useState(false);
   const rootRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    setIsHoverEnabled(window.matchMedia("(hover: hover)").matches);
+  }, []);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -52,8 +57,8 @@ export default function HeaderCategoriesDropdown({
     <div
       ref={rootRef}
       className={`site-header-categories${isOpen ? " is-open" : ""}`}
-      onMouseEnter={() => setIsOpen(true)}
-      onMouseLeave={() => setIsOpen(false)}
+      onMouseEnter={() => isHoverEnabled && setIsOpen(true)}
+      onMouseLeave={() => isHoverEnabled && setIsOpen(false)}
     >
       <button
         type="button"

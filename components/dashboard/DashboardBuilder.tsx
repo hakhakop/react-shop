@@ -1484,9 +1484,25 @@ export default function DashboardBuilder({
     const shell = previewShellRef.current;
     if (!shell) return;
     const shellWidth = shell.clientWidth || window.innerWidth;
-    setPreviewCanvasWidth(shellWidth);
-    setPreviewScale(1);
-  }, []);
+
+    let targetWidth = shellWidth;
+    if (device === "tablet") {
+      targetWidth = 820;
+    } else if (device === "mobile") {
+      targetWidth = 390;
+    }
+
+    const padding = device === "desktop" ? 0 : 48;
+    const availableWidth = Math.max(240, shellWidth - padding);
+
+    let scale = 1;
+    if (targetWidth > availableWidth) {
+      scale = availableWidth / targetWidth;
+    }
+
+    setPreviewCanvasWidth(targetWidth);
+    setPreviewScale(scale);
+  }, [device]);
 
   useEffect(() => {
     const shell = previewShellRef.current;
@@ -7211,16 +7227,23 @@ export default function DashboardBuilder({
           style={
             {
               "--builder-preview-shell-bg": previewPageBackground,
-              "--builder-preview-scale": previewScale,
-              "--builder-preview-canvas-width": `${previewCanvasWidth}px`,
             } as CSSProperties
           }
         >
           <div
-            ref={previewHeaderSlotRef}
-            className="builder-preview-header-slot"
-          />
-          <ProductCategoryFilterProvider key={builderState.page}>
+            className="builder-preview-viewport-container"
+            style={
+              {
+                "--builder-preview-scale": previewScale,
+                "--builder-preview-canvas-width": `${previewCanvasWidth}px`,
+              } as CSSProperties
+            }
+          >
+            <div
+              ref={previewHeaderSlotRef}
+              className="builder-preview-header-slot"
+            />
+            <ProductCategoryFilterProvider key={builderState.page}>
           <PreviewCanvas
             sections={builderState.sections}
             page={builderState.page}
@@ -7289,6 +7312,7 @@ export default function DashboardBuilder({
             onCycleSectionSpacing={cycleSectionSpacing}
           />
           </ProductCategoryFilterProvider>
+          </div>
         </div>
       </main>
 

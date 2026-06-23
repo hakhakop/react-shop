@@ -320,6 +320,12 @@ export default function HeaderNav({
   const rawPathname = usePathname();
   const dashboardMode = rawPathname === "/dashboard";
   const [dashboardPageKey, setDashboardPageKey] = useState<string | null>(null);
+  const [isMobileOpen, setIsMobileOpen] = useState(false);
+
+  // Close mobile navigation panel when path changes
+  useEffect(() => {
+    setIsMobileOpen(false);
+  }, [rawPathname]);
 
   useEffect(() => {
     if (!dashboardMode) {
@@ -360,8 +366,25 @@ export default function HeaderNav({
     : normalizePath(rawPathname || "/");
 
   return (
-    <nav className="site-header-nav">
-      {renderMenuItems(items, currentPath, dashboardMode, presentationById)}
-    </nav>
+    <div className={`site-header-nav-container${isMobileOpen ? " is-open" : ""}`}>
+      <button
+        type="button"
+        className="site-header-mobile-menu-toggle"
+        onClick={() => setIsMobileOpen((prev) => !prev)}
+        aria-expanded={isMobileOpen}
+        aria-label="Toggle navigation menu"
+      >
+        <div className="mobile-menu-grid-dot-wrap">
+          <span className="mobile-menu-grid-dot" />
+          <span className="mobile-menu-grid-dot" />
+          <span className="mobile-menu-grid-dot" />
+          <span className="mobile-menu-grid-dot" />
+        </div>
+      </button>
+
+      <nav className="site-header-nav">
+        {renderMenuItems(items, currentPath, dashboardMode, presentationById)}
+      </nav>
+    </div>
   );
 }
