@@ -2388,6 +2388,12 @@ body[data-storefront-preset="princity"] .category-mega-card,
   transform: scale(1.1);
 }
 
+/* Default styles for Mobile Drawer (Hidden on Desktop/Tablet by default) */
+.site-header-mobile-drawer-backdrop,
+.site-header-mobile-drawer {
+  display: none !important;
+}
+
 @container site-header-container (max-width: 640px) {
   /* Set center container to static so absolute toggle positions against header wrapper */
   #site-header-pill .site-header-main-center,
@@ -2492,6 +2498,7 @@ body[data-storefront-preset="princity"] .category-mega-card,
   
   /* Backdrop */
   .site-header-mobile-drawer-backdrop {
+    display: block !important;
     position: fixed !important;
     inset: 0 !important;
     background: rgba(0, 0, 0, 0.4) !important;
