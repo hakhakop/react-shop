@@ -14,6 +14,8 @@
   position: sticky;
   top: 0;
   z-index: 20;
+  container-type: inline-size;
+  container-name: site-header-container;
 }
 
 /* --- PILL ON SCROLL HEADER (layout = pill / princity) --- */
@@ -2386,7 +2388,7 @@ body[data-storefront-preset="princity"] .category-mega-card,
   transform: scale(1.1);
 }
 
-@media (max-width: 640px) {
+@container site-header-container (max-width: 640px) {
   /* Set center container to static so absolute toggle positions against header wrapper */
   #site-header-pill .site-header-main-center,
   .site-header-princity-center {
@@ -2485,7 +2487,7 @@ body[data-storefront-preset="princity"] .category-mega-card,
     top: calc(100% + 8px) !important;
     right: -10px !important;
     left: auto !important;
-    width: calc(100vw - 32px) !important;
+    width: calc(100cqw - 32px) !important;
     max-width: 300px !important;
     min-width: 0 !important;
     max-height: 80vh !important;
@@ -2635,7 +2637,7 @@ body[data-storefront-preset="princity"] .category-mega-card,
   }
 }
 
-@media (max-width: 390px) {
+@container site-header-container (max-width: 390px) {
   /* Compress action icons gap & size slightly for 390px viewports */
   .site-header-actions {
     gap: 4px !important;
