@@ -2370,7 +2370,8 @@ body[data-storefront-preset="princity"] .category-mega-card,
 .site-header[data-header-text-mode="dark"]:not([data-scrolled="true"]) .mobile-menu-grid-dot {
   background: #111827 !important;
 }
-[data-theme="dark"] .mobile-menu-grid-dot {
+[data-theme="dark"] .mobile-menu-grid-dot,
+.dark .mobile-menu-grid-dot {
   background: #f3f4f6 !important;
 }
 
