@@ -629,9 +629,7 @@ body {
 
 /* 🌙 Dark theme overrides */
 
-[data-theme="dark"] body,
-.dark body,
-body.dark {
+[data-theme="dark"] body {
   background: radial-gradient(circle at top left, #020617, #020617);
   color: #e5e7eb;
   --header-bg: rgba(15, 23, 42, 0.96);
