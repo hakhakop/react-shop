@@ -10,6 +10,7 @@ import {
   type ReactNode,
 } from "react";
 import { useWishlist } from "./WishlistProvider";
+import { useCart } from "./CartProvider";
 import { useSearch } from "./SearchProvider";
 import ThemeToggle from "./ThemeToggle";
 import HeaderAccountButton from "./HeaderAccountButton";
@@ -330,6 +331,7 @@ export default function HeaderNav({
   const [dashboardPageKey, setDashboardPageKey] = useState<string | null>(null);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const { totalCount: wishlistCount } = useWishlist();
+  const { totalCount: cartCount, openMiniCart } = useCart();
   const { openSearch } = useSearch();
 
   // Close mobile navigation panel when path changes
@@ -402,97 +404,107 @@ export default function HeaderNav({
         onClick={() => setIsMobileOpen(false)}
       />
 
-      <div className={`site-header-mobile-drawer${isMobileOpen ? " is-open" : ""}`}>
-        {/* 1. Header (Menu / close) */}
-        <div className="mobile-drawer-header">
-          <span className="mobile-drawer-title">Menu</span>
-          <button
-            type="button"
-            className="mobile-drawer-close"
-            onClick={() => setIsMobileOpen(false)}
-            aria-label="Close menu"
-          >
-            <svg viewBox="0 0 20 20" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
-              <path d="M15,15 L5,5" />
-              <path d="M15,5 L5,15" />
-            </svg>
-          </button>
-        </div>
+      <div className={`site-header-mobile-drawer-wrapper${isMobileOpen ? " is-open" : ""}`}>
+        <div className="site-header-mobile-drawer">
+          {/* 1. Header (Menu / close) */}
+          <div className="mobile-drawer-header">
+            <span className="mobile-drawer-title">Menu</span>
+            <button
+              type="button"
+              className="mobile-drawer-close"
+              onClick={() => setIsMobileOpen(false)}
+              aria-label="Close menu"
+            >
+              <svg viewBox="0 0 20 20" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+                <path d="M15,15 L5,5" />
+                <path d="M15,5 L5,15" />
+              </svg>
+            </button>
+          </div>
 
-        {/* 2. Search Shortcut */}
-        <div className="mobile-drawer-search">
-          <button
-            type="button"
-            className="mobile-drawer-search-btn"
-            onClick={() => {
-              setIsMobileOpen(false);
-              openSearch();
-            }}
-          >
-            <svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
-              <circle cx="9" cy="9" r="6" />
-              <path d="M14,14 L18,18" />
-            </svg>
-            <span>Search products...</span>
-          </button>
-        </div>
+          {/* 2. Top Actions (Account, Wishlist, Cart, Theme Toggle) */}
+          <div className="mobile-drawer-top-actions">
+            <div className="mobile-drawer-top-action-wrapper" onClick={() => setIsMobileOpen(false)}>
+              <HeaderAccountButton />
+            </div>
 
-        <div className="mobile-drawer-scrollable-content">
-          {/* 3. Main Navigation Links */}
-          <div className="mobile-drawer-section mobile-drawer-nav-links">
-            <span className="mobile-drawer-section-title">Navigation</span>
-            <div className="mobile-drawer-nav-items">
-              {renderMenuItems(items, currentPath, dashboardMode, presentationById)}
+            <Link
+              href="/wishlist"
+              className="mobile-drawer-top-action-btn"
+              onClick={() => setIsMobileOpen(false)}
+              aria-label={`Wishlist (${wishlistCount} items)`}
+            >
+              <div className="mobile-drawer-top-action-icon-wrap">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                </svg>
+                {wishlistCount > 0 && (
+                  <span className="mobile-drawer-top-action-badge">{wishlistCount}</span>
+                )}
+              </div>
+            </Link>
+
+            <button
+              type="button"
+              className="mobile-drawer-top-action-btn"
+              onClick={() => {
+                setIsMobileOpen(false);
+                openMiniCart();
+              }}
+              aria-label={`Cart (${cartCount} items)`}
+            >
+              <div className="mobile-drawer-top-action-icon-wrap">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="9" cy="21" r="1" />
+                  <circle cx="20" cy="21" r="1" />
+                  <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+                </svg>
+                {cartCount > 0 && (
+                  <span className="mobile-drawer-top-action-badge">{cartCount}</span>
+                )}
+              </div>
+            </button>
+
+            <div className="mobile-drawer-top-action-wrapper">
+              <ThemeToggle size="md" />
             </div>
           </div>
 
-          {/* 4. Categories */}
-          {categories && (
-            <div className="mobile-drawer-section mobile-drawer-categories">
-              <span className="mobile-drawer-section-title">Categories</span>
-              <div className="mobile-drawer-categories-wrap">
-                {categories}
+          <div className="mobile-drawer-scrollable-content">
+            {/* 3. Main Navigation Links */}
+            <div className="mobile-drawer-section mobile-drawer-nav-links">
+              <span className="mobile-drawer-section-title">Navigation</span>
+              <div className="mobile-drawer-nav-items">
+                {renderMenuItems(items, currentPath, dashboardMode, presentationById)}
+                {serviceHomepageMode && (
+                  <div className="site-header-nav-item">
+                    <Link
+                      href="/client"
+                      className="site-header-nav-link mobile-drawer-builder-direct-link"
+                      onClick={() => setIsMobileOpen(false)}
+                    >
+                      <span className="site-header-nav-icon">
+                        <svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+                          <rect x="2" y="2" width="16" height="16" rx="2" />
+                          <path d="M6,6 L14,6 M6,10 L14,10 M6,14 L10,14" />
+                        </svg>
+                      </span>
+                      <span>Start Builder</span>
+                    </Link>
+                  </div>
+                )}
               </div>
             </div>
-          )}
 
-          {/* 5. Account / Wishlist / Builder */}
-          <div className="mobile-drawer-section mobile-drawer-actions">
-            <span className="mobile-drawer-section-title">Account & Utilities</span>
-            <div className="mobile-drawer-actions-list">
-              <div className="mobile-drawer-account-wrap">
-                <HeaderAccountButton />
+            {/* 4. Categories */}
+            {categories && (
+              <div className="mobile-drawer-section mobile-drawer-categories">
+                <span className="mobile-drawer-section-title">Categories</span>
+                <div className="mobile-drawer-categories-wrap">
+                  {categories}
+                </div>
               </div>
-              
-              <Link href="/wishlist" className="mobile-drawer-wishlist-link">
-                <span className="mobile-drawer-action-icon">
-                  <svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
-                    <path d="M10,4 C10,4 8.1,2 5.74,2 C3.38,2 1,3.55 1,6.73 C1,8.84 2.67,10.44 2.67,10.44 L10,18 L17.33,10.44 C17.33,10.44 19,8.84 19,6.73 C19,3.55 16.62,2 14.26,2 C11.9,2 10,4 10,4 L10,4 Z" />
-                  </svg>
-                </span>
-                <span>My Wishlist ({wishlistCount})</span>
-              </Link>
-
-              {serviceHomepageMode && (
-                <Link href="/client" className="mobile-drawer-builder-link">
-                  <span className="mobile-drawer-action-icon">
-                    <svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
-                      <rect x="2" y="2" width="16" height="16" rx="2" />
-                      <path d="M6,6 L14,6 M6,10 L14,10 M6,14 L10,14" />
-                    </svg>
-                  </span>
-                  <span>Start Builder</span>
-                </Link>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* 6. Theme Toggle (Footer) */}
-        <div className="mobile-drawer-footer">
-          <div className="mobile-drawer-theme-control">
-            <span className="mobile-drawer-theme-label">Theme</span>
-            <ThemeToggle variant="ghost" size="sm" />
+            )}
           </div>
         </div>
       </div>
