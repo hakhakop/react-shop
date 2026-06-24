@@ -2427,7 +2427,8 @@ body[data-storefront-preset="princity"] .category-mega-card,
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05) !important;
   }
 
-  [data-theme="dark"] .site-header:has(.site-header-nav-container.is-open) {
+  [data-theme="dark"] .site-header:has(.site-header-nav-container.is-open),
+  .dark .site-header:has(.site-header-nav-container.is-open) {
     background: rgba(15, 23, 42, 0.98) !important;
     border-color: rgba(255, 255, 255, 0.08) !important;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3) !important;
@@ -2437,7 +2438,8 @@ body[data-storefront-preset="princity"] .category-mega-card,
     background: var(--surface-main, #ffffff) !important;
     border-bottom-color: var(--border-soft, rgba(17, 17, 17, 0.12)) !important;
   }
-  [data-theme="dark"] body[data-storefront-preset="princity"] .site-header:has(.site-header-nav-container.is-open) {
+  [data-theme="dark"] body[data-storefront-preset="princity"] .site-header:has(.site-header-nav-container.is-open),
+  .dark body[data-storefront-preset="princity"] .site-header:has(.site-header-nav-container.is-open) {
     background: var(--surface-main, #0b0b0b) !important;
     border-color: rgba(255, 255, 255, 0.08) !important;
   }
@@ -2446,7 +2448,8 @@ body[data-storefront-preset="princity"] .category-mega-card,
     background: var(--header-bg, #ffffff) !important;
     border-color: var(--header-border, rgba(229, 231, 235, 0.8)) !important;
   }
-  [data-theme="dark"] .site-header:has(.site-header-nav-container.is-open) #site-header-pill .site-header-pill-inner {
+  [data-theme="dark"] .site-header:has(.site-header-nav-container.is-open) #site-header-pill .site-header-pill-inner,
+  .dark .site-header:has(.site-header-nav-container.is-open) #site-header-pill .site-header-pill-inner {
     background: rgba(15, 23, 42, 0.98) !important;
     border-color: rgba(255, 255, 255, 0.08) !important;
   }
@@ -2464,10 +2467,14 @@ body[data-storefront-preset="princity"] .category-mega-card,
   /* Force light contrast on dark theme header elements when drawer is open */
   [data-theme="dark"] .site-header:has(.site-header-nav-container.is-open) .site-header-brand span,
   [data-theme="dark"] .site-header:has(.site-header-nav-container.is-open) .site-header-action-pill,
-  [data-theme="dark"] .site-header:has(.site-header-nav-container.is-open) .theme-toggle-btn {
+  [data-theme="dark"] .site-header:has(.site-header-nav-container.is-open) .theme-toggle-btn,
+  .dark .site-header:has(.site-header-nav-container.is-open) .site-header-brand span,
+  .dark .site-header:has(.site-header-nav-container.is-open) .site-header-action-pill,
+  .dark .site-header:has(.site-header-nav-container.is-open) .theme-toggle-btn {
     color: #ffffff !important;
   }
-  [data-theme="dark"] .site-header:has(.site-header-nav-container.is-open) .mobile-menu-grid-dot {
+  [data-theme="dark"] .site-header:has(.site-header-nav-container.is-open) .mobile-menu-grid-dot,
+  .dark .site-header:has(.site-header-nav-container.is-open) .mobile-menu-grid-dot {
     background: #ffffff !important;
   }
 }
@@ -2571,7 +2578,8 @@ body[data-storefront-preset="princity"] .category-mega-card,
     border-bottom: 1px solid var(--header-border, rgba(229, 231, 235, 0.8)) !important;
   }
 
-  [data-theme="dark"] .site-header:has(.site-header-nav-container.is-open) #site-header-pill .site-header-pill-inner {
+  [data-theme="dark"] .site-header:has(.site-header-nav-container.is-open) #site-header-pill .site-header-pill-inner,
+  .dark .site-header:has(.site-header-nav-container.is-open) #site-header-pill .site-header-pill-inner {
     background: rgba(15, 23, 42, 0.98) !important;
     border-bottom-color: rgba(255, 255, 255, 0.08) !important;
   }
@@ -2612,7 +2620,8 @@ body[data-storefront-preset="princity"] .category-mega-card,
     border-bottom: 1px solid var(--border-soft, rgba(17, 17, 17, 0.12)) !important;
   }
 
-  [data-theme="dark"] .site-header:has(.site-header-nav-container.is-open) .site-header-princity-inner {
+  [data-theme="dark"] .site-header:has(.site-header-nav-container.is-open) .site-header-princity-inner,
+  .dark .site-header:has(.site-header-nav-container.is-open) .site-header-princity-inner {
     background: var(--surface-main, #0b0b0b) !important;
     border-bottom-color: rgba(255, 255, 255, 0.08) !important;
   }
