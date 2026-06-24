@@ -2385,7 +2385,6 @@ body[data-storefront-preset="princity"] .category-mega-card,
 
 .site-header .site-header-nav-container.is-open .mobile-menu-grid-dot {
   border-radius: 25% !important; /* Morph from circle to rounded diamond */
-  background: #ffffff !important;
 }
 
 /* Disperse dots outwards to make the grid expansion animation feel lively and distinct */
@@ -2458,12 +2457,18 @@ body[data-storefront-preset="princity"] .category-mega-card,
   .site-header:has(.site-header-nav-container.is-open) .theme-toggle-btn {
     color: var(--text-main, #111827) !important;
   }
+  .site-header:has(.site-header-nav-container.is-open) .mobile-menu-grid-dot {
+    background: var(--text-main, #111827) !important;
+  }
 
   /* Force light contrast on dark theme header elements when drawer is open */
   [data-theme="dark"] .site-header:has(.site-header-nav-container.is-open) .site-header-brand span,
   [data-theme="dark"] .site-header:has(.site-header-nav-container.is-open) .site-header-action-pill,
   [data-theme="dark"] .site-header:has(.site-header-nav-container.is-open) .theme-toggle-btn {
     color: #ffffff !important;
+  }
+  [data-theme="dark"] .site-header:has(.site-header-nav-container.is-open) .mobile-menu-grid-dot {
+    background: #ffffff !important;
   }
 }
 
