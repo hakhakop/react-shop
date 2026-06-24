@@ -2383,8 +2383,9 @@ body[data-storefront-preset="princity"] .category-mega-card,
   background-color: rgba(255, 255, 255, 0.08);
 }
 
-.site-header-nav-container.is-open .mobile-menu-grid-dot {
+.site-header .site-header-nav-container.is-open .mobile-menu-grid-dot {
   border-radius: 25% !important; /* Morph from circle to rounded diamond */
+  background: #ffffff !important;
 }
 
 /* Disperse dots outwards to make the grid expansion animation feel lively and distinct */
