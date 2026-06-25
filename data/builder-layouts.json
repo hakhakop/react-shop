@@ -100,7 +100,7 @@
                 "title": "[Ընտրեք փաթեթը |տրամադրեք տեղեկությունը| ձեր կայքը պատրաստ է]",
                 "body": "Կայք, հոսթինգ և սպասարկում՝ մեկ պարզ փաթեթով",
                 "buttonLabel": "Բաժանորդագրվել",
-                "buttonUrl": "/",
+                "buttonUrl": "https://webpages.am/#packages",
                 "carouselSettings": {
                   "variant": "default"
                 },
@@ -163,15 +163,7 @@
                     "left": "0px"
                   }
                 },
-                "buttons": [
-                  {
-                    "id": "btn-mqni2j4d-0",
-                    "label": "New Button",
-                    "url": "/",
-                    "target": "_self",
-                    "style": "primary"
-                  }
-                ]
+                "buttons": []
               }
             ]
           }
@@ -266,6 +258,16 @@
                 "gridItems": [
                   {
                     "id": "grid-item-mq4zvogn",
+                    "eyebrow": "01",
+                    "title": "Բժշկական կենտրոն",
+                    "meta": "Meta",
+                    "text": "<p>Լայն typography, CTA, proof cards և slider-ային ներկայացումներ։</p><p></p><p></p>",
+                    "buttonLabel": "Learn more",
+                    "buttonUrl": "/",
+                    "buttonStyle": "primary"
+                  },
+                  {
+                    "id": "grid-mqtkrux2",
                     "eyebrow": "01",
                     "title": "Բժշկական կենտրոն",
                     "meta": "Meta",
@@ -550,11 +552,11 @@
                     "left": "sm"
                   },
                   "margin": {
-                    "top": "medium",
-                    "right": "medium",
-                    "bottom": "medium",
-                    "left": "medium",
-                    "linked": true
+                    "top": "none",
+                    "right": "none",
+                    "bottom": "none",
+                    "left": "none",
+                    "linked": false
                   },
                   "card": {
                     "titleWeight": "800",
@@ -1252,7 +1254,7 @@
         ]
       }
     ],
-    "updatedAt": "2026-06-21T16:26:50.379Z"
+    "updatedAt": "2026-06-25T14:09:24.697Z"
   },
   "shop": {
     "version": 1,
