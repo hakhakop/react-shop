@@ -2452,25 +2452,6 @@ body[data-storefront-preset="princity"] .category-mega-card,
     border-color: rgba(255, 255, 255, 0.08) !important;
   }
 
-  /* Force dark contrast on light theme header elements when drawer is open */
-  .site-header:has(.site-header-nav-container.is-open) .site-header-brand span,
-  .site-header:has(.site-header-nav-container.is-open) .site-header-action-pill,
-  .site-header:has(.site-header-nav-container.is-open) .theme-toggle-btn {
-    color: var(--text-main, #111827) !important;
-  }
-  .site-header:has(.site-header-nav-container.is-open) .mobile-menu-grid-dot {
-    background: var(--text-main, #111827) !important;
-  }
-
-  /* Force light contrast on dark theme header elements when drawer is open */
-  [data-theme="dark"] .site-header:has(.site-header-nav-container.is-open) .site-header-brand span,
-  [data-theme="dark"] .site-header:has(.site-header-nav-container.is-open) .site-header-action-pill,
-  [data-theme="dark"] .site-header:has(.site-header-nav-container.is-open) .theme-toggle-btn {
-    color: #ffffff !important;
-  }
-  [data-theme="dark"] .site-header:has(.site-header-nav-container.is-open) .mobile-menu-grid-dot {
-    background: #ffffff !important;
-  }
 }
 
 @container site-header-container (max-width: 640px) {
