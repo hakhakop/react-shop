@@ -3658,10 +3658,15 @@ ul.is-icon-gradient-cycle li:nth-child(3n) svg {
 
 /* Storefront: Force full bleed and center horizontally without transforms to allow GSAP pinning */
 .shop-builder-section:has(.shop-builder-column-block--scroll-pinned):not(.builder-preview-section),
+.shop-builder-section:has(.scroll-pinned-section):not(.builder-preview-section),
 .shop-builder-section:has(.shop-builder-column-block--scroll-pinned):not(.builder-preview-section) .shop-builder-section-content,
+.shop-builder-section:has(.scroll-pinned-section):not(.builder-preview-section) .shop-builder-section-content,
 .shop-builder-section:has(.shop-builder-column-block--scroll-pinned):not(.builder-preview-section) .shop-builder-content-layout-grid,
+.shop-builder-section:has(.scroll-pinned-section):not(.builder-preview-section) .shop-builder-content-layout-grid,
 .shop-builder-section:has(.shop-builder-column-block--scroll-pinned):not(.builder-preview-section) article.w-full,
-.shop-builder-section:has(.shop-builder-column-block--scroll-pinned):not(.builder-preview-section) .shop-builder-column-block--scroll-pinned {
+.shop-builder-section:has(.scroll-pinned-section):not(.builder-preview-section) article.w-full,
+.shop-builder-section:has(.shop-builder-column-block--scroll-pinned):not(.builder-preview-section) .shop-builder-column-block--scroll-pinned,
+.shop-builder-section:has(.scroll-pinned-section):not(.builder-preview-section) .scroll-pinned-section {
   padding-top: 0 !important;
   padding-bottom: 0 !important;
   padding-left: 0 !important;
@@ -3681,13 +3686,16 @@ ul.is-icon-gradient-cycle li:nth-child(3n) svg {
 }
 
 /* Storefront root section specific centering and full width */
-.shop-builder-section:has(.shop-builder-column-block--scroll-pinned):not(.builder-preview-section) {
+.shop-builder-section:has(.shop-builder-column-block--scroll-pinned):not(.builder-preview-section),
+.shop-builder-section:has(.scroll-pinned-section):not(.builder-preview-section) {
   margin-left: calc(50% - 50vw) !important;
   width: 100vw !important;
 }
 
 /* Dashboard Preview: Keep container-query based full bleed using standard transforms */
-.builder-preview-section:has(.shop-builder-column-block--scroll-pinned) {
+.builder-preview-section:has(.shop-builder-column-block--scroll-pinned),
+.builder-preview-section:has(.scroll-pinned-section),
+.builder-preview-section.builder-preview-scrollPinnedDemo {
   padding-top: 0 !important;
   padding-bottom: 0 !important;
   padding-left: 0 !important;
@@ -3699,10 +3707,52 @@ ul.is-icon-gradient-cycle li:nth-child(3n) svg {
   transform: translateX(-50%) !important;
 }
 
-.builder-preview-section:has(.shop-builder-column-block--scroll-pinned) .shop-builder-section-content {
+.builder-preview-section:has(.shop-builder-column-block--scroll-pinned) .shop-builder-section-content,
+.builder-preview-section:has(.scroll-pinned-section) .shop-builder-section-content,
+.builder-preview-section.builder-preview-scrollPinnedDemo .shop-builder-section-content {
   max-width: none !important;
   width: 100% !important;
   gap: 0 !important;
+}
+
+/* --- Scroll Pinned Mobile Responsive Overrides --- */
+@media (max-width: 767px) {
+  .scroll-pinned-section {
+    min-height: 100svh;
+    padding-top: clamp(24px, 6vw, 48px);
+    padding-bottom: clamp(24px, 6vw, 48px);
+  }
+
+  .scroll-pinned-section .container {
+    gap: 24px !important;
+    grid-template-columns: 1fr !important;
+    min-height: auto !important;
+  }
+
+  /* Reduce title size on mobile */
+  .scroll-pinned-section h2 {
+    font-size: clamp(1.5rem, 7vw, 2.25rem) !important;
+  }
+
+  /* Reduce card title size */
+  .scroll-pinned-card-item h3 {
+    font-size: 1.25rem !important;
+  }
+
+  /* Cards take full width on mobile */
+  .scroll-pinned-card-item {
+    max-width: 100% !important;
+  }
+
+  /* Reduce image placeholder height on mobile */
+  .scroll-pinned-card-fallback-image {
+    height: 80px !important;
+  }
+
+  /* Right panel fills width on mobile */
+  .scroll-pinned-section [class*="md:col-span-7"] {
+    min-height: 320px !important;
+  }
 }
 
 /* ==========================================
@@ -4405,9 +4455,11 @@ ul.is-icon-gradient-cycle li:nth-child(3n) svg {
     left: auto !important;
     right: auto !important;
   }
-  .shop-builder-section:has(.shop-builder-column-block--scroll-pinned):not(.builder-preview-section) {
-    width: 100vw !important;
+  .shop-builder-section:has(.shop-builder-column-block--scroll-pinned):not(.builder-preview-section),
+  .shop-builder-section:has(.scroll-pinned-section):not(.builder-preview-section) {
+    width: auto !important;
     margin-left: -14px !important;
+    margin-right: -14px !important;
     transform: none !important;
   }
 }
@@ -4427,9 +4479,11 @@ ul.is-icon-gradient-cycle li:nth-child(3n) svg {
     left: auto !important;
     right: auto !important;
   }
-  .shop-builder-section:has(.shop-builder-column-block--scroll-pinned):not(.builder-preview-section) {
-    width: 100vw !important;
+  .shop-builder-section:has(.shop-builder-column-block--scroll-pinned):not(.builder-preview-section),
+  .shop-builder-section:has(.scroll-pinned-section):not(.builder-preview-section) {
+    width: auto !important;
     margin-left: -16px !important;
+    margin-right: -16px !important;
     transform: none !important;
   }
   .shop-builder-promo .shop-builder-section-content {

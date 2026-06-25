@@ -3259,7 +3259,11 @@ function BuilderSectionRenderer({
   } else if (section.kind === "embed") {
     content = <EmbedSection section={section} layoutScheme={layoutScheme} />;
   } else if (section.kind === "scrollPinnedDemo") {
-    content = <ScrollPinnedDemo section={section} />;
+    content = (
+      <SectionFrame section={section} layoutScheme={layoutScheme}>
+        <ScrollPinnedDemo section={section} />
+      </SectionFrame>
+    );
   } else {
     return null;
   }

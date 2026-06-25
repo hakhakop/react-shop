@@ -813,7 +813,23 @@
                 "typewriterSpeed": 250,
                 "typewriterLoop": true,
                 "listIconColorScheme": "gradient-cycle",
-                "listIcon": "check"
+                "listIcon": "check",
+                "visualStyle": {
+                  "padding": {
+                    "linked": true,
+                    "top": "none",
+                    "right": "none",
+                    "bottom": "none",
+                    "left": "none"
+                  },
+                  "margin": {
+                    "linked": true,
+                    "top": "none",
+                    "right": "none",
+                    "bottom": "none",
+                    "left": "none"
+                  }
+                }
               }
             ]
           }
@@ -1254,7 +1270,7 @@
         ]
       }
     ],
-    "updatedAt": "2026-06-25T14:09:24.697Z"
+    "updatedAt": "2026-06-25T14:16:59.981Z"
   },
   "shop": {
     "version": 1,

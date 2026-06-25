@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { resolveBuilderSpacing } from "@/lib/builderSpacing";
 import {
   CheckCircle2,
   LayoutTemplate,
@@ -246,6 +247,33 @@ export default function ScrollPinnedDemo({ section, block, isPreview = false }: 
 
   const isRichText = (val: string) => /<[a-z][\s\S]*>/i.test(val);
 
+  // Resolve section spacing from builder settings
+  const sectionSpacingStyle: Record<string, string | undefined> = {};
+  if (section) {
+    if (section.topSpacing && section.topSpacing !== "inherit") {
+      sectionSpacingStyle["--builder-section-padding-top"] = resolveBuilderSpacing(section.topSpacing, "sectionPadding").css;
+    }
+    if (section.bottomSpacing && section.bottomSpacing !== "inherit") {
+      sectionSpacingStyle["--builder-section-padding-bottom"] = resolveBuilderSpacing(section.bottomSpacing, "sectionPadding").css;
+    }
+    if (section.topMargin && section.topMargin !== "inherit") {
+      sectionSpacingStyle["--builder-section-margin-top"] = resolveBuilderSpacing(section.topMargin, "sectionMargin").css;
+    }
+    if (section.bottomMargin && section.bottomMargin !== "inherit") {
+      sectionSpacingStyle["--builder-section-margin-bottom"] = resolveBuilderSpacing(section.bottomMargin, "sectionMargin").css;
+    }
+  }
+
+  // Build dynamic inline padding/margin from resolved spacing or fallback to CSS variables
+  const resolvedPaddingTop = sectionSpacingStyle["--builder-section-padding-top"]
+    ?? "var(--builder-global-section-padding-top, clamp(28px, 5vw, 72px))";
+  const resolvedPaddingBottom = sectionSpacingStyle["--builder-section-padding-bottom"]
+    ?? "var(--builder-global-section-padding-bottom, clamp(28px, 5vw, 72px))";
+  const resolvedMarginTop = sectionSpacingStyle["--builder-section-margin-top"]
+    ?? "var(--builder-global-section-margin-top, 0px)";
+  const resolvedMarginBottom = sectionSpacingStyle["--builder-section-margin-bottom"]
+    ?? "var(--builder-global-section-margin-bottom, 0px)";
+
   if (!slides || slides.length === 0) {
     return (
       <div className="p-12 text-center text-neutral-500 bg-neutral-900 border border-neutral-800 rounded-3xl">
@@ -256,18 +284,29 @@ export default function ScrollPinnedDemo({ section, block, isPreview = false }: 
   }
 
   return (
-    <div className={`w-full font-sans ${textColorClass} antialiased`}>
+    <div
+      className={`w-full font-sans ${textColorClass} antialiased`}
+      style={{
+        marginTop: resolvedMarginTop,
+        marginBottom: resolvedMarginBottom,
+        ...sectionSpacingStyle,
+      } as React.CSSProperties}
+    >
       {/* PINNED SECTION ZONE */}
       <section 
         ref={triggerRef} 
-        className={`relative w-full flex items-center justify-center overflow-hidden py-12 ${
+        className={`scroll-pinned-section relative w-full flex items-center justify-center overflow-hidden ${
           isPreview ? "min-h-[500px]" : "min-h-screen"
         }`}
+        style={{
+          paddingTop: resolvedPaddingTop,
+          paddingBottom: resolvedPaddingBottom,
+        } as React.CSSProperties}
       >
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,rgba(99,102,241,0.04),transparent_40%)]" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_70%,rgba(168,85,247,0.04),transparent_40%)]" />
 
-        <div className="container mx-auto px-6 md:px-12 grid grid-cols-1 md:grid-cols-12 gap-12 items-center min-h-[70vh] relative z-10">
+        <div className="container mx-auto px-6 md:px-12 grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 items-center min-h-[70vh] relative z-10">
           
           {/* Left Panel: Static content with Scroll Progress Tracker */}
           <div className="md:col-span-5 flex flex-col justify-center h-full">
