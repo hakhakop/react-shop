@@ -305,13 +305,19 @@ export default function BuilderWireframePanel({
                   >
                     <ChevronRight size={13} />
                   </button>
-                  <button
-                    type="button"
+                  <div
                     className={`builder-wireframe-item builder-wireframe-item--section${
                       sectionSelected ? " is-selected" : ""
                     }`}
                     onClick={() => onSelectSection(section.id)}
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter" || event.key === " ") {
+                        event.preventDefault();
+                        onSelectSection(section.id);
+                      }
+                    }}
                     role="treeitem"
+                    tabIndex={0}
                     aria-selected={sectionSelected}
                   >
                     <GripVertical size={11} className="builder-wireframe-grip" />
@@ -392,7 +398,7 @@ export default function BuilderWireframePanel({
                         )}
                       </div>
                     </span>
-                  </button>
+                  </div>
                 </div>
 
                 {!sectionCollapsed && (
@@ -438,13 +444,19 @@ export default function BuilderWireframePanel({
                               >
                                 <ChevronRight size={13} />
                               </button>
-                              <button
-                                type="button"
+                              <div
                                 className={`builder-wireframe-item builder-wireframe-item--row${
                                   rowSelected ? " is-selected" : ""
                                 }`}
                                 onClick={() => onSelectRow(section.id, rowIndex)}
+                                onKeyDown={(event) => {
+                                  if (event.key === "Enter" || event.key === " ") {
+                                    event.preventDefault();
+                                    onSelectRow(section.id, rowIndex);
+                                  }
+                                }}
                                 role="treeitem"
+                                tabIndex={0}
                                 aria-selected={rowSelected}
                               >
                                 <GripVertical size={11} className="builder-wireframe-grip" />
@@ -525,7 +537,7 @@ export default function BuilderWireframePanel({
                                     )}
                                   </div>
                                 </span>
-                              </button>
+                              </div>
                             </div>
 
                             {!rowCollapsed && (
@@ -599,8 +611,7 @@ export default function BuilderWireframePanel({
                                               selectedLayoutBlockKey === blockKey;
 
                                             return (
-                                              <button
-                                                type="button"
+                                              <div
                                                 key={blockKey}
                                                 className={`builder-wireframe-item builder-wireframe-item--block${
                                                   blockSelected ? " is-selected" : ""
@@ -612,7 +623,18 @@ export default function BuilderWireframePanel({
                                                     blockKey,
                                                   )
                                                 }
+                                                onKeyDown={(event) => {
+                                                  if (event.key === "Enter" || event.key === " ") {
+                                                    event.preventDefault();
+                                                    onSelectBlock(
+                                                      section.id,
+                                                      columnKey,
+                                                      blockKey,
+                                                    );
+                                                  }
+                                                }}
                                                 role="treeitem"
+                                                tabIndex={0}
                                                 aria-selected={blockSelected}
                                               >
                                                 <GripVertical size={11} className="builder-wireframe-grip" />
@@ -703,7 +725,7 @@ export default function BuilderWireframePanel({
                                                     )}
                                                   </div>
                                                 </span>
-                                              </button>
+                                              </div>
                                             );
                                           })
                                         )}

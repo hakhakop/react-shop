@@ -19,8 +19,6 @@ import {
   ListChecks,
   Navigation,
   PanelLeft,
-  PanelRightClose,
-  PanelRightOpen,
   Plus,
   ShoppingBag,
   LockKeyhole,
@@ -6574,19 +6572,6 @@ export default function DashboardBuilder({
             </button>
           ))}
         </div>
-        <button
-          type="button"
-          className="builder-sidebar-collapse-inline"
-          onClick={() => setSidebarCollapsed((value) => !value)}
-          title={sidebarCollapsed ? "Open panel" : "Collapse panel"}
-          aria-label={sidebarCollapsed ? "Open panel" : "Collapse panel"}
-        >
-          {sidebarCollapsed ? (
-            <PanelRightOpen size={15} />
-          ) : (
-            <PanelRightClose size={15} />
-          )}
-        </button>
         <button
           type="button"
           className="builder-theme-toggle"

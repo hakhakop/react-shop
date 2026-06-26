@@ -351,6 +351,18 @@ export default function DashboardSidebar({
             );
           })}
         </div>
+        <button
+          type="button"
+          className={`builder-sidebar-rail-toggle${
+            sidebarCollapsed ? " is-collapsed" : ""
+          }`}
+          onClick={() => onSetSidebarCollapsed?.(!sidebarCollapsed)}
+          title={sidebarCollapsed ? "Open panel" : "Collapse panel"}
+          aria-label={sidebarCollapsed ? "Open panel" : "Collapse panel"}
+        >
+          <ChevronLeft size={18} />
+          <span>{sidebarCollapsed ? "Open" : "Close"}</span>
+        </button>
       </div>
 
       {/* Right content panel container */}
