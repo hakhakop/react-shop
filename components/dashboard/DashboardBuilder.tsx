@@ -109,6 +109,7 @@ import {
   templateDescriptions,
   templateLabels,
 } from "@/components/dashboard/builderRegistry";
+import { createDragGhost } from "@/components/dashboard/builderDragGhost";
 import {
   builderRowLayoutPresets,
   getBuilderRowLayoutPreset,
@@ -160,6 +161,7 @@ import {
   getBuilderImageAspectRatio,
   getBuilderImageObjectFit,
 } from "@/lib/builderImages";
+import { AnimatePresence, motion } from "framer-motion";
 
 const BUILDER_TEMPLATE_DND_TYPE = "application/x-builder-template";
 const BUILDER_TEMPLATE_SECTION_DND_TYPE =
@@ -3176,6 +3178,7 @@ export default function DashboardBuilder({
     sourceBlockKey,
     targetColumnKey,
     targetBlockKey,
+    placement = "above",
   }: {
     sectionId: string;
     targetSectionId?: string;
@@ -3183,6 +3186,7 @@ export default function DashboardBuilder({
     sourceBlockKey: string;
     targetColumnKey: string;
     targetBlockKey?: string;
+    placement?: "above" | "below";
   }) => {
     setBuilderState((current) => {
       let movingBlock: BuilderLayoutBlock | null = null;
@@ -3259,11 +3263,12 @@ export default function DashboardBuilder({
               )
             : -1;
 
-          targetBlocks.splice(
-            targetIndex >= 0 ? targetIndex : targetBlocks.length,
-            0,
-            blockToMove,
-          );
+          let insertIndex = targetIndex >= 0 ? targetIndex : targetBlocks.length;
+          if (targetIndex >= 0 && placement === "below") {
+            insertIndex = targetIndex + 1;
+          }
+
+          targetBlocks.splice(insertIndex, 0, blockToMove);
           layoutItems[targetColumnIndex] = {
             ...targetItem,
             blocks: targetBlocks,
@@ -3285,11 +3290,13 @@ export default function DashboardBuilder({
     targetColumnKey,
     kind,
     targetBlockKey,
+    placement = "above",
   }: {
     sectionId: string;
     targetColumnKey: string;
     kind: LayoutBlockKind;
     targetBlockKey?: string;
+    placement?: "above" | "below";
   }) => {
     const block = createLayoutBlock(kind);
     setBuilderState((current) => ({
@@ -3316,11 +3323,12 @@ export default function DashboardBuilder({
             )
           : -1;
 
-        targetBlocks.splice(
-          targetIndex >= 0 ? targetIndex : targetBlocks.length,
-          0,
-          block,
-        );
+        let insertIndex = targetIndex >= 0 ? targetIndex : targetBlocks.length;
+        if (targetIndex >= 0 && placement === "below") {
+          insertIndex = targetIndex + 1;
+        }
+
+        targetBlocks.splice(insertIndex, 0, block);
         layoutItems[targetColumnIndex] = {
           ...targetItem,
           blocks: targetBlocks,
@@ -3923,18 +3931,22 @@ export default function DashboardBuilder({
     setSelectedId(sectionId);
   };
 
-  const reorderSection = (sourceId: string, targetId: string) => {
+  const reorderSection = (sourceId: string, targetId: string, placement: "above" | "below" = "above") => {
     if (sourceId === targetId) return;
     setBuilderState((current) => {
       const sourceIndex = current.sections.findIndex(
         (section) => section.id === sourceId,
       );
-      const targetIndex = current.sections.findIndex(
-        (section) => section.id === targetId,
-      );
-      if (sourceIndex < 0 || targetIndex < 0) return current;
+      if (sourceIndex < 0) return current;
       const nextSections = [...current.sections];
       const [section] = nextSections.splice(sourceIndex, 1);
+      let targetIndex = nextSections.findIndex(
+        (sec) => sec.id === targetId,
+      );
+      if (targetIndex < 0) return current;
+      if (placement === "below") {
+        targetIndex += 1;
+      }
       nextSections.splice(targetIndex, 0, section);
       return { ...current, sections: nextSections };
     });
@@ -4879,11 +4891,13 @@ export default function DashboardBuilder({
     sectionId,
     columnKey,
     targetBlockKey,
+    placement = "above",
   }: {
     templateId: string;
     sectionId: string;
     columnKey: string;
     targetBlockKey?: string;
+    placement?: "above" | "below";
   }) => {
     const template = getSavedTemplateById(templateId);
     if (!template || template.templateType !== "element") {
@@ -4919,7 +4933,13 @@ export default function DashboardBuilder({
                     targetBlockKey,
                 )
               : -1;
-            blocks.splice(targetIndex >= 0 ? targetIndex : blocks.length, 0, insertedBlock);
+
+            let insertIndex = targetIndex >= 0 ? targetIndex : blocks.length;
+            if (targetIndex >= 0 && placement === "below") {
+              insertIndex = targetIndex + 1;
+            }
+
+            blocks.splice(insertIndex, 0, insertedBlock);
             return { ...item, blocks };
           }),
         };
@@ -7488,7 +7508,7 @@ function PreviewCanvas({
   ) => void;
   onDragStart: (sectionId: string) => void;
   onDragEnd: () => void;
-  onReorder: (sourceId: string, targetId: string) => void;
+  onReorder: (sourceId: string, targetId: string, placement?: "above" | "below") => void;
   onBlockDragStart: (blockKey: string) => void;
   onBlockDragEnd: () => void;
   onMoveBlock: (payload: {
@@ -7691,10 +7711,15 @@ function PreviewCanvas({
   const [hoveredSectionId, setHoveredSectionId] = useState<string | null>(null);
   const [hoveredColumnKey, setHoveredColumnKey] = useState<string | null>(null);
   const [hoveredBlockKey, setHoveredBlockKey] = useState<string | null>(null);
-  const [sectionDragOverId, setSectionDragOverId] = useState<string | null>(null);
+  const [activeDragOver, setActiveDragOver] = useState<{
+    type: "section" | "column" | "block";
+    sectionId: string;
+    columnKey?: string;
+    blockKey?: string;
+    placement?: "above" | "below" | "inside";
+  } | null>(null);
   const [templateDragType, setTemplateDragType] =
     useState<BuilderTemplateDragType | null>(null);
-  const sectionDragClearTimer = useRef<number | null>(null);
   const [insertTarget, setInsertTarget] = useState<{
     sectionId: string | null;
     placement: "above" | "below";
@@ -7879,8 +7904,12 @@ function PreviewCanvas({
           return;
         }
         setTemplateDragType(null);
+        setActiveDragOver(null);
       }}
-      onDrop={() => setTemplateDragType(null)}
+      onDrop={() => {
+        setTemplateDragType(null);
+        setActiveDragOver(null);
+      }}
     >
       {visibleSections.length === 0 && (
         <div className="builder-preview-empty">
@@ -7901,7 +7930,7 @@ function PreviewCanvas({
       <div
         className={`shop-builder-main shop-builder-main--scheme-${
           design.colorScheme ?? "auto"
-        } builder-preview-page`}
+        } builder-preview-page${draggingSectionId ? " is-dragging-section" : ""}`}
         style={previewDesignStyle(design)}
         data-builder-page-root
         data-builder-page={page}
@@ -7915,6 +7944,7 @@ function PreviewCanvas({
           className="shop-builder-inner builder-preview-inner"
           aria-label={`${pageLabel} preview`}
         >
+          <AnimatePresence mode="sync">
           {visibleSections.map((section) => {
             const sourceIndex = sections.findIndex(
               (item) => item.id === section.id,
@@ -7936,15 +7966,31 @@ function PreviewCanvas({
             const isSectionAntigravity = section.backgroundEffect === "antigravity";
             const isFullTheme = isSectionAntigravity && (section.antigravityVisualMode === undefined || section.antigravityVisualMode === "full");
 
+            const isDragOverAbove = activeDragOver?.type === "section" && activeDragOver.sectionId === section.id && activeDragOver.placement === "above";
+            const isDragOverBelow = activeDragOver?.type === "section" && activeDragOver.sectionId === section.id && activeDragOver.placement === "below";
+
             return (
+              <motion.div
+                key={section.id}
+                layout
+                initial={{ opacity: 0, y: 16, scale: 0.98 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.96, y: -8 }}
+                transition={{ duration: 0.26, ease: "easeOut" }}
+              >
               <div
                 id={section.id}
-                key={section.id}
                 role="button"
                 tabIndex={0}
                 draggable
                 onMouseEnter={() => setHoveredSectionId(section.id)}
                 onMouseLeave={() => setHoveredSectionId(null)}
+                onDragStart={(event) => {
+                  event.dataTransfer.setData("text/plain", section.id);
+                  event.dataTransfer.effectAllowed = "move";
+                  onDragStart(section.id);
+                  createDragGhost(event, sectionLabels[section.kind] || "Section");
+                }}
                 className={`builder-preview-section ${getStorefrontPreviewClass(
                   section,
                 )} builder-preview-${section.kind} builder-preview-section--${
@@ -7957,7 +8003,7 @@ function PreviewCanvas({
                   isSelected ? "is-selected" : ""
                 } ${
                   hoveredSectionId === section.id ? "is-hovered" : ""
-                } ${visualStyleClassName(section.visualStyle)} ${draggingSectionId === section.id ? "is-dragging" : ""} ${sectionDragOverId === section.id ? "is-drag-over" : ""}`}
+                } ${visualStyleClassName(section.visualStyle)} ${draggingSectionId === section.id ? "is-dragging" : ""} ${isDragOverAbove ? "is-drag-over-above" : ""} ${isDragOverBelow ? "is-drag-over-below" : ""}`}
                 style={
                   {
                     background: section.background,
@@ -8002,64 +8048,62 @@ function PreviewCanvas({
                     onSelect(section.id);
                   }
                 }}
-                onDragStart={(event) => {
-                  event.dataTransfer.setData("text/plain", section.id);
-                  event.dataTransfer.effectAllowed = "move";
-                  onDragStart(section.id);
-                }}
-                onDragEnter={(event) => {
+                onDragOver={(event) => {
                   const types = Array.from(event.dataTransfer.types);
-                  if (
+                  const isSectionDrag =
                     types.includes("text/plain") &&
                     !types.includes("application/x-builder-block") &&
-                    !types.includes("application/x-builder-new-block")
-                  ) {
+                    !types.includes("application/x-builder-new-block") &&
+                    getBuilderTemplateDragType(event.dataTransfer.types) !== "element";
+
+                  if (isSectionDrag) {
                     event.preventDefault();
-                    if (sectionDragClearTimer.current !== null) {
-                      clearTimeout(sectionDragClearTimer.current);
-                      sectionDragClearTimer.current = null;
+                    event.stopPropagation();
+                    const rect = event.currentTarget.getBoundingClientRect();
+                    const relativeY = event.clientY - rect.top;
+                    const placement = relativeY < rect.height / 2 ? "above" : "below";
+                    if (
+                      !activeDragOver ||
+                      activeDragOver.type !== "section" ||
+                      activeDragOver.sectionId !== section.id ||
+                      activeDragOver.placement !== placement
+                    ) {
+                      setActiveDragOver({
+                        type: "section",
+                        sectionId: section.id,
+                        placement,
+                      });
                     }
-                    setSectionDragOverId(section.id);
+                    event.dataTransfer.dropEffect = "move";
                   }
-                }}
-                onDragLeave={() => {
-                  sectionDragClearTimer.current = window.setTimeout(() => {
-                    sectionDragClearTimer.current = null;
-                    setSectionDragOverId(null);
-                  }, 50);
-                }}
-                onDragOver={(event) => {
-                  event.preventDefault();
-                  event.dataTransfer.dropEffect = "move";
                 }}
                 onDrop={(event) => {
-                  if (sectionDragClearTimer.current !== null) {
-                    clearTimeout(sectionDragClearTimer.current);
-                    sectionDragClearTimer.current = null;
-                  }
                   event.preventDefault();
+                  event.stopPropagation();
+                  const placement = activeDragOver?.type === "section" && activeDragOver.sectionId === section.id && (activeDragOver.placement === "above" || activeDragOver.placement === "below")
+                    ? activeDragOver.placement
+                    : "above";
+                  setActiveDragOver(null);
+
                   if (event.dataTransfer.getData(BUILDER_TEMPLATE_DND_TYPE)) {
-                    setSectionDragOverId(null);
+                    const templateId = event.dataTransfer.getData(BUILDER_TEMPLATE_DND_TYPE);
+                    if (templateId) {
+                      onDropSectionTemplate(templateId, section.id, placement);
+                    }
                     onDragEnd();
                     return;
                   }
                   const sourceId = event.dataTransfer.getData("text/plain");
                   if (!sourceId) {
-                    setSectionDragOverId(null);
                     onDragEnd();
                     return;
                   }
                   if (sourceId.startsWith("builder-block:")) return;
-                  onReorder(sourceId, section.id);
+                  onReorder(sourceId, section.id, placement);
                   onDragEnd();
-                  setSectionDragOverId(null);
                 }}
                 onDragEnd={() => {
-                  if (sectionDragClearTimer.current !== null) {
-                    clearTimeout(sectionDragClearTimer.current);
-                    sectionDragClearTimer.current = null;
-                  }
-                  setSectionDragOverId(null);
+                  setActiveDragOver(null);
                   onDragEnd();
                 }}
                 >
@@ -8176,7 +8220,7 @@ function PreviewCanvas({
                     if (getBuilderTemplateDragType(event.dataTransfer.types) !== "section") return;
                     event.preventDefault();
                     event.stopPropagation();
-                    setSectionDragOverId(section.id);
+                    setActiveDragOver({ type: "section", sectionId: section.id, placement: "above" });
                     event.dataTransfer.dropEffect = "copy";
                   }}
                   onDrop={(event) => {
@@ -8186,7 +8230,7 @@ function PreviewCanvas({
                     if (!templateId) return;
                     event.preventDefault();
                     event.stopPropagation();
-                    setSectionDragOverId(null);
+                    setActiveDragOver(null);
                     onDropSectionTemplate(templateId, section.id, "above");
                   }}
                 >
@@ -8214,7 +8258,7 @@ function PreviewCanvas({
                     if (getBuilderTemplateDragType(event.dataTransfer.types) !== "section") return;
                     event.preventDefault();
                     event.stopPropagation();
-                    setSectionDragOverId(section.id);
+                    setActiveDragOver({ type: "section", sectionId: section.id, placement: "below" });
                     event.dataTransfer.dropEffect = "copy";
                   }}
                   onDrop={(event) => {
@@ -8224,7 +8268,7 @@ function PreviewCanvas({
                     if (!templateId) return;
                     event.preventDefault();
                     event.stopPropagation();
-                    setSectionDragOverId(null);
+                    setActiveDragOver(null);
                     onDropSectionTemplate(templateId, section.id, "below");
                   }}
                 >
@@ -8254,6 +8298,8 @@ function PreviewCanvas({
                   selectedSectionId={selectedId}
                   selectedLayoutBlockKey={selectedLayoutBlockKey}
                   draggingLayoutBlockKey={draggingLayoutBlockKey}
+                  activeDragOver={activeDragOver}
+                  onCanvasDragOverChange={setActiveDragOver}
                   onSelectColumn={onSelectColumn}
                   onSelectRow={onSelectRow}
                   onSelectBlock={onSelectBlock}
@@ -8295,8 +8341,10 @@ function PreviewCanvas({
                   spacingOverlayEnabled={spacingOverlayEnabled}
                 />
               </div>
+              </motion.div>
             );
           })}
+          </AnimatePresence>
         </div>
       </div>
       {insertLayoutPicker ? createPortal(insertLayoutPicker, document.body) : null}
@@ -9863,6 +9911,8 @@ function PreviewSection({
   selectedSectionId,
   selectedLayoutBlockKey,
   draggingLayoutBlockKey,
+  activeDragOver,
+  onCanvasDragOverChange,
   onSelectColumn,
   onSelectRow,
   onSelectBlock,
@@ -9913,6 +9963,20 @@ function PreviewSection({
   selectedSectionId: string;
   selectedLayoutBlockKey: string | null;
   draggingLayoutBlockKey: string | null;
+  activeDragOver: {
+    type: "section" | "column" | "block";
+    sectionId: string;
+    columnKey?: string;
+    blockKey?: string;
+    placement?: "above" | "below" | "inside";
+  } | null;
+  onCanvasDragOverChange: (state: {
+    type: "section" | "column" | "block";
+    sectionId: string;
+    columnKey?: string;
+    blockKey?: string;
+    placement?: "above" | "below" | "inside";
+  } | null) => void;
   onSelectColumn: (sectionId: string, columnKey: string) => void;
   onSelectRow: (sectionId: string, rowIndex: number) => void;
   onSelectBlock: (
@@ -9929,12 +9993,14 @@ function PreviewSection({
     sourceBlockKey: string;
     targetColumnKey: string;
     targetBlockKey?: string;
+    placement?: "above" | "below";
   }) => void;
   onCreateBlock: (payload: {
     sectionId: string;
     targetColumnKey: string;
     kind: LayoutBlockKind;
     targetBlockKey?: string;
+    placement?: "above" | "below";
   }) => void;
   onDuplicateBlock: (payload: {
     sectionId: string;
@@ -10050,6 +10116,7 @@ function PreviewSection({
     sectionId: string;
     columnKey: string;
     targetBlockKey?: string;
+    placement?: "above" | "below";
   }) => void;
   onDeleteButton: (
     sectionId: string,
@@ -10094,8 +10161,6 @@ function PreviewSection({
 }) {
   const [hoveredColumnKey, setHoveredColumnKey] = useState<string | null>(null);
   const [hoveredBlockKey, setHoveredBlockKey] = useState<string | null>(null);
-  const dragClearTimer = useRef<number | null>(null);
-  const [dragOverKey, setDragOverKey] = useState<string | null>(null);
   const [draggingItem, setDraggingItem] = useState<{
     kind: "grid" | "badge" | "button" | "list" | "sectionBadge";
     blockKey: string;
@@ -10623,6 +10688,8 @@ if (section.kind === "embed") {
             return (
               <Fragment key={columnKey}>
               <article
+                key={columnKey}
+                id={columnKey}
                 onMouseEnter={() => setHoveredColumnKey(columnKey)}
                 onMouseLeave={() => setHoveredColumnKey(null)}
                 className={hasScrollPinned ? `w-full col-span-12 ${
@@ -10634,7 +10701,7 @@ if (section.kind === "embed") {
                 } ${
                   isSelectedRow ? "is-selected-row" : ""
                 } ${
-                  dragOverKey === `col:${columnKey}` ? "is-drag-over" : ""
+                  activeDragOver?.type === "column" && activeDragOver.columnKey === columnKey ? "is-drag-over" : ""
                 }` : `shop-builder-content-layout-card shop-card-preset--${cardStyle} ${
                   blocks.length === 0 ? "is-empty-column" : ""
                 } ${
@@ -10646,15 +10713,17 @@ if (section.kind === "embed") {
                 } ${
                   isSelectedRow ? "is-selected-row" : ""
                 } ${
-                  dragOverKey === `col:${columnKey}` ? "is-drag-over" : ""
+                  activeDragOver?.type === "column" && activeDragOver.columnKey === columnKey ? "is-drag-over" : ""
                 }`}
                 style={
-                  hasScrollPinned
-                    ? { ...rowSpacingStyle, gridColumn: "span 12" }
-                    : {
-                        ...rowSpacingStyle,
-                        gridColumn: `span ${rowMeta?.span ?? 12}`,
-                      }
+                  {
+                    ...(hasScrollPinned
+                      ? { ...rowSpacingStyle, gridColumn: "span 12" }
+                      : {
+                          ...rowSpacingStyle,
+                          gridColumn: `span ${rowMeta?.span ?? 12}`,
+                        }),
+                  } as CSSProperties
                 }
                 onClick={(event) => {
                   if (
@@ -10666,56 +10735,48 @@ if (section.kind === "embed") {
                   event.stopPropagation();
                   onSelectColumn(section.id, columnKey);
                 }}
-                onDragEnter={(event) => {
-                  const types = Array.from(event.dataTransfer.types);
-                  if (
-                    types.includes("application/x-builder-block") ||
-                    types.includes("application/x-builder-new-block") ||
-                    getBuilderTemplateDragType(event.dataTransfer.types) === "element"
-                  ) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    if (dragClearTimer.current !== null) {
-                      clearTimeout(dragClearTimer.current);
-                      dragClearTimer.current = null;
-                    }
-                    setDragOverKey(`col:${columnKey}`);
-                  }
-                }}
-                onDragLeave={() => {
-                  dragClearTimer.current = window.setTimeout(() => {
-                    dragClearTimer.current = null;
-                    setDragOverKey(null);
-                  }, 50);
-                }}
                 onDragOver={(event) => {
                   const types = Array.from(event.dataTransfer.types);
-                  if (
+                  const isElementDrag =
                     types.includes("application/x-builder-block") ||
                     types.includes("application/x-builder-new-block") ||
-                    getBuilderTemplateDragType(event.dataTransfer.types) === "element"
-                  ) {
+                    getBuilderTemplateDragType(event.dataTransfer.types) === "element";
+
+                  if (isElementDrag) {
                     event.preventDefault();
                     event.stopPropagation();
-                    event.dataTransfer.dropEffect = types.includes(
-                      "application/x-builder-new-block",
-                    ) || getBuilderTemplateDragType(event.dataTransfer.types) === "element"
-                      ? "copy"
-                      : "move";
+                    
+                    if (blocks.length === 0) {
+                      if (
+                        !activeDragOver ||
+                        activeDragOver.type !== "column" ||
+                        activeDragOver.columnKey !== columnKey
+                      ) {
+                        onCanvasDragOverChange({
+                          type: "column",
+                          sectionId: section.id,
+                          columnKey,
+                          placement: "inside",
+                        });
+                      }
+                    }
+                    
+                    event.dataTransfer.dropEffect =
+                      types.includes("application/x-builder-new-block") ||
+                      getBuilderTemplateDragType(event.dataTransfer.types) === "element"
+                        ? "copy"
+                        : "move";
                   }
                 }}
                 onDrop={(event) => {
-                  if (dragClearTimer.current !== null) {
-                    clearTimeout(dragClearTimer.current);
-                    dragClearTimer.current = null;
-                  }
-                  setDragOverKey(null);
+                  event.preventDefault();
+                  event.stopPropagation();
+                  onCanvasDragOverChange(null);
+
                   const templateId = event.dataTransfer.getData(
                     BUILDER_TEMPLATE_DND_TYPE,
                   );
                   if (templateId) {
-                    event.preventDefault();
-                    event.stopPropagation();
                     onDropElementTemplate({
                       templateId,
                       sectionId: section.id,
@@ -10727,8 +10788,6 @@ if (section.kind === "embed") {
                     "application/x-builder-new-block",
                   ) as LayoutBlockKind;
                   if (newBlockKind && newBlockKind in layoutBlockLabels) {
-                    event.preventDefault();
-                    event.stopPropagation();
                     onCreateBlock({
                       sectionId: section.id,
                       targetColumnKey: columnKey,
@@ -10741,8 +10800,6 @@ if (section.kind === "embed") {
                     "application/x-builder-block",
                   );
                   if (!payload) return;
-                  event.preventDefault();
-                  event.stopPropagation();
                   try {
                     const parsed = JSON.parse(payload) as {
                       sectionId: string;
@@ -10843,7 +10900,9 @@ if (section.kind === "embed") {
                           ? "is-dragging-block"
                           : ""
                       } ${
-                        dragOverKey === `blk:${blockKey}` ? "is-drag-over" : ""
+                        activeDragOver?.type === "block" && activeDragOver.blockKey === blockKey && activeDragOver.placement === "above" ? "is-drag-over-above" : ""
+                      } ${
+                        activeDragOver?.type === "block" && activeDragOver.blockKey === blockKey && activeDragOver.placement === "below" ? "is-drag-over-below" : ""
                       } ${previewAnimationClassName(block.animation)}`}
                       style={
                         {
@@ -10895,37 +10954,37 @@ if (section.kind === "embed") {
                         );
                         event.dataTransfer.effectAllowed = "move";
                         onBlockDragStart(blockKey);
-                      }}
-                      onDragEnter={(event) => {
-                        const types = Array.from(event.dataTransfer.types);
-                        if (
-                          types.includes("application/x-builder-block") ||
-                          types.includes("application/x-builder-new-block") ||
-                          getBuilderTemplateDragType(event.dataTransfer.types) === "element"
-                        ) {
-                          event.stopPropagation();
-                          if (dragClearTimer.current !== null) {
-                            clearTimeout(dragClearTimer.current);
-                            dragClearTimer.current = null;
-                          }
-                          setDragOverKey(`blk:${blockKey}`);
-                        }
-                      }}
-                      onDragLeave={() => {
-                        dragClearTimer.current = window.setTimeout(() => {
-                          dragClearTimer.current = null;
-                          setDragOverKey(null);
-                        }, 50);
+                        createDragGhost(event, layoutBlockLabels[block.kind!] || "Block");
                       }}
                       onDragOver={(event) => {
                         const types = Array.from(event.dataTransfer.types);
-                        if (
+                        const isElementDrag =
                           types.includes("application/x-builder-block") ||
                           types.includes("application/x-builder-new-block") ||
-                          getBuilderTemplateDragType(event.dataTransfer.types) === "element"
-                        ) {
+                          getBuilderTemplateDragType(event.dataTransfer.types) === "element";
+
+                        if (isElementDrag) {
                           event.preventDefault();
                           event.stopPropagation();
+                          
+                          const rect = event.currentTarget.getBoundingClientRect();
+                          const relativeY = event.clientY - rect.top;
+                          const placement = relativeY < rect.height / 2 ? "above" : "below";
+                          if (
+                            !activeDragOver ||
+                            activeDragOver.type !== "block" ||
+                            activeDragOver.blockKey !== blockKey ||
+                            activeDragOver.placement !== placement
+                          ) {
+                            onCanvasDragOverChange({
+                              type: "block",
+                              sectionId: section.id,
+                              columnKey,
+                              blockKey,
+                              placement,
+                            });
+                          }
+                          
                           event.dataTransfer.dropEffect = types.includes(
                             "application/x-builder-new-block",
                           ) || getBuilderTemplateDragType(event.dataTransfer.types) === "element"
@@ -10934,22 +10993,24 @@ if (section.kind === "embed") {
                         }
                       }}
                       onDrop={(event) => {
-                        if (dragClearTimer.current !== null) {
-                          clearTimeout(dragClearTimer.current);
-                          dragClearTimer.current = null;
-                        }
-                        setDragOverKey(null);
+                        event.preventDefault();
+                        event.stopPropagation();
+                        
+                        const placement = activeDragOver?.type === "block" && activeDragOver.blockKey === blockKey && (activeDragOver.placement === "above" || activeDragOver.placement === "below")
+                          ? activeDragOver.placement
+                          : "above";
+                        onCanvasDragOverChange(null);
+
                         const templateId = event.dataTransfer.getData(
                           BUILDER_TEMPLATE_DND_TYPE,
                         );
                         if (templateId) {
-                          event.preventDefault();
-                          event.stopPropagation();
                           onDropElementTemplate({
                             templateId,
                             sectionId: section.id,
                             columnKey,
                             targetBlockKey: blockKey,
+                            placement,
                           });
                           return;
                         }
@@ -10957,13 +11018,12 @@ if (section.kind === "embed") {
                           "application/x-builder-new-block",
                         ) as LayoutBlockKind;
                         if (newBlockKind && newBlockKind in layoutBlockLabels) {
-                          event.preventDefault();
-                          event.stopPropagation();
                           onCreateBlock({
                             sectionId: section.id,
                             targetColumnKey: columnKey,
                             targetBlockKey: blockKey,
                             kind: newBlockKind,
+                            placement,
                           });
                           return;
                         }
@@ -10972,8 +11032,6 @@ if (section.kind === "embed") {
                           "application/x-builder-block",
                         );
                         if (!payload) return;
-                        event.preventDefault();
-                        event.stopPropagation();
                         try {
                           const parsed = JSON.parse(payload) as {
                             sectionId: string;
@@ -10985,6 +11043,7 @@ if (section.kind === "embed") {
                             targetSectionId: section.id,
                             targetColumnKey: columnKey,
                             targetBlockKey: blockKey,
+                            placement,
                           });
                         } catch {
                           onBlockDragEnd();
@@ -10992,11 +11051,7 @@ if (section.kind === "embed") {
                         onBlockDragEnd();
                       }}
                       onDragEnd={() => {
-                        if (dragClearTimer.current !== null) {
-                          clearTimeout(dragClearTimer.current);
-                          dragClearTimer.current = null;
-                        }
-                        setDragOverKey(null);
+                        onCanvasDragOverChange(null);
                         onBlockDragEnd();
                       }}
                     >

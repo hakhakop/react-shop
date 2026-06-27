@@ -10010,7 +10010,6 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
           )}
         </>
       )}
-
       {isLayoutPickerOpen && layoutContainerSection ? (
         <div
           className="builder-layout-modal"

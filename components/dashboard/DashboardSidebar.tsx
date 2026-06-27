@@ -42,6 +42,8 @@ import type {
 } from "@/components/dashboard/builderTypes";
 import ElementLibrary from "@/components/dashboard/ElementLibrary";
 import ReactMenuEditorPanel from "@/components/dashboard/ReactMenuEditorPanel";
+import { createDragGhost } from "@/components/dashboard/builderDragGhost";
+import { AnimatePresence, motion } from "framer-motion";
 
 type TemplateLibraryTab = "page" | "section" | "row" | "element";
 
@@ -370,133 +372,185 @@ export default function DashboardSidebar({
         {topActionsSlot ? (
           <div className="builder-sidebar-top-actions">{topActionsSlot}</div>
         ) : null}
-
         <div className="builder-sidebar-content">
-          {sidebarTab === "elements" && (
-            <ElementLibrary
-              availableLayoutBlockKinds={availableLayoutBlockKinds}
-              onAddElement={onAddElementFromLibrary}
-              onRenderLayoutBlockIcon={onRenderLayoutBlockIcon}
-            />
-          )}
+          <AnimatePresence mode="wait">
+            {sidebarTab === "elements" && (
+              <motion.div
+                key="elements"
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -4 }}
+                transition={{ duration: 0.16, ease: "easeOut" }}
+              >
+                <ElementLibrary
+                  availableLayoutBlockKinds={availableLayoutBlockKinds}
+                  onAddElement={onAddElementFromLibrary}
+                  onRenderLayoutBlockIcon={onRenderLayoutBlockIcon}
+                />
+              </motion.div>
+            )}
 
-          {sidebarTab === "builder" && builderSlot}
+            {sidebarTab === "builder" && (
+              <motion.div
+                key="builder"
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -4 }}
+                transition={{ duration: 0.16, ease: "easeOut" }}
+              >
+                {builderSlot}
+              </motion.div>
+            )}
 
-          {sidebarTab === "menu" && (
-            <ReactMenuEditorPanel
-              menuItems={shellSettings.menuItems ?? []}
-              onChangeMenuItems={(newItems) => onUpdateShellSettings({ menuItems: newItems })}
-              customPages={customPages}
-            />
-          )}
+            {sidebarTab === "menu" && (
+              <motion.div
+                key="menu"
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -4 }}
+                transition={{ duration: 0.16, ease: "easeOut" }}
+              >
+                <ReactMenuEditorPanel
+                  menuItems={shellSettings.menuItems ?? []}
+                  onChangeMenuItems={(newItems) => onUpdateShellSettings({ menuItems: newItems })}
+                  customPages={customPages}
+                />
+              </motion.div>
+            )}
 
-          {sidebarTab === "inspector" && (
-            inspectorOpen ? (
-              inspectorSlot
-            ) : (
-              <div className="builder-sidebar-panel builder-inspector-reopen">
-                <div className="builder-sidebar-panel-header">
-                  <div>
-                    <strong>Inspector</strong>
-                    <span>Section, row, and element controls are closed.</span>
+            {sidebarTab === "inspector" && (
+              <motion.div
+                key="inspector"
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -4 }}
+                transition={{ duration: 0.16, ease: "easeOut" }}
+              >
+                {inspectorOpen ? (
+                  inspectorSlot
+                ) : (
+                  <div className="builder-sidebar-panel builder-inspector-reopen">
+                    <div className="builder-sidebar-panel-header">
+                      <div>
+
+                        <strong>Inspector</strong>
+                        <span>Section, row, and element controls are closed.</span>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      className="builder-secondary-button builder-full-button"
+                      onClick={onOpenInspector}
+                    >
+                      Open Inspector
+                    </button>
                   </div>
-                </div>
-                <button
-                  type="button"
-                  className="builder-secondary-button builder-full-button"
-                  onClick={onOpenInspector}
-                >
-                  Open Inspector
-                </button>
-              </div>
-            )
-          )}
+                )}
+              </motion.div>
+            )}
 
-          {sidebarTab === "globalStyles" && globalStylesSlot}
+            {sidebarTab === "globalStyles" && (
+              <motion.div
+                key="globalStyles"
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -4 }}
+                transition={{ duration: 0.16, ease: "easeOut" }}
+              >
+                {globalStylesSlot}
+              </motion.div>
+            )}
 
-          {sidebarTab === "pages" && (
-            <div className="builder-sidebar-panel">
-              {/* Core Storefront Pages */}
-              <div className="builder-card builder-pages-card" style={{ marginBottom: "14px" }}>
-                <div className="builder-card-title">
-                  <strong>Core Storefront Pages</strong>
-                  <span>{corePages.length}</span>
-                </div>
-                <div className="builder-pages-list">
-                  {orderedCorePages.map((page) => {
-                    const isActive = builderState.page === page.key;
-                    const isPublished = publishedKeys.includes(page.key);
-                    const isDragging = draggingCorePageKey === page.key;
-                    const isDragOver = dragOverCorePageKey === page.key;
-                    return (
-                      <div
-                        key={page.key}
-                        className={`builder-page-row${isActive ? " is-active" : ""}${
-                          isDragging ? " is-dragging" : ""
-                        }${isDragOver ? " is-drag-over" : ""}`}
-                        draggable
-                        onDragStart={(event) => {
-                          setDraggingCorePageKey(page.key);
-                          event.dataTransfer.setData("application/x-builder-core-page-key", page.key);
-                          event.dataTransfer.effectAllowed = "move";
-                        }}
-                        onDragOver={(event) => {
-                          if (draggingCorePageKey && draggingCorePageKey !== page.key) {
-                            event.preventDefault();
-                            setDragOverCorePageKey(page.key);
-                          }
-                        }}
-                        onDragLeave={() => {
-                          if (dragOverCorePageKey === page.key) {
-                            setDragOverCorePageKey(null);
-                          }
-                        }}
-                        onDrop={(event) => {
-                          event.preventDefault();
-                          const draggedKey = event.dataTransfer.getData("application/x-builder-core-page-key");
-                          if (draggedKey && draggedKey !== page.key) {
-                            setCorePagesOrder((current) => {
-                              const next = [...current];
-                              const draggedIndex = next.indexOf(draggedKey);
-                              const targetIndex = next.indexOf(page.key);
-                              if (draggedIndex !== -1 && targetIndex !== -1) {
-                                next.splice(draggedIndex, 1);
-                                next.splice(targetIndex, 0, draggedKey);
-                                window.localStorage.setItem("react-shop-builder-core-pages-order", JSON.stringify(next));
+            {sidebarTab === "pages" && (
+              <motion.div
+                key="pages"
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -4 }}
+                transition={{ duration: 0.16, ease: "easeOut" }}
+              >
+                <div className="builder-sidebar-panel">
+                  {/* Core Storefront Pages */}
+                  <div className="builder-card builder-pages-card" style={{ marginBottom: "14px" }}>
+                    <div className="builder-card-title">
+                      <strong>Core Storefront Pages</strong>
+                      <span>{corePages.length}</span>
+                    </div>
+                    <div className="builder-pages-list">
+                      {orderedCorePages.map((page) => {
+                        const isActive = builderState.page === page.key;
+                        const isPublished = publishedKeys.includes(page.key);
+                        const isDragging = draggingCorePageKey === page.key;
+                        const isDragOver = dragOverCorePageKey === page.key;
+                        return (
+                          <div
+                            key={page.key}
+                            className={`builder-page-row${isActive ? " is-active" : ""}${
+                              isDragging ? " is-dragging" : ""
+                            }${isDragOver ? " is-drag-over" : ""}`}
+                            draggable
+                            onDragStart={(event) => {
+                              setDraggingCorePageKey(page.key);
+                              event.dataTransfer.setData("application/x-builder-core-page-key", page.key);
+                              event.dataTransfer.effectAllowed = "move";
+                            }}
+                            onDragOver={(event) => {
+                              if (draggingCorePageKey && draggingCorePageKey !== page.key) {
+                                event.preventDefault();
+                                setDragOverCorePageKey(page.key);
                               }
-                              return next;
-                            });
-                          }
-                          setDraggingCorePageKey(null);
-                          setDragOverCorePageKey(null);
-                        }}
-                        onDragEnd={() => {
-                          setDraggingCorePageKey(null);
-                          setDragOverCorePageKey(null);
-                        }}
-                      >
-                        <GripVertical size={13} className="builder-group-drag-handle" style={{ marginRight: "2px", flexShrink: 0 }} />
-                        <button type="button" className="builder-page-title-button" onClick={() => onSwitchBuilderTarget(page.key)}>
-                          <strong>{page.title}</strong>
-                          <span>{page.slug ? `/${page.slug}` : "/"}</span>
-                        </button>
-                        <span
-                          className={`builder-page-status ${isPublished ? "is-published" : "is-draft"}`}
-                          style={{
-                            fontSize: "10px",
-                            padding: "2px 6px",
-                            borderRadius: "4px",
-                            backgroundColor: isActive
-                              ? "rgba(255, 255, 255, 0.25)"
-                              : "rgba(164, 190, 123, 0.15)",
-                            color: isActive
-                              ? "#ffffff"
-                              : (isPublished ? "#91ad68" : "var(--builder-ui-muted)"),
-                            border: `1px solid ${isActive
-                              ? "rgba(255, 255, 255, 0.4)"
-                              : "rgba(164, 190, 123, 0.3)"}`,
-                            textTransform: "uppercase",
-                            fontWeight: "bold",
+                            }}
+                            onDragLeave={() => {
+                              if (dragOverCorePageKey === page.key) {
+                                setDragOverCorePageKey(null);
+                              }
+                            }}
+                            onDrop={(event) => {
+                              event.preventDefault();
+                              const draggedKey = event.dataTransfer.getData("application/x-builder-core-page-key");
+                              if (draggedKey && draggedKey !== page.key) {
+                                setCorePagesOrder((current) => {
+                                  const next = [...current];
+                                  const draggedIndex = next.indexOf(draggedKey);
+                                  const targetIndex = next.indexOf(page.key);
+                                  if (draggedIndex !== -1 && targetIndex !== -1) {
+                                    next.splice(draggedIndex, 1);
+                                    next.splice(targetIndex, 0, draggedKey);
+                                    window.localStorage.setItem("react-shop-builder-core-pages-order", JSON.stringify(next));
+                                  }
+                                  return next;
+                                });
+                              }
+                              setDraggingCorePageKey(null);
+                              setDragOverCorePageKey(null);
+                            }}
+                            onDragEnd={() => {
+                              setDraggingCorePageKey(null);
+                              setDragOverCorePageKey(null);
+                            }}
+                          >
+                            <GripVertical size={13} className="builder-group-drag-handle" style={{ marginRight: "2px", flexShrink: 0 }} />
+                            <button type="button" className="builder-page-title-button" onClick={() => onSwitchBuilderTarget(page.key)}>
+                              <strong>{page.title}</strong>
+                              <span>{page.slug ? `/${page.slug}` : "/"}</span>
+                            </button>
+                            <span
+                              className={`builder-page-status ${isPublished ? "is-published" : "is-draft"}`}
+                              style={{
+                                fontSize: "10px",
+                                padding: "2px 6px",
+                                borderRadius: "4px",
+                                backgroundColor: isActive
+                                  ? "rgba(255, 255, 255, 0.25)"
+                                  : "rgba(164, 190, 123, 0.15)",
+                                color: isActive
+                                  ? "#ffffff"
+                                  : (isPublished ? "#91ad68" : "var(--builder-ui-muted)"),
+                                border: `1px solid ${isActive
+                                  ? "rgba(255, 255, 255, 0.4)"
+                                  : "rgba(164, 190, 123, 0.3)"}`,
+                                textTransform: "uppercase",
+                                fontWeight: "bold",
                             letterSpacing: "0.05em",
                             marginLeft: "auto",
                             marginRight: "4px",
@@ -634,9 +688,17 @@ export default function DashboardSidebar({
                 <small style={{ display: "block", marginTop: "10px" }}>{pageStatus}</small>
               </div>
             </div>
+          </motion.div>
           )}
 
           {sidebarTab === "history" && (
+            <motion.div
+              key="history"
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -4 }}
+              transition={{ duration: 0.16, ease: "easeOut" }}
+            >
             <div className="builder-sidebar-panel">
               <div className="builder-card">
                 <div className="builder-card-title">
@@ -647,9 +709,17 @@ export default function DashboardSidebar({
                 </div>
               </div>
             </div>
+            </motion.div>
           )}
 
           {sidebarTab === "templates" && (
+            <motion.div
+              key="templates"
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -4 }}
+              transition={{ duration: 0.16, ease: "easeOut" }}
+            >
             <div className="builder-sidebar-panel">
               <div className="builder-card builder-pages-card" style={{ marginBottom: '14px' }}>
                 <div className="builder-card-title"><strong>Global Layout Target</strong></div>
@@ -775,6 +845,7 @@ export default function DashboardSidebar({
                           event.dataTransfer.setData(templateDragMimeType, template.id);
                         }
                         event.dataTransfer.effectAllowed = "copy";
+                        createDragGhost(event, template.title || "Template");
                       }}
                     >
                       {renamingTemplateId === template.id ? (
@@ -855,8 +926,10 @@ export default function DashboardSidebar({
                 </div>
               )}
             </div>
+          </motion.div>
           )}
-        </div>
+        </AnimatePresence>
+      </div>
       </div>
 
       <button

@@ -9,6 +9,7 @@ import {
   layoutBlockGroups,
   layoutBlockLabels,
 } from "@/components/dashboard/builderRegistry";
+import { createDragGhost } from "@/components/dashboard/builderDragGhost";
 
 const FAVORITES_KEY = "react-shop-builder-favorite-blocks";
 const RECENT_KEY = "react-shop-builder-recent-blocks";
@@ -211,6 +212,7 @@ export default function ElementLibrary({
           `builder-new-block:${blockKind}`,
         );
         event.dataTransfer.effectAllowed = "copy";
+        createDragGhost(event, layoutBlockLabels[blockKind] || blockKind);
       }}
       onDragEnd={() => rememberRecent(blockKind)}
       onClick={() => addElement(blockKind)}

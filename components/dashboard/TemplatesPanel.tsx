@@ -9,6 +9,7 @@ import type {
   BuilderTargetType,
   BuilderTemplate,
 } from "./builderTypes";
+import { createDragGhost } from "./builderDragGhost";
 
 type TemplateLibraryTab = "page" | "section" | "row" | "element";
 
@@ -245,6 +246,7 @@ export default function TemplatesPanel({
                     event.dataTransfer.setData(templateDragMimeType, template.id);
                   }
                   event.dataTransfer.effectAllowed = "copy";
+                  createDragGhost(event, template.title || "Template");
                 }}
               >
                 {renamingTemplateId === template.id ? (
