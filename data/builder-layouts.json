@@ -64,37 +64,7 @@
             "rowLayout": "whole",
             "blocks": [
               {
-                "id": "image-block-mqho93e8-k93hf",
-                "kind": "image",
-                "title": "Image",
-                "body": "A simple image block for banners, artwork, and visual breaks.",
-                "imageUrl": "https://cms.webpages.am/wp-content/uploads/2026/06/logo-2-1-scaled.png",
-                "imageAlt": "logo-2 (1)",
-                "imageAlignment": "center",
-                "imageMaxWidth": 300,
-                "imageBorderRadius": 0,
-                "imageCaption": "",
-                "panelStyle": "dark",
-                "borderRadius": 10,
-                "visualStyle": {
-                  "padding": {
-                    "linked": true,
-                    "top": "none",
-                    "right": "none",
-                    "bottom": "none",
-                    "left": "none"
-                  },
-                  "margin": {
-                    "linked": true,
-                    "top": "none",
-                    "right": "none",
-                    "bottom": "none",
-                    "left": "none"
-                  }
-                }
-              },
-              {
-                "id": "hero-block-mqkhhqgx-m82o9",
+                "id": "hero-block-mqxvovas-174fd",
                 "kind": "hero",
                 "eyebrow": "Բարի գալուստ webpages",
                 "title": "[Ընտրեք փաթեթը |տրամադրեք տեղեկությունը| ձեր կայքը պատրաստ է]",
@@ -161,6 +131,119 @@
                     "right": "0px",
                     "bottom": "0px",
                     "left": "0px"
+                  },
+                  "visibility": {
+                    "desktop": true,
+                    "tablet": true,
+                    "mobile": false
+                  }
+                },
+                "buttons": [],
+                "typewriterMobileReservedLines": 3
+              },
+              {
+                "id": "image-block-mqho93e8-k93hf",
+                "kind": "image",
+                "title": "Image",
+                "body": "A simple image block for banners, artwork, and visual breaks.",
+                "imageUrl": "https://cms.webpages.am/wp-content/uploads/2026/06/logo-2-1-scaled.png",
+                "imageAlt": "logo-2 (1)",
+                "imageAlignment": "center",
+                "imageMaxWidth": 300,
+                "imageBorderRadius": 0,
+                "imageCaption": "",
+                "panelStyle": "dark",
+                "borderRadius": 10,
+                "visualStyle": {
+                  "padding": {
+                    "linked": true,
+                    "top": "none",
+                    "right": "none",
+                    "bottom": "none",
+                    "left": "none"
+                  },
+                  "margin": {
+                    "linked": true,
+                    "top": "none",
+                    "right": "none",
+                    "bottom": "none",
+                    "left": "none"
+                  }
+                }
+              },
+              {
+                "id": "hero-block-mqkhhqgx-m82o9",
+                "kind": "hero",
+                "eyebrow": "Բարի գալուստ webpages",
+                "title": "[Ընտրեք փաթեթը |տրամադրեք տեղեկությունը| ձեր կայքը պատրաստ է]",
+                "body": "Կայք, հոսթինգ և սպասարկում՝ մեկ պարզ փաթեթով",
+                "buttonLabel": "Բաժանորդագրվել",
+                "buttonUrl": "https://webpages.am/#packages",
+                "carouselSettings": {
+                  "variant": "default"
+                },
+                "elementAlign": "center",
+                "typewriterEnabled": true,
+                "typography": {
+                  "title": {
+                    "lineHeight": "1.8",
+                    "fontSize": "48px",
+                    "fontWeight": "700",
+                    "letterSpacing": "0px",
+                    "textDecoration": "none"
+                  },
+                  "eyebrow": {
+                    "fontSize": "14px",
+                    "textTransform": "uppercase",
+                    "color": "#c084fc",
+                    "fontWeight": "600",
+                    "letterSpacing": "0.15rem",
+                    "lineHeight": ""
+                  }
+                },
+                "buttonBg": "var(--builder-preview-section-button-bg, var(--builder-section-button-bg, var(--builder-button-bg, #111111)))",
+                "buttonTextColor": "var(--builder-preview-section-button-text, var(--builder-section-button-text, var(--builder-button-text, #ffffff)))",
+                "buttonBorderRadius": "999px",
+                "buttonBorderWidth": "0px",
+                "buttonBorderColor": "transparent",
+                "buttonPaddingY": "11px",
+                "buttonPaddingX": "18px",
+                "buttonFontWeight": "720",
+                "buttonLetterSpacing": "0px",
+                "buttonHoverBg": "var(--builder-preview-section-button-bg, var(--builder-section-button-bg, var(--builder-button-bg, #111111)))",
+                "buttonHoverTextColor": "var(--builder-preview-section-button-text, var(--builder-section-button-text, var(--builder-button-text, #ffffff)))",
+                "buttonHoverBorderColor": "transparent",
+                "buttonHoverEffect": "lift",
+                "typewriterUseGradient": true,
+                "typewriterSpeed": 60,
+                "typewriterLoop": true,
+                "textGradientPreset": "custom",
+                "textGradientCustomStartOffset": 0,
+                "textGradientCustomStart": "#c1dbfb",
+                "textGradientCustomMiddle": "#818cf8",
+                "textGradientCustomEnd": "#c084fc",
+                "textGradientCustomMiddleOffset": 63,
+                "textGradientCustomEndOffset": 100,
+                "textGradientCustomAngle": 100,
+                "visualStyle": {
+                  "padding": {
+                    "linked": true,
+                    "top": "md",
+                    "right": "md",
+                    "bottom": "md",
+                    "left": "md"
+                  },
+                  "margin": {
+                    "linked": true,
+                    "top": "0px",
+                    "right": "0px",
+                    "bottom": "0px",
+                    "left": "0px"
+                  },
+                  "visibility": {
+                    "desktop": false,
+                    "tablet": false,
+                    "mobile": true
                   }
                 },
                 "buttons": [],
@@ -996,6 +1079,20 @@
                     "cardPadding": "28px",
                     "cardGap": "18px",
                     "contentSize": "1.18rem"
+                  },
+                  "padding": {
+                    "linked": true,
+                    "top": "xs",
+                    "right": "xs",
+                    "bottom": "xs",
+                    "left": "xs"
+                  },
+                  "margin": {
+                    "linked": true,
+                    "top": "xs",
+                    "right": "xs",
+                    "bottom": "xs",
+                    "left": "xs"
                   }
                 }
               }
@@ -1271,7 +1368,7 @@
         ]
       }
     ],
-    "updatedAt": "2026-06-28T07:34:42.493Z"
+    "updatedAt": "2026-06-28T16:29:18.603Z"
   },
   "shop": {
     "version": 1,

@@ -7960,6 +7960,23 @@ body[data-storefront-preset="princity"]
   }
 }
 
+.builder-preview-mobile .builder-hide-mobile,
+.builder-preview-tablet .builder-hide-tablet,
+.builder-preview-desktop .builder-hide-desktop {
+  display: none !important;
+}
+
+/* In mobile/tablet preview the viewport is desktop-sized, so @media
+   (min-width:1024px) hides builder-hide-desktop everywhere. Unhide it
+   when the preview mode says the device is NOT desktop, unless the
+   element is also hidden on the current preview device. */
+.builder-preview-mobile .builder-hide-desktop:not(.builder-hide-mobile) {
+  display: block !important;
+}
+.builder-preview-tablet .builder-hide-desktop:not(.builder-hide-tablet) {
+  display: block !important;
+}
+
 /* Dashboard preview containment
    Storefront styles use viewport units for real pages. Inside the builder,
    the preview must respond to the workspace left after the sidebar. */
@@ -11136,6 +11153,15 @@ article.is-selected-column > .builder-preview-box-spacing,
 
 .builder-preview-mobile
   .builder-preview-canvas
+  .builder-preview-content-layout {
+  width: 100% !important;
+  max-width: 100% !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  justify-items: stretch !important;
+}
+
+.builder-preview-mobile
+  .builder-preview-canvas
   :is(
     .shop-builder-content-layout-grid,
     .shop-builder-content-row,
@@ -11165,6 +11191,70 @@ article.is-selected-column > .builder-preview-box-spacing,
   .builder-preview-canvas
   :is(img, video, iframe, canvas, svg) {
   max-width: 100%;
+}
+
+.builder-preview-mobile
+  .builder-preview-canvas
+  .scroll-pinned-section {
+  min-height: 100svh !important;
+  padding-top: clamp(24px, 6vw, 48px) !important;
+  padding-bottom: clamp(24px, 6vw, 48px) !important;
+}
+
+.builder-preview-mobile
+  .builder-preview-canvas
+  .scroll-pinned-section
+  .container {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  min-height: auto !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  gap: 24px !important;
+  padding-right: 16px !important;
+  padding-left: 16px !important;
+  box-sizing: border-box;
+}
+
+.builder-preview-mobile
+  .builder-preview-canvas
+  .scroll-pinned-section
+  .container
+  > * {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  grid-column: 1 / -1 !important;
+}
+
+.builder-preview-mobile
+  .builder-preview-canvas
+  .scroll-pinned-section
+  [class*="md:col-span-7"] {
+  min-height: 500px !important;
+  align-items: flex-start !important;
+  padding-top: 28px !important;
+}
+
+.builder-preview-mobile
+  .builder-preview-canvas
+  .scroll-pinned-section
+  h2 {
+  font-size: clamp(1.5rem, 7vw, 2.25rem) !important;
+}
+
+.builder-preview-mobile
+  .builder-preview-canvas
+  .scroll-pinned-card-item {
+  top: 28px !important;
+  max-width: 100% !important;
+}
+
+.builder-preview-mobile
+  .builder-preview-canvas
+  .scroll-pinned-card-item
+  h3 {
+  font-size: 1.25rem !important;
 }
 
 .builder-preview-mobile {

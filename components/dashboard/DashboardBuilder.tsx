@@ -8705,6 +8705,7 @@ function PreviewCanvas({
                       </button>
                     </div>
                     <PreviewSection
+                      device={device}
                       section={section}
                       shellSettings={shellSettings}
                       previewProducts={previewProducts}
@@ -10425,6 +10426,7 @@ function elementSpacingOverlayLabels(
 }
 
 function PreviewSection({
+  device,
   section,
   shellSettings,
   previewProducts,
@@ -10477,6 +10479,7 @@ function PreviewSection({
   onOpenElementsPanel,
   spacingOverlayEnabled,
 }: {
+  device: PreviewDevice;
   section: BuilderSection;
   shellSettings: BuilderShellSettings;
   previewProducts: ProductNode[];
@@ -11163,8 +11166,14 @@ function PreviewSection({
             {
               "--builder-preview-layout-columns": section.layoutColumns ?? 2,
               "--builder-layout-columns": section.layoutColumns ?? 2,
-              gridTemplateColumns: "repeat(12, minmax(0, 1fr))",
-              columnGap: resolveBuilderSpacing(undefined, "columnGap").css,
+              gridTemplateColumns:
+                device === "mobile"
+                  ? "minmax(0, 1fr)"
+                  : "repeat(12, minmax(0, 1fr))",
+              columnGap:
+                device === "mobile"
+                  ? "0px"
+                  : resolveBuilderSpacing(undefined, "columnGap").css,
               rowGap: "var(--builder-global-row-gap, 64px)",
             } as CSSProperties
           }
@@ -11264,10 +11273,17 @@ function PreviewSection({
                   style={
                     {
                       ...(hasScrollPinned
-                        ? { ...rowSpacingStyle, gridColumn: "span 12" }
+                        ? {
+                            ...rowSpacingStyle,
+                            gridColumn:
+                              device === "mobile" ? "1 / -1" : "span 12",
+                          }
                         : {
                             ...rowSpacingStyle,
-                            gridColumn: `span ${rowMeta?.span ?? 12}`,
+                            gridColumn:
+                              device === "mobile"
+                                ? "1 / -1"
+                                : `span ${rowMeta?.span ?? 12}`,
                           }),
                     } as CSSProperties
                   }

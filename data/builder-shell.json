@@ -30,14 +30,14 @@
   "rowMarginTop": "md",
   "rowMarginBottom": "md",
   "rowGap": "sm",
-  "elementPaddingTop": "md",
-  "elementPaddingRight": "md",
-  "elementPaddingBottom": "md",
-  "elementPaddingLeft": "md",
-  "elementMarginTop": "md",
-  "elementMarginRight": "md",
-  "elementMarginBottom": "md",
-  "elementMarginLeft": "md",
+  "elementPaddingTop": "xs",
+  "elementPaddingRight": "xs",
+  "elementPaddingBottom": "xs",
+  "elementPaddingLeft": "xs",
+  "elementMarginTop": "xs",
+  "elementMarginRight": "xs",
+  "elementMarginBottom": "xs",
+  "elementMarginLeft": "xs",
   "menuPresentation": {
     "cG9zdDo1MzQ2": {
       "showHeading": false,
@@ -161,5 +161,5 @@
       "parentId": null
     }
   ],
-  "updatedAt": "2026-06-25T13:55:56.469Z"
+  "updatedAt": "2026-06-28T16:18:19.572Z"
 }
