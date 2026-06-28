@@ -224,6 +224,9 @@ export type BuilderLayoutBlock = {
   typewriterLoop?: boolean;
   typewriterUseGradient?: boolean;
   typewriterGradientPreset?: string;
+  typewriterPreserveHeight?: boolean;
+  typewriterReservedLines?: number;
+  typewriterMobileReservedLines?: number;
   premiumButtonStyle?: string;
   premiumCardStyle?: string;
   textGradientPreset?: string;
@@ -385,6 +388,16 @@ export type BuilderSection = {
   typography?: Record<string, unknown>;
   visualStyle?: Record<string, unknown>;
   animation?: Record<string, unknown>;
+  typewriterEnabled?: boolean;
+  typewriterSpeed?: number;
+  typewriterEraseSpeed?: number;
+  typewriterDelay?: number;
+  typewriterLoop?: boolean;
+  typewriterUseGradient?: boolean;
+  typewriterGradientPreset?: string;
+  typewriterPreserveHeight?: boolean;
+  typewriterReservedLines?: number;
+  typewriterMobileReservedLines?: number;
   pagination?: {
     enabled: boolean;
     perPage: number;

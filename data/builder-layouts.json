@@ -163,7 +163,8 @@
                     "left": "0px"
                   }
                 },
-                "buttons": []
+                "buttons": [],
+                "typewriterMobileReservedLines": 3
               }
             ]
           }
@@ -1270,7 +1271,7 @@
         ]
       }
     ],
-    "updatedAt": "2026-06-25T14:16:59.981Z"
+    "updatedAt": "2026-06-28T07:34:42.493Z"
   },
   "shop": {
     "version": 1,

@@ -102,7 +102,8 @@ function cssSpacingValue(value: string | null | undefined) {
   const trimmed = (value ?? "").toString().trim();
   if (!trimmed) return null;
   if (/^\d+(\.\d+)?$/.test(trimmed)) return `${trimmed}px`;
-  if (/^-?\d+(\.\d+)?(px|rem|em|%|vw|vh|svh|dvh)$/.test(trimmed)) return trimmed;
+  if (/^-?\d+(\.\d+)?(px|rem|em|%|vw|vh|svh|dvh)$/.test(trimmed))
+    return trimmed;
   if (/^clamp\([^)]+\)$/.test(trimmed)) return trimmed;
   return null;
 }
@@ -179,7 +180,7 @@ function readableSchemeForColor(color: string | undefined) {
 
 function resolveColorSchemeForBackground(
   bg: string | undefined,
-  parentScheme: "light" | "dark" = "light"
+  parentScheme: "light" | "dark" = "light",
 ): "light" | "dark" {
   if (!bg) return parentScheme;
   const color = bg.trim().toLowerCase();
@@ -220,7 +221,7 @@ function resolveColorSchemeForBackground(
     }
 
     if (count > 0) {
-      return (totalLuminance / count) < 0.48 ? "dark" : "light";
+      return totalLuminance / count < 0.48 ? "dark" : "light";
     }
   }
 
@@ -237,7 +238,9 @@ function resolveColorSchemeForBackground(
     return luminance < 0.48 ? "dark" : "light";
   }
 
-  const rgbMatch = color.match(/^rgba?\((\d+)\s*,\s*(\d+)\s*,\s*(\d+)(?:\s*,\s*([\d.]+))?\)$/);
+  const rgbMatch = color.match(
+    /^rgba?\((\d+)\s*,\s*(\d+)\s*,\s*(\d+)(?:\s*,\s*([\d.]+))?\)$/,
+  );
   if (rgbMatch) {
     const r = parseInt(rgbMatch[1], 10);
     const g = parseInt(rgbMatch[2], 10);
@@ -251,7 +254,10 @@ function resolveColorSchemeForBackground(
   return readableSchemeForColor(bg);
 }
 
-function getContextVars(scheme: "light" | "dark" | "auto", customBg?: string): Record<string, string | undefined> {
+function getContextVars(
+  scheme: "light" | "dark" | "auto",
+  customBg?: string,
+): Record<string, string | undefined> {
   if (scheme === "auto") {
     return {
       "--context-bg": customBg || "transparent",
@@ -274,8 +280,10 @@ function getContextVars(scheme: "light" | "dark" | "auto", customBg?: string): R
     };
   }
 
-  const schemeColors = scheme === "dark" ? builderDarkScheme : builderLightScheme;
-  const cardBorder = scheme === "dark" ? "rgba(255, 255, 255, 0.08)" : "rgba(17, 17, 17, 0.08)";
+  const schemeColors =
+    scheme === "dark" ? builderDarkScheme : builderLightScheme;
+  const cardBorder =
+    scheme === "dark" ? "rgba(255, 255, 255, 0.08)" : "rgba(17, 17, 17, 0.08)";
   return {
     "--context-bg": customBg || schemeColors.pageBackground,
     "--context-text": schemeColors.textColor,
@@ -385,24 +393,24 @@ function builderPageShellCss(layout: BuilderLayout) {
   const surfaceColor = safeCssColor(colors.surfaceColor, "#efefe9");
   const darkPageBackground = safeCssColor(
     builderDarkScheme.pageBackground,
-    "#101010"
+    "#101010",
   );
   const darkTextColor = safeCssColor(builderDarkScheme.textColor, "#f7f7f1");
   const darkMutedTextColor = safeCssColor(
     builderDarkScheme.mutedTextColor,
-    "#c8c8be"
+    "#c8c8be",
   );
   const darkSurfaceColor = safeCssColor(
     builderDarkScheme.surfaceColor,
-    "#24241f"
+    "#24241f",
   );
   const darkButtonBackground = safeCssColor(
     builderDarkScheme.buttonBackground,
-    "#f7f7f1"
+    "#f7f7f1",
   );
   const darkButtonTextColor = safeCssColor(
     builderDarkScheme.buttonTextColor,
-    "#101010"
+    "#101010",
   );
 
   return `
@@ -459,9 +467,9 @@ async function BuilderProductsSection({
   const isPaginationEnabled = section.pagination?.enabled ?? false;
   const pageSize = isPaginationEnabled
     ? (section.pagination?.perPage ?? 12)
-    : (typeof section.gridLimit === "number" && section.gridLimit >= 4
-        ? Math.min(Math.round(section.gridLimit), 48)
-        : 24);
+    : typeof section.gridLimit === "number" && section.gridLimit >= 4
+      ? Math.min(Math.round(section.gridLimit), 48)
+      : 24;
   const fetchLimit = isPaginationEnabled ? 200 : Math.max(pageSize, 48);
   const source =
     section.source === "featured" || section.source === "category"
@@ -606,7 +614,9 @@ function sectionClassName(
   const visualClass = visualStyleClassName(
     section.visualStyle as BuilderVisualStyle | undefined,
   );
-  const srClass = isScrollRevealPreset(section.animation) ? "shop-builder-section--scroll-reveal" : "";
+  const srClass = isScrollRevealPreset(section.animation)
+    ? "shop-builder-section--scroll-reveal"
+    : "";
   const heightClass = `shop-builder-section--height-${section.sectionHeight ?? "auto"}`;
   const verticalAlignClass = `shop-builder-section--align-${section.contentVerticalAlign ?? "top"}`;
   return `shop-builder-section shop-builder-section--${mode} shop-builder-section--content-${contentMode} shop-builder-section--scheme-${scheme} ${heightClass} ${verticalAlignClass} ${visualClass} ${animationClassName(section.animation)} ${srClass} ${extra}`.trim();
@@ -625,11 +635,11 @@ const scrollRevealPresets = new Set([
   "stagger",
 ]);
 
-const styleOnlyPresets = new Set([
-  "princity-gradient",
-]);
+const styleOnlyPresets = new Set(["princity-gradient"]);
 
-function isScrollRevealPreset(animation?: BuilderAnimation | Record<string, unknown>) {
+function isScrollRevealPreset(
+  animation?: BuilderAnimation | Record<string, unknown>,
+) {
   const preset =
     animation && typeof animation.preset === "string"
       ? animation.preset
@@ -637,7 +647,9 @@ function isScrollRevealPreset(animation?: BuilderAnimation | Record<string, unkn
   return scrollRevealPresets.has(preset);
 }
 
-function animationPreset(animation?: BuilderAnimation | Record<string, unknown>) {
+function animationPreset(
+  animation?: BuilderAnimation | Record<string, unknown>,
+) {
   const preset =
     animation && typeof animation.preset === "string"
       ? animation.preset
@@ -689,11 +701,12 @@ function animationDataAttributes(
     Number.isFinite(animation.durationMs)
       ? `${Math.max(200, animation.durationMs * 1000)}ms`
       : undefined;
-  const easing = animation?.easing === "ease-in-out"
-    ? "cubic-bezier(0.65, 0, 0.35, 1)"
-    : animation?.easing === "spring"
-      ? "cubic-bezier(0.34, 1.56, 0.64, 1)"
-      : undefined;
+  const easing =
+    animation?.easing === "ease-in-out"
+      ? "cubic-bezier(0.65, 0, 0.35, 1)"
+      : animation?.easing === "spring"
+        ? "cubic-bezier(0.34, 1.56, 0.64, 1)"
+        : undefined;
   const style = {
     ...(delay ? { "--builder-animate-delay": delay } : {}),
     ...(duration ? { "--builder-animate-duration": duration } : {}),
@@ -704,11 +717,12 @@ function animationDataAttributes(
     ...(scrubDistance ? { "--builder-pin-distance": scrubDistance } : {}),
   } as BuilderStyle;
 
-  const playOnce = typeof animation?.once !== "undefined"
-    ? animation.once
-    : typeof animation?.playOnce !== "undefined"
-      ? animation.playOnce
-      : true;
+  const playOnce =
+    typeof animation?.once !== "undefined"
+      ? animation.once
+      : typeof animation?.playOnce !== "undefined"
+        ? animation.playOnce
+        : true;
   const triggerOffset =
     typeof animation?.triggerOffset === "number" &&
     Number.isFinite(animation.triggerOffset)
@@ -722,7 +736,8 @@ function animationDataAttributes(
       "data-builder-pause": animation?.pauseUntilComplete ? "true" : undefined,
       "data-builder-step-offset": stepOffset,
       "data-builder-trigger-offset": triggerOffset,
-      "data-builder-progress-direction": animation?.progressDirection === "vertical" ? "vertical" : undefined,
+      "data-builder-progress-direction":
+        animation?.progressDirection === "vertical" ? "vertical" : undefined,
     },
     style: Object.keys(style).length ? style : undefined,
   };
@@ -754,7 +769,8 @@ function SectionFrame({
   const isAntigravity = section.backgroundEffect === "antigravity";
   const isFullTheme =
     isAntigravity &&
-    (section.antigravityVisualMode === undefined || section.antigravityVisualMode === "full");
+    (section.antigravityVisualMode === undefined ||
+      section.antigravityVisualMode === "full");
 
   return (
     <section
@@ -766,7 +782,10 @@ function SectionFrame({
             ? "relative overflow-hidden"
             : ""
       }`}
-      style={{ ...sectionStyle(section, layoutScheme), ...animationAttrs.style }}
+      style={{
+        ...sectionStyle(section, layoutScheme),
+        ...animationAttrs.style,
+      }}
       data-gsap-section={section.kind === "hero" ? "hero" : section.kind}
       {...animationAttrs.data}
     >
@@ -791,11 +810,13 @@ function SectionFrame({
               className="antigravity-grid-overlay"
               aria-hidden="true"
               style={
-                section.antigravityGridMoveSpeed !== undefined || section.antigravityColor
+                section.antigravityGridMoveSpeed !== undefined ||
+                section.antigravityColor
                   ? {
-                      animationDuration: section.antigravityGridMoveSpeed === 0
-                        ? "0s"
-                        : `${25 / (section.antigravityGridMoveSpeed ?? 1.0)}s`,
+                      animationDuration:
+                        section.antigravityGridMoveSpeed === 0
+                          ? "0s"
+                          : `${25 / (section.antigravityGridMoveSpeed ?? 1.0)}s`,
                       backgroundImage: section.antigravityColor
                         ? `linear-gradient(${section.antigravityColor}08 1px, transparent 1px), linear-gradient(90deg, ${section.antigravityColor}08 1px, transparent 1px)`
                         : undefined,
@@ -809,9 +830,7 @@ function SectionFrame({
       <div
         className="shop-builder-section-content"
         data-gsap-stagger={
-          section.kind === "hero" || section.kind === "embed"
-            ? undefined
-            : true
+          section.kind === "hero" || section.kind === "embed" ? undefined : true
         }
       >
         {children}
@@ -838,7 +857,6 @@ function ProductsSkeleton() {
   );
 }
 
-
 function HeroSection({
   section,
   product,
@@ -863,9 +881,9 @@ function HeroSection({
       <div data-gsap-hero-item className="shop-builder-hero-content-left">
         {section.eyebrow && (
           <Typog
-             as="p"
-             className="shop-builder-eyebrow"
-             typography={section.typography}
+            as="p"
+            className="shop-builder-eyebrow"
+            typography={section.typography}
           >
             {section.eyebrow}
           </Typog>
@@ -878,7 +896,20 @@ function HeroSection({
           {isProductTemplate ? (
             product?.name
           ) : isAntigravity && section.title ? (
-            <TypewriterText text={section.title} typography={section.typography} area="title" />
+            <TypewriterText
+              text={section.title}
+              typography={section.typography}
+              area="title"
+              speed={section.typewriterSpeed}
+              eraseSpeed={section.typewriterEraseSpeed}
+              delay={section.typewriterDelay}
+              loop={section.typewriterLoop}
+              useGradient={section.typewriterUseGradient}
+              gradientPreset={section.typewriterGradientPreset}
+              preserveHeight={section.typewriterPreserveHeight !== false}
+              reservedLines={section.typewriterReservedLines ?? 1}
+              mobileReservedLines={section.typewriterMobileReservedLines ?? 2}
+            />
           ) : (
             section.title
           )}
@@ -1269,7 +1300,7 @@ function RenderChecklist({
   if (!items || items.length === 0) return null;
   const isGradientCycle = colorScheme === "gradient-cycle";
   return (
-    <ul 
+    <ul
       className={`shop-builder-column-block--list-items ${isGradientCycle ? "is-icon-gradient-cycle" : ""}`}
       style={{
         listStyle: "none",
@@ -1280,11 +1311,11 @@ function RenderChecklist({
       }}
     >
       {items.map((item, index) => (
-        <li 
-          key={`${item}-${index}`} 
-          style={{ 
-            display: "flex", 
-            alignItems: "center", 
+        <li
+          key={`${item}-${index}`}
+          style={{
+            display: "flex",
+            alignItems: "center",
             gap: "0.5rem",
             fontSize: "0.95rem",
           }}
@@ -1298,7 +1329,9 @@ function RenderChecklist({
             sparkles: <Sparkles size={iconSize} />,
             shield: <ShieldCheck size={iconSize} />,
           }[iconName] ?? <Check size={iconSize} />}
-          <Typog as="span" typography={typography}>{item}</Typog>
+          <Typog as="span" typography={typography}>
+            {item}
+          </Typog>
         </li>
       ))}
     </ul>
@@ -1346,28 +1379,35 @@ function GridCards({
     ["none", "small", "medium", "large", "max"],
     "medium",
   );
-  const gridGapCustom = gridGapClass === "custom" ? cssSpacingValue(block.gridGap) : null;
+  const gridGapCustom =
+    gridGapClass === "custom" ? cssSpacingValue(block.gridGap) : null;
   const imagePaddingClass = gridSpacingClass(
     block.gridImagePadding,
     ["frameless", "none", "small", "medium", "max"],
     "frameless",
   );
   const imagePaddingCustom =
-    imagePaddingClass === "custom" ? cssSpacingValue(block.gridImagePadding) : null;
+    imagePaddingClass === "custom"
+      ? cssSpacingValue(block.gridImagePadding)
+      : null;
   const contentPaddingClass = gridSpacingClass(
     block.gridContentPadding,
     ["none", "small", "medium", "large"],
     "medium",
   );
   const contentPaddingCustom =
-    contentPaddingClass === "custom" ? cssSpacingValue(block.gridContentPadding) : null;
+    contentPaddingClass === "custom"
+      ? cssSpacingValue(block.gridContentPadding)
+      : null;
   return (
     <div
       className={`shop-builder-grid shop-builder-grid--gap-${gridGapClass} shop-builder-grid--margin-${blockLegacyGridMargin(block)} shop-card-preset--${block.panelStyle ?? "default"} ${visualClass}`}
       style={
         {
           "--shop-builder-grid-columns": block.columns ?? 3,
-          ...(gridGapCustom ? { "--shop-builder-grid-gap": gridGapCustom } : {}),
+          ...(gridGapCustom
+            ? { "--shop-builder-grid-gap": gridGapCustom }
+            : {}),
           ...visualStyleToCss(
             block.visualStyle as BuilderVisualStyle | undefined,
           ),
@@ -1384,7 +1424,9 @@ function GridCards({
                 ? { "--shop-builder-grid-image-padding": imagePaddingCustom }
                 : {}),
               ...(contentPaddingCustom
-                ? { "--shop-builder-grid-content-padding": contentPaddingCustom }
+                ? {
+                    "--shop-builder-grid-content-padding": contentPaddingCustom,
+                  }
                 : {}),
             } as CSSProperties
           }
@@ -1413,8 +1455,12 @@ function GridCards({
             {block.gridShowMeta !== false && item.meta && (
               <small>{item.meta}</small>
             )}
-            {block.gridShowText !== false && item.text && <Typog as="p" typography={item.typography ?? block.typography}>{item.text}</Typog>}
-            
+            {block.gridShowText !== false && item.text && (
+              <Typog as="p" typography={item.typography ?? block.typography}>
+                {item.text}
+              </Typog>
+            )}
+
             <RenderChecklist
               items={item.items}
               iconName={item.listIcon}
@@ -1494,7 +1540,9 @@ function ProductSummaryBlock({
   return (
     <div className="shop-builder-product-summary">
       <div className="product-header-row">
-        <Typog as="h3" typography={typography}>{product.name}</Typog>
+        <Typog as="h3" typography={typography}>
+          {product.name}
+        </Typog>
         <WishlistToggle
           id={product.id}
           slug={product.slug}
@@ -1560,7 +1608,9 @@ function ProductDynamicBlock({
         <div className="shop-builder-premium-product-copy">
           <span>Featured Product</span>
           <div className="product-header-row">
-            <Typog as="h3" typography={block?.typography}>{product.name}</Typog>
+            <Typog as="h3" typography={block?.typography}>
+              {product.name}
+            </Typog>
             <WishlistToggle
               id={product.id}
               slug={product.slug}
@@ -1595,8 +1645,10 @@ function ProductDynamicBlock({
   if (kind === "productInfoStack") {
     return (
       <div className="shop-builder-product-info-stack">
-          <div className="product-header-row">
-          <Typog as="h3" typography={block?.typography}>{product.name}</Typog>
+        <div className="product-header-row">
+          <Typog as="h3" typography={block?.typography}>
+            {product.name}
+          </Typog>
           <WishlistToggle
             id={product.id}
             slug={product.slug}
@@ -1631,7 +1683,9 @@ function ProductDynamicBlock({
     return (
       <div className="shop-builder-product-purchase-panel">
         <span>Ready to order</span>
-        <Typog as="h3" typography={block?.typography}>{product.name}</Typog>
+        <Typog as="h3" typography={block?.typography}>
+          {product.name}
+        </Typog>
         {product.priceFormatted && (
           <div className="shop-builder-product-price">
             {product.priceFormatted}
@@ -1685,7 +1739,9 @@ function ProductDynamicBlock({
   if (kind === "productTitle") {
     return (
       <div className="product-header-row">
-        <Typog as="h3" typography={block?.typography}>{product.name}</Typog>
+        <Typog as="h3" typography={block?.typography}>
+          {product.name}
+        </Typog>
         <WishlistToggle
           id={product.id}
           slug={product.slug}
@@ -1771,24 +1827,30 @@ function ContentLayoutBlock({
 }) {
   if (block.kind === "button") {
     return (
-      <div className={`shop-builder-column-block shop-builder-column-block--button ${block.premiumCardStyle && block.premiumCardStyle !== "none" ? `shop-builder-card--${block.premiumCardStyle}` : ""}`}>
-        <div 
+      <div
+        className={`shop-builder-column-block shop-builder-column-block--button ${block.premiumCardStyle && block.premiumCardStyle !== "none" ? `shop-builder-card--${block.premiumCardStyle}` : ""}`}
+      >
+        <div
           className={`shop-builder-buttons ${block.premiumButtonStyle && block.premiumButtonStyle !== "default" ? "" : `shop-builder-buttons--${block.buttonsLayout ?? "inline"}`}`}
-          style={{
-            display: "flex",
-            width: "fit-content",
-            maxWidth: "100%",
-            flexDirection: block.buttonsLayout === "stacked" ? "column" : "row",
-            flexWrap: "wrap",
-            "--button-group-gap": block.buttonGap || "0.75rem",
-            gap: "var(--button-group-gap, 0.75rem)",
-          } as CSSProperties}
+          style={
+            {
+              display: "flex",
+              width: "fit-content",
+              maxWidth: "100%",
+              flexDirection:
+                block.buttonsLayout === "stacked" ? "column" : "row",
+              flexWrap: "wrap",
+              "--button-group-gap": block.buttonGap || "0.75rem",
+              gap: "var(--button-group-gap, 0.75rem)",
+            } as CSSProperties
+          }
         >
           {block.buttonLabel && block.buttonUrl && (
             <Typog
               as="a"
               className={`shop-builder-cta ${
-                block.premiumButtonStyle && block.premiumButtonStyle !== "default"
+                block.premiumButtonStyle &&
+                block.premiumButtonStyle !== "default"
                   ? `shop-builder-cta--${block.premiumButtonStyle}`
                   : `shop-builder-cta--${block.buttonStyle ?? "primary"}`
               }`}
@@ -1805,7 +1867,8 @@ function ContentLayoutBlock({
               key={btn.id ?? btnIdx}
               as="a"
               className={`shop-builder-cta ${
-                block.premiumButtonStyle && block.premiumButtonStyle !== "default"
+                block.premiumButtonStyle &&
+                block.premiumButtonStyle !== "default"
                   ? `shop-builder-cta--${block.premiumButtonStyle}`
                   : `shop-builder-cta--${btn.style ?? "primary"}`
               }`}
@@ -1840,7 +1903,9 @@ function ContentLayoutBlock({
             </div>
           }
         >
-          <CategoryFiltersBlock hiddenCategorySlugs={block.hiddenCategorySlugs} />
+          <CategoryFiltersBlock
+            hiddenCategorySlugs={block.hiddenCategorySlugs}
+          />
         </Suspense>
       </div>
     );
@@ -1901,8 +1966,16 @@ function ContentLayoutBlock({
 
     return (
       <div className="shop-builder-column-block shop-builder-column-block--slider">
-        {block.title && <Typog as="h3" typography={block.typography}>{block.title}</Typog>}
-        {block.body && <Typog as="p" typography={block.typography}>{block.body}</Typog>}
+        {block.title && (
+          <Typog as="h3" typography={block.typography}>
+            {block.title}
+          </Typog>
+        )}
+        {block.body && (
+          <Typog as="p" typography={block.typography}>
+            {block.body}
+          </Typog>
+        )}
         <CarouselBlock
           block={{
             __typename: "PageBuilderLayoutPageBuilderCarouselLayoutLayout",
@@ -1917,7 +1990,7 @@ function ContentLayoutBlock({
 
   if (block.kind === "scrollPinnedDemo") {
     return (
-      <div 
+      <div
         className="shop-builder-column-block shop-builder-column-block--scroll-pinned"
         style={blockSurfaceStyle(block, parentScheme)}
       >
@@ -1929,8 +2002,16 @@ function ContentLayoutBlock({
   if (block.kind === "embed") {
     return (
       <div className="shop-builder-column-block shop-builder-column-block--embed">
-        {block.title && <Typog as="h3" typography={block.typography}>{block.title}</Typog>}
-        {block.body && <Typog as="p" typography={block.typography}>{block.body}</Typog>}
+        {block.title && (
+          <Typog as="h3" typography={block.typography}>
+            {block.title}
+          </Typog>
+        )}
+        {block.body && (
+          <Typog as="p" typography={block.typography}>
+            {block.body}
+          </Typog>
+        )}
         <EmbedSectionClient
           mode={block.embedMode}
           code={block.embedCode}
@@ -1970,8 +2051,16 @@ function ContentLayoutBlock({
 
     return (
       <div className="shop-builder-column-block shop-builder-column-block--badges">
-        {block.title && <Typog as="h3" typography={block.typography}>{block.title}</Typog>}
-        {block.body && <Typog as="p" typography={block.typography}>{block.body}</Typog>}
+        {block.title && (
+          <Typog as="h3" typography={block.typography}>
+            {block.title}
+          </Typog>
+        )}
+        {block.body && (
+          <Typog as="p" typography={block.typography}>
+            {block.body}
+          </Typog>
+        )}
         <div
           className="shop-builder-column-badges"
           style={
@@ -1983,8 +2072,16 @@ function ContentLayoutBlock({
           {badges.map((badge, index) => (
             <article key={badge.id ?? index}>
               {badge.label && <span>{badge.label}</span>}
-              {badge.title && <Typog as="strong" typography={block.typography}>{badge.title}</Typog>}
-              {badge.body && <Typog as="p" typography={block.typography}>{badge.body}</Typog>}
+              {badge.title && (
+                <Typog as="strong" typography={block.typography}>
+                  {badge.title}
+                </Typog>
+              )}
+              {badge.body && (
+                <Typog as="p" typography={block.typography}>
+                  {badge.body}
+                </Typog>
+              )}
               {badge.items && badge.items.length > 0 && (
                 <RenderChecklist
                   items={badge.items}
@@ -2004,7 +2101,11 @@ function ContentLayoutBlock({
   if (block.kind === "products") {
     return (
       <div className="shop-builder-column-block shop-builder-column-block--products">
-        {block.title && <Typog as="h3" typography={block.typography}>{block.title}</Typog>}
+        {block.title && (
+          <Typog as="h3" typography={block.typography}>
+            {block.title}
+          </Typog>
+        )}
         <Suspense fallback={<ProductsSkeleton />}>
           <ContentProductsBlock
             block={block}
@@ -2030,8 +2131,16 @@ function ContentLayoutBlock({
     return (
       <div className="shop-builder-column-block shop-builder-column-block--icon">
         <GoodieIcon iconName={block.iconName} />
-        {block.title && <Typog as="h3" typography={block.typography}>{block.title}</Typog>}
-        {block.body && <Typog as="p" typography={block.typography}>{block.body}</Typog>}
+        {block.title && (
+          <Typog as="h3" typography={block.typography}>
+            {block.title}
+          </Typog>
+        )}
+        {block.body && (
+          <Typog as="p" typography={block.typography}>
+            {block.body}
+          </Typog>
+        )}
       </div>
     );
   }
@@ -2040,7 +2149,11 @@ function ContentLayoutBlock({
     const isGradientCycle = block.listIconColorScheme === "gradient-cycle";
     return (
       <div className="shop-builder-column-block shop-builder-column-block--list">
-        {block.title && <Typog as="h3" typography={block.typography}>{block.title}</Typog>}
+        {block.title && (
+          <Typog as="h3" typography={block.typography}>
+            {block.title}
+          </Typog>
+        )}
         <ul className={isGradientCycle ? "is-icon-gradient-cycle" : undefined}>
           {(block.items ?? []).map((item, index) => (
             <li key={`${item}-${index}`}>
@@ -2052,7 +2165,9 @@ function ContentLayoutBlock({
                 heart: <Heart size={block.listIconSize ?? 16} />,
                 sparkles: <Sparkles size={block.listIconSize ?? 16} />,
                 shield: <ShieldCheck size={block.listIconSize ?? 16} />,
-              }[block.listIcon ?? "check"] ?? <Check size={block.listIconSize ?? 16} />}
+              }[block.listIcon ?? "check"] ?? (
+                <Check size={block.listIconSize ?? 16} />
+              )}
               <span>{item}</span>
             </li>
           ))}
@@ -2063,18 +2178,40 @@ function ContentLayoutBlock({
 
   if (block.kind === "heading") {
     const Tag = block.headingLevel ?? "h2";
-    const levelDefaults: Record<string, { fontSize: string; fontWeight: string; lineHeight: string }> = {
-      h1: { fontSize: "clamp(42px, 8vw, 126px)", fontWeight: "760", lineHeight: "0.92" },
-      h2: { fontSize: "clamp(32px, 5vw, 64px)", fontWeight: "700", lineHeight: "1.1" },
-      h3: { fontSize: "clamp(24px, 4vw, 40px)", fontWeight: "700", lineHeight: "1.2" },
-      h4: { fontSize: "clamp(20px, 3vw, 32px)", fontWeight: "600", lineHeight: "1.2" },
+    const levelDefaults: Record<
+      string,
+      { fontSize: string; fontWeight: string; lineHeight: string }
+    > = {
+      h1: {
+        fontSize: "clamp(42px, 8vw, 126px)",
+        fontWeight: "760",
+        lineHeight: "0.92",
+      },
+      h2: {
+        fontSize: "clamp(32px, 5vw, 64px)",
+        fontWeight: "700",
+        lineHeight: "1.1",
+      },
+      h3: {
+        fontSize: "clamp(24px, 4vw, 40px)",
+        fontWeight: "700",
+        lineHeight: "1.2",
+      },
+      h4: {
+        fontSize: "clamp(20px, 3vw, 32px)",
+        fontWeight: "600",
+        lineHeight: "1.2",
+      },
       h5: { fontSize: "20px", fontWeight: "600", lineHeight: "1.3" },
       h6: { fontSize: "16px", fontWeight: "600", lineHeight: "1.4" },
     };
     const defaultForLevel = levelDefaults[Tag] ?? levelDefaults.h2;
 
-    const userTitleTyp = (block.typography as any)?.title ?? 
-      (typeof block.typography === "object" && !(block.typography as any).title ? block.typography : {});
+    const userTitleTyp =
+      (block.typography as any)?.title ??
+      (typeof block.typography === "object" && !(block.typography as any).title
+        ? block.typography
+        : {});
 
     const resolvedTypography = {
       variant: "heading",
@@ -2088,16 +2225,22 @@ function ContentLayoutBlock({
       textDecoration: userTitleTyp.textDecoration,
     };
 
-    const isGradient = block.textGradientPreset && block.textGradientPreset !== "none";
+    const isGradient =
+      block.textGradientPreset && block.textGradientPreset !== "none";
     const isCustom = block.textGradientPreset === "custom";
-    const titleClassName = isGradient && !isCustom ? `text-gradient--${block.textGradientPreset}` : "";
-    const customStyle = isCustom ? {
-      backgroundImage: `linear-gradient(${block.textGradientCustomAngle ?? 135}deg, ${block.textGradientCustomStart ?? "#ffffff"} ${block.textGradientCustomStartOffset ?? 0}%, ${block.textGradientCustomMiddle ?? "#60a5fa"} ${block.textGradientCustomMiddleOffset ?? 50}%, ${block.textGradientCustomEnd ?? "#c084fc"} ${block.textGradientCustomEndOffset ?? 100}%)`,
-      WebkitBackgroundClip: "text",
-      WebkitTextFillColor: "transparent",
-      backgroundClip: "text",
-      display: "inline-block",
-    } : {};
+    const titleClassName =
+      isGradient && !isCustom
+        ? `text-gradient--${block.textGradientPreset}`
+        : "";
+    const customStyle = isCustom
+      ? {
+          backgroundImage: `linear-gradient(${block.textGradientCustomAngle ?? 135}deg, ${block.textGradientCustomStart ?? "#ffffff"} ${block.textGradientCustomStartOffset ?? 0}%, ${block.textGradientCustomMiddle ?? "#60a5fa"} ${block.textGradientCustomMiddleOffset ?? 50}%, ${block.textGradientCustomEnd ?? "#c084fc"} ${block.textGradientCustomEndOffset ?? 100}%)`,
+          WebkitBackgroundClip: "text",
+          WebkitTextFillColor: "transparent",
+          backgroundClip: "text",
+          display: "inline-block",
+        }
+      : {};
     return (
       <div
         className={`shop-builder-column-block shop-builder-column-block--heading ${block.premiumCardStyle && block.premiumCardStyle !== "none" ? `shop-builder-card--${block.premiumCardStyle}` : ""}`}
@@ -2107,7 +2250,11 @@ function ContentLayoutBlock({
           as={Tag}
           className={titleClassName}
           typography={resolvedTypography}
-          style={{ textAlign: block.headingAlign ?? "left", margin: 0, ...customStyle }}
+          style={{
+            textAlign: block.headingAlign ?? "left",
+            margin: 0,
+            ...customStyle,
+          }}
         >
           {block.typewriterEnabled ? (
             <TypewriterText
@@ -2117,12 +2264,24 @@ function ContentLayoutBlock({
               delay={block.typewriterDelay}
               loop={block.typewriterLoop}
               useGradient={block.typewriterUseGradient}
-              gradientPreset={block.textGradientPreset ?? block.typewriterGradientPreset} customStart={block.textGradientCustomStart} customMiddle={block.textGradientCustomMiddle} customEnd={block.textGradientCustomEnd} customAngle={block.textGradientCustomAngle} customStartOffset={block.textGradientCustomStartOffset} customMiddleOffset={block.textGradientCustomMiddleOffset} customEndOffset={block.textGradientCustomEndOffset}
+              gradientPreset={
+                block.textGradientPreset ?? block.typewriterGradientPreset
+              }
+              customStart={block.textGradientCustomStart}
+              customMiddle={block.textGradientCustomMiddle}
+              customEnd={block.textGradientCustomEnd}
+              customAngle={block.textGradientCustomAngle}
+              customStartOffset={block.textGradientCustomStartOffset}
+              customMiddleOffset={block.textGradientCustomMiddleOffset}
+              customEndOffset={block.textGradientCustomEndOffset}
               typography={resolvedTypography}
               area="title"
+              preserveHeight={block.typewriterPreserveHeight !== false}
+              reservedLines={block.typewriterReservedLines ?? 1}
+              mobileReservedLines={block.typewriterMobileReservedLines ?? 2}
             />
           ) : (
-            block.headingText ?? "Your Heading Text"
+            (block.headingText ?? "Your Heading Text")
           )}
         </Typog>
       </div>
@@ -2133,8 +2292,16 @@ function ContentLayoutBlock({
     return (
       <div className="shop-builder-column-block shop-builder-column-block--date-picker">
         <CalendarDays size={24} />
-        {block.title && <Typog as="h3" typography={block.typography}>{block.title}</Typog>}
-        {block.body && <Typog as="p" typography={block.typography}>{block.body}</Typog>}
+        {block.title && (
+          <Typog as="h3" typography={block.typography}>
+            {block.title}
+          </Typog>
+        )}
+        {block.body && (
+          <Typog as="p" typography={block.typography}>
+            {block.body}
+          </Typog>
+        )}
         <label>
           <span>{block.dateLabel ?? "Preferred date"}</span>
           <input type="date" />
@@ -2145,12 +2312,12 @@ function ContentLayoutBlock({
 
   if (block.kind === "cartContent") {
     return page === "page:cart" ? (
-      pageContent ?? (
+      (pageContent ?? (
         <div className="shop-builder-column-block shop-builder-column-block--text">
           <Typog as="h3">Cart content</Typog>
           <Typog as="p">The live cart UI will render here.</Typog>
         </div>
-      )
+      ))
     ) : (
       <div className="shop-builder-column-block shop-builder-column-block--text">
         <Typog as="h3">Cart content</Typog>
@@ -2161,12 +2328,12 @@ function ContentLayoutBlock({
 
   if (block.kind === "checkoutContent") {
     return page === "page:checkout" ? (
-      pageContent ?? (
+      (pageContent ?? (
         <div className="shop-builder-column-block shop-builder-column-block--text">
           <Typog as="h3">Checkout content</Typog>
           <Typog as="p">The live checkout UI will render here.</Typog>
         </div>
-      )
+      ))
     ) : (
       <div className="shop-builder-column-block shop-builder-column-block--text">
         <Typog as="h3">Checkout content</Typog>
@@ -2177,12 +2344,12 @@ function ContentLayoutBlock({
 
   if (block.kind === "accountContent") {
     return page === "page:my-account" ? (
-      pageContent ?? (
+      (pageContent ?? (
         <div className="shop-builder-column-block shop-builder-column-block--text">
           <Typog as="h3">My account content</Typog>
           <Typog as="p">The live account UI will render here.</Typog>
         </div>
-      )
+      ))
     ) : (
       <div className="shop-builder-column-block shop-builder-column-block--text">
         <Typog as="h3">My account content</Typog>
@@ -2192,26 +2359,35 @@ function ContentLayoutBlock({
   }
 
   if (block.kind === "hero") {
-    const isBlockAntigravity = block.carouselSettings?.variant === "antigravity";
-    const isGradient = block.textGradientPreset && block.textGradientPreset !== "none";
+    const isBlockAntigravity =
+      block.carouselSettings?.variant === "antigravity";
+    const isGradient =
+      block.textGradientPreset && block.textGradientPreset !== "none";
     const isCustom = block.textGradientPreset === "custom";
-    const titleClassName = isGradient && !isCustom
-      ? `text-gradient--${block.textGradientPreset}`
-      : isBlockAntigravity
-        ? "shop-builder-title--gradient"
-        : "";
-    const customStyle = isCustom ? {
-      backgroundImage: `linear-gradient(${block.textGradientCustomAngle ?? 135}deg, ${block.textGradientCustomStart ?? "#ffffff"} ${block.textGradientCustomStartOffset ?? 0}%, ${block.textGradientCustomMiddle ?? "#60a5fa"} ${block.textGradientCustomMiddleOffset ?? 50}%, ${block.textGradientCustomEnd ?? "#c084fc"} ${block.textGradientCustomEndOffset ?? 100}%)`,
-      WebkitBackgroundClip: "text",
-      WebkitTextFillColor: "transparent",
-      backgroundClip: "text",
-      display: "inline-block",
-    } : {};
+    const titleClassName =
+      isGradient && !isCustom
+        ? `text-gradient--${block.textGradientPreset}`
+        : isBlockAntigravity
+          ? "shop-builder-title--gradient"
+          : "";
+    const customStyle = isCustom
+      ? {
+          backgroundImage: `linear-gradient(${block.textGradientCustomAngle ?? 135}deg, ${block.textGradientCustomStart ?? "#ffffff"} ${block.textGradientCustomStartOffset ?? 0}%, ${block.textGradientCustomMiddle ?? "#60a5fa"} ${block.textGradientCustomMiddleOffset ?? 50}%, ${block.textGradientCustomEnd ?? "#c084fc"} ${block.textGradientCustomEndOffset ?? 100}%)`,
+          WebkitBackgroundClip: "text",
+          WebkitTextFillColor: "transparent",
+          backgroundClip: "text",
+          display: "inline-block",
+        }
+      : {};
     const buttonItems = getBlockButtonItems(block);
 
     return (
-      <div className={`shop-builder-column-block shop-builder-column-block--hero ${isBlockAntigravity ? "shop-builder-hero--antigravity shop-builder-hero--antigravity-block" : ""} ${block.premiumCardStyle && block.premiumCardStyle !== "none" ? `shop-builder-card--${block.premiumCardStyle}` : ""}`}>
-        <div className={isBlockAntigravity ? "shop-builder-hero-content-left" : ""}>
+      <div
+        className={`shop-builder-column-block shop-builder-column-block--hero ${isBlockAntigravity ? "shop-builder-hero--antigravity shop-builder-hero--antigravity-block" : ""} ${block.premiumCardStyle && block.premiumCardStyle !== "none" ? `shop-builder-card--${block.premiumCardStyle}` : ""}`}
+      >
+        <div
+          className={isBlockAntigravity ? "shop-builder-hero-content-left" : ""}
+        >
           {block.eyebrow && (
             <Typog
               as="span"
@@ -2236,9 +2412,21 @@ function ContentLayoutBlock({
                   delay={block.typewriterDelay}
                   loop={block.typewriterLoop}
                   useGradient={block.typewriterUseGradient}
-                  gradientPreset={block.textGradientPreset ?? block.typewriterGradientPreset} customStart={block.textGradientCustomStart} customMiddle={block.textGradientCustomMiddle} customEnd={block.textGradientCustomEnd} customAngle={block.textGradientCustomAngle} customStartOffset={block.textGradientCustomStartOffset} customMiddleOffset={block.textGradientCustomMiddleOffset} customEndOffset={block.textGradientCustomEndOffset}
+                  gradientPreset={
+                    block.textGradientPreset ?? block.typewriterGradientPreset
+                  }
+                  customStart={block.textGradientCustomStart}
+                  customMiddle={block.textGradientCustomMiddle}
+                  customEnd={block.textGradientCustomEnd}
+                  customAngle={block.textGradientCustomAngle}
+                  customStartOffset={block.textGradientCustomStartOffset}
+                  customMiddleOffset={block.textGradientCustomMiddleOffset}
+                  customEndOffset={block.textGradientCustomEndOffset}
                   typography={block.typography}
                   area="title"
+                  preserveHeight={block.typewriterPreserveHeight !== false}
+                  reservedLines={block.typewriterReservedLines ?? 1}
+                  mobileReservedLines={block.typewriterMobileReservedLines ?? 2}
                 />
               ) : isBlockAntigravity ? (
                 <TypewriterText
@@ -2248,13 +2436,21 @@ function ContentLayoutBlock({
                   delay={block.typewriterDelay}
                   loop={block.typewriterLoop}
                   useGradient={block.typewriterUseGradient}
-                  gradientPreset={block.textGradientPreset ?? block.typewriterGradientPreset}
+                  gradientPreset={
+                    block.textGradientPreset ?? block.typewriterGradientPreset
+                  }
                   customStart={block.textGradientCustomStart}
                   customMiddle={block.textGradientCustomMiddle}
                   customEnd={block.textGradientCustomEnd}
-                  customAngle={block.textGradientCustomAngle} customStartOffset={block.textGradientCustomStartOffset} customMiddleOffset={block.textGradientCustomMiddleOffset} customEndOffset={block.textGradientCustomEndOffset}
+                  customAngle={block.textGradientCustomAngle}
+                  customStartOffset={block.textGradientCustomStartOffset}
+                  customMiddleOffset={block.textGradientCustomMiddleOffset}
+                  customEndOffset={block.textGradientCustomEndOffset}
                   typography={block.typography}
                   area="title"
+                  preserveHeight={block.typewriterPreserveHeight !== false}
+                  reservedLines={block.typewriterReservedLines ?? 1}
+                  mobileReservedLines={block.typewriterMobileReservedLines ?? 2}
                 />
               ) : (
                 block.title
@@ -2271,9 +2467,21 @@ function ContentLayoutBlock({
                   delay={block.typewriterDelay}
                   loop={block.typewriterLoop}
                   useGradient={block.typewriterUseGradient}
-                  gradientPreset={block.textGradientPreset ?? block.typewriterGradientPreset} customStart={block.textGradientCustomStart} customMiddle={block.textGradientCustomMiddle} customEnd={block.textGradientCustomEnd} customAngle={block.textGradientCustomAngle} customStartOffset={block.textGradientCustomStartOffset} customMiddleOffset={block.textGradientCustomMiddleOffset} customEndOffset={block.textGradientCustomEndOffset}
+                  gradientPreset={
+                    block.textGradientPreset ?? block.typewriterGradientPreset
+                  }
+                  customStart={block.textGradientCustomStart}
+                  customMiddle={block.textGradientCustomMiddle}
+                  customEnd={block.textGradientCustomEnd}
+                  customAngle={block.textGradientCustomAngle}
+                  customStartOffset={block.textGradientCustomStartOffset}
+                  customMiddleOffset={block.textGradientCustomMiddleOffset}
+                  customEndOffset={block.textGradientCustomEndOffset}
                   typography={block.typography}
                   area="body"
+                  preserveHeight={block.typewriterPreserveHeight !== false}
+                  reservedLines={block.typewriterReservedLines ?? 1}
+                  mobileReservedLines={block.typewriterMobileReservedLines ?? 2}
                 />
               ) : (
                 block.body
@@ -2283,23 +2491,28 @@ function ContentLayoutBlock({
           {buttonItems.length > 0 && (
             <div
               className={`shop-builder-buttons ${
-                block.premiumButtonStyle && block.premiumButtonStyle !== "default"
+                block.premiumButtonStyle &&
+                block.premiumButtonStyle !== "default"
                   ? ""
                   : `shop-builder-buttons--${block.buttonsLayout ?? "inline"}`
               }`}
-              style={{
-                display: "flex",
-                width: "fit-content",
-                maxWidth: "100%",
-                flexDirection: block.buttonsLayout === "stacked" ? "column" : "row",
-                flexWrap: "wrap",
-                "--button-group-gap": block.buttonGap || "0.75rem",
-                gap: "var(--button-group-gap, 0.75rem)",
-              } as CSSProperties}
+              style={
+                {
+                  display: "flex",
+                  width: "fit-content",
+                  maxWidth: "100%",
+                  flexDirection:
+                    block.buttonsLayout === "stacked" ? "column" : "row",
+                  flexWrap: "wrap",
+                  "--button-group-gap": block.buttonGap || "0.75rem",
+                  gap: "var(--button-group-gap, 0.75rem)",
+                } as CSSProperties
+              }
             >
               {buttonItems.map((button) => {
                 const isPremium =
-                  block.premiumButtonStyle && block.premiumButtonStyle !== "default";
+                  block.premiumButtonStyle &&
+                  block.premiumButtonStyle !== "default";
                 return (
                   <Typog
                     key={button.key}
@@ -2347,9 +2560,21 @@ function ContentLayoutBlock({
                   delay={block.typewriterDelay}
                   loop={block.typewriterLoop}
                   useGradient={block.typewriterUseGradient}
-                  gradientPreset={block.textGradientPreset ?? block.typewriterGradientPreset} customStart={block.textGradientCustomStart} customMiddle={block.textGradientCustomMiddle} customEnd={block.textGradientCustomEnd} customAngle={block.textGradientCustomAngle} customStartOffset={block.textGradientCustomStartOffset} customMiddleOffset={block.textGradientCustomMiddleOffset} customEndOffset={block.textGradientCustomEndOffset}
+                  gradientPreset={
+                    block.textGradientPreset ?? block.typewriterGradientPreset
+                  }
+                  customStart={block.textGradientCustomStart}
+                  customMiddle={block.textGradientCustomMiddle}
+                  customEnd={block.textGradientCustomEnd}
+                  customAngle={block.textGradientCustomAngle}
+                  customStartOffset={block.textGradientCustomStartOffset}
+                  customMiddleOffset={block.textGradientCustomMiddleOffset}
+                  customEndOffset={block.textGradientCustomEndOffset}
                   typography={block.typography}
                   area="title"
+                  preserveHeight={block.typewriterPreserveHeight !== false}
+                  reservedLines={block.typewriterReservedLines ?? 1}
+                  mobileReservedLines={block.typewriterMobileReservedLines ?? 2}
                 />
               ) : (
                 block.title
@@ -2366,9 +2591,21 @@ function ContentLayoutBlock({
                   delay={block.typewriterDelay}
                   loop={block.typewriterLoop}
                   useGradient={block.typewriterUseGradient}
-                  gradientPreset={block.textGradientPreset ?? block.typewriterGradientPreset} customStart={block.textGradientCustomStart} customMiddle={block.textGradientCustomMiddle} customEnd={block.textGradientCustomEnd} customAngle={block.textGradientCustomAngle} customStartOffset={block.textGradientCustomStartOffset} customMiddleOffset={block.textGradientCustomMiddleOffset} customEndOffset={block.textGradientCustomEndOffset}
+                  gradientPreset={
+                    block.textGradientPreset ?? block.typewriterGradientPreset
+                  }
+                  customStart={block.textGradientCustomStart}
+                  customMiddle={block.textGradientCustomMiddle}
+                  customEnd={block.textGradientCustomEnd}
+                  customAngle={block.textGradientCustomAngle}
+                  customStartOffset={block.textGradientCustomStartOffset}
+                  customMiddleOffset={block.textGradientCustomMiddleOffset}
+                  customEndOffset={block.textGradientCustomEndOffset}
                   typography={block.typography}
                   area="body"
+                  preserveHeight={block.typewriterPreserveHeight !== false}
+                  reservedLines={block.typewriterReservedLines ?? 1}
+                  mobileReservedLines={block.typewriterMobileReservedLines ?? 2}
                 />
               ) : (
                 block.body
@@ -2442,7 +2679,11 @@ function ContentLayoutBlock({
             </span>
           )}
           {block.title && (
-            <Typog as="h3" typography={block.typography} style={panelTitleStyle}>
+            <Typog
+              as="h3"
+              typography={block.typography}
+              style={panelTitleStyle}
+            >
               {block.typewriterEnabled ? (
                 <TypewriterText
                   text={block.title}
@@ -2451,9 +2692,21 @@ function ContentLayoutBlock({
                   delay={block.typewriterDelay}
                   loop={block.typewriterLoop}
                   useGradient={block.typewriterUseGradient}
-                  gradientPreset={block.textGradientPreset ?? block.typewriterGradientPreset} customStart={block.textGradientCustomStart} customMiddle={block.textGradientCustomMiddle} customEnd={block.textGradientCustomEnd} customAngle={block.textGradientCustomAngle} customStartOffset={block.textGradientCustomStartOffset} customMiddleOffset={block.textGradientCustomMiddleOffset} customEndOffset={block.textGradientCustomEndOffset}
+                  gradientPreset={
+                    block.textGradientPreset ?? block.typewriterGradientPreset
+                  }
+                  customStart={block.textGradientCustomStart}
+                  customMiddle={block.textGradientCustomMiddle}
+                  customEnd={block.textGradientCustomEnd}
+                  customAngle={block.textGradientCustomAngle}
+                  customStartOffset={block.textGradientCustomStartOffset}
+                  customMiddleOffset={block.textGradientCustomMiddleOffset}
+                  customEndOffset={block.textGradientCustomEndOffset}
                   typography={block.typography}
                   area="title"
+                  preserveHeight={block.typewriterPreserveHeight !== false}
+                  reservedLines={block.typewriterReservedLines ?? 1}
+                  mobileReservedLines={block.typewriterMobileReservedLines ?? 2}
                 />
               ) : (
                 block.title
@@ -2470,16 +2723,28 @@ function ContentLayoutBlock({
                   delay={block.typewriterDelay}
                   loop={block.typewriterLoop}
                   useGradient={block.typewriterUseGradient}
-                  gradientPreset={block.textGradientPreset ?? block.typewriterGradientPreset} customStart={block.textGradientCustomStart} customMiddle={block.textGradientCustomMiddle} customEnd={block.textGradientCustomEnd} customAngle={block.textGradientCustomAngle} customStartOffset={block.textGradientCustomStartOffset} customMiddleOffset={block.textGradientCustomMiddleOffset} customEndOffset={block.textGradientCustomEndOffset}
+                  gradientPreset={
+                    block.textGradientPreset ?? block.typewriterGradientPreset
+                  }
+                  customStart={block.textGradientCustomStart}
+                  customMiddle={block.textGradientCustomMiddle}
+                  customEnd={block.textGradientCustomEnd}
+                  customAngle={block.textGradientCustomAngle}
+                  customStartOffset={block.textGradientCustomStartOffset}
+                  customMiddleOffset={block.textGradientCustomMiddleOffset}
+                  customEndOffset={block.textGradientCustomEndOffset}
                   typography={block.typography}
                   area="body"
+                  preserveHeight={block.typewriterPreserveHeight !== false}
+                  reservedLines={block.typewriterReservedLines ?? 1}
+                  mobileReservedLines={block.typewriterMobileReservedLines ?? 2}
                 />
               ) : (
                 block.body
               )}
             </Typog>
           )}
-          
+
           <RenderChecklist
             items={block.items}
             iconName={block.listIcon}
@@ -2498,19 +2763,19 @@ function ContentLayoutBlock({
               {block.buttonLabel}
             </Typog>
           )}
-        {(block.buttons ?? []).map((btn, btnIdx) => (
-          <Typog
-            key={btn.id ?? btnIdx}
-            as="a"
-            className={`shop-builder-cta shop-builder-cta--${btn.style ?? "primary"}`}
-            href={btn.url}
-            target={btn.target === "_blank" ? "_blank" : undefined}
-            rel={btn.target === "_blank" ? "noreferrer" : undefined}
-            typography={block.typography}
-          >
-            {btn.label}
-          </Typog>
-        ))}
+          {(block.buttons ?? []).map((btn, btnIdx) => (
+            <Typog
+              key={btn.id ?? btnIdx}
+              as="a"
+              className={`shop-builder-cta shop-builder-cta--${btn.style ?? "primary"}`}
+              href={btn.url}
+              target={btn.target === "_blank" ? "_blank" : undefined}
+              rel={btn.target === "_blank" ? "noreferrer" : undefined}
+              typography={block.typography}
+            >
+              {btn.label}
+            </Typog>
+          ))}
         </div>
       </div>
     );
@@ -2531,7 +2796,9 @@ function ContentLayoutBlock({
           className="shop-builder-image-figure"
           style={{
             textAlign: block.imageAlignment ?? "center",
-            maxWidth: block.imageMaxWidth ? `${block.imageMaxWidth}px` : undefined,
+            maxWidth: block.imageMaxWidth
+              ? `${block.imageMaxWidth}px`
+              : undefined,
             marginInline: "auto",
           }}
         >
@@ -2552,11 +2819,7 @@ function ContentLayoutBlock({
               }}
             />
           </div>
-        {block.imageCaption && (
-          <figcaption>
-            {block.imageCaption}
-          </figcaption>
-        )}
+          {block.imageCaption && <figcaption>{block.imageCaption}</figcaption>}
         </figure>
       </div>
     );
@@ -2569,7 +2832,11 @@ function ContentLayoutBlock({
         <div style={{ overflowX: "auto" }}>
           <table
             className={`builder-preview-table builder-preview-table--${block.tableStyle ?? "striped"}`}
-            style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.9em" }}
+            style={{
+              width: "100%",
+              borderCollapse: "collapse",
+              fontSize: "0.9em",
+            }}
           >
             {headLength > 0 && (
               <thead>
@@ -2583,9 +2850,12 @@ function ContentLayoutBlock({
             <tbody>
               {(block.tableRows ?? []).map((row, rIdx) => (
                 <tr key={rIdx}>
-                  {Array.from({ length: Math.max(headLength, row.length) }, (_, cIdx) => (
-                    <td key={cIdx}>{row[cIdx] ?? ""}</td>
-                  ))}
+                  {Array.from(
+                    { length: Math.max(headLength, row.length) },
+                    (_, cIdx) => (
+                      <td key={cIdx}>{row[cIdx] ?? ""}</td>
+                    ),
+                  )}
                 </tr>
               ))}
             </tbody>
@@ -2598,9 +2868,17 @@ function ContentLayoutBlock({
   return (
     <div className="shop-builder-column-block shop-builder-column-block--text">
       {block.eyebrow && <span>{block.eyebrow}</span>}
-      {block.title && <Typog as="h3" typography={block.typography}>{block.title}</Typog>}
-      {block.body && <Typog as="p" typography={block.typography}>{block.body}</Typog>}
-      
+      {block.title && (
+        <Typog as="h3" typography={block.typography}>
+          {block.title}
+        </Typog>
+      )}
+      {block.body && (
+        <Typog as="p" typography={block.typography}>
+          {block.body}
+        </Typog>
+      )}
+
       <RenderChecklist
         items={block.items}
         iconName={block.listIcon}
@@ -2609,17 +2887,19 @@ function ContentLayoutBlock({
         iconSize={block.listIconSize}
       />
 
-      <div 
+      <div
         className={`shop-builder-buttons shop-builder-buttons--${block.buttonsLayout ?? "inline"}`}
-        style={{
-          display: "flex",
-          width: "fit-content",
-          maxWidth: "100%",
-          flexDirection: block.buttonsLayout === "stacked" ? "column" : "row",
-          flexWrap: "wrap",
-          "--button-group-gap": block.buttonGap || "0.75rem",
-          gap: "var(--button-group-gap, 0.75rem)",
-        } as CSSProperties}
+        style={
+          {
+            display: "flex",
+            width: "fit-content",
+            maxWidth: "100%",
+            flexDirection: block.buttonsLayout === "stacked" ? "column" : "row",
+            flexWrap: "wrap",
+            "--button-group-gap": block.buttonGap || "0.75rem",
+            gap: "var(--button-group-gap, 0.75rem)",
+          } as CSSProperties
+        }
       >
         {block.buttonLabel && block.buttonUrl && (
           <Typog
@@ -2651,10 +2931,13 @@ function ContentLayoutBlock({
 
 function resolveBlockColorSchemeAndBg(
   block: BuilderLayoutBlock,
-  parentScheme: "light" | "dark" = "light"
+  parentScheme: "light" | "dark" = "light",
 ): { scheme: "light" | "dark"; bg: string | undefined } {
   if (block.elementBackgroundMode === "custom" && block.elementBackground) {
-    const scheme = resolveColorSchemeForBackground(block.elementBackground, parentScheme);
+    const scheme = resolveColorSchemeForBackground(
+      block.elementBackground,
+      parentScheme,
+    );
     return { scheme, bg: block.elementBackground };
   }
   if (block.elementBackgroundMode === "transparent") {
@@ -2680,7 +2963,7 @@ function resolveBlockColorSchemeAndBg(
 
 function blockSurfaceStyle(
   block: BuilderLayoutBlock,
-  parentScheme: "light" | "dark" = "light"
+  parentScheme: "light" | "dark" = "light",
 ): CSSProperties {
   const visual = block.visualStyle as BuilderVisualStyle | undefined;
   const visualCss = visualStyleToCss(visual);
@@ -2712,7 +2995,8 @@ function blockSurfaceStyle(
     } else {
       legacy.paddingTop = "var(--builder-global-element-padding-top, 16px)";
       legacy.paddingRight = "var(--builder-global-element-padding-right, 16px)";
-      legacy.paddingBottom = "var(--builder-global-element-padding-bottom, 16px)";
+      legacy.paddingBottom =
+        "var(--builder-global-element-padding-bottom, 16px)";
       legacy.paddingLeft = "var(--builder-global-element-padding-left, 16px)";
     }
   }
@@ -2731,14 +3015,14 @@ function blockSurfaceStyle(
   return { ...contextVars, ...legacy, ...visualCss };
 }
 
-
 function blockShellClassName(block: BuilderLayoutBlock) {
   const visualClass = visualStyleClassName(
     block.visualStyle as BuilderVisualStyle | undefined,
   );
-  const premiumCardClass = block.premiumCardStyle && block.premiumCardStyle !== "none"
-    ? `shop-builder-card--${block.premiumCardStyle}`
-    : "";
+  const premiumCardClass =
+    block.premiumCardStyle && block.premiumCardStyle !== "none"
+      ? `shop-builder-card--${block.premiumCardStyle}`
+      : "";
   return `shop-builder-element-shell shop-card-preset--${
     block.panelStyle ?? "default"
   } is-padding-${
@@ -2784,18 +3068,33 @@ function buttonTypographyStyle(
   return buttonSafeStyle;
 }
 
-function Typog({ as: As = "div", typography, className, children, style, ...props }: any) {
+function Typog({
+  as: As = "div",
+  typography,
+  className,
+  children,
+  style,
+  ...props
+}: any) {
   const tp = typographyProps(
     typography,
     inferTypographyArea(String(As), className),
   );
   const combined = [className, tp.className].filter(Boolean).join(" ");
-  const combinedStyle = buttonTypographyStyle(combined, { ...tp.style, ...style });
+  const combinedStyle = buttonTypographyStyle(combined, {
+    ...tp.style,
+    ...style,
+  });
   const isRich = isRichPreviewText(children);
   if (isRich) {
     const Tag = getRichTextSafeTag(String(As)) as any;
     return (
-      <Tag className={combined || undefined} style={combinedStyle} {...props} dangerouslySetInnerHTML={{ __html: children }} />
+      <Tag
+        className={combined || undefined}
+        style={combinedStyle}
+        {...props}
+        dangerouslySetInnerHTML={{ __html: children }}
+      />
     );
   }
   const Tag = As as any;
@@ -2806,10 +3105,21 @@ function Typog({ as: As = "div", typography, className, children, style, ...prop
   );
 }
 
-function BodyText({ children, className }: { children: string | null | undefined; className?: string }) {
+function BodyText({
+  children,
+  className,
+}: {
+  children: string | null | undefined;
+  className?: string;
+}) {
   if (!children) return null;
   if (isRichPreviewText(children)) {
-    return <div className={className} dangerouslySetInnerHTML={{ __html: children }} />;
+    return (
+      <div
+        className={className}
+        dangerouslySetInnerHTML={{ __html: children }}
+      />
+    );
   }
   return <p className={className}>{children}</p>;
 }
@@ -2831,7 +3141,10 @@ function inferTypographyArea(
   return "body";
 }
 
-function rowStyle(rowItem: any, parentScheme: "light" | "dark" | "auto" = "light"): CSSProperties {
+function rowStyle(
+  rowItem: any,
+  parentScheme: "light" | "dark" | "auto" = "light",
+): CSSProperties {
   const visual = rowItem?.rowVisualStyle as BuilderVisualStyle | undefined;
   const visualCss = visualStyleToCss(visual);
   const styleObj: any = {};
@@ -2973,10 +3286,19 @@ function ContentLayoutSection({
             rowItem?.rowBackgroundEffect === "webgl_flowfield" ||
             rowItem?.rowBackgroundEffect === "webgl_cybergrid" ||
             rowItem?.rowBackgroundEffect === "webgl_fluid";
-          const isRowAntigravity = rowItem?.rowBackgroundEffect === "antigravity";
-          const isFullRowTheme = isRowAntigravity && (rowItem.rowAntigravityVisualMode === undefined || rowItem.rowAntigravityVisualMode === "full");
-          const rowAnimationAttrs = animationDataAttributes(rowItem?.rowAnimation);
-          const rowColorScheme = resolveColorSchemeForBackground(rowItem?.rowBackground, sectionColorScheme === "auto" ? "light" : sectionColorScheme);
+          const isRowAntigravity =
+            rowItem?.rowBackgroundEffect === "antigravity";
+          const isFullRowTheme =
+            isRowAntigravity &&
+            (rowItem.rowAntigravityVisualMode === undefined ||
+              rowItem.rowAntigravityVisualMode === "full");
+          const rowAnimationAttrs = animationDataAttributes(
+            rowItem?.rowAnimation,
+          );
+          const rowColorScheme = resolveColorSchemeForBackground(
+            rowItem?.rowBackground,
+            sectionColorScheme === "auto" ? "light" : sectionColorScheme,
+          );
 
           return (
             <div
@@ -3013,32 +3335,38 @@ function ContentLayoutSection({
                     showParticles={rowItem.rowAntigravityShowParticles}
                     gridMoveSpeed={rowItem.rowAntigravityGridMoveSpeed}
                     glowIntensity={rowItem.rowAntigravityGlowIntensity}
-                    interactionScope={rowItem.rowAntigravityInteractionScope as any}
+                    interactionScope={
+                      rowItem.rowAntigravityInteractionScope as any
+                    }
                     visualMode={rowItem.rowAntigravityVisualMode as any}
                     effectType={rowItem.rowBackgroundEffect}
                   />
-                  {isRowAntigravity && rowItem.rowAntigravityShowGrid !== false && (
-                    <div
-                      className="antigravity-grid-overlay"
-                      aria-hidden="true"
-                      style={
-                        rowItem.rowAntigravityGridMoveSpeed !== undefined || rowItem.rowAntigravityColor
-                          ? {
-                              animationDuration: rowItem.rowAntigravityGridMoveSpeed === 0
-                                ? "0s"
-                                : `${25 / (rowItem.rowAntigravityGridMoveSpeed ?? 1.0)}s`,
-                              backgroundImage: rowItem.rowAntigravityColor
-                                ? `linear-gradient(${rowItem.rowAntigravityColor}08 1px, transparent 1px), linear-gradient(90deg, ${rowItem.rowAntigravityColor}08 1px, transparent 1px)`
-                                : undefined,
-                            }
-                          : undefined
-                      }
-                    />
-                  )}
+                  {isRowAntigravity &&
+                    rowItem.rowAntigravityShowGrid !== false && (
+                      <div
+                        className="antigravity-grid-overlay"
+                        aria-hidden="true"
+                        style={
+                          rowItem.rowAntigravityGridMoveSpeed !== undefined ||
+                          rowItem.rowAntigravityColor
+                            ? {
+                                animationDuration:
+                                  rowItem.rowAntigravityGridMoveSpeed === 0
+                                    ? "0s"
+                                    : `${25 / (rowItem.rowAntigravityGridMoveSpeed ?? 1.0)}s`,
+                                backgroundImage: rowItem.rowAntigravityColor
+                                  ? `linear-gradient(${rowItem.rowAntigravityColor}08 1px, transparent 1px), linear-gradient(90deg, ${rowItem.rowAntigravityColor}08 1px, transparent 1px)`
+                                  : undefined,
+                              }
+                            : undefined
+                        }
+                      />
+                    )}
                 </>
               )}
               {row.items.map((item, index) => {
-                const columnKey = item.id ?? `layout-item-${row.startIndex + index}`;
+                const columnKey =
+                  item.id ?? `layout-item-${row.startIndex + index}`;
                 const rowMeta = rowMetaByColumnKey.get(columnKey);
                 const span = rowMeta?.span ?? 12;
 
@@ -3053,12 +3381,22 @@ function ContentLayoutSection({
                   blocks[0]?.cardPreset ??
                   "default";
 
-                const hasScrollPinned = blocks.some((b) => b.kind === "scrollPinnedDemo");
+                const hasScrollPinned = blocks.some(
+                  (b) => b.kind === "scrollPinnedDemo",
+                );
                 return (
                   <article
                     key={columnKey}
-                    className={hasScrollPinned ? "w-full col-span-12" : `shop-builder-content-layout-card shop-card-preset--${cardStyle}`}
-                    style={hasScrollPinned ? { gridColumn: "span 12" } : { gridColumn: `span ${span}` }}
+                    className={
+                      hasScrollPinned
+                        ? "w-full col-span-12"
+                        : `shop-builder-content-layout-card shop-card-preset--${cardStyle}`
+                    }
+                    style={
+                      hasScrollPinned
+                        ? { gridColumn: "span 12" }
+                        : { gridColumn: `span ${span}` }
+                    }
                   >
                     {blocks.map((block, blockIndex) => {
                       if (block.kind === "scrollPinnedDemo") {
@@ -3215,7 +3553,13 @@ function BuilderSectionRenderer({
   let content: ReactNode;
 
   if (section.kind === "hero") {
-    content = <HeroSection section={section} product={product} layoutScheme={layoutScheme} />;
+    content = (
+      <HeroSection
+        section={section}
+        product={product}
+        layoutScheme={layoutScheme}
+      />
+    );
   } else if (section.kind === "recentlyViewed") {
     content = (
       <SectionFrame section={section} layoutScheme={layoutScheme}>
@@ -3224,7 +3568,11 @@ function BuilderSectionRenderer({
     );
   } else if (section.kind === "productArchive") {
     content = (
-      <SectionFrame section={section} layoutScheme={layoutScheme} extra="shop-builder-products">
+      <SectionFrame
+        section={section}
+        layoutScheme={layoutScheme}
+        extra="shop-builder-products"
+      >
         <Suspense fallback={<ProductsSkeleton />}>
           <BuilderProductsSection
             section={section}
@@ -3236,11 +3584,15 @@ function BuilderSectionRenderer({
       </SectionFrame>
     );
   } else if (section.kind === "filters") {
-    content = <FilterPillsSection section={section} layoutScheme={layoutScheme} />;
+    content = (
+      <FilterPillsSection section={section} layoutScheme={layoutScheme} />
+    );
   } else if (section.kind === "promo") {
     content = <PromoSection section={section} layoutScheme={layoutScheme} />;
   } else if (section.kind === "badgeGrid") {
-    content = <BadgeGridSection section={section} layoutScheme={layoutScheme} />;
+    content = (
+      <BadgeGridSection section={section} layoutScheme={layoutScheme} />
+    );
   } else if (section.kind === "contentLayout") {
     content = (
       <ContentLayoutSection
@@ -3324,10 +3676,14 @@ export default function StorefrontBuilderRenderer({
   const isHomePage = page === "home";
   const designColorScheme = layout.design?.colorScheme;
   const layoutScheme: "light" | "dark" | "auto" =
-    designColorScheme === "dark" || designColorScheme === "light" || designColorScheme === "auto"
+    designColorScheme === "dark" ||
+    designColorScheme === "light" ||
+    designColorScheme === "auto"
       ? designColorScheme
       : "auto";
-  const firstVisibleSection = layout.sections.find((section) => section.visible);
+  const firstVisibleSection = layout.sections.find(
+    (section) => section.visible,
+  );
   const pullUnderHeader = firstVisibleSection?.pullUnderHeader === true;
 
   return (
@@ -3346,7 +3702,7 @@ export default function StorefrontBuilderRenderer({
                 document.documentElement.classList.remove("dark");
               }
             })();
-          `.trim()
+          `.trim(),
         }}
       />
       <style

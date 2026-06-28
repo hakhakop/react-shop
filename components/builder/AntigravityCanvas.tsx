@@ -1497,12 +1497,17 @@ export default function AntigravityCanvas({
     initGrid();
     initAurora();
 
+    let resizeTimeout: NodeJS.Timeout;
     const resizeObserver = new ResizeObserver((entries) => {
       if (!canvas) return;
-      width = canvas.width = canvas.offsetWidth;
-      height = canvas.height = canvas.offsetHeight;
-      initGrid();
-      initAurora();
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(() => {
+        if (!canvas) return;
+        width = canvas.width = canvas.offsetWidth;
+        height = canvas.height = canvas.offsetHeight;
+        initGrid();
+        initAurora();
+      }, 100);
     });
     resizeObserver.observe(canvas);
 
@@ -1770,6 +1775,7 @@ export default function AntigravityCanvas({
 
     return () => {
       resizeObserver.disconnect();
+      clearTimeout(resizeTimeout);
       if (trackingTarget) {
         trackingTarget.removeEventListener("mousemove", handleMouseMove as EventListener);
         trackingTarget.removeEventListener("mousedown", handleMouseDown as EventListener);

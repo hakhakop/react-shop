@@ -380,6 +380,50 @@ export default function TextFieldsPanel() {
                   />
                   <span>Use title gradient for typewriter text</span>
                 </label>
+
+                <label className="builder-check" style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: "4px" }}>
+                  <input
+                    type="checkbox"
+                    checked={block.typewriterPreserveHeight !== false}
+                    onChange={(event) =>
+                      updateSelectedLayoutBlockByKey({ typewriterPreserveHeight: event.target.checked })
+                    }
+                  />
+                  <span>Preserve Typewriter Height</span>
+                </label>
+
+                {block.typewriterPreserveHeight !== false && (
+                  <div className="builder-two-column" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginTop: "4px" }}>
+                    <label className="builder-field">
+                      <span>Reserved Lines</span>
+                      <input
+                        type="number"
+                        min="1"
+                        max="10"
+                        value={block.typewriterReservedLines ?? 1}
+                        onChange={(event) =>
+                          updateSelectedLayoutBlockByKey({
+                            typewriterReservedLines: Math.max(1, Math.min(10, Number(event.target.value) || 1))
+                          })
+                        }
+                      />
+                    </label>
+                    <label className="builder-field">
+                      <span>Mobile Reserved Lines</span>
+                      <input
+                        type="number"
+                        min="1"
+                        max="10"
+                        value={block.typewriterMobileReservedLines ?? 2}
+                        onChange={(event) =>
+                          updateSelectedLayoutBlockByKey({
+                            typewriterMobileReservedLines: Math.max(1, Math.min(10, Number(event.target.value) || 2))
+                          })
+                        }
+                      />
+                    </label>
+                  </div>
+                )}
               </div>
             )}
           </details>

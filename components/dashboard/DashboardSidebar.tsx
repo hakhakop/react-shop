@@ -377,10 +377,10 @@ export default function DashboardSidebar({
             {sidebarTab === "elements" && (
               <motion.div
                 key="elements"
-                initial={{ opacity: 0, y: 6 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -4 }}
-                transition={{ duration: 0.16, ease: "easeOut" }}
+                initial={{ opacity: 0, scale: 0.985 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.995 }}
+                transition={{ duration: 0.12, ease: "easeOut" }}
               >
                 <ElementLibrary
                   availableLayoutBlockKinds={availableLayoutBlockKinds}
@@ -393,10 +393,10 @@ export default function DashboardSidebar({
             {sidebarTab === "builder" && (
               <motion.div
                 key="builder"
-                initial={{ opacity: 0, y: 6 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -4 }}
-                transition={{ duration: 0.16, ease: "easeOut" }}
+                initial={{ opacity: 0, scale: 0.985 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.995 }}
+                transition={{ duration: 0.12, ease: "easeOut" }}
               >
                 {builderSlot}
               </motion.div>
@@ -405,10 +405,10 @@ export default function DashboardSidebar({
             {sidebarTab === "menu" && (
               <motion.div
                 key="menu"
-                initial={{ opacity: 0, y: 6 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -4 }}
-                transition={{ duration: 0.16, ease: "easeOut" }}
+                initial={{ opacity: 0, scale: 0.985 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.995 }}
+                transition={{ duration: 0.12, ease: "easeOut" }}
               >
                 <ReactMenuEditorPanel
                   menuItems={shellSettings.menuItems ?? []}
@@ -421,10 +421,10 @@ export default function DashboardSidebar({
             {sidebarTab === "inspector" && (
               <motion.div
                 key="inspector"
-                initial={{ opacity: 0, y: 6 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -4 }}
-                transition={{ duration: 0.16, ease: "easeOut" }}
+                initial={{ opacity: 0, scale: 0.985 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.995 }}
+                transition={{ duration: 0.12, ease: "easeOut" }}
               >
                 {inspectorOpen ? (
                   inspectorSlot
@@ -452,10 +452,10 @@ export default function DashboardSidebar({
             {sidebarTab === "globalStyles" && (
               <motion.div
                 key="globalStyles"
-                initial={{ opacity: 0, y: 6 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -4 }}
-                transition={{ duration: 0.16, ease: "easeOut" }}
+                initial={{ opacity: 0, scale: 0.985 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.995 }}
+                transition={{ duration: 0.12, ease: "easeOut" }}
               >
                 {globalStylesSlot}
               </motion.div>
@@ -464,10 +464,10 @@ export default function DashboardSidebar({
             {sidebarTab === "pages" && (
               <motion.div
                 key="pages"
-                initial={{ opacity: 0, y: 6 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -4 }}
-                transition={{ duration: 0.16, ease: "easeOut" }}
+                initial={{ opacity: 0, scale: 0.985 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.995 }}
+                transition={{ duration: 0.12, ease: "easeOut" }}
               >
                 <div className="builder-sidebar-panel">
                   {/* Core Storefront Pages */}
@@ -694,10 +694,10 @@ export default function DashboardSidebar({
           {sidebarTab === "history" && (
             <motion.div
               key="history"
-              initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -4 }}
-              transition={{ duration: 0.16, ease: "easeOut" }}
+              initial={{ opacity: 0, scale: 0.985 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.995 }}
+              transition={{ duration: 0.12, ease: "easeOut" }}
             >
             <div className="builder-sidebar-panel">
               <div className="builder-card">
@@ -715,10 +715,10 @@ export default function DashboardSidebar({
           {sidebarTab === "templates" && (
             <motion.div
               key="templates"
-              initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -4 }}
-              transition={{ duration: 0.16, ease: "easeOut" }}
+              initial={{ opacity: 0, scale: 0.985 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.995 }}
+              transition={{ duration: 0.12, ease: "easeOut" }}
             >
             <div className="builder-sidebar-panel">
               <div className="builder-card builder-pages-card" style={{ marginBottom: '14px' }}>

@@ -21,6 +21,9 @@ interface TypewriterTextProps {
   customEndOffset?: number;
   typography?: any;      // Typography settings
   area?: "title" | "body" | "button" | "eyebrow";
+  preserveHeight?: boolean;
+  reservedLines?: number;
+  mobileReservedLines?: number;
 }
 
 export default function TypewriterText({
@@ -41,6 +44,9 @@ export default function TypewriterText({
   customEndOffset,
   typography,
   area,
+  preserveHeight = true,
+  reservedLines = 1,
+  mobileReservedLines = 2,
 }: TypewriterTextProps) {
   const [displayText, setDisplayText] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
@@ -111,7 +117,36 @@ export default function TypewriterText({
   if (!text) return null;
 
   const tp = typographyProps(typography, area);
-  const combinedClassName = ["typewriter-outer", className, tp.className].filter(Boolean).join(" ");
+  
+  // Resolve line height factor for height preservation calculation
+  let resolvedLh = 1.2;
+  if (tp.style?.lineHeight) {
+    const lhVal = parseFloat(String(tp.style.lineHeight));
+    if (!isNaN(lhVal)) {
+      resolvedLh = lhVal;
+    }
+  } else if (typography?.variant) {
+    if (typography.variant === "heading") resolvedLh = 0.92;
+    else if (typography.variant === "subheading") resolvedLh = 1.0;
+    else if (typography.variant === "body") resolvedLh = 1.7;
+    else if (typography.variant === "button") resolvedLh = 1.0;
+  }
+
+  const outerStyle: React.CSSProperties = { ...tp.style };
+  if (preserveHeight) {
+    outerStyle.display = "inline-block";
+    outerStyle.minHeight = "var(--typewriter-min-height, auto)";
+    (outerStyle as any)["--typewriter-lines-desktop"] = reservedLines;
+    (outerStyle as any)["--typewriter-lines-mobile"] = mobileReservedLines;
+    (outerStyle as any)["--typewriter-lh"] = resolvedLh;
+  }
+
+  const combinedClassName = [
+    "typewriter-outer",
+    preserveHeight ? "typewriter-preserve-height" : "",
+    className,
+    tp.className
+  ].filter(Boolean).join(" ");
 
   const hasFontWeight = Boolean(
     tp.style?.fontWeight ||
@@ -126,8 +161,8 @@ export default function TypewriterText({
   const isCustom = validPreset === "custom";
 
   const typingSpanClass = useGradient && !isCustom
-    ? `typewriter-inner text-gradient--${validPreset} ${fontWeightClass} border-r-2 border-indigo-400 animate-pulse-cursor pr-1`
-    : `typewriter-inner ${fontWeightClass} border-r-2 border-indigo-400 animate-pulse-cursor pr-1`;
+    ? `typewriter-inner text-gradient--${validPreset} ${fontWeightClass} pr-1`
+    : `typewriter-inner ${fontWeightClass} pr-1`;
 
   const customStyle: React.CSSProperties = (useGradient && isCustom) ? {
     backgroundImage: `linear-gradient(${customAngle ?? 135}deg, ${customStart ?? "#ffffff"} ${customStartOffset ?? 0}%, ${customMiddle ?? "#60a5fa"} ${customMiddleOffset ?? 50}%, ${customEnd ?? "#c084fc"} ${customEndOffset ?? 100}%)`,
@@ -139,9 +174,24 @@ export default function TypewriterText({
 
   // Render
   return (
-    <span className={combinedClassName || undefined} style={tp.style}>
+    <span className={combinedClassName || undefined} style={outerStyle}>
       {prefix}
-      <span className={typingSpanClass} style={customStyle}>{displayText}</span>
+      <span className={typingSpanClass} style={customStyle}>
+        {displayText}
+      </span>
+      <span
+        className="typewriter-cursor animate-pulse-cursor"
+        style={{
+          backgroundColor: "rgb(129, 140, 248)",
+          marginLeft: "2px",
+          display: "inline-block",
+          width: "0.06em",
+          minWidth: "2px",
+          height: "1.25em",
+          verticalAlign: "-0.15em",
+          fontSize: "inherit",
+        }}
+      />
       {suffix}
     </span>
   );

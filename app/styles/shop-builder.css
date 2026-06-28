@@ -173,12 +173,37 @@
   line-height: inherit;
 }
 
+.typewriter-outer.typewriter-preserve-height {
+  display: inline-block;
+  --typewriter-min-height: calc(
+    var(--typewriter-lines-desktop, 1) * var(--typewriter-lh, 1.2) * 1em
+  );
+  min-height: var(--typewriter-min-height, auto);
+}
+
+@media (max-width: 640px) {
+  .typewriter-outer.typewriter-preserve-height {
+    --typewriter-min-height: calc(
+      var(--typewriter-lines-mobile, 2) * var(--typewriter-lh, 1.2) * 1em
+    );
+  }
+}
+
+@container (max-width: 640px) {
+  .typewriter-outer.typewriter-preserve-height {
+    --typewriter-min-height: calc(
+      var(--typewriter-lines-mobile, 2) * var(--typewriter-lh, 1.2) * 1em
+    );
+  }
+}
+
 .typewriter-inner {
   font-size: inherit !important;
   font-family: inherit !important;
   font-weight: inherit !important;
   line-height: inherit !important;
   letter-spacing: inherit !important;
+  display: inline !important;
 }
 
 .shop-builder-body {
@@ -3969,8 +3994,8 @@ ul.is-icon-gradient-cycle li:nth-child(3n) svg {
 }
 
 @keyframes pulseCursor {
-  from, to { border-color: transparent }
-  50% { border-color: rgb(129, 140, 248) }
+  from, to { opacity: 0 }
+  50% { opacity: 1 }
 }
 
 .animate-pulse-cursor {

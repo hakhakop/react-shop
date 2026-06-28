@@ -50,7 +50,14 @@ import type {
   MouseEvent as ReactMouseEvent,
   ReactNode,
 } from "react";
-import { Fragment, useEffect, useMemo, useRef, useState, useCallback } from "react";
+import {
+  Fragment,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useCallback,
+} from "react";
 import { createPortal } from "react-dom";
 import CarouselBlock, {
   type CarouselSlide,
@@ -196,7 +203,7 @@ function RenderDashboardChecklist({
   if (!items || items.length === 0) return null;
   const isGradientCycle = colorScheme === "gradient-cycle";
   return (
-    <ul 
+    <ul
       className={`builder-preview-goodie-list-checklist ${isGradientCycle ? "is-icon-gradient-cycle" : ""}`}
       style={{
         listStyle: "none",
@@ -207,11 +214,11 @@ function RenderDashboardChecklist({
       }}
     >
       {items.map((item, index) => (
-        <li 
-          key={`${item}-${index}`} 
-          style={{ 
-            display: "flex", 
-            alignItems: "center", 
+        <li
+          key={`${item}-${index}`}
+          style={{
+            display: "flex",
+            alignItems: "center",
             gap: "8px",
             fontSize: "13px",
           }}
@@ -225,7 +232,9 @@ function RenderDashboardChecklist({
             sparkles: <Sparkles size={14} />,
             shield: <ShieldCheck size={14} />,
           }[iconName] ?? <Check size={14} />}
-          <DashboardTypog as="span" typography={typography}>{item}</DashboardTypog>
+          <DashboardTypog as="span" typography={typography}>
+            {item}
+          </DashboardTypog>
         </li>
       ))}
     </ul>
@@ -456,7 +465,7 @@ function resolveUIKitIconName(icon: string | null): string | null {
   if (normalized.length === 0) return null;
   return UIKIT_ICON_INNER_HTML[normalized]
     ? normalized
-    : UIKIT_ICON_ALIASES[normalized] ?? null;
+    : (UIKIT_ICON_ALIASES[normalized] ?? null);
 }
 
 function getMenuIconLabel(icon: string | null): string {
@@ -691,7 +700,7 @@ function readableSchemeForColor(color: string | undefined): SectionColorScheme {
     }
 
     if (count > 0) {
-      return (totalLuminance / count) < 0.48 ? "dark" : "light";
+      return totalLuminance / count < 0.48 ? "dark" : "light";
     }
   }
 
@@ -712,7 +721,9 @@ function readableSchemeForColor(color: string | undefined): SectionColorScheme {
   }
 
   // Handle RGB
-  const rgbMatch = bg.match(/^rgba?\((\d+)\s*,\s*(\d+)\s*,\s*(\d+)(?:\s*,\s*([\d.]+))?\)$/);
+  const rgbMatch = bg.match(
+    /^rgba?\((\d+)\s*,\s*(\d+)\s*,\s*(\d+)(?:\s*,\s*([\d.]+))?\)$/,
+  );
   if (rgbMatch) {
     const r = parseInt(rgbMatch[1], 10);
     const g = parseInt(rgbMatch[2], 10);
@@ -730,19 +741,25 @@ const previewButtonsStyle = (
   layout?: "inline" | "stacked",
   align?: "left" | "center" | "right",
   gap?: string,
-): CSSProperties => ({
-  display: "flex",
-  width: "fit-content",
-  maxWidth: "100%",
-  marginLeft: align === "center" || align === "right" ? "auto" : undefined,
-  marginRight: align === "center" ? "auto" : undefined,
-  flexDirection: layout === "stacked" ? "column" : "row",
-  flexWrap: "wrap",
-  "--button-group-gap": gap || "0.75rem",
-  gap: "var(--button-group-gap, 0.75rem)",
-  justifyContent: align === "center" ? "center" : align === "right" ? "flex-end" : "flex-start",
-  alignItems: "center",
-} as CSSProperties);
+): CSSProperties =>
+  ({
+    display: "flex",
+    width: "fit-content",
+    maxWidth: "100%",
+    marginLeft: align === "center" || align === "right" ? "auto" : undefined,
+    marginRight: align === "center" ? "auto" : undefined,
+    flexDirection: layout === "stacked" ? "column" : "row",
+    flexWrap: "wrap",
+    "--button-group-gap": gap || "0.75rem",
+    gap: "var(--button-group-gap, 0.75rem)",
+    justifyContent:
+      align === "center"
+        ? "center"
+        : align === "right"
+          ? "flex-end"
+          : "flex-start",
+    alignItems: "center",
+  }) as CSSProperties;
 
 const rowInsertionPresets = [
   { key: "whole", label: "1/1", ratios: [1] },
@@ -780,7 +797,8 @@ function cssSpacingValue(value: string | null | undefined) {
   const trimmed = (value ?? "").toString().trim();
   if (!trimmed) return null;
   if (/^\d+(\.\d+)?$/.test(trimmed)) return `${trimmed}px`;
-  if (/^-?\d+(\.\d+)?(px|rem|em|%|vw|vh|svh|dvh)$/.test(trimmed)) return trimmed;
+  if (/^-?\d+(\.\d+)?(px|rem|em|%|vw|vh|svh|dvh)$/.test(trimmed))
+    return trimmed;
   if (/^clamp\([^)]+\)$/.test(trimmed)) return trimmed;
   return null;
 }
@@ -808,7 +826,10 @@ function DashboardTypog({
     inferTypographyArea(String(As), className),
   );
   const combined = [className, tp.className].filter(Boolean).join(" ");
-  const combinedStyle = buttonTypographyStyle(combined, { ...tp.style, ...style });
+  const combinedStyle = buttonTypographyStyle(combined, {
+    ...tp.style,
+    ...style,
+  });
   const isRich = isRichPreviewText(children);
   if (isRich) {
     const RichTag = getRichTextSafeTag(String(As)) as any;
@@ -845,10 +866,21 @@ function inferTypographyArea(
   return "body";
 }
 
-function BodyText({ children, className }: { children: string | null | undefined; className?: string }) {
+function BodyText({
+  children,
+  className,
+}: {
+  children: string | null | undefined;
+  className?: string;
+}) {
   if (!children) return null;
   if (isRichPreviewText(children)) {
-    return <div className={className} dangerouslySetInnerHTML={{ __html: children }} />;
+    return (
+      <div
+        className={className}
+        dangerouslySetInnerHTML={{ __html: children }}
+      />
+    );
   }
   return <p className={className}>{children}</p>;
 }
@@ -1049,7 +1081,9 @@ function isLayoutContainerSection(section: BuilderSection | null | undefined) {
   );
 }
 
-function normalizeScrollPinnedDemoSection(section: BuilderSection): BuilderSection {
+function normalizeScrollPinnedDemoSection(
+  section: BuilderSection,
+): BuilderSection {
   const hasEditableBlocks = (section.layoutItems ?? []).some(
     (item) => (item.blocks ?? []).length > 0,
   );
@@ -1058,29 +1092,28 @@ function normalizeScrollPinnedDemoSection(section: BuilderSection): BuilderSecti
   }
 
   const rowId = `${section.id}-story-row`;
-  const slides =
-    section.slides?.length
-      ? section.slides
-      : [
-          {
-            id: `${section.id}-story-card-1`,
-            badge: "01",
-            title: "Layout Intercepted",
-            text: "The section holds position while scroll movement drives the reveal.",
-          },
-          {
-            id: `${section.id}-story-card-2`,
-            badge: "02",
-            title: "Timeline Scrubbing",
-            text: "Each panel appears from normal reusable builder content.",
-          },
-          {
-            id: `${section.id}-story-card-3`,
-            badge: "03",
-            title: "Scroll Release",
-            text: "After the stack completes, the page resumes normal scrolling.",
-          },
-        ];
+  const slides = section.slides?.length
+    ? section.slides
+    : [
+        {
+          id: `${section.id}-story-card-1`,
+          badge: "01",
+          title: "Layout Intercepted",
+          text: "The section holds position while scroll movement drives the reveal.",
+        },
+        {
+          id: `${section.id}-story-card-2`,
+          badge: "02",
+          title: "Timeline Scrubbing",
+          text: "Each panel appears from normal reusable builder content.",
+        },
+        {
+          id: `${section.id}-story-card-3`,
+          badge: "03",
+          title: "Scroll Release",
+          text: "After the stack completes, the page resumes normal scrolling.",
+        },
+      ];
 
   return {
     ...section,
@@ -1228,7 +1261,9 @@ export default function DashboardBuilder({
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [builderState, setBuilderState] = useState<BuilderState>(defaultState);
-  const [dashboardTheme, setDashboardTheme] = useState<"light" | "dark">("dark");
+  const [dashboardTheme, setDashboardTheme] = useState<"light" | "dark">(
+    "dark",
+  );
 
   useEffect(() => {
     const saved = localStorage.getItem("builder-dashboard-theme");
@@ -1251,6 +1286,9 @@ export default function DashboardBuilder({
     defaultState.sections[0]?.id ?? "",
   );
   const [device, setDevice] = useState<PreviewDevice>("desktop");
+  const [customMobileWidth, setCustomMobileWidth] = useState(390);
+  const [customTabletWidth, setCustomTabletWidth] = useState(820);
+  const [isResizingDevice, setIsResizingDevice] = useState(false);
   const [copied, setCopied] = useState(false);
   const [draftReady, setDraftReady] = useState(false);
   const [publishStatus, setPublishStatus] = useState("Local draft autosaves");
@@ -1464,8 +1502,11 @@ export default function DashboardBuilder({
     } else {
       // Revert to visitor theme preference
       const stored = window.localStorage.getItem("wc-store-theme");
-      const prefersDark = window.matchMedia?.("(prefers-color-scheme: dark)")?.matches;
-      const theme = stored === "dark" || (!stored && prefersDark) ? "dark" : "light";
+      const prefersDark = window.matchMedia?.(
+        "(prefers-color-scheme: dark)",
+      )?.matches;
+      const theme =
+        stored === "dark" || (!stored && prefersDark) ? "dark" : "light";
       document.documentElement.dataset.theme = theme;
       if (theme === "dark") {
         document.documentElement.classList.add("dark");
@@ -1487,9 +1528,9 @@ export default function DashboardBuilder({
 
     let targetWidth = shellWidth;
     if (device === "tablet") {
-      targetWidth = 820;
+      targetWidth = customTabletWidth;
     } else if (device === "mobile") {
-      targetWidth = 390;
+      targetWidth = customMobileWidth;
     }
 
     const padding = device === "desktop" ? 0 : 48;
@@ -1502,7 +1543,7 @@ export default function DashboardBuilder({
 
     setPreviewCanvasWidth(targetWidth);
     setPreviewScale(scale);
-  }, [device]);
+  }, [device, customMobileWidth, customTabletWidth]);
 
   useEffect(() => {
     const shell = previewShellRef.current;
@@ -1518,6 +1559,42 @@ export default function DashboardBuilder({
       window.removeEventListener("resize", updatePreviewViewport);
     };
   }, [device, sidebarCollapsed, sidebarWidth, updatePreviewViewport]);
+
+  const handleDeviceResizeStart = (
+    e: React.MouseEvent,
+    side: "left" | "right",
+  ) => {
+    e.preventDefault();
+    setIsResizingDevice(true);
+
+    const startX = e.clientX;
+    const startWidth =
+      device === "mobile" ? customMobileWidth : customTabletWidth;
+
+    const handleMouseMove = (moveEvent: MouseEvent) => {
+      const deltaX = moveEvent.clientX - startX;
+      const multiplier = side === "right" ? 2 : -2;
+      const newWidth = Math.max(
+        320,
+        Math.min(1600, startWidth + deltaX * multiplier),
+      );
+
+      if (device === "mobile") {
+        setCustomMobileWidth(newWidth);
+      } else {
+        setCustomTabletWidth(newWidth);
+      }
+    };
+
+    const handleMouseUp = () => {
+      setIsResizingDevice(false);
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mouseup", handleMouseUp);
+  };
 
   useEffect(() => {
     const updatePreviewHeaderPill = () => {
@@ -1849,7 +1926,17 @@ export default function DashboardBuilder({
     sectionId: string,
     field: "topSpacing" | "bottomSpacing" | "topMargin" | "bottomMargin",
   ) => {
-    const cycleOrder: SectionSpacing[] = ["inherit", "none", "xs", "sm", "md", "lg", "xl", "2xl", "3xl"];
+    const cycleOrder: SectionSpacing[] = [
+      "inherit",
+      "none",
+      "xs",
+      "sm",
+      "md",
+      "lg",
+      "xl",
+      "2xl",
+      "3xl",
+    ];
     setBuilderState((current) => ({
       ...current,
       sections: current.sections.map((section) => {
@@ -2358,10 +2445,7 @@ export default function DashboardBuilder({
     }));
   };
 
-  const deleteSectionBadgeByKey = (
-    sectionId: string,
-    badgeIndex: number,
-  ) => {
+  const deleteSectionBadgeByKey = (sectionId: string, badgeIndex: number) => {
     setBuilderState((current) => ({
       ...current,
       sections: current.sections.map((section) => {
@@ -2547,7 +2631,9 @@ export default function DashboardBuilder({
     if (!spacingFocusRequest || spacingFocusRequest.scope === "globalSection") {
       return;
     }
-    setInspectorTab(spacingFocusRequest.scope === "column" ? "layout" : "spacing");
+    setInspectorTab(
+      spacingFocusRequest.scope === "column" ? "layout" : "spacing",
+    );
   }, [spacingFocusRequest]);
 
   useEffect(() => {
@@ -2674,7 +2760,10 @@ export default function DashboardBuilder({
         const lastIndex = safeColumns - 1;
         nextItems[lastIndex] = {
           ...nextItems[lastIndex],
-          blocks: [...getLayoutItemBlocks(nextItems[lastIndex]), ...overflowBlocks],
+          blocks: [
+            ...getLayoutItemBlocks(nextItems[lastIndex]),
+            ...overflowBlocks,
+          ],
         };
       }
     }
@@ -2682,10 +2771,7 @@ export default function DashboardBuilder({
     return nextItems;
   };
 
-  const applyContentLayoutPreset = (
-    sectionId: string,
-    presetKey: string,
-  ) => {
+  const applyContentLayoutPreset = (sectionId: string, presetKey: string) => {
     const preset = getBuilderRowLayoutPreset(presetKey);
     if (!preset) return;
 
@@ -2710,7 +2796,8 @@ export default function DashboardBuilder({
           const selectedBlockMatch = layoutItems.find((item, index) =>
             getLayoutItemBlocks(item).some(
               (block, blockIndex) =>
-                (block.id ?? `${item.id ?? `layout-item-${index}`}-block-${blockIndex}`) ===
+                (block.id ??
+                  `${item.id ?? `layout-item-${index}`}-block-${blockIndex}`) ===
                 selectedLayoutBlockKey,
             ),
           );
@@ -3015,7 +3102,9 @@ export default function DashboardBuilder({
     const block = blocks[blockIndex] ?? {};
     blocks[blockIndex] = {
       ...block,
-      buttons: (block.buttons ?? []).filter((_, index) => index !== buttonIndex),
+      buttons: (block.buttons ?? []).filter(
+        (_, index) => index !== buttonIndex,
+      ),
     };
     layoutItems[columnIndex] = { ...item, blocks };
     updateSelected({ layoutItems });
@@ -3109,11 +3198,7 @@ export default function DashboardBuilder({
             (block.id ?? `${columnKey}-block-${index}`) === blockKey,
         );
         const nextIndex = blockIndex + direction;
-        if (
-          blockIndex < 0 ||
-          nextIndex < 0 ||
-          nextIndex >= blocks.length
-        ) {
+        if (blockIndex < 0 || nextIndex < 0 || nextIndex >= blocks.length) {
           return section;
         }
 
@@ -3263,7 +3348,8 @@ export default function DashboardBuilder({
               )
             : -1;
 
-          let insertIndex = targetIndex >= 0 ? targetIndex : targetBlocks.length;
+          let insertIndex =
+            targetIndex >= 0 ? targetIndex : targetBlocks.length;
           if (targetIndex >= 0 && placement === "below") {
             insertIndex = targetIndex + 1;
           }
@@ -3620,7 +3706,8 @@ export default function DashboardBuilder({
         const layoutRows = getPreviewLayoutRows(section, layoutItems);
         const targetRow = layoutRows[rowIndex];
         const insertIndex = targetRow
-          ? targetRow.startIndex + (placement === "after" ? targetRow.items.length : 0)
+          ? targetRow.startIndex +
+            (placement === "after" ? targetRow.items.length : 0)
           : layoutItems.length;
         const nextLayoutItems = [...layoutItems];
         nextLayoutItems.splice(insertIndex, 0, ...newItems);
@@ -3678,7 +3765,10 @@ export default function DashboardBuilder({
       }),
     }));
 
-    if (selectedLayoutColumnKey && removedColumnKeys.has(selectedLayoutColumnKey)) {
+    if (
+      selectedLayoutColumnKey &&
+      removedColumnKeys.has(selectedLayoutColumnKey)
+    ) {
       setSelectedLayoutColumnKey(null);
       setSelectedLayoutBlockKey(null);
     }
@@ -3815,10 +3905,7 @@ export default function DashboardBuilder({
     setBuilderState((current) => ({
       ...current,
       sections: current.sections.map((section) => {
-        if (
-          section.id !== sectionId ||
-          !isLayoutContainerSection(section)
-        ) {
+        if (section.id !== sectionId || !isLayoutContainerSection(section)) {
           return section;
         }
 
@@ -3931,7 +4018,11 @@ export default function DashboardBuilder({
     setSelectedId(sectionId);
   };
 
-  const reorderSection = (sourceId: string, targetId: string, placement: "above" | "below" = "above") => {
+  const reorderSection = (
+    sourceId: string,
+    targetId: string,
+    placement: "above" | "below" = "above",
+  ) => {
     if (sourceId === targetId) return;
     setBuilderState((current) => {
       const sourceIndex = current.sections.findIndex(
@@ -3940,9 +4031,7 @@ export default function DashboardBuilder({
       if (sourceIndex < 0) return current;
       const nextSections = [...current.sections];
       const [section] = nextSections.splice(sourceIndex, 1);
-      let targetIndex = nextSections.findIndex(
-        (sec) => sec.id === targetId,
-      );
+      let targetIndex = nextSections.findIndex((sec) => sec.id === targetId);
       if (targetIndex < 0) return current;
       if (placement === "below") {
         targetIndex += 1;
@@ -4049,8 +4138,14 @@ export default function DashboardBuilder({
       const mod = e.metaKey || e.ctrlKey;
       const isUndo = mod && e.key === "z" && !e.shiftKey;
       const isRedo = mod && e.key === "z" && e.shiftKey;
-      if (isUndo) { e.preventDefault(); undoRef.current(); }
-      if (isRedo) { e.preventDefault(); redoRef.current(); }
+      if (isUndo) {
+        e.preventDefault();
+        undoRef.current();
+      }
+      if (isRedo) {
+        e.preventDefault();
+        redoRef.current();
+      }
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
@@ -4213,10 +4308,7 @@ export default function DashboardBuilder({
     });
   };
 
-  const updateHeaderIcon = (
-    icon: BuilderHeaderIconId,
-    enabled: boolean,
-  ) => {
+  const updateHeaderIcon = (icon: BuilderHeaderIconId, enabled: boolean) => {
     const currentOrder =
       shellSettings.headerIconOrder?.length > 0
         ? shellSettings.headerIconOrder
@@ -4231,7 +4323,8 @@ export default function DashboardBuilder({
   };
 
   const applyHeaderPreset = (
-    preset: "service" | "commerce" | "classic" | "simple" | "hero" | "wordpress",
+    preset:
+      "service" | "commerce" | "classic" | "simple" | "hero" | "wordpress",
   ) => {
     if (preset === "wordpress") {
       updateShellSettings({
@@ -4417,7 +4510,9 @@ export default function DashboardBuilder({
     }
   };
 
-  const cloneTemplateBlock = (block: BuilderLayoutBlock): BuilderLayoutBlock => {
+  const cloneTemplateBlock = (
+    block: BuilderLayoutBlock,
+  ): BuilderLayoutBlock => {
     const nextBlock = JSON.parse(JSON.stringify(block)) as BuilderLayoutBlock;
     return {
       ...nextBlock,
@@ -4428,27 +4523,30 @@ export default function DashboardBuilder({
   const cloneTemplateSection = (section: BuilderSection): BuilderSection => {
     const nextSection = JSON.parse(JSON.stringify(section)) as BuilderSection;
     const rowIdMap = new Map<string, string>();
-    const nextLayoutItems = (nextSection.layoutItems ?? []).map((item, index) => {
-      const itemRowId = item.rowId;
-      const nextRowId = itemRowId
-        ? (rowIdMap.get(itemRowId) ??
-          `layout-row-${Date.now().toString(36)}-${index}`)
-        : undefined;
-      if (itemRowId && nextRowId) rowIdMap.set(itemRowId, nextRowId);
-      return {
-        ...item,
-        id: `layout-item-${Date.now().toString(36)}-${index}-${Math.random()
-          .toString(36)
-          .slice(2, 6)}`,
-        rowId: nextRowId,
-        blocks: (item.blocks ?? []).map(cloneTemplateBlock),
-      };
-    });
+    const nextLayoutItems = (nextSection.layoutItems ?? []).map(
+      (item, index) => {
+        const itemRowId = item.rowId;
+        const nextRowId = itemRowId
+          ? (rowIdMap.get(itemRowId) ??
+            `layout-row-${Date.now().toString(36)}-${index}`)
+          : undefined;
+        if (itemRowId && nextRowId) rowIdMap.set(itemRowId, nextRowId);
+        return {
+          ...item,
+          id: `layout-item-${Date.now().toString(36)}-${index}-${Math.random()
+            .toString(36)
+            .slice(2, 6)}`,
+          rowId: nextRowId,
+          blocks: (item.blocks ?? []).map(cloneTemplateBlock),
+        };
+      },
+    );
 
     return {
       ...nextSection,
       id: createId(nextSection.kind),
-      layoutItems: nextLayoutItems.length > 0 ? nextLayoutItems : nextSection.layoutItems,
+      layoutItems:
+        nextLayoutItems.length > 0 ? nextLayoutItems : nextSection.layoutItems,
     };
   };
 
@@ -4479,7 +4577,11 @@ export default function DashboardBuilder({
     const rows = getPreviewLayoutRows(section, section.layoutItems ?? []);
     const row = rows[rowIndex];
     if (!row) return null;
-    const wrapper = createWireframeSection(row.items.length || 1, 1, row.layoutKey);
+    const wrapper = createWireframeSection(
+      row.items.length || 1,
+      1,
+      row.layoutKey,
+    );
     const rowId = `layout-row-${Date.now().toString(36)}-template`;
     return {
       ...wrapper,
@@ -4659,7 +4761,8 @@ export default function DashboardBuilder({
         (layoutItem.id ?? `layout-item-${index}`) === columnKey,
     );
     const block = (item?.blocks ?? []).find(
-      (entry, index) => (entry.id ?? `${columnKey}-block-${index}`) === blockKey,
+      (entry, index) =>
+        (entry.id ?? `${columnKey}-block-${index}`) === blockKey,
     );
     if (!block) {
       setTemplateStatus("Select an element before saving");
@@ -4769,7 +4872,7 @@ export default function DashboardBuilder({
         ? "Element template added as a new section"
         : templateType === "row"
           ? "Row template added as a new section"
-        : "Section template added",
+          : "Section template added",
     );
   };
 
@@ -4842,7 +4945,8 @@ export default function DashboardBuilder({
       return;
     }
 
-    const nextSelectedRowIndex = placement === "before" ? rowIndex : rowIndex + 1;
+    const nextSelectedRowIndex =
+      placement === "before" ? rowIndex : rowIndex + 1;
     setBuilderState((current) => ({
       ...current,
       sections: current.sections.map((section) => {
@@ -4861,7 +4965,9 @@ export default function DashboardBuilder({
         const targetItemIndex = layoutItems.findIndex((item, index) => {
           const itemKey = item.id ?? `layout-item-${index}`;
           const targetKey = targetItem?.id;
-          return item === targetItem || (targetKey ? itemKey === targetKey : false);
+          return (
+            item === targetItem || (targetKey ? itemKey === targetKey : false)
+          );
         });
         if (targetItemIndex < 0) return section;
         const insertIndex =
@@ -5138,7 +5244,10 @@ export default function DashboardBuilder({
 
   const globalStylesPanel = (
     <div className="builder-sidebar-panel builder-sidebar-global-styles">
-      <div className="builder-global-style-tabs" aria-label="Global style sections">
+      <div
+        className="builder-global-style-tabs"
+        aria-label="Global style sections"
+      >
         {(
           [
             ["siteDesign", "Site Design"],
@@ -5214,8 +5323,9 @@ export default function DashboardBuilder({
                 <input
                   type="color"
                   value={
-                    (builderState.design[key as keyof BuilderDesign] as string) ??
-                    "#ffffff"
+                    (builderState.design[
+                      key as keyof BuilderDesign
+                    ] as string) ?? "#ffffff"
                   }
                   onChange={(event) =>
                     updateDesign({
@@ -5281,11 +5391,21 @@ export default function DashboardBuilder({
                 })
               }
             >
-              <option value="minimal">Minimal (Dark gray, round buttons)</option>
-              <option value="soft">Soft (Sage tones, medium round buttons)</option>
-              <option value="elevated">Elevated (Slate tones, large card shadows)</option>
-              <option value="boutique">Boutique (Red accents, square buttons)</option>
-              <option value="princity">Princity (Pure white, bold borders)</option>
+              <option value="minimal">
+                Minimal (Dark gray, round buttons)
+              </option>
+              <option value="soft">
+                Soft (Sage tones, medium round buttons)
+              </option>
+              <option value="elevated">
+                Elevated (Slate tones, large card shadows)
+              </option>
+              <option value="boutique">
+                Boutique (Red accents, square buttons)
+              </option>
+              <option value="princity">
+                Princity (Pure white, bold borders)
+              </option>
             </select>
           </label>
 
@@ -5316,7 +5436,6 @@ export default function DashboardBuilder({
               />
             </label>
           </div>
-
         </div>
       )}
 
@@ -5330,7 +5449,11 @@ export default function DashboardBuilder({
             </span>
           </div>
 
-          <section id="global-spacing-section" className="builder-global-spacing-group" tabIndex={-1}>
+          <section
+            id="global-spacing-section"
+            className="builder-global-spacing-group"
+            tabIndex={-1}
+          >
             <div className="builder-card-title">
               <strong>Section Spacing</strong>
               <span>default padding + margin</span>
@@ -5345,8 +5468,14 @@ export default function DashboardBuilder({
               context="sectionPadding"
               onChange={(newVals) => {
                 updateShellSettings({
-                  sectionPaddingTop: newVals.top !== undefined ? newVals.top : shellSettings.sectionPaddingTop,
-                  sectionPaddingBottom: newVals.bottom !== undefined ? newVals.bottom : shellSettings.sectionPaddingBottom,
+                  sectionPaddingTop:
+                    newVals.top !== undefined
+                      ? newVals.top
+                      : shellSettings.sectionPaddingTop,
+                  sectionPaddingBottom:
+                    newVals.bottom !== undefined
+                      ? newVals.bottom
+                      : shellSettings.sectionPaddingBottom,
                 });
               }}
             />
@@ -5360,14 +5489,24 @@ export default function DashboardBuilder({
               context="sectionMargin"
               onChange={(newVals) => {
                 updateShellSettings({
-                  sectionMarginTop: newVals.top !== undefined ? newVals.top : shellSettings.sectionMarginTop,
-                  sectionMarginBottom: newVals.bottom !== undefined ? newVals.bottom : shellSettings.sectionMarginBottom,
+                  sectionMarginTop:
+                    newVals.top !== undefined
+                      ? newVals.top
+                      : shellSettings.sectionMarginTop,
+                  sectionMarginBottom:
+                    newVals.bottom !== undefined
+                      ? newVals.bottom
+                      : shellSettings.sectionMarginBottom,
                 });
               }}
             />
           </section>
 
-          <section id="global-spacing-row" className="builder-global-spacing-group" tabIndex={-1}>
+          <section
+            id="global-spacing-row"
+            className="builder-global-spacing-group"
+            tabIndex={-1}
+          >
             <div className="builder-card-title">
               <strong>Row Spacing</strong>
               <span>default padding, margin + gap</span>
@@ -5382,8 +5521,14 @@ export default function DashboardBuilder({
               context="rowPadding"
               onChange={(newVals) => {
                 updateShellSettings({
-                  rowPaddingTop: newVals.top !== undefined ? newVals.top : shellSettings.rowPaddingTop,
-                  rowPaddingBottom: newVals.bottom !== undefined ? newVals.bottom : shellSettings.rowPaddingBottom,
+                  rowPaddingTop:
+                    newVals.top !== undefined
+                      ? newVals.top
+                      : shellSettings.rowPaddingTop,
+                  rowPaddingBottom:
+                    newVals.bottom !== undefined
+                      ? newVals.bottom
+                      : shellSettings.rowPaddingBottom,
                 });
               }}
             />
@@ -5397,8 +5542,14 @@ export default function DashboardBuilder({
               context="rowMargin"
               onChange={(newVals) => {
                 updateShellSettings({
-                  rowMarginTop: newVals.top !== undefined ? newVals.top : shellSettings.rowMarginTop,
-                  rowMarginBottom: newVals.bottom !== undefined ? newVals.bottom : shellSettings.rowMarginBottom,
+                  rowMarginTop:
+                    newVals.top !== undefined
+                      ? newVals.top
+                      : shellSettings.rowMarginTop,
+                  rowMarginBottom:
+                    newVals.bottom !== undefined
+                      ? newVals.bottom
+                      : shellSettings.rowMarginBottom,
                 });
               }}
             />
@@ -5417,7 +5568,11 @@ export default function DashboardBuilder({
             />
           </section>
 
-          <section id="global-spacing-element" className="builder-global-spacing-group" tabIndex={-1}>
+          <section
+            id="global-spacing-element"
+            className="builder-global-spacing-group"
+            tabIndex={-1}
+          >
             <div className="builder-card-title">
               <strong>Element Spacing</strong>
               <span>default padding + margin on every side</span>
@@ -5434,10 +5589,22 @@ export default function DashboardBuilder({
               context="elementPadding"
               onChange={(newVals) => {
                 updateShellSettings({
-                  elementPaddingTop: newVals.top !== undefined ? newVals.top : shellSettings.elementPaddingTop,
-                  elementPaddingRight: newVals.right !== undefined ? newVals.right : shellSettings.elementPaddingRight,
-                  elementPaddingBottom: newVals.bottom !== undefined ? newVals.bottom : shellSettings.elementPaddingBottom,
-                  elementPaddingLeft: newVals.left !== undefined ? newVals.left : shellSettings.elementPaddingLeft,
+                  elementPaddingTop:
+                    newVals.top !== undefined
+                      ? newVals.top
+                      : shellSettings.elementPaddingTop,
+                  elementPaddingRight:
+                    newVals.right !== undefined
+                      ? newVals.right
+                      : shellSettings.elementPaddingRight,
+                  elementPaddingBottom:
+                    newVals.bottom !== undefined
+                      ? newVals.bottom
+                      : shellSettings.elementPaddingBottom,
+                  elementPaddingLeft:
+                    newVals.left !== undefined
+                      ? newVals.left
+                      : shellSettings.elementPaddingLeft,
                 });
               }}
             />
@@ -5453,10 +5620,22 @@ export default function DashboardBuilder({
               context="elementMargin"
               onChange={(newVals) => {
                 updateShellSettings({
-                  elementMarginTop: newVals.top !== undefined ? newVals.top : shellSettings.elementMarginTop,
-                  elementMarginRight: newVals.right !== undefined ? newVals.right : shellSettings.elementMarginRight,
-                  elementMarginBottom: newVals.bottom !== undefined ? newVals.bottom : shellSettings.elementMarginBottom,
-                  elementMarginLeft: newVals.left !== undefined ? newVals.left : shellSettings.elementMarginLeft,
+                  elementMarginTop:
+                    newVals.top !== undefined
+                      ? newVals.top
+                      : shellSettings.elementMarginTop,
+                  elementMarginRight:
+                    newVals.right !== undefined
+                      ? newVals.right
+                      : shellSettings.elementMarginRight,
+                  elementMarginBottom:
+                    newVals.bottom !== undefined
+                      ? newVals.bottom
+                      : shellSettings.elementMarginBottom,
+                  elementMarginLeft:
+                    newVals.left !== undefined
+                      ? newVals.left
+                      : shellSettings.elementMarginLeft,
                 });
               }}
             />
@@ -5489,7 +5668,9 @@ export default function DashboardBuilder({
               <span>Card Radius</span>
               <select
                 value={
-                  ["0px", "4px", "8px", "12px", "16px", "24px"].includes(shellSettings.productCardRadius)
+                  ["0px", "4px", "8px", "12px", "16px", "24px"].includes(
+                    shellSettings.productCardRadius,
+                  )
                     ? shellSettings.productCardRadius
                     : "custom"
                 }
@@ -5513,7 +5694,9 @@ export default function DashboardBuilder({
             </label>
           </div>
 
-          {!["0px", "4px", "8px", "12px", "16px", "24px"].includes(shellSettings.productCardRadius) && (
+          {!["0px", "4px", "8px", "12px", "16px", "24px"].includes(
+            shellSettings.productCardRadius,
+          ) && (
             <label className="builder-field">
               <span>Custom Card Radius (px/rem)</span>
               <input
@@ -5531,7 +5714,9 @@ export default function DashboardBuilder({
           <label className="builder-field">
             <span>Card Shadow</span>
             <select
-              value={shellSettings.productCardShadow || "0 0 0 rgba(15, 23, 42, 0)"}
+              value={
+                shellSettings.productCardShadow || "0 0 0 rgba(15, 23, 42, 0)"
+              }
               onChange={(event) =>
                 updateShellSettings({
                   productCardShadow: event.target.value,
@@ -5539,17 +5724,28 @@ export default function DashboardBuilder({
               }
             >
               <option value="0 0 0 rgba(15, 23, 42, 0)">None</option>
-              <option value="0 4px 12px rgba(15, 23, 42, 0.05)">Subtle (0 4px 12px)</option>
-              <option value="0 8px 24px rgba(15, 23, 42, 0.06)">Soft (0 8px 24px)</option>
-              <option value="0 12px 30px rgba(15, 23, 42, 0.08)">Medium (0 12px 30px)</option>
-              <option value="0 18px 42px rgba(15, 23, 42, 0.12)">Strong (0 18px 42px)</option>
+              <option value="0 4px 12px rgba(15, 23, 42, 0.05)">
+                Subtle (0 4px 12px)
+              </option>
+              <option value="0 8px 24px rgba(15, 23, 42, 0.06)">
+                Soft (0 8px 24px)
+              </option>
+              <option value="0 12px 30px rgba(15, 23, 42, 0.08)">
+                Medium (0 12px 30px)
+              </option>
+              <option value="0 18px 42px rgba(15, 23, 42, 0.12)">
+                Strong (0 18px 42px)
+              </option>
             </select>
           </label>
 
           <label className="builder-field">
             <span>Card Hover Shadow</span>
             <select
-              value={shellSettings.productCardShadowHover || "0 18px 40px rgba(15, 23, 42, 0.14)"}
+              value={
+                shellSettings.productCardShadowHover ||
+                "0 18px 40px rgba(15, 23, 42, 0.14)"
+              }
               onChange={(event) =>
                 updateShellSettings({
                   productCardShadowHover: event.target.value,
@@ -5557,9 +5753,15 @@ export default function DashboardBuilder({
               }
             >
               <option value="0 0 0 rgba(15, 23, 42, 0)">None</option>
-              <option value="0 12px 24px rgba(15, 23, 42, 0.08)">Soft (0 12px 24px)</option>
-              <option value="0 18px 40px rgba(15, 23, 42, 0.14)">Medium (0 18px 40px)</option>
-              <option value="0 24px 54px rgba(15, 23, 42, 0.18)">Strong (0 24px 54px)</option>
+              <option value="0 12px 24px rgba(15, 23, 42, 0.08)">
+                Soft (0 12px 24px)
+              </option>
+              <option value="0 18px 40px rgba(15, 23, 42, 0.14)">
+                Medium (0 18px 40px)
+              </option>
+              <option value="0 24px 54px rgba(15, 23, 42, 0.18)">
+                Strong (0 24px 54px)
+              </option>
             </select>
           </label>
 
@@ -5667,7 +5869,9 @@ export default function DashboardBuilder({
             <span>Image Aspect Ratio</span>
             <select
               value={
-                ["auto", "1 / 1", "4 / 3", "16 / 9", "3 / 2"].includes(shellSettings.productImageAspectRatio)
+                ["auto", "1 / 1", "4 / 3", "16 / 9", "3 / 2"].includes(
+                  shellSettings.productImageAspectRatio,
+                )
                   ? shellSettings.productImageAspectRatio
                   : "custom"
               }
@@ -5689,7 +5893,9 @@ export default function DashboardBuilder({
             </select>
           </label>
 
-          {!["auto", "1 / 1", "4 / 3", "16 / 9", "3 / 2"].includes(shellSettings.productImageAspectRatio) && (
+          {!["auto", "1 / 1", "4 / 3", "16 / 9", "3 / 2"].includes(
+            shellSettings.productImageAspectRatio,
+          ) && (
             <label className="builder-field">
               <span>Custom Aspect Ratio (e.g. 4/5)</span>
               <input
@@ -5726,7 +5932,13 @@ export default function DashboardBuilder({
             <span>Image Padding</span>
             <select
               value={
-                ["0px", "clamp(6px, 1vw, 14px)", "clamp(14px, 1.5vw, 22px)", "clamp(22px, 2.4vw, 36px)", "clamp(28px, 4vw, 48px)"].includes(shellSettings.productImagePadding)
+                [
+                  "0px",
+                  "clamp(6px, 1vw, 14px)",
+                  "clamp(14px, 1.5vw, 22px)",
+                  "clamp(22px, 2.4vw, 36px)",
+                  "clamp(28px, 4vw, 48px)",
+                ].includes(shellSettings.productImagePadding)
                   ? shellSettings.productImagePadding
                   : "custom"
               }
@@ -5735,26 +5947,40 @@ export default function DashboardBuilder({
                 if (val === "custom") {
                   updateShellSettings({
                     productImagePadding: "20px",
-                    productImageNoPadding: false
+                    productImageNoPadding: false,
                   });
                 } else {
                   updateShellSettings({
                     productImagePadding: val,
-                    productImageNoPadding: val === "0px"
+                    productImageNoPadding: val === "0px",
                   });
                 }
               }}
             >
               <option value="0px">None (0px)</option>
-              <option value="clamp(6px, 1vw, 14px)">Tight (Tight padding)</option>
-              <option value="clamp(14px, 1.5vw, 22px)">Compact (Compact padding)</option>
-              <option value="clamp(22px, 2.4vw, 36px)">Medium (Medium padding)</option>
-              <option value="clamp(28px, 4vw, 48px)">Large (Large padding)</option>
+              <option value="clamp(6px, 1vw, 14px)">
+                Tight (Tight padding)
+              </option>
+              <option value="clamp(14px, 1.5vw, 22px)">
+                Compact (Compact padding)
+              </option>
+              <option value="clamp(22px, 2.4vw, 36px)">
+                Medium (Medium padding)
+              </option>
+              <option value="clamp(28px, 4vw, 48px)">
+                Large (Large padding)
+              </option>
               <option value="custom">Custom...</option>
             </select>
           </label>
 
-          {!["0px", "clamp(6px, 1vw, 14px)", "clamp(14px, 1.5vw, 22px)", "clamp(22px, 2.4vw, 36px)", "clamp(28px, 4vw, 48px)"].includes(shellSettings.productImagePadding) && (
+          {![
+            "0px",
+            "clamp(6px, 1vw, 14px)",
+            "clamp(14px, 1.5vw, 22px)",
+            "clamp(22px, 2.4vw, 36px)",
+            "clamp(28px, 4vw, 48px)",
+          ].includes(shellSettings.productImagePadding) && (
             <label className="builder-field">
               <span>Custom Image Padding (e.g. 10px)</span>
               <input
@@ -5763,7 +5989,7 @@ export default function DashboardBuilder({
                 onChange={(event) =>
                   updateShellSettings({
                     productImagePadding: event.target.value,
-                    productImageNoPadding: event.target.value.trim() === "0px"
+                    productImageNoPadding: event.target.value.trim() === "0px",
                   })
                 }
               />
@@ -5777,7 +6003,9 @@ export default function DashboardBuilder({
               onChange={(event) =>
                 updateShellSettings({
                   productImageNoPadding: event.target.checked,
-                  productImagePadding: event.target.checked ? "0px" : "clamp(22px, 2.4vw, 36px)"
+                  productImagePadding: event.target.checked
+                    ? "0px"
+                    : "clamp(22px, 2.4vw, 36px)",
                 })
               }
             />
@@ -5800,7 +6028,9 @@ export default function DashboardBuilder({
                   key={preset.key}
                   type="button"
                   className={`builder-preset-btn${activePreset === preset.key ? " is-active" : ""}`}
-                  onClick={() => updateShellSettings(builderButtonPresetFields(preset.key))}
+                  onClick={() =>
+                    updateShellSettings(builderButtonPresetFields(preset.key))
+                  }
                 >
                   <span>{preset.label}</span>
                   <small>{preset.description}</small>
@@ -5822,272 +6052,301 @@ export default function DashboardBuilder({
               <span>Fine tune button style</span>
               <small>optional custom values</small>
             </summary>
-          <div className="builder-card-title">
-            <strong>Button Core Style</strong>
-            <span>colors + borders</span>
-          </div>
+            <div className="builder-card-title">
+              <strong>Button Core Style</strong>
+              <span>colors + borders</span>
+            </div>
 
-          <div className="builder-two-column">
-            <label className="builder-field">
-              <span>Background</span>
-              <input
-                type="color"
-                value={buttonColorInputValue(shellSettings.buttonBg, "#111111")}
-                onChange={(event) =>
-                  updateShellSettings({
-                    buttonBg: event.target.value,
-                  })
-                }
-              />
-            </label>
-
-            <label className="builder-field">
-              <span>Text Color</span>
-              <input
-                type="color"
-                value={buttonColorInputValue(shellSettings.buttonTextColor, "#ffffff")}
-                onChange={(event) =>
-                  updateShellSettings({
-                    buttonTextColor: event.target.value,
-                  })
-                }
-              />
-            </label>
-          </div>
-
-          <div className="builder-two-column">
-            <label className="builder-field">
-              <span>Border Radius</span>
-              <select
-                value={
-                  ["0px", "4px", "8px", "12px", "16px", "999px"].includes(shellSettings.buttonBorderRadius)
-                    ? shellSettings.buttonBorderRadius
-                    : "custom"
-                }
-                onChange={(event) => {
-                  const val = event.target.value;
-                  if (val === "custom") {
-                    updateShellSettings({ buttonBorderRadius: "10px" });
-                  } else {
-                    updateShellSettings({ buttonBorderRadius: val });
+            <div className="builder-two-column">
+              <label className="builder-field">
+                <span>Background</span>
+                <input
+                  type="color"
+                  value={buttonColorInputValue(
+                    shellSettings.buttonBg,
+                    "#111111",
+                  )}
+                  onChange={(event) =>
+                    updateShellSettings({
+                      buttonBg: event.target.value,
+                    })
                   }
-                }}
-              >
-                <option value="0px">Flat (0px)</option>
-                <option value="4px">Small (4px)</option>
-                <option value="8px">Medium (8px)</option>
-                <option value="12px">Rounded (12px)</option>
-                <option value="16px">Large (16px)</option>
-                <option value="999px">Pill (999px)</option>
-                <option value="custom">Custom...</option>
-              </select>
-            </label>
+                />
+              </label>
 
-            <label className="builder-field">
-              <span>Border Width</span>
-              <select
-                value={
-                  ["0px", "1px", "2px", "3px", "4px"].includes(shellSettings.buttonBorderWidth)
-                    ? shellSettings.buttonBorderWidth
-                    : "custom"
-                }
-                onChange={(event) => {
-                  const val = event.target.value;
-                  if (val === "custom") {
-                    updateShellSettings({ buttonBorderWidth: "1.5px" });
-                  } else {
-                    updateShellSettings({ buttonBorderWidth: val });
+              <label className="builder-field">
+                <span>Text Color</span>
+                <input
+                  type="color"
+                  value={buttonColorInputValue(
+                    shellSettings.buttonTextColor,
+                    "#ffffff",
+                  )}
+                  onChange={(event) =>
+                    updateShellSettings({
+                      buttonTextColor: event.target.value,
+                    })
                   }
-                }}
-              >
-                <option value="0px">None (0px)</option>
-                <option value="1px">Thin (1px)</option>
-                <option value="2px">Medium (2px)</option>
-                <option value="3px">Thick (3px)</option>
-                <option value="custom">Custom...</option>
-              </select>
-            </label>
-          </div>
+                />
+              </label>
+            </div>
 
-          {!["0px", "4px", "8px", "12px", "16px", "999px"].includes(shellSettings.buttonBorderRadius) && (
-            <label className="builder-field">
-              <span>Custom Border Radius (px/rem)</span>
-              <input
-                type="text"
-                value={shellSettings.buttonBorderRadius}
-                onChange={(event) =>
-                  updateShellSettings({
-                    buttonBorderRadius: event.target.value,
-                  })
-                }
-              />
-            </label>
-          )}
+            <div className="builder-two-column">
+              <label className="builder-field">
+                <span>Border Radius</span>
+                <select
+                  value={
+                    ["0px", "4px", "8px", "12px", "16px", "999px"].includes(
+                      shellSettings.buttonBorderRadius,
+                    )
+                      ? shellSettings.buttonBorderRadius
+                      : "custom"
+                  }
+                  onChange={(event) => {
+                    const val = event.target.value;
+                    if (val === "custom") {
+                      updateShellSettings({ buttonBorderRadius: "10px" });
+                    } else {
+                      updateShellSettings({ buttonBorderRadius: val });
+                    }
+                  }}
+                >
+                  <option value="0px">Flat (0px)</option>
+                  <option value="4px">Small (4px)</option>
+                  <option value="8px">Medium (8px)</option>
+                  <option value="12px">Rounded (12px)</option>
+                  <option value="16px">Large (16px)</option>
+                  <option value="999px">Pill (999px)</option>
+                  <option value="custom">Custom...</option>
+                </select>
+              </label>
 
-          {!["0px", "1px", "2px", "3px", "4px"].includes(shellSettings.buttonBorderWidth) && (
-            <label className="builder-field">
-              <span>Custom Border Width (px/rem)</span>
-              <input
-                type="text"
-                value={shellSettings.buttonBorderWidth}
-                onChange={(event) =>
-                  updateShellSettings({
-                    buttonBorderWidth: event.target.value,
-                  })
-                }
-              />
-            </label>
-          )}
+              <label className="builder-field">
+                <span>Border Width</span>
+                <select
+                  value={
+                    ["0px", "1px", "2px", "3px", "4px"].includes(
+                      shellSettings.buttonBorderWidth,
+                    )
+                      ? shellSettings.buttonBorderWidth
+                      : "custom"
+                  }
+                  onChange={(event) => {
+                    const val = event.target.value;
+                    if (val === "custom") {
+                      updateShellSettings({ buttonBorderWidth: "1.5px" });
+                    } else {
+                      updateShellSettings({ buttonBorderWidth: val });
+                    }
+                  }}
+                >
+                  <option value="0px">None (0px)</option>
+                  <option value="1px">Thin (1px)</option>
+                  <option value="2px">Medium (2px)</option>
+                  <option value="3px">Thick (3px)</option>
+                  <option value="custom">Custom...</option>
+                </select>
+              </label>
+            </div>
 
-          <label className="builder-field">
-            <span>Border Color</span>
-            <input
-              type="color"
-              value={buttonColorInputValue(shellSettings.buttonBorderColor, "#111111")}
-              onChange={(event) =>
-                updateShellSettings({
-                  buttonBorderColor: event.target.value,
-                })
-              }
-            />
-          </label>
+            {!["0px", "4px", "8px", "12px", "16px", "999px"].includes(
+              shellSettings.buttonBorderRadius,
+            ) && (
+              <label className="builder-field">
+                <span>Custom Border Radius (px/rem)</span>
+                <input
+                  type="text"
+                  value={shellSettings.buttonBorderRadius}
+                  onChange={(event) =>
+                    updateShellSettings({
+                      buttonBorderRadius: event.target.value,
+                    })
+                  }
+                />
+              </label>
+            )}
 
-          <div className="builder-card-title">
-            <strong>Sizing & Spacing</strong>
-            <span>paddings + text options</span>
-          </div>
-
-          <div className="builder-two-column">
-            <label className="builder-field">
-              <span>Padding Y (vertical)</span>
-              <input
-                type="text"
-                value={shellSettings.buttonPaddingY}
-                onChange={(event) =>
-                  updateShellSettings({
-                    buttonPaddingY: event.target.value,
-                  })
-                }
-                placeholder="e.g. 11px"
-              />
-            </label>
-
-            <label className="builder-field">
-              <span>Padding X (horizontal)</span>
-              <input
-                type="text"
-                value={shellSettings.buttonPaddingX}
-                onChange={(event) =>
-                  updateShellSettings({
-                    buttonPaddingX: event.target.value,
-                  })
-                }
-                placeholder="e.g. 18px"
-              />
-            </label>
-          </div>
-
-          <div className="builder-two-column">
-            <label className="builder-field">
-              <span>Font Weight</span>
-              <select
-                value={shellSettings.buttonFontWeight || "720"}
-                onChange={(event) =>
-                  updateShellSettings({
-                    buttonFontWeight: event.target.value,
-                  })
-                }
-              >
-                <option value="400">Normal (400)</option>
-                <option value="500">Medium (500)</option>
-                <option value="600">Semibold (600)</option>
-                <option value="700">Bold (700)</option>
-                <option value="720">Heavy (720)</option>
-                <option value="800">Extra Bold (800)</option>
-              </select>
-            </label>
+            {!["0px", "1px", "2px", "3px", "4px"].includes(
+              shellSettings.buttonBorderWidth,
+            ) && (
+              <label className="builder-field">
+                <span>Custom Border Width (px/rem)</span>
+                <input
+                  type="text"
+                  value={shellSettings.buttonBorderWidth}
+                  onChange={(event) =>
+                    updateShellSettings({
+                      buttonBorderWidth: event.target.value,
+                    })
+                  }
+                />
+              </label>
+            )}
 
             <label className="builder-field">
-              <span>Letter Spacing</span>
-              <select
-                value={shellSettings.buttonLetterSpacing || "0px"}
-                onChange={(event) =>
-                  updateShellSettings({
-                    buttonLetterSpacing: event.target.value,
-                  })
-                }
-              >
-                <option value="0px">None (0px)</option>
-                <option value="0.02em">Tight (0.02em)</option>
-                <option value="0.05em">Medium (0.05em)</option>
-                <option value="0.1em">Wide (0.1em)</option>
-              </select>
-            </label>
-          </div>
-
-          <div className="builder-card-title">
-            <strong>Hover Behavior</strong>
-            <span>actions + animations</span>
-          </div>
-
-          <div className="builder-two-column">
-            <label className="builder-field">
-              <span>Hover Background</span>
+              <span>Border Color</span>
               <input
                 type="color"
-                value={buttonColorInputValue(shellSettings.buttonHoverBg, "#111111")}
+                value={buttonColorInputValue(
+                  shellSettings.buttonBorderColor,
+                  "#111111",
+                )}
                 onChange={(event) =>
                   updateShellSettings({
-                    buttonHoverBg: event.target.value,
+                    buttonBorderColor: event.target.value,
                   })
                 }
               />
             </label>
 
-            <label className="builder-field">
-              <span>Hover Text</span>
-              <input
-                type="color"
-                value={buttonColorInputValue(shellSettings.buttonHoverTextColor, "#ffffff")}
-                onChange={(event) =>
-                  updateShellSettings({
-                    buttonHoverTextColor: event.target.value,
-                  })
-                }
-              />
-            </label>
-          </div>
+            <div className="builder-card-title">
+              <strong>Sizing & Spacing</strong>
+              <span>paddings + text options</span>
+            </div>
 
-          <div className="builder-two-column">
-            <label className="builder-field">
-              <span>Hover Border</span>
-              <input
-                type="color"
-                value={buttonColorInputValue(shellSettings.buttonHoverBorderColor, "#111111")}
-                onChange={(event) =>
-                  updateShellSettings({
-                    buttonHoverBorderColor: event.target.value,
-                  })
-                }
-              />
-            </label>
+            <div className="builder-two-column">
+              <label className="builder-field">
+                <span>Padding Y (vertical)</span>
+                <input
+                  type="text"
+                  value={shellSettings.buttonPaddingY}
+                  onChange={(event) =>
+                    updateShellSettings({
+                      buttonPaddingY: event.target.value,
+                    })
+                  }
+                  placeholder="e.g. 11px"
+                />
+              </label>
 
-            <label className="builder-field">
-              <span>Hover Action</span>
-              <select
-                value={shellSettings.buttonHoverEffect || "lift"}
-                onChange={(event) =>
-                  updateShellSettings({
-                    buttonHoverEffect: event.target.value as "none" | "lift" | "grow",
-                  })
-                }
-              >
-                <option value="none">None (Stay static)</option>
-                <option value="lift">Lift Up (Hover translation + shadow)</option>
-                <option value="grow">Grow (Slightly scale up)</option>
-              </select>
-            </label>
-          </div>
+              <label className="builder-field">
+                <span>Padding X (horizontal)</span>
+                <input
+                  type="text"
+                  value={shellSettings.buttonPaddingX}
+                  onChange={(event) =>
+                    updateShellSettings({
+                      buttonPaddingX: event.target.value,
+                    })
+                  }
+                  placeholder="e.g. 18px"
+                />
+              </label>
+            </div>
+
+            <div className="builder-two-column">
+              <label className="builder-field">
+                <span>Font Weight</span>
+                <select
+                  value={shellSettings.buttonFontWeight || "720"}
+                  onChange={(event) =>
+                    updateShellSettings({
+                      buttonFontWeight: event.target.value,
+                    })
+                  }
+                >
+                  <option value="400">Normal (400)</option>
+                  <option value="500">Medium (500)</option>
+                  <option value="600">Semibold (600)</option>
+                  <option value="700">Bold (700)</option>
+                  <option value="720">Heavy (720)</option>
+                  <option value="800">Extra Bold (800)</option>
+                </select>
+              </label>
+
+              <label className="builder-field">
+                <span>Letter Spacing</span>
+                <select
+                  value={shellSettings.buttonLetterSpacing || "0px"}
+                  onChange={(event) =>
+                    updateShellSettings({
+                      buttonLetterSpacing: event.target.value,
+                    })
+                  }
+                >
+                  <option value="0px">None (0px)</option>
+                  <option value="0.02em">Tight (0.02em)</option>
+                  <option value="0.05em">Medium (0.05em)</option>
+                  <option value="0.1em">Wide (0.1em)</option>
+                </select>
+              </label>
+            </div>
+
+            <div className="builder-card-title">
+              <strong>Hover Behavior</strong>
+              <span>actions + animations</span>
+            </div>
+
+            <div className="builder-two-column">
+              <label className="builder-field">
+                <span>Hover Background</span>
+                <input
+                  type="color"
+                  value={buttonColorInputValue(
+                    shellSettings.buttonHoverBg,
+                    "#111111",
+                  )}
+                  onChange={(event) =>
+                    updateShellSettings({
+                      buttonHoverBg: event.target.value,
+                    })
+                  }
+                />
+              </label>
+
+              <label className="builder-field">
+                <span>Hover Text</span>
+                <input
+                  type="color"
+                  value={buttonColorInputValue(
+                    shellSettings.buttonHoverTextColor,
+                    "#ffffff",
+                  )}
+                  onChange={(event) =>
+                    updateShellSettings({
+                      buttonHoverTextColor: event.target.value,
+                    })
+                  }
+                />
+              </label>
+            </div>
+
+            <div className="builder-two-column">
+              <label className="builder-field">
+                <span>Hover Border</span>
+                <input
+                  type="color"
+                  value={buttonColorInputValue(
+                    shellSettings.buttonHoverBorderColor,
+                    "#111111",
+                  )}
+                  onChange={(event) =>
+                    updateShellSettings({
+                      buttonHoverBorderColor: event.target.value,
+                    })
+                  }
+                />
+              </label>
+
+              <label className="builder-field">
+                <span>Hover Action</span>
+                <select
+                  value={shellSettings.buttonHoverEffect || "lift"}
+                  onChange={(event) =>
+                    updateShellSettings({
+                      buttonHoverEffect: event.target.value as
+                        "none" | "lift" | "grow",
+                    })
+                  }
+                >
+                  <option value="none">None (Stay static)</option>
+                  <option value="lift">
+                    Lift Up (Hover translation + shadow)
+                  </option>
+                  <option value="grow">Grow (Slightly scale up)</option>
+                </select>
+              </label>
+            </div>
           </details>
         </div>
       )}
@@ -6556,12 +6815,25 @@ export default function DashboardBuilder({
   );
 
   const sidebarTopActions = (
-    <div className="builder-sidebar-top-action-bar" aria-label="Builder page actions">
+    <div
+      className="builder-sidebar-top-action-bar"
+      aria-label="Builder page actions"
+    >
       <div className="builder-sidebar-top-action-copy">
         <strong>
           {sidebarTab === "globalStyles" ? (
-            <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
-              <Sliders size={12} className="builder-wireframe-icon" style={{ flexShrink: 0 }} />
+            <span
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "6px",
+              }}
+            >
+              <Sliders
+                size={12}
+                className="builder-wireframe-icon"
+                style={{ flexShrink: 0 }}
+              />
               Global Styles
             </span>
           ) : hasPendingChanges ? (
@@ -6624,14 +6896,26 @@ export default function DashboardBuilder({
         ) : (
           hasPendingChanges && (
             <>
-              <button type="button" onClick={undoBuilder} title="Undo last change">
+              <button
+                type="button"
+                onClick={undoBuilder}
+                title="Undo last change"
+              >
                 <Undo2 size={15} />
                 Undo
               </button>
-              <button type="button" onClick={redoBuilder} title="Redo last change">
+              <button
+                type="button"
+                onClick={redoBuilder}
+                title="Redo last change"
+              >
                 <Redo2 size={15} />
               </button>
-              <button type="button" className="is-primary" onClick={publishLayout}>
+              <button
+                type="button"
+                className="is-primary"
+                onClick={publishLayout}
+              >
                 <CloudUpload size={15} />
                 Publish
               </button>
@@ -6672,7 +6956,9 @@ export default function DashboardBuilder({
         inspectorOpen={inspectorOpen}
         inspectorOpenKey={inspectorOpenKey}
         pageStatus={pageStatus}
-        selectedSectionTitle={selectedSection?.title || selectedSection?.kind || null}
+        selectedSectionTitle={
+          selectedSection?.title || selectedSection?.kind || null
+        }
         selectedElementLabel={
           selectedLayoutBlock
             ? layoutBlockLabels[selectedLayoutBlock.kind ?? "text"]
@@ -7046,7 +7332,8 @@ export default function DashboardBuilder({
                     value={shellSettings.headerTextMode || "auto"}
                     onChange={(event) =>
                       updateShellSettings({
-                        headerTextMode: event.target.value as BuilderHeaderTextMode,
+                        headerTextMode: event.target
+                          .value as BuilderHeaderTextMode,
                       })
                     }
                   >
@@ -7273,10 +7560,7 @@ export default function DashboardBuilder({
                               option.id,
                             )}
                             onChange={(event) =>
-                              updateHeaderIcon(
-                                option.id,
-                                event.target.checked,
-                              )
+                              updateHeaderIcon(option.id, event.target.checked)
                             }
                           />
                           <span>{option.label}</span>
@@ -7285,7 +7569,6 @@ export default function DashboardBuilder({
                     </div>
                   </div>
                 </div>
-
               </div>
             </div>
           </section>
@@ -7310,19 +7593,29 @@ export default function DashboardBuilder({
           ref={previewShellRef}
           className={`builder-preview-shell builder-preview-${device} builder-preview-scheme-${
             builderState.design.colorScheme ?? "auto"
-          }${spacingOverlayEnabled ? " is-spacing-overlay-enabled" : ""}`}
+          }${spacingOverlayEnabled ? " is-spacing-overlay-enabled" : ""}${isResizingDevice ? " is-resizing-device" : ""}`}
           style={
             {
               "--builder-preview-shell-bg": previewPageBackground,
             } as CSSProperties
           }
         >
-          <div
+          <motion.div
             className="builder-preview-viewport-container"
+            animate={{
+              width: device === "desktop" ? "100%" : previewCanvasWidth,
+              scale: device === "desktop" ? 1 : previewScale,
+            }}
+            transition={
+              isResizingDevice
+                ? { type: "tween", duration: 0 }
+                : { type: "spring", stiffness: 380, damping: 38, mass: 1 }
+            }
             style={
               {
-                "--builder-preview-scale": previewScale,
-                "--builder-preview-canvas-width": `${previewCanvasWidth}px`,
+                transformOrigin: "top center",
+                "--builder-preview-device-width": `${previewCanvasWidth}px`,
+                "--builder-preview-header-width": `${previewCanvasWidth}px`,
               } as CSSProperties
             }
           >
@@ -7331,75 +7624,126 @@ export default function DashboardBuilder({
               className="builder-preview-header-slot"
             />
             <ProductCategoryFilterProvider key={builderState.page}>
-          <PreviewCanvas
-            sections={builderState.sections}
-            page={builderState.page}
-            previewProducts={previewProducts}
-            previewCategoryTree={previewCategoryTree}
-            previewCategoryCounts={previewCategoryCounts}
-            pageLabel={getLayoutLabel(builderState.page, customPages)}
-            design={builderState.design}
-            shellSettings={shellSettings}
-            spacingOverlayEnabled={spacingOverlayEnabled}
-            selectedId={selectedId}
-            selectedLayoutColumnKey={selectedLayoutColumnKey}
-            selectedLayoutRowIndex={selectedLayoutRowIndex}
-            selectedLayoutBlockKey={selectedLayoutBlockKey}
-            draggingSectionId={draggingSectionId}
-            draggingLayoutBlockKey={draggingLayoutBlockKey}
-            onSelect={selectSection}
-            onSelectColumn={selectLayoutColumn}
-            onSelectRow={selectLayoutRow}
-            onSelectBlock={selectLayoutBlock}
-            onDragStart={setDraggingSectionId}
-            onDragEnd={() => setDraggingSectionId(null)}
-            onReorder={reorderSection}
-            onBlockDragStart={setDraggingLayoutBlockKey}
-            onBlockDragEnd={() => setDraggingLayoutBlockKey(null)}
-            onMoveBlock={moveLayoutBlock}
-            onCreateBlock={createLayoutBlockAtDrop}
-            onDuplicateBlock={duplicateLayoutBlock}
-            onDeleteBlock={deleteLayoutBlock}
-            onUpdateBlock={updateLayoutBlockByKey}
-            onUpdateGridItem={updateGridItemByKey}
-            onDeleteGridItem={deleteGridItemByKey}
-            onDuplicateGridItem={duplicateGridItemByKey}
-            onMoveGridItem={moveGridItemByKey}
-            onMoveBadge={moveBadgeByKey}
-            onMoveButton={moveButtonByKey}
-            onMoveListItem={moveListItemByKey}
-            onDeleteBadge={deleteBadgeByKey}
-            onDuplicateBadge={duplicateBadgeByKey}
-            onDeleteButton={deleteButtonByKey}
-            onDuplicateButton={duplicateButtonByKey}
-            onDeleteListItem={deleteListItemByKey}
-            onDuplicateListItem={duplicateListItemByKey}
-            onDeleteSectionBadge={deleteSectionBadgeByKey}
-            onDuplicateSectionBadge={duplicateSectionBadgeByKey}
-            onMoveSectionBadge={moveSectionBadgeByKey}
-            onUploadGridItemImage={pickGridItemImage}
-            onAddWireframe={addWireframeNear}
-            onAddRow={addRowNear}
-            onDeleteRow={deleteEmptyRow}
-            onDuplicateRow={duplicateLayoutRow}
-            onMoveRow={moveLayoutRow}
-            onSaveSectionTemplate={saveSectionTemplateById}
-            onSaveRowTemplate={saveRowTemplateByIndex}
-            onSaveElementTemplate={saveElementTemplateByKey}
-            onMoveBlockWithinColumn={moveLayoutBlockWithinColumn}
-            onDropSectionTemplate={insertSectionTemplateNear}
-            onDropRowTemplate={insertRowTemplateAt}
-            onDropElementTemplate={insertElementTemplateAt}
-            onMoveSection={moveSection}
-            onDuplicateSection={duplicateSection}
-            onDeleteSection={deleteSection}
-            onOpenSpacingSettings={openSpacingSettings}
-            onSetSidebarTab={setSidebarTab}
-            onOpenElementsPanel={openElementsPanel}
-            onCycleSectionSpacing={cycleSectionSpacing}
-          />
-          </ProductCategoryFilterProvider>
-          </div>
+              <PreviewCanvas
+                device={device}
+                sections={builderState.sections}
+                page={builderState.page}
+                previewProducts={previewProducts}
+                previewCategoryTree={previewCategoryTree}
+                previewCategoryCounts={previewCategoryCounts}
+                pageLabel={getLayoutLabel(builderState.page, customPages)}
+                design={builderState.design}
+                shellSettings={shellSettings}
+                spacingOverlayEnabled={spacingOverlayEnabled}
+                selectedId={selectedId}
+                selectedLayoutColumnKey={selectedLayoutColumnKey}
+                selectedLayoutRowIndex={selectedLayoutRowIndex}
+                selectedLayoutBlockKey={selectedLayoutBlockKey}
+                draggingSectionId={draggingSectionId}
+                draggingLayoutBlockKey={draggingLayoutBlockKey}
+                onSelect={selectSection}
+                onSelectColumn={selectLayoutColumn}
+                onSelectRow={selectLayoutRow}
+                onSelectBlock={selectLayoutBlock}
+                onDragStart={setDraggingSectionId}
+                onDragEnd={() => setDraggingSectionId(null)}
+                onReorder={reorderSection}
+                onBlockDragStart={setDraggingLayoutBlockKey}
+                onBlockDragEnd={() => setDraggingLayoutBlockKey(null)}
+                onMoveBlock={moveLayoutBlock}
+                onCreateBlock={createLayoutBlockAtDrop}
+                onDuplicateBlock={duplicateLayoutBlock}
+                onDeleteBlock={deleteLayoutBlock}
+                onUpdateBlock={updateLayoutBlockByKey}
+                onUpdateGridItem={updateGridItemByKey}
+                onDeleteGridItem={deleteGridItemByKey}
+                onDuplicateGridItem={duplicateGridItemByKey}
+                onMoveGridItem={moveGridItemByKey}
+                onMoveBadge={moveBadgeByKey}
+                onMoveButton={moveButtonByKey}
+                onMoveListItem={moveListItemByKey}
+                onDeleteBadge={deleteBadgeByKey}
+                onDuplicateBadge={duplicateBadgeByKey}
+                onDeleteButton={deleteButtonByKey}
+                onDuplicateButton={duplicateButtonByKey}
+                onDeleteListItem={deleteListItemByKey}
+                onDuplicateListItem={duplicateListItemByKey}
+                onDeleteSectionBadge={deleteSectionBadgeByKey}
+                onDuplicateSectionBadge={duplicateSectionBadgeByKey}
+                onMoveSectionBadge={moveSectionBadgeByKey}
+                onUploadGridItemImage={pickGridItemImage}
+                onAddWireframe={addWireframeNear}
+                onAddRow={addRowNear}
+                onDeleteRow={deleteEmptyRow}
+                onDuplicateRow={duplicateLayoutRow}
+                onMoveRow={moveLayoutRow}
+                onSaveSectionTemplate={saveSectionTemplateById}
+                onSaveRowTemplate={saveRowTemplateByIndex}
+                onSaveElementTemplate={saveElementTemplateByKey}
+                onMoveBlockWithinColumn={moveLayoutBlockWithinColumn}
+                onDropSectionTemplate={insertSectionTemplateNear}
+                onDropRowTemplate={insertRowTemplateAt}
+                onDropElementTemplate={insertElementTemplateAt}
+                onMoveSection={moveSection}
+                onDuplicateSection={duplicateSection}
+                onDeleteSection={deleteSection}
+                onOpenSpacingSettings={openSpacingSettings}
+                onSetSidebarTab={setSidebarTab}
+                onOpenElementsPanel={openElementsPanel}
+                onCycleSectionSpacing={cycleSectionSpacing}
+              />
+            </ProductCategoryFilterProvider>
+            {device !== "desktop" && (
+              <>
+                <div
+                  className="builder-device-resize-handle handle-left"
+                  onMouseDown={(e) => handleDeviceResizeStart(e, "left")}
+                  onDoubleClick={() => {
+                    if (device === "mobile") {
+                      setCustomMobileWidth(390);
+                    } else if (device === "tablet") {
+                      setCustomTabletWidth(820);
+                    }
+                  }}
+                  title="Drag to resize, double-click to reset"
+                />
+                <div
+                  className="builder-device-resize-handle handle-right"
+                  onMouseDown={(e) => handleDeviceResizeStart(e, "right")}
+                  onDoubleClick={() => {
+                    if (device === "mobile") {
+                      setCustomMobileWidth(390);
+                    } else if (device === "tablet") {
+                      setCustomTabletWidth(820);
+                    }
+                  }}
+                  title="Drag to resize, double-click to reset"
+                />
+                <div className="builder-device-size-indicator">
+                  <span>
+                    {device === "mobile"
+                      ? customMobileWidth
+                      : customTabletWidth}
+                    px
+                  </span>
+                  <button
+                    type="button"
+                    className="builder-device-size-reset"
+                    onClick={() => {
+                      if (device === "mobile") {
+                        setCustomMobileWidth(390);
+                      } else if (device === "tablet") {
+                        setCustomTabletWidth(820);
+                      }
+                    }}
+                    title="Reset to default preset"
+                  >
+                    Reset
+                  </button>
+                </div>
+              </>
+            )}
+          </motion.div>
         </div>
       </main>
 
@@ -7410,12 +7754,12 @@ export default function DashboardBuilder({
         onSelect={selectWordPressMedia}
         onClose={closeWordPressMediaPicker}
       />
-
     </div>
   );
 }
 
 function PreviewCanvas({
+  device,
   sections,
   page,
   previewProducts,
@@ -7482,7 +7826,7 @@ function PreviewCanvas({
   onOpenElementsPanel,
   onCycleSectionSpacing,
 }: {
-
+  device: PreviewDevice;
   sections: BuilderSection[];
   page: BuilderLayoutKey;
   previewProducts: ProductNode[];
@@ -7508,7 +7852,11 @@ function PreviewCanvas({
   ) => void;
   onDragStart: (sectionId: string) => void;
   onDragEnd: () => void;
-  onReorder: (sourceId: string, targetId: string, placement?: "above" | "below") => void;
+  onReorder: (
+    sourceId: string,
+    targetId: string,
+    placement?: "above" | "below",
+  ) => void;
   onBlockDragStart: (blockKey: string) => void;
   onBlockDragEnd: () => void;
   onMoveBlock: (payload: {
@@ -7683,14 +8031,8 @@ function PreviewCanvas({
     blockKey: string,
     itemIndex: number,
   ) => void;
-  onDeleteSectionBadge: (
-    sectionId: string,
-    badgeIndex: number,
-  ) => void;
-  onDuplicateSectionBadge: (
-    sectionId: string,
-    badgeIndex: number,
-  ) => void;
+  onDeleteSectionBadge: (sectionId: string, badgeIndex: number) => void;
+  onDuplicateSectionBadge: (sectionId: string, badgeIndex: number) => void;
   onMoveSectionBadge: (
     sectionId: string,
     fromIndex: number,
@@ -7751,9 +8093,7 @@ function PreviewCanvas({
       >
         <div className="builder-layout-header">
           <div>
-            <strong id="builder-layout-picker-title">
-              Choose row layout
-            </strong>
+            <strong id="builder-layout-picker-title">Choose row layout</strong>
             <span>
               {insertTargetSection
                 ? `Insert a section ${insertTarget.placement} ${sectionLabels[
@@ -7812,6 +8152,16 @@ function PreviewCanvas({
     <div
       className={`builder-preview-canvas${
         templateDragType ? ` is-dragging-template-${templateDragType}` : ""
+      }${selectedLayoutBlockKey !== null ? " has-selected-block" : ""}${
+        selectedLayoutRowIndex !== null && selectedLayoutBlockKey === null
+          ? " has-selected-row"
+          : ""
+      }${
+        selectedId &&
+        selectedLayoutRowIndex === null &&
+        selectedLayoutBlockKey === null
+          ? " has-selected-section"
+          : ""
       }`}
       style={
         {
@@ -7945,409 +8295,478 @@ function PreviewCanvas({
           aria-label={`${pageLabel} preview`}
         >
           <AnimatePresence mode="sync">
-          {visibleSections.map((section) => {
-            const sourceIndex = sections.findIndex(
-              (item) => item.id === section.id,
-            );
-            const isSelected = selectedId === section.id;
-            const isSectionActive = isSelected && selectedLayoutRowIndex === null && selectedLayoutColumnKey === null && selectedLayoutBlockKey === null;
-            const animationAttrs = previewAnimationAttrs(section.animation);
-            const isAnimatedBg =
-              section.backgroundEffect === "antigravity" ||
-              section.backgroundEffect === "antigravity2" ||
-              section.backgroundEffect === "aurora" ||
-              section.backgroundEffect === "constellation" ||
-              section.backgroundEffect === "waves" ||
-              section.backgroundEffect === "flowfield" ||
-              section.backgroundEffect === "webgl_waves" ||
-              section.backgroundEffect === "webgl_flowfield" ||
-              section.backgroundEffect === "webgl_cybergrid" ||
-              section.backgroundEffect === "webgl_fluid";
-            const isSectionAntigravity = section.backgroundEffect === "antigravity";
-            const isFullTheme = isSectionAntigravity && (section.antigravityVisualMode === undefined || section.antigravityVisualMode === "full");
+            {visibleSections.map((section) => {
+              const sourceIndex = sections.findIndex(
+                (item) => item.id === section.id,
+              );
+              const isSelected = selectedId === section.id;
+              const isSectionActive =
+                isSelected &&
+                selectedLayoutRowIndex === null &&
+                selectedLayoutColumnKey === null &&
+                selectedLayoutBlockKey === null;
+              const animationAttrs = previewAnimationAttrs(section.animation);
+              const isAnimatedBg =
+                section.backgroundEffect === "antigravity" ||
+                section.backgroundEffect === "antigravity2" ||
+                section.backgroundEffect === "aurora" ||
+                section.backgroundEffect === "constellation" ||
+                section.backgroundEffect === "waves" ||
+                section.backgroundEffect === "flowfield" ||
+                section.backgroundEffect === "webgl_waves" ||
+                section.backgroundEffect === "webgl_flowfield" ||
+                section.backgroundEffect === "webgl_cybergrid" ||
+                section.backgroundEffect === "webgl_fluid";
+              const isSectionAntigravity =
+                section.backgroundEffect === "antigravity";
+              const isFullTheme =
+                isSectionAntigravity &&
+                (section.antigravityVisualMode === undefined ||
+                  section.antigravityVisualMode === "full");
 
-            const isDragOverAbove = activeDragOver?.type === "section" && activeDragOver.sectionId === section.id && activeDragOver.placement === "above";
-            const isDragOverBelow = activeDragOver?.type === "section" && activeDragOver.sectionId === section.id && activeDragOver.placement === "below";
+              const isDragOverAbove =
+                activeDragOver?.type === "section" &&
+                activeDragOver.sectionId === section.id &&
+                activeDragOver.placement === "above";
+              const isDragOverBelow =
+                activeDragOver?.type === "section" &&
+                activeDragOver.sectionId === section.id &&
+                activeDragOver.placement === "below";
 
-            return (
-              <motion.div
-                key={section.id}
-                layout
-                initial={{ opacity: 0, y: 16, scale: 0.98 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.96, y: -8 }}
-                transition={{ duration: 0.26, ease: "easeOut" }}
-              >
-              <div
-                id={section.id}
-                role="button"
-                tabIndex={0}
-                draggable
-                onMouseEnter={() => setHoveredSectionId(section.id)}
-                onMouseLeave={() => setHoveredSectionId(null)}
-                onDragStart={(event) => {
-                  event.dataTransfer.setData("text/plain", section.id);
-                  event.dataTransfer.effectAllowed = "move";
-                  onDragStart(section.id);
-                  createDragGhost(event, sectionLabels[section.kind] || "Section");
-                }}
-                className={`builder-preview-section ${getStorefrontPreviewClass(
-                  section,
-                )} builder-preview-${section.kind} builder-preview-section--${
-                  section.backgroundMode === "boxed" ? "boxed" : "full"
-                } builder-preview-section--content-${
-                  section.contentMode ?? "boxed"
-                } builder-preview-section--scheme-${resolveSectionColorScheme(section, layoutScheme)} ${
-                  isFullTheme ? "shop-builder-section--effect-antigravity" : isAnimatedBg ? "relative overflow-hidden" : ""
-                } ${
-                  isSelected ? "is-selected" : ""
-                } ${
-                  hoveredSectionId === section.id ? "is-hovered" : ""
-                } ${visualStyleClassName(section.visualStyle)} ${draggingSectionId === section.id ? "is-dragging" : ""} ${isDragOverAbove ? "is-drag-over-above" : ""} ${isDragOverBelow ? "is-drag-over-below" : ""}`}
-                style={
-                  {
-                    background: section.background,
-                    "--builder-preview-padding-top": getPreviewSpacing(
-                      section.topSpacing,
-                    ),
-                    "--builder-preview-padding-bottom": getPreviewSpacing(
-                      section.bottomSpacing,
-                    ),
-                    "--builder-section-padding-top": getPreviewSpacing(
-                      section.topSpacing,
-                    ),
-                    "--builder-section-padding-bottom": getPreviewSpacing(
-                      section.bottomSpacing,
-                    ),
-                    "--builder-section-margin-top": getPreviewSectionMargin(
-                      section.topMargin,
-                    ),
-                    "--builder-section-margin-bottom": getPreviewSectionMargin(
-                      section.bottomMargin,
-                    ),
-                    "--builder-radius":
-                      section.borderRadius !== undefined
-                        ? `${section.borderRadius}px`
-                        : undefined,
-                    "--builder-card-radius":
-                      section.borderRadius !== undefined
-                        ? `${section.borderRadius}px`
-                        : undefined,
-                    ...sectionSchemeStyle(section),
-                    ...visualStyleToCss(
-                      section.visualStyle as BuilderVisualStyle | undefined,
-                    ),
-                    ...animationAttrs.style,
-                  } as CSSProperties
-                }
-                {...animationAttrs.data}
-                onClick={() => onSelect(section.id)}
-                onKeyDown={(event) => {
-                  if (event.key === "Enter" || event.key === " ") {
-                    event.preventDefault();
-                    onSelect(section.id);
-                  }
-                }}
-                onDragOver={(event) => {
-                  const types = Array.from(event.dataTransfer.types);
-                  const isSectionDrag =
-                    types.includes("text/plain") &&
-                    !types.includes("application/x-builder-block") &&
-                    !types.includes("application/x-builder-new-block") &&
-                    getBuilderTemplateDragType(event.dataTransfer.types) !== "element";
-
-                  if (isSectionDrag) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    const rect = event.currentTarget.getBoundingClientRect();
-                    const relativeY = event.clientY - rect.top;
-                    const placement = relativeY < rect.height / 2 ? "above" : "below";
-                    if (
-                      !activeDragOver ||
-                      activeDragOver.type !== "section" ||
-                      activeDragOver.sectionId !== section.id ||
-                      activeDragOver.placement !== placement
-                    ) {
-                      setActiveDragOver({
-                        type: "section",
-                        sectionId: section.id,
-                        placement,
-                      });
-                    }
-                    event.dataTransfer.dropEffect = "move";
-                  }
-                }}
-                onDrop={(event) => {
-                  event.preventDefault();
-                  event.stopPropagation();
-                  const placement = activeDragOver?.type === "section" && activeDragOver.sectionId === section.id && (activeDragOver.placement === "above" || activeDragOver.placement === "below")
-                    ? activeDragOver.placement
-                    : "above";
-                  setActiveDragOver(null);
-
-                  if (event.dataTransfer.getData(BUILDER_TEMPLATE_DND_TYPE)) {
-                    const templateId = event.dataTransfer.getData(BUILDER_TEMPLATE_DND_TYPE);
-                    if (templateId) {
-                      onDropSectionTemplate(templateId, section.id, placement);
-                    }
-                    onDragEnd();
-                    return;
-                  }
-                  const sourceId = event.dataTransfer.getData("text/plain");
-                  if (!sourceId) {
-                    onDragEnd();
-                    return;
-                  }
-                  if (sourceId.startsWith("builder-block:")) return;
-                  onReorder(sourceId, section.id, placement);
-                  onDragEnd();
-                }}
-                onDragEnd={() => {
-                  setActiveDragOver(null);
-                  onDragEnd();
-                }}
+              return (
+                <motion.div
+                  key={section.id}
+                  layout
+                  initial={{ opacity: 0, y: 16, scale: 0.98 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.96, y: -8 }}
+                  transition={{
+                    layout: {
+                      type: "spring",
+                      stiffness: 380,
+                      damping: 38,
+                      mass: 0.8,
+                    },
+                    opacity: { duration: 0.16, ease: "easeOut" },
+                    y: { type: "spring", stiffness: 380, damping: 38 },
+                    scale: { duration: 0.16, ease: "easeOut" },
+                  }}
                 >
-                {isSectionActive && (
-                  <SectionSpacingOverlay
-                    section={section}
-                    shellSettings={shellSettings}
-                    showZeroLabels={spacingOverlayEnabled}
-                    onOpenSpacingSettings={onOpenSpacingSettings}
-                    onCycleSectionSpacing={onCycleSectionSpacing}
-                  />
-                )}
-                {isAnimatedBg && (
-                  <>
-                    <AntigravityCanvas
-                      speed={section.antigravitySpeed}
-                      particleCount={section.antigravityParticleCount}
-                      color={section.antigravityColor}
-                      gridDensity={section.antigravityGridDensity as any}
-                      interactive={section.antigravityInteractive}
-                      showGrid={section.antigravityShowGrid}
-                      showParticles={section.antigravityShowParticles}
-                      gridMoveSpeed={section.antigravityGridMoveSpeed}
-                      glowIntensity={section.antigravityGlowIntensity}
-                      interactionScope={section.antigravityInteractionScope as any}
-                      visualMode={section.antigravityVisualMode as any}
-                      effectType={section.backgroundEffect}
-                    />
-                    {isSectionAntigravity && section.antigravityShowGrid !== false && (
-                      <div
-                        className="antigravity-grid-overlay"
-                        aria-hidden="true"
-                        style={
-                          section.antigravityGridMoveSpeed !== undefined || section.antigravityColor
-                            ? {
-                                animationDuration: section.antigravityGridMoveSpeed === 0
-                                  ? "0s"
-                                  : `${25 / (section.antigravityGridMoveSpeed ?? 1.0)}s`,
-                                backgroundImage: section.antigravityColor
-                                  ? `linear-gradient(${section.antigravityColor}08 1px, transparent 1px), linear-gradient(90deg, ${section.antigravityColor}08 1px, transparent 1px)`
-                                  : undefined,
-                              }
-                            : undefined
+                  <div
+                    id={section.id}
+                    role="button"
+                    tabIndex={0}
+                    draggable
+                    onMouseEnter={() => setHoveredSectionId(section.id)}
+                    onMouseLeave={() => setHoveredSectionId(null)}
+                    onDragStart={(event) => {
+                      event.dataTransfer.setData("text/plain", section.id);
+                      event.dataTransfer.effectAllowed = "move";
+                      onDragStart(section.id);
+                      createDragGhost(
+                        event,
+                        sectionLabels[section.kind] || "Section",
+                      );
+                    }}
+                    className={`builder-preview-section ${getStorefrontPreviewClass(
+                      section,
+                    )} builder-preview-${section.kind} builder-preview-section--${
+                      section.backgroundMode === "boxed" ? "boxed" : "full"
+                    } builder-preview-section--content-${
+                      section.contentMode ?? "boxed"
+                    } builder-preview-section--scheme-${resolveSectionColorScheme(section, layoutScheme)} ${
+                      isFullTheme
+                        ? "shop-builder-section--effect-antigravity"
+                        : isAnimatedBg
+                          ? "relative overflow-hidden"
+                          : ""
+                    } ${isSelected ? "is-selected" : ""} ${
+                      hoveredSectionId === section.id ? "is-hovered" : ""
+                    } ${visualStyleClassName(section.visualStyle)} ${draggingSectionId === section.id ? "is-dragging" : ""} ${isDragOverAbove ? "is-drag-over-above" : ""} ${isDragOverBelow ? "is-drag-over-below" : ""}`}
+                    style={
+                      {
+                        background: section.background,
+                        "--builder-preview-padding-top": getPreviewSpacing(
+                          section.topSpacing,
+                        ),
+                        "--builder-preview-padding-bottom": getPreviewSpacing(
+                          section.bottomSpacing,
+                        ),
+                        "--builder-section-padding-top": getPreviewSpacing(
+                          section.topSpacing,
+                        ),
+                        "--builder-section-padding-bottom": getPreviewSpacing(
+                          section.bottomSpacing,
+                        ),
+                        "--builder-section-margin-top": getPreviewSectionMargin(
+                          section.topMargin,
+                        ),
+                        "--builder-section-margin-bottom":
+                          getPreviewSectionMargin(section.bottomMargin),
+                        "--builder-radius":
+                          section.borderRadius !== undefined
+                            ? `${section.borderRadius}px`
+                            : undefined,
+                        "--builder-card-radius":
+                          section.borderRadius !== undefined
+                            ? `${section.borderRadius}px`
+                            : undefined,
+                        ...sectionSchemeStyle(section),
+                        ...visualStyleToCss(
+                          section.visualStyle as BuilderVisualStyle | undefined,
+                        ),
+                        ...animationAttrs.style,
+                      } as CSSProperties
+                    }
+                    {...animationAttrs.data}
+                    onClick={() => onSelect(section.id)}
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter" || event.key === " ") {
+                        event.preventDefault();
+                        onSelect(section.id);
+                      }
+                    }}
+                    onDragOver={(event) => {
+                      const types = Array.from(event.dataTransfer.types);
+                      const isSectionDrag =
+                        types.includes("text/plain") &&
+                        !types.includes("application/x-builder-block") &&
+                        !types.includes("application/x-builder-new-block") &&
+                        getBuilderTemplateDragType(event.dataTransfer.types) !==
+                          "element";
+
+                      if (isSectionDrag) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        const rect =
+                          event.currentTarget.getBoundingClientRect();
+                        const relativeY = event.clientY - rect.top;
+                        const placement =
+                          relativeY < rect.height / 2 ? "above" : "below";
+                        if (
+                          !activeDragOver ||
+                          activeDragOver.type !== "section" ||
+                          activeDragOver.sectionId !== section.id ||
+                          activeDragOver.placement !== placement
+                        ) {
+                          setActiveDragOver({
+                            type: "section",
+                            sectionId: section.id,
+                            placement,
+                          });
                         }
+                        event.dataTransfer.dropEffect = "move";
+                      }
+                    }}
+                    onDrop={(event) => {
+                      event.preventDefault();
+                      event.stopPropagation();
+                      const placement =
+                        activeDragOver?.type === "section" &&
+                        activeDragOver.sectionId === section.id &&
+                        (activeDragOver.placement === "above" ||
+                          activeDragOver.placement === "below")
+                          ? activeDragOver.placement
+                          : "above";
+                      setActiveDragOver(null);
+
+                      if (
+                        event.dataTransfer.getData(BUILDER_TEMPLATE_DND_TYPE)
+                      ) {
+                        const templateId = event.dataTransfer.getData(
+                          BUILDER_TEMPLATE_DND_TYPE,
+                        );
+                        if (templateId) {
+                          onDropSectionTemplate(
+                            templateId,
+                            section.id,
+                            placement,
+                          );
+                        }
+                        onDragEnd();
+                        return;
+                      }
+                      const sourceId = event.dataTransfer.getData("text/plain");
+                      if (!sourceId) {
+                        onDragEnd();
+                        return;
+                      }
+                      if (sourceId.startsWith("builder-block:")) return;
+                      onReorder(sourceId, section.id, placement);
+                      onDragEnd();
+                    }}
+                    onDragEnd={() => {
+                      setActiveDragOver(null);
+                      onDragEnd();
+                    }}
+                  >
+                    {isSectionActive && (
+                      <SectionSpacingOverlay
+                        section={section}
+                        shellSettings={shellSettings}
+                        showZeroLabels={spacingOverlayEnabled}
+                        onOpenSpacingSettings={onOpenSpacingSettings}
+                        onCycleSectionSpacing={onCycleSectionSpacing}
                       />
                     )}
-                  </>
-                )}
-                <div
-                  className={`builder-preview-section-tools ${
-                    isSelected ? "is-selected-tools" : ""
-                  }`}
-                  onClick={(event) => event.stopPropagation()}
-                  onMouseDown={(event) => event.stopPropagation()}
-                  onDragStart={(event) => event.stopPropagation()}
-                >
-                  <div className="builder-preview-section-tools-main">
-                    <span>{sectionLabels[section.kind]}</span>
-                    <button
-                      type="button"
-                      onClick={() => onSelect(section.id)}
-                      aria-label="Open section settings"
-                      title="Section settings"
+                    {isAnimatedBg && (
+                      <>
+                        <AntigravityCanvas
+                          speed={section.antigravitySpeed}
+                          particleCount={section.antigravityParticleCount}
+                          color={section.antigravityColor}
+                          gridDensity={section.antigravityGridDensity as any}
+                          interactive={section.antigravityInteractive}
+                          showGrid={section.antigravityShowGrid}
+                          showParticles={section.antigravityShowParticles}
+                          gridMoveSpeed={section.antigravityGridMoveSpeed}
+                          glowIntensity={section.antigravityGlowIntensity}
+                          interactionScope={
+                            section.antigravityInteractionScope as any
+                          }
+                          visualMode={section.antigravityVisualMode as any}
+                          effectType={section.backgroundEffect}
+                        />
+                        {isSectionAntigravity &&
+                          section.antigravityShowGrid !== false && (
+                            <div
+                              className="antigravity-grid-overlay"
+                              aria-hidden="true"
+                              style={
+                                section.antigravityGridMoveSpeed !==
+                                  undefined || section.antigravityColor
+                                  ? {
+                                      animationDuration:
+                                        section.antigravityGridMoveSpeed === 0
+                                          ? "0s"
+                                          : `${25 / (section.antigravityGridMoveSpeed ?? 1.0)}s`,
+                                      backgroundImage: section.antigravityColor
+                                        ? `linear-gradient(${section.antigravityColor}08 1px, transparent 1px), linear-gradient(90deg, ${section.antigravityColor}08 1px, transparent 1px)`
+                                        : undefined,
+                                    }
+                                  : undefined
+                              }
+                            />
+                          )}
+                      </>
+                    )}
+                    <div
+                      className={`builder-preview-section-tools ${
+                        isSelected ? "is-selected-tools" : ""
+                      }`}
+                      onClick={(event) => event.stopPropagation()}
+                      onMouseDown={(event) => event.stopPropagation()}
+                      onDragStart={(event) => event.stopPropagation()}
                     >
-                      <Settings2 size={14} />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => onSaveSectionTemplate(section.id)}
-                      title="Save section as template"
+                      <div className="builder-preview-section-tools-main">
+                        <span>{sectionLabels[section.kind]}</span>
+                        <button
+                          type="button"
+                          onClick={() => onSelect(section.id)}
+                          aria-label="Open section settings"
+                          title="Section settings"
+                        >
+                          <Settings2 size={14} />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => onSaveSectionTemplate(section.id)}
+                          title="Save section as template"
+                        >
+                          <Save size={14} />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => onMoveSection(section.id, -1)}
+                          disabled={sourceIndex <= 0}
+                          title="Move section up"
+                        >
+                          <ArrowUp size={14} />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => onMoveSection(section.id, 1)}
+                          disabled={
+                            sourceIndex < 0 ||
+                            sourceIndex >= sections.length - 1
+                          }
+                          title="Move section down"
+                        >
+                          <ArrowDown size={14} />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => onDuplicateSection(section.id)}
+                          title="Duplicate section"
+                        >
+                          <Copy size={14} />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => onDeleteSection(section.id)}
+                          title="Delete section"
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      </div>
+                    </div>
+                    <div
+                      className="builder-preview-section-insert builder-preview-section-insert--top"
+                      onClick={(event) => event.stopPropagation()}
+                      onMouseDown={(event) => event.stopPropagation()}
+                      onDragStart={(event) => event.stopPropagation()}
+                      onDragOver={(event) => {
+                        if (
+                          getBuilderTemplateDragType(
+                            event.dataTransfer.types,
+                          ) !== "section"
+                        )
+                          return;
+                        event.preventDefault();
+                        event.stopPropagation();
+                        setActiveDragOver({
+                          type: "section",
+                          sectionId: section.id,
+                          placement: "above",
+                        });
+                        event.dataTransfer.dropEffect = "copy";
+                      }}
+                      onDrop={(event) => {
+                        const templateId = event.dataTransfer.getData(
+                          BUILDER_TEMPLATE_DND_TYPE,
+                        );
+                        if (!templateId) return;
+                        event.preventDefault();
+                        event.stopPropagation();
+                        setActiveDragOver(null);
+                        onDropSectionTemplate(templateId, section.id, "above");
+                      }}
                     >
-                      <Save size={14} />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => onMoveSection(section.id, -1)}
-                      disabled={sourceIndex <= 0}
-                      title="Move section up"
+                      <button
+                        type="button"
+                        className="builder-preview-section-insert-trigger"
+                        onClick={() =>
+                          setInsertTarget({
+                            sectionId: section.id,
+                            placement: "above",
+                          })
+                        }
+                        aria-label="Add section above"
+                        title="Add section above"
+                      >
+                        <Plus size={16} />
+                      </button>
+                    </div>
+                    <div
+                      className="builder-preview-section-insert builder-preview-section-insert--bottom"
+                      onClick={(event) => event.stopPropagation()}
+                      onMouseDown={(event) => event.stopPropagation()}
+                      onDragStart={(event) => event.stopPropagation()}
+                      onDragOver={(event) => {
+                        if (
+                          getBuilderTemplateDragType(
+                            event.dataTransfer.types,
+                          ) !== "section"
+                        )
+                          return;
+                        event.preventDefault();
+                        event.stopPropagation();
+                        setActiveDragOver({
+                          type: "section",
+                          sectionId: section.id,
+                          placement: "below",
+                        });
+                        event.dataTransfer.dropEffect = "copy";
+                      }}
+                      onDrop={(event) => {
+                        const templateId = event.dataTransfer.getData(
+                          BUILDER_TEMPLATE_DND_TYPE,
+                        );
+                        if (!templateId) return;
+                        event.preventDefault();
+                        event.stopPropagation();
+                        setActiveDragOver(null);
+                        onDropSectionTemplate(templateId, section.id, "below");
+                      }}
                     >
-                      <ArrowUp size={14} />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => onMoveSection(section.id, 1)}
-                      disabled={
-                        sourceIndex < 0 || sourceIndex >= sections.length - 1
-                      }
-                      title="Move section down"
-                    >
-                      <ArrowDown size={14} />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => onDuplicateSection(section.id)}
-                      title="Duplicate section"
-                    >
-                      <Copy size={14} />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => onDeleteSection(section.id)}
-                      title="Delete section"
-                    >
-                      <Trash2 size={14} />
-                    </button>
+                      <button
+                        type="button"
+                        className="builder-preview-section-insert-trigger"
+                        onClick={() =>
+                          setInsertTarget({
+                            sectionId: section.id,
+                            placement: "below",
+                          })
+                        }
+                        aria-label="Add section below"
+                        title="Add section below"
+                      >
+                        <Plus size={16} />
+                      </button>
+                    </div>
+                    <PreviewSection
+                      section={section}
+                      shellSettings={shellSettings}
+                      previewProducts={previewProducts}
+                      previewCategoryTree={previewCategoryTree}
+                      previewCategoryCounts={previewCategoryCounts}
+                      selectedLayoutColumnKey={selectedLayoutColumnKey}
+                      selectedLayoutRowIndex={selectedLayoutRowIndex}
+                      selectedSectionId={selectedId}
+                      selectedLayoutBlockKey={selectedLayoutBlockKey}
+                      draggingLayoutBlockKey={draggingLayoutBlockKey}
+                      activeDragOver={activeDragOver}
+                      onCanvasDragOverChange={setActiveDragOver}
+                      onSelectColumn={onSelectColumn}
+                      onSelectRow={onSelectRow}
+                      onSelectBlock={onSelectBlock}
+                      onBlockDragStart={onBlockDragStart}
+                      onBlockDragEnd={onBlockDragEnd}
+                      onMoveBlock={onMoveBlock}
+                      onCreateBlock={onCreateBlock}
+                      onDuplicateBlock={onDuplicateBlock}
+                      onDeleteBlock={onDeleteBlock}
+                      onUpdateBlock={onUpdateBlock}
+                      onUpdateGridItem={onUpdateGridItem}
+                      onDeleteGridItem={onDeleteGridItem}
+                      onDuplicateGridItem={onDuplicateGridItem}
+                      onMoveGridItem={onMoveGridItem}
+                      onMoveBadge={onMoveBadge}
+                      onMoveButton={onMoveButton}
+                      onMoveListItem={onMoveListItem}
+                      onDeleteBadge={onDeleteBadge}
+                      onDuplicateBadge={onDuplicateBadge}
+                      onDeleteButton={onDeleteButton}
+                      onDuplicateButton={onDuplicateButton}
+                      onDeleteListItem={onDeleteListItem}
+                      onDuplicateListItem={onDuplicateListItem}
+                      onDeleteSectionBadge={onDeleteSectionBadge}
+                      onDuplicateSectionBadge={onDuplicateSectionBadge}
+                      onMoveSectionBadge={onMoveSectionBadge}
+                      onUploadGridItemImage={onUploadGridItemImage}
+                      onAddRow={onAddRow}
+                      onDeleteRow={onDeleteRow}
+                      onDuplicateRow={onDuplicateRow}
+                      onMoveRow={onMoveRow}
+                      onSaveRowTemplate={onSaveRowTemplate}
+                      onSaveElementTemplate={onSaveElementTemplate}
+                      onMoveBlockWithinColumn={onMoveBlockWithinColumn}
+                      onDropRowTemplate={onDropRowTemplate}
+                      onDropElementTemplate={onDropElementTemplate}
+                      onOpenSpacingSettings={onOpenSpacingSettings}
+                      onOpenElementsPanel={onOpenElementsPanel}
+                      spacingOverlayEnabled={spacingOverlayEnabled}
+                    />
                   </div>
-                </div>
-                <div
-                  className="builder-preview-section-insert builder-preview-section-insert--top"
-                  onClick={(event) => event.stopPropagation()}
-                  onMouseDown={(event) => event.stopPropagation()}
-                  onDragStart={(event) => event.stopPropagation()}
-                  onDragOver={(event) => {
-                    if (getBuilderTemplateDragType(event.dataTransfer.types) !== "section") return;
-                    event.preventDefault();
-                    event.stopPropagation();
-                    setActiveDragOver({ type: "section", sectionId: section.id, placement: "above" });
-                    event.dataTransfer.dropEffect = "copy";
-                  }}
-                  onDrop={(event) => {
-                    const templateId = event.dataTransfer.getData(
-                      BUILDER_TEMPLATE_DND_TYPE,
-                    );
-                    if (!templateId) return;
-                    event.preventDefault();
-                    event.stopPropagation();
-                    setActiveDragOver(null);
-                    onDropSectionTemplate(templateId, section.id, "above");
-                  }}
-                >
-                  <button
-                    type="button"
-                    className="builder-preview-section-insert-trigger"
-                    onClick={() =>
-                      setInsertTarget({
-                        sectionId: section.id,
-                        placement: "above",
-                      })
-                    }
-                    aria-label="Add section above"
-                    title="Add section above"
-                  >
-                    <Plus size={16} />
-                  </button>
-                </div>
-                <div
-                  className="builder-preview-section-insert builder-preview-section-insert--bottom"
-                  onClick={(event) => event.stopPropagation()}
-                  onMouseDown={(event) => event.stopPropagation()}
-                  onDragStart={(event) => event.stopPropagation()}
-                  onDragOver={(event) => {
-                    if (getBuilderTemplateDragType(event.dataTransfer.types) !== "section") return;
-                    event.preventDefault();
-                    event.stopPropagation();
-                    setActiveDragOver({ type: "section", sectionId: section.id, placement: "below" });
-                    event.dataTransfer.dropEffect = "copy";
-                  }}
-                  onDrop={(event) => {
-                    const templateId = event.dataTransfer.getData(
-                      BUILDER_TEMPLATE_DND_TYPE,
-                    );
-                    if (!templateId) return;
-                    event.preventDefault();
-                    event.stopPropagation();
-                    setActiveDragOver(null);
-                    onDropSectionTemplate(templateId, section.id, "below");
-                  }}
-                >
-                  <button
-                    type="button"
-                    className="builder-preview-section-insert-trigger"
-                    onClick={() =>
-                      setInsertTarget({
-                        sectionId: section.id,
-                        placement: "below",
-                      })
-                    }
-                    aria-label="Add section below"
-                    title="Add section below"
-                  >
-                    <Plus size={16} />
-                  </button>
-                </div>
-                <PreviewSection
-                  section={section}
-                  shellSettings={shellSettings}
-                  previewProducts={previewProducts}
-                  previewCategoryTree={previewCategoryTree}
-                  previewCategoryCounts={previewCategoryCounts}
-                  selectedLayoutColumnKey={selectedLayoutColumnKey}
-                  selectedLayoutRowIndex={selectedLayoutRowIndex}
-                  selectedSectionId={selectedId}
-                  selectedLayoutBlockKey={selectedLayoutBlockKey}
-                  draggingLayoutBlockKey={draggingLayoutBlockKey}
-                  activeDragOver={activeDragOver}
-                  onCanvasDragOverChange={setActiveDragOver}
-                  onSelectColumn={onSelectColumn}
-                  onSelectRow={onSelectRow}
-                  onSelectBlock={onSelectBlock}
-                  onBlockDragStart={onBlockDragStart}
-                  onBlockDragEnd={onBlockDragEnd}
-                  onMoveBlock={onMoveBlock}
-                  onCreateBlock={onCreateBlock}
-                  onDuplicateBlock={onDuplicateBlock}
-                  onDeleteBlock={onDeleteBlock}
-                  onUpdateBlock={onUpdateBlock}
-                  onUpdateGridItem={onUpdateGridItem}
-                  onDeleteGridItem={onDeleteGridItem}
-                  onDuplicateGridItem={onDuplicateGridItem}
-                  onMoveGridItem={onMoveGridItem}
-                  onMoveBadge={onMoveBadge}
-                  onMoveButton={onMoveButton}
-                  onMoveListItem={onMoveListItem}
-                  onDeleteBadge={onDeleteBadge}
-                  onDuplicateBadge={onDuplicateBadge}
-                  onDeleteButton={onDeleteButton}
-                  onDuplicateButton={onDuplicateButton}
-                  onDeleteListItem={onDeleteListItem}
-                  onDuplicateListItem={onDuplicateListItem}
-                  onDeleteSectionBadge={onDeleteSectionBadge}
-                  onDuplicateSectionBadge={onDuplicateSectionBadge}
-                  onMoveSectionBadge={onMoveSectionBadge}
-                  onUploadGridItemImage={onUploadGridItemImage}
-                  onAddRow={onAddRow}
-                  onDeleteRow={onDeleteRow}
-                  onDuplicateRow={onDuplicateRow}
-                  onMoveRow={onMoveRow}
-                  onSaveRowTemplate={onSaveRowTemplate}
-                  onSaveElementTemplate={onSaveElementTemplate}
-                  onMoveBlockWithinColumn={onMoveBlockWithinColumn}
-                  onDropRowTemplate={onDropRowTemplate}
-                  onDropElementTemplate={onDropElementTemplate}
-                  onOpenSpacingSettings={onOpenSpacingSettings}
-                  onOpenElementsPanel={onOpenElementsPanel}
-                  spacingOverlayEnabled={spacingOverlayEnabled}
-                />
-              </div>
-              </motion.div>
-            );
-          })}
+                </motion.div>
+              );
+            })}
           </AnimatePresence>
         </div>
       </div>
-      {insertLayoutPicker ? createPortal(insertLayoutPicker, document.body) : null}
+      {insertLayoutPicker
+        ? createPortal(insertLayoutPicker, document.body)
+        : null}
     </div>
   );
 }
@@ -8466,7 +8885,13 @@ function GlobalSpacingControl({
     const val = values[side];
     const isPresetToken = (v?: string) => {
       if (!v) return true;
-      return presets.some((p) => p.value === v || (v === "small" && p.value === "sm") || (v === "medium" && p.value === "md") || (v === "large" && p.value === "lg"));
+      return presets.some(
+        (p) =>
+          p.value === v ||
+          (v === "small" && p.value === "sm") ||
+          (v === "medium" && p.value === "md") ||
+          (v === "large" && p.value === "lg"),
+      );
     };
 
     const isPreset = isPresetToken(val);
@@ -8475,7 +8900,9 @@ function GlobalSpacingControl({
     const numericMatch = val ? val.trim().match(/^(\d+)px$/i) : null;
     const customNumericValue = numericMatch ? numericMatch[1] : "";
 
-    const handleCustomNumericChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleCustomNumericChange = (
+      event: React.ChangeEvent<HTMLInputElement>,
+    ) => {
       const num = event.target.value.replace(/\D/g, "");
       setSideValue(side, num ? `${num}px` : "0px");
     };
@@ -8508,7 +8935,10 @@ function GlobalSpacingControl({
         <div className="builder-style-chips-row">
           {presets.map((preset) => {
             const isSelected = selectValue === preset.value;
-            const px = BUILDER_SPACING_SCALE[preset.value as keyof typeof BUILDER_SPACING_SCALE];
+            const px =
+              BUILDER_SPACING_SCALE[
+                preset.value as keyof typeof BUILDER_SPACING_SCALE
+              ];
             const displayLabel = `${preset.label} ${px}px`;
             return (
               <button
@@ -8562,7 +8992,8 @@ function GlobalSpacingControl({
                 const nextLinked = event.target.checked;
                 setLinked(nextLinked);
                 if (nextLinked) {
-                  const firstVal = values[sides[0]] ?? getDefaultSpacingToken(context);
+                  const firstVal =
+                    values[sides[0]] ?? getDefaultSpacingToken(context);
                   const updated: Record<string, string> = {};
                   sides.forEach((s) => {
                     updated[s] = firstVal;
@@ -8667,11 +9098,12 @@ function previewAnimationAttrs(
     Number.isFinite(animation.durationMs)
       ? `${Math.max(200, animation.durationMs * 1000)}ms`
       : undefined;
-  const easing = animation?.easing === "ease-in-out"
-    ? "cubic-bezier(0.65, 0, 0.35, 1)"
-    : animation?.easing === "spring"
-      ? "cubic-bezier(0.34, 1.56, 0.64, 1)"
-      : undefined;
+  const easing =
+    animation?.easing === "ease-in-out"
+      ? "cubic-bezier(0.65, 0, 0.35, 1)"
+      : animation?.easing === "spring"
+        ? "cubic-bezier(0.34, 1.56, 0.64, 1)"
+        : undefined;
   const style = {
     ...(delay ? { "--builder-animate-delay": delay } : {}),
     ...(duration ? { "--builder-animate-duration": duration } : {}),
@@ -8696,7 +9128,8 @@ function previewAnimationAttrs(
       "data-builder-pause": animation?.pauseUntilComplete ? "true" : undefined,
       "data-builder-step-offset": stepOffset,
       "data-builder-trigger-offset": triggerOffset,
-      "data-builder-progress-direction": animation?.progressDirection === "vertical" ? "vertical" : undefined,
+      "data-builder-progress-direction":
+        animation?.progressDirection === "vertical" ? "vertical" : undefined,
     },
     style: Object.keys(style).length ? style : undefined,
   };
@@ -8729,8 +9162,6 @@ function getPreviewLayoutBlocks(
 }
 
 type PreviewLayoutItem = NonNullable<BuilderSection["layoutItems"]>[number];
-
-
 
 function getPreviewGoodieIcon(iconName: BuilderLayoutBlock["iconName"]) {
   if (iconName === "heart") return <Heart size={24} />;
@@ -9063,20 +9494,24 @@ function RowInsertControl({
       onMouseDown={(event) => event.stopPropagation()}
       onDragStart={(event) => event.stopPropagation()}
       onDragEnter={(event) => {
-        if (getBuilderTemplateDragType(event.dataTransfer.types) !== "row") return;
+        if (getBuilderTemplateDragType(event.dataTransfer.types) !== "row")
+          return;
         event.preventDefault();
         event.stopPropagation();
         setTemplateDragOver(true);
       }}
       onDragLeave={() => setTemplateDragOver(false)}
       onDragOver={(event) => {
-        if (getBuilderTemplateDragType(event.dataTransfer.types) !== "row") return;
+        if (getBuilderTemplateDragType(event.dataTransfer.types) !== "row")
+          return;
         event.preventDefault();
         event.stopPropagation();
         event.dataTransfer.dropEffect = "copy";
       }}
       onDrop={(event) => {
-        const templateId = event.dataTransfer.getData(BUILDER_TEMPLATE_DND_TYPE);
+        const templateId = event.dataTransfer.getData(
+          BUILDER_TEMPLATE_DND_TYPE,
+        );
         if (!templateId || !onTemplateDrop) return;
         event.preventDefault();
         event.stopPropagation();
@@ -9180,7 +9615,9 @@ function RowLayoutToolbar({
             ? `Delete row ${rowIndex + 1}`
             : `Row ${rowIndex + 1} must be empty before deleting`
         }
-        title={isEmpty ? "Delete empty row" : "Delete is available for empty rows"}
+        title={
+          isEmpty ? "Delete empty row" : "Delete is available for empty rows"
+        }
       >
         <Trash2 size={13} />
       </button>
@@ -9329,13 +9766,30 @@ function RowSpacingOverlay({
   showZeroLabels?: boolean;
   onOpenSpacingSettings?: (target: SpacingInspectorTarget) => void;
 }) {
-  const topMargin = resolveBuilderSpacing(item.rowTopMargin ?? "inherit", "rowMargin", shellSettings.rowMarginTop);
-  const topPadding = resolveBuilderSpacing(item.rowTopSpacing ?? "inherit", "rowPadding", shellSettings.rowPaddingTop);
-  const bottomPadding = resolveBuilderSpacing(item.rowBottomSpacing ?? "inherit", "rowPadding", shellSettings.rowPaddingBottom);
-  const bottomMargin = resolveBuilderSpacing(item.rowBottomMargin ?? "inherit", "rowMargin", shellSettings.rowMarginBottom);
-  const rowGap = rowIndex > 0
-    ? resolveBuilderSpacing(undefined, "rowGap", shellSettings.rowGap)
-    : undefined;
+  const topMargin = resolveBuilderSpacing(
+    item.rowTopMargin ?? "inherit",
+    "rowMargin",
+    shellSettings.rowMarginTop,
+  );
+  const topPadding = resolveBuilderSpacing(
+    item.rowTopSpacing ?? "inherit",
+    "rowPadding",
+    shellSettings.rowPaddingTop,
+  );
+  const bottomPadding = resolveBuilderSpacing(
+    item.rowBottomSpacing ?? "inherit",
+    "rowPadding",
+    shellSettings.rowPaddingBottom,
+  );
+  const bottomMargin = resolveBuilderSpacing(
+    item.rowBottomMargin ?? "inherit",
+    "rowMargin",
+    shellSettings.rowMarginBottom,
+  );
+  const rowGap =
+    rowIndex > 0
+      ? resolveBuilderSpacing(undefined, "rowGap", shellSettings.rowGap)
+      : undefined;
 
   const marginTopTarget: SpacingInspectorTarget = {
     scope: "row",
@@ -9371,7 +9825,11 @@ function RowSpacingOverlay({
         >
           <SpacingGuideLabel
             className={`builder-preview-spacing-label builder-preview-spacing-label--gap builder-preview-spacing-label--source-${rowGap.source.toLowerCase()}`}
-            style={{ left: "50%", top: "50%", transform: "translate(-50%, -50%)" }}
+            style={{
+              left: "50%",
+              top: "50%",
+              transform: "translate(-50%, -50%)",
+            }}
           >
             Gap {formatSpacingMeasurement(rowGap)}
           </SpacingGuideLabel>
@@ -9386,7 +9844,11 @@ function RowSpacingOverlay({
             <SpacingGuideLabel
               className={`builder-preview-spacing-label builder-preview-spacing-label--margin builder-preview-spacing-label--source-${topMargin.source.toLowerCase()}`}
               style={{ left: "8px", right: "auto", bottom: "4px", top: "auto" }}
-              onClick={onOpenSpacingSettings ? () => onOpenSpacingSettings(marginTopTarget) : undefined}
+              onClick={
+                onOpenSpacingSettings
+                  ? () => onOpenSpacingSettings(marginTopTarget)
+                  : undefined
+              }
             >
               MT {formatSpacingMeasurement(topMargin)}
             </SpacingGuideLabel>
@@ -9402,7 +9864,11 @@ function RowSpacingOverlay({
             <SpacingGuideLabel
               className={`builder-preview-spacing-label builder-preview-spacing-label--padding builder-preview-spacing-label--source-${topPadding.source.toLowerCase()}`}
               style={{ left: "8px", right: "auto", top: "4px", bottom: "auto" }}
-              onClick={onOpenSpacingSettings ? () => onOpenSpacingSettings(paddingTopTarget) : undefined}
+              onClick={
+                onOpenSpacingSettings
+                  ? () => onOpenSpacingSettings(paddingTopTarget)
+                  : undefined
+              }
             >
               PT {formatSpacingMeasurement(topPadding)}
             </SpacingGuideLabel>
@@ -9418,7 +9884,11 @@ function RowSpacingOverlay({
             <SpacingGuideLabel
               className={`builder-preview-spacing-label builder-preview-spacing-label--padding builder-preview-spacing-label--source-${bottomPadding.source.toLowerCase()}`}
               style={{ left: "8px", right: "auto", bottom: "4px", top: "auto" }}
-              onClick={onOpenSpacingSettings ? () => onOpenSpacingSettings(paddingBottomTarget) : undefined}
+              onClick={
+                onOpenSpacingSettings
+                  ? () => onOpenSpacingSettings(paddingBottomTarget)
+                  : undefined
+              }
             >
               PB {formatSpacingMeasurement(bottomPadding)}
             </SpacingGuideLabel>
@@ -9434,7 +9904,11 @@ function RowSpacingOverlay({
             <SpacingGuideLabel
               className={`builder-preview-spacing-label builder-preview-spacing-label--margin builder-preview-spacing-label--source-${bottomMargin.source.toLowerCase()}`}
               style={{ left: "8px", right: "auto", top: "4px", bottom: "auto" }}
-              onClick={onOpenSpacingSettings ? () => onOpenSpacingSettings(marginBottomTarget) : undefined}
+              onClick={
+                onOpenSpacingSettings
+                  ? () => onOpenSpacingSettings(marginBottomTarget)
+                  : undefined
+              }
             >
               MB {formatSpacingMeasurement(bottomMargin)}
             </SpacingGuideLabel>
@@ -9478,7 +9952,8 @@ function BoxSpacingOverlay({
           className={`builder-preview-spacing-label builder-preview-spacing-label--box builder-preview-spacing-label--${label.tone} builder-preview-spacing-label--${label.position} builder-preview-spacing-label--source-${label.measurement.source.toLowerCase()}`}
           onClick={
             onOpenSpacingSettings && label.target
-              ? () => onOpenSpacingSettings(label.target as SpacingInspectorTarget)
+              ? () =>
+                  onOpenSpacingSettings(label.target as SpacingInspectorTarget)
               : undefined
           }
         >
@@ -9542,17 +10017,18 @@ type SpacingInspectorTarget =
   | {
       scope: "section";
       sectionId: string;
-      field:
-        | "topSpacing"
-        | "bottomSpacing"
-        | "topMargin"
-        | "bottomMargin";
+      field: "topSpacing" | "bottomSpacing" | "topMargin" | "bottomMargin";
     }
   | {
       scope: "row";
       sectionId: string;
       rowIndex: number;
-      field?: "rowTopSpacing" | "rowBottomSpacing" | "rowTopMargin" | "rowBottomMargin" | "rowGap";
+      field?:
+        | "rowTopSpacing"
+        | "rowBottomSpacing"
+        | "rowTopMargin"
+        | "rowBottomMargin"
+        | "rowGap";
     }
   | {
       scope: "column";
@@ -9565,7 +10041,8 @@ type SpacingInspectorTarget =
       sectionId: string;
       columnKey: string;
       blockKey: string;
-      field?: "elementPadding" | "visualPadding" | "visualMargin" | "elementGap";
+      field?:
+        "elementPadding" | "visualPadding" | "visualMargin" | "elementGap";
     };
 
 type BuilderSpacingOverlayLabel = {
@@ -9688,7 +10165,8 @@ function dashboardElementBoxStyle(block: BuilderLayoutBlock): CSSProperties {
     } else {
       style.paddingTop = "var(--builder-global-element-padding-top, 16px)";
       style.paddingRight = "var(--builder-global-element-padding-right, 16px)";
-      style.paddingBottom = "var(--builder-global-element-padding-bottom, 16px)";
+      style.paddingBottom =
+        "var(--builder-global-element-padding-bottom, 16px)";
       style.paddingLeft = "var(--builder-global-element-padding-left, 16px)";
     }
   }
@@ -9714,7 +10192,8 @@ function visualSpacingSideValue(
   const linked = sides.linked !== false;
   if (side === "top") return sides.top;
   if (side === "right") return sides.right ?? (linked ? sides.top : undefined);
-  if (side === "bottom") return sides.bottom ?? (linked ? sides.top : undefined);
+  if (side === "bottom")
+    return sides.bottom ?? (linked ? sides.top : undefined);
   return sides.left ?? (linked ? sides.top : sides.right);
 }
 
@@ -9722,10 +10201,22 @@ function visualSpacingMeasurements(
   sides: BuilderVisualStyle["padding"] | BuilderVisualStyle["margin"],
   context: Parameters<typeof resolveBuilderSpacingCssValue>[1],
 ) {
-  const top = resolveLocalSpacingValue(visualSpacingSideValue(sides, "top"), context);
-  const right = resolveLocalSpacingValue(visualSpacingSideValue(sides, "right"), context);
-  const bottom = resolveLocalSpacingValue(visualSpacingSideValue(sides, "bottom"), context);
-  const left = resolveLocalSpacingValue(visualSpacingSideValue(sides, "left"), context);
+  const top = resolveLocalSpacingValue(
+    visualSpacingSideValue(sides, "top"),
+    context,
+  );
+  const right = resolveLocalSpacingValue(
+    visualSpacingSideValue(sides, "right"),
+    context,
+  );
+  const bottom = resolveLocalSpacingValue(
+    visualSpacingSideValue(sides, "bottom"),
+    context,
+  );
+  const left = resolveLocalSpacingValue(
+    visualSpacingSideValue(sides, "left"),
+    context,
+  );
   return { top, right, bottom, left };
 }
 
@@ -9733,12 +10224,29 @@ function inheritedElementSpacingMeasurements(
   shellSettings: BuilderShellSettings,
   context: "elementPadding" | "elementMargin",
 ) {
-  const prefix = context === "elementPadding" ? "elementPadding" : "elementMargin";
+  const prefix =
+    context === "elementPadding" ? "elementPadding" : "elementMargin";
   return {
-    top: resolveBuilderSpacing(undefined, context, shellSettings[`${prefix}Top`]),
-    right: resolveBuilderSpacing(undefined, context, shellSettings[`${prefix}Right`]),
-    bottom: resolveBuilderSpacing(undefined, context, shellSettings[`${prefix}Bottom`]),
-    left: resolveBuilderSpacing(undefined, context, shellSettings[`${prefix}Left`]),
+    top: resolveBuilderSpacing(
+      undefined,
+      context,
+      shellSettings[`${prefix}Top`],
+    ),
+    right: resolveBuilderSpacing(
+      undefined,
+      context,
+      shellSettings[`${prefix}Right`],
+    ),
+    bottom: resolveBuilderSpacing(
+      undefined,
+      context,
+      shellSettings[`${prefix}Bottom`],
+    ),
+    left: resolveBuilderSpacing(
+      undefined,
+      context,
+      shellSettings[`${prefix}Left`],
+    ),
   };
 }
 
@@ -9761,19 +10269,20 @@ function boxSpacingSideLabels(
   const first = visible[0];
   const allEqual =
     visible.length === 4 && visible.every((entry) => entry.css === first.css);
-  const positions = tone === "margin"
-    ? {
-        top: "outside-top" as const,
-        right: "outside-right" as const,
-        bottom: "outside-bottom" as const,
-        left: "outside-left" as const,
-      }
-    : {
-        top: "inside-top" as const,
-        right: "inside-right" as const,
-        bottom: "inside-bottom" as const,
-        left: "inside-left" as const,
-      };
+  const positions =
+    tone === "margin"
+      ? {
+          top: "outside-top" as const,
+          right: "outside-right" as const,
+          bottom: "outside-bottom" as const,
+          left: "outside-left" as const,
+        }
+      : {
+          top: "inside-top" as const,
+          right: "inside-right" as const,
+          bottom: "inside-bottom" as const,
+          left: "inside-left" as const,
+        };
 
   if (allEqual) {
     return compactSpacingLabels([
@@ -9783,8 +10292,20 @@ function boxSpacingSideLabels(
 
   return compactSpacingLabels([
     spacingLabel(`${prefix}t`, measurements.top, tone, positions.top, target),
-    spacingLabel(`${prefix}r`, measurements.right, tone, positions.right, target),
-    spacingLabel(`${prefix}b`, measurements.bottom, tone, positions.bottom, target),
+    spacingLabel(
+      `${prefix}r`,
+      measurements.right,
+      tone,
+      positions.right,
+      target,
+    ),
+    spacingLabel(
+      `${prefix}b`,
+      measurements.bottom,
+      tone,
+      positions.bottom,
+      target,
+    ),
     spacingLabel(`${prefix}l`, measurements.left, tone, positions.left, target),
   ]);
 }
@@ -9847,8 +10368,8 @@ function elementSpacingOverlayLabels(
   const legacyPaddingIsLocal = Boolean(
     block.elementPadding && block.elementPadding !== "inherit",
   );
-  labels.push(...(
-    visualPaddingLabels.length > 0
+  labels.push(
+    ...(visualPaddingLabels.length > 0
       ? visualPaddingLabels
       : legacyPaddingIsLocal
         ? compactSpacingLabels([
@@ -9863,10 +10384,13 @@ function elementSpacingOverlayLabels(
         : boxSpacingSideLabels(
             "p",
             "padding",
-            inheritedElementSpacingMeasurements(shellSettings, "elementPadding"),
+            inheritedElementSpacingMeasurements(
+              shellSettings,
+              "elementPadding",
+            ),
             visualPaddingTarget,
-          )
-  ));
+          )),
+  );
   const visualMarginLabels = boxSpacingSideLabels(
     "m",
     "margin",
@@ -9876,8 +10400,8 @@ function elementSpacingOverlayLabels(
   const legacyMarginIsLocal = Boolean(
     block.gridMargin && block.gridMargin !== "inherit",
   );
-  labels.push(...(
-    visualMarginLabels.length > 0
+  labels.push(
+    ...(visualMarginLabels.length > 0
       ? visualMarginLabels
       : legacyMarginIsLocal
         ? compactSpacingLabels([
@@ -9894,8 +10418,8 @@ function elementSpacingOverlayLabels(
             "margin",
             inheritedElementSpacingMeasurements(shellSettings, "elementMargin"),
             visualMarginTarget,
-          )
-  ));
+          )),
+  );
 
   return labels;
 }
@@ -9970,13 +10494,15 @@ function PreviewSection({
     blockKey?: string;
     placement?: "above" | "below" | "inside";
   } | null;
-  onCanvasDragOverChange: (state: {
-    type: "section" | "column" | "block";
-    sectionId: string;
-    columnKey?: string;
-    blockKey?: string;
-    placement?: "above" | "below" | "inside";
-  } | null) => void;
+  onCanvasDragOverChange: (
+    state: {
+      type: "section" | "column" | "block";
+      sectionId: string;
+      columnKey?: string;
+      blockKey?: string;
+      placement?: "above" | "below" | "inside";
+    } | null,
+  ) => void;
   onSelectColumn: (sectionId: string, columnKey: string) => void;
   onSelectRow: (sectionId: string, rowIndex: number) => void;
   onSelectBlock: (
@@ -10142,14 +10668,8 @@ function PreviewSection({
     blockKey: string,
     itemIndex: number,
   ) => void;
-  onDeleteSectionBadge: (
-    sectionId: string,
-    badgeIndex: number,
-  ) => void;
-  onDuplicateSectionBadge: (
-    sectionId: string,
-    badgeIndex: number,
-  ) => void;
+  onDeleteSectionBadge: (sectionId: string, badgeIndex: number) => void;
+  onDuplicateSectionBadge: (sectionId: string, badgeIndex: number) => void;
   onMoveSectionBadge: (
     sectionId: string,
     fromIndex: number,
@@ -10240,7 +10760,9 @@ function PreviewSection({
   if (section.kind === "hero") {
     const isAntigravity = section.carouselSettings?.variant === "antigravity";
     return (
-      <div className={`shop-builder-section-content builder-preview-hero-inner ${isAntigravity ? "shop-builder-hero--antigravity" : ""}`}>
+      <div
+        className={`shop-builder-section-content builder-preview-hero-inner ${isAntigravity ? "shop-builder-hero--antigravity" : ""}`}
+      >
         <div className="shop-builder-hero-content-left">
           {section.eyebrow && (
             <DashboardTypog
@@ -10261,6 +10783,15 @@ function PreviewSection({
                 text={section.title}
                 typography={section.typography}
                 area="title"
+                speed={section.typewriterSpeed}
+                eraseSpeed={section.typewriterEraseSpeed}
+                delay={section.typewriterDelay}
+                loop={section.typewriterLoop}
+                useGradient={section.typewriterUseGradient}
+                gradientPreset={section.typewriterGradientPreset}
+                preserveHeight={section.typewriterPreserveHeight !== false}
+                reservedLines={section.typewriterReservedLines ?? 1}
+                mobileReservedLines={section.typewriterMobileReservedLines ?? 2}
               />
             ) : (
               section.title
@@ -10492,7 +11023,9 @@ function PreviewSection({
             {section.title?.trim() ? (
               <h2 className="shop-builder-title">{section.title}</h2>
             ) : null}
-            <BodyText className="shop-builder-body">{section.body?.trim() ? section.body : null}</BodyText>
+            <BodyText className="shop-builder-body">
+              {section.body?.trim() ? section.body : null}
+            </BodyText>
           </div>
         )}
         <CarouselBlock
@@ -10513,11 +11046,7 @@ function PreviewSection({
     );
   }
 
-
-
-
-
-if (section.kind === "embed") {
+  if (section.kind === "embed") {
     return (
       <div className="shop-builder-section-content builder-preview-embed">
         <div className="shop-builder-embed-heading">
@@ -10526,7 +11055,9 @@ if (section.kind === "embed") {
             {section.embedMode === "code" ? "custom code" : "iframe"} embed
           </p>
           <h2 className="shop-builder-title">{section.title}</h2>
-          {section.body && <BodyText className="shop-builder-body">{section.body}</BodyText>}
+          {section.body && (
+            <BodyText className="shop-builder-body">{section.body}</BodyText>
+          )}
         </div>
         <div
           className="shop-builder-embed-empty builder-preview-embed-frame"
@@ -10644,15 +11175,16 @@ if (section.kind === "embed") {
             const blocks = getPreviewLayoutBlocks(item);
             const cardStyle =
               blocks.find(
-                (block) =>
-                  block.panelStyle && block.panelStyle !== "default",
+                (block) => block.panelStyle && block.panelStyle !== "default",
               )?.panelStyle ??
               blocks.find((block) => block.cardPreset)?.cardPreset ??
               blocks[0]?.panelStyle ??
               blocks[0]?.cardPreset ??
               "default";
 
-            const hasScrollPinned = blocks.some((b) => b.kind === "scrollPinnedDemo");
+            const hasScrollPinned = blocks.some(
+              (b) => b.kind === "scrollPinnedDemo",
+            );
             const isColumnActive =
               selectedSectionId === section.id &&
               selectedLayoutColumnKey === columnKey &&
@@ -10673,1184 +11205,1271 @@ if (section.kind === "embed") {
               selectedSectionId === section.id &&
               selectedLayoutRowIndex === rowMeta.rowIndex;
             const rowSpacingStyle: CSSProperties = {};
-            rowSpacingStyle.paddingTop = item.rowTopSpacing && item.rowTopSpacing !== "inherit"
-              ? resolveBuilderSpacing(item.rowTopSpacing, "rowPadding").css
-              : "var(--builder-global-row-padding-top, 32px)";
-            rowSpacingStyle.paddingBottom = item.rowBottomSpacing && item.rowBottomSpacing !== "inherit"
-              ? resolveBuilderSpacing(item.rowBottomSpacing, "rowPadding").css
-              : "var(--builder-global-row-padding-bottom, 32px)";
-            rowSpacingStyle.marginTop = item.rowTopMargin && item.rowTopMargin !== "inherit"
-              ? resolveBuilderSpacing(item.rowTopMargin, "rowMargin").css
-              : "var(--builder-global-row-margin-top, 0px)";
-            rowSpacingStyle.marginBottom = item.rowBottomMargin && item.rowBottomMargin !== "inherit"
-              ? resolveBuilderSpacing(item.rowBottomMargin, "rowMargin").css
-              : "var(--builder-global-row-margin-bottom, 0px)";
+            rowSpacingStyle.paddingTop =
+              item.rowTopSpacing && item.rowTopSpacing !== "inherit"
+                ? resolveBuilderSpacing(item.rowTopSpacing, "rowPadding").css
+                : "var(--builder-global-row-padding-top, 32px)";
+            rowSpacingStyle.paddingBottom =
+              item.rowBottomSpacing && item.rowBottomSpacing !== "inherit"
+                ? resolveBuilderSpacing(item.rowBottomSpacing, "rowPadding").css
+                : "var(--builder-global-row-padding-bottom, 32px)";
+            rowSpacingStyle.marginTop =
+              item.rowTopMargin && item.rowTopMargin !== "inherit"
+                ? resolveBuilderSpacing(item.rowTopMargin, "rowMargin").css
+                : "var(--builder-global-row-margin-top, 0px)";
+            rowSpacingStyle.marginBottom =
+              item.rowBottomMargin && item.rowBottomMargin !== "inherit"
+                ? resolveBuilderSpacing(item.rowBottomMargin, "rowMargin").css
+                : "var(--builder-global-row-margin-bottom, 0px)";
             return (
               <Fragment key={columnKey}>
-              <article
-                key={columnKey}
-                id={columnKey}
-                onMouseEnter={() => setHoveredColumnKey(columnKey)}
-                onMouseLeave={() => setHoveredColumnKey(null)}
-                className={hasScrollPinned ? `w-full col-span-12 ${
-                  selectedLayoutColumnKey === columnKey
-                    ? "is-selected-column"
-                    : ""
-                } ${
-                  hoveredColumnKey === columnKey ? "is-hovered-column" : ""
-                } ${
-                  isSelectedRow ? "is-selected-row" : ""
-                } ${
-                  activeDragOver?.type === "column" && activeDragOver.columnKey === columnKey ? "is-drag-over" : ""
-                }` : `shop-builder-content-layout-card shop-card-preset--${cardStyle} ${
-                  blocks.length === 0 ? "is-empty-column" : ""
-                } ${
-                  selectedLayoutColumnKey === columnKey
-                    ? "is-selected-column"
-                    : ""
-                } ${
-                  hoveredColumnKey === columnKey ? "is-hovered-column" : ""
-                } ${
-                  isSelectedRow ? "is-selected-row" : ""
-                } ${
-                  activeDragOver?.type === "column" && activeDragOver.columnKey === columnKey ? "is-drag-over" : ""
-                }`}
-                style={
-                  {
-                    ...(hasScrollPinned
-                      ? { ...rowSpacingStyle, gridColumn: "span 12" }
-                      : {
-                          ...rowSpacingStyle,
-                          gridColumn: `span ${rowMeta?.span ?? 12}`,
-                        }),
-                  } as CSSProperties
-                }
-                onClick={(event) => {
-                  if (
-                    event.target instanceof HTMLElement &&
-                    event.target.closest(".builder-preview-layout-block")
-                  ) {
-                    return;
+                <article
+                  key={columnKey}
+                  id={columnKey}
+                  onMouseEnter={() => setHoveredColumnKey(columnKey)}
+                  onMouseLeave={() => setHoveredColumnKey(null)}
+                  className={
+                    hasScrollPinned
+                      ? `w-full col-span-12 ${
+                          selectedLayoutColumnKey === columnKey
+                            ? "is-selected-column"
+                            : ""
+                        } ${
+                          hoveredColumnKey === columnKey
+                            ? "is-hovered-column"
+                            : ""
+                        } ${isSelectedRow ? "is-selected-row" : ""} ${
+                          activeDragOver?.type === "column" &&
+                          activeDragOver.columnKey === columnKey
+                            ? "is-drag-over"
+                            : ""
+                        }`
+                      : `shop-builder-content-layout-card shop-card-preset--${cardStyle} ${
+                          blocks.length === 0 ? "is-empty-column" : ""
+                        } ${
+                          selectedLayoutColumnKey === columnKey
+                            ? "is-selected-column"
+                            : ""
+                        } ${
+                          hoveredColumnKey === columnKey
+                            ? "is-hovered-column"
+                            : ""
+                        } ${isSelectedRow ? "is-selected-row" : ""} ${
+                          activeDragOver?.type === "column" &&
+                          activeDragOver.columnKey === columnKey
+                            ? "is-drag-over"
+                            : ""
+                        }`
                   }
-                  event.stopPropagation();
-                  onSelectColumn(section.id, columnKey);
-                }}
-                onDragOver={(event) => {
-                  const types = Array.from(event.dataTransfer.types);
-                  const isElementDrag =
-                    types.includes("application/x-builder-block") ||
-                    types.includes("application/x-builder-new-block") ||
-                    getBuilderTemplateDragType(event.dataTransfer.types) === "element";
+                  style={
+                    {
+                      ...(hasScrollPinned
+                        ? { ...rowSpacingStyle, gridColumn: "span 12" }
+                        : {
+                            ...rowSpacingStyle,
+                            gridColumn: `span ${rowMeta?.span ?? 12}`,
+                          }),
+                    } as CSSProperties
+                  }
+                  onClick={(event) => {
+                    if (
+                      event.target instanceof HTMLElement &&
+                      event.target.closest(".builder-preview-layout-block")
+                    ) {
+                      return;
+                    }
+                    event.stopPropagation();
+                    onSelectColumn(section.id, columnKey);
+                  }}
+                  onDragOver={(event) => {
+                    const types = Array.from(event.dataTransfer.types);
+                    const isElementDrag =
+                      types.includes("application/x-builder-block") ||
+                      types.includes("application/x-builder-new-block") ||
+                      getBuilderTemplateDragType(event.dataTransfer.types) ===
+                        "element";
 
-                  if (isElementDrag) {
+                    if (isElementDrag) {
+                      event.preventDefault();
+                      event.stopPropagation();
+
+                      if (blocks.length === 0) {
+                        if (
+                          !activeDragOver ||
+                          activeDragOver.type !== "column" ||
+                          activeDragOver.columnKey !== columnKey
+                        ) {
+                          onCanvasDragOverChange({
+                            type: "column",
+                            sectionId: section.id,
+                            columnKey,
+                            placement: "inside",
+                          });
+                        }
+                      }
+
+                      event.dataTransfer.dropEffect =
+                        types.includes("application/x-builder-new-block") ||
+                        getBuilderTemplateDragType(event.dataTransfer.types) ===
+                          "element"
+                          ? "copy"
+                          : "move";
+                    }
+                  }}
+                  onDrop={(event) => {
                     event.preventDefault();
                     event.stopPropagation();
-                    
-                    if (blocks.length === 0) {
-                      if (
-                        !activeDragOver ||
-                        activeDragOver.type !== "column" ||
-                        activeDragOver.columnKey !== columnKey
-                      ) {
-                        onCanvasDragOverChange({
-                          type: "column",
-                          sectionId: section.id,
-                          columnKey,
-                          placement: "inside",
-                        });
-                      }
+                    onCanvasDragOverChange(null);
+
+                    const templateId = event.dataTransfer.getData(
+                      BUILDER_TEMPLATE_DND_TYPE,
+                    );
+                    if (templateId) {
+                      onDropElementTemplate({
+                        templateId,
+                        sectionId: section.id,
+                        columnKey,
+                      });
+                      return;
                     }
-                    
-                    event.dataTransfer.dropEffect =
-                      types.includes("application/x-builder-new-block") ||
-                      getBuilderTemplateDragType(event.dataTransfer.types) === "element"
-                        ? "copy"
-                        : "move";
-                  }
-                }}
-                onDrop={(event) => {
-                  event.preventDefault();
-                  event.stopPropagation();
-                  onCanvasDragOverChange(null);
+                    const newBlockKind = event.dataTransfer.getData(
+                      "application/x-builder-new-block",
+                    ) as LayoutBlockKind;
+                    if (newBlockKind && newBlockKind in layoutBlockLabels) {
+                      onCreateBlock({
+                        sectionId: section.id,
+                        targetColumnKey: columnKey,
+                        kind: newBlockKind,
+                      });
+                      return;
+                    }
 
-                  const templateId = event.dataTransfer.getData(
-                    BUILDER_TEMPLATE_DND_TYPE,
-                  );
-                  if (templateId) {
-                    onDropElementTemplate({
-                      templateId,
-                      sectionId: section.id,
-                      columnKey,
-                    });
-                    return;
-                  }
-                  const newBlockKind = event.dataTransfer.getData(
-                    "application/x-builder-new-block",
-                  ) as LayoutBlockKind;
-                  if (newBlockKind && newBlockKind in layoutBlockLabels) {
-                    onCreateBlock({
-                      sectionId: section.id,
-                      targetColumnKey: columnKey,
-                      kind: newBlockKind,
-                    });
-                    return;
-                  }
-
-                  const payload = event.dataTransfer.getData(
-                    "application/x-builder-block",
-                  );
-                  if (!payload) return;
-                  try {
-                    const parsed = JSON.parse(payload) as {
-                      sectionId: string;
-                      sourceColumnKey: string;
-                      sourceBlockKey: string;
-                    };
-                    onMoveBlock({
-                      ...parsed,
-                      targetSectionId: section.id,
-                      targetColumnKey: columnKey,
-                    });
-                  } catch {
+                    const payload = event.dataTransfer.getData(
+                      "application/x-builder-block",
+                    );
+                    if (!payload) return;
+                    try {
+                      const parsed = JSON.parse(payload) as {
+                        sectionId: string;
+                        sourceColumnKey: string;
+                        sourceBlockKey: string;
+                      };
+                      onMoveBlock({
+                        ...parsed,
+                        targetSectionId: section.id,
+                        targetColumnKey: columnKey,
+                      });
+                    } catch {
+                      onBlockDragEnd();
+                    }
                     onBlockDragEnd();
-                  }
-                  onBlockDragEnd();
-                }}
-              >
-                {isColumnActive && (
-                  <BoxSpacingOverlay
-                    kind="column"
-                    labels={columnSpacingOverlayLabels(rowMeta)}
-                    onOpenSpacingSettings={onOpenSpacingSettings}
-	                  />
-                )}
-                {isRowActive && rowMeta?.isRowStart && (
-                  <RowSpacingOverlay
-                    item={item}
-                    shellSettings={shellSettings}
-                    sectionId={section.id}
-                    rowIndex={rowMeta.rowIndex}
-                    isRowStart
-                    showZeroLabels={spacingOverlayEnabled}
-                    onOpenSpacingSettings={onOpenSpacingSettings}
-                  />
-                )}
-                {rowMeta?.isRowStart && (
-                  <RowLayoutToolbar
-                    rowIndex={rowMeta.rowIndex}
-                    canMoveUp={rowMeta.rowIndex > 0}
-                    canMoveDown={rowMeta.rowIndex < layoutRows.length - 1}
-                    isEmpty={isEmptyRow}
-                    onSettings={() => onSelectRow(section.id, rowMeta.rowIndex)}
-                    onMoveUp={() => onMoveRow(section.id, rowMeta.rowIndex, -1)}
-                    onMoveDown={() => onMoveRow(section.id, rowMeta.rowIndex, 1)}
-                    onSave={() => onSaveRowTemplate(section.id, rowMeta.rowIndex)}
-                    onDuplicate={() => onDuplicateRow(section.id, rowMeta.rowIndex)}
-                    onDelete={() => onDeleteRow(section.id, rowMeta.rowIndex)}
-                  />
-                )}
-                <div className="builder-preview-column-label">
-                  Row {(rowMeta?.rowIndex ?? 0) + 1} / Column{" "}
-                  {(rowMeta?.columnIndex ?? index) + 1}
-                </div>
-                {blocks.length === 0 && (
-                  <div
-                    className="builder-preview-drop-zone"
-                    aria-label={`Drop element into row ${(rowMeta?.rowIndex ?? 0) + 1}, column ${(rowMeta?.columnIndex ?? index) + 1}`}
-                    title={`Drop element into row ${(rowMeta?.rowIndex ?? 0) + 1}, column ${(rowMeta?.columnIndex ?? index) + 1}`}
-                    onClick={(event) => {
-                      event.stopPropagation();
-                      onOpenElementsPanel();
-                    }}
-                  >
-                    <Plus size={16} />
-                  </div>
-                )}
-                {blocks.map((block, blockIndex) => {
-                  const blockKey =
-                    block.id ?? `${columnKey}-block-${blockIndex}`;
-                  const blockAnimationAttrs = previewAnimationAttrs(
-                    block.animation,
-                  );
-                  const isElementActive =
-                    selectedSectionId === section.id &&
-                    selectedLayoutColumnKey === columnKey &&
-                    selectedLayoutBlockKey === blockKey;
-
-                  return (
-                    <div
-                      key={blockKey}
-                      draggable
-                      onMouseEnter={() => setHoveredBlockKey(blockKey)}
-                      onMouseLeave={() => setHoveredBlockKey(null)}
-                      className={`builder-preview-layout-block is-${
-                        block.kind ?? "text"
-                      } ${
-                        block.kind === "scrollPinnedDemo"
-                          ? ""
-                          : `shop-card-preset--${block.panelStyle ?? "default"} is-padding-${hasBuilderVisualSpacing(block.visualStyle?.padding) || !block.elementPadding || block.elementPadding === "inherit" ? "none" : block.elementPadding} is-align-${block.elementAlign ?? "left"} ${visualStyleClassName(block.visualStyle)} ${block.premiumCardStyle && block.premiumCardStyle !== "none" ? `shop-builder-card--${block.premiumCardStyle}` : ""}`
-                      } ${
-                        selectedLayoutBlockKey === blockKey
-                          ? "is-selected-block"
-                          : ""
-                      } ${
-                        hoveredBlockKey === blockKey ? "is-hovered-block" : ""
-                      } ${
-                        draggingLayoutBlockKey === blockKey
-                          ? "is-dragging-block"
-                          : ""
-                      } ${
-                        activeDragOver?.type === "block" && activeDragOver.blockKey === blockKey && activeDragOver.placement === "above" ? "is-drag-over-above" : ""
-                      } ${
-                        activeDragOver?.type === "block" && activeDragOver.blockKey === blockKey && activeDragOver.placement === "below" ? "is-drag-over-below" : ""
-                      } ${previewAnimationClassName(block.animation)}`}
-                      style={
-                        {
-                          "--builder-element-bg":
-                            block.elementBackgroundMode === "transparent"
-                              ? "transparent"
-                              : block.elementBackgroundMode === "custom"
-                                ? (block.elementBackground ?? "#ffffff")
-                                : undefined,
-                          "--builder-radius":
-                            block.borderRadius !== undefined
-                              ? `${block.borderRadius}px`
-                              : undefined,
-                          "--builder-card-radius":
-                            block.borderRadius !== undefined
-                              ? `${block.borderRadius}px`
-                              : undefined,
-                          ...blockButtonCssVars(block),
-                          ...dashboardElementBoxStyle(block),
-                          ...visualStyleToCss(
-                            block.visualStyle as BuilderVisualStyle | undefined,
-                          ),
-                          ...blockAnimationAttrs.style,
-                        } as CSSProperties
+                  }}
+                >
+                  {isColumnActive && (
+                    <BoxSpacingOverlay
+                      kind="column"
+                      labels={columnSpacingOverlayLabels(rowMeta)}
+                      onOpenSpacingSettings={onOpenSpacingSettings}
+                    />
+                  )}
+                  {isRowActive && rowMeta?.isRowStart && (
+                    <RowSpacingOverlay
+                      item={item}
+                      shellSettings={shellSettings}
+                      sectionId={section.id}
+                      rowIndex={rowMeta.rowIndex}
+                      isRowStart
+                      showZeroLabels={spacingOverlayEnabled}
+                      onOpenSpacingSettings={onOpenSpacingSettings}
+                    />
+                  )}
+                  {rowMeta?.isRowStart && (
+                    <RowLayoutToolbar
+                      rowIndex={rowMeta.rowIndex}
+                      canMoveUp={rowMeta.rowIndex > 0}
+                      canMoveDown={rowMeta.rowIndex < layoutRows.length - 1}
+                      isEmpty={isEmptyRow}
+                      onSettings={() =>
+                        onSelectRow(section.id, rowMeta.rowIndex)
                       }
-                      {...blockAnimationAttrs.data}
-                      onMouseDown={(event) => {
-                        event.stopPropagation();
-                        onSelectBlock(section.id, columnKey, blockKey);
-                      }}
+                      onMoveUp={() =>
+                        onMoveRow(section.id, rowMeta.rowIndex, -1)
+                      }
+                      onMoveDown={() =>
+                        onMoveRow(section.id, rowMeta.rowIndex, 1)
+                      }
+                      onSave={() =>
+                        onSaveRowTemplate(section.id, rowMeta.rowIndex)
+                      }
+                      onDuplicate={() =>
+                        onDuplicateRow(section.id, rowMeta.rowIndex)
+                      }
+                      onDelete={() => onDeleteRow(section.id, rowMeta.rowIndex)}
+                    />
+                  )}
+                  <div className="builder-preview-column-label">
+                    Row {(rowMeta?.rowIndex ?? 0) + 1} / Column{" "}
+                    {(rowMeta?.columnIndex ?? index) + 1}
+                  </div>
+                  {blocks.length === 0 && (
+                    <div
+                      className="builder-preview-drop-zone"
+                      aria-label={`Drop element into row ${(rowMeta?.rowIndex ?? 0) + 1}, column ${(rowMeta?.columnIndex ?? index) + 1}`}
+                      title={`Drop element into row ${(rowMeta?.rowIndex ?? 0) + 1}, column ${(rowMeta?.columnIndex ?? index) + 1}`}
                       onClick={(event) => {
                         event.stopPropagation();
-                        onSelectBlock(section.id, columnKey, blockKey);
-                      }}
-                      onDragStart={(event) => {
-                        event.stopPropagation();
-                        const payload = JSON.stringify({
-                          sectionId: section.id,
-                          sourceColumnKey: columnKey,
-                          sourceBlockKey: blockKey,
-                        });
-                        event.dataTransfer.setData(
-                          "application/x-builder-block",
-                          payload,
-                        );
-                        event.dataTransfer.setData(
-                          "text/plain",
-                          `builder-block:${blockKey}`,
-                        );
-                        event.dataTransfer.effectAllowed = "move";
-                        onBlockDragStart(blockKey);
-                        createDragGhost(event, layoutBlockLabels[block.kind!] || "Block");
-                      }}
-                      onDragOver={(event) => {
-                        const types = Array.from(event.dataTransfer.types);
-                        const isElementDrag =
-                          types.includes("application/x-builder-block") ||
-                          types.includes("application/x-builder-new-block") ||
-                          getBuilderTemplateDragType(event.dataTransfer.types) === "element";
-
-                        if (isElementDrag) {
-                          event.preventDefault();
-                          event.stopPropagation();
-                          
-                          const rect = event.currentTarget.getBoundingClientRect();
-                          const relativeY = event.clientY - rect.top;
-                          const placement = relativeY < rect.height / 2 ? "above" : "below";
-                          if (
-                            !activeDragOver ||
-                            activeDragOver.type !== "block" ||
-                            activeDragOver.blockKey !== blockKey ||
-                            activeDragOver.placement !== placement
-                          ) {
-                            onCanvasDragOverChange({
-                              type: "block",
-                              sectionId: section.id,
-                              columnKey,
-                              blockKey,
-                              placement,
-                            });
-                          }
-                          
-                          event.dataTransfer.dropEffect = types.includes(
-                            "application/x-builder-new-block",
-                          ) || getBuilderTemplateDragType(event.dataTransfer.types) === "element"
-                            ? "copy"
-                            : "move";
-                        }
-                      }}
-                      onDrop={(event) => {
-                        event.preventDefault();
-                        event.stopPropagation();
-                        
-                        const placement = activeDragOver?.type === "block" && activeDragOver.blockKey === blockKey && (activeDragOver.placement === "above" || activeDragOver.placement === "below")
-                          ? activeDragOver.placement
-                          : "above";
-                        onCanvasDragOverChange(null);
-
-                        const templateId = event.dataTransfer.getData(
-                          BUILDER_TEMPLATE_DND_TYPE,
-                        );
-                        if (templateId) {
-                          onDropElementTemplate({
-                            templateId,
-                            sectionId: section.id,
-                            columnKey,
-                            targetBlockKey: blockKey,
-                            placement,
-                          });
-                          return;
-                        }
-                        const newBlockKind = event.dataTransfer.getData(
-                          "application/x-builder-new-block",
-                        ) as LayoutBlockKind;
-                        if (newBlockKind && newBlockKind in layoutBlockLabels) {
-                          onCreateBlock({
-                            sectionId: section.id,
-                            targetColumnKey: columnKey,
-                            targetBlockKey: blockKey,
-                            kind: newBlockKind,
-                            placement,
-                          });
-                          return;
-                        }
-
-                        const payload = event.dataTransfer.getData(
-                          "application/x-builder-block",
-                        );
-                        if (!payload) return;
-                        try {
-                          const parsed = JSON.parse(payload) as {
-                            sectionId: string;
-                            sourceColumnKey: string;
-                            sourceBlockKey: string;
-                          };
-                          onMoveBlock({
-                            ...parsed,
-                            targetSectionId: section.id,
-                            targetColumnKey: columnKey,
-                            targetBlockKey: blockKey,
-                            placement,
-                          });
-                        } catch {
-                          onBlockDragEnd();
-                        }
-                        onBlockDragEnd();
-                      }}
-                      onDragEnd={() => {
-                        onCanvasDragOverChange(null);
-                        onBlockDragEnd();
+                        onOpenElementsPanel();
                       }}
                     >
-                      {isElementActive && (
-                        <BoxSpacingOverlay
-                          kind="element"
-                          labels={elementSpacingOverlayLabels(
-                            block,
-                            shellSettings,
-                            section.id,
-                            columnKey,
-                            blockKey,
-                          )}
-                          onOpenSpacingSettings={onOpenSpacingSettings}
-	                        />
-                      )}
+                      <Plus size={16} />
+                    </div>
+                  )}
+                  {blocks.map((block, blockIndex) => {
+                    const blockKey =
+                      block.id ?? `${columnKey}-block-${blockIndex}`;
+                    const blockAnimationAttrs = previewAnimationAttrs(
+                      block.animation,
+                    );
+                    const isElementActive =
+                      selectedSectionId === section.id &&
+                      selectedLayoutColumnKey === columnKey &&
+                      selectedLayoutBlockKey === blockKey;
+
+                    return (
                       <div
-                        className="builder-preview-block-tools"
-                        onClick={(event) => event.stopPropagation()}
-                        onMouseDown={(event) => event.stopPropagation()}
-                        onDragStart={(event) => event.stopPropagation()}
+                        key={blockKey}
+                        draggable
+                        onMouseEnter={() => setHoveredBlockKey(blockKey)}
+                        onMouseLeave={() => setHoveredBlockKey(null)}
+                        className={`builder-preview-layout-block is-${
+                          block.kind ?? "text"
+                        } ${
+                          block.kind === "scrollPinnedDemo"
+                            ? ""
+                            : `shop-card-preset--${block.panelStyle ?? "default"} is-padding-${hasBuilderVisualSpacing(block.visualStyle?.padding) || !block.elementPadding || block.elementPadding === "inherit" ? "none" : block.elementPadding} is-align-${block.elementAlign ?? "left"} ${visualStyleClassName(block.visualStyle)} ${block.premiumCardStyle && block.premiumCardStyle !== "none" ? `shop-builder-card--${block.premiumCardStyle}` : ""}`
+                        } ${
+                          selectedLayoutBlockKey === blockKey
+                            ? "is-selected-block"
+                            : ""
+                        } ${
+                          hoveredBlockKey === blockKey ? "is-hovered-block" : ""
+                        } ${
+                          draggingLayoutBlockKey === blockKey
+                            ? "is-dragging-block"
+                            : ""
+                        } ${
+                          activeDragOver?.type === "block" &&
+                          activeDragOver.blockKey === blockKey &&
+                          activeDragOver.placement === "above"
+                            ? "is-drag-over-above"
+                            : ""
+                        } ${
+                          activeDragOver?.type === "block" &&
+                          activeDragOver.blockKey === blockKey &&
+                          activeDragOver.placement === "below"
+                            ? "is-drag-over-below"
+                            : ""
+                        } ${previewAnimationClassName(block.animation)}`}
+                        style={
+                          {
+                            "--builder-element-bg":
+                              block.elementBackgroundMode === "transparent"
+                                ? "transparent"
+                                : block.elementBackgroundMode === "custom"
+                                  ? (block.elementBackground ?? "#ffffff")
+                                  : undefined,
+                            "--builder-radius":
+                              block.borderRadius !== undefined
+                                ? `${block.borderRadius}px`
+                                : undefined,
+                            "--builder-card-radius":
+                              block.borderRadius !== undefined
+                                ? `${block.borderRadius}px`
+                                : undefined,
+                            ...blockButtonCssVars(block),
+                            ...dashboardElementBoxStyle(block),
+                            ...visualStyleToCss(
+                              block.visualStyle as
+                                BuilderVisualStyle | undefined,
+                            ),
+                            ...blockAnimationAttrs.style,
+                          } as CSSProperties
+                        }
+                        {...blockAnimationAttrs.data}
+                        onMouseDown={(event) => {
+                          event.stopPropagation();
+                          onSelectBlock(section.id, columnKey, blockKey);
+                        }}
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          onSelectBlock(section.id, columnKey, blockKey);
+                        }}
+                        onDragStart={(event) => {
+                          event.stopPropagation();
+                          const payload = JSON.stringify({
+                            sectionId: section.id,
+                            sourceColumnKey: columnKey,
+                            sourceBlockKey: blockKey,
+                          });
+                          event.dataTransfer.setData(
+                            "application/x-builder-block",
+                            payload,
+                          );
+                          event.dataTransfer.setData(
+                            "text/plain",
+                            `builder-block:${blockKey}`,
+                          );
+                          event.dataTransfer.effectAllowed = "move";
+                          onBlockDragStart(blockKey);
+                          createDragGhost(
+                            event,
+                            layoutBlockLabels[block.kind!] || "Block",
+                          );
+                        }}
+                        onDragOver={(event) => {
+                          const types = Array.from(event.dataTransfer.types);
+                          const isElementDrag =
+                            types.includes("application/x-builder-block") ||
+                            types.includes("application/x-builder-new-block") ||
+                            getBuilderTemplateDragType(
+                              event.dataTransfer.types,
+                            ) === "element";
+
+                          if (isElementDrag) {
+                            event.preventDefault();
+                            event.stopPropagation();
+
+                            const rect =
+                              event.currentTarget.getBoundingClientRect();
+                            const relativeY = event.clientY - rect.top;
+                            const placement =
+                              relativeY < rect.height / 2 ? "above" : "below";
+                            if (
+                              !activeDragOver ||
+                              activeDragOver.type !== "block" ||
+                              activeDragOver.blockKey !== blockKey ||
+                              activeDragOver.placement !== placement
+                            ) {
+                              onCanvasDragOverChange({
+                                type: "block",
+                                sectionId: section.id,
+                                columnKey,
+                                blockKey,
+                                placement,
+                              });
+                            }
+
+                            event.dataTransfer.dropEffect =
+                              types.includes(
+                                "application/x-builder-new-block",
+                              ) ||
+                              getBuilderTemplateDragType(
+                                event.dataTransfer.types,
+                              ) === "element"
+                                ? "copy"
+                                : "move";
+                          }
+                        }}
+                        onDrop={(event) => {
+                          event.preventDefault();
+                          event.stopPropagation();
+
+                          const placement =
+                            activeDragOver?.type === "block" &&
+                            activeDragOver.blockKey === blockKey &&
+                            (activeDragOver.placement === "above" ||
+                              activeDragOver.placement === "below")
+                              ? activeDragOver.placement
+                              : "above";
+                          onCanvasDragOverChange(null);
+
+                          const templateId = event.dataTransfer.getData(
+                            BUILDER_TEMPLATE_DND_TYPE,
+                          );
+                          if (templateId) {
+                            onDropElementTemplate({
+                              templateId,
+                              sectionId: section.id,
+                              columnKey,
+                              targetBlockKey: blockKey,
+                              placement,
+                            });
+                            return;
+                          }
+                          const newBlockKind = event.dataTransfer.getData(
+                            "application/x-builder-new-block",
+                          ) as LayoutBlockKind;
+                          if (
+                            newBlockKind &&
+                            newBlockKind in layoutBlockLabels
+                          ) {
+                            onCreateBlock({
+                              sectionId: section.id,
+                              targetColumnKey: columnKey,
+                              targetBlockKey: blockKey,
+                              kind: newBlockKind,
+                              placement,
+                            });
+                            return;
+                          }
+
+                          const payload = event.dataTransfer.getData(
+                            "application/x-builder-block",
+                          );
+                          if (!payload) return;
+                          try {
+                            const parsed = JSON.parse(payload) as {
+                              sectionId: string;
+                              sourceColumnKey: string;
+                              sourceBlockKey: string;
+                            };
+                            onMoveBlock({
+                              ...parsed,
+                              targetSectionId: section.id,
+                              targetColumnKey: columnKey,
+                              targetBlockKey: blockKey,
+                              placement,
+                            });
+                          } catch {
+                            onBlockDragEnd();
+                          }
+                          onBlockDragEnd();
+                        }}
+                        onDragEnd={() => {
+                          onCanvasDragOverChange(null);
+                          onBlockDragEnd();
+                        }}
                       >
-                        <span>
-                          {layoutBlockLabels[block.kind ?? "text"] ?? "Block"}
-                        </span>
-                        <button
-                          type="button"
-                          onClick={() =>
-                            onSelectBlock(section.id, columnKey, blockKey)
-                          }
-                          title="Edit element"
-                        >
-                          <Settings2 size={13} />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() =>
-                            onMoveBlockWithinColumn({
-                              sectionId: section.id,
+                        {isElementActive && (
+                          <BoxSpacingOverlay
+                            kind="element"
+                            labels={elementSpacingOverlayLabels(
+                              block,
+                              shellSettings,
+                              section.id,
                               columnKey,
                               blockKey,
-                              direction: -1,
-                            })
-                          }
-                          disabled={blockIndex <= 0}
-                          title="Move element up"
-                        >
-                          <ArrowUp size={13} />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() =>
-                            onMoveBlockWithinColumn({
-                              sectionId: section.id,
-                              columnKey,
-                              blockKey,
-                              direction: 1,
-                            })
-                          }
-                          disabled={blockIndex >= blocks.length - 1}
-                          title="Move element down"
-                        >
-                          <ArrowDown size={13} />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() =>
-                            onSaveElementTemplate(section.id, columnKey, blockKey)
-                          }
-                          title="Save element as template"
-                        >
-                          <Save size={13} />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() =>
-                            onDuplicateBlock({
-                              sectionId: section.id,
-                              columnKey,
-                              blockKey,
-                            })
-                          }
-                          title="Duplicate element"
-                        >
-                          <Copy size={13} />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() =>
-                            onDeleteBlock({
-                              sectionId: section.id,
-                              columnKey,
-                              blockKey,
-                            })
-                          }
-                          title="Delete element"
-                        >
-                          <Trash2 size={13} />
-                        </button>
-                      </div>
-                      <span
-                        className="builder-preview-drag-handle"
-                        aria-hidden="true"
-                      >
-                        ::
-                      </span>
-                      {block.kind !== "products" &&
-                      block.kind?.startsWith("product") ? (
-                        <PreviewProductBlockContent
-                          block={block}
-                          product={previewProduct}
-                        />
-                      ) : block.kind === "button" ? (
-                        <div className={`shop-builder-column-block shop-builder-column-block--button ${block.premiumCardStyle && block.premiumCardStyle !== "none" ? `shop-builder-card--${block.premiumCardStyle}` : ""}`}>
-                          <div 
-                            className={`shop-builder-buttons ${block.premiumButtonStyle && block.premiumButtonStyle !== "default" ? "" : `shop-builder-buttons--${block.buttonsLayout ?? "inline"}`}`}
-                            style={previewButtonsStyle(block.buttonsLayout, block.elementAlign, block.buttonGap)}
-                          >
-                            {block.buttonLabel && (
-                              <DashboardTypog
-                                as="span"
-                                className={`builder-preview-cta ${
-                                  block.premiumButtonStyle && block.premiumButtonStyle !== "default"
-                                    ? `shop-builder-cta--${block.premiumButtonStyle}`
-                                    : `builder-preview-cta--${block.buttonStyle ?? "primary"}`
-                                }`}
-                                typography={block.typography}
-                              >
-                                {block.buttonLabel}
-                              </DashboardTypog>
                             )}
-                            {(block.buttons ?? []).map((btn, btnIdx) => (
-                              <div
-                                key={btn.id ?? btnIdx}
-                                className={`builder-preview-button-item ${draggingItem?.kind === "button" && draggingItem?.fromIndex === btnIdx && draggingItem?.blockKey === blockKey ? "is-dragging" : ""} ${draggingItem?.kind === "button" && dropHoverIndex === btnIdx ? "is-drag-over" : ""}`}
-                                draggable
-                                onDragStart={(event) => {
-                                  event.stopPropagation();
-                                  event.dataTransfer.setData("text/plain", `button:${blockKey}:${btnIdx}`);
-                                  event.dataTransfer.effectAllowed = "move";
-                                  setDraggingItem({ kind: "button", blockKey, fromIndex: btnIdx });
-                                }}
-                                onDragOver={(event) => {
-                                  if (!draggingItem || draggingItem.kind !== "button" || draggingItem.blockKey !== blockKey) return;
-                                  if (draggingItem.fromIndex === btnIdx) {
-                                    setDropHoverIndex(null);
-                                    return;
-                                  }
-                                  event.preventDefault();
-                                  event.dataTransfer.dropEffect = "move";
-                                  if (dropHoverIndex !== btnIdx) {
-                                    setDropHoverIndex(btnIdx);
-                                  }
-                                }}
-                                onDragLeave={() => {
-                                  if (dropHoverIndex === btnIdx) {
-                                    setDropHoverIndex(null);
-                                  }
-                                }}
-                                onDrop={(event) => {
-                                  event.preventDefault();
-                                  event.stopPropagation();
-                                  setDropHoverIndex(null);
-                                  if (!draggingItem || draggingItem.kind !== "button" || draggingItem.blockKey !== blockKey) return;
-                                  if (draggingItem.fromIndex === btnIdx) {
-                                    setDraggingItem(null);
-                                    return;
-                                  }
-                                  onMoveButton(section.id, columnKey, blockKey, draggingItem.fromIndex, btnIdx);
-                                  setDraggingItem(null);
-                                }}
-                                onDragEnd={() => {
-                                  setDraggingItem(null);
-                                  setDropHoverIndex(null);
-                                }}
-                                style={{ position: "relative", display: "inline-flex", alignItems: "center", gap: "4px" }}
-                              >
-                                <div className="builder-preview-button-tools">
-                                  <button
-                                    type="button"
-                                    onMouseDown={(e) => e.stopPropagation()}
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      onDuplicateButton(section.id, columnKey, blockKey, btnIdx);
-                                    }}
-                                    title="Duplicate button"
-                                  >
-                                    <Copy size={12} />
-                                  </button>
-                                  <button
-                                    type="button"
-                                    onMouseDown={(e) => e.stopPropagation()}
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      onDeleteButton(section.id, columnKey, blockKey, btnIdx);
-                                    }}
-                                    title="Delete button"
-                                  >
-                                    <Trash2 size={12} />
-                                  </button>
-                                </div>
-                                <span className="builder-preview-button-drag-handle" aria-hidden="true">⠿</span>
+                            onOpenSpacingSettings={onOpenSpacingSettings}
+                          />
+                        )}
+                        <div
+                          className="builder-preview-block-tools"
+                          onClick={(event) => event.stopPropagation()}
+                          onMouseDown={(event) => event.stopPropagation()}
+                          onDragStart={(event) => event.stopPropagation()}
+                        >
+                          <span>
+                            {layoutBlockLabels[block.kind ?? "text"] ?? "Block"}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              onSelectBlock(section.id, columnKey, blockKey)
+                            }
+                            title="Edit element"
+                          >
+                            <Settings2 size={13} />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              onMoveBlockWithinColumn({
+                                sectionId: section.id,
+                                columnKey,
+                                blockKey,
+                                direction: -1,
+                              })
+                            }
+                            disabled={blockIndex <= 0}
+                            title="Move element up"
+                          >
+                            <ArrowUp size={13} />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              onMoveBlockWithinColumn({
+                                sectionId: section.id,
+                                columnKey,
+                                blockKey,
+                                direction: 1,
+                              })
+                            }
+                            disabled={blockIndex >= blocks.length - 1}
+                            title="Move element down"
+                          >
+                            <ArrowDown size={13} />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              onSaveElementTemplate(
+                                section.id,
+                                columnKey,
+                                blockKey,
+                              )
+                            }
+                            title="Save element as template"
+                          >
+                            <Save size={13} />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              onDuplicateBlock({
+                                sectionId: section.id,
+                                columnKey,
+                                blockKey,
+                              })
+                            }
+                            title="Duplicate element"
+                          >
+                            <Copy size={13} />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              onDeleteBlock({
+                                sectionId: section.id,
+                                columnKey,
+                                blockKey,
+                              })
+                            }
+                            title="Delete element"
+                          >
+                            <Trash2 size={13} />
+                          </button>
+                        </div>
+                        <span
+                          className="builder-preview-drag-handle"
+                          aria-hidden="true"
+                        >
+                          ::
+                        </span>
+                        {block.kind !== "products" &&
+                        block.kind?.startsWith("product") ? (
+                          <PreviewProductBlockContent
+                            block={block}
+                            product={previewProduct}
+                          />
+                        ) : block.kind === "button" ? (
+                          <div
+                            className={`shop-builder-column-block shop-builder-column-block--button ${block.premiumCardStyle && block.premiumCardStyle !== "none" ? `shop-builder-card--${block.premiumCardStyle}` : ""}`}
+                          >
+                            <div
+                              className={`shop-builder-buttons ${block.premiumButtonStyle && block.premiumButtonStyle !== "default" ? "" : `shop-builder-buttons--${block.buttonsLayout ?? "inline"}`}`}
+                              style={previewButtonsStyle(
+                                block.buttonsLayout,
+                                block.elementAlign,
+                                block.buttonGap,
+                              )}
+                            >
+                              {block.buttonLabel && (
                                 <DashboardTypog
                                   as="span"
                                   className={`builder-preview-cta ${
-                                    block.premiumButtonStyle && block.premiumButtonStyle !== "default"
+                                    block.premiumButtonStyle &&
+                                    block.premiumButtonStyle !== "default"
                                       ? `shop-builder-cta--${block.premiumButtonStyle}`
-                                      : `builder-preview-cta--${btn.style ?? "primary"}`
+                                      : `builder-preview-cta--${block.buttonStyle ?? "primary"}`
                                   }`}
                                   typography={block.typography}
                                 >
-                                  {btn.label || "Button"}
+                                  {block.buttonLabel}
                                 </DashboardTypog>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      ) : block.kind === "icon" ? (
-                        <div className="builder-preview-goodie builder-preview-goodie-icon">
-                          {getPreviewGoodieIcon(block.iconName)}
-                          {block.title && (
-                            <DashboardTypog
-                              as="strong"
-                              typography={block.typography}
-                            >
-                              {block.title}
-                            </DashboardTypog>
-                          )}
-                          {block.body && (
-                            <DashboardTypog as="p" typography={block.typography}>
-                              {block.body}
-                            </DashboardTypog>
-                          )}
-                        </div>
-                      ) : block.kind === "list" ? (
-                        <div className="builder-preview-goodie builder-preview-goodie-list">
-                          {block.title && (
-                            <DashboardTypog
-                              as="strong"
-                              typography={block.typography}
-                            >
-                              {block.title}
-                            </DashboardTypog>
-                          )}
-                          <ul className={block.listIconColorScheme === "gradient-cycle" ? "is-icon-gradient-cycle" : undefined}>
-                            {(block.items ?? []).map((item, index) => (
-                              <li
-                                key={`${item}-${index}`}
-                                className={`builder-preview-list-item ${draggingItem?.kind === "list" && draggingItem?.fromIndex === index && draggingItem?.blockKey === blockKey ? "is-dragging" : ""} ${draggingItem?.kind === "list" && dropHoverIndex === index ? "is-drag-over" : ""}`}
-                                draggable
-                                onDragStart={(event) => {
-                                  event.stopPropagation();
-                                  event.dataTransfer.setData("text/plain", `list:${blockKey}:${index}`);
-                                  event.dataTransfer.effectAllowed = "move";
-                                  setDraggingItem({ kind: "list", blockKey, fromIndex: index });
-                                }}
-                                onDragOver={(event) => {
-                                  if (!draggingItem || draggingItem.kind !== "list" || draggingItem.blockKey !== blockKey) return;
-                                  if (draggingItem.fromIndex === index) {
+                              )}
+                              {(block.buttons ?? []).map((btn, btnIdx) => (
+                                <div
+                                  key={btn.id ?? btnIdx}
+                                  className={`builder-preview-button-item ${draggingItem?.kind === "button" && draggingItem?.fromIndex === btnIdx && draggingItem?.blockKey === blockKey ? "is-dragging" : ""} ${draggingItem?.kind === "button" && dropHoverIndex === btnIdx ? "is-drag-over" : ""}`}
+                                  draggable
+                                  onDragStart={(event) => {
+                                    event.stopPropagation();
+                                    event.dataTransfer.setData(
+                                      "text/plain",
+                                      `button:${blockKey}:${btnIdx}`,
+                                    );
+                                    event.dataTransfer.effectAllowed = "move";
+                                    setDraggingItem({
+                                      kind: "button",
+                                      blockKey,
+                                      fromIndex: btnIdx,
+                                    });
+                                  }}
+                                  onDragOver={(event) => {
+                                    if (
+                                      !draggingItem ||
+                                      draggingItem.kind !== "button" ||
+                                      draggingItem.blockKey !== blockKey
+                                    )
+                                      return;
+                                    if (draggingItem.fromIndex === btnIdx) {
+                                      setDropHoverIndex(null);
+                                      return;
+                                    }
+                                    event.preventDefault();
+                                    event.dataTransfer.dropEffect = "move";
+                                    if (dropHoverIndex !== btnIdx) {
+                                      setDropHoverIndex(btnIdx);
+                                    }
+                                  }}
+                                  onDragLeave={() => {
+                                    if (dropHoverIndex === btnIdx) {
+                                      setDropHoverIndex(null);
+                                    }
+                                  }}
+                                  onDrop={(event) => {
+                                    event.preventDefault();
+                                    event.stopPropagation();
                                     setDropHoverIndex(null);
-                                    return;
-                                  }
-                                  event.preventDefault();
-                                  event.dataTransfer.dropEffect = "move";
-                                  if (dropHoverIndex !== index) {
-                                    setDropHoverIndex(index);
-                                  }
-                                }}
-                                onDragLeave={() => {
-                                  if (dropHoverIndex === index) {
-                                    setDropHoverIndex(null);
-                                  }
-                                }}
-                                onDrop={(event) => {
-                                  event.preventDefault();
-                                  event.stopPropagation();
-                                  setDropHoverIndex(null);
-                                  if (!draggingItem || draggingItem.kind !== "list" || draggingItem.blockKey !== blockKey) return;
-                                  if (draggingItem.fromIndex === index) {
-                                    setDraggingItem(null);
-                                    return;
-                                  }
-                                  onMoveListItem(section.id, columnKey, blockKey, draggingItem.fromIndex, index);
-                                  setDraggingItem(null);
-                                }}
-                                onDragEnd={() => {
-                                  setDraggingItem(null);
-                                  setDropHoverIndex(null);
-                                }}
-                                style={{ position: "relative", display: "flex", alignItems: "center", gap: "4px" }}
-                              >
-                                <div className="builder-preview-list-item-tools">
-                                  <button
-                                    type="button"
-                                    onMouseDown={(e) => e.stopPropagation()}
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      onDuplicateListItem(section.id, columnKey, blockKey, index);
-                                    }}
-                                    title="Duplicate list item"
-                                  >
-                                    <Copy size={12} />
-                                  </button>
-                                  <button
-                                    type="button"
-                                    onMouseDown={(e) => e.stopPropagation()}
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      onDeleteListItem(section.id, columnKey, blockKey, index);
-                                    }}
-                                    title="Delete list item"
-                                  >
-                                    <Trash2 size={12} />
-                                  </button>
-                                </div>
-                                <span className="builder-preview-list-item-drag-handle" aria-hidden="true">⠿</span>
-                                {{
-                                  check: <Check size={14} />,
-                                  circleCheck: <CircleCheck size={14} />,
-                                  arrowRight: <ArrowRight size={14} />,
-                                  star: <Star size={14} />,
-                                  heart: <Heart size={14} />,
-                                  sparkles: <Sparkles size={14} />,
-                                  shield: <ShieldCheck size={14} />,
-                                }[block.listIcon ?? "check"] ?? <Check size={14} />}
-                                <DashboardTypog
-                                  as="span"
-                                  typography={block.typography}
-                                >
-                                  {item}
-                                </DashboardTypog>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      ) : block.kind === "heading" ? (
-                        <div
-                          className={`shop-builder-column-block shop-builder-column-block--heading ${block.premiumCardStyle && block.premiumCardStyle !== "none" ? `shop-builder-card--${block.premiumCardStyle}` : ""}`}
-                          style={{ textAlign: block.headingAlign ?? "left" }}
-                        >
-                          {(() => {
-                            const Tag = block.headingLevel ?? "h2";
-                            const levelDefaults: Record<string, { fontSize: string; fontWeight: string; lineHeight: string }> = {
-                              h1: { fontSize: "clamp(42px, 8vw, 126px)", fontWeight: "760", lineHeight: "0.92" },
-                              h2: { fontSize: "clamp(32px, 5vw, 64px)", fontWeight: "700", lineHeight: "1.1" },
-                              h3: { fontSize: "clamp(24px, 4vw, 40px)", fontWeight: "700", lineHeight: "1.2" },
-                              h4: { fontSize: "clamp(20px, 3vw, 32px)", fontWeight: "600", lineHeight: "1.2" },
-                              h5: { fontSize: "20px", fontWeight: "600", lineHeight: "1.3" },
-                              h6: { fontSize: "16px", fontWeight: "600", lineHeight: "1.4" },
-                            };
-                            const defaultForLevel = levelDefaults[Tag] ?? levelDefaults.h2;
-
-                            const userTitleTyp = (block.typography as any)?.title ?? 
-                              (typeof block.typography === "object" && !(block.typography as any).title ? block.typography : {});
-
-                            const resolvedTypography = {
-                              variant: "heading",
-                              fontSize: userTitleTyp.fontSize || defaultForLevel.fontSize,
-                              fontWeight: userTitleTyp.fontWeight || defaultForLevel.fontWeight,
-                              lineHeight: userTitleTyp.lineHeight || defaultForLevel.lineHeight,
-                              fontFamily: userTitleTyp.fontFamily,
-                              letterSpacing: userTitleTyp.letterSpacing,
-                              color: userTitleTyp.color,
-                              textTransform: userTitleTyp.textTransform,
-                              textDecoration: userTitleTyp.textDecoration,
-                            };
-
-                            return (
-                              <DashboardTypog
-                                as={Tag}
-                                className={block.textGradientPreset && block.textGradientPreset !== "none" && block.textGradientPreset !== "custom" ? `text-gradient--${block.textGradientPreset}` : ""}
-                                typography={resolvedTypography}
-                                style={{
-                                  textAlign: block.headingAlign ?? "left",
-                                  margin: 0,
-                                  ...(block.textGradientPreset === "custom" ? {
-                                    backgroundImage: `linear-gradient(${block.textGradientCustomAngle ?? 135}deg, ${block.textGradientCustomStart ?? "#ffffff"} ${block.textGradientCustomStartOffset ?? 0}%, ${block.textGradientCustomMiddle ?? "#60a5fa"} ${block.textGradientCustomMiddleOffset ?? 50}%, ${block.textGradientCustomEnd ?? "#c084fc"} ${block.textGradientCustomEndOffset ?? 100}%)`,
-                                    WebkitBackgroundClip: "text",
-                                    WebkitTextFillColor: "transparent",
-                                    backgroundClip: "text",
-                                    display: "inline-block",
-                                  } : {})
-                                }}
-                              >
-                                {block.typewriterEnabled ? (
-                                  <TypewriterText
-                                    text={block.headingText ?? "Your Heading Text"}
-                                    speed={block.typewriterSpeed}
-                                    eraseSpeed={block.typewriterEraseSpeed}
-                                    delay={block.typewriterDelay}
-                                    loop={block.typewriterLoop}
-                                    useGradient={block.typewriterUseGradient}
-                                    gradientPreset={block.textGradientPreset ?? block.typewriterGradientPreset} customStart={block.textGradientCustomStart} customMiddle={block.textGradientCustomMiddle} customEnd={block.textGradientCustomEnd} customAngle={block.textGradientCustomAngle} customStartOffset={block.textGradientCustomStartOffset} customMiddleOffset={block.textGradientCustomMiddleOffset} customEndOffset={block.textGradientCustomEndOffset}
-                                    typography={resolvedTypography}
-                                    area="title"
-                                  />
-                                ) : (
-                                  block.headingText ?? "Your Heading Text"
-                                )}
-                              </DashboardTypog>
-                            );
-                          })()}
-                        </div>
-                      ) : block.kind === "datePicker" ? (
-                        <div className="builder-preview-goodie builder-preview-goodie-date">
-                          <CalendarDays size={24} />
-                          {block.title && (
-                            <DashboardTypog
-                              as="strong"
-                              typography={block.typography}
-                            >
-                              {block.title}
-                            </DashboardTypog>
-                          )}
-                          {block.body && (
-                            <DashboardTypog as="p" typography={block.typography}>
-                              {block.body}
-                            </DashboardTypog>
-                          )}
-                          <label>
-                            <span>{block.dateLabel ?? "Preferred date"}</span>
-                            <input type="date" />
-                          </label>
-                        </div>
-                      ) : block.kind === "hero" ? (
-                        <div className={`shop-builder-column-block shop-builder-column-block--hero ${block.carouselSettings?.variant === "antigravity" ? "shop-builder-hero--antigravity shop-builder-hero--antigravity-block" : ""} ${block.premiumCardStyle && block.premiumCardStyle !== "none" ? `shop-builder-card--${block.premiumCardStyle}` : ""}`}>
-                          <div className={block.carouselSettings?.variant === "antigravity" ? "shop-builder-hero-content-left" : ""}>
-                          {block.eyebrow && (
-                            <InlineEditableText
-                              as="span"
-                              className="shop-builder-eyebrow"
-                              typography={block.typography}
-                              value={block.eyebrow}
-                              onChange={(eyebrow) =>
-                                onUpdateBlock(section.id, columnKey, blockKey, {
-                                  eyebrow,
-                                })
-                              }
-                            />
-                          )}
-                          {block.title && (
-                            (block.typewriterEnabled || block.carouselSettings?.variant === "antigravity") ? (
-                              <DashboardTypog
-                                as="h3"
-                                className={block.textGradientPreset && block.textGradientPreset !== "none" ? `text-gradient--${block.textGradientPreset}` : block.carouselSettings?.variant === "antigravity" ? "shop-builder-title--gradient" : ""}
-                                typography={block.typography}
-                              >
-                                <TypewriterText
-                                  text={block.title}
-                                  speed={block.typewriterSpeed}
-                                  eraseSpeed={block.typewriterEraseSpeed}
-                                  delay={block.typewriterDelay}
-                                  loop={block.typewriterLoop}
-                                  useGradient={block.typewriterUseGradient}
-                                  gradientPreset={block.textGradientPreset ?? block.typewriterGradientPreset} customStart={block.textGradientCustomStart} customMiddle={block.textGradientCustomMiddle} customEnd={block.textGradientCustomEnd} customAngle={block.textGradientCustomAngle} customStartOffset={block.textGradientCustomStartOffset} customMiddleOffset={block.textGradientCustomMiddleOffset} customEndOffset={block.textGradientCustomEndOffset}
-                                  typography={block.typography}
-                                  area="title"
-                                />
-                              </DashboardTypog>
-                            ) : (
-                              <InlineEditableText
-                                as="h3"
-                                className={block.textGradientPreset && block.textGradientPreset !== "none" && block.textGradientPreset !== "custom" ? `text-gradient--${block.textGradientPreset}` : block.carouselSettings?.variant === "antigravity" ? "shop-builder-title--gradient" : ""}
-                                typography={block.typography}
-                                value={block.title}
-                                onChange={(title) =>
-                                  onUpdateBlock(section.id, columnKey, blockKey, {
-                                    title,
-                                  })
-                                }
-                                style={block.textGradientPreset === "custom" ? {
-                                  backgroundImage: `linear-gradient(${block.textGradientCustomAngle ?? 135}deg, ${block.textGradientCustomStart ?? "#ffffff"} ${block.textGradientCustomStartOffset ?? 0}%, ${block.textGradientCustomMiddle ?? "#60a5fa"} ${block.textGradientCustomMiddleOffset ?? 50}%, ${block.textGradientCustomEnd ?? "#c084fc"} ${block.textGradientCustomEndOffset ?? 100}%)`,
-                                  WebkitBackgroundClip: "text",
-                                  WebkitTextFillColor: "transparent",
-                                  backgroundClip: "text",
-                                  display: "inline-block",
-                                } : undefined}
-                              />
-                            )
-                          )}
-                           {block.body && (
-                            block.typewriterEnabled && !block.title ? (
-                              <DashboardTypog as="p" typography={block.typography}>
-                                <TypewriterText
-                                  text={block.body}
-                                  speed={block.typewriterSpeed}
-                                  eraseSpeed={block.typewriterEraseSpeed}
-                                  delay={block.typewriterDelay}
-                                  loop={block.typewriterLoop}
-                                  useGradient={block.typewriterUseGradient}
-                                  gradientPreset={block.textGradientPreset ?? block.typewriterGradientPreset} customStart={block.textGradientCustomStart} customMiddle={block.textGradientCustomMiddle} customEnd={block.textGradientCustomEnd} customAngle={block.textGradientCustomAngle} customStartOffset={block.textGradientCustomStartOffset} customMiddleOffset={block.textGradientCustomMiddleOffset} customEndOffset={block.textGradientCustomEndOffset}
-                                  typography={block.typography}
-                                  area="body"
-                                />
-                              </DashboardTypog>
-                            ) : (
-                              <InlineEditableText
-                                as="p"
-                                typography={block.typography}
-                                value={block.body}
-                                onChange={(body) =>
-                                  onUpdateBlock(section.id, columnKey, blockKey, {
-                                    body,
-                                  })
-                                }
-                              />
-                            )
-                          )}
-                          <div 
-                            className={`shop-builder-buttons ${block.premiumButtonStyle && block.premiumButtonStyle !== "default" ? "" : `shop-builder-buttons--${block.buttonsLayout ?? "inline"}`}`}
-                            style={previewButtonsStyle(block.buttonsLayout, block.elementAlign, block.buttonGap)}
-                          >
-                            {block.buttonLabel && (
-                              <DashboardTypog
-                                as="span"
-                                className={`builder-preview-cta ${
-                                  block.premiumButtonStyle && block.premiumButtonStyle !== "default"
-                                    ? `shop-builder-cta--${block.premiumButtonStyle}`
-                                    : block.carouselSettings?.variant === "antigravity"
-                                      ? "shop-builder-cta--antigravity"
-                                      : `builder-preview-cta--${block.buttonStyle ?? "primary"}`
-                                }`}
-                                typography={block.typography}
-                              >
-                                {block.buttonLabel}
-                              </DashboardTypog>
-                            )}
-                            {(block.buttons ?? []).map((btn, btnIdx) => (
-                              <DashboardTypog
-                                key={btn.id ?? btnIdx}
-                                as="span"
-                                className={`builder-preview-cta ${
-                                  block.premiumButtonStyle && block.premiumButtonStyle !== "default"
-                                    ? `shop-builder-cta--${block.premiumButtonStyle}`
-                                    : `builder-preview-cta--${btn.style ?? "primary"}`
-                                }`}
-                                style={{ display: "inline-flex" }}
-                                typography={block.typography}
-                              >
-                                {btn.label || "Button"}
-                              </DashboardTypog>
-                            ))}
-                          </div>
-                          </div>
-                          {block.carouselSettings?.variant === "antigravity" && (
-                            <div className="shop-builder-hero-media shop-builder-hero-media--antigravity">
-                              <AntigravityTerminal />
-                            </div>
-                          )}
-                        </div>
-                      ) : block.kind === "promoStrip" ? (
-                        <div className="shop-builder-column-block shop-builder-column-block--promo-strip">
-                          <div>
-                            {block.eyebrow && (
-                              <InlineEditableText
-                                as="span"
-                                className="shop-builder-eyebrow"
-                                typography={block.typography}
-                                value={block.eyebrow}
-                                onChange={(eyebrow) =>
-                                  onUpdateBlock(
-                                    section.id,
-                                    columnKey,
-                                    blockKey,
-                                    { eyebrow },
-                                  )
-                                }
-                              />
-                            )}
-                            {block.title && (
-                              block.typewriterEnabled ? (
-                                <DashboardTypog as="h3" typography={block.typography}>
-                                  <TypewriterText
-                                    text={block.title}
-                                    speed={block.typewriterSpeed}
-                                    eraseSpeed={block.typewriterEraseSpeed}
-                                    delay={block.typewriterDelay}
-                                    loop={block.typewriterLoop}
-                                    useGradient={block.typewriterUseGradient}
-                                    gradientPreset={block.textGradientPreset ?? block.typewriterGradientPreset} customStart={block.textGradientCustomStart} customMiddle={block.textGradientCustomMiddle} customEnd={block.textGradientCustomEnd} customAngle={block.textGradientCustomAngle} customStartOffset={block.textGradientCustomStartOffset} customMiddleOffset={block.textGradientCustomMiddleOffset} customEndOffset={block.textGradientCustomEndOffset}
-                                    typography={block.typography}
-                                    area="title"
-                                  />
-                                </DashboardTypog>
-                              ) : (
-                                <InlineEditableText
-                                  as="h3"
-                                  typography={block.typography}
-                                  value={block.title}
-                                  onChange={(title) =>
-                                    onUpdateBlock(
+                                    if (
+                                      !draggingItem ||
+                                      draggingItem.kind !== "button" ||
+                                      draggingItem.blockKey !== blockKey
+                                    )
+                                      return;
+                                    if (draggingItem.fromIndex === btnIdx) {
+                                      setDraggingItem(null);
+                                      return;
+                                    }
+                                    onMoveButton(
                                       section.id,
                                       columnKey,
                                       blockKey,
-                                      { title },
-                                    )
-                                  }
-                                />
-                              )
+                                      draggingItem.fromIndex,
+                                      btnIdx,
+                                    );
+                                    setDraggingItem(null);
+                                  }}
+                                  onDragEnd={() => {
+                                    setDraggingItem(null);
+                                    setDropHoverIndex(null);
+                                  }}
+                                  style={{
+                                    position: "relative",
+                                    display: "inline-flex",
+                                    alignItems: "center",
+                                    gap: "4px",
+                                  }}
+                                >
+                                  <div className="builder-preview-button-tools">
+                                    <button
+                                      type="button"
+                                      onMouseDown={(e) => e.stopPropagation()}
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        onDuplicateButton(
+                                          section.id,
+                                          columnKey,
+                                          blockKey,
+                                          btnIdx,
+                                        );
+                                      }}
+                                      title="Duplicate button"
+                                    >
+                                      <Copy size={12} />
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onMouseDown={(e) => e.stopPropagation()}
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        onDeleteButton(
+                                          section.id,
+                                          columnKey,
+                                          blockKey,
+                                          btnIdx,
+                                        );
+                                      }}
+                                      title="Delete button"
+                                    >
+                                      <Trash2 size={12} />
+                                    </button>
+                                  </div>
+                                  <span
+                                    className="builder-preview-button-drag-handle"
+                                    aria-hidden="true"
+                                  >
+                                    ⠿
+                                  </span>
+                                  <DashboardTypog
+                                    as="span"
+                                    className={`builder-preview-cta ${
+                                      block.premiumButtonStyle &&
+                                      block.premiumButtonStyle !== "default"
+                                        ? `shop-builder-cta--${block.premiumButtonStyle}`
+                                        : `builder-preview-cta--${btn.style ?? "primary"}`
+                                    }`}
+                                    typography={block.typography}
+                                  >
+                                    {btn.label || "Button"}
+                                  </DashboardTypog>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        ) : block.kind === "icon" ? (
+                          <div className="builder-preview-goodie builder-preview-goodie-icon">
+                            {getPreviewGoodieIcon(block.iconName)}
+                            {block.title && (
+                              <DashboardTypog
+                                as="strong"
+                                typography={block.typography}
+                              >
+                                {block.title}
+                              </DashboardTypog>
                             )}
                             {block.body && (
-                              block.typewriterEnabled && !block.title ? (
-                                <DashboardTypog as="p" typography={block.typography}>
-                                  <TypewriterText
-                                    text={block.body}
-                                    speed={block.typewriterSpeed}
-                                    eraseSpeed={block.typewriterEraseSpeed}
-                                    delay={block.typewriterDelay}
-                                    loop={block.typewriterLoop}
-                                    useGradient={block.typewriterUseGradient}
-                                    gradientPreset={block.textGradientPreset ?? block.typewriterGradientPreset} customStart={block.textGradientCustomStart} customMiddle={block.textGradientCustomMiddle} customEnd={block.textGradientCustomEnd} customAngle={block.textGradientCustomAngle} customStartOffset={block.textGradientCustomStartOffset} customMiddleOffset={block.textGradientCustomMiddleOffset} customEndOffset={block.textGradientCustomEndOffset}
+                              <DashboardTypog
+                                as="p"
+                                typography={block.typography}
+                              >
+                                {block.body}
+                              </DashboardTypog>
+                            )}
+                          </div>
+                        ) : block.kind === "list" ? (
+                          <div className="builder-preview-goodie builder-preview-goodie-list">
+                            {block.title && (
+                              <DashboardTypog
+                                as="strong"
+                                typography={block.typography}
+                              >
+                                {block.title}
+                              </DashboardTypog>
+                            )}
+                            <ul
+                              className={
+                                block.listIconColorScheme === "gradient-cycle"
+                                  ? "is-icon-gradient-cycle"
+                                  : undefined
+                              }
+                            >
+                              {(block.items ?? []).map((item, index) => (
+                                <li
+                                  key={`${item}-${index}`}
+                                  className={`builder-preview-list-item ${draggingItem?.kind === "list" && draggingItem?.fromIndex === index && draggingItem?.blockKey === blockKey ? "is-dragging" : ""} ${draggingItem?.kind === "list" && dropHoverIndex === index ? "is-drag-over" : ""}`}
+                                  draggable
+                                  onDragStart={(event) => {
+                                    event.stopPropagation();
+                                    event.dataTransfer.setData(
+                                      "text/plain",
+                                      `list:${blockKey}:${index}`,
+                                    );
+                                    event.dataTransfer.effectAllowed = "move";
+                                    setDraggingItem({
+                                      kind: "list",
+                                      blockKey,
+                                      fromIndex: index,
+                                    });
+                                  }}
+                                  onDragOver={(event) => {
+                                    if (
+                                      !draggingItem ||
+                                      draggingItem.kind !== "list" ||
+                                      draggingItem.blockKey !== blockKey
+                                    )
+                                      return;
+                                    if (draggingItem.fromIndex === index) {
+                                      setDropHoverIndex(null);
+                                      return;
+                                    }
+                                    event.preventDefault();
+                                    event.dataTransfer.dropEffect = "move";
+                                    if (dropHoverIndex !== index) {
+                                      setDropHoverIndex(index);
+                                    }
+                                  }}
+                                  onDragLeave={() => {
+                                    if (dropHoverIndex === index) {
+                                      setDropHoverIndex(null);
+                                    }
+                                  }}
+                                  onDrop={(event) => {
+                                    event.preventDefault();
+                                    event.stopPropagation();
+                                    setDropHoverIndex(null);
+                                    if (
+                                      !draggingItem ||
+                                      draggingItem.kind !== "list" ||
+                                      draggingItem.blockKey !== blockKey
+                                    )
+                                      return;
+                                    if (draggingItem.fromIndex === index) {
+                                      setDraggingItem(null);
+                                      return;
+                                    }
+                                    onMoveListItem(
+                                      section.id,
+                                      columnKey,
+                                      blockKey,
+                                      draggingItem.fromIndex,
+                                      index,
+                                    );
+                                    setDraggingItem(null);
+                                  }}
+                                  onDragEnd={() => {
+                                    setDraggingItem(null);
+                                    setDropHoverIndex(null);
+                                  }}
+                                  style={{
+                                    position: "relative",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: "4px",
+                                  }}
+                                >
+                                  <div className="builder-preview-list-item-tools">
+                                    <button
+                                      type="button"
+                                      onMouseDown={(e) => e.stopPropagation()}
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        onDuplicateListItem(
+                                          section.id,
+                                          columnKey,
+                                          blockKey,
+                                          index,
+                                        );
+                                      }}
+                                      title="Duplicate list item"
+                                    >
+                                      <Copy size={12} />
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onMouseDown={(e) => e.stopPropagation()}
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        onDeleteListItem(
+                                          section.id,
+                                          columnKey,
+                                          blockKey,
+                                          index,
+                                        );
+                                      }}
+                                      title="Delete list item"
+                                    >
+                                      <Trash2 size={12} />
+                                    </button>
+                                  </div>
+                                  <span
+                                    className="builder-preview-list-item-drag-handle"
+                                    aria-hidden="true"
+                                  >
+                                    ⠿
+                                  </span>
+                                  {{
+                                    check: <Check size={14} />,
+                                    circleCheck: <CircleCheck size={14} />,
+                                    arrowRight: <ArrowRight size={14} />,
+                                    star: <Star size={14} />,
+                                    heart: <Heart size={14} />,
+                                    sparkles: <Sparkles size={14} />,
+                                    shield: <ShieldCheck size={14} />,
+                                  }[block.listIcon ?? "check"] ?? (
+                                    <Check size={14} />
+                                  )}
+                                  <DashboardTypog
+                                    as="span"
                                     typography={block.typography}
-                                    area="body"
-                                  />
+                                  >
+                                    {item}
+                                  </DashboardTypog>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        ) : block.kind === "heading" ? (
+                          <div
+                            className={`shop-builder-column-block shop-builder-column-block--heading ${block.premiumCardStyle && block.premiumCardStyle !== "none" ? `shop-builder-card--${block.premiumCardStyle}` : ""}`}
+                            style={{ textAlign: block.headingAlign ?? "left" }}
+                          >
+                            {(() => {
+                              const Tag = block.headingLevel ?? "h2";
+                              const levelDefaults: Record<
+                                string,
+                                {
+                                  fontSize: string;
+                                  fontWeight: string;
+                                  lineHeight: string;
+                                }
+                              > = {
+                                h1: {
+                                  fontSize: "clamp(42px, 8vw, 126px)",
+                                  fontWeight: "760",
+                                  lineHeight: "0.92",
+                                },
+                                h2: {
+                                  fontSize: "clamp(32px, 5vw, 64px)",
+                                  fontWeight: "700",
+                                  lineHeight: "1.1",
+                                },
+                                h3: {
+                                  fontSize: "clamp(24px, 4vw, 40px)",
+                                  fontWeight: "700",
+                                  lineHeight: "1.2",
+                                },
+                                h4: {
+                                  fontSize: "clamp(20px, 3vw, 32px)",
+                                  fontWeight: "600",
+                                  lineHeight: "1.2",
+                                },
+                                h5: {
+                                  fontSize: "20px",
+                                  fontWeight: "600",
+                                  lineHeight: "1.3",
+                                },
+                                h6: {
+                                  fontSize: "16px",
+                                  fontWeight: "600",
+                                  lineHeight: "1.4",
+                                },
+                              };
+                              const defaultForLevel =
+                                levelDefaults[Tag] ?? levelDefaults.h2;
+
+                              const userTitleTyp =
+                                (block.typography as any)?.title ??
+                                (typeof block.typography === "object" &&
+                                !(block.typography as any).title
+                                  ? block.typography
+                                  : {});
+
+                              const resolvedTypography = {
+                                variant: "heading",
+                                fontSize:
+                                  userTitleTyp.fontSize ||
+                                  defaultForLevel.fontSize,
+                                fontWeight:
+                                  userTitleTyp.fontWeight ||
+                                  defaultForLevel.fontWeight,
+                                lineHeight:
+                                  userTitleTyp.lineHeight ||
+                                  defaultForLevel.lineHeight,
+                                fontFamily: userTitleTyp.fontFamily,
+                                letterSpacing: userTitleTyp.letterSpacing,
+                                color: userTitleTyp.color,
+                                textTransform: userTitleTyp.textTransform,
+                                textDecoration: userTitleTyp.textDecoration,
+                              };
+
+                              return (
+                                <DashboardTypog
+                                  as={Tag}
+                                  className={
+                                    block.textGradientPreset &&
+                                    block.textGradientPreset !== "none" &&
+                                    block.textGradientPreset !== "custom"
+                                      ? `text-gradient--${block.textGradientPreset}`
+                                      : ""
+                                  }
+                                  typography={resolvedTypography}
+                                  style={{
+                                    textAlign: block.headingAlign ?? "left",
+                                    margin: 0,
+                                    ...(block.textGradientPreset === "custom"
+                                      ? {
+                                          backgroundImage: `linear-gradient(${block.textGradientCustomAngle ?? 135}deg, ${block.textGradientCustomStart ?? "#ffffff"} ${block.textGradientCustomStartOffset ?? 0}%, ${block.textGradientCustomMiddle ?? "#60a5fa"} ${block.textGradientCustomMiddleOffset ?? 50}%, ${block.textGradientCustomEnd ?? "#c084fc"} ${block.textGradientCustomEndOffset ?? 100}%)`,
+                                          WebkitBackgroundClip: "text",
+                                          WebkitTextFillColor: "transparent",
+                                          backgroundClip: "text",
+                                          display: "inline-block",
+                                        }
+                                      : {}),
+                                  }}
+                                >
+                                  {block.typewriterEnabled ? (
+                                    <TypewriterText
+                                      text={
+                                        block.headingText ?? "Your Heading Text"
+                                      }
+                                      speed={block.typewriterSpeed}
+                                      eraseSpeed={block.typewriterEraseSpeed}
+                                      delay={block.typewriterDelay}
+                                      loop={block.typewriterLoop}
+                                      useGradient={block.typewriterUseGradient}
+                                      gradientPreset={
+                                        block.textGradientPreset ??
+                                        block.typewriterGradientPreset
+                                      }
+                                      customStart={
+                                        block.textGradientCustomStart
+                                      }
+                                      customMiddle={
+                                        block.textGradientCustomMiddle
+                                      }
+                                      customEnd={block.textGradientCustomEnd}
+                                      customAngle={
+                                        block.textGradientCustomAngle
+                                      }
+                                      customStartOffset={
+                                        block.textGradientCustomStartOffset
+                                      }
+                                      customMiddleOffset={
+                                        block.textGradientCustomMiddleOffset
+                                      }
+                                      customEndOffset={
+                                        block.textGradientCustomEndOffset
+                                      }
+                                      typography={resolvedTypography}
+                                      area="title"
+                                      preserveHeight={
+                                        block.typewriterPreserveHeight !== false
+                                      }
+                                      reservedLines={
+                                        block.typewriterReservedLines ?? 1
+                                      }
+                                      mobileReservedLines={
+                                        block.typewriterMobileReservedLines ?? 2
+                                      }
+                                    />
+                                  ) : (
+                                    (block.headingText ?? "Your Heading Text")
+                                  )}
                                 </DashboardTypog>
-                              ) : (
+                              );
+                            })()}
+                          </div>
+                        ) : block.kind === "datePicker" ? (
+                          <div className="builder-preview-goodie builder-preview-goodie-date">
+                            <CalendarDays size={24} />
+                            {block.title && (
+                              <DashboardTypog
+                                as="strong"
+                                typography={block.typography}
+                              >
+                                {block.title}
+                              </DashboardTypog>
+                            )}
+                            {block.body && (
+                              <DashboardTypog
+                                as="p"
+                                typography={block.typography}
+                              >
+                                {block.body}
+                              </DashboardTypog>
+                            )}
+                            <label>
+                              <span>{block.dateLabel ?? "Preferred date"}</span>
+                              <input type="date" />
+                            </label>
+                          </div>
+                        ) : block.kind === "hero" ? (
+                          <div
+                            className={`shop-builder-column-block shop-builder-column-block--hero ${block.carouselSettings?.variant === "antigravity" ? "shop-builder-hero--antigravity shop-builder-hero--antigravity-block" : ""} ${block.premiumCardStyle && block.premiumCardStyle !== "none" ? `shop-builder-card--${block.premiumCardStyle}` : ""}`}
+                          >
+                            <div
+                              className={
+                                block.carouselSettings?.variant ===
+                                "antigravity"
+                                  ? "shop-builder-hero-content-left"
+                                  : ""
+                              }
+                            >
+                              {block.eyebrow && (
                                 <InlineEditableText
-                                  as="p"
+                                  as="span"
+                                  className="shop-builder-eyebrow"
                                   typography={block.typography}
-                                  value={block.body}
-                                  onChange={(body) =>
+                                  value={block.eyebrow}
+                                  onChange={(eyebrow) =>
                                     onUpdateBlock(
                                       section.id,
                                       columnKey,
                                       blockKey,
-                                      { body },
+                                      {
+                                        eyebrow,
+                                      },
                                     )
                                   }
                                 />
-                              )
-                            )}
-                          </div>
-                        <div 
-                          className={`shop-builder-buttons shop-builder-buttons--${block.buttonsLayout ?? "inline"}`}
-                          style={previewButtonsStyle(block.buttonsLayout, block.elementAlign, block.buttonGap)}
-                        >
-                          {block.buttonLabel && (
-                            <DashboardTypog
-                              as="span"
-                              className="builder-preview-cta"
-                              typography={block.typography}
-                            >
-                              {block.buttonLabel}
-                            </DashboardTypog>
-                          )}
-                          {(block.buttons ?? []).map((btn, btnIdx) => (
-                            <DashboardTypog
-                              key={btn.id ?? btnIdx}
-                              as="span"
-                              className={`builder-preview-cta builder-preview-cta--${btn.style ?? "primary"}`}
-                              style={{ display: "inline-flex" }}
-                              typography={block.typography}
-                            >
-                              {btn.label || "Button"}
-                            </DashboardTypog>
-                          ))}
-                        </div>
-                        </div>
-                      ) : block.kind === "panel" ? (
-                        (() => {
-                          const panelTitleStyle = {
-                            color: "var(--builder-card-title-color, inherit)",
-                            fontSize: "var(--builder-card-title-size, inherit)",
-                            fontWeight: "var(--builder-card-title-weight, inherit)",
-                            textAlign:
-                              "var(--builder-card-title-align, inherit)" as React.CSSProperties["textAlign"],
-                            margin: "var(--builder-card-title-margin, 0)",
-                          } as React.CSSProperties;
-                          const panelMetaStyle = {
-                            color: "var(--builder-card-meta-color, inherit)",
-                            fontSize: "var(--builder-card-meta-size, inherit)",
-                            textTransform:
-                              "var(--builder-card-meta-transform, none)" as React.CSSProperties["textTransform"],
-                            marginTop: "var(--builder-card-meta-spacing, 0)",
-                          } as React.CSSProperties;
-                          const panelBodyStyle = {
-                            color: "var(--builder-card-content-color, inherit)",
-                            fontSize: "var(--builder-card-content-size, inherit)",
-                            lineHeight: "var(--builder-card-content-line-height, inherit)",
-                            maxWidth: "var(--builder-card-content-max-width, none)",
-                          } as React.CSSProperties;
-
-                          return (
-                            <div className="shop-builder-column-block shop-builder-column-block--panel">
-                              {block.imageUrl && (
-                                <div
-                                  className="shop-builder-panel-media"
-                                  style={{
-                                    backgroundImage: `url(${block.imageUrl})`,
-                                  }}
-                                />
                               )}
-                              <div>
-                                {block.eyebrow && (
-                                  <InlineEditableText
-                                    as="span"
-                                    className="shop-builder-eyebrow shop-builder-panel-meta"
+                              {block.title &&
+                                (block.typewriterEnabled ||
+                                block.carouselSettings?.variant ===
+                                  "antigravity" ? (
+                                  <DashboardTypog
+                                    as="h3"
+                                    className={
+                                      block.textGradientPreset &&
+                                      block.textGradientPreset !== "none"
+                                        ? `text-gradient--${block.textGradientPreset}`
+                                        : block.carouselSettings?.variant ===
+                                            "antigravity"
+                                          ? "shop-builder-title--gradient"
+                                          : ""
+                                    }
                                     typography={block.typography}
-                                    style={panelMetaStyle}
-                                    value={block.eyebrow}
-                                    onChange={(eyebrow) =>
+                                  >
+                                    <TypewriterText
+                                      text={block.title}
+                                      speed={block.typewriterSpeed}
+                                      eraseSpeed={block.typewriterEraseSpeed}
+                                      delay={block.typewriterDelay}
+                                      loop={block.typewriterLoop}
+                                      useGradient={block.typewriterUseGradient}
+                                      gradientPreset={
+                                        block.textGradientPreset ??
+                                        block.typewriterGradientPreset
+                                      }
+                                      customStart={
+                                        block.textGradientCustomStart
+                                      }
+                                      customMiddle={
+                                        block.textGradientCustomMiddle
+                                      }
+                                      customEnd={block.textGradientCustomEnd}
+                                      customAngle={
+                                        block.textGradientCustomAngle
+                                      }
+                                      customStartOffset={
+                                        block.textGradientCustomStartOffset
+                                      }
+                                      customMiddleOffset={
+                                        block.textGradientCustomMiddleOffset
+                                      }
+                                      customEndOffset={
+                                        block.textGradientCustomEndOffset
+                                      }
+                                      typography={block.typography}
+                                      area="title"
+                                      preserveHeight={
+                                        block.typewriterPreserveHeight !== false
+                                      }
+                                      reservedLines={
+                                        block.typewriterReservedLines ?? 1
+                                      }
+                                      mobileReservedLines={
+                                        block.typewriterMobileReservedLines ?? 2
+                                      }
+                                    />
+                                  </DashboardTypog>
+                                ) : (
+                                  <InlineEditableText
+                                    as="h3"
+                                    className={
+                                      block.textGradientPreset &&
+                                      block.textGradientPreset !== "none" &&
+                                      block.textGradientPreset !== "custom"
+                                        ? `text-gradient--${block.textGradientPreset}`
+                                        : block.carouselSettings?.variant ===
+                                            "antigravity"
+                                          ? "shop-builder-title--gradient"
+                                          : ""
+                                    }
+                                    typography={block.typography}
+                                    value={block.title}
+                                    onChange={(title) =>
                                       onUpdateBlock(
                                         section.id,
                                         columnKey,
                                         blockKey,
-                                        { eyebrow },
+                                        {
+                                          title,
+                                        },
+                                      )
+                                    }
+                                    style={
+                                      block.textGradientPreset === "custom"
+                                        ? {
+                                            backgroundImage: `linear-gradient(${block.textGradientCustomAngle ?? 135}deg, ${block.textGradientCustomStart ?? "#ffffff"} ${block.textGradientCustomStartOffset ?? 0}%, ${block.textGradientCustomMiddle ?? "#60a5fa"} ${block.textGradientCustomMiddleOffset ?? 50}%, ${block.textGradientCustomEnd ?? "#c084fc"} ${block.textGradientCustomEndOffset ?? 100}%)`,
+                                            WebkitBackgroundClip: "text",
+                                            WebkitTextFillColor: "transparent",
+                                            backgroundClip: "text",
+                                            display: "inline-block",
+                                          }
+                                        : undefined
+                                    }
+                                  />
+                                ))}
+                              {block.body &&
+                                (block.typewriterEnabled && !block.title ? (
+                                  <DashboardTypog
+                                    as="p"
+                                    typography={block.typography}
+                                  >
+                                    <TypewriterText
+                                      text={block.body}
+                                      speed={block.typewriterSpeed}
+                                      eraseSpeed={block.typewriterEraseSpeed}
+                                      delay={block.typewriterDelay}
+                                      loop={block.typewriterLoop}
+                                      useGradient={block.typewriterUseGradient}
+                                      gradientPreset={
+                                        block.textGradientPreset ??
+                                        block.typewriterGradientPreset
+                                      }
+                                      customStart={
+                                        block.textGradientCustomStart
+                                      }
+                                      customMiddle={
+                                        block.textGradientCustomMiddle
+                                      }
+                                      customEnd={block.textGradientCustomEnd}
+                                      customAngle={
+                                        block.textGradientCustomAngle
+                                      }
+                                      customStartOffset={
+                                        block.textGradientCustomStartOffset
+                                      }
+                                      customMiddleOffset={
+                                        block.textGradientCustomMiddleOffset
+                                      }
+                                      customEndOffset={
+                                        block.textGradientCustomEndOffset
+                                      }
+                                      typography={block.typography}
+                                      area="body"
+                                      preserveHeight={
+                                        block.typewriterPreserveHeight !== false
+                                      }
+                                      reservedLines={
+                                        block.typewriterReservedLines ?? 1
+                                      }
+                                      mobileReservedLines={
+                                        block.typewriterMobileReservedLines ?? 2
+                                      }
+                                    />
+                                  </DashboardTypog>
+                                ) : (
+                                  <InlineEditableText
+                                    as="p"
+                                    typography={block.typography}
+                                    value={block.body}
+                                    onChange={(body) =>
+                                      onUpdateBlock(
+                                        section.id,
+                                        columnKey,
+                                        blockKey,
+                                        {
+                                          body,
+                                        },
                                       )
                                     }
                                   />
+                                ))}
+                              <div
+                                className={`shop-builder-buttons ${block.premiumButtonStyle && block.premiumButtonStyle !== "default" ? "" : `shop-builder-buttons--${block.buttonsLayout ?? "inline"}`}`}
+                                style={previewButtonsStyle(
+                                  block.buttonsLayout,
+                                  block.elementAlign,
+                                  block.buttonGap,
                                 )}
-                                {block.title && (
-                                  block.typewriterEnabled ? (
-                                    <DashboardTypog as="h3" typography={block.typography} style={panelTitleStyle}>
-                                      <TypewriterText
-                                        text={block.title}
-                                        speed={block.typewriterSpeed}
-                                        eraseSpeed={block.typewriterEraseSpeed}
-                                        delay={block.typewriterDelay}
-                                        loop={block.typewriterLoop}
-                                        useGradient={block.typewriterUseGradient}
-                                        gradientPreset={block.textGradientPreset ?? block.typewriterGradientPreset} customStart={block.textGradientCustomStart} customMiddle={block.textGradientCustomMiddle} customEnd={block.textGradientCustomEnd} customAngle={block.textGradientCustomAngle} customStartOffset={block.textGradientCustomStartOffset} customMiddleOffset={block.textGradientCustomMiddleOffset} customEndOffset={block.textGradientCustomEndOffset}
-                                        typography={block.typography}
-                                        area="title"
-                                      />
-                                    </DashboardTypog>
-                                  ) : (
-                                    <InlineEditableText
-                                      as="h3"
-                                      typography={block.typography}
-                                      style={panelTitleStyle}
-                                      value={block.title}
-                                      onChange={(title) =>
-                                        onUpdateBlock(
-                                          section.id,
-                                          columnKey,
-                                          blockKey,
-                                          { title },
-                                        )
-                                      }
-                                    />
-                                  )
-                                )}
-                                {block.body && (
-                                  block.typewriterEnabled && !block.title ? (
-                                    <DashboardTypog as="p" typography={block.typography} style={panelBodyStyle}>
-                                      <TypewriterText
-                                        text={block.body}
-                                        speed={block.typewriterSpeed}
-                                        eraseSpeed={block.typewriterEraseSpeed}
-                                        delay={block.typewriterDelay}
-                                        loop={block.typewriterLoop}
-                                        useGradient={block.typewriterUseGradient}
-                                        gradientPreset={block.textGradientPreset ?? block.typewriterGradientPreset} customStart={block.textGradientCustomStart} customMiddle={block.textGradientCustomMiddle} customEnd={block.textGradientCustomEnd} customAngle={block.textGradientCustomAngle} customStartOffset={block.textGradientCustomStartOffset} customMiddleOffset={block.textGradientCustomMiddleOffset} customEndOffset={block.textGradientCustomEndOffset}
-                                        typography={block.typography}
-                                        area="body"
-                                      />
-                                    </DashboardTypog>
-                                  ) : (
-                                    <InlineEditableText
-                                      as="p"
-                                      typography={block.typography}
-                                      style={panelBodyStyle}
-                                      value={block.body}
-                                      onChange={(body) =>
-                                        onUpdateBlock(
-                                          section.id,
-                                          columnKey,
-                                          blockKey,
-                                          { body },
-                                        )
-                                      }
-                                    />
-                                  )
-                                )}
-                                
-                                <RenderDashboardChecklist
-                                  items={block.items}
-                                  iconName={block.listIcon}
-                                  colorScheme={block.listIconColorScheme}
-                                  typography={block.typography}
-                                />
-
-                              <div 
-                                className={`shop-builder-buttons shop-builder-buttons--${block.buttonsLayout ?? "inline"}`}
-                                style={{
-                                  ...previewButtonsStyle(block.buttonsLayout, block.elementAlign, block.buttonGap),
-                                  justifyContent: `var(--builder-card-button-align, ${
-                                    block.elementAlign === "center"
-                                      ? "center"
-                                      : block.elementAlign === "right"
-                                        ? "flex-end"
-                                        : "flex-start"
-                                  })`,
-                                }}
                               >
                                 {block.buttonLabel && (
                                   <DashboardTypog
                                     as="span"
-                                    className="builder-preview-cta"
+                                    className={`builder-preview-cta ${
+                                      block.premiumButtonStyle &&
+                                      block.premiumButtonStyle !== "default"
+                                        ? `shop-builder-cta--${block.premiumButtonStyle}`
+                                        : block.carouselSettings?.variant ===
+                                            "antigravity"
+                                          ? "shop-builder-cta--antigravity"
+                                          : `builder-preview-cta--${block.buttonStyle ?? "primary"}`
+                                    }`}
                                     typography={block.typography}
                                   >
                                     {block.buttonLabel}
@@ -11860,416 +12479,1330 @@ if (section.kind === "embed") {
                                   <DashboardTypog
                                     key={btn.id ?? btnIdx}
                                     as="span"
-                                    className={`builder-preview-cta builder-preview-cta--${btn.style ?? "primary"}`}
-                                  style={{ display: "inline-flex" }}
+                                    className={`builder-preview-cta ${
+                                      block.premiumButtonStyle &&
+                                      block.premiumButtonStyle !== "default"
+                                        ? `shop-builder-cta--${block.premiumButtonStyle}`
+                                        : `builder-preview-cta--${btn.style ?? "primary"}`
+                                    }`}
+                                    style={{ display: "inline-flex" }}
                                     typography={block.typography}
                                   >
                                     {btn.label || "Button"}
                                   </DashboardTypog>
                                 ))}
                               </div>
-                              </div>
                             </div>
-                          );
-                        })()
-                      ) : block.kind === "image" ? (
-                        (() => {
-                          const imageAspectRatio = getBuilderImageAspectRatio(block.imageRatio);
-                          const imageObjectFit = getBuilderImageObjectFit(block.imageFit);
-                          const imageRadius = `${block.imageBorderRadius ?? 12}px`;
+                            {block.carouselSettings?.variant ===
+                              "antigravity" && (
+                              <div className="shop-builder-hero-media shop-builder-hero-media--antigravity">
+                                <AntigravityTerminal />
+                              </div>
+                            )}
+                          </div>
+                        ) : block.kind === "promoStrip" ? (
+                          <div className="shop-builder-column-block shop-builder-column-block--promo-strip">
+                            <div>
+                              {block.eyebrow && (
+                                <InlineEditableText
+                                  as="span"
+                                  className="shop-builder-eyebrow"
+                                  typography={block.typography}
+                                  value={block.eyebrow}
+                                  onChange={(eyebrow) =>
+                                    onUpdateBlock(
+                                      section.id,
+                                      columnKey,
+                                      blockKey,
+                                      { eyebrow },
+                                    )
+                                  }
+                                />
+                              )}
+                              {block.title &&
+                                (block.typewriterEnabled ? (
+                                  <DashboardTypog
+                                    as="h3"
+                                    typography={block.typography}
+                                  >
+                                    <TypewriterText
+                                      text={block.title}
+                                      speed={block.typewriterSpeed}
+                                      eraseSpeed={block.typewriterEraseSpeed}
+                                      delay={block.typewriterDelay}
+                                      loop={block.typewriterLoop}
+                                      useGradient={block.typewriterUseGradient}
+                                      gradientPreset={
+                                        block.textGradientPreset ??
+                                        block.typewriterGradientPreset
+                                      }
+                                      customStart={
+                                        block.textGradientCustomStart
+                                      }
+                                      customMiddle={
+                                        block.textGradientCustomMiddle
+                                      }
+                                      customEnd={block.textGradientCustomEnd}
+                                      customAngle={
+                                        block.textGradientCustomAngle
+                                      }
+                                      customStartOffset={
+                                        block.textGradientCustomStartOffset
+                                      }
+                                      customMiddleOffset={
+                                        block.textGradientCustomMiddleOffset
+                                      }
+                                      customEndOffset={
+                                        block.textGradientCustomEndOffset
+                                      }
+                                      typography={block.typography}
+                                      area="title"
+                                      preserveHeight={
+                                        block.typewriterPreserveHeight !== false
+                                      }
+                                      reservedLines={
+                                        block.typewriterReservedLines ?? 1
+                                      }
+                                      mobileReservedLines={
+                                        block.typewriterMobileReservedLines ?? 2
+                                      }
+                                    />
+                                  </DashboardTypog>
+                                ) : (
+                                  <InlineEditableText
+                                    as="h3"
+                                    typography={block.typography}
+                                    value={block.title}
+                                    onChange={(title) =>
+                                      onUpdateBlock(
+                                        section.id,
+                                        columnKey,
+                                        blockKey,
+                                        { title },
+                                      )
+                                    }
+                                  />
+                                ))}
+                              {block.body &&
+                                (block.typewriterEnabled && !block.title ? (
+                                  <DashboardTypog
+                                    as="p"
+                                    typography={block.typography}
+                                  >
+                                    <TypewriterText
+                                      text={block.body}
+                                      speed={block.typewriterSpeed}
+                                      eraseSpeed={block.typewriterEraseSpeed}
+                                      delay={block.typewriterDelay}
+                                      loop={block.typewriterLoop}
+                                      useGradient={block.typewriterUseGradient}
+                                      gradientPreset={
+                                        block.textGradientPreset ??
+                                        block.typewriterGradientPreset
+                                      }
+                                      customStart={
+                                        block.textGradientCustomStart
+                                      }
+                                      customMiddle={
+                                        block.textGradientCustomMiddle
+                                      }
+                                      customEnd={block.textGradientCustomEnd}
+                                      customAngle={
+                                        block.textGradientCustomAngle
+                                      }
+                                      customStartOffset={
+                                        block.textGradientCustomStartOffset
+                                      }
+                                      customMiddleOffset={
+                                        block.textGradientCustomMiddleOffset
+                                      }
+                                      customEndOffset={
+                                        block.textGradientCustomEndOffset
+                                      }
+                                      typography={block.typography}
+                                      area="body"
+                                      preserveHeight={
+                                        block.typewriterPreserveHeight !== false
+                                      }
+                                      reservedLines={
+                                        block.typewriterReservedLines ?? 1
+                                      }
+                                      mobileReservedLines={
+                                        block.typewriterMobileReservedLines ?? 2
+                                      }
+                                    />
+                                  </DashboardTypog>
+                                ) : (
+                                  <InlineEditableText
+                                    as="p"
+                                    typography={block.typography}
+                                    value={block.body}
+                                    onChange={(body) =>
+                                      onUpdateBlock(
+                                        section.id,
+                                        columnKey,
+                                        blockKey,
+                                        { body },
+                                      )
+                                    }
+                                  />
+                                ))}
+                            </div>
+                            <div
+                              className={`shop-builder-buttons shop-builder-buttons--${block.buttonsLayout ?? "inline"}`}
+                              style={previewButtonsStyle(
+                                block.buttonsLayout,
+                                block.elementAlign,
+                                block.buttonGap,
+                              )}
+                            >
+                              {block.buttonLabel && (
+                                <DashboardTypog
+                                  as="span"
+                                  className="builder-preview-cta"
+                                  typography={block.typography}
+                                >
+                                  {block.buttonLabel}
+                                </DashboardTypog>
+                              )}
+                              {(block.buttons ?? []).map((btn, btnIdx) => (
+                                <DashboardTypog
+                                  key={btn.id ?? btnIdx}
+                                  as="span"
+                                  className={`builder-preview-cta builder-preview-cta--${btn.style ?? "primary"}`}
+                                  style={{ display: "inline-flex" }}
+                                  typography={block.typography}
+                                >
+                                  {btn.label || "Button"}
+                                </DashboardTypog>
+                              ))}
+                            </div>
+                          </div>
+                        ) : block.kind === "panel" ? (
+                          (() => {
+                            const panelTitleStyle = {
+                              color: "var(--builder-card-title-color, inherit)",
+                              fontSize:
+                                "var(--builder-card-title-size, inherit)",
+                              fontWeight:
+                                "var(--builder-card-title-weight, inherit)",
+                              textAlign:
+                                "var(--builder-card-title-align, inherit)" as React.CSSProperties["textAlign"],
+                              margin: "var(--builder-card-title-margin, 0)",
+                            } as React.CSSProperties;
+                            const panelMetaStyle = {
+                              color: "var(--builder-card-meta-color, inherit)",
+                              fontSize:
+                                "var(--builder-card-meta-size, inherit)",
+                              textTransform:
+                                "var(--builder-card-meta-transform, none)" as React.CSSProperties["textTransform"],
+                              marginTop: "var(--builder-card-meta-spacing, 0)",
+                            } as React.CSSProperties;
+                            const panelBodyStyle = {
+                              color:
+                                "var(--builder-card-content-color, inherit)",
+                              fontSize:
+                                "var(--builder-card-content-size, inherit)",
+                              lineHeight:
+                                "var(--builder-card-content-line-height, inherit)",
+                              maxWidth:
+                                "var(--builder-card-content-max-width, none)",
+                            } as React.CSSProperties;
 
-                          return (
-                            <div className="shop-builder-column-block shop-builder-column-block--image">
-                              <figure
-                                className="shop-builder-image-figure"
-                                style={{
-                                  textAlign: block.imageAlignment ?? "center",
-                                  maxWidth: block.imageMaxWidth ? `${block.imageMaxWidth}px` : undefined,
-                                  marginInline: "auto",
-                                }}
-                              >
-                                <div
-                                  className="shop-builder-image-media"
+                            return (
+                              <div className="shop-builder-column-block shop-builder-column-block--panel">
+                                {block.imageUrl && (
+                                  <div
+                                    className="shop-builder-panel-media"
+                                    style={{
+                                      backgroundImage: `url(${block.imageUrl})`,
+                                    }}
+                                  />
+                                )}
+                                <div>
+                                  {block.eyebrow && (
+                                    <InlineEditableText
+                                      as="span"
+                                      className="shop-builder-eyebrow shop-builder-panel-meta"
+                                      typography={block.typography}
+                                      style={panelMetaStyle}
+                                      value={block.eyebrow}
+                                      onChange={(eyebrow) =>
+                                        onUpdateBlock(
+                                          section.id,
+                                          columnKey,
+                                          blockKey,
+                                          { eyebrow },
+                                        )
+                                      }
+                                    />
+                                  )}
+                                  {block.title &&
+                                    (block.typewriterEnabled ? (
+                                      <DashboardTypog
+                                        as="h3"
+                                        typography={block.typography}
+                                        style={panelTitleStyle}
+                                      >
+                                        <TypewriterText
+                                          text={block.title}
+                                          speed={block.typewriterSpeed}
+                                          eraseSpeed={
+                                            block.typewriterEraseSpeed
+                                          }
+                                          delay={block.typewriterDelay}
+                                          loop={block.typewriterLoop}
+                                          useGradient={
+                                            block.typewriterUseGradient
+                                          }
+                                          gradientPreset={
+                                            block.textGradientPreset ??
+                                            block.typewriterGradientPreset
+                                          }
+                                          customStart={
+                                            block.textGradientCustomStart
+                                          }
+                                          customMiddle={
+                                            block.textGradientCustomMiddle
+                                          }
+                                          customEnd={
+                                            block.textGradientCustomEnd
+                                          }
+                                          customAngle={
+                                            block.textGradientCustomAngle
+                                          }
+                                          customStartOffset={
+                                            block.textGradientCustomStartOffset
+                                          }
+                                          customMiddleOffset={
+                                            block.textGradientCustomMiddleOffset
+                                          }
+                                          customEndOffset={
+                                            block.textGradientCustomEndOffset
+                                          }
+                                          typography={block.typography}
+                                          area="title"
+                                          preserveHeight={
+                                            block.typewriterPreserveHeight !==
+                                            false
+                                          }
+                                          reservedLines={
+                                            block.typewriterReservedLines ?? 1
+                                          }
+                                          mobileReservedLines={
+                                            block.typewriterMobileReservedLines ??
+                                            2
+                                          }
+                                        />
+                                      </DashboardTypog>
+                                    ) : (
+                                      <InlineEditableText
+                                        as="h3"
+                                        typography={block.typography}
+                                        style={panelTitleStyle}
+                                        value={block.title}
+                                        onChange={(title) =>
+                                          onUpdateBlock(
+                                            section.id,
+                                            columnKey,
+                                            blockKey,
+                                            { title },
+                                          )
+                                        }
+                                      />
+                                    ))}
+                                  {block.body &&
+                                    (block.typewriterEnabled && !block.title ? (
+                                      <DashboardTypog
+                                        as="p"
+                                        typography={block.typography}
+                                        style={panelBodyStyle}
+                                      >
+                                        <TypewriterText
+                                          text={block.body}
+                                          speed={block.typewriterSpeed}
+                                          eraseSpeed={
+                                            block.typewriterEraseSpeed
+                                          }
+                                          delay={block.typewriterDelay}
+                                          loop={block.typewriterLoop}
+                                          useGradient={
+                                            block.typewriterUseGradient
+                                          }
+                                          gradientPreset={
+                                            block.textGradientPreset ??
+                                            block.typewriterGradientPreset
+                                          }
+                                          customStart={
+                                            block.textGradientCustomStart
+                                          }
+                                          customMiddle={
+                                            block.textGradientCustomMiddle
+                                          }
+                                          customEnd={
+                                            block.textGradientCustomEnd
+                                          }
+                                          customAngle={
+                                            block.textGradientCustomAngle
+                                          }
+                                          customStartOffset={
+                                            block.textGradientCustomStartOffset
+                                          }
+                                          customMiddleOffset={
+                                            block.textGradientCustomMiddleOffset
+                                          }
+                                          customEndOffset={
+                                            block.textGradientCustomEndOffset
+                                          }
+                                          typography={block.typography}
+                                          area="body"
+                                          preserveHeight={
+                                            block.typewriterPreserveHeight !==
+                                            false
+                                          }
+                                          reservedLines={
+                                            block.typewriterReservedLines ?? 1
+                                          }
+                                          mobileReservedLines={
+                                            block.typewriterMobileReservedLines ??
+                                            2
+                                          }
+                                        />
+                                      </DashboardTypog>
+                                    ) : (
+                                      <InlineEditableText
+                                        as="p"
+                                        typography={block.typography}
+                                        style={panelBodyStyle}
+                                        value={block.body}
+                                        onChange={(body) =>
+                                          onUpdateBlock(
+                                            section.id,
+                                            columnKey,
+                                            blockKey,
+                                            { body },
+                                          )
+                                        }
+                                      />
+                                    ))}
+
+                                  <RenderDashboardChecklist
+                                    items={block.items}
+                                    iconName={block.listIcon}
+                                    colorScheme={block.listIconColorScheme}
+                                    typography={block.typography}
+                                  />
+
+                                  <div
+                                    className={`shop-builder-buttons shop-builder-buttons--${block.buttonsLayout ?? "inline"}`}
+                                    style={{
+                                      ...previewButtonsStyle(
+                                        block.buttonsLayout,
+                                        block.elementAlign,
+                                        block.buttonGap,
+                                      ),
+                                      justifyContent: `var(--builder-card-button-align, ${
+                                        block.elementAlign === "center"
+                                          ? "center"
+                                          : block.elementAlign === "right"
+                                            ? "flex-end"
+                                            : "flex-start"
+                                      })`,
+                                    }}
+                                  >
+                                    {block.buttonLabel && (
+                                      <DashboardTypog
+                                        as="span"
+                                        className="builder-preview-cta"
+                                        typography={block.typography}
+                                      >
+                                        {block.buttonLabel}
+                                      </DashboardTypog>
+                                    )}
+                                    {(block.buttons ?? []).map(
+                                      (btn, btnIdx) => (
+                                        <DashboardTypog
+                                          key={btn.id ?? btnIdx}
+                                          as="span"
+                                          className={`builder-preview-cta builder-preview-cta--${btn.style ?? "primary"}`}
+                                          style={{ display: "inline-flex" }}
+                                          typography={block.typography}
+                                        >
+                                          {btn.label || "Button"}
+                                        </DashboardTypog>
+                                      ),
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                            );
+                          })()
+                        ) : block.kind === "image" ? (
+                          (() => {
+                            const imageAspectRatio = getBuilderImageAspectRatio(
+                              block.imageRatio,
+                            );
+                            const imageObjectFit = getBuilderImageObjectFit(
+                              block.imageFit,
+                            );
+                            const imageRadius = `${block.imageBorderRadius ?? 12}px`;
+
+                            return (
+                              <div className="shop-builder-column-block shop-builder-column-block--image">
+                                <figure
+                                  className="shop-builder-image-figure"
                                   style={{
-                                    aspectRatio: imageAspectRatio,
-                                    borderRadius: imageRadius,
+                                    textAlign: block.imageAlignment ?? "center",
+                                    maxWidth: block.imageMaxWidth
+                                      ? `${block.imageMaxWidth}px`
+                                      : undefined,
+                                    marginInline: "auto",
                                   }}
                                 >
-                                  {block.imageUrl ? (
-                                    <Image
-                                      src={block.imageUrl}
-                                      alt={block.imageAlt ?? ""}
-                                      width={1200}
-                                      height={800}
-                                      style={{
-                                        width: "100%",
-                                        height: imageAspectRatio ? "100%" : "auto",
-                                        objectFit: imageObjectFit,
-                                      }}
-                                    />
-                                  ) : (
-                                    <div className="builder-mini-empty builder-mini-empty--image">
-                                      Choose an image in the inspector.
-                                    </div>
+                                  <div
+                                    className="shop-builder-image-media"
+                                    style={{
+                                      aspectRatio: imageAspectRatio,
+                                      borderRadius: imageRadius,
+                                    }}
+                                  >
+                                    {block.imageUrl ? (
+                                      <Image
+                                        src={block.imageUrl}
+                                        alt={block.imageAlt ?? ""}
+                                        width={1200}
+                                        height={800}
+                                        style={{
+                                          width: "100%",
+                                          height: imageAspectRatio
+                                            ? "100%"
+                                            : "auto",
+                                          objectFit: imageObjectFit,
+                                        }}
+                                      />
+                                    ) : (
+                                      <div className="builder-mini-empty builder-mini-empty--image">
+                                        Choose an image in the inspector.
+                                      </div>
+                                    )}
+                                  </div>
+                                  {block.imageCaption && (
+                                    <figcaption>
+                                      {block.imageCaption}
+                                    </figcaption>
                                   )}
-                                </div>
-                                {block.imageCaption && (
-                                  <figcaption>
-                                    {block.imageCaption}
-                                  </figcaption>
+                                </figure>
+                              </div>
+                            );
+                          })()
+                        ) : block.kind === "table" ? (
+                          <div className="shop-builder-column-block shop-builder-column-block--table">
+                            <div style={{ overflowX: "auto" }}>
+                              <table
+                                className={`builder-preview-table builder-preview-table--${block.tableStyle ?? "striped"}`}
+                                style={{
+                                  width: "100%",
+                                  borderCollapse: "collapse",
+                                  fontSize: "0.9em",
+                                }}
+                              >
+                                {(block.tableHeadings ?? []).length > 0 && (
+                                  <thead>
+                                    <tr>
+                                      {(block.tableHeadings ?? []).map(
+                                        (heading, hIdx) => (
+                                          <th key={hIdx}>{heading}</th>
+                                        ),
+                                      )}
+                                    </tr>
+                                  </thead>
                                 )}
-                              </figure>
+                                <tbody>
+                                  {(block.tableRows ?? []).map((row, rIdx) => (
+                                    <tr key={rIdx}>
+                                      {row.map((cell, cIdx) => (
+                                        <td key={cIdx}>{cell}</td>
+                                      ))}
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
                             </div>
-                          );
-                        })()
-                      ) : block.kind === "table" ? (
-                        <div className="shop-builder-column-block shop-builder-column-block--table">
-                          <div style={{ overflowX: "auto" }}>
-                            <table
-                              className={`builder-preview-table builder-preview-table--${block.tableStyle ?? "striped"}`}
-                              style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.9em" }}
-                            >
-                              {(block.tableHeadings ?? []).length > 0 && (
-                                <thead>
-                                  <tr>
-                                    {(block.tableHeadings ?? []).map((heading, hIdx) => (
-                                      <th key={hIdx}>{heading}</th>
-                                    ))}
-                                  </tr>
-                                </thead>
-                              )}
-                              <tbody>
-                                {(block.tableRows ?? []).map((row, rIdx) => (
-                                  <tr key={rIdx}>
-                                    {row.map((cell, cIdx) => (
-                                      <td key={cIdx}>{cell}</td>
-                                    ))}
-                                  </tr>
-                                ))}
-                              </tbody>
-                            </table>
                           </div>
-                        </div>
-                      ) : block.kind === "categoryFilters" ? (
-                        <div className="shop-builder-column-block shop-builder-column-block--category-filters">
-                          {previewCategoryTree.length > 0 ? (
-                            <CategoryBar
-                              categoryTree={previewCategoryTree}
-                              countsBySlug={previewCategoryCounts}
-                              hiddenCategorySlugs={block.hiddenCategorySlugs}
-                            />
-                          ) : (
-                            <div className="shop-builder-filter-pills">
-                              <span>Women</span>
-                              <span>Men</span>
-                              <span>Boots</span>
-                              <span>Accessories</span>
-                            </div>
-                          )}
-                        </div>
-                      ) : block.kind === "scrollPinnedDemo" ? (
-                        <div className="shop-builder-column-block shop-builder-column-block--scroll-pinned">
-                          <ScrollPinnedDemo block={block} isPreview={true} />
-                        </div>
-                      ) : block.kind === "slider" ? (
-                        <div className="shop-builder-column-block shop-builder-column-block--slider">
-                          {block.title && (
-                            <DashboardTypog as="h3" typography={block.typography}>
-                              {block.title}
-                            </DashboardTypog>
-                          )}
-                          {block.body && (
-                            <DashboardTypog as="p" typography={block.typography}>
-                              {block.body}
-                            </DashboardTypog>
-                          )}
-                          <CarouselBlock
-                            block={{
-                              __typename:
-                                "PageBuilderLayoutPageBuilderCarouselLayoutLayout",
-                              fieldGroupName: "ReactBuilderColumnSliderPreview",
-                            }}
-                            slides={(block.slides ?? []).map(
-                              (slide, slideIndex) => ({
-                                id:
-                                  slide.id ?? `${blockKey}-slide-${slideIndex}`,
-                                title: slide.title,
-                                subtitle: slide.subtitle,
-                                text: slide.text,
-                                badge: slide.badge,
-                                imageUrl: slide.imageUrl,
-                                imageAlt: slide.imageAlt,
-                                imagePadding: slide.imagePadding,
-                                buttonLabel: slide.buttonLabel,
-                                buttonUrl: slide.buttonUrl,
-                              }),
+                        ) : block.kind === "categoryFilters" ? (
+                          <div className="shop-builder-column-block shop-builder-column-block--category-filters">
+                            {previewCategoryTree.length > 0 ? (
+                              <CategoryBar
+                                categoryTree={previewCategoryTree}
+                                countsBySlug={previewCategoryCounts}
+                                hiddenCategorySlugs={block.hiddenCategorySlugs}
+                              />
+                            ) : (
+                              <div className="shop-builder-filter-pills">
+                                <span>Women</span>
+                                <span>Men</span>
+                                <span>Boots</span>
+                                <span>Accessories</span>
+                              </div>
                             )}
-                            settings={block.carouselSettings}
-                            className="builder-preview-carousel"
-                          />
-                        </div>
-                      ) : block.kind === "products" ? (
-                        <div className="shop-builder-column-block shop-builder-column-block--products">
-                          {block.title && (
-                            <DashboardTypog as="h3" typography={block.typography}>
-                              {block.title}
-                            </DashboardTypog>
-                          )}
-                          {previewProducts.length > 0 ? (
-                            (() => {
-                              const cardBorderRadiusStyle =
-                                block.borderRadius !== undefined
-                                  ? {
-                                      "--builder-card-radius": `${block.borderRadius}px`,
-                                      "--product-card-radius": `${block.borderRadius}px`,
-                                    }
-                                  : {};
-
-                              const cardBackgroundStyle =
-                                block.elementBackgroundMode === "custom" && block.elementBackground
-                                  ? { "--builder-card-bg": block.elementBackground }
-                                  : block.elementBackgroundMode === "transparent"
-                                    ? { "--builder-card-bg": "transparent" }
+                          </div>
+                        ) : block.kind === "scrollPinnedDemo" ? (
+                          <div className="shop-builder-column-block shop-builder-column-block--scroll-pinned">
+                            <ScrollPinnedDemo block={block} isPreview={true} />
+                          </div>
+                        ) : block.kind === "slider" ? (
+                          <div className="shop-builder-column-block shop-builder-column-block--slider">
+                            {block.title && (
+                              <DashboardTypog
+                                as="h3"
+                                typography={block.typography}
+                              >
+                                {block.title}
+                              </DashboardTypog>
+                            )}
+                            {block.body && (
+                              <DashboardTypog
+                                as="p"
+                                typography={block.typography}
+                              >
+                                {block.body}
+                              </DashboardTypog>
+                            )}
+                            <CarouselBlock
+                              block={{
+                                __typename:
+                                  "PageBuilderLayoutPageBuilderCarouselLayoutLayout",
+                                fieldGroupName:
+                                  "ReactBuilderColumnSliderPreview",
+                              }}
+                              slides={(block.slides ?? []).map(
+                                (slide, slideIndex) => ({
+                                  id:
+                                    slide.id ??
+                                    `${blockKey}-slide-${slideIndex}`,
+                                  title: slide.title,
+                                  subtitle: slide.subtitle,
+                                  text: slide.text,
+                                  badge: slide.badge,
+                                  imageUrl: slide.imageUrl,
+                                  imageAlt: slide.imageAlt,
+                                  imagePadding: slide.imagePadding,
+                                  buttonLabel: slide.buttonLabel,
+                                  buttonUrl: slide.buttonUrl,
+                                }),
+                              )}
+                              settings={block.carouselSettings}
+                              className="builder-preview-carousel"
+                            />
+                          </div>
+                        ) : block.kind === "products" ? (
+                          <div className="shop-builder-column-block shop-builder-column-block--products">
+                            {block.title && (
+                              <DashboardTypog
+                                as="h3"
+                                typography={block.typography}
+                              >
+                                {block.title}
+                              </DashboardTypog>
+                            )}
+                            {previewProducts.length > 0 ? (
+                              (() => {
+                                const cardBorderRadiusStyle =
+                                  block.borderRadius !== undefined
+                                    ? {
+                                        "--builder-card-radius": `${block.borderRadius}px`,
+                                        "--product-card-radius": `${block.borderRadius}px`,
+                                      }
                                     : {};
 
-                              const productStyleProps = {
-                                ...cardBorderRadiusStyle,
-                                ...cardBackgroundStyle,
-                                ...visualStyleToCss(
-                                  block.visualStyle as BuilderVisualStyle | undefined,
-                                ),
-                              } as React.CSSProperties;
-                              const productVisualClass = visualStyleClassName(
-                                block.visualStyle as BuilderVisualStyle | undefined,
-                              );
+                                const cardBackgroundStyle =
+                                  block.elementBackgroundMode === "custom" &&
+                                  block.elementBackground
+                                    ? {
+                                        "--builder-card-bg":
+                                          block.elementBackground,
+                                      }
+                                    : block.elementBackgroundMode ===
+                                        "transparent"
+                                      ? { "--builder-card-bg": "transparent" }
+                                      : {};
 
-                              return block.layoutVariant === "carousel" ? (
-                                <div className={productVisualClass} style={productStyleProps}>
-                                  <ProductCarousel
-                                    products={previewProducts.slice(
-                                      0,
-                                      block.gridLimit ?? 8,
-                                    )}
-                                    preset={block.cardPreset ?? "standard"}
-                                    cardStyle={block.cardStyle}
-                                    cardTheme={block.panelStyle}
-                                    gridImageFrame={block.gridImageFrame}
-                                    imagePadding={block.imagePadding}
-                                    imageFit={block.imageFit}
-                                    imageRatio={block.imageRatio}
-                                    borderRadius={block.borderRadius}
-                                    addToCartStyle={block.addToCartStyle}
-                                    addToCartSize={block.addToCartSize}
-                                    addToCartDisplay={block.addToCartDisplay}
-                                    addToCartVisibility={block.addToCartVisibility}
-                                    addToCartPosition={block.addToCartPosition}
-                                    typography={block.typography}
-                                    categoryTree={previewCategoryTree}
-                                  />
-                                </div>
-                              ) : (
-                                <div
-                                  className={`shop-builder-grid--margin-${
-                                    hasBuilderVisualSpacing(block.visualStyle?.margin)
-                                      ? "none"
-                                      : block.gridMargin && block.gridMargin !== "inherit"
-                                        ? block.gridMargin
-                                        : "none"
-                                  } shop-card-preset--${block.panelStyle ?? "default"} ${productVisualClass}`}
-                                  style={productStyleProps}
-                                >
-                                  <CategoryWithFilters
-                                    products={
-                                      (block.pagination?.enabled ?? false)
-                                        ? previewProducts
-                                        : previewProducts.slice(0, block.gridLimit ?? 4)
-                                    }
-                                    columns={block.columns}
-                                    filterPosition={block.filterPosition}
-                                    cardStyle={block.cardStyle}
-                                    cardPreset={block.cardPreset}
-                                    cardTheme={block.panelStyle}
-                                    pageSize={block.gridLimit}
-                                    gridGap={block.gridGap}
-                                    cardPadding={block.cardPadding}
-                                    imagePadding={block.imagePadding}
-                                    imageFit={block.imageFit}
-                                    imageRatio={block.imageRatio}
-                                    imageFrame={block.gridImageFrame}
-                                    borderRadius={block.borderRadius}
-                                    addToCartStyle={block.addToCartStyle}
-                                    addToCartSize={block.addToCartSize}
-                                    addToCartPosition={block.addToCartPosition}
-                                    addToCartVisibility={block.addToCartVisibility}
-                                    addToCartDisplay={block.addToCartDisplay}
-                                    hiddenCategorySlugs={block.hiddenCategorySlugs}
-                                    categoryTree={previewCategoryTree}
-                                    typography={block.typography}
-                                    pagination={block.pagination}
-                                  />
-                              </div>
-                              );
-                            })()
-                          ) : (
-                            <div
-                              className={`builder-preview-products shop-card-preset--${block.panelStyle ?? "default"}`}
-                            >
-                              {sampleProducts
-                                .slice(0, block.gridLimit ?? 4)
-                                .map((name) => (
-                                  <span
-                                    key={name}
-                                    className="product-card builder-preview-product-card"
+                                const productStyleProps = {
+                                  ...cardBorderRadiusStyle,
+                                  ...cardBackgroundStyle,
+                                  ...visualStyleToCss(
+                                    block.visualStyle as
+                                      BuilderVisualStyle | undefined,
+                                  ),
+                                } as React.CSSProperties;
+                                const productVisualClass = visualStyleClassName(
+                                  block.visualStyle as
+                                    BuilderVisualStyle | undefined,
+                                );
+
+                                return block.layoutVariant === "carousel" ? (
+                                  <div
+                                    className={productVisualClass}
+                                    style={productStyleProps}
                                   >
-                                    {name}
-                                  </span>
-                                ))}
-                            </div>
-                          )}
-                        </div>
-                      ) : block.kind === "grid" ? (
-                        (() => {
-                          const gridGapClass = gridSpacingClass(
-                            block.gridGap,
-                            ["none", "small", "medium", "large", "max"],
-                            "medium",
-                          );
-                          const gridGapCustom =
-                            gridGapClass === "custom" ? cssSpacingValue(block.gridGap) : null;
-                          const imagePaddingClass = gridSpacingClass(
-                            block.gridImagePadding,
-                            ["frameless", "none", "small", "medium", "max"],
-                            "frameless",
-                          );
-                          const imagePaddingCustom =
-                            imagePaddingClass === "custom"
-                              ? cssSpacingValue(block.gridImagePadding)
-                              : null;
-                          const contentPaddingClass = gridSpacingClass(
-                            block.gridContentPadding,
-                            ["none", "small", "medium", "large"],
-                            "medium",
-                          );
-                          const contentPaddingCustom =
-                            contentPaddingClass === "custom"
-                              ? cssSpacingValue(block.gridContentPadding)
-                              : null;
+                                    <ProductCarousel
+                                      products={previewProducts.slice(
+                                        0,
+                                        block.gridLimit ?? 8,
+                                      )}
+                                      preset={block.cardPreset ?? "standard"}
+                                      cardStyle={block.cardStyle}
+                                      cardTheme={block.panelStyle}
+                                      gridImageFrame={block.gridImageFrame}
+                                      imagePadding={block.imagePadding}
+                                      imageFit={block.imageFit}
+                                      imageRatio={block.imageRatio}
+                                      borderRadius={block.borderRadius}
+                                      addToCartStyle={block.addToCartStyle}
+                                      addToCartSize={block.addToCartSize}
+                                      addToCartDisplay={block.addToCartDisplay}
+                                      addToCartVisibility={
+                                        block.addToCartVisibility
+                                      }
+                                      addToCartPosition={
+                                        block.addToCartPosition
+                                      }
+                                      typography={block.typography}
+                                      categoryTree={previewCategoryTree}
+                                    />
+                                  </div>
+                                ) : (
+                                  <div
+                                    className={`shop-builder-grid--margin-${
+                                      hasBuilderVisualSpacing(
+                                        block.visualStyle?.margin,
+                                      )
+                                        ? "none"
+                                        : block.gridMargin &&
+                                            block.gridMargin !== "inherit"
+                                          ? block.gridMargin
+                                          : "none"
+                                    } shop-card-preset--${block.panelStyle ?? "default"} ${productVisualClass}`}
+                                    style={productStyleProps}
+                                  >
+                                    <CategoryWithFilters
+                                      products={
+                                        (block.pagination?.enabled ?? false)
+                                          ? previewProducts
+                                          : previewProducts.slice(
+                                              0,
+                                              block.gridLimit ?? 4,
+                                            )
+                                      }
+                                      columns={block.columns}
+                                      filterPosition={block.filterPosition}
+                                      cardStyle={block.cardStyle}
+                                      cardPreset={block.cardPreset}
+                                      cardTheme={block.panelStyle}
+                                      pageSize={block.gridLimit}
+                                      gridGap={block.gridGap}
+                                      cardPadding={block.cardPadding}
+                                      imagePadding={block.imagePadding}
+                                      imageFit={block.imageFit}
+                                      imageRatio={block.imageRatio}
+                                      imageFrame={block.gridImageFrame}
+                                      borderRadius={block.borderRadius}
+                                      addToCartStyle={block.addToCartStyle}
+                                      addToCartSize={block.addToCartSize}
+                                      addToCartPosition={
+                                        block.addToCartPosition
+                                      }
+                                      addToCartVisibility={
+                                        block.addToCartVisibility
+                                      }
+                                      addToCartDisplay={block.addToCartDisplay}
+                                      hiddenCategorySlugs={
+                                        block.hiddenCategorySlugs
+                                      }
+                                      categoryTree={previewCategoryTree}
+                                      typography={block.typography}
+                                      pagination={block.pagination}
+                                    />
+                                  </div>
+                                );
+                              })()
+                            ) : (
+                              <div
+                                className={`builder-preview-products shop-card-preset--${block.panelStyle ?? "default"}`}
+                              >
+                                {sampleProducts
+                                  .slice(0, block.gridLimit ?? 4)
+                                  .map((name) => (
+                                    <span
+                                      key={name}
+                                      className="product-card builder-preview-product-card"
+                                    >
+                                      {name}
+                                    </span>
+                                  ))}
+                              </div>
+                            )}
+                          </div>
+                        ) : block.kind === "grid" ? (
+                          (() => {
+                            const gridGapClass = gridSpacingClass(
+                              block.gridGap,
+                              ["none", "small", "medium", "large", "max"],
+                              "medium",
+                            );
+                            const gridGapCustom =
+                              gridGapClass === "custom"
+                                ? cssSpacingValue(block.gridGap)
+                                : null;
+                            const imagePaddingClass = gridSpacingClass(
+                              block.gridImagePadding,
+                              ["frameless", "none", "small", "medium", "max"],
+                              "frameless",
+                            );
+                            const imagePaddingCustom =
+                              imagePaddingClass === "custom"
+                                ? cssSpacingValue(block.gridImagePadding)
+                                : null;
+                            const contentPaddingClass = gridSpacingClass(
+                              block.gridContentPadding,
+                              ["none", "small", "medium", "large"],
+                              "medium",
+                            );
+                            const contentPaddingCustom =
+                              contentPaddingClass === "custom"
+                                ? cssSpacingValue(block.gridContentPadding)
+                                : null;
 
-                          return (
-                        <div className="shop-builder-column-block shop-builder-column-block--grid">
-                          <div
-                            className={`shop-builder-grid shop-builder-grid--gap-${gridGapClass} shop-builder-grid--margin-${hasBuilderVisualSpacing(block.visualStyle?.margin) || !block.gridMargin || block.gridMargin === "inherit" ? "none" : block.gridMargin} shop-card-preset--${block.panelStyle ?? "default"} ${visualStyleClassName(block.visualStyle as BuilderVisualStyle | undefined)}`}
-                            style={
-                              {
-                                "--shop-builder-grid-columns":
-                                  block.columns ?? 3,
-                                ...(gridGapCustom
-                                  ? { "--shop-builder-grid-gap": gridGapCustom }
-                                  : {}),
-                                ...visualStyleToCss(
-                                  block.visualStyle as BuilderVisualStyle | undefined,
-                                ),
-                              } as CSSProperties
-                            }
-                          >
-                            {(block.gridSource === "products"
-                              ? previewProducts.map((product) => ({
-                                  id: product.id,
-                                  imageUrl: product.image?.sourceUrl,
-                                  imageAlt:
-                                    product.image?.altText ?? product.name,
-                                  eyebrow: "Product",
-                                  title: product.name,
-                                  meta: product.price ?? "",
-                                  text: product.attributes?.nodes
-                                    ?.map(
-                                      (attribute) =>
-                                        attribute.label ?? attribute.name,
-                                    )
-                                    .join(", "),
-                                  buttonLabel: "View product",
-                                  buttonUrl: `/product/${product.slug}`,
-                                  buttonStyle: "primary" as const,
-                                  buttonAlign: "left" as const,
-                                }))
-                              : (block.gridItems ?? [])
-                            )
-                              .slice(
-                                0,
-                                Math.max(
-                                  1,
-                                  (block.columns ?? 3) * (block.gridRows ?? 1),
-                                ),
-                              )
-                              .map((item, itemIndex) => {
-                                const itemTypography =
-                                  ("typography" in item
-                                    ? item.typography
-                                    : undefined) ?? block.typography;
-                                const gridTitleStyle = {
-                                  color:
-                                    "var(--builder-card-title-color, inherit)",
-                                  fontSize:
-                                    "var(--builder-card-title-size, inherit)",
-                                  fontWeight:
-                                    "var(--builder-card-title-weight, inherit)",
-                                  textAlign:
-                                    "var(--builder-card-title-align, inherit)" as CSSProperties["textAlign"],
-                                  margin:
-                                    "var(--builder-card-title-margin, 0)",
-                                } as CSSProperties;
-
-                                return (
-                                <article
-                                  key={
-                                    item.id ?? `${blockKey}-grid-${itemIndex}`
-                                  }
-                                  draggable={block.gridSource !== "products"}
-                                  className={`shop-builder-grid-card is-image-${imagePaddingClass} is-content-${contentPaddingClass} is-frame-${
-                                    block.gridImageFrame ?? "none"
-                                  } ${
-                                    draggingItem?.blockKey === blockKey && draggingItem?.fromIndex === itemIndex
-                                      ? "is-dragging-grid"
-                                      : ""
-                                  } ${
-                                    draggingItem && dropHoverIndex === itemIndex && draggingItem.blockKey === blockKey
-                                      ? "is-drag-over-grid"
-                                      : ""
-                                  }`}
+                            return (
+                              <div className="shop-builder-column-block shop-builder-column-block--grid">
+                                <div
+                                  className={`shop-builder-grid shop-builder-grid--gap-${gridGapClass} shop-builder-grid--margin-${hasBuilderVisualSpacing(block.visualStyle?.margin) || !block.gridMargin || block.gridMargin === "inherit" ? "none" : block.gridMargin} shop-card-preset--${block.panelStyle ?? "default"} ${visualStyleClassName(block.visualStyle as BuilderVisualStyle | undefined)}`}
                                   style={
                                     {
-                                      ...(imagePaddingCustom
-                                        ? { "--shop-builder-grid-image-padding": imagePaddingCustom }
+                                      "--shop-builder-grid-columns":
+                                        block.columns ?? 3,
+                                      ...(gridGapCustom
+                                        ? {
+                                            "--shop-builder-grid-gap":
+                                              gridGapCustom,
+                                          }
                                         : {}),
-                                      ...(contentPaddingCustom
-                                        ? { "--shop-builder-grid-content-padding": contentPaddingCustom }
-                                        : {}),
+                                      ...visualStyleToCss(
+                                        block.visualStyle as
+                                          BuilderVisualStyle | undefined,
+                                      ),
                                     } as CSSProperties
                                   }
+                                >
+                                  {(block.gridSource === "products"
+                                    ? previewProducts.map((product) => ({
+                                        id: product.id,
+                                        imageUrl: product.image?.sourceUrl,
+                                        imageAlt:
+                                          product.image?.altText ??
+                                          product.name,
+                                        eyebrow: "Product",
+                                        title: product.name,
+                                        meta: product.price ?? "",
+                                        text: product.attributes?.nodes
+                                          ?.map(
+                                            (attribute) =>
+                                              attribute.label ?? attribute.name,
+                                          )
+                                          .join(", "),
+                                        buttonLabel: "View product",
+                                        buttonUrl: `/product/${product.slug}`,
+                                        buttonStyle: "primary" as const,
+                                        buttonAlign: "left" as const,
+                                      }))
+                                    : (block.gridItems ?? [])
+                                  )
+                                    .slice(
+                                      0,
+                                      Math.max(
+                                        1,
+                                        (block.columns ?? 3) *
+                                          (block.gridRows ?? 1),
+                                      ),
+                                    )
+                                    .map((item, itemIndex) => {
+                                      const itemTypography =
+                                        ("typography" in item
+                                          ? item.typography
+                                          : undefined) ?? block.typography;
+                                      const gridTitleStyle = {
+                                        color:
+                                          "var(--builder-card-title-color, inherit)",
+                                        fontSize:
+                                          "var(--builder-card-title-size, inherit)",
+                                        fontWeight:
+                                          "var(--builder-card-title-weight, inherit)",
+                                        textAlign:
+                                          "var(--builder-card-title-align, inherit)" as CSSProperties["textAlign"],
+                                        margin:
+                                          "var(--builder-card-title-margin, 0)",
+                                      } as CSSProperties;
+
+                                      return (
+                                        <article
+                                          key={
+                                            item.id ??
+                                            `${blockKey}-grid-${itemIndex}`
+                                          }
+                                          draggable={
+                                            block.gridSource !== "products"
+                                          }
+                                          className={`shop-builder-grid-card is-image-${imagePaddingClass} is-content-${contentPaddingClass} is-frame-${
+                                            block.gridImageFrame ?? "none"
+                                          } ${
+                                            draggingItem?.blockKey ===
+                                              blockKey &&
+                                            draggingItem?.fromIndex ===
+                                              itemIndex
+                                              ? "is-dragging-grid"
+                                              : ""
+                                          } ${
+                                            draggingItem &&
+                                            dropHoverIndex === itemIndex &&
+                                            draggingItem.blockKey === blockKey
+                                              ? "is-drag-over-grid"
+                                              : ""
+                                          }`}
+                                          style={
+                                            {
+                                              ...(imagePaddingCustom
+                                                ? {
+                                                    "--shop-builder-grid-image-padding":
+                                                      imagePaddingCustom,
+                                                  }
+                                                : {}),
+                                              ...(contentPaddingCustom
+                                                ? {
+                                                    "--shop-builder-grid-content-padding":
+                                                      contentPaddingCustom,
+                                                  }
+                                                : {}),
+                                            } as CSSProperties
+                                          }
+                                          onDragStart={(event) => {
+                                            if (block.gridSource === "products")
+                                              return;
+                                            event.stopPropagation();
+                                            event.dataTransfer.setData(
+                                              "text/plain",
+                                              `grid-item:${blockKey}:${itemIndex}`,
+                                            );
+                                            event.dataTransfer.effectAllowed =
+                                              "move";
+                                            setDraggingItem({
+                                              kind: "grid",
+                                              blockKey,
+                                              fromIndex: itemIndex,
+                                            });
+                                          }}
+                                          onDragOver={(event) => {
+                                            if (
+                                              !draggingItem ||
+                                              draggingItem.kind !== "grid" ||
+                                              draggingItem.blockKey !== blockKey
+                                            )
+                                              return;
+                                            if (
+                                              draggingItem.fromIndex ===
+                                              itemIndex
+                                            ) {
+                                              setDropHoverIndex(null);
+                                              return;
+                                            }
+                                            event.preventDefault();
+                                            event.dataTransfer.dropEffect =
+                                              "move";
+                                            if (dropHoverIndex !== itemIndex) {
+                                              setDropHoverIndex(itemIndex);
+                                            }
+                                          }}
+                                          onDragLeave={() => {
+                                            if (dropHoverIndex === itemIndex) {
+                                              setDropHoverIndex(null);
+                                            }
+                                          }}
+                                          onDrop={(event) => {
+                                            event.preventDefault();
+                                            event.stopPropagation();
+                                            setDropHoverIndex(null);
+                                            if (
+                                              !draggingItem ||
+                                              draggingItem.kind !== "grid" ||
+                                              draggingItem.blockKey !== blockKey
+                                            )
+                                              return;
+                                            if (
+                                              draggingItem.fromIndex ===
+                                              itemIndex
+                                            ) {
+                                              setDraggingItem(null);
+                                              return;
+                                            }
+                                            onMoveGridItem(
+                                              section.id,
+                                              columnKey,
+                                              blockKey,
+                                              draggingItem.fromIndex,
+                                              itemIndex,
+                                            );
+                                            setDraggingItem(null);
+                                          }}
+                                          onDragEnd={() => {
+                                            setDraggingItem(null);
+                                            setDropHoverIndex(null);
+                                          }}
+                                        >
+                                          {block.gridSource !== "products" && (
+                                            <>
+                                              <div className="builder-preview-grid-item-tools">
+                                                <button
+                                                  type="button"
+                                                  onMouseDown={(event) =>
+                                                    event.stopPropagation()
+                                                  }
+                                                  onClick={(event) => {
+                                                    event.stopPropagation();
+                                                    onDuplicateGridItem(
+                                                      section.id,
+                                                      columnKey,
+                                                      blockKey,
+                                                      itemIndex,
+                                                    );
+                                                  }}
+                                                  title="Duplicate item"
+                                                >
+                                                  <Copy size={12} />
+                                                </button>
+                                                <button
+                                                  type="button"
+                                                  onMouseDown={(event) =>
+                                                    event.stopPropagation()
+                                                  }
+                                                  onClick={(event) => {
+                                                    event.stopPropagation();
+                                                    onDeleteGridItem(
+                                                      section.id,
+                                                      columnKey,
+                                                      blockKey,
+                                                      itemIndex,
+                                                    );
+                                                  }}
+                                                  title="Delete item"
+                                                >
+                                                  <Trash2 size={12} />
+                                                </button>
+                                              </div>
+                                              <span
+                                                className="builder-preview-grid-drag-handle"
+                                                aria-hidden="true"
+                                              >
+                                                ::
+                                              </span>
+                                            </>
+                                          )}
+                                          {block.gridShowImage !== false && (
+                                            <div
+                                              className={`shop-builder-grid-image ${
+                                                item.imageUrl ? "" : "is-empty"
+                                              }`}
+                                            >
+                                              {item.imageUrl ? (
+                                                <Image
+                                                  src={item.imageUrl}
+                                                  alt={
+                                                    item.imageAlt ||
+                                                    item.title ||
+                                                    ""
+                                                  }
+                                                  width={420}
+                                                  height={420}
+                                                />
+                                              ) : block.gridSource !==
+                                                "products" ? (
+                                                <span>No image</span>
+                                              ) : null}
+                                              {block.gridSource !==
+                                                "products" && (
+                                                <button
+                                                  type="button"
+                                                  className="builder-preview-image-upload"
+                                                  onClick={(event) => {
+                                                    event.stopPropagation();
+                                                    onUploadGridItemImage(
+                                                      section.id,
+                                                      columnKey,
+                                                      blockKey,
+                                                      itemIndex,
+                                                      item.imageUrl,
+                                                    );
+                                                  }}
+                                                >
+                                                  <ImageIcon size={14} />
+                                                  <span>
+                                                    {item.imageUrl
+                                                      ? "Change image"
+                                                      : "Select image"}
+                                                  </span>
+                                                </button>
+                                              )}
+                                            </div>
+                                          )}
+                                          <div className="shop-builder-grid-content">
+                                            {block.gridSource !== "products" ? (
+                                              <>
+                                                {block.gridShowEyebrow !==
+                                                  false &&
+                                                  item.eyebrow && (
+                                                    <InlineEditableText
+                                                      as="span"
+                                                      className="shop-builder-eyebrow"
+                                                      typography={
+                                                        itemTypography
+                                                      }
+                                                      value={item.eyebrow}
+                                                      onChange={(eyebrow) =>
+                                                        onUpdateGridItem(
+                                                          section.id,
+                                                          columnKey,
+                                                          blockKey,
+                                                          itemIndex,
+                                                          {
+                                                            eyebrow,
+                                                          },
+                                                        )
+                                                      }
+                                                    />
+                                                  )}
+                                                {item.title && (
+                                                  <InlineEditableText
+                                                    as="h3"
+                                                    className="shop-builder-title"
+                                                    typography={itemTypography}
+                                                    style={gridTitleStyle}
+                                                    value={item.title}
+                                                    onChange={(title) =>
+                                                      onUpdateGridItem(
+                                                        section.id,
+                                                        columnKey,
+                                                        blockKey,
+                                                        itemIndex,
+                                                        {
+                                                          title,
+                                                        },
+                                                      )
+                                                    }
+                                                  />
+                                                )}
+                                                {block.gridShowMeta !== false &&
+                                                  item.meta && (
+                                                    <InlineEditableText
+                                                      as="span"
+                                                      className="shop-builder-grid-meta"
+                                                      typography={
+                                                        itemTypography
+                                                      }
+                                                      value={item.meta}
+                                                      onChange={(meta) =>
+                                                        onUpdateGridItem(
+                                                          section.id,
+                                                          columnKey,
+                                                          blockKey,
+                                                          itemIndex,
+                                                          {
+                                                            meta,
+                                                          },
+                                                        )
+                                                      }
+                                                    />
+                                                  )}
+                                                {block.gridShowText !== false &&
+                                                  item.text && (
+                                                    <InlineEditableText
+                                                      as="p"
+                                                      className="shop-builder-body"
+                                                      typography={
+                                                        itemTypography
+                                                      }
+                                                      value={item.text}
+                                                      onChange={(text) =>
+                                                        onUpdateGridItem(
+                                                          section.id,
+                                                          columnKey,
+                                                          blockKey,
+                                                          itemIndex,
+                                                          {
+                                                            text,
+                                                          },
+                                                        )
+                                                      }
+                                                    />
+                                                  )}
+
+                                                <RenderDashboardChecklist
+                                                  items={
+                                                    "items" in item
+                                                      ? item.items
+                                                      : undefined
+                                                  }
+                                                  iconName={
+                                                    "listIcon" in item
+                                                      ? item.listIcon
+                                                      : undefined
+                                                  }
+                                                  colorScheme={
+                                                    "listIconColorScheme" in
+                                                    item
+                                                      ? item.listIconColorScheme
+                                                      : undefined
+                                                  }
+                                                  typography={itemTypography}
+                                                />
+
+                                                {block.gridShowButton !==
+                                                  false &&
+                                                  item.buttonLabel && (
+                                                    <div
+                                                      className={`shop-builder-grid-button shop-builder-grid-button--${item.buttonAlign ?? "left"}`}
+                                                    >
+                                                      <InlineEditableText
+                                                        as="span"
+                                                        className={`builder-preview-cta builder-preview-cta--${item.buttonStyle ?? "primary"}`}
+                                                        typography={
+                                                          itemTypography
+                                                        }
+                                                        value={item.buttonLabel}
+                                                        onChange={(
+                                                          buttonLabel,
+                                                        ) =>
+                                                          onUpdateGridItem(
+                                                            section.id,
+                                                            columnKey,
+                                                            blockKey,
+                                                            itemIndex,
+                                                            {
+                                                              buttonLabel,
+                                                            },
+                                                          )
+                                                        }
+                                                      />
+                                                    </div>
+                                                  )}
+                                              </>
+                                            ) : (
+                                              <>
+                                                {block.gridShowEyebrow !==
+                                                  false &&
+                                                  item.eyebrow && (
+                                                    <span>{item.eyebrow}</span>
+                                                  )}
+                                                {item.title && (
+                                                  <h3 style={gridTitleStyle}>
+                                                    {item.title}
+                                                  </h3>
+                                                )}
+                                                {block.gridShowMeta !== false &&
+                                                  item.meta && (
+                                                    <small>{item.meta}</small>
+                                                  )}
+                                                {block.gridShowText !== false &&
+                                                  item.text && (
+                                                    <p>{item.text}</p>
+                                                  )}
+                                                {block.gridShowButton !==
+                                                  false &&
+                                                  item.buttonLabel && (
+                                                    <div
+                                                      className={`shop-builder-grid-button shop-builder-grid-button--${item.buttonAlign ?? "left"}`}
+                                                    >
+                                                      <span
+                                                        className={`builder-preview-cta builder-preview-cta--${item.buttonStyle ?? "primary"}`}
+                                                      >
+                                                        {item.buttonLabel}
+                                                      </span>
+                                                    </div>
+                                                  )}
+                                              </>
+                                            )}
+                                          </div>
+                                        </article>
+                                      );
+                                    })}
+                                </div>
+                              </div>
+                            );
+                          })()
+                        ) : block.kind === "badgeGrid" ? (
+                          <div className="shop-builder-column-block shop-builder-column-block--badges">
+                            {block.title && (
+                              <DashboardTypog
+                                as="h3"
+                                typography={block.typography}
+                              >
+                                {block.title}
+                              </DashboardTypog>
+                            )}
+                            {block.body && (
+                              <DashboardTypog
+                                as="p"
+                                typography={block.typography}
+                              >
+                                {block.body}
+                              </DashboardTypog>
+                            )}
+                            <div
+                              className="shop-builder-column-badges"
+                              style={
+                                {
+                                  "--builder-column-badge-columns":
+                                    block.columns ?? 2,
+                                } as CSSProperties
+                              }
+                            >
+                              {(block.badges ?? []).map((badge, badgeIndex) => (
+                                <article
+                                  key={
+                                    badge.id ??
+                                    `${blockKey}-badge-${badgeIndex}`
+                                  }
+                                  className={`shop-builder-badge-card ${draggingItem?.kind === "badge" && draggingItem?.fromIndex === badgeIndex && draggingItem?.blockKey === blockKey ? "is-dragging" : ""} ${draggingItem?.kind === "badge" && dropHoverIndex === badgeIndex ? "is-drag-over" : ""}`}
+                                  draggable
                                   onDragStart={(event) => {
-                                    if (block.gridSource === "products") return;
                                     event.stopPropagation();
                                     event.dataTransfer.setData(
                                       "text/plain",
-                                      `grid-item:${blockKey}:${itemIndex}`,
+                                      `badge:${blockKey}:${badgeIndex}`,
                                     );
                                     event.dataTransfer.effectAllowed = "move";
-                                    setDraggingItem({ kind: "grid", blockKey, fromIndex: itemIndex });
+                                    setDraggingItem({
+                                      kind: "badge",
+                                      blockKey,
+                                      fromIndex: badgeIndex,
+                                    });
                                   }}
                                   onDragOver={(event) => {
-                                    if (!draggingItem || draggingItem.kind !== "grid" || draggingItem.blockKey !== blockKey) return;
-                                    if (draggingItem.fromIndex === itemIndex) {
+                                    if (
+                                      !draggingItem ||
+                                      draggingItem.kind !== "badge" ||
+                                      draggingItem.blockKey !== blockKey
+                                    )
+                                      return;
+                                    if (draggingItem.fromIndex === badgeIndex) {
                                       setDropHoverIndex(null);
                                       return;
                                     }
                                     event.preventDefault();
                                     event.dataTransfer.dropEffect = "move";
-                                    if (dropHoverIndex !== itemIndex) {
-                                      setDropHoverIndex(itemIndex);
+                                    if (dropHoverIndex !== badgeIndex) {
+                                      setDropHoverIndex(badgeIndex);
                                     }
                                   }}
                                   onDragLeave={() => {
-                                    if (dropHoverIndex === itemIndex) {
+                                    if (dropHoverIndex === badgeIndex) {
                                       setDropHoverIndex(null);
                                     }
                                   }}
@@ -12277,17 +13810,22 @@ if (section.kind === "embed") {
                                     event.preventDefault();
                                     event.stopPropagation();
                                     setDropHoverIndex(null);
-                                    if (!draggingItem || draggingItem.kind !== "grid" || draggingItem.blockKey !== blockKey) return;
-                                    if (draggingItem.fromIndex === itemIndex) {
+                                    if (
+                                      !draggingItem ||
+                                      draggingItem.kind !== "badge" ||
+                                      draggingItem.blockKey !== blockKey
+                                    )
+                                      return;
+                                    if (draggingItem.fromIndex === badgeIndex) {
                                       setDraggingItem(null);
                                       return;
                                     }
-                                    onMoveGridItem(
+                                    onMoveBadge(
                                       section.id,
                                       columnKey,
                                       blockKey,
                                       draggingItem.fromIndex,
-                                      itemIndex,
+                                      badgeIndex,
                                     );
                                     setDraggingItem(null);
                                   }}
@@ -12296,473 +13834,186 @@ if (section.kind === "embed") {
                                     setDropHoverIndex(null);
                                   }}
                                 >
-                                  {block.gridSource !== "products" && (
-                                    <>
-                                      <div className="builder-preview-grid-item-tools">
-                                        <button
-                                          type="button"
-                                          onMouseDown={(event) => event.stopPropagation()}
-                                          onClick={(event) => {
-                                            event.stopPropagation();
-                                            onDuplicateGridItem(
-                                              section.id,
-                                              columnKey,
-                                              blockKey,
-                                              itemIndex,
-                                            );
-                                          }}
-                                          title="Duplicate item"
-                                        >
-                                          <Copy size={12} />
-                                        </button>
-                                        <button
-                                          type="button"
-                                          onMouseDown={(event) => event.stopPropagation()}
-                                          onClick={(event) => {
-                                            event.stopPropagation();
-                                            onDeleteGridItem(
-                                              section.id,
-                                              columnKey,
-                                              blockKey,
-                                              itemIndex,
-                                            );
-                                          }}
-                                          title="Delete item"
-                                        >
-                                          <Trash2 size={12} />
-                                        </button>
-                                      </div>
-                                      <span
-                                        className="builder-preview-grid-drag-handle"
-                                        aria-hidden="true"
-                                      >
-                                        ::
-                                      </span>
-                                    </>
-                                  )}
-                                  {block.gridShowImage !== false && (
-                                    <div
-                                      className={`shop-builder-grid-image ${
-                                        item.imageUrl ? "" : "is-empty"
-                                      }`}
+                                  <div className="builder-preview-badge-tools">
+                                    <button
+                                      type="button"
+                                      onMouseDown={(event) =>
+                                        event.stopPropagation()
+                                      }
+                                      onClick={(event) => {
+                                        event.stopPropagation();
+                                        onDuplicateBadge(
+                                          section.id,
+                                          columnKey,
+                                          blockKey,
+                                          badgeIndex,
+                                        );
+                                      }}
+                                      title="Duplicate badge"
                                     >
-                                      {item.imageUrl ? (
-                                        <Image
-                                          src={item.imageUrl}
-                                          alt={
-                                            item.imageAlt || item.title || ""
-                                          }
-                                          width={420}
-                                          height={420}
-                                        />
-                                      ) : block.gridSource !== "products" ? (
-                                        <span>No image</span>
-                                      ) : null}
-                                      {block.gridSource !== "products" && (
-                                        <button
-                                          type="button"
-                                          className="builder-preview-image-upload"
-                                          onClick={(event) => {
-                                            event.stopPropagation();
-                                            onUploadGridItemImage(
-                                              section.id,
-                                              columnKey,
-                                              blockKey,
-                                              itemIndex,
-                                              item.imageUrl,
-                                            );
-                                          }}
-                                        >
-                                          <ImageIcon size={14} />
-                                          <span>
-                                            {item.imageUrl
-                                              ? "Change image"
-                                              : "Select image"}
-                                          </span>
-                                        </button>
-                                      )}
-                                    </div>
-                                  )}
-                                  <div className="shop-builder-grid-content">
-                                    {block.gridSource !== "products" ? (
-                                      <>
-                                        {block.gridShowEyebrow !== false &&
-                                          item.eyebrow && (
-                                            <InlineEditableText
-                                              as="span"
-                                              className="shop-builder-eyebrow"
-                                              typography={itemTypography}
-                                              value={item.eyebrow}
-                                              onChange={(eyebrow) =>
-                                                onUpdateGridItem(
-                                                  section.id,
-                                                  columnKey,
-                                                  blockKey,
-                                                  itemIndex,
-                                                  {
-                                                    eyebrow,
-                                                  },
-                                                )
-                                              }
-                                            />
-                                          )}
-                                        {item.title && (
-                                          <InlineEditableText
-                                            as="h3"
-                                            className="shop-builder-title"
-                                            typography={itemTypography}
-                                            style={gridTitleStyle}
-                                            value={item.title}
-                                            onChange={(title) =>
-                                              onUpdateGridItem(
-                                                section.id,
-                                                columnKey,
-                                                blockKey,
-                                                itemIndex,
-                                                {
-                                                  title,
-                                                },
-                                              )
-                                            }
-                                          />
-                                        )}
-                                        {block.gridShowMeta !== false &&
-                                          item.meta && (
-                                            <InlineEditableText
-                                              as="span"
-                                              className="shop-builder-grid-meta"
-                                              typography={itemTypography}
-                                              value={item.meta}
-                                              onChange={(meta) =>
-                                                onUpdateGridItem(
-                                                  section.id,
-                                                  columnKey,
-                                                  blockKey,
-                                                  itemIndex,
-                                                  {
-                                                    meta,
-                                                  },
-                                                )
-                                              }
-                                            />
-                                          )}
-                                        {block.gridShowText !== false &&
-                                          item.text && (
-                                            <InlineEditableText
-                                              as="p"
-                                              className="shop-builder-body"
-                                              typography={itemTypography}
-                                              value={item.text}
-                                              onChange={(text) =>
-                                                onUpdateGridItem(
-                                                  section.id,
-                                                  columnKey,
-                                                  blockKey,
-                                                  itemIndex,
-                                                  {
-                                                    text,
-                                                  },
-                                                )
-                                              }
-                                            />
-                                          )}
-
-                                        <RenderDashboardChecklist
-                                          items={"items" in item ? item.items : undefined}
-                                          iconName={"listIcon" in item ? item.listIcon : undefined}
-                                          colorScheme={"listIconColorScheme" in item ? item.listIconColorScheme : undefined}
-                                          typography={itemTypography}
-                                        />
-
-                                        {block.gridShowButton !== false &&
-                                          item.buttonLabel && (
-                                            <div
-                                              className={`shop-builder-grid-button shop-builder-grid-button--${item.buttonAlign ?? "left"}`}
-                                            >
-                                              <InlineEditableText
-                                                as="span"
-                                                className={`builder-preview-cta builder-preview-cta--${item.buttonStyle ?? "primary"}`}
-                                                typography={itemTypography}
-                                                value={item.buttonLabel}
-                                                onChange={(buttonLabel) =>
-                                                  onUpdateGridItem(
-                                                    section.id,
-                                                    columnKey,
-                                                    blockKey,
-                                                    itemIndex,
-                                                    {
-                                                      buttonLabel,
-                                                    },
-                                                  )
-                                                }
-                                              />
-                                            </div>
-                                          )}
-                                      </>
-                                    ) : (
-                                      <>
-                                        {block.gridShowEyebrow !== false &&
-                                          item.eyebrow && (
-                                            <span>{item.eyebrow}</span>
-                                          )}
-                                        {item.title && (
-                                          <h3 style={gridTitleStyle}>
-                                            {item.title}
-                                          </h3>
-                                        )}
-                                        {block.gridShowMeta !== false &&
-                                          item.meta && (
-                                            <small>{item.meta}</small>
-                                          )}
-                                        {block.gridShowText !== false &&
-                                          item.text && <p>{item.text}</p>}
-                                        {block.gridShowButton !== false &&
-                                          item.buttonLabel && (
-                                            <div
-                                              className={`shop-builder-grid-button shop-builder-grid-button--${item.buttonAlign ?? "left"}`}
-                                            >
-                                              <span
-                                                className={`builder-preview-cta builder-preview-cta--${item.buttonStyle ?? "primary"}`}
-                                              >
-                                                {item.buttonLabel}
-                                              </span>
-                                            </div>
-                                          )}
-                                      </>
-                                    )}
+                                      <Copy size={12} />
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onMouseDown={(event) =>
+                                        event.stopPropagation()
+                                      }
+                                      onClick={(event) => {
+                                        event.stopPropagation();
+                                        onDeleteBadge(
+                                          section.id,
+                                          columnKey,
+                                          blockKey,
+                                          badgeIndex,
+                                        );
+                                      }}
+                                      title="Delete badge"
+                                    >
+                                      <Trash2 size={12} />
+                                    </button>
                                   </div>
+                                  <span
+                                    className="builder-preview-badge-drag-handle"
+                                    aria-hidden="true"
+                                  >
+                                    ::
+                                  </span>
+                                  {badge.label && (
+                                    <DashboardTypog
+                                      as="span"
+                                      typography={block.typography}
+                                    >
+                                      {badge.label}
+                                    </DashboardTypog>
+                                  )}
+                                  {badge.title && (
+                                    <DashboardTypog
+                                      as="strong"
+                                      typography={block.typography}
+                                    >
+                                      {badge.title}
+                                    </DashboardTypog>
+                                  )}
+                                  {badge.body && (
+                                    <DashboardTypog
+                                      as="p"
+                                      typography={block.typography}
+                                    >
+                                      {badge.body}
+                                    </DashboardTypog>
+                                  )}
                                 </article>
-                              );
-                              })}
+                              ))}
+                            </div>
                           </div>
-                        </div>
-                          );
-                        })()
-                      ) : block.kind === "badgeGrid" ? (
-                        <div className="shop-builder-column-block shop-builder-column-block--badges">
-                          {block.title && (
-                            <DashboardTypog as="h3" typography={block.typography}>
-                              {block.title}
-                            </DashboardTypog>
-                          )}
-                          {block.body && (
-                            <DashboardTypog as="p" typography={block.typography}>
-                              {block.body}
-                            </DashboardTypog>
-                          )}
-                          <div
-                            className="shop-builder-column-badges"
-                            style={
-                              {
-                                "--builder-column-badge-columns":
-                                  block.columns ?? 2,
-                              } as CSSProperties
-                            }
-                          >
-                            {(block.badges ?? []).map((badge, badgeIndex) => (
-                              <article
-                                key={
-                                  badge.id ?? `${blockKey}-badge-${badgeIndex}`
+                        ) : block.kind === "fluentForm" ? (
+                          <div className="shop-builder-column-block shop-builder-column-block--fluent-form builder-preview-fluent-form">
+                            <FluentFormClient
+                              formId={block.fluentFormId}
+                              title={block.title}
+                              previewMode
+                            />
+                          </div>
+                        ) : (
+                          <>
+                            <small>
+                              {layoutBlockLabels[block.kind ?? "text"]}
+                            </small>
+                            {block.eyebrow && (
+                              <InlineEditableText
+                                as="em"
+                                value={block.eyebrow}
+                                typography={block.typography}
+                                onChange={(eyebrow) =>
+                                  onUpdateBlock(
+                                    section.id,
+                                    columnKey,
+                                    blockKey,
+                                    {
+                                      eyebrow,
+                                    },
+                                  )
                                 }
-                                className={`shop-builder-badge-card ${draggingItem?.kind === "badge" && draggingItem?.fromIndex === badgeIndex && draggingItem?.blockKey === blockKey ? "is-dragging" : ""} ${draggingItem?.kind === "badge" && dropHoverIndex === badgeIndex ? "is-drag-over" : ""}`}
-                                draggable
-                                onDragStart={(event) => {
-                                  event.stopPropagation();
-                                  event.dataTransfer.setData("text/plain", `badge:${blockKey}:${badgeIndex}`);
-                                  event.dataTransfer.effectAllowed = "move";
-                                  setDraggingItem({ kind: "badge", blockKey, fromIndex: badgeIndex });
-                                }}
-                                onDragOver={(event) => {
-                                  if (!draggingItem || draggingItem.kind !== "badge" || draggingItem.blockKey !== blockKey) return;
-                                  if (draggingItem.fromIndex === badgeIndex) {
-                                    setDropHoverIndex(null);
-                                    return;
-                                  }
-                                  event.preventDefault();
-                                  event.dataTransfer.dropEffect = "move";
-                                  if (dropHoverIndex !== badgeIndex) {
-                                    setDropHoverIndex(badgeIndex);
-                                  }
-                                }}
-                                onDragLeave={() => {
-                                  if (dropHoverIndex === badgeIndex) {
-                                    setDropHoverIndex(null);
-                                  }
-                                }}
-                                onDrop={(event) => {
-                                  event.preventDefault();
-                                  event.stopPropagation();
-                                  setDropHoverIndex(null);
-                                  if (!draggingItem || draggingItem.kind !== "badge" || draggingItem.blockKey !== blockKey) return;
-                                  if (draggingItem.fromIndex === badgeIndex) {
-                                    setDraggingItem(null);
-                                    return;
-                                  }
-                                  onMoveBadge(section.id, columnKey, blockKey, draggingItem.fromIndex, badgeIndex);
-                                  setDraggingItem(null);
-                                }}
-                                onDragEnd={() => {
-                                  setDraggingItem(null);
-                                  setDropHoverIndex(null);
-                                }}
-                              >
-                                <div className="builder-preview-badge-tools">
-                                  <button
-                                    type="button"
-                                    onMouseDown={(event) => event.stopPropagation()}
-                                    onClick={(event) => {
-                                      event.stopPropagation();
-                                      onDuplicateBadge(
-                                        section.id,
-                                        columnKey,
-                                        blockKey,
-                                        badgeIndex,
-                                      );
-                                    }}
-                                    title="Duplicate badge"
-                                  >
-                                    <Copy size={12} />
-                                  </button>
-                                  <button
-                                    type="button"
-                                    onMouseDown={(event) => event.stopPropagation()}
-                                    onClick={(event) => {
-                                      event.stopPropagation();
-                                      onDeleteBadge(
-                                        section.id,
-                                        columnKey,
-                                        blockKey,
-                                        badgeIndex,
-                                      );
-                                    }}
-                                    title="Delete badge"
-                                  >
-                                    <Trash2 size={12} />
-                                  </button>
-                                </div>
-                                <span
-                                  className="builder-preview-badge-drag-handle"
-                                  aria-hidden="true"
-                                >
-                                  ::
-                                </span>
-                                {badge.label && (
-                                  <DashboardTypog
-                                    as="span"
-                                    typography={block.typography}
-                                  >
-                                    {badge.label}
-                                  </DashboardTypog>
-                                )}
-                                {badge.title && (
-                                  <DashboardTypog
-                                    as="strong"
-                                    typography={block.typography}
-                                  >
-                                    {badge.title}
-                                  </DashboardTypog>
-                                )}
-                                {badge.body && (
-                                  <DashboardTypog
-                                    as="p"
-                                    typography={block.typography}
-                                  >
-                                    {badge.body}
-                                  </DashboardTypog>
-                                )}
-                              </article>
-                            ))}
-                          </div>
-                        </div>
-                      ) : block.kind === "fluentForm" ? (
-                        <div className="shop-builder-column-block shop-builder-column-block--fluent-form builder-preview-fluent-form">
-                          <FluentFormClient
-                            formId={block.fluentFormId}
-                            title={block.title}
-                            previewMode
-                          />
-                        </div>
-                      ) : (
-                        <>
-                          <small>
-                            {layoutBlockLabels[block.kind ?? "text"]}
-                          </small>
-                          {block.eyebrow && (
-                            <InlineEditableText
-                              as="em"
-                              value={block.eyebrow}
-                              typography={block.typography}
-                              onChange={(eyebrow) =>
-                                onUpdateBlock(section.id, columnKey, blockKey, {
-                                  eyebrow,
-                                })
-                              }
-                            />
-                          )}
-                          {block.title && (
-                            <InlineEditableText
-                              as="strong"
-                              value={block.title}
-                              typography={block.typography}
-                              onChange={(title) =>
-                                onUpdateBlock(section.id, columnKey, blockKey, {
-                                  title,
-                                })
-                              }
-                            />
-                          )}
-                          {block.body && (
-                            <InlineEditableText
-                              as="p"
-                              value={block.body}
-                              typography={block.typography}
-                              onChange={(body) =>
-                                onUpdateBlock(section.id, columnKey, blockKey, {
-                                  body,
-                                })
-                              }
-                            />
-                          )}
-                          
-                          <RenderDashboardChecklist
-                            items={block.items}
-                            iconName={block.listIcon}
-                            colorScheme={block.listIconColorScheme}
-                            typography={block.typography}
-                          />
-
-                          {block.kind === "embed" && (
-                            <span>{block.embedMode ?? "code"} block</span>
-                          )}
-                          {block.kind === "breadcrumbs" && (
-                            <span>Dynamic navigation path</span>
-                          )}
-                          <div 
-                            className={`shop-builder-buttons shop-builder-buttons--${block.buttonsLayout ?? "inline"}`}
-                            style={previewButtonsStyle(block.buttonsLayout, block.elementAlign, block.buttonGap)}
-                          >
-                            {block.buttonLabel && (
-                              <span className="builder-preview-cta">
-                                {block.buttonLabel}
-                              </span>
+                              />
                             )}
-                            {(block.buttons ?? []).map((btn, btnIdx) => (
-                              <DashboardTypog
-                                key={btn.id ?? btnIdx}
-                                as="span"
-                                className={`builder-preview-cta builder-preview-cta--${btn.style ?? "primary"}`}
-                              style={{ display: "inline-flex" }}
-                              >
-                                {btn.label || "Button"}
-                              </DashboardTypog>
-                            ))}
-                          </div>
-                        </>
-                      )}
-                    </div>
-                  );
-                })}
-              </article>
+                            {block.title && (
+                              <InlineEditableText
+                                as="strong"
+                                value={block.title}
+                                typography={block.typography}
+                                onChange={(title) =>
+                                  onUpdateBlock(
+                                    section.id,
+                                    columnKey,
+                                    blockKey,
+                                    {
+                                      title,
+                                    },
+                                  )
+                                }
+                              />
+                            )}
+                            {block.body && (
+                              <InlineEditableText
+                                as="p"
+                                value={block.body}
+                                typography={block.typography}
+                                onChange={(body) =>
+                                  onUpdateBlock(
+                                    section.id,
+                                    columnKey,
+                                    blockKey,
+                                    {
+                                      body,
+                                    },
+                                  )
+                                }
+                              />
+                            )}
+
+                            <RenderDashboardChecklist
+                              items={block.items}
+                              iconName={block.listIcon}
+                              colorScheme={block.listIconColorScheme}
+                              typography={block.typography}
+                            />
+
+                            {block.kind === "embed" && (
+                              <span>{block.embedMode ?? "code"} block</span>
+                            )}
+                            {block.kind === "breadcrumbs" && (
+                              <span>Dynamic navigation path</span>
+                            )}
+                            <div
+                              className={`shop-builder-buttons shop-builder-buttons--${block.buttonsLayout ?? "inline"}`}
+                              style={previewButtonsStyle(
+                                block.buttonsLayout,
+                                block.elementAlign,
+                                block.buttonGap,
+                              )}
+                            >
+                              {block.buttonLabel && (
+                                <span className="builder-preview-cta">
+                                  {block.buttonLabel}
+                                </span>
+                              )}
+                              {(block.buttons ?? []).map((btn, btnIdx) => (
+                                <DashboardTypog
+                                  key={btn.id ?? btnIdx}
+                                  as="span"
+                                  className={`builder-preview-cta builder-preview-cta--${btn.style ?? "primary"}`}
+                                  style={{ display: "inline-flex" }}
+                                >
+                                  {btn.label || "Button"}
+                                </DashboardTypog>
+                              ))}
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    );
+                  })}
+                </article>
                 {rowMeta?.isRowEnd && (
                   <RowInsertControl
                     placement="after"
@@ -12799,7 +14050,9 @@ if (section.kind === "embed") {
             <p className="shop-builder-eyebrow">{section.eyebrow}</p>
           )}
           <h2 className="shop-builder-title">{section.title}</h2>
-          {section.body && <BodyText className="shop-builder-body">{section.body}</BodyText>}
+          {section.body && (
+            <BodyText className="shop-builder-body">{section.body}</BodyText>
+          )}
         </div>
         <div
           className="shop-builder-badges builder-preview-badges"
@@ -12817,12 +14070,24 @@ if (section.kind === "embed") {
               draggable
               onDragStart={(event) => {
                 event.stopPropagation();
-                event.dataTransfer.setData("text/plain", `sectionBadge:${section.id}:${index}`);
+                event.dataTransfer.setData(
+                  "text/plain",
+                  `sectionBadge:${section.id}:${index}`,
+                );
                 event.dataTransfer.effectAllowed = "move";
-                setDraggingItem({ kind: "sectionBadge", blockKey: section.id, fromIndex: index });
+                setDraggingItem({
+                  kind: "sectionBadge",
+                  blockKey: section.id,
+                  fromIndex: index,
+                });
               }}
               onDragOver={(event) => {
-                if (!draggingItem || draggingItem.kind !== "sectionBadge" || draggingItem.blockKey !== section.id) return;
+                if (
+                  !draggingItem ||
+                  draggingItem.kind !== "sectionBadge" ||
+                  draggingItem.blockKey !== section.id
+                )
+                  return;
                 if (draggingItem.fromIndex === index) {
                   setDropHoverIndex(null);
                   return;
@@ -12842,7 +14107,12 @@ if (section.kind === "embed") {
                 event.preventDefault();
                 event.stopPropagation();
                 setDropHoverIndex(null);
-                if (!draggingItem || draggingItem.kind !== "sectionBadge" || draggingItem.blockKey !== section.id) return;
+                if (
+                  !draggingItem ||
+                  draggingItem.kind !== "sectionBadge" ||
+                  draggingItem.blockKey !== section.id
+                )
+                  return;
                 if (draggingItem.fromIndex === index) {
                   setDraggingItem(null);
                   return;
@@ -12879,7 +14149,12 @@ if (section.kind === "embed") {
                   <Trash2 size={12} />
                 </button>
               </div>
-              <span className="builder-preview-section-badge-drag-handle" aria-hidden="true">⠿</span>
+              <span
+                className="builder-preview-section-badge-drag-handle"
+                aria-hidden="true"
+              >
+                ⠿
+              </span>
               {badge.label && <span>{badge.label}</span>}
               {badge.title && <h3>{badge.title}</h3>}
               <BodyText>{badge.body}</BodyText>
@@ -12902,7 +14177,9 @@ if (section.kind === "embed") {
           Promo
         </p>
         <h2 className="shop-builder-title">{section.title}</h2>
-        {section.body && <BodyText className="shop-builder-body">{section.body}</BodyText>}
+        {section.body && (
+          <BodyText className="shop-builder-body">{section.body}</BodyText>
+        )}
       </div>
       {section.ctaLabel && (
         <span className="shop-builder-cta shop-builder-cta--light">

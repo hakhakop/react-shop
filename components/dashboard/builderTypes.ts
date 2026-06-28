@@ -345,6 +345,9 @@ export type BuilderLayoutBlock = {
   typewriterLoop?: boolean;
   typewriterUseGradient?: boolean;
   typewriterGradientPreset?: string;
+  typewriterPreserveHeight?: boolean;
+  typewriterReservedLines?: number;
+  typewriterMobileReservedLines?: number;
   premiumButtonStyle?: "neon-glow" | "cyber-glitch" | "glassmorphic" | "default";
   premiumCardStyle?: "neon-border" | "glass-morph" | "cyber-grid" | "none";
   textGradientPreset?: "indigo-purple" | "cyan-blue" | "emerald-teal" | "sunset-orange" | "none" | "custom";
@@ -559,6 +562,9 @@ export type BuilderSection = {
   typewriterLoop?: boolean;
   typewriterUseGradient?: boolean;
   typewriterGradientPreset?: string;
+  typewriterPreserveHeight?: boolean;
+  typewriterReservedLines?: number;
+  typewriterMobileReservedLines?: number;
   premiumButtonStyle?: "neon-glow" | "cyber-glitch" | "glassmorphic" | "default";
   premiumCardStyle?: "neon-border" | "glass-morph" | "cyber-grid" | "none";
   textGradientPreset?: "indigo-purple" | "cyan-blue" | "emerald-teal" | "sunset-orange" | "none" | "custom";
