@@ -94,6 +94,7 @@ export default function FrontendAdminBar() {
   const pathname = usePathname();
   const [ready, setReady] = useState(false);
   const [visible, setVisible] = useState(false);
+  const [isSaasLoggedIn, setIsSaasLoggedIn] = useState(false);
   const [productEditHref, setProductEditHref] = useState<string | null>(null);
   const target = useMemo(
     () => dashboardTargetForPath(pathname ?? "/"),
@@ -104,6 +105,29 @@ export default function FrontendAdminBar() {
     window.queueMicrotask(() => {
       setReady(true);
     });
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function checkSaasSession() {
+      try {
+        const response = await fetch("/api/auth/me", { cache: "no-store" });
+        if (!cancelled) {
+          setIsSaasLoggedIn(response.ok);
+        }
+      } catch {
+        if (!cancelled) {
+          setIsSaasLoggedIn(false);
+        }
+      }
+    }
+
+    checkSaasSession();
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   useEffect(() => {
@@ -141,7 +165,7 @@ export default function FrontendAdminBar() {
     };
   }, [pathname]);
 
-  const shouldShow = ready && target && isLocalHost();
+  const shouldShow = ready && target && isLocalHost() && isSaasLoggedIn;
 
   if (!ready || pathname?.startsWith("/dashboard")) return null;
 

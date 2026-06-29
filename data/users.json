@@ -1,0 +1,11 @@
+[
+  {
+    "id": "a010b610-5c47-441c-b2ec-00a6e9eb3f88",
+    "email": "hakop28ol@yahoo.com",
+    "passwordHash": "$2b$12$L2FcYCmhPMwYXX2XhrAK7O88rF3kgmVBdEdsv46PWQ2yzh0oHn9l2",
+    "name": "Hakob Jaghatspanyan",
+    "role": "super_admin",
+    "createdAt": "2026-06-29T19:14:12.875Z",
+    "updatedAt": "2026-06-29T19:14:12.875Z"
+  }
+]

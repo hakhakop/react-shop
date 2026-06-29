@@ -5737,5 +5737,86 @@
       }
     ],
     "updatedAt": "2026-06-22T18:05:38.195Z"
+  },
+  "page:new": {
+    "version": 1,
+    "key": "page:new",
+    "page": "page:new",
+    "targetType": "page",
+    "design": {
+      "preset": "princity",
+      "colorScheme": "auto",
+      "pageBackground": "#f7f7f4",
+      "textColor": "#111111",
+      "mutedTextColor": "#5f5f58",
+      "accentColor": "#a4be7b",
+      "surfaceColor": "#efefe9",
+      "buttonBackground": "#111111",
+      "buttonTextColor": "#ffffff",
+      "radius": "8px",
+      "sectionMaxWidth": "1640px",
+      "sectionGutter": "48px",
+      "headingFontFamily": "inherit",
+      "headingSize": "clamp(42px, 8vw, 126px)",
+      "headingWeight": "760",
+      "headingLineHeight": "0.92",
+      "cardBg": "#efefe9",
+      "cardRadius": "8px",
+      "cardBorder": "transparent",
+      "cardShadow": "0 12px 30px rgba(17,17,17,0.06)",
+      "cardShadowHover": "0 18px 42px rgba(17,17,17,0.1)",
+      "cardImageBg": "#ffffff",
+      "cardImagePadding": "clamp(22px, 2.4vw, 36px)"
+    },
+    "sections": [
+      {
+        "id": "contentLayout-mqy29i3v-d2o70",
+        "kind": "contentLayout",
+        "title": "",
+        "background": "#111111",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "topSpacing": "inherit",
+        "bottomSpacing": "inherit",
+        "topMargin": "inherit",
+        "bottomMargin": "inherit",
+        "pullUnderHeader": false,
+        "visible": true,
+        "eyebrow": "",
+        "body": "",
+        "layout": "whole",
+        "layoutColumns": 1,
+        "layoutItems": [
+          {
+            "id": "layout-item-mqy29i3v-1",
+            "blocks": [
+              {
+                "id": "hero-block-mqy2keqk-oytu6",
+                "kind": "hero",
+                "eyebrow": "Featured",
+                "title": "Hero Element",
+                "body": "A strong visual opening with editable copy and action.",
+                "buttonLabel": "Learn more",
+                "buttonUrl": "/",
+                "carouselSettings": {
+                  "variant": "default"
+                },
+                "elementAlign": "center",
+                "typewriterEnabled": true,
+                "typography": {
+                  "title": {
+                    "fontSize": "88px"
+                  }
+                }
+              }
+            ]
+          }
+        ],
+        "layoutRows": 1,
+        "backgroundEffect": "flowfield"
+      }
+    ],
+    "updatedAt": "2026-06-28T17:35:46.239Z"
   }
 }

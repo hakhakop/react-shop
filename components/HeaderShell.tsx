@@ -13,6 +13,7 @@ import HeaderCategoriesDropdown from "./HeaderCategoriesDropdown";
 import CategoryMegaMenu from "./CategoryMegaMenu";
 import HeaderNav from "./HeaderNav";
 import HeaderFrame from "./HeaderFrame";
+import HeaderSaaSEntry from "./HeaderSaaSEntry";
 import HeaderPillController from "./HeaderPillController";
 import {
   getBuilderShellSettings,
@@ -226,6 +227,23 @@ export default async function HeaderShell({ layoutOverride }: HeaderShellProps) 
         { id: "home", label: "Home", url: "/", path: "/" },
         { id: "shop", label: "Shop", url: "/shop", path: "/shop" },
       ];
+  const filterSaaSItems = (items: MenuItem[]): MenuItem[] =>
+    items
+      .map((item) => ({
+        ...item,
+        children: item.children ? filterSaaSItems(item.children) : [],
+      }))
+      .filter((item) => {
+        const href = (item.path || item.url || "").toLowerCase();
+        const label = item.label.toLowerCase();
+        return (
+          !href.startsWith("/dashboard") &&
+          !href.startsWith("/app") &&
+          label !== "builder" &&
+          label !== "dashboard"
+        );
+      });
+  const publicItemsToRender = filterSaaSItems(itemsToRender);
 
   const menuPresentation = (
     (shellSettingsRaw || {}) as { menuPresentation?: BuilderMenuPresentationMap }
@@ -266,6 +284,7 @@ export default async function HeaderShell({ layoutOverride }: HeaderShellProps) 
           Start
         </Link>
       )}
+      <HeaderSaaSEntry />
       <HeaderActions
         icons={effectiveIconOrder}
         iconVariant={effectiveIconVariant}
@@ -336,7 +355,7 @@ export default async function HeaderShell({ layoutOverride }: HeaderShellProps) 
             <div className="site-header-row-bottom">
               <div className="site-header-row-bottom-inner">
                 <HeaderNav
-                  items={itemsToRender}
+                  items={publicItemsToRender}
                   presentationById={menuPresentation}
                   categories={<CategoryMegaMenu />}
                   serviceHomepageMode={serviceHomepageMode}
@@ -368,7 +387,7 @@ export default async function HeaderShell({ layoutOverride }: HeaderShellProps) 
 
                 <div className="site-header-main-center">
                   <HeaderNav
-                    items={itemsToRender}
+                    items={publicItemsToRender}
                     presentationById={menuPresentation}
                     categories={<CategoryMegaMenu />}
                     serviceHomepageMode={serviceHomepageMode}
@@ -407,8 +426,8 @@ export default async function HeaderShell({ layoutOverride }: HeaderShellProps) 
                 </div>
 
                 <div className="site-header-princity-center">
-                  <HeaderNav
-                    items={itemsToRender}
+                    <HeaderNav
+                    items={publicItemsToRender}
                     presentationById={menuPresentation}
                     categories={<CategoryMegaMenu />}
                     serviceHomepageMode={serviceHomepageMode}
@@ -435,7 +454,7 @@ export default async function HeaderShell({ layoutOverride }: HeaderShellProps) 
 
             <div className="site-header-main-center">
               <HeaderNav
-                items={itemsToRender}
+                items={publicItemsToRender}
                 presentationById={menuPresentation}
                 categories={<CategoryMegaMenu />}
                 serviceHomepageMode={serviceHomepageMode}
@@ -480,7 +499,7 @@ export default async function HeaderShell({ layoutOverride }: HeaderShellProps) 
 
             <div className="site-header-hero-menu">
               <HeaderNav
-                items={itemsToRender}
+                items={publicItemsToRender}
                 presentationById={menuPresentation}
                 categories={<CategoryMegaMenu />}
                 serviceHomepageMode={serviceHomepageMode}
