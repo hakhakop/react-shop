@@ -9,11 +9,15 @@ import {
   writeBuilderLayoutStore,
   type BuilderLayout,
 } from "@/lib/builderLayouts";
+import { getAuthorizedWebsiteBuilderScope } from "@/lib/websiteBuilderAccess";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function GET(request: NextRequest) {
+  const access = await getAuthorizedWebsiteBuilderScope(request);
+  if ("error" in access) return access.error;
+
   const page = normalizeBuilderLayoutKey(
     request.nextUrl.searchParams.get("key") ??
       request.nextUrl.searchParams.get("template") ??
@@ -21,11 +25,14 @@ export async function GET(request: NextRequest) {
   );
 
   return NextResponse.json({
-    layout: await getPublishedBuilderLayout(page),
+    layout: await getPublishedBuilderLayout(page, access.scope),
   });
 }
 
 export async function POST(request: NextRequest) {
+  const access = await getAuthorizedWebsiteBuilderScope(request);
+  if ("error" in access) return access.error;
+
   const body = (await request.json()) as {
     key?: string;
     page?: string;
@@ -46,7 +53,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const store = await readBuilderLayoutStore();
+  const store = await readBuilderLayoutStore(access.scope);
   const layout: BuilderLayout = {
     version: 1,
     key: page,
@@ -59,7 +66,7 @@ export async function POST(request: NextRequest) {
   };
 
   store[page] = layout;
-  await writeBuilderLayoutStore(store);
+  await writeBuilderLayoutStore(store, access.scope);
 
   return NextResponse.json({ layout });
 }

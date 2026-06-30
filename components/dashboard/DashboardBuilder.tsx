@@ -244,6 +244,26 @@ function RenderDashboardChecklist({
 const STORAGE_KEY = "react-shop-visual-builder-v1";
 const STORAGE_BY_KEY = "react-shop-visual-builder-drafts-v2";
 const STORAGE_CUSTOM_PAGES = "react-shop-visual-builder-pages-v1";
+type BuilderStorageKeys = {
+  state: string;
+  drafts: string;
+  pages: string;
+};
+
+const defaultBuilderStorageKeys: BuilderStorageKeys = {
+  state: STORAGE_KEY,
+  drafts: STORAGE_BY_KEY,
+  pages: STORAGE_CUSTOM_PAGES,
+};
+
+function getBuilderStorageKeys(websiteId?: string): BuilderStorageKeys {
+  if (!websiteId) return defaultBuilderStorageKeys;
+  return {
+    state: `${STORAGE_KEY}:${websiteId}`,
+    drafts: `${STORAGE_BY_KEY}:${websiteId}`,
+    pages: `${STORAGE_CUSTOM_PAGES}:${websiteId}`,
+  };
+}
 
 const defaultShellSettings: BuilderShellSettings = {
   headerVisible: true,
@@ -565,6 +585,17 @@ function getFrontendUrlForBuilderKey(
     return page ? `/${page.slug}` : "/";
   }
   return "/";
+}
+
+function getPreviewUrlForBuilderKey(
+  key: BuilderLayoutKey,
+  customPages: BuilderCustomPage[],
+  websiteId?: string,
+) {
+  if (!websiteId) return getFrontendUrlForBuilderKey(key, customPages);
+
+  const params = new URLSearchParams({ page: key });
+  return `/app/websites/${websiteId}/preview?${params.toString()}`;
 }
 
 const lightScheme = {
@@ -985,11 +1016,13 @@ function getDefaultStateForKey(key: BuilderLayoutKey): BuilderState {
   };
 }
 
-function loadInitialState(): BuilderState {
+function loadInitialState(
+  storageKeys: BuilderStorageKeys = defaultBuilderStorageKeys,
+): BuilderState {
   if (typeof window === "undefined") return defaultState;
 
   try {
-    const drafts = window.localStorage.getItem(STORAGE_BY_KEY);
+    const drafts = window.localStorage.getItem(storageKeys.drafts);
     if (drafts) {
       const parsedDrafts = JSON.parse(drafts) as Partial<
         Record<BuilderLayoutKey, BuilderState>
@@ -1000,7 +1033,7 @@ function loadInitialState(): BuilderState {
       }
     }
 
-    const stored = window.localStorage.getItem(STORAGE_KEY);
+    const stored = window.localStorage.getItem(storageKeys.state);
     if (!stored) return defaultState;
     const parsed = JSON.parse(stored) as BuilderState;
     if (!Array.isArray(parsed.sections)) return defaultState;
@@ -1178,11 +1211,14 @@ function createProductDynamicBlock(
   };
 }
 
-function loadDraftForKey(key: BuilderLayoutKey): BuilderState {
+function loadDraftForKey(
+  key: BuilderLayoutKey,
+  storageKeys: BuilderStorageKeys = defaultBuilderStorageKeys,
+): BuilderState {
   if (typeof window === "undefined") return getDefaultStateForKey(key);
 
   try {
-    const raw = window.localStorage.getItem(STORAGE_BY_KEY);
+    const raw = window.localStorage.getItem(storageKeys.drafts);
     if (!raw) return getDefaultStateForKey(key);
     const drafts = JSON.parse(raw) as Partial<
       Record<BuilderLayoutKey, BuilderState>
@@ -1251,19 +1287,55 @@ function getPreviewProductModel(previewProducts: ProductNode[]) {
 
 export type DashboardBuilderProps = {
   menuTree?: MenuItem[];
+  websiteId?: string;
 };
 
 export default function DashboardBuilder({
   menuTree = [],
+  websiteId,
 }: DashboardBuilderProps) {
   const router = useRouter();
   const { theme } = useTheme();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const storageKeys = useMemo(() => getBuilderStorageKeys(websiteId), [websiteId]);
+  const builderApiUrl = useCallback(
+    (path: string, params: Record<string, string | number | boolean> = {}) => {
+      const query = new URLSearchParams();
+      Object.entries(params).forEach(([key, value]) => {
+        query.set(key, String(value));
+      });
+      if (websiteId) {
+        query.set("websiteId", websiteId);
+      }
+      const queryString = query.toString();
+      const url = queryString ? `${path}?${queryString}` : path;
+      if (
+        path.includes("/api/builder-layouts") ||
+        path.includes("/api/builder-pages") ||
+        path.includes("/api/builder-shell")
+      ) {
+        console.log("[builder-scope] DashboardBuilder API URL", {
+          websiteId,
+          path,
+          url,
+        });
+      }
+      return url;
+    },
+    [websiteId],
+  );
   const [builderState, setBuilderState] = useState<BuilderState>(defaultState);
   const [dashboardTheme, setDashboardTheme] = useState<"light" | "dark">(
     "dark",
   );
+
+  useEffect(() => {
+    console.log("[builder-scope] DashboardBuilder websiteId prop", {
+      websiteId,
+      pathname,
+    });
+  }, [pathname, websiteId]);
 
   useEffect(() => {
     const saved = localStorage.getItem("builder-dashboard-theme");
@@ -1413,8 +1485,8 @@ export default function DashboardBuilder({
     [],
   );
   const currentFrontendUrl = useMemo(
-    () => getFrontendUrlForBuilderKey(builderState.page, customPages),
-    [builderState.page, customPages],
+    () => getPreviewUrlForBuilderKey(builderState.page, customPages, websiteId),
+    [builderState.page, customPages, websiteId],
   );
   const builderStateSignature = useMemo(
     () => JSON.stringify(builderState),
@@ -1473,10 +1545,10 @@ export default function DashboardBuilder({
   );
 
   useEffect(() => {
-    const draft = loadInitialState();
+    const draft = loadInitialState(storageKeys);
     let localPages: BuilderCustomPage[] = [];
     try {
-      const rawPages = window.localStorage.getItem(STORAGE_CUSTOM_PAGES);
+      const rawPages = window.localStorage.getItem(storageKeys.pages);
       localPages = rawPages
         ? (JSON.parse(rawPages) as BuilderCustomPage[]).filter((page) =>
             isBuilderCustomPageKey(page.key),
@@ -1489,7 +1561,7 @@ export default function DashboardBuilder({
     setBuilderState(draft);
     setSelectedId(draft.sections[0]?.id ?? "");
     setDraftReady(true);
-  }, []);
+  }, [storageKeys]);
 
   useEffect(() => {
     const scheme = builderState.design.colorScheme ?? "auto";
@@ -1673,7 +1745,7 @@ export default function DashboardBuilder({
 
     async function loadBuilderPages() {
       try {
-        const response = await fetch("/api/builder-pages", {
+        const response = await fetch(builderApiUrl("/api/builder-pages"), {
           cache: "no-store",
         });
         if (!response.ok) return;
@@ -1688,7 +1760,7 @@ export default function DashboardBuilder({
           setCustomPages(pages);
           setPublishedKeys(payload.publishedKeys ?? []);
           window.localStorage.setItem(
-            STORAGE_CUSTOM_PAGES,
+            storageKeys.pages,
             JSON.stringify(pages),
           );
         }
@@ -1702,7 +1774,7 @@ export default function DashboardBuilder({
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [builderApiUrl, storageKeys.pages]);
 
   useEffect(() => {
     let cancelled = false;
@@ -1799,7 +1871,7 @@ export default function DashboardBuilder({
 
     if (!nextKey || nextKey === builderState.page) return;
 
-    const nextState = loadDraftForKey(nextKey);
+    const nextState = loadDraftForKey(nextKey, storageKeys);
     setBuilderState(nextState);
     setSelectedId(nextState.sections[0]?.id ?? "");
     setSelectedLayoutColumnKey(null);
@@ -1807,7 +1879,7 @@ export default function DashboardBuilder({
     setOpenLayoutItemId(null);
     setOpenSlideId(null);
     setPublishStatus("Loaded from menu selection");
-  }, [builderState.page, draftReady, searchParams]);
+  }, [builderState.page, draftReady, searchParams, storageKeys]);
 
   useEffect(() => {
     if (!menuTree.length) {
@@ -1826,7 +1898,7 @@ export default function DashboardBuilder({
 
     async function loadShellSettings() {
       try {
-        const response = await fetch("/api/builder-shell", {
+        const response = await fetch(builderApiUrl("/api/builder-shell"), {
           cache: "no-store",
         });
         if (!response.ok) return;
@@ -1849,14 +1921,14 @@ export default function DashboardBuilder({
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [builderApiUrl]);
 
   useEffect(() => {
     if (!draftReady) return;
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(builderState));
+    window.localStorage.setItem(storageKeys.state, JSON.stringify(builderState));
     let drafts: Partial<Record<BuilderLayoutKey, BuilderState>> = {};
     try {
-      const rawDrafts = window.localStorage.getItem(STORAGE_BY_KEY);
+      const rawDrafts = window.localStorage.getItem(storageKeys.drafts);
       drafts = rawDrafts
         ? (JSON.parse(rawDrafts) as Partial<
             Record<BuilderLayoutKey, BuilderState>
@@ -1866,8 +1938,8 @@ export default function DashboardBuilder({
       drafts = {};
     }
     drafts[builderState.page] = builderState;
-    window.localStorage.setItem(STORAGE_BY_KEY, JSON.stringify(drafts));
-  }, [builderState, draftReady]);
+    window.localStorage.setItem(storageKeys.drafts, JSON.stringify(drafts));
+  }, [builderState, draftReady, storageKeys]);
 
   useEffect(() => {
     if (!draftReady) return;
@@ -4159,12 +4231,11 @@ export default function DashboardBuilder({
 
   const loadPublishedLayout = useCallback(async () => {
     setPublishStatus("Reading published layout...");
-    const response = await fetch(
-      `/api/builder-layouts?key=${builderState.page}`,
-      {
-        cache: "no-store",
-      },
-    );
+    const response = await fetch(builderApiUrl("/api/builder-layouts", {
+      key: builderState.page,
+    }), {
+      cache: "no-store",
+    });
 
     if (!response.ok) {
       setPublishStatus("Could not read published layout");
@@ -4210,7 +4281,12 @@ export default function DashboardBuilder({
     setBuilderState(nextPublishedState);
     setSelectedId(nextPublishedState.sections[0]?.id ?? "");
     setPublishStatus("Published layout loaded");
-  }, [builderState.page, builderState.targetType, builderState.template]);
+  }, [
+    builderApiUrl,
+    builderState.page,
+    builderState.targetType,
+    builderState.template,
+  ]);
 
   useEffect(() => {
     if (!draftReady) return;
@@ -4220,7 +4296,7 @@ export default function DashboardBuilder({
   const publishLayout = async () => {
     setPublishStatus("Publishing layout...");
     setPublishCelebration(false);
-    const response = await fetch("/api/builder-layouts", {
+    const response = await fetch(builderApiUrl("/api/builder-layouts"), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -4252,7 +4328,7 @@ export default function DashboardBuilder({
     nextSettings: BuilderShellSettings,
     status = "Global settings saved",
   ) => {
-    const response = await fetch("/api/builder-shell", {
+    const response = await fetch(builderApiUrl("/api/builder-shell"), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -4402,7 +4478,7 @@ export default function DashboardBuilder({
     const title = newPageTitle.trim() || "New Page";
     setPageStatus("Creating page...");
 
-    const response = await fetch("/api/builder-pages", {
+    const response = await fetch(builderApiUrl("/api/builder-pages"), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -4433,7 +4509,7 @@ export default function DashboardBuilder({
     ];
     setCustomPages(nextPages);
     window.localStorage.setItem(
-      STORAGE_CUSTOM_PAGES,
+      storageKeys.pages,
       JSON.stringify(nextPages),
     );
     setNewPageTitle("");
@@ -4452,7 +4528,7 @@ export default function DashboardBuilder({
   const deleteBuilderPage = async (key: BuilderCustomPageKey) => {
     setPageStatus("Deleting page...");
     const response = await fetch(
-      `/api/builder-pages?key=${encodeURIComponent(key)}`,
+      builderApiUrl("/api/builder-pages", { key }),
       {
         method: "DELETE",
       },
@@ -4467,19 +4543,19 @@ export default function DashboardBuilder({
     setCustomPages(nextPages);
     setPublishedKeys((current) => current.filter((k) => k !== key));
     window.localStorage.setItem(
-      STORAGE_CUSTOM_PAGES,
+      storageKeys.pages,
       JSON.stringify(nextPages),
     );
 
     try {
-      const rawDrafts = window.localStorage.getItem(STORAGE_BY_KEY);
+      const rawDrafts = window.localStorage.getItem(storageKeys.drafts);
       const drafts = rawDrafts
         ? (JSON.parse(rawDrafts) as Partial<
             Record<BuilderLayoutKey, BuilderState>
           >)
         : {};
       delete drafts[key];
-      window.localStorage.setItem(STORAGE_BY_KEY, JSON.stringify(drafts));
+      window.localStorage.setItem(storageKeys.drafts, JSON.stringify(drafts));
     } catch {
       // Keeping a stale local draft is harmless if cleanup fails.
     }
@@ -4494,11 +4570,11 @@ export default function DashboardBuilder({
   const handleReorderCustomPages = async (nextPages: BuilderCustomPage[]) => {
     setCustomPages(nextPages);
     window.localStorage.setItem(
-      STORAGE_CUSTOM_PAGES,
+      storageKeys.pages,
       JSON.stringify(nextPages),
     );
     try {
-      await fetch("/api/builder-pages", {
+      await fetch(builderApiUrl("/api/builder-pages"), {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

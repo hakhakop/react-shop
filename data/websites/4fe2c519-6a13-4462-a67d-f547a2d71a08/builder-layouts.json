@@ -96,7 +96,7 @@
               {
                 "id": "hero-block-mqxvovas-174fd",
                 "kind": "hero",
-                "eyebrow": "Բարի գալուստ webpages Note1",
+                "eyebrow": "Բարի գալուստ webpages Note",
                 "title": "[Ընտրեք փաթեթը |տրամադրեք տեղեկությունը| ձեր կայքը պատրաստ է]",
                 "body": "Կայք, հոսթինգ և սպասարկում՝ մեկ պարզ փաթեթով",
                 "buttonLabel": "Բաժանորդագրվել",
@@ -1368,7 +1368,7 @@
         ]
       }
     ],
-    "updatedAt": "2026-06-30T07:05:40.569Z"
+    "updatedAt": "2026-06-30T07:04:08.121Z"
   },
   "shop": {
     "version": 1,
@@ -1401,6 +1401,45 @@
       "cardImagePadding": "clamp(22px, 2.4vw, 36px)"
     },
     "sections": [
+      {
+        "id": "contentLayout-mr0ca0yy-757ol",
+        "kind": "contentLayout",
+        "title": "",
+        "background": "#ffffff",
+        "backgroundMode": "boxed",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "topSpacing": "inherit",
+        "bottomSpacing": "inherit",
+        "topMargin": "inherit",
+        "bottomMargin": "inherit",
+        "pullUnderHeader": false,
+        "visible": true,
+        "eyebrow": "",
+        "body": "",
+        "layout": "whole",
+        "layoutColumns": 1,
+        "layoutItems": [
+          {
+            "id": "layout-item-mr0ca0yy-1",
+            "blocks": [
+              {
+                "id": "hero-block-mr0caiu0-mchje",
+                "kind": "hero",
+                "eyebrow": "Featured",
+                "title": "jaghats",
+                "body": "A strong visual opening with editable copy and action.",
+                "buttonLabel": "Learn more",
+                "buttonUrl": "/",
+                "carouselSettings": {
+                  "variant": "default"
+                }
+              }
+            ]
+          }
+        ],
+        "layoutRows": 1
+      },
       {
         "id": "contentLayout-mqcpe2nr-yz507",
         "kind": "contentLayout",
@@ -1514,7 +1553,7 @@
         "layoutRows": 1
       }
     ],
-    "updatedAt": "2026-06-22T19:15:32.721Z"
+    "updatedAt": "2026-06-30T07:43:07.922Z"
   },
   "client": {
     "version": 1,

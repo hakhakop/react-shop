@@ -1,0 +1,50 @@
+[
+  {
+    "key": "page:fashion-store",
+    "title": "Fashion Store",
+    "slug": "fashion-store",
+    "updatedAt": "2026-05-23T22:48:30.543Z"
+  },
+  {
+    "key": "page:furniture-store",
+    "title": "Furniture Store",
+    "slug": "furniture-store",
+    "updatedAt": "2026-05-23T21:38:58.696Z"
+  },
+  {
+    "key": "page:demos",
+    "title": "Demos",
+    "slug": "demos",
+    "updatedAt": "2026-05-24T05:26:31.182Z"
+  },
+  {
+    "key": "page:builder",
+    "title": "Builder",
+    "slug": "builder",
+    "updatedAt": "2026-06-13T12:23:20.441Z"
+  },
+  {
+    "key": "page:new-home",
+    "title": "New Home",
+    "slug": "new-home",
+    "updatedAt": "2026-06-17T17:18:42.422Z"
+  },
+  {
+    "key": "page:demo-2",
+    "title": "Demo 2",
+    "slug": "demo-2",
+    "updatedAt": "2026-06-21T06:12:43.357Z"
+  },
+  {
+    "key": "page:notebookmall-recreation",
+    "title": "Notebookmall recreation",
+    "slug": "notebookmall-recreation",
+    "updatedAt": "2026-06-21T18:12:54.908Z"
+  },
+  {
+    "key": "page:new",
+    "title": "new",
+    "slug": "new",
+    "updatedAt": "2026-06-28T17:22:52.861Z"
+  }
+]

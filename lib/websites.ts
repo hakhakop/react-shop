@@ -1,6 +1,8 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import crypto from "node:crypto";
 import path from "node:path";
+import { isSaaSAdmin, type PublicSaaSUser } from "@/lib/auth";
+import { ensureWebsiteBuilderData } from "@/lib/websiteBuilderData";
 
 export type WebsiteStatus = "creating" | "active" | "suspended";
 
@@ -100,6 +102,19 @@ export async function getWebsitesForOwner(ownerId: string) {
   return websites.filter((website) => website.ownerId === ownerId);
 }
 
+export async function getWebsiteById(id: string) {
+  const websites = await readWebsites();
+  return websites.find((website) => website.id === id) ?? null;
+}
+
+export function canAccessWebsiteBuilder(
+  user: PublicSaaSUser | null | undefined,
+  website: SaaSWebsite | null | undefined,
+) {
+  if (!user || !website) return false;
+  return website.ownerId === user.id || isSaaSAdmin(user);
+}
+
 export async function createWebsite(input: {
   ownerId: string;
   name: string;
@@ -125,6 +140,7 @@ export async function createWebsite(input: {
   };
 
   await writeWebsites([...websites, website]);
+  await ensureWebsiteBuilderData(website.id);
   return { website };
 }
 

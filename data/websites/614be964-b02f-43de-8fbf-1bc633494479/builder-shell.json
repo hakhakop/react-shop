@@ -1,0 +1,165 @@
+{
+  "headerVisible": true,
+  "topToolbarVisible": false,
+  "topToolbarText": "Fast support & setup by Webpages",
+  "topToolbarPhone": "+374 xx xx xx",
+  "topToolbarMeta": "AMD ֏",
+  "headerBackgroundMode": "none",
+  "headerTextMode": "auto",
+  "headerLayout": "princity",
+  "headerBrandMode": "logo",
+  "headerBrandText": "WebPages",
+  "headerLogoUrl": "https://cms.webpages.am/wp-content/uploads/2025/11/logo-2-small.png",
+  "headerLogoAlt": "WebPages logo",
+  "headerLogoMaxWidth": 161,
+  "headerIconVariant": "muted",
+  "headerIconOrder": [
+    "wishlist",
+    "cart",
+    "account",
+    "theme",
+    "search"
+  ],
+  "headerActiveIndicator": "princity",
+  "sectionPaddingTop": "lg",
+  "sectionPaddingBottom": "lg",
+  "sectionMarginTop": "lg",
+  "sectionMarginBottom": "lg",
+  "rowPaddingTop": "md",
+  "rowPaddingBottom": "md",
+  "rowMarginTop": "md",
+  "rowMarginBottom": "md",
+  "rowGap": "sm",
+  "elementPaddingTop": "xs",
+  "elementPaddingRight": "xs",
+  "elementPaddingBottom": "xs",
+  "elementPaddingLeft": "xs",
+  "elementMarginTop": "xs",
+  "elementMarginRight": "xs",
+  "elementMarginBottom": "xs",
+  "elementMarginLeft": "xs",
+  "menuPresentation": {
+    "cG9zdDo1MzQ2": {
+      "showHeading": false,
+      "icon": "home",
+      "submenuLayout": "list",
+      "submenuColumns": 3,
+      "badgeText": null
+    },
+    "cG9zdDo4MQ==": {
+      "showHeading": false,
+      "icon": null,
+      "submenuLayout": "list",
+      "submenuColumns": 3,
+      "badgeText": null
+    },
+    "cG9zdDo3OQ==": {
+      "showHeading": false,
+      "icon": null,
+      "submenuLayout": "list",
+      "submenuColumns": 3,
+      "badgeText": null
+    },
+    "cG9zdDo3Nw==": {
+      "showHeading": false,
+      "icon": null,
+      "submenuLayout": "grid",
+      "submenuColumns": 3,
+      "badgeText": null
+    },
+    "cG9zdDo1NTA3": {
+      "showHeading": false,
+      "icon": null,
+      "submenuLayout": "list",
+      "submenuColumns": 3,
+      "badgeText": null
+    }
+  },
+  "storefrontPreset": "princity",
+  "primaryColor": "#111111",
+  "accentColor": "#940a0a",
+  "productCardRadius": "10px",
+  "productCardBg": "#ffffff",
+  "productCardShadow": "0 0 0 rgba(15, 23, 42, 0)",
+  "productCardShadowHover": "0 18px 40px rgba(15, 23, 42, 0.14)",
+  "productCardMinHeight": "0px",
+  "productCardMaxWidth": "100%",
+  "productImageWidth": "100%",
+  "productImageHeight": "260px",
+  "productImageMaxWidth": "100%",
+  "productImageMaxHeight": "100%",
+  "productImageAspectRatio": "auto",
+  "productImageNoPadding": false,
+  "productImagePadding": "clamp(22px, 2.4vw, 36px)",
+  "productImageObjectFit": "contain",
+  "buttonBg": "",
+  "buttonTextColor": "",
+  "buttonBorderRadius": "6px",
+  "buttonBorderWidth": "0px",
+  "buttonBorderColor": "transparent",
+  "buttonPaddingY": "12px",
+  "buttonPaddingX": "18px",
+  "buttonFontWeight": "760",
+  "buttonLetterSpacing": "0px",
+  "buttonHoverBg": "",
+  "buttonHoverTextColor": "",
+  "buttonHoverBorderColor": "transparent",
+  "buttonHoverEffect": "none",
+  "menuItems": [
+    {
+      "id": "home",
+      "label": "Գլխավոր",
+      "url": "/",
+      "parentId": null
+    },
+    {
+      "id": "menu_sbyhyzc43",
+      "label": "Օրինակներ",
+      "url": "/demos",
+      "parentId": null
+    },
+    {
+      "id": "menu_c8gxt1zuo",
+      "label": "Cart",
+      "url": "/cart",
+      "parentId": "menu_sbyhyzc43"
+    },
+    {
+      "id": "menu_xrvt3q0ps",
+      "label": "My Account",
+      "url": "/my-account",
+      "parentId": "menu_sbyhyzc43"
+    },
+    {
+      "id": "menu_s2il6v58h",
+      "label": "Builder",
+      "url": "/builder",
+      "parentId": "menu_sbyhyzc43"
+    },
+    {
+      "id": "menu_6hb0ecunh",
+      "label": "Վճարում",
+      "url": "/checkout",
+      "parentId": "menu_sbyhyzc43"
+    },
+    {
+      "id": "menu_07porwk43",
+      "label": "Fashion Store",
+      "url": "/fashion-store",
+      "parentId": "menu_sbyhyzc43"
+    },
+    {
+      "id": "menu_3fwu3xn75",
+      "label": "Furniture Store",
+      "url": "/furniture-store",
+      "parentId": "menu_sbyhyzc43"
+    },
+    {
+      "id": "shop",
+      "label": "Խանութ",
+      "url": "/shop",
+      "parentId": null
+    }
+  ],
+  "updatedAt": "2026-06-28T16:18:19.572Z"
+}

@@ -21,72 +21,13 @@ function isLocalHost() {
   );
 }
 
-function labelFromSlug(slug: string) {
-  return slug
-    .split("-")
-    .filter(Boolean)
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(" ");
-}
-
 function dashboardTargetForPath(pathname: string) {
   if (pathname.startsWith("/dashboard")) return null;
-  if (pathname === "/") {
-    return {
-      href: "/dashboard?page=home",
-      label: "Edit Home",
-      context: "Page",
-    };
-  }
-  if (pathname === "/shop") {
-    return {
-      href: "/dashboard?page=shop",
-      label: "Edit Shop",
-      context: "Page",
-    };
-  }
-  if (pathname === "/client") {
-    return {
-      href: "/dashboard?page=client",
-      label: "Edit Client",
-      context: "Page",
-    };
-  }
-  if (pathname.startsWith("/product/")) {
-    return {
-      href: "/dashboard?page=product-single",
-      label: "Edit Product Template",
-      context: "Template",
-    };
-  }
-  if (pathname.startsWith("/category/")) {
-    return {
-      href: "/dashboard?page=product-category",
-      label: "Edit Category Template",
-      context: "Template",
-    };
-  }
-  if (pathname.startsWith("/search")) {
-    return {
-      href: "/dashboard?page=search-results",
-      label: "Edit Search Template",
-      context: "Template",
-    };
-  }
-
-  const slug = pathname.replace(/^\/+|\/+$/g, "");
-  if (!slug || slug.includes("/")) {
-    return {
-      href: "/dashboard",
-      label: "Open Builder",
-      context: "Dashboard",
-    };
-  }
 
   return {
-    href: `/dashboard?page=page:${slug}`,
-    label: `Edit ${labelFromSlug(slug)}`,
-    context: "Builder Page",
+    href: "/app/websites",
+    label: "Open Website Builder",
+    context: "Websites",
   };
 }
 
@@ -201,9 +142,9 @@ export default function FrontendAdminBar() {
           Edit Product
         </a>
       ) : null}
-      <Link href="/dashboard">
+      <Link href="/app/websites">
         <Gauge size={15} />
-        Dashboard
+        Websites
       </Link>
       <a href="https://cms.webpages.am/wp-admin/" target="_blank" rel="noreferrer">
         <ExternalLink size={15} />

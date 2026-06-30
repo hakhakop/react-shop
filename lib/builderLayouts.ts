@@ -1,5 +1,9 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
+import {
+  getBuilderLayoutStorePath,
+  getBuilderPagesPath,
+} from "@/lib/websiteBuilderData";
 
 export type BuilderCustomPageKey = `page:${string}`;
 export type BuilderPage = "home" | "shop" | "client" | BuilderCustomPageKey;
@@ -441,6 +445,9 @@ const DATA_DIR = path.join(process.cwd(), "data");
 const DATA_FILE = path.join(DATA_DIR, "builder-layouts.json");
 const PAGES_FILE = path.join(DATA_DIR, "builder-pages.json");
 const TEMPLATES_FILE = path.join(DATA_DIR, "builder-templates.json");
+type BuilderDataScope = {
+  websiteId?: string;
+};
 const pages = new Set(["home", "shop", "client"]);
 const templates = new Set([
   "product-single",
@@ -482,9 +489,18 @@ export function isBuilderTemplate(
   return templates.has(key);
 }
 
-export async function readBuilderLayoutStore(): Promise<BuilderLayoutStore> {
+export async function readBuilderLayoutStore(
+  scope: BuilderDataScope = {},
+): Promise<BuilderLayoutStore> {
   try {
-    const raw = await readFile(DATA_FILE, "utf8");
+    const filePath = scope.websiteId
+      ? getBuilderLayoutStorePath(scope.websiteId)
+      : DATA_FILE;
+    console.log("[builder-scope] read builder-layouts", {
+      websiteId: scope.websiteId ?? null,
+      filePath,
+    });
+    const raw = await readFile(filePath, "utf8");
     const parsed = JSON.parse(raw) as BuilderLayoutStore;
     return parsed && typeof parsed === "object" ? parsed : {};
   } catch {
@@ -494,19 +510,39 @@ export async function readBuilderLayoutStore(): Promise<BuilderLayoutStore> {
 
 export async function getPublishedBuilderLayout(
   page: BuilderLayoutKey,
+  scope: BuilderDataScope = {},
 ): Promise<BuilderLayout | null> {
-  const store = await readBuilderLayoutStore();
+  const store = await readBuilderLayoutStore(scope);
   return store[page] ?? null;
 }
 
-export async function writeBuilderLayoutStore(store: BuilderLayoutStore) {
-  await mkdir(DATA_DIR, { recursive: true });
-  await writeFile(DATA_FILE, `${JSON.stringify(store, null, 2)}\n`, "utf8");
+export async function writeBuilderLayoutStore(
+  store: BuilderLayoutStore,
+  scope: BuilderDataScope = {},
+) {
+  const filePath = scope.websiteId
+    ? getBuilderLayoutStorePath(scope.websiteId)
+    : DATA_FILE;
+  console.log("[builder-scope] write builder-layouts", {
+    websiteId: scope.websiteId ?? null,
+    filePath,
+  });
+  await mkdir(path.dirname(filePath), { recursive: true });
+  await writeFile(filePath, `${JSON.stringify(store, null, 2)}\n`, "utf8");
 }
 
-export async function readBuilderCustomPages(): Promise<BuilderCustomPage[]> {
+export async function readBuilderCustomPages(
+  scope: BuilderDataScope = {},
+): Promise<BuilderCustomPage[]> {
   try {
-    const raw = await readFile(PAGES_FILE, "utf8");
+    const filePath = scope.websiteId
+      ? getBuilderPagesPath(scope.websiteId)
+      : PAGES_FILE;
+    console.log("[builder-scope] read builder-pages", {
+      websiteId: scope.websiteId ?? null,
+      filePath,
+    });
+    const raw = await readFile(filePath, "utf8");
     const parsed = JSON.parse(raw) as BuilderCustomPage[];
     if (!Array.isArray(parsed)) return [];
     return parsed.filter(
@@ -522,10 +558,18 @@ export async function readBuilderCustomPages(): Promise<BuilderCustomPage[]> {
 
 export async function writeBuilderCustomPages(
   pagesToWrite: BuilderCustomPage[],
+  scope: BuilderDataScope = {},
 ) {
-  await mkdir(DATA_DIR, { recursive: true });
+  const filePath = scope.websiteId
+    ? getBuilderPagesPath(scope.websiteId)
+    : PAGES_FILE;
+  console.log("[builder-scope] write builder-pages", {
+    websiteId: scope.websiteId ?? null,
+    filePath,
+  });
+  await mkdir(path.dirname(filePath), { recursive: true });
   await writeFile(
-    PAGES_FILE,
+    filePath,
     `${JSON.stringify(pagesToWrite, null, 2)}\n`,
     "utf8",
   );

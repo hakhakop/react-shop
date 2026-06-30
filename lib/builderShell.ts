@@ -1,5 +1,6 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
+import { getBuilderShellPath } from "@/lib/websiteBuilderData";
 
 export type BuilderHeaderLayout =
   | "wordpress"
@@ -110,6 +111,9 @@ export type BuilderSectionSpacing = string;
 
 const DATA_DIR = path.join(process.cwd(), "data");
 const DATA_FILE = path.join(DATA_DIR, "builder-shell.json");
+type BuilderShellScope = {
+  websiteId?: string;
+};
 
 export const defaultBuilderShellSettings: BuilderShellSettings = {
   headerVisible: true,
@@ -570,19 +574,38 @@ function normalizeObjectFit(value: unknown, fallback: string): string {
   return fallback;
 }
 
-export async function getBuilderShellSettings(): Promise<BuilderShellSettings> {
+export async function getBuilderShellSettings(
+  scope: BuilderShellScope = {},
+): Promise<BuilderShellSettings> {
   try {
-    const raw = await readFile(DATA_FILE, "utf8");
+    const filePath = scope.websiteId
+      ? getBuilderShellPath(scope.websiteId)
+      : DATA_FILE;
+    console.log("[builder-scope] read builder-shell", {
+      websiteId: scope.websiteId ?? null,
+      filePath,
+    });
+    const raw = await readFile(filePath, "utf8");
     return normalizeBuilderShellSettings(JSON.parse(raw));
   } catch {
     return defaultBuilderShellSettings;
   }
 }
 
-export async function writeBuilderShellSettings(settings: BuilderShellSettings) {
-  await mkdir(DATA_DIR, { recursive: true });
+export async function writeBuilderShellSettings(
+  settings: BuilderShellSettings,
+  scope: BuilderShellScope = {},
+) {
+  const filePath = scope.websiteId
+    ? getBuilderShellPath(scope.websiteId)
+    : DATA_FILE;
+  console.log("[builder-scope] write builder-shell", {
+    websiteId: scope.websiteId ?? null,
+    filePath,
+  });
+  await mkdir(path.dirname(filePath), { recursive: true });
   await writeFile(
-    DATA_FILE,
+    filePath,
     `${JSON.stringify(
       {
         ...normalizeBuilderShellSettings(settings),

@@ -1,4 +1,5 @@
 import { cookies } from "next/headers";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import AccessDenied from "@/components/saas/AccessDenied";
 import SaaSShell from "@/components/saas/SaaSShell";
@@ -35,6 +36,7 @@ export default async function AdminWebsitesPage() {
               <span>Owner</span>
               <span>Status</span>
               <span>Created</span>
+              <span>Action</span>
             </div>
             {websites.map((website) => {
               const owner = usersById.get(website.ownerId);
@@ -48,6 +50,9 @@ export default async function AdminWebsitesPage() {
                   <span>{owner?.email ?? "Unknown owner"}</span>
                   <span>{website.status}</span>
                   <span>{new Date(website.createdAt).toLocaleDateString()}</span>
+                  <Link href={`/app/websites/${website.id}/builder`}>
+                    Builder
+                  </Link>
                 </div>
               );
             })}

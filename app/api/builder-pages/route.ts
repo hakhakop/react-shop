@@ -7,6 +7,7 @@ import {
   type BuilderCustomPage,
   type BuilderCustomPageKey,
 } from "@/lib/builderLayouts";
+import { getAuthorizedWebsiteBuilderScope } from "@/lib/websiteBuilderAccess";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -46,22 +47,28 @@ function uniqueSlug(baseSlug: string, pages: BuilderCustomPage[]) {
   return slug;
 }
 
-export async function GET() {
-  const store = await readBuilderLayoutStore();
+export async function GET(request: NextRequest) {
+  const access = await getAuthorizedWebsiteBuilderScope(request);
+  if ("error" in access) return access.error;
+
+  const store = await readBuilderLayoutStore(access.scope);
   const publishedKeys = Object.keys(store);
   return NextResponse.json({
-    pages: await readBuilderCustomPages(),
+    pages: await readBuilderCustomPages(access.scope),
     publishedKeys,
   });
 }
 
 export async function POST(request: NextRequest) {
+  const access = await getAuthorizedWebsiteBuilderScope(request);
+  if ("error" in access) return access.error;
+
   const body = (await request.json()) as {
     title?: string;
     slug?: string;
   };
   const title = body.title?.trim() || "New Page";
-  const existingPages = await readBuilderCustomPages();
+  const existingPages = await readBuilderCustomPages(access.scope);
   const slug = uniqueSlug(slugify(body.slug || title), existingPages);
   const page: BuilderCustomPage = {
     key: `page:${slug}` as BuilderCustomPageKey,
@@ -70,27 +77,33 @@ export async function POST(request: NextRequest) {
     updatedAt: new Date().toISOString(),
   };
 
-  await writeBuilderCustomPages([...existingPages, page]);
+  await writeBuilderCustomPages([...existingPages, page], access.scope);
 
   return NextResponse.json({ page }, { status: 201 });
 }
 
 export async function DELETE(request: NextRequest) {
+  const access = await getAuthorizedWebsiteBuilderScope(request);
+  if ("error" in access) return access.error;
+
   const key = request.nextUrl.searchParams.get("key");
 
   if (!isBuilderCustomPageKey(key)) {
     return NextResponse.json({ error: "Invalid page key." }, { status: 400 });
   }
 
-  const pages = await readBuilderCustomPages();
+  const pages = await readBuilderCustomPages(access.scope);
   const nextPages = pages.filter((page) => page.key !== key);
-  await writeBuilderCustomPages(nextPages);
+  await writeBuilderCustomPages(nextPages, access.scope);
 
   return NextResponse.json({ pages: nextPages });
 }
 
 export async function PUT(request: NextRequest) {
   try {
+    const access = await getAuthorizedWebsiteBuilderScope(request);
+    if ("error" in access) return access.error;
+
     const body = (await request.json()) as {
       pages?: BuilderCustomPage[];
     };
@@ -99,7 +112,7 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: "Invalid pages data." }, { status: 400 });
     }
 
-    await writeBuilderCustomPages(body.pages);
+    await writeBuilderCustomPages(body.pages, access.scope);
     return NextResponse.json({ pages: body.pages });
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 });

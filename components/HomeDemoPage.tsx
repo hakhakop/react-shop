@@ -346,7 +346,7 @@ export async function HomeDemoPage() {
                 <Link href="/shop">See the shop</Link>
               </Button>
               <Button asChild size="lg" variant="outline">
-                <Link href="/dashboard">Open the builder</Link>
+                <Link href="/app/websites">Open the builder</Link>
               </Button>
             </div>
           </div>

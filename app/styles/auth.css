@@ -378,7 +378,8 @@
   padding-top: 6px;
 }
 
-.saas-website-actions button {
+.saas-website-actions button,
+.saas-website-actions a {
   min-height: 36px;
   border: 1px solid var(--border-soft, #d7dde8);
   border-radius: 999px;
@@ -388,8 +389,23 @@
   font-size: 13px;
   font-weight: 800;
   padding: 0 12px;
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+.saas-website-actions button {
   cursor: not-allowed;
   opacity: 0.82;
+}
+
+.saas-website-actions a {
+  cursor: pointer;
+}
+
+.saas-website-actions a:hover {
+  border-color: rgba(17, 24, 39, 0.22);
+  background: #ffffff;
 }
 
 .saas-website-form {
@@ -414,7 +430,7 @@
 }
 
 .saas-users-row--websites {
-  grid-template-columns: 1.3fr 1.5fr 0.8fr 0.8fr;
+  grid-template-columns: 1.3fr 1.5fr 0.8fr 0.8fr 0.7fr;
 }
 
 .saas-users-row.is-heading {

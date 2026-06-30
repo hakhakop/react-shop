@@ -7,5 +7,14 @@
     "role": "super_admin",
     "createdAt": "2026-06-29T19:14:12.875Z",
     "updatedAt": "2026-06-29T19:14:12.875Z"
+  },
+  {
+    "id": "9782eff3-23e8-4dea-934b-1c6ceae4cd04",
+    "email": "jaghatspanyan35@gmail.com",
+    "passwordHash": "$2b$12$NzC4ymdpkBJDIQiycEmeW.YeOc8Y.9wgzHTq4Uh0CtMrJ7m2BN.NO",
+    "name": "Notebookmall",
+    "role": "user",
+    "createdAt": "2026-06-30T07:05:03.122Z",
+    "updatedAt": "2026-06-30T07:05:03.122Z"
   }
 ]

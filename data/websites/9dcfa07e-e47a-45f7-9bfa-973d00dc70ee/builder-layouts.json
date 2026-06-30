@@ -64,39 +64,9 @@
             "rowLayout": "whole",
             "blocks": [
               {
-                "id": "image-block-mqho93e8-k93hf",
-                "kind": "image",
-                "title": "Image",
-                "body": "A simple image block for banners, artwork, and visual breaks.",
-                "imageUrl": "https://cms.webpages.am/wp-content/uploads/2026/06/logo-2-1-scaled.png",
-                "imageAlt": "logo-2 (1)",
-                "imageAlignment": "center",
-                "imageMaxWidth": 300,
-                "imageBorderRadius": 0,
-                "imageCaption": "",
-                "panelStyle": "dark",
-                "borderRadius": 10,
-                "visualStyle": {
-                  "padding": {
-                    "linked": true,
-                    "top": "none",
-                    "right": "none",
-                    "bottom": "none",
-                    "left": "none"
-                  },
-                  "margin": {
-                    "linked": true,
-                    "top": "none",
-                    "right": "none",
-                    "bottom": "none",
-                    "left": "none"
-                  }
-                }
-              },
-              {
                 "id": "hero-block-mqxvovas-174fd",
                 "kind": "hero",
-                "eyebrow": "Բարի գալուստ webpages Note1",
+                "eyebrow": "Բարի գալուստ webpages",
                 "title": "[Ընտրեք փաթեթը |տրամադրեք տեղեկությունը| ձեր կայքը պատրաստ է]",
                 "body": "Կայք, հոսթինգ և սպասարկում՝ մեկ պարզ փաթեթով",
                 "buttonLabel": "Բաժանորդագրվել",
@@ -170,6 +140,36 @@
                 },
                 "buttons": [],
                 "typewriterMobileReservedLines": 3
+              },
+              {
+                "id": "image-block-mqho93e8-k93hf",
+                "kind": "image",
+                "title": "Image",
+                "body": "A simple image block for banners, artwork, and visual breaks.",
+                "imageUrl": "https://cms.webpages.am/wp-content/uploads/2026/06/logo-2-1-scaled.png",
+                "imageAlt": "logo-2 (1)",
+                "imageAlignment": "center",
+                "imageMaxWidth": 300,
+                "imageBorderRadius": 0,
+                "imageCaption": "",
+                "panelStyle": "dark",
+                "borderRadius": 10,
+                "visualStyle": {
+                  "padding": {
+                    "linked": true,
+                    "top": "none",
+                    "right": "none",
+                    "bottom": "none",
+                    "left": "none"
+                  },
+                  "margin": {
+                    "linked": true,
+                    "top": "none",
+                    "right": "none",
+                    "bottom": "none",
+                    "left": "none"
+                  }
+                }
               },
               {
                 "id": "hero-block-mqkhhqgx-m82o9",
@@ -1368,7 +1368,7 @@
         ]
       }
     ],
-    "updatedAt": "2026-06-30T07:05:40.569Z"
+    "updatedAt": "2026-06-28T16:29:18.603Z"
   },
   "shop": {
     "version": 1,
@@ -1401,6 +1401,45 @@
       "cardImagePadding": "clamp(22px, 2.4vw, 36px)"
     },
     "sections": [
+      {
+        "id": "contentLayout-mr0c6jzg-wzy0a",
+        "kind": "contentLayout",
+        "title": "",
+        "background": "#ffffff",
+        "backgroundMode": "boxed",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "topSpacing": "inherit",
+        "bottomSpacing": "inherit",
+        "topMargin": "inherit",
+        "bottomMargin": "inherit",
+        "pullUnderHeader": false,
+        "visible": true,
+        "eyebrow": "",
+        "body": "",
+        "layout": "whole",
+        "layoutColumns": 1,
+        "layoutItems": [
+          {
+            "id": "layout-item-mr0c6jzg-1",
+            "blocks": [
+              {
+                "id": "hero-block-mr0c6m5r-sfxhx",
+                "kind": "hero",
+                "eyebrow": "Featured",
+                "title": "NOtebookMall",
+                "body": "A strong visual opening with editable copy and action.",
+                "buttonLabel": "Learn more",
+                "buttonUrl": "/",
+                "carouselSettings": {
+                  "variant": "default"
+                }
+              }
+            ]
+          }
+        ],
+        "layoutRows": 1
+      },
       {
         "id": "contentLayout-mqcpe2nr-yz507",
         "kind": "contentLayout",
@@ -1514,7 +1553,7 @@
         "layoutRows": 1
       }
     ],
-    "updatedAt": "2026-06-22T19:15:32.721Z"
+    "updatedAt": "2026-06-30T07:40:08.677Z"
   },
   "client": {
     "version": 1,

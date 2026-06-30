@@ -48,7 +48,9 @@ export default async function WebsitesPage() {
                   Created {new Date(website.createdAt).toLocaleDateString()}
                 </small>
                 <div className="saas-website-actions">
-                  <button type="button">Open Builder</button>
+                  <Link href={`/app/websites/${website.id}/builder`}>
+                    Open Builder
+                  </Link>
                   <button type="button">Open Website</button>
                   <button type="button">Settings</button>
                 </div>

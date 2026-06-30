@@ -60,7 +60,7 @@ export default function SaaSShell({
             <span>{eyebrow}</span>
             <h1>{title}</h1>
           </div>
-          <Link className="saas-shell-header-link" href="/dashboard">
+          <Link className="saas-shell-header-link" href="/app/websites">
             Builder
           </Link>
         </header>
