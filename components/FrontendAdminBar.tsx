@@ -7,6 +7,23 @@ import { useEffect, useMemo, useState } from "react";
 
 const PRODUCT_EDIT_EVENT = "react-shop:product-edit-target";
 
+type AuthMeResponse = {
+  user?: {
+    id: string;
+    name?: string;
+    role: "user" | "admin" | "super_admin";
+  } | null;
+};
+
+type DashboardTarget = {
+  href: string;
+  label: string;
+  context: string;
+  secondaryHref?: string;
+  secondaryLabel?: string;
+  legacy?: boolean;
+};
+
 function isLocalHost() {
   if (typeof window === "undefined") return false;
   const hostname = window.location.hostname;
@@ -21,13 +38,77 @@ function isLocalHost() {
   );
 }
 
-function dashboardTargetForPath(pathname: string) {
+function getBuilderPageKeyForPath(pathname: string) {
+  if (pathname === "/") return "home";
+  if (pathname === "/shop") return "shop";
+  if (pathname === "/client") return "client";
+  if (pathname === "/cart") return "page:cart";
+  if (pathname === "/checkout") return "page:checkout";
+  if (pathname === "/my-account") return "page:my-account";
+  if (pathname === "/search") return "search-results";
+  if (pathname.startsWith("/product/")) return "product-single";
+  if (pathname.startsWith("/category/")) return "product-category-specific";
+
+  const customPageMatch = pathname.match(/^\/([a-z0-9]+(?:-[a-z0-9]+)*)$/);
+  return customPageMatch ? `page:${customPageMatch[1]}` : "home";
+}
+
+function labelForPageKey(pageKey: string, pathname: string) {
+  if (pageKey === "product-single") return "Edit Product Template";
+  if (pageKey === "product-category-specific") return "Edit Category Template";
+  if (pageKey === "search-results") return "Edit Search Template";
+  if (pathname === "/cart" || pathname === "/checkout" || pathname === "/my-account") {
+    return "Edit Current Page";
+  }
+  return "Edit Current Page";
+}
+
+function scopedWebsiteIdFromPreviewPath(pathname: string) {
+  const match = pathname.match(/^\/app\/websites\/([^/]+)\/preview/);
+  return match?.[1] ?? null;
+}
+
+function dashboardTargetForPath(
+  pathname: string,
+  pageParam: string | null,
+  userRole: AuthMeResponse["user"] extends infer User
+    ? User extends { role: infer Role }
+      ? Role
+      : never
+    : never,
+): DashboardTarget | null {
   if (pathname.startsWith("/dashboard")) return null;
 
+  const scopedWebsiteId = scopedWebsiteIdFromPreviewPath(pathname);
+  if (scopedWebsiteId) {
+    const pageKey = pageParam || "home";
+    const params = new URLSearchParams({ page: pageKey });
+    return {
+      href: `/app/websites/${scopedWebsiteId}/builder?${params.toString()}`,
+      label: "Edit This Page",
+      context: "Website preview",
+      secondaryHref: `/app/websites/${scopedWebsiteId}/builder`,
+      secondaryLabel: "Edit This Website",
+    };
+  }
+
+  if (pathname.startsWith("/app") || pathname.startsWith("/admin")) {
+    return null;
+  }
+
+  if (userRole !== "super_admin") {
+    return null;
+  }
+
+  const pageKey = getBuilderPageKeyForPath(pathname);
+  const params = new URLSearchParams({ page: pageKey });
   return {
-    href: "/app/websites",
-    label: "Open Website Builder",
-    context: "Websites",
+    href: `/dashboard?${params.toString()}`,
+    label: pageKey === "home" ? "Edit Root Site" : labelForPageKey(pageKey, pathname),
+    context: "Root site builder",
+    secondaryHref: "/dashboard",
+    secondaryLabel: "Open Root Builder",
+    legacy: true,
   };
 }
 
@@ -35,11 +116,17 @@ export default function FrontendAdminBar() {
   const pathname = usePathname();
   const [ready, setReady] = useState(false);
   const [visible, setVisible] = useState(false);
-  const [isSaasLoggedIn, setIsSaasLoggedIn] = useState(false);
+  const [saasUser, setSaasUser] = useState<AuthMeResponse["user"]>(null);
   const [productEditHref, setProductEditHref] = useState<string | null>(null);
+  const [pageParam, setPageParam] = useState<string | null>(null);
   const target = useMemo(
-    () => dashboardTargetForPath(pathname ?? "/"),
-    [pathname]
+    () =>
+      dashboardTargetForPath(
+        pathname ?? "/",
+        pageParam,
+        saasUser?.role ?? "user",
+      ),
+    [pageParam, pathname, saasUser?.role],
   );
 
   useEffect(() => {
@@ -49,17 +136,27 @@ export default function FrontendAdminBar() {
   }, []);
 
   useEffect(() => {
+    setPageParam(new URLSearchParams(window.location.search).get("page"));
+  }, [pathname]);
+
+  useEffect(() => {
     let cancelled = false;
 
     async function checkSaasSession() {
       try {
         const response = await fetch("/api/auth/me", { cache: "no-store" });
         if (!cancelled) {
-          setIsSaasLoggedIn(response.ok);
+          if (!response.ok) {
+            setSaasUser(null);
+            return;
+          }
+
+          const data = (await response.json()) as AuthMeResponse;
+          setSaasUser(data.user ?? null);
         }
       } catch {
         if (!cancelled) {
-          setIsSaasLoggedIn(false);
+          setSaasUser(null);
         }
       }
     }
@@ -69,7 +166,7 @@ export default function FrontendAdminBar() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [pathname]);
 
   useEffect(() => {
     if (!pathname?.startsWith("/product/")) return;
@@ -106,7 +203,7 @@ export default function FrontendAdminBar() {
     };
   }, [pathname]);
 
-  const shouldShow = ready && target && isLocalHost() && isSaasLoggedIn;
+  const shouldShow = ready && target && isLocalHost() && Boolean(saasUser);
 
   if (!ready || pathname?.startsWith("/dashboard")) return null;
 
@@ -130,21 +227,27 @@ export default function FrontendAdminBar() {
     <aside className="frontend-admin-bar" aria-label="Frontend editor tools">
       <div>
         <strong>{target.context}</strong>
-        <span>React visual builder</span>
+        <span>{target.legacy ? "Root site editor" : "React visual builder"}</span>
       </div>
       <Link className="frontend-admin-bar-primary" href={target.href}>
         <Edit3 size={15} />
         {target.label}
       </Link>
+      {target.secondaryHref && target.secondaryLabel ? (
+        <Link href={target.secondaryHref}>
+          <Gauge size={15} />
+          {target.secondaryLabel}
+        </Link>
+      ) : null}
       {pathname?.startsWith("/product/") && productEditHref ? (
         <a href={productEditHref} target="_blank" rel="noopener noreferrer">
           <Edit3 size={15} />
           Edit Product
         </a>
       ) : null}
-      <Link href="/app/websites">
+      <Link href={target.legacy ? "/admin/websites" : "/app/websites"}>
         <Gauge size={15} />
-        Websites
+        {target.legacy ? "All Websites" : "My Websites"}
       </Link>
       <a href="https://cms.webpages.am/wp-admin/" target="_blank" rel="noreferrer">
         <ExternalLink size={15} />

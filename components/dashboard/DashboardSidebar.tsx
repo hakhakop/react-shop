@@ -78,6 +78,9 @@ type DashboardSidebarProps = {
   newPageTitle: string;
   builderSlot: ReactNode;
   globalStylesSlot: ReactNode;
+  canUseShellSettings?: boolean;
+  shellSettingsLabel?: string;
+  shellSettingsShortLabel?: string;
   inspectorSlot: ReactNode;
   inspectorOpen?: boolean;
   inspectorOpenKey?: number;
@@ -95,6 +98,7 @@ type DashboardSidebarProps = {
   templateLabels: Record<BuilderTemplate, string>;
   templateStatus: string;
   onUpdateShellSettings: (patch: Partial<BuilderShellSettings>) => void;
+  onSaveMenuItems?: (newItems: BuilderShellSettings["menuItems"]) => void | Promise<void>;
   topActionsSlot?: ReactNode;
   onAddElementFromLibrary: (kind: LayoutBlockKind) => void;
   onCreateBuilderPage: () => void;
@@ -125,6 +129,9 @@ export default function DashboardSidebar({
   newPageTitle,
   builderSlot,
   globalStylesSlot,
+  canUseShellSettings = true,
+  shellSettingsLabel = "Global Styles",
+  shellSettingsShortLabel = "Global",
   inspectorSlot,
   inspectorOpen = true,
   inspectorOpenKey = 0,
@@ -156,6 +163,7 @@ export default function DashboardSidebar({
   onSwitchBuilderTarget,
   openElementsPanelKey,
   onUpdateShellSettings,
+  onSaveMenuItems,
   onReorderCustomPages,
   sidebarCollapsed = true,
   onSetSidebarCollapsed,
@@ -251,11 +259,15 @@ export default function DashboardSidebar({
       label: "Inspector",
       description: "Edit the selected section, column, or element.",
     },
-    {
-      tab: "globalStyles",
-      label: "Global Styles",
-      description: "Site design, typography, header, and spacing.",
-    },
+    ...(canUseShellSettings
+      ? [
+          {
+            tab: "globalStyles" as SidebarTab,
+            label: shellSettingsLabel,
+            description: "Design, typography, header, menu, and spacing.",
+          },
+        ]
+      : []),
     {
       tab: "menu",
       label: "Menu",
@@ -312,7 +324,15 @@ export default function DashboardSidebar({
     { tab: "builder" as SidebarTab, label: "Structure", icon: <Layers3 size={18} /> },
     { tab: "elements" as SidebarTab, label: "Blocks", icon: <Boxes size={18} /> },
     { tab: "templates" as SidebarTab, label: "Layouts", icon: <LayoutTemplate size={18} /> },
-    { tab: "globalStyles" as SidebarTab, label: "Global", icon: <Sliders size={18} /> },
+    ...(canUseShellSettings
+      ? [
+          {
+            tab: "globalStyles" as SidebarTab,
+            label: shellSettingsShortLabel,
+            icon: <Sliders size={18} />,
+          },
+        ]
+      : []),
     { tab: "pages" as SidebarTab, label: "Pages", icon: <FileText size={18} /> },
     { tab: "history" as SidebarTab, label: "History", icon: <History size={18} /> },
     { tab: "inspector" as SidebarTab, label: "Inspector", icon: <Settings size={18} /> },
@@ -413,6 +433,7 @@ export default function DashboardSidebar({
                 <ReactMenuEditorPanel
                   menuItems={shellSettings.menuItems ?? []}
                   onChangeMenuItems={(newItems) => onUpdateShellSettings({ menuItems: newItems })}
+                  onSaveMenuItems={onSaveMenuItems}
                   customPages={customPages}
                 />
               </motion.div>
@@ -449,7 +470,7 @@ export default function DashboardSidebar({
               </motion.div>
             )}
 
-            {sidebarTab === "globalStyles" && (
+            {canUseShellSettings && sidebarTab === "globalStyles" && (
               <motion.div
                 key="globalStyles"
                 initial={{ opacity: 0, scale: 0.985 }}

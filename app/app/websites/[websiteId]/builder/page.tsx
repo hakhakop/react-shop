@@ -75,8 +75,10 @@ export default async function WebsiteBuilderPage({
   });
 
   return (
-    <Suspense fallback={null}>
-      <DashboardBuilder websiteId={website.id} />
-    </Suspense>
+    <div data-scoped-builder-root>
+      <Suspense fallback={null}>
+        <DashboardBuilder websiteId={website.id} saasUserRole={user.role} />
+      </Suspense>
+    </div>
   );
 }

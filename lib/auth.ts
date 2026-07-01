@@ -2,6 +2,7 @@ import bcrypt from "bcrypt";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import crypto from "node:crypto";
 import path from "node:path";
+import { getRuntimeDataDir } from "@/lib/runtimeDataDir";
 
 export type SaaSUserRole = "user" | "admin" | "super_admin";
 
@@ -26,8 +27,7 @@ type CookieReader = {
   get(name: string): { value?: string } | undefined;
 };
 
-const DATA_DIR = path.join(process.cwd(), "data");
-const USERS_FILE = path.join(DATA_DIR, "users.json");
+const USERS_FILE = () => path.join(getRuntimeDataDir(), "users.json");
 const SESSION_COOKIE_NAME = "saas_session";
 const SESSION_MAX_AGE_SECONDS = 60 * 60 * 24 * 7;
 const MIN_PASSWORD_LENGTH = 8;
@@ -149,7 +149,7 @@ export function validateLoginInput(input: {
 
 export async function readUsers(): Promise<SaaSUser[]> {
   try {
-    const raw = await readFile(USERS_FILE, "utf8");
+    const raw = await readFile(USERS_FILE(), "utf8");
     const parsed = JSON.parse(raw) as unknown;
     return Array.isArray(parsed) ? parsed.filter(isSaaSUser) : [];
   } catch {
@@ -163,8 +163,9 @@ export async function readPublicUsers(): Promise<PublicSaaSUser[]> {
 }
 
 async function writeUsers(users: SaaSUser[]) {
-  await mkdir(DATA_DIR, { recursive: true });
-  await writeFile(USERS_FILE, `${JSON.stringify(users, null, 2)}\n`, "utf8");
+  const usersFile = USERS_FILE();
+  await mkdir(path.dirname(usersFile), { recursive: true });
+  await writeFile(usersFile, `${JSON.stringify(users, null, 2)}\n`, "utf8");
 }
 
 export async function findUserByEmail(email: string) {

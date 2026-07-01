@@ -41,7 +41,7 @@ export default function SaaSShell({
             <>
               <span className="saas-shell-nav-label">Admin</span>
               <Link href="/admin">Admin Home</Link>
-              <Link href="/admin/websites">Websites</Link>
+              <Link href="/admin/websites">All Websites</Link>
               <Link href="/admin/users">Users</Link>
             </>
           )}

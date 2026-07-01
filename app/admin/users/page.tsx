@@ -1,4 +1,5 @@
 import { cookies } from "next/headers";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import AccessDenied from "@/components/saas/AccessDenied";
 import SaaSShell from "@/components/saas/SaaSShell";
@@ -32,7 +33,7 @@ export default async function AdminUsersPage() {
             <span>Email</span>
             <span>Role</span>
             <span>Websites</span>
-            <span>Created</span>
+            <span>Actions</span>
           </div>
           {users.map((item) => (
             <div className="saas-users-row" key={item.id} role="row">
@@ -40,7 +41,9 @@ export default async function AdminUsersPage() {
               <span>{item.email}</span>
               <span>{item.role}</span>
               <span>{websiteCounts.get(item.id) ?? 0}</span>
-              <span>{new Date(item.createdAt).toLocaleDateString()}</span>
+              <span className="saas-row-actions">
+                <Link href={`/admin/users/${item.id}`}>View User</Link>
+              </span>
             </div>
           ))}
         </div>

@@ -1,6 +1,8 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import AccessDenied from "@/components/saas/AccessDenied";
+import HeaderShell from "@/components/HeaderShell";
+import ScopedPreviewLinkRouter from "@/components/builder/ScopedPreviewLinkRouter";
 import StorefrontBuilderRenderer from "@/components/builder/StorefrontBuilderRenderer";
 import { getCurrentUser } from "@/lib/auth";
 import {
@@ -82,6 +84,38 @@ function pageLabel(
   return customPages.find((item) => item.key === page)?.title;
 }
 
+function resolvePreviewPageKey(
+  requestedPage: string,
+  customPages: Awaited<ReturnType<typeof readBuilderCustomPages>>,
+): BuilderLayoutKey {
+  if (requestedPage === "cart") return "page:cart";
+  if (requestedPage === "checkout") return "page:checkout";
+  if (requestedPage === "my-account") return "page:my-account";
+
+  const normalizedDirect = normalizeBuilderLayoutKey(requestedPage);
+  if (
+    normalizedDirect !== "shop" ||
+    requestedPage === "shop" ||
+    requestedPage === "product-single" ||
+    requestedPage === "product-category" ||
+    requestedPage === "product-category-specific" ||
+    requestedPage === "search-results" ||
+    requestedPage.startsWith("page:")
+  ) {
+    return normalizedDirect;
+  }
+
+  const requestedSlug = requestedPage.replace(/^\/+|\/+$/g, "");
+  const customPage = customPages.find(
+    (item) =>
+      item.slug === requestedSlug ||
+      item.key === `page:${requestedSlug}` ||
+      item.key === requestedPage,
+  );
+
+  return customPage?.key ?? normalizedDirect;
+}
+
 export default async function WebsitePreviewPage({
   params,
   searchParams,
@@ -106,7 +140,12 @@ export default async function WebsitePreviewPage({
   await ensureWebsiteBuilderData(website.id);
 
   const scope = { websiteId: website.id };
-  const page = normalizeBuilderLayoutKey(requestedPage);
+  const customPages = await readBuilderCustomPages(scope);
+  const scopedPreviewPages = customPages.map((item) => ({
+    key: item.key,
+    slug: item.slug,
+  }));
+  const page = resolvePreviewPageKey(requestedPage, customPages);
   console.log("[builder-preview-scope] resolved files", {
     websiteId: website.id,
     page,
@@ -115,9 +154,8 @@ export default async function WebsitePreviewPage({
     shellPath: getBuilderShellPath(website.id),
   });
 
-  const [layout, customPages, shellSettings] = await Promise.all([
+  const [layout, shellSettings] = await Promise.all([
     getPublishedBuilderLayout(page, scope),
-    readBuilderCustomPages(scope),
     getBuilderShellSettings(scope),
   ]);
 
@@ -139,16 +177,27 @@ export default async function WebsitePreviewPage({
   }
 
   return (
-    <>
+    <div data-scoped-preview-root>
+      <ScopedPreviewLinkRouter
+        websiteId={website.id}
+        pages={scopedPreviewPages}
+      />
       <style
         data-builder-preview-shell
         dangerouslySetInnerHTML={{ __html: scopedShellCss(shellSettings) }}
+      />
+      <HeaderShell
+        layoutOverride={shellSettings.headerLayout}
+        shellSettingsOverride={shellSettings}
+        scopedPreviewWebsiteId={website.id}
+        scopedPreviewPage={page}
+        scopedPreviewPages={scopedPreviewPages}
       />
       <StorefrontBuilderRenderer
         layout={layout}
         page={page}
         pageLabel={pageLabel(page, customPages)}
       />
-    </>
+    </div>
   );
 }

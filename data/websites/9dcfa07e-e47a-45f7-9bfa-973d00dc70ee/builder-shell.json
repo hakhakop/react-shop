@@ -9,16 +9,16 @@
   "headerLayout": "princity",
   "headerBrandMode": "logo",
   "headerBrandText": "WebPages",
-  "headerLogoUrl": "https://cms.webpages.am/wp-content/uploads/2025/11/logo-2-small.png",
+  "headerLogoUrl": "https://cms.webpages.am/wp-content/uploads/2026/06/premium-16.png",
   "headerLogoAlt": "WebPages logo",
   "headerLogoMaxWidth": 161,
   "headerIconVariant": "muted",
   "headerIconOrder": [
-    "wishlist",
     "cart",
     "account",
     "theme",
-    "search"
+    "search",
+    "wishlist"
   ],
   "headerActiveIndicator": "princity",
   "sectionPaddingTop": "lg",
@@ -113,6 +113,12 @@
       "parentId": null
     },
     {
+      "id": "menu_es48bvnjt",
+      "label": "note.Supeadmin",
+      "url": "/new",
+      "parentId": null
+    },
+    {
       "id": "menu_sbyhyzc43",
       "label": "Օրինակներ",
       "url": "/demos",
@@ -159,7 +165,19 @@
       "label": "Խանութ",
       "url": "/shop",
       "parentId": null
+    },
+    {
+      "id": "menu_u9ovr659u",
+      "label": "Fashion Store",
+      "url": "/fashion-store",
+      "parentId": null
+    },
+    {
+      "id": "menu_v1cl77cc5",
+      "label": "RootWebէ",
+      "url": "/",
+      "parentId": null
     }
   ],
-  "updatedAt": "2026-06-28T16:18:19.572Z"
+  "updatedAt": "2026-07-01T09:13:20.526Z"
 }

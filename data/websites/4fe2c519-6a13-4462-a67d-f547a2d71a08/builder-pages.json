@@ -46,5 +46,11 @@
     "title": "new",
     "slug": "new",
     "updatedAt": "2026-06-28T17:22:52.861Z"
+  },
+  {
+    "key": "page:new-page",
+    "title": "New Page",
+    "slug": "new-page",
+    "updatedAt": "2026-06-30T18:46:53.564Z"
   }
 ]

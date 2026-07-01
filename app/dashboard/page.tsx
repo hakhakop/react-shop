@@ -45,7 +45,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
 
   return (
     <Suspense fallback={null}>
-      <DashboardBuilder />
+      <DashboardBuilder saasUserRole={user.role} />
     </Suspense>
   );
 }

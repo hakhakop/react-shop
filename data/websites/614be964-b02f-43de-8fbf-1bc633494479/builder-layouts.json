@@ -45,7 +45,7 @@
         "bottomMargin": "none",
         "layout": "whole",
         "layoutColumns": 1,
-        "layoutRows": 1,
+        "layoutRows": 2,
         "backgroundEffect": "antigravity2",
         "antigravitySpeed": 1.8,
         "antigravityParticleCount": 260,
@@ -248,6 +248,26 @@
                 },
                 "buttons": [],
                 "typewriterMobileReservedLines": 3
+              }
+            ]
+          },
+          {
+            "id": "layout-row-mr1tfxqv-column-1",
+            "rowId": "layout-row-mr1tfxqv",
+            "rowLayout": "whole",
+            "blocks": [
+              {
+                "id": "hero-block-mr1tg0hj-l65ew",
+                "kind": "hero",
+                "eyebrow": "Featured",
+                "title": "Granit Website Created by Superadmin",
+                "body": "A strong visual opening with editable copy and action.",
+                "buttonLabel": "Learn more",
+                "buttonUrl": "/",
+                "carouselSettings": {
+                  "variant": "default"
+                },
+                "elementAlign": "center"
               }
             ]
           }
@@ -1368,7 +1388,7 @@
         ]
       }
     ],
-    "updatedAt": "2026-06-30T07:02:48.151Z"
+    "updatedAt": "2026-07-01T13:22:05.046Z"
   },
   "shop": {
     "version": 1,
@@ -1427,7 +1447,7 @@
                 "id": "hero-block-mr0c7dh3-9g9c0",
                 "kind": "hero",
                 "eyebrow": "Featured",
-                "title": "Granit",
+                "title": "Super admin Granit",
                 "body": "A strong visual opening with editable copy and action.",
                 "buttonLabel": "Learn more",
                 "buttonUrl": "/",
@@ -1553,7 +1573,7 @@
         "layoutRows": 1
       }
     ],
-    "updatedAt": "2026-06-30T07:40:39.637Z"
+    "updatedAt": "2026-06-30T18:25:38.081Z"
   },
   "client": {
     "version": 1,

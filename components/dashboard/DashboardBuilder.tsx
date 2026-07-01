@@ -43,6 +43,7 @@ import {
 import Image from "next/image";
 import { useTheme } from "@/components/ThemeProvider";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import type { SaaSUserRole } from "@/lib/auth";
 import type {
   CSSProperties,
   FocusEvent as ReactFocusEvent,
@@ -66,6 +67,7 @@ import BuilderScrollAnimations from "@/components/builder/BuilderScrollAnimation
 import CategoryBar from "@/components/CategoryBar";
 import CategoryWithFilters from "@/components/CategoryWithFilters";
 import ProductCategoryFilterProvider from "@/components/ProductCategoryFilterProvider";
+import HeaderShellView from "@/components/HeaderShellView";
 import FluentFormClient from "@/components/builder/FluentFormClient";
 import ProductCarousel from "@/components/ProductCarousel";
 import ProductOptionsSelector from "@/components/ProductOptionsSelector";
@@ -85,7 +87,6 @@ import type {
   BuilderHeaderActiveIndicator,
   BuilderHeaderBackgroundMode,
   BuilderHeaderTextMode,
-  BuilderHeaderLayout,
   BuilderHeaderBrandMode,
   BuilderHeaderIconId,
   BuilderHeaderIconVariant,
@@ -140,6 +141,7 @@ import type { MenuItem } from "@/lib/navigation";
 import type { ProductNode } from "@/lib/products";
 import type { BuilderVisualStyle } from "@/lib/builderVisualStyle";
 import { typographyProps, type TypographyArea } from "@/lib/builderTypography";
+import type { HeaderSettings } from "@/lib/themeSettings";
 import {
   hasBuilderVisualSpacing,
   resolveSpacingToken,
@@ -1288,11 +1290,13 @@ function getPreviewProductModel(previewProducts: ProductNode[]) {
 export type DashboardBuilderProps = {
   menuTree?: MenuItem[];
   websiteId?: string;
+  saasUserRole?: SaaSUserRole;
 };
 
 export default function DashboardBuilder({
   menuTree = [],
   websiteId,
+  saasUserRole,
 }: DashboardBuilderProps) {
   const router = useRouter();
   const { theme } = useTheme();
@@ -1321,10 +1325,29 @@ export default function DashboardBuilder({
           url,
         });
       }
+      if (path.includes("/api/builder-shell")) {
+        console.log("[global-settings-scope] DashboardBuilder shell API URL", {
+          userRole: saasUserRole ?? null,
+          websiteId: websiteId ?? null,
+          section: "builder-shell",
+          path,
+          url,
+        });
+      }
       return url;
     },
-    [websiteId],
+    [saasUserRole, websiteId],
   );
+  const isWebsiteScopedBuilder = Boolean(websiteId);
+  const canEditShellSettings =
+    isWebsiteScopedBuilder || saasUserRole === "super_admin";
+  const shellSettingsLabel = isWebsiteScopedBuilder
+    ? "Website Settings"
+    : "Global Styles";
+  const shellSettingsShortLabel = isWebsiteScopedBuilder ? "Website" : "Global";
+  const shellSettingsStatusLabel = isWebsiteScopedBuilder
+    ? "Website settings"
+    : "Global settings";
   const [builderState, setBuilderState] = useState<BuilderState>(defaultState);
   const [dashboardTheme, setDashboardTheme] = useState<"light" | "dark">(
     "dark",
@@ -1349,6 +1372,7 @@ export default function DashboardBuilder({
     setDashboardTheme(nextTheme);
     localStorage.setItem("builder-dashboard-theme", nextTheme);
   };
+
   const layoutScheme =
     builderState.design.colorScheme === "dark" ||
     (builderState.design.colorScheme === "auto" && theme === "dark")
@@ -1413,7 +1437,7 @@ export default function DashboardBuilder({
   const [shellSettings, setShellSettings] =
     useState<BuilderShellSettings>(defaultShellSettings);
   const [shellStatus, setShellStatus] = useState(
-    "Shell settings load from React",
+    `${shellSettingsStatusLabel} load from React`,
   );
   const [selectedMenuItemId, setSelectedMenuItemId] = useState<string | null>(
     null,
@@ -1423,6 +1447,13 @@ export default function DashboardBuilder({
   const publishCelebrationTimer = useRef<number | null>(null);
   const shellAutoSaveTimer = useRef<number | null>(null);
   const spacingFocusRequestId = useRef(0);
+
+  useEffect(() => {
+    if (sidebarTab === "globalStyles" && !canEditShellSettings) {
+      setSidebarTab("elements");
+      setShellStatus("Platform global settings require super admin access.");
+    }
+  }, [canEditShellSettings, sidebarTab]);
   const [customPages, setCustomPages] = useState<BuilderCustomPage[]>([]);
   const [publishedKeys, setPublishedKeys] = useState<string[]>([]);
   const [newPageTitle, setNewPageTitle] = useState("");
@@ -1447,7 +1478,6 @@ export default function DashboardBuilder({
   const [mediaPickerOpen, setMediaPickerOpen] = useState(false);
   const [mediaPickerTitle, setMediaPickerTitle] = useState("WordPress Media");
   const [mediaPickerCurrentUrl, setMediaPickerCurrentUrl] = useState("");
-  const previewHeaderSlotRef = useRef<HTMLDivElement>(null);
   const previewShellRef = useRef<HTMLDivElement>(null);
   const mediaSelectRef = useRef<((media: WordPressMediaItem) => void) | null>(
     null,
@@ -1487,6 +1517,23 @@ export default function DashboardBuilder({
   const currentFrontendUrl = useMemo(
     () => getPreviewUrlForBuilderKey(builderState.page, customPages, websiteId),
     [builderState.page, customPages, websiteId],
+  );
+  const scopedPreviewPages = useMemo(
+    () =>
+      customPages.map((page) => ({
+        key: page.key,
+        slug: page.slug,
+      })),
+    [customPages],
+  );
+  const dashboardHeaderSettings = useMemo<HeaderSettings>(
+    () => ({
+      menuLocation: "primary",
+      logoMaxWidth: 160,
+      iconVariant: "muted",
+      iconOrder: defaultShellSettings.headerIconOrder,
+    }),
+    [],
   );
   const builderStateSignature = useMemo(
     () => JSON.stringify(builderState),
@@ -1669,37 +1716,10 @@ export default function DashboardBuilder({
   };
 
   useEffect(() => {
-    const updatePreviewHeaderPill = () => {
-      const pill =
-        previewHeaderSlotRef.current?.querySelector<HTMLElement>(
-          "#site-header-pill",
-        );
-      const header =
-        previewHeaderSlotRef.current?.querySelector<HTMLElement>(
-          ".site-header",
-        );
-      if (!pill) return;
-      const shellScrollTop = previewShellRef.current?.scrollTop ?? 0;
-      const isScrolled = Math.max(shellScrollTop, window.scrollY) > 56;
-      pill.dataset.scrolled = isScrolled ? "true" : "false";
-      pill.dataset.pillInit = "true";
-      if (header) {
-        header.dataset.scrolled = isScrolled ? "true" : "false";
-      }
-    };
-
-    const shell = previewShellRef.current;
-    updatePreviewHeaderPill();
-    shell?.addEventListener("scroll", updatePreviewHeaderPill, {
-      passive: true,
-    });
-    window.addEventListener("scroll", updatePreviewHeaderPill, {
-      passive: true,
-    });
+    document.body.classList.add("is-visual-builder-active");
 
     return () => {
-      shell?.removeEventListener("scroll", updatePreviewHeaderPill);
-      window.removeEventListener("scroll", updatePreviewHeaderPill);
+      document.body.classList.remove("is-visual-builder-active");
     };
   }, []);
 
@@ -1711,32 +1731,6 @@ export default function DashboardBuilder({
       if (publishCelebrationTimer.current) {
         window.clearTimeout(publishCelebrationTimer.current);
       }
-    };
-  }, []);
-
-  useEffect(() => {
-    let header: Element | null = null;
-    let parent: Node | null = null;
-    let nextSibling: ChildNode | null = null;
-
-    const moveHeaderIntoPreview = () => {
-      const slot = previewHeaderSlotRef.current;
-      const nextHeader = document.querySelector(".site-header");
-      if (!slot || !nextHeader || slot.contains(nextHeader)) return;
-      header = nextHeader;
-      parent = nextHeader.parentNode;
-      nextSibling = nextHeader.nextSibling;
-      slot.appendChild(nextHeader);
-    };
-
-    moveHeaderIntoPreview();
-    const observer = new MutationObserver(moveHeaderIntoPreview);
-    observer.observe(document.body, { childList: true, subtree: true });
-
-    return () => {
-      observer.disconnect();
-      if (!header || !parent) return;
-      parent.insertBefore(header, nextSibling);
     };
   }, []);
 
@@ -2653,6 +2647,10 @@ export default function DashboardBuilder({
     setSidebarCollapsed(false);
 
     if (target.scope === "globalSection") {
+      if (!canEditShellSettings) {
+        setShellStatus("Platform global settings require super admin access.");
+        return;
+      }
       setSidebarTab("globalStyles");
       setGlobalStylesTab("spacing");
       setGlobalSpacingFocus("section");
@@ -4326,9 +4324,22 @@ export default function DashboardBuilder({
 
   const saveShellSettings = async (
     nextSettings: BuilderShellSettings,
-    status = "Global settings saved",
+    status?: string,
   ) => {
-    const response = await fetch(builderApiUrl("/api/builder-shell"), {
+    if (!canEditShellSettings) {
+      setShellStatus("Platform global settings require super admin access.");
+      return false;
+    }
+
+    const apiUrl = builderApiUrl("/api/builder-shell");
+    console.log("[global-settings-scope] DashboardBuilder saving shell settings", {
+      userRole: saasUserRole ?? null,
+      websiteId: websiteId ?? null,
+      section: "builder-shell",
+      apiUrl,
+      payloadKeys: Object.keys(nextSettings),
+    });
+    const response = await fetch(apiUrl, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -4348,23 +4359,51 @@ export default function DashboardBuilder({
     if (payload.settings) {
       setShellSettings(payload.settings);
     }
-    setShellStatus(status);
-    router.refresh();
+    setShellStatus(status ?? `${shellSettingsStatusLabel} saved`);
     return true;
   };
 
   const updateShellSettings = (patch: Partial<BuilderShellSettings>) => {
+    if (!canEditShellSettings) {
+      setShellStatus("Platform global settings require super admin access.");
+      return;
+    }
+
     const nextSettings = { ...shellSettings, ...patch };
     setShellSettings(nextSettings);
-    setShellStatus("Updating global preview...");
+    setShellStatus(`Updating ${isWebsiteScopedBuilder ? "website" : "global"} preview...`);
 
     if (shellAutoSaveTimer.current) {
       window.clearTimeout(shellAutoSaveTimer.current);
     }
 
     shellAutoSaveTimer.current = window.setTimeout(() => {
-      void saveShellSettings(nextSettings, "Global preview updated");
+      void saveShellSettings(
+        nextSettings,
+        `${isWebsiteScopedBuilder ? "Website" : "Global"} preview updated`,
+      );
     }, 220);
+  };
+
+  const saveMenuItems = async (menuItems: BuilderShellSettings["menuItems"]) => {
+    if (!canEditShellSettings) {
+      setShellStatus("Platform global settings require super admin access.");
+      return;
+    }
+
+    const nextSettings = { ...shellSettings, menuItems };
+    setShellSettings(nextSettings);
+    setShellStatus("Saving menu...");
+
+    if (shellAutoSaveTimer.current) {
+      window.clearTimeout(shellAutoSaveTimer.current);
+      shellAutoSaveTimer.current = null;
+    }
+
+    await saveShellSettings(
+      nextSettings,
+      `${isWebsiteScopedBuilder ? "Website" : "Global"} menu saved`,
+    );
   };
 
   const updateMenuPresentation = (
@@ -4470,8 +4509,16 @@ export default function DashboardBuilder({
   };
 
   const publishShellSettings = async () => {
-    setShellStatus("Publishing global settings...");
-    await saveShellSettings(shellSettings, "Global settings published");
+    if (!canEditShellSettings) {
+      setShellStatus("Platform global settings require super admin access.");
+      return;
+    }
+
+    setShellStatus(`Publishing ${isWebsiteScopedBuilder ? "website" : "global"} settings...`);
+    await saveShellSettings(
+      shellSettings,
+      `${isWebsiteScopedBuilder ? "Website" : "Global"} settings published`,
+    );
   };
 
   const createBuilderPage = async () => {
@@ -5279,15 +5326,23 @@ export default function DashboardBuilder({
       updateSelectedLayoutBlockGridItem={updateSelectedLayoutBlockGridItem}
       updateSelectedLayoutBlockSlide={updateSelectedLayoutBlockSlide}
       updateSelectedSlide={updateSelectedSlide}
-      onOpenGlobalSpacingSettings={(scope) => {
-        setSidebarTab("globalStyles");
-        setGlobalStylesTab("spacing");
-        setGlobalSpacingFocus(scope);
-      }}
-      onOpenGlobalTypographySettings={() => {
-        setSidebarTab("globalStyles");
-        setGlobalStylesTab("typography");
-      }}
+      onOpenGlobalSpacingSettings={
+        canEditShellSettings
+          ? (scope) => {
+              setSidebarTab("globalStyles");
+              setGlobalStylesTab("spacing");
+              setGlobalSpacingFocus(scope);
+            }
+          : undefined
+      }
+      onOpenGlobalTypographySettings={
+        canEditShellSettings
+          ? () => {
+              setSidebarTab("globalStyles");
+              setGlobalStylesTab("typography");
+            }
+          : undefined
+      }
       uploadSelectedLayoutBlockSlideImage={uploadSelectedLayoutBlockSlideImage}
       uploadSelectedSlideImage={uploadSelectedSlideImage}
     />
@@ -5320,9 +5375,19 @@ export default function DashboardBuilder({
 
   const globalStylesPanel = (
     <div className="builder-sidebar-panel builder-sidebar-global-styles">
+      <div className="builder-sidebar-panel-header">
+        <div>
+          <strong>{shellSettingsLabel}</strong>
+          <span>
+            {isWebsiteScopedBuilder
+              ? "Design, header, logo, menu presentation, and spacing for this website."
+              : "Legacy demo design, header, logo, menu presentation, and spacing."}
+          </span>
+        </div>
+      </div>
       <div
         className="builder-global-style-tabs"
-        aria-label="Global style sections"
+        aria-label={`${shellSettingsLabel} sections`}
       >
         {(
           [
@@ -6910,7 +6975,7 @@ export default function DashboardBuilder({
                 className="builder-wireframe-icon"
                 style={{ flexShrink: 0 }}
               />
-              Global Styles
+              {shellSettingsLabel}
             </span>
           ) : hasPendingChanges ? (
             "Unsaved changes"
@@ -6964,7 +7029,7 @@ export default function DashboardBuilder({
             type="button"
             className="is-primary"
             onClick={publishShellSettings}
-            title="Publish Global Settings"
+            title={`Publish ${shellSettingsLabel}`}
           >
             <CloudUpload size={15} />
             Publish Settings
@@ -7027,6 +7092,9 @@ export default function DashboardBuilder({
         publishedKeys={publishedKeys}
         builderSlot={builderWireframePanel}
         globalStylesSlot={globalStylesPanel}
+        canUseShellSettings={canEditShellSettings}
+        shellSettingsLabel={shellSettingsLabel}
+        shellSettingsShortLabel={shellSettingsShortLabel}
         newPageTitle={newPageTitle}
         inspectorSlot={inspectorPanel}
         inspectorOpen={inspectorOpen}
@@ -7065,6 +7133,7 @@ export default function DashboardBuilder({
         openElementsPanelKey={panelForceToggler}
         shellSettings={shellSettings}
         onUpdateShellSettings={updateShellSettings}
+        onSaveMenuItems={saveMenuItems}
         sidebarCollapsed={sidebarCollapsed}
         onSetSidebarCollapsed={setSidebarCollapsed}
       />
@@ -7695,10 +7764,30 @@ export default function DashboardBuilder({
               } as CSSProperties
             }
           >
-            <div
-              ref={previewHeaderSlotRef}
-              className="builder-preview-header-slot"
-            />
+            <div className="builder-preview-header-slot">
+              {shellSettings.headerVisible !== false && (
+                <HeaderShellView
+                  layoutOverride={shellSettings.headerLayout}
+                  shellSettings={shellSettings}
+                  headerSettings={dashboardHeaderSettings}
+                  homeHref={
+                    websiteId
+                      ? `/app/websites/${websiteId}/builder?page=home`
+                      : "/dashboard?page=home"
+                  }
+                  clientHref={
+                    websiteId
+                      ? `/app/websites/${websiteId}/builder?page=client`
+                      : "/dashboard?page=client"
+                  }
+                  scopedPreviewWebsiteId={websiteId}
+                  scopedPreviewPage={builderState.page}
+                  scopedPreviewPages={scopedPreviewPages}
+                  scopedLinkMode="builder"
+                  categoriesContent={null}
+                />
+              )}
+            </div>
             <ProductCategoryFilterProvider key={builderState.page}>
               <PreviewCanvas
                 device={device}

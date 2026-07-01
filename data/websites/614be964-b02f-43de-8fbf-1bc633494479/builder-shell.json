@@ -9,7 +9,7 @@
   "headerLayout": "princity",
   "headerBrandMode": "logo",
   "headerBrandText": "WebPages",
-  "headerLogoUrl": "https://cms.webpages.am/wp-content/uploads/2025/11/logo-2-small.png",
+  "headerLogoUrl": "https://cms.webpages.am/wp-content/uploads/2025/11/adidas-9-logo-svgrepo-com.svg",
   "headerLogoAlt": "WebPages logo",
   "headerLogoMaxWidth": 161,
   "headerIconVariant": "muted",
@@ -159,7 +159,13 @@
       "label": "Խանութ",
       "url": "/shop",
       "parentId": null
+    },
+    {
+      "id": "menu_jtfwhs1c8",
+      "label": "new",
+      "url": "/new",
+      "parentId": null
     }
   ],
-  "updatedAt": "2026-06-28T16:18:19.572Z"
+  "updatedAt": "2026-07-01T13:15:48.300Z"
 }

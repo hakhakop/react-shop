@@ -15,12 +15,24 @@ import { useSearch } from "./SearchProvider";
 import ThemeToggle from "./ThemeToggle";
 import HeaderAccountButton from "./HeaderAccountButton";
 import type { MenuItem } from "../lib/navigation";
+import {
+  getScopedWebsiteIdFromPath,
+  getPreviewActivePathForPageKey,
+  resolveScopedBuilderHref,
+  resolveScopedPreviewHref,
+  type ScopedPreviewPage,
+} from "../lib/scopedPreviewLinks";
+import type { BuilderLayoutKey } from "../lib/builderLayouts";
 
 interface HeaderNavProps {
   items: MenuItem[];
   presentationById?: Record<string, MenuPresentationSettings>;
   categories?: ReactNode;
   serviceHomepageMode?: boolean;
+  scopedPreviewWebsiteId?: string;
+  activePageKey?: BuilderLayoutKey;
+  scopedPreviewPages?: ScopedPreviewPage[];
+  scopedLinkMode?: "builder" | "preview";
 }
 
 function handleNavMouseMove(e: MouseEvent<HTMLAnchorElement>) {
@@ -240,12 +252,16 @@ function renderMenuItems(
   currentPath: string,
   dashboardMode: boolean,
   presentationById?: Record<string, MenuPresentationSettings>,
-  level = 0
+  level = 0,
+  hrefResolver?: (href: string) => string,
 ): ReactNode {
   return items.map((item) => {
     const href = item.path || item.url || "#";
     const isSectionLink = href.includes("#");
-    const dashboardHref = getDashboardEditHref(href, dashboardMode);
+    const resolvedHref = hrefResolver ? hrefResolver(href) : href;
+    const dashboardHref = dashboardMode
+      ? getDashboardEditHref(href, dashboardMode)
+      : resolvedHref;
     const itemPath =
       href === "#" ? "#" : normalizePath(item.path || item.url || href);
     const isActive =
@@ -311,6 +327,7 @@ function renderMenuItems(
                 dashboardMode,
                 presentationById,
                 level + 1,
+                hrefResolver,
               )}
             </div>
           </div>
@@ -325,6 +342,10 @@ export default function HeaderNav({
   presentationById,
   categories,
   serviceHomepageMode,
+  scopedPreviewWebsiteId,
+  activePageKey,
+  scopedPreviewPages,
+  scopedLinkMode = "preview",
 }: HeaderNavProps) {
   const rawPathname = usePathname();
   const dashboardMode = rawPathname === "/dashboard";
@@ -375,7 +396,23 @@ export default function HeaderNav({
 
   const currentPath = dashboardMode
     ? getDashboardActivePath(dashboardPageKey)
-    : normalizePath(rawPathname || "/");
+    : activePageKey
+      ? getPreviewActivePathForPageKey(activePageKey)
+      : normalizePath(rawPathname || "/");
+  const activeScopedWebsiteId =
+    scopedPreviewWebsiteId ?? getScopedWebsiteIdFromPath(rawPathname);
+  const hrefResolver = activeScopedWebsiteId
+    ? (href: string) =>
+        scopedLinkMode === "builder"
+          ? resolveScopedBuilderHref(href, {
+              websiteId: activeScopedWebsiteId,
+              pages: scopedPreviewPages,
+            })
+          : resolveScopedPreviewHref(href, {
+              websiteId: activeScopedWebsiteId,
+              pages: scopedPreviewPages,
+            })
+    : undefined;
 
   return (
     <div className={`site-header-nav-container${isMobileOpen ? " is-open" : ""}`}>
@@ -395,7 +432,14 @@ export default function HeaderNav({
       </button>
 
       <nav className="site-header-nav">
-        {renderMenuItems(items, currentPath, dashboardMode, presentationById)}
+        {renderMenuItems(
+          items,
+          currentPath,
+          dashboardMode,
+          presentationById,
+          0,
+          hrefResolver,
+        )}
       </nav>
 
       {/* Unified Mobile Right Slide-in Drawer */}
@@ -475,11 +519,18 @@ export default function HeaderNav({
             <div className="mobile-drawer-section mobile-drawer-nav-links">
               <span className="mobile-drawer-section-title">Navigation</span>
               <div className="mobile-drawer-nav-items">
-                {renderMenuItems(items, currentPath, dashboardMode, presentationById)}
+                {renderMenuItems(
+                  items,
+                  currentPath,
+                  dashboardMode,
+                  presentationById,
+                  0,
+                  hrefResolver,
+                )}
                 {serviceHomepageMode && (
                   <div className="site-header-nav-item">
                     <Link
-                      href="/client"
+                      href={hrefResolver ? hrefResolver("/client") : "/client"}
                       className="site-header-nav-link mobile-drawer-builder-direct-link"
                       onClick={() => setIsMobileOpen(false)}
                     >

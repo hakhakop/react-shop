@@ -45,7 +45,7 @@
         "bottomMargin": "none",
         "layout": "whole",
         "layoutColumns": 1,
-        "layoutRows": 1,
+        "layoutRows": 2,
         "backgroundEffect": "antigravity2",
         "antigravitySpeed": 1.8,
         "antigravityParticleCount": 260,
@@ -248,6 +248,26 @@
                 },
                 "buttons": [],
                 "typewriterMobileReservedLines": 3
+              }
+            ]
+          },
+          {
+            "id": "layout-row-mr1t69ur-column-1",
+            "rowId": "layout-row-mr1t69ur",
+            "rowLayout": "whole",
+            "blocks": [
+              {
+                "id": "hero-block-mr1t6brt-0l8k0",
+                "kind": "hero",
+                "eyebrow": "Featured",
+                "title": "Tis is the Notebookmall website created by Super admin",
+                "body": "A strong visual opening with editable copy and action.",
+                "buttonLabel": "Learn more",
+                "buttonUrl": "/",
+                "carouselSettings": {
+                  "variant": "default"
+                },
+                "elementAlign": "center"
               }
             ]
           }
@@ -1368,7 +1388,7 @@
         ]
       }
     ],
-    "updatedAt": "2026-06-28T16:29:18.603Z"
+    "updatedAt": "2026-07-01T08:23:55.944Z"
   },
   "shop": {
     "version": 1,
@@ -1427,7 +1447,19 @@
                 "id": "hero-block-mr0c6m5r-sfxhx",
                 "kind": "hero",
                 "eyebrow": "Featured",
-                "title": "NOtebookMall",
+                "title": "Super admin NOtebookMall",
+                "body": "A strong visual opening with editable copy and action.",
+                "buttonLabel": "Learn more",
+                "buttonUrl": "/",
+                "carouselSettings": {
+                  "variant": "default"
+                }
+              },
+              {
+                "id": "hero-block-mr0ouwkx-85fzb",
+                "kind": "hero",
+                "eyebrow": "Featured",
+                "title": "Hero Element",
                 "body": "A strong visual opening with editable copy and action.",
                 "buttonLabel": "Learn more",
                 "buttonUrl": "/",
@@ -1553,7 +1585,7 @@
         "layoutRows": 1
       }
     ],
-    "updatedAt": "2026-06-30T07:40:08.677Z"
+    "updatedAt": "2026-06-30T18:23:45.506Z"
   },
   "client": {
     "version": 1,
@@ -5857,5 +5889,106 @@
       }
     ],
     "updatedAt": "2026-06-28T17:35:46.239Z"
+  },
+  "page:hey": {
+    "version": 1,
+    "key": "page:hey",
+    "page": "page:hey",
+    "targetType": "page",
+    "design": {
+      "preset": "princity",
+      "colorScheme": "auto",
+      "pageBackground": "#f7f7f4",
+      "textColor": "#111111",
+      "mutedTextColor": "#5f5f58",
+      "accentColor": "#a4be7b",
+      "surfaceColor": "#efefe9",
+      "buttonBackground": "#111111",
+      "buttonTextColor": "#ffffff",
+      "radius": "8px",
+      "sectionMaxWidth": "1640px",
+      "sectionGutter": "48px",
+      "headingFontFamily": "inherit",
+      "headingSize": "clamp(42px, 8vw, 126px)",
+      "headingWeight": "760",
+      "headingLineHeight": "0.92",
+      "cardBg": "#efefe9",
+      "cardRadius": "8px",
+      "cardBorder": "transparent",
+      "cardShadow": "0 12px 30px rgba(17,17,17,0.06)",
+      "cardShadowHover": "0 18px 42px rgba(17,17,17,0.1)",
+      "cardImageBg": "#ffffff",
+      "cardImagePadding": "clamp(22px, 2.4vw, 36px)"
+    },
+    "sections": [
+      {
+        "id": "page:hey-hero",
+        "kind": "hero",
+        "title": "Hey",
+        "eyebrow": "Builder page",
+        "body": "A custom React page created from the visual dashboard.",
+        "background": "#f7f7f4",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "layout": "split",
+        "topSpacing": "medium",
+        "bottomSpacing": "medium",
+        "visible": true
+      },
+      {
+        "id": "contentLayout-mr0oy1vl-hv6z2",
+        "kind": "contentLayout",
+        "title": "",
+        "background": "#ffffff",
+        "backgroundMode": "boxed",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "topSpacing": "inherit",
+        "bottomSpacing": "inherit",
+        "topMargin": "inherit",
+        "bottomMargin": "inherit",
+        "pullUnderHeader": false,
+        "visible": true,
+        "eyebrow": "",
+        "body": "",
+        "layout": "whole",
+        "layoutColumns": 1,
+        "layoutItems": [
+          {
+            "id": "layout-item-mr0oy1vl-1",
+            "blocks": [
+              {
+                "id": "products-block-mr0oy853-cfjm2",
+                "kind": "products",
+                "title": "Products",
+                "source": "all",
+                "layoutVariant": "grid",
+                "columns": 4,
+                "gridLimit": 12,
+                "filterPosition": "left",
+                "cardStyle": "flat",
+                "cardPreset": "standard",
+                "panelStyle": "default"
+              },
+              {
+                "id": "hero-block-mr0oy5u7-eni42",
+                "kind": "hero",
+                "eyebrow": "Featured",
+                "title": "Hero Element",
+                "body": "A strong visual opening with editable copy and action.",
+                "buttonLabel": "Learn more",
+                "buttonUrl": "/",
+                "carouselSettings": {
+                  "variant": "default"
+                }
+              }
+            ]
+          }
+        ],
+        "layoutRows": 1
+      }
+    ],
+    "updatedAt": "2026-06-30T13:37:22.542Z"
   }
 }

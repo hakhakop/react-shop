@@ -5,9 +5,12 @@
     "name": "Notebookmall",
     "slug": "note",
     "domain": null,
-    "status": "creating",
+    "status": "maintenance",
     "createdAt": "2026-06-29T19:29:57.677Z",
-    "updatedAt": "2026-06-29T19:29:57.677Z"
+    "updatedAt": "2026-06-30T14:20:54.291Z",
+    "description": "Hey you are what the rights",
+    "timeZone": "Asia/Yerevan",
+    "language": "hy"
   },
   {
     "id": "614be964-b02f-43de-8fbf-1bc633494479",
@@ -17,7 +20,10 @@
     "domain": null,
     "status": "creating",
     "createdAt": "2026-06-30T07:03:11.484Z",
-    "updatedAt": "2026-06-30T07:03:11.484Z"
+    "updatedAt": "2026-06-30T07:03:11.484Z",
+    "description": "",
+    "timeZone": "Asia/Yerevan",
+    "language": "hy"
   },
   {
     "id": "4fe2c519-6a13-4462-a67d-f547a2d71a08",
@@ -25,8 +31,11 @@
     "name": "Notebookmall",
     "slug": "note1",
     "domain": null,
-    "status": "creating",
+    "status": "maintenance",
     "createdAt": "2026-06-30T07:05:21.045Z",
-    "updatedAt": "2026-06-30T07:05:21.045Z"
+    "updatedAt": "2026-06-30T13:39:59.822Z",
+    "description": "hey hey hey",
+    "timeZone": "Asia/Yerevan",
+    "language": "hy"
   }
 ]

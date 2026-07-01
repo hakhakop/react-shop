@@ -8,6 +8,7 @@ import {
   ChevronRight,
   GripVertical,
   Plus,
+  Save,
   Trash2,
   FolderTree,
   Link,
@@ -19,6 +20,7 @@ import type { BuilderCustomPage } from "@/components/dashboard/builderTypes";
 type ReactMenuEditorPanelProps = {
   menuItems: ReactMenuItem[];
   onChangeMenuItems: (newItems: ReactMenuItem[]) => void;
+  onSaveMenuItems?: (newItems: ReactMenuItem[]) => void | Promise<void>;
   customPages: BuilderCustomPage[];
 };
 
@@ -111,6 +113,7 @@ function getFlattenedNodes(tree: TreeItem[], depth = 0): FlattenedNode[] {
 export default function ReactMenuEditorPanel({
   menuItems,
   onChangeMenuItems,
+  onSaveMenuItems,
   customPages,
 }: ReactMenuEditorPanelProps) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -445,6 +448,17 @@ export default function ReactMenuEditorPanel({
           <Plus size={13} />
           Add Item
         </button>
+        {onSaveMenuItems && (
+          <button
+            type="button"
+            onClick={() => void onSaveMenuItems(menuItems)}
+            className="builder-primary-button"
+            style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "6px 12px", minHeight: "30px", fontSize: "11px" }}
+          >
+            <Save size={13} />
+            Save Menu
+          </button>
+        )}
       </div>
 
       {flattenedNodes.length > 0 ? (
@@ -652,6 +666,7 @@ export default function ReactMenuEditorPanel({
                         type="text"
                         value={selectedItem.label}
                         onChange={(e) => handleUpdateItem(node.id, { label: e.target.value })}
+                        onKeyDown={(event) => event.stopPropagation()}
                         placeholder="e.g. Shop"
                         style={{ width: "100%", padding: "6px 8px", fontSize: "12px" }}
                       />
@@ -690,6 +705,7 @@ export default function ReactMenuEditorPanel({
                         type="text"
                         value={selectedItem.url}
                         onChange={(e) => handleUpdateItem(node.id, { url: e.target.value })}
+                        onKeyDown={(event) => event.stopPropagation()}
                         placeholder="e.g. /shop"
                         style={{ width: "100%", padding: "6px 8px", fontSize: "12px" }}
                       />

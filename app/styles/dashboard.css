@@ -4338,6 +4338,24 @@
   );
 }
 
+body.is-visual-builder-active .site-header {
+  display: none !important;
+}
+
+body.is-visual-builder-active .builder-preview-header-slot .site-header {
+  display: block !important;
+}
+
+body:has([data-scoped-builder-root]) .site-header,
+body:has([data-scoped-preview-root]) .site-header {
+  display: none !important;
+}
+
+body:has([data-scoped-builder-root]) .builder-preview-header-slot .site-header,
+body:has([data-scoped-preview-root]) [data-scoped-preview-root] .site-header {
+  display: block !important;
+}
+
 [data-theme="dark"] .builder-dashboard.builder-preview-scheme-auto,
 .dark .builder-dashboard.builder-preview-scheme-auto,
 [data-theme="dark"] .builder-preview-shell.builder-preview-scheme-auto,

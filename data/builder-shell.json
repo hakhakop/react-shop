@@ -9,7 +9,7 @@
   "headerLayout": "princity",
   "headerBrandMode": "logo",
   "headerBrandText": "WebPages",
-  "headerLogoUrl": "https://cms.webpages.am/wp-content/uploads/2025/11/logo-2-small.png",
+  "headerLogoUrl": "https://cms.webpages.am/wp-content/uploads/2026/06/logo-2-1-scaled.png",
   "headerLogoAlt": "WebPages logo",
   "headerLogoMaxWidth": 161,
   "headerIconVariant": "muted",
@@ -161,5 +161,5 @@
       "parentId": null
     }
   ],
-  "updatedAt": "2026-06-28T16:18:19.572Z"
+  "updatedAt": "2026-07-01T08:12:28.085Z"
 }

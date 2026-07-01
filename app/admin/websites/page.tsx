@@ -24,9 +24,9 @@ export default async function AdminWebsitesPage() {
   const usersById = new Map(users.map((item) => [item.id, item]));
 
   return (
-    <SaaSShell user={user} title="Websites" eyebrow="Admin workspace">
+    <SaaSShell user={user} title="All Websites" eyebrow="Admin workspace">
       <section className="saas-panel">
-        <h2>All SaaS websites</h2>
+        <h2>All Websites</h2>
         {websites.length === 0 ? (
           <p>No websites have been created yet.</p>
         ) : (
@@ -36,7 +36,7 @@ export default async function AdminWebsitesPage() {
               <span>Owner</span>
               <span>Status</span>
               <span>Created</span>
-              <span>Action</span>
+              <span>Actions</span>
             </div>
             {websites.map((website) => {
               const owner = usersById.get(website.ownerId);
@@ -50,9 +50,17 @@ export default async function AdminWebsitesPage() {
                   <span>{owner?.email ?? "Unknown owner"}</span>
                   <span>{website.status}</span>
                   <span>{new Date(website.createdAt).toLocaleDateString()}</span>
-                  <Link href={`/app/websites/${website.id}/builder`}>
-                    Builder
-                  </Link>
+                  <span className="saas-row-actions">
+                    <Link href={`/app/websites/${website.id}/builder`}>
+                      Builder
+                    </Link>
+                    <Link href={`/app/websites/${website.id}/settings`}>
+                      Settings
+                    </Link>
+                    <Link href={`/app/websites/${website.id}/preview`}>
+                      Preview
+                    </Link>
+                  </span>
                 </div>
               );
             })}

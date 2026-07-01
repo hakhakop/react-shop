@@ -43,6 +43,7 @@ export default async function WebsitesPage() {
               <article className="saas-website-card" key={website.id}>
                 <span>{website.status}</span>
                 <h3>{website.name}</h3>
+                {website.description && <p>{website.description}</p>}
                 <p>Slug: /{website.slug}</p>
                 <small>
                   Created {new Date(website.createdAt).toLocaleDateString()}
@@ -52,7 +53,9 @@ export default async function WebsitesPage() {
                     Open Builder
                   </Link>
                   <button type="button">Open Website</button>
-                  <button type="button">Settings</button>
+                  <Link href={`/app/websites/${website.id}/settings`}>
+                    Settings
+                  </Link>
                 </div>
               </article>
             ))}

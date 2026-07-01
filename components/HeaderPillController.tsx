@@ -4,18 +4,16 @@ import { useEffect } from "react";
 
 export default function HeaderPillController() {
   useEffect(() => {
-    if (document.querySelector(".builder-dashboard")) return;
-
-    const el = document.getElementById("site-header-pill");
-    if (!el) return;
+    const pills = Array.from(
+      document.querySelectorAll<HTMLElement>("#site-header-pill"),
+    );
+    if (pills.length === 0) return;
 
     const threshold = 56;
     let ticking = false;
 
-    const getScrollY = () => {
-      const previewShell = document.querySelector<HTMLElement>(
-        ".builder-preview-shell",
-      );
+    const getScrollY = (el: HTMLElement) => {
+      const previewShell = el.closest<HTMLElement>(".builder-preview-shell");
       const previewShellOverflow = previewShell
         ? window.getComputedStyle(previewShell).overflowY
         : "";
@@ -23,7 +21,7 @@ export default function HeaderPillController() {
         previewShell &&
         previewShell.scrollHeight > previewShell.clientHeight + 1 &&
         (previewShellOverflow === "auto" || previewShellOverflow === "scroll");
-      if (previewShell?.contains(el) && shellCanScroll) {
+      if (shellCanScroll) {
         return Math.round(previewShell.scrollTop || 0);
       }
       return Math.round(
@@ -37,13 +35,15 @@ export default function HeaderPillController() {
 
     const update = () => {
       ticking = false;
-      const isScrolled = getScrollY() > threshold;
-      el.dataset.scrolled = isScrolled ? "true" : "false";
-      el.dataset.pillInit = "true";
-      el.closest<HTMLElement>(".site-header")?.setAttribute(
-        "data-scrolled",
-        isScrolled ? "true" : "false",
-      );
+      pills.forEach((el) => {
+        const isScrolled = getScrollY(el) > threshold;
+        el.dataset.scrolled = isScrolled ? "true" : "false";
+        el.dataset.pillInit = "true";
+        el.closest<HTMLElement>(".site-header")?.setAttribute(
+          "data-scrolled",
+          isScrolled ? "true" : "false",
+        );
+      });
     };
 
     const onScroll = () => {
@@ -55,15 +55,23 @@ export default function HeaderPillController() {
     update();
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onScroll, { passive: true });
-    const previewShell = document.querySelector<HTMLElement>(
-      ".builder-preview-shell",
+    const previewShells = Array.from(
+      new Set(
+        pills
+          .map((el) => el.closest<HTMLElement>(".builder-preview-shell"))
+          .filter((el): el is HTMLElement => Boolean(el)),
+      ),
     );
-    previewShell?.addEventListener("scroll", onScroll, { passive: true });
+    previewShells.forEach((previewShell) => {
+      previewShell.addEventListener("scroll", onScroll, { passive: true });
+    });
 
     return () => {
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
-      previewShell?.removeEventListener("scroll", onScroll);
+      previewShells.forEach((previewShell) => {
+        previewShell.removeEventListener("scroll", onScroll);
+      });
     };
   }, []);
 

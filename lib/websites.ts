@@ -2,9 +2,10 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import crypto from "node:crypto";
 import path from "node:path";
 import { isSaaSAdmin, type PublicSaaSUser } from "@/lib/auth";
+import { getRuntimeDataDir } from "@/lib/runtimeDataDir";
 import { ensureWebsiteBuilderData } from "@/lib/websiteBuilderData";
 
-export type WebsiteStatus = "creating" | "active" | "suspended";
+export type WebsiteStatus = "creating" | "active" | "maintenance" | "suspended";
 
 export type SaaSWebsite = {
   id: string;
@@ -12,6 +13,9 @@ export type SaaSWebsite = {
   name: string;
   slug: string;
   domain: string | null;
+  description: string;
+  timeZone: string;
+  language: string;
   status: WebsiteStatus;
   createdAt: string;
   updatedAt: string;
@@ -21,8 +25,7 @@ type StoredWebsite = Omit<SaaSWebsite, "status"> & {
   status: WebsiteStatus | "draft";
 };
 
-const DATA_DIR = path.join(process.cwd(), "data");
-const WEBSITES_FILE = path.join(DATA_DIR, "websites.json");
+const WEBSITES_FILE = () => path.join(getRuntimeDataDir(), "websites.json");
 const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
 function normalizeName(name: unknown) {
@@ -46,6 +49,7 @@ function isStoredWebsite(value: unknown): value is StoredWebsite {
     (status === "creating" ||
       status === "draft" ||
       status === "active" ||
+      status === "maintenance" ||
       status === "suspended") &&
     typeof website.createdAt === "string" &&
     typeof website.updatedAt === "string"
@@ -73,15 +77,67 @@ export function validateWebsiteInput(input: {
   return { name, slug };
 }
 
+function normalizeDescription(description: unknown) {
+  return typeof description === "string"
+    ? description.trim().replace(/\s+/g, " ").slice(0, 240)
+    : "";
+}
+
+function normalizeOption(value: unknown, fallback: string) {
+  return typeof value === "string" && value.trim()
+    ? value.trim().slice(0, 80)
+    : fallback;
+}
+
+function normalizeWebsiteStatus(value: unknown): WebsiteStatus | null {
+  return value === "active" || value === "maintenance" || value === "suspended"
+    ? value
+    : null;
+}
+
+export function validateWebsiteSettingsInput(input: {
+  name?: unknown;
+  slug?: unknown;
+  description?: unknown;
+  timeZone?: unknown;
+  language?: unknown;
+  status?: unknown;
+}) {
+  const base = validateWebsiteInput(input);
+  if ("error" in base) {
+    return { error: base.error ?? "Invalid website settings." };
+  }
+  const { name, slug } = base;
+
+  const status = normalizeWebsiteStatus(input.status);
+  if (!status) {
+    return { error: "Choose a valid website status." };
+  }
+
+  return {
+    name,
+    slug,
+    description: normalizeDescription(input.description),
+    timeZone: normalizeOption(input.timeZone, "Asia/Yerevan"),
+    language: normalizeOption(input.language, "hy"),
+    status,
+  };
+}
+
 export async function readWebsites(): Promise<SaaSWebsite[]> {
   try {
-    const raw = await readFile(WEBSITES_FILE, "utf8");
+    const raw = await readFile(WEBSITES_FILE(), "utf8");
     const parsed = JSON.parse(raw) as unknown;
     if (!Array.isArray(parsed)) return [];
     return parsed.filter(isStoredWebsite).map((website) => ({
       ...website,
       status: website.status === "draft" ? "creating" : website.status,
       domain: website.domain || null,
+      description:
+        typeof website.description === "string" ? website.description : "",
+      timeZone:
+        typeof website.timeZone === "string" ? website.timeZone : "Asia/Yerevan",
+      language: typeof website.language === "string" ? website.language : "hy",
     }));
   } catch {
     return [];
@@ -89,9 +145,10 @@ export async function readWebsites(): Promise<SaaSWebsite[]> {
 }
 
 async function writeWebsites(websites: SaaSWebsite[]) {
-  await mkdir(DATA_DIR, { recursive: true });
+  const websitesFile = WEBSITES_FILE();
+  await mkdir(path.dirname(websitesFile), { recursive: true });
   await writeFile(
-    WEBSITES_FILE,
+    websitesFile,
     `${JSON.stringify(websites, null, 2)}\n`,
     "utf8",
   );
@@ -134,6 +191,9 @@ export async function createWebsite(input: {
     name: normalizeName(input.name),
     slug,
     domain: null,
+    description: "",
+    timeZone: "Asia/Yerevan",
+    language: "hy",
     status: "creating",
     createdAt: now,
     updatedAt: now,
@@ -142,6 +202,49 @@ export async function createWebsite(input: {
   await writeWebsites([...websites, website]);
   await ensureWebsiteBuilderData(website.id);
   return { website };
+}
+
+export async function updateWebsiteSettings(input: {
+  websiteId: string;
+  name: string;
+  slug: string;
+  description: string;
+  timeZone: string;
+  language: string;
+  status: WebsiteStatus;
+}) {
+  const websites = await readWebsites();
+  const website = websites.find((item) => item.id === input.websiteId);
+
+  if (!website) {
+    return { error: "Website not found." };
+  }
+
+  const slug = normalizeSlug(input.slug);
+  if (
+    websites.some(
+      (item) => item.id !== website.id && normalizeSlug(item.slug) === slug,
+    )
+  ) {
+    return { error: "This slug is already used by another website." };
+  }
+
+  const updatedWebsite: SaaSWebsite = {
+    ...website,
+    name: normalizeName(input.name),
+    slug,
+    description: normalizeDescription(input.description),
+    timeZone: normalizeOption(input.timeZone, "Asia/Yerevan"),
+    language: normalizeOption(input.language, "hy"),
+    status: input.status,
+    updatedAt: new Date().toISOString(),
+  };
+
+  await writeWebsites(
+    websites.map((item) => (item.id === website.id ? updatedWebsite : item)),
+  );
+
+  return { website: updatedWebsite };
 }
 
 export function getWebsiteCountsByOwner(websites: SaaSWebsite[]) {

@@ -7,9 +7,9 @@
   "headerBackgroundMode": "none",
   "headerTextMode": "auto",
   "headerLayout": "princity",
-  "headerBrandMode": "logo",
+  "headerBrandMode": "brand",
   "headerBrandText": "WebPages",
-  "headerLogoUrl": "https://cms.webpages.am/wp-content/uploads/2025/11/logo-2-small.png",
+  "headerLogoUrl": "https://cms.webpages.am/wp-content/uploads/2026/06/business-card-flat.png",
   "headerLogoAlt": "WebPages logo",
   "headerLogoMaxWidth": 161,
   "headerIconVariant": "muted",
@@ -77,7 +77,7 @@
   },
   "storefrontPreset": "princity",
   "primaryColor": "#111111",
-  "accentColor": "#940a0a",
+  "accentColor": "#8f3d3d",
   "productCardRadius": "10px",
   "productCardBg": "#ffffff",
   "productCardShadow": "0 0 0 rgba(15, 23, 42, 0)",
@@ -155,11 +155,17 @@
       "parentId": "menu_sbyhyzc43"
     },
     {
+      "id": "menu_hxrp1vy4v",
+      "label": "New Page1",
+      "url": "/new-page",
+      "parentId": null
+    },
+    {
       "id": "shop",
       "label": "Խանութ",
       "url": "/shop",
       "parentId": null
     }
   ],
-  "updatedAt": "2026-06-28T16:18:19.572Z"
+  "updatedAt": "2026-07-01T08:46:16.265Z"
 }
