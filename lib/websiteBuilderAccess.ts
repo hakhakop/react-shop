@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
-import { canAccessWebsiteBuilder, getWebsiteById } from "@/lib/websites";
+import { canAccessWebsiteBuilder, getWebsiteByIdOrSlug } from "@/lib/websites";
 import { ensureWebsiteBuilderData } from "@/lib/websiteBuilderData";
 
 export async function getAuthorizedWebsiteBuilderScope(request: NextRequest) {
@@ -19,7 +19,7 @@ export async function getAuthorizedWebsiteBuilderScope(request: NextRequest) {
     };
   }
 
-  const website = await getWebsiteById(websiteId);
+  const website = await getWebsiteByIdOrSlug(websiteId);
   if (!website || !canAccessWebsiteBuilder(user, website)) {
     return {
       error: NextResponse.json({ error: "Access denied." }, { status: 403 }),

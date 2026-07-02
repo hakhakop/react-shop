@@ -37,5 +37,18 @@
     "description": "hey hey hey",
     "timeZone": "Asia/Yerevan",
     "language": "hy"
+  },
+  {
+    "id": "82339d1e-f7a3-490d-9528-a1107179278e",
+    "ownerId": "a010b610-5c47-441c-b2ec-00a6e9eb3f88",
+    "name": "SteelChef",
+    "slug": "steel",
+    "domain": null,
+    "description": "",
+    "timeZone": "Asia/Yerevan",
+    "language": "hy",
+    "status": "creating",
+    "createdAt": "2026-07-02T15:12:01.040Z",
+    "updatedAt": "2026-07-02T15:12:01.040Z"
   }
 ]

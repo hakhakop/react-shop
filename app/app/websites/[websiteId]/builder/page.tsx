@@ -5,7 +5,11 @@ import AccessDenied from "@/components/saas/AccessDenied";
 import DashboardBuilder from "@/components/dashboard/DashboardBuilder";
 import { getCurrentUser } from "@/lib/auth";
 import { loginRedirectFor } from "@/lib/saasRoutes";
-import { canAccessWebsiteBuilder, getWebsiteById } from "@/lib/websites";
+import {
+  canAccessWebsiteBuilder,
+  getWebsiteByIdOrSlug,
+  getWebsiteRouteSegment,
+} from "@/lib/websites";
 import { ensureWebsiteBuilderData } from "@/lib/websiteBuilderData";
 
 export const metadata = {
@@ -62,7 +66,7 @@ export default async function WebsiteBuilderPage({
     redirect(loginRedirectFor(requestedPath));
   }
 
-  const website = await getWebsiteById(websiteId);
+  const website = await getWebsiteByIdOrSlug(websiteId);
   if (!website || !canAccessWebsiteBuilder(user, website)) {
     return <AccessDenied />;
   }
@@ -77,7 +81,11 @@ export default async function WebsiteBuilderPage({
   return (
     <div data-scoped-builder-root>
       <Suspense fallback={null}>
-        <DashboardBuilder websiteId={website.id} saasUserRole={user.role} />
+        <DashboardBuilder
+          websiteId={website.id}
+          websiteRouteSegment={getWebsiteRouteSegment(website)}
+          saasUserRole={user.role}
+        />
       </Suspense>
     </div>
   );

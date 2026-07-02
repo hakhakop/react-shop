@@ -1478,6 +1478,23 @@
   height: 38px;
 }
 
+.site-header-action-pill.site-header-saas-cta,
+.site-header-princity .site-header-action-pill.site-header-saas-cta {
+  width: auto;
+  min-width: max-content;
+  max-width: none;
+  height: 38px;
+  min-height: 38px;
+  border-radius: 999px;
+  padding: 0 16px;
+  background: var(--surface-muted, #f5f5f3);
+  color: var(--text-main, #111111);
+  font-size: 13px;
+  font-weight: 900;
+  line-height: 1;
+  white-space: nowrap;
+}
+
 .site-header--service .site-header-princity .site-header-brand {
   display: inline-flex;
   font-size: 20px;

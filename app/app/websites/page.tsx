@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import SaaSShell from "@/components/saas/SaaSShell";
 import { getCurrentUser } from "@/lib/auth";
-import { getWebsitesForOwner } from "@/lib/websites";
+import { getWebsiteRouteSegment, getWebsitesForOwner } from "@/lib/websites";
 import { loginRedirectFor } from "@/lib/saasRoutes";
 import { getDefaultWebsiteBuilderLinks } from "@/lib/websiteBuilderLinks.server";
 
@@ -19,7 +19,7 @@ export default async function WebsitesPage() {
   const websites = await getWebsitesForOwner(user.id);
   const websiteCards = await Promise.all(
     websites.map(async (website) => {
-      const links = await getDefaultWebsiteBuilderLinks(website.id);
+      const links = await getDefaultWebsiteBuilderLinks(website);
       return {
         website,
         ...links,
@@ -63,7 +63,7 @@ export default async function WebsitesPage() {
                     Open Builder
                   </Link>
                   <Link href={previewHref}>Open Website</Link>
-                  <Link href={`/app/websites/${website.id}/settings`}>
+                  <Link href={`/app/websites/${getWebsiteRouteSegment(website)}/settings`}>
                     Settings
                   </Link>
                 </div>

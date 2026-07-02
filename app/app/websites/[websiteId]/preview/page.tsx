@@ -27,7 +27,11 @@ import {
   type BuilderSpacingContext,
 } from "@/lib/builderSpacing";
 import { loginRedirectFor } from "@/lib/saasRoutes";
-import { canAccessWebsiteBuilder, getWebsiteById } from "@/lib/websites";
+import {
+  canAccessWebsiteBuilder,
+  getWebsiteByIdOrSlug,
+  getWebsiteRouteSegment,
+} from "@/lib/websites";
 
 export const dynamic = "force-dynamic";
 
@@ -132,7 +136,7 @@ export default async function WebsitePreviewPage({
     redirect(loginRedirectFor(requestedPath));
   }
 
-  const website = await getWebsiteById(websiteId);
+  const website = await getWebsiteByIdOrSlug(websiteId);
   if (!website || !canAccessWebsiteBuilder(user, website)) {
     return <AccessDenied />;
   }
@@ -145,6 +149,7 @@ export default async function WebsitePreviewPage({
     key: item.key,
     slug: item.slug,
   }));
+  const websiteRouteSegment = getWebsiteRouteSegment(website);
   const page = resolvePreviewPageKey(requestedPage, customPages);
   console.log("[builder-preview-scope] resolved files", {
     websiteId: website.id,
@@ -179,7 +184,7 @@ export default async function WebsitePreviewPage({
   return (
     <div data-scoped-preview-root>
       <ScopedPreviewLinkRouter
-        websiteId={website.id}
+        websiteId={websiteRouteSegment}
         pages={scopedPreviewPages}
       />
       <style
@@ -189,7 +194,7 @@ export default async function WebsitePreviewPage({
       <HeaderShell
         layoutOverride={shellSettings.headerLayout}
         shellSettingsOverride={shellSettings}
-        scopedPreviewWebsiteId={website.id}
+        scopedPreviewWebsiteId={websiteRouteSegment}
         scopedPreviewPage={page}
         scopedPreviewPages={scopedPreviewPages}
       />

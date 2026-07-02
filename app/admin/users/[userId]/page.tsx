@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import AccessDenied from "@/components/saas/AccessDenied";
 import SaaSShell from "@/components/saas/SaaSShell";
 import { findUserById, getCurrentUser, isSaaSAdmin, toPublicUser } from "@/lib/auth";
-import { getWebsitesForOwner } from "@/lib/websites";
+import { getWebsiteRouteSegment, getWebsitesForOwner } from "@/lib/websites";
 import { loginRedirectFor } from "@/lib/saasRoutes";
 import { getDefaultWebsiteBuilderLinks } from "@/lib/websiteBuilderLinks.server";
 
@@ -57,7 +57,7 @@ export default async function AdminUserDetailPage({
   const websites = await getWebsitesForOwner(publicUser.id);
   const websiteCards = await Promise.all(
     websites.map(async (website) => {
-      const links = await getDefaultWebsiteBuilderLinks(website.id);
+      const links = await getDefaultWebsiteBuilderLinks(website);
       return {
         website,
         ...links,
@@ -128,7 +128,7 @@ export default async function AdminUserDetailPage({
                   <Link href={previewHref}>
                     Preview
                   </Link>
-                  <Link href={`/app/websites/${website.id}/settings`}>
+                  <Link href={`/app/websites/${getWebsiteRouteSegment(website)}/settings`}>
                     Settings
                   </Link>
                 </div>

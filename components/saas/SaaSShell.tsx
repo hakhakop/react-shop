@@ -1,5 +1,6 @@
 import Link from "next/link";
 import LogoutButton from "@/components/auth/LogoutButton";
+import ThemeToggle from "@/components/ThemeToggle";
 import { isSaaSAdmin, type PublicSaaSUser } from "@/lib/auth";
 
 type SaaSShellProps = {
@@ -51,11 +52,6 @@ export default function SaaSShell({
           )}
         </nav>
 
-        <div className="saas-shell-user">
-          <span>{user.name}</span>
-          <small>{user.email}</small>
-          <LogoutButton />
-        </div>
       </aside>
 
       <section className="saas-shell-main">
@@ -64,9 +60,19 @@ export default function SaaSShell({
             <span>{eyebrow}</span>
             <h1>{title}</h1>
           </div>
-          <Link className="saas-shell-header-link" href={actionHref}>
-            {actionLabel}
-          </Link>
+          <div className="saas-shell-header-actions">
+            <ThemeToggle variant="ghost" size="md" />
+            <Link className="saas-shell-header-link" href={actionHref}>
+              {actionLabel}
+            </Link>
+            <div className="saas-shell-account">
+              <div className="saas-shell-account-copy">
+                <span>{user.name}</span>
+                <small>{user.email}</small>
+              </div>
+              <LogoutButton />
+            </div>
+          </div>
         </header>
         {children}
       </section>

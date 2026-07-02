@@ -593,12 +593,12 @@ function getFrontendUrlForBuilderKey(
 function getPreviewUrlForBuilderKey(
   key: BuilderLayoutKey,
   customPages: BuilderCustomPage[],
-  websiteId?: string,
+  websiteRouteSegment?: string,
 ) {
-  if (!websiteId) return getFrontendUrlForBuilderKey(key, customPages);
+  if (!websiteRouteSegment) return getFrontendUrlForBuilderKey(key, customPages);
 
   const params = new URLSearchParams({ page: key });
-  return `/app/websites/${websiteId}/preview?${params.toString()}`;
+  return `/app/websites/${websiteRouteSegment}/preview?${params.toString()}`;
 }
 
 const lightScheme = {
@@ -1291,12 +1291,14 @@ function getPreviewProductModel(previewProducts: ProductNode[]) {
 export type DashboardBuilderProps = {
   menuTree?: MenuItem[];
   websiteId?: string;
+  websiteRouteSegment?: string;
   saasUserRole?: SaaSUserRole;
 };
 
 export default function DashboardBuilder({
   menuTree = [],
   websiteId,
+  websiteRouteSegment = websiteId,
   saasUserRole,
 }: DashboardBuilderProps) {
   const router = useRouter();
@@ -1524,8 +1526,13 @@ export default function DashboardBuilder({
     [],
   );
   const currentFrontendUrl = useMemo(
-    () => getPreviewUrlForBuilderKey(builderState.page, customPages, websiteId),
-    [builderState.page, customPages, websiteId],
+    () =>
+      getPreviewUrlForBuilderKey(
+        builderState.page,
+        customPages,
+        websiteRouteSegment,
+      ),
+    [builderState.page, customPages, websiteRouteSegment],
   );
   const scopedPreviewPages = useMemo(
     () =>
@@ -7791,15 +7798,15 @@ export default function DashboardBuilder({
                   headerSettings={dashboardHeaderSettings}
                   homeHref={
                     websiteId
-                      ? `/app/websites/${websiteId}/builder?page=home`
+                      ? `/app/websites/${websiteRouteSegment}/builder?page=home`
                       : "/dashboard?page=home"
                   }
                   clientHref={
                     websiteId
-                      ? `/app/websites/${websiteId}/builder?page=client`
+                      ? `/app/websites/${websiteRouteSegment}/builder?page=client`
                       : "/dashboard?page=client"
                   }
-                  scopedPreviewWebsiteId={websiteId}
+                  scopedPreviewWebsiteId={websiteRouteSegment}
                   scopedPreviewPage={builderState.page}
                   scopedPreviewPages={scopedPreviewPages}
                   scopedLinkMode="builder"

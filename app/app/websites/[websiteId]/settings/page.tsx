@@ -7,6 +7,8 @@ import { loginRedirectFor } from "@/lib/saasRoutes";
 import {
   canAccessWebsiteBuilder,
   getWebsiteById,
+  getWebsiteByIdOrSlug,
+  getWebsiteRouteSegment,
   updateWebsiteSettings,
   validateWebsiteSettingsInput,
   type WebsiteStatus,
@@ -88,7 +90,13 @@ async function saveWebsiteSettingsAction(formData: FormData) {
     errorRedirect(result.error ?? "Website settings could not be saved.");
   }
 
-  redirect(`/app/websites/${websiteId}/settings?saved=1`);
+  if (!("website" in result) || !result.website) {
+    errorRedirect("Website settings could not be saved.");
+  }
+
+  redirect(
+    `/app/websites/${getWebsiteRouteSegment(result.website!)}/settings?saved=1`,
+  );
 }
 
 export default async function WebsiteSettingsPage({
@@ -105,7 +113,7 @@ export default async function WebsiteSettingsPage({
     redirect(loginRedirectFor(`/app/websites/${websiteId}/settings`));
   }
 
-  const website = await getWebsiteById(websiteId);
+  const website = await getWebsiteByIdOrSlug(websiteId);
   if (!website || !canAccessWebsiteBuilder(user, website)) {
     return <AccessDenied />;
   }

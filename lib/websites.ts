@@ -164,6 +164,19 @@ export async function getWebsiteById(id: string) {
   return websites.find((website) => website.id === id) ?? null;
 }
 
+export async function getWebsiteByIdOrSlug(value: string) {
+  const websites = await readWebsites();
+  return (
+    websites.find((website) => website.id === value) ??
+    websites.find((website) => website.slug === normalizeSlug(value)) ??
+    null
+  );
+}
+
+export function getWebsiteRouteSegment(website: Pick<SaaSWebsite, "id" | "slug">) {
+  return website.slug || website.id;
+}
+
 export function canAccessWebsiteBuilder(
   user: PublicSaaSUser | null | undefined,
   website: SaaSWebsite | null | undefined,
