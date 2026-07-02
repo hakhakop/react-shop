@@ -23,6 +23,7 @@ type HeaderShellProps = {
   scopedPreviewWebsiteId?: string;
   scopedPreviewPage?: BuilderLayoutKey;
   scopedPreviewPages?: Pick<BuilderCustomPage, "key" | "slug">[];
+  hideSaaSEntry?: boolean;
 };
 
 export default async function HeaderShell({
@@ -31,6 +32,7 @@ export default async function HeaderShell({
   scopedPreviewWebsiteId,
   scopedPreviewPage,
   scopedPreviewPages,
+  hideSaaSEntry = false,
 }: HeaderShellProps) {
   const [settingsRaw, shellSettingsRaw, homeLayout] = await Promise.all([
     getThemeSettings().catch(() => ({})),
@@ -77,6 +79,7 @@ export default async function HeaderShell({
       scopedPreviewWebsiteId={scopedPreviewWebsiteId}
       scopedPreviewPage={scopedPreviewPage}
       scopedPreviewPages={scopedPreviewPages}
+      hideSaaSEntry={hideSaaSEntry}
       categoriesContent={<CategoryMegaMenu />}
     />
   );

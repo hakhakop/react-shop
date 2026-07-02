@@ -109,6 +109,7 @@ type HeaderShellViewProps = {
   scopedPreviewPage?: BuilderLayoutKey;
   scopedPreviewPages?: Pick<BuilderCustomPage, "key" | "slug">[];
   scopedLinkMode?: "builder" | "preview";
+  hideSaaSEntry?: boolean;
   categoriesContent?: ReactNode;
 };
 
@@ -124,6 +125,7 @@ export default function HeaderShellView({
   scopedPreviewPage,
   scopedPreviewPages,
   scopedLinkMode,
+  hideSaaSEntry = false,
   categoriesContent,
 }: HeaderShellViewProps) {
   const primaryColor =
@@ -282,7 +284,7 @@ export default function HeaderShellView({
           Start
         </Link>
       )}
-      {!scopedPreviewWebsiteId && <HeaderSaaSEntry />}
+      {!scopedPreviewWebsiteId && !hideSaaSEntry && <HeaderSaaSEntry />}
       <HeaderActions
         icons={effectiveIconOrder}
         iconVariant={effectiveIconVariant}

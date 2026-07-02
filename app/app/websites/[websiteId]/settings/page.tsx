@@ -5,6 +5,7 @@ import SaaSShell from "@/components/saas/SaaSShell";
 import { getCurrentUser, isSaaSAdmin } from "@/lib/auth";
 import { loginRedirectFor } from "@/lib/saasRoutes";
 import {
+  addWebsiteDomain,
   canAccessWebsiteBuilder,
   getWebsiteById,
   getWebsiteByIdOrSlug,
@@ -21,6 +22,7 @@ type WebsiteSettingsPageProps = {
     websiteId: string;
   }>;
   searchParams?: Promise<{
+    domainSaved?: string;
     error?: string;
     saved?: string;
   }>;
@@ -39,7 +41,6 @@ const futureCards = [
   { title: "Branding", description: "Logo, favicon, colors, and brand assets." },
   { title: "Logo", description: "Upload and manage the main website logo." },
   { title: "Favicon", description: "Set browser and mobile shortcut icons." },
-  { title: "Domains", description: "Connect custom domains and DNS later." },
   { title: "SEO", description: "Default metadata and search appearance." },
   { title: "Members", description: "Invite teammates and manage access." },
 ];
@@ -97,6 +98,40 @@ async function saveWebsiteSettingsAction(formData: FormData) {
   redirect(
     `/app/websites/${getWebsiteRouteSegment(result.website!)}/settings?saved=1`,
   );
+}
+
+async function addWebsiteDomainAction(formData: FormData) {
+  "use server";
+
+  const websiteId = String(formData.get("websiteId") ?? "");
+  const domain = String(formData.get("domain") ?? "");
+  const user = await getCurrentUser(await cookies());
+  const errorRedirect = (message: string): never => {
+    const params = new URLSearchParams({ error: message });
+    redirect(`/app/websites/${websiteId}/settings?${params.toString()}#domains`);
+  };
+
+  if (!user) {
+    redirect(loginRedirectFor(`/app/websites/${websiteId}/settings`));
+  }
+
+  const website = await getWebsiteById(websiteId);
+  if (!website || !canAccessWebsiteBuilder(user, website)) {
+    errorRedirect("Access denied.");
+  }
+
+  const result = await addWebsiteDomain({ websiteId, domain });
+  if ("error" in result) {
+    errorRedirect(result.error ?? "Domain could not be added.");
+  }
+
+  if ("website" in result && result.website) {
+    redirect(
+      `/app/websites/${getWebsiteRouteSegment(result.website)}/settings?domainSaved=1#domains`,
+    );
+  }
+
+  errorRedirect("Domain could not be added.");
 }
 
 export default async function WebsiteSettingsPage({
@@ -225,6 +260,47 @@ export default async function WebsiteSettingsPage({
 
               <button className="saas-auth-submit" type="submit">
                 Save Changes
+              </button>
+            </form>
+          </section>
+
+          <section className="saas-panel" id="domains">
+            <div className="saas-panel-heading">
+              <div>
+                <h2>Domains</h2>
+                <p>Add custom domains manually. DNS and SSL automation come later.</p>
+              </div>
+            </div>
+
+            {website.domains.length > 0 ? (
+              <div className="saas-domain-list">
+                {website.domains.map((domain) => (
+                  <div className="saas-domain-item" key={domain}>
+                    <span>{domain}</span>
+                    {domain === website.primaryDomain && <strong>Primary</strong>}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p>No custom domains connected yet.</p>
+            )}
+
+            <form className="saas-settings-form" action={addWebsiteDomainAction}>
+              <input type="hidden" name="websiteId" value={website.id} />
+              <label className="saas-auth-field saas-field-wide">
+                <span>Domain</span>
+                <input
+                  name="domain"
+                  required
+                  placeholder="clientdomain.am"
+                  autoComplete="off"
+                />
+              </label>
+              {query?.domainSaved && (
+                <p className="saas-auth-success">Domain added.</p>
+              )}
+              <button className="saas-auth-submit" type="submit">
+                Add Domain
               </button>
             </form>
           </section>

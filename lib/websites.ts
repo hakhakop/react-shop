@@ -13,6 +13,8 @@ export type SaaSWebsite = {
   name: string;
   slug: string;
   domain: string | null;
+  primaryDomain: string | null;
+  domains: string[];
   description: string;
   timeZone: string;
   language: string;
@@ -27,6 +29,7 @@ type StoredWebsite = Omit<SaaSWebsite, "status"> & {
 
 const WEBSITES_FILE = () => path.join(getRuntimeDataDir(), "websites.json");
 const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+const DOMAIN_LABEL_PATTERN = /^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/;
 
 function normalizeName(name: unknown) {
   return typeof name === "string" ? name.trim().replace(/\s+/g, " ") : "";
@@ -34,6 +37,60 @@ function normalizeName(name: unknown) {
 
 function normalizeSlug(slug: unknown) {
   return typeof slug === "string" ? slug.trim().toLowerCase() : "";
+}
+
+export function normalizeWebsiteDomain(domain: unknown) {
+  if (typeof domain !== "string") return "";
+  let normalized = domain.trim().toLowerCase();
+  if (!normalized) return "";
+
+  normalized = normalized.replace(/^[a-z][a-z0-9+.-]*:\/\//, "");
+  normalized = normalized.replace(/^[^@/]+@/, "");
+  normalized = normalized.split(/[/?#]/)[0] ?? "";
+  normalized = normalized.replace(/\.$/, "");
+
+  if (normalized.startsWith("[") && normalized.includes("]")) {
+    return normalized;
+  }
+
+  const colonIndex = normalized.lastIndexOf(":");
+  if (colonIndex > -1 && normalized.indexOf(":") === colonIndex) {
+    normalized = normalized.slice(0, colonIndex);
+  }
+
+  return normalized;
+}
+
+function uniqueDomains(domains: unknown[]) {
+  return Array.from(
+    new Set(
+      domains
+        .map(normalizeWebsiteDomain)
+        .filter((domain) => domain.length > 0),
+    ),
+  );
+}
+
+function getWebsiteDomains(
+  website: Partial<StoredWebsite> | Partial<SaaSWebsite>,
+) {
+  return uniqueDomains([
+    website.primaryDomain,
+    website.domain,
+    ...(Array.isArray(website.domains) ? website.domains : []),
+  ]);
+}
+
+function isValidWebsiteDomain(domain: string) {
+  if (!domain || domain.length > 253 || domain.includes(" ")) return false;
+  if (domain === "localhost") return false;
+  if (/^\d+\.\d+\.\d+\.\d+$/.test(domain)) return true;
+
+  const labels = domain.split(".");
+  return (
+    labels.length >= 2 &&
+    labels.every((label) => DOMAIN_LABEL_PATTERN.test(label))
+  );
 }
 
 function isStoredWebsite(value: unknown): value is StoredWebsite {
@@ -45,7 +102,9 @@ function isStoredWebsite(value: unknown): value is StoredWebsite {
     typeof website.ownerId === "string" &&
     typeof website.name === "string" &&
     typeof website.slug === "string" &&
-    (typeof website.domain === "string" || website.domain === null) &&
+    (typeof website.domain === "string" ||
+      typeof website.domain === "undefined" ||
+      website.domain === null) &&
     (status === "creating" ||
       status === "draft" ||
       status === "active" ||
@@ -129,16 +188,24 @@ export async function readWebsites(): Promise<SaaSWebsite[]> {
     const raw = await readFile(WEBSITES_FILE(), "utf8");
     const parsed = JSON.parse(raw) as unknown;
     if (!Array.isArray(parsed)) return [];
-    return parsed.filter(isStoredWebsite).map((website) => ({
-      ...website,
-      status: website.status === "draft" ? "creating" : website.status,
-      domain: website.domain || null,
-      description:
-        typeof website.description === "string" ? website.description : "",
-      timeZone:
-        typeof website.timeZone === "string" ? website.timeZone : "Asia/Yerevan",
-      language: typeof website.language === "string" ? website.language : "hy",
-    }));
+    return parsed.filter(isStoredWebsite).map((website) => {
+      const domains = getWebsiteDomains(website);
+      const primaryDomain =
+        normalizeWebsiteDomain(website.primaryDomain) || domains[0] || null;
+
+      return {
+        ...website,
+        status: website.status === "draft" ? "creating" : website.status,
+        domain: primaryDomain,
+        primaryDomain,
+        domains,
+        description:
+          typeof website.description === "string" ? website.description : "",
+        timeZone:
+          typeof website.timeZone === "string" ? website.timeZone : "Asia/Yerevan",
+        language: typeof website.language === "string" ? website.language : "hy",
+      };
+    });
   } catch {
     return [];
   }
@@ -173,6 +240,18 @@ export async function getWebsiteByIdOrSlug(value: string) {
   );
 }
 
+export async function getWebsiteByDomainHost(host: string | null | undefined) {
+  const domain = normalizeWebsiteDomain(host ?? "");
+  if (!domain) return null;
+
+  const websites = await readWebsites();
+  return (
+    websites.find((website) =>
+      getWebsiteDomains(website).includes(domain),
+    ) ?? null
+  );
+}
+
 export function getWebsiteRouteSegment(website: Pick<SaaSWebsite, "id" | "slug">) {
   return website.slug || website.id;
 }
@@ -204,6 +283,8 @@ export async function createWebsite(input: {
     name: normalizeName(input.name),
     slug,
     domain: null,
+    primaryDomain: null,
+    domains: [],
     description: "",
     timeZone: "Asia/Yerevan",
     language: "hy",
@@ -250,6 +331,46 @@ export async function updateWebsiteSettings(input: {
     timeZone: normalizeOption(input.timeZone, "Asia/Yerevan"),
     language: normalizeOption(input.language, "hy"),
     status: input.status,
+    updatedAt: new Date().toISOString(),
+  };
+
+  await writeWebsites(
+    websites.map((item) => (item.id === website.id ? updatedWebsite : item)),
+  );
+
+  return { website: updatedWebsite };
+}
+
+export async function addWebsiteDomain(input: {
+  websiteId: string;
+  domain: string;
+}) {
+  const domain = normalizeWebsiteDomain(input.domain);
+  if (!isValidWebsiteDomain(domain)) {
+    return { error: "Enter a valid domain, without protocol or path." };
+  }
+
+  const websites = await readWebsites();
+  const website = websites.find((item) => item.id === input.websiteId);
+  if (!website) {
+    return { error: "Website not found." };
+  }
+
+  const duplicate = websites.find(
+    (item) =>
+      item.id !== website.id && getWebsiteDomains(item).includes(domain),
+  );
+  if (duplicate) {
+    return { error: "This domain is already connected to another website." };
+  }
+
+  const domains = uniqueDomains([...website.domains, domain]);
+  const primaryDomain = website.primaryDomain || domain;
+  const updatedWebsite: SaaSWebsite = {
+    ...website,
+    domain: primaryDomain,
+    primaryDomain,
+    domains,
     updatedAt: new Date().toISOString(),
   };
 

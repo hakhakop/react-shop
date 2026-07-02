@@ -574,6 +574,34 @@
   gap: 12px;
 }
 
+.saas-domain-list {
+  display: grid;
+  gap: 8px;
+}
+
+.saas-domain-item {
+  display: flex;
+  min-height: 42px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border: 1px solid var(--border-soft, #d7dde8);
+  border-radius: 16px;
+  background: var(--saas-panel-soft-bg);
+  color: var(--text-main, #111827);
+  font-weight: 850;
+  padding: 0 12px;
+}
+
+.saas-domain-item strong {
+  border-radius: 999px;
+  background: var(--saas-chip-bg);
+  color: var(--text-main, #111827);
+  font-size: 11px;
+  padding: 5px 9px;
+  text-transform: uppercase;
+}
+
 .saas-settings-placeholder {
   display: grid;
   gap: 8px;

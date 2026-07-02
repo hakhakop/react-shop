@@ -23,6 +23,7 @@ import {
   type BuilderSpacingContext,
 } from "../lib/builderSpacing";
 import { normalizeButtonStyleFields } from "../lib/builderButtons";
+import { getWebsiteByDomainHost } from "../lib/websites";
 
 export const metadata: Metadata = {
   title: "Webpages Store",
@@ -37,10 +38,13 @@ export default async function RootLayout({
 }) {
   const requestHeaders = await headers();
   const pathname = requestHeaders.get("x-current-path") ?? "/";
-  const [themeSettingsRaw, shellSettings] = await Promise.all([
+  const host = requestHeaders.get("host");
+  const [themeSettingsRaw, shellSettings, domainWebsite] = await Promise.all([
     getThemeSettings(),
     getBuilderShellSettings(),
+    getWebsiteByDomainHost(host),
   ]);
+  const isDomainWebsiteRequest = Boolean(domainWebsite);
 
   // All ACF options from WordPress (via webpagesThemeSettingsRaw)
   const settings = (themeSettingsRaw || {}) as Record<string, any>;
@@ -325,7 +329,7 @@ ${explicitWordPressProductVars}
                 <SearchProvider>
                   <ProductCategoryFilterProvider>
                    <RecentlyViewedProvider>
-                  {shellSettings.headerVisible && (
+                  {!isDomainWebsiteRequest && shellSettings.headerVisible && (
                     <RootHeaderVisibility initialPathname={pathname}>
                       <HeaderShell layoutOverride={shellSettings.headerLayout} />
                     </RootHeaderVisibility>
@@ -340,19 +344,21 @@ ${explicitWordPressProductVars}
                     <FloatingCartSummary />
                   <MiniCart />
 
-                  <footer className="site-footer">
-                    <div className="site-footer-inner">
-                      <span>
-                        © 2025 Webpages · Headless WooCommerce demo
-                      </span>
-                      <span>
-                        Powered by{" "}
-                          <span className="site-footer-strong">
-                            WordPress · WooCommerce · WPGraphQL · Next.js
-                          </span>
-                      </span>
-                    </div>
-                  </footer>
+                  {!isDomainWebsiteRequest && (
+                    <footer className="site-footer">
+                      <div className="site-footer-inner">
+                        <span>
+                          © 2025 Webpages · Headless WooCommerce demo
+                        </span>
+                        <span>
+                          Powered by{" "}
+                            <span className="site-footer-strong">
+                              WordPress · WooCommerce · WPGraphQL · Next.js
+                            </span>
+                        </span>
+                      </div>
+                    </footer>
+                  )}
                   </RecentlyViewedProvider>
                   </ProductCategoryFilterProvider>
                 </SearchProvider>

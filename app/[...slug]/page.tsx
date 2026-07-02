@@ -1,14 +1,17 @@
 // wc-store/app/[...slug]/page.tsx
+import { headers } from "next/headers";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { graphqlFetch } from "../../lib/graphql";
 import Breadcrumbs from "../../components/Breadcrumbs";
 import StorefrontBuilderRenderer from "../../components/builder/StorefrontBuilderRenderer";
+import WebsiteFrontend from "../../components/website/WebsiteFrontend";
 import {
   getPublishedBuilderLayout,
   readBuilderCustomPages,
   type BuilderCustomPageKey,
 } from "../../lib/builderLayouts";
+import { getWebsiteByDomainHost } from "../../lib/websites";
 
 type WPPageParams = {
   slug?: string[];
@@ -30,6 +33,17 @@ export default async function WPPage({
   // Next 16: params is a Promise → we must await it
   const resolved = await params;
   const slugSegments = resolved.slug;
+  const domainWebsite = await getWebsiteByDomainHost((await headers()).get("host"));
+
+  if (domainWebsite) {
+    return (
+      <WebsiteFrontend
+        website={domainWebsite}
+        requestedPage={slugSegments?.join("/") || "home"}
+        mode="domain"
+      />
+    );
+  }
 
   // Special-case: /shop → redirect to main store (home)
   if (
