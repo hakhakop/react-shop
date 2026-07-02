@@ -6,6 +6,7 @@ import SaaSShell from "@/components/saas/SaaSShell";
 import { findUserById, getCurrentUser, isSaaSAdmin, toPublicUser } from "@/lib/auth";
 import { getWebsitesForOwner } from "@/lib/websites";
 import { loginRedirectFor } from "@/lib/saasRoutes";
+import { getDefaultWebsiteBuilderLinks } from "@/lib/websiteBuilderLinks.server";
 
 export const dynamic = "force-dynamic";
 
@@ -34,7 +35,13 @@ export default async function AdminUserDetailPage({
   const user = await findUserById(userId);
   if (!user) {
     return (
-      <SaaSShell user={currentUser} title="User Not Found" eyebrow="Admin workspace">
+      <SaaSShell
+        user={currentUser}
+        title="User Not Found"
+        eyebrow="Admin workspace"
+        actionHref="/admin/users"
+        actionLabel="Users"
+      >
         <section className="saas-empty-state">
           <span>User not found</span>
           <p>This SaaS user does not exist or was removed.</p>
@@ -48,12 +55,23 @@ export default async function AdminUserDetailPage({
 
   const publicUser = toPublicUser(user);
   const websites = await getWebsitesForOwner(publicUser.id);
+  const websiteCards = await Promise.all(
+    websites.map(async (website) => {
+      const links = await getDefaultWebsiteBuilderLinks(website.id);
+      return {
+        website,
+        ...links,
+      };
+    }),
+  );
 
   return (
     <SaaSShell
       user={currentUser}
       title={publicUser.name}
       eyebrow="Admin user detail"
+      actionHref="/admin/users"
+      actionLabel="Users"
     >
       <section className="saas-panel">
         <div className="saas-panel-heading">
@@ -94,7 +112,7 @@ export default async function AdminUserDetailPage({
           <p>This user does not own any websites yet.</p>
         ) : (
           <div className="saas-website-grid">
-            {websites.map((website) => (
+            {websiteCards.map(({ website, builderHref, previewHref }) => (
               <article className="saas-website-card" key={website.id}>
                 <span>{website.status}</span>
                 <h3>{website.name}</h3>
@@ -104,10 +122,10 @@ export default async function AdminUserDetailPage({
                   Created {new Date(website.createdAt).toLocaleDateString()}
                 </small>
                 <div className="saas-website-actions">
-                  <Link href={`/app/websites/${website.id}/builder`}>
+                  <Link href={builderHref}>
                     Open Builder
                   </Link>
-                  <Link href={`/app/websites/${website.id}/preview`}>
+                  <Link href={previewHref}>
                     Preview
                   </Link>
                   <Link href={`/app/websites/${website.id}/settings`}>

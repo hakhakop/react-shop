@@ -14,7 +14,7 @@ export default async function AppSettingsPage() {
   }
 
   return (
-    <SaaSShell user={user} title="Settings">
+    <SaaSShell user={user} title="Account Settings">
       <section className="saas-panel">
         <h2>Account information</h2>
         <dl className="saas-account-details">

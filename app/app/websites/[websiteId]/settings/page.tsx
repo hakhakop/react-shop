@@ -2,7 +2,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import AccessDenied from "@/components/saas/AccessDenied";
 import SaaSShell from "@/components/saas/SaaSShell";
-import { getCurrentUser } from "@/lib/auth";
+import { getCurrentUser, isSaaSAdmin } from "@/lib/auth";
 import { loginRedirectFor } from "@/lib/saasRoutes";
 import {
   canAccessWebsiteBuilder,
@@ -111,7 +111,13 @@ export default async function WebsiteSettingsPage({
   }
 
   return (
-    <SaaSShell user={user} title="Website Settings" eyebrow={website.name}>
+    <SaaSShell
+      user={user}
+      title="Website Settings"
+      eyebrow={website.name}
+      actionHref={isSaaSAdmin(user) ? "/admin/websites" : "/app/websites"}
+      actionLabel={isSaaSAdmin(user) ? "All Websites" : "My Websites"}
+    >
       <div className="saas-settings-layout">
         <aside className="saas-settings-sidebar" aria-label="Website settings">
           {settingsSections.map((section) => (

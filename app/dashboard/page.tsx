@@ -6,8 +6,8 @@ import { getCurrentUser } from "@/lib/auth";
 import { loginRedirectFor } from "@/lib/saasRoutes";
 
 export const metadata = {
-  title: "Visual Builder Dashboard",
-  description: "Create storefront page layouts with a live React preview.",
+  title: "Root Website Builder",
+  description: "Edit the public WebPages website with a live React preview.",
 };
 
 export const dynamic = "force-dynamic";

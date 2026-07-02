@@ -6,6 +6,7 @@ import SaaSShell from "@/components/saas/SaaSShell";
 import { getCurrentUser, isSaaSAdmin, readPublicUsers } from "@/lib/auth";
 import { readWebsites } from "@/lib/websites";
 import { loginRedirectFor } from "@/lib/saasRoutes";
+import { getDefaultWebsiteBuilderLinks } from "@/lib/websiteBuilderLinks.server";
 
 export const dynamic = "force-dynamic";
 
@@ -22,9 +23,24 @@ export default async function AdminWebsitesPage() {
 
   const [websites, users] = await Promise.all([readWebsites(), readPublicUsers()]);
   const usersById = new Map(users.map((item) => [item.id, item]));
+  const websiteRows = await Promise.all(
+    websites.map(async (website) => {
+      const links = await getDefaultWebsiteBuilderLinks(website.id);
+      return {
+        website,
+        ...links,
+      };
+    }),
+  );
 
   return (
-    <SaaSShell user={user} title="All Websites" eyebrow="Admin workspace">
+    <SaaSShell
+      user={user}
+      title="All Websites"
+      eyebrow="Admin workspace"
+      actionHref="/admin/users"
+      actionLabel="Users"
+    >
       <section className="saas-panel">
         <h2>All Websites</h2>
         {websites.length === 0 ? (
@@ -38,7 +54,7 @@ export default async function AdminWebsitesPage() {
               <span>Created</span>
               <span>Actions</span>
             </div>
-            {websites.map((website) => {
+            {websiteRows.map(({ website, builderHref, previewHref }) => {
               const owner = usersById.get(website.ownerId);
               return (
                 <div
@@ -51,13 +67,13 @@ export default async function AdminWebsitesPage() {
                   <span>{website.status}</span>
                   <span>{new Date(website.createdAt).toLocaleDateString()}</span>
                   <span className="saas-row-actions">
-                    <Link href={`/app/websites/${website.id}/builder`}>
+                    <Link href={builderHref}>
                       Builder
                     </Link>
                     <Link href={`/app/websites/${website.id}/settings`}>
                       Settings
                     </Link>
-                    <Link href={`/app/websites/${website.id}/preview`}>
+                    <Link href={previewHref}>
                       Preview
                     </Link>
                   </span>

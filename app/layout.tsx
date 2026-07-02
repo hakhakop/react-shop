@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import "./globals.css";
 // Force HMR reload for category layout alignment styling modifications
 
@@ -15,6 +16,7 @@ import FloatingCartSummary from "../components/FloatingCartSummary";
 import ScrollToTopButton from "../components/ScrollToTopButton";
 import FrontendAdminBar from "../components/FrontendAdminBar";
 import ProductCategoryFilterProvider from "../components/ProductCategoryFilterProvider";
+import RootHeaderVisibility from "../components/RootHeaderVisibility";
 import { getBuilderShellSettings } from "../lib/builderShell";
 import {
   resolveBuilderSpacing,
@@ -33,6 +35,8 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const requestHeaders = await headers();
+  const pathname = requestHeaders.get("x-current-path") ?? "/";
   const [themeSettingsRaw, shellSettings] = await Promise.all([
     getThemeSettings(),
     getBuilderShellSettings(),
@@ -322,7 +326,9 @@ ${explicitWordPressProductVars}
                   <ProductCategoryFilterProvider>
                    <RecentlyViewedProvider>
                   {shellSettings.headerVisible && (
-                    <HeaderShell layoutOverride={shellSettings.headerLayout} />
+                    <RootHeaderVisibility initialPathname={pathname}>
+                      <HeaderShell layoutOverride={shellSettings.headerLayout} />
+                    </RootHeaderVisibility>
                   )}
 
                   <main className="site-main">{children}</main>

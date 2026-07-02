@@ -4,6 +4,13 @@ import { Edit3, ExternalLink, Gauge, Settings, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
+import {
+  getDefaultWebsiteBuilderPageKey,
+  resolveBuilderPageParam,
+  scopedBuilderHref,
+  type BuilderPageSummary,
+  type WebsiteBuilderPages,
+} from "@/lib/websiteBuilderLinks";
 
 const PRODUCT_EDIT_EVENT = "react-shop:product-edit-target";
 
@@ -22,6 +29,11 @@ type DashboardTarget = {
   secondaryHref?: string;
   secondaryLabel?: string;
   legacy?: boolean;
+};
+
+type BuilderPagesResponse = {
+  pages?: BuilderPageSummary[];
+  publishedKeys?: string[];
 };
 
 function isLocalHost() {
@@ -71,6 +83,7 @@ function scopedWebsiteIdFromPreviewPath(pathname: string) {
 function dashboardTargetForPath(
   pathname: string,
   pageParam: string | null,
+  builderPages: WebsiteBuilderPages | null,
   userRole: AuthMeResponse["user"] extends infer User
     ? User extends { role: infer Role }
       ? Role
@@ -81,13 +94,13 @@ function dashboardTargetForPath(
 
   const scopedWebsiteId = scopedWebsiteIdFromPreviewPath(pathname);
   if (scopedWebsiteId) {
-    const pageKey = pageParam || "home";
-    const params = new URLSearchParams({ page: pageKey });
+    const pageKey = resolveBuilderPageParam(pageParam, builderPages);
+    const websitePageKey = getDefaultWebsiteBuilderPageKey(builderPages);
     return {
-      href: `/app/websites/${scopedWebsiteId}/builder?${params.toString()}`,
+      href: scopedBuilderHref(scopedWebsiteId, pageKey),
       label: "Edit This Page",
       context: "Website preview",
-      secondaryHref: `/app/websites/${scopedWebsiteId}/builder`,
+      secondaryHref: scopedBuilderHref(scopedWebsiteId, websitePageKey),
       secondaryLabel: "Edit This Website",
     };
   }
@@ -119,14 +132,20 @@ export default function FrontendAdminBar() {
   const [saasUser, setSaasUser] = useState<AuthMeResponse["user"]>(null);
   const [productEditHref, setProductEditHref] = useState<string | null>(null);
   const [pageParam, setPageParam] = useState<string | null>(null);
+  const [builderPages, setBuilderPages] = useState<WebsiteBuilderPages | null>(null);
+  const scopedWebsiteId = useMemo(
+    () => scopedWebsiteIdFromPreviewPath(pathname ?? "/"),
+    [pathname],
+  );
   const target = useMemo(
     () =>
       dashboardTargetForPath(
         pathname ?? "/",
         pageParam,
+        builderPages,
         saasUser?.role ?? "user",
       ),
-    [pageParam, pathname, saasUser?.role],
+    [builderPages, pageParam, pathname, saasUser?.role],
   );
 
   useEffect(() => {
@@ -138,6 +157,43 @@ export default function FrontendAdminBar() {
   useEffect(() => {
     setPageParam(new URLSearchParams(window.location.search).get("page"));
   }, [pathname]);
+
+  useEffect(() => {
+    if (!scopedWebsiteId || !saasUser) {
+      setBuilderPages(null);
+      return;
+    }
+
+    const websiteId = scopedWebsiteId;
+    let cancelled = false;
+
+    async function loadBuilderPages() {
+      try {
+        const params = new URLSearchParams({ websiteId });
+        const response = await fetch(`/api/builder-pages?${params.toString()}`, {
+          cache: "no-store",
+        });
+        if (!response.ok) return;
+
+        const payload = (await response.json()) as BuilderPagesResponse;
+        if (!cancelled) {
+          setBuilderPages({
+            pages: payload.pages ?? [],
+            publishedKeys: payload.publishedKeys ?? [],
+          });
+        }
+      } catch {
+        if (!cancelled) setBuilderPages(null);
+      }
+    }
+
+    setBuilderPages(null);
+    void loadBuilderPages();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [saasUser, scopedWebsiteId]);
 
   useEffect(() => {
     let cancelled = false;
@@ -227,7 +283,7 @@ export default function FrontendAdminBar() {
     <aside className="frontend-admin-bar" aria-label="Frontend editor tools">
       <div>
         <strong>{target.context}</strong>
-        <span>{target.legacy ? "Root site editor" : "React visual builder"}</span>
+        <span>{target.legacy ? "Root website editor" : "Website builder"}</span>
       </div>
       <Link className="frontend-admin-bar-primary" href={target.href}>
         <Edit3 size={15} />

@@ -282,7 +282,7 @@ export default function HeaderShellView({
           Start
         </Link>
       )}
-      <HeaderSaaSEntry />
+      {!scopedPreviewWebsiteId && <HeaderSaaSEntry />}
       <HeaderActions
         icons={effectiveIconOrder}
         iconVariant={effectiveIconVariant}

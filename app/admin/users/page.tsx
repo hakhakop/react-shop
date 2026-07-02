@@ -24,7 +24,13 @@ export default async function AdminUsersPage() {
   const websiteCounts = getWebsiteCountsByOwner(websites);
 
   return (
-    <SaaSShell user={user} title="Users" eyebrow="Admin workspace">
+    <SaaSShell
+      user={user}
+      title="Users"
+      eyebrow="Admin workspace"
+      actionHref="/admin/websites"
+      actionLabel="All Websites"
+    >
       <section className="saas-panel">
         <h2>Registered SaaS users</h2>
         <div className="saas-users-table" role="table">

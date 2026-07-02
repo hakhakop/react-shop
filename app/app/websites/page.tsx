@@ -5,6 +5,7 @@ import SaaSShell from "@/components/saas/SaaSShell";
 import { getCurrentUser } from "@/lib/auth";
 import { getWebsitesForOwner } from "@/lib/websites";
 import { loginRedirectFor } from "@/lib/saasRoutes";
+import { getDefaultWebsiteBuilderLinks } from "@/lib/websiteBuilderLinks.server";
 
 export const dynamic = "force-dynamic";
 
@@ -16,6 +17,15 @@ export default async function WebsitesPage() {
   }
 
   const websites = await getWebsitesForOwner(user.id);
+  const websiteCards = await Promise.all(
+    websites.map(async (website) => {
+      const links = await getDefaultWebsiteBuilderLinks(website.id);
+      return {
+        website,
+        ...links,
+      };
+    }),
+  );
 
   return (
     <SaaSShell user={user} title="My Websites">
@@ -39,7 +49,7 @@ export default async function WebsitesPage() {
             </Link>
           </div>
           <div className="saas-website-grid">
-            {websites.map((website) => (
+            {websiteCards.map(({ website, builderHref, previewHref }) => (
               <article className="saas-website-card" key={website.id}>
                 <span>{website.status}</span>
                 <h3>{website.name}</h3>
@@ -49,10 +59,10 @@ export default async function WebsitesPage() {
                   Created {new Date(website.createdAt).toLocaleDateString()}
                 </small>
                 <div className="saas-website-actions">
-                  <Link href={`/app/websites/${website.id}/builder`}>
+                  <Link href={builderHref}>
                     Open Builder
                   </Link>
-                  <button type="button">Open Website</button>
+                  <Link href={previewHref}>Open Website</Link>
                   <Link href={`/app/websites/${website.id}/settings`}>
                     Settings
                   </Link>

@@ -6,6 +6,8 @@ type SaaSShellProps = {
   user: PublicSaaSUser;
   title: string;
   eyebrow?: string;
+  actionHref?: string;
+  actionLabel?: string;
   children: React.ReactNode;
 };
 
@@ -19,6 +21,8 @@ export default function SaaSShell({
   user,
   title,
   eyebrow = "SaaS workspace",
+  actionHref = "/app/websites",
+  actionLabel = "My Websites",
   children,
 }: SaaSShellProps) {
   const canUseAdmin = isSaaSAdmin(user);
@@ -60,8 +64,8 @@ export default function SaaSShell({
             <span>{eyebrow}</span>
             <h1>{title}</h1>
           </div>
-          <Link className="saas-shell-header-link" href="/app/websites">
-            Builder
+          <Link className="saas-shell-header-link" href={actionHref}>
+            {actionLabel}
           </Link>
         </header>
         {children}

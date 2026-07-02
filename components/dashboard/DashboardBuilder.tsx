@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  ArrowLeft,
   ArrowDown,
   ArrowRight,
   ArrowUp,
@@ -1341,13 +1342,21 @@ export default function DashboardBuilder({
   const isWebsiteScopedBuilder = Boolean(websiteId);
   const canEditShellSettings =
     isWebsiteScopedBuilder || saasUserRole === "super_admin";
+  const websiteListHref =
+    saasUserRole === "admin" || saasUserRole === "super_admin"
+      ? "/admin/websites"
+      : "/app/websites";
+  const websiteListLabel =
+    saasUserRole === "admin" || saasUserRole === "super_admin"
+      ? "All Websites"
+      : "My Websites";
   const shellSettingsLabel = isWebsiteScopedBuilder
     ? "Website Settings"
-    : "Global Styles";
-  const shellSettingsShortLabel = isWebsiteScopedBuilder ? "Website" : "Global";
+    : "Root Website Settings";
+  const shellSettingsShortLabel = isWebsiteScopedBuilder ? "Website" : "Root";
   const shellSettingsStatusLabel = isWebsiteScopedBuilder
     ? "Website settings"
-    : "Global settings";
+    : "Root website settings";
   const [builderState, setBuilderState] = useState<BuilderState>(defaultState);
   const [dashboardTheme, setDashboardTheme] = useState<"light" | "dark">(
     "dark",
@@ -5381,7 +5390,7 @@ export default function DashboardBuilder({
           <span>
             {isWebsiteScopedBuilder
               ? "Design, header, logo, menu presentation, and spacing for this website."
-              : "Legacy demo design, header, logo, menu presentation, and spacing."}
+              : "Design, header, logo, menu presentation, and spacing for the public WebPages website."}
           </span>
         </div>
       </div>
@@ -6992,6 +7001,16 @@ export default function DashboardBuilder({
         </span>
       </div>
       <div className="builder-sidebar-top-action-buttons">
+        {websiteId ? (
+          <button
+            type="button"
+            onClick={() => router.push(websiteListHref)}
+            title={`Back to ${websiteListLabel}`}
+          >
+            <ArrowLeft size={15} />
+            {websiteListLabel}
+          </button>
+        ) : null}
         <div className="builder-device-toggle" aria-label="Preview device">
           {(["desktop", "tablet", "mobile"] as PreviewDevice[]).map((item) => (
             <button

@@ -27,7 +27,13 @@ export default async function AdminPage() {
   );
 
   return (
-    <SaaSShell user={user} title="Admin" eyebrow="Admin workspace">
+    <SaaSShell
+      user={user}
+      title="Admin"
+      eyebrow="Admin workspace"
+      actionHref="/admin/websites"
+      actionLabel="All Websites"
+    >
       <section className="saas-dashboard-card">
         <span>Users</span>
         <strong>{users.length}</strong>
