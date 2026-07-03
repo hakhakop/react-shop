@@ -93,6 +93,23 @@ function isValidWebsiteDomain(domain: string) {
   );
 }
 
+function getPrimaryDomain(domains: string[], currentPrimary: string | null) {
+  const normalizedPrimary = normalizeWebsiteDomain(currentPrimary);
+  return normalizedPrimary && domains.includes(normalizedPrimary)
+    ? normalizedPrimary
+    : domains[0] ?? null;
+}
+
+function hasDomainDuplicate(
+  websites: SaaSWebsite[],
+  websiteId: string,
+  domain: string,
+) {
+  return websites.some(
+    (item) => item.id !== websiteId && getWebsiteDomains(item).includes(domain),
+  );
+}
+
 function isStoredWebsite(value: unknown): value is StoredWebsite {
   if (!value || typeof value !== "object") return false;
   const website = value as Partial<StoredWebsite>;
@@ -356,16 +373,129 @@ export async function addWebsiteDomain(input: {
     return { error: "Website not found." };
   }
 
-  const duplicate = websites.find(
-    (item) =>
-      item.id !== website.id && getWebsiteDomains(item).includes(domain),
-  );
-  if (duplicate) {
+  if (hasDomainDuplicate(websites, website.id, domain)) {
     return { error: "This domain is already connected to another website." };
   }
 
   const domains = uniqueDomains([...website.domains, domain]);
   const primaryDomain = website.primaryDomain || domain;
+  const updatedWebsite: SaaSWebsite = {
+    ...website,
+    domain: primaryDomain,
+    primaryDomain,
+    domains,
+    updatedAt: new Date().toISOString(),
+  };
+
+  await writeWebsites(
+    websites.map((item) => (item.id === website.id ? updatedWebsite : item)),
+  );
+
+  return { website: updatedWebsite };
+}
+
+export async function setWebsitePrimaryDomain(input: {
+  websiteId: string;
+  domain: string;
+}) {
+  const domain = normalizeWebsiteDomain(input.domain);
+  const websites = await readWebsites();
+  const website = websites.find((item) => item.id === input.websiteId);
+  if (!website) {
+    return { error: "Website not found." };
+  }
+
+  if (!website.domains.includes(domain)) {
+    return { error: "Choose an existing domain for this website." };
+  }
+
+  const updatedWebsite: SaaSWebsite = {
+    ...website,
+    domain,
+    primaryDomain: domain,
+    updatedAt: new Date().toISOString(),
+  };
+
+  await writeWebsites(
+    websites.map((item) => (item.id === website.id ? updatedWebsite : item)),
+  );
+
+  return { website: updatedWebsite };
+}
+
+export async function removeWebsiteDomain(input: {
+  websiteId: string;
+  domain: string;
+}) {
+  const domain = normalizeWebsiteDomain(input.domain);
+  const websites = await readWebsites();
+  const website = websites.find((item) => item.id === input.websiteId);
+  if (!website) {
+    return { error: "Website not found." };
+  }
+
+  if (!website.domains.includes(domain)) {
+    return { error: "Domain not found." };
+  }
+
+  const domains = website.domains.filter((item) => item !== domain);
+  const primaryDomain = getPrimaryDomain(
+    domains,
+    website.primaryDomain === domain ? null : website.primaryDomain,
+  );
+  const updatedWebsite: SaaSWebsite = {
+    ...website,
+    domain: primaryDomain,
+    primaryDomain,
+    domains,
+    updatedAt: new Date().toISOString(),
+  };
+
+  await writeWebsites(
+    websites.map((item) => (item.id === website.id ? updatedWebsite : item)),
+  );
+
+  return { website: updatedWebsite };
+}
+
+export async function updateWebsiteDomain(input: {
+  websiteId: string;
+  currentDomain: string;
+  nextDomain: string;
+}) {
+  const currentDomain = normalizeWebsiteDomain(input.currentDomain);
+  const nextDomain = normalizeWebsiteDomain(input.nextDomain);
+  if (!isValidWebsiteDomain(nextDomain)) {
+    return { error: "Enter a valid domain, without protocol or path." };
+  }
+
+  const websites = await readWebsites();
+  const website = websites.find((item) => item.id === input.websiteId);
+  if (!website) {
+    return { error: "Website not found." };
+  }
+
+  if (!website.domains.includes(currentDomain)) {
+    return { error: "Domain not found." };
+  }
+
+  if (
+    nextDomain !== currentDomain &&
+    (website.domains.includes(nextDomain) ||
+      hasDomainDuplicate(websites, website.id, nextDomain))
+  ) {
+    return { error: "This domain is already connected to another website." };
+  }
+
+  const domains = uniqueDomains(
+    website.domains.map((domain) =>
+      domain === currentDomain ? nextDomain : domain,
+    ),
+  );
+  const primaryDomain = getPrimaryDomain(
+    domains,
+    website.primaryDomain === currentDomain ? nextDomain : website.primaryDomain,
+  );
   const updatedWebsite: SaaSWebsite = {
     ...website,
     domain: primaryDomain,

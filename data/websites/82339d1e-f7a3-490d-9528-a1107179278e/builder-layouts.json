@@ -35,7 +35,7 @@
         "kind": "contentLayout",
         "visible": true,
         "title": "",
-        "background": "#ffffff",
+        "background": "#111111",
         "backgroundMode": "full",
         "contentMode": "boxed",
         "colorScheme": "inherit",
@@ -46,7 +46,7 @@
         "layout": "whole",
         "layoutColumns": 1,
         "layoutRows": 1,
-        "backgroundEffect": "antigravity2",
+        "backgroundEffect": "aurora",
         "antigravitySpeed": 1.8,
         "antigravityParticleCount": 260,
         "antigravityColor": "#a855f7",
@@ -64,34 +64,31 @@
             "rowLayout": "whole",
             "blocks": [
               {
-                "id": "image-block-mqho93e8-k93hf",
-                "kind": "image",
-                "title": "Image",
-                "body": "A simple image block for banners, artwork, and visual breaks.",
-                "imageUrl": "https://cms.webpages.am/wp-content/uploads/2026/06/logo-2-1-scaled.png",
-                "imageAlt": "logo-2 (1)",
-                "imageAlignment": "center",
-                "imageMaxWidth": 300,
-                "imageBorderRadius": 0,
-                "imageCaption": "",
-                "panelStyle": "dark",
-                "borderRadius": 10,
-                "visualStyle": {
-                  "padding": {
-                    "linked": true,
-                    "top": "none",
-                    "right": "none",
-                    "bottom": "none",
-                    "left": "none"
-                  },
-                  "margin": {
-                    "linked": true,
-                    "top": "none",
-                    "right": "none",
-                    "bottom": "none",
-                    "left": "none"
+                "id": "hero-block-mr4dbvdn-7u8g1",
+                "kind": "hero",
+                "eyebrow": "Featured",
+                "title": "SteelChef",
+                "body": "A strong visual opening with editable copy and action.",
+                "buttonLabel": "Learn more",
+                "buttonUrl": "/",
+                "carouselSettings": {
+                  "variant": "default"
+                },
+                "elementAlign": "center",
+                "typography": {
+                  "title": {
+                    "fontSize": "88px",
+                    "fontWeight": "800"
                   }
-                }
+                },
+                "textGradientPreset": "custom",
+                "textGradientCustomMiddleOffset": 60,
+                "textGradientCustomStart": "#fb923c",
+                "textGradientCustomMiddle": "#ec4899",
+                "textGradientCustomEnd": "#a855f7",
+                "textGradientCustomStartOffset": 0,
+                "textGradientCustomEndOffset": 100,
+                "textGradientCustomAngle": 135
               },
               {
                 "id": "hero-block-mqkhhqgx-m82o9",
@@ -1368,7 +1365,7 @@
         ]
       }
     ],
-    "updatedAt": "2026-07-01T08:12:53.761Z"
+    "updatedAt": "2026-07-03T03:26:12.900Z"
   },
   "shop": {
     "version": 1,

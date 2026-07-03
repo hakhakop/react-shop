@@ -10,6 +10,9 @@ import {
   getWebsiteById,
   getWebsiteByIdOrSlug,
   getWebsiteRouteSegment,
+  removeWebsiteDomain,
+  setWebsitePrimaryDomain,
+  updateWebsiteDomain,
   updateWebsiteSettings,
   validateWebsiteSettingsInput,
   type WebsiteStatus,
@@ -23,18 +26,19 @@ type WebsiteSettingsPageProps = {
   }>;
   searchParams?: Promise<{
     domainSaved?: string;
+    domainUpdated?: string;
     error?: string;
     saved?: string;
   }>;
 };
 
 const settingsSections = [
-  "General",
-  "Branding",
-  "Domains",
-  "SEO",
-  "Members",
-  "Advanced",
+  { title: "General", available: true },
+  { title: "Branding", available: false },
+  { title: "Domains", available: true },
+  { title: "SEO", available: false },
+  { title: "Members", available: false },
+  { title: "Advanced", available: false },
 ];
 
 const futureCards = [
@@ -134,6 +138,95 @@ async function addWebsiteDomainAction(formData: FormData) {
   errorRedirect("Domain could not be added.");
 }
 
+async function setPrimaryDomainAction(formData: FormData) {
+  "use server";
+
+  const websiteId = String(formData.get("websiteId") ?? "");
+  const domain = String(formData.get("domain") ?? "");
+  const user = await getCurrentUser(await cookies());
+  const errorRedirect = (message: string): never => {
+    const params = new URLSearchParams({ error: message });
+    redirect(`/app/websites/${websiteId}/settings?${params.toString()}#domains`);
+  };
+
+  if (!user) {
+    redirect(loginRedirectFor(`/app/websites/${websiteId}/settings`));
+  }
+
+  const website = await getWebsiteById(websiteId);
+  if (!website || !canAccessWebsiteBuilder(user, website)) {
+    errorRedirect("Access denied.");
+  }
+
+  const result = await setWebsitePrimaryDomain({ websiteId, domain });
+  if ("error" in result) {
+    errorRedirect(result.error ?? "Primary domain could not be changed.");
+  }
+
+  redirect(`/app/websites/${websiteId}/settings?domainUpdated=1#domains`);
+}
+
+async function removeWebsiteDomainAction(formData: FormData) {
+  "use server";
+
+  const websiteId = String(formData.get("websiteId") ?? "");
+  const domain = String(formData.get("domain") ?? "");
+  const user = await getCurrentUser(await cookies());
+  const errorRedirect = (message: string): never => {
+    const params = new URLSearchParams({ error: message });
+    redirect(`/app/websites/${websiteId}/settings?${params.toString()}#domains`);
+  };
+
+  if (!user) {
+    redirect(loginRedirectFor(`/app/websites/${websiteId}/settings`));
+  }
+
+  const website = await getWebsiteById(websiteId);
+  if (!website || !canAccessWebsiteBuilder(user, website)) {
+    errorRedirect("Access denied.");
+  }
+
+  const result = await removeWebsiteDomain({ websiteId, domain });
+  if ("error" in result) {
+    errorRedirect(result.error ?? "Domain could not be removed.");
+  }
+
+  redirect(`/app/websites/${websiteId}/settings?domainUpdated=1#domains`);
+}
+
+async function editWebsiteDomainAction(formData: FormData) {
+  "use server";
+
+  const websiteId = String(formData.get("websiteId") ?? "");
+  const currentDomain = String(formData.get("currentDomain") ?? "");
+  const nextDomain = String(formData.get("nextDomain") ?? "");
+  const user = await getCurrentUser(await cookies());
+  const errorRedirect = (message: string): never => {
+    const params = new URLSearchParams({ error: message });
+    redirect(`/app/websites/${websiteId}/settings?${params.toString()}#domains`);
+  };
+
+  if (!user) {
+    redirect(loginRedirectFor(`/app/websites/${websiteId}/settings`));
+  }
+
+  const website = await getWebsiteById(websiteId);
+  if (!website || !canAccessWebsiteBuilder(user, website)) {
+    errorRedirect("Access denied.");
+  }
+
+  const result = await updateWebsiteDomain({
+    websiteId,
+    currentDomain,
+    nextDomain,
+  });
+  if ("error" in result) {
+    errorRedirect(result.error ?? "Domain could not be updated.");
+  }
+
+  redirect(`/app/websites/${websiteId}/settings?domainUpdated=1#domains`);
+}
+
 export default async function WebsiteSettingsPage({
   params,
   searchParams,
@@ -165,12 +258,12 @@ export default async function WebsiteSettingsPage({
         <aside className="saas-settings-sidebar" aria-label="Website settings">
           {settingsSections.map((section) => (
             <a
-              key={section}
-              className={section === "General" ? "is-active" : ""}
-              href={`#${section.toLowerCase()}`}
+              key={section.title}
+              className={section.title === "General" ? "is-active" : ""}
+              href={`#${section.title.toLowerCase()}`}
             >
-              {section}
-              {section !== "General" && <span>Soon</span>}
+              {section.title}
+              {!section.available && <span>Soon</span>}
             </a>
           ))}
         </aside>
@@ -275,9 +368,58 @@ export default async function WebsiteSettingsPage({
             {website.domains.length > 0 ? (
               <div className="saas-domain-list">
                 {website.domains.map((domain) => (
-                  <div className="saas-domain-item" key={domain}>
-                    <span>{domain}</span>
-                    {domain === website.primaryDomain && <strong>Primary</strong>}
+                  <div
+                    className="saas-domain-item"
+                    key={domain}
+                    data-primary={domain === website.primaryDomain ? "true" : "false"}
+                  >
+                    <form
+                      className="saas-domain-edit-form"
+                      action={editWebsiteDomainAction}
+                    >
+                      <input type="hidden" name="websiteId" value={website.id} />
+                      <input type="hidden" name="currentDomain" value={domain} />
+                      <label className="saas-auth-field">
+                        <span>Domain</span>
+                        <input
+                          name="nextDomain"
+                          required
+                          defaultValue={domain}
+                          autoComplete="off"
+                        />
+                      </label>
+                      <button className="saas-auth-secondary-button" type="submit">
+                        Save
+                      </button>
+                    </form>
+
+                    <div className="saas-domain-actions">
+                      {domain === website.primaryDomain ? (
+                        <strong>Primary</strong>
+                      ) : (
+                        <form action={setPrimaryDomainAction}>
+                          <input type="hidden" name="websiteId" value={website.id} />
+                          <input type="hidden" name="domain" value={domain} />
+                          <button
+                            className="saas-auth-secondary-button"
+                            type="submit"
+                          >
+                            Set Primary
+                          </button>
+                        </form>
+                      )}
+
+                      <form action={removeWebsiteDomainAction}>
+                        <input type="hidden" name="websiteId" value={website.id} />
+                        <input type="hidden" name="domain" value={domain} />
+                        <button
+                          className="saas-auth-secondary-button"
+                          type="submit"
+                        >
+                          Remove
+                        </button>
+                      </form>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -298,6 +440,9 @@ export default async function WebsiteSettingsPage({
               </label>
               {query?.domainSaved && (
                 <p className="saas-auth-success">Domain added.</p>
+              )}
+              {query?.domainUpdated && (
+                <p className="saas-auth-success">Domain settings updated.</p>
               )}
               <button className="saas-auth-submit" type="submit">
                 Add Domain

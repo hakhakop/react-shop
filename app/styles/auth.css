@@ -580,16 +580,54 @@
 }
 
 .saas-domain-item {
-  display: flex;
-  min-height: 42px;
-  align-items: center;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   gap: 12px;
   border: 1px solid var(--border-soft, #d7dde8);
   border-radius: 16px;
   background: var(--saas-panel-soft-bg);
   color: var(--text-main, #111827);
   font-weight: 850;
+  padding: 0 12px;
+}
+
+.saas-domain-item[data-primary="true"] {
+  border-color: color-mix(in srgb, var(--accent, #2563eb) 40%, var(--border-soft, #d7dde8));
+}
+
+.saas-domain-edit-form {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) auto;
+  gap: 10px;
+  align-items: end;
+  padding: 10px 0;
+}
+
+.saas-domain-edit-form .saas-auth-field {
+  gap: 4px;
+}
+
+.saas-domain-edit-form .saas-auth-field input {
+  min-height: 38px;
+  padding: 9px 11px;
+}
+
+.saas-domain-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 10px 0;
+}
+
+.saas-domain-actions form {
+  display: inline-flex;
+}
+
+.saas-domain-actions .saas-auth-secondary-button,
+.saas-domain-edit-form .saas-auth-secondary-button {
+  min-height: 38px;
   padding: 0 12px;
 }
 

@@ -51,16 +51,16 @@
     "ownerId": "a010b610-5c47-441c-b2ec-00a6e9eb3f88",
     "name": "SteelChef",
     "slug": "steel",
-    "domain": "google.com",
-    "primaryDomain": "google.com",
+    "domain": "testclient.webpages.am",
+    "primaryDomain": "testclient.webpages.am",
     "domains": [
-      "google.com"
+      "testclient.webpages.am"
     ],
     "description": "",
     "timeZone": "Asia/Yerevan",
     "language": "hy",
     "status": "creating",
     "createdAt": "2026-07-02T15:12:01.040Z",
-    "updatedAt": "2026-07-02T18:10:15.891Z"
+    "updatedAt": "2026-07-03T03:22:23.612Z"
   }
 ]
