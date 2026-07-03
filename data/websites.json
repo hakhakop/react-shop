@@ -4,14 +4,14 @@
     "ownerId": "a010b610-5c47-441c-b2ec-00a6e9eb3f88",
     "name": "Notebookmall",
     "slug": "note",
-    "domain": "clientdomain.am",
-    "primaryDomain": "clientdomain.am",
+    "domain": "testclient2.webpages.am",
+    "primaryDomain": "testclient2.webpages.am",
     "domains": [
-      "clientdomain.am"
+      "testclient2.webpages.am"
     ],
     "status": "maintenance",
     "createdAt": "2026-06-29T19:29:57.677Z",
-    "updatedAt": "2026-06-30T14:20:54.291Z",
+    "updatedAt": "2026-07-03T06:08:02.092Z",
     "description": "Hey you are what the rights",
     "timeZone": "Asia/Yerevan",
     "language": "hy"

@@ -581,18 +581,152 @@
 
 .saas-domain-item {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 12px;
+  gap: 14px;
   border: 1px solid var(--border-soft, #d7dde8);
-  border-radius: 16px;
-  background: var(--saas-panel-soft-bg);
+  border-radius: 20px;
+  background:
+    linear-gradient(135deg, var(--saas-panel-bg), var(--saas-panel-soft-bg));
   color: var(--text-main, #111827);
   font-weight: 850;
-  padding: 0 12px;
+  padding: 16px;
 }
 
 .saas-domain-item[data-primary="true"] {
   border-color: color-mix(in srgb, var(--accent, #2563eb) 40%, var(--border-soft, #d7dde8));
+}
+
+.saas-domain-connection {
+  display: grid;
+  gap: 14px;
+}
+
+.saas-domain-connection-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.saas-domain-connection-header > div {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.saas-domain-name {
+  color: var(--text-main, #111827);
+  font-size: clamp(18px, 2vw, 24px);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+}
+
+.saas-domain-primary,
+.saas-domain-status,
+.saas-domain-progress span {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 900;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.saas-domain-primary {
+  background: var(--saas-chip-bg);
+  color: var(--text-main, #111827);
+  padding: 6px 9px;
+}
+
+.saas-domain-status {
+  border: 1px solid var(--border-soft, #d7dde8);
+  color: var(--text-muted, #667085);
+  padding: 7px 10px;
+}
+
+.saas-domain-status.is-connected {
+  border-color: rgba(22, 163, 74, 0.28);
+  background: rgba(22, 163, 74, 0.12);
+  color: #15803d;
+}
+
+.saas-domain-status.is-waiting_for_dns {
+  border-color: rgba(217, 119, 6, 0.26);
+  background: rgba(217, 119, 6, 0.12);
+  color: #b45309;
+}
+
+.saas-domain-status.is-dns_error {
+  border-color: rgba(220, 38, 38, 0.26);
+  background: rgba(220, 38, 38, 0.1);
+  color: #b91c1c;
+}
+
+.saas-domain-status.is-not_configured {
+  background: var(--saas-chip-bg);
+}
+
+.saas-domain-progress {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.saas-domain-progress span {
+  border: 1px solid var(--border-soft, #d7dde8);
+  color: var(--text-muted, #667085);
+  padding: 7px 10px;
+}
+
+.saas-domain-progress span::before {
+  content: "";
+  display: inline-grid;
+  width: 16px;
+  height: 16px;
+  place-items: center;
+  margin-right: 6px;
+  border-radius: 999px;
+  background: var(--saas-chip-bg);
+}
+
+.saas-domain-progress .is-complete {
+  border-color: rgba(22, 163, 74, 0.26);
+  color: #15803d;
+}
+
+.saas-domain-progress .is-complete::before {
+  content: "✓";
+  background: rgba(22, 163, 74, 0.14);
+}
+
+.saas-domain-progress .is-pending::before {
+  background: rgba(217, 119, 6, 0.14);
+}
+
+.saas-domain-progress .is-next {
+  opacity: 0.72;
+}
+
+.saas-domain-message {
+  margin: 0;
+}
+
+.saas-domain-instruction {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  border: 1px dashed var(--border-soft, #d7dde8);
+  border-radius: 16px;
+  background: var(--saas-panel-muted-bg);
+  color: var(--text-muted, #667085);
+  padding: 12px;
+}
+
+.saas-domain-instruction strong {
+  color: var(--text-main, #111827);
 }
 
 .saas-domain-edit-form {
@@ -616,7 +750,7 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: flex-start;
   gap: 8px;
   padding: 10px 0;
 }
@@ -629,15 +763,6 @@
 .saas-domain-edit-form .saas-auth-secondary-button {
   min-height: 38px;
   padding: 0 12px;
-}
-
-.saas-domain-item strong {
-  border-radius: 999px;
-  background: var(--saas-chip-bg);
-  color: var(--text-main, #111827);
-  font-size: 11px;
-  padding: 5px 9px;
-  text-transform: uppercase;
 }
 
 .saas-settings-placeholder {

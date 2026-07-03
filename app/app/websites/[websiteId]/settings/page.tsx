@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import AccessDenied from "@/components/saas/AccessDenied";
+import DomainConnectionStatus from "@/components/saas/DomainConnectionStatus";
 import SaaSShell from "@/components/saas/SaaSShell";
 import { getCurrentUser, isSaaSAdmin } from "@/lib/auth";
 import { loginRedirectFor } from "@/lib/saasRoutes";
@@ -373,6 +374,12 @@ export default async function WebsiteSettingsPage({
                     key={domain}
                     data-primary={domain === website.primaryDomain ? "true" : "false"}
                   >
+                    <DomainConnectionStatus
+                      domain={domain}
+                      isPrimary={domain === website.primaryDomain}
+                      websiteId={website.id}
+                    />
+
                     <form
                       className="saas-domain-edit-form"
                       action={editWebsiteDomainAction}
