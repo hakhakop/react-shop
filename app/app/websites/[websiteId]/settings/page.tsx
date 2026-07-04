@@ -39,7 +39,7 @@ const settingsSections = [
   { title: "Domains", available: true },
   { title: "SEO", available: false },
   { title: "Members", available: false },
-  { title: "Advanced", available: false },
+  { title: "Advanced", available: true },
 ];
 
 const futureCards = [
@@ -455,6 +455,22 @@ export default async function WebsiteSettingsPage({
                 Add Domain
               </button>
             </form>
+          </section>
+
+          <section className="saas-panel" id="advanced">
+            <div className="saas-panel-heading">
+              <div>
+                <h2>Advanced</h2>
+                <p>Download a JSON backup of this website for safekeeping.</p>
+              </div>
+            </div>
+
+            <a
+              className="saas-auth-submit"
+              href={`/api/websites/${getWebsiteRouteSegment(website)}/export-backup`}
+            >
+              Export Backup
+            </a>
           </section>
 
           <section className="saas-settings-placeholder-grid">

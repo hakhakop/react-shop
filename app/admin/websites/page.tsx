@@ -76,6 +76,11 @@ export default async function AdminWebsitesPage() {
                     <Link href={previewHref}>
                       Preview
                     </Link>
+                    <a
+                      href={`/api/websites/${getWebsiteRouteSegment(website)}/export-backup`}
+                    >
+                      Export Backup
+                    </a>
                   </span>
                 </div>
               );

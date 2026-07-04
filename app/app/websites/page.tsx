@@ -66,6 +66,11 @@ export default async function WebsitesPage() {
                   <Link href={`/app/websites/${getWebsiteRouteSegment(website)}/settings`}>
                     Settings
                   </Link>
+                  <a
+                    href={`/api/websites/${getWebsiteRouteSegment(website)}/export-backup`}
+                  >
+                    Export Backup
+                  </a>
                 </div>
               </article>
             ))}
