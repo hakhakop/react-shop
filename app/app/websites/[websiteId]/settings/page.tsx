@@ -6,6 +6,12 @@ import SaaSShell from "@/components/saas/SaaSShell";
 import { getCurrentUser, isSaaSAdmin } from "@/lib/auth";
 import { loginRedirectFor } from "@/lib/saasRoutes";
 import {
+  createStoredWebsiteBackup,
+  listWebsiteBackups,
+  restoreStoredWebsiteBackup,
+  restoreWebsiteBackup,
+} from "@/lib/websiteBackup";
+import {
   addWebsiteDomain,
   canAccessWebsiteBuilder,
   getWebsiteById,
@@ -29,6 +35,9 @@ type WebsiteSettingsPageProps = {
     domainSaved?: string;
     domainUpdated?: string;
     error?: string;
+    backupCreated?: string;
+    backupRestored?: string;
+    restoreSource?: string;
     saved?: string;
   }>;
 };
@@ -49,6 +58,19 @@ const futureCards = [
   { title: "SEO", description: "Default metadata and search appearance." },
   { title: "Members", description: "Invite teammates and manage access." },
 ];
+
+function formatBackupSize(sizeBytes: number) {
+  if (sizeBytes < 1024) return `${sizeBytes} B`;
+  if (sizeBytes < 1024 * 1024) return `${Math.round(sizeBytes / 1024)} KB`;
+  return `${(sizeBytes / 1024 / 1024).toFixed(1)} MB`;
+}
+
+function formatBackupDate(value: string) {
+  return new Intl.DateTimeFormat("en", {
+    dateStyle: "medium",
+    timeStyle: "short",
+  }).format(new Date(value));
+}
 
 async function saveWebsiteSettingsAction(formData: FormData) {
   "use server";
@@ -228,6 +250,131 @@ async function editWebsiteDomainAction(formData: FormData) {
   redirect(`/app/websites/${websiteId}/settings?domainUpdated=1#domains`);
 }
 
+async function createWebsiteBackupAction(formData: FormData) {
+  "use server";
+
+  const websiteId = String(formData.get("websiteId") ?? "");
+  const user = await getCurrentUser(await cookies());
+  const errorRedirect = (message: string): never => {
+    const params = new URLSearchParams({ error: message });
+    redirect(`/app/websites/${websiteId}/settings?${params.toString()}#advanced`);
+  };
+
+  if (!user) {
+    redirect(loginRedirectFor(`/app/websites/${websiteId}/settings`));
+  }
+
+  const website = await getWebsiteById(websiteId);
+  if (!website || !canAccessWebsiteBuilder(user, website)) {
+    errorRedirect("Access denied.");
+  }
+  const targetWebsite = website!;
+
+  await createStoredWebsiteBackup(targetWebsite);
+
+  redirect(
+    `/app/websites/${getWebsiteRouteSegment(targetWebsite)}/settings?backupCreated=1#advanced`,
+  );
+}
+
+async function restoreExistingWebsiteBackupAction(formData: FormData) {
+  "use server";
+
+  const websiteId = String(formData.get("websiteId") ?? "");
+  const backupId = String(formData.get("backupId") ?? "");
+  const user = await getCurrentUser(await cookies());
+  const errorRedirect = (message: string): never => {
+    const params = new URLSearchParams({
+      error: message,
+      restoreSource: "existing",
+    });
+    redirect(`/app/websites/${websiteId}/settings?${params.toString()}#advanced`);
+  };
+
+  if (!user) {
+    redirect(loginRedirectFor(`/app/websites/${websiteId}/settings`));
+  }
+
+  const website = await getWebsiteById(websiteId);
+  if (!website || !canAccessWebsiteBuilder(user, website)) {
+    errorRedirect("Access denied.");
+  }
+  const targetWebsite = website!;
+
+  if (!backupId) {
+    errorRedirect("Choose a backup to restore.");
+  }
+
+  if (formData.get("confirmRestore") !== "on") {
+    errorRedirect("Confirm restore before restoring a backup.");
+  }
+
+  try {
+    await restoreStoredWebsiteBackup({ website: targetWebsite, backupId });
+  } catch (error) {
+    errorRedirect(
+      error instanceof Error ? error.message : "Backup could not be restored.",
+    );
+  }
+
+  redirect(
+    `/app/websites/${getWebsiteRouteSegment(targetWebsite)}/settings?backupRestored=1&restoreSource=existing#advanced`,
+  );
+}
+
+async function restoreWebsiteBackupAction(formData: FormData) {
+  "use server";
+
+  const websiteId = String(formData.get("websiteId") ?? "");
+  const user = await getCurrentUser(await cookies());
+  const errorRedirect = (message: string): never => {
+    const params = new URLSearchParams({
+      error: message,
+      restoreSource: "upload",
+    });
+    redirect(`/app/websites/${websiteId}/settings?${params.toString()}#advanced`);
+  };
+
+  if (!user) {
+    redirect(loginRedirectFor(`/app/websites/${websiteId}/settings`));
+  }
+
+  const website = await getWebsiteById(websiteId);
+  if (!website || !canAccessWebsiteBuilder(user, website)) {
+    errorRedirect("Access denied.");
+  }
+  const targetWebsite = website!;
+
+  if (formData.get("confirmRestore") !== "on") {
+    errorRedirect("Confirm restore before uploading a backup.");
+  }
+
+  const fileEntry = formData.get("backupFile");
+  if (!(fileEntry instanceof File) || fileEntry.size === 0) {
+    errorRedirect("Choose a WebPages backup JSON file.");
+  }
+  const backupFile = fileEntry as File;
+
+  if (!backupFile.name.toLowerCase().endsWith(".json")) {
+    errorRedirect("Backup file must be a .json file.");
+  }
+
+  try {
+    await restoreWebsiteBackup({
+      website: targetWebsite,
+      backup: JSON.parse(await backupFile.text()),
+    });
+  } catch (error) {
+    errorRedirect(
+      error instanceof Error ? error.message : "Backup could not be restored.",
+    );
+  }
+
+  redirect(
+    `/app/websites/${getWebsiteRouteSegment(targetWebsite)}/settings?backupRestored=1&restoreSource=upload#advanced`,
+  );
+}
+
 export default async function WebsiteSettingsPage({
   params,
   searchParams,
@@ -246,6 +393,9 @@ export default async function WebsiteSettingsPage({
   if (!website || !canAccessWebsiteBuilder(user, website)) {
     return <AccessDenied />;
   }
+  const backups = await listWebsiteBackups(website.id);
+  const websiteRouteSegment = getWebsiteRouteSegment(website);
+  const restoreSource = query?.restoreSource === "upload" ? "upload" : "existing";
 
   return (
     <SaaSShell
@@ -460,17 +610,177 @@ export default async function WebsiteSettingsPage({
           <section className="saas-panel" id="advanced">
             <div className="saas-panel-heading">
               <div>
-                <h2>Advanced</h2>
-                <p>Download a JSON backup of this website for safekeeping.</p>
+                <h2>Backup & Restore</h2>
+                <p>Manage server backups and restore this website's builder data.</p>
               </div>
             </div>
 
-            <a
-              className="saas-auth-submit"
-              href={`/api/websites/${getWebsiteRouteSegment(website)}/export-backup`}
-            >
-              Export Backup
-            </a>
+            <div className="saas-backup-restore-grid">
+              <div className="saas-backup-panel">
+                <div className="saas-backup-panel-heading">
+                  <div>
+                    <h3>Backups</h3>
+                    <p>Manage your existing backups. We keep the latest 5 backups.</p>
+                  </div>
+                  <form action={createWebsiteBackupAction}>
+                    <input type="hidden" name="websiteId" value={website.id} />
+                    <button className="saas-auth-submit" type="submit">
+                      Create New Backup
+                    </button>
+                  </form>
+                </div>
+
+                {query?.backupCreated && (
+                  <p className="saas-auth-success">Backup created.</p>
+                )}
+
+                {backups.length > 0 ? (
+                  <div className="saas-backup-table">
+                    <div className="saas-backup-row is-heading">
+                      <span>Date Created</span>
+                      <span>Version</span>
+                      <span>Size</span>
+                      <span>Actions</span>
+                    </div>
+                    {backups.map((backup, index) => (
+                      <div className="saas-backup-row" key={backup.id}>
+                        <span>
+                          <strong>{formatBackupDate(backup.createdAt)}</strong>
+                          {index === 0 ? <small>Latest</small> : null}
+                        </span>
+                        <span>v{backup.exportVersion}</span>
+                        <span>{formatBackupSize(backup.sizeBytes)}</span>
+                        <span className="saas-backup-actions">
+                          <a
+                            className="saas-auth-secondary-button"
+                            href={`/api/websites/${websiteRouteSegment}/backups/${encodeURIComponent(backup.id)}`}
+                          >
+                            Download
+                          </a>
+                          <button
+                            className="saas-auth-secondary-button"
+                            type="button"
+                            disabled
+                          >
+                            More
+                          </button>
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p>No server backups yet.</p>
+                )}
+
+                <p className="saas-backup-note">
+                  A maximum of 5 backups are kept. Creating a new backup will
+                  remove the oldest one.
+                </p>
+              </div>
+
+              <div className="saas-backup-panel">
+                <div className="saas-backup-panel-heading">
+                  <div>
+                    <h3>Restore</h3>
+                    <p>Restore your website from an existing backup or upload one.</p>
+                  </div>
+                </div>
+
+                <div className="saas-restore-tabs" role="tablist">
+                  <a
+                    className={restoreSource === "existing" ? "is-active" : ""}
+                    href={`/app/websites/${websiteRouteSegment}/settings?restoreSource=existing#advanced`}
+                  >
+                    From Existing Backups
+                  </a>
+                  <a
+                    className={restoreSource === "upload" ? "is-active" : ""}
+                    href={`/app/websites/${websiteRouteSegment}/settings?restoreSource=upload#advanced`}
+                  >
+                    Upload from Computer
+                  </a>
+                </div>
+
+                {restoreSource === "existing" ? (
+                  <form
+                    className="saas-settings-form"
+                    action={restoreExistingWebsiteBackupAction}
+                  >
+                    <input type="hidden" name="websiteId" value={website.id} />
+                    <label className="saas-auth-field saas-field-wide">
+                      <span>Select a backup to restore</span>
+                      <select name="backupId" required defaultValue="">
+                        <option value="" disabled>
+                          Choose a backup...
+                        </option>
+                        {backups.map((backup) => (
+                          <option key={backup.id} value={backup.id}>
+                            {formatBackupDate(backup.createdAt)} - v
+                            {backup.exportVersion} - {formatBackupSize(backup.sizeBytes)}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                    <p className="saas-backup-warning">
+                      This will replace the current website design/pages. A
+                      safety backup will be created before restoring.
+                    </p>
+                    <label className="saas-auth-field saas-field-wide">
+                      <span>Confirm Restore</span>
+                      <input name="confirmRestore" type="checkbox" required />
+                    </label>
+                    {query?.backupRestored && restoreSource === "existing" && (
+                      <p className="saas-auth-success">Website backup restored.</p>
+                    )}
+                    {query?.error && restoreSource === "existing" && (
+                      <p className="saas-auth-error">{query.error}</p>
+                    )}
+                    <button className="saas-auth-submit" type="submit">
+                      Restore Selected Backup
+                    </button>
+                  </form>
+                ) : (
+                  <form
+                    className="saas-settings-form"
+                    action={restoreWebsiteBackupAction}
+                    encType="multipart/form-data"
+                  >
+                    <input type="hidden" name="websiteId" value={website.id} />
+                    <label className="saas-auth-field saas-field-wide">
+                      <span>Upload Backup File</span>
+                      <input
+                        name="backupFile"
+                        type="file"
+                        accept=".json,application/json"
+                        required
+                      />
+                    </label>
+                    <p className="saas-backup-warning">
+                      This will replace the current website design/pages. A
+                      safety backup will be created before restoring.
+                    </p>
+                    <label className="saas-auth-field saas-field-wide">
+                      <span>Confirm Restore</span>
+                      <input name="confirmRestore" type="checkbox" required />
+                    </label>
+                    {query?.backupRestored && restoreSource === "upload" && (
+                      <p className="saas-auth-success">Website backup restored.</p>
+                    )}
+                    {query?.error && restoreSource === "upload" && (
+                      <p className="saas-auth-error">{query.error}</p>
+                    )}
+                    <button className="saas-auth-submit" type="submit">
+                      Restore Uploaded Backup
+                    </button>
+                  </form>
+                )}
+              </div>
+            </div>
+
+            <p className="saas-backup-safety">
+              Your safety is our priority. Before any restore, a safety backup
+              of your current data will be created automatically.
+            </p>
           </section>
 
           <section className="saas-settings-placeholder-grid">

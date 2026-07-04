@@ -1,12 +1,10 @@
-import { readFile } from "node:fs/promises";
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
-import { canAccessWebsiteBuilder, getWebsiteByIdOrSlug } from "@/lib/websites";
 import {
-  getBuilderLayoutStorePath,
-  getBuilderPagesPath,
-  getBuilderShellPath,
-} from "@/lib/websiteBuilderData";
+  createWebsiteBackupPayload,
+  getWebsiteBackupDownloadFilename,
+} from "@/lib/websiteBackup";
+import { canAccessWebsiteBuilder, getWebsiteByIdOrSlug } from "@/lib/websites";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -16,28 +14,6 @@ type ExportBackupRouteProps = {
     websiteId: string;
   }>;
 };
-
-async function readJsonFile(filePath: string, fallback: unknown) {
-  try {
-    return JSON.parse(await readFile(filePath, "utf8"));
-  } catch {
-    return fallback;
-  }
-}
-
-function backupDateStamp(date: Date) {
-  return date.toISOString().slice(0, 10);
-}
-
-function safeFilenamePart(value: string) {
-  return (
-    value
-      .trim()
-      .toLowerCase()
-      .replace(/[^a-z0-9-]+/g, "-")
-      .replace(/^-+|-+$/g, "") || "website"
-  );
-}
 
 export async function GET(request: NextRequest, { params }: ExportBackupRouteProps) {
   const user = await getCurrentUser(request.cookies);
@@ -59,20 +35,8 @@ export async function GET(request: NextRequest, { params }: ExportBackupRoutePro
   }
 
   const exportedAt = new Date();
-  const backup = {
-    exportVersion: 1,
-    exportedAt: exportedAt.toISOString(),
-    website,
-    files: {
-      "builder-layouts.json": await readJsonFile(
-        getBuilderLayoutStorePath(website.id),
-        {},
-      ),
-      "builder-pages.json": await readJsonFile(getBuilderPagesPath(website.id), []),
-      "builder-shell.json": await readJsonFile(getBuilderShellPath(website.id), {}),
-    },
-  };
-  const filename = `webpages-backup-${safeFilenamePart(website.slug)}-${backupDateStamp(exportedAt)}.json`;
+  const backup = await createWebsiteBackupPayload(website);
+  const filename = getWebsiteBackupDownloadFilename(website, exportedAt);
 
   return new NextResponse(`${JSON.stringify(backup, null, 2)}\n`, {
     headers: {

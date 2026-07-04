@@ -568,6 +568,147 @@
   width: max-content;
 }
 
+.saas-backup-restore-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 520px), 1fr));
+  gap: 18px;
+}
+
+.saas-backup-panel {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+  border: 1px solid var(--border-soft, #d7dde8);
+  border-radius: 18px;
+  background: var(--saas-panel-soft-bg);
+  padding: clamp(16px, 2vw, 22px);
+}
+
+.saas-backup-panel-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.saas-backup-panel-heading form {
+  flex-shrink: 0;
+}
+
+.saas-backup-panel-heading .saas-auth-submit {
+  min-width: max-content;
+  white-space: nowrap;
+}
+
+.saas-backup-panel-heading h3 {
+  margin: 0;
+  color: var(--text-main, #111827);
+  font-size: 20px;
+  letter-spacing: 0;
+}
+
+.saas-backup-panel-heading p,
+.saas-backup-note,
+.saas-backup-safety {
+  margin: 0;
+  color: var(--text-muted, #667085);
+  line-height: 1.5;
+}
+
+.saas-backup-table {
+  display: grid;
+  gap: 0;
+}
+
+.saas-backup-row {
+  display: grid;
+  grid-template-columns: minmax(150px, 1fr) 64px 76px minmax(132px, auto);
+  gap: 14px;
+  align-items: center;
+  border-top: 1px solid var(--border-soft, #d7dde8);
+  color: var(--text-main, #111827);
+  padding: 12px 0;
+}
+
+.saas-backup-row.is-heading {
+  border-top: 0;
+  color: var(--text-muted, #667085);
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  padding-top: 0;
+  text-transform: uppercase;
+}
+
+.saas-backup-row strong,
+.saas-backup-row small {
+  display: block;
+}
+
+.saas-backup-row small {
+  color: #16a34a;
+  font-weight: 900;
+  padding-top: 2px;
+}
+
+.saas-backup-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.saas-backup-actions .saas-auth-secondary-button {
+  min-height: 36px;
+  padding: 0 12px;
+}
+
+.saas-backup-note {
+  border-radius: 14px;
+  background: var(--saas-panel-muted-bg);
+  padding: 12px 14px;
+}
+
+.saas-restore-tabs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border-bottom: 1px solid var(--border-soft, #d7dde8);
+}
+
+.saas-restore-tabs a {
+  color: var(--text-muted, #667085);
+  font-size: 14px;
+  font-weight: 900;
+  padding: 0 12px 12px;
+  text-align: center;
+  text-decoration: none;
+}
+
+.saas-restore-tabs a.is-active {
+  border-bottom: 2px solid var(--accent, #2563eb);
+  color: var(--accent, #2563eb);
+}
+
+.saas-backup-warning {
+  grid-column: 1 / -1;
+  margin: 0;
+  border: 1px solid color-mix(in srgb, #ef4444 34%, var(--border-soft, #d7dde8));
+  border-radius: 14px;
+  background: color-mix(in srgb, #ef4444 8%, var(--saas-panel-bg));
+  color: var(--text-main, #111827);
+  line-height: 1.5;
+  padding: 14px;
+}
+
+.saas-backup-safety {
+  border: 1px solid color-mix(in srgb, var(--accent, #2563eb) 28%, var(--border-soft, #d7dde8));
+  border-radius: 18px;
+  background: color-mix(in srgb, var(--accent, #2563eb) 7%, var(--saas-panel-bg));
+  color: var(--text-main, #111827);
+  font-weight: 750;
+  padding: 16px 18px;
+}
+
 .saas-settings-placeholder-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
@@ -836,7 +977,8 @@
   }
 
   .saas-settings-layout,
-  .saas-settings-form {
+  .saas-settings-form,
+  .saas-backup-restore-grid {
     grid-template-columns: 1fr;
   }
 
