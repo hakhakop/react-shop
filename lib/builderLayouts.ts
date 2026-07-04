@@ -1,6 +1,8 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import {
+  backupRootBuilderFileBeforeWrite,
+  ensureRootBuilderData,
   getBuilderLayoutStorePath,
   getBuilderPagesPath,
   getBuilderTemplatesPath,
@@ -490,6 +492,9 @@ export async function readBuilderLayoutStore(
   scope: BuilderDataScope = {},
 ): Promise<BuilderLayoutStore> {
   try {
+    if (!scope.websiteId) {
+      await ensureRootBuilderData();
+    }
     const filePath = getBuilderLayoutStorePath(scope.websiteId);
     console.log("[builder-scope] read builder-layouts", {
       websiteId: scope.websiteId ?? null,
@@ -521,6 +526,9 @@ export async function writeBuilderLayoutStore(
     filePath,
   });
   await mkdir(path.dirname(filePath), { recursive: true });
+  if (!scope.websiteId) {
+    await backupRootBuilderFileBeforeWrite("builder-layouts.json");
+  }
   await writeFile(filePath, `${JSON.stringify(store, null, 2)}\n`, "utf8");
 }
 
@@ -528,6 +536,9 @@ export async function readBuilderCustomPages(
   scope: BuilderDataScope = {},
 ): Promise<BuilderCustomPage[]> {
   try {
+    if (!scope.websiteId) {
+      await ensureRootBuilderData();
+    }
     const filePath = getBuilderPagesPath(scope.websiteId);
     console.log("[builder-scope] read builder-pages", {
       websiteId: scope.websiteId ?? null,
@@ -557,6 +568,9 @@ export async function writeBuilderCustomPages(
     filePath,
   });
   await mkdir(path.dirname(filePath), { recursive: true });
+  if (!scope.websiteId) {
+    await backupRootBuilderFileBeforeWrite("builder-pages.json");
+  }
   await writeFile(
     filePath,
     `${JSON.stringify(pagesToWrite, null, 2)}\n`,

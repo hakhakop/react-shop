@@ -1,6 +1,10 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { getBuilderShellPath } from "@/lib/websiteBuilderData";
+import {
+  backupRootBuilderFileBeforeWrite,
+  ensureRootBuilderData,
+  getBuilderShellPath,
+} from "@/lib/websiteBuilderData";
 
 export type BuilderHeaderLayout =
   | "wordpress"
@@ -576,6 +580,9 @@ export async function getBuilderShellSettings(
   scope: BuilderShellScope = {},
 ): Promise<BuilderShellSettings> {
   try {
+    if (!scope.websiteId) {
+      await ensureRootBuilderData();
+    }
     const filePath = getBuilderShellPath(scope.websiteId);
     console.log("[builder-scope] read builder-shell", {
       websiteId: scope.websiteId ?? null,
@@ -598,6 +605,9 @@ export async function writeBuilderShellSettings(
     filePath,
   });
   await mkdir(path.dirname(filePath), { recursive: true });
+  if (!scope.websiteId) {
+    await backupRootBuilderFileBeforeWrite("builder-shell.json");
+  }
   await writeFile(
     filePath,
     `${JSON.stringify(
