@@ -247,16 +247,19 @@ function RenderDashboardChecklist({
 const STORAGE_KEY = "react-shop-visual-builder-v1";
 const STORAGE_BY_KEY = "react-shop-visual-builder-drafts-v2";
 const STORAGE_CUSTOM_PAGES = "react-shop-visual-builder-pages-v1";
+const SIDEBAR_COLLAPSED_BREAKPOINT = 900;
 type BuilderStorageKeys = {
   state: string;
   drafts: string;
   pages: string;
+  sidebarCollapsed: string;
 };
 
 const defaultBuilderStorageKeys: BuilderStorageKeys = {
   state: STORAGE_KEY,
   drafts: STORAGE_BY_KEY,
   pages: STORAGE_CUSTOM_PAGES,
+  sidebarCollapsed: "react-shop-builder-sidebar-collapsed-v1",
 };
 
 function getBuilderStorageKeys(websiteId?: string): BuilderStorageKeys {
@@ -265,7 +268,22 @@ function getBuilderStorageKeys(websiteId?: string): BuilderStorageKeys {
     state: `${STORAGE_KEY}:${websiteId}`,
     drafts: `${STORAGE_BY_KEY}:${websiteId}`,
     pages: `${STORAGE_CUSTOM_PAGES}:${websiteId}`,
+    sidebarCollapsed: `react-shop-builder-sidebar-collapsed-v1:${websiteId}`,
   };
+}
+
+function getDefaultSidebarCollapsed() {
+  if (typeof window === "undefined") return false;
+  return window.innerWidth < SIDEBAR_COLLAPSED_BREAKPOINT;
+}
+
+function loadSidebarCollapsedPreference(storageKey: string) {
+  if (typeof window === "undefined") return false;
+
+  const stored = window.localStorage.getItem(storageKey);
+  if (stored === "true") return true;
+  if (stored === "false") return false;
+  return getDefaultSidebarCollapsed();
 }
 
 const defaultShellSettings: BuilderShellSettings = {
@@ -1431,8 +1449,10 @@ export default function DashboardBuilder({
   const [globalSpacingFocus, setGlobalSpacingFocus] = useState<
     "section" | "row" | "element" | null
   >(null);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
-  const [sidebarWidth, setSidebarWidth] = useState(390);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(() =>
+    loadSidebarCollapsedPreference(storageKeys.sidebarCollapsed),
+  );
+  const [sidebarWidth, setSidebarWidth] = useState(480);
   const [sidebarResizing, setSidebarResizing] = useState(false);
   const [previewScale, setPreviewScale] = useState(1);
   const [previewCanvasWidth, setPreviewCanvasWidth] = useState(1180);
@@ -1455,6 +1475,13 @@ export default function DashboardBuilder({
   );
   const [menuIconPickerOpen, setMenuIconPickerOpen] = useState(false);
   const [menuIconSearch, setMenuIconSearch] = useState("");
+  const setSidebarCollapsedPreference = useCallback(
+    (next: boolean) => {
+      setSidebarCollapsed(next);
+      window.localStorage.setItem(storageKeys.sidebarCollapsed, String(next));
+    },
+    [storageKeys.sidebarCollapsed],
+  );
   const publishCelebrationTimer = useRef<number | null>(null);
   const shellAutoSaveTimer = useRef<number | null>(null);
   const spacingFocusRequestId = useRef(0);
@@ -1465,6 +1492,13 @@ export default function DashboardBuilder({
       setShellStatus("Platform global settings require super admin access.");
     }
   }, [canEditShellSettings, sidebarTab]);
+
+  useEffect(() => {
+    setSidebarCollapsed(
+      loadSidebarCollapsedPreference(storageKeys.sidebarCollapsed),
+    );
+  }, [storageKeys.sidebarCollapsed]);
+
   const [customPages, setCustomPages] = useState<BuilderCustomPage[]>([]);
   const [publishedKeys, setPublishedKeys] = useState<string[]>([]);
   const [newPageTitle, setNewPageTitle] = useState("");
@@ -7161,7 +7195,7 @@ export default function DashboardBuilder({
         onUpdateShellSettings={updateShellSettings}
         onSaveMenuItems={saveMenuItems}
         sidebarCollapsed={sidebarCollapsed}
-        onSetSidebarCollapsed={setSidebarCollapsed}
+        onSetSidebarCollapsed={setSidebarCollapsedPreference}
       />
 
       <main className="builder-workspace">
