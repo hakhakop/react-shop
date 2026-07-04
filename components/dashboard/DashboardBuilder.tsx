@@ -5268,6 +5268,124 @@ export default function DashboardBuilder({
     setTemplateStatus("Template renamed");
   };
 
+  const exportSavedTemplate = (template: BuilderSavedTemplate) => {
+    const exportedAt = new Date().toISOString();
+    const payload = {
+      exportType: "webpages-builder-template",
+      exportVersion: 1,
+      exportedAt,
+      template,
+    };
+    const templateType = template.templateType ?? "page";
+    const slug =
+      template.title
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "")
+        .slice(0, 72) || "template";
+    const blob = new Blob([`${JSON.stringify(payload, null, 2)}\n`], {
+      type: "application/json",
+    });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `webpages-${templateType}-template-${slug}.json`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.URL.revokeObjectURL(url);
+    setTemplateStatus(`${templateType} template exported`);
+  };
+
+  const importSavedTemplate = async (
+    file: File,
+    templateType: NonNullable<BuilderSavedTemplate["templateType"]>,
+  ) => {
+    setTemplateStatus("Importing template...");
+
+    try {
+      const parsed = JSON.parse(await file.text()) as unknown;
+      const parsedObject =
+        parsed && typeof parsed === "object"
+          ? (parsed as Record<string, unknown>)
+          : null;
+      const wrappedTemplate =
+        parsedObject?.template &&
+        typeof parsedObject.template === "object" &&
+        !Array.isArray(parsedObject.template)
+          ? (parsedObject.template as Partial<BuilderSavedTemplate>)
+          : null;
+      const importedTemplate = wrappedTemplate
+        ? wrappedTemplate
+        : (parsedObject as Partial<BuilderSavedTemplate> | null);
+
+      if (!importedTemplate) {
+        setTemplateStatus("Template import failed: invalid JSON");
+        return;
+      }
+
+      const importedType = importedTemplate.templateType ?? templateType;
+
+      if (
+        importedType !== "page" &&
+        importedType !== "section" &&
+        importedType !== "row" &&
+        importedType !== "element"
+      ) {
+        setTemplateStatus("Template import failed: unsupported type");
+        return;
+      }
+
+      if (importedType !== templateType) {
+        setTemplateStatus(`Switch to ${importedType}s before importing this export`);
+        return;
+      }
+
+      if (!Array.isArray(importedTemplate.sections)) {
+        setTemplateStatus("Template import failed: missing sections");
+        return;
+      }
+
+      const response = await fetch("/api/builder-templates", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          title: importedTemplate.title
+            ? `${importedTemplate.title} import`
+            : "Imported Template",
+          templateType,
+          description: importedTemplate.description,
+          sourcePage: importedTemplate.sourcePage,
+          design: importedTemplate.design,
+          sections: importedTemplate.sections,
+        }),
+      });
+
+      if (!response.ok) {
+        setTemplateStatus("Template import failed");
+        return;
+      }
+
+      const payload = (await response.json()) as {
+        template?: BuilderSavedTemplate;
+        templates?: BuilderSavedTemplate[];
+      };
+      setSavedTemplates(payload.templates ?? []);
+      if (payload.template) {
+        setRenameTemplateRequest({
+          id: payload.template.id,
+          templateType: payload.template.templateType ?? templateType,
+        });
+      }
+      setTemplateStatus(`${templateType} template imported`);
+    } catch {
+      setTemplateStatus("Template import failed: invalid JSON");
+    }
+  };
+
   const deleteSavedTemplate = async (id: string) => {
     setTemplateStatus("Deleting template...");
     const response = await fetch(
@@ -7160,14 +7278,6 @@ export default function DashboardBuilder({
         inspectorOpen={inspectorOpen}
         inspectorOpenKey={inspectorOpenKey}
         pageStatus={pageStatus}
-        selectedSectionTitle={
-          selectedSection?.title || selectedSection?.kind || null
-        }
-        selectedElementLabel={
-          selectedLayoutBlock
-            ? layoutBlockLabels[selectedLayoutBlock.kind ?? "text"]
-            : null
-        }
         savedTemplates={savedTemplates}
         renameTemplateRequest={renameTemplateRequest}
         sidebarTab={sidebarTab}
@@ -7181,9 +7291,9 @@ export default function DashboardBuilder({
         onDeleteSavedTemplate={deleteSavedTemplate}
         onRenderLayoutBlockIcon={getLayoutBlockLibraryIcon}
         onSaveCurrentPageAsTemplate={saveCurrentPageAsTemplate}
-        onSaveSelectedSectionAsTemplate={saveSelectedSectionAsTemplate}
-        onSaveSelectedElementAsTemplate={saveSelectedElementAsTemplate}
         onApplySavedTemplate={applySavedTemplate}
+        onExportSavedTemplate={exportSavedTemplate}
+        onImportSavedTemplate={importSavedTemplate}
         onRenameSavedTemplate={renameSavedTemplate}
         onSetNewPageTitle={setNewPageTitle}
         onSetSidebarTab={setSidebarTab}

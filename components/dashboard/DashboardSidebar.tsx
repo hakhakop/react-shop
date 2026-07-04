@@ -2,6 +2,7 @@
 
 import {
   ChevronLeft,
+  Download,
   ExternalLink,
   GripVertical,
   LibraryBig,
@@ -9,6 +10,7 @@ import {
   Plus,
   Save,
   Trash2,
+  Upload,
   X,
   Layers3,
   Boxes,
@@ -85,8 +87,6 @@ type DashboardSidebarProps = {
   inspectorOpen?: boolean;
   inspectorOpenKey?: number;
   pageStatus: string;
-  selectedSectionTitle?: string | null;
-  selectedElementLabel?: string | null;
   shellSettings: BuilderShellSettings;
   sidebarTab: SidebarTab;
   savedTemplates: BuilderSavedTemplate[];
@@ -106,9 +106,12 @@ type DashboardSidebarProps = {
   onDeleteSavedTemplate: (id: string) => void;
   onRenderLayoutBlockIcon: (kind: LayoutBlockKind) => ReactNode;
   onSaveCurrentPageAsTemplate: (title?: string) => void | Promise<unknown>;
-  onSaveSelectedSectionAsTemplate?: (title?: string) => void | Promise<unknown>;
-  onSaveSelectedElementAsTemplate?: (title?: string) => void | Promise<unknown>;
   onApplySavedTemplate?: (template: BuilderSavedTemplate) => void;
+  onExportSavedTemplate?: (template: BuilderSavedTemplate) => void;
+  onImportSavedTemplate?: (
+    file: File,
+    templateType: NonNullable<BuilderSavedTemplate["templateType"]>,
+  ) => void | Promise<void>;
   onRenameSavedTemplate?: (template: BuilderSavedTemplate, title: string) => void;
   onSetNewPageTitle: Dispatch<SetStateAction<string>>;
   onSetSidebarTab: Dispatch<SetStateAction<SidebarTab>>;
@@ -136,8 +139,6 @@ export default function DashboardSidebar({
   inspectorOpen = true,
   inspectorOpenKey = 0,
   pageStatus,
-  selectedSectionTitle,
-  selectedElementLabel,
   shellSettings,
   sidebarTab,
   savedTemplates,
@@ -152,9 +153,9 @@ export default function DashboardSidebar({
   onDeleteSavedTemplate,
   onRenderLayoutBlockIcon,
   onSaveCurrentPageAsTemplate,
-  onSaveSelectedSectionAsTemplate = () => undefined,
-  onSaveSelectedElementAsTemplate = () => undefined,
   onApplySavedTemplate = () => undefined,
+  onExportSavedTemplate = () => undefined,
+  onImportSavedTemplate = () => undefined,
   onRenameSavedTemplate = () => undefined,
   onSetNewPageTitle,
   onSetSidebarTab,
@@ -174,6 +175,7 @@ export default function DashboardSidebar({
     useState<TemplateLibraryTab>("section");
   const [renamingTemplateId, setRenamingTemplateId] = useState<string | null>(null);
   const [renamingTemplateTitle, setRenamingTemplateTitle] = useState("");
+  const [templateImportKey, setTemplateImportKey] = useState(0);
 
   const [corePagesOrder, setCorePagesOrder] = useState<string[]>([]);
   const [draggingCorePageKey, setDraggingCorePageKey] = useState<string | null>(null);
@@ -298,18 +300,12 @@ export default function DashboardSidebar({
     setNestedOpen(true);
   };
   const templateTitleValue = templateDraftTitle.trim();
-  const saveTemplateAndClear = (kind: "page" | "section" | "element") => {
+  const saveTemplateAndClear = (kind: "page") => {
     const nextTitle =
       templateTitleValue ||
-      (kind === "page"
-        ? builderState.page
-        : kind === "section"
-          ? selectedSectionTitle || "Saved Section"
-          : selectedElementLabel || "Saved Element");
+      builderState.page;
 
     if (kind === "page") onSaveCurrentPageAsTemplate(nextTitle);
-    if (kind === "section") onSaveSelectedSectionAsTemplate(nextTitle);
-    if (kind === "element") onSaveSelectedElementAsTemplate(nextTitle);
 
     setTemplateDraftTitle("");
   };
@@ -319,6 +315,10 @@ export default function DashboardSidebar({
   const selectedTemplateTabLabel =
     templateLibraryTabs.find((tab) => tab.value === templateLibraryTab)?.label ??
     "Templates";
+  const selectedTemplateTabSingular =
+    selectedTemplateTabLabel.endsWith("s")
+      ? selectedTemplateTabLabel.slice(0, -1)
+      : selectedTemplateTabLabel;
 
   const leftNavTabs = [
     { tab: "builder" as SidebarTab, label: "Structure", icon: <Layers3 size={18} /> },
@@ -742,79 +742,6 @@ export default function DashboardSidebar({
               transition={{ duration: 0.12, ease: "easeOut" }}
             >
             <div className="builder-sidebar-panel">
-              <div className="builder-card builder-pages-card" style={{ marginBottom: '14px' }}>
-                <div className="builder-card-title"><strong>Global Layout Target</strong></div>
-                <div className="builder-target-toggle" aria-label="Builder target type">
-                  {(["page", "template"] as BuilderTargetType[]).map((targetType) => (
-                    <button key={targetType} type="button" className={(builderState.targetType ?? "page") === targetType ? "is-active" : ""} onClick={() => onSwitchBuilderTarget(targetType === "page" ? "shop" : "product-single")}>
-                      {targetType === "page" ? "Custom Pages" : "Global Templates"}
-                    </button>
-                  ))}
-                </div>
-                {(builderState.targetType ?? "page") === "template" && (
-                  <label className="builder-field" style={{ marginTop: '12px' }}>
-                    <span>Editing Template</span>
-                    <select value={builderState.page} onChange={(event) => onSwitchBuilderTarget(event.target.value as BuilderLayoutKey)}>
-                      {Object.entries(templateLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
-                    </select>
-                  </label>
-                )}
-                {(builderState.targetType ?? "page") === "template" && builderState.template && (
-                  <div className="builder-template-note" style={{ marginTop: '8px' }}>
-                    <strong>{templateLabels[builderState.template]}</strong>
-                    <span>{templateDescriptions[builderState.template]}</span>
-                  </div>
-                )}
-              </div>
-
-              <div className="builder-card builder-pages-card">
-                <div className="builder-card-title"><strong>Save Reusable Template</strong><span>{builderState.page}</span></div>
-                <label className="builder-field">
-                  <span>Template name</span>
-                  <input
-                    type="text"
-                    value={templateDraftTitle}
-                    onChange={(event) => setTemplateDraftTitle(event.target.value)}
-                    placeholder="Optional custom name"
-                  />
-                </label>
-                <div className="builder-template-save-list">
-                  <button type="button" className="builder-template-save-card" onClick={() => saveTemplateAndClear("page")}>
-                    <Save size={16} />
-                    <span>
-                      <strong>Save Current Page</strong>
-                      <small>Reusable full-page layout</small>
-                    </span>
-                  </button>
-                  <button
-                    type="button"
-                    className="builder-template-save-card"
-                    onClick={() => saveTemplateAndClear("section")}
-                    disabled={!selectedSectionTitle}
-                    title={selectedSectionTitle ? `Save selected section: ${selectedSectionTitle}` : "Click a section in the preview first"}
-                  >
-                    <Save size={16} />
-                    <span>
-                      <strong>Save Selected Section</strong>
-                      <small>{selectedSectionTitle ? selectedSectionTitle : "Click a section first"}</small>
-                    </span>
-                  </button>
-                  <button
-                    type="button"
-                    className="builder-template-save-card"
-                    onClick={() => saveTemplateAndClear("element")}
-                    disabled={!selectedElementLabel}
-                    title={selectedElementLabel ? `Save selected element: ${selectedElementLabel}` : "Click an element in the preview first"}
-                  >
-                    <Save size={16} />
-                    <span>
-                      <strong>Save Selected Element</strong>
-                      <small>{selectedElementLabel ? selectedElementLabel : "Click an element first"}</small>
-                    </span>
-                  </button>
-                </div>
-                <small>{templateStatus}</small>
-              </div>
               <div className="builder-template-tabs" role="tablist" aria-label="Template types">
                 {templateLibraryTabs.map((tab) => {
                   const tabCount = savedTemplates.filter(
@@ -838,6 +765,53 @@ export default function DashboardSidebar({
                   );
                 })}
               </div>
+              {templateLibraryTab === "page" ? (
+                <div className="builder-card builder-pages-card" style={{ marginBottom: "12px" }}>
+                  <div className="builder-card-title"><strong>Global Layout Target</strong></div>
+                  <div className="builder-target-toggle" aria-label="Builder target type">
+                    {(["page", "template"] as BuilderTargetType[]).map((targetType) => (
+                      <button key={targetType} type="button" className={(builderState.targetType ?? "page") === targetType ? "is-active" : ""} onClick={() => onSwitchBuilderTarget(targetType === "page" ? "shop" : "product-single")}>
+                        {targetType === "page" ? "Custom Pages" : "Global Templates"}
+                      </button>
+                    ))}
+                  </div>
+                  {(builderState.targetType ?? "page") === "template" && (
+                    <label className="builder-field" style={{ marginTop: '12px' }}>
+                      <span>Editing Template</span>
+                      <select value={builderState.page} onChange={(event) => onSwitchBuilderTarget(event.target.value as BuilderLayoutKey)}>
+                        {Object.entries(templateLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+                      </select>
+                    </label>
+                  )}
+                  {(builderState.targetType ?? "page") === "template" && builderState.template && (
+                    <div className="builder-template-note" style={{ marginTop: '8px' }}>
+                      <strong>{templateLabels[builderState.template]}</strong>
+                      <span>{templateDescriptions[builderState.template]}</span>
+                    </div>
+                  )}
+                  <label className="builder-field">
+                    <span>Template name</span>
+                    <input
+                      type="text"
+                      value={templateDraftTitle}
+                      onChange={(event) => setTemplateDraftTitle(event.target.value)}
+                      placeholder="Optional custom name"
+                    />
+                  </label>
+                  <button
+                    type="button"
+                    className="builder-template-save-card"
+                    onClick={() => saveTemplateAndClear("page")}
+                  >
+                    <Save size={16} />
+                    <span>
+                      <strong>Save Current Page</strong>
+                      <small>Reusable full-page layout</small>
+                    </span>
+                  </button>
+                  <small>{templateStatus}</small>
+                </div>
+              ) : null}
               {filteredTemplates.length > 0 ? (
                 <div className="builder-pages-list builder-template-list">
                   {filteredTemplates.map((template) => {
@@ -921,6 +895,14 @@ export default function DashboardSidebar({
                           <button
                             type="button"
                             className="builder-icon-button"
+                            onClick={() => onExportSavedTemplate(template)}
+                            aria-label={`Export ${template.title}`}
+                          >
+                            <Download size={14} />
+                          </button>
+                          <button
+                            type="button"
+                            className="builder-icon-button"
                             onClick={() => {
                               setRenamingTemplateId(template.id);
                               setRenamingTemplateTitle(template.title);
@@ -946,6 +928,21 @@ export default function DashboardSidebar({
                   </span>
                 </div>
               )}
+              <label className="builder-template-import-control">
+                <Upload size={14} />
+                <span>Upload {selectedTemplateTabSingular} Export</span>
+                <input
+                  key={`${templateLibraryTab}-${templateImportKey}`}
+                  type="file"
+                  accept=".json,application/json"
+                  onChange={async (event) => {
+                    const file = event.currentTarget.files?.[0];
+                    if (!file) return;
+                    await onImportSavedTemplate(file, templateLibraryTab);
+                    setTemplateImportKey((key) => key + 1);
+                  }}
+                />
+              </label>
             </div>
           </motion.div>
           )}
