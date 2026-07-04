@@ -1,16 +1,18 @@
 import { copyFile, mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { getRepoDataDir, getRuntimeDataDir } from "@/lib/runtimeDataDir";
+import { getRuntimeDataDir, getSeedDataDir } from "@/lib/runtimeDataDir";
 
-const REPO_DATA_DIR = getRepoDataDir();
+const SEED_DATA_DIR = getSeedDataDir();
 
 const BUILDER_FILES = [
   "builder-layouts.json",
   "builder-pages.json",
   "builder-shell.json",
 ] as const;
+const BUILDER_TEMPLATES_FILE = "builder-templates.json";
 
 type BuilderFileName = (typeof BUILDER_FILES)[number];
+type RuntimeBuilderFileName = BuilderFileName | typeof BUILDER_TEMPLATES_FILE;
 
 function assertSafeWebsiteId(websiteId: string) {
   if (!/^[a-zA-Z0-9_-]+$/.test(websiteId)) {
@@ -30,22 +32,30 @@ export function getWebsiteBuilderFilePath(
   return path.join(getWebsiteBuilderDir(websiteId), fileName);
 }
 
+function getRuntimeBuilderFilePath(fileName: RuntimeBuilderFileName) {
+  return path.join(getRuntimeDataDir(), fileName);
+}
+
 export function getBuilderLayoutStorePath(websiteId?: string) {
   return websiteId
     ? getWebsiteBuilderFilePath(websiteId, "builder-layouts.json")
-    : path.join(REPO_DATA_DIR, "builder-layouts.json");
+    : getRuntimeBuilderFilePath("builder-layouts.json");
 }
 
 export function getBuilderPagesPath(websiteId?: string) {
   return websiteId
     ? getWebsiteBuilderFilePath(websiteId, "builder-pages.json")
-    : path.join(REPO_DATA_DIR, "builder-pages.json");
+    : getRuntimeBuilderFilePath("builder-pages.json");
 }
 
 export function getBuilderShellPath(websiteId?: string) {
   return websiteId
     ? getWebsiteBuilderFilePath(websiteId, "builder-shell.json")
-    : path.join(REPO_DATA_DIR, "builder-shell.json");
+    : getRuntimeBuilderFilePath("builder-shell.json");
+}
+
+export function getBuilderTemplatesPath() {
+  return getRuntimeBuilderFilePath(BUILDER_TEMPLATES_FILE);
 }
 
 async function fileExists(filePath: string) {
@@ -61,7 +71,13 @@ async function seedBuilderFile(websiteId: string, fileName: BuilderFileName) {
   const target = getWebsiteBuilderFilePath(websiteId, fileName);
   if (await fileExists(target)) return;
 
-  const source = path.join(REPO_DATA_DIR, fileName);
+  const source = path.join(SEED_DATA_DIR, fileName);
+  console.info("[webpages-data] seed website builder file", {
+    websiteId,
+    fileName,
+    source,
+    target,
+  });
   try {
     await copyFile(source, target);
   } catch {

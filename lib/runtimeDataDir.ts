@@ -15,12 +15,16 @@ export function getRepoDataDir() {
   return REPO_DATA_DIR;
 }
 
+export function getSeedDataDir() {
+  return REPO_DATA_DIR;
+}
+
 export function getRuntimeDataDir() {
   const dir = resolveDataDir(process.env.WEBPAGES_DATA_DIR);
 
   if (!loggedRuntimeDataDir) {
-    console.info("[webpages-data] runtime data directory", {
-      dir,
+    console.info("[webpages-data] directories", {
+      runtimeDir: dir,
       source: process.env.WEBPAGES_DATA_DIR
         ? "WEBPAGES_DATA_DIR"
         : "repo data fallback",

@@ -109,8 +109,6 @@ export type BuilderShellSettings = {
 
 export type BuilderSectionSpacing = string;
 
-const DATA_DIR = path.join(process.cwd(), "data");
-const DATA_FILE = path.join(DATA_DIR, "builder-shell.json");
 type BuilderShellScope = {
   websiteId?: string;
 };
@@ -578,9 +576,7 @@ export async function getBuilderShellSettings(
   scope: BuilderShellScope = {},
 ): Promise<BuilderShellSettings> {
   try {
-    const filePath = scope.websiteId
-      ? getBuilderShellPath(scope.websiteId)
-      : DATA_FILE;
+    const filePath = getBuilderShellPath(scope.websiteId);
     console.log("[builder-scope] read builder-shell", {
       websiteId: scope.websiteId ?? null,
       filePath,
@@ -596,9 +592,7 @@ export async function writeBuilderShellSettings(
   settings: BuilderShellSettings,
   scope: BuilderShellScope = {},
 ) {
-  const filePath = scope.websiteId
-    ? getBuilderShellPath(scope.websiteId)
-    : DATA_FILE;
+  const filePath = getBuilderShellPath(scope.websiteId);
   console.log("[builder-scope] write builder-shell", {
     websiteId: scope.websiteId ?? null,
     filePath,

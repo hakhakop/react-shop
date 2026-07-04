@@ -3,6 +3,7 @@ import path from "node:path";
 import {
   getBuilderLayoutStorePath,
   getBuilderPagesPath,
+  getBuilderTemplatesPath,
 } from "@/lib/websiteBuilderData";
 
 export type BuilderCustomPageKey = `page:${string}`;
@@ -441,10 +442,6 @@ export type BuilderSavedTemplate = {
   updatedAt: string;
 };
 
-const DATA_DIR = path.join(process.cwd(), "data");
-const DATA_FILE = path.join(DATA_DIR, "builder-layouts.json");
-const PAGES_FILE = path.join(DATA_DIR, "builder-pages.json");
-const TEMPLATES_FILE = path.join(DATA_DIR, "builder-templates.json");
 type BuilderDataScope = {
   websiteId?: string;
 };
@@ -493,9 +490,7 @@ export async function readBuilderLayoutStore(
   scope: BuilderDataScope = {},
 ): Promise<BuilderLayoutStore> {
   try {
-    const filePath = scope.websiteId
-      ? getBuilderLayoutStorePath(scope.websiteId)
-      : DATA_FILE;
+    const filePath = getBuilderLayoutStorePath(scope.websiteId);
     console.log("[builder-scope] read builder-layouts", {
       websiteId: scope.websiteId ?? null,
       filePath,
@@ -520,9 +515,7 @@ export async function writeBuilderLayoutStore(
   store: BuilderLayoutStore,
   scope: BuilderDataScope = {},
 ) {
-  const filePath = scope.websiteId
-    ? getBuilderLayoutStorePath(scope.websiteId)
-    : DATA_FILE;
+  const filePath = getBuilderLayoutStorePath(scope.websiteId);
   console.log("[builder-scope] write builder-layouts", {
     websiteId: scope.websiteId ?? null,
     filePath,
@@ -535,9 +528,7 @@ export async function readBuilderCustomPages(
   scope: BuilderDataScope = {},
 ): Promise<BuilderCustomPage[]> {
   try {
-    const filePath = scope.websiteId
-      ? getBuilderPagesPath(scope.websiteId)
-      : PAGES_FILE;
+    const filePath = getBuilderPagesPath(scope.websiteId);
     console.log("[builder-scope] read builder-pages", {
       websiteId: scope.websiteId ?? null,
       filePath,
@@ -560,9 +551,7 @@ export async function writeBuilderCustomPages(
   pagesToWrite: BuilderCustomPage[],
   scope: BuilderDataScope = {},
 ) {
-  const filePath = scope.websiteId
-    ? getBuilderPagesPath(scope.websiteId)
-    : PAGES_FILE;
+  const filePath = getBuilderPagesPath(scope.websiteId);
   console.log("[builder-scope] write builder-pages", {
     websiteId: scope.websiteId ?? null,
     filePath,
@@ -579,7 +568,7 @@ export async function readBuilderSavedTemplates(): Promise<
   BuilderSavedTemplate[]
 > {
   try {
-    const raw = await readFile(TEMPLATES_FILE, "utf8");
+    const raw = await readFile(getBuilderTemplatesPath(), "utf8");
     const parsed = JSON.parse(raw) as BuilderSavedTemplate[];
     if (!Array.isArray(parsed)) return [];
     return parsed.filter(isValidBuilderSavedTemplate);
@@ -591,9 +580,10 @@ export async function readBuilderSavedTemplates(): Promise<
 export async function writeBuilderSavedTemplates(
   templatesToWrite: BuilderSavedTemplate[],
 ) {
-  await mkdir(DATA_DIR, { recursive: true });
+  const filePath = getBuilderTemplatesPath();
+  await mkdir(path.dirname(filePath), { recursive: true });
   await writeFile(
-    TEMPLATES_FILE,
+    filePath,
     `${JSON.stringify(templatesToWrite, null, 2)}\n`,
     "utf8",
   );
