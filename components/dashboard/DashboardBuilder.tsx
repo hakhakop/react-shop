@@ -140,6 +140,7 @@ import {
 import type { CategoryTreeItem } from "@/lib/categories";
 import type { MenuItem } from "@/lib/navigation";
 import type { ProductNode } from "@/lib/products";
+import type { PageTemplateLibraryItem } from "@/components/dashboard/pageTemplateLibrary";
 import type { BuilderVisualStyle } from "@/lib/builderVisualStyle";
 import { typographyProps, type TypographyArea } from "@/lib/builderTypography";
 import type { HeaderSettings } from "@/lib/themeSettings";
@@ -4610,8 +4611,15 @@ export default function DashboardBuilder({
     );
   };
 
-  const createBuilderPage = async () => {
-    const title = newPageTitle.trim() || "New Page";
+  const createBuilderPage = async (
+    template?: Pick<BuilderSavedTemplate, "title" | "design" | "sections">,
+    customTitle?: string,
+  ) => {
+    const title =
+      customTitle?.trim() ||
+      template?.title?.trim() ||
+      newPageTitle.trim() ||
+      "New Page";
     setPageStatus("Creating page...");
 
     const response = await fetch(builderApiUrl("/api/builder-pages"), {
@@ -4648,17 +4656,48 @@ export default function DashboardBuilder({
       storageKeys.pages,
       JSON.stringify(nextPages),
     );
-    setNewPageTitle("");
+    if (!template) {
+      setNewPageTitle("");
+    }
 
-    const nextState = getDefaultStateForKey(payload.page.key);
+    const nextState = template
+      ? normalizeBuilderState(
+          {
+            page: payload.page.key,
+            targetType: "page",
+            template: undefined,
+            design: template.design ?? defaultDesign,
+            sections: template.sections.map(cloneTemplateSection),
+          },
+          payload.page.key,
+        )
+      : getDefaultStateForKey(payload.page.key);
     setBuilderState(nextState);
     setSelectedId(nextState.sections[0]?.id ?? "");
     setSelectedLayoutColumnKey(null);
     setSelectedLayoutBlockKey(null);
     setOpenLayoutItemId(null);
     setOpenSlideId(null);
-    setPageStatus("Page created");
+    setPageStatus(template ? "Page created from template" : "Page created");
     router.replace(`${pathname}?page=${payload.page.key}`, { scroll: false });
+  };
+
+  const createBuilderPageFromTemplate = (
+    template: BuilderSavedTemplate | PageTemplateLibraryItem,
+    customTitle?: string,
+  ) => {
+    if ("templateType" in template && (template.templateType ?? "page") !== "page") {
+      setPageStatus("Choose a page template");
+      return;
+    }
+    void createBuilderPage(
+      {
+        title: "name" in template ? template.name : template.title,
+        design: template.design,
+        sections: template.sections,
+      },
+      customTitle,
+    );
   };
 
   const deleteBuilderPage = async (key: BuilderCustomPageKey) => {
@@ -7326,6 +7365,7 @@ export default function DashboardBuilder({
         topActionsSlot={sidebarTopActions}
         onAddElementFromLibrary={addElementFromLibrary}
         onCreateBuilderPage={createBuilderPage}
+        onCreateBuilderPageFromTemplate={createBuilderPageFromTemplate}
         onDeleteBuilderPage={deleteBuilderPage}
         onDeleteSavedTemplate={deleteSavedTemplate}
         onRenderLayoutBlockIcon={getLayoutBlockLibraryIcon}

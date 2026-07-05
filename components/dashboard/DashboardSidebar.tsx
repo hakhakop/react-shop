@@ -29,6 +29,7 @@ import {
   type ReactNode,
   type SetStateAction,
 } from "react";
+import { createPortal } from "react-dom";
 import type { MenuItem } from "@/lib/navigation";
 import type {
   BuilderCustomPage,
@@ -45,6 +46,12 @@ import type {
 import ElementLibrary from "@/components/dashboard/ElementLibrary";
 import ReactMenuEditorPanel from "@/components/dashboard/ReactMenuEditorPanel";
 import { createDragGhost } from "@/components/dashboard/builderDragGhost";
+import {
+  pageTemplateCategories,
+  pageTemplateLibrary,
+  type PageTemplateCategory,
+  type PageTemplateLibraryItem,
+} from "@/components/dashboard/pageTemplateLibrary";
 import { AnimatePresence, motion } from "framer-motion";
 
 type TemplateLibraryTab = "page" | "section" | "row" | "element";
@@ -102,6 +109,10 @@ type DashboardSidebarProps = {
   topActionsSlot?: ReactNode;
   onAddElementFromLibrary: (kind: LayoutBlockKind) => void;
   onCreateBuilderPage: () => void;
+  onCreateBuilderPageFromTemplate?: (
+    template: BuilderSavedTemplate | PageTemplateLibraryItem,
+    customTitle?: string,
+  ) => void;
   onDeleteBuilderPage: (key: BuilderCustomPage["key"]) => void;
   onDeleteSavedTemplate: (id: string) => void;
   onRenderLayoutBlockIcon: (kind: LayoutBlockKind) => ReactNode;
@@ -149,6 +160,7 @@ export default function DashboardSidebar({
   topActionsSlot,
   onAddElementFromLibrary,
   onCreateBuilderPage,
+  onCreateBuilderPageFromTemplate = () => undefined,
   onDeleteBuilderPage,
   onDeleteSavedTemplate,
   onRenderLayoutBlockIcon,
@@ -173,6 +185,9 @@ export default function DashboardSidebar({
   const [templateDraftTitle, setTemplateDraftTitle] = useState("");
   const [templateLibraryTab, setTemplateLibraryTab] =
     useState<TemplateLibraryTab>("section");
+  const [pageTemplateLibraryOpen, setPageTemplateLibraryOpen] = useState(false);
+  const [pageTemplateCategory, setPageTemplateCategory] =
+    useState<PageTemplateCategory | "all">("all");
   const [renamingTemplateId, setRenamingTemplateId] = useState<string | null>(null);
   const [renamingTemplateTitle, setRenamingTemplateTitle] = useState("");
   const [templateImportKey, setTemplateImportKey] = useState(0);
@@ -312,6 +327,10 @@ export default function DashboardSidebar({
   const filteredTemplates = savedTemplates.filter(
     (template) => (template.templateType ?? "page") === templateLibraryTab,
   );
+  const pageTemplates = pageTemplateLibrary.filter(
+    (template) =>
+      pageTemplateCategory === "all" || template.category === pageTemplateCategory,
+  );
   const selectedTemplateTabLabel =
     templateLibraryTabs.find((tab) => tab.value === templateLibraryTab)?.label ??
     "Templates";
@@ -339,7 +358,113 @@ export default function DashboardSidebar({
     { tab: "menu" as SidebarTab, label: "Menu", icon: <Menu size={18} /> },
   ];
 
+  useEffect(() => {
+    if (!pageTemplateLibraryOpen) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setPageTemplateLibraryOpen(false);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [pageTemplateLibraryOpen]);
+
+  const pageTemplateLibraryModal = pageTemplateLibraryOpen ? (
+    <div
+      className="builder-layout-modal builder-page-template-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="builder-page-template-library-title"
+      onMouseDown={(event) => {
+        if (event.target === event.currentTarget) {
+          setPageTemplateLibraryOpen(false);
+        }
+      }}
+    >
+      <div className="builder-layout-dialog">
+        <div className="builder-layout-header">
+          <div>
+            <strong id="builder-page-template-library-title">
+              Page Template Library
+            </strong>
+            <span>Choose a ready-made page design and import it as an editable builder page.</span>
+          </div>
+          <button
+            type="button"
+            className="builder-icon-button builder-layout-close"
+            onClick={() => setPageTemplateLibraryOpen(false)}
+            aria-label="Close template library"
+          >
+            <X size={16} />
+          </button>
+        </div>
+
+        <div className="builder-page-template-categories" role="tablist" aria-label="Page template categories">
+          {pageTemplateCategories.map((category) => (
+            <button
+              key={category.value}
+              type="button"
+              role="tab"
+              aria-selected={pageTemplateCategory === category.value}
+              className={pageTemplateCategory === category.value ? "is-active" : ""}
+              onClick={() => setPageTemplateCategory(category.value)}
+            >
+              {category.label}
+            </button>
+          ))}
+        </div>
+
+        {pageTemplates.length > 0 ? (
+          <div className="builder-page-template-grid">
+            {pageTemplates.map((template) => (
+              <article className="builder-page-template-card" key={template.id}>
+                <img
+                  className="builder-page-template-preview-image"
+                  src={template.previewImage}
+                  alt={`${template.name} template preview`}
+                />
+                <div className="builder-page-template-card-body">
+                  <strong>{template.name}</strong>
+                  <span>{template.description}</span>
+                  <small>
+                    {template.sections.length} section{template.sections.length === 1 ? "" : "s"}
+                  </small>
+                </div>
+                <button
+                  type="button"
+                  className="builder-template-use-button"
+                  onClick={() => {
+                    const pageName = window.prompt(
+                      "Name this new page",
+                      template.name,
+                    );
+                    if (pageName === null) return;
+                    onCreateBuilderPageFromTemplate(
+                      template,
+                      pageName.trim() || template.name,
+                    );
+                    setPageTemplateLibraryOpen(false);
+                  }}
+                >
+                  Use Template
+                </button>
+              </article>
+            ))}
+          </div>
+        ) : (
+          <div className="builder-template-note">
+            <strong>No templates in this category yet</strong>
+            <span>Choose another category or start with Blank.</span>
+          </div>
+        )}
+      </div>
+    </div>
+  ) : null;
+
   return (
+    <>
     <aside className="builder-sidebar builder-panel">
       {/* Persistent narrow left nav */}
       <div className="builder-sidebar-left-nav">
@@ -708,6 +833,7 @@ export default function DashboardSidebar({
                 )}
                 <small style={{ display: "block", marginTop: "10px" }}>{pageStatus}</small>
               </div>
+
             </div>
           </motion.div>
           )}
@@ -775,6 +901,17 @@ export default function DashboardSidebar({
                       </button>
                     ))}
                   </div>
+                  <button
+                    type="button"
+                    className="builder-template-save-card builder-page-template-browse"
+                    onClick={() => setPageTemplateLibraryOpen(true)}
+                  >
+                    <LibraryBig size={16} />
+                    <span>
+                      <strong>Browse Templates</strong>
+                      <small>{pageTemplateLibrary.length} ready-made page templates</small>
+                    </span>
+                  </button>
                   {(builderState.targetType ?? "page") === "template" && (
                     <label className="builder-field" style={{ marginTop: '12px' }}>
                       <span>Editing Template</span>
@@ -961,5 +1098,9 @@ export default function DashboardSidebar({
         title="Resize panel"
       />
     </aside>
+    {pageTemplateLibraryModal && typeof document !== "undefined"
+      ? createPortal(pageTemplateLibraryModal, document.body)
+      : null}
+    </>
   );
 }
