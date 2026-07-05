@@ -107,6 +107,12 @@
   "buttonHoverEffect": "none",
   "menuItems": [
     {
+      "id": "shop",
+      "label": "Խանութ",
+      "url": "/shop",
+      "parentId": null
+    },
+    {
       "id": "home",
       "label": "Գլխավոր",
       "url": "/",
@@ -153,13 +159,7 @@
       "label": "Furniture Store",
       "url": "/furniture-store",
       "parentId": "menu_sbyhyzc43"
-    },
-    {
-      "id": "shop",
-      "label": "Խանութ",
-      "url": "/shop",
-      "parentId": null
     }
   ],
-  "updatedAt": "2026-07-05T05:13:55.844Z"
+  "updatedAt": "2026-07-05T05:13:37.125Z"
 }

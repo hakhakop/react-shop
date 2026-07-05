@@ -339,6 +339,7 @@ export type BuilderLayoutBlock = {
   visualStyle?: BuilderVisualStyle;
   animation?: BuilderAnimationSettings;
   typewriterEnabled?: boolean;
+  typewriterPhrases?: string[];
   typewriterSpeed?: number;
   typewriterEraseSpeed?: number;
   typewriterDelay?: number;
@@ -556,6 +557,7 @@ export type BuilderSection = {
   visualStyle?: BuilderVisualStyle;
   animation?: BuilderAnimationSettings;
   typewriterEnabled?: boolean;
+  typewriterPhrases?: string[];
   typewriterSpeed?: number;
   typewriterEraseSpeed?: number;
   typewriterDelay?: number;

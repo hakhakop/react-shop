@@ -225,6 +225,7 @@ export type BuilderLayoutBlock = {
   visualStyle?: Record<string, unknown>;
   animation?: Record<string, unknown>;
   typewriterEnabled?: boolean;
+  typewriterPhrases?: string[];
   typewriterSpeed?: number;
   typewriterEraseSpeed?: number;
   typewriterDelay?: number;
@@ -396,6 +397,7 @@ export type BuilderSection = {
   visualStyle?: Record<string, unknown>;
   animation?: Record<string, unknown>;
   typewriterEnabled?: boolean;
+  typewriterPhrases?: string[];
   typewriterSpeed?: number;
   typewriterEraseSpeed?: number;
   typewriterDelay?: number;

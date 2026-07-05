@@ -1,6 +1,9 @@
 import HeaderShell from "@/components/HeaderShell";
 import ScopedPreviewLinkRouter from "@/components/builder/ScopedPreviewLinkRouter";
-import StorefrontBuilderRenderer from "@/components/builder/StorefrontBuilderRenderer";
+import StorefrontBuilderRenderer, {
+  type StorefrontBuilderRendererProps,
+} from "@/components/builder/StorefrontBuilderRenderer";
+import type { ReactNode } from "react";
 import {
   getPublishedBuilderLayout,
   isBuilderCustomPageKey,
@@ -25,6 +28,12 @@ type WebsiteFrontendProps = {
   website: SaaSWebsite;
   requestedPage: string;
   mode: WebsiteFrontendMode;
+  pageLabelOverride?: string;
+  rendererProps?: Omit<
+    StorefrontBuilderRendererProps,
+    "layout" | "page" | "pageLabel"
+  >;
+  fallbackContent?: ReactNode;
 };
 
 function spacing(value: string | undefined, context: BuilderSpacingContext) {
@@ -99,6 +108,9 @@ export default async function WebsiteFrontend({
   website,
   requestedPage,
   mode,
+  pageLabelOverride,
+  rendererProps,
+  fallbackContent,
 }: WebsiteFrontendProps) {
   await ensureWebsiteBuilderData(website.id);
 
@@ -116,7 +128,9 @@ export default async function WebsiteFrontend({
     getBuilderShellSettings(scope),
   ]);
 
-  if (!layout?.sections?.some((section) => section.visible)) {
+  const hasVisibleLayout = layout?.sections?.some((section) => section.visible);
+
+  if (!hasVisibleLayout && !fallbackContent) {
     return (
       <main className="page">
         <h1 className="page-title">Page not found</h1>
@@ -149,11 +163,16 @@ export default async function WebsiteFrontend({
         scopedPreviewPages={scopedPreviewPages}
         hideSaaSEntry={!isPreview}
       />
-      <StorefrontBuilderRenderer
-        layout={layout}
-        page={page}
-        pageLabel={pageLabel(page, customPages)}
-      />
+      {layout && hasVisibleLayout ? (
+        <StorefrontBuilderRenderer
+          layout={layout}
+          page={page}
+          pageLabel={pageLabelOverride ?? pageLabel(page, customPages)}
+          {...rendererProps}
+        />
+      ) : (
+        fallbackContent
+      )}
     </div>
   );
 }

@@ -5,6 +5,7 @@ import ProductGallery from "../../../components/ProductGallery";
 import ProductOptionsSelector from "../../../components/ProductOptionsSelector";
 import WishlistToggle from "../../../components/WishlistToggle";
 import StorefrontBuilderRenderer from "@/components/builder/StorefrontBuilderRenderer";
+import { renderDomainWebsiteFrontend } from "@/components/website/DomainWebsiteFrontend";
 import ProductAdminMarker from "@/components/ProductAdminMarker";
 import { ProductRecentlyViewedTracker } from "@/components/RecentlyViewedProvider";
 import { getPublishedBuilderLayout } from "@/lib/builderLayouts";
@@ -160,6 +161,46 @@ const priceFormatted =
   const mainImageUrl = p.image?.sourceUrl || undefined;
 
   const attributes = p.attributes?.nodes ?? [];
+  const rendererProduct = {
+    id: p.id,
+    slug: p.slug,
+    name: p.name,
+    description: p.description,
+    priceNumber,
+    priceFormatted,
+    imageUrl: mainImageUrl,
+    images,
+    attributes,
+  };
+  const domainWebsitePage = await renderDomainWebsiteFrontend({
+    requestedPage: "product-single",
+    pageLabel: p.name,
+    rendererProps: {
+      breadcrumbItems: [
+        { label: "Home", href: "/" },
+        { label: "Shop", href: "/shop" },
+        { label: p.name },
+      ],
+      product: rendererProduct,
+    },
+  });
+
+  if (domainWebsitePage) {
+    return (
+      <>
+        <ProductAdminMarker productId={wpProductId} />
+        <ProductRecentlyViewedTracker
+          id={p.id}
+          slug={p.slug}
+          name={p.name}
+          thumbnailUrl={p.image?.sourceUrl}
+          price={priceFormatted}
+        />
+        {domainWebsitePage}
+      </>
+    );
+  }
+
   const templateLayout = await getPublishedBuilderLayout("product-single");
 
   if (templateLayout) {
@@ -182,17 +223,7 @@ const priceFormatted =
             { label: "Shop", href: "/shop" },
             { label: p.name },
           ]}
-          product={{
-            id: p.id,
-            slug: p.slug,
-            name: p.name,
-            description: p.description,
-            priceNumber,
-            priceFormatted,
-            imageUrl: mainImageUrl,
-            images,
-            attributes,
-          }}
+          product={rendererProduct}
         />
       </>
     );

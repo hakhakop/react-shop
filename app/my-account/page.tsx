@@ -1,6 +1,7 @@
 import { ArrowRight, Download, Home, MapPin, Package, UserRound } from "lucide-react";
 import StorefrontBuilderRenderer from "@/components/builder/StorefrontBuilderRenderer";
 import WordPressAccountStatus from "@/components/WordPressAccountStatus";
+import { renderDomainWebsiteFrontend } from "@/components/website/DomainWebsiteFrontend";
 import { getPublishedBuilderLayout } from "@/lib/builderLayouts";
 import { getWooAccountUrl, getWordPressBaseUrl } from "@/lib/wordpressUrl";
 
@@ -105,8 +106,18 @@ function MyAccountPageContent() {
 }
 
 export default async function MyAccountPage() {
-  const layout = await getPublishedBuilderLayout("page:my-account");
   const content = <MyAccountPageContent />;
+  const domainWebsitePage = await renderDomainWebsiteFrontend({
+    requestedPage: "my-account",
+    rendererProps: {
+      pageContent: content,
+    },
+    fallbackContent: <main className="page account-bridge-page">{content}</main>,
+  });
+
+  if (domainWebsitePage) return domainWebsitePage;
+
+  const layout = await getPublishedBuilderLayout("page:my-account");
 
   if (layout) {
     return (

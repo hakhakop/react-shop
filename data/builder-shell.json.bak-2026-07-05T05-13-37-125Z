@@ -149,17 +149,17 @@
       "parentId": "menu_sbyhyzc43"
     },
     {
+      "id": "shop",
+      "label": "Խանութ",
+      "url": "/shop",
+      "parentId": "menu_sbyhyzc43"
+    },
+    {
       "id": "menu_3fwu3xn75",
       "label": "Furniture Store",
       "url": "/furniture-store",
       "parentId": "menu_sbyhyzc43"
-    },
-    {
-      "id": "shop",
-      "label": "Խանութ",
-      "url": "/shop",
-      "parentId": null
     }
   ],
-  "updatedAt": "2026-07-05T05:13:55.844Z"
+  "updatedAt": "2026-07-05T05:13:31.500Z"
 }

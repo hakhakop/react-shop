@@ -5,6 +5,7 @@ import CategoryWithFilters from "@/components/CategoryWithFilters";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import RecentlyViewedStrip from "@/components/RecentlyViewedStrip";
 import StorefrontBuilderRenderer from "@/components/builder/StorefrontBuilderRenderer";
+import { renderDomainWebsiteFrontend } from "@/components/website/DomainWebsiteFrontend";
 import { getPublishedBuilderLayout } from "@/lib/builderLayouts";
 
 export const dynamic = "force-dynamic";
@@ -70,6 +71,13 @@ function DefaultShopPage() {
 }
 
 export default async function ShopPage() {
+  const domainWebsitePage = await renderDomainWebsiteFrontend({
+    requestedPage: "shop",
+    fallbackContent: <DefaultShopPage />,
+  });
+
+  if (domainWebsitePage) return domainWebsitePage;
+
   const layout = await getPublishedBuilderLayout("shop");
 
   if (layout?.sections?.some((section) => section.visible)) {

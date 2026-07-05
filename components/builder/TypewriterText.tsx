@@ -5,6 +5,7 @@ import { typographyProps } from "@/lib/builderTypography";
 
 interface TypewriterTextProps {
   text: string;
+  phrases?: string[];
   speed?: number;       // Speed of typing in ms
   eraseSpeed?: number;   // Speed of erasing in ms
   delay?: number;        // Delay before starting to type/erase in ms
@@ -28,6 +29,7 @@ interface TypewriterTextProps {
 
 export default function TypewriterText({
   text,
+  phrases,
   speed = 80,
   eraseSpeed = 40,
   delay = 2000,
@@ -52,8 +54,16 @@ export default function TypewriterText({
   const [isDeleting, setIsDeleting] = useState(false);
   const [loopNum, setLoopNum] = useState(0);
 
-  // Parse the input: e.g. "We build AI agents to [write code|test features|deploy apps]"
+  // Keep bracket syntax as a fallback for older saved content.
   const parsed = React.useMemo(() => {
+    const explicitWords = phrases
+      ?.map((phrase) => phrase.trim())
+      .filter(Boolean);
+
+    if (explicitWords?.length) {
+      return { prefix: "", words: explicitWords, suffix: "" };
+    }
+
     if (!text) return { prefix: "", words: [], suffix: "" };
 
     const bracketStart = text.indexOf("[");
@@ -63,12 +73,12 @@ export default function TypewriterText({
       const prefix = text.substring(0, bracketStart);
       const inner = text.substring(bracketStart + 1, bracketEnd);
       const suffix = text.substring(bracketEnd + 1);
-      const words = inner.split("|").map((w) => w.trim());
+      const words = inner.split("|").map((w) => w.trim()).filter(Boolean);
       return { prefix, words, suffix };
     }
 
     return { prefix: "", words: [text], suffix: "" };
-  }, [text]);
+  }, [phrases, text]);
 
   const { prefix, words, suffix } = parsed;
 
@@ -112,9 +122,9 @@ export default function TypewriterText({
     setDisplayText("");
     setIsDeleting(false);
     setLoopNum(0);
-  }, [text]);
+  }, [phrases, text]);
 
-  if (!text) return null;
+  if (!text && words.length === 0) return null;
 
   const tp = typographyProps(typography, area);
   

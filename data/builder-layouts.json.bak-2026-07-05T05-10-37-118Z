@@ -246,15 +246,7 @@
                     "mobile": false
                   }
                 },
-                "buttons": [
-                  {
-                    "id": "btn-mr7c1n3n-0",
-                    "label": "New Button",
-                    "url": "/",
-                    "target": "_self",
-                    "style": "primary"
-                  }
-                ],
+                "buttons": [],
                 "typewriterMobileReservedLines": 3
               }
             ]
@@ -1376,7 +1368,7 @@
         ]
       }
     ],
-    "updatedAt": "2026-07-05T05:10:37.115Z"
+    "updatedAt": "2026-07-01T08:12:53.761Z"
   },
   "shop": {
     "version": 1,

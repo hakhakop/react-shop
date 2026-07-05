@@ -132,6 +132,93 @@ function InspectorChoiceGroup<T extends string>({
   );
 }
 
+function getTypewriterPhraseSeed(text?: string) {
+  const raw = text?.trim();
+  if (!raw) return [""];
+
+  const bracketStart = raw.indexOf("[");
+  const bracketEnd = raw.indexOf("]");
+  if (bracketStart !== -1 && bracketEnd > bracketStart) {
+    const inner = raw.slice(bracketStart + 1, bracketEnd);
+    const phrases = inner
+      .split("|")
+      .map((phrase) => phrase.trim())
+      .filter(Boolean);
+    if (phrases.length) return phrases;
+  }
+
+  return [raw];
+}
+
+function TypewriterPhrasesControl({
+  block,
+  fallbackText,
+  onChange,
+}: {
+  block: BuilderLayoutBlock;
+  fallbackText?: string;
+  onChange: (phrases: string[]) => void;
+}) {
+  const phrases =
+    block.typewriterPhrases && block.typewriterPhrases.length > 0
+      ? block.typewriterPhrases
+      : getTypewriterPhraseSeed(fallbackText);
+
+  const updatePhrase = (phraseIndex: number, value: string) => {
+    onChange(
+      phrases.map((phrase, currentIndex) =>
+        currentIndex === phraseIndex ? value : phrase,
+      ),
+    );
+  };
+
+  const addPhrase = () => {
+    onChange([...phrases, ""]);
+  };
+
+  const removePhrase = (phraseIndex: number) => {
+    const nextPhrases = phrases.filter((_, currentIndex) => currentIndex !== phraseIndex);
+    onChange(nextPhrases.length > 0 ? nextPhrases : [""]);
+  };
+
+  return (
+    <div className="builder-typewriter-lines">
+      <div className="builder-card-title">
+        <strong>Typewriter Lines</strong>
+        <button
+          type="button"
+          className="builder-icon-button"
+          onClick={addPhrase}
+          aria-label="Add typewriter line"
+          title="Add typewriter line"
+        >
+          <Plus size={14} />
+        </button>
+      </div>
+      <div className="builder-typewriter-lines-list">
+        {phrases.map((phrase, phraseIndex) => (
+          <div className="builder-typewriter-line-row" key={phraseIndex}>
+            <input
+              value={phrase}
+              onChange={(event) => updatePhrase(phraseIndex, event.target.value)}
+              placeholder={`Line ${phraseIndex + 1}`}
+            />
+            <button
+              type="button"
+              className="builder-icon-button"
+              onClick={() => removePhrase(phraseIndex)}
+              aria-label={`Remove typewriter line ${phraseIndex + 1}`}
+              title="Remove line"
+            >
+              <Trash2 size={14} />
+            </button>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function InspectorPresetWithCustom({
   value,
   options,
@@ -6591,36 +6678,15 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                             padding: "10px 0",
                                                           }}
                                                         >
-                                                          <div
-                                                            className="builder-contrast-note"
-                                                            style={{
-                                                              fontSize: "12px",
-                                                              padding: "8px",
-                                                              background:
-                                                                "rgba(0,0,0,0.03)",
-                                                              borderRadius:
-                                                                "4px",
-                                                              borderLeft:
-                                                                "3px solid #6366f1",
-                                                            }}
-                                                          >
-                                                            <strong>
-                                                              Bracket format
-                                                              instruction:
-                                                            </strong>{" "}
-                                                            Use square brackets
-                                                            with pipe separators
-                                                            to cycle multiple
-                                                            phrases. Example:{" "}
-                                                            <code>
-                                                              Build the future
-                                                              with [dynamic
-                                                              animations|interactive
-                                                              particles|typewriter
-                                                              effects|premium
-                                                              aesthetics]
-                                                            </code>
-                                                          </div>
+                                                          <TypewriterPhrasesControl
+                                                            block={block}
+                                                            fallbackText={block.headingText ?? block.title ?? block.body}
+                                                            onChange={(phrases) =>
+                                                              updateSelectedLayoutBlock(index, blockIndex, {
+                                                                typewriterPhrases: phrases,
+                                                              })
+                                                            }
+                                                          />
 
                                                           <label
                                                             className="builder-check"
@@ -10086,36 +10152,15 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                             padding: "10px 0",
                                                           }}
                                                         >
-                                                          <div
-                                                            className="builder-contrast-note"
-                                                            style={{
-                                                              fontSize: "12px",
-                                                              padding: "8px",
-                                                              background:
-                                                                "rgba(0,0,0,0.03)",
-                                                              borderRadius:
-                                                                "4px",
-                                                              borderLeft:
-                                                                "3px solid #6366f1",
-                                                            }}
-                                                          >
-                                                            <strong>
-                                                              Bracket format
-                                                              instruction:
-                                                            </strong>{" "}
-                                                            Use square brackets
-                                                            with pipe separators
-                                                            to cycle multiple
-                                                            phrases. Example:{" "}
-                                                            <code>
-                                                              Build the future
-                                                              with [dynamic
-                                                              animations|interactive
-                                                              particles|typewriter
-                                                              effects|premium
-                                                              aesthetics]
-                                                            </code>
-                                                          </div>
+                                                          <TypewriterPhrasesControl
+                                                            block={block}
+                                                            fallbackText={block.headingText ?? block.title ?? block.body}
+                                                            onChange={(phrases) =>
+                                                              updateSelectedLayoutBlock(index, blockIndex, {
+                                                                typewriterPhrases: phrases,
+                                                              })
+                                                            }
+                                                          />
 
                                                           <label
                                                             className="builder-check"
@@ -12382,36 +12427,15 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                             padding: "10px 0",
                                                           }}
                                                         >
-                                                          <div
-                                                            className="builder-contrast-note"
-                                                            style={{
-                                                              fontSize: "12px",
-                                                              padding: "8px",
-                                                              background:
-                                                                "rgba(0,0,0,0.03)",
-                                                              borderRadius:
-                                                                "4px",
-                                                              borderLeft:
-                                                                "3px solid #6366f1",
-                                                            }}
-                                                          >
-                                                            <strong>
-                                                              Bracket format
-                                                              instruction:
-                                                            </strong>{" "}
-                                                            Use square brackets
-                                                            with pipe separators
-                                                            to cycle multiple
-                                                            phrases. Example:{" "}
-                                                            <code>
-                                                              Build the future
-                                                              with [dynamic
-                                                              animations|interactive
-                                                              particles|typewriter
-                                                              effects|premium
-                                                              aesthetics]
-                                                            </code>
-                                                          </div>
+                                                          <TypewriterPhrasesControl
+                                                            block={block}
+                                                            fallbackText={block.headingText ?? block.title ?? block.body}
+                                                            onChange={(phrases) =>
+                                                              updateSelectedLayoutBlock(index, blockIndex, {
+                                                                typewriterPhrases: phrases,
+                                                              })
+                                                            }
+                                                          />
 
                                                           <label
                                                             className="builder-check"

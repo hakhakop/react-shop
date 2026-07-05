@@ -65,7 +65,7 @@ import {
   getBuilderImageObjectFit,
 } from "@/lib/builderImages";
 
-type StorefrontBuilderRendererProps = {
+export type StorefrontBuilderRendererProps = {
   layout: BuilderLayout;
   page: BuilderLayoutKey;
   pageLabel?: string;
@@ -898,6 +898,7 @@ function HeroSection({
           ) : isAntigravity && section.title ? (
             <TypewriterText
               text={section.title}
+              phrases={section.typewriterPhrases}
               typography={section.typography}
               area="title"
               speed={section.typewriterSpeed}
@@ -2259,6 +2260,7 @@ function ContentLayoutBlock({
           {block.typewriterEnabled ? (
             <TypewriterText
               text={block.headingText ?? "Your Heading Text"}
+              phrases={block.typewriterPhrases}
               speed={block.typewriterSpeed}
               eraseSpeed={block.typewriterEraseSpeed}
               delay={block.typewriterDelay}
@@ -2407,6 +2409,7 @@ function ContentLayoutBlock({
               {block.typewriterEnabled ? (
                 <TypewriterText
                   text={block.title}
+                  phrases={block.typewriterPhrases}
                   speed={block.typewriterSpeed}
                   eraseSpeed={block.typewriterEraseSpeed}
                   delay={block.typewriterDelay}
@@ -2431,6 +2434,7 @@ function ContentLayoutBlock({
               ) : isBlockAntigravity ? (
                 <TypewriterText
                   text={block.title}
+                  phrases={block.typewriterPhrases}
                   speed={block.typewriterSpeed}
                   eraseSpeed={block.typewriterEraseSpeed}
                   delay={block.typewriterDelay}
@@ -2462,6 +2466,7 @@ function ContentLayoutBlock({
               {block.typewriterEnabled && !block.title ? (
                 <TypewriterText
                   text={block.body}
+                  phrases={block.typewriterPhrases}
                   speed={block.typewriterSpeed}
                   eraseSpeed={block.typewriterEraseSpeed}
                   delay={block.typewriterDelay}
@@ -2555,6 +2560,7 @@ function ContentLayoutBlock({
               {block.typewriterEnabled ? (
                 <TypewriterText
                   text={block.title}
+                  phrases={block.typewriterPhrases}
                   speed={block.typewriterSpeed}
                   eraseSpeed={block.typewriterEraseSpeed}
                   delay={block.typewriterDelay}
@@ -2586,6 +2592,7 @@ function ContentLayoutBlock({
               {block.typewriterEnabled && !block.title ? (
                 <TypewriterText
                   text={block.body}
+                  phrases={block.typewriterPhrases}
                   speed={block.typewriterSpeed}
                   eraseSpeed={block.typewriterEraseSpeed}
                   delay={block.typewriterDelay}
@@ -2687,6 +2694,7 @@ function ContentLayoutBlock({
               {block.typewriterEnabled ? (
                 <TypewriterText
                   text={block.title}
+                  phrases={block.typewriterPhrases}
                   speed={block.typewriterSpeed}
                   eraseSpeed={block.typewriterEraseSpeed}
                   delay={block.typewriterDelay}
@@ -2718,6 +2726,7 @@ function ContentLayoutBlock({
               {block.typewriterEnabled && !block.title ? (
                 <TypewriterText
                   text={block.body}
+                  phrases={block.typewriterPhrases}
                   speed={block.typewriterSpeed}
                   eraseSpeed={block.typewriterEraseSpeed}
                   delay={block.typewriterDelay}

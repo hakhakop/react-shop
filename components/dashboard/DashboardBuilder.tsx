@@ -1390,6 +1390,27 @@ export default function DashboardBuilder({
   }, [pathname, websiteId]);
 
   useEffect(() => {
+    const handleHeaderPointerMove = (event: PointerEvent) => {
+      const target = event.target;
+      if (!(target instanceof Element)) return;
+      setHeaderHovered(
+        Boolean(
+          target.closest(
+            ".builder-preview-header-editable .site-header, .builder-preview-header-editable #site-header-pill, .builder-preview-header-tools",
+          ),
+        ),
+      );
+    };
+
+    window.addEventListener("pointermove", handleHeaderPointerMove, {
+      passive: true,
+    });
+    return () => {
+      window.removeEventListener("pointermove", handleHeaderPointerMove);
+    };
+  }, []);
+
+  useEffect(() => {
     const saved = localStorage.getItem("builder-dashboard-theme");
     if (saved === "light" || saved === "dark") {
       setDashboardTheme(saved as "light" | "dark");
@@ -1410,6 +1431,8 @@ export default function DashboardBuilder({
   const [selectedId, setSelectedId] = useState(
     defaultState.sections[0]?.id ?? "",
   );
+  const [headerSelected, setHeaderSelected] = useState(false);
+  const [headerHovered, setHeaderHovered] = useState(false);
   const [device, setDevice] = useState<PreviewDevice>("desktop");
   const [customMobileWidth, setCustomMobileWidth] = useState(390);
   const [customTabletWidth, setCustomTabletWidth] = useState(820);
@@ -2645,6 +2668,7 @@ export default function DashboardBuilder({
   };
 
   const selectSection = (sectionId: string) => {
+    setHeaderSelected(false);
     setSelectedId(sectionId);
     setSelectedLayoutRowIndex(null);
     setSelectedLayoutColumnKey(null);
@@ -2657,6 +2681,7 @@ export default function DashboardBuilder({
   };
 
   const selectLayoutColumn = (sectionId: string, columnKey: string) => {
+    setHeaderSelected(false);
     setSelectedId(sectionId);
     setSelectedLayoutRowIndex(null);
     setSelectedLayoutColumnKey(columnKey);
@@ -2671,6 +2696,7 @@ export default function DashboardBuilder({
     columnKey: string,
     blockKey: string,
   ) => {
+    setHeaderSelected(false);
     setSelectedId(sectionId);
     setSelectedLayoutRowIndex(null);
     setSelectedLayoutColumnKey(columnKey);
@@ -2682,6 +2708,7 @@ export default function DashboardBuilder({
   };
 
   const selectLayoutRow = (sectionId: string, rowIndex: number) => {
+    setHeaderSelected(false);
     setSelectedId(sectionId);
     setSelectedLayoutRowIndex(rowIndex);
     setSelectedLayoutColumnKey(null);
@@ -2690,6 +2717,18 @@ export default function DashboardBuilder({
     setSectionStructureOpen(false);
     setInspectorTab("layout");
     openInspectorPanel();
+  };
+
+  const selectHeader = () => {
+    setHeaderSelected(true);
+    setSelectedId("");
+    setSelectedLayoutRowIndex(null);
+    setSelectedLayoutColumnKey(null);
+    setSelectedLayoutBlockKey(null);
+    setOpenLayoutItemId(null);
+    setSidebarCollapsed(false);
+    setSidebarTab("globalStyles");
+    setGlobalStylesTab("header");
   };
 
   const openSpacingSettings = (target: SpacingInspectorTarget) => {
@@ -7936,26 +7975,57 @@ export default function DashboardBuilder({
           >
             <div className="builder-preview-header-slot">
               {shellSettings.headerVisible !== false && (
-                <HeaderShellView
-                  layoutOverride={shellSettings.headerLayout}
-                  shellSettings={shellSettings}
-                  headerSettings={dashboardHeaderSettings}
-                  homeHref={
-                    websiteId
-                      ? `/app/websites/${websiteRouteSegment}/builder?page=home`
-                      : "/dashboard?page=home"
-                  }
-                  clientHref={
-                    websiteId
-                      ? `/app/websites/${websiteRouteSegment}/builder?page=client`
-                      : "/dashboard?page=client"
-                  }
-                  scopedPreviewWebsiteId={websiteRouteSegment}
-                  scopedPreviewPage={builderState.page}
-                  scopedPreviewPages={scopedPreviewPages}
-                  scopedLinkMode="builder"
-                  categoriesContent={null}
-                />
+                <div
+                  className={`builder-preview-header-editable ${
+                    headerSelected ? "is-selected" : ""
+                  } ${headerHovered ? "is-hovered" : ""}`}
+                  onMouseOverCapture={() => setHeaderHovered(true)}
+                  onMouseLeave={() => setHeaderHovered(false)}
+                  onFocusCapture={() => setHeaderHovered(true)}
+                  onBlurCapture={(event) => {
+                    if (!event.currentTarget.contains(event.relatedTarget)) {
+                      setHeaderHovered(false);
+                    }
+                  }}
+                >
+                  <HeaderShellView
+                    layoutOverride={shellSettings.headerLayout}
+                    shellSettings={shellSettings}
+                    headerSettings={dashboardHeaderSettings}
+                    homeHref={
+                      websiteId
+                        ? `/app/websites/${websiteRouteSegment}/builder?page=home`
+                        : "/dashboard?page=home"
+                    }
+                    clientHref={
+                      websiteId
+                        ? `/app/websites/${websiteRouteSegment}/builder?page=client`
+                        : "/dashboard?page=client"
+                    }
+                    scopedPreviewWebsiteId={websiteRouteSegment}
+                    scopedPreviewPage={builderState.page}
+                    scopedPreviewPages={scopedPreviewPages}
+                    scopedLinkMode="builder"
+                    categoriesContent={null}
+                  />
+                  <div
+                    className="builder-preview-header-tools"
+                    onClick={(event) => event.stopPropagation()}
+                    onMouseDown={(event) => event.stopPropagation()}
+                  >
+                    <div className="builder-preview-header-tools-main">
+                      <span>Header</span>
+                      <button
+                        type="button"
+                        onClick={selectHeader}
+                        aria-label="Edit Header"
+                        title="Edit Header"
+                      >
+                        <Settings2 size={14} />
+                      </button>
+                    </div>
+                  </div>
+                </div>
               )}
             </div>
             <ProductCategoryFilterProvider key={builderState.page}>
@@ -11119,6 +11189,7 @@ function PreviewSection({
             {isAntigravity && section.title ? (
               <TypewriterText
                 text={section.title}
+                phrases={section.typewriterPhrases}
                 typography={section.typography}
                 area="title"
                 speed={section.typewriterSpeed}
@@ -12536,6 +12607,7 @@ function PreviewSection({
                                       text={
                                         block.headingText ?? "Your Heading Text"
                                       }
+                                      phrases={block.typewriterPhrases}
                                       speed={block.typewriterSpeed}
                                       eraseSpeed={block.typewriterEraseSpeed}
                                       delay={block.typewriterDelay}
@@ -12656,6 +12728,7 @@ function PreviewSection({
                                   >
                                     <TypewriterText
                                       text={block.title}
+                                      phrases={block.typewriterPhrases}
                                       speed={block.typewriterSpeed}
                                       eraseSpeed={block.typewriterEraseSpeed}
                                       delay={block.typewriterDelay}
@@ -12743,6 +12816,7 @@ function PreviewSection({
                                   >
                                     <TypewriterText
                                       text={block.body}
+                                      phrases={block.typewriterPhrases}
                                       speed={block.typewriterSpeed}
                                       eraseSpeed={block.typewriterEraseSpeed}
                                       delay={block.typewriterDelay}
@@ -12878,6 +12952,7 @@ function PreviewSection({
                                   >
                                     <TypewriterText
                                       text={block.title}
+                                      phrases={block.typewriterPhrases}
                                       speed={block.typewriterSpeed}
                                       eraseSpeed={block.typewriterEraseSpeed}
                                       delay={block.typewriterDelay}
@@ -12942,6 +13017,7 @@ function PreviewSection({
                                   >
                                     <TypewriterText
                                       text={block.body}
+                                      phrases={block.typewriterPhrases}
                                       speed={block.typewriterSpeed}
                                       eraseSpeed={block.typewriterEraseSpeed}
                                       delay={block.typewriterDelay}
@@ -13097,6 +13173,7 @@ function PreviewSection({
                                       >
                                         <TypewriterText
                                           text={block.title}
+                                          phrases={block.typewriterPhrases}
                                           speed={block.typewriterSpeed}
                                           eraseSpeed={
                                             block.typewriterEraseSpeed
@@ -13171,6 +13248,7 @@ function PreviewSection({
                                       >
                                         <TypewriterText
                                           text={block.body}
+                                          phrases={block.typewriterPhrases}
                                           speed={block.typewriterSpeed}
                                           eraseSpeed={
                                             block.typewriterEraseSpeed
