@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import DeleteWebsiteButton from "@/components/saas/DeleteWebsiteButton";
 import SaaSShell from "@/components/saas/SaaSShell";
 import { getCurrentUser } from "@/lib/auth";
 import { getWebsiteRouteSegment, getWebsitesForOwner } from "@/lib/websites";
@@ -17,6 +18,7 @@ export default async function WebsitesPage() {
   }
 
   const websites = await getWebsitesForOwner(user.id);
+  const showRootWebsite = user.role === "super_admin";
   const websiteCards = await Promise.all(
     websites.map(async (website) => {
       const links = await getDefaultWebsiteBuilderLinks(website);
@@ -29,7 +31,7 @@ export default async function WebsitesPage() {
 
   return (
     <SaaSShell user={user} title="My Websites">
-      {websites.length === 0 ? (
+      {websiteCards.length === 0 && !showRootWebsite ? (
         <section className="saas-empty-state">
           <span>No websites yet</span>
           <p>
@@ -49,6 +51,26 @@ export default async function WebsitesPage() {
             </Link>
           </div>
           <div className="saas-website-grid">
+            {showRootWebsite && (
+              <article className="saas-website-card" key="root-website">
+                <div className="saas-website-badge-row">
+                  <span>Main Website</span>
+                  <span>Root Website</span>
+                  <span>Undeletable</span>
+                </div>
+                <h3>WebPages Root Website</h3>
+                <p>
+                  The public platform website at /. It is managed separately
+                  from customer tenant websites.
+                </p>
+                <p>Route: /</p>
+                <small>Edited through the Root Website Builder</small>
+                <div className="saas-website-actions">
+                  <Link href="/dashboard?page=home">Open Builder</Link>
+                  <Link href="/">View Frontend</Link>
+                </div>
+              </article>
+            )}
             {websiteCards.map(({ website, builderHref, previewHref }) => (
               <article className="saas-website-card" key={website.id}>
                 <span>{website.status}</span>
@@ -71,6 +93,10 @@ export default async function WebsitesPage() {
                   >
                     Export Backup
                   </a>
+                  <DeleteWebsiteButton
+                    websiteId={getWebsiteRouteSegment(website)}
+                    websiteName={website.name}
+                  />
                 </div>
               </article>
             ))}

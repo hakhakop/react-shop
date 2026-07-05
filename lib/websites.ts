@@ -30,6 +30,8 @@ type StoredWebsite = Omit<SaaSWebsite, "status"> & {
 const WEBSITES_FILE = () => path.join(getRuntimeDataDir(), "websites.json");
 const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const DOMAIN_LABEL_PATTERN = /^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/;
+export const ROOT_WEBSITE_ID = "root";
+export const ROOT_WEBSITE_SLUG = "root-website";
 
 function normalizeName(name: unknown) {
   return typeof name === "string" ? name.trim().replace(/\s+/g, " ") : "";
@@ -273,6 +275,11 @@ export function getWebsiteRouteSegment(website: Pick<SaaSWebsite, "id" | "slug">
   return website.slug || website.id;
 }
 
+export function isRootWebsiteIdentifier(value: string | null | undefined) {
+  const normalized = normalizeSlug(value);
+  return normalized === ROOT_WEBSITE_ID || normalized === ROOT_WEBSITE_SLUG;
+}
+
 export function canAccessWebsiteBuilder(
   user: PublicSaaSUser | null | undefined,
   website: SaaSWebsite | null | undefined,
@@ -356,6 +363,24 @@ export async function updateWebsiteSettings(input: {
   );
 
   return { website: updatedWebsite };
+}
+
+export async function deleteWebsite(input: { websiteId: string }) {
+  if (isRootWebsiteIdentifier(input.websiteId)) {
+    return { error: "The Root Website cannot be deleted." };
+  }
+
+  const websites = await readWebsites();
+  const website =
+    websites.find((item) => item.id === input.websiteId) ??
+    websites.find((item) => item.slug === normalizeSlug(input.websiteId));
+
+  if (!website) {
+    return { error: "Website not found." };
+  }
+
+  await writeWebsites(websites.filter((item) => item.id !== website.id));
+  return { website };
 }
 
 export async function addWebsiteDomain(input: {
