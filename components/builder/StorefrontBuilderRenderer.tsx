@@ -77,7 +77,7 @@ export type StorefrontBuilderRendererProps = {
   pageContent?: ReactNode;
 };
 
-type StorefrontBuilderProduct = {
+export type StorefrontBuilderProduct = {
   id: string;
   slug: string;
   name: string;

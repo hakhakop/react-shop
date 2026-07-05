@@ -159,6 +159,13 @@ function resolveScopedWebsiteHref(
   const previewPage =
     pageKey.startsWith("page:") ? pageKey.slice("page:".length) : pageKey;
   const params = new URLSearchParams({ page: previewPage });
+  const { path } = normalizeHrefPath(trimmed);
+
+  if (path.startsWith("/product/")) {
+    const productSlug = path.replace(/^\/product\/+/, "").split("/")[0];
+    if (productSlug) params.set("product", productSlug);
+  }
+
   return `/app/websites/${encodeURIComponent(
     websiteId,
   )}/${mode}?${params.toString()}${hash}`;
