@@ -141,6 +141,10 @@ import type { CategoryTreeItem } from "@/lib/categories";
 import type { MenuItem } from "@/lib/navigation";
 import type { ProductNode } from "@/lib/products";
 import type { PageTemplateLibraryItem } from "@/components/dashboard/pageTemplateLibrary";
+import {
+  GLOBAL_STYLE_PRESETS,
+  type GlobalStylePreset,
+} from "@/components/dashboard/globalStylePresets";
 import type { BuilderVisualStyle } from "@/lib/builderVisualStyle";
 import { typographyProps, type TypographyArea } from "@/lib/builderTypography";
 import type { HeaderSettings } from "@/lib/themeSettings";
@@ -1468,8 +1472,14 @@ export default function DashboardBuilder({
   const [sectionSettingsOpen, setSectionSettingsOpen] = useState(false);
   const [sectionStructureOpen, setSectionStructureOpen] = useState(false);
   const [globalStylesTab, setGlobalStylesTab] = useState<
-    "siteDesign" | "spacing" | "cards" | "typography" | "header" | "buttons"
-  >("siteDesign");
+    | "presets"
+    | "siteDesign"
+    | "spacing"
+    | "cards"
+    | "typography"
+    | "header"
+    | "buttons"
+  >("presets");
   const [globalSpacingFocus, setGlobalSpacingFocus] = useState<
     "section" | "row" | "element" | null
   >(null);
@@ -4475,6 +4485,24 @@ export default function DashboardBuilder({
     }, 220);
   };
 
+  const applyGlobalStylePreset = (preset: GlobalStylePreset) => {
+    const confirmed = window.confirm(
+      "Apply this style preset?\nThis will replace your current Global Style settings while keeping your pages and content.",
+    );
+
+    if (!confirmed) return;
+
+    const expandedDesign = preset.design.preset
+      ? {
+          ...designPresets[preset.design.preset],
+          ...preset.design,
+        }
+      : preset.design;
+
+    updateDesign(expandedDesign);
+    updateShellSettings(preset.shellSettings);
+  };
+
   const saveMenuItems = async (menuItems: BuilderShellSettings["menuItems"]) => {
     if (!canEditShellSettings) {
       setShellStatus("Platform global settings require super admin access.");
@@ -5637,6 +5665,7 @@ export default function DashboardBuilder({
       >
         {(
           [
+            ["presets", "Presets"],
             ["siteDesign", "Site Design"],
             ["spacing", "Spacing"],
             ["cards", "Cards"],
@@ -5655,6 +5684,53 @@ export default function DashboardBuilder({
           </button>
         ))}
       </div>
+
+      {globalStylesTab === "presets" && (
+        <div className="builder-global-styles-group">
+          <div className="builder-card-title">
+            <strong>Style Presets</strong>
+            <span>apply a complete visual system</span>
+          </div>
+
+          <div className="builder-global-preset-grid">
+            {GLOBAL_STYLE_PRESETS.map((preset) => (
+              <article className="builder-global-preset-card" key={preset.id}>
+                <img
+                  src={preset.previewImage}
+                  alt={`${preset.name} style preview`}
+                  className="builder-global-preset-preview"
+                />
+                <div className="builder-global-preset-card-body">
+                  <div>
+                    <strong>{preset.name}</strong>
+                    <p>{preset.description}</p>
+                  </div>
+                  <div
+                    className="builder-global-preset-palette"
+                    aria-label={`${preset.name} color palette`}
+                  >
+                    {preset.palette.map((color) => (
+                      <span
+                        key={color}
+                        style={{ background: color }}
+                        title={color}
+                      />
+                    ))}
+                  </div>
+                  <button
+                    type="button"
+                    className="builder-global-preset-apply"
+                    onClick={() => applyGlobalStylePreset(preset)}
+                  >
+                    <Sparkles size={14} />
+                    Apply
+                  </button>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      )}
 
       {globalStylesTab === "siteDesign" && (
         <div className="builder-global-styles-group">
