@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import AuthForm from "@/components/auth/AuthForm";
 import { getCurrentUser } from "@/lib/auth";
 import { getSafeNextPath } from "@/lib/saasRoutes";
+import { readActiveSubscriptionPackages } from "@/lib/subscriptions";
 
 export const dynamic = "force-dynamic";
 
@@ -15,6 +16,7 @@ export default async function RegisterPage({
 }: RegisterPageProps) {
   const user = await getCurrentUser(await cookies());
   const nextPath = getSafeNextPath((await searchParams)?.next);
+  const packages = await readActiveSubscriptionPackages();
 
   if (user) {
     redirect(nextPath);
@@ -22,7 +24,7 @@ export default async function RegisterPage({
 
   return (
     <main className="saas-auth-page">
-      <AuthForm mode="register" nextPath={nextPath} />
+      <AuthForm mode="register" nextPath={nextPath} packages={packages} />
     </main>
   );
 }

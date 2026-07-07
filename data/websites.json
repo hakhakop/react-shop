@@ -62,5 +62,20 @@
     "status": "creating",
     "createdAt": "2026-07-02T15:12:01.040Z",
     "updatedAt": "2026-07-03T03:22:23.612Z"
+  },
+  {
+    "id": "7985de5a-a8a7-4526-8359-dd23ddc84bbb",
+    "ownerId": "db003b60-c750-431a-970d-7c4da5b39fd4",
+    "name": "Start",
+    "slug": "start",
+    "domain": null,
+    "primaryDomain": null,
+    "domains": [],
+    "description": "",
+    "timeZone": "Asia/Yerevan",
+    "language": "hy",
+    "status": "creating",
+    "createdAt": "2026-07-07T06:15:00.591Z",
+    "updatedAt": "2026-07-07T06:15:00.591Z"
   }
 ]

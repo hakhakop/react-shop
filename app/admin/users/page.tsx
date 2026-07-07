@@ -38,6 +38,7 @@ export default async function AdminUsersPage() {
             <span>Name</span>
             <span>Email</span>
             <span>Role</span>
+            <span>Package</span>
             <span>Websites</span>
             <span>Actions</span>
           </div>
@@ -46,6 +47,7 @@ export default async function AdminUsersPage() {
               <span>{item.name}</span>
               <span>{item.email}</span>
               <span>{item.role}</span>
+              <span>{item.subscription?.packageName ?? "Not selected"}</span>
               <span>{websiteCounts.get(item.id) ?? 0}</span>
               <span className="saas-row-actions">
                 <Link href={`/admin/users/${item.id}`}>View User</Link>

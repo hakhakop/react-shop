@@ -8,8 +8,15 @@ import { loginRedirectFor } from "@/lib/saasRoutes";
 
 export const dynamic = "force-dynamic";
 
-export default async function AppDashboardPage() {
+type AppDashboardPageProps = {
+  searchParams?: Promise<{ registered?: string }>;
+};
+
+export default async function AppDashboardPage({
+  searchParams,
+}: AppDashboardPageProps) {
   const user = await getCurrentUser(await cookies());
+  const params = await searchParams;
 
   if (!user) {
     redirect(loginRedirectFor("/app"));
@@ -25,6 +32,37 @@ export default async function AppDashboardPage() {
 
   return (
     <SaaSShell user={user} title="Dashboard">
+      {params?.registered === "1" && (
+        <section className="saas-auth-success">
+          Your subscription request has been received. We will prepare and configure
+          your website within 24 hours.
+        </section>
+      )}
+
+      <section className="saas-panel">
+        <div className="saas-panel-heading">
+          <div>
+            <h2>Subscription Request</h2>
+            <p>Your package and onboarding details for manual setup.</p>
+          </div>
+          <Link className="saas-auth-submit" href="/app/settings">
+            Edit Profile
+          </Link>
+        </div>
+        <div className="saas-dashboard-grid">
+          <article className="saas-dashboard-card">
+            <span>Package</span>
+            <strong>{user.subscription?.packageName ?? "Not selected"}</strong>
+            <p>{user.subscription?.priceText ?? "Contact support to select a package."}</p>
+          </article>
+          <article className="saas-dashboard-card">
+            <span>Website Request</span>
+            <strong>{user.onboarding?.websiteName ?? "Not submitted"}</strong>
+            <p>{user.onboarding?.businessDescription ?? "Complete your setup information."}</p>
+          </article>
+        </div>
+      </section>
+
       {websites.length === 0 ? (
         <section className="saas-empty-state">
           <span>Welcome to WebPages</span>

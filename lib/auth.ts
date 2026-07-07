@@ -12,11 +12,38 @@ export type SaaSUser = {
   passwordHash: string;
   name: string;
   role: SaaSUserRole;
+  subscription?: SaaSUserSubscription;
+  onboarding?: SaaSUserOnboarding;
   createdAt: string;
   updatedAt: string;
 };
 
 export type PublicSaaSUser = Omit<SaaSUser, "passwordHash">;
+
+export type SaaSUserSubscription = {
+  packageId: string;
+  packageName: string;
+  packageType: string;
+  priceText: string;
+  requestedAt: string;
+};
+
+export type SaaSUserOnboarding = {
+  companyName: string;
+  logoUrl: string;
+  businessCategory: string;
+  phone: string;
+  publicEmail: string;
+  address: string;
+  websiteName: string;
+  preferredDomain: string;
+  businessDescription: string;
+  facebookUrl: string;
+  instagramUrl: string;
+  styleNotes: string;
+  additionalNotes: string;
+  updatedAt: string;
+};
 
 type SessionPayload = {
   userId: string;
@@ -63,6 +90,23 @@ function normalizeName(name: unknown) {
   return typeof name === "string" ? name.trim().replace(/\s+/g, " ") : "";
 }
 
+function normalizeText(value: unknown, maxLength: number) {
+  return typeof value === "string"
+    ? value.trim().replace(/\s+/g, " ").slice(0, maxLength)
+    : "";
+}
+
+function normalizeLongText(value: unknown, maxLength: number) {
+  return typeof value === "string" ? value.trim().slice(0, maxLength) : "";
+}
+
+function normalizeUrl(value: unknown) {
+  const text = normalizeText(value, 240);
+  if (!text) return "";
+  if (/^https?:\/\//i.test(text)) return text;
+  return `https://${text}`;
+}
+
 function toBase64Url(value: string) {
   return Buffer.from(value, "utf8").toString("base64url");
 }
@@ -95,18 +139,65 @@ function isSaaSUser(value: unknown): value is SaaSUser {
     (user.role === "user" ||
       user.role === "admin" ||
       user.role === "super_admin") &&
+    (user.subscription === undefined || isUserSubscription(user.subscription)) &&
+    (user.onboarding === undefined || isUserOnboarding(user.onboarding)) &&
     typeof user.createdAt === "string" &&
     typeof user.updatedAt === "string"
   );
 }
 
+function isUserSubscription(value: unknown): value is SaaSUserSubscription {
+  if (!value || typeof value !== "object") return false;
+  const subscription = value as Partial<SaaSUserSubscription>;
+  return (
+    typeof subscription.packageId === "string" &&
+    typeof subscription.packageName === "string" &&
+    typeof subscription.packageType === "string" &&
+    typeof subscription.priceText === "string" &&
+    typeof subscription.requestedAt === "string"
+  );
+}
+
+function isUserOnboarding(value: unknown): value is SaaSUserOnboarding {
+  if (!value || typeof value !== "object") return false;
+  const onboarding = value as Partial<SaaSUserOnboarding>;
+  return (
+    typeof onboarding.companyName === "string" &&
+    typeof onboarding.logoUrl === "string" &&
+    typeof onboarding.businessCategory === "string" &&
+    typeof onboarding.phone === "string" &&
+    typeof onboarding.publicEmail === "string" &&
+    typeof onboarding.address === "string" &&
+    typeof onboarding.websiteName === "string" &&
+    typeof onboarding.preferredDomain === "string" &&
+    typeof onboarding.businessDescription === "string" &&
+    typeof onboarding.facebookUrl === "string" &&
+    typeof onboarding.instagramUrl === "string" &&
+    typeof onboarding.styleNotes === "string" &&
+    typeof onboarding.additionalNotes === "string" &&
+    typeof onboarding.updatedAt === "string"
+  );
+}
+
 export function toPublicUser(user: SaaSUser): PublicSaaSUser {
-  const { passwordHash: _passwordHash, ...publicUser } = user;
-  return publicUser;
+  return {
+    id: user.id,
+    email: user.email,
+    name: user.name,
+    role: user.role,
+    subscription: user.subscription,
+    onboarding: user.onboarding,
+    createdAt: user.createdAt,
+    updatedAt: user.updatedAt,
+  };
 }
 
 export function isSaaSAdmin(user: PublicSaaSUser | null | undefined) {
   return user?.role === "admin" || user?.role === "super_admin";
+}
+
+export function isSaaSSuperAdmin(user: PublicSaaSUser | null | undefined) {
+  return user?.role === "super_admin";
 }
 
 export function validateRegistrationInput(input: {
@@ -131,6 +222,52 @@ export function validateRegistrationInput(input: {
   }
 
   return { email, name, password };
+}
+
+export function validateOnboardingInput(
+  input: Record<string, unknown>,
+  existingLogoUrl = "",
+) {
+  const companyName = normalizeText(input.companyName, 120);
+  const businessCategory = normalizeText(input.businessCategory, 100);
+  const phone = normalizeText(input.phone, 60);
+  const publicEmail = normalizeEmail(input.publicEmail);
+  const address = normalizeText(input.address, 180);
+  const websiteName = normalizeText(input.websiteName, 100);
+  const preferredDomain = normalizeText(input.preferredDomain, 120);
+  const businessDescription = normalizeLongText(input.businessDescription, 800);
+  const facebookUrl = normalizeUrl(input.facebookUrl);
+  const instagramUrl = normalizeUrl(input.instagramUrl);
+  const styleNotes = normalizeLongText(input.styleNotes, 600);
+  const additionalNotes = normalizeLongText(input.additionalNotes, 800);
+
+  if (!companyName) return { error: "Company / Business name is required." };
+  if (!businessCategory) return { error: "Business category is required." };
+  if (!phone) return { error: "Phone is required." };
+  if (!EMAIL_PATTERN.test(publicEmail)) {
+    return { error: "Enter a valid public business email." };
+  }
+  if (!websiteName) return { error: "Website name is required." };
+  if (!businessDescription) {
+    return { error: "Short business description is required." };
+  }
+
+  return {
+    companyName,
+    logoUrl: existingLogoUrl,
+    businessCategory,
+    phone,
+    publicEmail,
+    address,
+    websiteName,
+    preferredDomain,
+    businessDescription,
+    facebookUrl,
+    instagramUrl,
+    styleNotes,
+    additionalNotes,
+    updatedAt: new Date().toISOString(),
+  };
 }
 
 export function validateLoginInput(input: {
@@ -183,6 +320,8 @@ export async function createUser(input: {
   email: string;
   password: string;
   name: string;
+  subscription?: SaaSUserSubscription;
+  onboarding?: SaaSUserOnboarding;
 }) {
   const users = await readUsers();
   const email = normalizeEmail(input.email);
@@ -198,12 +337,32 @@ export async function createUser(input: {
     passwordHash: await bcrypt.hash(input.password, 12),
     name: normalizeName(input.name),
     role: "user",
+    subscription: input.subscription,
+    onboarding: input.onboarding,
     createdAt: now,
     updatedAt: now,
   };
 
   await writeUsers([...users, user]);
   return { user };
+}
+
+export async function updateUserOnboarding(
+  userId: string,
+  onboarding: SaaSUserOnboarding,
+) {
+  const users = await readUsers();
+  const existing = users.find((user) => user.id === userId);
+  if (!existing) return { error: "User not found." };
+
+  const updatedUser: SaaSUser = {
+    ...existing,
+    onboarding,
+    updatedAt: new Date().toISOString(),
+  };
+
+  await writeUsers(users.map((user) => (user.id === userId ? updatedUser : user)));
+  return { user: updatedUser };
 }
 
 export async function verifyUserPassword(user: SaaSUser, password: string) {

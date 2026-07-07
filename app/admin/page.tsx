@@ -5,6 +5,7 @@ import AccessDenied from "@/components/saas/AccessDenied";
 import SaaSShell from "@/components/saas/SaaSShell";
 import { getCurrentUser, isSaaSAdmin, readPublicUsers } from "@/lib/auth";
 import { loginRedirectFor } from "@/lib/saasRoutes";
+import { readSubscriptionPackages } from "@/lib/subscriptions";
 import { readWebsites } from "@/lib/websites";
 
 export const dynamic = "force-dynamic";
@@ -20,8 +21,13 @@ export default async function AdminPage() {
     return <AccessDenied />;
   }
 
-  const [users, websites] = await Promise.all([readPublicUsers(), readWebsites()]);
+  const [users, websites, packages] = await Promise.all([
+    readPublicUsers(),
+    readWebsites(),
+    readSubscriptionPackages(),
+  ]);
   const activeWebsites = websites.filter((website) => website.status === "active");
+  const activePackages = packages.filter((item) => item.isActive);
   const creatingWebsites = websites.filter(
     (website) => website.status === "creating" || website.status === "maintenance",
   );
@@ -46,6 +52,14 @@ export default async function AdminPage() {
         <p>Review websites across every SaaS customer account.</p>
         <Link href="/admin/websites">View websites</Link>
       </section>
+      {user.role === "super_admin" && (
+        <section className="saas-dashboard-card">
+          <span>Packages</span>
+          <strong>{activePackages.length}</strong>
+          <p>Active subscription packages shown during registration.</p>
+          <Link href="/admin/packages">Manage packages</Link>
+        </section>
+      )}
       <section className="saas-dashboard-card">
         <span>Active</span>
         <strong>{activeWebsites.length}</strong>

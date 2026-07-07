@@ -1,0 +1,71 @@
+[
+  {
+    "id": "411e6d1b-3688-4cbb-ad61-533760969d57",
+    "name": "🌱 Ստարտ",
+    "description": "✅ 1–5 էջ\r\n✅ Կոնտակտային ձև\r\n✅ Կայքի տեղադրում\r\n✅ Տեխնիկական աջակցություն\r\n🎁 Անվճար webpages.am ենթադոմեյն",
+    "priceText": "5000 ֏/Ամիս",
+    "type": "Business Website",
+    "features": [
+      "✅ 1–5 էջ",
+      "✅ Կոնտակտային ձև",
+      "✅ Կայքի տեղադրում",
+      "✅ Տեխնիկական աջակցություն",
+      "🎁 Անվճար webpages.am ենթադոմեյն"
+    ],
+    "displayOrder": 1,
+    "isActive": true,
+    "createdAt": "2026-07-07T06:11:44.506Z",
+    "updatedAt": "2026-07-07T06:11:44.506Z"
+  },
+  {
+    "id": "business-website",
+    "name": "Business Website",
+    "description": "A polished company website for services, teams, and lead generation.",
+    "priceText": "$299 setup / $49 mo",
+    "type": "Business Website",
+    "features": [
+      "Responsive website",
+      "Core business pages",
+      "Contact forms",
+      "Manual setup within 24 hours"
+    ],
+    "displayOrder": 10,
+    "isActive": true,
+    "createdAt": "2026-01-01T00:00:00.000Z",
+    "updatedAt": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "website-blog",
+    "name": "Website + Blog",
+    "description": "A complete website with a content-ready blog structure.",
+    "priceText": "$399 setup / $79 mo",
+    "type": "Website + Blog",
+    "features": [
+      "Everything in Business Website",
+      "Blog-ready pages",
+      "Category structure",
+      "Editorial layout setup"
+    ],
+    "displayOrder": 20,
+    "isActive": true,
+    "createdAt": "2026-01-01T00:00:00.000Z",
+    "updatedAt": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "e-commerce",
+    "name": "E-Commerce",
+    "description": "A storefront request package for shops that need product selling pages.",
+    "priceText": "$599 setup / $129 mo",
+    "type": "E-Commerce",
+    "features": [
+      "Storefront design",
+      "Product/catalog structure",
+      "Shopping experience planning",
+      "Manual WooCommerce preparation"
+    ],
+    "displayOrder": 30,
+    "isActive": true,
+    "createdAt": "2026-01-01T00:00:00.000Z",
+    "updatedAt": "2026-01-01T00:00:00.000Z"
+  }
+]

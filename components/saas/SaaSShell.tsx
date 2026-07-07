@@ -1,7 +1,7 @@
 import Link from "next/link";
 import LogoutButton from "@/components/auth/LogoutButton";
 import ThemeToggle from "@/components/ThemeToggle";
-import { isSaaSAdmin, type PublicSaaSUser } from "@/lib/auth";
+import { isSaaSAdmin, isSaaSSuperAdmin, type PublicSaaSUser } from "@/lib/auth";
 
 type SaaSShellProps = {
   user: PublicSaaSUser;
@@ -27,6 +27,7 @@ export default function SaaSShell({
   children,
 }: SaaSShellProps) {
   const canUseAdmin = isSaaSAdmin(user);
+  const canManagePackages = isSaaSSuperAdmin(user);
 
   return (
     <main className="saas-shell">
@@ -46,6 +47,7 @@ export default function SaaSShell({
             <>
               <span className="saas-shell-nav-label">Admin</span>
               <Link href="/admin">Admin Home</Link>
+              {canManagePackages && <Link href="/admin/packages">Packages</Link>}
               <Link href="/admin/websites">All Websites</Link>
               <Link href="/admin/users">Users</Link>
             </>

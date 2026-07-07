@@ -16,5 +16,37 @@
     "role": "user",
     "createdAt": "2026-06-30T07:05:03.122Z",
     "updatedAt": "2026-06-30T07:05:03.122Z"
+  },
+  {
+    "id": "db003b60-c750-431a-970d-7c4da5b39fd4",
+    "email": "info@webpages.am",
+    "passwordHash": "$2b$12$tq/moezc9D5w1QDOrA8E2.ayA6cavqXqhixgzK2nPdm8hCAPoka3i",
+    "name": "Hakob Jaghatspanyan",
+    "role": "user",
+    "subscription": {
+      "packageId": "411e6d1b-3688-4cbb-ad61-533760969d57",
+      "packageName": "🌱 Ստարտ",
+      "packageType": "Business Website",
+      "priceText": "5000 ֏/Ամիս",
+      "requestedAt": "2026-07-07T06:14:32.890Z"
+    },
+    "onboarding": {
+      "companyName": "WebPages",
+      "logoUrl": "/uploads/onboarding/logo-2-mra97qux.svg",
+      "businessCategory": "WebPages",
+      "phone": "+37499451167",
+      "publicEmail": "hi@mail.com",
+      "address": "hey",
+      "websiteName": "ay",
+      "preferredDomain": "oy",
+      "businessDescription": "iy",
+      "facebookUrl": "https://hoy",
+      "instagramUrl": "https://hiy",
+      "styleNotes": "yay",
+      "additionalNotes": "bay",
+      "updatedAt": "2026-07-07T06:14:32.890Z"
+    },
+    "createdAt": "2026-07-07T06:14:32.890Z",
+    "updatedAt": "2026-07-07T06:14:32.890Z"
   }
 ]
