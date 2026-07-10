@@ -1392,17 +1392,15 @@ export default function CategoryWithFilters({
                         <div className="product-attributes-row">
                           {attributes.map((attr: any) => {
                             const key =
-                              (attr?.name ?? attr?.label ?? "").toString() ||
+                              safeDecodeURI((attr?.name ?? attr?.label ?? "").toString()) ||
                               "attr";
-                            const label = (
-                              attr?.label ??
-                              attr?.name ??
-                              ""
-                            ).toString();
+                            const label = safeDecodeURI(
+                              (attr?.label ?? attr?.name ?? "").toString()
+                            );
                             const values = Array.isArray(attr?.options)
                               ? attr.options
                                   .map((v: any) =>
-                                    v != null ? String(v).trim() : "",
+                                    v != null ? safeDecodeURI(String(v).trim()) : "",
                                   )
                                   .filter((v: string) => v.length > 0)
                               : [];
