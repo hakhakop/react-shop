@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getWordPressBaseUrl } from "@/lib/wordpressUrl";
+import {
+  getWooCommerceConnectionForRequest,
+  hasUsableWooCommerceConnection,
+} from "@/lib/woocommerce";
 
 /**
  * Try to extract a numeric WooCommerce product ID from a cart item payload.
@@ -49,15 +52,14 @@ function getNumericProductIdFromItem(item: any): number | null {
   return null;
 }
 
-function getOrderPaymentUrl(order: any) {
+function getOrderPaymentUrl(order: any, wordpressBaseUrl: string | null) {
   if (typeof order?.payment_url === "string" && order.payment_url) {
     return order.payment_url;
   }
 
-  const baseUrl = getWordPressBaseUrl();
-  if (!baseUrl || !order?.id || !order?.order_key) return null;
+  if (!wordpressBaseUrl || !order?.id || !order?.order_key) return null;
 
-  return `${baseUrl}/checkout/order-pay/${order.id}/?pay_for_order=true&key=${encodeURIComponent(
+  return `${wordpressBaseUrl}/checkout/order-pay/${order.id}/?pay_for_order=true&key=${encodeURIComponent(
     order.order_key
   )}`;
 }
@@ -93,15 +95,13 @@ function getAddressPayload(address: any, fallback: any) {
 }
 
 export async function POST(req: NextRequest) {
-  const apiUrl = process.env.WC_API_URL;
-  const ck = process.env.WC_CONSUMER_KEY;
-  const cs = process.env.WC_CONSUMER_SECRET;
+  const connection = await getWooCommerceConnectionForRequest(req);
 
-  if (!apiUrl || !ck || !cs) {
+  if (!hasUsableWooCommerceConnection(connection)) {
     return NextResponse.json(
       {
         success: false,
-        message: "WooCommerce API environment variables are missing.",
+        message: "WooCommerce API settings are missing.",
       },
       { status: 500 }
     );
@@ -110,7 +110,7 @@ export async function POST(req: NextRequest) {
   let body: any;
   try {
     body = await req.json();
-  } catch (err) {
+  } catch {
     return NextResponse.json(
       { success: false, message: "Invalid JSON body." },
       { status: 400 }
@@ -176,9 +176,11 @@ export async function POST(req: NextRequest) {
   };
 
   try {
-    const auth = Buffer.from(`${ck}:${cs}`).toString("base64");
+    const auth = Buffer.from(
+      `${connection.consumerKey!}:${connection.consumerSecret!}`,
+    ).toString("base64");
 
-    const res = await fetch(`${apiUrl}/orders`, {
+    const res = await fetch(`${connection.apiUrl}/orders`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -190,7 +192,10 @@ export async function POST(req: NextRequest) {
     const data = await res.json();
 
     if (!res.ok) {
-      console.error("WooCommerce error:", data);
+      console.error("WooCommerce order creation failed:", {
+        status: res.status,
+        message: data?.message,
+      });
       return NextResponse.json(
         {
           success: false,
@@ -206,12 +211,12 @@ export async function POST(req: NextRequest) {
       {
         success: true,
         orderId: data.id,
-        checkoutUrl: getOrderPaymentUrl(data),
+        checkoutUrl: getOrderPaymentUrl(data, connection.wordpressBaseUrl),
       },
       { status: 200 }
     );
-  } catch (err: any) {
-    console.error("Error calling WooCommerce:", err);
+  } catch {
+    console.error("Unexpected error calling WooCommerce order API.");
     return NextResponse.json(
       {
         success: false,

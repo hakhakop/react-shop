@@ -1886,9 +1886,15 @@ export default function DashboardBuilder({
 
     async function loadPreviewCategories() {
       try {
-        const response = await fetch("/api/builder-preview-categories", {
+        const params = new URLSearchParams();
+        if (websiteId) params.set("websiteId", websiteId);
+        const query = params.toString();
+        const response = await fetch(
+          `/api/builder-preview-categories${query ? `?${query}` : ""}`,
+          {
           cache: "no-store",
-        });
+          },
+        );
         if (!response.ok) return;
         const payload = (await response.json()) as {
           categoryTree?: CategoryTreeItem[];
@@ -1911,14 +1917,16 @@ export default function DashboardBuilder({
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [websiteId]);
 
   useEffect(() => {
     let cancelled = false;
 
     async function loadPreviewProducts() {
       try {
-        const response = await fetch("/api/builder-preview-products?limit=48", {
+        const params = new URLSearchParams({ limit: "48" });
+        if (websiteId) params.set("websiteId", websiteId);
+        const response = await fetch(`/api/builder-preview-products?${params}`, {
           cache: "no-store",
         });
         if (!response.ok) return;
@@ -1938,7 +1946,7 @@ export default function DashboardBuilder({
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [websiteId]);
 
   useEffect(() => {
     if (!draftReady) return;

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { getCategoryTree, type CategoryTreeItem } from "../lib/categories";
+import type { SaaSWebsite } from "@/lib/websites";
 
 function RootCategoryBlock({ cat }: { cat: CategoryTreeItem }) {
   const hasChildren = cat.children && cat.children.length > 0;
@@ -45,8 +46,14 @@ function RootCategoryBlock({ cat }: { cat: CategoryTreeItem }) {
  * Meant to be placed inside an absolutely-positioned dropdown
  * in the header.
  */
-export default async function CategoryMegaMenu() {
-  const tree = await getCategoryTree();
+export default async function CategoryMegaMenu({
+  website,
+}: {
+  website?: SaaSWebsite | null;
+}) {
+  if (website && website.type !== "e-commerce") return null;
+
+  const tree = await getCategoryTree({ website }).catch(() => []);
 
   if (!tree.length) {
     return null;

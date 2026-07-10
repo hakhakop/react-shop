@@ -7,6 +7,8 @@ import RecentlyViewedStrip from "@/components/RecentlyViewedStrip";
 import StorefrontBuilderRenderer from "@/components/builder/StorefrontBuilderRenderer";
 import { renderDomainWebsiteFrontend } from "@/components/website/DomainWebsiteFrontend";
 import { getPublishedBuilderLayout } from "@/lib/builderLayouts";
+import { getCurrentWebsiteFromHeaders } from "@/lib/currentWebsite";
+import type { SaaSWebsite } from "@/lib/websites";
 
 export const dynamic = "force-dynamic";
 
@@ -16,10 +18,14 @@ export const metadata = {
     "Browse all products in our store. Filter by category, attributes and price to quickly find what you need.",
 };
 
-async function ShopProductsSection() {
+async function ShopProductsSection({
+  website,
+}: {
+  website?: SaaSWebsite | null;
+}) {
   const [products, categoryTree] = await Promise.all([
-    getProducts(),
-    getCategoryTree().catch(() => []),
+    getProducts({ website }),
+    getCategoryTree({ website }).catch(() => []),
   ]);
   return <CategoryWithFilters products={products} categoryTree={categoryTree} />;
 }
@@ -42,7 +48,7 @@ function ShopProductsSkeleton() {
   );
 }
 
-function DefaultShopPage() {
+function DefaultShopPage({ website }: { website?: SaaSWebsite | null }) {
   return (
     <main className="page">
       <Breadcrumbs
@@ -64,16 +70,17 @@ function DefaultShopPage() {
       <RecentlyViewedStrip />
 
       <Suspense fallback={<ShopProductsSkeleton />}>
-        <ShopProductsSection />
+        <ShopProductsSection website={website} />
       </Suspense>
     </main>
   );
 }
 
 export default async function ShopPage() {
+  const website = await getCurrentWebsiteFromHeaders();
   const domainWebsitePage = await renderDomainWebsiteFrontend({
     requestedPage: "shop",
-    fallbackContent: <DefaultShopPage />,
+    fallbackContent: <DefaultShopPage website={website} />,
   });
 
   if (domainWebsitePage) return domainWebsitePage;
@@ -84,5 +91,5 @@ export default async function ShopPage() {
     return <StorefrontBuilderRenderer layout={layout} page="shop" />;
   }
 
-  return <DefaultShopPage />;
+  return <DefaultShopPage website={website} />;
 }

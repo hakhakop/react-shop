@@ -13,10 +13,9 @@ import {
 import { CartItem, useCart } from "./CartProvider";
 import { useWordPressSession } from "./useWordPressSession";
 
-const wordpressBaseUrl = process.env.NEXT_PUBLIC_WORDPRESS_SITE_URL ?? null;
-
 type CheckoutPageClientProps = {
   asSlot?: boolean;
+  wordpressBaseUrl?: string | null;
 };
 
 type CheckoutAddress = {
@@ -96,6 +95,7 @@ function getAddress(formData: FormData, prefix: "shipping" | "billing"): Checkou
 
 export default function CheckoutPageClient({
   asSlot = false,
+  wordpressBaseUrl = null,
 }: CheckoutPageClientProps) {
   const { items, clearCart } = useCart();
   const checkoutItems = items as CheckoutCartItem[];

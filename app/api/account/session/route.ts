@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getWordPressBaseUrl } from "@/lib/wordpressUrl";
+import { getWooCommerceConnectionForRequest } from "@/lib/woocommerce";
 
 type WordPressUser = {
   id?: number;
@@ -9,7 +9,7 @@ type WordPressUser = {
 };
 
 export async function GET(request: NextRequest) {
-  const wordpressBaseUrl = getWordPressBaseUrl();
+  const { wordpressBaseUrl } = await getWooCommerceConnectionForRequest(request);
 
   if (!wordpressBaseUrl) {
     return NextResponse.json(

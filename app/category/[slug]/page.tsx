@@ -9,6 +9,7 @@ import CategoryWithFilters from "../../../components/CategoryWithFilters";
 import StorefrontBuilderRenderer from "@/components/builder/StorefrontBuilderRenderer";
 import { renderDomainWebsiteFrontend } from "@/components/website/DomainWebsiteFrontend";
 import { getPublishedBuilderLayout } from "@/lib/builderLayouts";
+import { getCurrentWebsiteFromHeaders } from "@/lib/currentWebsite";
 
 export default async function CategoryPage({
   params,
@@ -16,8 +17,9 @@ export default async function CategoryPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
+  const website = await getCurrentWebsiteFromHeaders();
 
-  const category = await getCategoryProductsBySlug(slug);
+  const category = await getCategoryProductsBySlug(slug, { website });
 
   if (!category) {
     return (
@@ -42,7 +44,7 @@ export default async function CategoryPage({
   }
 
   const products: ProductNode[] = category.products;
-  const categoryTree = await getCategoryTree().catch(() => []);
+  const categoryTree = await getCategoryTree({ website }).catch(() => []);
   const fallbackContent = (
     <main className="page">
       <Breadcrumbs

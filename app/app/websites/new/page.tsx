@@ -2,7 +2,11 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import SaaSShell from "@/components/saas/SaaSShell";
 import { getCurrentUser } from "@/lib/auth";
-import { createWebsite, validateWebsiteInput } from "@/lib/websites";
+import {
+  createWebsite,
+  normalizeWebsiteType,
+  validateWebsiteInput,
+} from "@/lib/websites";
 import { loginRedirectFor } from "@/lib/saasRoutes";
 
 export const dynamic = "force-dynamic";
@@ -37,7 +41,13 @@ async function createWebsiteAction(formData: FormData) {
     redirect(`/app/websites/new?${params.toString()}`);
   }
 
-  const result = await createWebsite({ ownerId: user.id, ...parsed });
+  const result = await createWebsite({
+    ownerId: user.id,
+    type: normalizeWebsiteType(
+      user.subscription?.packageType === "E-Commerce" ? "e-commerce" : "business",
+    ),
+    ...parsed,
+  });
 
   if ("error" in result) {
     const params = new URLSearchParams({

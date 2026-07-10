@@ -9,7 +9,7 @@ type DomainWebsiteFrontendOptions = {
   pageLabel?: string;
   rendererProps?: Omit<
     StorefrontBuilderRendererProps,
-    "layout" | "page" | "pageLabel"
+    "layout" | "page" | "pageLabel" | "website"
   >;
   fallbackContent?: ReactNode;
 };

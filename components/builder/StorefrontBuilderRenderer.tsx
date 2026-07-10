@@ -37,6 +37,8 @@ import { getCategoryTree } from "@/lib/categories";
 import type { CategoryTreeItem } from "@/lib/categories";
 import { getProductCategories, type ProductCategory } from "@/lib/navigation";
 import { getProductsForGrid, type ProductNode } from "@/lib/products";
+import { safeDecodeURI } from "@/lib/graphql";
+import type { SaaSWebsite } from "@/lib/websites";
 import type {
   BuilderLayout,
   BuilderLayoutBlock,
@@ -75,6 +77,7 @@ export type StorefrontBuilderRendererProps = {
   activeCategorySlug?: string | null;
   product?: StorefrontBuilderProduct;
   pageContent?: ReactNode;
+  website?: SaaSWebsite | null;
 };
 
 export type StorefrontBuilderProduct = {
@@ -458,11 +461,13 @@ async function BuilderProductsSection({
   products: productsOverride,
   categoryTree,
   activeCategorySlug,
+  website,
 }: {
   section: BuilderSection;
   products?: ProductNode[];
   categoryTree?: CategoryTreeItem[];
   activeCategorySlug?: string | null;
+  website?: SaaSWebsite | null;
 }) {
   const isPaginationEnabled = section.pagination?.enabled ?? false;
   const pageSize = isPaginationEnabled
@@ -481,6 +486,7 @@ async function BuilderProductsSection({
       limit: fetchLimit,
       source,
       categoryId: section.categoryId,
+      website,
     }));
 
   if (section.layoutVariant === "carousel") {
@@ -506,7 +512,7 @@ async function BuilderProductsSection({
     );
   }
   const resolvedCategoryTree =
-    categoryTree ?? (await getCategoryTree().catch(() => []));
+    categoryTree ?? (await getCategoryTree({ website }).catch(() => []));
 
   return (
     <CategoryWithFilters
@@ -999,9 +1005,11 @@ function PromoSection({
 async function FilterPillsSection({
   section,
   layoutScheme = "light",
+  website,
 }: {
   section: BuilderSection;
   layoutScheme?: "light" | "dark" | "auto";
+  website?: SaaSWebsite | null;
 }) {
   return (
     <SectionFrame
@@ -1010,7 +1018,7 @@ async function FilterPillsSection({
       extra="shop-builder-filters"
     >
       {section.title && <h2 className="shop-builder-title">{section.title}</h2>}
-      <CategoryFiltersBlock />
+      <CategoryFiltersBlock website={website} />
     </SectionFrame>
   );
 }
@@ -1145,12 +1153,14 @@ function getBlockButtonItems(block: BuilderLayoutBlock) {
 
 async function CategoryFiltersBlock({
   hiddenCategorySlugs = [],
+  website,
 }: {
   hiddenCategorySlugs?: string[];
+  website?: SaaSWebsite | null;
 }) {
   const [flatCategories, categoryTree] = await Promise.all([
-    getProductCategories(),
-    getCategoryTree().catch(() => []),
+    getProductCategories({ website }),
+    getCategoryTree({ website }).catch(() => []),
   ]);
 
   const countsBySlug: Record<string, number> = {};
@@ -1178,10 +1188,12 @@ async function ContentProductsBlock({
   block,
   categoryTree,
   activeCategorySlug,
+  website,
 }: {
   block: BuilderLayoutBlock;
   categoryTree?: CategoryTreeItem[];
   activeCategorySlug?: string | null;
+  website?: SaaSWebsite | null;
 }) {
   const isPaginationEnabled = block.pagination?.enabled ?? false;
   const originalLimit =
@@ -1197,6 +1209,7 @@ async function ContentProductsBlock({
         ? block.source
         : "all",
     categoryId: block.categoryId,
+    website,
   });
 
   const cardBorderRadiusStyle =
@@ -1248,7 +1261,7 @@ async function ContentProductsBlock({
     );
   }
   const resolvedCategoryTree =
-    categoryTree ?? (await getCategoryTree().catch(() => []));
+    categoryTree ?? (await getCategoryTree({ website }).catch(() => []));
 
   return (
     <div
@@ -1493,12 +1506,19 @@ function GridCards({
   );
 }
 
-async function ContentGridBlock({ block }: { block: BuilderLayoutBlock }) {
+async function ContentGridBlock({
+  block,
+  website,
+}: {
+  block: BuilderLayoutBlock;
+  website?: SaaSWebsite | null;
+}) {
   if (block.gridSource === "products") {
     const limit = Math.max(1, (block.columns ?? 3) * (block.gridRows ?? 1));
     const products = await getProductsForGrid({
       limit,
       source: "all",
+      website,
     });
     return (
       <GridCards
@@ -1511,7 +1531,7 @@ async function ContentGridBlock({ block }: { block: BuilderLayoutBlock }) {
           title: product.name,
           meta: product.price ?? undefined,
           text: product.attributes?.nodes
-            ?.map((attribute) => attribute.label ?? attribute.name)
+            ?.map((attribute) => safeDecodeURI(attribute.label ?? attribute.name))
             .join(", "),
           buttonLabel: "View product",
           buttonUrl: `/product/${product.slug}`,
@@ -1815,6 +1835,7 @@ function ContentLayoutBlock({
   pageContent,
   categoryTree,
   activeCategorySlug,
+  website,
   parentScheme = "light",
 }: {
   block: BuilderLayoutBlock;
@@ -1824,6 +1845,7 @@ function ContentLayoutBlock({
   pageContent?: ReactNode;
   categoryTree?: CategoryTreeItem[];
   activeCategorySlug?: string | null;
+  website?: SaaSWebsite | null;
   parentScheme?: "light" | "dark";
 }) {
   if (block.kind === "button") {
@@ -1906,6 +1928,7 @@ function ContentLayoutBlock({
         >
           <CategoryFiltersBlock
             hiddenCategorySlugs={block.hiddenCategorySlugs}
+            website={website}
           />
         </Suspense>
       </div>
@@ -2112,6 +2135,7 @@ function ContentLayoutBlock({
             block={block}
             categoryTree={categoryTree}
             activeCategorySlug={activeCategorySlug}
+            website={website}
           />
         </Suspense>
       </div>
@@ -2122,7 +2146,7 @@ function ContentLayoutBlock({
     return (
       <div className="shop-builder-column-block shop-builder-column-block--grid">
         <Suspense fallback={<ProductsSkeleton />}>
-          <ContentGridBlock block={block} />
+          <ContentGridBlock block={block} website={website} />
         </Suspense>
       </div>
     );
@@ -3200,6 +3224,7 @@ function ContentLayoutSection({
   pageContent,
   categoryTree,
   activeCategorySlug,
+  website,
   layoutScheme = "light",
 }: {
   section: BuilderSection;
@@ -3209,6 +3234,7 @@ function ContentLayoutSection({
   pageContent?: ReactNode;
   categoryTree?: CategoryTreeItem[];
   activeCategorySlug?: string | null;
+  website?: SaaSWebsite | null;
   layoutScheme?: "light" | "dark" | "auto";
 }) {
   const items = section.layoutItems?.length
@@ -3419,6 +3445,7 @@ function ContentLayoutSection({
                             pageContent={pageContent}
                             categoryTree={categoryTree}
                             activeCategorySlug={activeCategorySlug}
+                            website={website}
                             parentScheme={rowColorScheme}
                           />
                         );
@@ -3446,6 +3473,7 @@ function ContentLayoutSection({
                             pageContent={pageContent}
                             categoryTree={categoryTree}
                             activeCategorySlug={activeCategorySlug}
+                            website={website}
                             parentScheme={rowColorScheme}
                           />
                         </div>
@@ -3545,6 +3573,7 @@ function BuilderSectionRenderer({
   breadcrumbItems,
   page,
   pageContent,
+  website,
   layoutScheme = "light",
 }: {
   section: BuilderSection;
@@ -3555,6 +3584,7 @@ function BuilderSectionRenderer({
   breadcrumbItems: { label: string; href?: string }[];
   page: BuilderLayoutKey;
   pageContent?: ReactNode;
+  website?: SaaSWebsite | null;
   layoutScheme?: "light" | "dark" | "auto";
 }) {
   if (!section.visible) return null;
@@ -3588,13 +3618,18 @@ function BuilderSectionRenderer({
             products={products}
             categoryTree={categoryTree}
             activeCategorySlug={activeCategorySlug}
+            website={website}
           />
         </Suspense>
       </SectionFrame>
     );
   } else if (section.kind === "filters") {
     content = (
-      <FilterPillsSection section={section} layoutScheme={layoutScheme} />
+      <FilterPillsSection
+        section={section}
+        layoutScheme={layoutScheme}
+        website={website}
+      />
     );
   } else if (section.kind === "promo") {
     content = <PromoSection section={section} layoutScheme={layoutScheme} />;
@@ -3612,6 +3647,7 @@ function BuilderSectionRenderer({
         pageContent={pageContent}
         categoryTree={categoryTree}
         activeCategorySlug={activeCategorySlug}
+        website={website}
         layoutScheme={layoutScheme}
       />
     );
@@ -3664,6 +3700,7 @@ export default function StorefrontBuilderRenderer({
   activeCategorySlug,
   product,
   pageContent,
+  website,
 }: StorefrontBuilderRendererProps) {
   const label =
     pageLabel ??
@@ -3739,6 +3776,7 @@ export default function StorefrontBuilderRenderer({
               breadcrumbItems={resolvedBreadcrumbItems}
               page={page}
               pageContent={pageContent}
+              website={website}
               layoutScheme={layoutScheme}
             />
           ))}

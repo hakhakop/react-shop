@@ -6,6 +6,7 @@ import Link from "next/link";
 import Image from "next/image";
 import WishlistToggle from "./WishlistToggle";
 import AddToCartButton from "./AddToCartButton";
+import { safeDecodeURI } from "@/lib/graphql";
 import { SiteIcon } from "@/components/ui/SiteIcon";
 import { motion, AnimatePresence } from "framer-motion";
 import type {
@@ -56,9 +57,9 @@ function formatPrice(price: string | null | undefined) {
 function getProductAttributes(product: BasicProduct) {
   return (product.attributes?.nodes ?? [])
     .map((attr) => {
-      const label = (attr.label || attr.name || "").trim();
+      const label = safeDecodeURI(attr.label || attr.name || "").trim();
       const values = (attr.options ?? [])
-        .map((value) => value.trim())
+        .map((value) => safeDecodeURI(value).trim())
         .filter(Boolean);
 
       return { label, values };

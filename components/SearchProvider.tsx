@@ -23,23 +23,10 @@ type SearchResult = {
 };
 
 type SearchProductsResponse = {
-  data?: {
-    products?: {
-      nodes?: Array<{
-        id: string;
-        slug: string;
-        name: string;
-        price?: string | null;
-        image?: {
-          sourceUrl?: string | null;
-        } | null;
-      }>;
-    };
-  };
+  products?: SearchResult[];
 };
 
 const SearchContext = createContext<SearchContextType | null>(null);
-const GRAPHQL_ENDPOINT = process.env.NEXT_PUBLIC_WORDPRESS_GRAPHQL_URL;
 
 export function SearchProvider({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false);
@@ -59,12 +46,13 @@ export function SearchProvider({ children }: { children: ReactNode }) {
   // Cmd+K / Ctrl+K global shortcut
   useEffect(() => {
     const handler = (event: KeyboardEvent) => {
-      const isK = event.key.toLowerCase() === "k";
+      const key = typeof event.key === "string" ? event.key : "";
+      const isK = key.toLowerCase() === "k";
       if ((event.metaKey || event.ctrlKey) && isK) {
         event.preventDefault();
         setOpen(true);
       }
-      if (event.key === "Escape") {
+      if (key === "Escape") {
         setOpen(false);
       }
     };
@@ -86,41 +74,12 @@ export function SearchProvider({ children }: { children: ReactNode }) {
     let cancelled = false;
     const timeoutId = window.setTimeout(async () => {
       try {
-        if (!GRAPHQL_ENDPOINT) {
-          console.warn(
-            "NEXT_PUBLIC_WORDPRESS_GRAPHQL_URL is not defined - search will not work."
-          );
-          return;
-        }
-
         setLoading(true);
 
-        const graphQuery = `
-          query SearchProducts($search: String!) {
-            products(first: 10, where: { search: $search }) {
-              nodes {
-                id
-                slug
-                name
-                ... on SimpleProduct { price }
-                ... on VariableProduct { price }
-                image {
-                  sourceUrl
-                  altText
-                }
-              }
-            }
-          }
-        `;
-
-        const res = await fetch(GRAPHQL_ENDPOINT, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            query: graphQuery,
-            variables: { search: trimmed },
-          }),
-        });
+        const res = await fetch(
+          `/api/product-search?q=${encodeURIComponent(trimmed)}`,
+          { cache: "no-store" },
+        );
 
         if (!res.ok) {
           throw new Error(`Network error: ${res.status}`);
@@ -129,17 +88,7 @@ export function SearchProvider({ children }: { children: ReactNode }) {
         const json = (await res.json()) as SearchProductsResponse;
         if (cancelled) return;
 
-        const nodes = json.data?.products?.nodes ?? [];
-
-        const mapped: SearchResult[] = nodes.map((node) => ({
-          id: node.id,
-          slug: node.slug,
-          name: node.name,
-          thumbnailUrl: node.image?.sourceUrl ?? undefined,
-          price: node.price ?? null,
-        }));
-
-        setResults(mapped);
+        setResults(json.products ?? []);
       } catch (error) {
         console.error("Search error:", error);
         if (!cancelled) {

@@ -2,10 +2,21 @@ import StorefrontBuilderRenderer from "@/components/builder/StorefrontBuilderRen
 import CheckoutPageClient from "@/components/CheckoutPageClient";
 import { renderDomainWebsiteFrontend } from "@/components/website/DomainWebsiteFrontend";
 import { getPublishedBuilderLayout } from "@/lib/builderLayouts";
+import { getCurrentWebsiteFromHeaders } from "@/lib/currentWebsite";
+import { getWooCommerceConnection } from "@/lib/woocommerce";
 
 export default async function CheckoutPage() {
-  const pageContent = <CheckoutPageClient asSlot />;
-  const fallbackContent = <CheckoutPageClient />;
+  const website = await getCurrentWebsiteFromHeaders();
+  const connection = getWooCommerceConnection(website);
+  const pageContent = (
+    <CheckoutPageClient
+      asSlot
+      wordpressBaseUrl={connection.wordpressBaseUrl}
+    />
+  );
+  const fallbackContent = (
+    <CheckoutPageClient wordpressBaseUrl={connection.wordpressBaseUrl} />
+  );
   const domainWebsitePage = await renderDomainWebsiteFrontend({
     requestedPage: "checkout",
     rendererProps: {

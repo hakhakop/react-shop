@@ -14,7 +14,8 @@
     "updatedAt": "2026-07-03T06:08:02.092Z",
     "description": "Hey you are what the rights",
     "timeZone": "Asia/Yerevan",
-    "language": "hy"
+    "language": "hy",
+    "type": "business"
   },
   {
     "id": "614be964-b02f-43de-8fbf-1bc633494479",
@@ -29,7 +30,8 @@
     "updatedAt": "2026-06-30T07:03:11.484Z",
     "description": "",
     "timeZone": "Asia/Yerevan",
-    "language": "hy"
+    "language": "hy",
+    "type": "business"
   },
   {
     "id": "4fe2c519-6a13-4462-a67d-f547a2d71a08",
@@ -44,7 +46,8 @@
     "updatedAt": "2026-06-30T13:39:59.822Z",
     "description": "hey hey hey",
     "timeZone": "Asia/Yerevan",
-    "language": "hy"
+    "language": "hy",
+    "type": "business"
   },
   {
     "id": "82339d1e-f7a3-490d-9528-a1107179278e",
@@ -59,9 +62,10 @@
     "description": "",
     "timeZone": "Asia/Yerevan",
     "language": "hy",
-    "status": "creating",
+    "status": "maintenance",
     "createdAt": "2026-07-02T15:12:01.040Z",
-    "updatedAt": "2026-07-03T03:22:23.612Z"
+    "updatedAt": "2026-07-09T19:18:47.415Z",
+    "type": "e-commerce"
   },
   {
     "id": "7985de5a-a8a7-4526-8359-dd23ddc84bbb",
@@ -74,8 +78,54 @@
     "description": "",
     "timeZone": "Asia/Yerevan",
     "language": "hy",
-    "status": "creating",
+    "status": "active",
     "createdAt": "2026-07-07T06:15:00.591Z",
-    "updatedAt": "2026-07-07T06:15:00.591Z"
+    "updatedAt": "2026-07-09T17:30:58.169Z",
+    "type": "business"
+  },
+  {
+    "id": "5a89c262-09cc-440f-bd06-50841a0a49f5",
+    "ownerId": "33d9dc8c-59ab-402f-8068-5fa8b25752cd",
+    "name": "new Ecommerce",
+    "slug": "commerce",
+    "type": "e-commerce",
+    "domain": null,
+    "primaryDomain": null,
+    "domains": [],
+    "description": "",
+    "timeZone": "Asia/Yerevan",
+    "language": "hy",
+    "status": "creating",
+    "createdAt": "2026-07-09T18:43:34.749Z",
+    "updatedAt": "2026-07-10T06:01:49.852Z",
+    "ecommerceSettings": {
+      "wordpressCmsUrl": "https://webpages.am",
+      "wordpressGraphqlUrl": "https://webpages.am/graphql",
+      "wordpressAdminUrl": "https://webpages.am/wp-admin",
+      "wooCommerceAdminUrl": "https://webpages.am/wp-admin",
+      "wooCommerceRestApiUrl": "https://webpages.am/wp-json/wc/v3",
+      "wordpressAdminUser": "hakop28ol@yahoo.com",
+      "storeStatusNotes": "hhh",
+      "wooCommerceConsumerKey": "ck_e7fce71a2e1ba6f10050f2848faa1c2cbdea2e3b",
+      "wooCommerceConsumerSecret": "cs_b13d2a5da4df94fbbdc4ce25f13dbc5f86b626cc",
+      "technicalNotes": "",
+      "updatedAt": "2026-07-10T06:01:49.851Z"
+    }
+  },
+  {
+    "id": "901efe7e-f5d6-4e91-84d0-e6716d7c47ad",
+    "ownerId": "a010b610-5c47-441c-b2ec-00a6e9eb3f88",
+    "name": "new5",
+    "slug": "new5",
+    "type": "business",
+    "domain": null,
+    "primaryDomain": null,
+    "domains": [],
+    "description": "",
+    "timeZone": "Asia/Yerevan",
+    "language": "hy",
+    "status": "creating",
+    "createdAt": "2026-07-09T18:59:07.392Z",
+    "updatedAt": "2026-07-09T18:59:07.392Z"
   }
 ]

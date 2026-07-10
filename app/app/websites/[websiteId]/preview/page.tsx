@@ -59,7 +59,9 @@ export default async function WebsitePreviewPage({
 
   const productData =
     requestedPage === "product-single" && productSlug
-      ? await getStorefrontBuilderProductBySlug(productSlug).catch(() => null)
+      ? await getStorefrontBuilderProductBySlug(productSlug, {
+          website,
+        }).catch(() => null)
       : null;
 
   return (

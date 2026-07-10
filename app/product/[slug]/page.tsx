@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { graphqlFetch } from "../../../lib/graphql";
 import Breadcrumbs from "../../../components/Breadcrumbs";
 import ProductGallery from "../../../components/ProductGallery";
 import ProductOptionsSelector from "../../../components/ProductOptionsSelector";
@@ -9,6 +8,8 @@ import { renderDomainWebsiteFrontend } from "@/components/website/DomainWebsiteF
 import ProductAdminMarker from "@/components/ProductAdminMarker";
 import { ProductRecentlyViewedTracker } from "@/components/RecentlyViewedProvider";
 import { getPublishedBuilderLayout } from "@/lib/builderLayouts";
+import { getCurrentWebsiteFromHeaders } from "@/lib/currentWebsite";
+import { getProductBySlug } from "@/lib/products";
 
 type WPImage = {
   sourceUrl: string;
@@ -33,65 +34,17 @@ type Product = {
   attributes?: { nodes: ProductAttribute[] } | null;
 };
 
-type ProductData = {
-  product: Product | null;
-};
-
-const PRODUCT_QUERY = `
-  query SingleProduct($id: ID!) {
-    product(id: $id, idType: SLUG) {
-      id
-      databaseId
-      name
-      slug
-      description
-      image {
-        sourceUrl
-        altText
-      }
-      galleryImages(first: 10) {
-        nodes {
-          sourceUrl
-          altText
-        }
-      }
-
-      ... on SimpleProduct {
-        price(format: RAW)
-        attributes {
-          nodes {
-            name
-            label
-            options
-          }
-        }
-      }
-
-      ... on VariableProduct {
-        price(format: RAW)
-        attributes {
-          nodes {
-            name
-            label
-            options
-          }
-        }
-      }
-    }
-  }
-`;
-
 export default async function ProductPage({
   params,
 }: {
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-
-  let data: ProductData;
+  const website = await getCurrentWebsiteFromHeaders();
+  let p: Product | null;
 
   try {
-    data = await graphqlFetch<ProductData>(PRODUCT_QUERY, { id: slug });
+    p = await getProductBySlug(slug, { website });
   } catch (err: any) {
     return (
       <main className="product-page">
@@ -112,7 +65,7 @@ export default async function ProductPage({
     );
   }
 
-  if (!data.product) {
+  if (!p) {
     return (
       <main className="product-page">
         <Breadcrumbs
@@ -133,7 +86,6 @@ export default async function ProductPage({
     );
   }
 
-  const p = data.product;
   const wpProductId = p.databaseId ?? null;
 
 const priceNumber = p.price ? parseFloat(p.price) : null;

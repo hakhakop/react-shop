@@ -1,4 +1,5 @@
-import { graphqlFetch } from "./graphql";
+import { getWebsiteGraphQLEndpoint, graphqlFetch } from "./graphql";
+import type { SaaSWebsite } from "@/lib/websites";
 
 export type FeaturedProduct = {
   id: string;
@@ -19,7 +20,7 @@ export type FeaturedProductsData = {
 
 const FEATURED_QUERY = `
   query FeaturedProducts($limit: Int) {
-    products(where: { featured: true }, first: $limit) {
+    products(where: { featured: true, supportedTypesOnly: true }, first: $limit) {
       nodes {
         id
         slug
@@ -39,7 +40,13 @@ const FEATURED_QUERY = `
   }
 `;
 
-export async function getFeaturedProducts(limit?: number) {
-  const data = await graphqlFetch<FeaturedProductsData>(FEATURED_QUERY, { limit: limit ?? 12 });
+export async function getFeaturedProducts(
+  limit?: number,
+  _options?: { website?: SaaSWebsite | null },
+) {
+  const endpoint = getWebsiteGraphQLEndpoint(_options?.website);
+  const data = await graphqlFetch<FeaturedProductsData>(FEATURED_QUERY, {
+    limit: limit ?? 12,
+  }, { endpoint });
   return data.products.nodes;
 }

@@ -30,6 +30,7 @@ import {
   type ProductImageRatio,
 } from "@/lib/productCardImage";
 import { useProductCategoryFilter } from "./ProductCategoryFilterProvider";
+import { safeDecodeURI } from "@/lib/graphql";
 
 type Props = {
   products: ProductNode[];
@@ -198,7 +199,7 @@ function normalizeAttributeNode(
 ): { attrKey: string; label: string; values: string[] } | null {
   if (!attr) return null;
 
-  const rawName = (attr.name ?? attr.label ?? "").toString().trim();
+  const rawName = safeDecodeURI((attr.name ?? attr.label ?? "").toString().trim());
   if (!rawName) return null;
 
   const attrKey = rawName.toLowerCase();
@@ -207,7 +208,7 @@ function normalizeAttributeNode(
   if (Array.isArray(attr.options) && attr.options.length > 0) {
     for (const opt of attr.options) {
       if (!opt) continue;
-      const v = String(opt).trim();
+      const v = safeDecodeURI(String(opt).trim());
       if (v) values.push(v);
     }
   }
@@ -216,7 +217,7 @@ function normalizeAttributeNode(
 
   return {
     attrKey,
-    label: attr.label || rawName,
+    label: safeDecodeURI(attr.label || rawName),
     values,
   };
 }

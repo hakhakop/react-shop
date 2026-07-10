@@ -48,5 +48,133 @@
     },
     "createdAt": "2026-07-07T06:14:32.890Z",
     "updatedAt": "2026-07-07T06:14:32.890Z"
+  },
+  {
+    "id": "91e79ce9-598e-454e-93df-c0e370dbf73a",
+    "email": "info@prada.com",
+    "passwordHash": "$2b$12$Vvo.coyOYaWT2W2hsFV8DOIV/LB6o7s/TWyRhBZLUvqdRMLjtfOMi",
+    "name": "HAKOB JAGHATSPANYAN",
+    "role": "user",
+    "subscription": {
+      "packageId": "e-commerce",
+      "packageName": "E-Commerce",
+      "packageType": "E-Commerce",
+      "priceText": "$599 setup / $129 mo",
+      "requestedAt": "2026-07-09T17:34:47.643Z"
+    },
+    "onboarding": {
+      "companyName": "HAKOB JAGHATSPANYAN PE",
+      "logoUrl": "",
+      "businessCategory": "HAKOB JAGHATSPANYAN PE",
+      "phone": "+37499451167",
+      "publicEmail": "info@prada.com",
+      "address": "",
+      "websiteName": "prada.com",
+      "preferredDomain": "",
+      "businessDescription": "dsvdsfsfsdf",
+      "facebookUrl": "",
+      "instagramUrl": "",
+      "styleNotes": "",
+      "additionalNotes": "",
+      "updatedAt": "2026-07-09T17:34:47.643Z"
+    },
+    "createdAt": "2026-07-09T17:34:47.643Z",
+    "updatedAt": "2026-07-09T17:34:47.643Z"
+  },
+  {
+    "id": "034319ed-1792-45c3-b1de-99ce26fcb1ae",
+    "email": "info@notebookmall.am",
+    "passwordHash": "$2b$12$tyz70qpOqqwCUxjOSqEcvuk8d1zI4kgYUbR3Q7V9ihV6Ir9fDtwoO",
+    "name": "HAKOB JAGHATSPANYAN",
+    "role": "user",
+    "subscription": {
+      "packageId": "e-commerce",
+      "packageName": "E-Commerce",
+      "packageType": "E-Commerce",
+      "priceText": "$599 setup / $129 mo",
+      "requestedAt": "2026-07-09T17:37:37.221Z"
+    },
+    "onboarding": {
+      "companyName": "HAKOB JAGHATSPANYAN PE",
+      "logoUrl": "",
+      "businessCategory": "HAKOB JAGHATSPANYAN PE",
+      "phone": "+37499451167",
+      "publicEmail": "info@prada.com",
+      "address": "3 Station Place, Finsbury Park",
+      "websiteName": "cxv",
+      "preferredDomain": "",
+      "businessDescription": "cxvxcvxc",
+      "facebookUrl": "",
+      "instagramUrl": "",
+      "styleNotes": "vcxvxc",
+      "additionalNotes": "vxcvxcvx",
+      "updatedAt": "2026-07-09T17:37:37.221Z"
+    },
+    "createdAt": "2026-07-09T17:37:37.221Z",
+    "updatedAt": "2026-07-09T17:37:37.221Z"
+  },
+  {
+    "id": "db26c829-284a-45b9-b487-6b4375df5e0e",
+    "email": "info@prafda.com",
+    "passwordHash": "$2b$12$Bywa55RhKdf3Z/cpbpsQPudZxN0YZxytDlTr9ACuSMvmZxyx3xBMW",
+    "name": "HAKOB JAGHATSPANYAN",
+    "role": "user",
+    "subscription": {
+      "packageId": "e-commerce",
+      "packageName": "E-Commerce",
+      "packageType": "E-Commerce",
+      "priceText": "$599 setup / $129 mo",
+      "requestedAt": "2026-07-09T18:32:54.412Z"
+    },
+    "onboarding": {
+      "companyName": "HAKOB JAGHATSPANYAN PE",
+      "logoUrl": "",
+      "businessCategory": "HAKOB JAGHATSPANYAN PE",
+      "phone": "+37499451167",
+      "publicEmail": "info@a41studio.am",
+      "address": "sadfd",
+      "websiteName": "asfdsa",
+      "preferredDomain": "sadfds",
+      "businessDescription": "dsfasdf",
+      "facebookUrl": "https://dfsafds",
+      "instagramUrl": "https://dfa",
+      "styleNotes": "sdafsda",
+      "additionalNotes": "sadfdf",
+      "updatedAt": "2026-07-09T18:32:54.412Z"
+    },
+    "createdAt": "2026-07-09T18:32:54.413Z",
+    "updatedAt": "2026-07-09T18:32:54.413Z"
+  },
+  {
+    "id": "33d9dc8c-59ab-402f-8068-5fa8b25752cd",
+    "email": "hakop28ol@yahoo1.com",
+    "passwordHash": "$2b$12$0YpRNrR3hOlYI/MTGiAgdeIHaXqfrw7G6WhgIu8h5ssL/Es6ntWyC",
+    "name": "HAKOB JAGHATSPANYAN",
+    "role": "user",
+    "subscription": {
+      "packageId": "e-commerce",
+      "packageName": "E-Commerce",
+      "packageType": "E-Commerce",
+      "priceText": "$599 setup / $129 mo",
+      "requestedAt": "2026-07-09T18:43:20.325Z"
+    },
+    "onboarding": {
+      "companyName": "HAKOB JAGHATSPANYAN PE",
+      "logoUrl": "",
+      "businessCategory": "HAKOB JAGHATSPANYAN PE",
+      "phone": "+37499451167",
+      "publicEmail": "hakop28ol@yahoo1.com",
+      "address": "Leningradyan 38",
+      "websiteName": "1",
+      "preferredDomain": "1",
+      "businessDescription": "1",
+      "facebookUrl": "https://1",
+      "instagramUrl": "https://1",
+      "styleNotes": "1",
+      "additionalNotes": "1",
+      "updatedAt": "2026-07-09T18:43:20.325Z"
+    },
+    "createdAt": "2026-07-09T18:43:20.325Z",
+    "updatedAt": "2026-07-09T18:43:20.325Z"
   }
 ]

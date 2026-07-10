@@ -1,4 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
+import {
+  getWooCommerceConnectionForRequest,
+  hasUsableWooCommerceConnection,
+} from "@/lib/woocommerce";
 
 type WooCustomerAddress = {
   first_name?: string;
@@ -41,14 +45,12 @@ function normalizeAddress(address?: WooCustomerAddress | null) {
 }
 
 export async function GET(request: NextRequest) {
-  const apiUrl = process.env.WC_API_URL;
-  const ck = process.env.WC_CONSUMER_KEY;
-  const cs = process.env.WC_CONSUMER_SECRET;
+  const connection = await getWooCommerceConnectionForRequest(request);
   const customerId = request.nextUrl.searchParams.get("customerId")?.trim();
 
-  if (!apiUrl || !ck || !cs) {
+  if (!hasUsableWooCommerceConnection(connection)) {
     return NextResponse.json(
-      { message: "WooCommerce API environment variables are missing." },
+      { message: "WooCommerce API settings are missing." },
       { status: 500 }
     );
   }
@@ -61,8 +63,10 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const auth = Buffer.from(`${ck}:${cs}`).toString("base64");
-    const response = await fetch(`${apiUrl}/customers/${customerId}`, {
+    const auth = Buffer.from(
+      `${connection.consumerKey!}:${connection.consumerSecret!}`,
+    ).toString("base64");
+    const response = await fetch(`${connection.apiUrl}/customers/${customerId}`, {
       headers: {
         Accept: "application/json",
         Authorization: `Basic ${auth}`,

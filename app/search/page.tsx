@@ -1,25 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
-import { graphqlFetch } from "../../lib/graphql";
-
-type WPImage = {
-  sourceUrl: string;
-  altText?: string | null;
-};
-
-type ProductNode = {
-  id: string;
-  slug: string;
-  name: string;
-  image?: WPImage | null;
-  price?: string | null;
-};
-
-type SearchProductsData = {
-  products: {
-    nodes: ProductNode[];
-  };
-};
+import { getCurrentWebsiteFromHeaders } from "@/lib/currentWebsite";
+import { searchProducts, type ProductNode } from "@/lib/products";
 
 // Next.js 16: searchParams is a Promise
 type SearchPageProps = {
@@ -28,51 +10,22 @@ type SearchPageProps = {
   }>;
 };
 
-const SEARCH_PRODUCTS_QUERY = `
-  query SearchProducts($search: String!) {
-    products(
-      first: 24
-      where: {
-        search: $search
-      }
-    ) {
-      nodes {
-        id
-        slug
-        name
-        image {
-          sourceUrl
-          altText
-        }
-        ... on SimpleProduct {
-          price(format: RAW)
-        }
-        ... on VariableProduct {
-          price(format: RAW)
-        }
-      }
-    }
-  }
-`;
-
 export default async function SearchPage({ searchParams }: SearchPageProps) {
   // ✅ unwrap the Promise
   const resolved = await searchParams;
   const term = (resolved.q || "").trim();
+  const website = await getCurrentWebsiteFromHeaders();
 
   let products: ProductNode[] = [];
   let errorMessage: string | null = null;
 
   if (term) {
     try {
-      const data = await graphqlFetch<SearchProductsData>(
-        SEARCH_PRODUCTS_QUERY,
-        { search: term }
-      );
-      products = data.products?.nodes ?? [];
-    } catch (err: any) {
-      errorMessage = err?.message || "Failed to load search results.";
-      console.error("Search error:", err);
+      products = await searchProducts(term, { website });
+    } catch (err: unknown) {
+      errorMessage =
+        err instanceof Error ? err.message : "Failed to load search results.";
+      console.error("Search error.");
     }
   }
 

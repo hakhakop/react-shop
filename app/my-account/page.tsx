@@ -3,7 +3,12 @@ import StorefrontBuilderRenderer from "@/components/builder/StorefrontBuilderRen
 import WordPressAccountStatus from "@/components/WordPressAccountStatus";
 import { renderDomainWebsiteFrontend } from "@/components/website/DomainWebsiteFrontend";
 import { getPublishedBuilderLayout } from "@/lib/builderLayouts";
-import { getWooAccountUrl, getWordPressBaseUrl } from "@/lib/wordpressUrl";
+import { getCurrentWebsiteFromHeaders } from "@/lib/currentWebsite";
+import {
+  getWooAccountUrl,
+  getWooCommerceConnection,
+  type WooCommerceConnection,
+} from "@/lib/woocommerce";
 
 const accountLinks = [
   {
@@ -32,9 +37,13 @@ const accountLinks = [
   },
 ];
 
-function MyAccountPageContent() {
-  const wordpressBaseUrl = getWordPressBaseUrl();
-  const accountUrl = getWooAccountUrl();
+function MyAccountPageContent({
+  connection,
+}: {
+  connection: WooCommerceConnection;
+}) {
+  const wordpressBaseUrl = connection.wordpressBaseUrl;
+  const accountUrl = getWooAccountUrl(connection);
 
   return (
     <>
@@ -70,7 +79,7 @@ function MyAccountPageContent() {
 
       <div className="account-bridge-grid">
         {accountLinks.map((item) => {
-          const href = getWooAccountUrl(item.path) ?? "#";
+          const href = getWooAccountUrl(connection, item.path) ?? "#";
           const Icon = item.icon;
           return (
             <a
@@ -106,7 +115,9 @@ function MyAccountPageContent() {
 }
 
 export default async function MyAccountPage() {
-  const content = <MyAccountPageContent />;
+  const website = await getCurrentWebsiteFromHeaders();
+  const connection = getWooCommerceConnection(website);
+  const content = <MyAccountPageContent connection={connection} />;
   const domainWebsitePage = await renderDomainWebsiteFrontend({
     requestedPage: "my-account",
     rendererProps: {

@@ -6,12 +6,14 @@ import { getRuntimeDataDir } from "@/lib/runtimeDataDir";
 import { ensureWebsiteBuilderData } from "@/lib/websiteBuilderData";
 
 export type WebsiteStatus = "creating" | "active" | "maintenance" | "suspended";
+export type WebsiteType = "business" | "e-commerce";
 
 export type SaaSWebsite = {
   id: string;
   ownerId: string;
   name: string;
   slug: string;
+  type: WebsiteType;
   domain: string | null;
   primaryDomain: string | null;
   domains: string[];
@@ -19,12 +21,28 @@ export type SaaSWebsite = {
   timeZone: string;
   language: string;
   status: WebsiteStatus;
+  ecommerceSettings?: WebsiteEcommerceSettings;
   createdAt: string;
   updatedAt: string;
 };
 
 type StoredWebsite = Omit<SaaSWebsite, "status"> & {
+  type?: WebsiteType;
   status: WebsiteStatus | "draft";
+};
+
+export type WebsiteEcommerceSettings = {
+  wordpressCmsUrl: string;
+  wordpressGraphqlUrl: string;
+  wordpressAdminUrl: string;
+  wooCommerceAdminUrl: string;
+  wooCommerceRestApiUrl: string;
+  wordpressAdminUser: string;
+  storeStatusNotes: string;
+  wooCommerceConsumerKey: string;
+  wooCommerceConsumerSecret: string;
+  technicalNotes: string;
+  updatedAt: string;
 };
 
 const WEBSITES_FILE = () => path.join(getRuntimeDataDir(), "websites.json");
@@ -167,15 +185,66 @@ function normalizeOption(value: unknown, fallback: string) {
     : fallback;
 }
 
+function normalizeLongText(value: unknown, maxLength: number) {
+  return typeof value === "string" ? value.trim().slice(0, maxLength) : "";
+}
+
+function normalizeUrl(value: unknown) {
+  const text = typeof value === "string" ? value.trim().slice(0, 240) : "";
+  if (!text) return "";
+  return /^https?:\/\//i.test(text) ? text : `https://${text}`;
+}
+
+function isWebsiteEcommerceSettings(
+  value: unknown,
+): value is Partial<WebsiteEcommerceSettings> {
+  if (!value || typeof value !== "object") return false;
+  const settings = value as Partial<WebsiteEcommerceSettings>;
+  return (
+    typeof settings.wordpressCmsUrl === "string" &&
+    typeof settings.wordpressAdminUser === "string" &&
+    typeof settings.storeStatusNotes === "string" &&
+    typeof settings.wooCommerceConsumerKey === "string" &&
+    typeof settings.wooCommerceConsumerSecret === "string" &&
+    typeof settings.technicalNotes === "string" &&
+    typeof settings.updatedAt === "string"
+  );
+}
+
+function normalizeWebsiteEcommerceSettings(
+  value: unknown,
+): WebsiteEcommerceSettings | undefined {
+  if (!isWebsiteEcommerceSettings(value)) return undefined;
+
+  return {
+    wordpressCmsUrl: value.wordpressCmsUrl ?? "",
+    wordpressGraphqlUrl: value.wordpressGraphqlUrl ?? "",
+    wordpressAdminUrl: value.wordpressAdminUrl ?? "",
+    wooCommerceAdminUrl: value.wooCommerceAdminUrl ?? "",
+    wooCommerceRestApiUrl: value.wooCommerceRestApiUrl ?? "",
+    wordpressAdminUser: value.wordpressAdminUser ?? "",
+    storeStatusNotes: value.storeStatusNotes ?? "",
+    wooCommerceConsumerKey: value.wooCommerceConsumerKey ?? "",
+    wooCommerceConsumerSecret: value.wooCommerceConsumerSecret ?? "",
+    technicalNotes: value.technicalNotes ?? "",
+    updatedAt: value.updatedAt ?? "",
+  };
+}
+
 function normalizeWebsiteStatus(value: unknown): WebsiteStatus | null {
   return value === "active" || value === "maintenance" || value === "suspended"
     ? value
     : null;
 }
 
+export function normalizeWebsiteType(value: unknown): WebsiteType {
+  return value === "e-commerce" ? "e-commerce" : "business";
+}
+
 export function validateWebsiteSettingsInput(input: {
   name?: unknown;
   slug?: unknown;
+  type?: unknown;
   description?: unknown;
   timeZone?: unknown;
   language?: unknown;
@@ -195,10 +264,63 @@ export function validateWebsiteSettingsInput(input: {
   return {
     name,
     slug,
+    type: normalizeWebsiteType(input.type),
     description: normalizeDescription(input.description),
     timeZone: normalizeOption(input.timeZone, "Asia/Yerevan"),
     language: normalizeOption(input.language, "hy"),
     status,
+  };
+}
+
+export function validateWebsiteEcommerceSettingsInput(input: {
+  wordpressCmsUrl?: unknown;
+  wordpressGraphqlUrl?: unknown;
+  wordpressAdminUrl?: unknown;
+  wooCommerceAdminUrl?: unknown;
+  wooCommerceRestApiUrl?: unknown;
+  wordpressAdminUser?: unknown;
+  storeStatusNotes?: unknown;
+  wooCommerceConsumerKey?: unknown;
+  wooCommerceConsumerSecret?: unknown;
+  technicalNotes?: unknown;
+}) {
+  const wordpressCmsUrl = normalizeUrl(input.wordpressCmsUrl);
+  const wordpressGraphqlUrl = normalizeUrl(input.wordpressGraphqlUrl);
+  const wordpressAdminUrl = normalizeUrl(input.wordpressAdminUrl);
+  const wooCommerceAdminUrl = normalizeUrl(input.wooCommerceAdminUrl);
+  const wooCommerceRestApiUrl = normalizeUrl(input.wooCommerceRestApiUrl);
+  const wordpressAdminUser = normalizeOption(input.wordpressAdminUser, "");
+  const storeStatusNotes = normalizeLongText(input.storeStatusNotes, 1000);
+  const wooCommerceConsumerKey = normalizeLongText(
+    input.wooCommerceConsumerKey,
+    240,
+  );
+  const wooCommerceConsumerSecret = normalizeLongText(
+    input.wooCommerceConsumerSecret,
+    240,
+  );
+  const technicalNotes = normalizeLongText(input.technicalNotes, 1200);
+
+  if (!wordpressCmsUrl) {
+    return { error: "WordPress CMS URL is required." };
+  }
+
+  if (!wordpressAdminUser) {
+    return { error: "WordPress admin username/email is required." };
+  }
+
+  return {
+    wordpressCmsUrl,
+    wordpressGraphqlUrl,
+    wordpressAdminUrl,
+    wooCommerceAdminUrl,
+    wooCommerceRestApiUrl,
+    wordpressAdminUser,
+    storeStatusNotes,
+    wooCommerceConsumerKey,
+    wooCommerceConsumerSecret,
+    technicalNotes,
+    updatedAt: new Date().toISOString(),
   };
 }
 
@@ -214,6 +336,7 @@ export async function readWebsites(): Promise<SaaSWebsite[]> {
 
       return {
         ...website,
+        type: normalizeWebsiteType(website.type),
         status: website.status === "draft" ? "creating" : website.status,
         domain: primaryDomain,
         primaryDomain,
@@ -223,6 +346,9 @@ export async function readWebsites(): Promise<SaaSWebsite[]> {
         timeZone:
           typeof website.timeZone === "string" ? website.timeZone : "Asia/Yerevan",
         language: typeof website.language === "string" ? website.language : "hy",
+        ecommerceSettings: normalizeWebsiteEcommerceSettings(
+          website.ecommerceSettings,
+        ),
       };
     });
   } catch {
@@ -292,6 +418,7 @@ export async function createWebsite(input: {
   ownerId: string;
   name: string;
   slug: string;
+  type?: WebsiteType;
 }) {
   const websites = await readWebsites();
   const slug = normalizeSlug(input.slug);
@@ -306,6 +433,7 @@ export async function createWebsite(input: {
     ownerId: input.ownerId,
     name: normalizeName(input.name),
     slug,
+    type: normalizeWebsiteType(input.type),
     domain: null,
     primaryDomain: null,
     domains: [],
@@ -326,6 +454,7 @@ export async function updateWebsiteSettings(input: {
   websiteId: string;
   name: string;
   slug: string;
+  type?: WebsiteType;
   description: string;
   timeZone: string;
   language: string;
@@ -351,10 +480,35 @@ export async function updateWebsiteSettings(input: {
     ...website,
     name: normalizeName(input.name),
     slug,
+    type: normalizeWebsiteType(input.type ?? website.type),
     description: normalizeDescription(input.description),
     timeZone: normalizeOption(input.timeZone, "Asia/Yerevan"),
     language: normalizeOption(input.language, "hy"),
     status: input.status,
+    updatedAt: new Date().toISOString(),
+  };
+
+  await writeWebsites(
+    websites.map((item) => (item.id === website.id ? updatedWebsite : item)),
+  );
+
+  return { website: updatedWebsite };
+}
+
+export async function updateWebsiteEcommerceSettings(input: {
+  websiteId: string;
+  ecommerceSettings: WebsiteEcommerceSettings;
+}) {
+  const websites = await readWebsites();
+  const website = websites.find((item) => item.id === input.websiteId);
+
+  if (!website) {
+    return { error: "Website not found." };
+  }
+
+  const updatedWebsite: SaaSWebsite = {
+    ...website,
+    ecommerceSettings: input.ecommerceSettings,
     updatedAt: new Date().toISOString(),
   };
 

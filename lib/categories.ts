@@ -1,6 +1,7 @@
 // wc-store/lib/categories.ts
 
-import { graphqlFetch } from "./graphql";
+import { getWebsiteGraphQLEndpoint, graphqlFetch } from "./graphql";
+import type { SaaSWebsite } from "@/lib/websites";
 
 export type RawCategoryNode = {
   id: string;
@@ -42,12 +43,18 @@ const CATEGORY_TREE_QUERY = `
 /**
  * Build a tree out of flat WooCommerce categories using parentDatabaseId.
  */
-export async function getCategoryTree(): Promise<CategoryTreeItem[]> {
-  const data = await graphqlFetch<CategoriesResponse>(CATEGORY_TREE_QUERY);
+export async function getCategoryTree(_options?: {
+  website?: SaaSWebsite | null;
+}): Promise<CategoryTreeItem[]> {
+  const endpoint = getWebsiteGraphQLEndpoint(_options?.website);
+  const data = await graphqlFetch<CategoriesResponse>(
+    CATEGORY_TREE_QUERY,
+    undefined,
+    { endpoint },
+  );
 
   const flat = data.productCategories?.nodes ?? [];
 
-  // Map dbId -> CategoryTreeItem
   const byId = new Map<number, CategoryTreeItem>();
 
   for (const cat of flat) {
@@ -67,7 +74,6 @@ export async function getCategoryTree(): Promise<CategoryTreeItem[]> {
 
   const roots: CategoryTreeItem[] = [];
 
-  // Attach children to parents via parentId (which is parentDatabaseId)
   for (const item of byId.values()) {
     if (item.parentId && byId.has(item.parentId)) {
       byId.get(item.parentId)!.children.push(item);
@@ -76,7 +82,6 @@ export async function getCategoryTree(): Promise<CategoryTreeItem[]> {
     }
   }
 
-  // Sort roots and children alphabetically
   function sortTree(nodes: CategoryTreeItem[]) {
     nodes.sort((a, b) => a.name.localeCompare(b.name));
     for (const n of nodes) {

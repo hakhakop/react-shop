@@ -31,7 +31,7 @@ type WebsiteFrontendProps = {
   pageLabelOverride?: string;
   rendererProps?: Omit<
     StorefrontBuilderRendererProps,
-    "layout" | "page" | "pageLabel"
+    "layout" | "page" | "pageLabel" | "website"
   >;
   fallbackContent?: ReactNode;
 };
@@ -162,12 +162,14 @@ export default async function WebsiteFrontend({
         scopedPreviewPage={page}
         scopedPreviewPages={scopedPreviewPages}
         hideSaaSEntry={!isPreview}
+        website={website}
       />
       {layout && hasVisibleLayout ? (
         <StorefrontBuilderRenderer
           layout={layout}
           page={page}
           pageLabel={pageLabelOverride ?? pageLabel(page, customPages)}
+          website={website}
           {...rendererProps}
         />
       ) : (

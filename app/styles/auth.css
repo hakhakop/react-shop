@@ -55,13 +55,29 @@
   gap: 7px;
 }
 
+.saas-readonly-field {
+  display: grid;
+  gap: 7px;
+  border: 1px solid var(--border-soft, #d7dde8);
+  border-radius: 16px;
+  background: var(--saas-panel-soft-bg, rgba(255, 255, 255, 0.54));
+  color: var(--text-main, #111827);
+  padding: 13px 15px;
+}
+
 .saas-auth-field span,
+.saas-readonly-field span,
 .saas-account-details dt {
   color: var(--text-muted, #667085);
   font-size: 12px;
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+}
+
+.saas-readonly-field strong {
+  color: var(--text-main, #111827);
+  font-size: 15px;
 }
 
 .saas-auth-field input,
@@ -1082,6 +1098,16 @@
   justify-content: flex-start;
   gap: 8px;
   padding: 10px 0;
+}
+
+.saas-ecommerce-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.saas-ecommerce-actions .saas-auth-secondary-button {
+  min-height: 40px;
 }
 
 .saas-domain-actions form {

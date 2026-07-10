@@ -14,6 +14,7 @@ import {
   type BuilderLayoutKey,
 } from "../lib/builderLayouts";
 import { resolveScopedPreviewHref } from "../lib/scopedPreviewLinks";
+import type { SaaSWebsite } from "@/lib/websites";
 import CategoryMegaMenu from "./CategoryMegaMenu";
 import HeaderShellView from "./HeaderShellView";
 
@@ -24,6 +25,7 @@ type HeaderShellProps = {
   scopedPreviewPage?: BuilderLayoutKey;
   scopedPreviewPages?: Pick<BuilderCustomPage, "key" | "slug">[];
   hideSaaSEntry?: boolean;
+  website?: SaaSWebsite | null;
 };
 
 export default async function HeaderShell({
@@ -33,6 +35,7 @@ export default async function HeaderShell({
   scopedPreviewPage,
   scopedPreviewPages,
   hideSaaSEntry = false,
+  website,
 }: HeaderShellProps) {
   const [settingsRaw, shellSettingsRaw, homeLayout] = await Promise.all([
     getThemeSettings().catch(() => ({})),
@@ -80,7 +83,7 @@ export default async function HeaderShell({
       scopedPreviewPage={scopedPreviewPage}
       scopedPreviewPages={scopedPreviewPages}
       hideSaaSEntry={hideSaaSEntry}
-      categoriesContent={<CategoryMegaMenu />}
+      categoriesContent={<CategoryMegaMenu website={website} />}
     />
   );
 }

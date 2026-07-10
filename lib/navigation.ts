@@ -1,6 +1,7 @@
 // wc-store/lib/navigation.ts
 
-import { graphqlFetch } from "./graphql";
+import { getWebsiteGraphQLEndpoint, graphqlFetch } from "./graphql";
+import type { SaaSWebsite } from "@/lib/websites";
 
 /**
  * WORDPRESS MENU "Main"
@@ -33,10 +34,6 @@ type CategoriesData = {
   };
 };
 
-/**
- * We fetch only TOP-LEVEL categories (parent = 0), hide empty,
- * then deduplicate by slug so "Accessories" doesn't appear 4 times.
- */
 const PRODUCT_CATEGORIES_QUERY = `
   query ProductCategories {
     productCategories(
@@ -54,12 +51,18 @@ const PRODUCT_CATEGORIES_QUERY = `
   }
 `;
 
-export async function getProductCategories(): Promise<ProductCategory[]> {
+export async function getProductCategories(_options?: {
+  website?: SaaSWebsite | null;
+}): Promise<ProductCategory[]> {
   try {
-    const data = await graphqlFetch<CategoriesData>(PRODUCT_CATEGORIES_QUERY);
+    const endpoint = getWebsiteGraphQLEndpoint(_options?.website);
+    const data = await graphqlFetch<CategoriesData>(
+      PRODUCT_CATEGORIES_QUERY,
+      undefined,
+      { endpoint },
+    );
     const all = data.productCategories?.nodes ?? [];
 
-    // Deduplicate by slug
     const bySlug = new Map<string, ProductCategory>();
     for (const cat of all) {
       if (!bySlug.has(cat.slug)) {
@@ -67,7 +70,6 @@ export async function getProductCategories(): Promise<ProductCategory[]> {
       }
     }
 
-    // Return sorted by name for nicer UI
     const unique = Array.from(bySlug.values());
     unique.sort((a, b) => a.name.localeCompare(b.name, "en"));
 

@@ -1,5 +1,6 @@
 import type { StorefrontBuilderProduct } from "@/components/builder/StorefrontBuilderRenderer";
-import { graphqlFetch } from "@/lib/graphql";
+import { getWebsiteGraphQLEndpoint, graphqlFetch, safeDecodeURI } from "@/lib/graphql";
+import type { SaaSWebsite } from "@/lib/websites";
 
 type WPImage = {
   sourceUrl: string;
@@ -72,8 +73,16 @@ const PRODUCT_QUERY = `
   }
 `;
 
-export async function getStorefrontBuilderProductBySlug(slug: string) {
-  const data = await graphqlFetch<ProductData>(PRODUCT_QUERY, { id: slug });
+export async function getStorefrontBuilderProductBySlug(
+  slug: string,
+  _options?: { website?: SaaSWebsite | null },
+) {
+  const endpoint = getWebsiteGraphQLEndpoint(_options?.website);
+  const data = await graphqlFetch<ProductData>(
+    PRODUCT_QUERY,
+    { id: slug },
+    { endpoint },
+  );
   const product = data.product;
   if (!product) return null;
 
@@ -111,7 +120,11 @@ export async function getStorefrontBuilderProductBySlug(slug: string) {
       priceFormatted,
       imageUrl: product.image?.sourceUrl || undefined,
       images,
-      attributes: product.attributes?.nodes ?? [],
+      attributes: (product.attributes?.nodes ?? []).map((attr) => ({
+        name: safeDecodeURI(attr.name),
+        label: safeDecodeURI(attr.label),
+        options: attr.options.map(safeDecodeURI),
+      })),
     } satisfies StorefrontBuilderProduct,
   };
 }
