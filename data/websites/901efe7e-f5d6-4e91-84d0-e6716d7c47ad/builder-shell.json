@@ -9,9 +9,9 @@
   "headerLayout": "princity",
   "headerBrandMode": "logo",
   "headerBrandText": "WebPages",
-  "headerLogoUrl": "https://cms.webpages.am/wp-content/uploads/2026/06/logo-2-1-scaled.png",
+  "headerLogoUrl": "https://cms.webpages.am/wp-content/uploads/2026/07/sungoods-logo.svg",
   "headerLogoAlt": "WebPages logo",
-  "headerLogoMaxWidth": 161,
+  "headerLogoMaxWidth": 360,
   "headerIconVariant": "muted",
   "headerIconOrder": [
     "wishlist",
@@ -161,5 +161,5 @@
       "parentId": null
     }
   ],
-  "updatedAt": "2026-07-05T05:13:55.844Z"
+  "updatedAt": "2026-07-10T13:16:15.376Z"
 }

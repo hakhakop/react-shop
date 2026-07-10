@@ -560,6 +560,12 @@ function parseBuilderLayoutKey(value: string | null): BuilderLayoutKey | null {
     : null;
 }
 
+const tenantCorePageKeys: Record<string, BuilderLayoutKey> = {
+  cart: "page:cart",
+  checkout: "page:checkout",
+  "my-account": "page:my-account",
+};
+
 function isBuilderCustomPageKey(
   value: string | null,
 ): value is BuilderCustomPageKey {
@@ -1951,9 +1957,20 @@ export default function DashboardBuilder({
   useEffect(() => {
     if (!draftReady) return;
 
-    const nextKey = parseBuilderLayoutKey(
-      searchParams.get("page") ?? searchParams.get("template"),
-    );
+    const requestedPage =
+      searchParams.get("page") ?? searchParams.get("template");
+    const nextKey =
+      parseBuilderLayoutKey(requestedPage) ??
+      (websiteId && requestedPage
+        ? tenantCorePageKeys[requestedPage] ?? null
+        : null) ??
+      (websiteId && requestedPage
+        ? customPages.find(
+            (page) =>
+              page.slug === requestedPage ||
+              page.key === `page:${requestedPage}`,
+          )?.key ?? null
+        : null);
 
     if (!nextKey || nextKey === builderState.page) return;
 
@@ -1965,7 +1982,14 @@ export default function DashboardBuilder({
     setOpenLayoutItemId(null);
     setOpenSlideId(null);
     setPublishStatus("Loaded from menu selection");
-  }, [builderState.page, draftReady, searchParams, storageKeys]);
+  }, [
+    builderState.page,
+    customPages,
+    draftReady,
+    searchParams,
+    storageKeys,
+    websiteId,
+  ]);
 
   useEffect(() => {
     if (!menuTree.length) {

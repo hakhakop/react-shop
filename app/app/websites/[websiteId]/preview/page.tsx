@@ -1,6 +1,9 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import AccessDenied from "@/components/saas/AccessDenied";
+import CartPageClient from "@/components/CartPageClient";
+import CheckoutPageClient from "@/components/CheckoutPageClient";
+import MyAccountPageContent from "@/components/MyAccountPageContent";
 import WebsiteFrontend from "@/components/website/WebsiteFrontend";
 import { getCurrentUser } from "@/lib/auth";
 import { loginRedirectFor } from "@/lib/saasRoutes";
@@ -9,6 +12,7 @@ import {
   canAccessWebsiteBuilder,
   getWebsiteByIdOrSlug,
 } from "@/lib/websites";
+import { getWooCommerceConnection } from "@/lib/woocommerce";
 
 export const dynamic = "force-dynamic";
 
@@ -63,6 +67,27 @@ export default async function WebsitePreviewPage({
           website,
         }).catch(() => null)
       : null;
+  const connection = getWooCommerceConnection(website);
+  const corePageContent =
+    requestedPage === "cart" || requestedPage === "page:cart" ? (
+      <CartPageClient asSlot />
+    ) : requestedPage === "checkout" || requestedPage === "page:checkout" ? (
+      <CheckoutPageClient
+        asSlot
+        wordpressBaseUrl={connection.wordpressBaseUrl}
+      />
+    ) : requestedPage === "my-account" ||
+      requestedPage === "page:my-account" ? (
+      <MyAccountPageContent connection={connection} />
+    ) : null;
+  const corePageFallback =
+    requestedPage === "cart" || requestedPage === "page:cart" ? (
+      <CartPageClient />
+    ) : requestedPage === "checkout" || requestedPage === "page:checkout" ? (
+      <CheckoutPageClient wordpressBaseUrl={connection.wordpressBaseUrl} />
+    ) : corePageContent ? (
+      <main className="page account-bridge-page">{corePageContent}</main>
+    ) : undefined;
 
   return (
     <WebsiteFrontend
@@ -80,8 +105,11 @@ export default async function WebsitePreviewPage({
               ],
               product: productData.product,
             }
-          : undefined
+          : corePageContent
+            ? { pageContent: corePageContent }
+            : undefined
       }
+      fallbackContent={corePageFallback}
     />
   );
 }

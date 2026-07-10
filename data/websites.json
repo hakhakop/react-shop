@@ -115,17 +115,30 @@
   {
     "id": "901efe7e-f5d6-4e91-84d0-e6716d7c47ad",
     "ownerId": "a010b610-5c47-441c-b2ec-00a6e9eb3f88",
-    "name": "new5",
-    "slug": "new5",
-    "type": "business",
+    "name": "SunGoods",
+    "slug": "sungoods",
+    "type": "e-commerce",
     "domain": null,
     "primaryDomain": null,
     "domains": [],
     "description": "",
     "timeZone": "Asia/Yerevan",
     "language": "hy",
-    "status": "creating",
+    "status": "active",
     "createdAt": "2026-07-09T18:59:07.392Z",
-    "updatedAt": "2026-07-09T18:59:07.392Z"
+    "updatedAt": "2026-07-10T13:09:23.493Z",
+    "ecommerceSettings": {
+      "wordpressCmsUrl": "https://sungoods.am",
+      "wordpressGraphqlUrl": "https://sungoods.am/graphql",
+      "wordpressAdminUrl": "https://sungoods.am/wp-admin",
+      "wooCommerceAdminUrl": "https://sungoods.am/wp-admin/admin.php?page=wc-admin",
+      "wooCommerceRestApiUrl": "https://sungoods.am/wp-json/wc/v3",
+      "wordpressAdminUser": "hakop28ol@yahoo.com",
+      "storeStatusNotes": "",
+      "wooCommerceConsumerKey": "ck_529c7edcb75f73c5013ceb4afb7ec1ce1e31a983",
+      "wooCommerceConsumerSecret": "cs_3a15ac6cfed3bf16e9980efa343af65ae6cf36c3",
+      "technicalNotes": "",
+      "updatedAt": "2026-07-10T13:07:10.471Z"
+    }
   }
 ]
