@@ -15,6 +15,8 @@ type DnsCheckStatus =
   | "dns_error"
   | "not_configured";
 
+type DomainVerification = "application" | "dns" | null;
+
 function getConfiguredServerIp() {
   return (
     process.env.WEBSITE_SERVER_PUBLIC_IP ??
@@ -32,12 +34,36 @@ function response(
     error?: string;
     resolvedIps?: string[];
     serverIp: string | null;
+    verification?: DomainVerification;
   },
 ) {
   return NextResponse.json({
     status,
     ...payload,
   });
+}
+
+async function domainServesWebsite(domain: string, websiteId: string) {
+  try {
+    const verificationUrl = new URL(
+      "/api/websites/domain-verification",
+      `https://${domain}`,
+    );
+    const verificationResponse = await fetch(verificationUrl, {
+      cache: "no-store",
+      headers: { Accept: "application/json" },
+      signal: AbortSignal.timeout(6000),
+    });
+    if (!verificationResponse.ok) return false;
+
+    const payload = (await verificationResponse.json()) as {
+      connected?: unknown;
+      websiteId?: unknown;
+    };
+    return payload.connected === true && payload.websiteId === websiteId;
+  } catch {
+    return false;
+  }
 }
 
 export async function POST(request: NextRequest) {
@@ -68,24 +94,49 @@ export async function POST(request: NextRequest) {
   }
 
   const serverIp = getConfiguredServerIp();
-  if (!serverIp) {
-    return response("not_configured", {
-      domain,
-      resolvedIps: [],
-      serverIp: null,
-    });
-  }
+  const servesWebsite = await domainServesWebsite(domain, website.id);
 
   try {
     const records = await dns.lookup(domain, { all: true, family: 4 });
     const resolvedIps = Array.from(new Set(records.map((record) => record.address)));
 
-    if (resolvedIps.includes(serverIp)) {
-      return response("connected", { domain, resolvedIps, serverIp });
+    if (servesWebsite) {
+      return response("connected", {
+        domain,
+        resolvedIps,
+        serverIp: serverIp || null,
+        verification: "application",
+      });
+    }
+
+    if (serverIp && resolvedIps.includes(serverIp)) {
+      return response("connected", {
+        domain,
+        resolvedIps,
+        serverIp,
+        verification: "dns",
+      });
+    }
+
+    if (!serverIp) {
+      return response("not_configured", {
+        domain,
+        resolvedIps,
+        serverIp: null,
+      });
     }
 
     return response("waiting_for_dns", { domain, resolvedIps, serverIp });
   } catch (error) {
+    if (servesWebsite) {
+      return response("connected", {
+        domain,
+        resolvedIps: [],
+        serverIp: serverIp || null,
+        verification: "application",
+      });
+    }
+
     return response("dns_error", {
       domain,
       error: error instanceof Error ? error.message : "DNS lookup failed.",

@@ -23,7 +23,10 @@ import {
   type BuilderSpacingContext,
 } from "../lib/builderSpacing";
 import { normalizeButtonStyleFields } from "../lib/builderButtons";
-import { getWebsiteByDomainHost } from "../lib/websites";
+import {
+  getWebsiteByDomainHost,
+  getWebsiteRouteSegment,
+} from "../lib/websites";
 
 export const metadata: Metadata = {
   title: "Webpages Store",
@@ -338,7 +341,16 @@ ${explicitWordPressProductVars}
                   <main className="site-main">{children}</main>
 
                   {/* Scroll to top + Floating cart bubble */}
-                    <FrontendAdminBar />
+                    <FrontendAdminBar
+                      domainWebsite={
+                        domainWebsite
+                          ? {
+                              ownerId: domainWebsite.ownerId,
+                              routeSegment: getWebsiteRouteSegment(domainWebsite),
+                            }
+                          : undefined
+                      }
+                    />
                     <ScrollToTopButton />
                   {/* Floating cart bubble */}
                     <FloatingCartSummary />

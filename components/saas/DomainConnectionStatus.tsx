@@ -14,6 +14,7 @@ type DnsCheckResponse = {
   resolvedIps?: string[];
   serverIp: string | null;
   status: DnsCheckStatus;
+  verification?: "application" | "dns" | null;
 };
 
 type DomainConnectionStatusProps = {
@@ -63,7 +64,9 @@ export default function DomainConnectionStatus({
 
   const message = useMemo(() => {
     if (status === "connected") {
-      return "DNS is pointing to this server.";
+      return result?.verification === "application"
+        ? "Domain is connected and serving this tenant website."
+        : "DNS is pointing to this server.";
     }
     if (status === "waiting_for_dns") {
       return resolvedIps.length > 0
@@ -74,7 +77,7 @@ export default function DomainConnectionStatus({
       return result?.error || "DNS lookup failed.";
     }
     return "Configure this server's public IP to enable DNS checks.";
-  }, [resolvedIps, result?.error, status]);
+  }, [resolvedIps, result?.error, result?.verification, status]);
 
   async function runCheck() {
     setIsChecking(true);

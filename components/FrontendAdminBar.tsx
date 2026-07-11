@@ -36,6 +36,11 @@ type BuilderPagesResponse = {
   publishedKeys?: string[];
 };
 
+type DomainWebsiteContext = {
+  ownerId: string;
+  routeSegment: string;
+};
+
 function isLocalHost() {
   if (typeof window === "undefined") return false;
   const hostname = window.location.hostname;
@@ -84,11 +89,8 @@ function dashboardTargetForPath(
   pathname: string,
   pageParam: string | null,
   builderPages: WebsiteBuilderPages | null,
-  userRole: AuthMeResponse["user"] extends infer User
-    ? User extends { role: infer Role }
-      ? Role
-      : never
-    : never,
+  user: AuthMeResponse["user"],
+  domainWebsite?: DomainWebsiteContext,
 ): DashboardTarget | null {
   if (pathname.startsWith("/dashboard")) return null;
 
@@ -109,7 +111,28 @@ function dashboardTargetForPath(
     return null;
   }
 
-  if (userRole !== "super_admin") {
+  if (domainWebsite) {
+    const canEditDomainWebsite =
+      user?.id === domainWebsite.ownerId ||
+      user?.role === "admin" ||
+      user?.role === "super_admin";
+    if (!canEditDomainWebsite) return null;
+
+    const pageKey = getBuilderPageKeyForPath(pathname);
+    const websitePageKey = getDefaultWebsiteBuilderPageKey(builderPages);
+    return {
+      href: scopedBuilderHref(domainWebsite.routeSegment, pageKey),
+      label: "Edit This Page",
+      context: "Tenant website",
+      secondaryHref: scopedBuilderHref(
+        domainWebsite.routeSegment,
+        websitePageKey,
+      ),
+      secondaryLabel: "Edit This Website",
+    };
+  }
+
+  if (user?.role !== "super_admin") {
     return null;
   }
 
@@ -125,7 +148,11 @@ function dashboardTargetForPath(
   };
 }
 
-export default function FrontendAdminBar() {
+export default function FrontendAdminBar({
+  domainWebsite,
+}: {
+  domainWebsite?: DomainWebsiteContext;
+}) {
   const pathname = usePathname();
   const [ready, setReady] = useState(false);
   const [visible, setVisible] = useState(false);
@@ -134,8 +161,11 @@ export default function FrontendAdminBar() {
   const [pageParam, setPageParam] = useState<string | null>(null);
   const [builderPages, setBuilderPages] = useState<WebsiteBuilderPages | null>(null);
   const scopedWebsiteId = useMemo(
-    () => scopedWebsiteIdFromPreviewPath(pathname ?? "/"),
-    [pathname],
+    () =>
+      scopedWebsiteIdFromPreviewPath(pathname ?? "/") ??
+      domainWebsite?.routeSegment ??
+      null,
+    [domainWebsite?.routeSegment, pathname],
   );
   const target = useMemo(
     () =>
@@ -143,9 +173,10 @@ export default function FrontendAdminBar() {
         pathname ?? "/",
         pageParam,
         builderPages,
-        saasUser?.role ?? "user",
+        saasUser,
+        domainWebsite,
       ),
-    [builderPages, pageParam, pathname, saasUser?.role],
+    [builderPages, domainWebsite, pageParam, pathname, saasUser],
   );
 
   useEffect(() => {
