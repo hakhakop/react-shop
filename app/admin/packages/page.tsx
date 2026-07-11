@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { CreditCard, Plus, Settings2 } from "lucide-react";
 import AccessDenied from "@/components/saas/AccessDenied";
 import SaaSShell from "@/components/saas/SaaSShell";
 import { getCurrentUser, isSaaSSuperAdmin } from "@/lib/auth";
@@ -95,52 +96,74 @@ export default async function AdminPackagesPage({
       actionHref="/admin/users"
       actionLabel="Users"
     >
-      {params?.error && <p className="saas-auth-error">{params.error}</p>}
-      {params?.saved && <p className="saas-auth-success">Package {params.saved}.</p>}
+      <div className="saas-phase-one-page saas-admin-packages-page">
+        {params?.error && <p className="saas-auth-error">{params.error}</p>}
+        {params?.saved && <p className="saas-auth-success">Package {params.saved}.</p>}
 
-      <section className="saas-panel">
-        <div className="saas-panel-heading">
+        <section className="saas-phase-one-intro is-compact">
           <div>
-            <h2>Create package</h2>
+            <span className="saas-phase-one-kicker"><CreditCard size={14} /> Subscription catalog</span>
+            <h2>Packages that stay out of the way.</h2>
+            <p>Review the catalog at a glance. Open a package only when you need to edit it.</p>
+          </div>
+        </section>
+
+        <div className="saas-admin-management-grid">
+          <section className="saas-admin-management-main">
+            <div className="saas-phase-one-section-heading">
+              <div>
+                <span>Available packages</span>
+                <h2>Subscription packages</h2>
+                <p>{packages.length} package{packages.length === 1 ? "" : "s"} configured.</p>
+              </div>
+            </div>
+
+            {packages.length === 0 ? (
+              <div className="saas-admin-compact-empty">No packages configured yet.</div>
+            ) : (
+              <div className="saas-admin-package-accordion">
+                {packages.map((item) => (
+                  <details className="saas-admin-package-item" key={item.id}>
+                    <summary>
+                      <span className="saas-admin-package-icon"><CreditCard size={18} /></span>
+                      <div>
+                        <strong>{item.name}</strong>
+                        <small>{item.type} · {item.priceText}</small>
+                      </div>
+                      <span className={`saas-phase-one-status ${item.isActive ? "is-active" : "is-suspended"}`}>
+                        {item.isActive ? "Active" : "Inactive"}
+                      </span>
+                      <span className="saas-admin-edit-hint"><Settings2 size={14} /> Edit</span>
+                    </summary>
+                    <div className="saas-admin-package-editor">
+                      <form action={updatePackageAction} className="saas-settings-form">
+                        <input name="id" type="hidden" value={item.id} />
+                        <PackageFields item={item} />
+                        <button className="saas-auth-submit" type="submit">Save Package</button>
+                      </form>
+                      <form action={deletePackageAction}>
+                        <input name="id" type="hidden" value={item.id} />
+                        <button className="saas-auth-secondary-button is-danger" type="submit">Delete Package</button>
+                      </form>
+                    </div>
+                  </details>
+                ))}
+              </div>
+            )}
+          </section>
+
+          <aside className="saas-admin-management-side">
+            <details className="saas-admin-create-panel">
+              <summary><Plus size={16} /> Create package</summary>
+              <form action={createPackageAction} className="saas-settings-form">
+                <PackageFields />
+                <button className="saas-auth-submit" type="submit">Create Package</button>
+              </form>
+            </details>
             <p>Active packages appear on public registration.</p>
-          </div>
+          </aside>
         </div>
-        <form action={createPackageAction} className="saas-settings-form">
-          <PackageFields />
-          <button className="saas-auth-submit" type="submit">
-            Create Package
-          </button>
-        </form>
-      </section>
-
-      <section className="saas-panel">
-        <div className="saas-panel-heading">
-          <div>
-            <h2>Packages</h2>
-            <p>{packages.length} packages configured.</p>
-          </div>
-        </div>
-
-        <div className="saas-admin-package-list">
-          {packages.map((item) => (
-            <article className="saas-admin-package-card" key={item.id}>
-              <form action={updatePackageAction} className="saas-settings-form">
-                <input name="id" type="hidden" value={item.id} />
-                <PackageFields item={item} />
-                <button className="saas-auth-submit" type="submit">
-                  Save Package
-                </button>
-              </form>
-              <form action={deletePackageAction}>
-                <input name="id" type="hidden" value={item.id} />
-                <button className="saas-auth-secondary-button" type="submit">
-                  Delete Package
-                </button>
-              </form>
-            </article>
-          ))}
-        </div>
-      </section>
+      </div>
     </SaaSShell>
   );
 }
