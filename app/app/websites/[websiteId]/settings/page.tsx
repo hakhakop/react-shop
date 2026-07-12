@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { Globe2, Settings2 } from "lucide-react";
 import AccessDenied from "@/components/saas/AccessDenied";
 import DomainConnectionStatus from "@/components/saas/DomainConnectionStatus";
 import SaaSShell from "@/components/saas/SaaSShell";
@@ -561,7 +562,17 @@ export default async function WebsiteSettingsPage({
       actionHref={isSaaSAdmin(user) ? "/admin/websites" : "/app/websites"}
       actionLabel={isSaaSAdmin(user) ? "All Websites" : "My Websites"}
     >
-      <div className="saas-settings-layout">
+      <div className="saas-phase-one-page saas-website-settings-page">
+        <section className="saas-phase-one-intro is-compact">
+          <div>
+            <span className="saas-phase-one-kicker"><Settings2 size={14} /> Website configuration</span>
+            <h2>{website.name}</h2>
+            <p><Globe2 size={14} /> {website.primaryDomain || `/${website.slug}`} · {website.type === "e-commerce" ? "E-Commerce" : "Business"} website</p>
+          </div>
+          <span className={`saas-phase-one-status is-${website.status}`}>{website.status}</span>
+        </section>
+
+        <div className="saas-settings-layout">
         <aside className="saas-settings-sidebar" aria-label="Website settings">
           {settingsSections.map((section) => (
             <a
@@ -781,8 +792,12 @@ export default async function WebsiteSettingsPage({
           </section>
 
           {isEcommerceWebsite && (
-            <section className="saas-panel" id="e-commerce">
-              <div className="saas-panel-heading">
+            <details
+              className="saas-settings-disclosure"
+              id="e-commerce"
+              open={Boolean(query?.ecommerceSaved)}
+            >
+              <summary>
                 <div>
                   <h2>E-Commerce</h2>
                   <p>
@@ -790,7 +805,10 @@ export default async function WebsiteSettingsPage({
                     connection details.
                   </p>
                 </div>
-              </div>
+                <span>Open settings</span>
+              </summary>
+
+              <div className="saas-settings-disclosure-body">
 
               {ecommerceActionLinks.length > 0 ? (
                 <div className="saas-ecommerce-actions">
@@ -929,16 +947,24 @@ export default async function WebsiteSettingsPage({
                   Save E-Commerce Settings
                 </button>
               </form>
-            </section>
+              </div>
+            </details>
           )}
 
-          <section className="saas-panel" id="advanced">
-            <div className="saas-panel-heading">
+          <details
+            className="saas-settings-disclosure"
+            id="advanced"
+            open={Boolean(query?.backupCreated || query?.backupRestored || query?.restoreSource)}
+          >
+            <summary>
               <div>
                 <h2>Backup & Restore</h2>
                 <p>Manage server backups and restore this website&apos;s builder data.</p>
               </div>
-            </div>
+              <span>Open backups</span>
+            </summary>
+
+            <div className="saas-settings-disclosure-body">
 
             <div className="saas-backup-restore-grid">
               <div className="saas-backup-panel">
@@ -1106,17 +1132,19 @@ export default async function WebsiteSettingsPage({
               Your safety is our priority. Before any restore, a safety backup
               of your current data will be created automatically.
             </p>
-          </section>
+            </div>
+          </details>
 
-          <section className="saas-settings-placeholder-grid">
+          <section className="saas-settings-future-list" aria-label="Future settings">
             {futureCards.map((card) => (
-              <article className="saas-settings-placeholder" key={card.title}>
+              <div id={card.title.toLowerCase()} key={card.title}>
                 <span>{card.title}</span>
                 <p>{card.description}</p>
-                <strong>Coming Soon</strong>
-              </article>
+                <strong>Soon</strong>
+              </div>
             ))}
           </section>
+        </div>
         </div>
       </div>
     </SaaSShell>

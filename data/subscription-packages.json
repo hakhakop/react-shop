@@ -2,7 +2,7 @@
   {
     "id": "411e6d1b-3688-4cbb-ad61-533760969d57",
     "name": "🌱 Ստարտ",
-    "description": "✅ 1–5 էջ\r\n✅ Կոնտակտային ձև\r\n✅ Կայքի տեղադրում\r\n✅ Տեխնիկական աջակցություն\r\n🎁 Անվճար webpages.am ենթադոմեյն",
+    "description": "Հարմար է բիզնեսների և անհատների համար, ովքեր ցանկանում են ներկայանալ առցանց և հեշտ կապ հաստատել հաճախորդների հետ։",
     "priceText": "5000 ֏/Ամիս",
     "type": "Business Website",
     "features": [
@@ -15,57 +15,61 @@
     "displayOrder": 1,
     "isActive": true,
     "createdAt": "2026-07-07T06:11:44.506Z",
-    "updatedAt": "2026-07-07T06:11:44.506Z"
+    "updatedAt": "2026-07-12T08:17:19.555Z"
   },
   {
     "id": "business-website",
-    "name": "Business Website",
-    "description": "A polished company website for services, teams, and lead generation.",
-    "priceText": "$299 setup / $49 mo",
-    "type": "Business Website",
+    "name": "🚀 Բիզնես",
+    "description": "Իդեալական է աճող բիզնեսների համար, որոնք ցանկանում են ներկայացնել իրենց ծառայությունները, հրապարակել նորություններ և ընդլայնել իրենց առցանց ներկայությունը։",
+    "priceText": "8000 ֏ /ամիս",
+    "type": "Բիզնես Կայք",
     "features": [
-      "Responsive website",
-      "Core business pages",
-      "Contact forms",
-      "Manual setup within 24 hours"
+      "✅ Ամեն ինչ Start փաթեթից",
+      "✅ Ավելի շատ էջեր",
+      "✅ Ծառայությունների ներկայացման էջեր",
+      "✅ Հայտերի ընդունման համակարգ",
+      "🎁 Անվճար .am կամ .com դոմեյն"
     ],
     "displayOrder": 10,
     "isActive": true,
     "createdAt": "2026-01-01T00:00:00.000Z",
-    "updatedAt": "2026-01-01T00:00:00.000Z"
+    "updatedAt": "2026-07-12T08:21:51.213Z"
   },
   {
     "id": "website-blog",
-    "name": "Website + Blog",
-    "description": "A complete website with a content-ready blog structure.",
-    "priceText": "$399 setup / $79 mo",
-    "type": "Website + Blog",
+    "name": "🛍 Խանութ",
+    "description": "Ամբողջական լուծում է առցանց վաճառքի համար՝ ապրանքների կառավարմամբ, պատվերների ընդունմամբ և էլեկտրոնային խանութի բոլոր անհրաժեշտ հնարավորություններով։",
+    "priceText": "12000 ֏ /ամիս",
+    "type": "Կոմերցիոն",
     "features": [
-      "Everything in Business Website",
-      "Blog-ready pages",
-      "Category structure",
-      "Editorial layout setup"
+      "✅ Business փաթեթի բոլոր հնարավորությունները",
+      "✅ Ապրանքների կատալոգ",
+      "✅ Ապրանքների կատեգորիաներ",
+      "✅ Գնումների զամբյուղ",
+      "✅ Առցանց պատվերների ընդունում",
+      "🎁 Անվճար .am կամ .com դոմեյն"
     ],
     "displayOrder": 20,
     "isActive": true,
     "createdAt": "2026-01-01T00:00:00.000Z",
-    "updatedAt": "2026-01-01T00:00:00.000Z"
+    "updatedAt": "2026-07-12T08:22:06.251Z"
   },
   {
     "id": "e-commerce",
-    "name": "E-Commerce",
-    "description": "A storefront request package for shops that need product selling pages.",
-    "priceText": "$599 setup / $129 mo",
+    "name": "✨ Պրեմիում",
+    "description": "Նախատեսված է պահանջկոտ բիզնեսների համար, որոնք ցանկանում են ունենալ անհատական լուծումներ, առաջադեմ հնարավորություններ, առաջնահերթ աջակցություն և կայքի շարունակական զարգացում։",
+    "priceText": "18000 ֏ /ամիս",
     "type": "E-Commerce",
     "features": [
-      "Storefront design",
-      "Product/catalog structure",
-      "Shopping experience planning",
-      "Manual WooCommerce preparation"
+      "✅ Professional փաթեթի բոլոր հնարավորությունները",
+      "✅ Անհատական կայքի կառուցվածք",
+      "✅ Անհատական ֆունկցիոնալություն",
+      "✅ Զարգացում՝ ըստ Ձեր բիզնեսի պահանջների",
+      "🎁 Անվճար .am կամ .com դոմեյն"
     ],
     "displayOrder": 30,
     "isActive": true,
     "createdAt": "2026-01-01T00:00:00.000Z",
-    "updatedAt": "2026-01-01T00:00:00.000Z"
+    "updatedAt": "2026-07-12T08:24:56.369Z"
   }
 ]

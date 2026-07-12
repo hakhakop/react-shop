@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
+import ThemeToggle from "@/components/ThemeToggle";
 import type { SubscriptionPackage } from "@/lib/subscriptions";
 
 type AuthMode = "login" | "register";
@@ -91,6 +92,9 @@ export default function AuthForm({
       className={`saas-auth-card${isRegister ? " saas-auth-card--onboarding" : ""}`}
       onSubmit={handleSubmit}
     >
+      <div className="saas-auth-theme-toggle">
+        <ThemeToggle variant="ghost" size="md" />
+      </div>
       <aside className="saas-auth-showcase">
         <Link className="saas-auth-brand-link" href="/">
           <span><Sparkles size={16} /></span>
