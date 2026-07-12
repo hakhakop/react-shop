@@ -1,6 +1,14 @@
 "use client";
 
 import Link from "next/link";
+import {
+  ArrowRight,
+  Check,
+  Globe2,
+  LockKeyhole,
+  ShieldCheck,
+  Sparkles,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 import type { SubscriptionPackage } from "@/lib/subscriptions";
@@ -83,15 +91,37 @@ export default function AuthForm({
       className={`saas-auth-card${isRegister ? " saas-auth-card--onboarding" : ""}`}
       onSubmit={handleSubmit}
     >
-      <div className="saas-auth-heading">
-        <span>SaaS dashboard</span>
-        <h1>{isRegister ? "Request your website" : "Welcome back"}</h1>
-        <p>
-          {isRegister
-            ? "Choose a package and share the details we need to prepare your website."
-            : "Log in to your React dashboard workspace."}
-        </p>
-      </div>
+      <aside className="saas-auth-showcase">
+        <Link className="saas-auth-brand-link" href="/">
+          <span><Sparkles size={16} /></span>
+          <strong>WebPages</strong>
+        </Link>
+        <div>
+          <span className="saas-auth-showcase-kicker">
+            {isRegister ? <Globe2 size={14} /> : <LockKeyhole size={14} />}
+            {isRegister ? "Your website service" : "Secure workspace"}
+          </span>
+          <h2>{isRegister ? "A professional website, without the complexity." : "Welcome back to your websites."}</h2>
+          <p>{isRegister ? "Choose your package, tell us about your business, and we’ll prepare the rest." : "Continue building, publishing, and managing from one calm dashboard."}</p>
+        </div>
+        <ul>
+          <li><Check size={14} /> Secure account access</li>
+          <li><Check size={14} /> Your websites in one place</li>
+          <li><Check size={14} /> Support when you need it</li>
+        </ul>
+        <span className="saas-auth-trust"><ShieldCheck size={15} /> WebPages managed service</span>
+      </aside>
+
+      <div className="saas-auth-form-main">
+        <div className="saas-auth-heading">
+          <span>{isRegister ? "Get started" : "SaaS dashboard"}</span>
+          <h1>{isRegister ? "Request your website" : "Sign in"}</h1>
+          <p>
+            {isRegister
+              ? "Select a package and share the details needed for setup."
+              : "Enter your account details to continue."}
+          </p>
+        </div>
 
       {isRegister && (
         <section className="saas-onboarding-section">
@@ -128,7 +158,7 @@ export default function AuthForm({
                       <li key={feature}>{feature}</li>
                     ))}
                   </ul>
-                  <b>{selectedPackageId === item.id ? "Selected" : "Select"}</b>
+                  <b>{selectedPackageId === item.id ? <><Check size={13} /> Selected</> : "Select"}</b>
                 </label>
               ))}
             </div>
@@ -259,6 +289,7 @@ export default function AuthForm({
           : isRegister
             ? "Submit subscription request"
             : "Log in"}
+        {!isSubmitting && <ArrowRight size={16} />}
       </button>
 
       <p className="saas-auth-switch">
@@ -267,6 +298,7 @@ export default function AuthForm({
           {isRegister ? "Login" : "Create one"}
         </Link>
       </p>
+      </div>
     </form>
   );
 }
