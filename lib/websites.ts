@@ -7,6 +7,8 @@ import { ensureWebsiteBuilderData } from "@/lib/websiteBuilderData";
 
 export type WebsiteStatus = "creating" | "active" | "maintenance" | "suspended";
 export type WebsiteType = "business" | "e-commerce";
+export type WebsiteContentLanguage = "hy" | "en" | "ru";
+export const websiteContentLanguages: WebsiteContentLanguage[] = ["hy", "en", "ru"];
 
 export type SaaSWebsite = {
   id: string;
@@ -20,6 +22,8 @@ export type SaaSWebsite = {
   description: string;
   timeZone: string;
   language: string;
+  primaryLanguage: WebsiteContentLanguage;
+  enabledLanguages: WebsiteContentLanguage[];
   status: WebsiteStatus;
   ecommerceSettings?: WebsiteEcommerceSettings;
   createdAt: string;
@@ -241,6 +245,15 @@ export function normalizeWebsiteType(value: unknown): WebsiteType {
   return value === "e-commerce" ? "e-commerce" : "business";
 }
 
+export function normalizeWebsiteContentLanguage(value: unknown): WebsiteContentLanguage {
+  return value === "en" || value === "ru" ? value : "hy";
+}
+
+function normalizeEnabledLanguages(value: unknown, primary: WebsiteContentLanguage) {
+  const requested = Array.isArray(value) ? value : [];
+  return Array.from(new Set([primary, ...requested.map(normalizeWebsiteContentLanguage)]));
+}
+
 export function validateWebsiteSettingsInput(input: {
   name?: unknown;
   slug?: unknown;
@@ -248,6 +261,8 @@ export function validateWebsiteSettingsInput(input: {
   description?: unknown;
   timeZone?: unknown;
   language?: unknown;
+  primaryLanguage?: unknown;
+  enabledLanguages?: unknown;
   status?: unknown;
 }) {
   const base = validateWebsiteInput(input);
@@ -267,7 +282,12 @@ export function validateWebsiteSettingsInput(input: {
     type: normalizeWebsiteType(input.type),
     description: normalizeDescription(input.description),
     timeZone: normalizeOption(input.timeZone, "Asia/Yerevan"),
-    language: normalizeOption(input.language, "hy"),
+    language: normalizeWebsiteContentLanguage(input.primaryLanguage ?? input.language),
+    primaryLanguage: normalizeWebsiteContentLanguage(input.primaryLanguage ?? input.language),
+    enabledLanguages: normalizeEnabledLanguages(
+      input.enabledLanguages,
+      normalizeWebsiteContentLanguage(input.primaryLanguage ?? input.language),
+    ),
     status,
   };
 }
@@ -345,7 +365,12 @@ export async function readWebsites(): Promise<SaaSWebsite[]> {
           typeof website.description === "string" ? website.description : "",
         timeZone:
           typeof website.timeZone === "string" ? website.timeZone : "Asia/Yerevan",
-        language: typeof website.language === "string" ? website.language : "hy",
+        language: normalizeWebsiteContentLanguage(website.primaryLanguage ?? website.language),
+        primaryLanguage: normalizeWebsiteContentLanguage(website.primaryLanguage ?? website.language),
+        enabledLanguages: normalizeEnabledLanguages(
+          website.enabledLanguages,
+          normalizeWebsiteContentLanguage(website.primaryLanguage ?? website.language),
+        ),
         ecommerceSettings: normalizeWebsiteEcommerceSettings(
           website.ecommerceSettings,
         ),
@@ -440,6 +465,8 @@ export async function createWebsite(input: {
     description: "",
     timeZone: "Asia/Yerevan",
     language: "hy",
+    primaryLanguage: "hy",
+    enabledLanguages: ["hy"],
     status: "creating",
     createdAt: now,
     updatedAt: now,
@@ -458,6 +485,8 @@ export async function updateWebsiteSettings(input: {
   description: string;
   timeZone: string;
   language: string;
+  primaryLanguage?: WebsiteContentLanguage;
+  enabledLanguages?: WebsiteContentLanguage[];
   status: WebsiteStatus;
 }) {
   const websites = await readWebsites();
@@ -483,7 +512,12 @@ export async function updateWebsiteSettings(input: {
     type: normalizeWebsiteType(input.type ?? website.type),
     description: normalizeDescription(input.description),
     timeZone: normalizeOption(input.timeZone, "Asia/Yerevan"),
-    language: normalizeOption(input.language, "hy"),
+    language: normalizeWebsiteContentLanguage(input.primaryLanguage ?? input.language),
+    primaryLanguage: normalizeWebsiteContentLanguage(input.primaryLanguage ?? input.language),
+    enabledLanguages: normalizeEnabledLanguages(
+      input.enabledLanguages,
+      normalizeWebsiteContentLanguage(input.primaryLanguage ?? input.language),
+    ),
     status: input.status,
     updatedAt: new Date().toISOString(),
   };

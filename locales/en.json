@@ -183,5 +183,50 @@
   "errors.accessDenied": "Access denied",
   "errors.adminOnly": "Admin only",
   "errors.noPermission": "Your SaaS account does not have permission to view this area."
-  ,"errors.backToDashboard": "Back to dashboard"
+  ,"errors.backToDashboard": "Back to dashboard",
+  "builder.navigation.structure": "Structure",
+  "builder.navigation.elements": "Elements",
+  "builder.navigation.inspector": "Inspector",
+  "builder.navigation.menu": "Menu",
+  "builder.navigation.pages": "Pages",
+  "builder.navigation.templates": "Templates",
+  "builder.navigation.layouts": "Layouts",
+  "builder.navigation.history": "History",
+  "builder.navigation.blocks": "Blocks",
+  "builder.navigation.globalStyles": "Global Styles",
+  "builder.elements.search": "Search {count} elements...",
+  "builder.elements.clearSearch": "Clear search",
+  "builder.elements.resultCount": "Found {count} matching elements",
+  "builder.elements.library": "Element library",
+  "builder.elements.favorites": "Favorites",
+  "builder.elements.recent": "Recently Used",
+  "builder.elements.noFavorites": "No Favorites Yet",
+  "builder.elements.favoriteHint": "Click the star on any element to pin it here.",
+  "builder.elements.noMatches": "No matching elements",
+  "builder.elements.searchHint": "Try another search term.",
+  "builder.elements.addBlock": "+ Add Block",
+  "builder.elements.addFavorite": "Add to favorites",
+  "builder.elements.removeFavorite": "Remove from favorites",
+  "builder.toolbar.previewDevice": "Preview device",
+  "builder.toolbar.undo": "Undo last change",
+  "builder.toolbar.redo": "Redo last change",
+  "builder.toolbar.save": "Save",
+  "builder.toolbar.publish": "Publish",
+  "builder.devices.desktop": "Desktop",
+  "builder.devices.tablet": "Tablet",
+  "builder.devices.mobile": "Mobile",
+  "builder.inspector.content": "Content",
+  "builder.inspector.layout": "Layout",
+  "builder.inspector.spacing": "Spacing",
+  "builder.inspector.styling": "Styling",
+  "builder.inspector.typography": "Typography",
+  "builder.inspector.advanced": "Advanced",
+  "builder.common.close": "Close",
+  "builder.common.none": "None"
+  ,"builder.contentLanguage.label": "Content"
+  ,"builder.contentLanguage.editing": "Editing content:"
+  ,"builder.contentLanguage.fallback": "Fallback"
+  ,"builder.contentLanguage.primaryFallback": "Primary language fallback"
+  ,"websites.primaryLanguage": "Primary Language"
+  ,"websites.enabledLanguages": "Additional Enabled Languages"
 }

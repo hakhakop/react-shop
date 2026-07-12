@@ -10,6 +10,7 @@ import {
   layoutBlockLabels,
 } from "@/components/dashboard/builderRegistry";
 import { createDragGhost } from "@/components/dashboard/builderDragGhost";
+import { useTranslation } from "@/components/i18n/LanguageProvider";
 
 const FAVORITES_KEY = "react-shop-builder-favorite-blocks";
 const RECENT_KEY = "react-shop-builder-recent-blocks";
@@ -69,6 +70,7 @@ export default function ElementLibrary({
   onRenderLayoutBlockIcon,
 }: ElementLibraryProps) {
   const [searchQuery, setSearchQuery] = useState("");
+  const { t } = useTranslation();
   const [favoriteKinds, setFavoriteKinds] = useState<LayoutBlockKind[]>([]);
   const [recentKinds, setRecentKinds] = useState<LayoutBlockKind[]>([]);
   const [groupIdsOrder, setGroupIdsOrder] = useState<string[]>([]);
@@ -224,8 +226,8 @@ export default function ElementLibrary({
         }`}
         aria-label={
           favoriteKinds.includes(blockKind)
-            ? "Remove from favorites"
-            : "Add to favorites"
+            ? t("builder.elements.removeFavorite")
+            : t("builder.elements.addFavorite")
         }
         onClick={(event) => {
           event.preventDefault();
@@ -253,7 +255,7 @@ export default function ElementLibrary({
       </div>
 
       <div className="builder-element-library-card-hover-action">
-        <span>+ Add Block</span>
+        <span>{t("builder.elements.addBlock")}</span>
       </div>
     </div>
   );
@@ -267,14 +269,14 @@ export default function ElementLibrary({
             type="text"
             value={searchQuery}
             onChange={(event) => setSearchQuery(event.target.value)}
-            placeholder={`Search ${availableLayoutBlockKinds.length} elements...`}
+            placeholder={t("builder.elements.search", { count: availableLayoutBlockKinds.length })}
           />
           {searchQuery && (
             <button
               type="button"
               className="builder-search-clear"
               onClick={() => setSearchQuery("")}
-              aria-label="Clear search"
+              aria-label={t("builder.elements.clearSearch")}
             >
               <X size={14} />
             </button>
@@ -282,18 +284,18 @@ export default function ElementLibrary({
         </label>
         {searchQuery && (
           <div className="builder-search-results-info">
-            Found {totalResultsCount} matching elements
+            {t("builder.elements.resultCount", { count: totalResultsCount })}
           </div>
         )}
       </div>
 
-      <div className="builder-element-library" aria-label="Element library">
+      <div className="builder-element-library" aria-label={t("builder.elements.library")}>
         {(!normalizedQuery || favoriteKindsList.length > 0) && (
           <details className="builder-collapse builder-element-library-group" open>
             <summary className="builder-element-library-group-title">
               <span>
                 <ChevronDown size={14} />
-                Favorites
+                {t("builder.elements.favorites")}
               </span>
               <small>{favoriteKindsList.length}</small>
             </summary>
@@ -303,8 +305,8 @@ export default function ElementLibrary({
               ) : (
                 <div className="builder-favorites-empty-state">
                   <Star size={20} className="builder-empty-star-icon" />
-                  <strong>No Favorites Yet</strong>
-                  <span>Click the star on any element to pin it here.</span>
+                  <strong>{t("builder.elements.noFavorites")}</strong>
+                  <span>{t("builder.elements.favoriteHint")}</span>
                 </div>
               )}
             </div>
@@ -316,7 +318,7 @@ export default function ElementLibrary({
             <summary className="builder-element-library-group-title">
               <span>
                 <ChevronDown size={14} />
-                Recently Used
+                {t("builder.elements.recent")}
               </span>
               <small>{recentKindsList.length}</small>
             </summary>
@@ -329,8 +331,8 @@ export default function ElementLibrary({
         {filteredGroups.length === 0 && (
           <div className="builder-empty-state builder-element-library-empty">
             <Search size={22} />
-            <strong>No matching elements</strong>
-            <span>Try another search term.</span>
+            <strong>{t("builder.elements.noMatches")}</strong>
+            <span>{t("builder.elements.searchHint")}</span>
           </div>
         )}
 

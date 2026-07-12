@@ -43,6 +43,13 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import { useTheme } from "@/components/ThemeProvider";
+import { useTranslation } from "@/components/i18n/LanguageProvider";
+import LanguageSwitcher from "@/components/i18n/LanguageSwitcher";
+import {
+  applyContentPatch,
+  isUsingPrimaryFallback,
+  resolveContentSections,
+} from "@/lib/builderContentLanguages";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import type { SaaSUserRole } from "@/lib/auth";
 import type {
@@ -1322,6 +1329,8 @@ export type DashboardBuilderProps = {
   websiteId?: string;
   websiteRouteSegment?: string;
   saasUserRole?: SaaSUserRole;
+  primaryContentLanguage?: string;
+  enabledContentLanguages?: string[];
 };
 
 export default function DashboardBuilder({
@@ -1329,8 +1338,12 @@ export default function DashboardBuilder({
   websiteId,
   websiteRouteSegment = websiteId,
   saasUserRole,
+  primaryContentLanguage = "hy",
+  enabledContentLanguages = [primaryContentLanguage],
 }: DashboardBuilderProps) {
   const router = useRouter();
+  const { t } = useTranslation();
+  const [contentLanguage, setContentLanguage] = useState(primaryContentLanguage);
   const { theme } = useTheme();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -1575,9 +1588,17 @@ export default function DashboardBuilder({
   const undoRef = useRef<() => void>(() => {});
   const redoRef = useRef<() => void>(() => {});
 
-  const selectedSection = useMemo(
+  const rawSelectedSection = useMemo(
     () => builderState.sections.find((section) => section.id === selectedId),
     [builderState.sections, selectedId],
+  );
+  const localizedSections = useMemo(
+    () => resolveContentSections(builderState.sections, contentLanguage, primaryContentLanguage),
+    [builderState.sections, contentLanguage, primaryContentLanguage],
+  );
+  const selectedSection = useMemo(
+    () => localizedSections.find((section) => section.id === selectedId),
+    [localizedSections, selectedId],
   );
   const selectedSectionIsFirstVisible =
     builderState.sections.find((section) => section.visible)?.id ===
@@ -2099,7 +2120,9 @@ export default function DashboardBuilder({
     setBuilderState((current) => ({
       ...current,
       sections: current.sections.map((section) =>
-        section.id === selectedId ? { ...section, ...patch } : section,
+        section.id === selectedId
+          ? applyContentPatch(section, patch, contentLanguage, primaryContentLanguage)
+          : section,
       ),
     }));
   };
@@ -2156,7 +2179,12 @@ export default function DashboardBuilder({
                 const currentBlockKey =
                   block.id ?? `${itemKey}-block-${blockIndex}`;
                 return currentBlockKey === blockKey
-                  ? { ...block, ...patch }
+                  ? applyContentPatch(
+                      block,
+                      patch,
+                      contentLanguage,
+                      primaryContentLanguage,
+                    )
                   : block;
               }),
             };
@@ -2189,10 +2217,12 @@ export default function DashboardBuilder({
                   block.id ?? `${itemKey}-block-${blockIndex}`;
                 if (currentBlockKey !== blockKey) return block;
                 const gridItems = [...(block.gridItems ?? [])];
-                gridItems[itemIndex] = {
-                  ...(gridItems[itemIndex] ?? {}),
-                  ...patch,
-                };
+                gridItems[itemIndex] = applyContentPatch(
+                  gridItems[itemIndex] ?? {},
+                  patch,
+                  contentLanguage,
+                  primaryContentLanguage,
+                );
                 return { ...block, gridItems };
               }),
             };
@@ -2857,9 +2887,9 @@ export default function DashboardBuilder({
     index: number,
     patch: NonNullable<BuilderSection["slides"]>[number],
   ) => {
-    if (!selectedSection) return;
-    const slides = [...(selectedSection.slides ?? [])];
-    slides[index] = { ...(slides[index] ?? {}), ...patch };
+    if (!rawSelectedSection) return;
+    const slides = [...(rawSelectedSection.slides ?? [])];
+    slides[index] = applyContentPatch(slides[index] ?? {}, patch, contentLanguage, primaryContentLanguage);
     updateSelected({ slides });
   };
 
@@ -2902,9 +2932,9 @@ export default function DashboardBuilder({
     index: number,
     patch: NonNullable<BuilderSection["badges"]>[number],
   ) => {
-    if (!selectedSection) return;
-    const badges = [...(selectedSection.badges ?? [])];
-    badges[index] = { ...(badges[index] ?? {}), ...patch };
+    if (!rawSelectedSection) return;
+    const badges = [...(rawSelectedSection.badges ?? [])];
+    badges[index] = applyContentPatch(badges[index] ?? {}, patch, contentLanguage, primaryContentLanguage);
     updateSelected({ badges });
   };
 
@@ -3033,11 +3063,16 @@ export default function DashboardBuilder({
     blockIndex: number,
     patch: BuilderLayoutBlock,
   ) => {
-    if (!selectedSection) return;
-    const layoutItems = [...(selectedSection.layoutItems ?? [])];
+    if (!rawSelectedSection) return;
+    const layoutItems = [...(rawSelectedSection.layoutItems ?? [])];
     const item = layoutItems[columnIndex] ?? {};
     const blocks = [...getLayoutItemBlocks(item)];
-    blocks[blockIndex] = { ...(blocks[blockIndex] ?? {}), ...patch };
+    blocks[blockIndex] = applyContentPatch(
+      blocks[blockIndex] ?? {},
+      patch,
+      contentLanguage,
+      primaryContentLanguage,
+    );
     layoutItems[columnIndex] = { ...item, blocks };
     updateSelected({ layoutItems });
   };
@@ -3048,13 +3083,13 @@ export default function DashboardBuilder({
     slideIndex: number,
     patch: NonNullable<BuilderLayoutBlock["slides"]>[number],
   ) => {
-    if (!selectedSection) return;
-    const layoutItems = [...(selectedSection.layoutItems ?? [])];
+    if (!rawSelectedSection) return;
+    const layoutItems = [...(rawSelectedSection.layoutItems ?? [])];
     const item = layoutItems[columnIndex] ?? {};
     const blocks = [...getLayoutItemBlocks(item)];
     const block = blocks[blockIndex] ?? {};
     const slides = [...(block.slides ?? [])];
-    slides[slideIndex] = { ...(slides[slideIndex] ?? {}), ...patch };
+    slides[slideIndex] = applyContentPatch(slides[slideIndex] ?? {}, patch, contentLanguage, primaryContentLanguage);
     blocks[blockIndex] = { ...block, slides };
     layoutItems[columnIndex] = { ...item, blocks };
     updateSelected({ layoutItems });
@@ -3064,8 +3099,8 @@ export default function DashboardBuilder({
     columnIndex: number,
     blockIndex: number,
   ) => {
-    if (!selectedSection) return;
-    const layoutItems = [...(selectedSection.layoutItems ?? [])];
+    if (!rawSelectedSection) return;
+    const layoutItems = [...(rawSelectedSection.layoutItems ?? [])];
     const item = layoutItems[columnIndex] ?? {};
     const blocks = [...getLayoutItemBlocks(item)];
     const block = blocks[blockIndex] ?? {};
@@ -3127,7 +3162,7 @@ export default function DashboardBuilder({
     const blocks = [...getLayoutItemBlocks(item)];
     const block = blocks[blockIndex] ?? {};
     const badges = [...(block.badges ?? [])];
-    badges[badgeIndex] = { ...(badges[badgeIndex] ?? {}), ...patch };
+    badges[badgeIndex] = applyContentPatch(badges[badgeIndex] ?? {}, patch, contentLanguage, primaryContentLanguage);
     blocks[blockIndex] = { ...block, badges };
     layoutItems[columnIndex] = { ...item, blocks };
     updateSelected({ layoutItems });
@@ -3137,8 +3172,8 @@ export default function DashboardBuilder({
     columnIndex: number,
     blockIndex: number,
   ) => {
-    if (!selectedSection) return;
-    const layoutItems = [...(selectedSection.layoutItems ?? [])];
+    if (!rawSelectedSection) return;
+    const layoutItems = [...(rawSelectedSection.layoutItems ?? [])];
     const item = layoutItems[columnIndex] ?? {};
     const blocks = [...getLayoutItemBlocks(item)];
     const block = blocks[blockIndex] ?? {};
@@ -3191,7 +3226,7 @@ export default function DashboardBuilder({
     const blocks = [...getLayoutItemBlocks(item)];
     const block = blocks[blockIndex] ?? {};
     const gridItems = [...(block.gridItems ?? [])];
-    gridItems[itemIndex] = { ...(gridItems[itemIndex] ?? {}), ...patch };
+    gridItems[itemIndex] = applyContentPatch(gridItems[itemIndex] ?? {}, patch, contentLanguage, primaryContentLanguage);
     blocks[blockIndex] = { ...block, gridItems };
     layoutItems[columnIndex] = { ...item, blocks };
     updateSelected({ layoutItems });
@@ -3201,8 +3236,8 @@ export default function DashboardBuilder({
     columnIndex: number,
     blockIndex: number,
   ) => {
-    if (!selectedSection) return;
-    const layoutItems = [...(selectedSection.layoutItems ?? [])];
+    if (!rawSelectedSection) return;
+    const layoutItems = [...(rawSelectedSection.layoutItems ?? [])];
     const item = layoutItems[columnIndex] ?? {};
     const blocks = [...getLayoutItemBlocks(item)];
     const block = blocks[blockIndex] ?? {};
@@ -3286,7 +3321,7 @@ export default function DashboardBuilder({
     const blocks = [...getLayoutItemBlocks(item)];
     const block = blocks[blockIndex] ?? {};
     const buttons = [...(block.buttons ?? [])];
-    buttons[buttonIndex] = { ...(buttons[buttonIndex] ?? {}), ...patch };
+    buttons[buttonIndex] = applyContentPatch(buttons[buttonIndex] ?? {}, patch, contentLanguage, primaryContentLanguage);
     blocks[blockIndex] = { ...block, buttons };
     layoutItems[columnIndex] = { ...item, blocks };
     updateSelected({ layoutItems });
@@ -5574,6 +5609,11 @@ export default function DashboardBuilder({
       getLayoutItemBlocks={getLayoutItemBlocks}
       inspectorOpen={inspectorOpen}
       inspectorTab={inspectorTab}
+      contentFallbackActive={isUsingPrimaryFallback(
+        selectedLayoutBlock ?? rawSelectedSection,
+        contentLanguage,
+        primaryContentLanguage,
+      )}
       spacingFocusRequest={spacingFocusRequest}
       spacingOverlayEnabled={spacingOverlayEnabled}
       layoutBlockLabels={layoutBlockLabels}
@@ -7356,14 +7396,28 @@ export default function DashboardBuilder({
             {websiteListLabel}
           </button>
         ) : null}
-        <div className="builder-device-toggle" aria-label="Preview device">
+        <LanguageSwitcher />
+        <label className="builder-content-language-select">
+          <span>{t("builder.contentLanguage.editing")}</span>
+          <select value={contentLanguage} onChange={(event) => setContentLanguage(event.target.value)}>
+            {enabledContentLanguages.map((language) => (
+              <option key={language} value={language}>
+                {language === "hy" ? "Հայերեն" : language === "en" ? "English" : "Русский"}
+              </option>
+            ))}
+          </select>
+          {isUsingPrimaryFallback(rawSelectedSection, contentLanguage, primaryContentLanguage) ? (
+            <small>{t("builder.contentLanguage.fallback")}</small>
+          ) : null}
+        </label>
+        <div className="builder-device-toggle" aria-label={t("builder.toolbar.previewDevice")}>
           {(["desktop", "tablet", "mobile"] as PreviewDevice[]).map((item) => (
             <button
               key={item}
               type="button"
               className={device === item ? "is-active" : ""}
               onClick={() => setDevice(item)}
-              title={`${item} preview`}
+              title={t(`builder.devices.${item}` as "builder.devices.desktop" | "builder.devices.tablet" | "builder.devices.mobile")}
             >
               <MonitorSmartphone size={15} />
             </button>
@@ -7404,15 +7458,15 @@ export default function DashboardBuilder({
               <button
                 type="button"
                 onClick={undoBuilder}
-                title="Undo last change"
+                title={t("builder.toolbar.undo")}
               >
                 <Undo2 size={15} />
-                Undo
+                {t("builder.toolbar.undo")}
               </button>
               <button
                 type="button"
                 onClick={redoBuilder}
-                title="Redo last change"
+                title={t("builder.toolbar.redo")}
               >
                 <Redo2 size={15} />
               </button>
@@ -7422,7 +7476,7 @@ export default function DashboardBuilder({
                 onClick={publishLayout}
               >
                 <CloudUpload size={15} />
-                Publish
+                {t("builder.toolbar.publish")}
               </button>
             </>
           )
@@ -8179,7 +8233,7 @@ export default function DashboardBuilder({
             <ProductCategoryFilterProvider key={builderState.page}>
               <PreviewCanvas
                 device={device}
-                sections={builderState.sections}
+                sections={localizedSections}
                 page={builderState.page}
                 previewProducts={previewProducts}
                 previewCategoryTree={previewCategoryTree}

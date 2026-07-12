@@ -11,6 +11,7 @@ import {
   getWebsiteRouteSegment,
 } from "@/lib/websites";
 import { ensureWebsiteBuilderData } from "@/lib/websiteBuilderData";
+import SaaSI18nProvider from "@/components/i18n/SaaSI18nProvider";
 
 export const metadata = {
   title: "Website Builder",
@@ -79,14 +80,16 @@ export default async function WebsiteBuilderPage({
   });
 
   return (
-    <div data-scoped-builder-root>
+    <SaaSI18nProvider userLocale={user.language} persistForUser><div data-scoped-builder-root>
       <Suspense fallback={null}>
         <DashboardBuilder
           websiteId={website.id}
           websiteRouteSegment={getWebsiteRouteSegment(website)}
           saasUserRole={user.role}
+          primaryContentLanguage={website.primaryLanguage}
+          enabledContentLanguages={website.enabledLanguages}
         />
       </Suspense>
-    </div>
+    </div></SaaSI18nProvider>
   );
 }

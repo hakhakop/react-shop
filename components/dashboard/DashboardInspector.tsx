@@ -64,6 +64,7 @@ import {
 import type { CategoryTreeItem } from "@/lib/categories";
 import type { TypographyArea } from "@/lib/builderTypography";
 import type { BuilderShellSettings } from "@/lib/builderShell";
+import { useTranslation } from "@/components/i18n/LanguageProvider";
 import {
   BUILDER_BUTTON_PRESETS,
   buttonColorInputValue,
@@ -768,6 +769,7 @@ type DashboardInspectorProps = {
   ) => BuilderLayoutBlock[];
   inspectorOpen: boolean;
   inspectorTab: InspectorTab;
+  contentFallbackActive?: boolean;
   spacingFocusRequest?: {
     id: number;
     scope: string;
@@ -904,6 +906,7 @@ function flattenCategoryTree(
 }
 
 export default function DashboardInspector(props: DashboardInspectorProps) {
+  const { t } = useTranslation();
   const [isLayoutPickerOpen, setLayoutPickerOpen] = useState(false);
   const [categoryHideSearch, setCategoryHideSearch] = useState("");
   const [openNestedCardId, setOpenNestedCardId] = useState<string | null>(null);
@@ -922,6 +925,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
     getLayoutItemBlocks,
     inspectorOpen,
     inspectorTab,
+    contentFallbackActive = false,
     layoutBlockLabels,
     openLayoutItemId,
     openSlideId,
@@ -1012,31 +1016,31 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
     ? getSupportedTypographyAreas(selectedLayoutBlock.kind ?? "text")
     : [];
   const blockTabs: [InspectorTab, string][] = [
-    ["content", "Content"],
-    ["layout", "Layout"],
-    ["spacing", "Spacing"],
-    ["style", "Styling"],
+    ["content", t("builder.inspector.content")],
+    ["layout", t("builder.inspector.layout")],
+    ["spacing", t("builder.inspector.spacing")],
+    ["style", t("builder.inspector.styling")],
   ];
   if (supportedAreas.length > 0) {
-    blockTabs.push(["typography", "Typography"]);
+    blockTabs.push(["typography", t("builder.inspector.typography")]);
   }
-  blockTabs.push(["advanced", "Advanced"]);
+  blockTabs.push(["advanced", t("builder.inspector.advanced")]);
 
   const inspectorTabs: [InspectorTab, string][] = selectedLayoutBlock
     ? blockTabs
     : selectedLayoutRow
       ? [
-          ["layout", "Layout"],
-          ["spacing", "Spacing"],
-          ["style", "Styling"],
-          ["advanced", "Advanced"],
+          ["layout", t("builder.inspector.layout")],
+          ["spacing", t("builder.inspector.spacing")],
+          ["style", t("builder.inspector.styling")],
+          ["advanced", t("builder.inspector.advanced")],
         ]
       : [
-          ["layout", "Layout"],
-          ["spacing", "Spacing"],
-          ["style", "Styling"],
-          ["advanced", "Advanced"],
-          ["content", "Content"],
+          ["layout", t("builder.inspector.layout")],
+          ["spacing", t("builder.inspector.spacing")],
+          ["style", t("builder.inspector.styling")],
+          ["advanced", t("builder.inspector.advanced")],
+          ["content", t("builder.inspector.content")],
         ];
   const categoryFilterOptions = flattenCategoryTree(previewCategoryTree);
   const filteredCategoryFilterOptions = categoryFilterOptions.filter(
@@ -1657,6 +1661,9 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                   ` > Col ${selectedColumnIndex + 1}`}
                 {selectedLayoutBlock && ` > ${selectedElementLabel}`}
               </span>
+              {contentFallbackActive ? (
+                <small className="builder-content-fallback-badge">{t("builder.contentLanguage.primaryFallback")}</small>
+              ) : null}
             </div>
 
             {spacingOverlayEnabled && (

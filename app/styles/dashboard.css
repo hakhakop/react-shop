@@ -338,6 +338,61 @@
   padding: 0;
 }
 
+.builder-sidebar-top-action-buttons .saas-language-switcher {
+  flex: 0 0 auto;
+  display: inline-flex;
+}
+
+.builder-sidebar-top-action-buttons .saas-language-switcher select {
+  width: 74px;
+  min-height: 28px;
+  height: 28px;
+  border-color: var(--builder-ui-border);
+  border-radius: var(--builder-ui-radius-sm);
+  background-color: var(--builder-ui-surface);
+  color: var(--builder-ui-text);
+  padding: 0 22px 0 7px;
+  font-size: 10.5px;
+  font-weight: 600;
+}
+
+.builder-content-language-select {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 28px;
+  padding: 0 5px;
+  border: 1px solid var(--builder-ui-border);
+  border-radius: var(--builder-ui-radius-sm);
+  background: var(--builder-ui-surface);
+  color: var(--builder-ui-text);
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.builder-content-language-select select {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+}
+
+.builder-content-language-select small {
+  color: #d97706;
+  font-size: 8px;
+}
+
+.builder-content-fallback-badge {
+  margin-left: auto;
+  color: #b45309;
+  background: #fef3c7;
+  border-radius: 999px;
+  padding: 2px 6px;
+  font-size: 9px;
+  white-space: nowrap;
+}
+
 .builder-sidebar-top-action-buttons button:hover {
   background: var(--builder-ui-surface-strong);
   border-color: var(--builder-ui-border-strong);

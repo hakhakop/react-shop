@@ -53,6 +53,7 @@ import {
   type PageTemplateLibraryItem,
 } from "@/components/dashboard/pageTemplateLibrary";
 import { AnimatePresence, motion } from "framer-motion";
+import { useTranslation } from "@/components/i18n/LanguageProvider";
 
 type TemplateLibraryTab = "page" | "section" | "row" | "element";
 
@@ -181,6 +182,7 @@ export default function DashboardSidebar({
   sidebarCollapsed = true,
   onSetSidebarCollapsed,
 }: DashboardSidebarProps) {
+  const { t } = useTranslation();
   const [nestedOpen, setNestedOpen] = useState(false);
   const [templateDraftTitle, setTemplateDraftTitle] = useState("");
   const [templateLibraryTab, setTemplateLibraryTab] =
@@ -261,19 +263,19 @@ export default function DashboardSidebar({
   }[] = [
     {
       tab: "builder",
-      label: "Builder",
+      label: t("builder.navigation.structure"),
       description: "Navigate the page wireframe tree.",
       count: builderState.sections.length,
     },
     {
       tab: "elements",
-      label: "Elements",
+      label: t("builder.navigation.elements"),
       description: "Add blocks to the selected layout column.",
       count: availableLayoutBlockKinds.length,
     },
     {
       tab: "inspector",
-      label: "Inspector",
+      label: t("builder.navigation.inspector"),
       description: "Edit the selected section, column, or element.",
     },
     ...(canUseShellSettings
@@ -287,19 +289,19 @@ export default function DashboardSidebar({
       : []),
     {
       tab: "menu",
-      label: "Menu",
+      label: t("builder.navigation.menu"),
       description: "Manage React menu items.",
       count: shellSettings.menuItems?.length ?? 0,
     },
     {
       tab: "pages",
-      label: "Pages",
+      label: t("builder.navigation.pages"),
       description: "Create and switch editable builder pages.",
       count: corePages.length + customPages.length,
     },
     {
       tab: "templates",
-      label: "Templates",
+      label: t("builder.navigation.templates"),
       description: "Save reusable page starting points.",
       count: savedTemplates.length,
     },
@@ -340,9 +342,9 @@ export default function DashboardSidebar({
       : selectedTemplateTabLabel;
 
   const leftNavTabs = [
-    { tab: "builder" as SidebarTab, label: "Structure", icon: <Layers3 size={18} /> },
-    { tab: "elements" as SidebarTab, label: "Blocks", icon: <Boxes size={18} /> },
-    { tab: "templates" as SidebarTab, label: "Layouts", icon: <LayoutTemplate size={18} /> },
+    { tab: "builder" as SidebarTab, label: t("builder.navigation.structure"), icon: <Layers3 size={18} /> },
+    { tab: "elements" as SidebarTab, label: t("builder.navigation.blocks"), icon: <Boxes size={18} /> },
+    { tab: "templates" as SidebarTab, label: t("builder.navigation.layouts"), icon: <LayoutTemplate size={18} /> },
     ...(canUseShellSettings
       ? [
           {
@@ -352,10 +354,10 @@ export default function DashboardSidebar({
           },
         ]
       : []),
-    { tab: "pages" as SidebarTab, label: "Pages", icon: <FileText size={18} /> },
-    { tab: "history" as SidebarTab, label: "History", icon: <History size={18} /> },
-    { tab: "inspector" as SidebarTab, label: "Inspector", icon: <Settings size={18} /> },
-    { tab: "menu" as SidebarTab, label: "Menu", icon: <Menu size={18} /> },
+    { tab: "pages" as SidebarTab, label: t("builder.navigation.pages"), icon: <FileText size={18} /> },
+    { tab: "history" as SidebarTab, label: t("builder.navigation.history"), icon: <History size={18} /> },
+    { tab: "inspector" as SidebarTab, label: t("builder.navigation.inspector"), icon: <Settings size={18} /> },
+    { tab: "menu" as SidebarTab, label: t("builder.navigation.menu"), icon: <Menu size={18} /> },
   ];
 
   useEffect(() => {

@@ -147,6 +147,8 @@ async function saveWebsiteSettingsAction(formData: FormData) {
     description: formData.get("description"),
     timeZone: formData.get("timeZone"),
     language: formData.get("language"),
+    primaryLanguage: formData.get("primaryLanguage"),
+    enabledLanguages: formData.getAll("enabledLanguages"),
     status: formData.get("status"),
   });
 
@@ -161,6 +163,8 @@ async function saveWebsiteSettingsAction(formData: FormData) {
     description: string;
     timeZone: string;
     language: string;
+    primaryLanguage: "hy" | "en" | "ru";
+    enabledLanguages: ("hy" | "en" | "ru")[];
     status: WebsiteStatus;
   };
 
@@ -643,13 +647,28 @@ export default async function WebsiteSettingsPage({
               </label>
 
               <label className="saas-auth-field">
-                <span><T k="websites.language" /></span>
-                <select name="language" defaultValue={website.language}>
+                <span><T k="websites.primaryLanguage" /></span>
+                <select name="primaryLanguage" defaultValue={website.primaryLanguage}>
                   <option value="hy">Armenian</option>
                   <option value="en">English</option>
                   <option value="ru">Russian</option>
                 </select>
               </label>
+
+              <fieldset className="saas-auth-field">
+                <span><T k="websites.enabledLanguages" /></span>
+                {(["hy", "en", "ru"] as const).map((language) => (
+                  <label key={language}>
+                    <input
+                      type="checkbox"
+                      name="enabledLanguages"
+                      value={language}
+                      defaultChecked={website.enabledLanguages.includes(language)}
+                    />
+                    {language === "hy" ? "Հայերեն" : language === "en" ? "English" : "Русский"}
+                  </label>
+                ))}
+              </fieldset>
 
               <label className="saas-auth-field">
                 <span><T k="websites.status" /></span>

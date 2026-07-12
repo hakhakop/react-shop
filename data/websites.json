@@ -15,7 +15,11 @@
     "description": "Hey you are what the rights",
     "timeZone": "Asia/Yerevan",
     "language": "hy",
-    "type": "business"
+    "type": "business",
+    "primaryLanguage": "hy",
+    "enabledLanguages": [
+      "hy"
+    ]
   },
   {
     "id": "614be964-b02f-43de-8fbf-1bc633494479",
@@ -31,7 +35,11 @@
     "description": "",
     "timeZone": "Asia/Yerevan",
     "language": "hy",
-    "type": "business"
+    "type": "business",
+    "primaryLanguage": "hy",
+    "enabledLanguages": [
+      "hy"
+    ]
   },
   {
     "id": "4fe2c519-6a13-4462-a67d-f547a2d71a08",
@@ -47,7 +55,11 @@
     "description": "hey hey hey",
     "timeZone": "Asia/Yerevan",
     "language": "hy",
-    "type": "business"
+    "type": "business",
+    "primaryLanguage": "hy",
+    "enabledLanguages": [
+      "hy"
+    ]
   },
   {
     "id": "82339d1e-f7a3-490d-9528-a1107179278e",
@@ -64,8 +76,13 @@
     "language": "hy",
     "status": "maintenance",
     "createdAt": "2026-07-02T15:12:01.040Z",
-    "updatedAt": "2026-07-09T19:18:47.415Z",
-    "type": "e-commerce"
+    "updatedAt": "2026-07-12T14:03:17.675Z",
+    "type": "e-commerce",
+    "primaryLanguage": "hy",
+    "enabledLanguages": [
+      "hy",
+      "en"
+    ]
   },
   {
     "id": "7985de5a-a8a7-4526-8359-dd23ddc84bbb",
@@ -81,7 +98,11 @@
     "status": "active",
     "createdAt": "2026-07-07T06:15:00.591Z",
     "updatedAt": "2026-07-09T17:30:58.169Z",
-    "type": "business"
+    "type": "business",
+    "primaryLanguage": "hy",
+    "enabledLanguages": [
+      "hy"
+    ]
   },
   {
     "id": "5a89c262-09cc-440f-bd06-50841a0a49f5",
@@ -110,7 +131,11 @@
       "wooCommerceConsumerSecret": "cs_b13d2a5da4df94fbbdc4ce25f13dbc5f86b626cc",
       "technicalNotes": "",
       "updatedAt": "2026-07-10T06:01:49.851Z"
-    }
+    },
+    "primaryLanguage": "hy",
+    "enabledLanguages": [
+      "hy"
+    ]
   },
   {
     "id": "901efe7e-f5d6-4e91-84d0-e6716d7c47ad",
@@ -141,6 +166,10 @@
       "wooCommerceConsumerSecret": "cs_3a15ac6cfed3bf16e9980efa343af65ae6cf36c3",
       "technicalNotes": "",
       "updatedAt": "2026-07-10T13:07:10.471Z"
-    }
+    },
+    "primaryLanguage": "hy",
+    "enabledLanguages": [
+      "hy"
+    ]
   }
 ]

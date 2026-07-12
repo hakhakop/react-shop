@@ -6,21 +6,21 @@
   "topToolbarMeta": "AMD ֏",
   "headerBackgroundMode": "glass",
   "headerTextMode": "auto",
-  "headerLayout": "pill",
-  "headerBrandMode": "both",
+  "headerLayout": "princity",
+  "headerBrandMode": "brand",
   "headerBrandText": "WebPages",
   "headerLogoUrl": "https://cms.webpages.am/wp-content/uploads/2026/06/logo-2-1-scaled.png",
   "headerLogoAlt": "WebPages logo",
   "headerLogoMaxWidth": 161,
-  "headerIconVariant": "ghost",
+  "headerIconVariant": "muted",
   "headerIconOrder": [
-    "search",
     "wishlist",
     "cart",
     "account",
-    "theme"
+    "theme",
+    "search"
   ],
-  "headerActiveIndicator": "underline",
+  "headerActiveIndicator": "princity",
   "sectionPaddingTop": "large",
   "sectionPaddingBottom": "large",
   "sectionMarginTop": "none",
@@ -161,5 +161,5 @@
       "parentId": null
     }
   ],
-  "updatedAt": "2026-07-05T14:10:44.742Z"
+  "updatedAt": "2026-07-12T14:08:58.391Z"
 }

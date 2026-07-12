@@ -183,5 +183,50 @@
   "errors.accessDenied": "Մուտքն արգելված է",
   "errors.adminOnly": "Միայն ադմինիստրատորի համար",
   "errors.noPermission": "Ձեր SaaS հաշիվը չունի այս բաժինը դիտելու թույլտվություն։"
-  ,"errors.backToDashboard": "Վերադառնալ կառավարման վահանակ"
+  ,"errors.backToDashboard": "Վերադառնալ կառավարման վահանակ",
+  "builder.navigation.structure": "Կառուցվածք",
+  "builder.navigation.elements": "Տարրեր",
+  "builder.navigation.inspector": "Տեսուչ",
+  "builder.navigation.menu": "Մենյու",
+  "builder.navigation.pages": "Էջեր",
+  "builder.navigation.templates": "Ձևանմուշներ",
+  "builder.navigation.layouts": "Դասավորություններ",
+  "builder.navigation.history": "Պատմություն",
+  "builder.navigation.blocks": "Բլոկներ",
+  "builder.navigation.globalStyles": "Ընդհանուր ոճեր",
+  "builder.elements.search": "Որոնել {count} տարրերում...",
+  "builder.elements.clearSearch": "Մաքրել որոնումը",
+  "builder.elements.resultCount": "Գտնվել է {count} համապատասխան տարր",
+  "builder.elements.library": "Տարրերի գրադարան",
+  "builder.elements.favorites": "Ընտրյալներ",
+  "builder.elements.recent": "Վերջերս օգտագործված",
+  "builder.elements.noFavorites": "Ընտրյալներ դեռ չկան",
+  "builder.elements.favoriteHint": "Սեղմեք որևէ տարրի աստղին՝ այն այստեղ ամրացնելու համար։",
+  "builder.elements.noMatches": "Համապատասխան տարրեր չկան",
+  "builder.elements.searchHint": "Փորձեք այլ որոնման բառ։",
+  "builder.elements.addBlock": "+ Ավելացնել բլոկ",
+  "builder.elements.addFavorite": "Ավելացնել ընտրյալներին",
+  "builder.elements.removeFavorite": "Հեռացնել ընտրյալներից",
+  "builder.toolbar.previewDevice": "Նախադիտման սարք",
+  "builder.toolbar.undo": "Հետարկել վերջին փոփոխությունը",
+  "builder.toolbar.redo": "Կրկնել վերջին փոփոխությունը",
+  "builder.toolbar.save": "Պահպանել",
+  "builder.toolbar.publish": "Հրապարակել",
+  "builder.devices.desktop": "Համակարգիչ",
+  "builder.devices.tablet": "Պլանշետ",
+  "builder.devices.mobile": "Հեռախոս",
+  "builder.inspector.content": "Բովանդակություն",
+  "builder.inspector.layout": "Դասավորություն",
+  "builder.inspector.spacing": "Բացատներ",
+  "builder.inspector.styling": "Ոճավորում",
+  "builder.inspector.typography": "Տառատեսակներ",
+  "builder.inspector.advanced": "Ընդլայնված",
+  "builder.common.close": "Փակել",
+  "builder.common.none": "Չկա"
+  ,"builder.contentLanguage.label": "Բովանդակություն"
+  ,"builder.contentLanguage.editing": "Խմբագրվող բովանդակություն՝"
+  ,"builder.contentLanguage.fallback": "Հիմնականից"
+  ,"builder.contentLanguage.primaryFallback": "Օգտագործվում է հիմնական լեզուն"
+  ,"websites.primaryLanguage": "Հիմնական լեզու"
+  ,"websites.enabledLanguages": "Լրացուցիչ ակտիվ լեզուներ"
 }

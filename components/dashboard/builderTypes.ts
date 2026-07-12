@@ -206,6 +206,7 @@ import type {
 
 
 export type BuilderLayoutBlock = {
+  contentTranslations?: BuilderContentTranslations;
   id?: string;
   kind?: LayoutBlockKind;
   eyebrow?: string;
@@ -222,6 +223,7 @@ export type BuilderLayoutBlock = {
   buttonsLayout?: "inline" | "stacked";
   buttonGap?: string;
   buttons?: {
+    contentTranslations?: BuilderContentTranslations;
     id?: string;
     label?: string;
     url?: string;
@@ -314,6 +316,7 @@ export type BuilderLayoutBlock = {
   gridShowText?: boolean;
   gridShowButton?: boolean;
   gridItems?: {
+    contentTranslations?: BuilderContentTranslations;
     id?: string;
     imageUrl?: string;
     imageAlt?: string;
@@ -385,6 +388,7 @@ export type WordPressMediaItem = {
 };
 
 export type BuilderSection = {
+  contentTranslations?: BuilderContentTranslations;
   id: string;
   kind: SectionKind;
   title: string;
@@ -494,6 +498,7 @@ export type BuilderSection = {
     rowAnimation?: BuilderAnimationSettings;
   }[];
   badges?: {
+    contentTranslations?: BuilderContentTranslations;
     id?: string;
     label?: string;
     title?: string;
@@ -504,6 +509,7 @@ export type BuilderSection = {
     listIconSize?: number;
   }[];
   slides?: {
+    contentTranslations?: BuilderContentTranslations;
     id?: string;
     title?: string;
     subtitle?: string;
@@ -578,6 +584,11 @@ export type BuilderSection = {
   textGradientCustomMiddleOffset?: number;
   textGradientCustomEndOffset?: number;
 };
+
+export type BuilderContentTranslations = Record<
+  string,
+  Record<string, unknown>
+>;
 
 export type BuilderState = {
   page: BuilderLayoutKey;

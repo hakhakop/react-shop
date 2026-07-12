@@ -45,7 +45,7 @@
         "bottomMargin": "none",
         "layout": "whole",
         "layoutColumns": 1,
-        "layoutRows": 1,
+        "layoutRows": 2,
         "backgroundEffect": "aurora",
         "antigravitySpeed": 1.8,
         "antigravityParticleCount": 260,
@@ -173,7 +173,7 @@
                 "kind": "hero",
                 "eyebrow": "Բարի գալուստ webpages ձեր վեբ էջերի ստեղծման գործիքը",
                 "title": "[Ընտրեք փաթեթը |տրամադրեք տեղեկությունը| ձեր կայքը պատրաստ է]",
-                "body": "Կայք, հոսթինգ և սպասարկում՝ մեկ պարզ փաթեթով",
+                "body": "<p><strong>Վեբկայք</strong>, հոսթինգ և սպասարկում՝ մեկ պարզ փաթեթով</p>",
                 "buttonLabel": "Բաժանորդագրվել",
                 "buttonUrl": "https://webpages.am/#packages",
                 "carouselSettings": {
@@ -244,7 +244,42 @@
                   }
                 },
                 "buttons": [],
-                "typewriterMobileReservedLines": 3
+                "typewriterMobileReservedLines": 3,
+                "contentTranslations": {
+                  "en": {
+                    "body": "<p>Website, հոսթինգ և սպասարկում՝ մեկ պարզ փաթեթով</p>",
+                    "title": "[Choose the  Package",
+                    "typewriterPhrases": [
+                      "Choose the  Package",
+                      "Provide the information",
+                      "Your website is ready"
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "id": "layout-row-mrhvkvb0-column-1",
+            "rowId": "layout-row-mrhvkvb0",
+            "rowLayout": "whole",
+            "blocks": [
+              {
+                "id": "hero-block-mrhvl3fu-wk6k5",
+                "kind": "hero",
+                "eyebrow": "Featured",
+                "title": "Hero Element",
+                "body": "<p>A <strong>ուժեղ</strong> visual opening with editable copy and action.</p>",
+                "buttonLabel": "Learn more",
+                "buttonUrl": "/",
+                "carouselSettings": {
+                  "variant": "default"
+                },
+                "contentTranslations": {
+                  "en": {
+                    "body": "<p>A <strong>strong</strong> visual opening with editable copy and action.</p>"
+                  }
+                }
               }
             ]
           }
@@ -256,7 +291,10 @@
         },
         "contentVerticalAlign": "center",
         "sectionHeight": "viewport",
-        "pullUnderHeader": true
+        "pullUnderHeader": true,
+        "contentTranslations": {
+          "en": {}
+        }
       },
       {
         "id": "contentLayout-mq4z4n9g-2ttwl",
@@ -1365,7 +1403,7 @@
         ]
       }
     ],
-    "updatedAt": "2026-07-03T03:26:12.900Z"
+    "updatedAt": "2026-07-12T14:19:17.337Z"
   },
   "shop": {
     "version": 1,
