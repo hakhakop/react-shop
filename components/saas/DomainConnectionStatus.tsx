@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "@/components/i18n/LanguageProvider";
 
 type DnsCheckStatus =
   | "connected"
@@ -21,13 +22,6 @@ type DomainConnectionStatusProps = {
   domain: string;
   isPrimary: boolean;
   websiteId: string;
-};
-
-const statusLabels: Record<DnsCheckStatus, string> = {
-  connected: "Connected",
-  waiting_for_dns: "Waiting for DNS",
-  dns_error: "DNS Error",
-  not_configured: "Not Configured",
 };
 
 async function checkDomainDns(websiteId: string, domain: string) {
@@ -56,6 +50,13 @@ export default function DomainConnectionStatus({
   const [isChecking, setIsChecking] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [didCopy, setDidCopy] = useState(false);
+  const { t } = useTranslation();
+  const statusLabels: Record<DnsCheckStatus, string> = {
+    connected: t("domain.connected"),
+    waiting_for_dns: t("domain.waiting"),
+    dns_error: t("domain.dnsError"),
+    not_configured: t("domain.notConfigured"),
+  };
 
   const status = result?.status ?? "not_configured";
   const serverIp = result?.serverIp;
@@ -109,17 +110,17 @@ export default function DomainConnectionStatus({
       <div className="saas-domain-connection-header">
         <div>
           <span className="saas-domain-name">{domain}</span>
-          {isPrimary && <strong className="saas-domain-primary">Primary</strong>}
+          {isPrimary && <strong className="saas-domain-primary">{t("domain.primary")}</strong>}
         </div>
         <span className={`saas-domain-status is-${status}`}>
-          {isChecking ? "Checking..." : statusLabels[status]}
+          {isChecking ? t("domain.checking") : statusLabels[status]}
         </span>
       </div>
 
       <div className="saas-domain-progress" aria-label="Domain setup progress">
-        <span className="is-complete">Domain Added</span>
+        <span className="is-complete">{t("domain.added")}</span>
         <span className={dnsComplete ? "is-complete" : "is-pending"}>
-          DNS Check
+          {t("domain.dnsCheck")}
         </span>
         <span className="is-next">Apache Proxy - Coming Next</span>
         <span className="is-next">SSL Certificate - Coming Next</span>
@@ -139,7 +140,7 @@ export default function DomainConnectionStatus({
           onClick={copyServerIp}
           type="button"
         >
-          {didCopy ? "Copied" : "Copy"}
+          {didCopy ? t("domain.copied") : t("domain.copy")}
         </button>
       </div>
 
@@ -149,7 +150,7 @@ export default function DomainConnectionStatus({
         onClick={runCheck}
         type="button"
       >
-        {isChecking ? "Checking DNS..." : "Check DNS"}
+        {isChecking ? t("domain.checkingDns") : t("domain.checkDns")}
       </button>
     </div>
   );

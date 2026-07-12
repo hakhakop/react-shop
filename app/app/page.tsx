@@ -15,6 +15,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { getWebsitesForOwner } from "@/lib/websites";
 import { loginRedirectFor } from "@/lib/saasRoutes";
 import { getDefaultWebsiteBuilderLinks } from "@/lib/websiteBuilderLinks.server";
+import { T } from "@/components/i18n/LanguageProvider";
 
 export const dynamic = "force-dynamic";
 
@@ -47,48 +48,44 @@ export default async function AppDashboardPage({
   );
 
   return (
-    <SaaSShell user={user} title="Dashboard">
+    <SaaSShell user={user} title={<T k="dashboard.title" />}>
       <div className="saas-phase-one-page saas-dashboard-home">
         {params?.registered === "1" && (
           <section className="saas-auth-success">
-            Your subscription request has been received. We will prepare and configure
-            your website within 24 hours.
+            <T k="dashboard.registrationSuccess" />
           </section>
         )}
 
         <section className="saas-phase-one-intro">
           <div>
             <span className="saas-phase-one-kicker">
-              <Sparkles size={14} /> Website overview
+              <Sparkles size={14} /> <T k="dashboard.overview" />
             </span>
-            <h2>Everything you own, in one calm workspace.</h2>
-            <p>
-              Manage your websites, monitor their status, and continue building
-              from where you left off.
-            </p>
+            <h2><T k="dashboard.heading" /></h2>
+            <p><T k="dashboard.description" /></p>
           </div>
           <Link className="saas-phase-one-primary-action" href="/app/websites/new">
-            <Plus size={17} /> Create Website
+            <Plus size={17} /> <T k="websites.create" />
           </Link>
         </section>
 
         <div className="saas-dashboard-metrics">
           <Link className="saas-dashboard-metric" href="/app/websites">
             <span className="saas-dashboard-metric-icon is-purple"><Globe2 size={20} /></span>
-            <div><small>Total Websites</small><strong>{websites.length}</strong></div>
-            <p>Everything connected to your account.</p>
+            <div><small><T k="dashboard.totalWebsites" /></small><strong>{websites.length}</strong></div>
+            <p><T k="dashboard.totalWebsitesDescription" /></p>
             <ArrowRight className="saas-dashboard-metric-arrow" size={16} />
           </Link>
           <Link className="saas-dashboard-metric" href="/app/websites">
             <span className="saas-dashboard-metric-icon is-green"><CheckCircle2 size={20} /></span>
-            <div><small>Active Websites</small><strong>{activeWebsites.length}</strong></div>
-            <p>Live and ready for visitors.</p>
+            <div><small><T k="dashboard.activeWebsites" /></small><strong>{activeWebsites.length}</strong></div>
+            <p><T k="dashboard.activeWebsitesDescription" /></p>
             <ArrowRight className="saas-dashboard-metric-arrow" size={16} />
           </Link>
           <Link className="saas-dashboard-metric" href="/app/websites">
             <span className="saas-dashboard-metric-icon is-amber"><Clock3 size={20} /></span>
-            <div><small>In Progress</small><strong>{creatingWebsites.length}</strong></div>
-            <p>Drafts currently being prepared.</p>
+            <div><small><T k="dashboard.inProgress" /></small><strong>{creatingWebsites.length}</strong></div>
+            <p><T k="dashboard.inProgressDescription" /></p>
             <ArrowRight className="saas-dashboard-metric-arrow" size={16} />
           </Link>
         </div>
@@ -98,23 +95,23 @@ export default async function AppDashboardPage({
             <section className="saas-phase-one-empty-state">
               <span className="saas-phase-one-empty-icon"><Globe2 size={28} /></span>
               <div>
-                <h2>Your first website starts here.</h2>
-                <p>Create a website and it will appear in this workspace.</p>
+                <h2><T k="dashboard.firstWebsite" /></h2>
+                <p><T k="dashboard.firstWebsiteDescription" /></p>
               </div>
               <Link className="saas-phase-one-primary-action" href="/app/websites/new">
-                <Plus size={17} /> Create Website
+                <Plus size={17} /> <T k="websites.create" />
               </Link>
             </section>
           ) : (
             <section className="saas-phase-one-section saas-dashboard-websites-overview">
               <div className="saas-phase-one-section-heading">
                 <div>
-                  <span>Your portfolio</span>
-                  <h2>My Websites</h2>
-                  <p>Choose a website to continue building.</p>
+                  <span><T k="dashboard.portfolio" /></span>
+                  <h2><T k="websites.title" /></h2>
+                  <p><T k="dashboard.chooseWebsite" /></p>
                 </div>
                 <Link className="saas-phase-one-secondary-action" href="/app/websites">
-                  View all <ArrowRight size={15} />
+                  <T k="dashboard.viewAll" /> <ArrowRight size={15} />
                 </Link>
               </div>
               <div className="saas-dashboard-website-list">
@@ -141,30 +138,30 @@ export default async function AppDashboardPage({
               <summary>
                 <span className="saas-dashboard-metric-icon is-blue"><CreditCard size={19} /></span>
                 <div>
-                  <small>Current package</small>
-                  <strong>{user.subscription?.packageName ?? "Not selected"}</strong>
+                  <small><T k="dashboard.currentPackage" /></small>
+                  <strong>{user.subscription?.packageName ?? <T k="common.notSelected" />}</strong>
                 </div>
                 <span className="saas-subscription-chevron" aria-hidden="true">⌄</span>
               </summary>
               <div className="saas-subscription-details">
                 <p>{user.subscription?.priceText ?? "Contact support to select a package."}</p>
                 <div>
-                  <small>Website request</small>
-                  <strong>{user.onboarding?.websiteName ?? "Not submitted"}</strong>
+                  <small><T k="dashboard.websiteRequest" /></small>
+                  <strong>{user.onboarding?.websiteName ?? <T k="common.notSubmitted" />}</strong>
                   <p>{user.onboarding?.businessDescription ?? "Complete your setup information."}</p>
                 </div>
                 <Link href="/app/settings">
-                  Manage account <ArrowRight size={14} />
+                  <T k="dashboard.manageAccount" /> <ArrowRight size={14} />
                 </Link>
               </div>
             </details>
 
             <Link className="saas-dashboard-quick-link" href="/app/websites">
-              <span><Globe2 size={17} /> Manage websites</span>
+              <span><Globe2 size={17} /> <T k="dashboard.manageWebsites" /></span>
               <ArrowRight size={15} />
             </Link>
             <Link className="saas-dashboard-quick-link" href="/app/settings">
-              <span><CreditCard size={17} /> Account settings</span>
+              <span><CreditCard size={17} /> <T k="dashboard.accountSettings" /></span>
               <ArrowRight size={15} />
             </Link>
           </aside>

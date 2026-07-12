@@ -10,6 +10,7 @@ import {
 } from "@/lib/auth";
 import { saveOnboardingLogo } from "@/lib/onboardingUploads";
 import { loginRedirectFor } from "@/lib/saasRoutes";
+import { T } from "@/components/i18n/LanguageProvider";
 
 export const dynamic = "force-dynamic";
 
@@ -63,27 +64,27 @@ export default async function AppSettingsPage({
   const subscription = user.subscription;
 
   return (
-    <SaaSShell user={user} title="Account Settings">
+    <SaaSShell user={user} title={<T k="settings.title" />}>
       {params?.error && <p className="saas-auth-error">{params.error}</p>}
-      {params?.saved && <p className="saas-auth-success">Profile saved.</p>}
+      {params?.saved && <p className="saas-auth-success"><T k="settings.profileSaved" /></p>}
 
       <section className="saas-panel">
-        <h2>Account information</h2>
+        <h2><T k="settings.accountInformation" /></h2>
         <dl className="saas-account-details">
           <div>
-            <dt>Name</dt>
+            <dt><T k="common.name" /></dt>
             <dd>{user.name}</dd>
           </div>
           <div>
-            <dt>Email</dt>
+            <dt><T k="common.email" /></dt>
             <dd>{user.email}</dd>
           </div>
           <div>
-            <dt>Role</dt>
+            <dt><T k="settings.role" /></dt>
             <dd>{user.role}</dd>
           </div>
           <div>
-            <dt>Created</dt>
+            <dt><T k="common.created" /></dt>
             <dd>{new Date(user.createdAt).toLocaleDateString()}</dd>
           </div>
         </dl>
@@ -92,18 +93,18 @@ export default async function AppSettingsPage({
       <section className="saas-panel">
         <div className="saas-panel-heading">
           <div>
-            <h2>Subscription</h2>
+            <h2><T k="settings.subscription" /></h2>
             <p>Package switching is not available in onboarding v1.</p>
           </div>
         </div>
         <div className="saas-dashboard-grid">
           <article className="saas-dashboard-card">
-            <span>Package</span>
-            <strong>{subscription?.packageName ?? "Not selected"}</strong>
+            <span><T k="settings.package" /></span>
+            <strong>{subscription?.packageName ?? <T k="common.notSelected" />}</strong>
             <p>{subscription?.packageType ?? "Contact support to choose a package."}</p>
           </article>
           <article className="saas-dashboard-card">
-            <span>Price / period</span>
+            <span><T k="settings.pricePeriod" /></span>
             <strong>{subscription?.priceText ?? "Contact support"}</strong>
             <p>
               {subscription
@@ -117,8 +118,8 @@ export default async function AppSettingsPage({
       <section className="saas-panel">
         <div className="saas-panel-heading">
           <div>
-            <h2>Business Information</h2>
-            <p>Update the details used to prepare and configure your website.</p>
+            <h2><T k="settings.businessInformation" /></h2>
+            <p><T k="settings.businessDescription" /></p>
           </div>
         </div>
 
@@ -134,63 +135,63 @@ export default async function AppSettingsPage({
 
         <form action={updateOnboardingAction} className="saas-settings-form">
           <label className="saas-auth-field">
-            <span>Company / Business name</span>
+            <span><T k="settings.companyName" /></span>
             <input name="companyName" required defaultValue={onboarding?.companyName ?? ""} />
           </label>
           <label className="saas-auth-field">
-            <span>Logo</span>
+            <span><T k="settings.logo" /></span>
             <input accept="image/*" name="logo" type="file" />
           </label>
           <label className="saas-auth-field">
-            <span>Business category</span>
+            <span><T k="settings.businessCategory" /></span>
             <input name="businessCategory" required defaultValue={onboarding?.businessCategory ?? ""} />
           </label>
           <label className="saas-auth-field">
-            <span>Phone</span>
+            <span><T k="common.phone" /></span>
             <input name="phone" required defaultValue={onboarding?.phone ?? ""} />
           </label>
           <label className="saas-auth-field">
-            <span>Public business email</span>
+            <span><T k="settings.publicEmail" /></span>
             <input name="publicEmail" required type="email" defaultValue={onboarding?.publicEmail ?? ""} />
           </label>
           <label className="saas-auth-field">
-            <span>Address</span>
+            <span><T k="common.address" /></span>
             <input name="address" defaultValue={onboarding?.address ?? ""} />
           </label>
           <label className="saas-auth-field">
-            <span>Facebook link</span>
+            <span><T k="settings.facebook" /></span>
             <input name="facebookUrl" defaultValue={onboarding?.facebookUrl ?? ""} />
           </label>
           <label className="saas-auth-field">
-            <span>Instagram link</span>
+            <span><T k="settings.instagram" /></span>
             <input name="instagramUrl" defaultValue={onboarding?.instagramUrl ?? ""} />
           </label>
           <div className="saas-onboarding-section-heading saas-field-wide">
             <span>Website Request / Setup Information</span>
-            <h2>Website details</h2>
+            <h2><T k="settings.websiteDetails" /></h2>
           </div>
           <label className="saas-auth-field">
-            <span>Website name</span>
+            <span><T k="settings.websiteName" /></span>
             <input name="websiteName" required defaultValue={onboarding?.websiteName ?? ""} />
           </label>
           <label className="saas-auth-field">
-            <span>Preferred domain</span>
+            <span><T k="settings.preferredDomain" /></span>
             <input name="preferredDomain" defaultValue={onboarding?.preferredDomain ?? ""} />
           </label>
           <label className="saas-auth-field saas-field-wide">
-            <span>Short business description</span>
+            <span><T k="settings.shortDescription" /></span>
             <textarea name="businessDescription" required rows={4} defaultValue={onboarding?.businessDescription ?? ""} />
           </label>
           <label className="saas-auth-field saas-field-wide">
-            <span>Preferred colors / style notes</span>
+            <span><T k="settings.styleNotes" /></span>
             <textarea name="styleNotes" rows={3} defaultValue={onboarding?.styleNotes ?? ""} />
           </label>
           <label className="saas-auth-field saas-field-wide">
-            <span>Additional notes</span>
+            <span><T k="settings.additionalNotes" /></span>
             <textarea name="additionalNotes" rows={3} defaultValue={onboarding?.additionalNotes ?? ""} />
           </label>
           <button className="saas-auth-submit" type="submit">
-            Save Profile
+            <T k="settings.saveProfile" />
           </button>
         </form>
       </section>

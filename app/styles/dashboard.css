@@ -11968,3 +11968,13 @@ article.is-selected-column > .builder-preview-box-spacing,
     transparent
   );
 }
+.saas-language-switcher select {
+  min-height: 38px;
+  border: 1px solid var(--border-color, rgba(127, 127, 127, 0.28));
+  border-radius: 10px;
+  background: transparent;
+  color: inherit;
+  padding: 0 28px 0 10px;
+  font: inherit;
+  cursor: pointer;
+}

@@ -3,6 +3,7 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import crypto from "node:crypto";
 import path from "node:path";
 import { getRuntimeDataDir } from "@/lib/runtimeDataDir";
+import type { Locale } from "@/lib/i18n";
 
 export type SaaSUserRole = "user" | "admin" | "super_admin";
 
@@ -12,6 +13,7 @@ export type SaaSUser = {
   passwordHash: string;
   name: string;
   role: SaaSUserRole;
+  language?: Locale;
   subscription?: SaaSUserSubscription;
   onboarding?: SaaSUserOnboarding;
   createdAt: string;
@@ -139,6 +141,7 @@ function isSaaSUser(value: unknown): value is SaaSUser {
     (user.role === "user" ||
       user.role === "admin" ||
       user.role === "super_admin") &&
+    (user.language === undefined || user.language === "en" || user.language === "hy") &&
     (user.subscription === undefined || isUserSubscription(user.subscription)) &&
     (user.onboarding === undefined || isUserOnboarding(user.onboarding)) &&
     typeof user.createdAt === "string" &&
@@ -185,6 +188,7 @@ export function toPublicUser(user: SaaSUser): PublicSaaSUser {
     email: user.email,
     name: user.name,
     role: user.role,
+    language: user.language,
     subscription: user.subscription,
     onboarding: user.onboarding,
     createdAt: user.createdAt,
@@ -361,6 +365,20 @@ export async function updateUserOnboarding(
     updatedAt: new Date().toISOString(),
   };
 
+  await writeUsers(users.map((user) => (user.id === userId ? updatedUser : user)));
+  return { user: updatedUser };
+}
+
+export async function updateUserLanguage(userId: string, language: Locale) {
+  const users = await readUsers();
+  const existing = users.find((user) => user.id === userId);
+  if (!existing) return { error: "User not found." };
+
+  const updatedUser: SaaSUser = {
+    ...existing,
+    language,
+    updatedAt: new Date().toISOString(),
+  };
   await writeUsers(users.map((user) => (user.id === userId ? updatedUser : user)));
   return { user: updatedUser };
 }

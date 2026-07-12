@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useTranslation } from "@/components/i18n/LanguageProvider";
 
 type DeleteWebsiteButtonProps = {
   websiteId: string;
@@ -14,12 +15,13 @@ export default function DeleteWebsiteButton({
 }: DeleteWebsiteButtonProps) {
   const router = useRouter();
   const [isDeleting, setIsDeleting] = useState(false);
+  const { t } = useTranslation();
 
   async function handleDelete() {
     if (isDeleting) return;
 
     const confirmed = window.confirm(
-      `Delete "${websiteName}"? This removes it from your websites list and cannot be undone.`,
+      t("websites.deleteConfirm", { name: websiteName }),
     );
     if (!confirmed) return;
 
@@ -35,12 +37,12 @@ export default function DeleteWebsiteButton({
         const payload = (await response.json().catch(() => null)) as {
           error?: string;
         } | null;
-        throw new Error(payload?.error ?? "Website could not be deleted.");
+        throw new Error(payload?.error ?? t("websites.deleteFailed"));
       }
       router.refresh();
     } catch (error) {
       window.alert(
-        error instanceof Error ? error.message : "Website could not be deleted.",
+        error instanceof Error ? error.message : t("websites.deleteFailed"),
       );
     } finally {
       setIsDeleting(false);
@@ -54,7 +56,7 @@ export default function DeleteWebsiteButton({
       onClick={handleDelete}
       type="button"
     >
-      {isDeleting ? "Deleting..." : "Delete"}
+      {isDeleting ? t("websites.deleting") : t("common.delete")}
     </button>
   );
 }

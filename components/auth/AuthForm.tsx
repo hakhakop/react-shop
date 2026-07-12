@@ -12,6 +12,8 @@ import {
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 import ThemeToggle from "@/components/ThemeToggle";
+import LanguageSwitcher from "@/components/i18n/LanguageSwitcher";
+import { useTranslation } from "@/components/i18n/LanguageProvider";
 import type { SubscriptionPackage } from "@/lib/subscriptions";
 
 type AuthMode = "login" | "register";
@@ -28,6 +30,7 @@ export default function AuthForm({
   packages = [],
 }: AuthFormProps) {
   const router = useRouter();
+  const { t } = useTranslation();
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -66,14 +69,14 @@ export default function AuthForm({
       };
 
       if (!response.ok) {
-        setError(data.error ?? "Authentication failed.");
+        setError(data.error ?? t("auth.failed"));
         return;
       }
 
       if (isRegister) {
         setSuccess(
           data.message ??
-            "Your subscription request has been received. We will prepare and configure your website within 24 hours.",
+            t("dashboard.registrationSuccess"),
         );
         router.push(`${nextPath}${nextPath.includes("?") ? "&" : "?"}registered=1`);
       } else {
@@ -81,7 +84,7 @@ export default function AuthForm({
       }
       router.refresh();
     } catch {
-      setError("Could not reach the auth service. Please try again.");
+      setError(t("auth.unreachable"));
     } finally {
       setIsSubmitting(false);
     }
@@ -93,6 +96,7 @@ export default function AuthForm({
       onSubmit={handleSubmit}
     >
       <div className="saas-auth-theme-toggle">
+        <LanguageSwitcher />
         <ThemeToggle variant="ghost" size="md" />
       </div>
       <aside className="saas-auth-showcase">
@@ -103,39 +107,39 @@ export default function AuthForm({
         <div>
           <span className="saas-auth-showcase-kicker">
             {isRegister ? <Globe2 size={14} /> : <LockKeyhole size={14} />}
-            {isRegister ? "Your website service" : "Secure workspace"}
+            {isRegister ? t("auth.websiteService") : t("auth.secureWorkspace")}
           </span>
-          <h2>{isRegister ? "A professional website, without the complexity." : "Welcome back to your websites."}</h2>
-          <p>{isRegister ? "Choose your package, tell us about your business, and we’ll prepare the rest." : "Continue building, publishing, and managing from one calm dashboard."}</p>
+          <h2>{isRegister ? t("auth.registerHeading") : t("auth.welcomeBack")}</h2>
+          <p>{isRegister ? t("auth.registerDescription") : t("auth.loginDescription")}</p>
         </div>
         <ul>
-          <li><Check size={14} /> Secure account access</li>
-          <li><Check size={14} /> Your websites in one place</li>
-          <li><Check size={14} /> Support when you need it</li>
+          <li><Check size={14} /> {t("auth.secureAccess")}</li>
+          <li><Check size={14} /> {t("auth.websitesOnePlace")}</li>
+          <li><Check size={14} /> {t("auth.support")}</li>
         </ul>
-        <span className="saas-auth-trust"><ShieldCheck size={15} /> WebPages managed service</span>
+        <span className="saas-auth-trust"><ShieldCheck size={15} /> {t("auth.managedService")}</span>
       </aside>
 
       <div className="saas-auth-form-main">
         <div className="saas-auth-heading">
-          <span>{isRegister ? "Get started" : "SaaS dashboard"}</span>
-          <h1>{isRegister ? "Request your website" : "Sign in"}</h1>
+          <span>{isRegister ? t("auth.getStarted") : t("dashboard.title")}</span>
+          <h1>{isRegister ? t("auth.register") : t("auth.login")}</h1>
           <p>
             {isRegister
-              ? "Select a package and share the details needed for setup."
-              : "Enter your account details to continue."}
+              ? t("auth.setupDetails")
+              : t("auth.accountDetails")}
           </p>
         </div>
 
       {isRegister && (
         <section className="saas-onboarding-section">
           <div className="saas-onboarding-section-heading">
-            <span>Subscription</span>
-            <h2>Select a package</h2>
+            <span>{t("auth.subscription")}</span>
+            <h2>{t("auth.selectPackage")}</h2>
           </div>
           {packages.length === 0 ? (
             <p className="saas-auth-error">
-              No active subscription packages are available yet.
+              {t("auth.noPackages")}
             </p>
           ) : (
             <div className="saas-package-grid">
@@ -162,7 +166,7 @@ export default function AuthForm({
                       <li key={feature}>{feature}</li>
                     ))}
                   </ul>
-                  <b>{selectedPackageId === item.id ? <><Check size={13} /> Selected</> : "Select"}</b>
+                  <b>{selectedPackageId === item.id ? <><Check size={13} /> {t("common.selected")}</> : t("common.select")}</b>
                 </label>
               ))}
             </div>
@@ -173,18 +177,18 @@ export default function AuthForm({
       <section className={isRegister ? "saas-onboarding-form-grid" : ""}>
         {isRegister && (
           <div className="saas-onboarding-section-heading saas-field-wide">
-            <span>Account</span>
-            <h2>Your details</h2>
+            <span>{t("auth.account")}</span>
+            <h2>{t("auth.yourDetails")}</h2>
           </div>
         )}
 
         {isRegister && (
           <label className="saas-auth-field">
-            <span>Full name</span>
+            <span>{t("auth.fullName")}</span>
             <input
               autoComplete="name"
               name="name"
-              placeholder="Your name"
+              placeholder={t("auth.yourName")}
               required
               maxLength={80}
             />
@@ -192,7 +196,7 @@ export default function AuthForm({
         )}
 
         <label className="saas-auth-field">
-          <span>Email</span>
+          <span>{t("common.email")}</span>
           <input
             autoComplete="email"
             name="email"
@@ -203,12 +207,12 @@ export default function AuthForm({
         </label>
 
         <label className="saas-auth-field">
-          <span>Password</span>
+          <span>{t("auth.password")}</span>
           <input
             autoComplete={isRegister ? "new-password" : "current-password"}
             name="password"
             minLength={8}
-            placeholder="At least 8 characters"
+            placeholder={t("auth.passwordHint")}
             required
             type="password"
           />
@@ -217,63 +221,63 @@ export default function AuthForm({
         {isRegister && (
           <>
             <div className="saas-onboarding-section-heading saas-field-wide">
-              <span>Business Information</span>
-              <h2>Company profile</h2>
+              <span>{t("settings.businessInformation")}</span>
+              <h2>{t("auth.companyProfile")}</h2>
             </div>
             <label className="saas-auth-field">
-              <span>Company / Business name</span>
+              <span>{t("settings.companyName")}</span>
               <input name="companyName" required maxLength={120} />
             </label>
             <label className="saas-auth-field">
-              <span>Logo upload</span>
+              <span>{t("auth.logoUpload")}</span>
               <input accept="image/*" name="logo" type="file" />
             </label>
             <label className="saas-auth-field">
-              <span>Business category / industry</span>
+              <span>{t("auth.businessCategory")}</span>
               <input name="businessCategory" required maxLength={100} />
             </label>
             <label className="saas-auth-field">
-              <span>Phone</span>
+              <span>{t("common.phone")}</span>
               <input autoComplete="tel" name="phone" required maxLength={60} />
             </label>
             <label className="saas-auth-field">
-              <span>Public business email</span>
+              <span>{t("settings.publicEmail")}</span>
               <input name="publicEmail" required type="email" />
             </label>
             <label className="saas-auth-field">
-              <span>Address</span>
+              <span>{t("common.address")}</span>
               <input name="address" maxLength={180} />
             </label>
             <label className="saas-auth-field">
-              <span>Facebook link</span>
+              <span>{t("settings.facebook")}</span>
               <input name="facebookUrl" maxLength={240} />
             </label>
             <label className="saas-auth-field">
-              <span>Instagram link</span>
+              <span>{t("settings.instagram")}</span>
               <input name="instagramUrl" maxLength={240} />
             </label>
             <div className="saas-onboarding-section-heading saas-field-wide">
-              <span>Website Request</span>
-              <h2>Setup information</h2>
+              <span>{t("auth.websiteRequest")}</span>
+              <h2>{t("auth.setupInformation")}</h2>
             </div>
             <label className="saas-auth-field">
-              <span>Website name</span>
+              <span>{t("settings.websiteName")}</span>
               <input name="websiteName" required maxLength={100} />
             </label>
             <label className="saas-auth-field">
-              <span>Preferred domain</span>
+              <span>{t("settings.preferredDomain")}</span>
               <input name="preferredDomain" maxLength={120} />
             </label>
             <label className="saas-auth-field saas-field-wide">
-              <span>Short business description</span>
+              <span>{t("settings.shortDescription")}</span>
               <textarea name="businessDescription" required rows={4} />
             </label>
             <label className="saas-auth-field saas-field-wide">
-              <span>Preferred colors / style notes</span>
+              <span>{t("settings.styleNotes")}</span>
               <textarea name="styleNotes" rows={3} />
             </label>
             <label className="saas-auth-field saas-field-wide">
-              <span>Additional notes</span>
+              <span>{t("settings.additionalNotes")}</span>
               <textarea name="additionalNotes" rows={3} />
             </label>
           </>
@@ -289,17 +293,17 @@ export default function AuthForm({
         type="submit"
       >
         {isSubmitting
-          ? "Please wait..."
+          ? t("auth.submitting")
           : isRegister
-            ? "Submit subscription request"
-            : "Log in"}
+            ? t("auth.submitRegister")
+            : t("auth.submitLogin")}
         {!isSubmitting && <ArrowRight size={16} />}
       </button>
 
       <p className="saas-auth-switch">
-        {isRegister ? "Already have an account?" : "Don’t have an account?"}{" "}
+        {isRegister ? t("auth.haveAccount") : t("auth.needAccount")}{" "}
         <Link href={isRegister ? "/login" : "/register"}>
-          {isRegister ? "Login" : "Create one"}
+          {isRegister ? t("auth.goToLogin") : t("auth.goToRegister")}
         </Link>
       </p>
       </div>

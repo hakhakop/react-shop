@@ -4,6 +4,7 @@ import { Globe2, Settings2 } from "lucide-react";
 import AccessDenied from "@/components/saas/AccessDenied";
 import DomainConnectionStatus from "@/components/saas/DomainConnectionStatus";
 import SaaSShell from "@/components/saas/SaaSShell";
+import { T } from "@/components/i18n/LanguageProvider";
 import { getCurrentUser, isSaaSAdmin } from "@/lib/auth";
 import { loginRedirectFor } from "@/lib/saasRoutes";
 import {
@@ -557,15 +558,15 @@ export default async function WebsiteSettingsPage({
   return (
     <SaaSShell
       user={user}
-      title="Website Settings"
+      title={<T k="websites.websiteSettings" />}
       eyebrow={website.name}
       actionHref={isSaaSAdmin(user) ? "/admin/websites" : "/app/websites"}
-      actionLabel={isSaaSAdmin(user) ? "All Websites" : "My Websites"}
+      actionLabel={isSaaSAdmin(user) ? <T k="navigation.allWebsites" /> : <T k="websites.title" />}
     >
       <div className="saas-phase-one-page saas-website-settings-page">
         <section className="saas-phase-one-intro is-compact">
           <div>
-            <span className="saas-phase-one-kicker"><Settings2 size={14} /> Website configuration</span>
+            <span className="saas-phase-one-kicker"><Settings2 size={14} /> <T k="websites.configuration" /></span>
             <h2>{website.name}</h2>
             <p><Globe2 size={14} /> {website.primaryDomain || `/${website.slug}`} · {website.type === "e-commerce" ? "E-Commerce" : "Business"} website</p>
           </div>
@@ -581,7 +582,7 @@ export default async function WebsiteSettingsPage({
               href={`#${section.title.toLowerCase()}`}
             >
               {section.title}
-              {!section.available && <span>Soon</span>}
+              {!section.available && <span><T k="common.soon" /></span>}
             </a>
           ))}
         </aside>
@@ -590,8 +591,8 @@ export default async function WebsiteSettingsPage({
           <section className="saas-panel" id="general">
             <div className="saas-panel-heading">
               <div>
-                <h2>General</h2>
-                <p>Manage the basic identity and status of this website.</p>
+                <h2><T k="settings.general" /></h2>
+                <p><T k="settings.generalDescription" /></p>
               </div>
             </div>
 
@@ -599,7 +600,7 @@ export default async function WebsiteSettingsPage({
               <input type="hidden" name="websiteId" value={website.id} />
 
               <label className="saas-auth-field">
-                <span>Website Name</span>
+                <span><T k="settings.websiteName" /></span>
                 <input
                   name="name"
                   required
@@ -609,7 +610,7 @@ export default async function WebsiteSettingsPage({
               </label>
 
               <label className="saas-auth-field">
-                <span>Website Slug</span>
+                <span><T k="websites.slug" /></span>
                 <input
                   name="slug"
                   required
@@ -621,7 +622,7 @@ export default async function WebsiteSettingsPage({
               </label>
 
               <label className="saas-auth-field saas-field-wide">
-                <span>Website Description</span>
+                <span><T k="websites.descriptionLabel" /></span>
                 <textarea
                   name="description"
                   maxLength={240}
@@ -632,7 +633,7 @@ export default async function WebsiteSettingsPage({
               </label>
 
               <label className="saas-auth-field">
-                <span>Website Time Zone</span>
+                <span><T k="websites.timeZone" /></span>
                 <select name="timeZone" defaultValue={website.timeZone}>
                   <option value="Asia/Yerevan">Asia/Yerevan</option>
                   <option value="UTC">UTC</option>
@@ -642,7 +643,7 @@ export default async function WebsiteSettingsPage({
               </label>
 
               <label className="saas-auth-field">
-                <span>Website Language</span>
+                <span><T k="websites.language" /></span>
                 <select name="language" defaultValue={website.language}>
                   <option value="hy">Armenian</option>
                   <option value="en">English</option>
@@ -651,7 +652,7 @@ export default async function WebsiteSettingsPage({
               </label>
 
               <label className="saas-auth-field">
-                <span>Website Status</span>
+                <span><T k="websites.status" /></span>
                 <select
                   name="status"
                   defaultValue={
@@ -666,7 +667,7 @@ export default async function WebsiteSettingsPage({
 
               {user.role === "super_admin" ? (
                 <label className="saas-auth-field">
-                  <span>Website Package / Type</span>
+                  <span><T k="websites.type" /></span>
                   <select name="type" defaultValue={website.type}>
                     <option value="business">Business</option>
                     <option value="e-commerce">E-Commerce</option>
@@ -674,7 +675,7 @@ export default async function WebsiteSettingsPage({
                 </label>
               ) : (
                 <div className="saas-readonly-field">
-                  <span>Website Package / Type</span>
+                  <span><T k="websites.type" /></span>
                   <strong>
                     {website.type === "e-commerce" ? "E-Commerce" : "Business"}
                   </strong>
@@ -683,11 +684,11 @@ export default async function WebsiteSettingsPage({
 
               {query?.error && <p className="saas-auth-error">{query.error}</p>}
               {query?.saved && (
-                <p className="saas-auth-success">Website settings saved.</p>
+                <p className="saas-auth-success"><T k="websites.saved" /></p>
               )}
 
               <button className="saas-auth-submit" type="submit">
-                Save Changes
+                <T k="websites.saveChanges" />
               </button>
             </form>
           </section>
@@ -695,8 +696,8 @@ export default async function WebsiteSettingsPage({
           <section className="saas-panel" id="domains">
             <div className="saas-panel-heading">
               <div>
-                <h2>Domains</h2>
-                <p>Add custom domains manually. DNS and SSL automation come later.</p>
+                <h2><T k="settings.domain" /></h2>
+                <p><T k="settings.domainsDescription" /></p>
               </div>
             </div>
 
@@ -721,7 +722,7 @@ export default async function WebsiteSettingsPage({
                       <input type="hidden" name="websiteId" value={website.id} />
                       <input type="hidden" name="currentDomain" value={domain} />
                       <label className="saas-auth-field">
-                        <span>Domain</span>
+                        <span><T k="domain.label" /></span>
                         <input
                           name="nextDomain"
                           required
@@ -736,7 +737,7 @@ export default async function WebsiteSettingsPage({
 
                     <div className="saas-domain-actions">
                       {domain === website.primaryDomain ? (
-                        <strong>Primary</strong>
+                        <strong><T k="domain.primary" /></strong>
                       ) : (
                         <form action={setPrimaryDomainAction}>
                           <input type="hidden" name="websiteId" value={website.id} />
@@ -765,13 +766,13 @@ export default async function WebsiteSettingsPage({
                 ))}
               </div>
             ) : (
-              <p>No custom domains connected yet.</p>
+              <p><T k="settings.noDomains" /></p>
             )}
 
             <form className="saas-settings-form" action={addWebsiteDomainAction}>
               <input type="hidden" name="websiteId" value={website.id} />
               <label className="saas-auth-field saas-field-wide">
-                <span>Domain</span>
+                <span><T k="domain.label" /></span>
                 <input
                   name="domain"
                   required
@@ -780,10 +781,10 @@ export default async function WebsiteSettingsPage({
                 />
               </label>
               {query?.domainSaved && (
-                <p className="saas-auth-success">Domain added.</p>
+                <p className="saas-auth-success"><T k="settings.domainAdded" /></p>
               )}
               {query?.domainUpdated && (
-                <p className="saas-auth-success">Domain settings updated.</p>
+                <p className="saas-auth-success"><T k="settings.domainUpdated" /></p>
               )}
               <button className="saas-auth-submit" type="submit">
                 Add Domain
@@ -799,13 +800,13 @@ export default async function WebsiteSettingsPage({
             >
               <summary>
                 <div>
-                  <h2>E-Commerce</h2>
+                  <h2><T k="settings.ecommerce" /></h2>
                   <p>
                     Store backend links and manual WordPress/WooCommerce
                     connection details.
                   </p>
                 </div>
-                <span>Open settings</span>
+                <span><T k="settings.openSettings" /></span>
               </summary>
 
               <div className="saas-settings-disclosure-body">
@@ -937,7 +938,7 @@ export default async function WebsiteSettingsPage({
                 </label>
 
                 {query?.ecommerceSaved && (
-                  <p className="saas-auth-success">E-Commerce settings saved.</p>
+                  <p className="saas-auth-success"><T k="settings.ecommerceSaved" /></p>
                 )}
                 {query?.error && (
                   <p className="saas-auth-error">{query.error}</p>
@@ -958,10 +959,10 @@ export default async function WebsiteSettingsPage({
           >
             <summary>
               <div>
-                <h2>Backup & Restore</h2>
-                <p>Manage server backups and restore this website&apos;s builder data.</p>
+                <h2><T k="settings.backups" /></h2>
+                <p><T k="settings.manageBackups" /></p>
               </div>
-              <span>Open backups</span>
+              <span><T k="settings.openBackups" /></span>
             </summary>
 
             <div className="saas-settings-disclosure-body">
@@ -970,8 +971,8 @@ export default async function WebsiteSettingsPage({
               <div className="saas-backup-panel">
                 <div className="saas-backup-panel-heading">
                   <div>
-                    <h3>Backups</h3>
-                    <p>Manage your existing backups. We keep the latest 5 backups.</p>
+                    <h3><T k="settings.backups" /></h3>
+                    <p><T k="settings.backupsDescription" /></p>
                   </div>
                   <form action={createWebsiteBackupAction}>
                     <input type="hidden" name="websiteId" value={website.id} />
@@ -982,22 +983,22 @@ export default async function WebsiteSettingsPage({
                 </div>
 
                 {query?.backupCreated && (
-                  <p className="saas-auth-success">Backup created.</p>
+                  <p className="saas-auth-success"><T k="settings.backupCreated" /></p>
                 )}
 
                 {backups.length > 0 ? (
                   <div className="saas-backup-table">
                     <div className="saas-backup-row is-heading">
-                      <span>Date Created</span>
-                      <span>Version</span>
-                      <span>Size</span>
-                      <span>Actions</span>
+                      <span><T k="settings.dateCreated" /></span>
+                      <span><T k="settings.version" /></span>
+                      <span><T k="settings.size" /></span>
+                      <span><T k="common.actions" /></span>
                     </div>
                     {backups.map((backup, index) => (
                       <div className="saas-backup-row" key={backup.id}>
                         <span>
                           <strong>{formatBackupDate(backup.createdAt)}</strong>
-                          {index === 0 ? <small>Latest</small> : null}
+                          {index === 0 ? <small><T k="settings.latest" /></small> : null}
                         </span>
                         <span>v{backup.exportVersion}</span>
                         <span>{formatBackupSize(backup.sizeBytes)}</span>
@@ -1020,7 +1021,7 @@ export default async function WebsiteSettingsPage({
                     ))}
                   </div>
                 ) : (
-                  <p>No server backups yet.</p>
+                  <p><T k="settings.noBackups" /></p>
                 )}
 
                 <p className="saas-backup-note">
@@ -1032,8 +1033,8 @@ export default async function WebsiteSettingsPage({
               <div className="saas-backup-panel">
                 <div className="saas-backup-panel-heading">
                   <div>
-                    <h3>Restore</h3>
-                    <p>Restore your website from an existing backup or upload one.</p>
+                    <h3><T k="settings.restore" /></h3>
+                    <p><T k="settings.restoreDescription" /></p>
                   </div>
                 </div>
 
@@ -1059,7 +1060,7 @@ export default async function WebsiteSettingsPage({
                   >
                     <input type="hidden" name="websiteId" value={website.id} />
                     <label className="saas-auth-field saas-field-wide">
-                      <span>Select a backup to restore</span>
+                      <span><T k="settings.selectBackup" /></span>
                       <select name="backupId" required defaultValue="">
                         <option value="" disabled>
                           Choose a backup...
@@ -1077,11 +1078,11 @@ export default async function WebsiteSettingsPage({
                       safety backup will be created before restoring.
                     </p>
                     <label className="saas-auth-field saas-field-wide">
-                      <span>Confirm Restore</span>
+                      <span><T k="settings.confirmRestore" /></span>
                       <input name="confirmRestore" type="checkbox" required />
                     </label>
                     {query?.backupRestored && restoreSource === "existing" && (
-                      <p className="saas-auth-success">Website backup restored.</p>
+                      <p className="saas-auth-success"><T k="settings.backupRestored" /></p>
                     )}
                     {query?.error && restoreSource === "existing" && (
                       <p className="saas-auth-error">{query.error}</p>
@@ -1098,7 +1099,7 @@ export default async function WebsiteSettingsPage({
                   >
                     <input type="hidden" name="websiteId" value={website.id} />
                     <label className="saas-auth-field saas-field-wide">
-                      <span>Upload Backup File</span>
+                      <span><T k="settings.uploadBackup" /></span>
                       <input
                         name="backupFile"
                         type="file"
@@ -1111,11 +1112,11 @@ export default async function WebsiteSettingsPage({
                       safety backup will be created before restoring.
                     </p>
                     <label className="saas-auth-field saas-field-wide">
-                      <span>Confirm Restore</span>
+                      <span><T k="settings.confirmRestore" /></span>
                       <input name="confirmRestore" type="checkbox" required />
                     </label>
                     {query?.backupRestored && restoreSource === "upload" && (
-                      <p className="saas-auth-success">Website backup restored.</p>
+                      <p className="saas-auth-success"><T k="settings.backupRestored" /></p>
                     )}
                     {query?.error && restoreSource === "upload" && (
                       <p className="saas-auth-error">{query.error}</p>
@@ -1140,7 +1141,7 @@ export default async function WebsiteSettingsPage({
               <div id={card.title.toLowerCase()} key={card.title}>
                 <span>{card.title}</span>
                 <p>{card.description}</p>
-                <strong>Soon</strong>
+                <strong><T k="common.soon" /></strong>
               </div>
             ))}
           </section>

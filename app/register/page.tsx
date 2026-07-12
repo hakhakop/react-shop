@@ -4,6 +4,7 @@ import AuthForm from "@/components/auth/AuthForm";
 import { getCurrentUser } from "@/lib/auth";
 import { getSafeNextPath } from "@/lib/saasRoutes";
 import { readActiveSubscriptionPackages } from "@/lib/subscriptions";
+import SaaSI18nProvider from "@/components/i18n/SaaSI18nProvider";
 
 export const dynamic = "force-dynamic";
 
@@ -23,8 +24,8 @@ export default async function RegisterPage({
   }
 
   return (
-    <main className="saas-auth-page">
+    <SaaSI18nProvider><main className="saas-auth-page">
       <AuthForm mode="register" nextPath={nextPath} packages={packages} />
-    </main>
+    </main></SaaSI18nProvider>
   );
 }

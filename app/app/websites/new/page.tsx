@@ -8,6 +8,7 @@ import {
   validateWebsiteInput,
 } from "@/lib/websites";
 import { loginRedirectFor } from "@/lib/saasRoutes";
+import { T } from "@/components/i18n/LanguageProvider";
 
 export const dynamic = "force-dynamic";
 
@@ -73,19 +74,16 @@ export default async function NewWebsitePage({
   const params = (await searchParams) ?? {};
 
   return (
-    <SaaSShell user={user} title="Create Website">
+    <SaaSShell user={user} title={<T k="websites.create" />}>
       <form className="saas-auth-card saas-website-form" action={createWebsiteAction}>
         <div className="saas-auth-heading">
-          <span>New website</span>
-          <h1>Create Website</h1>
-          <p>
-            Start with a simple website record. Provisioning, domains, and
-            builder connection will come later.
-          </p>
+          <span><T k="websites.new" /></span>
+          <h1><T k="websites.create" /></h1>
+          <p><T k="websites.newDescription" /></p>
         </div>
 
         <label className="saas-auth-field">
-          <span>Name</span>
+          <span><T k="common.name" /></span>
           <input
             name="name"
             placeholder="My Website"
@@ -96,7 +94,7 @@ export default async function NewWebsitePage({
         </label>
 
         <label className="saas-auth-field">
-          <span>Slug</span>
+          <span><T k="websites.slug" /></span>
           <input
             name="slug"
             placeholder="my-website"
@@ -111,7 +109,7 @@ export default async function NewWebsitePage({
         {params.error && <p className="saas-auth-error">{params.error}</p>}
 
         <button className="saas-auth-submit" type="submit">
-          Create Website
+          <T k="websites.create" />
         </button>
       </form>
     </SaaSShell>

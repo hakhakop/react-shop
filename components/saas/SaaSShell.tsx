@@ -1,40 +1,44 @@
 import Link from "next/link";
 import LogoutButton from "@/components/auth/LogoutButton";
 import ThemeToggle from "@/components/ThemeToggle";
+import LanguageSwitcher from "@/components/i18n/LanguageSwitcher";
+import SaaSI18nProvider from "@/components/i18n/SaaSI18nProvider";
+import { T } from "@/components/i18n/LanguageProvider";
 import { isSaaSAdmin, isSaaSSuperAdmin, type PublicSaaSUser } from "@/lib/auth";
 
 type SaaSShellProps = {
   user: PublicSaaSUser;
-  title: string;
-  eyebrow?: string;
+  title: React.ReactNode;
+  eyebrow?: React.ReactNode;
   actionHref?: string;
-  actionLabel?: string;
+  actionLabel?: React.ReactNode;
   children: React.ReactNode;
 };
 
 const appLinks = [
-  { href: "/app", label: "Dashboard" },
-  { href: "/app/websites", label: "My Websites" },
-  { href: "/app/settings", label: "Settings" },
+  { href: "/app", label: <T k="dashboard.title" /> },
+  { href: "/app/websites", label: <T k="websites.title" /> },
+  { href: "/app/settings", label: <T k="common.settings" /> },
 ];
 
 export default function SaaSShell({
   user,
   title,
-  eyebrow = "SaaS workspace",
+  eyebrow = <T k="dashboard.workspace" />,
   actionHref = "/app/websites",
-  actionLabel = "My Websites",
+  actionLabel = <T k="websites.title" />,
   children,
 }: SaaSShellProps) {
   const canUseAdmin = isSaaSAdmin(user);
   const canManagePackages = isSaaSSuperAdmin(user);
 
   return (
+    <SaaSI18nProvider userLocale={user.language} persistForUser>
     <main className="saas-shell">
       <aside className="saas-shell-sidebar">
         <Link className="saas-shell-brand" href="/app">
           <span>WebPages</span>
-          <strong>Dashboard</strong>
+          <strong><T k="dashboard.title" /></strong>
         </Link>
 
         <nav className="saas-shell-nav" aria-label="SaaS navigation">
@@ -45,11 +49,11 @@ export default function SaaSShell({
           ))}
           {canUseAdmin && (
             <>
-              <span className="saas-shell-nav-label">Admin</span>
-              <Link href="/admin">Admin Home</Link>
-              {canManagePackages && <Link href="/admin/packages">Packages</Link>}
-              <Link href="/admin/websites">All Websites</Link>
-              <Link href="/admin/users">Users</Link>
+              <span className="saas-shell-nav-label"><T k="navigation.admin" /></span>
+              <Link href="/admin"><T k="navigation.adminHome" /></Link>
+              {canManagePackages && <Link href="/admin/packages"><T k="navigation.packages" /></Link>}
+              <Link href="/admin/websites"><T k="navigation.allWebsites" /></Link>
+              <Link href="/admin/users"><T k="navigation.users" /></Link>
             </>
           )}
         </nav>
@@ -63,6 +67,7 @@ export default function SaaSShell({
             <h1>{title}</h1>
           </div>
           <div className="saas-shell-header-actions">
+            <LanguageSwitcher />
             <ThemeToggle variant="ghost" size="md" />
             <Link className="saas-shell-header-link" href={actionHref}>
               {actionLabel}
@@ -79,5 +84,6 @@ export default function SaaSShell({
         {children}
       </section>
     </main>
+    </SaaSI18nProvider>
   );
 }
