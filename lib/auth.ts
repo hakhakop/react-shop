@@ -320,6 +320,15 @@ export async function findUserById(id: string) {
   return users.find((user) => user.id === id) ?? null;
 }
 
+export async function deleteUser(userId: string) {
+  const users = await readUsers();
+  const existing = users.find((user) => user.id === userId);
+  if (!existing) return { error: "User not found." };
+
+  await writeUsers(users.filter((user) => user.id !== userId));
+  return { user: toPublicUser(existing) };
+}
+
 export async function createUser(input: {
   email: string;
   password: string;

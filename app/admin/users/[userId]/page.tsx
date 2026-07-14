@@ -4,6 +4,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import AccessDenied from "@/components/saas/AccessDenied";
 import SaaSShell from "@/components/saas/SaaSShell";
+import DeleteUserButton from "@/components/saas/DeleteUserButton";
 import { findUserById, getCurrentUser, isSaaSAdmin, toPublicUser } from "@/lib/auth";
 import { getWebsiteRouteSegment, getWebsitesForOwner } from "@/lib/websites";
 import { loginRedirectFor } from "@/lib/saasRoutes";
@@ -85,6 +86,22 @@ export default async function AdminUserDetailPage({
           <Link className="saas-auth-submit" href="/admin/users">
             Back to Users
           </Link>
+          <DeleteUserButton
+            userId={publicUser.id}
+            userName={publicUser.name}
+            redirectAfterDelete
+            disabled={
+              publicUser.id === currentUser.id ||
+              (publicUser.role !== "user" && currentUser.role !== "super_admin")
+            }
+            disabledReason={
+              publicUser.id === currentUser.id
+                ? "You cannot delete your own account."
+                : publicUser.role !== "user" && currentUser.role !== "super_admin"
+                  ? "Only a super admin can delete another administrator."
+                  : undefined
+            }
+          />
         </div>
 
         <div className="saas-dashboard-grid">
