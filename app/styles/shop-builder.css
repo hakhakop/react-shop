@@ -69,6 +69,18 @@
   padding-top: 0;
 }
 
+.site-footer-builder {
+  padding: 0;
+  border-top: 1px solid var(--border-soft, rgba(127, 127, 127, 0.18));
+}
+
+/* A document-level footer already owns the full available viewport width. */
+.site-footer-builder .shop-builder-section--full {
+  width: 100%;
+  margin-left: 0;
+  transform: none;
+}
+
 .shop-builder-section--full {
   width: 100vw;
   margin-left: 50%;

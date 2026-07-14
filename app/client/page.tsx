@@ -1,5 +1,6 @@
 import StorefrontBuilderRenderer from "@/components/builder/StorefrontBuilderRenderer";
 import { getPublishedBuilderLayout } from "@/lib/builderLayouts";
+import { getBuilderShellSettings } from "@/lib/builderShell";
 
 export const dynamic = "force-dynamic";
 
@@ -9,10 +10,19 @@ export const metadata = {
 };
 
 export default async function ClientPage() {
-  const layout = await getPublishedBuilderLayout("client");
+  const [layout, shellSettings] = await Promise.all([
+    getPublishedBuilderLayout("client"),
+    getBuilderShellSettings(),
+  ]);
 
   if (layout?.sections?.some((section) => section.visible)) {
-    return <StorefrontBuilderRenderer layout={layout} page="client" />;
+    return (
+      <StorefrontBuilderRenderer
+        layout={layout}
+        page="client"
+        headerOverlay={shellSettings.headerOverlay === true}
+      />
+    );
   }
 
   return (

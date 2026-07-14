@@ -33,7 +33,7 @@
 .builder-dashboard:not(.is-sidebar-resizing) {
   transition: grid-template-columns 220ms cubic-bezier(0.16, 1, 0.3, 1) !important;
   background: var(--builder-dashboard-bg, var(--builder-ui-bg));
-  color: var(--builder-ui-text);
+  color: rgba(255, 255, 255, 0.86);
   font-size: 13px;
   line-height: 1.4;
   backdrop-filter: blur(12px);
@@ -391,6 +391,467 @@
   padding: 2px 6px;
   font-size: 9px;
   white-space: nowrap;
+}
+
+.builder-header-document-preview {
+  position: relative;
+  width: 100%;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0;
+  outline: none;
+  background: transparent !important;
+  pointer-events: auto;
+}
+
+.builder-preview-shell .builder-preview-header-slot:has(.builder-header-document-preview) {
+  padding-top: 48px !important;
+}
+
+.builder-header-document-preview.is-selected {
+  outline: 2px solid color-mix(in srgb, var(--builder-ui-accent) 65%, transparent) !important;
+  outline-offset: -2px;
+}
+
+.builder-header-document-preview:hover:not(.is-selected) {
+  outline: 1px dashed color-mix(in srgb, var(--builder-ui-accent) 35%, transparent) !important;
+  outline-offset: -1px;
+}
+
+/* Pull-under is a storefront/page-composition behavior. While editing in the builder,
+   keep the real renderer in flow so the wireframe and slot cannot collapse underneath
+   an absolutely positioned Header. */
+.builder-header-document-preview .site-header,
+.builder-preview-header-editable .site-header {
+  position: relative !important;
+  inset: auto !important;
+  top: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+  left: auto !important;
+  width: 100% !important;
+}
+
+
+.builder-header-document-preview.is-header-hidden .site-header {
+  opacity: 0.55;
+}
+
+.builder-header-hidden-badge {
+  position: absolute;
+  right: 8px;
+  top: 8px;
+  z-index: 30;
+  border-radius: 999px;
+  background: #7c2d12;
+  color: #fff;
+  padding: 4px 8px;
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.builder-header-document-tools {
+  position: absolute;
+  left: 8px;
+  top: 8px;
+  z-index: 1200;
+  display: flex;
+  gap: 3px;
+  padding: 3px;
+  border-radius: 7px;
+  background: color-mix(in srgb, var(--builder-ui-surface) 94%, transparent);
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.14);
+}
+
+.builder-header-document-preview.builder-preview-section:hover .builder-header-document-tools,
+.builder-header-document-preview.builder-preview-section.is-selected .builder-header-document-tools,
+.builder-header-document-tools:hover,
+.builder-header-document-tools:focus-within {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  transform: scale(1) !important;
+}
+
+.builder-header-document-tools button {
+  min-height: 24px;
+  padding: 3px 7px;
+  border: 0;
+  background: transparent;
+  color: var(--builder-ui-muted);
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.builder-header-document-tools button:hover,
+.builder-header-document-tools button.is-active {
+  background: var(--builder-ui-accent);
+  color: #fff;
+}
+
+.builder-header-live-element {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  border: 0;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* The live Header element is only an editor overlay around HeaderShellView.
+   Generic Builder block chrome must not contribute to Header geometry. */
+.builder-header-live-element.builder-preview-layout-block {
+  flex: 0 0 auto;
+  align-self: center;
+  width: fit-content;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.builder-header-live-element-content {
+  display: inline-flex;
+  width: fit-content;
+  max-width: 100%;
+  min-width: 0;
+  align-items: center;
+}
+
+/* The generic block grip sits inside the block at left: 0 and covers Header
+   content. Header elements remain draggable through their exact live wrapper. */
+.builder-header-document-preview
+  .builder-header-live-element
+  > .builder-preview-drag-handle {
+  display: none !important;
+}
+
+.builder-header-live-element.builder-preview-layout-block
+  + .builder-header-live-element.builder-preview-layout-block {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: 0;
+}
+
+.builder-header-document-tools.builder-preview-section-tools {
+  position: absolute !important;
+  top: -38px !important;
+  right: auto !important;
+  left: 12px !important;
+  transform: none !important;
+  z-index: 10040 !important;
+  width: fit-content;
+  margin: 0;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+
+.builder-header-document-workspace-note {
+  display: grid;
+  min-height: 180px;
+  place-items: center;
+  padding: 32px;
+  color: var(--builder-ui-muted);
+  font-size: 12px;
+  text-align: center;
+}
+
+.builder-context-page-preview {
+  position: relative;
+}
+
+.builder-context-page-preview.is-locked {
+  opacity: 0.68;
+  filter: saturate(0.72);
+  cursor: not-allowed;
+}
+
+.builder-context-page-preview.is-locked .builder-preview-page {
+  pointer-events: none;
+}
+
+.builder-context-page-edit-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.builder-context-page-edit-overlay:hover {
+  background: color-mix(in srgb, var(--builder-ui-accent) 5%, transparent);
+}
+
+.builder-footer-page-context {
+  flex: 0 0 auto;
+}
+
+.builder-preview-footer-slot {
+  position: relative;
+  flex: 0 0 auto;
+  width: 100%;
+  isolation: isolate;
+}
+
+.builder-preview-footer-slot .site-footer-builder {
+  width: 100%;
+}
+
+.builder-preview-footer-edit-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.builder-preview-footer-edit-overlay:hover {
+  outline: 1px dashed color-mix(in srgb, var(--builder-ui-accent) 55%, transparent);
+  outline-offset: -1px;
+  background: color-mix(in srgb, var(--builder-ui-accent) 4%, transparent);
+}
+
+.builder-preview-footer-tools {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 11;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 6px;
+  border: 1px solid color-mix(in srgb, var(--builder-ui-accent) 28%, transparent);
+  border-radius: 7px;
+  background: color-mix(in srgb, var(--builder-ui-surface) 94%, transparent);
+  color: var(--builder-ui-muted);
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.14);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.builder-preview-footer-tools button {
+  display: grid;
+  width: 25px;
+  height: 25px;
+  place-items: center;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: inherit;
+}
+
+.builder-preview-footer-tools button:hover {
+  background: var(--builder-ui-accent);
+  color: #fff;
+}
+
+.builder-header-live-element[data-header-element="spacer"] {
+  flex: 1 1 48px;
+  align-self: stretch;
+  width: auto;
+  min-width: 32px;
+  min-height: 36px;
+  border-color: color-mix(in srgb, var(--builder-ui-muted) 45%, transparent);
+  background: repeating-linear-gradient(
+    135deg,
+    transparent 0 6px,
+    color-mix(in srgb, var(--builder-ui-muted) 8%, transparent) 6px 12px
+  );
+}
+
+.builder-header-live-column {
+  display: contents;
+}
+
+.builder-header-live-column > .header-builder-column {
+  position: relative;
+  min-width: 0;
+  min-height: 36px;
+  outline: 1px dashed color-mix(in srgb, var(--builder-ui-accent) 42%, transparent);
+  outline-offset: -1px;
+  border-radius: 7px;
+  background: color-mix(in srgb, var(--builder-ui-accent) 2.5%, transparent);
+  transition: outline-color 120ms ease, background 120ms ease, box-shadow 120ms ease;
+}
+
+.builder-header-live-column.is-selected > .header-builder-column,
+.builder-header-live-column.is-drag-over > .header-builder-column {
+  outline: 1px dashed var(--builder-ui-accent);
+  outline-offset: -1px;
+}
+
+.builder-header-live-column:hover > .header-builder-column,
+.builder-header-live-column.is-selected > .header-builder-column {
+  outline-color: color-mix(in srgb, var(--builder-ui-accent) 55%, transparent);
+  background: color-mix(in srgb, var(--builder-ui-accent) 5%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--builder-ui-accent) 12%, transparent);
+}
+
+.builder-header-live-column.is-drag-over > .header-builder-column {
+  outline-color: var(--builder-ui-accent);
+  background: color-mix(in srgb, var(--builder-ui-accent) 12%, transparent);
+  box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--builder-ui-accent) 24%, transparent);
+}
+
+.builder-header-document-preview.is-header-element-dragging .site-header-categories-panel {
+  display: none !important;
+}
+
+.builder-header-document-preview.is-header-element-dragging .builder-header-live-element:not(.is-selected) {
+  opacity: 0.72;
+}
+
+.builder-header-row-drag-handle {
+  cursor: grab !important;
+  touch-action: none;
+}
+
+.builder-header-row-drag-handle:active {
+  cursor: grabbing !important;
+}
+
+.builder-header-live-column > .header-builder-column.is-empty::after {
+  content: "Drop element";
+  margin: auto;
+  color: var(--builder-ui-muted);
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.site-header-builder-extra-row.is-builder-wireframe {
+  position: relative;
+  border: 0;
+  outline: 1px dashed color-mix(in srgb, var(--builder-ui-accent) 48%, transparent);
+  outline-offset: -1px;
+  background: color-mix(in srgb, var(--builder-ui-accent) 3%, var(--builder-preview-real-bg, #fff));
+}
+
+.builder-header-live-row {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  padding: 0;
+}
+
+.builder-header-document-preview .builder-header-live-row {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+.builder-header-document-preview .builder-header-live-element .builder-preview-block-tools {
+  top: auto !important;
+  bottom: -28px !important;
+  z-index: 10030 !important;
+}
+
+/* Storefront fixed-header spacers are not content in the isolated Header editor. */
+.builder-header-document-preview .site-header-pill-spacer,
+.builder-header-document-preview .site-header-princity-spacer {
+  display: none !important;
+}
+
+/* Keep the real pill row in the editing flow so its wireframe owns its height. */
+.builder-header-document-preview #site-header-pill .site-header-pill-main,
+.builder-header-document-preview #site-header-pill.site-header-princity-shell .site-header-princity {
+  position: relative !important;
+  inset: auto !important;
+  top: auto !important;
+  right: auto !important;
+  left: auto !important;
+  margin: 0 !important;
+}
+
+.builder-header-document-preview .builder-header-live-row-tools {
+  z-index: 10020;
+}
+
+.builder-header-document-preview .site-header-pill-inner > .builder-header-live-row,
+.builder-header-document-preview .site-header-princity-inner > .builder-header-live-row {
+  grid-column: 1 / -1;
+  flex: 1 1 100%;
+  width: 100%;
+  max-width: none;
+}
+
+.builder-header-row-drop-target {
+  position: absolute;
+  z-index: 10010;
+  left: 0;
+  right: 0;
+  display: none;
+  height: 18px;
+  pointer-events: none;
+}
+
+.builder-header-row-drop-target.is-before {
+  top: -9px;
+}
+
+.builder-header-row-drop-target.is-after {
+  bottom: -9px;
+}
+
+.builder-header-document-preview.is-header-row-dragging .builder-header-row-drop-target {
+  display: block;
+  pointer-events: auto;
+}
+
+.builder-header-row-drop-target.is-active {
+  height: 4px;
+  border-radius: 999px;
+  background: var(--builder-ui-accent);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--builder-ui-accent) 18%, transparent);
+}
+
+.builder-header-live-row:hover > .builder-header-live-row-tools,
+.builder-header-live-row.is-selected > .builder-header-live-row-tools,
+.builder-header-live-row-tools:hover,
+.builder-header-live-row-tools:focus-within {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  transform: translateY(-100%) scale(1) !important;
+}
+
+.builder-header-row-wireframe-label {
+  position: absolute;
+  top: -10px;
+  left: 12px;
+  z-index: 2;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: var(--builder-ui-accent);
+  color: #fff;
+  font-size: 8px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.builder-context-page-lock-badge {
+  position: sticky;
+  top: 8px;
+  z-index: 25;
+  width: max-content;
+  margin: 8px auto -36px;
+  border: 1px solid color-mix(in srgb, var(--builder-ui-border-strong) 70%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--builder-ui-surface) 94%, transparent);
+  color: var(--builder-ui-text);
+  padding: 5px 10px;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.12);
+  font-size: 10px;
+  font-weight: 700;
 }
 
 .builder-sidebar-top-action-buttons button:hover {
@@ -4613,10 +5074,7 @@
   min-height: 0;
   pointer-events: none;
   overflow: visible;
-  background: var(
-    --builder-preview-effective-bg,
-    var(--builder-preview-shell-bg, transparent)
-  );
+  background: transparent !important;
 }
 
 body.is-visual-builder-active .site-header {
@@ -4659,9 +5117,7 @@ body:has([data-scoped-preview-root]) [data-scoped-preview-root] .site-header {
 }
 
 [data-theme="dark"] .builder-preview-canvas,
-.dark .builder-preview-canvas,
-[data-theme="dark"] .builder-preview-header-slot,
-.dark .builder-preview-header-slot {
+.dark .builder-preview-canvas {
   background: #101010 !important;
   color: #f7f7f1;
 }
@@ -4698,10 +5154,7 @@ body:has([data-scoped-preview-root]) [data-scoped-preview-root] .site-header {
 .builder-preview-header-editable::after {
   content: "";
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 96px;
+  inset: 0;
   border: 1px solid rgba(13, 115, 255, 0);
   box-shadow: inset 0 0 0 1px rgba(13, 115, 255, 0);
   pointer-events: none;
@@ -4759,15 +5212,7 @@ body:has([data-scoped-preview-root]) [data-scoped-preview-root] .site-header {
 }
 
 .builder-preview-header-slot
-  #site-header-pill
-  .site-header-pill-inner {
-  width: min(calc(100% - 2.5rem), 1280px);
-  max-width: 100%;
-  margin: 0 auto;
-}
-
-.builder-preview-header-slot
-  #site-header-pill[data-scrolled="true"]
+  #site-header-pill:not([data-scrolled="true"])
   .site-header-pill-inner {
   width: min(calc(100% - 2.5rem), 1280px);
   max-width: 100%;
@@ -8562,14 +9007,14 @@ body[data-storefront-preset="princity"]
   grid-template-columns: none !important;
 }
 
-.builder-preview-tablet .builder-preview-header-slot #site-header-pill .site-header-pill-inner {
+.builder-preview-tablet .builder-preview-header-slot #site-header-pill:not([data-scrolled="true"]) .site-header-pill-inner {
   padding: 0.5rem 1.4rem !important;
   width: min(calc(100% - 2.5rem), 1280px) !important;
   max-width: min(calc(100% - 2.5rem), 1280px) !important;
   margin: 0 auto !important;
 }
 
-.builder-preview-desktop .builder-preview-header-slot #site-header-pill .site-header-pill-inner {
+.builder-preview-desktop .builder-preview-header-slot #site-header-pill:not([data-scrolled="true"]) .site-header-pill-inner {
   width: min(calc(100% - 2.5rem), 1280px) !important;
   max-width: min(calc(100% - 2.5rem), 1280px) !important;
   margin: 0 auto !important;
@@ -8829,18 +9274,20 @@ body[data-storefront-preset="princity"]
 
 /* Collapse slot height and remove background/borders when transparent header is at top */
 .builder-preview-shell:has(.builder-preview-page[data-overlap-header="true"])
+  .builder-preview-header-slot:has(.site-header--no-background:not([data-scrolled="true"])),
+.builder-preview-shell:has(.site-header--builder-overlay)
   .builder-preview-header-slot:has(.site-header--no-background:not([data-scrolled="true"])) {
+  height: 0 !important;
   min-height: 0 !important;
+  overflow: visible !important;
   background: transparent !important;
   border-bottom: none !important;
 }
 
 .builder-preview-shell:has(.builder-preview-page[data-overlap-header="true"])
+  .builder-preview-header-slot .site-header--no-background:not([data-scrolled="true"]),
+.builder-preview-shell:has(.site-header--builder-overlay)
   .builder-preview-header-slot .site-header--no-background:not([data-scrolled="true"]) {
-  position: absolute !important;
-  left: 0;
-  right: 0;
-  width: 100%;
   background: transparent !important;
   border-color: transparent !important;
   box-shadow: none !important;
@@ -8854,6 +9301,14 @@ body[data-storefront-preset="princity"]
 .builder-preview-shell:has(.builder-preview-page[data-overlap-header="true"])
   .builder-preview-header-slot
   .site-header--no-background:not([data-scrolled="true"])
+  .site-header-main-inner,
+.builder-preview-shell:has(.site-header--builder-overlay)
+  .builder-preview-header-slot .site-header--no-background:not([data-scrolled="true"]) .site-header-top,
+.builder-preview-shell:has(.site-header--builder-overlay)
+  .builder-preview-header-slot .site-header--no-background:not([data-scrolled="true"]) .site-header-main,
+.builder-preview-shell:has(.site-header--builder-overlay)
+  .builder-preview-header-slot
+  .site-header--no-background:not([data-scrolled="true"])
   .site-header-main-inner {
   background: transparent !important;
   border-color: transparent !important;
@@ -8861,24 +9316,24 @@ body[data-storefront-preset="princity"]
   backdrop-filter: none !important;
 }
 
-.builder-preview-header-slot .site-header--no-background #site-header-pill:not([data-scrolled="true"]) .site-header-top,
-.builder-preview-header-slot .site-header--no-background #site-header-pill:not([data-scrolled="true"]) .site-header-pill-main,
-.builder-preview-header-slot .site-header--no-background #site-header-pill:not([data-scrolled="true"]) .site-header-pill-inner {
+.builder-preview-header-slot .site-header--no-background:not([data-scrolled="true"]) #site-header-pill .site-header-top,
+.builder-preview-header-slot .site-header--no-background:not([data-scrolled="true"]) #site-header-pill .site-header-pill-main,
+.builder-preview-header-slot .site-header--no-background:not([data-scrolled="true"]) #site-header-pill .site-header-pill-inner {
   background: transparent !important;
   border-color: transparent !important;
   box-shadow: none !important;
   backdrop-filter: none !important;
 }
 
-.builder-preview-header-slot .site-header--no-background .site-header-princity-meta-row {
+.builder-preview-header-slot .site-header--no-background:not([data-scrolled="true"]) .site-header-princity-meta-row {
   background: transparent !important;
   border-color: transparent !important;
   box-shadow: none !important;
   backdrop-filter: none !important;
 }
 
-.builder-preview-header-slot .site-header--no-background #site-header-pill:not([data-scrolled="true"]) .site-header-princity,
-.builder-preview-header-slot .site-header--no-background #site-header-pill:not([data-scrolled="true"]) .site-header-princity-inner {
+.builder-preview-header-slot .site-header--no-background:not([data-scrolled="true"]) #site-header-pill .site-header-princity,
+.builder-preview-header-slot .site-header--no-background:not([data-scrolled="true"]) #site-header-pill .site-header-princity-inner {
   background: transparent !important;
   border-color: transparent !important;
   box-shadow: none !important;
@@ -11481,6 +11936,113 @@ article.is-selected-column > .builder-preview-box-spacing,
 }
 
 /* Dashboard Experience Polish - Phase 1 */
+.builder-sidebar-left-nav {
+  overflow: hidden;
+}
+
+.builder-sidebar-nav-tiles {
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.builder-sidebar-nav-tiles::-webkit-scrollbar {
+  display: none;
+}
+
+.builder-sidebar-utility-group {
+  width: 100%;
+  margin-top: auto;
+  padding-top: 10px;
+  display: grid;
+  gap: 5px;
+  flex: 0 0 auto;
+  border-top: 1px solid var(--builder-ui-border);
+}
+
+.builder-sidebar-utility-button,
+.builder-sidebar-utility-language {
+  position: relative;
+  width: calc(100% - 8px);
+  min-height: 45px;
+  margin: 0 4px;
+  padding: 4px 2px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  background: transparent;
+  color: var(--builder-ui-muted);
+  font: inherit;
+  cursor: pointer;
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease,
+    opacity 160ms ease,
+    transform 160ms ease;
+}
+
+.builder-sidebar-utility-button span,
+.builder-sidebar-utility-language > span {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.builder-sidebar-utility-button:hover:not(:disabled),
+.builder-sidebar-utility-button:focus-visible,
+.builder-sidebar-utility-language:hover,
+.builder-sidebar-utility-language:focus-within {
+  border-color: var(--builder-ui-border-strong);
+  background: var(--builder-ui-surface-hover);
+  color: var(--builder-ui-text-strong);
+  outline: none;
+}
+
+.builder-sidebar-utility-button:active:not(:disabled),
+.builder-sidebar-utility-language:active {
+  transform: scale(0.96);
+}
+
+.builder-sidebar-utility-button.is-active {
+  border-color: color-mix(in srgb, var(--builder-ui-accent) 52%, transparent);
+  background: var(--builder-ui-accent-soft);
+  color: #a5b4fc;
+}
+
+.builder-sidebar-utility-button.is-highlighted {
+  border-color: var(--builder-ui-accent);
+  color: #c7d2fe;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--builder-ui-accent) 20%, transparent);
+}
+
+.builder-sidebar-utility-button:disabled {
+  opacity: 0.34;
+  cursor: not-allowed;
+}
+
+.builder-sidebar-utility-language .saas-language-switcher,
+.builder-sidebar-utility-language .saas-language-switcher select {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  margin: 0;
+  border: 0;
+  padding: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
 .builder-sidebar-rail-toggle {
   width: calc(100% - 8px);
   min-height: 48px;
@@ -11501,6 +12063,10 @@ article.is-selected-column > .builder-preview-box-spacing,
     border-color 160ms ease,
     color 160ms ease,
     transform 160ms ease;
+}
+
+.builder-sidebar-utility-group .builder-sidebar-rail-toggle {
+  margin: 0 4px;
 }
 
 .builder-sidebar-rail-toggle span {
@@ -12032,4 +12598,362 @@ article.is-selected-column > .builder-preview-box-spacing,
   padding: 0 28px 0 10px;
   font: inherit;
   cursor: pointer;
+}
+
+/* Float Header row controls above the row's top boundary on the left side to avoid overlaps and right-side cutoffs. */
+.builder-header-document-preview
+  .builder-header-live-row
+  > .builder-header-live-row-tools {
+  top: 0 !important;
+  left: 200px !important;
+  right: auto !important;
+  transform: translateY(-100%) scale(0.96) !important;
+  transform-origin: bottom left !important;
+}
+
+.builder-header-document-preview
+  .builder-header-live-row:hover
+  > .builder-header-live-row-tools,
+.builder-header-document-preview
+  .builder-header-live-row.is-selected
+  > .builder-header-live-row-tools,
+.builder-header-document-preview .builder-header-live-row-tools:hover,
+.builder-header-document-preview .builder-header-live-row-tools:focus-within {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  left: 200px !important;
+  right: auto !important;
+  transform: translateY(-100%) scale(1) !important;
+}
+
+/* The generic page-preview Princity rule adds top: 18px for a floating
+   storefront header. Inside the Header document that offset is already
+   provided by the editor gutter and would bottom-align the compact pill. */
+.builder-preview-header-slot
+  .builder-header-document-preview
+  #site-header-pill.site-header-princity-shell
+  .site-header-princity,
+.builder-preview-header-slot
+  .builder-header-document-preview
+  #site-header-pill.site-header-princity-shell[data-scrolled="true"]
+  .site-header-princity {
+  position: relative !important;
+  inset: auto !important;
+  top: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+  left: auto !important;
+  margin: 0 !important;
+}
+
+/* Pull-under page preview CSS normally makes the top-state Header absolute.
+   In the Header document editor that collapses the selected wireframe, so the
+   real Header must remain in flow in both top and scrolled states. */
+.builder-preview-shell
+  .builder-preview-header-slot
+  .builder-header-document-preview
+  .site-header.site-header--builder-overlay.site-header--no-background:not([data-scrolled="true"]),
+.builder-preview-header-slot
+  .builder-header-document-preview
+  .site-header.site-header--builder-overlay {
+  position: relative !important;
+  inset: auto !important;
+  top: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+  left: auto !important;
+  width: 100% !important;
+}
+
+/* Header Builder Presets styling */
+.builder-header-presets-container {
+  margin: 0 12px 14px 12px;
+  padding: 12px;
+  border: 1px solid var(--builder-ui-border);
+  border-radius: var(--builder-ui-radius-sm);
+  background: var(--builder-ui-card-solid, rgba(23, 23, 23, 0.2));
+}
+
+.builder-header-presets-container .builder-card-title {
+  margin-bottom: 10px;
+}
+
+.builder-header-presets-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.builder-header-preset-card {
+  min-width: 0;
+  border: 1px solid var(--builder-ui-border);
+  border-radius: var(--builder-ui-radius-sm);
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  background: var(--builder-ui-panel-solid);
+  color: var(--builder-ui-text);
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.builder-header-preset-card:hover {
+  border-color: rgba(13, 115, 255, 0.42);
+  background: rgba(13, 115, 255, 0.08);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.builder-header-preset-card:active {
+  transform: translateY(0);
+}
+
+.builder-header-preset-card.is-active {
+  border-color: var(--builder-ui-accent, #0d73ff);
+  background: rgba(13, 115, 255, 0.12);
+  box-shadow: inset 0 0 0 1px var(--builder-ui-accent, #0d73ff);
+}
+
+.builder-header-preset-card strong {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--builder-ui-text);
+  margin-bottom: 2px;
+}
+
+.builder-header-preset-card small {
+  color: var(--builder-ui-muted);
+  font-size: 10px;
+  line-height: 1.3;
+}
+
+/* Document structure tools text button formatting override to prevent squishing */
+.builder-header-document-tools.builder-preview-section-tools button {
+  width: auto !important;
+  height: 28px !important;
+  border-radius: 6px !important;
+  padding: 0 10px !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+}
+
+/* Hide redundant wireframe row label in document editor to prevent overlap with tools */
+.builder-header-document-preview .builder-header-row-wireframe-label {
+  display: none !important;
+}
+
+/* Margin-top overrides for pill layout in builder to replicate fixed spacing */
+.builder-header-document-preview #site-header-pill:not([data-scrolled="true"]) .site-header-pill-main {
+  margin-top: 16px !important;
+}
+.builder-header-document-preview #site-header-pill[data-scrolled="true"] .site-header-pill-main {
+  margin-top: 12px !important;
+}
+
+/* Prevent double-padding (row padding + pill padding) which bloats the pill height in builder only when scrolled */
+.builder-header-document-preview #site-header-pill[data-scrolled="true"] .site-header-pill-inner > .builder-header-live-row,
+.builder-header-document-preview #site-header-pill[data-scrolled="true"] .site-header-princity-inner > .builder-header-live-row {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+/* Reposition row tools above the pill shape instead of inside it to prevent bloating only when scrolled */
+.builder-header-document-preview #site-header-pill[data-scrolled="true"] .site-header-pill-inner > .builder-header-live-row > .builder-header-live-row-tools,
+.builder-header-document-preview #site-header-pill[data-scrolled="true"] .site-header-princity-inner > .builder-header-live-row > .builder-header-live-row-tools {
+  top: -28px !important;
+  right: 12px !important;
+  left: auto !important;
+  transform: none !important;
+}
+
+/* Shrink the row width in scrolled compact pill state so it doesn't stretch the container */
+.builder-header-document-preview #site-header-pill[data-scrolled="true"] .builder-header-live-row {
+  width: auto !important;
+  min-width: max-content !important;
+}
+
+/* Always highlight header bar boundaries when Pull page content under Header (overlay) is selected and not scrolled */
+.builder-preview-header-slot:has(.site-header--no-background:not([data-scrolled="true"])) .builder-preview-header-editable::after {
+  border: 1.5px dashed rgba(13, 115, 255, 0.4) !important;
+  box-shadow: inset 0 0 0 1px rgba(13, 115, 255, 0.06) !important;
+  opacity: 1 !important;
+}
+
+.builder-preview-header-slot:has(.site-header--no-background:not([data-scrolled="true"])) .builder-header-document-preview {
+  outline: 1.5px dashed rgba(13, 115, 255, 0.4) !important;
+  outline-offset: -1.5px;
+}
+
+/* Solid focus border on hover/selection of overlay header */
+.builder-preview-header-slot:has(.site-header--no-background:not([data-scrolled="true"])) .builder-preview-header-editable:hover::after,
+.builder-preview-header-slot:has(.site-header--no-background:not([data-scrolled="true"])) .builder-preview-header-editable.is-hovered::after {
+  border: 1.5px dashed var(--builder-ui-accent, #0d73ff) !important;
+  box-shadow: inset 0 0 0 1px rgba(13, 115, 255, 0.12) !important;
+}
+
+.builder-preview-header-slot:has(.site-header--no-background:not([data-scrolled="true"])) .builder-preview-header-editable.is-selected::after {
+  border: 2px solid var(--builder-ui-accent, #0d73ff) !important;
+  box-shadow: inset 0 0 0 1px rgba(13, 115, 255, 0.18) !important;
+}
+
+.builder-preview-header-slot:has(.site-header--no-background:not([data-scrolled="true"])) .builder-header-document-preview:hover:not(.is-selected) {
+  outline: 1.5px dashed var(--builder-ui-accent, #0d73ff) !important;
+}
+
+.builder-preview-header-slot:has(.site-header--no-background:not([data-scrolled="true"])) .builder-header-document-preview.is-selected {
+  outline: 2px solid var(--builder-ui-accent, #0d73ff) !important;
+  outline-offset: -2px;
+}
+
+/* Reposition element toolbar inside header editor to float below the element to avoid being covered by header main tools */
+.builder-header-document-preview .builder-header-live-element .builder-preview-block-tools {
+  top: auto !important;
+  bottom: -28px !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transform: scale(0.96) !important;
+  transform-origin: top right !important;
+  z-index: 10030 !important;
+}
+
+.builder-header-document-preview .builder-header-live-element:has(> .builder-header-live-element-content:hover) .builder-preview-block-tools,
+.builder-header-document-preview .builder-header-live-element.is-selected-block .builder-preview-block-tools,
+.builder-header-document-preview .builder-header-live-element .builder-preview-block-tools:hover {
+  opacity: 1 !important;
+  transform: scale(1) !important;
+  pointer-events: auto !important;
+}
+
+/* The Header toolbar touches the element edge. A bridge here creates a large,
+   invisible hover target as wide as the toolbar, far outside the element. */
+.builder-header-document-preview .builder-header-live-element .builder-preview-block-tools::before {
+  display: none !important;
+}
+
+/* Builder preview theme variables for the header */
+.builder-preview-shell {
+  --header-bg: rgba(255, 255, 255, 0.92);
+  --header-border: rgba(209, 213, 219, 0.72);
+}
+
+.builder-preview-shell[data-theme="dark"],
+.builder-preview-shell.dark,
+.builder-preview-shell.builder-preview-scheme-dark,
+[data-theme="dark"] .builder-preview-shell,
+.dark .builder-preview-shell {
+  --header-bg: rgba(15, 23, 42, 0.96) !important;
+  --header-border: rgba(30, 64, 175, 0.7) !important;
+}
+
+/* Header editing chrome follows the live element box exactly. The toolbar is
+   absolutely positioned and remains outside layout without enlarging this box. */
+.builder-header-document-preview
+  .builder-header-live-element.builder-preview-layout-block:hover:not(.is-selected-block) {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.builder-header-document-preview
+  .builder-header-live-element.builder-preview-layout-block.is-selected-block {
+  outline: none !important;
+  outline-offset: 0 !important;
+  box-shadow: none !important;
+}
+
+.builder-header-document-preview
+  .builder-header-live-element.builder-preview-layout-block
+  > .builder-header-live-element-content:hover
+  > .header-builder-element,
+.builder-header-document-preview
+  .builder-header-live-element.builder-preview-layout-block:has(> .builder-preview-block-tools:hover)
+  > .builder-header-live-element-content
+  > .header-builder-element {
+  box-shadow: inset 0 0 0 1px rgba(13, 115, 255, 0.28) !important;
+}
+
+.builder-header-document-preview
+  .builder-header-live-element.builder-preview-layout-block.is-selected-block
+  > .builder-header-live-element-content
+  > .header-builder-element {
+  box-shadow: inset 0 0 0 1.5px var(--builder-ui-accent, #3b82f6) !important;
+}
+
+/* In the Header editor the slot owns the scroll relationship with the locked
+   page preview. Mirror document behavior on that slot without changing the
+   shared Header renderer's geometry. */
+.builder-preview-header-slot:has(.site-header[data-header-behavior="static"]) {
+  position: relative !important;
+  top: auto !important;
+}
+
+.builder-preview-header-slot:has(.site-header[data-header-behavior="sticky"]),
+.builder-preview-header-slot:has(.site-header[data-header-behavior="sticky-on-scroll-up"]),
+.builder-preview-header-slot:has(.site-header[data-header-behavior="pill-on-scroll"]) {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 10000;
+}
+
+/* Phase 4 workspace: navigation stays left; the one shared Inspector floats right. */
+.builder-floating-inspector {
+  position: fixed;
+  z-index: 12000;
+  top: 82px;
+  right: 14px;
+  bottom: 14px;
+  width: min(360px, calc(100vw - 92px));
+  min-height: 0;
+  overflow: hidden;
+  border-radius: var(--builder-ui-radius, 12px);
+  pointer-events: auto;
+}
+
+.builder-floating-inspector .builder-inspector {
+  position: relative;
+  inset: auto;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  padding: 14px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  border: 1px solid var(--builder-ui-border, rgba(255, 255, 255, 0.08));
+  border-radius: inherit;
+  background: color-mix(in srgb, var(--builder-ui-panel-solid, #121216) 88%, transparent);
+  box-shadow: var(--builder-ui-shadow, 0 12px 40px rgba(0, 0, 0, 0.5));
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+@media (max-width: 760px) {
+  .builder-floating-inspector {
+    top: 72px;
+    right: 8px;
+    bottom: 8px;
+    width: min(340px, calc(100vw - 80px));
+  }
+}
+
+/* Builder-only transparent preview rules must release the shared document
+   surface after the Header enters its scrolled state. */
+.builder-header-document-preview
+  .site-header--document-background[data-scrolled="true"]
+  .site-header-main-inner,
+.builder-header-document-preview
+  .site-header--document-background[data-scrolled="true"]
+  .site-header-pill-inner,
+.builder-header-document-preview
+  .site-header--document-background[data-scrolled="true"]
+  .site-header-princity-inner,
+.builder-header-document-preview
+  .site-header--document-background[data-scrolled="true"]
+  .site-header-builder-extra-row {
+  background-color: var(--header-document-background-color, var(--header-bg)) !important;
+  background-image: var(--header-document-background-image, none) !important;
 }

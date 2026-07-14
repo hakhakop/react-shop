@@ -1,3 +1,4 @@
+import { cookies } from "next/headers";
 import {
   extractHeaderSettings,
   getThemeSettings,
@@ -17,6 +18,11 @@ import { resolveScopedPreviewHref } from "../lib/scopedPreviewLinks";
 import type { SaaSWebsite } from "@/lib/websites";
 import CategoryMegaMenu from "./CategoryMegaMenu";
 import HeaderShellView from "./HeaderShellView";
+import {
+  getOrCreateHeaderBuilderLayout,
+} from "@/lib/headerBuilderDocument";
+import { resolveHeaderBuilderComposition } from "@/lib/headerBuilderComposition";
+import { resolveContentSections } from "@/lib/builderContentLanguages";
 
 type HeaderShellProps = {
   layoutOverride?: BuilderHeaderLayout;
@@ -26,6 +32,7 @@ type HeaderShellProps = {
   scopedPreviewPages?: Pick<BuilderCustomPage, "key" | "slug">[];
   hideSaaSEntry?: boolean;
   website?: SaaSWebsite | null;
+  activeContentLanguage?: string;
 };
 
 export default async function HeaderShell({
@@ -36,6 +43,7 @@ export default async function HeaderShell({
   scopedPreviewPages,
   hideSaaSEntry = false,
   website,
+  activeContentLanguage,
 }: HeaderShellProps) {
   const [settingsRaw, shellSettingsRaw, homeLayout] = await Promise.all([
     getThemeSettings().catch(() => ({})),
@@ -61,6 +69,28 @@ export default async function HeaderShell({
       ),
     ),
   );
+  const headerLayout = await getOrCreateHeaderBuilderLayout(
+    shellSettings,
+    website ? { websiteId: website.id } : {},
+    serviceHomepageMode,
+  );
+  const cookieStore = await cookies();
+  const langKey = `website_content_language_${website?.id ?? "root"}`;
+  const languageCookie = cookieStore.get(langKey)?.value;
+  const selectedContentLanguage =
+    activeContentLanguage ??
+    ((website?.enabledLanguages?.includes(languageCookie as never) || (!website && ["hy", "en", "ru"].includes(languageCookie as never)))
+      ? languageCookie!
+      : website?.primaryLanguage ?? "hy");
+  const localizedHeaderLayout = {
+    ...headerLayout,
+    sections: resolveContentSections(
+      headerLayout.sections as never,
+      selectedContentLanguage,
+      website?.primaryLanguage ?? selectedContentLanguage,
+    ) as typeof headerLayout.sections,
+  };
+  const headerComposition = resolveHeaderBuilderComposition(localizedHeaderLayout);
 
   return (
     <HeaderShellView
@@ -84,6 +114,10 @@ export default async function HeaderShell({
       scopedPreviewPages={scopedPreviewPages}
       hideSaaSEntry={hideSaaSEntry}
       categoriesContent={<CategoryMegaMenu website={website} />}
+      headerComposition={headerComposition}
+      activeContentLanguage={selectedContentLanguage}
+      enabledContentLanguages={website?.enabledLanguages ?? ["hy", "en", "ru"]}
+      languagePreferenceKey={`website_content_language_${website?.id ?? "root"}`}
     />
   );
 }

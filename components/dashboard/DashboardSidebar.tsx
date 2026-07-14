@@ -18,7 +18,6 @@ import {
   Sliders,
   FileText,
   History,
-  Settings,
   Menu,
 } from "lucide-react";
 import {
@@ -91,9 +90,6 @@ type DashboardSidebarProps = {
   canUseShellSettings?: boolean;
   shellSettingsLabel?: string;
   shellSettingsShortLabel?: string;
-  inspectorSlot: ReactNode;
-  inspectorOpen?: boolean;
-  inspectorOpenKey?: number;
   pageStatus: string;
   shellSettings: BuilderShellSettings;
   sidebarTab: SidebarTab;
@@ -108,6 +104,7 @@ type DashboardSidebarProps = {
   onUpdateShellSettings: (patch: Partial<BuilderShellSettings>) => void;
   onSaveMenuItems?: (newItems: BuilderShellSettings["menuItems"]) => void | Promise<void>;
   topActionsSlot?: ReactNode;
+  utilityControlsSlot?: ReactNode;
   onAddElementFromLibrary: (kind: LayoutBlockKind) => void;
   onCreateBuilderPage: () => void;
   onCreateBuilderPageFromTemplate?: (
@@ -127,7 +124,6 @@ type DashboardSidebarProps = {
   onRenameSavedTemplate?: (template: BuilderSavedTemplate, title: string) => void;
   onSetNewPageTitle: Dispatch<SetStateAction<string>>;
   onSetSidebarTab: Dispatch<SetStateAction<SidebarTab>>;
-  onOpenInspector?: () => void;
   onStartSidebarResize: (clientX: number) => void;
   onSwitchBuilderTarget: (nextKey: BuilderLayoutKey) => void;
   onReorderCustomPages?: (newPages: BuilderCustomPage[]) => void;
@@ -147,9 +143,6 @@ export default function DashboardSidebar({
   canUseShellSettings = true,
   shellSettingsLabel = "Global Styles",
   shellSettingsShortLabel = "Global",
-  inspectorSlot,
-  inspectorOpen = true,
-  inspectorOpenKey = 0,
   pageStatus,
   shellSettings,
   sidebarTab,
@@ -159,6 +152,7 @@ export default function DashboardSidebar({
   templateLabels,
   templateStatus,
   topActionsSlot,
+  utilityControlsSlot,
   onAddElementFromLibrary,
   onCreateBuilderPage,
   onCreateBuilderPageFromTemplate = () => undefined,
@@ -172,7 +166,6 @@ export default function DashboardSidebar({
   onRenameSavedTemplate = () => undefined,
   onSetNewPageTitle,
   onSetSidebarTab,
-  onOpenInspector = () => undefined,
   onStartSidebarResize,
   onSwitchBuilderTarget,
   openElementsPanelKey,
@@ -229,14 +222,6 @@ export default function DashboardSidebar({
   }, [corePagesOrder]);
 
   useEffect(() => {
-    if (inspectorOpenKey === 0 || sidebarTab !== "inspector" || !inspectorOpen) {
-      return;
-    }
-    const frame = window.requestAnimationFrame(() => setNestedOpen(true));
-    return () => window.cancelAnimationFrame(frame);
-  }, [inspectorOpenKey, inspectorOpen, sidebarTab]);
-
-  useEffect(() => {
     if (openElementsPanelKey === 0) return;
     onSetSidebarTab("elements");
     const frame = window.requestAnimationFrame(() => setNestedOpen(true));
@@ -273,11 +258,6 @@ export default function DashboardSidebar({
       description: "Add blocks to the selected layout column.",
       count: availableLayoutBlockKinds.length,
     },
-    {
-      tab: "inspector",
-      label: t("builder.navigation.inspector"),
-      description: "Edit the selected section, column, or element.",
-    },
     ...(canUseShellSettings
       ? [
           {
@@ -312,7 +292,6 @@ export default function DashboardSidebar({
     sidebarPanels.find((panel) => panel.tab === sidebarTab) ?? sidebarPanels[0];
 
   const openPanel = (tab: SidebarTab) => {
-    if (tab === "inspector") onOpenInspector();
     onSetSidebarTab(tab);
     setNestedOpen(true);
   };
@@ -356,7 +335,6 @@ export default function DashboardSidebar({
       : []),
     { tab: "pages" as SidebarTab, label: t("builder.navigation.pages"), icon: <FileText size={18} /> },
     { tab: "history" as SidebarTab, label: t("builder.navigation.history"), icon: <History size={18} /> },
-    { tab: "inspector" as SidebarTab, label: t("builder.navigation.inspector"), icon: <Settings size={18} /> },
     { tab: "menu" as SidebarTab, label: t("builder.navigation.menu"), icon: <Menu size={18} /> },
   ];
 
@@ -483,13 +461,11 @@ export default function DashboardSidebar({
                 className={`builder-sidebar-nav-tile${isActive ? " is-active" : ""}`}
                 onClick={() => {
                   if (sidebarCollapsed) {
-                    if (item.tab === "inspector") onOpenInspector();
                     onSetSidebarTab(item.tab);
                     onSetSidebarCollapsed?.(false);
                   } else if (sidebarTab === item.tab) {
                     onSetSidebarCollapsed?.(true);
                   } else {
-                    if (item.tab === "inspector") onOpenInspector();
                     onSetSidebarTab(item.tab);
                   }
                 }}
@@ -500,18 +476,21 @@ export default function DashboardSidebar({
             );
           })}
         </div>
-        <button
-          type="button"
-          className={`builder-sidebar-rail-toggle${
-            sidebarCollapsed ? " is-collapsed" : ""
-          }`}
-          onClick={() => onSetSidebarCollapsed?.(!sidebarCollapsed)}
-          title={sidebarCollapsed ? "Open panel" : "Collapse panel"}
-          aria-label={sidebarCollapsed ? "Open panel" : "Collapse panel"}
-        >
-          <ChevronLeft size={18} />
-          <span>{sidebarCollapsed ? "Open" : "Close"}</span>
-        </button>
+        <div className="builder-sidebar-utility-group" aria-label="Builder utilities">
+          {utilityControlsSlot}
+          <button
+            type="button"
+            className={`builder-sidebar-rail-toggle${
+              sidebarCollapsed ? " is-collapsed" : ""
+            }`}
+            onClick={() => onSetSidebarCollapsed?.(!sidebarCollapsed)}
+            title={sidebarCollapsed ? "Open Builder panel" : "Close Builder panel"}
+            aria-label={sidebarCollapsed ? "Open Builder panel" : "Close Builder panel"}
+          >
+            <ChevronLeft size={18} />
+            <span>{sidebarCollapsed ? "Open" : "Close"}</span>
+          </button>
+        </div>
       </div>
 
       {/* Right content panel container */}
@@ -533,6 +512,7 @@ export default function DashboardSidebar({
                   availableLayoutBlockKinds={availableLayoutBlockKinds}
                   onAddElement={onAddElementFromLibrary}
                   onRenderLayoutBlockIcon={onRenderLayoutBlockIcon}
+                  headerMode={builderState.page === "header"}
                 />
               </motion.div>
             )}
@@ -566,37 +546,6 @@ export default function DashboardSidebar({
               </motion.div>
             )}
 
-            {sidebarTab === "inspector" && (
-              <motion.div
-                key="inspector"
-                initial={{ opacity: 0, scale: 0.985 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.995 }}
-                transition={{ duration: 0.12, ease: "easeOut" }}
-              >
-                {inspectorOpen ? (
-                  inspectorSlot
-                ) : (
-                  <div className="builder-sidebar-panel builder-inspector-reopen">
-                    <div className="builder-sidebar-panel-header">
-                      <div>
-
-                        <strong>Inspector</strong>
-                        <span>Section, row, and element controls are closed.</span>
-                      </div>
-                    </div>
-                    <button
-                      type="button"
-                      className="builder-secondary-button builder-full-button"
-                      onClick={onOpenInspector}
-                    >
-                      Open Inspector
-                    </button>
-                  </div>
-                )}
-              </motion.div>
-            )}
-
             {canUseShellSettings && sidebarTab === "globalStyles" && (
               <motion.div
                 key="globalStyles"
@@ -618,6 +567,33 @@ export default function DashboardSidebar({
                 transition={{ duration: 0.12, ease: "easeOut" }}
               >
                 <div className="builder-sidebar-panel">
+                  <div className="builder-card builder-pages-card" style={{ marginBottom: "14px" }}>
+                    <div className="builder-card-title">
+                      <strong>{t("builder.navigation.website")}</strong>
+                    </div>
+                    <div className="builder-pages-list">
+                      <div className={`builder-page-row${builderState.page === "header" ? " is-active" : ""}`}>
+                        <button
+                          type="button"
+                          className="builder-page-title-button"
+                          onClick={() => onSwitchBuilderTarget("header")}
+                        >
+                          <strong>{t("builder.navigation.header")}</strong>
+                          <span>{t("builder.navigation.globalArea")}</span>
+                        </button>
+                      </div>
+                      <div className={`builder-page-row${builderState.page === "footer" ? " is-active" : ""}`}>
+                        <button
+                          type="button"
+                          className="builder-page-title-button"
+                          onClick={() => onSwitchBuilderTarget("footer")}
+                        >
+                          <strong>Footer</strong>
+                          <span>{t("builder.navigation.globalArea")}</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
                   {/* Core Storefront Pages */}
                   <div className="builder-card builder-pages-card" style={{ marginBottom: "14px" }}>
                     <div className="builder-card-title">

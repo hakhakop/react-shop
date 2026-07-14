@@ -5815,5 +5815,55 @@
       }
     ],
     "updatedAt": "2026-06-28T17:35:46.239Z"
+  },
+  "header": {
+    "version": 1,
+    "key": "header",
+    "page": "header",
+    "targetType": "header",
+    "design": {},
+    "sections": [
+      {
+        "id": "header-document",
+        "kind": "contentLayout",
+        "title": "Header",
+        "background": "transparent",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "layout": "header-row",
+        "layoutColumns": 1,
+        "layoutItems": [
+          {
+            "id": "header-main-row",
+            "rowId": "header-main-row",
+            "rowLayout": "header-main-row",
+            "blocks": [
+              {
+                "id": "header-logo",
+                "kind": "image",
+                "imageUrl": "https://cms.webpages.am/wp-content/uploads/2026/06/premium-16.png",
+                "imageAlt": "WebPages logo",
+                "imageMaxWidth": 161
+              },
+              {
+                "id": "header-navigation",
+                "kind": "menu",
+                "title": "Navigation",
+                "menuSource": "main"
+              },
+              {
+                "id": "header-spacer",
+                "kind": "embed",
+                "embedMode": "code",
+                "embedCode": ""
+              }
+            ]
+          }
+        ],
+        "visible": true
+      }
+    ],
+    "updatedAt": "2026-07-12T20:04:03.939Z"
   }
 }

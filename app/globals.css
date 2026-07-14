@@ -633,6 +633,10 @@ body {
 [data-theme="dark"] body {
   background: radial-gradient(circle at top left, #020617, #020617);
   color: #e5e7eb;
+}
+
+[data-theme="dark"],
+.dark {
   --header-bg: rgba(15, 23, 42, 0.96);
   --header-border: rgba(30, 64, 175, 0.7);
 }

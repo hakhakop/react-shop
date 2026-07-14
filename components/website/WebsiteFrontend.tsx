@@ -1,4 +1,5 @@
 import HeaderShell from "@/components/HeaderShell";
+import FooterShell from "@/components/FooterShell";
 import ScopedPreviewLinkRouter from "@/components/builder/ScopedPreviewLinkRouter";
 import StorefrontBuilderRenderer, {
   type StorefrontBuilderRendererProps,
@@ -21,6 +22,8 @@ import {
 } from "@/lib/builderSpacing";
 import { ensureWebsiteBuilderData } from "@/lib/websiteBuilderData";
 import { getWebsiteRouteSegment, type SaaSWebsite } from "@/lib/websites";
+import { cookies } from "next/headers";
+import { resolveContentSections } from "@/lib/builderContentLanguages";
 
 type WebsiteFrontendMode = "preview" | "domain";
 
@@ -127,8 +130,15 @@ export default async function WebsiteFrontend({
     getPublishedBuilderLayout(page, scope),
     getBuilderShellSettings(scope),
   ]);
+  const languageCookie = (await cookies()).get(`website_content_language_${website.id}`)?.value;
+  const activeContentLanguage = website.enabledLanguages.includes(languageCookie as never)
+    ? languageCookie!
+    : website.primaryLanguage;
+  const localizedLayout = layout
+    ? { ...layout, sections: resolveContentSections(layout.sections as never, activeContentLanguage, website.primaryLanguage) as typeof layout.sections }
+    : layout;
 
-  const hasVisibleLayout = layout?.sections?.some((section) => section.visible);
+  const hasVisibleLayout = localizedLayout?.sections?.some((section) => section.visible);
 
   if (!hasVisibleLayout && !fallbackContent) {
     return (
@@ -163,18 +173,24 @@ export default async function WebsiteFrontend({
         scopedPreviewPages={scopedPreviewPages}
         hideSaaSEntry={!isPreview}
         website={website}
+        activeContentLanguage={activeContentLanguage}
       />
-      {layout && hasVisibleLayout ? (
+      {localizedLayout && hasVisibleLayout ? (
         <StorefrontBuilderRenderer
-          layout={layout}
+          layout={localizedLayout}
           page={page}
           pageLabel={pageLabelOverride ?? pageLabel(page, customPages)}
           website={website}
+          headerOverlay={shellSettings.headerOverlay === true}
           {...rendererProps}
         />
       ) : (
         fallbackContent
       )}
+      <FooterShell
+        website={website}
+        activeContentLanguage={activeContentLanguage}
+      />
     </div>
   );
 }

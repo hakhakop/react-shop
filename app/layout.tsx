@@ -10,6 +10,7 @@ import { ThemeProvider } from "../components/ThemeProvider";
 import { WishlistProvider } from "../components/WishlistProvider";
 import MiniCart from "../components/MiniCart";
 import HeaderShell from "../components/HeaderShell";
+import FooterShell from "../components/FooterShell";
 import SearchProvider from "../components/SearchProvider";
 import RecentlyViewedProvider from "../components/RecentlyViewedProvider";
 import FloatingCartSummary from "../components/FloatingCartSummary";
@@ -17,6 +18,7 @@ import ScrollToTopButton from "../components/ScrollToTopButton";
 import FrontendAdminBar from "../components/FrontendAdminBar";
 import ProductCategoryFilterProvider from "../components/ProductCategoryFilterProvider";
 import RootHeaderVisibility from "../components/RootHeaderVisibility";
+import RootFooterVisibility from "../components/RootFooterVisibility";
 import { getBuilderShellSettings } from "../lib/builderShell";
 import {
   resolveBuilderSpacing,
@@ -48,6 +50,12 @@ export default async function RootLayout({
     getWebsiteByDomainHost(host),
   ]);
   const isDomainWebsiteRequest = Boolean(domainWebsite);
+  const isDashboardWorkspaceRequest =
+    pathname.startsWith("/dashboard") ||
+    pathname.startsWith("/app") ||
+    pathname.startsWith("/admin") ||
+    pathname.startsWith("/login") ||
+    pathname.startsWith("/register");
 
   // All ACF options from WordPress (via webpagesThemeSettingsRaw)
   const settings = (themeSettingsRaw || {}) as Record<string, any>;
@@ -356,20 +364,10 @@ ${explicitWordPressProductVars}
                     <FloatingCartSummary />
                   <MiniCart />
 
-                  {!isDomainWebsiteRequest && (
-                    <footer className="site-footer">
-                      <div className="site-footer-inner">
-                        <span>
-                          © 2025 Webpages · Headless WooCommerce demo
-                        </span>
-                        <span>
-                          Powered by{" "}
-                            <span className="site-footer-strong">
-                              WordPress · WooCommerce · WPGraphQL · Next.js
-                            </span>
-                        </span>
-                      </div>
-                    </footer>
+                  {!isDomainWebsiteRequest && !isDashboardWorkspaceRequest && (
+                    <RootFooterVisibility initialPathname={pathname}>
+                      <FooterShell />
+                    </RootFooterVisibility>
                   )}
                   </RecentlyViewedProvider>
                   </ProductCategoryFilterProvider>

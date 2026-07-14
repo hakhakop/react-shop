@@ -229,4 +229,7 @@
   ,"builder.contentLanguage.primaryFallback": "Primary language fallback"
   ,"websites.primaryLanguage": "Primary Language"
   ,"websites.enabledLanguages": "Additional Enabled Languages"
+  ,"builder.navigation.header": "Header"
+  ,"builder.navigation.website": "Website"
+  ,"builder.navigation.globalArea": "Global website area"
 }

@@ -1,5 +1,4 @@
-// wc-store/app/[...slug]/page.tsx
-import { headers } from "next/headers";
+import { cookies, headers } from "next/headers";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { graphqlFetch } from "../../lib/graphql";
@@ -12,6 +11,8 @@ import {
   type BuilderCustomPageKey,
 } from "../../lib/builderLayouts";
 import { getWebsiteByDomainHost } from "../../lib/websites";
+import { resolveContentSections } from "../../lib/builderContentLanguages";
+import { getBuilderShellSettings } from "../../lib/builderShell";
 
 type WPPageParams = {
   slug?: string[];
@@ -67,20 +68,38 @@ export default async function WPPage({
     const builderPage = builderPages.find((page) => page.slug === slug);
 
     if (builderPage) {
-      const layout = await getPublishedBuilderLayout(
-        builderPage.key as BuilderCustomPageKey
-      );
+      const [layout, shellSettings] = await Promise.all([
+        getPublishedBuilderLayout(builderPage.key as BuilderCustomPageKey),
+        getBuilderShellSettings(),
+      ]);
+      const cookieStore = await cookies();
+      const languageCookie = cookieStore.get("website_content_language_root")?.value;
+      const activeContentLanguage = ["hy", "en", "ru"].includes(languageCookie as never)
+        ? languageCookie!
+        : "hy";
 
-      if (layout?.sections?.some((section) => section.visible)) {
+      const localizedLayout = layout
+        ? {
+            ...layout,
+            sections: resolveContentSections(
+              layout.sections as never,
+              activeContentLanguage,
+              "hy",
+            ) as typeof layout.sections,
+          }
+        : layout;
+
+      if (localizedLayout?.sections?.some((section) => section.visible)) {
         return (
           <StorefrontBuilderRenderer
-            layout={layout}
+            layout={localizedLayout}
             page={builderPage.key}
             pageLabel={builderPage.title}
             breadcrumbItems={[
               { label: "Home", href: "/" },
               { label: builderPage.title, href: `/${builderPage.slug}` },
             ]}
+            headerOverlay={shellSettings.headerOverlay === true}
           />
         );
       }

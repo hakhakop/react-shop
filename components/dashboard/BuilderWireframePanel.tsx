@@ -276,6 +276,8 @@ export default function BuilderWireframePanel({
         </div>
       </div>
 
+
+
       <div className="builder-wireframe-tree" role="tree" aria-label="Page structure">
 
         {sections.length === 0 ? (

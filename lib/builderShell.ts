@@ -1,5 +1,6 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
+import { resolveHeaderBehavior, type HeaderBehavior } from "@/lib/headerBehavior";
 import {
   backupRootBuilderFileBeforeWrite,
   ensureRootBuilderData,
@@ -56,9 +57,18 @@ export type BuilderShellSettings = {
   headerLogoUrl: string | null;
   headerLogoAlt: string;
   headerLogoMaxWidth: number;
+  headerButtonLabel: string;
+  headerButtonUrl: string;
   headerIconVariant: BuilderHeaderIconVariant;
   headerIconOrder: BuilderHeaderIconId[];
   headerActiveIndicator: BuilderHeaderActiveIndicator;
+  headerBehavior: HeaderBehavior;
+  /** Legacy compatibility input. Header rendering uses headerBehavior. */
+  headerSticky?: boolean;
+  headerTransparent: boolean;
+  headerOverlay: boolean;
+  headerWidthMode: "boxed" | "full";
+  headerZIndex: number;
   sectionPaddingTop: BuilderSectionSpacing;
   sectionPaddingBottom: BuilderSectionSpacing;
   sectionMarginTop: BuilderSectionSpacing;
@@ -131,9 +141,16 @@ export const defaultBuilderShellSettings: BuilderShellSettings = {
   headerLogoUrl: null,
   headerLogoAlt: "Site logo",
   headerLogoMaxWidth: 160,
+  headerButtonLabel: "Start",
+  headerButtonUrl: "/client",
   headerIconVariant: "muted",
   headerIconOrder: ["wishlist", "cart", "account", "theme", "search"],
   headerActiveIndicator: "underline",
+  headerBehavior: "sticky",
+  headerTransparent: false,
+  headerOverlay: false,
+  headerWidthMode: "boxed",
+  headerZIndex: 40,
   sectionPaddingTop: "medium",
   sectionPaddingBottom: "medium",
   sectionMarginTop: "none",
@@ -364,11 +381,24 @@ export function normalizeBuilderShellSettings(
       normalizeOptionalString(value?.headerLogoAlt) ??
       defaultBuilderShellSettings.headerLogoAlt,
     headerLogoMaxWidth: normalizeHeaderLogoMaxWidth(value?.headerLogoMaxWidth),
+    headerButtonLabel:
+      normalizeOptionalString(value?.headerButtonLabel) ??
+      defaultBuilderShellSettings.headerButtonLabel,
+    headerButtonUrl:
+      normalizeOptionalString(value?.headerButtonUrl) ??
+      defaultBuilderShellSettings.headerButtonUrl,
     headerIconVariant: normalizeHeaderIconVariant(value?.headerIconVariant),
     headerIconOrder: normalizeHeaderIconOrder(value?.headerIconOrder),
     headerActiveIndicator: normalizeHeaderActiveIndicator(
       value?.headerActiveIndicator,
     ),
+    headerBehavior: resolveHeaderBehavior(value ?? {}),
+    headerTransparent: typeof value?.headerTransparent === "boolean" ? value.headerTransparent : false,
+    headerOverlay: typeof value?.headerOverlay === "boolean" ? value.headerOverlay : false,
+    headerWidthMode: value?.headerWidthMode === "full" ? "full" : "boxed",
+    headerZIndex: typeof value?.headerZIndex === "number" && Number.isFinite(value.headerZIndex)
+      ? Math.max(0, Math.min(999, Math.round(value.headerZIndex)))
+      : 40,
     sectionPaddingTop: normalizeSectionSpacing(
       value?.sectionPaddingTop,
       defaultBuilderShellSettings.sectionPaddingTop

@@ -7,16 +7,17 @@ import {
   type EffectiveHeaderBackgroundContext,
   type EffectiveHeaderTextMode,
 } from "@/lib/headerBackgroundContext";
+import type { HeaderBehavior } from "@/lib/headerBehavior";
 
 type HeaderFrameProps = {
   accentColor: string;
   children: React.ReactNode;
-  /** "sticky" keeps current behavior. "none" disables sticky + scroll-reactive background. */
-  mode?: "sticky" | "none";
+  behavior: HeaderBehavior;
   /** Extra classes appended to the header element. */
   className?: string;
   backgroundMode?: "default" | "glass" | "accent" | "none";
   textMode?: "auto" | "light" | "dark";
+  style?: React.CSSProperties;
 };
 
 /**
@@ -27,31 +28,47 @@ type HeaderFrameProps = {
 export default function HeaderFrame({
   accentColor,
   children,
-  mode = "sticky",
+  behavior,
   className = "",
   backgroundMode = "default",
   textMode = "auto",
+  style,
 }: HeaderFrameProps) {
   const headerRef = React.useRef<HTMLElement>(null);
   const [scrolled, setScrolled] = React.useState(false);
+  const [hiddenByScroll, setHiddenByScroll] = React.useState(false);
+  const previousScrollYRef = React.useRef(0);
   const [autoTextState, setAutoTextState] = React.useState<{
     context: EffectiveHeaderBackgroundContext;
     textMode: EffectiveHeaderTextMode;
   } | null>(null);
   const [overlapHeader, setOverlapHeader] = React.useState(false);
+  const scheduleUpdateRef = React.useRef<() => void>(() => {});
 
   React.useEffect(() => {
     const getScrollY = () => {
-      const previewShell = document.querySelector(".builder-preview-shell");
+      const previewShell = headerRef.current?.closest<HTMLElement>(".builder-preview-shell");
       if (previewShell) {
-        return previewShell.scrollTop;
+        const previewStyle = window.getComputedStyle(previewShell);
+        const previewOwnsScroll =
+          previewShell.scrollHeight > previewShell.clientHeight + 1 &&
+          (previewStyle.overflowY === "auto" || previewStyle.overflowY === "scroll");
+        if (previewOwnsScroll) return previewShell.scrollTop;
       }
       return window.scrollY;
     };
 
     const onScroll = () => {
-      // tweak the value (24) if you want stronger/weaker sensitivity
-      setScrolled(getScrollY() > 24);
+      const nextScrollY = getScrollY();
+      const threshold = behavior === "pill-on-scroll" ? 56 : 24;
+      setScrolled(behavior === "static" ? false : nextScrollY > threshold);
+      setHiddenByScroll(
+        behavior === "sticky-on-scroll-up" &&
+          nextScrollY > 24 &&
+          nextScrollY > previousScrollYRef.current,
+      );
+      previousScrollYRef.current = nextScrollY;
+      scheduleUpdateRef.current();
     };
 
     onScroll(); // run once on mount
@@ -60,7 +77,14 @@ export default function HeaderFrame({
     // including the builder preview shell.
     window.addEventListener("scroll", onScroll, { capture: true, passive: true });
     return () => window.removeEventListener("scroll", onScroll, { capture: true });
-  }, []);
+  }, [behavior]);
+
+  React.useEffect(() => {
+    const pill = headerRef.current?.querySelector<HTMLElement>("#site-header-pill");
+    if (pill) {
+      pill.dataset.scrolled = behavior === "pill-on-scroll" && scrolled ? "true" : "false";
+    }
+  }, [behavior, scrolled]);
 
   React.useEffect(() => {
     const updateOverlapState = () => {
@@ -91,10 +115,14 @@ export default function HeaderFrame({
     }
 
     const themeTextMode = (): EffectiveHeaderTextMode => {
+      const header = headerRef.current;
+      const previewShell = header?.closest<HTMLElement>(".builder-preview-shell");
       const isDark =
         document.documentElement.classList.contains("dark") ||
         document.documentElement.getAttribute("data-theme") === "dark" ||
-        document.body.classList.contains("dark");
+        document.body.classList.contains("dark") ||
+        previewShell?.getAttribute("data-theme") === "dark" ||
+        previewShell?.classList.contains("dark");
       return isDark ? "light" : "dark";
     };
 
@@ -190,6 +218,7 @@ export default function HeaderFrame({
         headerTextMode,
         pageTextMode,
         sectionTextMode,
+        scrolled,
       });
       setAutoTextState((current) =>
         current?.context === nextState.context &&
@@ -206,9 +235,10 @@ export default function HeaderFrame({
       window.cancelAnimationFrame(frameId);
       frameId = window.requestAnimationFrame(updateAutoScheme);
     };
-    const observer = new MutationObserver(scheduleUpdate);
+    scheduleUpdateRef.current = scheduleUpdate;
 
-    observer.observe(document.body, {
+    const observer = new MutationObserver(scheduleUpdate);
+    observer.observe(document.documentElement, {
       childList: true,
       subtree: true,
       attributes: true,
@@ -227,7 +257,7 @@ export default function HeaderFrame({
       observer.disconnect();
       window.removeEventListener("resize", scheduleUpdate);
     };
-  }, [backgroundMode, textMode]);
+  }, [backgroundMode, textMode, scrolled, overlapHeader]);
 
   let bgClass = "";
   let borderClass = "";
@@ -246,7 +276,7 @@ export default function HeaderFrame({
     borderClass = "border-transparent";
     textClass = "text-white [&_.site-header-nav-link]:text-white/80 [&_.site-header-nav-link.is-active]:text-white [&_.site-header-brand]:text-white [&_.site-header-brand_span]:!text-white [&_.site-header-top]:text-white/70";
   } else {
-    // default
+    // default background supports both light and dark mode colors through the CSS variable fallback
     bgClass = "bg-[var(--header-bg,rgba(255,255,255,0.92))]";
     borderClass = scrolled ? "border-[var(--header-border,rgba(209,213,219,0.72))]" : "border-transparent";
   }
@@ -256,25 +286,32 @@ export default function HeaderFrame({
 
   const baseNone = "site-header";
 
-  const base = mode === "sticky" ? baseSticky : baseNone;
-  const state = mode === "sticky" ? stateSticky : "";
+  const isSticky = behavior !== "static";
+  const base = isSticky ? baseSticky : baseNone;
+  const state = isSticky ? stateSticky : "";
 
   const resolvedTextMode =
     textMode === "auto" ? (autoTextState?.textMode ?? "auto") : textMode;
 
   return (
-    <header
-      ref={headerRef}
-      className={`${base} ${state} ${className}`}
-      style={mode === "sticky" ? { borderBottomColor: scrolled ? accentColor : "transparent" } : undefined}
-      data-scrolled={scrolled ? "true" : "false"}
-      data-overlap-header={overlapHeader ? "true" : "false"}
-      data-header-text-mode={resolvedTextMode}
-      data-header-background-context={
-        textMode === "auto" ? autoTextState?.context : undefined
-      }
-    >
-      {children}
-    </header>
+    <div className="site-header-wrapper">
+      <header
+        ref={headerRef}
+        className={`${base} ${state} ${className} ${hiddenByScroll ? "site-header--scroll-hidden" : ""} ${overlapHeader ? "site-header--no-background" : ""}`}
+        style={{
+          ...(isSticky ? { borderBottomColor: scrolled ? accentColor : "transparent" } : {}),
+          ...style,
+        }}
+        data-header-behavior={behavior}
+        data-scrolled={scrolled ? "true" : "false"}
+        data-overlap-header={overlapHeader ? "true" : "false"}
+        data-header-text-mode={resolvedTextMode}
+        data-header-background-context={
+          textMode === "auto" ? autoTextState?.context : undefined
+        }
+      >
+        {children}
+      </header>
+    </div>
   );
 }

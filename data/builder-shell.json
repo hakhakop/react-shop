@@ -12,6 +12,8 @@
   "headerLogoUrl": "https://cms.webpages.am/wp-content/uploads/2026/06/logo-2-1-scaled.png",
   "headerLogoAlt": "WebPages logo",
   "headerLogoMaxWidth": 161,
+  "headerButtonLabel": "Start",
+  "headerButtonUrl": "/client",
   "headerIconVariant": "muted",
   "headerIconOrder": [
     "wishlist",
@@ -21,6 +23,11 @@
     "search"
   ],
   "headerActiveIndicator": "princity",
+  "headerBehavior": "pill-on-scroll",
+  "headerTransparent": false,
+  "headerOverlay": true,
+  "headerWidthMode": "boxed",
+  "headerZIndex": 40,
   "sectionPaddingTop": "lg",
   "sectionPaddingBottom": "lg",
   "sectionMarginTop": "lg",
@@ -161,5 +168,6 @@
       "parentId": null
     }
   ],
-  "updatedAt": "2026-07-05T05:13:55.844Z"
+  "headerSticky": true,
+  "updatedAt": "2026-07-14T17:22:33.756Z"
 }

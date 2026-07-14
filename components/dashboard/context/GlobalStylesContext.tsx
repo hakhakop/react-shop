@@ -27,8 +27,6 @@ export type GlobalStylesContextType = {
   updateDesign: (patch: any) => void;
   updateShellSettings: (patch: any) => void;
   applyDesignPreset: (preset: any) => void;
-  applyHeaderPreset: (preset: any) => void;
-  updateHeaderIcon: (id: any, patch: any) => void;
   openWordPressMediaPicker: (options: WordPressMediaPickerOptions) => void;
   [key: string]: any;
 };

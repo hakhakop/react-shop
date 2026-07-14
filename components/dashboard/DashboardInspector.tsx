@@ -48,6 +48,7 @@ import {
   getBuilderRowLayoutSummary,
 } from "@/components/dashboard/builderLayoutPresets";
 import TypographyPanel from "@/components/dashboard/TypographyPanel";
+import { headerPresets } from "./headerPresets";
 import StyleTabPanel from "@/components/dashboard/style/StyleTabPanel";
 import AnimationControl from "@/components/dashboard/style/AnimationControl";
 import {
@@ -82,6 +83,7 @@ const getSupportedTypographyAreas = (
   if (kind === "button") return ["button"] as const;
   if (kind === "datePicker") return ["title", "body"] as const;
   if (kind === "list") return ["body"] as const;
+  if (kind === "menu") return ["body"] as const;
   if (kind === "table") return ["body"] as const;
   if (
     kind === "image" ||
@@ -792,6 +794,7 @@ type DashboardInspectorProps = {
   selectedSection: BuilderSection | undefined;
   selectedSectionIsFirstVisible?: boolean;
   shellSettings: BuilderShellSettings;
+  updateShellSettings?: (patch: Partial<BuilderShellSettings>) => void;
   uploadingNestedSlide: string | null;
   uploadingSlide: number | null;
   addSelectedLayoutBlockBadge: LooseHandler;
@@ -813,6 +816,7 @@ type DashboardInspectorProps = {
   duplicateSelectedRow?: LooseHandler;
   applyLayoutPreset: (sectionId: string, presetKey: string) => void;
   applySelectedRowLayoutPreset?: (presetKey: string) => void;
+  onApplyHeaderPreset?: (presetKey: string) => void;
   deleteSelectedRow?: LooseHandler;
   moveSelected: LooseHandler;
   openWordPressMediaPicker: (options: {
@@ -822,7 +826,7 @@ type DashboardInspectorProps = {
   }) => void;
   onOpenGlobalSpacingSettings?: (scope: "section" | "row" | "element") => void;
   onOpenGlobalTypographySettings?: () => void;
-  setInspectorOpen: Dispatch<SetStateAction<boolean>>;
+  onCloseInspector: () => void;
   setInspectorTab: Dispatch<SetStateAction<InspectorTab>>;
   setSpacingOverlayEnabled?: Dispatch<SetStateAction<boolean>>;
   setOpenSlideId: Dispatch<SetStateAction<string | null>>;
@@ -895,6 +899,156 @@ function InspectorGroupSummary({
   );
 }
 
+function HeaderDocumentSettings({
+  settings,
+  onChange,
+  onApplyHeaderPreset,
+  headerPresetKey,
+}: {
+  settings: BuilderShellSettings;
+  onChange: (patch: Partial<BuilderShellSettings>) => void;
+  onApplyHeaderPreset?: (presetKey: string) => void;
+  headerPresetKey?: string;
+}) {
+  const activePreset = headerPresets.find((p) => p.key === headerPresetKey);
+  return (
+    <div className="builder-inspector-stack">
+      {onApplyHeaderPreset && (
+        <details className="builder-collapse" open>
+          <summary>
+            <InspectorGroupSummary
+              title="Header Presets"
+              description="Choose a quick-start visual layout for your Header."
+              meta={activePreset ? activePreset.name : "Custom"}
+            />
+          </summary>
+          <div className="builder-header-presets-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", padding: "8px 0" }}>
+            {headerPresets.map((preset) => {
+              const isActive = headerPresetKey === preset.key;
+              return (
+                <button
+                  key={preset.key}
+                  type="button"
+                  className={`builder-header-preset-card${isActive ? " is-active" : ""}`}
+                  onClick={() => onApplyHeaderPreset(preset.key)}
+                  title={preset.description}
+                  style={{
+                    minWidth: 0,
+                    border: "1px solid var(--builder-ui-border)",
+                    borderRadius: "var(--builder-ui-radius-sm)",
+                    padding: "8px 10px",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "flex-start",
+                    background: isActive ? "rgba(13, 115, 255, 0.12)" : "var(--builder-ui-panel-solid)",
+                    color: "var(--builder-ui-text)",
+                    cursor: "pointer",
+                    textAlign: "left",
+                    font: "inherit",
+                    borderColor: isActive ? "var(--builder-ui-accent, #0d73ff)" : "var(--builder-ui-border)",
+                    boxShadow: isActive ? "inset 0 0 0 1px var(--builder-ui-accent, #0d73ff)" : "none",
+                  }}
+                >
+                  <strong style={{ fontSize: "12px", fontWeight: 700, marginBottom: "2px", display: "block" }}>{preset.name}</strong>
+                  <small style={{ color: "var(--builder-ui-muted)", fontSize: "10px", lineHeight: "1.3" }}>{preset.description}</small>
+                </button>
+              );
+            })}
+          </div>
+        </details>
+      )}
+
+      <details className="builder-collapse" open>
+        <summary>
+          <InspectorGroupSummary
+            title="Header Settings"
+            description="Document-wide behavior shared by every Header row and element."
+            meta={settings.headerVisible === false ? "hidden" : "visible"}
+          />
+        </summary>
+        <label className="builder-check">
+          <input type="checkbox" checked={settings.headerVisible !== false} onChange={(event) => onChange({ headerVisible: event.target.checked })} />
+          <span>Show website Header</span>
+        </label>
+        <label className="builder-field">
+          <span>Header Behavior</span>
+          <select
+            value={settings.headerBehavior ?? "sticky"}
+            onChange={(event) => onChange({ headerBehavior: event.target.value as BuilderShellSettings["headerBehavior"] })}
+          >
+            <option value="static">Static</option>
+            <option value="sticky">Sticky</option>
+            <option value="sticky-on-scroll-up">Sticky on scroll up</option>
+            <option value="pill-on-scroll">Pill on scroll</option>
+          </select>
+        </label>
+        <label className="builder-check">
+          <input
+            type="checkbox"
+            checked={settings.headerOverlay === true || settings.headerTransparent === true}
+            disabled={settings.headerOverlay === true}
+            onChange={(event) => onChange({ headerTransparent: event.target.checked })}
+          />
+          <span>Transparent mode</span>
+        </label>
+        <label className="builder-check">
+          <input type="checkbox" checked={settings.headerOverlay === true} onChange={(event) => onChange({ headerOverlay: event.target.checked })} />
+          <span>Pull page content under Header</span>
+        </label>
+        {settings.headerOverlay === true ? (
+          <small>Pull-under mode keeps the Header background transparent.</small>
+        ) : null}
+        <div className="builder-two-column">
+          <label className="builder-field">
+            <span>Header width</span>
+            <select value={settings.headerWidthMode ?? "boxed"} onChange={(event) => onChange({ headerWidthMode: event.target.value as BuilderShellSettings["headerWidthMode"] })}>
+              <option value="boxed">Boxed</option>
+              <option value="full">Full width</option>
+            </select>
+          </label>
+          <label className="builder-field">
+            <span>Z-index</span>
+            <input type="number" min={0} max={999} value={settings.headerZIndex ?? 40} onChange={(event) => onChange({ headerZIndex: Number(event.target.value) })} />
+          </label>
+        </div>
+      </details>
+
+      <details className="builder-collapse">
+        <summary>
+          <InspectorGroupSummary
+            title="Top Toolbar"
+            description="Header-wide announcement and support metadata."
+            meta={settings.topToolbarVisible ? "visible" : "hidden"}
+          />
+        </summary>
+        <label className="builder-check">
+          <input type="checkbox" checked={settings.topToolbarVisible} onChange={(event) => onChange({ topToolbarVisible: event.target.checked })} />
+          <span>Show top toolbar</span>
+        </label>
+        <label className="builder-field">
+          <span>Toolbar text</span>
+          <input value={settings.topToolbarText} onChange={(event) => onChange({ topToolbarText: event.target.value })} />
+        </label>
+        <div className="builder-two-column">
+          <label className="builder-field">
+            <span>Phone / support</span>
+            <input value={settings.topToolbarPhone} onChange={(event) => onChange({ topToolbarPhone: event.target.value })} />
+          </label>
+          <label className="builder-field">
+            <span>Right meta</span>
+            <input value={settings.topToolbarMeta} onChange={(event) => onChange({ topToolbarMeta: event.target.value })} />
+          </label>
+        </div>
+      </details>
+
+      <div className="builder-shell-note">
+        <strong>Page visibility rules</strong>
+        <span>This project currently has no per-page or device-wide Header visibility rule fields. Use element Advanced visibility for element-level responsive control.</span>
+      </div>
+    </div>
+  );
+}
+
 function flattenCategoryTree(
   categoryTree: CategoryTreeItem[],
   depth = 0,
@@ -947,6 +1101,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
     selectedSection,
     selectedSectionIsFirstVisible = false,
     shellSettings,
+    updateShellSettings = () => undefined,
     uploadingNestedSlide,
     uploadingSlide,
     addSelectedLayoutBlockBadge,
@@ -966,13 +1121,14 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
     duplicateSelectedRow = () => undefined,
     applyLayoutPreset,
     applySelectedRowLayoutPreset = () => undefined,
+    onApplyHeaderPreset,
     deleteSelectedRow = () => undefined,
     onUpdateRowStyle = () => undefined,
     moveSelected,
     openWordPressMediaPicker,
     onOpenGlobalSpacingSettings,
     onOpenGlobalTypographySettings,
-    setInspectorOpen,
+    onCloseInspector,
     setInspectorTab,
     setOpenSlideId,
     setSpacingOverlayEnabled = () => undefined,
@@ -1584,7 +1740,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
               <button
                 type="button"
                 className="builder-inspector-close"
-                onClick={() => setInspectorOpen(false)}
+                onClick={onCloseInspector}
                 aria-label="Close inspector"
               >
                 <PanelRightClose size={14} />
@@ -1639,7 +1795,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                 <button
                   type="button"
                   className="builder-inspector-close"
-                  onClick={() => setInspectorOpen(false)}
+                  onClick={onCloseInspector}
                   aria-label="Close inspector"
                 >
                   <PanelRightClose size={14} />
@@ -1756,6 +1912,18 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
             </div>
           ) : null}
 
+          {selectedSection.id === "header-document" &&
+            !selectedLayoutBlock &&
+            !selectedLayoutRow &&
+            inspectorTab === "layout" ? (
+              <HeaderDocumentSettings
+                settings={shellSettings}
+                onChange={updateShellSettings}
+                onApplyHeaderPreset={onApplyHeaderPreset}
+                headerPresetKey={selectedSection.headerPresetKey}
+              />
+            ) : null}
+
           {selectedLayoutBlock?.kind === "image" && isElementSettingsTab && (
             <div className="builder-inspector-stack">
               <details className="builder-collapse" open>
@@ -1857,6 +2025,49 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                       : "Custom or legacy row"}
                   </small>
                 </label>
+
+                {selectedSection?.id === "header-document" ? (
+                  <>
+                    <div className="builder-two-column">
+                      <label className="builder-field">
+                        <span>Justification</span>
+                        <select
+                          value={selectedRowItem?.headerJustify ?? "space-between"}
+                          onChange={(event) => onUpdateRowStyle({
+                            headerJustify: event.target.value as NonNullable<typeof selectedRowItem>["headerJustify"],
+                          })}
+                        >
+                          <option value="start">Start</option>
+                          <option value="center">Center</option>
+                          <option value="space-between">Space between</option>
+                          <option value="end">End</option>
+                        </select>
+                      </label>
+                      <label className="builder-field">
+                        <span>Alignment</span>
+                        <select
+                          value={selectedRowItem?.headerAlign ?? "center"}
+                          onChange={(event) => onUpdateRowStyle({
+                            headerAlign: event.target.value as NonNullable<typeof selectedRowItem>["headerAlign"],
+                          })}
+                        >
+                          <option value="start">Start</option>
+                          <option value="center">Center</option>
+                          <option value="end">End</option>
+                          <option value="stretch">Stretch</option>
+                        </select>
+                      </label>
+                    </div>
+                    <label className="builder-field">
+                      <span>Element Gap</span>
+                      <input
+                        value={selectedRowItem?.headerGap ?? ""}
+                        placeholder="Inherit (for example 2rem)"
+                        onChange={(event) => onUpdateRowStyle({ headerGap: event.target.value || undefined })}
+                      />
+                    </label>
+                  </>
+                ) : null}
 
                 <div className="builder-layout-picker-grid is-inline">
                   {builderRowLayoutPresets.map((preset) => {
@@ -2118,7 +2329,8 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
 
           {((!selectedLayoutBlock &&
             !selectedLayoutRow &&
-            inspectorTab === "layout") ||
+            inspectorTab === "layout" &&
+            selectedSection.id !== "header-document") ||
             (selectedLayoutBlock &&
               isLayoutContainerSection(selectedSection) &&
               (isElementContentTab ||
@@ -4797,7 +5009,210 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                           {isSelectedBlock &&
                                             isElementContentTab && (
                                               <>
-                                                {block.kind === "button" ? (
+                                                {selectedSection?.id === "header-document" && block.kind === "image" ? (
+                                                  <>
+                                                    <div className="builder-element-inspector-note">
+                                                      <strong>Header Logo</strong>
+                                                      <span>The Header document owns this logo content and presentation.</span>
+                                                    </div>
+                                                    <label className="builder-field">
+                                                      <span>Presentation</span>
+                                                      <select value={block.headerBrandMode ?? "logo"} onChange={(event) => updateSelectedLayoutBlock(index, blockIndex, { headerBrandMode: event.target.value as BuilderLayoutBlock["headerBrandMode"] })}>
+                                                        <option value="logo">Logo only</option>
+                                                        <option value="brand">Text brand</option>
+                                                        <option value="both">Logo + text</option>
+                                                      </select>
+                                                    </label>
+                                                    <label className="builder-field">
+                                                      <span>Brand text</span>
+                                                      <input value={block.headerBrandText ?? ""} onChange={(event) => updateSelectedLayoutBlock(index, blockIndex, { headerBrandText: event.target.value })} placeholder="WebPages" />
+                                                    </label>
+                                                    <label className="builder-field">
+                                                      <span>Logo image</span>
+                                                      <BuilderImageUrlControl
+                                                        value={block.imageUrl ?? ""}
+                                                        onChange={(event) => updateSelectedLayoutBlock(index, blockIndex, { imageUrl: event.target.value })}
+                                                        onChoose={() => openWordPressMediaPicker({
+                                                          title: "Header Logo",
+                                                          currentUrl: block.imageUrl ?? "",
+                                                          onSelect: (media) => updateSelectedLayoutBlock(index, blockIndex, {
+                                                            imageUrl: media.sourceUrl,
+                                                            imageAlt: block.imageAlt || media.altText || media.title || "Site logo",
+                                                          }),
+                                                        })}
+                                                      />
+                                                    </label>
+                                                    <label className="builder-field">
+                                                      <span>Logo alt text</span>
+                                                      <input value={block.imageAlt ?? ""} onChange={(event) => updateSelectedLayoutBlock(index, blockIndex, { imageAlt: event.target.value })} />
+                                                    </label>
+                                                    <div className="builder-two-column">
+                                                      <label className="builder-field">
+                                                        <span>Max width</span>
+                                                        <input type="number" min={40} max={360} value={block.imageMaxWidth ?? 160} onChange={(event) => updateSelectedLayoutBlock(index, blockIndex, { imageMaxWidth: Number(event.target.value) })} />
+                                                      </label>
+                                                      <label className="builder-field">
+                                                        <span>Alignment</span>
+                                                        <select value={block.imageAlignment ?? "left"} onChange={(event) => updateSelectedLayoutBlock(index, blockIndex, { imageAlignment: event.target.value as BuilderLayoutBlock["imageAlignment"] })}>
+                                                          <option value="left">Left</option>
+                                                          <option value="center">Center</option>
+                                                          <option value="right">Right</option>
+                                                        </select>
+                                                      </label>
+                                                    </div>
+                                                  </>
+                                                ) : selectedSection?.id === "header-document" && block.kind === "button" ? (
+                                                  <>
+                                                    <label className="builder-field">
+                                                      <span>Button Label</span>
+                                                      <input
+                                                        value={block.buttonLabel ?? ""}
+                                                        onChange={(event) =>
+                                                          updateSelectedLayoutBlock(
+                                                            index,
+                                                            blockIndex,
+                                                            { buttonLabel: event.target.value },
+                                                          )
+                                                        }
+                                                      />
+                                                    </label>
+                                                    <label className="builder-field">
+                                                      <span>Button URL</span>
+                                                      <input
+                                                        value={block.buttonUrl ?? ""}
+                                                        onChange={(event) =>
+                                                          updateSelectedLayoutBlock(
+                                                            index,
+                                                            blockIndex,
+                                                            { buttonUrl: event.target.value },
+                                                          )
+                                                        }
+                                                      />
+                                                    </label>
+                                                  </>
+                                                ) : block.kind === "menu" ? (
+                                                  <>
+                                                    <div className="builder-element-inspector-note">
+                                                      <strong>Navigation Menu</strong>
+                                                      <span>
+                                                        Renders the website menu with its real labels, URLs, hierarchy, and active-link behavior.
+                                                      </span>
+                                                    </div>
+                                                    <label className="builder-field">
+                                                      <span>Menu Source</span>
+                                                      <select
+                                                        value={block.menuSource ?? "main"}
+                                                        onChange={(event) =>
+                                                          updateSelectedLayoutBlock(
+                                                            index,
+                                                            blockIndex,
+                                                            { menuSource: event.target.value },
+                                                          )
+                                                        }
+                                                      >
+                                                        <option value="main">Main Menu</option>
+                                                      </select>
+                                                      <small>
+                                                        Additional menu sources can be added here later.
+                                                      </small>
+                                                    </label>
+                                                    <div className="builder-two-column">
+                                                      <label className="builder-field">
+                                                        <span>Item Spacing</span>
+                                                        <input value={block.menuItemGap ?? ""} placeholder="Inherit (for example 1.4rem)" onChange={(event) => updateSelectedLayoutBlock(index, blockIndex, { menuItemGap: event.target.value || undefined })} />
+                                                      </label>
+                                                      <label className="builder-field">
+                                                        <span>Alignment</span>
+                                                        <select value={block.elementAlign ?? "center"} onChange={(event) => updateSelectedLayoutBlock(index, blockIndex, { elementAlign: event.target.value as BuilderLayoutBlock["elementAlign"] })}>
+                                                          <option value="left">Left</option>
+                                                          <option value="center">Center</option>
+                                                          <option value="right">Right</option>
+                                                        </select>
+                                                      </label>
+                                                    </div>
+                                                    <div className="builder-two-column">
+                                                      <label className="builder-field"><span>Hover Color</span><input type="color" value={block.menuHoverColor ?? "#111827"} onChange={(event) => updateSelectedLayoutBlock(index, blockIndex, { menuHoverColor: event.target.value })} /></label>
+                                                      <label className="builder-field"><span>Active Color</span><input type="color" value={block.menuActiveColor ?? "#111827"} onChange={(event) => updateSelectedLayoutBlock(index, blockIndex, { menuActiveColor: event.target.value })} /></label>
+                                                    </div>
+                                                    <label className="builder-field">
+                                                      <span>Active indicator</span>
+                                                      <select value={block.menuActiveIndicator ?? "underline"} onChange={(event) => updateSelectedLayoutBlock(index, blockIndex, { menuActiveIndicator: event.target.value as BuilderLayoutBlock["menuActiveIndicator"] })}>
+                                                        <option value="princity">Princity motion</option>
+                                                        <option value="underline">Underline</option>
+                                                        <option value="none">None</option>
+                                                      </select>
+                                                    </label>
+                                                  </>
+                                                ) : block.kind === "headerCategories" ? (
+                                                  <>
+                                                    <div className="builder-element-inspector-note">
+                                                      <strong>Category Menu</strong>
+                                                      <span>Controls the existing category burger and dropdown.</span>
+                                                    </div>
+                                                    <label className="builder-field">
+                                                      <span>Label</span>
+                                                      <input value={block.headerCategoriesLabel ?? "Categories"} onChange={(event) => updateSelectedLayoutBlock(index, blockIndex, { headerCategoriesLabel: event.target.value })} />
+                                                    </label>
+                                                    <label className="builder-check">
+                                                      <input type="checkbox" checked={block.headerCategoriesShowLabel !== false} onChange={(event) => updateSelectedLayoutBlock(index, blockIndex, { headerCategoriesShowLabel: event.target.checked })} />
+                                                      <span>Show label beside burger icon</span>
+                                                    </label>
+                                                    <label className="builder-field">
+                                                      <span>Alignment</span>
+                                                      <select value={block.elementAlign ?? "center"} onChange={(event) => updateSelectedLayoutBlock(index, blockIndex, { elementAlign: event.target.value as BuilderLayoutBlock["elementAlign"] })}>
+                                                        <option value="left">Left</option>
+                                                        <option value="center">Center</option>
+                                                        <option value="right">Right</option>
+                                                      </select>
+                                                    </label>
+                                                  </>
+                                                ) : block.kind === "headerLanguage" ? (
+                                                  <>
+                                                    <div className="builder-element-inspector-note">
+                                                      <strong>Language Switcher</strong>
+                                                      <span>Uses the website&apos;s enabled content languages.</span>
+                                                    </div>
+                                                    <label className="builder-field">
+                                                      <span>Language labels</span>
+                                                      <select value={block.headerLanguageDisplay ?? "native"} onChange={(event) => updateSelectedLayoutBlock(index, blockIndex, { headerLanguageDisplay: event.target.value as BuilderLayoutBlock["headerLanguageDisplay"] })}>
+                                                        <option value="native">Native names</option>
+                                                        <option value="code">Language codes</option>
+                                                      </select>
+                                                    </label>
+                                                    <label className="builder-field">
+                                                      <span>Alignment</span>
+                                                      <select value={block.elementAlign ?? "center"} onChange={(event) => updateSelectedLayoutBlock(index, blockIndex, { elementAlign: event.target.value as BuilderLayoutBlock["elementAlign"] })}>
+                                                        <option value="left">Left</option>
+                                                        <option value="center">Center</option>
+                                                        <option value="right">Right</option>
+                                                      </select>
+                                                    </label>
+                                                  </>
+                                                ) : block.kind === "headerUtility" || ["headerSearch", "headerWishlist", "headerCart", "headerAccount", "headerTheme"].includes(block.kind ?? "") ? (
+                                                  <>
+                                                    <div className="builder-element-inspector-note">
+                                                      <strong>{layoutBlockLabels[block.kind ?? "headerUtility"]}</strong>
+                                                      <span>This action is stored as its own Header element.</span>
+                                                    </div>
+                                                    <label className="builder-field">
+                                                      <span>Style</span>
+                                                      <select value={block.headerUtilityVariant ?? "muted"} onChange={(event) => updateSelectedLayoutBlock(index, blockIndex, { headerUtilityVariant: event.target.value as BuilderLayoutBlock["headerUtilityVariant"] })}>
+                                                        <option value="muted">Muted</option>
+                                                        <option value="ghost">Ghost</option>
+                                                        <option value="solid">Solid</option>
+                                                        <option value="icon">Icon only</option>
+                                                      </select>
+                                                    </label>
+                                                    <label className="builder-field">
+                                                      <span>Alignment</span>
+                                                      <select value={block.elementAlign ?? "center"} onChange={(event) => updateSelectedLayoutBlock(index, blockIndex, { elementAlign: event.target.value as BuilderLayoutBlock["elementAlign"] })}>
+                                                        <option value="left">Left</option>
+                                                        <option value="center">Center</option>
+                                                        <option value="right">Right</option>
+                                                      </select>
+                                                    </label>
+                                                  </>
+                                                ) : block.kind === "button" ? (
                                                   <>
                                                     <div className="builder-section-heading">
                                                       <span>Buttons</span>

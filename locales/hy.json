@@ -229,4 +229,7 @@
   ,"builder.contentLanguage.primaryFallback": "Օգտագործվում է հիմնական լեզուն"
   ,"websites.primaryLanguage": "Հիմնական լեզու"
   ,"websites.enabledLanguages": "Լրացուցիչ ակտիվ լեզուներ"
+  ,"builder.navigation.header": "Վերնագիր"
+  ,"builder.navigation.website": "Կայք"
+  ,"builder.navigation.globalArea": "Կայքի ընդհանուր տարածք"
 }

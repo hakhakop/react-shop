@@ -14,12 +14,15 @@ import {
   ExternalLink,
   GalleryHorizontal,
   Grid3X3,
+  GripVertical,
   Heart,
   ImageIcon,
   Layers3,
   ListChecks,
   Navigation,
   PanelLeft,
+  PanelRightOpen,
+  Languages,
   Plus,
   ShoppingBag,
   LockKeyhole,
@@ -50,6 +53,14 @@ import {
   isUsingPrimaryFallback,
   resolveContentSections,
 } from "@/lib/builderContentLanguages";
+import { resolveHeaderBuilderComposition } from "@/lib/headerBuilderComposition";
+import {
+  decodeHeaderBlockDragPayload,
+  encodeHeaderBlockDragPayload,
+  HEADER_BLOCK_DRAG_TYPE,
+  moveHeaderBlockById,
+  type HeaderBlockDragPayload,
+} from "@/lib/headerBuilderBlockMove";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import type { SaaSUserRole } from "@/lib/auth";
 import type {
@@ -72,6 +83,7 @@ import CarouselBlock, {
   type CarouselSlide,
 } from "@/components/blocks/CarouselBlock";
 import BuilderScrollAnimations from "@/components/builder/BuilderScrollAnimations";
+import StorefrontBuilderRenderer from "@/components/builder/StorefrontBuilderRenderer";
 import CategoryBar from "@/components/CategoryBar";
 import CategoryWithFilters from "@/components/CategoryWithFilters";
 import ProductCategoryFilterProvider from "@/components/ProductCategoryFilterProvider";
@@ -80,6 +92,7 @@ import FluentFormClient from "@/components/builder/FluentFormClient";
 import ProductCarousel from "@/components/ProductCarousel";
 import ProductOptionsSelector from "@/components/ProductOptionsSelector";
 import DashboardInspector from "@/components/dashboard/DashboardInspector";
+import { headerPresets } from "./headerPresets";
 import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
 import BuilderWireframePanel from "@/components/dashboard/BuilderWireframePanel";
 import MediaManager from "@/components/dashboard/media/MediaManager";
@@ -92,12 +105,7 @@ import type {
   BuilderCustomPageKey,
   BuilderColorScheme,
   BuilderDesign,
-  BuilderHeaderActiveIndicator,
-  BuilderHeaderBackgroundMode,
-  BuilderHeaderTextMode,
-  BuilderHeaderBrandMode,
   BuilderHeaderIconId,
-  BuilderHeaderIconVariant,
   BuilderLayoutBlock,
   BuilderLayoutKey,
   BuilderSavedTemplate,
@@ -193,6 +201,11 @@ const BUILDER_TEMPLATE_ELEMENT_DND_TYPE =
   "application/x-builder-template-element";
 
 type BuilderTemplateDragType = "section" | "row" | "element";
+
+const getElementDropPlacement = (
+  clientY: number,
+  rect: Pick<DOMRect, "top" | "height">,
+): "above" | "below" => clientY - rect.top < rect.height / 2 ? "above" : "below";
 
 function getBuilderTemplateDragType(
   types: Iterable<string> | ArrayLike<string>,
@@ -312,9 +325,16 @@ const defaultShellSettings: BuilderShellSettings = {
   headerLogoUrl: null,
   headerLogoAlt: "Site logo",
   headerLogoMaxWidth: 160,
+  headerButtonLabel: "Start",
+  headerButtonUrl: "/client",
   headerIconVariant: "muted",
   headerIconOrder: ["wishlist", "cart", "account", "theme", "search"],
   headerActiveIndicator: "underline",
+  headerBehavior: "sticky",
+  headerTransparent: false,
+  headerOverlay: false,
+  headerWidthMode: "boxed",
+  headerZIndex: 40,
   sectionPaddingTop: "medium",
   sectionPaddingBottom: "medium",
   sectionMarginTop: "none",
@@ -377,16 +397,14 @@ const defaultMenuPresentation: MenuPresentationSettings = {
   badgeText: null,
 };
 
-const headerIconOptions: {
-  id: BuilderHeaderIconId;
-  label: string;
-}[] = [
-  { id: "wishlist", label: "Wishlist" },
-  { id: "cart", label: "Cart" },
-  { id: "account", label: "Account" },
-  { id: "theme", label: "Night mode" },
-  { id: "search", label: "Search" },
-];
+const headerActionFromKind = (kind?: LayoutBlockKind): BuilderHeaderIconId | undefined => {
+  if (kind === "headerSearch") return "search";
+  if (kind === "headerWishlist") return "wishlist";
+  if (kind === "headerCart") return "cart";
+  if (kind === "headerAccount") return "account";
+  if (kind === "headerTheme") return "theme";
+  return undefined;
+};
 
 function normalizeMenuPresentation(
   value?: Partial<MenuPresentationSettings> | null,
@@ -631,6 +649,11 @@ function getPreviewUrlForBuilderKey(
   customPages: BuilderCustomPage[],
   websiteRouteSegment?: string,
 ) {
+  if (key === "header" || key === "footer") {
+    return websiteRouteSegment
+      ? `/app/websites/${websiteRouteSegment}/preview?page=home`
+      : "/";
+  }
   if (!websiteRouteSegment) return getFrontendUrlForBuilderKey(key, customPages);
 
   const params = new URLSearchParams({ page: key });
@@ -956,6 +979,70 @@ function BodyText({
 }
 
 function getDefaultStateForKey(key: BuilderLayoutKey): BuilderState {
+  if (key === "header") {
+    return {
+      ...structuredClone(defaultState),
+      page: "header",
+      targetType: "header",
+      template: undefined,
+      sections: [
+        {
+          id: "header-document",
+          kind: "contentLayout",
+          title: "Header",
+          background: "transparent",
+          backgroundMode: "full",
+          contentMode: "boxed",
+          colorScheme: "inherit",
+          layout: "header-row",
+          layoutColumns: 1,
+          headerUtilityMigrationVersion: 3,
+          layoutItems: [],
+          visible: true,
+        },
+      ],
+    };
+  }
+
+  if (key === "footer") {
+    return {
+      ...structuredClone(defaultState),
+      page: "footer",
+      targetType: "footer",
+      template: undefined,
+      sections: [
+        {
+          id: "footer-document",
+          kind: "contentLayout",
+          title: "Footer",
+          background: "#111111",
+          backgroundMode: "full",
+          contentMode: "boxed",
+          colorScheme: "dark",
+          topSpacing: "sm",
+          bottomSpacing: "sm",
+          layout: "halves",
+          layoutColumns: 2,
+          layoutItems: [
+            {
+              id: "footer-main-left",
+              rowId: "footer-main-row",
+              rowLayout: "halves",
+              blocks: [{ id: "footer-copyright", kind: "text", body: "© 2025 Webpages · Headless WooCommerce demo" }],
+            },
+            {
+              id: "footer-main-right",
+              rowId: "footer-main-row",
+              rowLayout: "halves",
+              blocks: [{ id: "footer-platform", kind: "text", body: "Powered by WordPress · WooCommerce · WPGraphQL · Next.js" }],
+            },
+          ],
+          visible: true,
+        },
+      ],
+    };
+  }
+
   if (key in defaultTemplateStates) {
     return structuredClone(defaultTemplateStates[key as BuilderTemplate]);
   }
@@ -1055,6 +1142,18 @@ function getDefaultStateForKey(key: BuilderLayoutKey): BuilderState {
   };
 }
 
+function hydrateDocumentBuilderState(
+  state: BuilderState,
+  _settings: BuilderShellSettings,
+): BuilderState {
+  if (state.page !== "header" && state.page !== "footer") return state;
+  // Document migration is a one-time creation concern. Once a Builder document
+  // exists, hydration must never repair, populate, or reshape its rows.
+  return state.targetType === state.page
+    ? state
+    : { ...state, targetType: state.page };
+}
+
 function loadInitialState(
   storageKeys: BuilderStorageKeys = defaultBuilderStorageKeys,
 ): BuilderState {
@@ -1096,7 +1195,12 @@ function normalizeBuilderState(
   return {
     ...state,
     page: key,
-    targetType: isTemplate ? "template" : "page",
+    targetType:
+      key === "header" || key === "footer"
+        ? key
+        : isTemplate
+          ? "template"
+          : "page",
     template: isTemplate ? (key as BuilderTemplate) : undefined,
     sections,
     design: {
@@ -1324,6 +1428,49 @@ function getPreviewProductModel(previewProducts: ProductNode[]) {
   };
 }
 
+function mergeBrandingIntoPreset(
+  currentSections: BuilderSection[],
+  presetSections: BuilderSection[],
+): BuilderSection[] {
+  let currentLogoBlock: any = null;
+  for (const s of currentSections) {
+    for (const item of s.layoutItems ?? []) {
+      for (const block of item.blocks ?? []) {
+        if (block.id === "header-logo" || (block.kind === "image" && block.headerBrandMode)) {
+          currentLogoBlock = block;
+          break;
+        }
+      }
+      if (currentLogoBlock) break;
+    }
+    if (currentLogoBlock) break;
+  }
+
+  if (!currentLogoBlock) {
+    return presetSections;
+  }
+
+  return presetSections.map(section => ({
+    ...section,
+    layoutItems: (section.layoutItems ?? []).map(item => ({
+      ...item,
+      blocks: (item.blocks ?? []).map(block => {
+        if (block.id === "header-logo" || (block.kind === "image" && block.headerBrandMode)) {
+          return {
+            ...block,
+            imageUrl: currentLogoBlock.imageUrl ?? block.imageUrl,
+            imageAlt: currentLogoBlock.imageAlt ?? block.imageAlt,
+            imageMaxWidth: currentLogoBlock.imageMaxWidth ?? block.imageMaxWidth,
+            headerBrandMode: currentLogoBlock.headerBrandMode ?? block.headerBrandMode,
+            headerBrandText: currentLogoBlock.headerBrandText ?? block.headerBrandText,
+          };
+        }
+        return block;
+      }),
+    })),
+  }));
+}
+
 export type DashboardBuilderProps = {
   menuTree?: MenuItem[];
   websiteId?: string;
@@ -1347,6 +1494,10 @@ export default function DashboardBuilder({
   const { theme } = useTheme();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const [headerContextKey, setHeaderContextKey] = useState<BuilderLayoutKey>(() => {
+    const requestedContext = parseBuilderLayoutKey(searchParams.get("context"));
+    return requestedContext && requestedContext !== "header" ? requestedContext : "shop";
+  });
   const storageKeys = useMemo(() => getBuilderStorageKeys(websiteId), [websiteId]);
   const builderApiUrl = useCallback(
     (path: string, params: Record<string, string | number | boolean> = {}) => {
@@ -1401,7 +1552,45 @@ export default function DashboardBuilder({
   const shellSettingsStatusLabel = isWebsiteScopedBuilder
     ? "Website settings"
     : "Root website settings";
-  const [builderState, setBuilderState] = useState<BuilderState>(defaultState);
+  const [builderState, setRawBuilderState] = useState<BuilderState>(defaultState);
+  const setBuilderState = useCallback((value: BuilderState | ((current: BuilderState) => BuilderState)) => {
+    setRawBuilderState((current) => {
+      let nextState = typeof value === "function" ? value(current) : value;
+      if (nextState.page === "header" && nextState.sections && nextState.sections.length > 0) {
+        const oldSec = current.sections?.[0];
+        const nextSec = nextState.sections[0];
+        if (oldSec && nextSec) {
+          const oldKey = oldSec.headerPresetKey;
+          const nextKey = nextSec.headerPresetKey;
+
+          if (oldKey !== undefined && oldKey === nextKey) {
+            const oldSectionWithoutKey = { ...oldSec, headerPresetKey: undefined };
+            const nextSectionWithoutKey = { ...nextSec, headerPresetKey: undefined };
+
+            if (JSON.stringify(oldSectionWithoutKey) !== JSON.stringify(nextSectionWithoutKey)) {
+              nextState = {
+                ...nextState,
+                sections: [
+                  {
+                    ...nextSec,
+                    headerPresetKey: undefined
+                  },
+                  ...nextState.sections.slice(1)
+                ]
+              };
+            }
+          }
+        }
+      }
+      return nextState;
+    });
+  }, []);
+  const builderStateRef = useRef(builderState);
+  builderStateRef.current = builderState;
+  const restoredDraftKeysRef = useRef(new Set<BuilderLayoutKey>());
+  const [headerDocumentPreviewState, setHeaderDocumentPreviewState] = useState<BuilderState | null>(null);
+  const [footerDocumentPreviewState, setFooterDocumentPreviewState] = useState<BuilderState | null>(null);
+  const [presetToApply, setPresetToApply] = useState<{ presetKey: string; name: string } | null>(null);
   const [dashboardTheme, setDashboardTheme] = useState<"light" | "dark">(
     "dark",
   );
@@ -1452,11 +1641,26 @@ export default function DashboardBuilder({
     (builderState.design.colorScheme === "auto" && theme === "dark")
       ? "dark"
       : "light";
-  const [selectedId, setSelectedId] = useState(
-    defaultState.sections[0]?.id ?? "",
-  );
+  const [selectedId, setSelectedId] = useState("");
   const [headerSelected, setHeaderSelected] = useState(false);
   const [headerHovered, setHeaderHovered] = useState(false);
+  const [draggingHeaderElementId, setDraggingHeaderElementId] = useState<string | null>(null);
+  const [draggingHeaderRowId, setDraggingHeaderRowId] = useState<string | null>(null);
+  const [headerDropTarget, setHeaderDropTarget] = useState<string | null>(null);
+  const [headerRowDropTarget, setHeaderRowDropTarget] = useState<string | null>(null);
+
+  useEffect(() => {
+    const clearHeaderDragState = () => {
+      setDraggingHeaderElementId(null);
+      setHeaderDropTarget(null);
+    };
+    window.addEventListener("dragend", clearHeaderDragState);
+    window.addEventListener("drop", clearHeaderDragState);
+    return () => {
+      window.removeEventListener("dragend", clearHeaderDragState);
+      window.removeEventListener("drop", clearHeaderDragState);
+    };
+  }, []);
   const [device, setDevice] = useState<PreviewDevice>("desktop");
   const [customMobileWidth, setCustomMobileWidth] = useState(390);
   const [customTabletWidth, setCustomTabletWidth] = useState(820);
@@ -1496,7 +1700,6 @@ export default function DashboardBuilder({
     | "spacing"
     | "cards"
     | "typography"
-    | "header"
     | "buttons"
   >("presets");
   const [globalSpacingFocus, setGlobalSpacingFocus] = useState<
@@ -1515,9 +1718,8 @@ export default function DashboardBuilder({
     scope: string;
     field?: string;
   } | null>(null);
-  const [sidebarTab, setSidebarTab] = useState<SidebarTab>("settings");
+  const [sidebarTab, setSidebarTab] = useState<SidebarTab>("builder");
   const [panelForceToggler, setPanelForceToggler] = useState(0);
-  const [inspectorOpenKey, setInspectorOpenKey] = useState(0);
   const [shellSettings, setShellSettings] =
     useState<BuilderShellSettings>(defaultShellSettings);
   const [shellStatus, setShellStatus] = useState(
@@ -1585,6 +1787,8 @@ export default function DashboardBuilder({
   const skipUndoCaptureRef = useRef(false);
   const [committedBuilderStateSignature, setCommittedBuilderStateSignature] =
     useState("");
+  const [committedShellSettingsSignature, setCommittedShellSettingsSignature] =
+    useState("");
   const undoRef = useRef<() => void>(() => {});
   const redoRef = useRef<() => void>(() => {});
 
@@ -1596,10 +1800,93 @@ export default function DashboardBuilder({
     () => resolveContentSections(builderState.sections, contentLanguage, primaryContentLanguage),
     [builderState.sections, contentLanguage, primaryContentLanguage],
   );
+  const headerContextState = useMemo(
+    () =>
+      builderState.page === "header"
+        ? loadDraftForKey(headerContextKey, storageKeys)
+        : builderState,
+    [builderState, headerContextKey, storageKeys],
+  );
+  const headerContextSections = useMemo(
+    () => resolveContentSections(
+      headerContextState.sections,
+      contentLanguage,
+      primaryContentLanguage,
+    ),
+    [contentLanguage, headerContextState.sections, primaryContentLanguage],
+  );
+  const footerPageContextState = useMemo(
+    () => builderState.page === "footer"
+      ? loadDraftForKey(headerContextKey, storageKeys)
+      : builderState,
+    [builderState, headerContextKey, storageKeys],
+  );
+  const footerPageContextSections = useMemo(
+    () => resolveContentSections(
+      footerPageContextState.sections,
+      contentLanguage,
+      primaryContentLanguage,
+    ),
+    [contentLanguage, footerPageContextState.sections, primaryContentLanguage],
+  );
+  const headerDocumentState = useMemo(
+    () => builderState.page === "header"
+      ? builderState
+      : headerDocumentPreviewState ?? hydrateDocumentBuilderState(loadDraftForKey("header", storageKeys), shellSettings),
+    [builderState, headerDocumentPreviewState, shellSettings, storageKeys],
+  );
+  const footerDocumentState = useMemo(
+    () => builderState.page === "footer"
+      ? builderState
+      : footerDocumentPreviewState ?? hydrateDocumentBuilderState(loadDraftForKey("footer", storageKeys), shellSettings),
+    [builderState, footerDocumentPreviewState, shellSettings, storageKeys],
+  );
+  const footerDocumentSections = useMemo(
+    () => resolveContentSections(
+      footerDocumentState.sections,
+      contentLanguage,
+      primaryContentLanguage,
+    ),
+    [contentLanguage, footerDocumentState.sections, primaryContentLanguage],
+  );
+  const headerCompositionSections = useMemo(
+    () => resolveContentSections(
+      headerDocumentState.sections,
+      contentLanguage,
+      primaryContentLanguage,
+    ),
+    [contentLanguage, headerDocumentState.sections, primaryContentLanguage],
+  );
+  const currentHeaderComposition = useMemo(
+    () => {
+      const composition = resolveHeaderBuilderComposition({ sections: headerCompositionSections });
+      return { ...composition, columns: composition.columns ?? [] };
+    },
+    [headerCompositionSections],
+  );
+  const primaryHeaderColumnId = currentHeaderComposition.columns[0]?.id ?? "header-main-row";
+  const builderHeaderCategoriesContent = previewCategoryTree.length > 0 ? (
+    <div className="category-mega-menu">
+      <div className="category-mega-header">
+        <span>Shop by category</span>
+      </div>
+      <div className="category-mega-grid">
+          {previewCategoryTree.map((category) => (
+            <div key={category.id} className="category-mega-root">
+              <strong>{category.name}</strong>
+              {category.children.map((child) => <span key={child.id}>{child.name}</span>)}
+            </div>
+          ))}
+      </div>
+    </div>
+  ) : null;
   const selectedSection = useMemo(
     () => localizedSections.find((section) => section.id === selectedId),
     [localizedSections, selectedId],
   );
+  useEffect(() => {
+    setInspectorOpen(Boolean(selectedSection));
+  }, [selectedSection]);
   const selectedSectionIsFirstVisible =
     builderState.sections.find((section) => section.visible)?.id ===
     selectedSection?.id;
@@ -1617,17 +1904,20 @@ export default function DashboardBuilder({
     return null;
   }, [selectedLayoutBlockKey, selectedSection]);
   const availableLayoutBlockKinds = useMemo(
-    () => getLayoutBlockKindsForState(),
-    [],
+    () =>
+      builderState.page === "header"
+        ? (["image", "menu", "button", "embed", "headerSearch", "headerWishlist", "headerCart", "headerAccount", "headerTheme", "headerCategories", "headerLanguage"] as LayoutBlockKind[])
+        : getLayoutBlockKindsForState(),
+    [builderState.page],
   );
   const currentFrontendUrl = useMemo(
     () =>
       getPreviewUrlForBuilderKey(
-        builderState.page,
+        builderState.page === "header" ? headerContextState.page : builderState.page,
         customPages,
         websiteRouteSegment,
       ),
-    [builderState.page, customPages, websiteRouteSegment],
+    [builderState.page, customPages, headerContextState.page, websiteRouteSegment],
   );
   const scopedPreviewPages = useMemo(
     () =>
@@ -1650,10 +1940,35 @@ export default function DashboardBuilder({
     () => JSON.stringify(builderState),
     [builderState],
   );
-  const hasPendingChanges =
-    draftReady &&
+
+  const shellSettingsSignature = useMemo(
+    () => JSON.stringify(shellSettings),
+    [shellSettings],
+  );
+
+  const hasShellPendingChanges =
+    committedShellSettingsSignature.length > 0 &&
+    shellSettingsSignature !== committedShellSettingsSignature;
+
+  const hasLayoutPendingChanges =
     committedBuilderStateSignature.length > 0 &&
     builderStateSignature !== committedBuilderStateSignature;
+
+  const hasPendingChanges =
+    draftReady && (hasLayoutPendingChanges || hasShellPendingChanges);
+
+  const statusText = useMemo(() => {
+    if (hasLayoutPendingChanges && hasShellPendingChanges) {
+      return `Unpublished changes in ${getLayoutLabel(builderState.page, customPages)} & Settings`;
+    }
+    if (hasLayoutPendingChanges) {
+      return `Unpublished changes in ${getLayoutLabel(builderState.page, customPages)}`;
+    }
+    if (hasShellPendingChanges) {
+      return "Unpublished settings changes";
+    }
+    return publishStatus;
+  }, [hasLayoutPendingChanges, hasShellPendingChanges, builderState.page, customPages, publishStatus]);
   const previewColors = resolveDesignColors(builderState.design);
   const previewPageBackground =
     previewColors.pageBackground ??
@@ -1703,7 +2018,20 @@ export default function DashboardBuilder({
   );
 
   useEffect(() => {
-    const draft = loadInitialState(storageKeys);
+    try {
+      const storedDrafts = window.localStorage.getItem(storageKeys.drafts);
+      const parsedDrafts = storedDrafts
+        ? (JSON.parse(storedDrafts) as Partial<Record<BuilderLayoutKey, BuilderState>>)
+        : {};
+      restoredDraftKeysRef.current = new Set(
+        Object.keys(parsedDrafts).filter((key): key is BuilderLayoutKey =>
+          Boolean(parsedDrafts[key as BuilderLayoutKey]?.sections),
+        ),
+      );
+    } catch {
+      restoredDraftKeysRef.current = new Set();
+    }
+    const draft = hydrateDocumentBuilderState(loadInitialState(storageKeys), shellSettings);
     let localPages: BuilderCustomPage[] = [];
     try {
       const rawPages = window.localStorage.getItem(storageKeys.pages);
@@ -1717,7 +2045,7 @@ export default function DashboardBuilder({
     }
     setCustomPages(localPages);
     setBuilderState(draft);
-    setSelectedId(draft.sections[0]?.id ?? "");
+    setSelectedId("");
     setDraftReady(true);
   }, [storageKeys]);
 
@@ -1995,9 +2323,12 @@ export default function DashboardBuilder({
 
     if (!nextKey || nextKey === builderState.page) return;
 
-    const nextState = loadDraftForKey(nextKey, storageKeys);
+    const nextState = hydrateDocumentBuilderState(
+      loadDraftForKey(nextKey, storageKeys),
+      shellSettings,
+    );
     setBuilderState(nextState);
-    setSelectedId(nextState.sections[0]?.id ?? "");
+    setSelectedId("");
     setSelectedLayoutColumnKey(null);
     setSelectedLayoutBlockKey(null);
     setOpenLayoutItemId(null);
@@ -2037,10 +2368,11 @@ export default function DashboardBuilder({
           settings?: Partial<BuilderShellSettings>;
         };
         if (!cancelled && payload.settings) {
-          setShellSettings({
+          const nextShellSettings = {
             ...defaultShellSettings,
             ...payload.settings,
-          });
+          };
+          setShellSettings(nextShellSettings);
         }
       } catch {
         if (!cancelled) setShellStatus("Shell settings unavailable");
@@ -2073,6 +2405,80 @@ export default function DashboardBuilder({
   }, [builderState, draftReady, storageKeys]);
 
   useEffect(() => {
+    if (builderState.page === "header") {
+      setHeaderDocumentPreviewState(builderState);
+    }
+    if (builderState.page === "footer") {
+      setFooterDocumentPreviewState(builderState);
+    }
+  }, [builderState]);
+
+  useEffect(() => {
+    if (!draftReady || builderState.page === "header" || headerDocumentPreviewState) return;
+    let cancelled = false;
+
+    async function loadHeaderDocumentPreview() {
+      try {
+        const response = await fetch(builderApiUrl("/api/builder-layouts", { key: "header" }), {
+          cache: "no-store",
+        });
+        if (!response.ok) return;
+        const payload = (await response.json()) as { layout?: BuilderState | null };
+        if (cancelled || !payload.layout?.sections?.length) return;
+        const nextHeaderState = hydrateDocumentBuilderState(
+          normalizeBuilderState({
+            page: "header",
+            targetType: "header",
+            design: { ...defaultDesign, ...(payload.layout.design ?? {}) },
+            sections: payload.layout.sections,
+          }, "header"),
+          shellSettings,
+        );
+        setHeaderDocumentPreviewState(nextHeaderState);
+      } catch {
+        // Keep the locally hydrated header document when the published layout is unavailable.
+      }
+    }
+
+    void loadHeaderDocumentPreview();
+    return () => {
+      cancelled = true;
+    };
+  }, [builderApiUrl, builderState.page, draftReady, headerDocumentPreviewState, shellSettings]);
+
+  useEffect(() => {
+    if (!draftReady || builderState.page === "footer" || footerDocumentPreviewState) return;
+    let cancelled = false;
+
+    async function loadFooterDocumentPreview() {
+      try {
+        const response = await fetch(builderApiUrl("/api/builder-layouts", { key: "footer" }), {
+          cache: "no-store",
+        });
+        if (!response.ok) return;
+        const payload = (await response.json()) as { layout?: BuilderState | null };
+        if (cancelled || !payload.layout?.sections?.length) return;
+        setFooterDocumentPreviewState(hydrateDocumentBuilderState(
+          normalizeBuilderState({
+            page: "footer",
+            targetType: "footer",
+            design: { ...defaultDesign, ...(payload.layout.design ?? {}) },
+            sections: payload.layout.sections,
+          }, "footer"),
+          shellSettings,
+        ));
+      } catch {
+        // Keep the locally hydrated Footer document when the published layout is unavailable.
+      }
+    }
+
+    void loadFooterDocumentPreview();
+    return () => {
+      cancelled = true;
+    };
+  }, [builderApiUrl, builderState.page, draftReady, footerDocumentPreviewState, shellSettings]);
+
+  useEffect(() => {
     if (!draftReady) return;
     if (skipUndoCaptureRef.current) {
       skipUndoCaptureRef.current = false;
@@ -2096,15 +2502,24 @@ export default function DashboardBuilder({
     setCommittedBuilderStateSignature(JSON.stringify(builderState));
   }, [builderState, committedBuilderStateSignature, draftReady]);
 
+  useEffect(() => {
+    if (!draftReady) return;
+    if (committedShellSettingsSignature) return;
+    setCommittedShellSettingsSignature(JSON.stringify(shellSettings));
+  }, [shellSettings, committedShellSettingsSignature, draftReady]);
+
   const switchBuilderTarget = (
     nextKey: BuilderLayoutKey,
     options: { syncUrl?: boolean } = {},
   ) => {
-    const nextState = loadDraftForKey(nextKey);
+    const nextState = hydrateDocumentBuilderState(
+      loadDraftForKey(nextKey, storageKeys),
+      shellSettings,
+    );
     undoHistoryRef.current = [structuredClone(nextState)];
     setCommittedBuilderStateSignature(JSON.stringify(nextState));
     setBuilderState(nextState);
-    setSelectedId(nextState.sections[0]?.id ?? "");
+    setSelectedId("");
     setSelectedLayoutColumnKey(null);
     setSelectedLayoutBlockKey(null);
     setOpenLayoutItemId(null);
@@ -2158,12 +2573,81 @@ export default function DashboardBuilder({
     }));
   };
 
+  const syncHeaderBlockPatch = (
+    blockKey: string,
+    patch: Partial<BuilderLayoutBlock>,
+  ) => {
+    if (builderState.page !== "header") return;
+    if (blockKey === "header-logo") {
+      updateShellSettings({
+        ...(typeof patch.imageUrl === "string" ? { headerLogoUrl: patch.imageUrl || null } : {}),
+        ...(typeof patch.imageAlt === "string" ? { headerLogoAlt: patch.imageAlt } : {}),
+        ...(typeof patch.imageMaxWidth === "number" ? { headerLogoMaxWidth: patch.imageMaxWidth } : {}),
+      });
+    }
+    if (blockKey === "header-navigation" && Array.isArray(patch.items)) {
+      updateShellSettings({
+        menuItems: patch.items.map((label, index) => ({
+          ...(shellSettings.menuItems[index] ?? {
+            id: `header-menu-${Date.now().toString(36)}-${index}`,
+            url: "/",
+          }),
+          label,
+        })),
+      });
+    }
+    if (blockKey === "header-button") {
+      updateShellSettings({
+        ...(typeof patch.buttonLabel === "string" ? { headerButtonLabel: patch.buttonLabel } : {}),
+        ...(typeof patch.buttonUrl === "string" ? { headerButtonUrl: patch.buttonUrl } : {}),
+      });
+    }
+  };
+
+  const syncHeaderDocumentToShell = (state: BuilderState) => {
+    if (state.page !== "header") return;
+    const blocks = state.sections.flatMap((section) =>
+      (section.layoutItems ?? []).flatMap((item) => item.blocks ?? []),
+    );
+    const logo = blocks.find((block) => block.id === "header-logo");
+    const navigation = blocks.find((block) => block.id === "header-navigation");
+    const button = blocks.find((block) => block.id === "header-button");
+    updateShellSettings({
+      ...(logo
+        ? {
+            headerLogoUrl: logo.imageUrl || null,
+            headerLogoAlt: logo.imageAlt ?? shellSettings.headerLogoAlt,
+            headerLogoMaxWidth: logo.imageMaxWidth ?? shellSettings.headerLogoMaxWidth,
+          }
+        : {}),
+      ...(navigation?.items
+        ? {
+            menuItems: navigation.items.map((label, index) => ({
+              ...(shellSettings.menuItems[index] ?? {
+                id: `header-menu-${Date.now().toString(36)}-${index}`,
+                url: "/",
+              }),
+              label,
+            })),
+          }
+        : {}),
+      ...(button
+        ? {
+            headerButtonLabel: button.buttonLabel ?? shellSettings.headerButtonLabel,
+            headerButtonUrl: button.buttonUrl ?? shellSettings.headerButtonUrl,
+          }
+        : {}),
+    });
+  };
+
   const updateLayoutBlockByKey = (
     sectionId: string,
     columnKey: string,
     blockKey: string,
     patch: Partial<BuilderLayoutBlock>,
   ) => {
+    syncHeaderBlockPatch(blockKey, patch);
+
     setBuilderState((current) => ({
       ...current,
       sections: current.sections.map((section) => {
@@ -2734,10 +3218,23 @@ export default function DashboardBuilder({
   };
 
   const openInspectorPanel = () => {
-    setSidebarCollapsed(false);
     setInspectorOpen(true);
-    setSidebarTab("inspector");
-    setInspectorOpenKey((prev) => prev + 1);
+  };
+
+  const clearInspectorSelection = () => {
+    setInspectorOpen(false);
+    setHeaderSelected(false);
+    setSelectedId("");
+    setSelectedLayoutRowIndex(null);
+    setSelectedLayoutColumnKey(null);
+    setSelectedLayoutBlockKey(null);
+    setOpenLayoutItemId(null);
+    setOpenSlideId(null);
+  };
+
+  const toggleInspectorVisibility = () => {
+    if (!selectedSection) return;
+    setInspectorOpen((current) => !current);
   };
 
   const selectSection = (sectionId: string) => {
@@ -2793,15 +3290,49 @@ export default function DashboardBuilder({
   };
 
   const selectHeader = () => {
-    setHeaderSelected(true);
-    setSelectedId("");
+    const contextKey = builderState.page === "header" ? headerContextKey : builderState.page;
+    setHeaderContextKey(contextKey);
+    switchBuilderTarget("header", { syncUrl: false });
+    router.replace(`${pathname}?page=header&context=${encodeURIComponent(contextKey)}`, { scroll: false });
+    setHeaderSelected(false);
     setSelectedLayoutRowIndex(null);
     setSelectedLayoutColumnKey(null);
     setSelectedLayoutBlockKey(null);
     setOpenLayoutItemId(null);
     setSidebarCollapsed(false);
-    setSidebarTab("globalStyles");
-    setGlobalStylesTab("header");
+    setSidebarTab("builder");
+  };
+
+  const selectFooter = () => {
+    const contextKey = builderState.page === "header" || builderState.page === "footer"
+      ? headerContextKey
+      : builderState.page;
+    setHeaderContextKey(contextKey);
+    switchBuilderTarget("footer", { syncUrl: false });
+    router.replace(`${pathname}?page=footer&context=${encodeURIComponent(contextKey)}`, { scroll: false });
+    setHeaderSelected(false);
+    setSelectedLayoutRowIndex(null);
+    setSelectedLayoutColumnKey(null);
+    setSelectedLayoutBlockKey(null);
+    setOpenLayoutItemId(null);
+    setSidebarCollapsed(false);
+    setSidebarTab("builder");
+  };
+
+  const openHeaderSettings = () => {
+    if (builderState.page !== "header") {
+      const contextKey = builderState.page;
+      setHeaderContextKey(contextKey);
+      switchBuilderTarget("header", { syncUrl: false });
+      router.replace(`${pathname}?page=header&context=${encodeURIComponent(contextKey)}`, { scroll: false });
+    }
+    setSelectedId("header-document");
+    setSelectedLayoutRowIndex(null);
+    setSelectedLayoutColumnKey(null);
+    setSelectedLayoutBlockKey(null);
+    setOpenLayoutItemId(null);
+    setInspectorTab("layout");
+    openInspectorPanel();
   };
 
   const openSpacingSettings = (target: SpacingInspectorTarget) => {
@@ -2819,9 +3350,7 @@ export default function DashboardBuilder({
       return;
     }
 
-    setSidebarTab("inspector");
     setInspectorOpen(true);
-    setInspectorOpenKey((prev) => prev + 1);
     setSelectedId(target.sectionId);
     setSectionStructureOpen(false);
 
@@ -3058,6 +3587,78 @@ export default function DashboardBuilder({
     setSelectedLayoutBlockKey(nextSelectedBlockKey);
   };
 
+  const applyHeaderPreset = (presetKey: string) => {
+    const preset = headerPresets.find((p) => p.key === presetKey);
+    if (!preset) return;
+    setPresetToApply({ presetKey, name: preset.name });
+  };
+
+  const executeApplyHeaderPreset = (presetKey: string) => {
+    const preset = headerPresets.find((p) => p.key === presetKey);
+    if (!preset) return;
+
+    let currentHeaderSections: BuilderSection[] = [];
+    if (builderState.page === "header") {
+      currentHeaderSections = builderState.sections;
+    } else if (headerDocumentPreviewState?.sections) {
+      currentHeaderSections = headerDocumentPreviewState.sections;
+    }
+
+    const mergedSections = mergeBrandingIntoPreset(
+      currentHeaderSections,
+      preset.sections
+    );
+
+    if (mergedSections.length > 0) {
+      mergedSections[0] = {
+        ...mergedSections[0],
+        headerPresetKey: presetKey,
+      };
+    }
+
+    const nextHeaderState: BuilderState = {
+      page: "header",
+      targetType: "header",
+      design: builderState.design,
+      sections: mergedSections,
+    };
+
+    if (builderState.page === "header") {
+      setBuilderState((current) => ({
+        ...current,
+        sections: mergedSections,
+      }));
+    } else {
+      setHeaderDocumentPreviewState(nextHeaderState);
+      try {
+        let drafts: Partial<Record<BuilderLayoutKey, BuilderState>> = {};
+        const rawDrafts = window.localStorage.getItem(storageKeys.drafts);
+        drafts = rawDrafts ? JSON.parse(rawDrafts) : {};
+        drafts["header"] = nextHeaderState;
+        window.localStorage.setItem(storageKeys.drafts, JSON.stringify(drafts));
+      } catch (e) {
+        console.error("Failed to save header draft in localStorage:", e);
+      }
+
+      void fetch(builderApiUrl("/api/builder-layouts"), {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(nextHeaderState),
+      }).catch((err) => {
+        console.error("Failed to autosave preset to backend:", err);
+      });
+    }
+
+    updateShellSettings({
+      headerLayout: preset.headerLayout,
+      headerTransparent: preset.headerTransparent,
+      headerOverlay: preset.headerOverlay,
+      headerWidthMode: preset.headerWidthMode,
+    });
+  };
+
   const updateSelectedLayoutBlock = (
     columnIndex: number,
     blockIndex: number,
@@ -3067,8 +3668,13 @@ export default function DashboardBuilder({
     const layoutItems = [...(rawSelectedSection.layoutItems ?? [])];
     const item = layoutItems[columnIndex] ?? {};
     const blocks = [...getLayoutItemBlocks(item)];
+    const targetBlock = blocks[blockIndex] ?? {};
+    syncHeaderBlockPatch(
+      targetBlock.id ?? `${item.id ?? `layout-item-${columnIndex}`}-block-${blockIndex}`,
+      patch,
+    );
     blocks[blockIndex] = applyContentPatch(
-      blocks[blockIndex] ?? {},
+      targetBlock,
       patch,
       contentLanguage,
       primaryContentLanguage,
@@ -3608,6 +4214,84 @@ export default function DashboardBuilder({
     setSelectedLayoutBlockKey(sourceBlockKey);
   };
 
+  const moveHeaderBuilderElement = ({
+    payload,
+    targetRowId,
+    targetColumnId,
+    targetBlockId,
+    placement = "below",
+  }: {
+    payload: HeaderBlockDragPayload;
+    targetRowId: string;
+    targetColumnId: string;
+    targetBlockId?: string;
+    placement?: "above" | "below";
+  }) => {
+    setBuilderState((current) => {
+      if (current.page !== "header") return current;
+      const sectionIndex = current.sections.findIndex((section) => section.id === "header-document");
+      const section = current.sections[sectionIndex];
+      if (!section || !isLayoutContainerSection(section)) return current;
+      const result = moveHeaderBlockById(section.layoutItems ?? [], payload, {
+        targetRowId,
+        targetColumnId,
+        targetBlockId,
+        placement,
+      });
+      if (!result.moved) return current;
+
+      const sections = [...current.sections];
+      sections[sectionIndex] = {
+        ...section,
+        layoutItems: result.layoutItems,
+      };
+      return { ...current, sections };
+    });
+
+    setSelectedId("header-document");
+    setSelectedLayoutColumnKey(targetColumnId);
+    setSelectedLayoutBlockKey(payload.blockId);
+    setOpenLayoutItemId(targetColumnId);
+    setPublishStatus("Header element moved");
+  };
+
+  const moveHeaderBuilderRow = ({
+    sourceRowId,
+    targetRowId,
+    placement,
+  }: {
+    sourceRowId: string;
+    targetRowId: string;
+    placement: "before" | "after";
+  }) => {
+    if (sourceRowId === targetRowId) return;
+    setBuilderState((current) => {
+      if (current.page !== "header") return current;
+      const sections = current.sections.map((section) => {
+        if (section.id !== "header-document" || !isLayoutContainerSection(section)) return section;
+        const rows = getPreviewLayoutRows(section, section.layoutItems ?? []);
+        const sourceIndex = rows.findIndex((row) => row.items.some((item) => (item.rowId ?? item.id) === sourceRowId));
+        const targetIndex = rows.findIndex((row) => row.items.some((item) => (item.rowId ?? item.id) === targetRowId));
+        if (sourceIndex < 0 || targetIndex < 0) return section;
+
+        const nextRows = [...rows];
+        const [sourceRow] = nextRows.splice(sourceIndex, 1);
+        if (!sourceRow) return section;
+        const adjustedTargetIndex = nextRows.findIndex((row) => row === rows[targetIndex]);
+        const insertIndex = adjustedTargetIndex + (placement === "after" ? 1 : 0);
+        nextRows.splice(Math.max(0, insertIndex), 0, sourceRow);
+        return { ...section, headerUtilityMigrationVersion: 3 as const, layoutItems: nextRows.flatMap((row) => row.items) };
+      });
+      return { ...current, sections };
+    });
+
+    setSelectedId("header-document");
+    setSelectedLayoutRowIndex(null);
+    setSelectedLayoutColumnKey(null);
+    setSelectedLayoutBlockKey(null);
+    setPublishStatus("Header row moved");
+  };
+
   const createLayoutBlockAtDrop = ({
     sectionId,
     targetColumnKey,
@@ -3667,7 +4351,131 @@ export default function DashboardBuilder({
     setSelectedLayoutBlockKey(block.id ?? null);
   };
 
-  const addElementFromLibrary = (kind: LayoutBlockKind) => {
+  const addElementFromLibrary = (
+    kind: LayoutBlockKind,
+    preferredHeaderColumnKey?: string,
+    targetHeaderBlockId?: string,
+    placement: "above" | "below" = "below",
+  ) => {
+    if (builderState.page === "header") {
+      const headerElementByKind: Partial<Record<LayoutBlockKind, BuilderLayoutBlock>> = {
+        image: {
+          id: "header-logo",
+          kind: "image",
+          imageUrl: shellSettings.headerLogoUrl ?? undefined,
+          imageAlt: shellSettings.headerLogoAlt,
+          imageMaxWidth: shellSettings.headerLogoMaxWidth,
+          headerBrandMode: shellSettings.headerBrandMode,
+          headerBrandText: shellSettings.headerBrandText,
+        },
+        menu: {
+          id: "header-navigation",
+          kind: "menu",
+          title: "Navigation",
+          menuSource: "main",
+          menuActiveIndicator: shellSettings.headerActiveIndicator,
+        },
+        button: {
+          id: "header-button",
+          kind: "button",
+          buttonLabel: shellSettings.headerButtonLabel,
+          buttonUrl: shellSettings.headerButtonUrl,
+        },
+        embed: {
+          id: "header-spacer",
+          kind: "embed",
+          embedMode: "code",
+          embedCode: "",
+        },
+        headerSearch: {
+          id: "header-utility-search",
+          kind: "headerSearch",
+          headerUtilityAction: "search",
+          headerUtilityVariant: shellSettings.headerIconVariant,
+        },
+        headerWishlist: {
+          id: "header-utility-wishlist",
+          kind: "headerWishlist",
+          headerUtilityAction: "wishlist",
+          headerUtilityVariant: shellSettings.headerIconVariant,
+        },
+        headerCart: {
+          id: "header-utility-cart",
+          kind: "headerCart",
+          headerUtilityAction: "cart",
+          headerUtilityVariant: shellSettings.headerIconVariant,
+        },
+        headerAccount: {
+          id: "header-utility-account",
+          kind: "headerAccount",
+          headerUtilityAction: "account",
+          headerUtilityVariant: shellSettings.headerIconVariant,
+        },
+        headerTheme: {
+          id: "header-utility-theme",
+          kind: "headerTheme",
+          headerUtilityAction: "theme",
+          headerUtilityVariant: shellSettings.headerIconVariant,
+        },
+        headerCategories: {
+          id: "header-categories",
+          kind: "headerCategories",
+          headerCategoriesLabel: "Categories",
+          headerCategoriesShowLabel: true,
+        },
+        headerLanguage: {
+          id: "header-language",
+          kind: "headerLanguage",
+          headerLanguageDisplay: "native",
+        },
+      };
+      const headerElement = headerElementByKind[kind];
+      if (!headerElement?.id) return;
+      const headerSection = builderState.sections.find(
+        (section) => section.id === "header-document",
+      );
+      const existingLocation = headerSection?.layoutItems?.find((item) =>
+        (item.blocks ?? []).some((block) => block.id === headerElement.id),
+      );
+      const headerRow = headerSection?.layoutItems?.find(
+        (item) => item.id === (preferredHeaderColumnKey ?? selectedLayoutColumnKey),
+      ) ?? headerSection?.layoutItems?.find((item) => item.id === "header-main-row")
+        ?? headerSection?.layoutItems?.[0];
+      if (!headerSection || !headerRow) return;
+      if (existingLocation) {
+        selectLayoutBlock(headerSection.id, existingLocation.id ?? "header-main-row", headerElement.id);
+        return;
+      }
+      setBuilderState((current) => ({
+        ...current,
+        sections: current.sections.map((section) =>
+          section.id !== headerSection.id
+            ? section
+            : {
+                ...section,
+                layoutItems: (section.layoutItems ?? []).map((item) => {
+                  if (item.id !== headerRow.id) return item;
+                  const blocks = [...(item.blocks ?? [])];
+                  const targetIndex = targetHeaderBlockId
+                    ? blocks.findIndex((block) => block.id === targetHeaderBlockId)
+                    : -1;
+                  const insertIndex = targetIndex < 0
+                    ? blocks.length
+                    : targetIndex + (placement === "below" ? 1 : 0);
+                  blocks.splice(insertIndex, 0, headerElement);
+                  return { ...item, blocks };
+                }),
+              },
+        ),
+      }));
+      setSelectedId(headerSection.id);
+      setSelectedLayoutColumnKey(headerRow.id ?? "header-main-row");
+      setSelectedLayoutBlockKey(headerElement.id);
+      setInspectorOpen(true);
+      setPublishStatus(`${layoutBlockLabels[kind]} restored`);
+      return;
+    }
+
     let targetSection = selectedSection;
 
     if (!targetSection || !isLayoutContainerSection(targetSection)) {
@@ -4059,7 +4867,16 @@ export default function DashboardBuilder({
           },
         );
 
-        if (normalizedItems.length > preset.ratios.length) {
+        if (section.id === "header-document" && preset.ratios.length > 1) {
+          const allHeaderBlocks = normalizedItems.flatMap((item) => getLayoutItemBlocks(item));
+          nextRowItems.forEach((item, index) => {
+            item.blocks = allHeaderBlocks.filter((_, blockIndex) =>
+              Math.min(preset.ratios.length - 1, Math.floor(blockIndex * preset.ratios.length / Math.max(1, allHeaderBlocks.length))) === index,
+            );
+          });
+        }
+
+        if (section.id !== "header-document" && normalizedItems.length > preset.ratios.length) {
           const overflowBlocks = normalizedItems
             .slice(preset.ratios.length)
             .flatMap((item) => getLayoutItemBlocks(item));
@@ -4342,6 +5159,7 @@ export default function DashboardBuilder({
     const nextState = structuredClone(history[history.length - 1]);
     skipUndoCaptureRef.current = true;
     setBuilderState(nextState);
+    syncHeaderDocumentToShell(nextState);
 
     // Reset selection to first section or clear
     setSelectedId(nextState.sections[0]?.id ?? "");
@@ -4363,6 +5181,7 @@ export default function DashboardBuilder({
     undoHistoryRef.current.push(structuredClone(nextState));
     skipUndoCaptureRef.current = true;
     setBuilderState(nextState);
+    syncHeaderDocumentToShell(nextState);
     setSelectedId(nextState.sections[0]?.id ?? "");
     setSelectedLayoutColumnKey(null);
     setSelectedLayoutBlockKey(null);
@@ -4396,8 +5215,15 @@ export default function DashboardBuilder({
 
   const loadPublishedLayout = useCallback(async () => {
     setPublishStatus("Reading published layout...");
+    const requestedState = builderStateRef.current;
+    const requestedSignature = JSON.stringify(requestedState);
+    if (restoredDraftKeysRef.current.has(requestedState.page)) {
+      setCommittedBuilderStateSignature(requestedSignature);
+      setPublishStatus("Local draft restored");
+      return;
+    }
     const response = await fetch(builderApiUrl("/api/builder-layouts", {
-      key: builderState.page,
+      key: requestedState.page,
     }), {
       cache: "no-store",
     });
@@ -4411,31 +5237,31 @@ export default function DashboardBuilder({
       layout?: BuilderState | null;
     };
 
-    const currentSignature = JSON.stringify(builderState);
-
-    if (!payload.layout?.sections?.length) {
-      setPublishStatus("No published layout yet");
-      setCommittedBuilderStateSignature(JSON.stringify(builderState));
+    if (JSON.stringify(builderStateRef.current) !== requestedSignature) {
+      setPublishStatus("Kept newer local changes");
       return;
     }
 
-    const nextPublishedState = normalizeBuilderState(
-      {
+    if (!payload.layout?.sections?.length) {
+      setPublishStatus("No published layout yet");
+      setCommittedBuilderStateSignature(requestedSignature);
+      return;
+    }
+
+    const nextPublishedState = normalizeBuilderState({
         page: payload.layout.page,
         targetType:
-          payload.layout.targetType ?? builderState.targetType ?? "page",
+          payload.layout.targetType ?? requestedState.targetType ?? "page",
         template: payload.layout.template,
         design: {
           ...defaultDesign,
           ...(payload.layout.design ?? {}),
         },
         sections: payload.layout.sections,
-      },
-      builderState.page,
-    );
+      }, requestedState.page);
 
     const nextSignature = JSON.stringify(nextPublishedState);
-    if (nextSignature === currentSignature) {
+    if (nextSignature === requestedSignature) {
       setCommittedBuilderStateSignature(nextSignature);
       setPublishStatus("Local draft matches published");
       return;
@@ -4449,8 +5275,6 @@ export default function DashboardBuilder({
   }, [
     builderApiUrl,
     builderState.page,
-    builderState.targetType,
-    builderState.template,
   ]);
 
   useEffect(() => {
@@ -4459,27 +5283,59 @@ export default function DashboardBuilder({
   }, [builderState.page, draftReady, loadPublishedLayout]);
 
   const publishLayout = async () => {
-    setPublishStatus("Publishing layout...");
+    setPublishStatus("Publishing...");
     setPublishCelebration(false);
-    const response = await fetch(builderApiUrl("/api/builder-layouts"), {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(builderState),
-    });
 
-    if (!response.ok) {
-      setPublishStatus("Publish failed");
+    let layoutSuccess = true;
+    let shellSuccess = true;
+
+    if (hasLayoutPendingChanges) {
+      const response = await fetch(builderApiUrl("/api/builder-layouts"), {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(builderState),
+      });
+
+      if (!response.ok) {
+        layoutSuccess = false;
+      } else {
+        setCommittedBuilderStateSignature(JSON.stringify(builderState));
+        setPublishedKeys((current) => {
+          if (current.includes(builderState.page)) return current;
+          return [...current, builderState.page];
+        });
+      }
+    }
+
+    if (hasShellPendingChanges && canEditShellSettings) {
+      if (shellAutoSaveTimer.current) {
+        window.clearTimeout(shellAutoSaveTimer.current);
+      }
+      const success = await saveShellSettings(
+        shellSettings,
+        `${isWebsiteScopedBuilder ? "Website" : "Global"} settings published`,
+      );
+      if (success) {
+        setCommittedShellSettingsSignature(JSON.stringify(shellSettings));
+      } else {
+        shellSuccess = false;
+      }
+    }
+
+    if (!layoutSuccess || !shellSuccess) {
+      if (!layoutSuccess && !shellSuccess) {
+        setPublishStatus("Publish failed");
+      } else if (!layoutSuccess) {
+        setPublishStatus("Layout publish failed");
+      } else {
+        setPublishStatus("Settings publish failed");
+      }
       return;
     }
 
-    setCommittedBuilderStateSignature(JSON.stringify(builderState));
-    setPublishStatus("Published layout saved");
-    setPublishedKeys((current) => {
-      if (current.includes(builderState.page)) return current;
-      return [...current, builderState.page];
-    });
+    setPublishStatus("Published successfully");
     setPublishCelebration(true);
     if (publishCelebrationTimer.current) {
       window.clearTimeout(publishCelebrationTimer.current);
@@ -4608,90 +5464,6 @@ export default function DashboardBuilder({
     });
   };
 
-  const updateHeaderIcon = (icon: BuilderHeaderIconId, enabled: boolean) => {
-    const currentOrder =
-      shellSettings.headerIconOrder?.length > 0
-        ? shellSettings.headerIconOrder
-        : defaultShellSettings.headerIconOrder;
-    const nextOrder = enabled
-      ? [...currentOrder.filter((item) => item !== icon), icon]
-      : currentOrder.filter((item) => item !== icon);
-
-    updateShellSettings({
-      headerIconOrder: nextOrder.length > 0 ? nextOrder : [icon],
-    });
-  };
-
-  const applyHeaderPreset = (
-    preset:
-      "service" | "commerce" | "classic" | "simple" | "hero" | "wordpress",
-  ) => {
-    if (preset === "wordpress") {
-      updateShellSettings({
-        headerLayout: "wordpress",
-      });
-      return;
-    }
-
-    if (preset === "service") {
-      updateShellSettings({
-        headerVisible: true,
-        headerLayout: "princity",
-        headerBrandMode: "brand",
-        headerBrandText: "WebPages",
-        headerIconVariant: "muted",
-        headerIconOrder: ["wishlist", "cart", "account", "theme", "search"],
-        headerActiveIndicator: "princity",
-      });
-      return;
-    }
-
-    if (preset === "commerce") {
-      updateShellSettings({
-        headerVisible: true,
-        headerLayout: "pill",
-        headerBrandMode: "both",
-        headerBrandText: "WebPages Store",
-        headerIconVariant: "ghost",
-        headerIconOrder: ["search", "wishlist", "cart", "account", "theme"],
-        headerActiveIndicator: "underline",
-      });
-      return;
-    }
-
-    if (preset === "simple") {
-      updateShellSettings({
-        headerVisible: true,
-        headerLayout: "simple",
-        headerBrandMode: "logo",
-        headerIconVariant: "muted",
-        headerIconOrder: ["wishlist", "cart", "account", "theme", "search"],
-        headerActiveIndicator: "underline",
-      });
-      return;
-    }
-
-    if (preset === "hero") {
-      updateShellSettings({
-        headerVisible: true,
-        headerLayout: "hero",
-        headerBrandMode: "both",
-        headerIconVariant: "muted",
-        headerIconOrder: ["wishlist", "cart", "account", "theme", "search"],
-        headerActiveIndicator: "underline",
-      });
-      return;
-    }
-
-    updateShellSettings({
-      headerVisible: true,
-      headerLayout: "two-row",
-      headerBrandMode: "logo",
-      headerIconVariant: "muted",
-      headerIconOrder: ["wishlist", "cart", "account", "theme", "search"],
-      headerActiveIndicator: "underline",
-    });
-  };
 
   const publishShellSettings = async () => {
     if (!canEditShellSettings) {
@@ -5632,6 +6404,7 @@ export default function DashboardBuilder({
       selectedSection={selectedSection}
       selectedSectionIsFirstVisible={selectedSectionIsFirstVisible}
       shellSettings={shellSettings}
+      updateShellSettings={updateShellSettings}
       uploadingNestedSlide={uploadingNestedSlide}
       uploadingSlide={uploadingSlide}
       addSelectedLayoutBlockBadge={addSelectedLayoutBlockBadge}
@@ -5652,12 +6425,13 @@ export default function DashboardBuilder({
       duplicateSelected={duplicateSelected}
       duplicateSelectedRow={duplicateSelectedRow}
       applyLayoutPreset={applyContentLayoutPreset}
+      onApplyHeaderPreset={applyHeaderPreset}
       applySelectedRowLayoutPreset={applySelectedRowLayoutPreset}
       onUpdateRowStyle={updateSelectedRowStyle}
       deleteSelectedRow={deleteSelectedRow}
       moveSelected={moveSelected}
       openWordPressMediaPicker={openWordPressMediaPicker}
-      setInspectorOpen={setInspectorOpen}
+      onCloseInspector={() => setInspectorOpen(false)}
       setInspectorTab={setInspectorTab}
       setSpacingOverlayEnabled={setSpacingOverlayEnabled}
       setOpenSlideId={setOpenSlideId}
@@ -5726,8 +6500,8 @@ export default function DashboardBuilder({
           <strong>{shellSettingsLabel}</strong>
           <span>
             {isWebsiteScopedBuilder
-              ? "Design, header, logo, menu presentation, and spacing for this website."
-              : "Design, header, logo, menu presentation, and spacing for the public WebPages website."}
+              ? "Shared colors, typography, spacing, buttons, radius, shadows, and card styles for this website."
+              : "Shared colors, typography, spacing, buttons, radius, shadows, and card styles for the public WebPages website."}
           </span>
         </div>
       </div>
@@ -5743,7 +6517,6 @@ export default function DashboardBuilder({
             ["cards", "Cards"],
             ["buttons", "Buttons"],
             ["typography", "Typography"],
-            ["header", "Header"],
           ] as const
         ).map(([tab, label]) => (
           <button
@@ -7006,346 +7779,6 @@ export default function DashboardBuilder({
         </div>
       )}
 
-      {globalStylesTab === "header" && (
-        <div className="builder-global-styles-group">
-          <div className="builder-card-title">
-            <strong>Header</strong>
-            <span>layout + spacing</span>
-          </div>
-
-          <label className="builder-check">
-            <input
-              type="checkbox"
-              checked={shellSettings.headerVisible}
-              onChange={(event) =>
-                updateShellSettings({
-                  headerVisible: event.target.checked,
-                })
-              }
-            />
-            <span>Show website header</span>
-          </label>
-
-          <div className="builder-card-title">
-            <strong>Top Toolbar</strong>
-            <span>message + meta</span>
-          </div>
-
-          <label className="builder-check">
-            <input
-              type="checkbox"
-              checked={shellSettings.topToolbarVisible}
-              onChange={(event) =>
-                updateShellSettings({
-                  topToolbarVisible: event.target.checked,
-                })
-              }
-            />
-            <span>Show top toolbar</span>
-          </label>
-
-          <label className="builder-field">
-            <span>Toolbar Text</span>
-            <input
-              type="text"
-              value={shellSettings.topToolbarText}
-              onChange={(event) =>
-                updateShellSettings({
-                  topToolbarText: event.target.value,
-                })
-              }
-              placeholder="Fast support & setup by Webpages"
-            />
-          </label>
-
-          <div className="builder-two-column">
-            <label className="builder-field">
-              <span>Phone / Support</span>
-              <input
-                type="text"
-                value={shellSettings.topToolbarPhone}
-                onChange={(event) =>
-                  updateShellSettings({
-                    topToolbarPhone: event.target.value,
-                  })
-                }
-                placeholder="+374 xx xx xx"
-              />
-            </label>
-
-            <label className="builder-field">
-              <span>Right Meta</span>
-              <input
-                type="text"
-                value={shellSettings.topToolbarMeta}
-                onChange={(event) =>
-                  updateShellSettings({
-                    topToolbarMeta: event.target.value,
-                  })
-                }
-                placeholder="AMD ֏"
-              />
-            </label>
-          </div>
-
-          <label className="builder-field">
-            <span>Header Background</span>
-            <select
-              value={shellSettings.headerBackgroundMode}
-              onChange={(event) =>
-                updateShellSettings({
-                  headerBackgroundMode: event.target
-                    .value as BuilderHeaderBackgroundMode,
-                })
-              }
-            >
-              <option value="default">Default Solid</option>
-              <option value="glass">Glassmorphism (Blur)</option>
-              <option value="accent">Accent Color Gradient</option>
-              <option value="none">Transparent Overlay</option>
-            </select>
-          </label>
-
-          <label className="builder-field">
-            <span>Header Text Mode</span>
-            <select
-              value={shellSettings.headerTextMode || "auto"}
-              onChange={(event) =>
-                updateShellSettings({
-                  headerTextMode: event.target.value as BuilderHeaderTextMode,
-                })
-              }
-            >
-              <option value="auto">Auto</option>
-              <option value="light">Light</option>
-              <option value="dark">Dark</option>
-            </select>
-          </label>
-
-          <div className="builder-field">
-            <span>Header Style & Layout</span>
-            <div className="builder-header-presets-grid">
-              <button
-                type="button"
-                className={`builder-preset-btn ${shellSettings.headerLayout === "princity" ? "is-active" : ""}`}
-                onClick={() => applyHeaderPreset("service")}
-              >
-                <span>Princity Service</span>
-                <small>Flat layout, text logo</small>
-              </button>
-              <button
-                type="button"
-                className={`builder-preset-btn ${shellSettings.headerLayout === "pill" ? "is-active" : ""}`}
-                onClick={() => applyHeaderPreset("commerce")}
-              >
-                <span>Commerce Pill</span>
-                <small>Floating pill on scroll</small>
-              </button>
-              <button
-                type="button"
-                className={`builder-preset-btn ${shellSettings.headerLayout === "two-row" ? "is-active" : ""}`}
-                onClick={() => applyHeaderPreset("classic")}
-              >
-                <span>Classic Store</span>
-                <small>Traditional two-row links</small>
-              </button>
-              <button
-                type="button"
-                className={`builder-preset-btn ${shellSettings.headerLayout === "simple" ? "is-active" : ""}`}
-                onClick={() => applyHeaderPreset("simple")}
-              >
-                <span>Simple Store</span>
-                <small>Single row layout</small>
-              </button>
-              <button
-                type="button"
-                className={`builder-preset-btn ${shellSettings.headerLayout === "hero" ? "is-active" : ""}`}
-                onClick={() => applyHeaderPreset("hero")}
-              >
-                <span>Hero Spotlight</span>
-                <small>Split layout with hero banner</small>
-              </button>
-            </div>
-          </div>
-
-          <div className="builder-two-column">
-            <label className="builder-field">
-              <span>Brand Display</span>
-              <select
-                value={shellSettings.headerBrandMode}
-                onChange={(event) =>
-                  updateShellSettings({
-                    headerBrandMode: event.target
-                      .value as BuilderHeaderBrandMode,
-                  })
-                }
-              >
-                <option value="logo">Logo only</option>
-                <option value="brand">Text brand</option>
-                <option value="both">Logo + text</option>
-              </select>
-            </label>
-
-            <label className="builder-field">
-              <span>Logo Width</span>
-              <input
-                type="number"
-                min="40"
-                max="360"
-                value={shellSettings.headerLogoMaxWidth}
-                onChange={(event) =>
-                  updateShellSettings({
-                    headerLogoMaxWidth: Number(event.target.value),
-                  })
-                }
-              />
-            </label>
-          </div>
-
-          <label className="builder-field">
-            <span>Brand Text</span>
-            <input
-              type="text"
-              value={shellSettings.headerBrandText}
-              onChange={(event) =>
-                updateShellSettings({
-                  headerBrandText: event.target.value,
-                })
-              }
-              placeholder="WebPages"
-            />
-          </label>
-
-          <div className="builder-field">
-            <span>Logo Image</span>
-            <div className="builder-header-logo-picker">
-              <div className="builder-header-logo-preview">
-                {shellSettings.headerLogoUrl ? (
-                  <Image
-                    src={shellSettings.headerLogoUrl ?? ""}
-                    alt={
-                      shellSettings.headerLogoAlt ||
-                      shellSettings.headerBrandText ||
-                      "Site logo"
-                    }
-                    width={120}
-                    height={72}
-                    unoptimized
-                  />
-                ) : (
-                  <ImageIcon size={20} />
-                )}
-              </div>
-              <div className="builder-header-logo-actions">
-                <button
-                  type="button"
-                  onClick={() =>
-                    openWordPressMediaPicker({
-                      title: "Header Logo",
-                      currentUrl: shellSettings.headerLogoUrl ?? "",
-                      onSelect: (media) =>
-                        updateShellSettings({
-                          headerLogoUrl: media.sourceUrl,
-                          headerLogoAlt:
-                            shellSettings.headerLogoAlt ||
-                            media.altText ||
-                            media.title ||
-                            "Site logo",
-                        }),
-                    })
-                  }
-                >
-                  <GalleryHorizontal size={14} />
-                  Choose from library
-                </button>
-                {shellSettings.headerLogoUrl ? (
-                  <button
-                    type="button"
-                    className="is-muted"
-                    onClick={() => updateShellSettings({ headerLogoUrl: null })}
-                  >
-                    Clear
-                  </button>
-                ) : null}
-                <small>
-                  {shellSettings.headerLogoUrl
-                    ? "Logo selected from WordPress media."
-                    : "Select an image from WordPress media."}
-                </small>
-              </div>
-            </div>
-          </div>
-
-          <label className="builder-field">
-            <span>Logo Alt Text</span>
-            <input
-              type="text"
-              value={shellSettings.headerLogoAlt}
-              onChange={(event) =>
-                updateShellSettings({
-                  headerLogoAlt: event.target.value,
-                })
-              }
-              placeholder="Site logo"
-            />
-          </label>
-
-          <div className="builder-two-column">
-            <label className="builder-field">
-              <span>Icon Style</span>
-              <select
-                value={shellSettings.headerIconVariant}
-                onChange={(event) =>
-                  updateShellSettings({
-                    headerIconVariant: event.target
-                      .value as BuilderHeaderIconVariant,
-                  })
-                }
-              >
-                <option value="muted">Muted</option>
-                <option value="ghost">Ghost</option>
-                <option value="solid">Solid</option>
-                <option value="icon">Icon only</option>
-              </select>
-            </label>
-
-            <label className="builder-field">
-              <span>Active Indicator</span>
-              <select
-                value={shellSettings.headerActiveIndicator}
-                onChange={(event) =>
-                  updateShellSettings({
-                    headerActiveIndicator: event.target
-                      .value as BuilderHeaderActiveIndicator,
-                  })
-                }
-              >
-                <option value="princity">Princity motion</option>
-                <option value="underline">Underline</option>
-                <option value="none">None</option>
-              </select>
-            </label>
-          </div>
-
-          <div className="builder-field">
-            <span>Header Icons</span>
-            <div className="builder-header-icon-grid">
-              {headerIconOptions.map((option) => (
-                <label key={option.id}>
-                  <input
-                    type="checkbox"
-                    checked={shellSettings.headerIconOrder.includes(option.id)}
-                    onChange={(event) =>
-                      updateHeaderIcon(option.id, event.target.checked)
-                    }
-                  />
-                  <span>{option.label}</span>
-                </label>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 
@@ -7396,7 +7829,6 @@ export default function DashboardBuilder({
             {websiteListLabel}
           </button>
         ) : null}
-        <LanguageSwitcher />
         <label className="builder-content-language-select">
           <span>{t("builder.contentLanguage.editing")}</span>
           <select value={contentLanguage} onChange={(event) => setContentLanguage(event.target.value)}>
@@ -7425,15 +7857,6 @@ export default function DashboardBuilder({
         </div>
         <button
           type="button"
-          className="builder-theme-toggle"
-          onClick={handleToggleTheme}
-          title={`Switch to ${dashboardTheme === "light" ? "dark" : "light"} mode`}
-          aria-label={`Switch to ${dashboardTheme === "light" ? "dark" : "light"} mode`}
-        >
-          {dashboardTheme === "light" ? <Moon size={15} /> : <Sun size={15} />}
-        </button>
-        <button
-          type="button"
           onClick={() => {
             window.open(currentFrontendUrl, "_blank", "noopener,noreferrer");
           }}
@@ -7441,6 +7864,33 @@ export default function DashboardBuilder({
         >
           <ExternalLink size={15} />
           View Page
+        </button>
+        {builderState.page === "header" ? (
+          <button
+            type="button"
+            onClick={openHeaderSettings}
+            title="Open Header document settings"
+          >
+            <Settings2 size={15} />
+            Header Settings
+          </button>
+        ) : null}
+        <button
+          type="button"
+          onClick={undoBuilder}
+          disabled={undoHistoryRef.current.length <= 1}
+          title={t("builder.toolbar.undo")}
+        >
+          <Undo2 size={15} />
+          {t("builder.toolbar.undo")}
+        </button>
+        <button
+          type="button"
+          onClick={redoBuilder}
+          disabled={redoHistoryRef.current.length === 0}
+          title={t("builder.toolbar.redo")}
+        >
+          <Redo2 size={15} />
         </button>
         {sidebarTab === "globalStyles" ? (
           <button
@@ -7454,36 +7904,143 @@ export default function DashboardBuilder({
           </button>
         ) : (
           hasPendingChanges && (
-            <>
-              <button
-                type="button"
-                onClick={undoBuilder}
-                title={t("builder.toolbar.undo")}
-              >
-                <Undo2 size={15} />
-                {t("builder.toolbar.undo")}
-              </button>
-              <button
-                type="button"
-                onClick={redoBuilder}
-                title={t("builder.toolbar.redo")}
-              >
-                <Redo2 size={15} />
-              </button>
-              <button
-                type="button"
-                className="is-primary"
-                onClick={publishLayout}
-              >
-                <CloudUpload size={15} />
-                {t("builder.toolbar.publish")}
-              </button>
-            </>
+            <button
+              type="button"
+              className="is-primary"
+              onClick={publishLayout}
+            >
+              <CloudUpload size={15} />
+              {t("builder.toolbar.publish")}
+            </button>
           )
         )}
       </div>
     </div>
   );
+
+  const sidebarUtilityControls = (
+    <>
+      <button
+        type="button"
+        className={`builder-sidebar-utility-button builder-sidebar-inspector-toggle${
+          inspectorOpen ? " is-active" : selectedSection ? " is-highlighted" : ""
+        }`}
+        onClick={toggleInspectorVisibility}
+        disabled={!selectedSection}
+        title={
+          selectedSection
+            ? inspectorOpen
+              ? "Hide Inspector"
+              : "Open Inspector"
+            : "Select an object to use Inspector"
+        }
+        aria-label={inspectorOpen ? "Hide Inspector" : "Open Inspector"}
+        aria-pressed={inspectorOpen}
+      >
+        <PanelRightOpen size={18} />
+        <span>Inspector</span>
+      </button>
+      <button
+        type="button"
+        className="builder-sidebar-utility-button"
+        onClick={handleToggleTheme}
+        title={`Switch to ${dashboardTheme === "light" ? "dark" : "light"} mode`}
+        aria-label={`Switch to ${dashboardTheme === "light" ? "dark" : "light"} mode`}
+      >
+        {dashboardTheme === "light" ? <Moon size={18} /> : <Sun size={18} />}
+        <span>Theme</span>
+      </button>
+      <div className="builder-sidebar-utility-language" title={t("language.label")}>
+        <Languages size={18} aria-hidden="true" />
+        <span>{t("language.label")}</span>
+        <LanguageSwitcher />
+      </div>
+    </>
+  );
+
+  const confirmPresetModal = presetToApply ? (
+    <div
+      className="builder-layout-modal"
+      role="dialog"
+      aria-modal="true"
+      onClick={() => setPresetToApply(null)}
+    >
+      <div
+        className="builder-layout-dialog"
+        onClick={(event) => event.stopPropagation()}
+        style={{
+          width: "480px",
+          maxHeight: "300px",
+          display: "flex",
+          flexDirection: "column",
+          gap: "16px",
+          padding: "20px 24px",
+        }}
+      >
+        <div className="builder-layout-header" style={{ borderBottom: "none", paddingBottom: 0 }}>
+          <div>
+            <strong style={{ fontSize: "16px", fontWeight: 700, color: "var(--builder-ui-text)" }}>Apply Preset</strong>
+            <span style={{ fontSize: "13px", color: "var(--builder-ui-muted)", marginTop: "4px", display: "block" }}>
+              Are you sure you want to apply the "{presetToApply.name}" preset?
+            </span>
+          </div>
+          <button
+            type="button"
+            className="builder-layout-close"
+            onClick={() => setPresetToApply(null)}
+            aria-label="Close confirmation dialog"
+          >
+            <X size={15} />
+          </button>
+        </div>
+
+        <div style={{ fontSize: "13px", color: "var(--builder-ui-text)", lineHeight: "1.5" }}>
+          This will replace your current Header layout. (Global Styles and Custom Branding will remain unchanged)
+        </div>
+
+        <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px", marginTop: "auto" }}>
+          <button
+            type="button"
+            className="db-btn"
+            style={{
+              padding: "8px 16px",
+              border: "1px solid var(--builder-ui-border)",
+              borderRadius: "6px",
+              background: "transparent",
+              color: "var(--builder-ui-text)",
+              cursor: "pointer",
+              fontSize: "12px",
+              fontWeight: 500
+            }}
+            onClick={() => setPresetToApply(null)}
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            className="db-btn db-btn--primary"
+            style={{
+              padding: "8px 16px",
+              border: "none",
+              borderRadius: "6px",
+              background: "var(--builder-ui-accent, #0d73ff)",
+              color: "#fff",
+              cursor: "pointer",
+              fontSize: "12px",
+              fontWeight: 500
+            }}
+            onClick={() => {
+              const key = presetToApply.presetKey;
+              setPresetToApply(null);
+              executeApplyHeaderPreset(key);
+            }}
+          >
+            Apply Preset
+          </button>
+        </div>
+      </div>
+    </div>
+  ) : null;
 
   return (
     <div
@@ -7514,9 +8071,6 @@ export default function DashboardBuilder({
         shellSettingsLabel={shellSettingsLabel}
         shellSettingsShortLabel={shellSettingsShortLabel}
         newPageTitle={newPageTitle}
-        inspectorSlot={inspectorPanel}
-        inspectorOpen={inspectorOpen}
-        inspectorOpenKey={inspectorOpenKey}
         pageStatus={pageStatus}
         savedTemplates={savedTemplates}
         renameTemplateRequest={renameTemplateRequest}
@@ -7525,6 +8079,7 @@ export default function DashboardBuilder({
         templateLabels={templateLabels}
         templateStatus={templateStatus}
         topActionsSlot={sidebarTopActions}
+        utilityControlsSlot={sidebarUtilityControls}
         onAddElementFromLibrary={addElementFromLibrary}
         onCreateBuilderPage={createBuilderPage}
         onCreateBuilderPageFromTemplate={createBuilderPageFromTemplate}
@@ -7538,9 +8093,14 @@ export default function DashboardBuilder({
         onRenameSavedTemplate={renameSavedTemplate}
         onSetNewPageTitle={setNewPageTitle}
         onSetSidebarTab={setSidebarTab}
-        onOpenInspector={openInspectorPanel}
         onStartSidebarResize={startSidebarResize}
-        onSwitchBuilderTarget={switchBuilderTarget}
+        onSwitchBuilderTarget={(nextKey) =>
+          nextKey === "header"
+            ? selectHeader()
+            : nextKey === "footer"
+              ? selectFooter()
+              : switchBuilderTarget(nextKey)
+        }
         openElementsPanelKey={panelForceToggler}
         shellSettings={shellSettings}
         onUpdateShellSettings={updateShellSettings}
@@ -7550,585 +8110,6 @@ export default function DashboardBuilder({
       />
 
       <main className="builder-workspace">
-        {false && (
-          <section className="builder-global-styles builder-panel">
-            <div className="builder-global-styles-grid">
-              <div className="builder-global-styles-group">
-                <div className="builder-card-title">
-                  <strong>Site Design</strong>
-                  <span>{builderState.design.preset ?? "custom"}</span>
-                </div>
-
-                <label className="builder-field">
-                  <span>Design Preset</span>
-                  <select
-                    value={builderState.design.preset ?? "princity"}
-                    onChange={(event) =>
-                      applyDesignPreset(
-                        event.target.value as NonNullable<
-                          BuilderDesign["preset"]
-                        >,
-                      )
-                    }
-                  >
-                    <option value="princity">Princity clean</option>
-                    <option value="editorial">Editorial warm</option>
-                    <option value="contrast">Dark contrast</option>
-                  </select>
-                </label>
-
-                <label className="builder-field">
-                  <span>Website Color Mode</span>
-                  <select
-                    value={builderState.design.colorScheme ?? "auto"}
-                    onChange={(event) =>
-                      updateDesign({
-                        colorScheme: event.target.value as BuilderColorScheme,
-                        preset: undefined,
-                      })
-                    }
-                  >
-                    <option value="auto">Follow visitor switch</option>
-                    <option value="light">Force light</option>
-                    <option value="dark">Force dark</option>
-                  </select>
-                </label>
-
-                <div className="builder-design-grid">
-                  {[
-                    ["pageBackground", "Page"],
-                    ["textColor", "Text"],
-                    ["mutedTextColor", "Muted"],
-                    ["accentColor", "Accent"],
-                    ["surfaceColor", "Surface"],
-                    ["buttonBackground", "Button"],
-                  ].map(([key, label]) => (
-                    <label key={key} className="builder-swatch-field">
-                      <span>{label}</span>
-                      <input
-                        type="color"
-                        value={
-                          (builderState.design[
-                            key as keyof BuilderDesign
-                          ] as string) ?? "#ffffff"
-                        }
-                        onChange={(event) =>
-                          updateDesign({
-                            [key]: event.target.value,
-                            preset: undefined,
-                          } as Partial<BuilderDesign>)
-                        }
-                      />
-                    </label>
-                  ))}
-                </div>
-
-                <div className="builder-two-column">
-                  <label className="builder-field">
-                    <span>Radius</span>
-                    <select
-                      value={builderState.design.radius ?? "8px"}
-                      onChange={(event) =>
-                        updateDesign({
-                          radius: event.target.value,
-                          preset: undefined,
-                        })
-                      }
-                    >
-                      <option value="0px">Flat</option>
-                      <option value="4px">Small</option>
-                      <option value="8px">Medium</option>
-                      <option value="16px">Large</option>
-                      <option value="999px">Pill</option>
-                    </select>
-                  </label>
-
-                  <label className="builder-field">
-                    <span>Gutter</span>
-                    <select
-                      value={builderState.design.sectionGutter ?? "48px"}
-                      onChange={(event) =>
-                        updateDesign({
-                          sectionGutter: event.target.value,
-                          preset: undefined,
-                        })
-                      }
-                    >
-                      <option value="28px">Tight</option>
-                      <option value="48px">Medium</option>
-                      <option value="72px">Wide</option>
-                    </select>
-                  </label>
-                </div>
-              </div>
-
-              <div className="builder-global-styles-group">
-                <div className="builder-card-title">
-                  <strong>Typography</strong>
-                  <span>headings</span>
-                </div>
-
-                <label className="builder-field">
-                  <span>Heading Font</span>
-                  <select
-                    value={builderState.design.headingFontFamily ?? "inherit"}
-                    onChange={(event) =>
-                      updateDesign({
-                        headingFontFamily: event.target.value,
-                        preset: undefined,
-                      })
-                    }
-                  >
-                    <option value="inherit">Website font</option>
-                    <option value='system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'>
-                      System sans
-                    </option>
-                    <option value="Georgia, serif">Classic serif</option>
-                    <option value='"Times New Roman", serif'>
-                      Times serif
-                    </option>
-                    <option value='"Courier New", monospace'>Monospace</option>
-                  </select>
-                </label>
-
-                <label className="builder-field">
-                  <span>Heading Size</span>
-                  <select
-                    value={
-                      builderState.design.headingSize ??
-                      "clamp(42px, 8vw, 126px)"
-                    }
-                    onChange={(event) =>
-                      updateDesign({
-                        headingSize: event.target.value,
-                        preset: undefined,
-                      })
-                    }
-                  >
-                    <option value="clamp(32px, 5vw, 76px)">Compact</option>
-                    <option value="clamp(42px, 8vw, 126px)">Display</option>
-                    <option value="clamp(52px, 9vw, 144px)">Large</option>
-                  </select>
-                </label>
-
-                <div className="builder-two-column">
-                  <label className="builder-field">
-                    <span>Weight</span>
-                    <select
-                      value={builderState.design.headingWeight ?? "760"}
-                      onChange={(event) =>
-                        updateDesign({
-                          headingWeight: event.target.value,
-                          preset: undefined,
-                        })
-                      }
-                    >
-                      <option value="500">Medium</option>
-                      <option value="600">Semibold</option>
-                      <option value="700">Bold</option>
-                      <option value="760">Heavy</option>
-                    </select>
-                  </label>
-
-                  <label className="builder-field">
-                    <span>Line Height</span>
-                    <select
-                      value={builderState.design.headingLineHeight ?? "0.92"}
-                      onChange={(event) =>
-                        updateDesign({
-                          headingLineHeight: event.target.value,
-                          preset: undefined,
-                        })
-                      }
-                    >
-                      <option value="0.88">Tight</option>
-                      <option value="0.92">Display</option>
-                      <option value="1">Balanced</option>
-                      <option value="1.1">Relaxed</option>
-                    </select>
-                  </label>
-                </div>
-
-                <div className="builder-two-column">
-                  <label className="builder-swatch-field">
-                    <span>Heading Color</span>
-                    <input
-                      type="color"
-                      value={
-                        builderState.design.headingColor ??
-                        builderState.design.textColor ??
-                        "#111111"
-                      }
-                      onChange={(event) =>
-                        updateDesign({
-                          headingColor: event.target.value,
-                          preset: undefined,
-                        })
-                      }
-                    />
-                  </label>
-
-                  <button
-                    type="button"
-                    className="builder-secondary-button builder-typography-reset"
-                    onClick={() =>
-                      updateDesign({
-                        headingColor: undefined,
-                        preset: undefined,
-                      })
-                    }
-                  >
-                    Use section color
-                  </button>
-                </div>
-              </div>
-
-              <div className="builder-global-styles-group">
-                <div className="builder-card-title">
-                  <strong>Global Layout</strong>
-                  <span>header + spacing</span>
-                </div>
-
-                <label className="builder-check">
-                  <input
-                    type="checkbox"
-                    checked={shellSettings.headerVisible}
-                    onChange={(event) =>
-                      updateShellSettings({
-                        headerVisible: event.target.checked,
-                      })
-                    }
-                  />
-                  <span>Show website header</span>
-                </label>
-
-                <div className="builder-card-title">
-                  <strong>Top Toolbar</strong>
-                  <span>message + meta</span>
-                </div>
-
-                <label className="builder-check">
-                  <input
-                    type="checkbox"
-                    checked={shellSettings.topToolbarVisible}
-                    onChange={(event) =>
-                      updateShellSettings({
-                        topToolbarVisible: event.target.checked,
-                      })
-                    }
-                  />
-                  <span>Show top toolbar</span>
-                </label>
-
-                <label className="builder-field">
-                  <span>Toolbar Text</span>
-                  <input
-                    type="text"
-                    value={shellSettings.topToolbarText}
-                    onChange={(event) =>
-                      updateShellSettings({
-                        topToolbarText: event.target.value,
-                      })
-                    }
-                    placeholder="Fast support & setup by Webpages"
-                  />
-                </label>
-
-                <div className="builder-two-column">
-                  <label className="builder-field">
-                    <span>Phone / Support</span>
-                    <input
-                      type="text"
-                      value={shellSettings.topToolbarPhone}
-                      onChange={(event) =>
-                        updateShellSettings({
-                          topToolbarPhone: event.target.value,
-                        })
-                      }
-                      placeholder="+374 xx xx xx"
-                    />
-                  </label>
-
-                  <label className="builder-field">
-                    <span>Right Meta</span>
-                    <input
-                      type="text"
-                      value={shellSettings.topToolbarMeta}
-                      onChange={(event) =>
-                        updateShellSettings({
-                          topToolbarMeta: event.target.value,
-                        })
-                      }
-                      placeholder="AMD ֏"
-                    />
-                  </label>
-                </div>
-
-                <label className="builder-field">
-                  <span>Header Background</span>
-                  <select
-                    value={shellSettings.headerBackgroundMode}
-                    onChange={(event) =>
-                      updateShellSettings({
-                        headerBackgroundMode: event.target
-                          .value as BuilderHeaderBackgroundMode,
-                      })
-                    }
-                  >
-                    <option value="default">Default Solid</option>
-                    <option value="glass">Glassmorphism (Blur)</option>
-                    <option value="accent">Accent Color Gradient</option>
-                    <option value="none">Transparent Overlay</option>
-                  </select>
-                </label>
-
-                <label className="builder-field">
-                  <span>Header Text Mode</span>
-                  <select
-                    value={shellSettings.headerTextMode || "auto"}
-                    onChange={(event) =>
-                      updateShellSettings({
-                        headerTextMode: event.target
-                          .value as BuilderHeaderTextMode,
-                      })
-                    }
-                  >
-                    <option value="auto">Auto</option>
-                    <option value="light">Light</option>
-                    <option value="dark">Dark</option>
-                  </select>
-                </label>
-
-                <div className="builder-field">
-                  <span>Header Style & Layout</span>
-                  <div className="builder-header-presets-grid">
-                    <button
-                      type="button"
-                      className={`builder-preset-btn ${shellSettings.headerLayout === "princity" ? "is-active" : ""}`}
-                      onClick={() => applyHeaderPreset("service")}
-                    >
-                      <span>Princity Service</span>
-                      <small>Flat layout, text logo</small>
-                    </button>
-                    <button
-                      type="button"
-                      className={`builder-preset-btn ${shellSettings.headerLayout === "pill" ? "is-active" : ""}`}
-                      onClick={() => applyHeaderPreset("commerce")}
-                    >
-                      <span>Commerce Pill</span>
-                      <small>Floating pill on scroll</small>
-                    </button>
-                    <button
-                      type="button"
-                      className={`builder-preset-btn ${shellSettings.headerLayout === "two-row" ? "is-active" : ""}`}
-                      onClick={() => applyHeaderPreset("classic")}
-                    >
-                      <span>Classic Store</span>
-                      <small>Traditional two-row links</small>
-                    </button>
-                    <button
-                      type="button"
-                      className={`builder-preset-btn ${shellSettings.headerLayout === "simple" ? "is-active" : ""}`}
-                      onClick={() => applyHeaderPreset("simple")}
-                    >
-                      <span>Simple Store</span>
-                      <small>Single row layout</small>
-                    </button>
-                    <button
-                      type="button"
-                      className={`builder-preset-btn ${shellSettings.headerLayout === "hero" ? "is-active" : ""}`}
-                      onClick={() => applyHeaderPreset("hero")}
-                    >
-                      <span>Hero Spotlight</span>
-                      <small>Split layout with hero banner</small>
-                    </button>
-                  </div>
-                </div>
-
-                <div className="builder-two-column">
-                  <label className="builder-field">
-                    <span>Brand Display</span>
-                    <select
-                      value={shellSettings.headerBrandMode}
-                      onChange={(event) =>
-                        updateShellSettings({
-                          headerBrandMode: event.target
-                            .value as BuilderHeaderBrandMode,
-                        })
-                      }
-                    >
-                      <option value="logo">Logo only</option>
-                      <option value="brand">Text brand</option>
-                      <option value="both">Logo + text</option>
-                    </select>
-                  </label>
-
-                  <label className="builder-field">
-                    <span>Logo Width</span>
-                    <input
-                      type="number"
-                      min="40"
-                      max="360"
-                      value={shellSettings.headerLogoMaxWidth}
-                      onChange={(event) =>
-                        updateShellSettings({
-                          headerLogoMaxWidth: Number(event.target.value),
-                        })
-                      }
-                    />
-                  </label>
-                </div>
-
-                <label className="builder-field">
-                  <span>Brand Text</span>
-                  <input
-                    type="text"
-                    value={shellSettings.headerBrandText}
-                    onChange={(event) =>
-                      updateShellSettings({
-                        headerBrandText: event.target.value,
-                      })
-                    }
-                    placeholder="WebPages"
-                  />
-                </label>
-
-                <div className="builder-field">
-                  <span>Logo Image</span>
-                  <div className="builder-header-logo-picker">
-                    <div className="builder-header-logo-preview">
-                      {shellSettings.headerLogoUrl ? (
-                        <Image
-                          src={shellSettings.headerLogoUrl ?? ""}
-                          alt={
-                            shellSettings.headerLogoAlt ||
-                            shellSettings.headerBrandText ||
-                            "Site logo"
-                          }
-                          width={120}
-                          height={72}
-                          unoptimized
-                        />
-                      ) : (
-                        <ImageIcon size={20} />
-                      )}
-                    </div>
-                    <div className="builder-header-logo-actions">
-                      <button
-                        type="button"
-                        onClick={() =>
-                          openWordPressMediaPicker({
-                            title: "Header Logo",
-                            currentUrl: shellSettings.headerLogoUrl ?? "",
-                            onSelect: (media) =>
-                              updateShellSettings({
-                                headerLogoUrl: media.sourceUrl,
-                                headerLogoAlt:
-                                  shellSettings.headerLogoAlt ||
-                                  media.altText ||
-                                  media.title ||
-                                  "Site logo",
-                              }),
-                          })
-                        }
-                      >
-                        <GalleryHorizontal size={14} />
-                        Choose from library
-                      </button>
-                      {shellSettings.headerLogoUrl ? (
-                        <button
-                          type="button"
-                          className="is-muted"
-                          onClick={() =>
-                            updateShellSettings({ headerLogoUrl: null })
-                          }
-                        >
-                          Clear
-                        </button>
-                      ) : null}
-                      <small>
-                        {shellSettings.headerLogoUrl
-                          ? "Logo selected from WordPress media."
-                          : "Select an image from WordPress media."}
-                      </small>
-                    </div>
-                  </div>
-                </div>
-
-                <label className="builder-field">
-                  <span>Logo Alt Text</span>
-                  <input
-                    type="text"
-                    value={shellSettings.headerLogoAlt}
-                    onChange={(event) =>
-                      updateShellSettings({
-                        headerLogoAlt: event.target.value,
-                      })
-                    }
-                    placeholder="Site logo"
-                  />
-                </label>
-
-                <div className="builder-two-column">
-                  <label className="builder-field">
-                    <span>Icon Style</span>
-                    <select
-                      value={shellSettings.headerIconVariant}
-                      onChange={(event) =>
-                        updateShellSettings({
-                          headerIconVariant: event.target
-                            .value as BuilderHeaderIconVariant,
-                        })
-                      }
-                    >
-                      <option value="muted">Muted</option>
-                      <option value="ghost">Ghost</option>
-                      <option value="solid">Solid</option>
-                      <option value="icon">Icon only</option>
-                    </select>
-                  </label>
-
-                  <label className="builder-field">
-                    <span>Active Indicator</span>
-                    <select
-                      value={shellSettings.headerActiveIndicator}
-                      onChange={(event) =>
-                        updateShellSettings({
-                          headerActiveIndicator: event.target
-                            .value as BuilderHeaderActiveIndicator,
-                        })
-                      }
-                    >
-                      <option value="princity">Princity motion</option>
-                      <option value="underline">Underline</option>
-                      <option value="none">None</option>
-                    </select>
-                  </label>
-
-                  <div className="builder-field">
-                    <span>Header Icons</span>
-                    <div className="builder-header-icon-grid">
-                      {headerIconOptions.map((option) => (
-                        <label key={option.id}>
-                          <input
-                            type="checkbox"
-                            checked={shellSettings.headerIconOrder.includes(
-                              option.id,
-                            )}
-                            onChange={(event) =>
-                              updateHeaderIcon(option.id, event.target.checked)
-                            }
-                          />
-                          <span>{option.label}</span>
-                        </label>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </section>
-        )}
         {publishCelebration && (
           <div
             className="builder-publish-celebration"
@@ -8149,7 +8130,19 @@ export default function DashboardBuilder({
           ref={previewShellRef}
           className={`builder-preview-shell builder-preview-${device} builder-preview-scheme-${
             builderState.design.colorScheme ?? "auto"
-          }${spacingOverlayEnabled ? " is-spacing-overlay-enabled" : ""}${isResizingDevice ? " is-resizing-device" : ""}`}
+          }${builderState.design.colorScheme === "dark" ? " dark" : ""}${spacingOverlayEnabled ? " is-spacing-overlay-enabled" : ""}${isResizingDevice ? " is-resizing-device" : ""}`}
+          data-theme={builderState.design.colorScheme !== "auto" ? builderState.design.colorScheme : undefined}
+          onMouseDown={(event) => {
+            const target = event.target as HTMLElement;
+            if (
+              target.closest(
+                ".builder-preview-section, .builder-preview-layout-block, .builder-header-document-preview, button, input, select, textarea, [contenteditable='true'], [draggable='true']",
+              )
+            ) {
+              return;
+            }
+            clearInspectorSelection();
+          }}
           style={
             {
               "--builder-preview-shell-bg": previewPageBackground,
@@ -8176,7 +8169,312 @@ export default function DashboardBuilder({
             }
           >
             <div className="builder-preview-header-slot">
-              {shellSettings.headerVisible !== false && (
+              {builderState.page === "header" && (
+                <div
+                  className={`builder-header-document-preview builder-preview-section${selectedId === "header-document" ? " is-selected" : ""}${draggingHeaderElementId ? " is-header-element-dragging" : ""}${draggingHeaderRowId ? " is-header-row-dragging" : ""}${shellSettings.headerVisible === false ? " is-header-hidden" : ""}`}
+                  onDragOver={(event) => {
+                    if (!Array.from(event.dataTransfer.types).includes("application/x-builder-new-block")) return;
+                    event.preventDefault();
+                    event.dataTransfer.dropEffect = "copy";
+                  }}
+                  onDrop={(event) => {
+                    const kind = event.dataTransfer.getData("application/x-builder-new-block") as LayoutBlockKind;
+                    if (!kind || !(kind in layoutBlockLabels)) return;
+                    event.preventDefault();
+                    event.stopPropagation();
+                    addElementFromLibrary(kind);
+                  }}
+                  onDragEndCapture={() => {
+                    setDraggingHeaderElementId(null);
+                    setDraggingHeaderRowId(null);
+                    setHeaderDropTarget(null);
+                    setHeaderRowDropTarget(null);
+                  }}
+                  onDropCapture={() => {
+                    window.setTimeout(() => {
+                      setDraggingHeaderElementId(null);
+                      setDraggingHeaderRowId(null);
+                      setHeaderDropTarget(null);
+                      setHeaderRowDropTarget(null);
+                    }, 0);
+                  }}
+                >
+                  {shellSettings.headerVisible === false ? (
+                    <span className="builder-header-hidden-badge">Header hidden on website</span>
+                  ) : null}
+                  <div className="builder-header-document-tools builder-preview-section-tools" aria-label="Header structure controls">
+                    <button
+                      type="button"
+                      className={selectedId === "header-document" && !selectedLayoutColumnKey ? "is-active" : ""}
+                      onClick={() => {
+                        setSelectedId("header-document");
+                        setSelectedLayoutRowIndex(null);
+                        setSelectedLayoutColumnKey(null);
+                        setSelectedLayoutBlockKey(null);
+                        openInspectorPanel();
+                      }}
+                    >
+                      Header
+                    </button>
+                    <button
+                      type="button"
+                      className={selectedLayoutRowIndex === 0 && !selectedLayoutBlockKey ? "is-active" : ""}
+                      onClick={() => selectLayoutRow("header-document", 0)}
+                      title="Select Header row and choose its column layout in Inspector"
+                    >
+                      <Layers3 size={11} /> Row layout
+                    </button>
+                    <button
+                      type="button"
+                      className={selectedLayoutColumnKey === primaryHeaderColumnId && !selectedLayoutBlockKey ? "is-active" : ""}
+                      onClick={() => selectLayoutColumn("header-document", primaryHeaderColumnId)}
+                    >
+                      Container
+                    </button>
+                    <button
+                      type="button"
+                      title="Duplicate selected Header row"
+                      onClick={() => duplicateLayoutRow("header-document", selectedLayoutRowIndex ?? 0)}
+                    >
+                      <Copy size={11} />
+                    </button>
+                    <button
+                      type="button"
+                      title="Add Header row"
+                      onClick={() => {
+                        const headerSection = builderState.sections.find((section) => section.id === "header-document");
+                        const rowCount = headerSection ? getPreviewLayoutRows(headerSection, headerSection.layoutItems ?? []).length : 0;
+                        addRowNear("header-document", Math.max(0, rowCount - 1), "after", "whole");
+                      }}
+                    >
+                      <Plus size={11} />
+                    </button>
+                    <button
+                      type="button"
+                      title="Delete selected empty Header row"
+                      onClick={() => deleteEmptyRow("header-document", 0)}
+                    >
+                      <Trash2 size={11} />
+                    </button>
+                  </div>
+                  <HeaderShellView
+                    layoutOverride={shellSettings.headerLayout}
+                    shellSettings={shellSettings}
+                    headerSettings={dashboardHeaderSettings}
+                    homeHref="#"
+                    clientHref="#"
+                    scopedPreviewWebsiteId={websiteRouteSegment}
+                    scopedPreviewPage={headerContextState.page}
+                    scopedPreviewPages={scopedPreviewPages}
+                    scopedLinkMode="builder"
+                    categoriesContent={builderHeaderCategoriesContent}
+                    headerComposition={currentHeaderComposition}
+                    activeContentLanguage={contentLanguage}
+                    enabledContentLanguages={enabledContentLanguages}
+                    languagePreferenceKey={`website_content_language_${websiteId ?? "root"}`}
+                    onContentLanguageChange={setContentLanguage}
+                    renderBuilderElement={(element, content, flexItemStyle) => {
+                      const columnId = element.columnId ?? "header-main-row";
+                      const columnElements = currentHeaderComposition.elements.filter(
+                        (candidate) => candidate.columnId === element.columnId,
+                      );
+                      const elementIndex = columnElements.findIndex((candidate) => candidate.id === element.id);
+                      const dragPlacement = headerDropTarget?.startsWith(`${element.id}:`)
+                        ? headerDropTarget.slice(element.id.length + 1) as "above" | "below"
+                        : null;
+                      return (
+                        <div
+                          style={flexItemStyle}
+                          draggable={Boolean(element.rowId && element.columnId)}
+                          className={`builder-header-live-element builder-preview-layout-block is-${element.type}${selectedLayoutBlockKey === element.id ? " is-selected is-selected-block" : ""}${draggingHeaderElementId === element.id ? " is-dragging-block" : ""}${dragPlacement ? ` is-drag-over-${dragPlacement}` : ""}`}
+                          data-header-element={element.type}
+                          onMouseDown={(event) => {
+                            event.stopPropagation();
+                            selectLayoutBlock("header-document", columnId, element.id);
+                          }}
+                          onClick={(event) => {
+                            event.preventDefault();
+                            event.stopPropagation();
+                            selectLayoutBlock("header-document", columnId, element.id);
+                          }}
+                          onDragStart={(event) => {
+                            event.stopPropagation();
+                            if (!element.rowId || !element.columnId) {
+                              event.preventDefault();
+                              return;
+                            }
+                            event.dataTransfer.setData(HEADER_BLOCK_DRAG_TYPE, encodeHeaderBlockDragPayload({
+                              blockId: element.id,
+                              sourceRowId: element.rowId,
+                              sourceColumnId: element.columnId,
+                            }));
+                            event.dataTransfer.effectAllowed = "move";
+                            setDraggingHeaderElementId(element.id);
+                            setDraggingHeaderRowId(null);
+                            createDragGhost(event, element.type);
+                          }}
+                          onDragOver={(event) => {
+                            const types = Array.from(event.dataTransfer.types);
+                            if (!types.includes(HEADER_BLOCK_DRAG_TYPE) && !types.includes("application/x-builder-new-block")) return;
+                            event.preventDefault();
+                            event.stopPropagation();
+                            const rect = event.currentTarget.getBoundingClientRect();
+                            const placement = getElementDropPlacement(event.clientY, rect);
+                            setHeaderDropTarget(`${element.id}:${placement}`);
+                            event.dataTransfer.dropEffect = types.includes("application/x-builder-new-block") ? "copy" : "move";
+                          }}
+                          onDrop={(event) => {
+                            event.preventDefault();
+                            event.stopPropagation();
+                            event.nativeEvent.stopImmediatePropagation();
+                            const placement = dragPlacement ?? "above";
+                            const kind = event.dataTransfer.getData("application/x-builder-new-block") as LayoutBlockKind;
+                            if (kind && kind in layoutBlockLabels) {
+                              addElementFromLibrary(kind, element.columnId, element.id, placement);
+                              setHeaderDropTarget(null);
+                              return;
+                            }
+                            const payload = decodeHeaderBlockDragPayload(event.dataTransfer.getData(HEADER_BLOCK_DRAG_TYPE));
+                            if (payload && payload.blockId !== element.id && element.rowId && element.columnId) {
+                              moveHeaderBuilderElement({ payload, targetRowId: element.rowId, targetColumnId: element.columnId, targetBlockId: element.id, placement });
+                            }
+                            setHeaderDropTarget(null);
+                            setDraggingHeaderElementId(null);
+                          }}
+                          onDragEnd={() => {
+                            setDraggingHeaderElementId(null);
+                            setHeaderDropTarget(null);
+                          }}
+                        >
+                          <BuilderElementToolbar
+                            label={element.type}
+                            canMoveUp={elementIndex > 0}
+                            canMoveDown={elementIndex >= 0 && elementIndex < columnElements.length - 1}
+                            onSettings={() => selectLayoutBlock("header-document", columnId, element.id)}
+                            onMoveUp={() => moveLayoutBlockWithinColumn({ sectionId: "header-document", columnKey: columnId, blockKey: element.id, direction: -1 })}
+                            onMoveDown={() => moveLayoutBlockWithinColumn({ sectionId: "header-document", columnKey: columnId, blockKey: element.id, direction: 1 })}
+                            onSave={() => saveElementTemplateByKey("header-document", columnId, element.id)}
+                            onDuplicate={() => duplicateLayoutBlock({ sectionId: "header-document", columnKey: columnId, blockKey: element.id })}
+                            onDelete={() => deleteLayoutBlock({ sectionId: "header-document", columnKey: columnId, blockKey: element.id })}
+                          />
+                          <span className="builder-preview-drag-handle" aria-hidden="true">::</span>
+                          <div className="builder-header-live-element-content">
+                            {content}
+                          </div>
+                        </div>
+                      );
+                    }}
+                    renderBuilderColumn={(columnId, content) => (
+                      <div
+                        className={`builder-header-live-column${selectedLayoutColumnKey === columnId && !selectedLayoutBlockKey ? " is-selected" : ""}${headerDropTarget === `column:${columnId}` ? " is-drag-over" : ""}`}
+                        style={{ flex: currentHeaderComposition.columns.find((column) => column.id === columnId)?.flex ?? 1 }}
+                        onClick={(event) => {
+                          if ((event.target as HTMLElement).closest(".builder-header-live-element")) return;
+                          event.preventDefault();
+                          event.stopPropagation();
+                          setHeaderDropTarget(`column:${columnId}`);
+                          selectLayoutColumn("header-document", columnId);
+                        }}
+                        onDragOver={(event) => {
+                          const types = Array.from(event.dataTransfer.types);
+                          if (!types.includes("application/x-builder-new-block") && !types.includes(HEADER_BLOCK_DRAG_TYPE)) return;
+                          event.preventDefault();
+                          event.stopPropagation();
+                          if (types.includes(HEADER_BLOCK_DRAG_TYPE)) {
+                            setHeaderDropTarget(`column:${columnId}`);
+                          }
+                          event.dataTransfer.dropEffect = types.includes("application/x-builder-new-block") ? "copy" : "move";
+                        }}
+                        onDragLeave={(event) => {
+                          if (event.currentTarget.contains(event.relatedTarget as Node | null)) return;
+                          setHeaderDropTarget((current) => current === `column:${columnId}` ? null : current);
+                        }}
+                        onDrop={(event) => {
+                          event.preventDefault();
+                          event.stopPropagation();
+                          event.nativeEvent.stopImmediatePropagation();
+                          const kind = event.dataTransfer.getData("application/x-builder-new-block") as LayoutBlockKind;
+                          if (kind && kind in layoutBlockLabels) {
+                            addElementFromLibrary(kind, columnId);
+                            setHeaderDropTarget(null);
+                            return;
+                          }
+                          const payload = decodeHeaderBlockDragPayload(event.dataTransfer.getData(HEADER_BLOCK_DRAG_TYPE));
+                          const targetRowId = currentHeaderComposition.columns.find((column) => column.id === columnId)?.rowId;
+                          if (payload && targetRowId) {
+                            moveHeaderBuilderElement({ payload, targetRowId, targetColumnId: columnId, placement: "below" });
+                          }
+                          setHeaderDropTarget(null);
+                        }}
+                      >
+                        {content}
+                      </div>
+                    )}
+                    renderBuilderRow={(rowId, content) => {
+                      const headerSection = builderState.sections.find((section) => section.id === "header-document");
+                      const headerRows = headerSection ? getPreviewLayoutRows(headerSection, headerSection.layoutItems ?? []) : [];
+                      const rowIndex = headerRows.findIndex((row) => row.items.some((item) => (item.rowId ?? item.id) === rowId));
+                      return (
+                        <div className={`builder-header-live-row${selectedLayoutRowIndex === rowIndex ? " is-selected" : ""}`}>
+                          {(["before", "after"] as const).map((placement) => (
+                            <span
+                              key={placement}
+                              className={`builder-header-row-drop-target is-${placement}${headerRowDropTarget === `${rowId}:${placement}` ? " is-active" : ""}`}
+                              onDragOver={(event) => {
+                                if (!event.dataTransfer.types.includes("application/x-builder-header-row")) return;
+                                event.preventDefault();
+                                event.stopPropagation();
+                                setHeaderRowDropTarget(`${rowId}:${placement}`);
+                                event.dataTransfer.dropEffect = "move";
+                              }}
+                              onDragLeave={() => setHeaderRowDropTarget((current) => current === `${rowId}:${placement}` ? null : current)}
+                              onDrop={(event) => {
+                                event.preventDefault();
+                                event.stopPropagation();
+                                const sourceRowId = event.dataTransfer.getData("application/x-builder-header-row");
+                                if (sourceRowId && sourceRowId !== rowId) {
+                                  moveHeaderBuilderRow({ sourceRowId, targetRowId: rowId, placement });
+                                }
+                                setHeaderRowDropTarget(null);
+                              }}
+                              aria-hidden="true"
+                            />
+                          ))}
+                          <div className="builder-preview-row-toolbar builder-header-live-row-tools">
+                            <span>Header Row {rowIndex + 1}</span>
+                            <button
+                              type="button"
+                              className="builder-header-row-drag-handle"
+                              title={`Drag Header Row ${rowIndex + 1}`}
+                              aria-label={`Drag Header Row ${rowIndex + 1}`}
+                              draggable
+                              onPointerDown={(event) => event.stopPropagation()}
+                              onDragStart={(event) => {
+                                event.stopPropagation();
+                                event.dataTransfer.setData("application/x-builder-header-row", rowId);
+                                event.dataTransfer.effectAllowed = "move";
+                                setDraggingHeaderRowId(rowId);
+                                setDraggingHeaderElementId(null);
+                              }}
+                              onDragEnd={(event) => {
+                                event.stopPropagation();
+                                setDraggingHeaderRowId(null);
+                                setHeaderRowDropTarget(null);
+                              }}
+                            ><GripVertical size={12} /></button>
+                            <button type="button" title="Choose row layout" onClick={() => selectLayoutRow("header-document", rowIndex)}><Layers3 size={12} /></button>
+                            <button type="button" title="Duplicate row" onClick={() => duplicateLayoutRow("header-document", rowIndex)}><Copy size={12} /></button>
+                            <button type="button" title="Add row below" onClick={() => addRowNear("header-document", rowIndex, "after", "whole")}><Plus size={12} /></button>
+                            <button type="button" title="Delete empty row" onClick={() => deleteEmptyRow("header-document", rowIndex)}><Trash2 size={12} /></button>
+                          </div>
+                          {content}
+                        </div>
+                      );
+                    }}
+                  />
+                </div>
+              )}
+              {builderState.page !== "header" && shellSettings.headerVisible !== false && (
                 <div
                   className={`builder-preview-header-editable ${
                     headerSelected ? "is-selected" : ""
@@ -8208,7 +8506,12 @@ export default function DashboardBuilder({
                     scopedPreviewPage={builderState.page}
                     scopedPreviewPages={scopedPreviewPages}
                     scopedLinkMode="builder"
-                    categoriesContent={null}
+                    categoriesContent={builderHeaderCategoriesContent}
+                    headerComposition={currentHeaderComposition}
+                    activeContentLanguage={contentLanguage}
+                    enabledContentLanguages={enabledContentLanguages}
+                    languagePreferenceKey={`website_content_language_${websiteId ?? "root"}`}
+                    onContentLanguageChange={setContentLanguage}
                   />
                   <div
                     className="builder-preview-header-tools"
@@ -8223,6 +8526,14 @@ export default function DashboardBuilder({
                         aria-label="Edit Header"
                         title="Edit Header"
                       >
+                        <SquareMousePointer size={14} />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={openHeaderSettings}
+                        aria-label="Header Settings"
+                        title="Header Settings"
+                      >
                         <Settings2 size={14} />
                       </button>
                     </div>
@@ -8230,16 +8541,59 @@ export default function DashboardBuilder({
                 </div>
               )}
             </div>
-            <ProductCategoryFilterProvider key={builderState.page}>
+            {builderState.page === "footer" ? (
+              <div className="builder-context-page-preview is-locked builder-footer-page-context" aria-label="Locked page context">
+                <div className="builder-context-page-lock-badge">
+                  Previewing {getLayoutLabel(footerPageContextState.page, customPages)} · Page content locked
+                </div>
+                <button
+                  type="button"
+                  className="builder-context-page-edit-overlay"
+                  aria-label={`Edit ${getLayoutLabel(footerPageContextState.page, customPages)} page`}
+                  title={`Edit ${getLayoutLabel(footerPageContextState.page, customPages)} page`}
+                  onClick={() => switchBuilderTarget(footerPageContextState.page)}
+                />
+                <StorefrontBuilderRenderer
+                  layout={{
+                    version: 1,
+                    key: footerPageContextState.page,
+                    updatedAt: "",
+                    ...footerPageContextState,
+                    sections: footerPageContextSections,
+                  }}
+                  page={footerPageContextState.page}
+                  pageLabel={getLayoutLabel(footerPageContextState.page, customPages)}
+                />
+              </div>
+            ) : null}
+            <div
+              className={builderState.page === "header" ? "builder-context-page-preview is-locked" : ""}
+              aria-label={builderState.page === "header" ? "Locked page context" : undefined}
+            >
+            {builderState.page === "header" ? (
+              <div className="builder-context-page-lock-badge">
+                Previewing {getLayoutLabel(headerContextState.page, customPages)} · Page content locked
+              </div>
+            ) : null}
+            {builderState.page === "header" ? (
+              <button
+                type="button"
+                className="builder-context-page-edit-overlay"
+                aria-label={`Edit ${getLayoutLabel(headerContextState.page, customPages)} page`}
+                title={`Edit ${getLayoutLabel(headerContextState.page, customPages)} page`}
+                onClick={() => switchBuilderTarget(headerContextState.page)}
+              />
+            ) : null}
+            <ProductCategoryFilterProvider key={headerContextState.page}>
               <PreviewCanvas
                 device={device}
-                sections={localizedSections}
-                page={builderState.page}
+                sections={headerContextSections}
+                page={headerContextState.page}
                 previewProducts={previewProducts}
                 previewCategoryTree={previewCategoryTree}
                 previewCategoryCounts={previewCategoryCounts}
-                pageLabel={getLayoutLabel(builderState.page, customPages)}
-                design={builderState.design}
+                pageLabel={getLayoutLabel(headerContextState.page, customPages)}
+                design={headerContextState.design}
                 shellSettings={shellSettings}
                 spacingOverlayEnabled={spacingOverlayEnabled}
                 selectedId={selectedId}
@@ -8300,6 +8654,41 @@ export default function DashboardBuilder({
                 onCycleSectionSpacing={cycleSectionSpacing}
               />
             </ProductCategoryFilterProvider>
+            </div>
+            {builderState.page !== "footer" ? (
+              <div className="builder-preview-footer-slot" aria-label="Footer preview">
+                <StorefrontBuilderRenderer
+                  layout={{
+                    version: 1,
+                    key: "footer",
+                    updatedAt: "",
+                    ...footerDocumentState,
+                    sections: footerDocumentSections,
+                  }}
+                  page="footer"
+                  pageLabel="Footer"
+                  rootElement="footer"
+                />
+                <button
+                  type="button"
+                  className="builder-preview-footer-edit-overlay"
+                  aria-label="Edit Footer"
+                  title="Edit Footer"
+                  onClick={selectFooter}
+                />
+                <div className="builder-preview-footer-tools">
+                  <span>Footer</span>
+                  <button
+                    type="button"
+                    onClick={selectFooter}
+                    aria-label="Edit Footer"
+                    title="Edit Footer"
+                  >
+                    <SquareMousePointer size={14} />
+                  </button>
+                </div>
+              </div>
+            ) : null}
             {device !== "desktop" && (
               <>
                 <div
@@ -8354,6 +8743,16 @@ export default function DashboardBuilder({
         </div>
       </main>
 
+      {inspectorOpen && selectedSection ? (
+        <div
+          className="builder-floating-inspector"
+          onMouseDown={(event) => event.stopPropagation()}
+          onClick={(event) => event.stopPropagation()}
+        >
+          {inspectorPanel}
+        </div>
+      ) : null}
+
       <MediaManager
         open={mediaPickerOpen}
         title={mediaPickerTitle}
@@ -8361,6 +8760,7 @@ export default function DashboardBuilder({
         onSelect={selectWordPressMedia}
         onClose={closeWordPressMediaPicker}
       />
+      {confirmPresetModal ? createPortal(confirmPresetModal, document.body) : null}
     </div>
   );
 }
@@ -8684,6 +9084,7 @@ function PreviewCanvas({
       return `${section.id}:${sectionAnimation}:${blockAnimations}`;
     })
     .join("||");
+
   const insertTargetSection =
     sections.find((section) => section.id === insertTarget?.sectionId) ?? null;
   const insertLayoutPicker = insertTarget ? (
@@ -8888,12 +9289,13 @@ function PreviewCanvas({
         className={`shop-builder-main shop-builder-main--scheme-${
           design.colorScheme ?? "auto"
         } builder-preview-page${draggingSectionId ? " is-dragging-section" : ""}`}
+        data-theme={design.colorScheme !== "auto" ? design.colorScheme : undefined}
         style={previewDesignStyle(design)}
         data-builder-page-root
         data-builder-page={page}
         data-gsap-home={page === "home" ? true : undefined}
         data-overlap-header={
-          visibleSections[0]?.pullUnderHeader ? "true" : undefined
+          (visibleSections[0]?.pullUnderHeader || shellSettings.headerOverlay) ? "true" : undefined
         }
       >
         <BuilderScrollAnimations key={animationSignature} />
@@ -10227,6 +10629,57 @@ function RowLayoutToolbar({
           isEmpty ? "Delete empty row" : "Delete is available for empty rows"
         }
       >
+        <Trash2 size={13} />
+      </button>
+    </div>
+  );
+}
+
+function BuilderElementToolbar({
+  label,
+  canMoveUp,
+  canMoveDown,
+  onSettings,
+  onMoveUp,
+  onMoveDown,
+  onSave,
+  onDuplicate,
+  onDelete,
+}: {
+  label: string;
+  canMoveUp: boolean;
+  canMoveDown: boolean;
+  onSettings: () => void;
+  onMoveUp: () => void;
+  onMoveDown: () => void;
+  onSave: () => void;
+  onDuplicate: () => void;
+  onDelete: () => void;
+}) {
+  return (
+    <div
+      className="builder-preview-block-tools"
+      onClick={(event) => event.stopPropagation()}
+      onMouseDown={(event) => event.stopPropagation()}
+      onDragStart={(event) => event.stopPropagation()}
+    >
+      <span>{label}</span>
+      <button type="button" onClick={onSettings} title="Edit element">
+        <Settings2 size={13} />
+      </button>
+      <button type="button" onClick={onMoveUp} disabled={!canMoveUp} title="Move element up">
+        <ArrowUp size={13} />
+      </button>
+      <button type="button" onClick={onMoveDown} disabled={!canMoveDown} title="Move element down">
+        <ArrowDown size={13} />
+      </button>
+      <button type="button" onClick={onSave} title="Save element as template">
+        <Save size={13} />
+      </button>
+      <button type="button" onClick={onDuplicate} title="Duplicate element">
+        <Copy size={13} />
+      </button>
+      <button type="button" onClick={onDelete} title="Delete element">
         <Trash2 size={13} />
       </button>
     </div>
@@ -12163,11 +12616,8 @@ function PreviewSection({
                             event.preventDefault();
                             event.stopPropagation();
 
-                            const rect =
-                              event.currentTarget.getBoundingClientRect();
-                            const relativeY = event.clientY - rect.top;
-                            const placement =
-                              relativeY < rect.height / 2 ? "above" : "below";
+                            const rect = event.currentTarget.getBoundingClientRect();
+                            const placement = getElementDropPlacement(event.clientY, rect);
                             if (
                               !activeDragOver ||
                               activeDragOver.type !== "block" ||
@@ -12277,94 +12727,17 @@ function PreviewSection({
                             onOpenSpacingSettings={onOpenSpacingSettings}
                           />
                         )}
-                        <div
-                          className="builder-preview-block-tools"
-                          onClick={(event) => event.stopPropagation()}
-                          onMouseDown={(event) => event.stopPropagation()}
-                          onDragStart={(event) => event.stopPropagation()}
-                        >
-                          <span>
-                            {layoutBlockLabels[block.kind ?? "text"] ?? "Block"}
-                          </span>
-                          <button
-                            type="button"
-                            onClick={() =>
-                              onSelectBlock(section.id, columnKey, blockKey)
-                            }
-                            title="Edit element"
-                          >
-                            <Settings2 size={13} />
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() =>
-                              onMoveBlockWithinColumn({
-                                sectionId: section.id,
-                                columnKey,
-                                blockKey,
-                                direction: -1,
-                              })
-                            }
-                            disabled={blockIndex <= 0}
-                            title="Move element up"
-                          >
-                            <ArrowUp size={13} />
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() =>
-                              onMoveBlockWithinColumn({
-                                sectionId: section.id,
-                                columnKey,
-                                blockKey,
-                                direction: 1,
-                              })
-                            }
-                            disabled={blockIndex >= blocks.length - 1}
-                            title="Move element down"
-                          >
-                            <ArrowDown size={13} />
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() =>
-                              onSaveElementTemplate(
-                                section.id,
-                                columnKey,
-                                blockKey,
-                              )
-                            }
-                            title="Save element as template"
-                          >
-                            <Save size={13} />
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() =>
-                              onDuplicateBlock({
-                                sectionId: section.id,
-                                columnKey,
-                                blockKey,
-                              })
-                            }
-                            title="Duplicate element"
-                          >
-                            <Copy size={13} />
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() =>
-                              onDeleteBlock({
-                                sectionId: section.id,
-                                columnKey,
-                                blockKey,
-                              })
-                            }
-                            title="Delete element"
-                          >
-                            <Trash2 size={13} />
-                          </button>
-                        </div>
+                        <BuilderElementToolbar
+                          label={layoutBlockLabels[block.kind ?? "text"] ?? "Block"}
+                          canMoveUp={blockIndex > 0}
+                          canMoveDown={blockIndex < blocks.length - 1}
+                          onSettings={() => onSelectBlock(section.id, columnKey, blockKey)}
+                          onMoveUp={() => onMoveBlockWithinColumn({ sectionId: section.id, columnKey, blockKey, direction: -1 })}
+                          onMoveDown={() => onMoveBlockWithinColumn({ sectionId: section.id, columnKey, blockKey, direction: 1 })}
+                          onSave={() => onSaveElementTemplate(section.id, columnKey, blockKey)}
+                          onDuplicate={() => onDuplicateBlock({ sectionId: section.id, columnKey, blockKey })}
+                          onDelete={() => onDeleteBlock({ sectionId: section.id, columnKey, blockKey })}
+                        />
                         <span
                           className="builder-preview-drag-handle"
                           aria-hidden="true"

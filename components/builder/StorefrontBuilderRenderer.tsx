@@ -78,6 +78,11 @@ export type StorefrontBuilderRendererProps = {
   product?: StorefrontBuilderProduct;
   pageContent?: ReactNode;
   website?: SaaSWebsite | null;
+  /** When true, the header overlays page content (shellSettings.headerOverlay).
+   *  Sets data-overlap-header on the page root so HeaderFrame auto-detects
+   *  the first section's background for text-mode adaptation. */
+  headerOverlay?: boolean;
+  rootElement?: "main" | "footer";
 };
 
 export type StorefrontBuilderProduct = {
@@ -3701,6 +3706,8 @@ export default function StorefrontBuilderRenderer({
   product,
   pageContent,
   website,
+  headerOverlay = false,
+  rootElement = "main",
 }: StorefrontBuilderRendererProps) {
   const label =
     pageLabel ??
@@ -3719,7 +3726,8 @@ export default function StorefrontBuilderRenderer({
       ? [{ label: "Home" }]
       : [{ label: "Home", href: "/" }, { label }]);
 
-  const isHomePage = page === "home";
+  const isPageDocument = rootElement === "main";
+  const isHomePage = isPageDocument && page === "home";
   const designColorScheme = layout.design?.colorScheme;
   const layoutScheme: "light" | "dark" | "auto" =
     designColorScheme === "dark" ||
@@ -3731,10 +3739,11 @@ export default function StorefrontBuilderRenderer({
     (section) => section.visible,
   );
   const pullUnderHeader = firstVisibleSection?.pullUnderHeader === true;
+  const RootElement = rootElement;
 
   return (
     <>
-      <script
+      {isPageDocument ? <script
         key={layout.design?.colorScheme ?? "auto"}
         dangerouslySetInnerHTML={{
           __html: `
@@ -3750,17 +3759,17 @@ export default function StorefrontBuilderRenderer({
             })();
           `.trim(),
         }}
-      />
-      <style
+      /> : null}
+      {isPageDocument ? <style
         data-builder-page-shell
         dangerouslySetInnerHTML={{ __html: builderPageShellCss(layout) }}
-      />
-      <main
-        className={designClassName(layout)}
+      /> : null}
+      <RootElement
+        className={`${designClassName(layout)}${rootElement === "footer" ? " site-footer-builder" : ""}`}
         style={designStyle(layout)}
         data-builder-page-root
         data-gsap-home={isHomePage ? true : undefined}
-        data-overlap-header={pullUnderHeader ? "true" : undefined}
+        data-overlap-header={isPageDocument && (pullUnderHeader || headerOverlay) ? "true" : undefined}
       >
         <BuilderScrollAnimations />
         {isHomePage && <HomeGsapAnimations />}
@@ -3781,7 +3790,7 @@ export default function StorefrontBuilderRenderer({
             />
           ))}
         </div>
-      </main>
+      </RootElement>
     </>
   );
 }

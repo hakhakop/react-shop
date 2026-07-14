@@ -45,7 +45,7 @@
         "bottomMargin": "none",
         "layout": "whole",
         "layoutColumns": 1,
-        "layoutRows": 2,
+        "layoutRows": 1,
         "backgroundEffect": "aurora",
         "antigravitySpeed": 1.8,
         "antigravityParticleCount": 260,
@@ -254,30 +254,6 @@
                       "Provide the information",
                       "Your website is ready"
                     ]
-                  }
-                }
-              }
-            ]
-          },
-          {
-            "id": "layout-row-mrhvkvb0-column-1",
-            "rowId": "layout-row-mrhvkvb0",
-            "rowLayout": "whole",
-            "blocks": [
-              {
-                "id": "hero-block-mrhvl3fu-wk6k5",
-                "kind": "hero",
-                "eyebrow": "Featured",
-                "title": "Hero Element",
-                "body": "<p>A <strong>ուժեղ</strong> visual opening with editable copy and action.</p>",
-                "buttonLabel": "Learn more",
-                "buttonUrl": "/",
-                "carouselSettings": {
-                  "variant": "default"
-                },
-                "contentTranslations": {
-                  "en": {
-                    "body": "<p>A <strong>strong</strong> visual opening with editable copy and action.</p>"
                   }
                 }
               }
@@ -1403,7 +1379,7 @@
         ]
       }
     ],
-    "updatedAt": "2026-07-12T14:19:17.337Z"
+    "updatedAt": "2026-07-13T12:08:32.525Z"
   },
   "shop": {
     "version": 1,
@@ -5853,5 +5829,120 @@
       }
     ],
     "updatedAt": "2026-06-28T17:35:46.239Z"
+  },
+  "header": {
+    "version": 1,
+    "key": "header",
+    "page": "header",
+    "targetType": "header",
+    "design": {
+      "preset": "princity",
+      "colorScheme": "auto",
+      "pageBackground": "#f7f7f4",
+      "textColor": "#111111",
+      "mutedTextColor": "#5f5f58",
+      "accentColor": "#a4be7b",
+      "surfaceColor": "#efefe9",
+      "buttonBackground": "#111111",
+      "buttonTextColor": "#ffffff",
+      "radius": "8px",
+      "sectionMaxWidth": "1640px",
+      "sectionGutter": "48px",
+      "headingFontFamily": "inherit",
+      "headingSize": "clamp(42px, 8vw, 126px)",
+      "headingWeight": "760",
+      "headingLineHeight": "0.92",
+      "cardBg": "#efefe9",
+      "cardRadius": "8px",
+      "cardBorder": "transparent",
+      "cardShadow": "0 12px 30px rgba(17,17,17,0.06)",
+      "cardShadowHover": "0 18px 42px rgba(17,17,17,0.1)",
+      "cardImageBg": "#ffffff",
+      "cardImagePadding": "clamp(22px, 2.4vw, 36px)"
+    },
+    "sections": [
+      {
+        "id": "header-document",
+        "kind": "contentLayout",
+        "title": "Header",
+        "headerUtilityMigrationVersion": 3,
+        "background": "transparent",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "layout": "header-row",
+        "layoutColumns": 3,
+        "layoutItems": [
+          {
+            "id": "header-main-left",
+            "rowId": "header-main-row",
+            "rowLayout": "quarters-1-2-1",
+            "blocks": [
+              {
+                "id": "header-logo",
+                "kind": "image",
+                "headerBrandMode": "logo",
+                "headerBrandText": "WebPages",
+                "imageMaxWidth": 161,
+                "imageUrl": "https://cms.webpages.am/wp-content/uploads/2026/06/logo-2-1-scaled.png",
+                "imageAlt": "WebPages logo"
+              }
+            ]
+          },
+          {
+            "id": "header-main-center",
+            "rowId": "header-main-row",
+            "rowLayout": "quarters-1-2-1",
+            "blocks": [
+              {
+                "id": "header-navigation",
+                "kind": "menu",
+                "title": "Navigation",
+                "menuSource": "main",
+                "menuActiveIndicator": "princity",
+                "elementAlign": "center",
+                "typography": {
+                  "body": {
+                    "textAlign": "center"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "id": "header-main-right",
+            "rowId": "header-main-row",
+            "rowLayout": "quarters-1-2-1",
+            "blocks": [
+              {
+                "id": "header-utility-search",
+                "kind": "headerSearch",
+                "headerUtilityAction": "search",
+                "headerUtilityVariant": "muted"
+              },
+              {
+                "id": "header-utility-cart",
+                "kind": "headerCart",
+                "headerUtilityAction": "cart",
+                "headerUtilityVariant": "muted"
+              },
+              {
+                "id": "header-language",
+                "kind": "headerLanguage",
+                "headerLanguageDisplay": "native"
+              },
+              {
+                "id": "header-utility-account",
+                "kind": "headerAccount",
+                "headerUtilityAction": "account",
+                "headerUtilityVariant": "muted"
+              }
+            ]
+          }
+        ],
+        "visible": true
+      }
+    ],
+    "updatedAt": "2026-07-13T12:24:21.372Z"
   }
 }

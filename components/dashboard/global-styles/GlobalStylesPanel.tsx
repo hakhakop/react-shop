@@ -11,8 +11,7 @@ import GlobalSpacingPanel from "./GlobalSpacingPanel";
 import GlobalCardsPanel from "./GlobalCardsPanel";
 import GlobalButtonsPanel from "./GlobalButtonsPanel";
 import GlobalTypographyPanel from "./GlobalTypographyPanel";
-import GlobalHeaderPanel from "./GlobalHeaderPanel";
-import { Palette, Ruler, ShoppingBag, ToggleLeft, Type, LayoutGrid } from "lucide-react";
+import { Palette, Ruler, ShoppingBag, ToggleLeft, Type } from "lucide-react";
 
 type GlobalStylesPanelProps = GlobalStylesContextType;
 
@@ -49,8 +48,6 @@ export default function GlobalStylesPanel(props: GlobalStylesPanelProps) {
         return <GlobalButtonsPanel />;
       case "global-typography":
         return <GlobalTypographyPanel />;
-      case "global-header":
-        return <GlobalHeaderPanel />;
       default:
         return null;
     }
@@ -94,13 +91,6 @@ export default function GlobalStylesPanel(props: GlobalStylesPanelProps) {
             description: "Global font styles, weights, and line heights for headings",
             icon: <Type size={16} />,
             onClick: () => push({ id: "global-typography", label: "Typography" }),
-          },
-          {
-            id: "global-header",
-            label: "Header Settings",
-            description: "Header layout, brand modes, logo, active indicator & icons",
-            icon: <LayoutGrid size={16} />,
-            onClick: () => push({ id: "global-header", label: "Header Settings" }),
           },
         ]}
       />

@@ -2,6 +2,7 @@ import StorefrontBuilderRenderer from "@/components/builder/StorefrontBuilderRen
 import CartPageClient from "@/components/CartPageClient";
 import { renderDomainWebsiteFrontend } from "@/components/website/DomainWebsiteFrontend";
 import { getPublishedBuilderLayout } from "@/lib/builderLayouts";
+import { getBuilderShellSettings } from "@/lib/builderShell";
 
 export default async function CartPage() {
   const pageContent = <CartPageClient asSlot />;
@@ -16,7 +17,10 @@ export default async function CartPage() {
 
   if (domainWebsitePage) return domainWebsitePage;
 
-  const layout = await getPublishedBuilderLayout("page:cart");
+  const [layout, shellSettings] = await Promise.all([
+    getPublishedBuilderLayout("page:cart"),
+    getBuilderShellSettings(),
+  ]);
 
   if (layout) {
     return (
@@ -25,6 +29,7 @@ export default async function CartPage() {
         page="page:cart"
         pageLabel="Cart"
         pageContent={pageContent}
+        headerOverlay={shellSettings.headerOverlay === true}
       />
     );
   }

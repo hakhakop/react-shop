@@ -5827,5 +5827,85 @@
       }
     ],
     "updatedAt": "2026-06-28T17:35:46.239Z"
+  },
+  "header": {
+    "version": 1,
+    "key": "header",
+    "page": "header",
+    "targetType": "header",
+    "design": {
+      "preset": "princity",
+      "colorScheme": "auto",
+      "pageBackground": "#f7f7f4",
+      "textColor": "#111111",
+      "mutedTextColor": "#5f5f58",
+      "accentColor": "#a4be7b",
+      "surfaceColor": "#efefe9",
+      "buttonBackground": "#111111",
+      "buttonTextColor": "#ffffff",
+      "radius": "8px",
+      "sectionMaxWidth": "1640px",
+      "sectionGutter": "48px",
+      "headingFontFamily": "inherit",
+      "headingSize": "clamp(42px, 8vw, 126px)",
+      "headingWeight": "760",
+      "headingLineHeight": "0.92",
+      "cardBg": "#efefe9",
+      "cardRadius": "8px",
+      "cardBorder": "transparent",
+      "cardShadow": "0 12px 30px rgba(17,17,17,0.06)",
+      "cardShadowHover": "0 18px 42px rgba(17,17,17,0.1)",
+      "cardImageBg": "#ffffff",
+      "cardImagePadding": "clamp(22px, 2.4vw, 36px)"
+    },
+    "sections": [
+      {
+        "id": "header-document",
+        "kind": "contentLayout",
+        "title": "Header",
+        "background": "transparent",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "layout": "header-row",
+        "layoutColumns": 1,
+        "layoutItems": [
+          {
+            "id": "header-main-row",
+            "rowId": "header-main-row",
+            "rowLayout": "header-main-row",
+            "blocks": [
+              {
+                "id": "header-logo",
+                "kind": "image",
+                "imageAlt": "WebPages logo 1",
+                "imageMaxWidth": 360,
+                "imageUrl": "https://cms.webpages.am/wp-content/uploads/2026/07/sungoods-logo.svg"
+              },
+              {
+                "id": "header-navigation",
+                "kind": "menu",
+                "title": "Navigation",
+                "menuSource": "main"
+              },
+              {
+                "id": "header-button",
+                "kind": "button",
+                "buttonLabel": "Start",
+                "buttonUrl": "/client"
+              },
+              {
+                "id": "header-spacer",
+                "kind": "embed",
+                "embedMode": "code",
+                "embedCode": ""
+              }
+            ]
+          }
+        ],
+        "visible": true
+      }
+    ],
+    "updatedAt": "2026-07-12T20:04:04.399Z"
   }
 }

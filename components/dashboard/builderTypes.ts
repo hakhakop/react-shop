@@ -5,8 +5,9 @@ export type BuilderTemplate =
   | "product-category"
   | "product-category-specific"
   | "search-results";
-export type BuilderLayoutKey = BuilderPage | BuilderTemplate;
-export type BuilderTargetType = "page" | "template";
+export type BuilderDocumentKey = "header" | "footer";
+export type BuilderLayoutKey = BuilderPage | BuilderTemplate | BuilderDocumentKey;
+export type BuilderTargetType = "page" | "template" | BuilderDocumentKey;
 import type {
   BuilderHeaderLayout,
   BuilderHeaderBrandMode,
@@ -71,7 +72,6 @@ export type InspectorTab =
 export type SidebarTab =
   | "builder"
   | "elements"
-  | "inspector"
   | "globalStyles"
   | "history"
   | "menu"
@@ -137,6 +137,15 @@ export type LayoutBlockKind =
   | "badgeGrid"
   | "icon"
   | "list"
+  | "menu"
+  | "headerUtility"
+  | "headerSearch"
+  | "headerWishlist"
+  | "headerCart"
+  | "headerAccount"
+  | "headerTheme"
+  | "headerCategories"
+  | "headerLanguage"
   | "datePicker"
   | "products"
   | "categoryFilters"
@@ -284,6 +293,18 @@ export type BuilderLayoutBlock = {
   carouselSettings?: BuilderSection["carouselSettings"];
   iconName?: "sparkles" | "heart" | "truck" | "shield";
   items?: string[];
+  menuSource?: "main" | string;
+  menuItemGap?: string;
+  menuHoverColor?: string;
+  menuActiveColor?: string;
+  menuActiveIndicator?: BuilderHeaderActiveIndicator;
+  headerBrandMode?: BuilderHeaderBrandMode;
+  headerBrandText?: string;
+  headerUtilityAction?: BuilderHeaderIconId;
+  headerUtilityVariant?: BuilderHeaderIconVariant;
+  headerCategoriesLabel?: string;
+  headerCategoriesShowLabel?: boolean;
+  headerLanguageDisplay?: "native" | "code";
   listIcon?: "check" | "circleCheck" | "arrowRight" | "star" | "heart" | "sparkles" | "shield";
   listIconColorScheme?: "default" | "gradient-cycle";
   listIconSize?: number;
@@ -388,7 +409,9 @@ export type WordPressMediaItem = {
 };
 
 export type BuilderSection = {
+  headerPresetKey?: string;
   contentTranslations?: BuilderContentTranslations;
+  headerUtilityMigrationVersion?: 1 | 2 | 3;
   id: string;
   kind: SectionKind;
   title: string;
@@ -495,6 +518,9 @@ export type BuilderSection = {
     rowBottomMargin?: SectionSpacing;
     rowBorderRadius?: number;
     rowVisualStyle?: BuilderVisualStyle;
+    headerGap?: string;
+    headerJustify?: "start" | "center" | "space-between" | "end";
+    headerAlign?: "start" | "center" | "end" | "stretch";
     rowAnimation?: BuilderAnimationSettings;
   }[];
   badges?: {

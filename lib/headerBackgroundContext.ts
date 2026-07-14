@@ -10,6 +10,7 @@ type ResolveHeaderBackgroundContextInput = {
   backgroundMode: BuilderHeaderBackgroundMode;
   firstSectionOverlapEnabled: boolean;
   firstSectionTouchesPageTop: boolean;
+  scrolled?: boolean;
 };
 
 type ResolveHeaderTextModeInput = ResolveHeaderBackgroundContextInput & {
@@ -23,7 +24,9 @@ export function resolveHeaderBackgroundContext({
   backgroundMode,
   firstSectionOverlapEnabled,
   firstSectionTouchesPageTop,
+  scrolled,
 }: ResolveHeaderBackgroundContextInput): EffectiveHeaderBackgroundContext {
+  if (scrolled) return "header";
   if (backgroundMode !== "none") return "header";
   if (!firstSectionOverlapEnabled) return "page";
   if (!firstSectionTouchesPageTop) return "page";

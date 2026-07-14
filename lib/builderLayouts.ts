@@ -15,7 +15,8 @@ export type BuilderTemplate =
   | "product-category"
   | "product-category-specific"
   | "search-results";
-export type BuilderLayoutKey = BuilderPage | BuilderTemplate;
+export type BuilderDocumentKey = "header" | "footer";
+export type BuilderLayoutKey = BuilderPage | BuilderTemplate | BuilderDocumentKey;
 export type BuilderPanelStyle =
   | "default"
   | "princity"
@@ -59,6 +60,18 @@ export type BuilderDesign = {
 export type BuilderLayoutBlock = {
   id?: string;
   kind?: string;
+  menuSource?: string;
+  menuItemGap?: string;
+  menuHoverColor?: string;
+  menuActiveColor?: string;
+  menuActiveIndicator?: "princity" | "underline" | "none";
+  headerBrandMode?: "logo" | "brand" | "both";
+  headerBrandText?: string;
+  headerUtilityAction?: string;
+  headerUtilityVariant?: string;
+  headerCategoriesLabel?: string;
+  headerCategoriesShowLabel?: boolean;
+  headerLanguageDisplay?: "native" | "code";
   eyebrow?: string;
   title?: string;
   body?: string;
@@ -255,6 +268,7 @@ export type BuilderLayoutBlock = {
 };
 
 export type BuilderSection = {
+  headerUtilityMigrationVersion?: 1 | 2 | 3;
   id: string;
   kind: string;
   title: string;
@@ -351,6 +365,9 @@ export type BuilderSection = {
     rowBottomMargin?: string;
     rowBorderRadius?: number;
     rowVisualStyle?: Record<string, unknown>;
+    headerGap?: string;
+    headerJustify?: "start" | "center" | "space-between" | "end";
+    headerAlign?: "start" | "center" | "end" | "stretch";
     rowAnimation?: Record<string, unknown>;
   }[];
   badges?: {
@@ -420,7 +437,7 @@ export type BuilderLayout = {
   version: 1;
   key?: BuilderLayoutKey;
   page: BuilderLayoutKey;
-  targetType?: "page" | "template";
+  targetType?: "page" | "template" | BuilderDocumentKey;
   template?: BuilderTemplate;
   design?: BuilderDesign;
   sections: BuilderSection[];
@@ -446,7 +463,7 @@ export type BuilderSavedTemplate = {
   updatedAt: string;
 };
 
-type BuilderDataScope = {
+export type BuilderDataScope = {
   websiteId?: string;
 };
 const pages = new Set(["home", "shop", "client"]);
@@ -456,7 +473,7 @@ const templates = new Set([
   "product-category-specific",
   "search-results",
 ]);
-const layoutKeys = new Set([...pages, ...templates]);
+const layoutKeys = new Set([...pages, ...templates, "header", "footer"]);
 
 export function isBuilderCustomPageKey(
   value: string | null | undefined,
@@ -481,7 +498,11 @@ export function normalizeBuilderLayoutKey(
 }
 
 export function getBuilderTargetType(key: BuilderLayoutKey) {
-  return templates.has(key) ? "template" : "page";
+  return key === "header" || key === "footer"
+    ? key
+    : templates.has(key)
+      ? "template"
+      : "page";
 }
 
 export function isBuilderTemplate(

@@ -10,10 +10,14 @@ import {
 
 type HeaderCategoriesDropdownProps = {
   children: ReactNode;
+  label?: string;
+  showLabel?: boolean;
 };
 
 export default function HeaderCategoriesDropdown({
   children,
+  label = "Categories",
+  showLabel = true,
 }: HeaderCategoriesDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isHoverEnabled, setIsHoverEnabled] = useState(false);
@@ -68,7 +72,7 @@ export default function HeaderCategoriesDropdown({
         onClick={() => setIsOpen((current) => !current)}
         onKeyDown={handleKeyDown}
       >
-        <span>Categories</span>
+        {showLabel ? <span>{label}</span> : <span className="sr-only">{label}</span>}
       </button>
       <div className="site-header-categories-panel">{children}</div>
     </div>

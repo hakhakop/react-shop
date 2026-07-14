@@ -21,6 +21,37 @@ type ElementLibraryProps = {
   availableLayoutBlockKinds: LayoutBlockKind[];
   onAddElement: (kind: LayoutBlockKind) => void;
   onRenderLayoutBlockIcon: (kind: LayoutBlockKind) => ReactNode;
+  headerMode?: boolean;
+};
+
+const headerElementLabels: Partial<Record<LayoutBlockKind, string>> = {
+  image: "Logo",
+  menu: "Navigation",
+  headerUtility: "Utility Action",
+  headerSearch: "Search",
+  headerWishlist: "Wishlist",
+  headerCart: "Cart",
+  headerAccount: "Account",
+  headerTheme: "Theme Switcher",
+  headerCategories: "Category Menu",
+  headerLanguage: "Language Switcher",
+  button: "Button",
+  embed: "Spacer",
+};
+
+const headerElementDescriptions: Partial<Record<LayoutBlockKind, string>> = {
+  image: "The current Header logo and brand image.",
+  menu: "The current website navigation menu.",
+  headerUtility: "Restore an existing Header utility action.",
+  headerSearch: "Search action.",
+  headerWishlist: "Wishlist action.",
+  headerCart: "Cart action.",
+  headerAccount: "Account action.",
+  headerTheme: "Theme switcher action.",
+  headerCategories: "Category burger and dropdown.",
+  headerLanguage: "Website content language selector.",
+  button: "The Header call-to-action button.",
+  embed: "Flexible spacing inside the Header row.",
 };
 
 function readStoredKinds(key: string): LayoutBlockKind[] {
@@ -68,6 +99,7 @@ export default function ElementLibrary({
   availableLayoutBlockKinds,
   onAddElement,
   onRenderLayoutBlockIcon,
+  headerMode = false,
 }: ElementLibraryProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const { t } = useTranslation();
@@ -80,13 +112,20 @@ export default function ElementLibrary({
     () => new Set(),
   );
   const normalizedQuery = searchQuery.trim().toLowerCase();
+  const getElementLabel = (kind: LayoutBlockKind) =>
+    (headerMode ? headerElementLabels[kind] : undefined) ?? layoutBlockLabels[kind];
+  const getElementDescription = (kind: LayoutBlockKind) =>
+    (headerMode ? headerElementDescriptions[kind] : undefined) ?? layoutBlockDescriptions[kind];
+  const elementGroups = headerMode
+    ? [{ id: "header-elements", label: "Header Elements", kinds: availableLayoutBlockKinds }]
+    : layoutBlockGroups;
 
   useEffect(() => {
     setFavoriteKinds(readStoredKinds(FAVORITES_KEY));
     setRecentKinds(readStoredKinds(RECENT_KEY));
 
     const storedOrder = readStoredKinds(GROUPS_ORDER_KEY) as unknown as string[];
-    const defaultIds = layoutBlockGroups.map((g) => g.id);
+    const defaultIds = elementGroups.map((g) => g.id);
     if (storedOrder && storedOrder.length > 0) {
       const existingStored = storedOrder.filter((id) => defaultIds.includes(id));
       const missing = defaultIds.filter((id) => !existingStored.includes(id));
@@ -94,7 +133,7 @@ export default function ElementLibrary({
     } else {
       setGroupIdsOrder(defaultIds);
     }
-  }, []);
+  }, [headerMode]);
 
   const rememberRecent = (kind: LayoutBlockKind) => {
     setRecentKinds((current) => {
@@ -124,15 +163,15 @@ export default function ElementLibrary({
 
   const filteredGroups = useMemo(
     () =>
-      layoutBlockGroups
+      elementGroups
         .map((group) => {
           const kinds = group.kinds
             .filter((kind) => {
               if (!availableLayoutBlockKinds.includes(kind)) return false;
               if (!normalizedQuery) return true;
 
-              const label = layoutBlockLabels[kind].toLowerCase();
-              const description = layoutBlockDescriptions[kind].toLowerCase();
+              const label = getElementLabel(kind).toLowerCase();
+              const description = getElementDescription(kind).toLowerCase();
               return (
                 kind.toLowerCase().includes(normalizedQuery) ||
                 label.includes(normalizedQuery) ||
@@ -141,15 +180,15 @@ export default function ElementLibrary({
               );
             })
             .sort((a, b) => {
-              const labelA = layoutBlockLabels[a] || "";
-              const labelB = layoutBlockLabels[b] || "";
+              const labelA = getElementLabel(a) || "";
+              const labelB = getElementLabel(b) || "";
               return labelA.localeCompare(labelB);
             });
 
           return { ...group, kinds };
         })
         .filter((group) => group.kinds.length > 0),
-    [availableLayoutBlockKinds, normalizedQuery],
+    [availableLayoutBlockKinds, headerMode, normalizedQuery],
   );
 
   const orderedGroups = useMemo(() => {
@@ -167,7 +206,7 @@ export default function ElementLibrary({
       (kind) =>
         availableLayoutBlockKinds.includes(kind) &&
         (!normalizedQuery ||
-          layoutBlockLabels[kind].toLowerCase().includes(normalizedQuery) ||
+          getElementLabel(kind).toLowerCase().includes(normalizedQuery) ||
           kind.toLowerCase().includes(normalizedQuery)),
     );
   }, [availableLayoutBlockKinds, favoriteKinds, normalizedQuery]);
@@ -178,7 +217,7 @@ export default function ElementLibrary({
         availableLayoutBlockKinds.includes(kind) &&
         !favoriteKinds.includes(kind) &&
         (!normalizedQuery ||
-          layoutBlockLabels[kind].toLowerCase().includes(normalizedQuery) ||
+          getElementLabel(kind).toLowerCase().includes(normalizedQuery) ||
           kind.toLowerCase().includes(normalizedQuery)),
     );
   }, [availableLayoutBlockKinds, recentKinds, favoriteKinds, normalizedQuery]);
@@ -214,7 +253,7 @@ export default function ElementLibrary({
           `builder-new-block:${blockKind}`,
         );
         event.dataTransfer.effectAllowed = "copy";
-        createDragGhost(event, layoutBlockLabels[blockKind] || blockKind);
+        createDragGhost(event, getElementLabel(blockKind) || blockKind);
       }}
       onDragEnd={() => rememberRecent(blockKind)}
       onClick={() => addElement(blockKind)}
@@ -245,11 +284,11 @@ export default function ElementLibrary({
 
       <div className="builder-element-library-card-info">
         <strong>
-          <HighlightedText text={layoutBlockLabels[blockKind]} query={searchQuery} />
+          <HighlightedText text={getElementLabel(blockKind)} query={searchQuery} />
         </strong>
-        {layoutBlockDescriptions[blockKind] && (
+        {getElementDescription(blockKind) && (
           <small>
-            <HighlightedText text={layoutBlockDescriptions[blockKind]} query={searchQuery} />
+            <HighlightedText text={getElementDescription(blockKind)} query={searchQuery} />
           </small>
         )}
       </div>
