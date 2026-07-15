@@ -270,6 +270,8 @@ export type BuilderLayoutBlock = {
 export type BuilderSection = {
   headerUtilityMigrationVersion?: 1 | 2 | 3;
   id: string;
+  name?: string;
+  anchorId?: string;
   kind: string;
   title: string;
   eyebrow?: string;

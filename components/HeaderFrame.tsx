@@ -18,6 +18,7 @@ type HeaderFrameProps = {
   backgroundMode?: "default" | "glass" | "accent" | "none";
   textMode?: "auto" | "light" | "dark";
   style?: React.CSSProperties;
+  id?: string;
 };
 
 /**
@@ -33,6 +34,7 @@ export default function HeaderFrame({
   backgroundMode = "default",
   textMode = "auto",
   style,
+  id,
 }: HeaderFrameProps) {
   const headerRef = React.useRef<HTMLElement>(null);
   const [scrolled, setScrolled] = React.useState(false);
@@ -296,6 +298,7 @@ export default function HeaderFrame({
   return (
     <div className="site-header-wrapper">
       <header
+        id={id}
         ref={headerRef}
         className={`${base} ${state} ${className} ${hiddenByScroll ? "site-header--scroll-hidden" : ""} ${overlapHeader ? "site-header--no-background" : ""}`}
         style={{

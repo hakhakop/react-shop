@@ -69,6 +69,10 @@ import {
   type TypographyArea,
 } from "@/lib/builderTypography";
 import type { BuilderShellSettings } from "@/lib/builderShell";
+import {
+  normalizeBuilderAnchorId,
+  validateBuilderAnchorId,
+} from "@/lib/builderAnchors";
 import { useTranslation } from "@/components/i18n/LanguageProvider";
 import {
   BUILDER_BUTTON_PRESETS,
@@ -796,6 +800,7 @@ type DashboardInspectorProps = {
   selectedLayoutBlock: BuilderLayoutBlock | null;
   selectedLayoutBlockKey: string | null;
   selectedSection: BuilderSection | undefined;
+  anchorIdEntries?: Array<{ sectionId: string; anchorId: string }>;
   selectedSectionIsFirstVisible?: boolean;
   shellSettings: BuilderShellSettings;
   updateShellSettings?: (patch: Partial<BuilderShellSettings>) => void;
@@ -1063,6 +1068,80 @@ function flattenCategoryTree(
   ]);
 }
 
+function SectionAnchorControl({
+  section,
+  entries,
+  onUpdate,
+}: {
+  section: BuilderSection;
+  entries: Array<{ sectionId: string; anchorId: string }>;
+  onUpdate: (patch: Partial<BuilderSection>) => void;
+}) {
+  const [draft, setDraft] = useState(section.anchorId ?? "");
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setDraft(section.anchorId ?? "");
+    setError(null);
+  }, [section.anchorId, section.id]);
+
+  const validate = (value: string) => {
+    const normalized = normalizeBuilderAnchorId(value);
+    const syntaxError = validateBuilderAnchorId(value);
+    if (value && syntaxError) return syntaxError;
+    const duplicate = entries.some(
+      (entry) =>
+        entry.sectionId !== section.id &&
+        normalizeBuilderAnchorId(entry.anchorId) === normalized,
+    );
+    return duplicate ? `#${normalized} is already used in this document.` : null;
+  };
+
+  const commit = () => {
+    const normalized = normalizeBuilderAnchorId(draft);
+    const nextError = validate(normalized);
+    setDraft(normalized);
+    setError(nextError);
+    if (!nextError) onUpdate({ anchorId: normalized || undefined });
+  };
+
+  return (
+    <div className="builder-field">
+      <span>Anchor ID</span>
+      <div className="builder-anchor-field-row">
+        <span aria-hidden="true">#</span>
+        <input
+          value={draft}
+          placeholder="about-company"
+          aria-invalid={Boolean(error)}
+          onChange={(event) => {
+            const value = event.target.value;
+            setDraft(value);
+            const nextError = validate(value);
+            setError(nextError);
+            if (!nextError && value === normalizeBuilderAnchorId(value)) {
+              onUpdate({ anchorId: value || undefined });
+            }
+          }}
+          onBlur={commit}
+          onKeyDown={(event) => {
+            if (event.key === "Enter") {
+              event.preventDefault();
+              commit();
+              event.currentTarget.blur();
+            } else if (event.key === "Escape") {
+              event.preventDefault();
+              setDraft(section.anchorId ?? "");
+              setError(null);
+            }
+          }}
+        />
+      </div>
+      {error ? <small className="builder-field-error">{error}</small> : <small>Optional public link target, for example #about-company.</small>}
+    </div>
+  );
+}
+
 export default function DashboardInspector(props: DashboardInspectorProps) {
   const { t } = useTranslation();
   const [isLayoutPickerOpen, setLayoutPickerOpen] = useState(false);
@@ -1103,6 +1182,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
     selectedLayoutColumnKey,
     selectedLayoutRowIndex,
     selectedSection,
+    anchorIdEntries = [],
     selectedSectionIsFirstVisible = false,
     shellSettings,
     updateShellSettings = () => undefined,
@@ -1765,7 +1845,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                     ? `${selectedElementLabel} · Element`
                     : selectedLayoutRow
                       ? `Row ${(selectedLayoutRowIndex ?? 0) + 1} · Row`
-                      : `${sectionLabels[selectedSection.kind] || selectedSection.title || "Section"} · Section`}
+                      : `${selectedSection.name || sectionLabels[selectedSection.kind] || selectedSection.title || "Section"} · Section`}
                 </strong>
                 {selectedLayoutBlock && (
                   <button
@@ -1812,7 +1892,8 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
               aria-label="Selection path"
             >
               <span>
-                {sectionLabels[selectedSection.kind] ||
+                {selectedSection.name ||
+                  sectionLabels[selectedSection.kind] ||
                   selectedSection.title ||
                   "Section"}
                 {selectedLayoutRow &&
@@ -15958,6 +16039,30 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
             <>
               {!selectedLayoutBlock ? (
                 <>
+                  <details className="builder-collapse" open>
+                    <summary>
+                      <InspectorGroupSummary
+                        title="Section Identity"
+                        description="Set the Builder label and optional public link target."
+                        meta={selectedSection.anchorId ? `#${selectedSection.anchorId}` : "no anchor"}
+                      />
+                    </summary>
+                    <label className="builder-field">
+                      <span>Section Name</span>
+                      <input
+                        value={selectedSection.name ?? ""}
+                        placeholder={sectionLabels[selectedSection.kind] || "Section"}
+                        onChange={(event) => updateSelected({ name: event.target.value })}
+                      />
+                      <small>Shown in Structure. This does not change the section content title.</small>
+                    </label>
+                    <SectionAnchorControl
+                      section={selectedSection}
+                      entries={anchorIdEntries}
+                      onUpdate={updateSelected}
+                    />
+                  </details>
+
                   {renderAnimationControls(selectedSection, {
                     allowPause: true,
                   })}

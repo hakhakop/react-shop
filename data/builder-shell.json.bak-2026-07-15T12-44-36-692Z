@@ -171,10 +171,10 @@
     {
       "id": "menu_9dbyct27z",
       "label": "New Menu Item",
-      "url": "#new-way",
+      "url": "#",
       "parentId": null
     }
   ],
   "headerSticky": true,
-  "updatedAt": "2026-07-15T12:44:40.427Z"
+  "updatedAt": "2026-07-15T12:44:35.480Z"
 }

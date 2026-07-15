@@ -1710,6 +1710,55 @@
   background: rgba(255, 255, 255, 0.02);
 }
 
+.builder-wireframe-item.is-hovered:not(.is-selected) {
+  border-color: rgba(99, 102, 241, 0.42);
+  background: rgba(99, 102, 241, 0.08);
+}
+
+.builder-wireframe-rename-input {
+  min-width: 0;
+  flex: 1;
+  height: 26px;
+  padding: 0 7px;
+  border: 1px solid rgba(99, 102, 241, 0.72);
+  border-radius: 6px;
+  background: rgba(8, 10, 18, 0.92);
+  color: var(--builder-ui-text);
+  font: inherit;
+  font-size: 11px;
+  outline: none;
+}
+
+.builder-anchor-field-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.builder-anchor-field-row > span {
+  color: var(--builder-ui-muted);
+}
+
+.builder-anchor-field-row input {
+  min-width: 0;
+  flex: 1;
+}
+
+.builder-field-error {
+  color: #fca5a5 !important;
+}
+
+.builder-preview-content-layout-card.is-hovered-row:not(.is-selected-row) {
+  outline: 1px dashed rgba(99, 102, 241, 0.48);
+  outline-offset: -1px;
+}
+
+.builder-header-live-column.is-hovered-column:not(.is-selected),
+.builder-header-live-row.is-hovered-row:not(.is-selected) {
+  outline: 1px dashed rgba(99, 102, 241, 0.48);
+  outline-offset: -1px;
+}
+
 /* Glowing selection border/accents on active items */
 .builder-wireframe-item--section.is-selected {
   background: rgba(99, 102, 241, 0.06) !important;

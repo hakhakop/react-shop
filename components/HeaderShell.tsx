@@ -115,6 +115,7 @@ export default async function HeaderShell({
       hideSaaSEntry={hideSaaSEntry}
       categoriesContent={<CategoryMegaMenu website={website} />}
       headerComposition={headerComposition}
+      publicAnchorId={localizedHeaderLayout.sections[0]?.anchorId}
       activeContentLanguage={selectedContentLanguage}
       enabledContentLanguages={website?.enabledLanguages ?? ["hy", "en", "ru"]}
       languagePreferenceKey={`website_content_language_${website?.id ?? "root"}`}

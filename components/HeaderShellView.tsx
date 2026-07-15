@@ -129,6 +129,7 @@ type HeaderShellViewProps = {
   languagePreferenceKey?: string;
   languageSwitcherPreviewOnly?: boolean;
   onContentLanguageChange?: (language: string) => void;
+  publicAnchorId?: string;
 };
 
 export default function HeaderShellView({
@@ -154,6 +155,7 @@ export default function HeaderShellView({
   languagePreferenceKey = "website_content_language",
   languageSwitcherPreviewOnly = false,
   onContentLanguageChange,
+  publicAnchorId,
 }: HeaderShellViewProps) {
   const documentLogo = headerComposition.elements.find((item) => item.type === "logo");
   const documentNavigation = headerComposition.elements.find((item) => item.type === "navigation");
@@ -569,6 +571,7 @@ export default function HeaderShellView({
 
   return (
     <HeaderFrame
+      id={publicAnchorId}
       accentColor={accentColor}
       behavior={headerBehavior}
       className={headerClassName}

@@ -24,7 +24,7 @@ import {
   Sparkles,
   Plus,
 } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type {
   BuilderLayoutBlock,
   BuilderLayoutKey,
@@ -39,6 +39,12 @@ import {
   getBuilderLayoutRows,
   getBuilderRowLayoutPreset,
 } from "@/components/dashboard/builderLayoutPresets";
+
+export type BuilderHoverTarget =
+  | { type: "section"; sectionId: string }
+  | { type: "row"; sectionId: string; rowIndex: number }
+  | { type: "column"; sectionId: string; columnKey: string }
+  | { type: "block"; sectionId: string; columnKey: string; blockKey: string };
 
 type BuilderWireframePanelProps = {
   page: BuilderLayoutKey;
@@ -56,6 +62,12 @@ type BuilderWireframePanelProps = {
     columnKey: string,
     blockKey: string,
   ) => void;
+  hoveredTarget?: BuilderHoverTarget | null;
+  onHoverTarget?: (target: BuilderHoverTarget | null) => void;
+  onAddSection?: () => void;
+  renameSectionId?: string | null;
+  onRenameSection?: (sectionId: string, name: string) => void;
+  onRenameComplete?: () => void;
   // Optional action callbacks from DashboardBuilder
   onMoveSection?: (sectionId: string, direction: -1 | 1) => void;
   onDuplicateSection?: (sectionId: string) => void;
@@ -198,6 +210,12 @@ export default function BuilderWireframePanel({
   onSelectRow,
   onSelectColumn,
   onSelectBlock,
+  hoveredTarget,
+  onHoverTarget,
+  onAddSection,
+  renameSectionId,
+  onRenameSection,
+  onRenameComplete,
   onMoveSection,
   onDuplicateSection,
   onDeleteSection,
@@ -208,12 +226,16 @@ export default function BuilderWireframePanel({
   onDuplicateBlock,
   onDeleteBlock,
 }: BuilderWireframePanelProps) {
+  const treeRef = useRef<HTMLDivElement>(null);
   const [collapsedSections, setCollapsedSections] = useState<Set<string>>(
     () => new Set(),
   );
   const [collapsedRows, setCollapsedRows] = useState<Set<string>>(
     () => new Set(),
   );
+  const [editingSectionId, setEditingSectionId] = useState<string | null>(null);
+  const [sectionNameDraft, setSectionNameDraft] = useState("");
+  const renameInputRef = useRef<HTMLInputElement>(null);
 
   const sectionIds = useMemo(
     () => sections.map((section) => section.id).join("|"),
@@ -239,6 +261,106 @@ export default function BuilderWireframePanel({
       return next;
     });
   }, [selectedLayoutRowIndex, selectedSectionId]);
+
+  useEffect(() => {
+    if (!hoveredTarget) return;
+    setCollapsedSections((current) => {
+      const next = new Set(current);
+      next.delete(hoveredTarget.sectionId);
+      return next;
+    });
+    if (hoveredTarget.type !== "section") {
+      setCollapsedRows((current) => {
+        const next = new Set(current);
+        if (hoveredTarget.type === "row") {
+          next.delete(`${hoveredTarget.sectionId}:${hoveredTarget.rowIndex}`);
+        } else {
+          const section = sections.find((item) => item.id === hoveredTarget.sectionId);
+          if (!section) return current;
+          const rowIndex = getBuilderLayoutRows(section, section.layoutItems ?? []).findIndex(
+            (row) => row.items.some((item, index) =>
+              (item.id ?? `layout-item-${index}`) === hoveredTarget.columnKey,
+            ),
+          );
+          if (rowIndex >= 0) next.delete(`${hoveredTarget.sectionId}:${rowIndex}`);
+        }
+        return next;
+      });
+    }
+  }, [hoveredTarget, sections]);
+
+  const selectedStructureKey = selectedLayoutBlockKey
+    ? `block:${selectedSectionId}:${selectedLayoutColumnKey}:${selectedLayoutBlockKey}`
+    : selectedLayoutColumnKey
+      ? `column:${selectedSectionId}:${selectedLayoutColumnKey}`
+      : selectedLayoutRowIndex !== null
+        ? `row:${selectedSectionId}:${selectedLayoutRowIndex}`
+        : selectedSectionId
+          ? `section:${selectedSectionId}`
+          : null;
+  const hoveredStructureKey = hoveredTarget
+    ? hoveredTarget.type === "section"
+      ? `section:${hoveredTarget.sectionId}`
+      : hoveredTarget.type === "row"
+        ? `row:${hoveredTarget.sectionId}:${hoveredTarget.rowIndex}`
+        : hoveredTarget.type === "column"
+          ? `column:${hoveredTarget.sectionId}:${hoveredTarget.columnKey}`
+          : `block:${hoveredTarget.sectionId}:${hoveredTarget.columnKey}:${hoveredTarget.blockKey}`
+    : null;
+
+  useEffect(() => {
+    const key = selectedStructureKey ?? hoveredStructureKey;
+    const tree = treeRef.current;
+    if (!key || !tree) return;
+    const item = Array.from(
+      tree.querySelectorAll<HTMLElement>("[data-structure-key]"),
+    ).find((candidate) => candidate.dataset.structureKey === key);
+    if (!item) return;
+    let viewport: HTMLElement = tree;
+    let parent = tree.parentElement;
+    while (parent) {
+      if (parent.scrollHeight > parent.clientHeight) {
+        viewport = parent;
+        break;
+      }
+      parent = parent.parentElement;
+    }
+    const treeRect = viewport.getBoundingClientRect();
+    const itemRect = item.getBoundingClientRect();
+    if (itemRect.top < treeRect.top || itemRect.bottom > treeRect.bottom) {
+      item.scrollIntoView({ block: "nearest", inline: "nearest" });
+    }
+  }, [hoveredStructureKey, selectedStructureKey]);
+
+  useEffect(() => {
+    if (!renameSectionId) return;
+    const section = sections.find((item) => item.id === renameSectionId);
+    if (!section) return;
+    setEditingSectionId(section.id);
+    setSectionNameDraft(section.name ?? "");
+    requestAnimationFrame(() => {
+      renameInputRef.current?.focus();
+      renameInputRef.current?.select();
+    });
+  }, [renameSectionId, sections]);
+
+  const beginSectionRename = (section: BuilderSection) => {
+    setEditingSectionId(section.id);
+    setSectionNameDraft(section.name ?? "");
+    requestAnimationFrame(() => {
+      renameInputRef.current?.focus();
+      renameInputRef.current?.select();
+    });
+  };
+
+  const finishSectionRename = (sectionId: string, commit: boolean) => {
+    if (commit && sectionNameDraft.trim()) {
+      onRenameSection?.(sectionId, sectionNameDraft.trim());
+    }
+    setEditingSectionId(null);
+    setSectionNameDraft("");
+    onRenameComplete?.();
+  };
 
   const toggleSection = (sectionId: string) => {
     setCollapsedSections((current) => {
@@ -278,7 +400,7 @@ export default function BuilderWireframePanel({
 
 
 
-      <div className="builder-wireframe-tree" role="tree" aria-label="Page structure">
+      <div ref={treeRef} className="builder-wireframe-tree" role="tree" aria-label="Page structure">
 
         {sections.length === 0 ? (
           <div className="builder-wireframe-empty">
@@ -310,8 +432,15 @@ export default function BuilderWireframePanel({
                   <div
                     className={`builder-wireframe-item builder-wireframe-item--section${
                       sectionSelected ? " is-selected" : ""
-                    }`}
+                    }${hoveredStructureKey === `section:${section.id}` ? " is-hovered" : ""}`}
+                    data-structure-key={`section:${section.id}`}
+                    onMouseEnter={() => onHoverTarget?.({ type: "section", sectionId: section.id })}
+                    onMouseLeave={() => onHoverTarget?.(null)}
                     onClick={() => onSelectSection(section.id)}
+                    onDoubleClick={(event) => {
+                      event.stopPropagation();
+                      beginSectionRename(section);
+                    }}
                     onKeyDown={(event) => {
                       if (event.key === "Enter" || event.key === " ") {
                         event.preventDefault();
@@ -324,21 +453,39 @@ export default function BuilderWireframePanel({
                   >
                     <GripVertical size={11} className="builder-wireframe-grip" />
                     <Layers3 size={13} className="builder-wireframe-icon builder-wireframe-icon--section" />
-                    <span
-                      className="builder-wireframe-label-wrap"
-                      title={
-                        section.title ||
-                        sectionLabels[section.kind] ||
-                        `Section ${sectionIndex + 1}`
-                      }
-                    >
-                      <strong>
-                        {section.title ||
-                          sectionLabels[section.kind] ||
-                          `Section ${sectionIndex + 1}`}
-                      </strong>
-                      <small>Section</small>
-                    </span>
+                    {editingSectionId === section.id ? (
+                      <input
+                        ref={renameInputRef}
+                        className="builder-wireframe-rename-input"
+                        value={sectionNameDraft}
+                        placeholder={sectionLabels[section.kind] || `Section ${sectionIndex + 1}`}
+                        onChange={(event) => setSectionNameDraft(event.target.value)}
+                        onClick={(event) => event.stopPropagation()}
+                        onDoubleClick={(event) => event.stopPropagation()}
+                        onBlur={() => finishSectionRename(section.id, true)}
+                        onKeyDown={(event) => {
+                          event.stopPropagation();
+                          if (event.key === "Enter") {
+                            event.preventDefault();
+                            finishSectionRename(section.id, true);
+                          } else if (event.key === "Escape") {
+                            event.preventDefault();
+                            finishSectionRename(section.id, false);
+                          }
+                        }}
+                        aria-label="Section name"
+                      />
+                    ) : (
+                      <span
+                        className="builder-wireframe-label-wrap"
+                        title={section.name || section.title || sectionLabels[section.kind] || `Section ${sectionIndex + 1}`}
+                      >
+                        <strong>
+                          {section.name || section.title || sectionLabels[section.kind] || `Section ${sectionIndex + 1}`}
+                        </strong>
+                        <small>Section</small>
+                      </span>
+                    )}
                     {!section.visible ? <em className="builder-wireframe-hidden-tag">Hidden</em> : null}
                     
                     <span className="builder-wireframe-meta">
@@ -356,6 +503,20 @@ export default function BuilderWireframePanel({
                             title="Move section up"
                           >
                             <ChevronUp size={11} />
+                          </button>
+                        )}
+                        {onRenameSection && (
+                          <button
+                            type="button"
+                            className="builder-wireframe-action-btn"
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              beginSectionRename(section);
+                            }}
+                            title="Rename section"
+                            aria-label="Rename section"
+                          >
+                            <Type size={10} />
                           </button>
                         )}
                         {onMoveSection && (
@@ -449,7 +610,10 @@ export default function BuilderWireframePanel({
                               <div
                                 className={`builder-wireframe-item builder-wireframe-item--row${
                                   rowSelected ? " is-selected" : ""
-                                }`}
+                                }${hoveredStructureKey === `row:${section.id}:${rowIndex}` ? " is-hovered" : ""}`}
+                                data-structure-key={`row:${section.id}:${rowIndex}`}
+                                onMouseEnter={() => onHoverTarget?.({ type: "row", sectionId: section.id, rowIndex })}
+                                onMouseLeave={() => onHoverTarget?.(null)}
                                 onClick={() => onSelectRow(section.id, rowIndex)}
                                 onKeyDown={(event) => {
                                   if (event.key === "Enter" || event.key === " ") {
@@ -568,7 +732,10 @@ export default function BuilderWireframePanel({
                                         type="button"
                                         className={`builder-wireframe-item builder-wireframe-item--column${
                                           columnSelected ? " is-selected" : ""
-                                        }`}
+                                        }${hoveredStructureKey === `column:${section.id}:${columnKey}` ? " is-hovered" : ""}`}
+                                        data-structure-key={`column:${section.id}:${columnKey}`}
+                                        onMouseEnter={() => onHoverTarget?.({ type: "column", sectionId: section.id, columnKey })}
+                                        onMouseLeave={() => onHoverTarget?.(null)}
                                         onClick={() =>
                                           onSelectColumn(section.id, columnKey)
                                         }
@@ -617,7 +784,10 @@ export default function BuilderWireframePanel({
                                                 key={blockKey}
                                                 className={`builder-wireframe-item builder-wireframe-item--block${
                                                   blockSelected ? " is-selected" : ""
-                                                }`}
+                                                }${hoveredStructureKey === `block:${section.id}:${columnKey}:${blockKey}` ? " is-hovered" : ""}`}
+                                                data-structure-key={`block:${section.id}:${columnKey}:${blockKey}`}
+                                                onMouseEnter={() => onHoverTarget?.({ type: "block", sectionId: section.id, columnKey, blockKey })}
+                                                onMouseLeave={() => onHoverTarget?.(null)}
                                                 onClick={() =>
                                                   onSelectBlock(
                                                     section.id,
@@ -747,22 +917,17 @@ export default function BuilderWireframePanel({
             );
           })
         )}
-        {sections.length > 0 && (
-          <div className="builder-wireframe-add-section-wrapper">
+        <div className="builder-wireframe-add-section-wrapper">
             <button
               type="button"
               className="builder-wireframe-add-section-btn"
-              onClick={() => {
-                if (sections.length > 0) {
-                  onSelectSection(sections[sections.length - 1].id);
-                }
-              }}
+              onClick={onAddSection}
+              disabled={!onAddSection}
             >
               <Plus size={13} />
               <span>Add Section</span>
             </button>
-          </div>
-        )}
+        </div>
       </div>
     </div>
   );

@@ -413,6 +413,10 @@ export type BuilderSection = {
   contentTranslations?: BuilderContentTranslations;
   headerUtilityMigrationVersion?: 1 | 2 | 3;
   id: string;
+  /** User-facing label in Builder navigation. */
+  name?: string;
+  /** Optional public HTML anchor; internal Builder identity remains `id`. */
+  anchorId?: string;
   kind: SectionKind;
   title: string;
   eyebrow?: string;

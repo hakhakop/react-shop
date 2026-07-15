@@ -785,7 +785,8 @@ function SectionFrame({
 
   return (
     <section
-      id={section.id}
+      id={section.anchorId || section.id}
+      data-builder-section-id={section.id}
       className={`${sectionClassName(section, layoutScheme, extra)} ${
         isFullTheme
           ? "shop-builder-section--effect-antigravity"

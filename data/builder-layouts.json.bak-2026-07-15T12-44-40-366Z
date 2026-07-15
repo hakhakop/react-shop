@@ -690,15 +690,12 @@
                   "color": "inherit",
                   "textAlign": "left",
                   "body": {
-                    "textAlign": "center",
-                    "fontFamily": "inherit",
-                    "fontSize": "24px",
-                    "variant": "button"
+                    "textAlign": "center"
                   },
                   "title": {
                     "variant": "body",
                     "fontFamily": "inherit",
-                    "fontSize": "32px",
+                    "fontSize": "16px",
                     "fontWeight": "400",
                     "lineHeight": "1.4",
                     "letterSpacing": "0px",
@@ -707,10 +704,6 @@
                     "body": {
                       "textAlign": "left"
                     }
-                  },
-                  "eyebrow": {
-                    "fontSize": "24px",
-                    "fontFamily": "inherit"
                   }
                 },
                 "elementAlign": "center"
@@ -1389,117 +1382,9 @@
             ]
           }
         ]
-      },
-      {
-        "id": "contentLayout-mrm24btr-prktx",
-        "kind": "contentLayout",
-        "title": "",
-        "background": "#ffffff",
-        "backgroundMode": "boxed",
-        "contentMode": "boxed",
-        "colorScheme": "inherit",
-        "topSpacing": "inherit",
-        "bottomSpacing": "inherit",
-        "topMargin": "inherit",
-        "bottomMargin": "inherit",
-        "pullUnderHeader": false,
-        "visible": true,
-        "eyebrow": "",
-        "body": "",
-        "layout": "whole",
-        "layoutColumns": 1,
-        "layoutItems": [
-          {
-            "id": "layout-item-mrm24btr-1",
-            "blocks": []
-          }
-        ],
-        "layoutRows": 1
-      },
-      {
-        "id": "contentLayout-mrm24uc0-qxjce",
-        "kind": "contentLayout",
-        "title": "",
-        "background": "#ffffff",
-        "backgroundMode": "boxed",
-        "contentMode": "boxed",
-        "colorScheme": "inherit",
-        "topSpacing": "inherit",
-        "bottomSpacing": "inherit",
-        "topMargin": "inherit",
-        "bottomMargin": "inherit",
-        "pullUnderHeader": false,
-        "visible": true,
-        "eyebrow": "",
-        "body": "",
-        "layout": "whole",
-        "layoutColumns": 1,
-        "layoutItems": [
-          {
-            "id": "layout-item-mrm24uc0-1",
-            "blocks": []
-          }
-        ],
-        "layoutRows": 1
-      },
-      {
-        "id": "contentLayout-mrm292vo-jkd6q",
-        "kind": "contentLayout",
-        "title": "",
-        "background": "#ffffff",
-        "backgroundMode": "boxed",
-        "contentMode": "boxed",
-        "colorScheme": "inherit",
-        "topSpacing": "inherit",
-        "bottomSpacing": "inherit",
-        "topMargin": "inherit",
-        "bottomMargin": "inherit",
-        "pullUnderHeader": false,
-        "visible": true,
-        "eyebrow": "",
-        "body": "",
-        "layout": "whole",
-        "layoutColumns": 1,
-        "layoutItems": [
-          {
-            "id": "layout-item-mrm292vo-1",
-            "blocks": []
-          }
-        ],
-        "layoutRows": 1,
-        "name": "fwwote",
-        "anchorId": "fwwote"
-      },
-      {
-        "id": "contentLayout-mrm2igf0-9eho2",
-        "kind": "contentLayout",
-        "title": "",
-        "background": "#ffffff",
-        "backgroundMode": "boxed",
-        "contentMode": "boxed",
-        "colorScheme": "inherit",
-        "topSpacing": "inherit",
-        "bottomSpacing": "inherit",
-        "topMargin": "inherit",
-        "bottomMargin": "inherit",
-        "pullUnderHeader": false,
-        "visible": true,
-        "eyebrow": "",
-        "body": "",
-        "layout": "whole",
-        "layoutColumns": 1,
-        "layoutItems": [
-          {
-            "id": "layout-item-mrm2igf0-1",
-            "blocks": []
-          }
-        ],
-        "layoutRows": 1,
-        "name": "New way",
-        "anchorId": "new-way"
       }
     ],
-    "updatedAt": "2026-07-15T12:44:40.364Z"
+    "updatedAt": "2026-07-14T12:56:42.300Z"
   },
   "shop": {
     "version": 1,

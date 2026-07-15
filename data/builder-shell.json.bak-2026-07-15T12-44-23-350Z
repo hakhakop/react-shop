@@ -37,7 +37,6 @@
   "rowMarginTop": "md",
   "rowMarginBottom": "md",
   "rowGap": "sm",
-  "columnGap": "md",
   "elementPaddingTop": "xs",
   "elementPaddingRight": "xs",
   "elementPaddingBottom": "xs",
@@ -167,14 +166,8 @@
       "label": "Խանութ",
       "url": "/shop",
       "parentId": null
-    },
-    {
-      "id": "menu_9dbyct27z",
-      "label": "New Menu Item",
-      "url": "#new-way",
-      "parentId": null
     }
   ],
   "headerSticky": true,
-  "updatedAt": "2026-07-15T12:44:40.427Z"
+  "updatedAt": "2026-07-14T17:22:33.756Z"
 }

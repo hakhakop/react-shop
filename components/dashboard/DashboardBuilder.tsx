@@ -94,7 +94,9 @@ import ProductOptionsSelector from "@/components/ProductOptionsSelector";
 import DashboardInspector from "@/components/dashboard/DashboardInspector";
 import { headerPresets } from "./headerPresets";
 import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
-import BuilderWireframePanel from "@/components/dashboard/BuilderWireframePanel";
+import BuilderWireframePanel, {
+  type BuilderHoverTarget,
+} from "@/components/dashboard/BuilderWireframePanel";
 import MediaManager from "@/components/dashboard/media/MediaManager";
 import ScrollPinnedDemo from "@/components/animations/ScrollPinnedDemo";
 import { AntigravityTerminal } from "@/components/builder/AntigravityTerminal";
@@ -162,6 +164,9 @@ import {
 } from "@/components/dashboard/globalStylePresets";
 import type { BuilderVisualStyle } from "@/lib/builderVisualStyle";
 import { typographyProps, type TypographyArea } from "@/lib/builderTypography";
+import {
+  createUniqueBuilderAnchorId,
+} from "@/lib/builderAnchors";
 import type { HeaderSettings } from "@/lib/themeSettings";
 import {
   hasBuilderVisualSpacing,
@@ -1701,6 +1706,11 @@ export default function DashboardBuilder({
   const [selectedLayoutBlockKey, setSelectedLayoutBlockKey] = useState<
     string | null
   >(null);
+  const [hoveredBuilderTarget, setHoveredBuilderTarget] =
+    useState<BuilderHoverTarget | null>(null);
+  const [renameSectionRequestId, setRenameSectionRequestId] = useState<
+    string | null
+  >(null);
   const [draggingSectionId, setDraggingSectionId] = useState<string | null>(
     null,
   );
@@ -1882,6 +1892,16 @@ export default function DashboardBuilder({
     [headerCompositionSections],
   );
   const primaryHeaderColumnId = currentHeaderComposition.columns[0]?.id ?? "header-main-row";
+  const composedAnchorIdEntries = useMemo(() => {
+    const sections = [
+      ...builderState.sections,
+      ...(builderState.page === "header" ? [] : headerDocumentState.sections),
+      ...(builderState.page === "footer" ? [] : footerDocumentState.sections),
+    ];
+    return sections
+      .filter((section) => Boolean(section.anchorId))
+      .map((section) => ({ sectionId: section.id, anchorId: section.anchorId! }));
+  }, [builderState.page, builderState.sections, footerDocumentState.sections, headerDocumentState.sections]);
   const builderHeaderCategoriesContent = previewCategoryTree.length > 0 ? (
     <div className="category-mega-menu">
       <div className="category-mega-header">
@@ -3254,6 +3274,18 @@ export default function DashboardBuilder({
     setInspectorOpen((current) => !current);
   };
 
+  const revealCanvasTarget = (targetId: string | null | undefined) => {
+    if (!targetId) return;
+    requestAnimationFrame(() => {
+      const byInternalId = Array.from(
+        document.querySelectorAll<HTMLElement>("[data-builder-section-id]"),
+      ).find((element) => element.dataset.builderSectionId === targetId);
+      (byInternalId ?? document.getElementById(targetId))?.scrollIntoView({
+        block: "nearest",
+      });
+    });
+  };
+
   const selectSection = (sectionId: string) => {
     setHeaderSelected(false);
     setSelectedId(sectionId);
@@ -3265,6 +3297,7 @@ export default function DashboardBuilder({
     setInspectorTab("layout");
     setSectionSettingsOpen(true);
     setSectionStructureOpen(false);
+    revealCanvasTarget(sectionId);
   };
 
   const selectLayoutColumn = (sectionId: string, columnKey: string) => {
@@ -3276,6 +3309,7 @@ export default function DashboardBuilder({
     setOpenLayoutItemId(columnKey);
     setInspectorTab("layout");
     openInspectorPanel();
+    revealCanvasTarget(columnKey);
   };
 
   const selectLayoutBlock = (
@@ -3292,6 +3326,7 @@ export default function DashboardBuilder({
     setSectionStructureOpen(false);
     setInspectorTab("content");
     openInspectorPanel();
+    revealCanvasTarget(blockKey);
   };
 
   const selectLayoutRow = (sectionId: string, rowIndex: number) => {
@@ -3304,6 +3339,11 @@ export default function DashboardBuilder({
     setSectionStructureOpen(false);
     setInspectorTab("layout");
     openInspectorPanel();
+    const section = builderState.sections.find((item) => item.id === sectionId);
+    const row = section
+      ? getPreviewLayoutRows(section, section.layoutItems ?? [])[rowIndex]
+      : null;
+    revealCanvasTarget(row?.id);
   };
 
   const selectHeader = () => {
@@ -4713,6 +4753,8 @@ export default function DashboardBuilder({
     targetSectionId: string,
     placement: "above" | "below",
     presetKey?: string,
+    selectTarget: "column" | "section" = "column",
+    renameAfterCreate = false,
   ) => {
     const nextSection = createWireframeSection(columns, rows, presetKey);
     setBuilderState((current) => {
@@ -4728,7 +4770,8 @@ export default function DashboardBuilder({
       return { ...current, sections: nextSections };
     });
     setSelectedId(nextSection.id);
-    if (isLayoutContainerSection(nextSection)) {
+    setSelectedLayoutRowIndex(null);
+    if (selectTarget === "column" && isLayoutContainerSection(nextSection)) {
       const firstColumn = nextSection.layoutItems?.[0]?.id ?? null;
       setSelectedLayoutColumnKey(firstColumn);
       setOpenLayoutItemId(firstColumn);
@@ -4737,6 +4780,42 @@ export default function DashboardBuilder({
       setSelectedLayoutColumnKey(null);
       setSelectedLayoutBlockKey(null);
     }
+    openInspectorPanel();
+    setInspectorTab("layout");
+    if (selectTarget === "section") setSectionSettingsOpen(true);
+    if (renameAfterCreate) setRenameSectionRequestId(nextSection.id);
+    requestAnimationFrame(() => {
+      document.getElementById(nextSection.id)?.scrollIntoView({ block: "nearest" });
+    });
+  };
+
+  const renameBuilderSection = (sectionId: string, name: string) => {
+    const trimmedName = name.trim();
+    if (!trimmedName) return;
+    setBuilderState((current) => {
+      const reserved = [
+        ...current.sections,
+        ...headerDocumentState.sections,
+        ...footerDocumentState.sections,
+      ]
+        .filter((section) => section.id !== sectionId)
+        .map((section) => section.anchorId ?? "")
+        .filter(Boolean);
+      return {
+        ...current,
+        sections: current.sections.map((section) =>
+          section.id === sectionId
+            ? {
+                ...section,
+                name: trimmedName,
+                anchorId:
+                  section.anchorId ||
+                  createUniqueBuilderAnchorId(trimmedName, reserved),
+              }
+            : section,
+        ),
+      };
+    });
   };
 
   const addRowNear = (
@@ -6419,6 +6498,7 @@ export default function DashboardBuilder({
       selectedLayoutBlock={selectedLayoutBlock}
       selectedLayoutBlockKey={selectedLayoutBlockKey}
       selectedSection={selectedSection}
+      anchorIdEntries={composedAnchorIdEntries}
       selectedSectionIsFirstVisible={selectedSectionIsFirstVisible}
       shellSettings={shellSettings}
       updateShellSettings={updateShellSettings}
@@ -6498,6 +6578,15 @@ export default function DashboardBuilder({
       onSelectRow={selectLayoutRow}
       onSelectColumn={selectLayoutColumn}
       onSelectBlock={selectLayoutBlock}
+      hoveredTarget={hoveredBuilderTarget}
+      onHoverTarget={setHoveredBuilderTarget}
+      onAddSection={() => {
+        const lastSectionId = builderState.sections.at(-1)?.id ?? "__empty-page__";
+        addWireframeNear(1, 1, lastSectionId, "below", "whole", "section", true);
+      }}
+      renameSectionId={renameSectionRequestId}
+      onRenameSection={renameBuilderSection}
+      onRenameComplete={() => setRenameSectionRequestId(null)}
       onMoveSection={moveSection}
       onDuplicateSection={duplicateSection}
       onDeleteSection={deleteSection}
@@ -8197,7 +8286,9 @@ export default function DashboardBuilder({
             <div className="builder-preview-header-slot">
               {builderState.page === "header" && (
                 <div
-                  className={`builder-header-document-preview builder-preview-section${selectedId === "header-document" ? " is-selected" : ""}${draggingHeaderElementId ? " is-header-element-dragging" : ""}${draggingHeaderRowId ? " is-header-row-dragging" : ""}${shellSettings.headerVisible === false ? " is-header-hidden" : ""}`}
+                  className={`builder-header-document-preview builder-preview-section${selectedId === "header-document" ? " is-selected" : ""}${hoveredBuilderTarget?.type === "section" && hoveredBuilderTarget.sectionId === "header-document" ? " is-hovered" : ""}${draggingHeaderElementId ? " is-header-element-dragging" : ""}${draggingHeaderRowId ? " is-header-row-dragging" : ""}${shellSettings.headerVisible === false ? " is-header-hidden" : ""}`}
+                  onMouseEnter={() => setHoveredBuilderTarget({ type: "section", sectionId: "header-document" })}
+                  onMouseLeave={() => setHoveredBuilderTarget(null)}
                   onDragOver={(event) => {
                     if (!Array.from(event.dataTransfer.types).includes("application/x-builder-new-block")) return;
                     event.preventDefault();
@@ -8295,6 +8386,7 @@ export default function DashboardBuilder({
                     scopedLinkMode="builder"
                     categoriesContent={builderHeaderCategoriesContent}
                     headerComposition={currentHeaderComposition}
+                    publicAnchorId={builderState.sections.find((section) => section.id === "header-document")?.anchorId}
                     activeContentLanguage={contentLanguage}
                     enabledContentLanguages={enabledContentLanguages}
                     languagePreferenceKey={`website_content_language_${websiteId ?? "root"}`}
@@ -8310,10 +8402,13 @@ export default function DashboardBuilder({
                         : null;
                       return (
                         <div
+                          id={element.id}
                           style={flexItemStyle}
                           draggable={Boolean(element.rowId && element.columnId)}
-                          className={`builder-header-live-element builder-preview-layout-block is-${element.type}${selectedLayoutBlockKey === element.id ? " is-selected is-selected-block" : ""}${draggingHeaderElementId === element.id ? " is-dragging-block" : ""}${dragPlacement ? ` is-drag-over-${dragPlacement}` : ""}`}
+                          className={`builder-header-live-element builder-preview-layout-block is-${element.type}${selectedLayoutBlockKey === element.id ? " is-selected is-selected-block" : ""}${hoveredBuilderTarget?.type === "block" && hoveredBuilderTarget.blockKey === element.id ? " is-hovered-block" : ""}${draggingHeaderElementId === element.id ? " is-dragging-block" : ""}${dragPlacement ? ` is-drag-over-${dragPlacement}` : ""}`}
                           data-header-element={element.type}
+                          onMouseEnter={() => setHoveredBuilderTarget({ type: "block", sectionId: "header-document", columnKey: columnId, blockKey: element.id })}
+                          onMouseLeave={() => setHoveredBuilderTarget(null)}
                           onMouseDown={(event) => {
                             event.stopPropagation();
                             selectLayoutBlock("header-document", columnId, element.id);
@@ -8392,8 +8487,11 @@ export default function DashboardBuilder({
                     }}
                     renderBuilderColumn={(columnId, content) => (
                       <div
-                        className={`builder-header-live-column${selectedLayoutColumnKey === columnId && !selectedLayoutBlockKey ? " is-selected" : ""}${headerDropTarget === `column:${columnId}` ? " is-drag-over" : ""}`}
+                        id={columnId}
+                        className={`builder-header-live-column${selectedLayoutColumnKey === columnId && !selectedLayoutBlockKey ? " is-selected" : ""}${hoveredBuilderTarget?.type === "column" && hoveredBuilderTarget.columnKey === columnId ? " is-hovered-column" : ""}${headerDropTarget === `column:${columnId}` ? " is-drag-over" : ""}`}
                         style={{ flex: currentHeaderComposition.columns.find((column) => column.id === columnId)?.flex ?? 1 }}
+                        onMouseEnter={() => setHoveredBuilderTarget({ type: "column", sectionId: "header-document", columnKey: columnId })}
+                        onMouseLeave={() => setHoveredBuilderTarget(null)}
                         onClick={(event) => {
                           if ((event.target as HTMLElement).closest(".builder-header-live-element")) return;
                           event.preventDefault();
@@ -8441,7 +8539,12 @@ export default function DashboardBuilder({
                       const headerRows = headerSection ? getPreviewLayoutRows(headerSection, headerSection.layoutItems ?? []) : [];
                       const rowIndex = headerRows.findIndex((row) => row.items.some((item) => (item.rowId ?? item.id) === rowId));
                       return (
-                        <div className={`builder-header-live-row${selectedLayoutRowIndex === rowIndex ? " is-selected" : ""}`}>
+                        <div
+                          id={rowId}
+                          className={`builder-header-live-row${selectedLayoutRowIndex === rowIndex ? " is-selected" : ""}${hoveredBuilderTarget?.type === "row" && hoveredBuilderTarget.rowIndex === rowIndex ? " is-hovered-row" : ""}`}
+                          onMouseEnter={() => setHoveredBuilderTarget({ type: "row", sectionId: "header-document", rowIndex })}
+                          onMouseLeave={() => setHoveredBuilderTarget(null)}
+                        >
                           {(["before", "after"] as const).map((placement) => (
                             <span
                               key={placement}
@@ -8626,6 +8729,8 @@ export default function DashboardBuilder({
                 selectedLayoutColumnKey={selectedLayoutColumnKey}
                 selectedLayoutRowIndex={selectedLayoutRowIndex}
                 selectedLayoutBlockKey={selectedLayoutBlockKey}
+                hoveredTarget={hoveredBuilderTarget}
+                onHoverTarget={setHoveredBuilderTarget}
                 draggingSectionId={draggingSectionId}
                 draggingLayoutBlockKey={draggingLayoutBlockKey}
                 onSelect={selectSection}
@@ -8806,6 +8911,8 @@ function PreviewCanvas({
   selectedLayoutColumnKey,
   selectedLayoutRowIndex,
   selectedLayoutBlockKey,
+  hoveredTarget,
+  onHoverTarget,
   draggingSectionId,
   draggingLayoutBlockKey,
   onSelect,
@@ -8873,6 +8980,8 @@ function PreviewCanvas({
   selectedLayoutColumnKey: string | null;
   selectedLayoutRowIndex: number | null;
   selectedLayoutBlockKey: string | null;
+  hoveredTarget: BuilderHoverTarget | null;
+  onHoverTarget: (target: BuilderHoverTarget | null) => void;
   draggingSectionId: string | null;
   draggingLayoutBlockKey: string | null;
   onSelect: (id: string) => void;
@@ -9083,9 +9192,6 @@ function PreviewCanvas({
       ? "dark"
       : "light";
 
-  const [hoveredSectionId, setHoveredSectionId] = useState<string | null>(null);
-  const [hoveredColumnKey, setHoveredColumnKey] = useState<string | null>(null);
-  const [hoveredBlockKey, setHoveredBlockKey] = useState<string | null>(null);
   const [activeDragOver, setActiveDragOver] = useState<{
     type: "section" | "column" | "block";
     sectionId: string;
@@ -9393,12 +9499,13 @@ function PreviewCanvas({
                   }}
                 >
                   <div
-                    id={section.id}
+                    id={section.anchorId || section.id}
+                    data-builder-section-id={section.id}
                     role="button"
                     tabIndex={0}
                     draggable
-                    onMouseEnter={() => setHoveredSectionId(section.id)}
-                    onMouseLeave={() => setHoveredSectionId(null)}
+                    onMouseEnter={() => onHoverTarget({ type: "section", sectionId: section.id })}
+                    onMouseLeave={() => onHoverTarget(null)}
                     onDragStart={(event) => {
                       event.dataTransfer.setData("text/plain", section.id);
                       event.dataTransfer.effectAllowed = "move";
@@ -9421,7 +9528,10 @@ function PreviewCanvas({
                           ? "relative overflow-hidden"
                           : ""
                     } ${isSelected ? "is-selected" : ""} ${
-                      hoveredSectionId === section.id ? "is-hovered" : ""
+                      hoveredTarget?.type === "section" &&
+                      hoveredTarget.sectionId === section.id
+                        ? "is-hovered"
+                        : ""
                     } ${visualStyleClassName(section.visualStyle)} ${draggingSectionId === section.id ? "is-dragging" : ""} ${isDragOverAbove ? "is-drag-over-above" : ""} ${isDragOverBelow ? "is-drag-over-below" : ""}`}
                     style={
                       {
@@ -9755,6 +9865,8 @@ function PreviewCanvas({
                       selectedLayoutRowIndex={selectedLayoutRowIndex}
                       selectedSectionId={selectedId}
                       selectedLayoutBlockKey={selectedLayoutBlockKey}
+                      hoveredTarget={hoveredTarget}
+                      onHoverTarget={onHoverTarget}
                       draggingLayoutBlockKey={draggingLayoutBlockKey}
                       activeDragOver={activeDragOver}
                       onCanvasDragOverChange={setActiveDragOver}
@@ -10590,6 +10702,7 @@ function RowLayoutToolbar({
   onSave,
   onDuplicate,
   onDelete,
+  onHoverChange,
 }: {
   rowIndex: number;
   canMoveUp: boolean;
@@ -10601,6 +10714,7 @@ function RowLayoutToolbar({
   onSave: () => void;
   onDuplicate: () => void;
   onDelete: () => void;
+  onHoverChange?: (hovered: boolean) => void;
 }) {
   return (
     <div
@@ -10608,6 +10722,8 @@ function RowLayoutToolbar({
       onClick={(event) => event.stopPropagation()}
       onMouseDown={(event) => event.stopPropagation()}
       onDragStart={(event) => event.stopPropagation()}
+      onMouseEnter={() => onHoverChange?.(true)}
+      onMouseLeave={() => onHoverChange?.(false)}
     >
       <span>Row Layout</span>
       <button
@@ -11532,6 +11648,8 @@ function PreviewSection({
   selectedLayoutRowIndex,
   selectedSectionId,
   selectedLayoutBlockKey,
+  hoveredTarget,
+  onHoverTarget,
   draggingLayoutBlockKey,
   activeDragOver,
   onCanvasDragOverChange,
@@ -11585,6 +11703,8 @@ function PreviewSection({
   selectedLayoutRowIndex: number | null;
   selectedSectionId: string;
   selectedLayoutBlockKey: string | null;
+  hoveredTarget: BuilderHoverTarget | null;
+  onHoverTarget: (target: BuilderHoverTarget | null) => void;
   draggingLayoutBlockKey: string | null;
   activeDragOver: {
     type: "section" | "column" | "block";
@@ -11778,8 +11898,6 @@ function PreviewSection({
   onOpenElementsPanel: () => void;
   spacingOverlayEnabled: boolean;
 }) {
-  const [hoveredColumnKey, setHoveredColumnKey] = useState<string | null>(null);
-  const [hoveredBlockKey, setHoveredBlockKey] = useState<string | null>(null);
   const [draggingItem, setDraggingItem] = useState<{
     kind: "grid" | "badge" | "button" | "list" | "sectionBadge";
     blockKey: string;
@@ -12332,8 +12450,10 @@ function PreviewSection({
                 <article
                   key={columnKey}
                   id={columnKey}
-                  onMouseEnter={() => setHoveredColumnKey(columnKey)}
-                  onMouseLeave={() => setHoveredColumnKey(null)}
+                  onMouseEnter={() =>
+                    onHoverTarget({ type: "column", sectionId: section.id, columnKey })
+                  }
+                  onMouseLeave={() => onHoverTarget(null)}
                   className={
                     hasScrollPinned
                       ? `w-full col-span-12 ${
@@ -12341,10 +12461,18 @@ function PreviewSection({
                             ? "is-selected-column"
                             : ""
                         } ${
-                          hoveredColumnKey === columnKey
+                          hoveredTarget?.type === "column" &&
+                          hoveredTarget.sectionId === section.id &&
+                          hoveredTarget.columnKey === columnKey
                             ? "is-hovered-column"
                             : ""
                         } ${isSelectedRow ? "is-selected-row" : ""} ${
+                          hoveredTarget?.type === "row" &&
+                          hoveredTarget.sectionId === section.id &&
+                          hoveredTarget.rowIndex === rowMeta?.rowIndex
+                            ? "is-hovered-row"
+                            : ""
+                        } ${
                           activeDragOver?.type === "column" &&
                           activeDragOver.columnKey === columnKey
                             ? "is-drag-over"
@@ -12357,10 +12485,18 @@ function PreviewSection({
                             ? "is-selected-column"
                             : ""
                         } ${
-                          hoveredColumnKey === columnKey
+                          hoveredTarget?.type === "column" &&
+                          hoveredTarget.sectionId === section.id &&
+                          hoveredTarget.columnKey === columnKey
                             ? "is-hovered-column"
                             : ""
                         } ${isSelectedRow ? "is-selected-row" : ""} ${
+                          hoveredTarget?.type === "row" &&
+                          hoveredTarget.sectionId === section.id &&
+                          hoveredTarget.rowIndex === rowMeta?.rowIndex
+                            ? "is-hovered-row"
+                            : ""
+                        } ${
                           activeDragOver?.type === "column" &&
                           activeDragOver.columnKey === columnKey
                             ? "is-drag-over"
@@ -12518,6 +12654,17 @@ function PreviewSection({
                         onDuplicateRow(section.id, rowMeta.rowIndex)
                       }
                       onDelete={() => onDeleteRow(section.id, rowMeta.rowIndex)}
+                      onHoverChange={(hovered) =>
+                        onHoverTarget(
+                          hovered
+                            ? {
+                                type: "row",
+                                sectionId: section.id,
+                                rowIndex: rowMeta.rowIndex,
+                              }
+                            : null,
+                        )
+                      }
                     />
                   )}
                   <div className="builder-preview-column-label">
@@ -12551,9 +12698,17 @@ function PreviewSection({
                     return (
                       <div
                         key={blockKey}
+                        id={blockKey}
                         draggable
-                        onMouseEnter={() => setHoveredBlockKey(blockKey)}
-                        onMouseLeave={() => setHoveredBlockKey(null)}
+                        onMouseEnter={() =>
+                          onHoverTarget({
+                            type: "block",
+                            sectionId: section.id,
+                            columnKey,
+                            blockKey,
+                          })
+                        }
+                        onMouseLeave={() => onHoverTarget(null)}
                         className={`builder-preview-layout-block shop-builder-element-shell is-${
                           block.kind ?? "text"
                         } ${
@@ -12565,7 +12720,12 @@ function PreviewSection({
                             ? "is-selected-block"
                             : ""
                         } ${
-                          hoveredBlockKey === blockKey ? "is-hovered-block" : ""
+                          hoveredTarget?.type === "block" &&
+                          hoveredTarget.sectionId === section.id &&
+                          hoveredTarget.columnKey === columnKey &&
+                          hoveredTarget.blockKey === blockKey
+                            ? "is-hovered-block"
+                            : ""
                         } ${
                           draggingLayoutBlockKey === blockKey
                             ? "is-dragging-block"
