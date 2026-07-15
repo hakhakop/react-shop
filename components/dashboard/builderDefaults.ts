@@ -117,65 +117,10 @@ export const sectionBackgroundPresets = [
 ] as const;
 
 export const defaultState: BuilderState = {
-  page: "shop",
+  page: "home",
   targetType: "page",
   design: defaultDesign,
-  sections: [
-    {
-      id: "hero-1",
-      kind: "hero",
-      title: "Shop",
-      eyebrow: "New season",
-      body: "A clean commerce layout controlled from the visual builder.",
-      background: "#f7f7f4",
-      backgroundMode: "full",
-      contentMode: "boxed",
-      colorScheme: "inherit",
-      layout: "split",
-      topSpacing: "medium",
-      bottomSpacing: "medium",
-      buttonLabel: "Shop now",
-      buttonUrl: "/shop",
-      visible: true,
-    },
-    {
-      id: "recent-1",
-      kind: "recentlyViewed",
-      title: "Recently Viewed",
-      background: "#ffffff",
-      backgroundMode: "boxed",
-      contentMode: "full",
-      colorScheme: "inherit",
-      layout: "carousel",
-      visible: true,
-    },
-    {
-      id: "archive-1",
-      kind: "productArchive",
-      title: "All Products",
-      background: "#ffffff",
-      backgroundMode: "boxed",
-      contentMode: "full",
-      colorScheme: "inherit",
-      columns: 4,
-      filterPosition: "left",
-      cardStyle: "flat",
-      cardPreset: "standard",
-      gridGap: "large",
-      cardPadding: "medium",
-      imagePadding: "large",
-      source: "all",
-      gridLimit: 12,
-      layoutVariant: "grid",
-      pagination: {
-        enabled: false,
-        perPage: 12,
-        mode: "pageNumbers",
-        infiniteScroll: false,
-      },
-      visible: true,
-    },
-  ],
+  sections: [],
 };
 
 const defaultTypography: TypographySettings = {
@@ -451,11 +396,25 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
     return {
       id,
       kind,
-      eyebrow: "Featured",
-      title: "Hero Element",
-      body: "A strong visual opening with editable copy and action.",
-      buttonLabel: "Learn more",
+      eyebrow: "Designed for what comes next",
+      title: "Turn bold ideas into experiences people remember",
+      body: "Build a clear, confident digital presence that connects with your audience and grows naturally with your goals.",
+      buttonLabel: "Get Started",
       buttonUrl: "/",
+      buttonStyle: "primary",
+      buttons: [
+        {
+          id: `${id}-secondary-action`,
+          label: "Explore Services",
+          url: "/",
+          target: "_self",
+          style: "outline",
+        },
+      ],
+      buttonsLayout: "inline",
+      buttonGap: "0.75rem",
+      elementAlign: "left",
+      elementPadding: "lg",
       carouselSettings: {
         variant: "default",
       },
@@ -466,11 +425,12 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
     return {
       id,
       kind,
-      eyebrow: "Offer",
-      title: "Free delivery this week",
-      body: "Use promo strips for offers, notices, and compact calls to action.",
-      buttonLabel: "View offer",
-      buttonUrl: "/shop",
+      eyebrow: "Now available",
+      title: "A simpler way to move your next project forward",
+      body: "Flexible support, clear communication, and a smooth path from idea to launch.",
+      buttonLabel: "View Details",
+      buttonUrl: "/",
+      elementPadding: "sm",
     };
   }
 
@@ -482,7 +442,7 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
       buttons: [
         {
           id: `btn-${Date.now().toString(36)}`,
-          label: "Button Text",
+          label: "Get Started",
           url: "/",
           target: "_self",
           style: "primary",
@@ -497,7 +457,7 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
     return {
       id,
       kind,
-      title: "Grid",
+      title: "Services designed around your goals",
       gridSource: "static",
       columns: 3,
       gridRows: 1,
@@ -515,30 +475,30 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
         {
           id: `${id}-1`,
           eyebrow: "01",
-          title: "Grid item one",
-          meta: "Meta",
-          text: "Map static or dynamic content into a reusable card.",
-          buttonLabel: "Learn more",
+          title: "Strategy and planning",
+          meta: "Build with clarity",
+          text: "Turn priorities into a focused plan with practical next steps and measurable outcomes.",
+          buttonLabel: "View Details",
           buttonUrl: "/",
           typography: defaultTypography,
         },
         {
           id: `${id}-2`,
           eyebrow: "02",
-          title: "Grid item two",
-          meta: "Meta",
-          text: "Control columns, spacing, images, and content.",
-          buttonLabel: "Learn more",
+          title: "Design and delivery",
+          meta: "Make it memorable",
+          text: "Create a polished experience that communicates your value clearly across every screen.",
+          buttonLabel: "See Our Work",
           buttonUrl: "/",
           typography: defaultTypography,
         },
         {
           id: `${id}-3`,
           eyebrow: "03",
-          title: "Grid item three",
-          meta: "Meta",
-          text: "Later this can read posts, products, or custom fields.",
-          buttonLabel: "Learn more",
+          title: "Support and growth",
+          meta: "Ready for what follows",
+          text: "Keep improving with flexible support that adapts as your audience and ambitions grow.",
+          buttonLabel: "Contact Us",
           buttonUrl: "/",
           typography: defaultTypography,
         },
@@ -550,7 +510,7 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
     return {
       id,
       kind,
-      headingText: "Your Heading Text",
+      headingText: "Ideas shaped into meaningful results",
       headingLevel: "h2",
       headingAlign: "left",
       typography: {
@@ -569,13 +529,12 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
       kind,
       title: "",
       body: "",
-      imageUrl: "",
-      imageAlt: "",
+      imageUrl: "/globe.svg",
+      imageAlt: "Abstract globe illustration",
       imageAlignment: "center",
-      imageMaxWidth: 1200,
-      imageBorderRadius: 12,
-      imageFit: "cover",
-      imageRatio: "auto",
+      imageMaxWidth: 960,
+      imageFit: "contain",
+      imageRatio: "square",
       imageCaption: "",
     };
   }
@@ -584,12 +543,13 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
     return {
       id,
       kind,
-      title: "Table",
-      body: "An editable data table.",
-      tableHeadings: ["Column A", "Column B", "Column C"],
+      title: "Service comparison",
+      body: "A clear overview to help visitors compare the essentials at a glance.",
+      tableHeadings: ["Service", "Best for", "Typical timeline"],
       tableRows: [
-        ["Row 1 Cell A", "Row 1 Cell B", "Row 1 Cell C"],
-        ["Row 2 Cell A", "Row 2 Cell B", "Row 2 Cell C"],
+        ["Essential", "Focused launches", "2–3 weeks"],
+        ["Growth", "Expanding teams", "4–6 weeks"],
+        ["Custom", "Complex requirements", "Tailored"],
       ],
       tableStyle: "striped",
     };
@@ -599,13 +559,14 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
     return {
       id,
       kind,
-      eyebrow: "Panel",
-      title: "Content Panel",
-      body: "Add image, title, text, and action in one flexible element.",
-      buttonLabel: "Learn more",
+      eyebrow: "A thoughtful approach",
+      title: "Everything you need to move forward with confidence",
+      body: "Bring your message, services, and next steps together in one clear and engaging content area.",
+      buttonLabel: "Explore Services",
       buttonUrl: "/",
       imageUrl: "",
       imageAlt: "",
+      elementPadding: "md",
     };
   }
 
@@ -613,9 +574,10 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
     return {
       id,
       kind,
-      eyebrow: "Featured Product",
-      title: "Product Hero",
-      body: "Premium component: gallery, title, price, attributes, and purchase action from the current product.",
+      eyebrow: "Featured selection",
+      title: "Discover a product worth remembering",
+      body: "Showcase the current product with its gallery, key details, price, options, and purchase action in one balanced introduction.",
+      elementPadding: "md",
     };
   }
 
@@ -623,8 +585,9 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
     return {
       id,
       kind,
-      title: "Product Info Stack",
-      body: "Premium component: current product summary with dynamic title, price, description, and cart button.",
+      title: "Everything you need to choose with confidence",
+      body: "The current product title, price, description, options, and purchase action appear here automatically.",
+      elementPadding: "md",
     };
   }
 
@@ -632,8 +595,9 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
     return {
       id,
       kind,
-      title: "Purchase Panel",
-      body: "Premium component: focused WooCommerce buy box for the current product.",
+      title: "Ready when you are",
+      body: "A focused purchase panel using the current product price, available options, and add-to-cart action.",
+      elementPadding: "md",
     };
   }
 
@@ -641,8 +605,9 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
     return {
       id,
       kind,
-      title: "Specs Panel",
-      body: "Premium component: dynamic product attributes in a clean specification layout.",
+      title: "Product details",
+      body: "Materials, dimensions, options, and other current product attributes are organized here automatically.",
+      elementPadding: "md",
     };
   }
 
@@ -650,8 +615,8 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
     return {
       id,
       kind,
-      title: "Product Gallery",
-      body: "Dynamic field: current product gallery.",
+      title: "Product gallery",
+      body: "Browse the current product from every available angle.",
       galleryShowThumbnails: true,
       galleryThumbnailPosition: "bottom",
       galleryImageFit: "contain",
@@ -663,8 +628,8 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
     return {
       id,
       kind,
-      title: "Product Title",
-      body: "Dynamic field: current product title.",
+      title: "Signature Everyday Collection",
+      body: "The current product name appears here automatically.",
     };
   }
 
@@ -672,8 +637,8 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
     return {
       id,
       kind,
-      title: "Product Price",
-      body: "Dynamic field: current product price.",
+      title: "$89.00",
+      body: "The current product price and sale price appear here automatically.",
     };
   }
 
@@ -681,8 +646,9 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
     return {
       id,
       kind,
-      title: "Add To Cart",
-      body: "Dynamic WooCommerce add-to-cart button.",
+      title: "Add to cart",
+      body: "Let customers choose available options and add the current product to their cart.",
+      addToCartSize: "medium",
     };
   }
 
@@ -690,8 +656,8 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
     return {
       id,
       kind,
-      title: "Product Attributes",
-      body: "Dynamic field: current product attributes.",
+      title: "Details and specifications",
+      body: "The current product’s materials, sizes, colors, and other attributes appear here automatically.",
     };
   }
 
@@ -699,8 +665,8 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
     return {
       id,
       kind,
-      title: "Product Description",
-      body: "Dynamic field: current product description.",
+      title: "Made for everyday use",
+      body: "The current product description appears here, giving customers the context they need before purchasing.",
     };
   }
 
@@ -708,8 +674,8 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
     return {
       id,
       kind,
-      title: "Cart Content",
-      body: "Live cart UI rendered from the React storefront.",
+      title: "Your cart",
+      body: "Review selected items, update quantities, and continue securely when you are ready.",
     };
   }
 
@@ -717,8 +683,8 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
     return {
       id,
       kind,
-      title: "Checkout Content",
-      body: "Live checkout UI rendered from the React storefront.",
+      title: "Secure checkout",
+      body: "Complete delivery and payment details through the live storefront checkout.",
     };
   }
 
@@ -726,8 +692,8 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
     return {
       id,
       kind,
-      title: "My Account Content",
-      body: "Live account UI rendered from the React storefront.",
+      title: "Your account",
+      body: "Customers can review orders, manage account details, and keep their information up to date.",
     };
   }
 
@@ -735,28 +701,27 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
     return {
       id,
       kind,
-      title: "Scroll Pinned Storytelling",
-      eyebrow: "Interactive Showcase",
-      body: "Notice how the layout is locked. The scrollbar no longer moves the page vertically. Instead, it directs all energy into fueling the progressive card reveal.",
-      elementBackground: "#0a0a0a",
+      title: "A clear path from idea to launch",
+      eyebrow: "How it works",
+      body: "Guide visitors through a focused story with one meaningful step revealed at a time.",
       slides: [
         {
           id: `${id}-slide-1`,
           badge: "01",
-          title: "Layout Intercepted",
-          text: "GSAP ScrollTrigger sets a temporary inline position fixed to your container, creating a beautiful overlay effect without breaking page layout flow.",
+          title: "Start with your goals",
+          text: "Share what you want to achieve, who you want to reach, and what a successful result should look like.",
         },
         {
           id: `${id}-slide-2`,
           badge: "02",
-          title: "Timeline Scrubbing",
-          text: "Scrubbing maps scroll position to timeline interpolation. Scrolling backwards reverses the animation seamlessly.",
+          title: "Shape the right approach",
+          text: "Turn those priorities into a practical plan with clear content, structure, and next steps.",
         },
         {
           id: `${id}-slide-3`,
           badge: "03",
-          title: "Scroll Release",
-          text: "Once the timeline finishes, ScrollTrigger unpins the element, and the container rolls up smoothly. The user continues their journey.",
+          title: "Launch and keep growing",
+          text: "Publish with confidence, learn from real feedback, and continue improving as your needs evolve.",
         },
       ],
       carouselSettings: {
@@ -766,9 +731,9 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
         showNavigation: true,
       },
       items: [
-        "Natively linked with local state settings",
-        "Fully customizable badge numbers and tags",
-        "Smooth mobile & desktop layout responsiveness",
+        "A focused process from start to finish",
+        "Clear milestones and editable steps",
+        "Responsive presentation on every screen",
       ],
       listIcon: "circleCheck",
     };
@@ -778,22 +743,22 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
     return {
       id,
       kind,
-      title: "Swiper / Carousel",
-      body: "A modern reusable carousel block with editable slides.",
+      title: "Explore what makes the difference",
+      body: "Use a clear visual sequence to introduce services, benefits, projects, or important ideas.",
       slides: [
         {
           id: `${id}-slide-1`,
           badge: "01",
-          title: "First slide",
-          text: "Edit image, title, text, and call to action from the dashboard.",
+          title: "Thoughtful from the beginning",
+          text: "Every detail starts with a clear purpose, making the final experience easier to understand and use.",
           imagePadding: "medium",
           typography: defaultTypography,
         },
         {
           id: `${id}-slide-2`,
           badge: "02",
-          title: "Second slide",
-          text: "Use this for campaigns, features, or visual stories.",
+          title: "Flexible as your needs grow",
+          text: "Adapt the content, visuals, and calls to action without rebuilding the surrounding experience.",
           imagePadding: "medium",
           typography: defaultTypography,
         },
@@ -827,10 +792,10 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
     return {
       id,
       kind,
-      title: "HTML Block",
-      body: "Add a form, live chat, map, or trusted widget.",
+      title: "Custom integration",
+      body: "Embed a trusted form, map, booking tool, video, or service that supports the visitor journey.",
       embedMode: "code",
-      embedCode: "<div>Custom HTML block</div>",
+      embedCode: "<div><strong>Connect your preferred service</strong><p>Paste trusted embed code here to display it on the page.</p></div>",
       embedUrl: "",
       embedHeight: 260,
     };
@@ -840,8 +805,8 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
     return {
       id,
       kind,
-      title: "Contact Form",
-      body: "Rendered from Fluent Forms in WordPress.",
+      title: "Let’s start a conversation",
+      body: "Choose a Fluent Forms form to help visitors ask a question, request details, or book a consultation.",
       fluentFormId: "",
     };
   }
@@ -850,21 +815,27 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
     return {
       id,
       kind,
-      title: "Feature Badges",
-      body: "Use badge blocks for services, promises, or compact feature rows.",
-      columns: 2,
+      title: "Built around the essentials",
+      body: "Highlight the qualities that make your offer clear, dependable, and easy to choose.",
+      columns: 3,
       badges: [
         {
           id: `${id}-badge-1`,
           label: "01",
-          title: "Fast",
-          body: "Reusable block settings.",
+          title: "Clear process",
+          body: "Know what happens next at every stage.",
         },
         {
           id: `${id}-badge-2`,
           label: "02",
-          title: "Clean",
-          body: "Flat, modern presentation.",
+          title: "Flexible support",
+          body: "Adapt the approach as your needs change.",
+        },
+        {
+          id: `${id}-badge-3`,
+          label: "03",
+          title: "Lasting value",
+          body: "Create a strong foundation for future growth.",
         },
       ],
     };
@@ -875,8 +846,9 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
       id,
       kind,
       iconName: "sparkles",
-      title: "Icon Feature",
-      body: "Use a small visual cue for services, promises, or highlights.",
+      title: "Designed with care",
+      body: "A focused experience that makes important information easier to notice and understand.",
+      elementPadding: "sm",
     };
   }
 
@@ -884,9 +856,10 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
     return {
       id,
       kind,
-      title: "Feature List",
-      items: ["Fast setup", "Reusable layouts", "Live visual editing"],
-      listIcon: "check",
+      title: "What you can expect",
+      items: ["A clear plan and practical next steps", "Responsive design for every screen", "Flexible content that is easy to update", "Support as your needs evolve"],
+      listIcon: "circleCheck",
+      elementPadding: "sm",
     };
   }
 
@@ -894,9 +867,10 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
     return {
       id,
       kind,
-      title: "Choose a date",
-      dateLabel: "Preferred date",
-      body: "Useful for delivery, booking, or consultation flows.",
+      title: "Book a consultation",
+      dateLabel: "Choose your preferred date",
+      body: "Select a convenient date and we’ll follow up to confirm the details.",
+      elementPadding: "sm",
     };
   }
 
@@ -904,11 +878,11 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
     return {
       id,
       kind,
-      title: "Products",
+      title: "Shop the collection",
       source: "all",
       layoutVariant: "grid",
       columns: 4,
-      gridLimit: 12,
+      gridLimit: 8,
       filterPosition: "left",
       cardStyle: "flat",
       cardPreset: "standard",
@@ -920,8 +894,8 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
     return {
       id,
       kind,
-      title: "Category Filters",
-      body: "Dynamic WooCommerce category pills.",
+      title: "Browse by category",
+      body: "Help customers narrow the collection and find the right products faster.",
     };
   }
 
@@ -929,17 +903,17 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
     return {
       id,
       kind,
-      title: "Breadcrumbs",
-      body: "Dynamic navigation path for the current page.",
+      title: "You are here",
+      body: "A clear navigation path helps visitors understand where they are and move back easily.",
     };
   }
 
   return {
     id,
     kind: "text",
-    eyebrow: "Text",
-    title: "Text Block",
-    body: "Add copy, buttons, and simple content inside this column.",
+    eyebrow: "A better way forward",
+    title: "Make every interaction clear and useful",
+    body: "Thoughtful content helps visitors understand your value, find what they need, and take the next step with confidence.",
     buttonLabel: "",
     buttonUrl: "",
     typography: defaultTypography,

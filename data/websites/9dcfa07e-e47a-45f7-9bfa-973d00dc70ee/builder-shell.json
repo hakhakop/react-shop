@@ -6,7 +6,7 @@
   "topToolbarMeta": "AMD ֏",
   "headerBackgroundMode": "none",
   "headerTextMode": "auto",
-  "headerLayout": "pill",
+  "headerLayout": "princity",
   "headerBrandMode": "both",
   "headerBrandText": "WebPages Store",
   "headerLogoUrl": "https://cms.webpages.am/wp-content/uploads/2026/06/premium-16.png",
@@ -23,6 +23,11 @@
     "theme"
   ],
   "headerActiveIndicator": "underline",
+  "headerBehavior": "pill-on-scroll",
+  "headerTransparent": false,
+  "headerOverlay": false,
+  "headerWidthMode": "boxed",
+  "headerZIndex": 40,
   "sectionPaddingTop": "lg",
   "sectionPaddingBottom": "lg",
   "sectionMarginTop": "lg",
@@ -32,6 +37,7 @@
   "rowMarginTop": "md",
   "rowMarginBottom": "md",
   "rowGap": "sm",
+  "columnGap": "md",
   "elementPaddingTop": "xs",
   "elementPaddingRight": "xs",
   "elementPaddingBottom": "xs",
@@ -163,5 +169,5 @@
       "parentId": null
     }
   ],
-  "updatedAt": "2026-07-12T20:01:29.806Z"
+  "updatedAt": "2026-07-15T12:05:00.445Z"
 }

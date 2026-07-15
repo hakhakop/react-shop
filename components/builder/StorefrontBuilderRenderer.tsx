@@ -2905,14 +2905,18 @@ function ContentLayoutBlock({
 
   return (
     <div className="shop-builder-column-block shop-builder-column-block--text">
-      {block.eyebrow && <span>{block.eyebrow}</span>}
+      {block.eyebrow && (
+        <Typog as="span" area="eyebrow" typography={block.typography}>
+          {block.eyebrow}
+        </Typog>
+      )}
       {block.title && (
-        <Typog as="h3" typography={block.typography}>
+        <Typog as="h3" area="title" typography={block.typography}>
           {block.title}
         </Typog>
       )}
       {block.body && (
-        <Typog as="p" typography={block.typography}>
+        <Typog as="p" area="body" typography={block.typography}>
           {block.body}
         </Typog>
       )}
@@ -2942,6 +2946,7 @@ function ContentLayoutBlock({
         {block.buttonLabel && block.buttonUrl && (
           <Typog
             as="a"
+            area="button"
             className="shop-builder-cta"
             href={block.buttonUrl}
             typography={block.typography}
@@ -2953,6 +2958,7 @@ function ContentLayoutBlock({
           <Typog
             key={btn.id ?? btnIdx}
             as="a"
+            area="button"
             className={`shop-builder-cta shop-builder-cta--${btn.style ?? "primary"}`}
             href={btn.url}
             target={btn.target === "_blank" ? "_blank" : undefined}
@@ -3108,6 +3114,7 @@ function buttonTypographyStyle(
 
 function Typog({
   as: As = "div",
+  area,
   typography,
   className,
   children,
@@ -3116,7 +3123,7 @@ function Typog({
 }: any) {
   const tp = typographyProps(
     typography,
-    inferTypographyArea(String(As), className),
+    area ?? inferTypographyArea(String(As), className),
   );
   const combined = [className, tp.className].filter(Boolean).join(" ");
   const combinedStyle = buttonTypographyStyle(combined, {
@@ -3353,7 +3360,7 @@ function ContentLayoutSection({
               style={{
                 display: "grid",
                 gridTemplateColumns: "repeat(12, minmax(0, 1fr))",
-                gap: resolveBuilderSpacing(undefined, "columnGap").css,
+                columnGap: "var(--builder-global-column-gap, 32px)",
                 paddingTop: "var(--builder-section-padding-top, 0px)",
                 paddingBottom: "var(--builder-section-padding-bottom, 0px)",
                 marginTop: "var(--builder-section-margin-top, 0px)",

@@ -171,5 +171,125 @@
     "enabledLanguages": [
       "hy"
     ]
+  },
+  {
+    "id": "1fe31cd2-d036-4287-9fb6-8d1b996006d6",
+    "ownerId": "33d9dc8c-59ab-402f-8068-5fa8b25752cd",
+    "name": "new",
+    "slug": "new1",
+    "type": "e-commerce",
+    "domain": null,
+    "primaryDomain": null,
+    "domains": [],
+    "description": "",
+    "timeZone": "Asia/Yerevan",
+    "language": "hy",
+    "primaryLanguage": "hy",
+    "enabledLanguages": [
+      "hy"
+    ],
+    "status": "creating",
+    "createdAt": "2026-07-15T10:11:02.377Z",
+    "updatedAt": "2026-07-15T10:11:02.377Z"
+  },
+  {
+    "id": "717c8ac1-ee92-4af2-aad3-4fcc79959c71",
+    "ownerId": "a010b610-5c47-441c-b2ec-00a6e9eb3f88",
+    "name": "blank",
+    "slug": "blank",
+    "type": "business",
+    "domain": null,
+    "primaryDomain": null,
+    "domains": [],
+    "description": "",
+    "timeZone": "Asia/Yerevan",
+    "language": "hy",
+    "primaryLanguage": "hy",
+    "enabledLanguages": [
+      "hy"
+    ],
+    "status": "creating",
+    "createdAt": "2026-07-15T10:29:46.662Z",
+    "updatedAt": "2026-07-15T10:29:46.662Z"
+  },
+  {
+    "id": "756359ab-2093-4184-8407-ef35bfe6c138",
+    "ownerId": "a010b610-5c47-441c-b2ec-00a6e9eb3f88",
+    "name": "modern",
+    "slug": "modern",
+    "type": "business",
+    "domain": null,
+    "primaryDomain": null,
+    "domains": [],
+    "description": "",
+    "timeZone": "Asia/Yerevan",
+    "language": "hy",
+    "primaryLanguage": "hy",
+    "enabledLanguages": [
+      "hy"
+    ],
+    "status": "creating",
+    "createdAt": "2026-07-15T10:34:57.204Z",
+    "updatedAt": "2026-07-15T10:34:57.204Z"
+  },
+  {
+    "id": "bc613fc2-1b59-463b-adce-0b0df813c401",
+    "ownerId": "a010b610-5c47-441c-b2ec-00a6e9eb3f88",
+    "name": "Creative",
+    "slug": "creative",
+    "type": "business",
+    "domain": null,
+    "primaryDomain": null,
+    "domains": [],
+    "description": "",
+    "timeZone": "Asia/Yerevan",
+    "language": "hy",
+    "primaryLanguage": "hy",
+    "enabledLanguages": [
+      "hy"
+    ],
+    "status": "creating",
+    "createdAt": "2026-07-15T10:37:04.987Z",
+    "updatedAt": "2026-07-15T10:37:04.987Z"
+  },
+  {
+    "id": "1aa56d9f-ad12-4a8f-b8fb-808560842f47",
+    "ownerId": "a010b610-5c47-441c-b2ec-00a6e9eb3f88",
+    "name": "local",
+    "slug": "local",
+    "type": "business",
+    "domain": null,
+    "primaryDomain": null,
+    "domains": [],
+    "description": "",
+    "timeZone": "Asia/Yerevan",
+    "language": "hy",
+    "primaryLanguage": "hy",
+    "enabledLanguages": [
+      "hy"
+    ],
+    "status": "creating",
+    "createdAt": "2026-07-15T10:37:56.093Z",
+    "updatedAt": "2026-07-15T10:37:56.093Z"
+  },
+  {
+    "id": "88576d88-81fb-4040-a963-d9cafb355ddd",
+    "ownerId": "a010b610-5c47-441c-b2ec-00a6e9eb3f88",
+    "name": "new modern",
+    "slug": "new-modern",
+    "type": "business",
+    "domain": null,
+    "primaryDomain": null,
+    "domains": [],
+    "description": "",
+    "timeZone": "Asia/Yerevan",
+    "language": "hy",
+    "primaryLanguage": "hy",
+    "enabledLanguages": [
+      "hy"
+    ],
+    "status": "creating",
+    "createdAt": "2026-07-15T10:48:40.508Z",
+    "updatedAt": "2026-07-15T10:48:40.508Z"
   }
 ]

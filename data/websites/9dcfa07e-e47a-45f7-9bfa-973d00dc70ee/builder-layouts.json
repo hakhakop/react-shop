@@ -490,7 +490,16 @@
                 "animation": {
                   "preset": "none"
                 },
-                "elementAlign": "center"
+                "elementAlign": "center",
+                "typography": {
+                  "title": {
+                    "fontSize": "48px",
+                    "variant": "heading"
+                  },
+                  "body": {
+                    "fontSize": "18px"
+                  }
+                }
               },
               {
                 "id": "packages-grid",
@@ -671,12 +680,15 @@
                   "color": "inherit",
                   "textAlign": "left",
                   "body": {
-                    "textAlign": "center"
+                    "textAlign": "center",
+                    "fontFamily": "inherit",
+                    "fontSize": "48px",
+                    "fontWeight": "500"
                   },
                   "title": {
                     "variant": "body",
                     "fontFamily": "inherit",
-                    "fontSize": "16px",
+                    "fontSize": "18px",
                     "fontWeight": "400",
                     "lineHeight": "1.4",
                     "letterSpacing": "0px",
@@ -807,7 +819,9 @@
                   "color": "inherit",
                   "textAlign": "left",
                   "body": {
-                    "textAlign": "center"
+                    "textAlign": "center",
+                    "variant": "body",
+                    "fontSize": "16px"
                   }
                 },
                 "elementAlign": "center",
@@ -1365,7 +1379,7 @@
         ]
       }
     ],
-    "updatedAt": "2026-07-12T13:49:24.286Z"
+    "updatedAt": "2026-07-15T12:05:00.299Z"
   },
   "shop": {
     "version": 1,
@@ -5821,42 +5835,91 @@
     "key": "header",
     "page": "header",
     "targetType": "header",
-    "design": {},
+    "design": {
+      "preset": "princity",
+      "colorScheme": "auto",
+      "pageBackground": "#f7f7f4",
+      "textColor": "#111111",
+      "mutedTextColor": "#5f5f58",
+      "accentColor": "#a4be7b",
+      "surfaceColor": "#efefe9",
+      "buttonBackground": "#111111",
+      "buttonTextColor": "#ffffff",
+      "radius": "8px",
+      "sectionMaxWidth": "1640px",
+      "sectionGutter": "48px",
+      "headingFontFamily": "inherit",
+      "headingSize": "clamp(42px, 8vw, 126px)",
+      "headingWeight": "760",
+      "headingLineHeight": "0.92",
+      "cardBg": "#efefe9",
+      "cardRadius": "8px",
+      "cardBorder": "transparent",
+      "cardShadow": "0 12px 30px rgba(17,17,17,0.06)",
+      "cardShadowHover": "0 18px 42px rgba(17,17,17,0.1)",
+      "cardImageBg": "#ffffff",
+      "cardImagePadding": "clamp(22px, 2.4vw, 36px)"
+    },
     "sections": [
       {
         "id": "header-document",
         "kind": "contentLayout",
         "title": "Header",
+        "headerUtilityMigrationVersion": 3,
         "background": "transparent",
         "backgroundMode": "full",
         "contentMode": "boxed",
         "colorScheme": "inherit",
         "layout": "header-row",
-        "layoutColumns": 1,
+        "layoutColumns": 3,
         "layoutItems": [
           {
-            "id": "header-main-row",
+            "id": "header-main-left",
             "rowId": "header-main-row",
-            "rowLayout": "header-main-row",
+            "rowLayout": "quarters-1-2-1",
             "blocks": [
               {
                 "id": "header-logo",
                 "kind": "image",
+                "headerBrandMode": "logo",
+                "headerBrandText": "WebPages",
+                "imageMaxWidth": 161,
                 "imageUrl": "https://cms.webpages.am/wp-content/uploads/2026/06/premium-16.png",
-                "imageAlt": "WebPages logo",
-                "imageMaxWidth": 161
-              },
+                "imageAlt": "WebPages logo"
+              }
+            ]
+          },
+          {
+            "id": "header-main-center",
+            "rowId": "header-main-row",
+            "rowLayout": "quarters-1-2-1",
+            "blocks": [
               {
                 "id": "header-navigation",
                 "kind": "menu",
                 "title": "Navigation",
-                "menuSource": "main"
+                "menuSource": "main",
+                "menuActiveIndicator": "princity",
+                "elementAlign": "center"
+              }
+            ]
+          },
+          {
+            "id": "header-main-right",
+            "rowId": "header-main-row",
+            "rowLayout": "quarters-1-2-1",
+            "blocks": [
+              {
+                "id": "header-utility-search",
+                "kind": "headerSearch",
+                "headerUtilityAction": "search",
+                "headerUtilityVariant": "muted"
               },
               {
-                "id": "header-spacer",
-                "kind": "embed",
-                "embedMode": "code",
-                "embedCode": ""
+                "id": "header-utility-cart",
+                "kind": "headerCart",
+                "headerUtilityAction": "cart",
+                "headerUtilityVariant": "muted"
               }
             ]
           }
@@ -5864,6 +5927,56 @@
         "visible": true
       }
     ],
-    "updatedAt": "2026-07-12T20:04:03.939Z"
+    "updatedAt": "2026-07-15T12:01:27.018Z"
+  },
+  "footer": {
+    "version": 1,
+    "key": "footer",
+    "page": "footer",
+    "targetType": "footer",
+    "design": {},
+    "sections": [
+      {
+        "id": "footer-document",
+        "kind": "contentLayout",
+        "title": "Footer",
+        "background": "#111111",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "dark",
+        "topSpacing": "sm",
+        "bottomSpacing": "sm",
+        "layout": "halves",
+        "layoutColumns": 2,
+        "layoutItems": [
+          {
+            "id": "footer-main-left",
+            "rowId": "footer-main-row",
+            "rowLayout": "halves",
+            "blocks": [
+              {
+                "id": "footer-copyright",
+                "kind": "text",
+                "body": "© 2025 Webpages · Headless WooCommerce demo"
+              }
+            ]
+          },
+          {
+            "id": "footer-main-right",
+            "rowId": "footer-main-row",
+            "rowLayout": "halves",
+            "blocks": [
+              {
+                "id": "footer-platform",
+                "kind": "text",
+                "body": "Powered by WordPress · WooCommerce · WPGraphQL · Next.js"
+              }
+            ]
+          }
+        ],
+        "visible": true
+      }
+    ],
+    "updatedAt": "2026-07-15T11:46:35.794Z"
   }
 }

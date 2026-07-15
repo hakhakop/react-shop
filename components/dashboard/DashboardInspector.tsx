@@ -63,7 +63,11 @@ import {
   resolveBuilderSpacing,
 } from "@/lib/builderSpacing";
 import type { CategoryTreeItem } from "@/lib/categories";
-import type { TypographyArea } from "@/lib/builderTypography";
+import {
+  resolveTypographyInput,
+  updateTypographyArea,
+  type TypographyArea,
+} from "@/lib/builderTypography";
 import type { BuilderShellSettings } from "@/lib/builderShell";
 import { useTranslation } from "@/components/i18n/LanguageProvider";
 import {
@@ -79,7 +83,7 @@ const getSupportedTypographyAreas = (
   kind: string,
 ): readonly TypographyArea[] => {
   if (kind === "heading") return ["title"] as const;
-  if (kind === "text") return ["body"] as const;
+  if (kind === "text") return ["title", "body", "button", "eyebrow"] as const;
   if (kind === "button") return ["button"] as const;
   if (kind === "datePicker") return ["title", "body"] as const;
   if (kind === "list") return ["body"] as const;
@@ -2204,6 +2208,19 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                     · Global
                   </span>
                 </div>
+                <div className="builder-shell-note">
+                  <strong>Column Gap</strong>
+                  <span>
+                    {
+                      resolveBuilderSpacing(
+                        undefined,
+                        "columnGap",
+                        shellSettings.columnGap,
+                      ).label
+                    }{" "}
+                    · Global
+                  </span>
+                </div>
                 {onOpenGlobalSpacingSettings ? (
                   <button
                     type="button"
@@ -2920,31 +2937,10 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                   </span>
                                                   <TypographyPanel
                                                     value={{
-                                                      ...(activeTypographyArea ===
-                                                      "title"
-                                                        ? ((
-                                                            block.typography as any
-                                                          )?.title ??
-                                                          (typeof block.typography ===
-                                                            "object" &&
-                                                          !(
-                                                            block.typography as any
-                                                          ).title
-                                                            ? (block.typography as any)
-                                                            : undefined))
-                                                        : activeTypographyArea ===
-                                                            "body"
-                                                          ? (
-                                                              block.typography as any
-                                                            )?.body
-                                                          : activeTypographyArea ===
-                                                              "button"
-                                                            ? (
-                                                                block.typography as any
-                                                              )?.button
-                                                            : (
-                                                                block.typography as any
-                                                              )?.eyebrow),
+                                                      ...resolveTypographyInput(
+                                                        block.typography,
+                                                        activeTypographyArea,
+                                                      ),
                                                       ...(block.kind ===
                                                         "heading" &&
                                                       activeTypographyArea ===
@@ -2962,17 +2958,17 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                         ...tRest
                                                       } = t;
                                                       const patch: any = {
-                                                        typography: {
-                                                          ...((block.typography as any) ??
-                                                            {}),
-                                                          [activeTypographyArea]:
+                                                        typography:
+                                                          updateTypographyArea(
+                                                            block.typography,
+                                                            activeTypographyArea,
                                                             block.kind ===
                                                               "heading" &&
                                                             activeTypographyArea ===
                                                               "title"
                                                               ? tRest
                                                               : t,
-                                                        },
+                                                          ),
                                                       };
                                                       if (
                                                         block.kind ===

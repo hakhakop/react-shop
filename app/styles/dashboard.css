@@ -9390,6 +9390,17 @@ body[data-storefront-preset="princity"]
   outline: none;
 }
 
+/* Rich Text bodies render editable HTML inside this node. Keep structural
+   descendants on the typography selected for the Text body while allowing
+   semantic strong/em emphasis to retain its own weight/style. */
+.builder-inline-editable[contenteditable="true"] :where(p, div, span) {
+  font-family: inherit !important;
+  font-size: inherit !important;
+  line-height: inherit !important;
+  letter-spacing: inherit !important;
+  text-align: inherit !important;
+}
+
 .builder-preview-cta.builder-inline-editable {
   border-radius: var(--button-radius, 999px);
   color: var(--button-text-color, var(--builder-preview-active-button-text, #ffffff));

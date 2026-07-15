@@ -78,6 +78,7 @@ export type BuilderShellSettings = {
   rowMarginTop: BuilderSectionSpacing;
   rowMarginBottom: BuilderSectionSpacing;
   rowGap: BuilderSectionSpacing;
+  columnGap: BuilderSectionSpacing;
   elementPaddingTop: BuilderSectionSpacing;
   elementPaddingRight: BuilderSectionSpacing;
   elementPaddingBottom: BuilderSectionSpacing;
@@ -160,6 +161,7 @@ export const defaultBuilderShellSettings: BuilderShellSettings = {
   rowMarginTop: "none",
   rowMarginBottom: "none",
   rowGap: "lg",
+  columnGap: "md",
   elementPaddingTop: "sm",
   elementPaddingRight: "sm",
   elementPaddingBottom: "sm",
@@ -434,6 +436,10 @@ export function normalizeBuilderShellSettings(
     rowGap: normalizeSectionSpacing(
       value?.rowGap,
       defaultBuilderShellSettings.rowGap
+    ),
+    columnGap: normalizeSectionSpacing(
+      value?.columnGap,
+      defaultBuilderShellSettings.columnGap
     ),
     elementPaddingTop: normalizeSectionSpacing(
       value?.elementPaddingTop,

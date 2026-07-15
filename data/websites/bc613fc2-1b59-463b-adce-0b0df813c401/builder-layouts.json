@@ -1,0 +1,654 @@
+{
+  "home": {
+    "version": 1,
+    "key": "home",
+    "page": "home",
+    "targetType": "page",
+    "updatedAt": "2026-07-15T10:37:04.989Z",
+    "design": {
+      "preset": "princity",
+      "colorScheme": "auto",
+      "pageBackground": "#f8f6fc",
+      "textColor": "#211b2d",
+      "mutedTextColor": "#70687d",
+      "accentColor": "#6b4bc3",
+      "surfaceColor": "#eee9f7",
+      "buttonBackground": "#211b2d",
+      "buttonTextColor": "#ffffff",
+      "radius": "18px",
+      "sectionMaxWidth": "1280px",
+      "sectionGutter": "clamp(20px, 4vw, 64px)",
+      "headingFontFamily": "inherit",
+      "headingWeight": "720",
+      "headingLineHeight": "1.02",
+      "cardBg": "#ffffff",
+      "cardRadius": "18px",
+      "cardBorder": "rgba(20,20,20,0.09)",
+      "cardShadow": "0 10px 30px rgba(20,20,20,0.05)",
+      "cardShadowHover": "0 16px 38px rgba(20,20,20,0.09)"
+    },
+    "sections": [
+      {
+        "id": "hero",
+        "kind": "contentLayout",
+        "title": "Hero",
+        "background": "#f8f6fc",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "topSpacing": "large",
+        "bottomSpacing": "large",
+        "layout": "whole",
+        "layoutColumns": 1,
+        "layoutItems": [
+          {
+            "id": "hero-column-1",
+            "rowId": "hero-row",
+            "rowLayout": "whole",
+            "blocks": [
+              {
+                "id": "agency-hero",
+                "kind": "hero",
+                "eyebrow": "Independent thinking. Useful outcomes.",
+                "title": "Ideas shaped into work people remember",
+                "body": "Use this space to express the studio’s point of view, the problems you enjoy solving, and the kind of work you want to create next.",
+                "buttonLabel": "Start a Project",
+                "buttonUrl": "#contact",
+                "buttonStyle": "primary",
+                "buttons": [
+                  {
+                    "id": "agency-hero-secondary",
+                    "label": "See Our Work",
+                    "url": "#work",
+                    "target": "_self",
+                    "style": "outline"
+                  }
+                ],
+                "buttonsLayout": "inline",
+                "buttonGap": "0.75rem",
+                "elementAlign": "left",
+                "elementPadding": "lg",
+                "carouselSettings": {
+                  "variant": "default"
+                }
+              }
+            ]
+          }
+        ],
+        "visible": true
+      },
+      {
+        "id": "work",
+        "kind": "contentLayout",
+        "title": "Selected Work",
+        "eyebrow": "Selected work",
+        "body": "Lead with a small, edited set of projects. Each card should explain the challenge, contribution, and result.",
+        "background": "#211b2d",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "dark",
+        "topSpacing": "large",
+        "bottomSpacing": "large",
+        "layout": "whole",
+        "layoutColumns": 1,
+        "layoutItems": [
+          {
+            "id": "work-column-1",
+            "rowId": "work-row",
+            "rowLayout": "whole",
+            "blocks": [
+              {
+                "id": "work-grid",
+                "kind": "grid",
+                "title": "A focused portfolio creates a stronger impression",
+                "gridSource": "static",
+                "columns": 3,
+                "gridRows": 1,
+                "gridGap": "medium",
+                "gridContentPadding": "large",
+                "gridShowImage": false,
+                "gridShowEyebrow": true,
+                "gridShowMeta": false,
+                "gridShowText": true,
+                "gridShowButton": true,
+                "gridItems": [
+                  {
+                    "id": "work-1",
+                    "eyebrow": "Identity",
+                    "title": "A clearer brand for a growing team",
+                    "text": "Strategy, visual direction, and a flexible identity system.",
+                    "buttonLabel": "View Project",
+                    "buttonUrl": "#contact",
+                    "buttonStyle": "link"
+                  },
+                  {
+                    "id": "work-2",
+                    "eyebrow": "Digital",
+                    "title": "A simpler path through a complex offer",
+                    "text": "Content structure and a digital experience designed around decisions.",
+                    "buttonLabel": "View Project",
+                    "buttonUrl": "#contact",
+                    "buttonStyle": "link"
+                  },
+                  {
+                    "id": "work-3",
+                    "eyebrow": "Campaign",
+                    "title": "A launch designed to earn attention",
+                    "text": "A concise campaign system built for multiple channels.",
+                    "buttonLabel": "View Project",
+                    "buttonUrl": "#contact",
+                    "buttonStyle": "link"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "visible": true
+      },
+      {
+        "id": "services",
+        "kind": "contentLayout",
+        "title": "Services",
+        "eyebrow": "Capabilities",
+        "body": "Describe complementary services without turning the page into a long catalogue.",
+        "background": "#eee9f7",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "topSpacing": "large",
+        "bottomSpacing": "large",
+        "layout": "whole",
+        "layoutColumns": 1,
+        "layoutItems": [
+          {
+            "id": "services-column-1",
+            "rowId": "services-row",
+            "rowLayout": "whole",
+            "blocks": [
+              {
+                "id": "agency-services",
+                "kind": "grid",
+                "title": "From first idea to finished experience",
+                "gridSource": "static",
+                "columns": 3,
+                "gridRows": 1,
+                "gridGap": "medium",
+                "gridContentPadding": "large",
+                "gridShowImage": false,
+                "gridShowEyebrow": true,
+                "gridShowMeta": false,
+                "gridShowText": true,
+                "gridShowButton": false,
+                "gridItems": [
+                  {
+                    "id": "as-1",
+                    "eyebrow": "01",
+                    "title": "Brand direction",
+                    "text": "Positioning, messaging, and visual systems that create clarity.",
+                    "buttonStyle": "link"
+                  },
+                  {
+                    "id": "as-2",
+                    "eyebrow": "02",
+                    "title": "Digital experiences",
+                    "text": "Useful websites and interfaces built around real audience needs.",
+                    "buttonStyle": "link"
+                  },
+                  {
+                    "id": "as-3",
+                    "eyebrow": "03",
+                    "title": "Campaigns and content",
+                    "text": "Flexible creative systems that keep communication consistent.",
+                    "buttonStyle": "link"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "visible": true
+      },
+      {
+        "id": "about",
+        "kind": "contentLayout",
+        "title": "About the Studio",
+        "background": "#ffffff",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "topSpacing": "large",
+        "bottomSpacing": "large",
+        "layout": "halves",
+        "layoutColumns": 2,
+        "layoutItems": [
+          {
+            "id": "about-column-1",
+            "rowId": "about-row",
+            "rowLayout": "halves",
+            "blocks": [
+              {
+                "id": "studio-copy",
+                "kind": "text",
+                "eyebrow": "About the studio",
+                "title": "Small enough to stay close to the work",
+                "body": "Introduce the studio’s approach, the people behind it, and how collaboration works. Keep the copy personal and specific rather than sounding like a corporate biography.",
+                "typography": {
+                  "variant": "body",
+                  "fontFamily": "inherit",
+                  "fontSize": "",
+                  "fontWeight": "",
+                  "lineHeight": "",
+                  "letterSpacing": "",
+                  "color": "inherit",
+                  "textAlign": "left"
+                }
+              }
+            ]
+          },
+          {
+            "id": "about-column-2",
+            "rowId": "about-row",
+            "rowLayout": "halves",
+            "blocks": [
+              {
+                "id": "studio-list",
+                "kind": "list",
+                "title": "What clients can expect",
+                "items": [
+                  "Direct collaboration",
+                  "Senior creative attention",
+                  "A process shaped around the project"
+                ],
+                "listIcon": "circleCheck",
+                "elementPadding": "lg"
+              }
+            ]
+          }
+        ],
+        "visible": true
+      },
+      {
+        "id": "process",
+        "kind": "contentLayout",
+        "title": "Process",
+        "eyebrow": "How we work",
+        "body": "A simple process reduces uncertainty and makes starting feel easier.",
+        "background": "#f8f6fc",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "topSpacing": "large",
+        "bottomSpacing": "large",
+        "layout": "whole",
+        "layoutColumns": 1,
+        "layoutItems": [
+          {
+            "id": "process-column-1",
+            "rowId": "process-row",
+            "rowLayout": "whole",
+            "blocks": [
+              {
+                "id": "process-grid",
+                "kind": "grid",
+                "title": "A practical creative process",
+                "gridSource": "static",
+                "columns": 3,
+                "gridRows": 1,
+                "gridGap": "medium",
+                "gridContentPadding": "large",
+                "gridShowImage": false,
+                "gridShowEyebrow": true,
+                "gridShowMeta": false,
+                "gridShowText": true,
+                "gridShowButton": false,
+                "gridItems": [
+                  {
+                    "id": "process-1",
+                    "eyebrow": "01",
+                    "title": "Discover",
+                    "text": "Align on context, audience, and the opportunity worth pursuing.",
+                    "buttonStyle": "link"
+                  },
+                  {
+                    "id": "process-2",
+                    "eyebrow": "02",
+                    "title": "Shape",
+                    "text": "Explore directions, test ideas, and build a coherent system.",
+                    "buttonStyle": "link"
+                  },
+                  {
+                    "id": "process-3",
+                    "eyebrow": "03",
+                    "title": "Deliver",
+                    "text": "Refine the work and prepare everything for confident use.",
+                    "buttonStyle": "link"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "visible": true
+      },
+      {
+        "id": "testimonials",
+        "kind": "contentLayout",
+        "title": "Testimonials",
+        "background": "#eee9f7",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "topSpacing": "large",
+        "bottomSpacing": "large",
+        "layout": "whole",
+        "layoutColumns": 1,
+        "layoutItems": [
+          {
+            "id": "testimonials-column-1",
+            "rowId": "testimonials-row",
+            "rowLayout": "whole",
+            "blocks": [
+              {
+                "id": "agency-quotes",
+                "kind": "grid",
+                "title": "Creative partnership, clearly described",
+                "gridSource": "static",
+                "columns": 3,
+                "gridRows": 1,
+                "gridGap": "medium",
+                "gridContentPadding": "large",
+                "gridShowImage": false,
+                "gridShowEyebrow": true,
+                "gridShowMeta": true,
+                "gridShowText": true,
+                "gridShowButton": false,
+                "gridItems": [
+                  {
+                    "id": "aq-1",
+                    "eyebrow": "“",
+                    "title": "They understood the real challenge",
+                    "text": "The team asked better questions and turned complexity into a clear direction.",
+                    "meta": "Morgan Hale · Founder",
+                    "buttonStyle": "link"
+                  },
+                  {
+                    "id": "aq-2",
+                    "eyebrow": "“",
+                    "title": "The work feels distinctly ours",
+                    "text": "We gained a stronger identity without losing what made the company personal.",
+                    "meta": "Sam Ellis · Marketing Lead",
+                    "buttonStyle": "link"
+                  },
+                  {
+                    "id": "aq-3",
+                    "eyebrow": "“",
+                    "title": "A genuinely collaborative process",
+                    "text": "Ideas were shared openly, decisions were clear, and the final system is easy to use.",
+                    "meta": "Riley Chen · Product Director",
+                    "buttonStyle": "link"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "visible": true
+      },
+      {
+        "id": "cta",
+        "kind": "contentLayout",
+        "title": "Call to Action",
+        "background": "#6b4bc3",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "dark",
+        "topSpacing": "medium",
+        "bottomSpacing": "medium",
+        "layout": "whole",
+        "layoutColumns": 1,
+        "layoutItems": [
+          {
+            "id": "cta-column-1",
+            "rowId": "cta-row",
+            "rowLayout": "whole",
+            "blocks": [
+              {
+                "id": "agency-cta",
+                "kind": "promoStrip",
+                "eyebrow": "Have a project in mind?",
+                "title": "Let’s make the next idea useful and memorable",
+                "body": "Tell us where you are now and what you want the work to make possible.",
+                "buttonLabel": "Start a Project",
+                "buttonUrl": "#contact",
+                "buttonStyle": "light",
+                "elementPadding": "md"
+              }
+            ]
+          }
+        ],
+        "visible": true
+      },
+      {
+        "id": "contact",
+        "kind": "contentLayout",
+        "title": "Contact",
+        "background": "#f8f6fc",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "topSpacing": "large",
+        "bottomSpacing": "large",
+        "layout": "halves",
+        "layoutColumns": 2,
+        "layoutItems": [
+          {
+            "id": "contact-column-1",
+            "rowId": "contact-row",
+            "rowLayout": "halves",
+            "blocks": [
+              {
+                "id": "agency-contact",
+                "kind": "text",
+                "eyebrow": "Contact",
+                "title": "Begin with the essentials",
+                "body": "A short note about the project, timing, and ambition is enough to start a useful conversation.",
+                "typography": {
+                  "variant": "body",
+                  "fontFamily": "inherit",
+                  "fontSize": "",
+                  "fontWeight": "",
+                  "lineHeight": "",
+                  "letterSpacing": "",
+                  "color": "inherit",
+                  "textAlign": "left"
+                }
+              }
+            ]
+          },
+          {
+            "id": "contact-column-2",
+            "rowId": "contact-row",
+            "rowLayout": "halves",
+            "blocks": [
+              {
+                "id": "agency-contact-panel",
+                "kind": "panel",
+                "eyebrow": "New projects",
+                "title": "What would you like to create?",
+                "body": "Introduce the opportunity and we will reply with a clear next step.",
+                "buttonLabel": "Start a Conversation",
+                "buttonUrl": "mailto:hello@example.com",
+                "buttonStyle": "primary",
+                "elementPadding": "lg"
+              }
+            ]
+          }
+        ],
+        "visible": true
+      }
+    ]
+  },
+  "header": {
+    "version": 1,
+    "key": "header",
+    "page": "header",
+    "targetType": "header",
+    "updatedAt": "2026-07-15T10:37:04.989Z",
+    "design": {},
+    "sections": [
+      {
+        "id": "header-document",
+        "kind": "contentLayout",
+        "title": "Header",
+        "background": "#ffffff",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "topSpacing": "medium",
+        "bottomSpacing": "medium",
+        "layout": "thirds",
+        "layoutColumns": 3,
+        "layoutItems": [
+          {
+            "id": "header-document-column-1",
+            "rowId": "header-document-row",
+            "rowLayout": "thirds",
+            "blocks": [
+              {
+                "id": "starter-brand",
+                "kind": "image",
+                "headerBrandMode": "brand",
+                "headerBrandText": "Creative",
+                "imageAlt": "Creative logo",
+                "imageMaxWidth": 180
+              }
+            ]
+          },
+          {
+            "id": "header-document-column-2",
+            "rowId": "header-document-row",
+            "rowLayout": "thirds",
+            "blocks": [
+              {
+                "id": "starter-navigation",
+                "kind": "menu",
+                "title": "Navigation",
+                "menuSource": "main",
+                "menuActiveIndicator": "underline"
+              }
+            ]
+          },
+          {
+            "id": "header-document-column-3",
+            "rowId": "header-document-row",
+            "rowLayout": "thirds",
+            "blocks": [
+              {
+                "id": "starter-header-button",
+                "kind": "button",
+                "buttonLabel": "Start a Project",
+                "buttonUrl": "#contact",
+                "buttonStyle": "primary"
+              }
+            ]
+          }
+        ],
+        "visible": true,
+        "headerUtilityMigrationVersion": 3
+      }
+    ]
+  },
+  "footer": {
+    "version": 1,
+    "key": "footer",
+    "page": "footer",
+    "targetType": "footer",
+    "updatedAt": "2026-07-15T10:37:04.989Z",
+    "design": {},
+    "sections": [
+      {
+        "id": "footer-document",
+        "kind": "contentLayout",
+        "title": "Footer",
+        "background": "#211b2d",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "dark",
+        "topSpacing": "medium",
+        "bottomSpacing": "medium",
+        "layout": "thirds",
+        "layoutColumns": 3,
+        "layoutItems": [
+          {
+            "id": "footer-document-column-1",
+            "rowId": "footer-document-row",
+            "rowLayout": "thirds",
+            "blocks": [
+              {
+                "id": "footer-about",
+                "kind": "text",
+                "title": "Creative",
+                "body": "A concise closing statement that reinforces what you offer and who you help.",
+                "typography": {
+                  "variant": "body",
+                  "fontFamily": "inherit",
+                  "fontSize": "",
+                  "fontWeight": "",
+                  "lineHeight": "",
+                  "letterSpacing": "",
+                  "color": "inherit",
+                  "textAlign": "left"
+                }
+              }
+            ]
+          },
+          {
+            "id": "footer-document-column-2",
+            "rowId": "footer-document-row",
+            "rowLayout": "thirds",
+            "blocks": [
+              {
+                "id": "footer-links",
+                "kind": "list",
+                "title": "Explore",
+                "items": [
+                  "About",
+                  "Services",
+                  "Testimonials",
+                  "Contact"
+                ],
+                "listIcon": "arrowRight"
+              }
+            ]
+          },
+          {
+            "id": "footer-document-column-3",
+            "rowId": "footer-document-row",
+            "rowLayout": "thirds",
+            "blocks": [
+              {
+                "id": "footer-contact",
+                "kind": "text",
+                "eyebrow": "Contact",
+                "title": "Start a conversation",
+                "body": "hello@example.com\n+1 000 000 0000",
+                "typography": {
+                  "variant": "body",
+                  "fontFamily": "inherit",
+                  "fontSize": "",
+                  "fontWeight": "",
+                  "lineHeight": "",
+                  "letterSpacing": "",
+                  "color": "inherit",
+                  "textAlign": "left"
+                }
+              }
+            ]
+          }
+        ],
+        "visible": true
+      }
+    ]
+  }
+}

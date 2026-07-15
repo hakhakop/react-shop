@@ -304,6 +304,15 @@ export default function GlobalSpacingPanel() {
             });
           }}
         />
+        <GlobalSpacingControl
+          label="Gap Between Columns"
+          sides={["gap"]}
+          values={{ gap: shellSettings.columnGap }}
+          context="columnGap"
+          onChange={(newVals) => {
+            updateShellSettings({ columnGap: newVals.gap });
+          }}
+        />
       </section>
 
       <section id="global-spacing-element" className="builder-global-spacing-group" tabIndex={-1}>

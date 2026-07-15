@@ -39,14 +39,22 @@ function normalizeFontSize(value?: string) {
   return trimmed;
 }
 
-function resolveTypographyInput(
+export function isTypographyGroup(
+  typ?: TypographySettings | TypographyGroup,
+): typ is TypographyGroup {
+  if (!typ) return false;
+  const group = typ as TypographyGroup;
+  return Boolean(group.title || group.body || group.button || group.eyebrow);
+}
+
+export function resolveTypographyInput(
   typ?: TypographySettings | TypographyGroup,
   area?: TypographyArea,
 ): TypographySettings | undefined {
   if (!typ) return undefined;
 
   const group = typ as TypographyGroup;
-  const isGroup = Boolean(group.title || group.body || group.button || group.eyebrow);
+  const isGroup = isTypographyGroup(typ);
 
   if (isGroup) {
     if (area) {
@@ -81,6 +89,25 @@ function resolveTypographyInput(
   }
 
   return flatSettings;
+}
+
+export function updateTypographyArea(
+  typ: TypographySettings | TypographyGroup | undefined,
+  area: TypographyArea,
+  value: TypographySettings,
+): TypographyGroup {
+  if (isTypographyGroup(typ)) {
+    return { ...typ, [area]: value };
+  }
+
+  const inherited = typ ? { ...(typ as TypographySettings) } : undefined;
+  return {
+    title: inherited ? { ...inherited } : undefined,
+    body: inherited ? { ...inherited } : undefined,
+    button: inherited ? { ...inherited } : undefined,
+    eyebrow: inherited ? { ...inherited } : undefined,
+    [area]: value,
+  };
 }
 
 export function typographyProps(

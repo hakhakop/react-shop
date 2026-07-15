@@ -55,6 +55,7 @@ function scopedShellCss(shellSettings: BuilderShellSettings) {
   --builder-global-row-margin-top: ${spacing(shellSettings.rowMarginTop, "rowMargin")};
   --builder-global-row-margin-bottom: ${spacing(shellSettings.rowMarginBottom, "rowMargin")};
   --builder-global-row-gap: ${spacing(shellSettings.rowGap, "rowGap")};
+  --builder-global-column-gap: ${spacing(shellSettings.columnGap, "columnGap")};
   --builder-global-element-padding-top: ${spacing(shellSettings.elementPaddingTop, "elementPadding")};
   --builder-global-element-padding-right: ${spacing(shellSettings.elementPaddingRight, "elementPadding")};
   --builder-global-element-padding-bottom: ${spacing(shellSettings.elementPaddingBottom, "elementPadding")};

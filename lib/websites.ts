@@ -3,7 +3,10 @@ import crypto from "node:crypto";
 import path from "node:path";
 import { isSaaSAdmin, type PublicSaaSUser } from "@/lib/auth";
 import { getRuntimeDataDir } from "@/lib/runtimeDataDir";
-import { ensureWebsiteBuilderData } from "@/lib/websiteBuilderData";
+import {
+  initializeWebsiteBuilderData,
+} from "@/lib/websiteBuilderData";
+import type { StarterWebsiteId } from "@/lib/starterWebsites";
 
 export type WebsiteStatus = "creating" | "active" | "maintenance" | "suspended";
 export type WebsiteType = "business" | "e-commerce";
@@ -444,6 +447,7 @@ export async function createWebsite(input: {
   name: string;
   slug: string;
   type?: WebsiteType;
+  starterId?: StarterWebsiteId;
 }) {
   const websites = await readWebsites();
   const slug = normalizeSlug(input.slug);
@@ -473,7 +477,11 @@ export async function createWebsite(input: {
   };
 
   await writeWebsites([...websites, website]);
-  await ensureWebsiteBuilderData(website.id);
+  await initializeWebsiteBuilderData({
+    websiteId: website.id,
+    websiteName: website.name,
+    starterId: input.starterId,
+  });
   return { website };
 }
 

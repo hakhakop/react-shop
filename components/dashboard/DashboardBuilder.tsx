@@ -344,6 +344,7 @@ const defaultShellSettings: BuilderShellSettings = {
   rowMarginTop: "none",
   rowMarginBottom: "none",
   rowGap: "lg",
+  columnGap: "md",
   elementPaddingTop: "sm",
   elementPaddingRight: "sm",
   elementPaddingBottom: "sm",
@@ -907,6 +908,7 @@ function gridSpacingClass(
 
 function DashboardTypog({
   as: As = "div",
+  area,
   typography,
   className,
   children,
@@ -916,7 +918,7 @@ function DashboardTypog({
   const Tag = As as any;
   const tp = typographyProps(
     typography,
-    inferTypographyArea(String(As), className),
+    area ?? inferTypographyArea(String(As), className),
   );
   const combined = [className, tp.className].filter(Boolean).join(" ");
   const combinedStyle = buttonTypographyStyle(combined, {
@@ -1116,18 +1118,33 @@ function getDefaultStateForKey(key: BuilderLayoutKey): BuilderState {
       template: undefined,
       sections: [
         {
-          id: `${key}-hero`,
-          kind: "hero",
-          title,
-          eyebrow: "Builder page",
-          body: "A custom React page created from the visual dashboard.",
+          id: `${key}-content`,
+          kind: "contentLayout",
+          title: "Page introduction",
           background: "#f7f7f4",
           backgroundMode: "full",
           contentMode: "boxed",
           colorScheme: "inherit",
-          layout: "split",
+          layout: "whole",
+          layoutColumns: 1,
           topSpacing: "medium",
           bottomSpacing: "medium",
+          layoutItems: [{
+            id: `${key}-content-column`,
+            rowId: `${key}-content-row`,
+            rowLayout: "whole",
+            blocks: [{
+              id: `${key}-hero`,
+              kind: "hero",
+              eyebrow: "New page",
+              title,
+              body: "Introduce this page with a clear headline, useful context, and a focused next step.",
+              buttonLabel: "Get Started",
+              buttonUrl: "#",
+              buttonStyle: "primary",
+              elementPadding: "lg",
+            }],
+          }],
           visible: true,
         },
       ],
@@ -6874,6 +6891,15 @@ export default function DashboardBuilder({
                 });
               }}
             />
+            <GlobalSpacingControl
+              label="Gap Between Columns"
+              sides={["gap"]}
+              values={{ gap: shellSettings.columnGap }}
+              context="columnGap"
+              onChange={(newVals) => {
+                updateShellSettings({ columnGap: newVals.gap });
+              }}
+            />
           </section>
 
           <section
@@ -9209,6 +9235,11 @@ function PreviewCanvas({
             shellSettings.rowGap,
             "rowGap",
           ),
+          "--builder-global-column-gap": resolveBuilderSpacing(
+            undefined,
+            "columnGap",
+            shellSettings.columnGap,
+          ).css,
           "--builder-global-element-padding-top": getPreviewElementSpacing(
             shellSettings.elementPaddingTop,
             "elementPadding",
@@ -10418,6 +10449,7 @@ function PreviewProductBlockContent({
 
 function InlineEditableText({
   as: Tag,
+  area,
   value,
   className,
   onChange,
@@ -10425,13 +10457,17 @@ function InlineEditableText({
   style,
 }: {
   as: "span" | "em" | "strong" | "p" | "h2" | "h3";
+  area?: TypographyArea;
   value: string;
   className?: string;
   onChange: (value: string) => void;
   typography?: any;
   style?: React.CSSProperties;
 }) {
-  const tp = typographyProps(typography, inferTypographyArea(Tag, className));
+  const tp = typographyProps(
+    typography,
+    area ?? inferTypographyArea(Tag, className),
+  );
   const combinedClassName = ["builder-inline-editable", className, tp.className]
     .filter(Boolean)
     .join(" ");
@@ -12231,11 +12267,11 @@ function PreviewSection({
                 device === "mobile"
                   ? "minmax(0, 1fr)"
                   : "repeat(12, minmax(0, 1fr))",
+              rowGap: "var(--builder-global-row-gap, 64px)",
               columnGap:
                 device === "mobile"
                   ? "0px"
-                  : resolveBuilderSpacing(undefined, "columnGap").css,
-              rowGap: "var(--builder-global-row-gap, 64px)",
+                  : "var(--builder-global-column-gap, 32px)",
             } as CSSProperties
           }
         >
@@ -12518,7 +12554,7 @@ function PreviewSection({
                         draggable
                         onMouseEnter={() => setHoveredBlockKey(blockKey)}
                         onMouseLeave={() => setHoveredBlockKey(null)}
-                        className={`builder-preview-layout-block is-${
+                        className={`builder-preview-layout-block shop-builder-element-shell is-${
                           block.kind ?? "text"
                         } ${
                           block.kind === "scrollPinnedDemo"
@@ -14919,13 +14955,11 @@ function PreviewSection({
                             />
                           </div>
                         ) : (
-                          <>
-                            <small>
-                              {layoutBlockLabels[block.kind ?? "text"]}
-                            </small>
+                          <div className="shop-builder-column-block shop-builder-column-block--text">
                             {block.eyebrow && (
                               <InlineEditableText
                                 as="em"
+                                area="eyebrow"
                                 value={block.eyebrow}
                                 typography={block.typography}
                                 onChange={(eyebrow) =>
@@ -14943,6 +14977,7 @@ function PreviewSection({
                             {block.title && (
                               <InlineEditableText
                                 as="strong"
+                                area="title"
                                 value={block.title}
                                 typography={block.typography}
                                 onChange={(title) =>
@@ -14960,6 +14995,7 @@ function PreviewSection({
                             {block.body && (
                               <InlineEditableText
                                 as="p"
+                                area="body"
                                 value={block.body}
                                 typography={block.typography}
                                 onChange={(body) =>
@@ -14997,22 +15033,29 @@ function PreviewSection({
                               )}
                             >
                               {block.buttonLabel && (
-                                <span className="builder-preview-cta">
+                                <DashboardTypog
+                                  as="span"
+                                  area="button"
+                                  className={`shop-builder-cta shop-builder-cta--${block.buttonStyle ?? "primary"} builder-preview-cta`}
+                                  typography={block.typography}
+                                >
                                   {block.buttonLabel}
-                                </span>
+                                </DashboardTypog>
                               )}
                               {(block.buttons ?? []).map((btn, btnIdx) => (
                                 <DashboardTypog
                                   key={btn.id ?? btnIdx}
                                   as="span"
-                                  className={`builder-preview-cta builder-preview-cta--${btn.style ?? "primary"}`}
+                                  area="button"
+                                  className={`shop-builder-cta shop-builder-cta--${btn.style ?? "primary"} builder-preview-cta`}
+                                  typography={block.typography}
                                   style={{ display: "inline-flex" }}
                                 >
                                   {btn.label || "Button"}
                                 </DashboardTypog>
                               ))}
                             </div>
-                          </>
+                          </div>
                         )}
                       </div>
                     );

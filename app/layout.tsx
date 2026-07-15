@@ -319,6 +319,7 @@ export default async function RootLayout({
   --builder-global-row-margin-top: ${sectionSpacingToCss(shellSettings.rowMarginTop, "rowMargin")};
   --builder-global-row-margin-bottom: ${sectionSpacingToCss(shellSettings.rowMarginBottom, "rowMargin")};
   --builder-global-row-gap: ${sectionSpacingToCss(shellSettings.rowGap, "rowGap")};
+  --builder-global-column-gap: ${sectionSpacingToCss(shellSettings.columnGap, "columnGap")};
   --builder-global-element-padding-top: ${sectionSpacingToCss(shellSettings.elementPaddingTop, "elementPadding")};
   --builder-global-element-padding-right: ${sectionSpacingToCss(shellSettings.elementPaddingRight, "elementPadding")};
   --builder-global-element-padding-bottom: ${sectionSpacingToCss(shellSettings.elementPaddingBottom, "elementPadding")};

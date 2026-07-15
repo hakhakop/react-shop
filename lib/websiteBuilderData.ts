@@ -1,6 +1,10 @@
 import { copyFile, mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { getRuntimeDataDir, getSeedDataDir } from "@/lib/runtimeDataDir";
+import {
+  createStarterWebsiteData,
+  type StarterWebsiteId,
+} from "@/lib/starterWebsites";
 
 const SEED_DATA_DIR = getSeedDataDir();
 
@@ -204,5 +208,42 @@ export async function ensureWebsiteBuilderData(websiteId: string) {
   await mkdir(dir, { recursive: true });
   await Promise.all(
     BUILDER_FILES.map((fileName) => seedBuilderFile(websiteId, fileName)),
+  );
+}
+
+export async function initializeWebsiteBuilderData(input: {
+  websiteId: string;
+  websiteName: string;
+  starterId?: StarterWebsiteId;
+}) {
+  const dir = getWebsiteBuilderDir(input.websiteId);
+  await mkdir(dir, { recursive: true });
+
+  const targets = BUILDER_FILES.map((fileName) =>
+    getWebsiteBuilderFilePath(input.websiteId, fileName),
+  );
+  const existing = await Promise.all(targets.map(fileExists));
+  if (existing.some(Boolean)) {
+    throw new Error("Website Builder data already exists and was not replaced.");
+  }
+
+  const starter = createStarterWebsiteData({
+    starterId: input.starterId,
+    websiteName: input.websiteName,
+  });
+  const files: Record<BuilderFileName, unknown> = {
+    "builder-layouts.json": starter.layouts,
+    "builder-pages.json": starter.pages,
+    "builder-shell.json": starter.shell,
+  };
+
+  await Promise.all(
+    BUILDER_FILES.map((fileName) =>
+      writeFile(
+        getWebsiteBuilderFilePath(input.websiteId, fileName),
+        `${JSON.stringify(files[fileName], null, 2)}\n`,
+        "utf8",
+      ),
+    ),
   );
 }
