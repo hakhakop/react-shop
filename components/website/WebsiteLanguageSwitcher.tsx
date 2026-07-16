@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { type CSSProperties } from "react";
 
 const languageLabels: Record<string, string> = {
   hy: "Հայերեն",
@@ -19,6 +20,7 @@ type WebsiteLanguageSwitcherProps = {
    *  Used inside the Visual Builder to wire into the same
    *  setContentLanguage that the sidebar selector uses. */
   onLanguageChange?: (language: string) => void;
+  triggerStyle?: CSSProperties;
 };
 
 export default function WebsiteLanguageSwitcher({
@@ -28,6 +30,7 @@ export default function WebsiteLanguageSwitcher({
   previewOnly = false,
   display = "native",
   onLanguageChange,
+  triggerStyle,
 }: WebsiteLanguageSwitcherProps) {
   const router = useRouter();
 
@@ -38,7 +41,11 @@ export default function WebsiteLanguageSwitcher({
   if (languagesToRender.length <= 1) return null;
 
   return (
-    <label className="website-language-switcher" aria-label="Website language">
+    <label
+      className="website-language-switcher"
+      aria-label="Website language"
+      style={triggerStyle}
+    >
       <span aria-hidden="true">文</span>
       <select
         value={activeLanguage}

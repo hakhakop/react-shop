@@ -119,12 +119,17 @@ export default function HeaderFrame({
     const themeTextMode = (): EffectiveHeaderTextMode => {
       const header = headerRef.current;
       const previewShell = header?.closest<HTMLElement>(".builder-preview-shell");
+      if (previewShell) {
+        const isDark =
+          previewShell.getAttribute("data-theme") === "dark" ||
+          previewShell.classList.contains("dark") ||
+          previewShell.classList.contains("builder-preview-scheme-dark");
+        return isDark ? "light" : "dark";
+      }
       const isDark =
         document.documentElement.classList.contains("dark") ||
         document.documentElement.getAttribute("data-theme") === "dark" ||
-        document.body.classList.contains("dark") ||
-        previewShell?.getAttribute("data-theme") === "dark" ||
-        previewShell?.classList.contains("dark");
+        document.body.classList.contains("dark");
       return isDark ? "light" : "dark";
     };
 
@@ -169,17 +174,22 @@ export default function HeaderFrame({
         ".shop-builder-section",
       ) ?? null;
       const fallbackTextMode = themeTextMode();
-      const pageTextMode =
-        textModeFromBackground(pageRoot) ??
-        textModeFromBackground(previewShell ?? null) ??
-        textModeFromBackground(document.body) ??
-        textModeFromBackground(document.documentElement) ??
-        textModeFromClasses(
-          pageRoot,
-          "shop-builder-main--scheme-dark",
-          "shop-builder-main--scheme-light",
-        ) ??
-        fallbackTextMode;
+      // A Builder preview is its own storefront theme boundary. Page content and
+      // the dashboard document must not override the scheme selected on the shell.
+      const pageTextMode = previewShell
+        ? fallbackTextMode
+        : (textModeFromBackground(pageRoot) ??
+          textModeFromBackground(document.body) ??
+          textModeFromBackground(document.documentElement) ??
+          textModeFromClasses(
+            pageRoot,
+            "shop-builder-main--scheme-dark",
+            "shop-builder-main--scheme-light",
+          ) ??
+          fallbackTextMode);
+      // Pull-under Headers resolve against the first section just like the
+      // storefront. The preview shell remains the page-level theme boundary,
+      // but it must not replace an explicit section scheme/background.
       const sectionTextMode =
         textModeFromClasses(
           firstSection,
@@ -195,6 +205,8 @@ export default function HeaderFrame({
         pageTextMode;
       const headerSurface =
         header?.querySelector<HTMLElement>(".site-header-pill-inner") ??
+        header?.querySelector<HTMLElement>(".site-header-princity-inner") ??
+        header?.querySelector<HTMLElement>(".site-header-main-inner") ??
         header?.querySelector<HTMLElement>(".site-header-princity") ??
         header?.querySelector<HTMLElement>(".site-header-main") ??
         header;
@@ -239,7 +251,25 @@ export default function HeaderFrame({
     };
     scheduleUpdateRef.current = scheduleUpdate;
 
-    const observer = new MutationObserver(scheduleUpdate);
+    const observer = new MutationObserver((mutations) => {
+      const header = headerRef.current;
+      const affectsThemeSource = mutations.some((mutation) => {
+        const target = mutation.target;
+        if (!(target instanceof HTMLElement) || !header?.contains(target)) {
+          return true;
+        }
+
+        // Header controls are never background-context sources. Only changes to
+        // the Header or its structural painted surfaces can affect text mode.
+        return (
+          target === header ||
+          target.matches(
+            ".site-header-main, .site-header-main-inner, .site-header-pill-inner, .site-header-princity, .site-header-princity-inner, .site-header-builder-extra-row",
+          )
+        );
+      });
+      if (affectsThemeSource) scheduleUpdate();
+    });
     observer.observe(document.documentElement, {
       childList: true,
       subtree: true,

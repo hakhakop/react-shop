@@ -27,6 +27,8 @@ import { visualStyleClassName, visualStyleToCss } from "@/lib/builderVisualStyle
 import { typographyProps } from "@/lib/builderTypography";
 import WebsiteLanguageSwitcher from "@/components/website/WebsiteLanguageSwitcher";
 import { resolveHeaderBehavior } from "@/lib/headerBehavior";
+import { resolveHeaderHeightCss } from "@/lib/headerHeight";
+import { resolveBuilderSpacing } from "@/lib/builderSpacing";
 
 function asString(value: unknown, fallback: string | null = null): string | null {
   if (typeof value === "string" && value.trim() !== "") return value.trim();
@@ -201,6 +203,7 @@ export default function HeaderShellView({
       : asString(settings.layout, "centered");
   const layout = normalizeLayout(layoutValue);
   const headerBehavior = resolveHeaderBehavior(shellSettings);
+  const headerHeight = resolveHeaderHeightCss(shellSettings.headerHeight);
   const topToolbarVisible = shellSettings.topToolbarVisible !== false;
   const effectiveTopBarText =
     typeof shellSettings.topToolbarText === "string"
@@ -302,6 +305,23 @@ export default function HeaderShellView({
       <HeaderCategoriesDropdown
         label={element?.categoriesLabel || "Categories"}
         showLabel={element?.categoriesShowLabel !== false}
+        display={element?.categoriesDisplay}
+        icon={element?.categoriesIcon}
+        iconPosition={element?.categoriesIconPosition}
+        dropdownAlign={element?.categoriesDropdownAlign}
+        isBuilder={Boolean(renderBuilderElement)}
+        triggerStyle={{
+          ...typographyProps(element?.typography, "button").style,
+          ...(element?.buttonBg ? { background: element.buttonBg } : {}),
+          ...(element?.buttonTextColor ? { color: element.buttonTextColor } : {}),
+          ...(element?.buttonBorderRadius ? { borderRadius: element.buttonBorderRadius } : {}),
+          ...(element?.buttonBorderWidth ? { borderWidth: element.buttonBorderWidth, borderStyle: "solid" } : {}),
+          ...(element?.buttonBorderColor ? { borderColor: element.buttonBorderColor } : {}),
+          ...(element?.buttonPaddingY ? { paddingTop: element.buttonPaddingY, paddingBottom: element.buttonPaddingY } : {}),
+          ...(element?.buttonPaddingX ? { paddingLeft: element.buttonPaddingX, paddingRight: element.buttonPaddingX } : {}),
+          ...(element?.buttonFontWeight ? { fontWeight: element.buttonFontWeight } : {}),
+          ...(element?.buttonLetterSpacing ? { letterSpacing: element.buttonLetterSpacing } : {}),
+        }}
       >
         {categories}
       </HeaderCategoriesDropdown>
@@ -310,7 +330,7 @@ export default function HeaderShellView({
     <HeaderNav
       items={publicItemsToRender}
       presentationById={menuPresentation}
-      categories={categories}
+      categories={compositionTypes.has("categories") ? categories : null}
       serviceHomepageMode={serviceHomepageMode}
       scopedPreviewWebsiteId={scopedPreviewWebsiteId}
       activePageKey={scopedPreviewPage}
@@ -391,6 +411,16 @@ export default function HeaderShellView({
     const visualBackgroundImage = visualStyles.backgroundImage as string | undefined;
     const localGradient = localBackground?.includes("gradient(") ? localBackground : undefined;
     const localColor = localGradient ? undefined : localBackground;
+    const resolvedTopPadding = rowComp.rowTopSpacing !== undefined
+      ? resolveBuilderSpacing(rowComp.rowTopSpacing, "rowPadding", shellSettings.rowPaddingTop).css
+      : visualStyles.paddingTop === undefined
+        ? resolveBuilderSpacing("sm", "rowPadding").css
+        : undefined;
+    const resolvedBottomPadding = rowComp.rowBottomSpacing !== undefined
+      ? resolveBuilderSpacing(rowComp.rowBottomSpacing, "rowPadding", shellSettings.rowPaddingBottom).css
+      : visualStyles.paddingBottom === undefined
+        ? resolveBuilderSpacing("sm", "rowPadding").css
+        : undefined;
 
     return {
       ...visualStyles,
@@ -400,8 +430,8 @@ export default function HeaderShellView({
       ...(rowComp.headerGap ? { "--header-builder-row-gap": rowComp.headerGap } : {}),
       ...(rowComp.headerJustify ? { "--header-builder-row-justify": rowComp.headerJustify } : {}),
       ...(rowComp.headerAlign ? { "--header-builder-row-align": rowComp.headerAlign } : {}),
-      ...(rowComp.rowTopSpacing ? { paddingTop: rowComp.rowTopSpacing } : {}),
-      ...(rowComp.rowBottomSpacing ? { paddingBottom: rowComp.rowBottomSpacing } : {}),
+      ...(resolvedTopPadding !== undefined ? { paddingTop: resolvedTopPadding } : {}),
+      ...(resolvedBottomPadding !== undefined ? { paddingBottom: resolvedBottomPadding } : {}),
       ...(rowComp.rowTopMargin ? { marginTop: rowComp.rowTopMargin } : {}),
       ...(rowComp.rowBottomMargin ? { marginBottom: rowComp.rowBottomMargin } : {}),
       ...(rowComp.rowBorderRadius !== undefined ? { borderRadius: `${rowComp.rowBorderRadius}px` } : {}),
@@ -448,16 +478,31 @@ export default function HeaderShellView({
       );
     }
     if (element.type === "categories") content = renderCategoriesMega(element);
-    if (element.type === "language") content = (
-      <WebsiteLanguageSwitcher
-        activeLanguage={activeContentLanguage}
-        enabledLanguages={enabledContentLanguages}
-        preferenceKey={languagePreferenceKey}
-        previewOnly={languageSwitcherPreviewOnly}
-        display={element.languageDisplay}
-        onLanguageChange={onContentLanguageChange}
-      />
-    );
+    if (element.type === "language") {
+      const triggerStyle: CSSProperties = {
+        ...(element.buttonBg ? { background: element.buttonBg } : {}),
+        ...(element.buttonTextColor ? { color: element.buttonTextColor } : {}),
+        ...(element.buttonBorderRadius ? { borderRadius: element.buttonBorderRadius } : {}),
+        ...(element.buttonBorderWidth ? { borderWidth: element.buttonBorderWidth, borderStyle: "solid" } : {}),
+        ...(element.buttonBorderColor ? { borderColor: element.buttonBorderColor } : {}),
+        ...(element.buttonPaddingY ? { paddingTop: element.buttonPaddingY, paddingBottom: element.buttonPaddingY } : {}),
+        ...(element.buttonPaddingX ? { paddingLeft: element.buttonPaddingX, paddingRight: element.buttonPaddingX } : {}),
+        ...(element.buttonFontWeight ? { fontWeight: element.buttonFontWeight } : {}),
+        ...(element.buttonLetterSpacing ? { letterSpacing: element.buttonLetterSpacing } : {}),
+        ...typographyProps(element.typography, "button").style,
+      };
+      content = (
+        <WebsiteLanguageSwitcher
+          activeLanguage={activeContentLanguage}
+          enabledLanguages={enabledContentLanguages}
+          preferenceKey={languagePreferenceKey}
+          previewOnly={languageSwitcherPreviewOnly}
+          display={element.languageDisplay}
+          onLanguageChange={onContentLanguageChange}
+          triggerStyle={triggerStyle}
+        />
+      );
+    }
     const alignment = element.type === "logo" ? element.imageAlignment : element.elementAlign;
     const elementStyle: CSSProperties = {
       ...visualStyleToCss(element.visualStyle),
@@ -482,11 +527,19 @@ export default function HeaderShellView({
             ...typographyProps(element.typography).style,
           } as CSSProperties)
         : {}),
-      ...(element.type === "button"
+      ...(element.type === "button" || element.type === "categories" || element.type === "language"
         ? ({
             "--header-builder-button-hover-bg": element.buttonHoverBg,
             "--header-builder-button-hover-text": element.buttonHoverTextColor,
+            "--header-builder-button-hover-border": element.buttonHoverBorderColor,
+            "--header-builder-button-hover-transform": element.buttonHoverTransform,
+            "--header-builder-button-hover-shadow": element.buttonHoverBoxShadow,
+            "--header-builder-button-hover-bg-fallback": element.buttonBg || "",
+            "--header-builder-button-hover-text-fallback": element.buttonTextColor || "",
           } as CSSProperties)
+        : {}),
+      ...(element.type === "categories" || element.type === "language"
+        ? typographyProps(element.typography, "button").style
         : {}),
     };
     const styledContent = (
@@ -591,6 +644,8 @@ export default function HeaderShellView({
         "--header-builder-row-gap": headerComposition.rowGap,
         "--header-builder-row-justify": headerComposition.rowJustify,
         "--header-builder-row-align": headerComposition.rowAlign,
+        "--header-builder-height": headerHeight,
+        ...(headerHeight ? { "--header-main-h": headerHeight } : {}),
         zIndex: shellSettings.headerZIndex ?? 40,
       } as CSSProperties}
     >

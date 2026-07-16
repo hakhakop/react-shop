@@ -3,8 +3,17 @@
 import Link from "next/link";
 import { getCategoryTree, type CategoryTreeItem } from "../lib/categories";
 import type { SaaSWebsite } from "@/lib/websites";
+import { ChevronRight, ArrowUpRight } from "lucide-react";
 
-function RootCategoryBlock({ cat }: { cat: CategoryTreeItem }) {
+function RootCategoryBlock({
+  cat,
+  showCounts,
+  showHierarchy,
+}: {
+  cat: CategoryTreeItem;
+  showCounts: boolean;
+  showHierarchy: boolean;
+}) {
   const hasChildren = cat.children && cat.children.length > 0;
 
   return (
@@ -14,14 +23,14 @@ function RootCategoryBlock({ cat }: { cat: CategoryTreeItem }) {
         className="category-mega-root-link"
       >
         <span>{cat.name}</span>
-        {hasChildren && (
+        {hasChildren && showCounts && (
           <span className="category-mega-count">
             {cat.children.length}
           </span>
         )}
       </Link>
 
-      {hasChildren && (
+      {hasChildren && showHierarchy && (
         <ul className="category-mega-children">
           {cat.children.map((child) => (
             <li key={child.id}>
@@ -48,8 +57,14 @@ function RootCategoryBlock({ cat }: { cat: CategoryTreeItem }) {
  */
 export default async function CategoryMegaMenu({
   website,
+  showAllCategories = true,
+  showCounts = true,
+  showHierarchy = true,
 }: {
   website?: SaaSWebsite | null;
+  showAllCategories?: boolean;
+  showCounts?: boolean;
+  showHierarchy?: boolean;
 }) {
   if (website && website.type !== "e-commerce") return null;
 
@@ -61,20 +76,59 @@ export default async function CategoryMegaMenu({
 
   return (
     <div className="category-mega-menu">
-      <div className="category-mega-header">
-        <span>Shop by category</span>
-        <Link
-          href="/categories"
-          className="category-mega-all-link"
-        >
-          View full category list
-        </Link>
+      {/* Desktop version */}
+      <div className="category-mega-menu-desktop">
+        <div className="category-mega-header">
+          <span>Shop by category</span>
+          {showAllCategories ? (
+            <Link href="/categories" className="category-mega-all-link">
+              View full category list
+            </Link>
+          ) : null}
+        </div>
+
+        <div className="category-mega-grid">
+          {tree.map((root) => (
+            <RootCategoryBlock
+              key={root.id}
+              cat={root}
+              showCounts={showCounts}
+              showHierarchy={showHierarchy}
+            />
+          ))}
+        </div>
       </div>
 
-      <div className="category-mega-grid">
-        {tree.map((root) => (
-          <RootCategoryBlock key={root.id} cat={root} />
-        ))}
+      {/* Mobile version */}
+      <div className="category-mega-menu-mobile">
+        <div className="category-mobile-list">
+          {tree.map((root) => {
+            const hasChildren = root.children && root.children.length > 0;
+            return (
+              <Link
+                key={root.id}
+                href={`/category/${root.slug}`}
+                className="category-mobile-row"
+              >
+                <div className="category-mobile-row-left">
+                  <span className="category-mobile-name">{root.name}</span>
+                  {hasChildren && showCounts && (
+                    <span className="category-mobile-count-badge">
+                      {root.children.length}
+                    </span>
+                  )}
+                </div>
+                <ChevronRight size={16} className="category-mobile-chevron" />
+              </Link>
+            );
+          })}
+          {showAllCategories && (
+            <Link href="/categories" className="category-mobile-row category-mobile-row--all">
+              <span className="category-mobile-name">View full category list</span>
+              <ArrowUpRight size={16} className="category-mobile-external-icon" />
+            </Link>
+          )}
+        </div>
       </div>
     </div>
   );

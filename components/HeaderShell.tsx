@@ -91,6 +91,9 @@ export default async function HeaderShell({
     ) as typeof headerLayout.sections,
   };
   const headerComposition = resolveHeaderBuilderComposition(localizedHeaderLayout);
+  const categoryElement = headerComposition.elements.find(
+    (element) => element.type === "categories",
+  );
 
   return (
     <HeaderShellView
@@ -113,7 +116,14 @@ export default async function HeaderShell({
       scopedPreviewPage={scopedPreviewPage}
       scopedPreviewPages={scopedPreviewPages}
       hideSaaSEntry={hideSaaSEntry}
-      categoriesContent={<CategoryMegaMenu website={website} />}
+      categoriesContent={categoryElement ? (
+        <CategoryMegaMenu
+          website={website}
+          showAllCategories={categoryElement.categoriesShowAll !== false}
+          showCounts={categoryElement.categoriesShowCounts !== false}
+          showHierarchy={categoryElement.categoriesShowHierarchy !== false}
+        />
+      ) : null}
       headerComposition={headerComposition}
       publicAnchorId={localizedHeaderLayout.sections[0]?.anchorId}
       activeContentLanguage={selectedContentLanguage}

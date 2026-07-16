@@ -1020,6 +1020,16 @@ function HeaderDocumentSettings({
             <input type="number" min={0} max={999} value={settings.headerZIndex ?? 40} onChange={(event) => onChange({ headerZIndex: Number(event.target.value) })} />
           </label>
         </div>
+        <label className="builder-field">
+          <span>Header height</span>
+          <select value={settings.headerHeight ?? "auto"} onChange={(event) => onChange({ headerHeight: event.target.value })}>
+            <option value="auto">Auto (Responsive)</option>
+            <option value="compact">Compact (56px)</option>
+            <option value="comfortable">Comfortable (72px)</option>
+            <option value="spacious">Spacious (88px)</option>
+            <option value="showcase">Showcase (104px)</option>
+          </select>
+        </label>
       </details>
 
       <details className="builder-collapse">
@@ -3954,6 +3964,8 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                   "slider",
                                                   "text",
                                                   "grid",
+                                                  "headerCategories",
+                                                  "headerLanguage",
                                                 ].includes(
                                                   block.kind ?? "",
                                                 ) && (
@@ -5235,12 +5247,53 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                       <span>Show label beside burger icon</span>
                                                     </label>
                                                     <label className="builder-field">
+                                                      <span>Display Mode</span>
+                                                      <select value={block.headerCategoriesDisplay ?? "icon-label"} onChange={(event) => updateSelectedLayoutBlock(index, blockIndex, { headerCategoriesDisplay: event.target.value as BuilderLayoutBlock["headerCategoriesDisplay"] })}>
+                                                        <option value="icon-label">Icon and Label</option>
+                                                        <option value="icon">Icon Only</option>
+                                                        <option value="label">Label Only</option>
+                                                      </select>
+                                                    </label>
+                                                    <label className="builder-field">
+                                                      <span>Icon Style</span>
+                                                      <select value={block.headerCategoriesIcon ?? "menu"} onChange={(event) => updateSelectedLayoutBlock(index, blockIndex, { headerCategoriesIcon: event.target.value as BuilderLayoutBlock["headerCategoriesIcon"] })}>
+                                                        <option value="menu">Menu (Hamburger)</option>
+                                                        <option value="grid">Grid (Layout)</option>
+                                                      </select>
+                                                    </label>
+                                                    <label className="builder-field">
+                                                      <span>Icon Position</span>
+                                                      <select value={block.headerCategoriesIconPosition ?? "left"} onChange={(event) => updateSelectedLayoutBlock(index, blockIndex, { headerCategoriesIconPosition: event.target.value as BuilderLayoutBlock["headerCategoriesIconPosition"] })}>
+                                                        <option value="left">Left</option>
+                                                        <option value="right">Right</option>
+                                                      </select>
+                                                    </label>
+                                                    <label className="builder-field">
+                                                      <span>Dropdown Alignment</span>
+                                                      <select value={block.headerCategoriesDropdownAlign ?? "left"} onChange={(event) => updateSelectedLayoutBlock(index, blockIndex, { headerCategoriesDropdownAlign: event.target.value as BuilderLayoutBlock["headerCategoriesDropdownAlign"] })}>
+                                                        <option value="left">Left</option>
+                                                        <option value="right">Right</option>
+                                                      </select>
+                                                    </label>
+                                                    <label className="builder-field">
                                                       <span>Alignment</span>
                                                       <select value={block.elementAlign ?? "center"} onChange={(event) => updateSelectedLayoutBlock(index, blockIndex, { elementAlign: event.target.value as BuilderLayoutBlock["elementAlign"] })}>
                                                         <option value="left">Left</option>
                                                         <option value="center">Center</option>
                                                         <option value="right">Right</option>
                                                       </select>
+                                                    </label>
+                                                    <label className="builder-check">
+                                                      <input type="checkbox" checked={block.headerCategoriesShowAll !== false} onChange={(event) => updateSelectedLayoutBlock(index, blockIndex, { headerCategoriesShowAll: event.target.checked })} />
+                                                      <span>Show &quot;View full category list&quot; link</span>
+                                                    </label>
+                                                    <label className="builder-check">
+                                                      <input type="checkbox" checked={block.headerCategoriesShowCounts !== false} onChange={(event) => updateSelectedLayoutBlock(index, blockIndex, { headerCategoriesShowCounts: event.target.checked })} />
+                                                      <span>Show subcategory counts</span>
+                                                    </label>
+                                                    <label className="builder-check">
+                                                      <input type="checkbox" checked={block.headerCategoriesShowHierarchy !== false} onChange={(event) => updateSelectedLayoutBlock(index, blockIndex, { headerCategoriesShowHierarchy: event.target.checked })} />
+                                                      <span>Show subcategory hierarchy</span>
                                                     </label>
                                                   </>
                                                 ) : block.kind === "headerLanguage" ? (

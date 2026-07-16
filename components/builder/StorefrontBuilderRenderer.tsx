@@ -47,6 +47,10 @@ import type {
   BuilderSection,
 } from "@/lib/builderLayouts";
 import { typographyProps, type TypographyArea } from "@/lib/builderTypography";
+import {
+  resolveBuilderRowGap,
+  resolveBuilderRowStyle,
+} from "@/lib/builderRowStyles";
 import type { BuilderVisualStyle } from "@/lib/builderVisualStyle";
 import {
   hasBuilderVisualSpacing,
@@ -2432,6 +2436,7 @@ function ContentLayoutBlock({
           {block.title && (
             <Typog
               as="h3"
+              area="title"
               className={titleClassName}
               typography={block.typography}
               style={customStyle}
@@ -2711,13 +2716,20 @@ function ContentLayoutBlock({
         )}
         <div>
           {block.eyebrow && (
-            <span className="shop-builder-panel-meta" style={panelMetaStyle}>
+            <Typog
+              as="span"
+              area="eyebrow"
+              typography={block.typography}
+              className="shop-builder-panel-meta"
+              style={panelMetaStyle}
+            >
               {block.eyebrow}
-            </span>
+            </Typog>
           )}
           {block.title && (
             <Typog
               as="h3"
+              area="title"
               typography={block.typography}
               style={panelTitleStyle}
             >
@@ -2752,7 +2764,12 @@ function ContentLayoutBlock({
             </Typog>
           )}
           {block.body && (
-            <Typog as="p" typography={block.typography} style={panelBodyStyle}>
+            <Typog
+              as="p"
+              area="body"
+              typography={block.typography}
+              style={panelBodyStyle}
+            >
               {block.typewriterEnabled && !block.title ? (
                 <TypewriterText
                   text={block.body}
@@ -2795,6 +2812,7 @@ function ContentLayoutBlock({
           {block.buttonLabel && block.buttonUrl && (
             <Typog
               as="a"
+              area="button"
               className="shop-builder-cta"
               href={block.buttonUrl}
               typography={block.typography}
@@ -2806,6 +2824,7 @@ function ContentLayoutBlock({
             <Typog
               key={btn.id ?? btnIdx}
               as="a"
+              area="button"
               className={`shop-builder-cta shop-builder-cta--${btn.style ?? "primary"}`}
               href={btn.url}
               target={btn.target === "_blank" ? "_blank" : undefined}
@@ -3128,8 +3147,8 @@ function Typog({
   );
   const combined = [className, tp.className].filter(Boolean).join(" ");
   const combinedStyle = buttonTypographyStyle(combined, {
-    ...tp.style,
     ...style,
+    ...tp.style,
   });
   const isRich = isRichPreviewText(children);
   if (isRich) {
@@ -3191,33 +3210,15 @@ function rowStyle(
   rowItem: any,
   parentScheme: "light" | "dark" | "auto" = "light",
 ): CSSProperties {
-  const visual = rowItem?.rowVisualStyle as BuilderVisualStyle | undefined;
-  const visualCss = visualStyleToCss(visual);
-  const styleObj: any = {};
-
-  if (rowItem?.rowBackground) {
-    styleObj.background = rowItem.rowBackground;
-  }
-  styleObj["--builder-section-padding-top"] =
-    rowItem?.rowTopSpacing && rowItem.rowTopSpacing !== "inherit"
-      ? resolveBuilderSpacing(rowItem.rowTopSpacing, "rowPadding").css
-      : "var(--builder-global-row-padding-top, 32px)";
-  styleObj["--builder-section-padding-bottom"] =
-    rowItem?.rowBottomSpacing && rowItem.rowBottomSpacing !== "inherit"
-      ? resolveBuilderSpacing(rowItem.rowBottomSpacing, "rowPadding").css
-      : "var(--builder-global-row-padding-bottom, 32px)";
-  styleObj["--builder-section-margin-top"] =
-    rowItem?.rowTopMargin && rowItem.rowTopMargin !== "inherit"
-      ? resolveBuilderSpacing(rowItem.rowTopMargin, "rowMargin").css
-      : "var(--builder-global-row-margin-top, 0px)";
-  styleObj["--builder-section-margin-bottom"] =
-    rowItem?.rowBottomMargin && rowItem.rowBottomMargin !== "inherit"
-      ? resolveBuilderSpacing(rowItem.rowBottomMargin, "rowMargin").css
-      : "var(--builder-global-row-margin-bottom, 0px)";
+  const styleObj = resolveBuilderRowStyle(rowItem, {
+    rowPaddingTop: "var(--builder-global-row-padding-top, 32px)",
+    rowPaddingBottom: "var(--builder-global-row-padding-bottom, 32px)",
+    rowMarginTop: "var(--builder-global-row-margin-top, 0px)",
+    rowMarginBottom: "var(--builder-global-row-margin-bottom, 0px)",
+  }) as CSSProperties & Record<string, string | undefined>;
   if (rowItem?.rowBorderRadius !== undefined) {
     styleObj["--builder-radius"] = `${rowItem.rowBorderRadius}px`;
     styleObj["--builder-card-radius"] = `${rowItem.rowBorderRadius}px`;
-    styleObj.borderRadius = `${rowItem.rowBorderRadius}px`;
   }
 
   const resolvedScheme = resolveColorSchemeForBackground(
@@ -3226,7 +3227,7 @@ function rowStyle(
   );
   const contextVars = getContextVars(resolvedScheme, rowItem?.rowBackground);
 
-  return { ...styleObj, ...contextVars, ...visualCss };
+  return { ...styleObj, ...contextVars };
 }
 
 function ContentLayoutSection({
@@ -3318,10 +3319,10 @@ function ContentLayoutSection({
         style={{
           display: "flex",
           flexDirection: "column",
-          gap: "var(--builder-global-row-gap, 64px)",
+          gap: 0,
         }}
       >
-        {layoutRows.map((row) => {
+        {layoutRows.map((row, rowIndex) => {
           const rowItem = row.items[0];
           const isRowAnimatedBg =
             rowItem?.rowBackgroundEffect === "antigravity" ||
@@ -3348,9 +3349,16 @@ function ContentLayoutSection({
             sectionColorScheme === "auto" ? "light" : sectionColorScheme,
           );
 
+          const typedRowItem = rowItem as
+            | NonNullable<BuilderSection["layoutItems"]>[number]
+            | undefined;
+          const rowGap =
+            typedRowItem?.rowGap && typedRowItem.rowGap !== "inherit"
+            ? resolveBuilderRowGap(typedRowItem, undefined).css
+            : "var(--builder-global-row-gap, 64px)";
           return (
-            <div
-              key={row.id}
+            <div key={row.id} style={{ paddingTop: rowIndex > 0 ? rowGap : 0 }}>
+              <div
               className={`shop-builder-content-row ${
                 isFullRowTheme
                   ? "shop-builder-section--effect-antigravity"
@@ -3362,10 +3370,6 @@ function ContentLayoutSection({
                 display: "grid",
                 gridTemplateColumns: "repeat(12, minmax(0, 1fr))",
                 columnGap: "var(--builder-global-column-gap, 32px)",
-                paddingTop: "var(--builder-section-padding-top, 0px)",
-                paddingBottom: "var(--builder-section-padding-bottom, 0px)",
-                marginTop: "var(--builder-section-margin-top, 0px)",
-                marginBottom: "var(--builder-section-margin-bottom, 0px)",
                 ...rowStyle(rowItem, sectionColorScheme),
                 ...rowAnimationAttrs.style,
               }}
@@ -3495,6 +3499,7 @@ function ContentLayoutSection({
                   </article>
                 );
               })}
+              </div>
             </div>
           );
         })}

@@ -11,7 +11,7 @@
   "headerBrandText": "WebPages",
   "headerLogoUrl": "https://cms.webpages.am/wp-content/uploads/2026/06/logo-2-1-scaled.png",
   "headerLogoAlt": "WebPages logo",
-  "headerLogoMaxWidth": 161,
+  "headerLogoMaxWidth": 300,
   "headerButtonLabel": "Start",
   "headerButtonUrl": "/client",
   "headerIconVariant": "muted",
@@ -27,6 +27,7 @@
   "headerTransparent": false,
   "headerOverlay": true,
   "headerWidthMode": "boxed",
+  "headerHeight": "compact",
   "headerZIndex": 40,
   "sectionPaddingTop": "lg",
   "sectionPaddingBottom": "lg",
@@ -176,5 +177,5 @@
     }
   ],
   "headerSticky": true,
-  "updatedAt": "2026-07-15T12:44:40.427Z"
+  "updatedAt": "2026-07-16T18:07:14.790Z"
 }

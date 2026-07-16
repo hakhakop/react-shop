@@ -13,11 +13,16 @@ const sources = {
   typography: readFileSync(resolve(root, "lib/builderTypography.ts"), "utf8"),
   spacing: readFileSync(resolve(root, "lib/builderSpacing.ts"), "utf8"),
   visualStyle: readFileSync(resolve(root, "lib/builderVisualStyle.ts"), "utf8"),
+  rowStyles: readFileSync(resolve(root, "lib/builderRowStyles.ts"), "utf8"),
   dashboardCss: readFileSync(resolve(root, "app/styles/dashboard.css"), "utf8"),
+  headerView: readFileSync(resolve(root, "components/HeaderShellView.tsx"), "utf8"),
+  headerComposition: readFileSync(resolve(root, "lib/headerBuilderComposition.ts"), "utf8"),
+  headerDropdown: readFileSync(resolve(root, "components/HeaderCategoriesDropdown.tsx"), "utf8"),
+  headerHeight: readFileSync(resolve(root, "lib/headerHeight.ts"), "utf8"),
 };
 
 const require = createRequire(import.meta.url);
-function loadTypeScriptModule(path) {
+function loadTypeScriptModule(path, dependencies = {}) {
   const source = readFileSync(path, "utf8");
   const output = ts.transpileModule(source, {
     compilerOptions: {
@@ -28,12 +33,27 @@ function loadTypeScriptModule(path) {
     fileName: path,
   }).outputText;
   const mod = { exports: {} };
-  new Function("require", "module", "exports", output)(require, mod, mod.exports);
+  const localRequire = (specifier) => dependencies[specifier] ?? require(specifier);
+  new Function("require", "module", "exports", output)(localRequire, mod, mod.exports);
   return mod.exports;
 }
 
 const typographyRuntime = loadTypeScriptModule(resolve(root, "lib/builderTypography.ts"));
 const spacingRuntime = loadTypeScriptModule(resolve(root, "lib/builderSpacing.ts"));
+const visualStyleRuntime = loadTypeScriptModule(
+  resolve(root, "lib/builderVisualStyle.ts"),
+  { "@/lib/builderSpacing": spacingRuntime },
+);
+const rowStyleRuntime = loadTypeScriptModule(
+  resolve(root, "lib/builderRowStyles.ts"),
+  {
+    "@/lib/builderSpacing": spacingRuntime,
+    "@/lib/builderVisualStyle": visualStyleRuntime,
+  },
+);
+const headerHeightRuntime = loadTypeScriptModule(
+  resolve(root, "lib/headerHeight.ts"),
+);
 
 const contracts = [
   { element: "all text-capable elements", field: "typography", inspector: ["TypographyPanel", "updateTypographyArea"], builder: ["typographyProps"], storefront: ["typographyProps"], shared: ["resolveTypographyInput"] },
@@ -45,10 +65,13 @@ const contracts = [
   { element: "all elements", field: "background/border/radius", inspector: ["elementBackground", "borderRadius", "visualStyle"], builder: ["elementBackground", "borderRadius", "visualStyleToCss"], storefront: ["elementBackground", "borderRadius", "visualStyleToCss"], shared: ["visualStyleToCss"] },
   { element: "grid/products", field: "gridGap", inspector: ["gridGap"], builder: ["block.gridGap"], storefront: ["block.gridGap"], shared: ["resolveBuilderSpacing"] },
   { element: "section", field: "background and spacing", inspector: ["backgroundMode", "topSpacing", "bottomSpacing"], builder: ["section.background", "getPreviewSpacing"], storefront: ["section.background", "getSpacingValue"], shared: ["resolveBuilderSpacing"] },
-  { element: "row/column", field: "gap and alignment", inspector: ["rowGap", "columnGap"], builder: ["--builder-global-row-gap", "columnGap"], storefront: ["--builder-global-row-gap", "columnGap"], shared: ["resolveBuilderSpacing"] },
+  { element: "row/column", field: "gap, spacing, surface, and alignment", inspector: ["rowGap", "rowTopSpacing", "headerJustify", "headerAlign"], builder: ["resolveBuilderRowGap", "resolveBuilderRowStyle", "shop-builder-content-row"], storefront: ["resolveBuilderRowGap", "rowStyle", "shop-builder-content-row"], shared: ["resolveBuilderRowGap", "resolveBuilderRowStyle", "resolveBuilderRowAlignment"] },
+  { element: "panel", field: "title/body/button/eyebrow typography", inspector: ['kind === "panel"', "TypographyPanel"], builder: ['area="title"', 'area="body"', "panelTitleStyle", "panelBodyStyle"], storefront: ['area="title"', 'area="body"', "panelTitleStyle", "panelBodyStyle"], shared: ["resolveTypographyInput"] },
+  { element: "header", field: "document height", inspector: ["headerHeight", "Header height"], builder: ["headerHeight"], storefront: ["--header-builder-height"], shared: ["resolveHeaderHeightCss"] },
+  { element: "header category menu", field: "document element composition", inspector: ["headerCategoriesDisplay", "headerCategoriesDropdownAlign"], builder: ["headerCategories", "builderHeaderCategoriesContent"], storefront: ["HeaderCategoriesDropdown", 'element.type === "categories"'], shared: ["categoriesDisplay", "categoriesDropdownAlign"] },
 ];
 
-const sharedSource = `${sources.typography}\n${sources.spacing}\n${sources.visualStyle}`;
+const sharedSource = `${sources.typography}\n${sources.spacing}\n${sources.visualStyle}\n${sources.rowStyles}`;
 const missing = [];
 const report = [];
 
@@ -56,8 +79,12 @@ for (const contract of contracts) {
   const checks = {
     inspector: contract.inspector.every((token) => sources.inspector.includes(token)),
     builder: contract.builder.every((token) => sources.builder.includes(token)),
-    storefront: contract.storefront.every((token) => sources.storefront.includes(token)),
-    shared: contract.shared.every((token) => sharedSource.includes(token)),
+    storefront: contract.storefront.every((token) =>
+      `${sources.storefront}\n${sources.headerView}\n${sources.headerDropdown}`.includes(token),
+    ),
+    shared: contract.shared.every((token) =>
+      `${sharedSource}\n${sources.headerComposition}\n${sources.headerHeight}`.includes(token),
+    ),
   };
   const status = Object.values(checks).every(Boolean) ? "OK" : "MISMATCH";
   report.push({ ...contract, ...checks, status });
@@ -76,10 +103,22 @@ const distinctTypography = {
   button: { fontSize: "13px", textAlign: "left" },
 };
 
-function renderedTypography(tag, area, typography = distinctTypography) {
+function renderedTypography(
+  tag,
+  area,
+  typography = distinctTypography,
+  presentationStyle = {},
+) {
   const props = typographyRuntime.typographyProps(typography, area);
   return renderToStaticMarkup(
-    React.createElement(tag, { className: props.className, style: props.style }, `${area} content`),
+    React.createElement(
+      tag,
+      {
+        className: props.className,
+        style: { ...presentationStyle, ...props.style },
+      },
+      `${area} content`,
+    ),
   );
 }
 
@@ -147,6 +186,76 @@ const behavioralReport = [
     assert(row === "128px" && column === "16px" && row !== column, `Unexpected row/column gaps ${row}/${column}`);
     assert(sources.builder.includes("--builder-global-column-gap") && sources.storefront.includes("--builder-global-column-gap"), "Shared column-gap variable is not used by both renderers");
     return `row ${row}; column ${column}`;
+  }),
+  behavioralCase("row", "inherited and explicit row gap", () => {
+    const inherited = rowStyleRuntime.resolveBuilderRowGap({}, "lg");
+    const explicit = rowStyleRuntime.resolveBuilderRowGap({ rowGap: "sm" }, "lg");
+    const cleared = rowStyleRuntime.resolveBuilderRowGap({ rowGap: "inherit" }, "lg");
+    assert(inherited.css === "64px", `Inherited Row Gap was ${inherited.css}`);
+    assert(explicit.css === "16px", `Explicit Row Gap was ${explicit.css}`);
+    assert(cleared.css === inherited.css, "Clearing Row Gap did not restore the global value");
+    return `global ${inherited.css}; override ${explicit.css}; cleared ${cleared.css}`;
+  }),
+  behavioralCase("row", "padding and responsive inherited value", () => {
+    const desktop = rowStyleRuntime.resolveBuilderRowStyle(
+      { rowTopSpacing: "inherit", rowBottomSpacing: "sm" },
+      { rowPaddingTop: "2xl", rowPaddingBottom: "lg" },
+    );
+    const compact = rowStyleRuntime.resolveBuilderRowStyle(
+      { rowTopSpacing: "inherit", rowBottomSpacing: "sm" },
+      { rowPaddingTop: "md", rowPaddingBottom: "lg" },
+    );
+    assert(desktop.paddingTop === "128px", `Desktop inherited padding was ${desktop.paddingTop}`);
+    assert(compact.paddingTop === "32px", `Compact inherited padding was ${compact.paddingTop}`);
+    assert(desktop.paddingBottom === "16px" && compact.paddingBottom === "16px", "Explicit row padding did not survive inherited context changes");
+    return "inherited top changes 128px to 32px; explicit bottom remains 16px";
+  }),
+  behavioralCase("row", "horizontal and vertical alignment", () => {
+    const alignment = rowStyleRuntime.resolveBuilderRowAlignment({
+      headerJustify: "space-between",
+      headerAlign: "end",
+    });
+    assert(alignment.justifyContent === "space-between", "Horizontal alignment was not resolved");
+    assert(alignment.alignItems === "flex-end", "Vertical alignment was not resolved");
+    return "space-between / flex-end";
+  }),
+  behavioralCase("panel", "independent title and body font size", () => {
+    const cardPresentation = { fontSize: "var(--builder-card-title-size, 24px)" };
+    const title = renderedTypography("h3", "title", distinctTypography, cardPresentation);
+    const body = renderedTypography("p", "body", distinctTypography, {
+      fontSize: "var(--builder-card-content-size, 16px)",
+    });
+    assert(title.includes("font-size:41px"), "Panel title typography was overwritten by card presentation styles");
+    assert(body.includes("font-size:19px"), "Panel body typography was overwritten by card presentation styles");
+    assert(!title.includes("font-size:19px") && !body.includes("font-size:41px"), "Panel title/body areas are not independent");
+    return "title 41px; body 19px; card defaults remain fallback-only";
+  }),
+  behavioralCase("panel", "alignment and output change", () => {
+    const initial = renderedTypography("p", "body");
+    const changed = renderedTypography("p", "body", {
+      ...distinctTypography,
+      body: { ...distinctTypography.body, fontSize: "31px", textAlign: "center" },
+    });
+    assert(changed.includes("font-size:31px") && changed.includes("text-align:center"), "Panel body output ignored changed typography");
+    assert(changed !== initial, "Panel typography change did not alter rendered markup");
+    return "19px/right changes to 31px/center";
+  }),
+  behavioralCase("header", "height auto, token, and custom value", () => {
+    const auto = headerHeightRuntime.resolveHeaderHeightCss("auto");
+    const token = headerHeightRuntime.resolveHeaderHeightCss("comfortable");
+    const custom = headerHeightRuntime.resolveHeaderHeightCss("91px");
+    assert(auto === undefined, "Auto Header height emitted a fixed value");
+    assert(token === "72px", `Comfortable Header height resolved to ${token}`);
+    assert(custom === "91px", `Custom Header height resolved to ${custom}`);
+    assert(sources.headerView.includes('"--header-builder-height": headerHeight'), "Shared Header renderer does not receive resolved height");
+    return "auto unset; comfortable 72px; custom 91px";
+  }),
+  behavioralCase("header category menu", "shared document element wiring", () => {
+    assert(sources.headerComposition.includes('block.kind === "headerCategories"'), "Composition does not resolve the category block");
+    assert(sources.headerView.includes('element.type === "categories"'), "Shared Header renderer does not render the category element");
+    assert(sources.headerView.includes('compositionTypes.has("categories") ? categories : null'), "Mobile category content can render independently of the document element");
+    assert(sources.headerDropdown.includes('aria-expanded={isOpen}') && sources.headerDropdown.includes('document.addEventListener("pointerdown"'), "Dropdown open state or outside dismissal is not wired");
+    return "document block -> shared composition -> shared Header dropdown";
   }),
 ];
 

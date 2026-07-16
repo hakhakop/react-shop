@@ -43,6 +43,8 @@ import {
   X,
   Sun,
   Moon,
+  ChevronRight,
+  ArrowUpRight,
 } from "lucide-react";
 import Image from "next/image";
 import { useTheme } from "@/components/ThemeProvider";
@@ -164,6 +166,10 @@ import {
 } from "@/components/dashboard/globalStylePresets";
 import type { BuilderVisualStyle } from "@/lib/builderVisualStyle";
 import { typographyProps, type TypographyArea } from "@/lib/builderTypography";
+import {
+  resolveBuilderRowGap,
+  resolveBuilderRowStyle,
+} from "@/lib/builderRowStyles";
 import {
   createUniqueBuilderAnchorId,
 } from "@/lib/builderAnchors";
@@ -339,6 +345,7 @@ const defaultShellSettings: BuilderShellSettings = {
   headerTransparent: false,
   headerOverlay: false,
   headerWidthMode: "boxed",
+  headerHeight: "auto",
   headerZIndex: 40,
   sectionPaddingTop: "medium",
   sectionPaddingBottom: "medium",
@@ -927,8 +934,8 @@ function DashboardTypog({
   );
   const combined = [className, tp.className].filter(Boolean).join(" ");
   const combinedStyle = buttonTypographyStyle(combined, {
-    ...tp.style,
     ...style,
+    ...tp.style,
   });
   const isRich = isRichPreviewText(children);
   if (isRich) {
@@ -1891,7 +1898,6 @@ export default function DashboardBuilder({
     },
     [headerCompositionSections],
   );
-  const primaryHeaderColumnId = currentHeaderComposition.columns[0]?.id ?? "header-main-row";
   const composedAnchorIdEntries = useMemo(() => {
     const sections = [
       ...builderState.sections,
@@ -1902,21 +1908,79 @@ export default function DashboardBuilder({
       .filter((section) => Boolean(section.anchorId))
       .map((section) => ({ sectionId: section.id, anchorId: section.anchorId! }));
   }, [builderState.page, builderState.sections, footerDocumentState.sections, headerDocumentState.sections]);
-  const builderHeaderCategoriesContent = previewCategoryTree.length > 0 ? (
-    <div className="category-mega-menu">
-      <div className="category-mega-header">
-        <span>Shop by category</span>
+  const builderHeaderCategoriesContent = (() => {
+    if (previewCategoryTree.length === 0) return null;
+    const categoriesElement = currentHeaderComposition.elements.find((element) => element.type === "categories");
+    const showAllCategories = categoriesElement?.categoriesShowAll !== false;
+    const showCounts = categoriesElement?.categoriesShowCounts !== false;
+    const showHierarchy = categoriesElement?.categoriesShowHierarchy !== false;
+
+    return (
+      <div className="category-mega-menu">
+        {/* Desktop version */}
+        <div className="category-mega-menu-desktop">
+          <div className="category-mega-header">
+            <span>Shop by category</span>
+            {showAllCategories ? (
+              <span className="category-mega-all-link">View full category list</span>
+            ) : null}
+          </div>
+          <div className="category-mega-grid">
+            {previewCategoryTree.map((category) => {
+              const hasChildren = category.children && category.children.length > 0;
+              return (
+                <div key={category.id} className="category-mega-card">
+                  <span className="category-mega-root-link">
+                    <span>{category.name}</span>
+                    {hasChildren && showCounts && (
+                      <span className="category-mega-count">{category.children.length}</span>
+                    )}
+                  </span>
+                  {hasChildren && showHierarchy && (
+                    <ul className="category-mega-children">
+                      {category.children.map((child) => (
+                        <li key={child.id}>
+                          <span className="category-mega-child-link">{child.name}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Mobile version */}
+        <div className="category-mega-menu-mobile">
+          <div className="category-mobile-list">
+            {previewCategoryTree.map((category) => {
+              const hasChildren = category.children && category.children.length > 0;
+              return (
+                <div key={category.id} className="category-mobile-row">
+                  <div className="category-mobile-row-left">
+                    <span className="category-mobile-name">{category.name}</span>
+                    {hasChildren && showCounts && (
+                      <span className="category-mobile-count-badge">
+                        {category.children.length}
+                      </span>
+                    )}
+                  </div>
+                  <ChevronRight size={16} className="category-mobile-chevron" />
+                </div>
+              );
+            })}
+            {showAllCategories && (
+              <div className="category-mobile-row category-mobile-row--all">
+                <span className="category-mobile-name">View full category list</span>
+                <ArrowUpRight size={16} className="category-mobile-external-icon" />
+              </div>
+            )}
+          </div>
+        </div>
       </div>
-      <div className="category-mega-grid">
-          {previewCategoryTree.map((category) => (
-            <div key={category.id} className="category-mega-root">
-              <strong>{category.name}</strong>
-              {category.children.map((child) => <span key={child.id}>{child.name}</span>)}
-            </div>
-          ))}
-      </div>
-    </div>
-  ) : null;
+    );
+  })();
   const selectedSection = useMemo(
     () => localizedSections.find((section) => section.id === selectedId),
     [localizedSections, selectedId],
@@ -4477,8 +4541,15 @@ export default function DashboardBuilder({
         headerCategories: {
           id: "header-categories",
           kind: "headerCategories",
-          headerCategoriesLabel: "Categories",
-          headerCategoriesShowLabel: true,
+        headerCategoriesLabel: "Categories",
+        headerCategoriesShowLabel: true,
+        headerCategoriesDisplay: "icon-label",
+        headerCategoriesIcon: "menu",
+        headerCategoriesIconPosition: "left",
+        headerCategoriesDropdownAlign: "left",
+        headerCategoriesShowAll: true,
+        headerCategoriesShowCounts: true,
+        headerCategoriesShowHierarchy: true,
         },
         headerLanguage: {
           id: "header-language",
@@ -6581,9 +6652,17 @@ export default function DashboardBuilder({
       hoveredTarget={hoveredBuilderTarget}
       onHoverTarget={setHoveredBuilderTarget}
       onAddSection={() => {
+        if (builderState.page === "header") return;
         const lastSectionId = builderState.sections.at(-1)?.id ?? "__empty-page__";
         addWireframeNear(1, 1, lastSectionId, "below", "whole", "section", true);
       }}
+      onAddRow={builderState.page === "header" ? () => {
+        const headerSection = builderState.sections.find((section) => section.id === "header-document");
+        const rowCount = headerSection
+          ? getPreviewLayoutRows(headerSection, headerSection.layoutItems ?? []).length
+          : 0;
+        addRowNear("header-document", Math.max(0, rowCount - 1), "after", "whole");
+      } : undefined}
       renameSectionId={renameSectionRequestId}
       onRenameSection={renameBuilderSection}
       onRenameComplete={() => setRenameSectionRequestId(null)}
@@ -8245,8 +8324,8 @@ export default function DashboardBuilder({
           ref={previewShellRef}
           className={`builder-preview-shell builder-preview-${device} builder-preview-scheme-${
             builderState.design.colorScheme ?? "auto"
-          }${builderState.design.colorScheme === "dark" ? " dark" : ""}${spacingOverlayEnabled ? " is-spacing-overlay-enabled" : ""}${isResizingDevice ? " is-resizing-device" : ""}`}
-          data-theme={builderState.design.colorScheme !== "auto" ? builderState.design.colorScheme : undefined}
+          }${layoutScheme === "dark" ? " dark" : ""}${spacingOverlayEnabled ? " is-spacing-overlay-enabled" : ""}${isResizingDevice ? " is-resizing-device" : ""}`}
+          data-theme={layoutScheme}
           onMouseDown={(event) => {
             const target = event.target as HTMLElement;
             if (
@@ -8283,7 +8362,10 @@ export default function DashboardBuilder({
               } as CSSProperties
             }
           >
-            <div className="builder-preview-header-slot">
+            <div
+              id={builderState.page === "header" ? "builder-header-document-preview-slot" : undefined}
+              className="builder-preview-header-slot"
+            >
               {builderState.page === "header" && (
                 <div
                   className={`builder-header-document-preview builder-preview-section${selectedId === "header-document" ? " is-selected" : ""}${hoveredBuilderTarget?.type === "section" && hoveredBuilderTarget.sectionId === "header-document" ? " is-hovered" : ""}${draggingHeaderElementId ? " is-header-element-dragging" : ""}${draggingHeaderRowId ? " is-header-row-dragging" : ""}${shellSettings.headerVisible === false ? " is-header-hidden" : ""}`}
@@ -8319,7 +8401,7 @@ export default function DashboardBuilder({
                   {shellSettings.headerVisible === false ? (
                     <span className="builder-header-hidden-badge">Header hidden on website</span>
                   ) : null}
-                  <div className="builder-header-document-tools builder-preview-section-tools" aria-label="Header structure controls">
+                  <div className="builder-header-document-tools" aria-label="Header settings control">
                     <button
                       type="button"
                       className={selectedId === "header-document" && !selectedLayoutColumnKey ? "is-active" : ""}
@@ -8330,48 +8412,10 @@ export default function DashboardBuilder({
                         setSelectedLayoutBlockKey(null);
                         openInspectorPanel();
                       }}
+                      aria-label="Header Settings"
+                      title="Header Settings"
                     >
-                      Header
-                    </button>
-                    <button
-                      type="button"
-                      className={selectedLayoutRowIndex === 0 && !selectedLayoutBlockKey ? "is-active" : ""}
-                      onClick={() => selectLayoutRow("header-document", 0)}
-                      title="Select Header row and choose its column layout in Inspector"
-                    >
-                      <Layers3 size={11} /> Row layout
-                    </button>
-                    <button
-                      type="button"
-                      className={selectedLayoutColumnKey === primaryHeaderColumnId && !selectedLayoutBlockKey ? "is-active" : ""}
-                      onClick={() => selectLayoutColumn("header-document", primaryHeaderColumnId)}
-                    >
-                      Container
-                    </button>
-                    <button
-                      type="button"
-                      title="Duplicate selected Header row"
-                      onClick={() => duplicateLayoutRow("header-document", selectedLayoutRowIndex ?? 0)}
-                    >
-                      <Copy size={11} />
-                    </button>
-                    <button
-                      type="button"
-                      title="Add Header row"
-                      onClick={() => {
-                        const headerSection = builderState.sections.find((section) => section.id === "header-document");
-                        const rowCount = headerSection ? getPreviewLayoutRows(headerSection, headerSection.layoutItems ?? []).length : 0;
-                        addRowNear("header-document", Math.max(0, rowCount - 1), "after", "whole");
-                      }}
-                    >
-                      <Plus size={11} />
-                    </button>
-                    <button
-                      type="button"
-                      title="Delete selected empty Header row"
-                      onClick={() => deleteEmptyRow("header-document", 0)}
-                    >
-                      <Trash2 size={11} />
+                      <Settings2 size={13} />
                     </button>
                   </div>
                   <HeaderShellView
@@ -8410,13 +8454,31 @@ export default function DashboardBuilder({
                           onMouseEnter={() => setHoveredBuilderTarget({ type: "block", sectionId: "header-document", columnKey: columnId, blockKey: element.id })}
                           onMouseLeave={() => setHoveredBuilderTarget(null)}
                           onMouseDown={(event) => {
+                            const target = event.target as HTMLElement;
+                            if (target.closest("select, input, button, textarea, a, [role='button'], label, .website-language-switcher")) {
+                              // Skip immediate block selection on mousedown for interactive components to avoid
+                              // disruptive layout/state changes that interrupt browser native actions.
+                              return;
+                            }
                             event.stopPropagation();
-                            selectLayoutBlock("header-document", columnId, element.id);
+                            if (selectedLayoutBlockKey !== element.id) {
+                              selectLayoutBlock("header-document", columnId, element.id);
+                            }
                           }}
                           onClick={(event) => {
+                            const target = event.target as HTMLElement;
+                            if (target.closest("select, input, button, textarea, a, [role='button'], label, .website-language-switcher")) {
+                              // Select the block on click only if not already selected, and let the event bubble normally.
+                              if (selectedLayoutBlockKey !== element.id) {
+                                selectLayoutBlock("header-document", columnId, element.id);
+                              }
+                              return;
+                            }
                             event.preventDefault();
                             event.stopPropagation();
-                            selectLayoutBlock("header-document", columnId, element.id);
+                            if (selectedLayoutBlockKey !== element.id) {
+                              selectLayoutBlock("header-document", columnId, element.id);
+                            }
                           }}
                           onDragStart={(event) => {
                             event.stopPropagation();
@@ -8570,7 +8632,7 @@ export default function DashboardBuilder({
                             />
                           ))}
                           <div className="builder-preview-row-toolbar builder-header-live-row-tools">
-                            <span>Header Row {rowIndex + 1}</span>
+                            <span>Row Layout</span>
                             <button
                               type="button"
                               className="builder-header-row-drag-handle"
@@ -8591,12 +8653,24 @@ export default function DashboardBuilder({
                                 setHeaderRowDropTarget(null);
                               }}
                             ><GripVertical size={12} /></button>
-                            <button type="button" title="Choose row layout" onClick={() => selectLayoutRow("header-document", rowIndex)}><Layers3 size={12} /></button>
+                            <button type="button" title="Open row settings" onClick={() => selectLayoutRow("header-document", rowIndex)}><Settings2 size={12} /></button>
                             <button type="button" title="Duplicate row" onClick={() => duplicateLayoutRow("header-document", rowIndex)}><Copy size={12} /></button>
-                            <button type="button" title="Add row below" onClick={() => addRowNear("header-document", rowIndex, "after", "whole")}><Plus size={12} /></button>
                             <button type="button" title="Delete empty row" onClick={() => deleteEmptyRow("header-document", rowIndex)}><Trash2 size={12} /></button>
                           </div>
                           {content}
+                          <button
+                            type="button"
+                            className="builder-header-add-row-trigger"
+                            aria-label={`Add Header row after row ${rowIndex + 1}`}
+                            title="Add Header row"
+                            onClick={(event) => {
+                              event.preventDefault();
+                              event.stopPropagation();
+                              addRowNear("header-document", rowIndex, "after", "whole");
+                            }}
+                          >
+                            <Plus size={13} />
+                          </button>
                         </div>
                       );
                     }}
@@ -8696,22 +8770,29 @@ export default function DashboardBuilder({
               </div>
             ) : null}
             <div
-              className={builderState.page === "header" ? "builder-context-page-preview is-locked" : ""}
+              className={builderState.page === "header" ? "builder-context-page-preview builder-header-page-context is-locked" : ""}
               aria-label={builderState.page === "header" ? "Locked page context" : undefined}
+              onClick={builderState.page === "header" ? () => switchBuilderTarget(headerContextState.page) : undefined}
             >
             {builderState.page === "header" ? (
-              <div className="builder-context-page-lock-badge">
-                Previewing {getLayoutLabel(headerContextState.page, customPages)} · Page content locked
+              <div
+                className="builder-context-preview-status builder-context-preview-status--header-boundary"
+                role="group"
+                aria-label="Locked page preview status"
+              >
+                <span>
+                  Previewing {getLayoutLabel(headerContextState.page, customPages)} · Page editing locked
+                </span>
+                <button
+                  type="button"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    switchBuilderTarget(headerContextState.page);
+                  }}
+                >
+                  Edit {getLayoutLabel(headerContextState.page, customPages)} Page
+                </button>
               </div>
-            ) : null}
-            {builderState.page === "header" ? (
-              <button
-                type="button"
-                className="builder-context-page-edit-overlay"
-                aria-label={`Edit ${getLayoutLabel(headerContextState.page, customPages)} page`}
-                title={`Edit ${getLayoutLabel(headerContextState.page, customPages)} page`}
-                onClick={() => switchBuilderTarget(headerContextState.page)}
-              />
             ) : null}
             <ProductCategoryFilterProvider key={headerContextState.page}>
               <PreviewCanvas
@@ -9426,7 +9507,7 @@ function PreviewCanvas({
         className={`shop-builder-main shop-builder-main--scheme-${
           design.colorScheme ?? "auto"
         } builder-preview-page${draggingSectionId ? " is-dragging-section" : ""}`}
-        data-theme={design.colorScheme !== "auto" ? design.colorScheme : undefined}
+        data-theme={layoutScheme}
         style={previewDesignStyle(design)}
         data-builder-page-root
         data-builder-page={page}
@@ -10584,8 +10665,8 @@ function InlineEditableText({
     .filter(Boolean)
     .join(" ");
   const combinedStyle = buttonTypographyStyle(combinedClassName, {
-    ...tp.style,
     ...style,
+    ...tp.style,
   });
   const isRich = isRichPreviewText(value);
   const EditableTag = (isRich ? getRichTextSafeTag(Tag) : Tag) as any;
@@ -11001,7 +11082,7 @@ function RowSpacingOverlay({
   );
   const rowGap =
     rowIndex > 0
-      ? resolveBuilderSpacing(undefined, "rowGap", shellSettings.rowGap)
+      ? resolveBuilderRowGap(item, shellSettings.rowGap)
       : undefined;
 
   const marginTopTarget: SpacingInspectorTarget = {
@@ -12381,19 +12462,49 @@ function PreviewSection({
             {
               "--builder-preview-layout-columns": section.layoutColumns ?? 2,
               "--builder-layout-columns": section.layoutColumns ?? 2,
-              gridTemplateColumns:
-                device === "mobile"
-                  ? "minmax(0, 1fr)"
-                  : "repeat(12, minmax(0, 1fr))",
-              rowGap: "var(--builder-global-row-gap, 64px)",
-              columnGap:
-                device === "mobile"
-                  ? "0px"
-                  : "var(--builder-global-column-gap, 32px)",
+              display: "flex",
+              flexDirection: "column",
+              gap: 0,
             } as CSSProperties
           }
         >
-          {items.map((item, index) => {
+          {layoutRows.map((layoutRow, layoutRowIndex) => {
+            const rowItem = layoutRow.items[0];
+            const rowGap = resolveBuilderRowGap(
+              rowItem as NonNullable<BuilderSection["layoutItems"]>[number],
+              shellSettings.rowGap,
+            ).css;
+            const rowStyle = resolveBuilderRowStyle(
+              rowItem as NonNullable<BuilderSection["layoutItems"]>[number],
+              {
+                rowPaddingTop: shellSettings.rowPaddingTop,
+                rowPaddingBottom: shellSettings.rowPaddingBottom,
+                rowMarginTop: shellSettings.rowMarginTop,
+                rowMarginBottom: shellSettings.rowMarginBottom,
+              },
+            );
+            return (
+              <div
+                key={layoutRow.id}
+                style={{ paddingTop: layoutRowIndex > 0 ? rowGap : 0 }}
+              >
+                <div
+                  className="shop-builder-content-row builder-preview-content-row"
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns:
+                      device === "mobile"
+                        ? "minmax(0, 1fr)"
+                        : "repeat(12, minmax(0, 1fr))",
+                    columnGap:
+                      device === "mobile"
+                        ? "0px"
+                        : "var(--builder-global-column-gap, 32px)",
+                    ...rowStyle,
+                  }}
+                >
+                  {layoutRow.items.map((item, columnIndex) => {
+            const index = layoutRow.startIndex + columnIndex;
             const columnKey = item.id ?? `layout-item-${index}`;
             const rowMeta = rowMetaByColumnKey.get(columnKey);
             const blocks = getPreviewLayoutBlocks(item);
@@ -12428,23 +12539,6 @@ function PreviewSection({
               rowMeta !== undefined &&
               selectedSectionId === section.id &&
               selectedLayoutRowIndex === rowMeta.rowIndex;
-            const rowSpacingStyle: CSSProperties = {};
-            rowSpacingStyle.paddingTop =
-              item.rowTopSpacing && item.rowTopSpacing !== "inherit"
-                ? resolveBuilderSpacing(item.rowTopSpacing, "rowPadding").css
-                : "var(--builder-global-row-padding-top, 32px)";
-            rowSpacingStyle.paddingBottom =
-              item.rowBottomSpacing && item.rowBottomSpacing !== "inherit"
-                ? resolveBuilderSpacing(item.rowBottomSpacing, "rowPadding").css
-                : "var(--builder-global-row-padding-bottom, 32px)";
-            rowSpacingStyle.marginTop =
-              item.rowTopMargin && item.rowTopMargin !== "inherit"
-                ? resolveBuilderSpacing(item.rowTopMargin, "rowMargin").css
-                : "var(--builder-global-row-margin-top, 0px)";
-            rowSpacingStyle.marginBottom =
-              item.rowBottomMargin && item.rowBottomMargin !== "inherit"
-                ? resolveBuilderSpacing(item.rowBottomMargin, "rowMargin").css
-                : "var(--builder-global-row-margin-bottom, 0px)";
             return (
               <Fragment key={columnKey}>
                 <article
@@ -12507,12 +12601,10 @@ function PreviewSection({
                     {
                       ...(hasScrollPinned
                         ? {
-                            ...rowSpacingStyle,
                             gridColumn:
                               device === "mobile" ? "1 / -1" : "span 12",
                           }
                         : {
-                            ...rowSpacingStyle,
                             gridColumn:
                               device === "mobile"
                                 ? "1 / -1"
@@ -13921,6 +14013,7 @@ function PreviewSection({
                                   {block.eyebrow && (
                                     <InlineEditableText
                                       as="span"
+                                      area="eyebrow"
                                       className="shop-builder-eyebrow shop-builder-panel-meta"
                                       typography={block.typography}
                                       style={panelMetaStyle}
@@ -13939,6 +14032,7 @@ function PreviewSection({
                                     (block.typewriterEnabled ? (
                                       <DashboardTypog
                                         as="h3"
+                                        area="title"
                                         typography={block.typography}
                                         style={panelTitleStyle}
                                       >
@@ -13997,6 +14091,7 @@ function PreviewSection({
                                     ) : (
                                       <InlineEditableText
                                         as="h3"
+                                        area="title"
                                         typography={block.typography}
                                         style={panelTitleStyle}
                                         value={block.title}
@@ -14014,6 +14109,7 @@ function PreviewSection({
                                     (block.typewriterEnabled && !block.title ? (
                                       <DashboardTypog
                                         as="p"
+                                        area="body"
                                         typography={block.typography}
                                         style={panelBodyStyle}
                                       >
@@ -14072,6 +14168,7 @@ function PreviewSection({
                                     ) : (
                                       <InlineEditableText
                                         as="p"
+                                        area="body"
                                         typography={block.typography}
                                         style={panelBodyStyle}
                                         value={block.body}
@@ -14113,6 +14210,7 @@ function PreviewSection({
                                     {block.buttonLabel && (
                                       <DashboardTypog
                                         as="span"
+                                        area="button"
                                         className="builder-preview-cta"
                                         typography={block.typography}
                                       >
@@ -14124,6 +14222,7 @@ function PreviewSection({
                                         <DashboardTypog
                                           key={btn.id ?? btnIdx}
                                           as="span"
+                                          area="button"
                                           className={`builder-preview-cta builder-preview-cta--${btn.style ?? "primary"}`}
                                           style={{ display: "inline-flex" }}
                                           typography={block.typography}
@@ -15241,6 +15340,10 @@ function PreviewSection({
                   />
                 )}
               </Fragment>
+            );
+                  })}
+                </div>
+              </div>
             );
           })}
         </div>

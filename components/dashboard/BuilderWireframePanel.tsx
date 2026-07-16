@@ -65,6 +65,7 @@ type BuilderWireframePanelProps = {
   hoveredTarget?: BuilderHoverTarget | null;
   onHoverTarget?: (target: BuilderHoverTarget | null) => void;
   onAddSection?: () => void;
+  onAddRow?: () => void;
   renameSectionId?: string | null;
   onRenameSection?: (sectionId: string, name: string) => void;
   onRenameComplete?: () => void;
@@ -213,6 +214,7 @@ export default function BuilderWireframePanel({
   hoveredTarget,
   onHoverTarget,
   onAddSection,
+  onAddRow,
   renameSectionId,
   onRenameSection,
   onRenameComplete,
@@ -226,6 +228,13 @@ export default function BuilderWireframePanel({
   onDuplicateBlock,
   onDeleteBlock,
 }: BuilderWireframePanelProps) {
+  const isHeaderDocument = page === "header";
+  const headerRowCount = isHeaderDocument
+    ? sections.reduce(
+        (count, section) => count + getBuilderLayoutRows(section, section.layoutItems ?? []).length,
+        0,
+      )
+    : 0;
   const treeRef = useRef<HTMLDivElement>(null);
   const [collapsedSections, setCollapsedSections] = useState<Set<string>>(
     () => new Set(),
@@ -391,9 +400,11 @@ export default function BuilderWireframePanel({
           <span className="builder-wireframe-badge builder-wireframe-badge--page">PAGE</span>
         </div>
         <div className="builder-wireframe-header-row builder-wireframe-header-row--sub">
-          <span>Current page structure</span>
+          <span>{isHeaderDocument ? "Header structure" : "Current page structure"}</span>
           <small>
-            {sections.length} {sections.length === 1 ? "section" : "sections"}
+            {isHeaderDocument
+              ? `${headerRowCount} ${headerRowCount === 1 ? "row" : "rows"}`
+              : `${sections.length} ${sections.length === 1 ? "section" : "sections"}`}
           </small>
         </div>
       </div>
@@ -451,7 +462,7 @@ export default function BuilderWireframePanel({
                     tabIndex={0}
                     aria-selected={sectionSelected}
                   >
-                    <GripVertical size={11} className="builder-wireframe-grip" />
+                    {!isHeaderDocument ? <GripVertical size={11} className="builder-wireframe-grip" /> : null}
                     <Layers3 size={13} className="builder-wireframe-icon builder-wireframe-icon--section" />
                     {editingSectionId === section.id ? (
                       <input
@@ -483,14 +494,14 @@ export default function BuilderWireframePanel({
                         <strong>
                           {section.name || section.title || sectionLabels[section.kind] || `Section ${sectionIndex + 1}`}
                         </strong>
-                        <small>Section</small>
+                        <small>{isHeaderDocument ? "Header" : "Section"}</small>
                       </span>
                     )}
                     {!section.visible ? <em className="builder-wireframe-hidden-tag">Hidden</em> : null}
                     
                     <span className="builder-wireframe-meta">
-                      <span className="builder-wireframe-badge builder-wireframe-badge--section">SEC</span>
-                      <div className="builder-wireframe-actions">
+                      <span className="builder-wireframe-badge builder-wireframe-badge--section">{isHeaderDocument ? "HDR" : "SEC"}</span>
+                      {!isHeaderDocument ? <div className="builder-wireframe-actions">
                         {onMoveSection && (
                           <button
                             type="button"
@@ -559,7 +570,7 @@ export default function BuilderWireframePanel({
                             <Trash2 size={10} />
                           </button>
                         )}
-                      </div>
+                      </div> : null}
                     </span>
                   </div>
                 </div>
@@ -921,11 +932,11 @@ export default function BuilderWireframePanel({
             <button
               type="button"
               className="builder-wireframe-add-section-btn"
-              onClick={onAddSection}
-              disabled={!onAddSection}
+              onClick={isHeaderDocument ? onAddRow : onAddSection}
+              disabled={isHeaderDocument ? !onAddRow : !onAddSection}
             >
               <Plus size={13} />
-              <span>Add Section</span>
+              <span>{isHeaderDocument ? "Add Row" : "Add Section"}</span>
             </button>
         </div>
       </div>

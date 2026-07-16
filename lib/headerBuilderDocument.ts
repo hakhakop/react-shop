@@ -46,10 +46,20 @@ export type HeaderBuilderElement = {
   buttonLetterSpacing?: string;
   buttonHoverBg?: string;
   buttonHoverTextColor?: string;
+  buttonHoverBorderColor?: string;
+  buttonHoverTransform?: string;
+  buttonHoverBoxShadow?: string;
   utilityAction?: string;
   utilityVariant?: string;
   categoriesLabel?: string;
   categoriesShowLabel?: boolean;
+  categoriesDisplay?: "icon" | "icon-label" | "label";
+  categoriesIcon?: "menu" | "grid";
+  categoriesIconPosition?: "left" | "right";
+  categoriesDropdownAlign?: "left" | "right";
+  categoriesShowAll?: boolean;
+  categoriesShowCounts?: boolean;
+  categoriesShowHierarchy?: boolean;
   languageDisplay?: "native" | "code";
 };
 
@@ -110,6 +120,13 @@ export function createLegacyEquivalentHeaderLayout(
       kind: "headerCategories" as const,
       headerCategoriesLabel: "Categories",
       headerCategoriesShowLabel: true,
+      headerCategoriesDisplay: "icon-label" as const,
+      headerCategoriesIcon: "menu" as const,
+      headerCategoriesIconPosition: "left" as const,
+      headerCategoriesDropdownAlign: "left" as const,
+      headerCategoriesShowAll: true,
+      headerCategoriesShowCounts: true,
+      headerCategoriesShowHierarchy: true,
     },
     ...(showLegacyButton
       ? [{

@@ -397,15 +397,26 @@
   position: relative;
   width: 100%;
   margin: 0 !important;
-  padding: 0 !important;
+  padding: 24px 0 !important;
   border: 0;
   outline: none;
   background: transparent !important;
   pointer-events: auto;
 }
 
+
+/* The dashboard uses a compact 13px UI font. Reset the embedded storefront
+   Header to the frontend root size instead of compensating inside controls. */
+.builder-preview-header-slot .site-header {
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+/* Header document editing keeps the real Header box in the preview flow. The
+   storefront's pull-under slot collapse remains unchanged outside this mode. */
 .builder-preview-shell .builder-preview-header-slot:has(.builder-header-document-preview) {
-  padding-top: 48px !important;
+  height: auto !important;
+  min-height: 0 !important;
 }
 
 .builder-header-document-preview.is-selected {
@@ -457,8 +468,8 @@
   z-index: 1200;
   display: flex;
   gap: 3px;
-  padding: 3px;
-  border-radius: 7px;
+  padding: 2px;
+  border-radius: 999px;
   background: color-mix(in srgb, var(--builder-ui-surface) 94%, transparent);
   box-shadow: 0 4px 14px rgba(15, 23, 42, 0.14);
 }
@@ -473,8 +484,10 @@
 }
 
 .builder-header-document-tools button {
-  min-height: 24px;
-  padding: 3px 7px;
+  width: 26px;
+  min-height: 26px;
+  padding: 0;
+  border-radius: 999px;
   border: 0;
   background: transparent;
   color: var(--builder-ui-muted);
@@ -536,19 +549,6 @@
   border-top: 0;
 }
 
-.builder-header-document-tools.builder-preview-section-tools {
-  position: absolute !important;
-  top: -38px !important;
-  right: auto !important;
-  left: 12px !important;
-  transform: none !important;
-  z-index: 10040 !important;
-  width: fit-content;
-  margin: 0;
-  opacity: 1 !important;
-  pointer-events: auto !important;
-}
-
 .builder-header-document-workspace-note {
   display: grid;
   min-height: 180px;
@@ -569,8 +569,100 @@
   cursor: not-allowed;
 }
 
+.builder-header-page-context.is-locked {
+  opacity: 1;
+  filter: none;
+  cursor: pointer;
+}
+
 .builder-context-page-preview.is-locked .builder-preview-page {
   pointer-events: none;
+}
+
+.builder-header-page-context.is-locked .builder-preview-page {
+  user-select: none;
+}
+
+/* Locked page context keeps its storefront pixels but exposes no Page Builder
+   editing chrome while the Header document owns the workspace. */
+.builder-header-page-context :is(
+  .builder-preview-section-tools,
+  .builder-preview-block-tools,
+  .builder-preview-row-toolbar,
+  .builder-preview-section-insert,
+  .builder-preview-row-insert,
+  .builder-preview-drag-handle,
+  .builder-preview-spacing-overlay
+) {
+  display: none !important;
+}
+
+.builder-context-preview-status {
+  position: relative;
+  z-index: 10050;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  width: fit-content;
+  max-width: calc(100% - 24px);
+  margin: 7px auto;
+  padding: 6px 7px 6px 11px;
+  border: 1px solid var(--builder-ui-border-strong);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--builder-ui-surface) 94%, transparent);
+  color: var(--builder-ui-text);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.16);
+  backdrop-filter: blur(14px);
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.builder-context-preview-status span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.builder-context-preview-status button {
+  min-height: 26px;
+  padding: 4px 9px;
+  border: 1px solid var(--builder-ui-border-strong);
+  border-radius: 999px;
+  background: var(--builder-ui-surface-strong);
+  color: var(--builder-ui-text);
+  font: inherit;
+  cursor: pointer;
+}
+
+.builder-context-preview-status button:hover {
+  border-color: color-mix(in srgb, var(--builder-ui-accent) 55%, var(--builder-ui-border-strong));
+  background: color-mix(in srgb, var(--builder-ui-accent) 14%, var(--builder-ui-surface-strong));
+}
+
+.builder-context-preview-status button:focus-visible {
+  outline: 2px solid var(--builder-ui-accent);
+  outline-offset: 2px;
+}
+
+.builder-context-preview-status--header-boundary {
+  position: absolute;
+  top: 44px;
+  right: auto;
+  left: 50%;
+  z-index: 10050;
+  max-width: calc(100% - 24px);
+  margin: 0;
+  transform: translateX(-50%);
+}
+
+@container builder-header-slot (max-width: 520px) {
+  .builder-context-preview-status {
+    max-width: calc(100% - 24px);
+    gap: 6px;
+    padding-left: 8px;
+  }
 }
 
 .builder-context-page-edit-overlay {
@@ -745,11 +837,6 @@
   padding: 0;
 }
 
-.builder-header-document-preview .builder-header-live-row {
-  padding-top: 0 !important;
-  padding-bottom: 0 !important;
-}
-
 .builder-header-document-preview .builder-header-live-element .builder-preview-block-tools {
   top: auto !important;
   bottom: -28px !important;
@@ -775,6 +862,62 @@
 
 .builder-header-document-preview .builder-header-live-row-tools {
   z-index: 10020;
+}
+
+.builder-header-add-row-trigger {
+  position: absolute;
+  left: clamp(18px, 240px, calc(100% - 18px));
+  bottom: 0;
+  z-index: 10025;
+  display: grid;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  padding: 0;
+  border: 1px dashed color-mix(in srgb, var(--builder-ui-accent) 42%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--builder-ui-surface) 92%, transparent);
+  color: var(--builder-ui-accent);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.12);
+  opacity: 0.62;
+  pointer-events: auto;
+  transform: translate(-50%, 50%) scale(0.92);
+  transition: opacity 140ms ease, transform 140ms ease, background 140ms ease;
+  cursor: pointer;
+}
+
+.builder-header-document-preview .builder-header-live-element .builder-preview-block-tools::before {
+  content: "";
+  position: absolute;
+  top: -8px;
+  right: 0;
+  left: 0;
+  height: 8px;
+}
+
+.builder-header-live-row:hover > .builder-header-add-row-trigger,
+.builder-header-live-row:focus-within > .builder-header-add-row-trigger,
+.builder-header-add-row-trigger:hover,
+.builder-header-add-row-trigger:focus-visible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translate(-50%, 50%) scale(1);
+}
+
+.builder-header-live-row-tools::before {
+  content: "";
+  position: absolute;
+  top: -8px;
+  right: 0;
+  left: 0;
+  height: 8px;
+}
+
+.builder-header-add-row-trigger:hover,
+.builder-header-add-row-trigger:focus-visible {
+  background: color-mix(in srgb, var(--builder-ui-accent) 14%, var(--builder-ui-surface));
+  outline: 2px solid color-mix(in srgb, var(--builder-ui-accent) 42%, transparent);
+  outline-offset: 2px;
 }
 
 .builder-header-document-preview .site-header-pill-inner > .builder-header-live-row,
@@ -5117,6 +5260,8 @@
 
 .builder-preview-header-slot {
   position: sticky;
+  container-name: builder-header-slot;
+  container-type: inline-size;
   z-index: 1200;
   top: 0;
   flex: 0 0 auto;
@@ -5145,24 +5290,9 @@ body:has([data-scoped-preview-root]) [data-scoped-preview-root] .site-header {
 }
 
 [data-theme="dark"] .builder-dashboard.builder-preview-scheme-auto,
-.dark .builder-dashboard.builder-preview-scheme-auto,
-[data-theme="dark"] .builder-preview-shell.builder-preview-scheme-auto,
-.dark .builder-preview-shell.builder-preview-scheme-auto {
+.dark .builder-dashboard.builder-preview-scheme-auto {
   --builder-preview-effective-bg: #101010 !important;
   --builder-preview-real-bg: #101010 !important;
-}
-
-[data-theme="dark"] .builder-preview-shell,
-.dark .builder-preview-shell {
-  --builder-preview-effective-bg: #101010 !important;
-  --builder-preview-real-bg: #101010 !important;
-  --builder-preview-shell-bg: #101010 !important;
-  --page-bg: #101010;
-  --surface-main: #101010;
-  --surface-muted: #24241f;
-  --surface-soft: #24241f;
-  --text-main: #f7f7f1;
-  --text-muted: #c8c8be;
 }
 
 [data-theme="dark"] .builder-preview-canvas,
@@ -9333,6 +9463,13 @@ body[data-storefront-preset="princity"]
   border-bottom: none !important;
 }
 
+/* Header editing uses the same rendered Header box, but the editor boundary
+   must remain in flow so its status and locked page cannot overlap it. */
+#builder-header-document-preview-slot {
+  height: auto !important;
+  min-height: 0 !important;
+}
+
 .builder-preview-shell:has(.builder-preview-page[data-overlap-header="true"])
   .builder-preview-header-slot .site-header--no-background:not([data-scrolled="true"]),
 .builder-preview-shell:has(.site-header--builder-overlay)
@@ -12664,11 +12801,13 @@ article.is-selected-column > .builder-preview-box-spacing,
 .builder-header-document-preview
   .builder-header-live-row
   > .builder-header-live-row-tools {
-  top: 0 !important;
-  left: 200px !important;
+  top: 100% !important;
   right: auto !important;
-  transform: translateY(-100%) scale(0.96) !important;
-  transform-origin: bottom left !important;
+  left: 8px !important;
+  max-width: calc(100% - 16px);
+  overflow-x: auto;
+  transform: translateY(4px) scale(0.96) !important;
+  transform-origin: top left !important;
 }
 
 .builder-header-document-preview
@@ -12681,9 +12820,9 @@ article.is-selected-column > .builder-preview-box-spacing,
 .builder-header-document-preview .builder-header-live-row-tools:focus-within {
   opacity: 1 !important;
   pointer-events: auto !important;
-  left: 200px !important;
   right: auto !important;
-  transform: translateY(-100%) scale(1) !important;
+  left: 8px !important;
+  transform: translateY(4px) scale(1) !important;
 }
 
 /* The generic page-preview Princity rule adds top: 18px for a floating
@@ -12823,13 +12962,13 @@ article.is-selected-column > .builder-preview-box-spacing,
   padding-bottom: 0 !important;
 }
 
-/* Reposition row tools above the pill shape instead of inside it to prevent bloating only when scrolled */
+/* Keep row tools below the compact pill and inside the preview bounds. */
 .builder-header-document-preview #site-header-pill[data-scrolled="true"] .site-header-pill-inner > .builder-header-live-row > .builder-header-live-row-tools,
 .builder-header-document-preview #site-header-pill[data-scrolled="true"] .site-header-princity-inner > .builder-header-live-row > .builder-header-live-row-tools {
-  top: -28px !important;
-  right: 12px !important;
-  left: auto !important;
-  transform: none !important;
+  top: 100% !important;
+  right: auto !important;
+  left: 8px !important;
+  transform: translateY(4px) !important;
 }
 
 /* Shrink the row width in scrolled compact pill state so it doesn't stretch the container */
@@ -12902,13 +13041,17 @@ article.is-selected-column > .builder-preview-box-spacing,
   --header-border: rgba(209, 213, 219, 0.72);
 }
 
+.builder-preview-shell[data-theme="light"],
+.builder-preview-shell.builder-preview-scheme-light {
+  --header-bg: rgba(255, 255, 255, 0.92);
+  --header-border: rgba(209, 213, 219, 0.72);
+}
+
 .builder-preview-shell[data-theme="dark"],
 .builder-preview-shell.dark,
-.builder-preview-shell.builder-preview-scheme-dark,
-[data-theme="dark"] .builder-preview-shell,
-.dark .builder-preview-shell {
-  --header-bg: rgba(15, 23, 42, 0.96) !important;
-  --header-border: rgba(30, 64, 175, 0.7) !important;
+.builder-preview-shell.builder-preview-scheme-dark {
+  --header-bg: rgba(15, 23, 42, 0.96);
+  --header-border: rgba(30, 64, 175, 0.7);
 }
 
 /* Header editing chrome follows the live element box exactly. The toolbar is
@@ -12929,18 +13072,18 @@ article.is-selected-column > .builder-preview-box-spacing,
 .builder-header-document-preview
   .builder-header-live-element.builder-preview-layout-block
   > .builder-header-live-element-content:hover
-  > .header-builder-element,
+  > .header-builder-element:not(.header-builder-element--categories),
 .builder-header-document-preview
   .builder-header-live-element.builder-preview-layout-block:has(> .builder-preview-block-tools:hover)
   > .builder-header-live-element-content
-  > .header-builder-element {
+  > .header-builder-element:not(.header-builder-element--categories) {
   box-shadow: inset 0 0 0 1px rgba(13, 115, 255, 0.28) !important;
 }
 
 .builder-header-document-preview
   .builder-header-live-element.builder-preview-layout-block.is-selected-block
   > .builder-header-live-element-content
-  > .header-builder-element {
+  > .header-builder-element:not(.header-builder-element--categories) {
   box-shadow: inset 0 0 0 1.5px var(--builder-ui-accent, #3b82f6) !important;
 }
 

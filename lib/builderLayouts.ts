@@ -71,6 +71,13 @@ export type BuilderLayoutBlock = {
   headerUtilityVariant?: string;
   headerCategoriesLabel?: string;
   headerCategoriesShowLabel?: boolean;
+  headerCategoriesDisplay?: "icon" | "icon-label" | "label";
+  headerCategoriesIcon?: "menu" | "grid";
+  headerCategoriesIconPosition?: "left" | "right";
+  headerCategoriesDropdownAlign?: "left" | "right";
+  headerCategoriesShowAll?: boolean;
+  headerCategoriesShowCounts?: boolean;
+  headerCategoriesShowHierarchy?: boolean;
   headerLanguageDisplay?: "native" | "code";
   eyebrow?: string;
   title?: string;
@@ -104,6 +111,8 @@ export type BuilderLayoutBlock = {
   buttonHoverBg?: string;
   buttonHoverTextColor?: string;
   buttonHoverBorderColor?: string;
+  buttonHoverTransform?: string;
+  buttonHoverBoxShadow?: string;
   buttonHoverEffect?: string;
   imageUrl?: string;
   imageAlt?: string;
@@ -365,6 +374,7 @@ export type BuilderSection = {
     rowBottomSpacing?: string;
     rowTopMargin?: string;
     rowBottomMargin?: string;
+    rowGap?: string;
     rowBorderRadius?: number;
     rowVisualStyle?: Record<string, unknown>;
     headerGap?: string;

@@ -1,5 +1,119 @@
 [
   {
+    "id": "grid-mrma1ieq-j8yc",
+    "title": "Grid",
+    "templateType": "element",
+    "description": "Element template saved from Home",
+    "sourcePage": "home",
+    "sections": [
+      {
+        "id": "contentLayout-mrma1idv-4bjbt",
+        "kind": "contentLayout",
+        "title": "Grid",
+        "background": "#ffffff",
+        "backgroundMode": "boxed",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "topSpacing": "inherit",
+        "bottomSpacing": "inherit",
+        "topMargin": "inherit",
+        "bottomMargin": "inherit",
+        "pullUnderHeader": false,
+        "visible": true,
+        "eyebrow": "",
+        "body": "",
+        "layout": "whole",
+        "layoutColumns": 1,
+        "layoutItems": [
+          {
+            "id": "layout-item-mrma1idv-template-element",
+            "blocks": [
+              {
+                "id": "grid-block-mrma1idv-rfvja",
+                "kind": "grid",
+                "title": "Services designed around your goals",
+                "gridSource": "static",
+                "columns": 2,
+                "gridRows": 1,
+                "gridGap": "medium",
+                "gridMargin": "inherit",
+                "gridImagePadding": "frameless",
+                "gridContentPadding": "medium",
+                "gridImageFrame": "none",
+                "gridShowImage": true,
+                "gridShowEyebrow": true,
+                "gridShowMeta": true,
+                "gridShowText": true,
+                "gridShowButton": true,
+                "gridItems": [
+                  {
+                    "id": "grid-block-mrma14zr-gjmas-1",
+                    "eyebrow": "01",
+                    "title": "Strategy and planning",
+                    "meta": "Build with clarity",
+                    "text": "Turn priorities into a focused plan with practical next steps and measurable outcomes.",
+                    "buttonLabel": "View Details",
+                    "buttonUrl": "/",
+                    "typography": {
+                      "variant": "body",
+                      "fontFamily": "inherit",
+                      "fontSize": "16px",
+                      "fontWeight": "400",
+                      "lineHeight": "1.4",
+                      "letterSpacing": "0px",
+                      "color": "inherit",
+                      "textAlign": "left"
+                    }
+                  },
+                  {
+                    "id": "grid-block-mrma14zr-gjmas-2",
+                    "eyebrow": "02",
+                    "title": "Design and delivery",
+                    "meta": "Make it memorable",
+                    "text": "Create a polished experience that communicates your value clearly across every screen.",
+                    "buttonLabel": "See Our Work",
+                    "buttonUrl": "/",
+                    "typography": {
+                      "variant": "body",
+                      "fontFamily": "inherit",
+                      "fontSize": "16px",
+                      "fontWeight": "400",
+                      "lineHeight": "1.4",
+                      "letterSpacing": "0px",
+                      "color": "inherit",
+                      "textAlign": "left"
+                    }
+                  },
+                  {
+                    "id": "grid-block-mrma14zr-gjmas-3",
+                    "eyebrow": "03",
+                    "title": "Support and growth",
+                    "meta": "Ready for what follows",
+                    "text": "Keep improving with flexible support that adapts as your audience and ambitions grow.",
+                    "buttonLabel": "Contact Us",
+                    "buttonUrl": "/",
+                    "typography": {
+                      "variant": "body",
+                      "fontFamily": "inherit",
+                      "fontSize": "16px",
+                      "fontWeight": "400",
+                      "lineHeight": "1.4",
+                      "letterSpacing": "0px",
+                      "color": "inherit",
+                      "textAlign": "left"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "layoutRows": 1
+      }
+    ],
+    "updatedAt": "2026-07-15T16:10:55.730Z"
+  },
+  {
     "id": "section-layout-mqnvbnph-hj5w",
     "title": "Hero Home 1",
     "templateType": "section",
