@@ -414,12 +414,12 @@ export default function HeaderShellView({
     const resolvedTopPadding = rowComp.rowTopSpacing !== undefined
       ? resolveBuilderSpacing(rowComp.rowTopSpacing, "rowPadding", shellSettings.rowPaddingTop).css
       : visualStyles.paddingTop === undefined
-        ? resolveBuilderSpacing("sm", "rowPadding").css
+        ? resolveBuilderSpacing(shellSettings.rowPaddingTop ?? "sm", "rowPadding").css
         : undefined;
     const resolvedBottomPadding = rowComp.rowBottomSpacing !== undefined
       ? resolveBuilderSpacing(rowComp.rowBottomSpacing, "rowPadding", shellSettings.rowPaddingBottom).css
       : visualStyles.paddingBottom === undefined
-        ? resolveBuilderSpacing("sm", "rowPadding").css
+        ? resolveBuilderSpacing(shellSettings.rowPaddingBottom ?? "sm", "rowPadding").css
         : undefined;
 
     return {

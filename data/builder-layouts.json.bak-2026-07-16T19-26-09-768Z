@@ -6012,11 +6012,7 @@
                 "imageUrl": "https://cms.webpages.am/wp-content/uploads/2026/06/logo-2-1-scaled.png",
                 "imageAlt": "WebPages logo"
               }
-            ],
-            "rowBottomSpacing": "none",
-            "rowTopSpacing": "none",
-            "rowTopMargin": "none",
-            "rowBottomMargin": "none"
+            ]
           },
           {
             "id": "header-main-center",
@@ -6029,27 +6025,21 @@
                 "title": "Navigation",
                 "menuSource": "main",
                 "menuActiveIndicator": "princity",
-                "visualStyle": {
-                  "padding": {
-                    "linked": true,
-                    "top": "inherit",
-                    "right": "inherit",
-                    "bottom": "inherit",
-                    "left": "inherit"
-                  }
-                }
+                "elementAlign": "center"
               }
-            ],
-            "rowBottomSpacing": "none",
-            "rowTopSpacing": "none",
-            "rowTopMargin": "none",
-            "rowBottomMargin": "none"
+            ]
           },
           {
             "id": "header-main-right",
             "rowId": "header-main-row",
             "rowLayout": "quarters-1-2-1",
             "blocks": [
+              {
+                "id": "header-utility-theme",
+                "kind": "headerTheme",
+                "headerUtilityAction": "theme",
+                "headerUtilityVariant": "muted"
+              },
               {
                 "id": "header-utility-search",
                 "kind": "headerSearch",
@@ -6061,12 +6051,64 @@
                 "kind": "headerCart",
                 "headerUtilityAction": "cart",
                 "headerUtilityVariant": "muted"
+              },
+              {
+                "id": "header-language",
+                "kind": "headerLanguage",
+                "headerLanguageDisplay": "native"
+              },
+              {
+                "id": "header-categories",
+                "kind": "headerCategories",
+                "headerCategoriesLabel": "Categories",
+                "headerCategoriesShowLabel": true,
+                "headerCategoriesDisplay": "icon-label",
+                "headerCategoriesIcon": "grid",
+                "headerCategoriesIconPosition": "left",
+                "headerCategoriesDropdownAlign": "right",
+                "headerCategoriesShowAll": true,
+                "headerCategoriesShowCounts": true,
+                "headerCategoriesShowHierarchy": true,
+                "visualStyle": {
+                  "border": {
+                    "color": "#cccccc",
+                    "width": "0px",
+                    "style": "none"
+                  },
+                  "padding": {
+                    "linked": true,
+                    "top": "none",
+                    "right": "none",
+                    "bottom": "none",
+                    "left": "none"
+                  },
+                  "margin": {
+                    "linked": true,
+                    "top": "none",
+                    "right": "none",
+                    "bottom": "none",
+                    "left": "none"
+                  },
+                  "effects": {
+                    "boxShadow": ""
+                  }
+                },
+                "panelStyle": "princity",
+                "buttonBg": "var(--builder-preview-section-button-bg, var(--builder-section-button-bg, var(--builder-button-bg, #111111)))",
+                "buttonTextColor": "var(--builder-preview-section-button-text, var(--builder-section-button-text, var(--builder-button-text, #ffffff)))",
+                "buttonBorderRadius": "999px",
+                "buttonBorderWidth": "0px",
+                "buttonBorderColor": "transparent",
+                "buttonPaddingY": "11px",
+                "buttonPaddingX": "18px",
+                "buttonFontWeight": "720",
+                "buttonLetterSpacing": "0px",
+                "buttonHoverBg": "var(--builder-preview-section-button-bg, var(--builder-section-button-bg, var(--builder-button-bg, #111111)))",
+                "buttonHoverTextColor": "var(--builder-preview-section-button-text, var(--builder-section-button-text, var(--builder-button-text, #ffffff)))",
+                "buttonHoverBorderColor": "transparent",
+                "buttonHoverEffect": "lift"
               }
-            ],
-            "rowBottomSpacing": "none",
-            "rowTopSpacing": "none",
-            "rowTopMargin": "none",
-            "rowBottomMargin": "none"
+            ]
           }
         ],
         "visible": true,
@@ -6076,7 +6118,7 @@
         "bottomMargin": "none"
       }
     ],
-    "updatedAt": "2026-07-16T19:26:09.766Z"
+    "updatedAt": "2026-07-16T06:39:55.412Z"
   },
   "footer": {
     "version": 1,

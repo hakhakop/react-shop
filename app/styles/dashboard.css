@@ -857,7 +857,6 @@
   top: auto !important;
   right: auto !important;
   left: auto !important;
-  margin: 0 !important;
 }
 
 .builder-header-document-preview .builder-header-live-row-tools {
@@ -920,12 +919,15 @@
   outline-offset: 2px;
 }
 
+/* The Builder row wrapper replaces the renderer's direct row children, so it
+   must be transparent to the Header layout and fill the renderer-owned track.
+   Header width, columns, gaps and alignment remain controlled by the document. */
 .builder-header-document-preview .site-header-pill-inner > .builder-header-live-row,
 .builder-header-document-preview .site-header-princity-inner > .builder-header-live-row {
   grid-column: 1 / -1;
   flex: 1 1 100%;
   width: 100%;
-  max-width: none;
+  min-width: 0;
 }
 
 .builder-header-row-drop-target {
@@ -12842,7 +12844,6 @@ article.is-selected-column > .builder-preview-box-spacing,
   right: auto !important;
   bottom: auto !important;
   left: auto !important;
-  margin: 0 !important;
 }
 
 /* Pull-under page preview CSS normally makes the top-state Header absolute.
@@ -12947,21 +12948,6 @@ article.is-selected-column > .builder-preview-box-spacing,
   display: none !important;
 }
 
-/* Margin-top overrides for pill layout in builder to replicate fixed spacing */
-.builder-header-document-preview #site-header-pill:not([data-scrolled="true"]) .site-header-pill-main {
-  margin-top: 16px !important;
-}
-.builder-header-document-preview #site-header-pill[data-scrolled="true"] .site-header-pill-main {
-  margin-top: 12px !important;
-}
-
-/* Prevent double-padding (row padding + pill padding) which bloats the pill height in builder only when scrolled */
-.builder-header-document-preview #site-header-pill[data-scrolled="true"] .site-header-pill-inner > .builder-header-live-row,
-.builder-header-document-preview #site-header-pill[data-scrolled="true"] .site-header-princity-inner > .builder-header-live-row {
-  padding-top: 0 !important;
-  padding-bottom: 0 !important;
-}
-
 /* Keep row tools below the compact pill and inside the preview bounds. */
 .builder-header-document-preview #site-header-pill[data-scrolled="true"] .site-header-pill-inner > .builder-header-live-row > .builder-header-live-row-tools,
 .builder-header-document-preview #site-header-pill[data-scrolled="true"] .site-header-princity-inner > .builder-header-live-row > .builder-header-live-row-tools {
@@ -12969,12 +12955,6 @@ article.is-selected-column > .builder-preview-box-spacing,
   right: auto !important;
   left: 8px !important;
   transform: translateY(4px) !important;
-}
-
-/* Shrink the row width in scrolled compact pill state so it doesn't stretch the container */
-.builder-header-document-preview #site-header-pill[data-scrolled="true"] .builder-header-live-row {
-  width: auto !important;
-  min-width: max-content !important;
 }
 
 /* Always highlight header bar boundaries when Pull page content under Header (overlay) is selected and not scrolled */

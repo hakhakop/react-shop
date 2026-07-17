@@ -25,9 +25,9 @@
   "headerActiveIndicator": "princity",
   "headerBehavior": "pill-on-scroll",
   "headerTransparent": false,
-  "headerOverlay": false,
+  "headerOverlay": true,
   "headerWidthMode": "boxed",
-  "headerHeight": "comfortable",
+  "headerHeight": "compact",
   "headerZIndex": 40,
   "sectionPaddingTop": "lg",
   "sectionPaddingBottom": "lg",
@@ -177,5 +177,5 @@
     }
   ],
   "headerSticky": true,
-  "updatedAt": "2026-07-16T19:26:09.841Z"
+  "updatedAt": "2026-07-16T19:19:16.541Z"
 }
