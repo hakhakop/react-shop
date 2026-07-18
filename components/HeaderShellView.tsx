@@ -203,7 +203,10 @@ export default function HeaderShellView({
       : asString(settings.layout, "centered");
   const layout = normalizeLayout(layoutValue);
   const headerBehavior = resolveHeaderBehavior(shellSettings);
-  const headerHeight = resolveHeaderHeightCss(shellSettings.headerHeight);
+  const headerHeight = resolveHeaderHeightCss(
+    shellSettings.headerHeight,
+    shellSettings.headerCustomHeight,
+  );
   const topToolbarVisible = shellSettings.topToolbarVisible !== false;
   const effectiveTopBarText =
     typeof shellSettings.topToolbarText === "string"
@@ -366,7 +369,7 @@ export default function HeaderShellView({
   };
   const renderHeaderButton = (buttonElement?: HeaderBuilderElement) => showButtonElement ? (
     <Link
-      href={buttonElement?.url || clientHref}
+      href={serviceHomepageMode ? "/register" : (buttonElement?.url || clientHref)}
       className="site-header-action-pill site-header-service-cta"
       style={{
         ...(buttonElement?.buttonBg ? { background: buttonElement.buttonBg } : {}),
@@ -381,7 +384,7 @@ export default function HeaderShellView({
         ...typographyProps(buttonElement?.typography, "button").style,
       }}
     >
-      {buttonElement?.label || "Start"}
+      {serviceHomepageMode ? "Start Free" : (buttonElement?.label || "Start")}
     </Link>
   ) : null;
   const allDocumentElements = headerComposition.elements;

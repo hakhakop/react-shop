@@ -12,6 +12,7 @@ import {
 } from "@/lib/websites";
 import { ensureWebsiteBuilderData } from "@/lib/websiteBuilderData";
 import SaaSI18nProvider from "@/components/i18n/SaaSI18nProvider";
+import { readActiveSubscriptionPackages } from "@/lib/subscriptions";
 
 export const metadata = {
   title: "Website Builder",
@@ -73,6 +74,7 @@ export default async function WebsiteBuilderPage({
   }
 
   await ensureWebsiteBuilderData(website.id);
+  const subscriptionPackages = await readActiveSubscriptionPackages();
   console.log("[builder-scope] route passes DashboardBuilder websiteId", {
     routeWebsiteId: websiteId,
     resolvedWebsiteId: website.id,
@@ -88,6 +90,10 @@ export default async function WebsiteBuilderPage({
           saasUserRole={user.role}
           primaryContentLanguage={website.primaryLanguage}
           enabledContentLanguages={website.enabledLanguages}
+          websiteName={website.name}
+          websiteSlug={website.slug}
+          subscriptionPackages={subscriptionPackages}
+          websiteIsPublished={website.status === "active"}
         />
       </Suspense>
     </div></SaaSI18nProvider>

@@ -24,6 +24,7 @@ import { ensureWebsiteBuilderData } from "@/lib/websiteBuilderData";
 import { getWebsiteRouteSegment, type SaaSWebsite } from "@/lib/websites";
 import { cookies } from "next/headers";
 import { resolveContentSections } from "@/lib/builderContentLanguages";
+import { Sparkles } from "lucide-react";
 
 type WebsiteFrontendMode = "preview" | "domain";
 
@@ -192,6 +193,9 @@ export default async function WebsiteFrontend({
         website={website}
         activeContentLanguage={activeContentLanguage}
       />
+      {website.status !== "active" && (
+        <div className="webpages-draft-branding"><Sparkles size={14} /> Created with <strong>WebPages</strong></div>
+      )}
     </div>
   );
 }

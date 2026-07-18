@@ -378,6 +378,22 @@ export async function updateUserOnboarding(
   return { user: updatedUser };
 }
 
+export async function updateUserSubscription(
+  userId: string,
+  subscription: SaaSUserSubscription,
+) {
+  const users = await readUsers();
+  const existing = users.find((user) => user.id === userId);
+  if (!existing) return { error: "User not found." };
+  const updatedUser: SaaSUser = {
+    ...existing,
+    subscription,
+    updatedAt: new Date().toISOString(),
+  };
+  await writeUsers(users.map((user) => (user.id === userId ? updatedUser : user)));
+  return { user: updatedUser };
+}
+
 export async function updateUserLanguage(userId: string, language: Locale) {
   const users = await readUsers();
   const existing = users.find((user) => user.id === userId);

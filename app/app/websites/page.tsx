@@ -59,8 +59,8 @@ export default async function WebsitesPage() {
           <section className="saas-phase-one-empty-state">
             <span className="saas-phase-one-empty-icon"><Globe2 size={28} /></span>
             <div>
-              <h2><T k="websites.empty" /></h2>
-              <p><T k="websites.emptyDescription" /></p>
+              <h2>Create your first website</h2>
+              <p>Start with a template and make it yours in the Builder. No subscription required.</p>
             </div>
             <Link className="saas-phase-one-primary-action" href="/app/websites/new">
               <Plus size={17} /> <T k="websites.create" />

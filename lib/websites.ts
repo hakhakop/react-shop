@@ -1,9 +1,10 @@
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import crypto from "node:crypto";
 import path from "node:path";
 import { isSaaSAdmin, type PublicSaaSUser } from "@/lib/auth";
 import { getRuntimeDataDir } from "@/lib/runtimeDataDir";
 import {
+  getWebsiteBuilderDir,
   initializeWebsiteBuilderData,
 } from "@/lib/websiteBuilderData";
 import type { StarterWebsiteId } from "@/lib/starterWebsites";
@@ -28,6 +29,14 @@ export type SaaSWebsite = {
   primaryLanguage: WebsiteContentLanguage;
   enabledLanguages: WebsiteContentLanguage[];
   status: WebsiteStatus;
+  creationRequestId?: string;
+  websiteCategory?: string;
+  companyName?: string;
+  personName?: string;
+  logoUrl?: string;
+  contactPhone?: string;
+  contactEmail?: string;
+  socialLinks?: string;
   ecommerceSettings?: WebsiteEcommerceSettings;
   createdAt: string;
   updatedAt: string;
@@ -448,9 +457,28 @@ export async function createWebsite(input: {
   slug: string;
   type?: WebsiteType;
   starterId?: StarterWebsiteId;
+  websiteCategory?: string;
+  companyName?: string;
+  personName?: string;
+  description?: string;
+  logoUrl?: string;
+  contactPhone?: string;
+  contactEmail?: string;
+  socialLinks?: string;
+  creationRequestId?: string;
 }) {
   const websites = await readWebsites();
   const slug = normalizeSlug(input.slug);
+  const creationRequestId = normalizeLongText(input.creationRequestId, 80);
+
+  if (creationRequestId) {
+    const existingRequest = websites.find(
+      (website) =>
+        website.ownerId === input.ownerId &&
+        website.creationRequestId === creationRequestId,
+    );
+    if (existingRequest) return { website: existingRequest, reused: true };
+  }
 
   if (websites.some((website) => website.slug === slug)) {
     return { error: "This slug is already used by another website." };
@@ -466,23 +494,57 @@ export async function createWebsite(input: {
     domain: null,
     primaryDomain: null,
     domains: [],
-    description: "",
+    description: normalizeDescription(input.description),
+    websiteCategory: normalizeOption(input.websiteCategory, "Business"),
+    companyName: normalizeOption(input.companyName, ""),
+    personName: normalizeOption(input.personName, ""),
+    logoUrl: normalizeLongText(input.logoUrl, 240),
+    contactPhone: normalizeOption(input.contactPhone, ""),
+    contactEmail: normalizeOption(input.contactEmail, ""),
+    socialLinks: normalizeLongText(input.socialLinks, 600),
     timeZone: "Asia/Yerevan",
     language: "hy",
     primaryLanguage: "hy",
     enabledLanguages: ["hy"],
     status: "creating",
+    creationRequestId: creationRequestId || undefined,
     createdAt: now,
     updatedAt: now,
   };
 
-  await writeWebsites([...websites, website]);
-  await initializeWebsiteBuilderData({
-    websiteId: website.id,
-    websiteName: website.name,
-    starterId: input.starterId,
-  });
+  try {
+    // Persist every starter document before exposing the website record. The
+    // Builder route can therefore never observe a half-generated website.
+    await initializeWebsiteBuilderData({
+      websiteId: website.id,
+      websiteName: website.name,
+      starterId: input.starterId,
+    });
+    await writeWebsites([...websites, website]);
+  } catch (error) {
+    await rm(getWebsiteBuilderDir(website.id), { recursive: true, force: true }).catch(
+      () => undefined,
+    );
+    const message = error instanceof Error ? error.message : "Unknown generation error.";
+    return { error: `Website generation failed: ${message}` };
+  }
   return { website };
+}
+
+export async function activateWebsite(input: { websiteId: string }) {
+  const websites = await readWebsites();
+  const website = websites.find((item) => item.id === input.websiteId);
+  if (!website) return { error: "Website not found." };
+
+  const updatedWebsite: SaaSWebsite = {
+    ...website,
+    status: "active",
+    updatedAt: new Date().toISOString(),
+  };
+  await writeWebsites(
+    websites.map((item) => (item.id === website.id ? updatedWebsite : item)),
+  );
+  return { website: updatedWebsite };
 }
 
 export async function updateWebsiteSettings(input: {

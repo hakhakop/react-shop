@@ -70,6 +70,7 @@ import type {
   FocusEvent as ReactFocusEvent,
   KeyboardEvent as ReactKeyboardEvent,
   MouseEvent as ReactMouseEvent,
+  PointerEvent as ReactPointerEvent,
   ReactNode,
 } from "react";
 import {
@@ -94,6 +95,8 @@ import FluentFormClient from "@/components/builder/FluentFormClient";
 import ProductCarousel from "@/components/ProductCarousel";
 import ProductOptionsSelector from "@/components/ProductOptionsSelector";
 import DashboardInspector from "@/components/dashboard/DashboardInspector";
+import PublishFlowDialog from "@/components/dashboard/PublishFlowDialog";
+import type { SubscriptionPackage } from "@/lib/subscriptions";
 import { headerPresets } from "./headerPresets";
 import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
 import BuilderWireframePanel, {
@@ -208,6 +211,21 @@ const BUILDER_TEMPLATE_DND_TYPE = "application/x-builder-template";
 const BUILDER_TEMPLATE_SECTION_DND_TYPE =
   "application/x-builder-template-section";
 const BUILDER_TEMPLATE_ROW_DND_TYPE = "application/x-builder-template-row";
+const INSPECTOR_WIDTH_STORAGE_KEY = "webpages-builder-inspector-width";
+const INSPECTOR_DEFAULT_WIDTH = 360;
+const INSPECTOR_MIN_WIDTH = 300;
+const INSPECTOR_MIN_CANVAS_WIDTH = 320;
+const INSPECTOR_RESIZE_BREAKPOINT = 760;
+
+function readInspectorWidthPreference() {
+  if (typeof window === "undefined") return INSPECTOR_DEFAULT_WIDTH;
+  const storedWidth = Number(
+    window.localStorage.getItem(INSPECTOR_WIDTH_STORAGE_KEY),
+  );
+  return Number.isFinite(storedWidth) && storedWidth >= INSPECTOR_MIN_WIDTH
+    ? storedWidth
+    : INSPECTOR_DEFAULT_WIDTH;
+}
 const BUILDER_TEMPLATE_ELEMENT_DND_TYPE =
   "application/x-builder-template-element";
 
@@ -1507,6 +1525,10 @@ export type DashboardBuilderProps = {
   saasUserRole?: SaaSUserRole;
   primaryContentLanguage?: string;
   enabledContentLanguages?: string[];
+  websiteName?: string;
+  websiteSlug?: string;
+  subscriptionPackages?: SubscriptionPackage[];
+  websiteIsPublished?: boolean;
 };
 
 export default function DashboardBuilder({
@@ -1516,6 +1538,10 @@ export default function DashboardBuilder({
   saasUserRole,
   primaryContentLanguage = "hy",
   enabledContentLanguages = [primaryContentLanguage],
+  websiteName = "Website",
+  websiteSlug = websiteRouteSegment ?? "website",
+  subscriptionPackages = [],
+  websiteIsPublished = false,
 }: DashboardBuilderProps) {
   const router = useRouter();
   const { t } = useTranslation();
@@ -1698,6 +1724,8 @@ export default function DashboardBuilder({
   const [draftReady, setDraftReady] = useState(false);
   const [publishStatus, setPublishStatus] = useState("Local draft autosaves");
   const [publishCelebration, setPublishCelebration] = useState(false);
+  const [publishFlowOpen, setPublishFlowOpen] = useState(false);
+  const [publishAccessGranted, setPublishAccessGranted] = useState(websiteIsPublished);
   const [uploadingSlide, setUploadingSlide] = useState<number | null>(null);
   const [uploadingNestedSlide, setUploadingNestedSlide] = useState<
     string | null
@@ -1726,6 +1754,12 @@ export default function DashboardBuilder({
   >(null);
   const [inspectorTab, setInspectorTab] = useState<InspectorTab>("layout");
   const [inspectorOpen, setInspectorOpen] = useState(false);
+  const [inspectorWidth, setInspectorWidth] = useState(
+    readInspectorWidthPreference,
+  );
+  const [inspectorWorkspaceWidth, setInspectorWorkspaceWidth] = useState(0);
+  const [inspectorDesktopLayout, setInspectorDesktopLayout] = useState(false);
+  const [inspectorResizing, setInspectorResizing] = useState(false);
   const [sectionSettingsOpen, setSectionSettingsOpen] = useState(false);
   const [sectionStructureOpen, setSectionStructureOpen] = useState(false);
   const [globalStylesTab, setGlobalStylesTab] = useState<
@@ -1813,6 +1847,18 @@ export default function DashboardBuilder({
   const [mediaPickerTitle, setMediaPickerTitle] = useState("WordPress Media");
   const [mediaPickerCurrentUrl, setMediaPickerCurrentUrl] = useState("");
   const previewShellRef = useRef<HTMLDivElement>(null);
+  const builderWorkspaceRef = useRef<HTMLElement>(null);
+  const inspectorPanelRef = useRef<HTMLDivElement>(null);
+  const inspectorToggleRef = useRef<HTMLButtonElement>(null);
+  const inspectorPortalRootRef = useRef<HTMLDivElement>(null);
+  const inspectorResizeRef = useRef<{
+    pointerId: number;
+    startX: number;
+    startWidth: number;
+    currentWidth: number;
+    previousCursor: string;
+    previousUserSelect: string;
+  } | null>(null);
   const mediaSelectRef = useRef<((media: WordPressMediaItem) => void) | null>(
     null,
   );
@@ -1985,6 +2031,96 @@ export default function DashboardBuilder({
     () => localizedSections.find((section) => section.id === selectedId),
     [localizedSections, selectedId],
   );
+
+  const inspectorMaxWidth = Math.floor(
+    Math.min(
+      inspectorWorkspaceWidth * 0.5,
+      inspectorWorkspaceWidth - INSPECTOR_MIN_CANVAS_WIDTH,
+    ),
+  );
+  const inspectorResizeEnabled =
+    inspectorDesktopLayout && inspectorMaxWidth >= INSPECTOR_MIN_WIDTH;
+  const clampedInspectorWidth = inspectorResizeEnabled
+    ? Math.min(
+        inspectorMaxWidth,
+        Math.max(INSPECTOR_MIN_WIDTH, inspectorWidth),
+      )
+    : INSPECTOR_DEFAULT_WIDTH;
+
+  const restoreInspectorResizeDocumentStyles = useCallback(() => {
+    const resizeState = inspectorResizeRef.current;
+    if (!resizeState) return;
+    document.documentElement.style.cursor = resizeState.previousCursor;
+    document.body.style.userSelect = resizeState.previousUserSelect;
+    inspectorResizeRef.current = null;
+  }, []);
+
+  useEffect(() => {
+    const workspace = builderWorkspaceRef.current;
+    if (!workspace) return;
+
+    const updateWorkspaceSize = () => {
+      setInspectorWorkspaceWidth(workspace.getBoundingClientRect().width);
+      setInspectorDesktopLayout(
+        window.innerWidth > INSPECTOR_RESIZE_BREAKPOINT,
+      );
+    };
+    updateWorkspaceSize();
+
+    const resizeObserver = new ResizeObserver(updateWorkspaceSize);
+    resizeObserver.observe(workspace);
+    window.addEventListener("resize", updateWorkspaceSize);
+    return () => {
+      resizeObserver.disconnect();
+      window.removeEventListener("resize", updateWorkspaceSize);
+    };
+  }, []);
+
+  useEffect(() => {
+    return () => restoreInspectorResizeDocumentStyles();
+  }, [restoreInspectorResizeDocumentStyles]);
+
+  useEffect(() => {
+    if (!inspectorOpen) return;
+
+    const handleOutsidePointerDown = (event: PointerEvent) => {
+      const target = event.target;
+      if (!(target instanceof Element)) return;
+
+      const eventPath = event.composedPath();
+      const isWithinBoundary = [
+        inspectorPanelRef.current,
+        inspectorToggleRef.current,
+        inspectorPortalRootRef.current,
+      ].some((element) => element && eventPath.includes(element));
+      if (isWithinBoundary || target.closest("[data-inspector-owned-portal]")) {
+        return;
+      }
+
+      // Canvas selection handlers reopen the Inspector with the new target.
+      // Treat editable preview objects as part of the interaction boundary so
+      // capture-phase ordering cannot produce a close/reopen flash.
+      if (
+        target.closest(
+          ".builder-preview-section, .builder-preview-layout-block, .builder-header-document-preview, [data-builder-section-id]",
+        )
+      ) {
+        return;
+      }
+
+      setInspectorOpen(false);
+    };
+
+    document.addEventListener("pointerdown", handleOutsidePointerDown, true);
+    return () => {
+      document.removeEventListener(
+        "pointerdown",
+        handleOutsidePointerDown,
+        true,
+      );
+    };
+  }, [inspectorOpen]);
+
   useEffect(() => {
     setInspectorOpen(Boolean(selectedSection));
   }, [selectedSection]);
@@ -6539,6 +6675,61 @@ export default function DashboardBuilder({
     window.addEventListener("mouseup", stopResize);
   };
 
+  const startInspectorResize = (
+    event: ReactPointerEvent<HTMLDivElement>,
+  ) => {
+    if (!inspectorResizeEnabled || event.button !== 0) return;
+    event.preventDefault();
+    event.stopPropagation();
+
+    inspectorResizeRef.current = {
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      startWidth: clampedInspectorWidth,
+      currentWidth: clampedInspectorWidth,
+      previousCursor: document.documentElement.style.cursor,
+      previousUserSelect: document.body.style.userSelect,
+    };
+    event.currentTarget.setPointerCapture(event.pointerId);
+    document.documentElement.style.cursor = "col-resize";
+    document.body.style.userSelect = "none";
+    setInspectorResizing(true);
+  };
+
+  const moveInspectorResize = (
+    event: ReactPointerEvent<HTMLDivElement>,
+  ) => {
+    const resizeState = inspectorResizeRef.current;
+    if (!resizeState || resizeState.pointerId !== event.pointerId) return;
+    event.preventDefault();
+    const nextWidth =
+      resizeState.startWidth + resizeState.startX - event.clientX;
+    const clampedWidth = Math.min(
+      inspectorMaxWidth,
+      Math.max(INSPECTOR_MIN_WIDTH, nextWidth),
+    );
+    resizeState.currentWidth = clampedWidth;
+    setInspectorWidth(clampedWidth);
+  };
+
+  const stopInspectorResize = (
+    event: ReactPointerEvent<HTMLDivElement>,
+  ) => {
+    const resizeState = inspectorResizeRef.current;
+    if (!resizeState || resizeState.pointerId !== event.pointerId) return;
+    const persistedWidth = resizeState.currentWidth;
+    setInspectorWidth(persistedWidth);
+    window.localStorage.setItem(
+      INSPECTOR_WIDTH_STORAGE_KEY,
+      String(Math.round(persistedWidth)),
+    );
+    restoreInspectorResizeDocumentStyles();
+    setInspectorResizing(false);
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+  };
+
   const inspectorPanel = (
     <DashboardInspector
       hasSections={builderState.sections.length > 0}
@@ -8097,11 +8288,11 @@ export default function DashboardBuilder({
             Publish Settings
           </button>
         ) : (
-          hasPendingChanges && (
+          (hasPendingChanges || Boolean(websiteId)) && (
             <button
               type="button"
               className="is-primary"
-              onClick={publishLayout}
+              onClick={() => websiteId && !publishAccessGranted ? setPublishFlowOpen(true) : void publishLayout()}
             >
               <CloudUpload size={15} />
               {t("builder.toolbar.publish")}
@@ -8115,6 +8306,7 @@ export default function DashboardBuilder({
   const sidebarUtilityControls = (
     <>
       <button
+        ref={inspectorToggleRef}
         type="button"
         className={`builder-sidebar-utility-button builder-sidebar-inspector-toggle${
           inspectorOpen ? " is-active" : selectedSection ? " is-highlighted" : ""
@@ -8303,7 +8495,7 @@ export default function DashboardBuilder({
         onSetSidebarCollapsed={setSidebarCollapsedPreference}
       />
 
-      <main className="builder-workspace">
+      <main ref={builderWorkspaceRef} className="builder-workspace">
         {publishCelebration && (
           <div
             className="builder-publish-celebration"
@@ -8957,21 +9149,60 @@ export default function DashboardBuilder({
 
       {inspectorOpen && selectedSection ? (
         <div
-          className="builder-floating-inspector"
+          ref={inspectorPanelRef}
+          className={`builder-floating-inspector${inspectorResizing ? " is-resizing" : ""}`}
           onMouseDown={(event) => event.stopPropagation()}
           onClick={(event) => event.stopPropagation()}
+          style={
+            inspectorResizeEnabled
+              ? { width: `${clampedInspectorWidth}px` }
+              : undefined
+          }
         >
+          {inspectorResizeEnabled ? (
+            <div
+              className="builder-inspector-resize-handle"
+              role="separator"
+              aria-label="Resize Inspector"
+              aria-orientation="vertical"
+              aria-valuemin={INSPECTOR_MIN_WIDTH}
+              aria-valuemax={inspectorMaxWidth}
+              aria-valuenow={Math.round(clampedInspectorWidth)}
+              onPointerDown={startInspectorResize}
+              onPointerMove={moveInspectorResize}
+              onPointerUp={stopInspectorResize}
+              onPointerCancel={stopInspectorResize}
+              onLostPointerCapture={stopInspectorResize}
+            />
+          ) : null}
           {inspectorPanel}
         </div>
       ) : null}
 
-      <MediaManager
-        open={mediaPickerOpen}
-        title={mediaPickerTitle}
-        currentUrl={mediaPickerCurrentUrl}
-        onSelect={selectWordPressMedia}
-        onClose={closeWordPressMediaPicker}
-      />
+      <div
+        ref={inspectorPortalRootRef}
+        data-inspector-owned-portal
+        className="builder-inspector-owned-portal-root"
+      >
+        <MediaManager
+          open={mediaPickerOpen}
+          title={mediaPickerTitle}
+          currentUrl={mediaPickerCurrentUrl}
+          onSelect={selectWordPressMedia}
+          onClose={closeWordPressMediaPicker}
+        />
+      </div>
+      {websiteId ? (
+        <PublishFlowDialog
+          open={publishFlowOpen}
+          onClose={() => setPublishFlowOpen(false)}
+          onComplete={async () => { await publishLayout(); setPublishAccessGranted(true); }}
+          websiteId={websiteId}
+          websiteSlug={websiteSlug}
+          websiteName={websiteName}
+          packages={subscriptionPackages}
+        />
+      ) : null}
       {confirmPresetModal ? createPortal(confirmPresetModal, document.body) : null}
     </div>
   );

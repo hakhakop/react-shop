@@ -1,7 +1,10 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { resolveHeaderBehavior, type HeaderBehavior } from "@/lib/headerBehavior";
-import { normalizeHeaderHeight } from "@/lib/headerHeight";
+import {
+  normalizeHeaderCustomHeight,
+  normalizeHeaderHeight,
+} from "@/lib/headerHeight";
 import {
   backupRootBuilderFileBeforeWrite,
   ensureRootBuilderData,
@@ -70,6 +73,7 @@ export type BuilderShellSettings = {
   headerOverlay: boolean;
   headerWidthMode: "boxed" | "full";
   headerHeight?: string;
+  headerCustomHeight?: number;
   headerZIndex: number;
   sectionPaddingTop: BuilderSectionSpacing;
   sectionPaddingBottom: BuilderSectionSpacing;
@@ -402,6 +406,7 @@ export function normalizeBuilderShellSettings(
     headerOverlay: typeof value?.headerOverlay === "boolean" ? value.headerOverlay : false,
     headerWidthMode: value?.headerWidthMode === "full" ? "full" : "boxed",
     headerHeight: normalizeHeaderHeight(value?.headerHeight),
+    headerCustomHeight: normalizeHeaderCustomHeight(value?.headerCustomHeight),
     headerZIndex: typeof value?.headerZIndex === "number" && Number.isFinite(value.headerZIndex)
       ? Math.max(0, Math.min(999, Math.round(value.headerZIndex)))
       : 40,

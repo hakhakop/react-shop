@@ -261,156 +261,6 @@
                     "body": "<p><strong>Website</strong>, հոսթինգ և սպասարկում՝ մեկ պարզ փաթեթով</p>"
                   }
                 }
-              },
-              {
-                "id": "slider-block-mrp2hr8q-ptyuj",
-                "kind": "slider",
-                "title": "Explore what makes the difference",
-                "body": "Use a clear visual sequence to introduce services, benefits, projects, or important ideas.",
-                "slides": [
-                  {
-                    "id": "slider-block-mrp2hr8q-ptyuj-slide-1",
-                    "badge": "01",
-                    "title": "Enterprise Grade Security",
-                    "text": "Data protection is built into our core framework, ensuring your application remains safe and compliant.",
-                    "imagePadding": "medium",
-                    "typography": {
-                      "variant": "body",
-                      "fontFamily": "inherit",
-                      "fontSize": "16px",
-                      "fontWeight": "400",
-                      "lineHeight": "1.4",
-                      "letterSpacing": "0px",
-                      "color": "inherit",
-                      "textAlign": "left"
-                    }
-                  },
-                  {
-                    "id": "slider-block-mrp2hr8q-ptyuj-slide-2",
-                    "badge": "02",
-                    "title": "Sub-Second Page Speeds",
-                    "text": "Serve content globally through optimized CDN networks, providing visitors with instant load times.",
-                    "imagePadding": "medium",
-                    "typography": {
-                      "variant": "body",
-                      "fontFamily": "inherit",
-                      "fontSize": "16px",
-                      "fontWeight": "400",
-                      "lineHeight": "1.4",
-                      "letterSpacing": "0px",
-                      "color": "inherit",
-                      "textAlign": "left"
-                    }
-                  },
-                  {
-                    "id": "slider-block-mrp2hr8q-ptyuj-slide-3",
-                    "badge": "03",
-                    "title": "Dedicated Asset Hosting",
-                    "text": "Manage and deliver high-resolution media assets effortlessly without affecting site performance.",
-                    "imagePadding": "medium",
-                    "typography": {
-                      "variant": "body",
-                      "fontFamily": "inherit",
-                      "fontSize": "16px",
-                      "fontWeight": "400",
-                      "lineHeight": "1.4",
-                      "letterSpacing": "0px",
-                      "color": "inherit",
-                      "textAlign": "left"
-                    }
-                  }
-                ],
-                "carouselSettings": {
-                  "variant": "showcase",
-                  "loop": true,
-                  "autoplay": false,
-                  "autoplayDelayMs": 5000,
-                  "align": "start",
-                  "dragFree": false,
-                  "effect": "slide",
-                  "spaceBetween": 24,
-                  "coverflowRotate": 34,
-                  "coverflowDepth": 140,
-                  "coverflowStretch": 0,
-                  "cardsRotate": true,
-                  "cardsShadows": true,
-                  "creativePreset": "soft-stack",
-                  "fadeCrossFade": true,
-                  "freeModeMomentum": true,
-                  "cardsPerView": 1,
-                  "showArrows": true,
-                  "showDots": true,
-                  "pauseOnHover": true
-                }
-              },
-              {
-                "id": "button-block-mrp2hznt-vivxk",
-                "kind": "button",
-                "buttonsLayout": "inline",
-                "buttons": [
-                  {
-                    "id": "btn-mrp2hznt",
-                    "label": "Start Free Trial",
-                    "url": "/",
-                    "target": "_self",
-                    "style": "primary"
-                  }
-                ],
-                "elementPadding": "inherit",
-                "elementBackgroundMode": "transparent"
-              },
-              {
-                "id": "badgeGrid-block-mrp2ha21-um209",
-                "kind": "badgeGrid",
-                "title": "Built around the essentials",
-                "body": "Highlight the qualities that make your offer clear, dependable, and easy to choose.",
-                "columns": 3,
-                "badges": [
-                  {
-                    "id": "badgeGrid-block-mrp2ha21-um209-badge-1",
-                    "label": "99.99%",
-                    "title": "Enterprise SLA",
-                    "body": "Uptime guarantee backed by our priority support operations."
-                  },
-                  {
-                    "id": "badgeGrid-block-mrp2ha21-um209-badge-2",
-                    "label": "250ms",
-                    "title": "Global CDN Delivery",
-                    "body": "Fast content loading worldwide via cloud caching."
-                  },
-                  {
-                    "id": "badgeGrid-block-mrp2ha21-um209-badge-3",
-                    "label": "12K+",
-                    "title": "Launches Completed",
-                    "body": "Websites successfully launched on our platform."
-                  }
-                ]
-              },
-              {
-                "id": "hero-block-mrp2gslq-6o6q3",
-                "kind": "hero",
-                "eyebrow": "PLATFORM OVERVIEW",
-                "title": "Build beautiful websites without writing code",
-                "body": "Create professional websites using a visual builder designed for speed, flexibility, and pixel-perfect control.",
-                "buttonLabel": "Start Building",
-                "buttonUrl": "/",
-                "buttonStyle": "primary",
-                "buttons": [
-                  {
-                    "id": "hero-block-mrp2gslq-6o6q3-secondary-action",
-                    "label": "Explore Templates",
-                    "url": "/",
-                    "target": "_self",
-                    "style": "outline"
-                  }
-                ],
-                "buttonsLayout": "inline",
-                "buttonGap": "0.75rem",
-                "elementAlign": "left",
-                "elementPadding": "lg",
-                "carouselSettings": {
-                  "variant": "default"
-                }
               }
             ]
           },
@@ -468,137 +318,52 @@
             ],
             "rowTopMargin": "lg",
             "rowBottomMargin": "xl",
-            "rowBackground": "#050505",
+            "rowBackground": "#969696",
             "rowColorScheme": "light",
             "rowVisualStyle": {
               "border": {
-                "color": "#ff0000",
-                "width": "4px",
+                "color": "#ffffff",
+                "width": "2px",
                 "style": "solid",
-                "radius": "20px"
+                "radius": "12px"
               },
               "effects": {
                 "boxShadow": "0 8px 24px rgba(0,0,0,0.08)",
-                "opacity": 37
+                "opacity": 42
               },
               "background": {
                 "type": "color",
-                "color": "#d26565"
+                "color": "#e00000"
               }
             },
-            "rowBottomSpacing": "xl",
-            "rowGap": "inherit"
+            "rowBottomSpacing": "md"
           },
           {
             "id": "layout-row-mrm3av9h-column-2",
             "rowId": "layout-row-mrm3av9h",
             "rowLayout": "halves",
-            "blocks": [
-              {
-                "id": "grid-block-mrma14zr-gjmas",
-                "kind": "grid",
-                "title": "Services designed around your goals",
-                "gridSource": "static",
-                "columns": 2,
-                "gridRows": 1,
-                "gridGap": "medium",
-                "gridMargin": "inherit",
-                "gridImagePadding": "frameless",
-                "gridContentPadding": "medium",
-                "gridImageFrame": "none",
-                "gridShowImage": true,
-                "gridShowEyebrow": true,
-                "gridShowMeta": true,
-                "gridShowText": true,
-                "gridShowButton": true,
-                "gridItems": [
-                  {
-                    "id": "grid-block-mrma14zr-gjmas-1",
-                    "eyebrow": "01",
-                    "title": "Strategy and planning",
-                    "meta": "Build with clarity",
-                    "text": "Turn priorities into a focused plan with practical next steps and measurable outcomes.",
-                    "buttonLabel": "View Details",
-                    "buttonUrl": "/",
-                    "typography": {
-                      "variant": "body",
-                      "fontFamily": "inherit",
-                      "fontSize": "16px",
-                      "fontWeight": "400",
-                      "lineHeight": "1.4",
-                      "letterSpacing": "0px",
-                      "color": "inherit",
-                      "textAlign": "left"
-                    }
-                  },
-                  {
-                    "id": "grid-block-mrma14zr-gjmas-2",
-                    "eyebrow": "02",
-                    "title": "Design and delivery",
-                    "meta": "Make it memorable",
-                    "text": "Create a polished experience that communicates your value clearly across every screen.",
-                    "buttonLabel": "See Our Work",
-                    "buttonUrl": "/",
-                    "typography": {
-                      "variant": "body",
-                      "fontFamily": "inherit",
-                      "fontSize": "16px",
-                      "fontWeight": "400",
-                      "lineHeight": "1.4",
-                      "letterSpacing": "0px",
-                      "color": "inherit",
-                      "textAlign": "left"
-                    }
-                  },
-                  {
-                    "id": "grid-block-mrma14zr-gjmas-3",
-                    "eyebrow": "03",
-                    "title": "Support and growth",
-                    "meta": "Ready for what follows",
-                    "text": "Keep improving with flexible support that adapts as your audience and ambitions grow.",
-                    "buttonLabel": "Contact Us",
-                    "buttonUrl": "/",
-                    "typography": {
-                      "variant": "body",
-                      "fontFamily": "inherit",
-                      "fontSize": "16px",
-                      "fontWeight": "400",
-                      "lineHeight": "1.4",
-                      "letterSpacing": "0px",
-                      "color": "inherit",
-                      "textAlign": "left"
-                    }
-                  }
-                ],
-                "visualStyle": {
-                  "card": {
-                    "preset": "dark"
-                  }
-                }
-              }
-            ],
+            "blocks": [],
             "rowTopMargin": "lg",
             "rowBottomMargin": "xl",
-            "rowBackground": "#050505",
+            "rowBackground": "#969696",
             "rowColorScheme": "light",
             "rowVisualStyle": {
               "border": {
-                "color": "#ff0000",
-                "width": "4px",
+                "color": "#ffffff",
+                "width": "2px",
                 "style": "solid",
-                "radius": "20px"
+                "radius": "12px"
               },
               "effects": {
                 "boxShadow": "0 8px 24px rgba(0,0,0,0.08)",
-                "opacity": 37
+                "opacity": 42
               },
               "background": {
                 "type": "color",
-                "color": "#d26565"
+                "color": "#e00000"
               }
             },
-            "rowBottomSpacing": "xl",
-            "rowGap": "inherit"
+            "rowBottomSpacing": "md"
           },
           {
             "id": "layout-row-mrm3ighd-column-1",
@@ -619,7 +384,7 @@
           }
         },
         "contentVerticalAlign": "center",
-        "sectionHeight": "auto",
+        "sectionHeight": "viewport",
         "pullUnderHeader": false,
         "contentTranslations": {
           "en": {}
@@ -1739,7 +1504,7 @@
         ]
       }
     ],
-    "updatedAt": "2026-07-17T15:09:02.573Z"
+    "updatedAt": "2026-07-15T13:26:07.177Z"
   },
   "shop": {
     "version": 1,
@@ -6272,7 +6037,8 @@
                     "bottom": "inherit",
                     "left": "inherit"
                   }
-                }
+                },
+                "elementAlign": "center"
               }
             ],
             "rowBottomSpacing": "none",
@@ -6296,6 +6062,11 @@
                 "kind": "headerCart",
                 "headerUtilityAction": "cart",
                 "headerUtilityVariant": "muted"
+              },
+              {
+                "id": "header-language",
+                "kind": "headerLanguage",
+                "headerLanguageDisplay": "native"
               }
             ],
             "rowBottomSpacing": "none",
@@ -6311,7 +6082,7 @@
         "bottomMargin": "none"
       }
     ],
-    "updatedAt": "2026-07-16T19:26:09.766Z"
+    "updatedAt": "2026-07-17T13:24:38.380Z"
   },
   "footer": {
     "version": 1,

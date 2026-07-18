@@ -291,5 +291,35 @@
     "status": "creating",
     "createdAt": "2026-07-15T10:48:40.508Z",
     "updatedAt": "2026-07-15T10:48:40.508Z"
+  },
+  {
+    "id": "aae40cbf-8dab-4f4d-b50a-781dda893f64",
+    "ownerId": "3d5db4fd-c1a6-41c9-870a-ab05d889cbb0",
+    "name": "rrrr",
+    "slug": "rrrr",
+    "type": "business",
+    "domain": "rrrr.webpages.am",
+    "primaryDomain": "rrrr.webpages.am",
+    "domains": [
+      "rrrr.webpages.am"
+    ],
+    "description": "",
+    "websiteCategory": "Business",
+    "companyName": "",
+    "personName": "",
+    "logoUrl": "",
+    "contactPhone": "",
+    "contactEmail": "",
+    "socialLinks": "",
+    "timeZone": "Asia/Yerevan",
+    "language": "hy",
+    "primaryLanguage": "hy",
+    "enabledLanguages": [
+      "hy"
+    ],
+    "status": "active",
+    "creationRequestId": "_r_1_",
+    "createdAt": "2026-07-18T05:13:14.141Z",
+    "updatedAt": "2026-07-18T05:15:05.133Z"
   }
 ]

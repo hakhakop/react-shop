@@ -1,144 +1,69 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import SaaSShell from "@/components/saas/SaaSShell";
+import WebsiteCreationWizard from "@/components/saas/WebsiteCreationWizard";
 import { getCurrentUser } from "@/lib/auth";
-import {
-  createWebsite,
-  normalizeWebsiteType,
-  validateWebsiteInput,
-} from "@/lib/websites";
+import { createWebsite, normalizeWebsiteType, validateWebsiteInput } from "@/lib/websites";
 import { loginRedirectFor } from "@/lib/saasRoutes";
-import { T } from "@/components/i18n/LanguageProvider";
-import {
-  defaultStarterWebsiteId,
-  isStarterWebsiteId,
-  starterWebsiteLibrary,
-} from "@/lib/starterWebsites";
+import { isStarterWebsiteId, starterWebsiteLibrary } from "@/lib/starterWebsites";
+import { saveOnboardingLogo } from "@/lib/onboardingUploads";
 
 export const dynamic = "force-dynamic";
 
-type NewWebsitePageProps = {
-  searchParams?: Promise<{
-    error?: string;
-    name?: string;
-    slug?: string;
-    starter?: string;
-  }>;
-};
+export type WebsiteCreationResult =
+  | { ok: true; websiteId: string; websiteSlug: string; redirectTo: string }
+  | { ok: false; error: string };
 
-async function createWebsiteAction(formData: FormData) {
+async function createWebsiteAction(formData: FormData): Promise<WebsiteCreationResult> {
   "use server";
-
   const user = await getCurrentUser(await cookies());
-  if (!user) {
-    redirect(loginRedirectFor("/app/websites/new"));
-  }
+  if (!user) return { ok: false, error: "Your session expired. Sign in and try again." };
 
-  const parsed = validateWebsiteInput({
-    name: formData.get("name"),
-    slug: formData.get("slug"),
-  });
+  const name = String(formData.get("name") ?? "");
+  const suggestedSlug = name.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 52);
+  const parsed = validateWebsiteInput({ name, slug: suggestedSlug.length >= 3 ? suggestedSlug : `site-${Date.now().toString(36)}` });
+  if ("error" in parsed) return { ok: false, error: String(parsed.error ?? "Invalid website details") };
+
   const starterValue = formData.get("starterId");
-  const starterId = isStarterWebsiteId(starterValue)
-    ? starterValue
-    : defaultStarterWebsiteId;
+  const starterId = isStarterWebsiteId(starterValue) ? starterValue : "modern-business";
+  const logo = formData.get("logo");
+  const logoResult = await saveOnboardingLogo(logo instanceof File ? logo : null);
+  if ("error" in logoResult) return { ok: false, error: String(logoResult.error ?? "Logo upload failed") };
 
-  if ("error" in parsed) {
-    const params = new URLSearchParams({
-      error: String(parsed.error),
-      name: String(formData.get("name") ?? ""),
-      slug: String(formData.get("slug") ?? ""),
-      starter: starterId,
-    });
-    redirect(`/app/websites/new?${params.toString()}`);
-  }
-
+  const category = String(formData.get("websiteCategory") ?? "Business");
   const result = await createWebsite({
     ownerId: user.id,
-    type: normalizeWebsiteType(
-      user.subscription?.packageType === "E-Commerce" ? "e-commerce" : "business",
-    ),
     ...parsed,
+    type: normalizeWebsiteType(category === "Online Store" ? "e-commerce" : "business"),
     starterId,
+    websiteCategory: category,
+    companyName: String(formData.get("companyName") ?? ""),
+    personName: String(formData.get("personName") ?? ""),
+    description: String(formData.get("description") ?? ""),
+    logoUrl: logoResult.logoUrl,
+    contactPhone: String(formData.get("phone") ?? ""),
+    contactEmail: String(formData.get("contactEmail") ?? ""),
+    socialLinks: String(formData.get("socialLinks") ?? ""),
+    creationRequestId: String(formData.get("creationRequestId") ?? ""),
   });
+  if ("error" in result) return { ok: false, error: String(result.error ?? "Website creation failed") };
 
-  if ("error" in result) {
-    const params = new URLSearchParams({
-      error: String(result.error),
-      name: parsed.name,
-      slug: parsed.slug,
-      starter: starterId,
-    });
-    redirect(`/app/websites/new?${params.toString()}`);
-  }
-
-  redirect("/app/websites");
+  const redirectTo = `/app/websites/${result.website.slug}/builder?created=1`;
+  return {
+    ok: true,
+    websiteId: result.website.id,
+    websiteSlug: result.website.slug,
+    redirectTo,
+  };
 }
 
-export default async function NewWebsitePage({
-  searchParams,
-}: NewWebsitePageProps) {
+export default async function NewWebsitePage({ searchParams }: { searchParams?: Promise<{ error?: string }> }) {
   const user = await getCurrentUser(await cookies());
-
-  if (!user) {
-    redirect(loginRedirectFor("/app/websites/new"));
-  }
-
-  const params = (await searchParams) ?? {};
-  const selectedStarter = isStarterWebsiteId(params.starter)
-    ? params.starter
-    : defaultStarterWebsiteId;
-
+  if (!user) redirect(loginRedirectFor("/app/websites/new"));
+  const params = await searchParams;
   return (
-    <SaaSShell user={user} title={<T k="websites.create" />}>
-      <form className="saas-auth-card saas-website-form" action={createWebsiteAction}>
-        <div className="saas-auth-heading">
-          <span><T k="websites.new" /></span>
-          <h1><T k="websites.create" /></h1>
-          <p><T k="websites.newDescription" /></p>
-        </div>
-
-        <div className="saas-website-fields">
-          <label className="saas-auth-field">
-            <span><T k="common.name" /></span>
-            <input name="name" placeholder="My Website" required maxLength={100} defaultValue={params.name ?? ""} />
-          </label>
-
-          <label className="saas-auth-field">
-            <span><T k="websites.slug" /></span>
-            <input name="slug" placeholder="my-website" required minLength={3} maxLength={60} pattern="[a-z0-9]+(-[a-z0-9]+)*" defaultValue={params.slug ?? ""} />
-          </label>
-        </div>
-
-        <fieldset className="saas-starter-picker">
-          <legend>Choose a Starter</legend>
-          <p>Choose a professionally structured starting point. Every section remains fully editable.</p>
-          <div className="saas-starter-grid">
-            {starterWebsiteLibrary.map((starter) => (
-              <label className="saas-starter-card" key={starter.id}>
-                <input type="radio" name="starterId" value={starter.id} defaultChecked={starter.id === selectedStarter} />
-                <span className={`saas-starter-preview saas-starter-preview--${starter.preview.tone}`} aria-hidden="true">
-                  <i className="saas-starter-preview-header" />
-                  {starter.preview.rows.map((width, index) => (
-                    <i key={`${starter.id}-${index}`} style={{ width: `${width}%` }} />
-                  ))}
-                </span>
-                <span className="saas-starter-card-copy">
-                  <strong>{starter.name}</strong>
-                  <small>{starter.description}</small>
-                </span>
-                <span className="saas-starter-check" aria-hidden="true">✓</span>
-              </label>
-            ))}
-          </div>
-        </fieldset>
-
-        {params.error && <p className="saas-auth-error">{params.error}</p>}
-
-        <button className="saas-auth-submit" type="submit">
-          <T k="websites.create" />
-        </button>
-      </form>
+    <SaaSShell user={user} title="Create Website">
+      <WebsiteCreationWizard action={createWebsiteAction} error={params?.error} starters={starterWebsiteLibrary.map(({ id, name, description, preview }) => ({ id, name, description, preview }))} />
     </SaaSShell>
   );
 }

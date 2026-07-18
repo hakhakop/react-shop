@@ -70,6 +70,12 @@ import {
 } from "@/lib/builderTypography";
 import type { BuilderShellSettings } from "@/lib/builderShell";
 import {
+  getInitialHeaderCustomHeight,
+  HEADER_CUSTOM_HEIGHT_MAX,
+  HEADER_CUSTOM_HEIGHT_MIN,
+  normalizeHeaderCustomHeight,
+} from "@/lib/headerHeight";
+import {
   normalizeBuilderAnchorId,
   validateBuilderAnchorId,
 } from "@/lib/builderAnchors";
@@ -908,6 +914,114 @@ function InspectorGroupSummary({
   );
 }
 
+function HeaderHeightControl({
+  settings,
+  onChange,
+}: {
+  settings: BuilderShellSettings;
+  onChange: (patch: Partial<BuilderShellSettings>) => void;
+}) {
+  const resolvedCustomHeight =
+    normalizeHeaderCustomHeight(settings.headerCustomHeight) ??
+    getInitialHeaderCustomHeight(settings.headerHeight);
+  const [customHeightDraft, setCustomHeightDraft] = useState(
+    String(resolvedCustomHeight),
+  );
+
+  const selectHeight = (value: string) => {
+    if (value !== "custom") {
+      onChange({ headerHeight: value });
+      return;
+    }
+
+    setCustomHeightDraft(String(resolvedCustomHeight));
+    onChange({
+      headerHeight: "custom",
+      ...(settings.headerCustomHeight === undefined
+        ? { headerCustomHeight: resolvedCustomHeight }
+        : {}),
+    });
+  };
+
+  const updateCustomHeightDraft = (value: string) => {
+    if (!/^\d*$/.test(value)) return;
+    setCustomHeightDraft(value);
+    if (value === "") return;
+
+    const numericValue = Number(value);
+    if (
+      Number.isFinite(numericValue) &&
+      numericValue >= HEADER_CUSTOM_HEIGHT_MIN
+    ) {
+      const nextHeight =
+        normalizeHeaderCustomHeight(numericValue) ?? resolvedCustomHeight;
+      if (numericValue > HEADER_CUSTOM_HEIGHT_MAX) {
+        setCustomHeightDraft(String(nextHeight));
+      }
+      onChange({
+        headerCustomHeight: nextHeight,
+      });
+    }
+  };
+
+  const commitCustomHeightDraft = () => {
+    if (customHeightDraft === "") {
+      setCustomHeightDraft(String(resolvedCustomHeight));
+      return;
+    }
+
+    const nextHeight = normalizeHeaderCustomHeight(customHeightDraft);
+    if (nextHeight === undefined) {
+      setCustomHeightDraft(String(resolvedCustomHeight));
+      return;
+    }
+    setCustomHeightDraft(String(nextHeight));
+    if (nextHeight !== settings.headerCustomHeight) {
+      onChange({ headerCustomHeight: nextHeight });
+    }
+  };
+
+  return (
+    <>
+      <label className="builder-field">
+        <span>Header height</span>
+        <select
+          value={settings.headerHeight ?? "auto"}
+          onChange={(event) => selectHeight(event.target.value)}
+        >
+          <option value="auto">Auto (Responsive)</option>
+          <option value="compact">Compact (56px)</option>
+          <option value="comfortable">Comfortable (72px)</option>
+          <option value="spacious">Spacious (88px)</option>
+          <option value="showcase">Showcase (104px)</option>
+          <option value="custom">Custom</option>
+        </select>
+      </label>
+      {settings.headerHeight === "custom" ? (
+        <label className="builder-field builder-header-custom-height-field">
+          <span>Custom height</span>
+          <span className="builder-header-custom-height-input">
+            <input
+              type="number"
+              inputMode="numeric"
+              min={HEADER_CUSTOM_HEIGHT_MIN}
+              max={HEADER_CUSTOM_HEIGHT_MAX}
+              step={1}
+              value={customHeightDraft}
+              onChange={(event) =>
+                updateCustomHeightDraft(event.target.value)
+              }
+              onBlur={commitCustomHeightDraft}
+              aria-label="Custom Header height"
+            />
+            <small>px</small>
+          </span>
+        </label>
+      ) : null}
+    </>
+  );
+}
+
 function HeaderDocumentSettings({
   settings,
   onChange,
@@ -1020,16 +1134,7 @@ function HeaderDocumentSettings({
             <input type="number" min={0} max={999} value={settings.headerZIndex ?? 40} onChange={(event) => onChange({ headerZIndex: Number(event.target.value) })} />
           </label>
         </div>
-        <label className="builder-field">
-          <span>Header height</span>
-          <select value={settings.headerHeight ?? "auto"} onChange={(event) => onChange({ headerHeight: event.target.value })}>
-            <option value="auto">Auto (Responsive)</option>
-            <option value="compact">Compact (56px)</option>
-            <option value="comfortable">Comfortable (72px)</option>
-            <option value="spacious">Spacious (88px)</option>
-            <option value="showcase">Showcase (104px)</option>
-          </select>
-        </label>
+        <HeaderHeightControl settings={settings} onChange={onChange} />
       </details>
 
       <details className="builder-collapse">

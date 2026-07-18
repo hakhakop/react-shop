@@ -177,5 +177,21 @@
     },
     "createdAt": "2026-07-09T18:43:20.325Z",
     "updatedAt": "2026-07-09T18:43:20.325Z"
+  },
+  {
+    "id": "3d5db4fd-c1a6-41c9-870a-ab05d889cbb0",
+    "email": "hakop28ol2@yahoo.com",
+    "passwordHash": "$2b$12$HZrapxtIaTINBCYlUh3DdO0KQUElleVmqHZ2/wJg2ykjPFZt3XIa2",
+    "name": "Hakob",
+    "role": "user",
+    "createdAt": "2026-07-18T05:02:46.435Z",
+    "updatedAt": "2026-07-18T05:15:05.132Z",
+    "subscription": {
+      "packageId": "411e6d1b-3688-4cbb-ad61-533760969d57",
+      "packageName": "🌱 Ստարտ",
+      "packageType": "Business Website",
+      "priceText": "5000 ֏/Ամիս",
+      "requestedAt": "2026-07-18T05:15:05.132Z"
+    }
   }
 ]

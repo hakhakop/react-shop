@@ -42,11 +42,26 @@ export default async function HomePage() {
         ) as typeof layout.sections,
       }
     : layout;
+  const launchLayout = localizedLayout ? {
+    ...localizedLayout,
+    sections: localizedLayout.sections.map((section) => ({
+      ...section,
+      ...(section.buttonLabel && section.buttonUrl ? { buttonLabel: "Start Free", buttonUrl: "/register" } : {}),
+      layoutItems: section.layoutItems?.map((item) => ({
+        ...item,
+        blocks: item.blocks?.map((block) => ({
+          ...block,
+          ...(block.buttonLabel && block.buttonUrl ? { buttonLabel: "Start Free", buttonUrl: "/register" } : {}),
+          buttons: block.buttons?.map((button) => button.style === "primary" ? { ...button, label: "Start Free", url: "/register" } : button),
+        })),
+      })),
+    })),
+  } : localizedLayout;
 
-  if (localizedLayout?.sections?.some((section) => section.visible)) {
+  if (launchLayout?.sections?.some((section) => section.visible)) {
     return (
       <StorefrontBuilderRenderer
-        layout={localizedLayout}
+        layout={launchLayout}
         page="home"
         headerOverlay={shellSettings.headerOverlay === true}
       />
