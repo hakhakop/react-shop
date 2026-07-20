@@ -52,6 +52,7 @@ export default function SaaSShell({
               <span className="saas-shell-nav-label"><T k="navigation.admin" /></span>
               <Link href="/admin"><T k="navigation.adminHome" /></Link>
               {canManagePackages && <Link href="/admin/packages"><T k="navigation.packages" /></Link>}
+              {canManagePackages && <Link href="/admin/translations"><T k="navigation.translations" /></Link>}
               <Link href="/admin/websites"><T k="navigation.allWebsites" /></Link>
               <Link href="/admin/users"><T k="navigation.users" /></Link>
             </>

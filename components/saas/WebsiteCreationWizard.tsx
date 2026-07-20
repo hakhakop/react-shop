@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect, useId, useRef, useState } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   ArrowLeft,
@@ -17,6 +17,7 @@ import {
   Sparkles,
   Utensils,
 } from "lucide-react";
+import { useTranslation } from "@/components/i18n/LanguageProvider";
 
 type WebsiteCreationResult =
   | { ok: true; websiteId: string; websiteSlug: string; redirectTo: string }
@@ -43,14 +44,17 @@ const websiteTypes = [
 
 export default function WebsiteCreationWizard({
   action,
+  creationRequestId,
   starters,
   error,
 }: {
   action: (data: FormData) => Promise<WebsiteCreationResult>;
+  creationRequestId: string;
   starters: Starter[];
   error?: string;
 }) {
   const router = useRouter();
+  const { t } = useTranslation();
   const formRef = useRef<HTMLFormElement>(null);
   const submittedRef = useRef(false);
   const redirectTimerRef = useRef<number | null>(null);
@@ -60,7 +64,7 @@ export default function WebsiteCreationWizard({
   const [starter, setStarter] = useState("modern-business");
   const [phase, setPhase] = useState<GenerationPhase>("form");
   const [progress, setProgress] = useState(12);
-  const creationRequestId = useId();
+  const [hasSubmitted, setHasSubmitted] = useState(false);
   const [result, formAction, isPending] = useActionState(
     async (_previous: WebsiteCreationResult | null, formData: FormData) =>
       action(formData),
@@ -79,6 +83,7 @@ export default function WebsiteCreationWizard({
     if (!result) return;
     if (!result.ok) {
       submittedRef.current = false;
+      setHasSubmitted(false);
       setPhase("error");
       return;
     }
@@ -87,7 +92,7 @@ export default function WebsiteCreationWizard({
     setPhase("ready");
     redirectTimerRef.current = window.setTimeout(() => {
       router.replace(result.redirectTo);
-    }, 700);
+    }, 1000);
 
     return () => {
       if (redirectTimerRef.current !== null) {
@@ -112,6 +117,7 @@ export default function WebsiteCreationWizard({
       return;
     }
     submittedRef.current = true;
+    setHasSubmitted(true);
     setProgress(12);
     setPhase("creating");
   }
@@ -139,9 +145,9 @@ export default function WebsiteCreationWizard({
         <input type="hidden" name="starterId" value={starter} />
         <header className="saas-create-wizard-head">
           <div>
-            <span>New website</span>
-            <h1>Create something great.</h1>
-            <p>Start with a few essentials. Everything stays editable in the Builder.</p>
+            <span>{t("wizard.newWebsite")}</span>
+            <h1>{t("wizard.heading")}</h1>
+            <p>{t("wizard.description")}</p>
           </div>
           <div className="saas-create-steps">
             {[1, 2, 3].map((item) => (
@@ -154,8 +160,8 @@ export default function WebsiteCreationWizard({
 
         {step === 1 && (
           <section className="saas-wizard-panel">
-            <div className="saas-wizard-title"><span>01 · Basics</span><h2>What are you creating?</h2></div>
-            <label className="saas-auth-field"><span>Website name</span><input value={websiteName} onChange={(event) => setWebsiteName(event.target.value)} autoFocus required maxLength={100} placeholder="Acme Studio" /></label>
+            <div className="saas-wizard-title"><span>{t("wizard.basics")}</span><h2>{t("wizard.whatCreating")}</h2></div>
+            <label className="saas-auth-field"><span>{t("wizard.websiteName")}</span><input value={websiteName} onChange={(event) => setWebsiteName(event.target.value)} autoFocus required maxLength={100} placeholder="Acme Studio" /></label>
             <div className="saas-type-grid">
               {websiteTypes.map((item) => {
                 const Icon = item.icon;
@@ -167,7 +173,7 @@ export default function WebsiteCreationWizard({
 
         {step === 2 && (
           <section className="saas-wizard-panel">
-            <div className="saas-wizard-title"><span>02 · Starting point</span><h2>Choose a starter template</h2><p>Pick the closest direction—you can change every section later.</p></div>
+            <div className="saas-wizard-title"><span>{t("wizard.startingPoint")}</span><h2>{t("wizard.chooseStarter")}</h2><p>{t("wizard.starterDescription")}</p></div>
             <div className="saas-starter-grid">
               {starters.map((item) => <label className="saas-starter-card" key={item.id}><input type="radio" name="starterPicker" value={item.id} checked={starter === item.id} onChange={() => setStarter(item.id)} /><span className={`saas-starter-preview saas-starter-preview--${item.preview.tone}`}>{item.preview.rows.map((width, index) => <i key={index} style={{ width: `${width}%` }} />)}</span><span className="saas-starter-card-copy"><strong>{item.name}</strong><small>{item.description}</small></span><span className="saas-starter-check">✓</span></label>)}
             </div>
@@ -176,14 +182,14 @@ export default function WebsiteCreationWizard({
 
         {step === 3 && (
           <section className="saas-wizard-panel">
-            <div className="saas-wizard-title"><span>03 · Make it yours</span><h2>Tell us about the brand</h2><p>Only the website name is required. Add whatever you have now.</p></div>
-            <div className="saas-wizard-fields"><label className="saas-auth-field"><span>Company name</span><input name="companyName" maxLength={120} /></label><label className="saas-auth-field"><span>Contact person</span><input name="personName" maxLength={80} /></label><label className="saas-auth-field saas-field-wide"><span>Short description</span><textarea name="description" rows={3} maxLength={240} placeholder="What do you offer, and who is it for?" /></label><label className="saas-auth-field"><span><ImageIcon size={13} /> Logo</span><input type="file" name="logo" accept="image/*" /></label><label className="saas-auth-field"><span>Phone · optional</span><input name="phone" autoComplete="tel" /></label><label className="saas-auth-field"><span>Email · optional</span><input name="contactEmail" type="email" /></label><label className="saas-auth-field"><span>Social links · optional</span><input name="socialLinks" placeholder="Instagram, LinkedIn, Facebook..." /></label></div>
+            <div className="saas-wizard-title"><span>{t("wizard.makeItYours")}</span><h2>{t("wizard.brandHeading")}</h2><p>{t("wizard.brandDescription")}</p></div>
+            <div className="saas-wizard-fields"><label className="saas-auth-field"><span>{t("wizard.companyName")}</span><input name="companyName" maxLength={120} /></label><label className="saas-auth-field"><span>{t("wizard.contactPerson")}</span><input name="personName" maxLength={80} /></label><label className="saas-auth-field saas-field-wide"><span>{t("wizard.shortDescription")}</span><textarea name="description" rows={3} maxLength={240} placeholder={t("wizard.shortDescriptionPlaceholder")} /></label><label className="saas-auth-field"><span><ImageIcon size={13} /> {t("wizard.logo")}</span><input type="file" name="logo" accept="image/*" /></label><label className="saas-auth-field"><span>{t("wizard.optionalPhone")}</span><input name="phone" autoComplete="tel" /></label><label className="saas-auth-field"><span>{t("wizard.optionalEmail")}</span><input name="contactEmail" type="email" /></label><label className="saas-auth-field"><span>{t("wizard.optionalSocialLinks")}</span><input name="socialLinks" placeholder={t("wizard.socialPlaceholder")} /></label></div>
           </section>
         )}
 
         <footer className="saas-wizard-actions">
-          <button type="button" className="saas-wizard-back" disabled={step === 1} onClick={() => setStep((value) => value - 1)}><ArrowLeft size={16} /> Back</button>
-          {step < 3 ? <button type="button" className="saas-auth-submit" onClick={() => setStep((value) => value + 1)}>Continue <ArrowRight size={16} /></button> : <button type="submit" className="saas-auth-submit" disabled={isPending || submittedRef.current}>Create Website <Sparkles size={16} /></button>}
+          <button type="button" className="saas-wizard-back" disabled={step === 1} onClick={() => setStep((value) => value - 1)}><ArrowLeft size={16} /> {t("wizard.back")}</button>
+          {step < 3 ? <button type="button" className="saas-auth-submit" onClick={() => setStep((value) => value + 1)}>{t("wizard.continue")} <ArrowRight size={16} /></button> : <button type="submit" className="saas-auth-submit" disabled={isPending || hasSubmitted}>{t("wizard.createWebsite")} <Sparkles size={16} /></button>}
         </footer>
       </form>
 
@@ -192,14 +198,14 @@ export default function WebsiteCreationWizard({
           <span className="saas-generation-orbit">
             {phase === "error" ? <CircleAlert size={30} /> : phase === "ready" ? <Check size={32} /> : <Sparkles size={30} />}
           </span>
-          <p>WebPages AI setup</p>
-          <h1>{phase === "ready" ? "Your website is ready" : phase === "error" ? "We couldn’t create your website" : "Creating your website..."}</h1>
-          <p>{phase === "error" && result && !result.ok ? result.error : phase === "ready" ? "Everything is saved. Opening your Builder now." : "We’re assembling your header, navigation, starter pages, content, and footer."}</p>
+          <p>{t("wizard.aiSetup")}</p>
+          <h1>{phase === "ready" ? t("wizard.readyTitle") : phase === "error" ? t("wizard.errorTitle") : t("wizard.creatingTitle")}</h1>
+          <p>{phase === "error" && result && !result.ok ? result.error : phase === "ready" ? t("wizard.readyDescription") : t("wizard.creatingDescription")}</p>
           <div className="saas-generation-progress"><i style={{ width: `${progress}%` }} /></div>
           {phase === "error" ? (
-            <button type="button" className="saas-auth-submit saas-generation-retry" onClick={retryCreation} disabled={isPending}><RotateCcw size={16} /> Retry</button>
+            <button type="button" className="saas-auth-submit saas-generation-retry" onClick={retryCreation} disabled={isPending}><RotateCcw size={16} /> {t("wizard.retry")}</button>
           ) : (
-            <ul><li><Check size={15} /> Brand foundation</li><li><Check size={15} /> Responsive page layouts</li><li>{phase === "ready" ? <Check size={15} /> : <Sparkles size={15} />} {phase === "ready" ? "Website data saved" : "Opening your Builder"}</li></ul>
+            <ul><li><Check size={15} /> {t("wizard.brandFoundation")}</li><li><Check size={15} /> {t("wizard.responsiveLayouts")}</li><li>{phase === "ready" ? <Check size={15} /> : <Sparkles size={15} />} {phase === "ready" ? t("wizard.websiteDataSaved") : t("wizard.openingBuilder")}</li></ul>
           )}
         </section>
       )}

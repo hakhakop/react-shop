@@ -1,4 +1,5 @@
 import { cookies } from "next/headers";
+import crypto from "node:crypto";
 import { redirect } from "next/navigation";
 import SaaSShell from "@/components/saas/SaaSShell";
 import WebsiteCreationWizard from "@/components/saas/WebsiteCreationWizard";
@@ -7,6 +8,7 @@ import { createWebsite, normalizeWebsiteType, validateWebsiteInput } from "@/lib
 import { loginRedirectFor } from "@/lib/saasRoutes";
 import { isStarterWebsiteId, starterWebsiteLibrary } from "@/lib/starterWebsites";
 import { saveOnboardingLogo } from "@/lib/onboardingUploads";
+import { T } from "@/components/i18n/LanguageProvider";
 
 export const dynamic = "force-dynamic";
 
@@ -62,8 +64,8 @@ export default async function NewWebsitePage({ searchParams }: { searchParams?: 
   if (!user) redirect(loginRedirectFor("/app/websites/new"));
   const params = await searchParams;
   return (
-    <SaaSShell user={user} title="Create Website">
-      <WebsiteCreationWizard action={createWebsiteAction} error={params?.error} starters={starterWebsiteLibrary.map(({ id, name, description, preview }) => ({ id, name, description, preview }))} />
+    <SaaSShell user={user} title={<T k="wizard.title" />}>
+      <WebsiteCreationWizard action={createWebsiteAction} creationRequestId={crypto.randomUUID()} error={params?.error} starters={starterWebsiteLibrary.map(({ id, name, description, preview }) => ({ id, name, description, preview }))} />
     </SaaSShell>
   );
 }

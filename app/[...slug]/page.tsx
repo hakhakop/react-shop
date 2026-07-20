@@ -13,6 +13,7 @@ import {
 import { getWebsiteByDomainHost } from "../../lib/websites";
 import { resolveContentSections } from "../../lib/builderContentLanguages";
 import { getBuilderShellSettings } from "../../lib/builderShell";
+import { getPublishedHeaderDocumentSettings } from "../../lib/publishedHeaderDocumentSettings";
 
 type WPPageParams = {
   slug?: string[];
@@ -72,6 +73,7 @@ export default async function WPPage({
         getPublishedBuilderLayout(builderPage.key as BuilderCustomPageKey),
         getBuilderShellSettings(),
       ]);
+      const headerDocumentSettings = await getPublishedHeaderDocumentSettings(shellSettings);
       const cookieStore = await cookies();
       const languageCookie = cookieStore.get("website_content_language_root")?.value;
       const activeContentLanguage = ["hy", "en", "ru"].includes(languageCookie as never)
@@ -99,7 +101,7 @@ export default async function WPPage({
               { label: "Home", href: "/" },
               { label: builderPage.title, href: `/${builderPage.slug}` },
             ]}
-            headerOverlay={shellSettings.headerOverlay === true}
+            headerOverlay={headerDocumentSettings.overlay}
           />
         );
       }

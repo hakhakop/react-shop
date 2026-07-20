@@ -915,18 +915,24 @@ function InspectorGroupSummary({
 }
 
 function HeaderHeightControl({
-  settings,
+  height,
+  customHeight,
   onChange,
 }: {
-  settings: BuilderShellSettings;
-  onChange: (patch: Partial<BuilderShellSettings>) => void;
+  height?: string;
+  customHeight?: number;
+  onChange: (patch: Partial<Pick<BuilderSection, "headerHeight" | "headerCustomHeight">>) => void;
 }) {
   const resolvedCustomHeight =
-    normalizeHeaderCustomHeight(settings.headerCustomHeight) ??
-    getInitialHeaderCustomHeight(settings.headerHeight);
+    normalizeHeaderCustomHeight(customHeight) ??
+    getInitialHeaderCustomHeight(height);
   const [customHeightDraft, setCustomHeightDraft] = useState(
     String(resolvedCustomHeight),
   );
+
+  useEffect(() => {
+    setCustomHeightDraft(String(resolvedCustomHeight));
+  }, [resolvedCustomHeight]);
 
   const selectHeight = (value: string) => {
     if (value !== "custom") {
@@ -937,7 +943,7 @@ function HeaderHeightControl({
     setCustomHeightDraft(String(resolvedCustomHeight));
     onChange({
       headerHeight: "custom",
-      ...(settings.headerCustomHeight === undefined
+      ...(customHeight === undefined
         ? { headerCustomHeight: resolvedCustomHeight }
         : {}),
     });
@@ -976,7 +982,7 @@ function HeaderHeightControl({
       return;
     }
     setCustomHeightDraft(String(nextHeight));
-    if (nextHeight !== settings.headerCustomHeight) {
+    if (nextHeight !== customHeight) {
       onChange({ headerCustomHeight: nextHeight });
     }
   };
@@ -986,7 +992,8 @@ function HeaderHeightControl({
       <label className="builder-field">
         <span>Header height</span>
         <select
-          value={settings.headerHeight ?? "auto"}
+          data-testid="header-height-select"
+          value={height ?? "auto"}
           onChange={(event) => selectHeight(event.target.value)}
         >
           <option value="auto">Auto (Responsive)</option>
@@ -997,11 +1004,12 @@ function HeaderHeightControl({
           <option value="custom">Custom</option>
         </select>
       </label>
-      {settings.headerHeight === "custom" ? (
+      {height === "custom" ? (
         <label className="builder-field builder-header-custom-height-field">
           <span>Custom height</span>
           <span className="builder-header-custom-height-input">
             <input
+              data-testid="header-custom-height-input"
               type="number"
               inputMode="numeric"
               min={HEADER_CUSTOM_HEIGHT_MIN}
@@ -1025,11 +1033,25 @@ function HeaderHeightControl({
 function HeaderDocumentSettings({
   settings,
   onChange,
+  headerVisible,
+  headerTransparent,
+  headerOverlay,
+  headerHeight,
+  headerCustomHeight,
+  onHeaderDocumentChange,
+  onHeaderHeightChange,
   onApplyHeaderPreset,
   headerPresetKey,
 }: {
   settings: BuilderShellSettings;
   onChange: (patch: Partial<BuilderShellSettings>) => void;
+  headerVisible: boolean;
+  headerTransparent: boolean;
+  headerOverlay: boolean;
+  headerHeight?: string;
+  headerCustomHeight?: number;
+  onHeaderDocumentChange: (patch: Partial<Pick<BuilderSection, "headerVisible" | "headerTransparent" | "headerOverlay">>) => void;
+  onHeaderHeightChange: (patch: Partial<Pick<BuilderSection, "headerHeight" | "headerCustomHeight">>) => void;
   onApplyHeaderPreset?: (presetKey: string) => void;
   headerPresetKey?: string;
 }) {
@@ -1086,11 +1108,16 @@ function HeaderDocumentSettings({
           <InspectorGroupSummary
             title="Header Settings"
             description="Document-wide behavior shared by every Header row and element."
-            meta={settings.headerVisible === false ? "hidden" : "visible"}
+            meta={headerVisible ? "visible" : "hidden"}
           />
         </summary>
         <label className="builder-check">
-          <input type="checkbox" checked={settings.headerVisible !== false} onChange={(event) => onChange({ headerVisible: event.target.checked })} />
+          <input
+            data-testid="header-visible-checkbox"
+            type="checkbox"
+            checked={headerVisible}
+            onChange={(event) => onHeaderDocumentChange({ headerVisible: event.target.checked })}
+          />
           <span>Show website Header</span>
         </label>
         <label className="builder-field">
@@ -1107,20 +1134,22 @@ function HeaderDocumentSettings({
         </label>
         <label className="builder-check">
           <input
+            data-testid="header-transparent-checkbox"
             type="checkbox"
-            checked={settings.headerOverlay === true || settings.headerTransparent === true}
-            disabled={settings.headerOverlay === true}
-            onChange={(event) => onChange({ headerTransparent: event.target.checked })}
+            checked={headerTransparent}
+            onChange={(event) => onHeaderDocumentChange({ headerTransparent: event.target.checked })}
           />
           <span>Transparent mode</span>
         </label>
         <label className="builder-check">
-          <input type="checkbox" checked={settings.headerOverlay === true} onChange={(event) => onChange({ headerOverlay: event.target.checked })} />
+          <input
+            data-testid="header-overlay-checkbox"
+            type="checkbox"
+            checked={headerOverlay}
+            onChange={(event) => onHeaderDocumentChange({ headerOverlay: event.target.checked })}
+          />
           <span>Pull page content under Header</span>
         </label>
-        {settings.headerOverlay === true ? (
-          <small>Pull-under mode keeps the Header background transparent.</small>
-        ) : null}
         <div className="builder-two-column">
           <label className="builder-field">
             <span>Header width</span>
@@ -1134,7 +1163,11 @@ function HeaderDocumentSettings({
             <input type="number" min={0} max={999} value={settings.headerZIndex ?? 40} onChange={(event) => onChange({ headerZIndex: Number(event.target.value) })} />
           </label>
         </div>
-        <HeaderHeightControl settings={settings} onChange={onChange} />
+        <HeaderHeightControl
+          height={headerHeight}
+          customHeight={headerCustomHeight}
+          onChange={onHeaderHeightChange}
+        />
       </details>
 
       <details className="builder-collapse">
@@ -2119,6 +2152,13 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
               <HeaderDocumentSettings
                 settings={shellSettings}
                 onChange={updateShellSettings}
+                headerVisible={selectedSection.headerVisible ?? shellSettings.headerVisible ?? true}
+                headerTransparent={selectedSection.headerTransparent ?? shellSettings.headerTransparent ?? false}
+                headerOverlay={selectedSection.headerOverlay ?? shellSettings.headerOverlay ?? false}
+                headerHeight={selectedSection.headerHeight ?? shellSettings.headerHeight}
+                headerCustomHeight={selectedSection.headerCustomHeight ?? shellSettings.headerCustomHeight}
+                onHeaderDocumentChange={(patch) => updateSelected(patch)}
+                onHeaderHeightChange={(patch) => updateSelected(patch)}
                 onApplyHeaderPreset={onApplyHeaderPreset}
                 headerPresetKey={selectedSection.headerPresetKey}
               />
@@ -16242,16 +16282,24 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                       <InspectorGroupSummary
                         title="Publishing State"
                         description="Toggle whether this section is rendered on the page."
-                        meta={selectedSection.visible ? "visible" : "hidden"}
+                        meta={(selectedSection.id === "header-document"
+                          ? selectedSection.headerVisible ?? shellSettings.headerVisible ?? true
+                          : selectedSection.visible)
+                          ? "visible"
+                          : "hidden"}
                       />
                     </summary>
 
                     <label className="builder-check">
                       <input
                         type="checkbox"
-                        checked={selectedSection.visible}
+                        checked={selectedSection.id === "header-document"
+                          ? selectedSection.headerVisible ?? shellSettings.headerVisible ?? true
+                          : selectedSection.visible}
                         onChange={(event) =>
-                          updateSelected({ visible: event.target.checked })
+                          updateSelected(selectedSection.id === "header-document"
+                            ? { headerVisible: event.target.checked }
+                            : { visible: event.target.checked })
                         }
                       />
                       <span>Visible on page</span>

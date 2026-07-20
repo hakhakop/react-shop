@@ -6226,7 +6226,7 @@
         "kind": "contentLayout",
         "title": "Header",
         "headerUtilityMigrationVersion": 3,
-        "background": "transparent",
+        "background": "",
         "backgroundMode": "full",
         "contentMode": "boxed",
         "colorScheme": "inherit",
@@ -6247,7 +6247,11 @@
                 "imageUrl": "https://cms.webpages.am/wp-content/uploads/2026/06/logo-2-1-scaled.png",
                 "imageAlt": "WebPages logo"
               }
-            ]
+            ],
+            "rowBottomSpacing": "none",
+            "rowTopSpacing": "none",
+            "rowTopMargin": "none",
+            "rowBottomMargin": "none"
           },
           {
             "id": "header-main-center",
@@ -6259,9 +6263,22 @@
                 "kind": "menu",
                 "title": "Navigation",
                 "menuSource": "main",
-                "menuActiveIndicator": "princity"
+                "menuActiveIndicator": "princity",
+                "visualStyle": {
+                  "padding": {
+                    "linked": true,
+                    "top": "inherit",
+                    "right": "inherit",
+                    "bottom": "inherit",
+                    "left": "inherit"
+                  }
+                }
               }
-            ]
+            ],
+            "rowBottomSpacing": "none",
+            "rowTopSpacing": "none",
+            "rowTopMargin": "none",
+            "rowBottomMargin": "none"
           },
           {
             "id": "header-main-right",
@@ -6280,24 +6297,21 @@
                 "headerUtilityAction": "cart",
                 "headerUtilityVariant": "muted"
               }
-            ]
+            ],
+            "rowBottomSpacing": "none",
+            "rowTopSpacing": "none",
+            "rowTopMargin": "none",
+            "rowBottomMargin": "none"
           }
         ],
         "visible": true,
-        "topSpacing": "xs",
-        "bottomSpacing": "xs",
-        "topMargin": "xs",
-        "bottomMargin": "xs",
-        "contentTranslations": {
-          "en": {}
-        },
-        "headerHeight": "auto",
-        "headerCustomHeight": 40,
-        "headerOverlay": true,
-        "headerTransparent": false
+        "topSpacing": "none",
+        "bottomSpacing": "none",
+        "topMargin": "none",
+        "bottomMargin": "none"
       }
     ],
-    "updatedAt": "2026-07-18T19:57:35.365Z"
+    "updatedAt": "2026-07-16T19:26:09.766Z"
   },
   "footer": {
     "version": 1,

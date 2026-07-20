@@ -11,6 +11,13 @@ const headerActionFromKind = (kind?: string) => {
   return undefined;
 };
 
+const headerButtonHoverEffect = (
+  value?: string,
+): HeaderBuilderElement["buttonHoverEffect"] =>
+  value === "none" || value === "lift" || value === "grow" || value === "inherit"
+    ? value
+    : undefined;
+
 /** Pure, client-safe Header document resolver shared by Builder and storefront. */
 export function resolveHeaderBuilderComposition(
   layout: Pick<BuilderLayout, "sections"> | null | undefined,
@@ -84,6 +91,8 @@ export function resolveHeaderBuilderComposition(
       buttonLetterSpacing: block.buttonLetterSpacing,
       buttonHoverBg: block.buttonHoverBg,
       buttonHoverTextColor: block.buttonHoverTextColor,
+      buttonHoverBorderColor: block.buttonHoverBorderColor,
+      buttonHoverEffect: headerButtonHoverEffect(block.buttonHoverEffect),
       ...sharedElementFields(block),
     }];
     if (block.id === "header-spacer" || block.kind === "embed") return [{
@@ -123,6 +132,7 @@ export function resolveHeaderBuilderComposition(
       buttonHoverBg: block.buttonHoverBg,
       buttonHoverTextColor: block.buttonHoverTextColor,
       buttonHoverBorderColor: block.buttonHoverBorderColor,
+      buttonHoverEffect: headerButtonHoverEffect(block.buttonHoverEffect),
       buttonHoverTransform: block.buttonHoverTransform,
       buttonHoverBoxShadow: block.buttonHoverBoxShadow,
       ...sharedElementFields(block),
@@ -143,6 +153,7 @@ export function resolveHeaderBuilderComposition(
       buttonHoverBg: block.buttonHoverBg,
       buttonHoverTextColor: block.buttonHoverTextColor,
       buttonHoverBorderColor: block.buttonHoverBorderColor,
+      buttonHoverEffect: headerButtonHoverEffect(block.buttonHoverEffect),
       buttonHoverTransform: block.buttonHoverTransform,
       buttonHoverBoxShadow: block.buttonHoverBoxShadow,
       ...sharedElementFields(block),
@@ -186,6 +197,15 @@ export function resolveHeaderBuilderComposition(
     }),
     documentBackground: section?.background,
     documentVisualStyle: section?.visualStyle,
+    documentVisible: section?.headerVisible,
+    documentTransparent: section?.headerTransparent,
+    documentOverlay: section?.headerOverlay,
+    documentHeight: section?.headerHeight,
+    documentCustomHeight: section?.headerCustomHeight,
+    documentTopSpacing: section?.topSpacing,
+    documentBottomSpacing: section?.bottomSpacing,
+    documentTopMargin: section?.topMargin,
+    documentBottomMargin: section?.bottomMargin,
     rows: rowsList,
     rowVisualStyle: row?.rowVisualStyle,
     rowGap: row?.headerGap,

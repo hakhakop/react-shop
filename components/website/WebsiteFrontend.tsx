@@ -25,6 +25,7 @@ import { getWebsiteRouteSegment, type SaaSWebsite } from "@/lib/websites";
 import { cookies } from "next/headers";
 import { resolveContentSections } from "@/lib/builderContentLanguages";
 import { Sparkles } from "lucide-react";
+import { getPublishedHeaderDocumentSettings } from "@/lib/publishedHeaderDocumentSettings";
 
 type WebsiteFrontendMode = "preview" | "domain";
 
@@ -132,6 +133,10 @@ export default async function WebsiteFrontend({
     getPublishedBuilderLayout(page, scope),
     getBuilderShellSettings(scope),
   ]);
+  const headerDocumentSettings = await getPublishedHeaderDocumentSettings(
+    shellSettings,
+    scope,
+  );
   const languageCookie = (await cookies()).get(`website_content_language_${website.id}`)?.value;
   const activeContentLanguage = website.enabledLanguages.includes(languageCookie as never)
     ? languageCookie!
@@ -183,7 +188,7 @@ export default async function WebsiteFrontend({
           page={page}
           pageLabel={pageLabelOverride ?? pageLabel(page, customPages)}
           website={website}
-          headerOverlay={shellSettings.headerOverlay === true}
+          headerOverlay={headerDocumentSettings.overlay}
           {...rendererProps}
         />
       ) : (

@@ -47,6 +47,7 @@ export type HeaderBuilderElement = {
   buttonHoverBg?: string;
   buttonHoverTextColor?: string;
   buttonHoverBorderColor?: string;
+  buttonHoverEffect?: "none" | "lift" | "grow" | "inherit";
   buttonHoverTransform?: string;
   buttonHoverBoxShadow?: string;
   utilityAction?: string;
@@ -83,6 +84,15 @@ export type HeaderBuilderComposition = {
   columns?: { id: string; rowId: string; flex: number }[];
   documentBackground?: string;
   documentVisualStyle?: BuilderVisualStyle;
+  documentVisible?: boolean;
+  documentTransparent?: boolean;
+  documentOverlay?: boolean;
+  documentHeight?: string;
+  documentCustomHeight?: number;
+  documentTopSpacing?: string;
+  documentBottomSpacing?: string;
+  documentTopMargin?: string;
+  documentBottomMargin?: string;
   rows?: HeaderRowComposition[];
   rowVisualStyle?: BuilderVisualStyle;
   rowGap?: string;
@@ -186,6 +196,11 @@ export function createLegacyEquivalentHeaderLayout(
       kind: "contentLayout",
       title: "Header",
       headerUtilityMigrationVersion: 3,
+      headerVisible: settings.headerVisible,
+      headerTransparent: settings.headerTransparent,
+      headerOverlay: settings.headerOverlay,
+      headerHeight: settings.headerHeight,
+      headerCustomHeight: settings.headerCustomHeight,
       background: "transparent",
       backgroundMode: "full",
       contentMode: "boxed",

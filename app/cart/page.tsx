@@ -3,6 +3,7 @@ import CartPageClient from "@/components/CartPageClient";
 import { renderDomainWebsiteFrontend } from "@/components/website/DomainWebsiteFrontend";
 import { getPublishedBuilderLayout } from "@/lib/builderLayouts";
 import { getBuilderShellSettings } from "@/lib/builderShell";
+import { getPublishedHeaderDocumentSettings } from "@/lib/publishedHeaderDocumentSettings";
 
 export default async function CartPage() {
   const pageContent = <CartPageClient asSlot />;
@@ -21,6 +22,7 @@ export default async function CartPage() {
     getPublishedBuilderLayout("page:cart"),
     getBuilderShellSettings(),
   ]);
+  const headerDocumentSettings = await getPublishedHeaderDocumentSettings(shellSettings);
 
   if (layout) {
     return (
@@ -29,7 +31,7 @@ export default async function CartPage() {
         page="page:cart"
         pageLabel="Cart"
         pageContent={pageContent}
-        headerOverlay={shellSettings.headerOverlay === true}
+        headerOverlay={headerDocumentSettings.overlay}
       />
     );
   }

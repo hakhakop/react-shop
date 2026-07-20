@@ -30,7 +30,11 @@ export function LanguageProvider({
 
   const setLocale = useCallback(async (nextLocale: Locale) => {
     if (nextLocale === locale) return;
-    const nextMessages = (await import(`../../locales/${nextLocale}.json`)).default as Messages;
+    const response = await fetch(`/api/i18n/${nextLocale}`, { cache: "no-store" });
+    if (!response.ok) return;
+    const data = (await response.json()) as { messages?: Messages };
+    const nextMessages = data.messages;
+    if (!nextMessages) return;
     setCurrentLocale(nextLocale);
     setMessages(nextMessages);
     document.documentElement.lang = nextLocale;

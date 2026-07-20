@@ -330,7 +330,7 @@ export default function HeaderFrame({
       <header
         id={id}
         ref={headerRef}
-        className={`${base} ${state} ${className} ${hiddenByScroll ? "site-header--scroll-hidden" : ""} ${overlapHeader ? "site-header--no-background" : ""}`}
+        className={`${base} ${state} ${className} ${hiddenByScroll ? "site-header--scroll-hidden" : ""}`}
         style={{
           ...(isSticky ? { borderBottomColor: scrolled ? accentColor : "transparent" } : {}),
           ...style,

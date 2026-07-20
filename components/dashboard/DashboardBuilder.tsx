@@ -56,6 +56,7 @@ import {
   resolveContentSections,
 } from "@/lib/builderContentLanguages";
 import { resolveHeaderBuilderComposition } from "@/lib/headerBuilderComposition";
+import { resolveHeaderDocumentSettings } from "@/lib/headerDocumentSettings";
 import {
   decodeHeaderBlockDragPayload,
   encodeHeaderBlockDragPayload,
@@ -76,6 +77,7 @@ import type {
 import {
   Fragment,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -1847,6 +1849,8 @@ export default function DashboardBuilder({
   const [mediaPickerTitle, setMediaPickerTitle] = useState("WordPress Media");
   const [mediaPickerCurrentUrl, setMediaPickerCurrentUrl] = useState("");
   const previewShellRef = useRef<HTMLDivElement>(null);
+  const headerPreviewSlotRef = useRef<HTMLDivElement>(null);
+  const headerPageContextRef = useRef<HTMLDivElement>(null);
   const builderWorkspaceRef = useRef<HTMLElement>(null);
   const inspectorPanelRef = useRef<HTMLDivElement>(null);
   const inspectorToggleRef = useRef<HTMLButtonElement>(null);
@@ -1867,6 +1871,7 @@ export default function DashboardBuilder({
   const skipUndoCaptureRef = useRef(false);
   const [committedBuilderStateSignature, setCommittedBuilderStateSignature] =
     useState("");
+  const [headerContextStatusTop, setHeaderContextStatusTop] = useState<number | null>(null);
   const [committedShellSettingsSignature, setCommittedShellSettingsSignature] =
     useState("");
   const undoRef = useRef<() => void>(() => {});
@@ -1944,6 +1949,57 @@ export default function DashboardBuilder({
     },
     [headerCompositionSections],
   );
+  const currentHeaderDocumentSettings = useMemo(
+    () => resolveHeaderDocumentSettings(currentHeaderComposition, shellSettings),
+    [currentHeaderComposition, shellSettings],
+  );
+  useLayoutEffect(() => {
+    if (builderState.page !== "header" || !currentHeaderDocumentSettings.overlay) {
+      setHeaderContextStatusTop(null);
+      return;
+    }
+
+    const slot = headerPreviewSlotRef.current;
+    const pageContext = headerPageContextRef.current;
+    if (!slot || !pageContext) return;
+
+    let observedHeader: HTMLElement | null = null;
+    let resizeObserver: ResizeObserver | null = null;
+    const updateStatusPosition = () => {
+      const header = slot.querySelector<HTMLElement>(".site-header");
+      if (!header) return;
+
+      if (header !== observedHeader) {
+        if (observedHeader) resizeObserver?.unobserve(observedHeader);
+        observedHeader = header;
+        resizeObserver?.observe(header);
+      }
+
+      const nextTop = Math.max(
+        44,
+        Math.ceil(header.offsetTop + header.offsetHeight - pageContext.offsetTop + 8),
+      );
+      setHeaderContextStatusTop((current) => current === nextTop ? current : nextTop);
+    };
+
+    resizeObserver = new ResizeObserver(updateStatusPosition);
+    resizeObserver.observe(pageContext);
+    const mutationObserver = new MutationObserver(updateStatusPosition);
+    mutationObserver.observe(slot, {
+      attributes: true,
+      childList: true,
+      subtree: true,
+      attributeFilter: ["class", "style", "data-scrolled"],
+    });
+    window.addEventListener("resize", updateStatusPosition);
+    updateStatusPosition();
+
+    return () => {
+      resizeObserver.disconnect();
+      mutationObserver.disconnect();
+      window.removeEventListener("resize", updateStatusPosition);
+    };
+  }, [builderState.page, currentHeaderComposition, currentHeaderDocumentSettings.overlay]);
   const composedAnchorIdEntries = useMemo(() => {
     const sections = [
       ...builderState.sections,
@@ -3870,6 +3926,18 @@ export default function DashboardBuilder({
       mergedSections[0] = {
         ...mergedSections[0],
         headerPresetKey: presetKey,
+        headerVisible:
+          currentHeaderSections[0]?.headerVisible ??
+          shellSettings.headerVisible ??
+          true,
+        headerTransparent: preset.headerTransparent,
+        headerOverlay: preset.headerOverlay,
+        ...(currentHeaderSections[0]?.headerHeight !== undefined
+          ? { headerHeight: currentHeaderSections[0].headerHeight }
+          : {}),
+        ...(currentHeaderSections[0]?.headerCustomHeight !== undefined
+          ? { headerCustomHeight: currentHeaderSections[0].headerCustomHeight }
+          : {}),
       };
     }
 
@@ -3910,8 +3978,6 @@ export default function DashboardBuilder({
 
     updateShellSettings({
       headerLayout: preset.headerLayout,
-      headerTransparent: preset.headerTransparent,
-      headerOverlay: preset.headerOverlay,
       headerWidthMode: preset.headerWidthMode,
     });
   };
@@ -8555,12 +8621,13 @@ export default function DashboardBuilder({
             }
           >
             <div
+              ref={headerPreviewSlotRef}
               id={builderState.page === "header" ? "builder-header-document-preview-slot" : undefined}
               className="builder-preview-header-slot"
             >
               {builderState.page === "header" && (
                 <div
-                  className={`builder-header-document-preview builder-preview-section${selectedId === "header-document" ? " is-selected" : ""}${hoveredBuilderTarget?.type === "section" && hoveredBuilderTarget.sectionId === "header-document" ? " is-hovered" : ""}${draggingHeaderElementId ? " is-header-element-dragging" : ""}${draggingHeaderRowId ? " is-header-row-dragging" : ""}${shellSettings.headerVisible === false ? " is-header-hidden" : ""}`}
+                  className={`builder-header-document-preview builder-preview-section${currentHeaderDocumentSettings.overlay ? " is-header-overlay" : ""}${selectedId === "header-document" ? " is-selected" : ""}${hoveredBuilderTarget?.type === "section" && hoveredBuilderTarget.sectionId === "header-document" ? " is-hovered" : ""}${draggingHeaderElementId ? " is-header-element-dragging" : ""}${draggingHeaderRowId ? " is-header-row-dragging" : ""}${!currentHeaderDocumentSettings.visible ? " is-header-hidden" : ""}`}
                   onMouseEnter={() => setHoveredBuilderTarget({ type: "section", sectionId: "header-document" })}
                   onMouseLeave={() => setHoveredBuilderTarget(null)}
                   onDragOver={(event) => {
@@ -8590,7 +8657,7 @@ export default function DashboardBuilder({
                     }, 0);
                   }}
                 >
-                  {shellSettings.headerVisible === false ? (
+                  {!currentHeaderDocumentSettings.visible ? (
                     <span className="builder-header-hidden-badge">Header hidden on website</span>
                   ) : null}
                   <div className="builder-header-document-tools" aria-label="Header settings control">
@@ -8869,7 +8936,7 @@ export default function DashboardBuilder({
                   />
                 </div>
               )}
-              {builderState.page !== "header" && shellSettings.headerVisible !== false && (
+              {builderState.page !== "header" && currentHeaderDocumentSettings.visible && (
                 <div
                   className={`builder-preview-header-editable ${
                     headerSelected ? "is-selected" : ""
@@ -8962,6 +9029,7 @@ export default function DashboardBuilder({
               </div>
             ) : null}
             <div
+              ref={headerPageContextRef}
               className={builderState.page === "header" ? "builder-context-page-preview builder-header-page-context is-locked" : ""}
               aria-label={builderState.page === "header" ? "Locked page context" : undefined}
               onClick={builderState.page === "header" ? () => switchBuilderTarget(headerContextState.page) : undefined}
@@ -8971,6 +9039,11 @@ export default function DashboardBuilder({
                 className="builder-context-preview-status builder-context-preview-status--header-boundary"
                 role="group"
                 aria-label="Locked page preview status"
+                style={
+                  currentHeaderDocumentSettings.overlay && headerContextStatusTop !== null
+                    ? { top: headerContextStatusTop }
+                    : undefined
+                }
               >
                 <span>
                   Previewing {getLayoutLabel(headerContextState.page, customPages)} · Page editing locked
@@ -8997,6 +9070,7 @@ export default function DashboardBuilder({
                 pageLabel={getLayoutLabel(headerContextState.page, customPages)}
                 design={headerContextState.design}
                 shellSettings={shellSettings}
+                headerOverlay={currentHeaderDocumentSettings.overlay}
                 spacingOverlayEnabled={spacingOverlayEnabled}
                 selectedId={selectedId}
                 selectedLayoutColumnKey={selectedLayoutColumnKey}
@@ -9218,6 +9292,7 @@ function PreviewCanvas({
   pageLabel,
   design,
   shellSettings,
+  headerOverlay,
   spacingOverlayEnabled,
   selectedId,
   selectedLayoutColumnKey,
@@ -9287,6 +9362,7 @@ function PreviewCanvas({
   pageLabel: string;
   design: BuilderDesign;
   shellSettings: BuilderShellSettings;
+  headerOverlay: boolean;
   spacingOverlayEnabled: boolean;
   selectedId: string;
   selectedLayoutColumnKey: string | null;
@@ -9744,7 +9820,7 @@ function PreviewCanvas({
         data-builder-page={page}
         data-gsap-home={page === "home" ? true : undefined}
         data-overlap-header={
-          (visibleSections[0]?.pullUnderHeader || shellSettings.headerOverlay) ? "true" : undefined
+          (visibleSections[0]?.pullUnderHeader || headerOverlay) ? "true" : undefined
         }
       >
         <BuilderScrollAnimations key={animationSignature} />

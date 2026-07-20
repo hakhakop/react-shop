@@ -341,7 +341,7 @@ ${explicitWordPressProductVars}
                 <SearchProvider>
                   <ProductCategoryFilterProvider>
                    <RecentlyViewedProvider>
-                  {!isDomainWebsiteRequest && shellSettings.headerVisible && (
+                  {!isDomainWebsiteRequest && (
                     <RootHeaderVisibility initialPathname={pathname}>
                       <HeaderShell layoutOverride={shellSettings.headerLayout} />
                     </RootHeaderVisibility>

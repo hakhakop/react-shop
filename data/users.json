@@ -6,8 +6,8 @@
     "name": "Hakob Jaghatspanyan",
     "role": "super_admin",
     "createdAt": "2026-06-29T19:14:12.875Z",
-    "updatedAt": "2026-07-15T10:29:08.998Z",
-    "language": "en"
+    "updatedAt": "2026-07-20T05:25:22.606Z",
+    "language": "hy"
   },
   {
     "id": "9782eff3-23e8-4dea-934b-1c6ceae4cd04",
@@ -193,5 +193,22 @@
       "priceText": "5000 ֏/Ամիս",
       "requestedAt": "2026-07-18T05:15:05.132Z"
     }
+  },
+  {
+    "id": "e58db68c-2f41-4dcd-8159-9707b2a972ee",
+    "email": "hakop28ol3@yahoo.com",
+    "passwordHash": "$2b$12$0BxMfewAr1pLf89dHgM6CuiL74rzuen2gnjdoZsDEjWRkMZA/ZIM2",
+    "name": "Hakob Jaghatspanyan",
+    "role": "user",
+    "createdAt": "2026-07-18T06:28:42.667Z",
+    "updatedAt": "2026-07-18T18:10:28.372Z",
+    "subscription": {
+      "packageId": "website-blog",
+      "packageName": "🛍 Խանութ",
+      "packageType": "Կոմերցիոն",
+      "priceText": "12000 ֏ /ամիս",
+      "requestedAt": "2026-07-18T06:53:20.221Z"
+    },
+    "language": "en"
   }
 ]

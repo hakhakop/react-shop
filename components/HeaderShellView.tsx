@@ -29,6 +29,7 @@ import WebsiteLanguageSwitcher from "@/components/website/WebsiteLanguageSwitche
 import { resolveHeaderBehavior } from "@/lib/headerBehavior";
 import { resolveHeaderHeightCss } from "@/lib/headerHeight";
 import { resolveBuilderSpacing } from "@/lib/builderSpacing";
+import { resolveHeaderDocumentSettings } from "@/lib/headerDocumentSettings";
 
 function asString(value: unknown, fallback: string | null = null): string | null {
   if (typeof value === "string" && value.trim() !== "") return value.trim();
@@ -57,6 +58,13 @@ function normalizeLayout(
     default:
       return "two-row";
   }
+}
+
+function normalizeLegacyHeaderSpacing(value: string | undefined) {
+  if (value === "small") return "sm";
+  if (value === "medium") return "md";
+  if (value === "large") return "lg";
+  return value;
 }
 
 function buildReactMenuTree(items: ReactMenuItem[] = []): MenuItem[] {
@@ -203,10 +211,34 @@ export default function HeaderShellView({
       : asString(settings.layout, "centered");
   const layout = normalizeLayout(layoutValue);
   const headerBehavior = resolveHeaderBehavior(shellSettings);
-  const headerHeight = resolveHeaderHeightCss(
-    shellSettings.headerHeight,
-    shellSettings.headerCustomHeight,
+  const documentSettings = resolveHeaderDocumentSettings(
+    headerComposition,
+    shellSettings,
   );
+  const headerHeight = resolveHeaderHeightCss(
+    documentSettings.height,
+    documentSettings.customHeight,
+  );
+  const documentPaddingTop = resolveBuilderSpacing(
+    normalizeLegacyHeaderSpacing(headerComposition.documentTopSpacing) ?? "none",
+    "sectionPadding",
+    normalizeLegacyHeaderSpacing(shellSettings.sectionPaddingTop),
+  ).css;
+  const documentPaddingBottom = resolveBuilderSpacing(
+    normalizeLegacyHeaderSpacing(headerComposition.documentBottomSpacing) ?? "none",
+    "sectionPadding",
+    normalizeLegacyHeaderSpacing(shellSettings.sectionPaddingBottom),
+  ).css;
+  const documentMarginTop = resolveBuilderSpacing(
+    normalizeLegacyHeaderSpacing(headerComposition.documentTopMargin) ?? "none",
+    "sectionMargin",
+    normalizeLegacyHeaderSpacing(shellSettings.sectionMarginTop),
+  ).css;
+  const documentMarginBottom = resolveBuilderSpacing(
+    normalizeLegacyHeaderSpacing(headerComposition.documentBottomMargin) ?? "none",
+    "sectionMargin",
+    normalizeLegacyHeaderSpacing(shellSettings.sectionMarginBottom),
+  ).css;
   const topToolbarVisible = shellSettings.topToolbarVisible !== false;
   const effectiveTopBarText =
     typeof shellSettings.topToolbarText === "string"
@@ -243,8 +275,7 @@ export default function HeaderShellView({
   const hasDocumentBackground = Boolean(
     documentHeaderBackground || documentVisualBackground || documentVisualBackgroundImage,
   );
-  const headerMustBeTransparent =
-    shellSettings.headerOverlay === true || shellSettings.headerTransparent === true;
+  const headerMustBeTransparent = documentSettings.transparent;
   const effectiveHeaderTextMode = shellSettings.headerTextMode || "auto";
   const effectiveLogoUrl = documentLogo?.imageUrl || shellSettings.headerLogoUrl || logoUrl;
   const effectiveBrandText =
@@ -270,7 +301,7 @@ export default function HeaderShellView({
       : "",
     `site-header--background-${headerMustBeTransparent ? "none" : effectiveHeaderBackgroundMode}`,
     `site-header--indicator-${effectiveActiveIndicator}`,
-    shellSettings.headerOverlay ? "site-header--builder-overlay" : "",
+    documentSettings.overlay ? "site-header--builder-overlay" : "",
     hasDocumentBackground
       ? "site-header--document-background"
       : "",
@@ -417,12 +448,22 @@ export default function HeaderShellView({
     const resolvedTopPadding = rowComp.rowTopSpacing !== undefined
       ? resolveBuilderSpacing(rowComp.rowTopSpacing, "rowPadding", shellSettings.rowPaddingTop).css
       : visualStyles.paddingTop === undefined
-        ? resolveBuilderSpacing(shellSettings.rowPaddingTop ?? "sm", "rowPadding").css
+        ? resolveBuilderSpacing("none", "rowPadding").css
         : undefined;
     const resolvedBottomPadding = rowComp.rowBottomSpacing !== undefined
       ? resolveBuilderSpacing(rowComp.rowBottomSpacing, "rowPadding", shellSettings.rowPaddingBottom).css
       : visualStyles.paddingBottom === undefined
-        ? resolveBuilderSpacing(shellSettings.rowPaddingBottom ?? "sm", "rowPadding").css
+        ? resolveBuilderSpacing("none", "rowPadding").css
+        : undefined;
+    const resolvedTopMargin = rowComp.rowTopMargin !== undefined
+      ? resolveBuilderSpacing(rowComp.rowTopMargin, "rowMargin", shellSettings.rowMarginTop).css
+      : visualStyles.marginTop === undefined
+        ? resolveBuilderSpacing("none", "rowMargin").css
+        : undefined;
+    const resolvedBottomMargin = rowComp.rowBottomMargin !== undefined
+      ? resolveBuilderSpacing(rowComp.rowBottomMargin, "rowMargin", shellSettings.rowMarginBottom).css
+      : visualStyles.marginBottom === undefined
+        ? resolveBuilderSpacing("none", "rowMargin").css
         : undefined;
 
     return {
@@ -435,8 +476,8 @@ export default function HeaderShellView({
       ...(rowComp.headerAlign ? { "--header-builder-row-align": rowComp.headerAlign } : {}),
       ...(resolvedTopPadding !== undefined ? { paddingTop: resolvedTopPadding } : {}),
       ...(resolvedBottomPadding !== undefined ? { paddingBottom: resolvedBottomPadding } : {}),
-      ...(rowComp.rowTopMargin ? { marginTop: rowComp.rowTopMargin } : {}),
-      ...(rowComp.rowBottomMargin ? { marginBottom: rowComp.rowBottomMargin } : {}),
+      ...(resolvedTopMargin !== undefined ? { marginTop: resolvedTopMargin } : {}),
+      ...(resolvedBottomMargin !== undefined ? { marginBottom: resolvedBottomMargin } : {}),
       ...(rowComp.rowBorderRadius !== undefined ? { borderRadius: `${rowComp.rowBorderRadius}px` } : {}),
     } as CSSProperties;
   };
@@ -467,6 +508,25 @@ export default function HeaderShellView({
     element: HeaderBuilderElement,
     flexItemStyle?: CSSProperties,
   ) => {
+    const localHoverEffect = element.buttonHoverEffect === "inherit"
+      ? undefined
+      : element.buttonHoverEffect;
+    const localHoverTransform = element.buttonHoverTransform ?? (
+      localHoverEffect === "lift"
+        ? "translateY(-2px)"
+        : localHoverEffect === "grow"
+          ? "scale(1.04)"
+          : localHoverEffect === "none"
+            ? "none"
+            : undefined
+    );
+    const localHoverShadow = element.buttonHoverBoxShadow ?? (
+      localHoverEffect === "lift"
+        ? "0 16px 34px rgba(17, 17, 17, 0.16)"
+        : localHoverEffect
+          ? "none"
+          : undefined
+    );
     let content: ReactNode = null;
     if (element.type === "logo") content = renderLogoAndBrand(element);
     if (element.type === "navigation") content = nav;
@@ -535,8 +595,8 @@ export default function HeaderShellView({
             "--header-builder-button-hover-bg": element.buttonHoverBg,
             "--header-builder-button-hover-text": element.buttonHoverTextColor,
             "--header-builder-button-hover-border": element.buttonHoverBorderColor,
-            "--header-builder-button-hover-transform": element.buttonHoverTransform,
-            "--header-builder-button-hover-shadow": element.buttonHoverBoxShadow,
+            "--header-builder-button-hover-transform": localHoverTransform,
+            "--header-builder-button-hover-shadow": localHoverShadow,
             "--header-builder-button-hover-bg-fallback": element.buttonBg || "",
             "--header-builder-button-hover-text-fallback": element.buttonTextColor || "",
           } as CSSProperties)
@@ -649,6 +709,12 @@ export default function HeaderShellView({
         "--header-builder-row-align": headerComposition.rowAlign,
         "--header-builder-height": headerHeight,
         ...(headerHeight ? { "--header-main-h": headerHeight } : {}),
+        "--header-document-padding-top": documentPaddingTop,
+        "--header-document-padding-bottom": documentPaddingBottom,
+        paddingTop: documentPaddingTop,
+        paddingBottom: documentPaddingBottom,
+        marginTop: documentMarginTop,
+        marginBottom: documentMarginBottom,
         zIndex: shellSettings.headerZIndex ?? 40,
       } as CSSProperties}
     >

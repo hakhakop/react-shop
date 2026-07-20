@@ -9478,7 +9478,7 @@ body[data-storefront-preset="princity"]
 .builder-preview-shell:has(.builder-preview-page[data-overlap-header="true"])
   .builder-preview-header-slot:has(.site-header--no-background:not([data-scrolled="true"])),
 .builder-preview-shell:has(.site-header--builder-overlay)
-  .builder-preview-header-slot:has(.site-header--no-background:not([data-scrolled="true"])) {
+  .builder-preview-header-slot {
   height: 0 !important;
   min-height: 0 !important;
   overflow: visible !important;
@@ -9486,9 +9486,45 @@ body[data-storefront-preset="princity"]
   border-bottom: none !important;
 }
 
+/* The pull-under slot is intentionally zero-height. Keep the Builder selection
+   frame on the rendered Header box instead of its collapsed document wrapper. */
+.builder-header-document-preview.builder-preview-section.is-header-overlay,
+.builder-header-document-preview.builder-preview-section.is-header-overlay.is-selected,
+.builder-header-document-preview.builder-preview-section.is-header-overlay:hover {
+  border: 0 !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+.builder-header-document-preview.is-header-overlay.is-selected
+  .site-header::before {
+  content: "";
+  position: absolute;
+  z-index: 10020;
+  top: var(--header-document-padding-top, 0px);
+  right: 0;
+  bottom: var(--header-document-padding-bottom, 0px);
+  left: 0;
+  border: 2px solid var(--builder-ui-accent, #0d73ff);
+  pointer-events: none;
+}
+
+.builder-header-document-preview.is-header-overlay:hover:not(.is-selected)
+  .site-header::before {
+  content: "";
+  position: absolute;
+  z-index: 10020;
+  top: var(--header-document-padding-top, 0px);
+  right: 0;
+  bottom: var(--header-document-padding-bottom, 0px);
+  left: 0;
+  border: 1.5px dashed var(--builder-ui-accent, #0d73ff);
+  pointer-events: none;
+}
+
 /* Header editing uses the same rendered Header box, but the editor boundary
    must remain in flow so its status and locked page cannot overlap it. */
-#builder-header-document-preview-slot {
+#builder-header-document-preview-slot:not(:has(.site-header--builder-overlay)) {
   height: auto !important;
   min-height: 0 !important;
 }
@@ -12867,25 +12903,6 @@ article.is-selected-column > .builder-preview-box-spacing,
   left: auto !important;
 }
 
-/* Pull-under page preview CSS normally makes the top-state Header absolute.
-   In the Header document editor that collapses the selected wireframe, so the
-   real Header must remain in flow in both top and scrolled states. */
-.builder-preview-shell
-  .builder-preview-header-slot
-  .builder-header-document-preview
-  .site-header.site-header--builder-overlay.site-header--no-background:not([data-scrolled="true"]),
-.builder-preview-header-slot
-  .builder-header-document-preview
-  .site-header.site-header--builder-overlay {
-  position: relative !important;
-  inset: auto !important;
-  top: auto !important;
-  right: auto !important;
-  bottom: auto !important;
-  left: auto !important;
-  width: 100% !important;
-}
-
 /* Header Builder Presets styling */
 .builder-header-presets-container {
   margin: 0 12px 14px 12px;
@@ -12985,11 +13002,6 @@ article.is-selected-column > .builder-preview-box-spacing,
   opacity: 1 !important;
 }
 
-.builder-preview-header-slot:has(.site-header--no-background:not([data-scrolled="true"])) .builder-header-document-preview {
-  outline: 1.5px dashed rgba(13, 115, 255, 0.4) !important;
-  outline-offset: -1.5px;
-}
-
 /* Solid focus border on hover/selection of overlay header */
 .builder-preview-header-slot:has(.site-header--no-background:not([data-scrolled="true"])) .builder-preview-header-editable:hover::after,
 .builder-preview-header-slot:has(.site-header--no-background:not([data-scrolled="true"])) .builder-preview-header-editable.is-hovered::after {
@@ -13000,15 +13012,6 @@ article.is-selected-column > .builder-preview-box-spacing,
 .builder-preview-header-slot:has(.site-header--no-background:not([data-scrolled="true"])) .builder-preview-header-editable.is-selected::after {
   border: 2px solid var(--builder-ui-accent, #0d73ff) !important;
   box-shadow: inset 0 0 0 1px rgba(13, 115, 255, 0.18) !important;
-}
-
-.builder-preview-header-slot:has(.site-header--no-background:not([data-scrolled="true"])) .builder-header-document-preview:hover:not(.is-selected) {
-  outline: 1.5px dashed var(--builder-ui-accent, #0d73ff) !important;
-}
-
-.builder-preview-header-slot:has(.site-header--no-background:not([data-scrolled="true"])) .builder-header-document-preview.is-selected {
-  outline: 2px solid var(--builder-ui-accent, #0d73ff) !important;
-  outline-offset: -2px;
 }
 
 /* Reposition element toolbar inside header editor to float below the element to avoid being covered by header main tools */

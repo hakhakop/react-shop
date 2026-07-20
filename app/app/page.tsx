@@ -144,11 +144,11 @@ export default async function AppDashboardPage({
                 <span className="saas-subscription-chevron" aria-hidden="true">⌄</span>
               </summary>
               <div className="saas-subscription-details">
-                <p>{user.subscription?.priceText ?? "Contact support to select a package."}</p>
+                <p>{user.subscription?.priceText ?? <T k="dashboard.packageHelp" />}</p>
                 <div>
                   <small><T k="dashboard.websiteRequest" /></small>
                   <strong>{user.onboarding?.websiteName ?? <T k="common.notSubmitted" />}</strong>
-                  <p>{user.onboarding?.businessDescription ?? "Complete your setup information."}</p>
+                  <p>{user.onboarding?.businessDescription ?? <T k="dashboard.setupHelp" />}</p>
                 </div>
                 <Link href="/app/settings">
                   <T k="dashboard.manageAccount" /> <ArrowRight size={14} />

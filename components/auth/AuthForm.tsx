@@ -99,8 +99,8 @@ export default function AuthForm({
             {isRegister ? <Globe2 size={14} /> : <LockKeyhole size={14} />}
             {isRegister ? t("auth.websiteService") : t("auth.secureWorkspace")}
           </span>
-          <h2>{isRegister ? "Create first. Decide later." : t("auth.welcomeBack")}</h2>
-          <p>{isRegister ? "Build and experience your website for free. Choose a plan only when you’re ready to publish." : t("auth.loginDescription")}</p>
+          <h2>{isRegister ? t("auth.registerShowcaseTitle") : t("auth.welcomeBack")}</h2>
+          <p>{isRegister ? t("auth.registerShowcaseDescription") : t("auth.loginDescription")}</p>
         </div>
         <ul>
           <li><Check size={14} /> {t("auth.secureAccess")}</li>
@@ -113,10 +113,10 @@ export default function AuthForm({
       <div className="saas-auth-form-main">
         <div className="saas-auth-heading">
           <span>{isRegister ? t("auth.getStarted") : t("dashboard.title")}</span>
-          <h1>{isRegister ? "Create your account" : t("auth.login")}</h1>
+          <h1>{isRegister ? t("auth.createAccount") : t("auth.login")}</h1>
           <p>
             {isRegister
-              ? "Three details. Less than 30 seconds."
+              ? t("auth.registerQuickDetails")
               : t("auth.accountDetails")}
           </p>
         </div>
@@ -172,7 +172,7 @@ export default function AuthForm({
         {isSubmitting
           ? t("auth.submitting")
           : isRegister
-            ? "Start Free"
+            ? t("auth.startFree")
             : t("auth.submitLogin")}
         {!isSubmitting && <ArrowRight size={16} />}
       </button>

@@ -141,7 +141,10 @@ function isSaaSUser(value: unknown): value is SaaSUser {
     (user.role === "user" ||
       user.role === "admin" ||
       user.role === "super_admin") &&
-    (user.language === undefined || user.language === "en" || user.language === "hy") &&
+    (user.language === undefined ||
+      user.language === "en" ||
+      user.language === "hy" ||
+      user.language === "ru") &&
     (user.subscription === undefined || isUserSubscription(user.subscription)) &&
     (user.onboarding === undefined || isUserOnboarding(user.onboarding)) &&
     typeof user.createdAt === "string" &&

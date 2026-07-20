@@ -419,6 +419,11 @@ export type WordPressMediaItem = {
 
 export type BuilderSection = {
   headerPresetKey?: string;
+  headerVisible?: boolean;
+  headerTransparent?: boolean;
+  headerOverlay?: boolean;
+  headerHeight?: string;
+  headerCustomHeight?: number;
   contentTranslations?: BuilderContentTranslations;
   headerUtilityMigrationVersion?: 1 | 2 | 3;
   id: string;

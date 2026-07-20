@@ -278,6 +278,11 @@ export type BuilderLayoutBlock = {
 
 export type BuilderSection = {
   headerUtilityMigrationVersion?: 1 | 2 | 3;
+  headerVisible?: boolean;
+  headerTransparent?: boolean;
+  headerOverlay?: boolean;
+  headerHeight?: string;
+  headerCustomHeight?: number;
   id: string;
   name?: string;
   anchorId?: string;

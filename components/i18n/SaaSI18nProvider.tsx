@@ -1,11 +1,11 @@
 import { cookies, headers } from "next/headers";
 import { LanguageProvider } from "@/components/i18n/LanguageProvider";
 import {
-  loadMessages,
   localeCookieName,
   normalizeLocale,
   type Locale,
 } from "@/lib/i18n";
+import { loadMessages } from "@/lib/i18n.server";
 
 export default async function SaaSI18nProvider({
   children,

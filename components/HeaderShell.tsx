@@ -22,6 +22,7 @@ import {
   getOrCreateHeaderBuilderLayout,
 } from "@/lib/headerBuilderDocument";
 import { resolveHeaderBuilderComposition } from "@/lib/headerBuilderComposition";
+import { resolveHeaderDocumentSettings } from "@/lib/headerDocumentSettings";
 import { resolveContentSections } from "@/lib/builderContentLanguages";
 
 type HeaderShellProps = {
@@ -91,6 +92,11 @@ export default async function HeaderShell({
     ) as typeof headerLayout.sections,
   };
   const headerComposition = resolveHeaderBuilderComposition(localizedHeaderLayout);
+  const documentSettings = resolveHeaderDocumentSettings(
+    headerComposition,
+    shellSettings,
+  );
+  if (!documentSettings.visible) return null;
   const categoryElement = headerComposition.elements.find(
     (element) => element.type === "categories",
   );

@@ -815,6 +815,7 @@
   justify-content: var(--header-builder-row-justify, space-between);
   gap: var(--header-builder-row-gap, 2rem);
   min-height: var(--header-builder-height);
+  height: var(--header-builder-height);
 }
 
 .site-header--builder-width-full .site-header-main-inner,
@@ -827,20 +828,6 @@
   position: absolute !important;
   inset: 0 0 auto;
   width: 100%;
-}
-
-.site-header--builder-overlay:not([data-scrolled="true"]),
-.site-header--builder-overlay:not([data-scrolled="true"]) .site-header-top,
-.site-header--builder-overlay:not([data-scrolled="true"]) .site-header-main,
-.site-header--builder-overlay:not([data-scrolled="true"]) .site-header-pill-main,
-.site-header--builder-overlay:not([data-scrolled="true"]) .site-header-pill-inner,
-.site-header--builder-overlay:not([data-scrolled="true"]) .site-header-princity,
-.site-header--builder-overlay:not([data-scrolled="true"]) .site-header-princity-meta-row,
-.site-header--builder-overlay:not([data-scrolled="true"]) .site-header-princity-inner {
-  background: transparent !important;
-  border-color: transparent !important;
-  box-shadow: none !important;
-  backdrop-filter: none !important;
 }
 
 .header-builder-element--navigation .site-header-nav {
@@ -864,6 +851,9 @@
 .header-builder-element--button .site-header-service-cta:hover {
   background: var(--header-builder-button-hover-bg, var(--button-hover-bg, inherit));
   color: var(--header-builder-button-hover-text, var(--button-hover-text-color, inherit));
+  border-color: var(--header-builder-button-hover-border, var(--button-hover-border-color, currentColor));
+  transform: var(--header-builder-button-hover-transform, var(--button-hover-transform, none));
+  box-shadow: var(--header-builder-button-hover-shadow, var(--button-hover-shadow, none));
 }
 
 .header-builder-element--spacer {
@@ -934,6 +924,7 @@
   padding: 0.75rem 2rem;
   border-top: 1px solid var(--header-border, rgba(209, 213, 219, 0.7));
   min-height: var(--header-builder-height);
+  height: var(--header-builder-height);
 }
 
 .header-builder-spacer-content {
@@ -1405,6 +1396,7 @@
   padding: 1.85rem 1.75rem;
   text-align: center;
   min-height: var(--header-builder-height);
+  height: var(--header-builder-height);
 }
 
 .site-header-hero-logo {
@@ -1691,6 +1683,7 @@
 .site-header-princity-inner {
   width: 100%;
   min-height: var(--header-builder-height, auto);
+  height: var(--header-builder-height, auto);
   margin: 0 auto;
   padding: 0 48px;
   display: grid;
