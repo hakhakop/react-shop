@@ -13211,3 +13211,131 @@ article.is-selected-column > .builder-preview-box-spacing,
   background-color: var(--header-document-background-color, var(--header-bg)) !important;
   background-image: var(--header-document-background-image, none) !important;
 }
+
+/* Centering sticky wrapper for the header lock status pill */
+.builder-context-preview-status-sticky-wrapper {
+  position: absolute !important;
+  top: 0 !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  width: 100% !important;
+  display: flex !important;
+  justify-content: center !important;
+  pointer-events: none !important;
+  z-index: 10050 !important;
+  margin: 0 !important;
+}
+
+.builder-header-page-context.is-locked[data-overlap-header="true"] .builder-context-preview-status-sticky-wrapper {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+/* If header is static (not sticky), stick the pill closer to the top edge (24px) when scrolled */
+.builder-preview-shell:has(.site-header[data-header-behavior="static"]) .builder-context-preview-status-sticky-wrapper .builder-context-preview-status--header-boundary {
+  top: 24px !important;
+}
+
+.builder-context-preview-status-sticky-wrapper .builder-context-preview-status--header-boundary {
+  position: sticky !important;
+  top: calc(var(--header-builder-height, 72px) + 24px) !important;
+  margin-top: 24px !important;
+  height: max-content !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  width: max-content !important;
+  max-width: calc(100% - 24px) !important;
+  padding: 6px 14px !important;
+  border: 1px solid var(--builder-ui-border-strong) !important;
+  border-radius: 999px !important;
+  background: color-mix(in srgb, var(--builder-ui-surface) 94%, transparent) !important;
+  color: var(--builder-ui-text) !important;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.16) !important;
+  backdrop-filter: blur(14px) !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  pointer-events: auto !important;
+}
+
+.builder-context-preview-status-sticky-wrapper .builder-context-preview-status--header-boundary button {
+  margin-left: 8px !important;
+  background: var(--builder-ui-accent, #3b82f6) !important;
+  color: #ffffff !important;
+  border: none !important;
+  border-radius: 999px !important;
+  padding: 4px 12px !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+}
+
+/* Constrain and center header inside visual builder canvas frame boundaries */
+body.is-visual-builder-active .site-header,
+body:has([data-scoped-builder-root]) .site-header {
+  position: sticky !important;
+  top: 0 !important;
+  left: auto !important;
+  right: auto !important;
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+body.is-visual-builder-active #site-header-pill .site-header-pill-main,
+body:has([data-scoped-builder-root]) #site-header-pill .site-header-pill-main {
+  position: sticky !important;
+  top: 16px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  width: min(calc(100% - 2rem), 1440px) !important;
+  max-width: 100% !important;
+}
+
+/* Style the viewport container as the device frame bezel, wrapping both header and page canvas (only for tablet/mobile device mockups) */
+.builder-preview-mobile .builder-preview-viewport-container,
+.builder-preview-tablet .builder-preview-viewport-container {
+  contain: paint !important;
+  border: 1px solid var(--builder-ui-border-strong) !important;
+  border-radius: var(--builder-preview-radius, 8px) !important;
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.12) !important;
+  background: var(--builder-preview-effective-bg, var(--builder-preview-shell-bg, transparent)) !important;
+}
+
+/* Ensure the header slot has matching top rounded corners so content doesn't bleed out on mobile/tablet */
+.builder-preview-mobile .builder-preview-header-slot,
+.builder-preview-tablet .builder-preview-header-slot {
+  border-top-left-radius: var(--builder-preview-radius, 8px) !important;
+  border-top-right-radius: var(--builder-preview-radius, 8px) !important;
+  overflow: hidden !important;
+}
+
+/* Desktop visual builder mode has NO device frame bezel, spanning the full screen width freely */
+.builder-preview-desktop .builder-preview-viewport-container {
+  contain: none !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  width: 100% !important;
+  margin: 0 !important;
+}
+
+.builder-preview-desktop .builder-preview-header-slot {
+  border-top-left-radius: 0 !important;
+  border-top-right-radius: 0 !important;
+  overflow: visible !important;
+}
+
+/* Remove default frame styling from the canvas since it is now on the viewport container */
+.builder-preview-canvas {
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
+
+
+
+

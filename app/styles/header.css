@@ -1,7 +1,7 @@
 :root {
   --header-topbar-h: 56px;
   --header-builder-height: auto;
-  --header-main-h: var(--header-builder-height, 72px);
+  --header-main-h: 72px;
   --header-pill-h: 64px;
   --header-pill-top-at-top: 36px; /* fixed header row position when NOT scrolled */
   --header-pill-top-scrolled: 12px; /* fixed header row position when scrolled */
@@ -212,40 +212,42 @@
   height: calc(var(--header-main-h) + 36px);
 }
 
-/* When NOT scrolled (top position or data-scrolled="false"), remove background/borders and position absolutely */
-.site-header[data-overlap-header="true"].site-header--no-background:not([data-scrolled="true"]) {
+/* When NOT scrolled (top position or data-scrolled="false") and data-overlap-header is active,
+   remove background/borders and position absolutely over the top of section 1 on frontend */
+.site-header[data-overlap-header="true"]:not([data-scrolled="true"]) {
   position: absolute !important;
   left: 0;
   right: 0;
   width: 100%;
+  z-index: 40;
   background: transparent !important;
   border-bottom-color: transparent !important;
   box-shadow: none !important;
   backdrop-filter: none !important;
 }
 
-.site-header[data-overlap-header="true"].site-header--no-background:not([data-scrolled="true"]) .site-header-top,
-.site-header[data-overlap-header="true"].site-header--no-background:not([data-scrolled="true"]) .site-header-main,
-.site-header[data-overlap-header="true"].site-header--no-background:not([data-scrolled="true"]) .site-header-main-inner {
+.site-header[data-overlap-header="true"]:not([data-scrolled="true"]) .site-header-top,
+.site-header[data-overlap-header="true"]:not([data-scrolled="true"]) .site-header-main,
+.site-header[data-overlap-header="true"]:not([data-scrolled="true"]) .site-header-main-inner {
   background: transparent !important;
   border-color: transparent !important;
   box-shadow: none !important;
   backdrop-filter: none !important;
 }
 
-/* For pill layouts inside no-background headers, only make transparent at top position */
-.site-header--no-background:not([data-scrolled="true"]) #site-header-pill .site-header-top,
-.site-header--no-background:not([data-scrolled="true"]) #site-header-pill .site-header-pill-main,
-.site-header--no-background:not([data-scrolled="true"]) #site-header-pill .site-header-pill-inner {
+/* For pill layouts inside overlap headers, make transparent at top position */
+.site-header[data-overlap-header="true"]:not([data-scrolled="true"]) #site-header-pill .site-header-top,
+.site-header[data-overlap-header="true"]:not([data-scrolled="true"]) #site-header-pill .site-header-pill-main,
+.site-header[data-overlap-header="true"]:not([data-scrolled="true"]) #site-header-pill .site-header-pill-inner {
   background: transparent !important;
   border-color: transparent !important;
   box-shadow: none !important;
   backdrop-filter: none !important;
 }
 
-/* Hide spacers in no-background mode so content starts at top of viewport */
-.site-header[data-overlap-header="true"].site-header--no-background .site-header-pill-spacer,
-.site-header[data-overlap-header="true"].site-header--no-background .site-header-princity-spacer {
+/* Hide spacers in overlap mode so content starts at top of viewport */
+.site-header[data-overlap-header="true"] .site-header-pill-spacer,
+.site-header[data-overlap-header="true"] .site-header-princity-spacer {
   display: none !important;
 }
 
@@ -809,6 +811,7 @@ html.dark .site-header {
 }
 
 .site-header-main-inner {
+  box-sizing: border-box !important;
   max-width: 1440px;
   margin: 0 auto;
   padding: 1rem 2rem;
@@ -843,7 +846,9 @@ html.dark .site-header {
 .header-builder-element--navigation .site-header-nav-link.is-active,
 .header-builder-element--navigation .site-header-nav-link[aria-current="page"],
 .header-builder-element--navigation .site-header-nav-link[data-active="true"] {
-  color: var(--header-builder-menu-active, var(--text-main, #111827));
+  color: var(--header-builder-menu-active, var(--text-main, inherit));
+  background: none;
+  -webkit-text-fill-color: initial;
 }
 
 .header-builder-element--logo .site-header-logo-img-wrap img {
@@ -1267,6 +1272,18 @@ html.dark .site-header {
   background-position: 50% 50%;
 }
 
+/* When the navigation element sets an explicit active color, use it instead of
+   the princity gradient so Dashboard preview and frontend render identically. */
+.site-header--indicator-princity .header-builder-element--navigation .site-header-nav-link.is-active,
+.site-header--indicator-princity .header-builder-element--navigation .site-header-nav-link[aria-current="page"],
+.site-header--indicator-princity .header-builder-element--navigation .site-header-nav-link[data-active="true"] {
+  color: var(--header-builder-menu-active, var(--text-main, inherit));
+  background: none;
+  -webkit-background-clip: initial;
+  -webkit-text-fill-color: initial;
+  background-clip: initial;
+}
+
 /* Header action pills */
 
 .site-header-action-pill {
@@ -1641,13 +1658,17 @@ html.dark .site-header {
 
 .site-header-princity-meta-row {
   width: 100%;
+  max-width: min(calc(100% - 4rem), 1440px);
   min-height: 38px;
-  padding: 0 48px;
+  margin: 0 auto;
+  padding: 0 24px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 24px;
-  border-bottom: 1px solid var(--header-border, rgba(17, 17, 17, 0.12));
+  transition:
+    opacity 200ms ease,
+    transform 200ms ease;
   background: var(--surface-main, #ffffff);
   color: var(--text-muted, #656565);
   font-size: 13px;
@@ -1660,7 +1681,7 @@ html.dark .site-header {
   top: 38px;
   z-index: 1000;
   background: var(--surface-main, #ffffff);
-  border-bottom: 1px solid var(--header-border, rgba(17, 17, 17, 0.12));
+  border-bottom: none;
   transition:
     top 260ms cubic-bezier(0.22, 1, 0.36, 1),
     background-color 220ms ease,
@@ -1704,11 +1725,13 @@ html.dark .site-header {
 }
 
 .site-header-princity-inner {
+  box-sizing: border-box !important;
   width: 100%;
+  max-width: min(calc(100% - 4rem), 1440px);
   min-height: var(--header-builder-height, auto);
   height: var(--header-builder-height, auto);
   margin: 0 auto;
-  padding: 0 48px;
+  padding: 0 24px;
   display: grid;
   grid-template-columns: minmax(120px, 0.85fr) minmax(0, 1.7fr) minmax(220px, 0.9fr);
   align-items: center;
@@ -1782,6 +1805,12 @@ html.dark .site-header {
 #site-header-pill.site-header-princity-shell[data-scrolled="true"] .relative.inline-flex {
   width: 34px;
   height: 34px;
+}
+
+.site-header-princity-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .site-header-princity .site-header-logo-wrap {

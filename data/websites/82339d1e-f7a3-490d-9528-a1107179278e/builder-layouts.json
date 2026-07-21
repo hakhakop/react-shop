@@ -5940,9 +5940,66 @@
             ]
           }
         ],
+        "visible": true,
+        "headerHeight": "compact",
+        "headerTransparent": true,
+        "headerOverlay": true,
+        "topSpacing": "none",
+        "bottomSpacing": "none",
+        "topMargin": "xs",
+        "bottomMargin": "xs"
+      }
+    ],
+    "updatedAt": "2026-07-21T18:16:45.247Z"
+  },
+  "footer": {
+    "version": 1,
+    "key": "footer",
+    "page": "footer",
+    "targetType": "footer",
+    "design": {},
+    "sections": [
+      {
+        "id": "footer-document",
+        "kind": "contentLayout",
+        "title": "Footer",
+        "background": "#111111",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "dark",
+        "topSpacing": "sm",
+        "bottomSpacing": "sm",
+        "layout": "halves",
+        "layoutColumns": 2,
+        "layoutItems": [
+          {
+            "id": "footer-main-left",
+            "rowId": "footer-main-row",
+            "rowLayout": "halves",
+            "blocks": [
+              {
+                "id": "footer-copyright",
+                "kind": "text",
+                "body": "© 2025 Webpages · Headless WooCommerce demo"
+              }
+            ]
+          },
+          {
+            "id": "footer-main-right",
+            "rowId": "footer-main-row",
+            "rowLayout": "halves",
+            "blocks": [
+              {
+                "id": "footer-platform",
+                "kind": "text",
+                "body": "Powered by WordPress · WooCommerce · WPGraphQL · Next.js"
+              }
+            ]
+          }
+        ],
         "visible": true
       }
     ],
-    "updatedAt": "2026-07-13T12:24:21.372Z"
+    "updatedAt": "2026-07-21T13:48:42.420Z"
   }
 }

@@ -807,11 +807,11 @@
               {
                 "id": "header-logo",
                 "kind": "image",
-                "imageUrl": "https://cms.webpages.am/wp-content/uploads/2025/11/logo-2-small.png",
-                "imageAlt": "new test logo",
-                "imageMaxWidth": 180,
                 "headerBrandMode": "logo",
-                "headerBrandText": "new test"
+                "headerBrandText": "new test",
+                "imageMaxWidth": 180,
+                "imageUrl": "https://cms.webpages.am/wp-content/uploads/2025/11/logo-2-small.png",
+                "imageAlt": "new test logo"
               }
             ]
           },
@@ -825,8 +825,7 @@
                 "kind": "menu",
                 "title": "Navigation",
                 "menuSource": "main",
-                "menuActiveIndicator": "princity",
-                "elementAlign": "center"
+                "menuActiveIndicator": "princity"
               }
             ]
           },
@@ -842,47 +841,10 @@
                 "headerUtilityVariant": "muted"
               },
               {
-                "id": "header-language",
-                "kind": "headerLanguage",
-                "headerLanguageDisplay": "native"
-              },
-              {
                 "id": "header-utility-cart",
                 "kind": "headerCart",
                 "headerUtilityAction": "cart",
                 "headerUtilityVariant": "muted"
-              },
-              {
-                "id": "header-utility-theme",
-                "kind": "headerTheme",
-                "headerUtilityAction": "theme",
-                "headerUtilityVariant": "muted"
-              },
-              {
-                "id": "header-button",
-                "kind": "button",
-                "buttonLabel": "Start a Project 1",
-                "buttonUrl": "#contact",
-                "elementAlign": "center",
-                "visualStyle": {
-                  "padding": {
-                    "linked": true,
-                    "top": "none",
-                    "right": "none",
-                    "bottom": "none",
-                    "left": "none"
-                  },
-                  "margin": {
-                    "linked": true,
-                    "top": "none",
-                    "right": "none",
-                    "bottom": "none",
-                    "left": "none"
-                  },
-                  "effects": {
-                    "overflow": "visible"
-                  }
-                }
               }
             ]
           }
@@ -890,10 +852,15 @@
         "visible": true,
         "headerVisible": true,
         "headerTransparent": false,
-        "headerOverlay": false
+        "headerOverlay": false,
+        "headerHeight": "compact",
+        "topSpacing": "none",
+        "bottomSpacing": "none",
+        "topMargin": "none",
+        "bottomMargin": "none"
       }
     ],
-    "updatedAt": "2026-07-21T07:39:31.778Z"
+    "updatedAt": "2026-07-21T10:11:43.747Z"
   },
   "footer": {
     "version": 1,

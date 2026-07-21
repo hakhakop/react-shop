@@ -57,6 +57,7 @@ import {
 } from "@/lib/builderContentLanguages";
 import { resolveHeaderBuilderComposition } from "@/lib/headerBuilderComposition";
 import { resolveHeaderDocumentSettings } from "@/lib/headerDocumentSettings";
+import { resolveHeaderHeightCss } from "@/lib/headerHeight";
 import {
   decodeHeaderBlockDragPayload,
   encodeHeaderBlockDragPayload,
@@ -8457,7 +8458,7 @@ export default function DashboardBuilder({
           <div>
             <strong style={{ fontSize: "16px", fontWeight: 700, color: "var(--builder-ui-text)" }}>Apply Preset</strong>
             <span style={{ fontSize: "13px", color: "var(--builder-ui-muted)", marginTop: "4px", display: "block" }}>
-              Are you sure you want to apply the "{presetToApply.name}" preset?
+              Are you sure you want to apply the &quot;{presetToApply.name}&quot; preset?
             </span>
           </div>
           <button
@@ -8641,6 +8642,14 @@ export default function DashboardBuilder({
                 transformOrigin: "top center",
                 "--builder-preview-device-width": `${previewCanvasWidth}px`,
                 "--builder-preview-header-width": `${previewCanvasWidth}px`,
+                "--header-builder-height": resolveHeaderHeightCss(
+                  currentHeaderDocumentSettings.height,
+                  currentHeaderDocumentSettings.customHeight,
+                ) ?? "72px",
+                "--header-main-h": resolveHeaderHeightCss(
+                  currentHeaderDocumentSettings.height,
+                  currentHeaderDocumentSettings.customHeight,
+                ) ?? "72px",
               } as CSSProperties
             }
           >
@@ -9050,33 +9059,45 @@ export default function DashboardBuilder({
             ) : null}
             <div
               ref={headerPageContextRef}
+              data-overlap-header={currentHeaderDocumentSettings.overlay ? "true" : "false"}
               className={builderState.page === "header" ? "builder-context-page-preview builder-header-page-context is-locked" : ""}
               aria-label={builderState.page === "header" ? "Locked page context" : undefined}
               onClick={builderState.page === "header" ? () => switchBuilderTarget(headerContextState.page) : undefined}
+              style={
+                builderState.page === "header"
+                  ? ({
+                      "--header-builder-height": resolveHeaderHeightCss(
+                        currentHeaderDocumentSettings.height,
+                        currentHeaderDocumentSettings.customHeight,
+                      ) ?? "72px",
+                      "--header-main-h": resolveHeaderHeightCss(
+                        currentHeaderDocumentSettings.height,
+                        currentHeaderDocumentSettings.customHeight,
+                      ) ?? "72px",
+                    } as CSSProperties)
+                  : undefined
+              }
             >
             {builderState.page === "header" ? (
-              <div
-                className="builder-context-preview-status builder-context-preview-status--header-boundary"
-                role="group"
-                aria-label="Locked page preview status"
-                style={
-                  currentHeaderDocumentSettings.overlay && headerContextStatusTop !== null
-                    ? { top: headerContextStatusTop }
-                    : undefined
-                }
-              >
-                <span>
-                  Previewing {getLayoutLabel(headerContextState.page, customPages)} · Page editing locked
-                </span>
-                <button
-                  type="button"
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    switchBuilderTarget(headerContextState.page);
-                  }}
+              <div className="builder-context-preview-status-sticky-wrapper">
+                <div
+                  className="builder-context-preview-status builder-context-preview-status--header-boundary"
+                  role="group"
+                  aria-label="Locked page preview status"
                 >
-                  Edit {getLayoutLabel(headerContextState.page, customPages)} Page
-                </button>
+                  <span>
+                    Previewing {getLayoutLabel(headerContextState.page, customPages)} · Page editing locked
+                  </span>
+                  <button
+                    type="button"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      switchBuilderTarget(headerContextState.page);
+                    }}
+                  >
+                    Edit {getLayoutLabel(headerContextState.page, customPages)} Page
+                  </button>
+                </div>
               </div>
             ) : null}
             <ProductCategoryFilterProvider key={headerContextState.page}>

@@ -66,16 +66,7 @@ export default async function HeaderShell({
   const scopedLinkContext = scopedPreviewWebsiteId
     ? { websiteId: scopedPreviewWebsiteId, pages: scopedPreviewPages }
     : null;
-  const serviceHomepageMode = !website && !scopedPreviewWebsiteId || Boolean(
-    homeLayout?.sections?.some((section) =>
-      section.title?.includes("Beautiful React Websites") ||
-      section.layoutItems?.some((item) =>
-        item.blocks?.some((block) =>
-          block.title?.includes("Beautiful React Websites"),
-        ),
-      ),
-    ),
-  );
+  const serviceHomepageMode = !website && !scopedPreviewWebsiteId;
   const headerLayout = await getOrCreateHeaderBuilderLayout(
     shellSettings,
     scope ?? {},

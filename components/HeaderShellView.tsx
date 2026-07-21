@@ -222,22 +222,22 @@ export default function HeaderShellView({
   const documentPaddingTop = resolveBuilderSpacing(
     normalizeLegacyHeaderSpacing(headerComposition.documentTopSpacing) ?? "none",
     "sectionPadding",
-    normalizeLegacyHeaderSpacing(shellSettings.sectionPaddingTop),
+    "none",
   ).css;
   const documentPaddingBottom = resolveBuilderSpacing(
     normalizeLegacyHeaderSpacing(headerComposition.documentBottomSpacing) ?? "none",
     "sectionPadding",
-    normalizeLegacyHeaderSpacing(shellSettings.sectionPaddingBottom),
+    "none",
   ).css;
   const documentMarginTop = resolveBuilderSpacing(
     normalizeLegacyHeaderSpacing(headerComposition.documentTopMargin) ?? "none",
     "sectionMargin",
-    normalizeLegacyHeaderSpacing(shellSettings.sectionMarginTop),
+    "none",
   ).css;
   const documentMarginBottom = resolveBuilderSpacing(
     normalizeLegacyHeaderSpacing(headerComposition.documentBottomMargin) ?? "none",
     "sectionMargin",
-    normalizeLegacyHeaderSpacing(shellSettings.sectionMarginBottom),
+    "none",
   ).css;
   const topToolbarVisible = shellSettings.topToolbarVisible !== false;
   const effectiveTopBarText =
@@ -467,12 +467,18 @@ export default function HeaderShellView({
     const resolvedTopPadding = rowComp.rowTopSpacing !== undefined
       ? resolveBuilderSpacing(rowComp.rowTopSpacing, "rowPadding", shellSettings.rowPaddingTop).css
       : visualStyles.paddingTop === undefined
-        ? resolveBuilderSpacing("none", "rowPadding").css
+        ? (headerHeight ? "0px" : resolveBuilderSpacing(
+            normalizeLegacyHeaderSpacing(shellSettings.rowPaddingTop) ?? "none",
+            "rowPadding",
+          ).css)
         : undefined;
     const resolvedBottomPadding = rowComp.rowBottomSpacing !== undefined
       ? resolveBuilderSpacing(rowComp.rowBottomSpacing, "rowPadding", shellSettings.rowPaddingBottom).css
       : visualStyles.paddingBottom === undefined
-        ? resolveBuilderSpacing("none", "rowPadding").css
+        ? (headerHeight ? "0px" : resolveBuilderSpacing(
+            normalizeLegacyHeaderSpacing(shellSettings.rowPaddingBottom) ?? "none",
+            "rowPadding",
+          ).css)
         : undefined;
     const resolvedTopMargin = rowComp.rowTopMargin !== undefined
       ? resolveBuilderSpacing(rowComp.rowTopMargin, "rowMargin", shellSettings.rowMarginTop).css

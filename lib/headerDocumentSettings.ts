@@ -35,10 +35,9 @@ export function resolveHeaderDocumentSettings(
   fallback: HeaderSettingsFallback,
 ): ResolvedHeaderDocumentSettings {
   return {
-    visible: composition.documentVisible ?? fallback.headerVisible ?? true,
-    transparent:
-      composition.documentTransparent ?? fallback.headerTransparent ?? false,
-    overlay: composition.documentOverlay ?? fallback.headerOverlay ?? false,
+    visible: composition.documentVisible ?? (fallback.headerVisible ?? true),
+    transparent: Boolean(composition.documentTransparent || fallback.headerTransparent),
+    overlay: Boolean(composition.documentOverlay || fallback.headerOverlay),
     height: composition.documentHeight ?? fallback.headerHeight,
     customHeight:
       composition.documentCustomHeight ?? fallback.headerCustomHeight,

@@ -6,8 +6,15 @@
     "name": "Hakob Jaghatspanyan",
     "role": "super_admin",
     "createdAt": "2026-06-29T19:14:12.875Z",
-    "updatedAt": "2026-07-20T05:25:22.606Z",
-    "language": "hy"
+    "updatedAt": "2026-07-21T13:49:18.841Z",
+    "language": "hy",
+    "subscription": {
+      "packageId": "411e6d1b-3688-4cbb-ad61-533760969d57",
+      "packageName": "🌱 Ստարտ",
+      "packageType": "Business Website",
+      "priceText": "5000 ֏/Ամիս",
+      "requestedAt": "2026-07-21T13:49:18.841Z"
+    }
   },
   {
     "id": "9782eff3-23e8-4dea-934b-1c6ceae4cd04",

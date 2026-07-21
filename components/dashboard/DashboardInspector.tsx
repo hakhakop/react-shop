@@ -2157,8 +2157,14 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                 headerOverlay={selectedSection.headerOverlay ?? shellSettings.headerOverlay ?? false}
                 headerHeight={selectedSection.headerHeight ?? shellSettings.headerHeight}
                 headerCustomHeight={selectedSection.headerCustomHeight ?? shellSettings.headerCustomHeight}
-                onHeaderDocumentChange={(patch) => updateSelected(patch)}
-                onHeaderHeightChange={(patch) => updateSelected(patch)}
+                onHeaderDocumentChange={(patch) => {
+                  updateSelected(patch);
+                  updateShellSettings(patch as Partial<BuilderShellSettings>);
+                }}
+                onHeaderHeightChange={(patch) => {
+                  updateSelected(patch);
+                  updateShellSettings(patch as Partial<BuilderShellSettings>);
+                }}
                 onApplyHeaderPreset={onApplyHeaderPreset}
                 headerPresetKey={selectedSection.headerPresetKey}
               />
@@ -16327,11 +16333,14 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                         checked={selectedSection.id === "header-document"
                           ? selectedSection.headerVisible ?? shellSettings.headerVisible ?? true
                           : selectedSection.visible}
-                        onChange={(event) =>
-                          updateSelected(selectedSection.id === "header-document"
-                            ? { headerVisible: event.target.checked }
-                            : { visible: event.target.checked })
-                        }
+                        onChange={(event) => {
+                          if (selectedSection.id === "header-document") {
+                            updateSelected({ headerVisible: event.target.checked });
+                            updateShellSettings({ headerVisible: event.target.checked });
+                          } else {
+                            updateSelected({ visible: event.target.checked });
+                          }
+                        }}
                       />
                       <span>Visible on page</span>
                     </label>

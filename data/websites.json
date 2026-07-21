@@ -69,14 +69,15 @@
     "domain": "testclient.webpages.am",
     "primaryDomain": "testclient.webpages.am",
     "domains": [
-      "testclient.webpages.am"
+      "testclient.webpages.am",
+      "steel.webpages.am"
     ],
     "description": "",
     "timeZone": "Asia/Yerevan",
     "language": "hy",
-    "status": "maintenance",
+    "status": "active",
     "createdAt": "2026-07-02T15:12:01.040Z",
-    "updatedAt": "2026-07-12T14:03:17.675Z",
+    "updatedAt": "2026-07-21T13:49:18.843Z",
     "type": "e-commerce",
     "primaryLanguage": "hy",
     "enabledLanguages": [
