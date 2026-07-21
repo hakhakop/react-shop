@@ -1,4 +1,8 @@
 {
+  "auth.login": "Войти",
+  "auth.dashboard": "Панель",
+  "auth.account": "Аккаунт",
+  "auth.startFree": "Начать бесплатно",
   "common.save": "Сохранить",
   "common.cancel": "Отмена",
   "common.delete": "Удалить",

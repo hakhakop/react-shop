@@ -1,4 +1,4 @@
-import { Suspense } from "react";
+import { Suspense, memo } from "react";
 import type { CSSProperties, ReactNode } from "react";
 import AntigravityTerminal from "@/components/builder/AntigravityTerminal";
 import AntigravityCanvas from "@/components/builder/AntigravityCanvas";
@@ -1441,7 +1441,7 @@ function GridCards({
       {items.slice(0, limit).map((item) => (
         <article
           key={item.id}
-          className={`shop-builder-grid-card is-image-${imagePaddingClass} is-content-${contentPaddingClass} is-frame-${block.gridImageFrame ?? "none"}`}
+          className={`shop-builder-grid-card is-image-${imagePaddingClass} is-content-${contentPaddingClass} is-frame-${block.gridImageFrame ?? "none"} cards-${block.cardStyle ?? "flat"} preset-${block.cardPreset ?? "standard"} shop-card-preset--${block.panelStyle ?? "default"}`}
           style={
             {
               ...(imagePaddingCustom
@@ -1465,12 +1465,20 @@ function GridCards({
           )}
           <div className="shop-builder-grid-content">
             {block.gridShowEyebrow !== false && item.eyebrow && (
-              <span>{item.eyebrow}</span>
+              <Typog
+                as="span"
+                className="shop-builder-eyebrow"
+                typography={item.typography ?? block.typography}
+                area="eyebrow"
+              >
+                {item.eyebrow}
+              </Typog>
             )}
             {item.title && (
               <Typog
                 as="h3"
                 typography={item.typography ?? block.typography}
+                area="title"
                 style={gridTitleStyle}
               >
                 {item.title}
@@ -1480,7 +1488,7 @@ function GridCards({
               <small>{item.meta}</small>
             )}
             {block.gridShowText !== false && item.text && (
-              <Typog as="p" typography={item.typography ?? block.typography}>
+              <Typog as="p" typography={item.typography ?? block.typography} area="body">
                 {item.text}
               </Typog>
             )}
@@ -2589,9 +2597,18 @@ function ContentLayoutBlock({
     return (
       <div className="shop-builder-column-block shop-builder-column-block--promo-strip">
         <div>
-          {block.eyebrow && <span>{block.eyebrow}</span>}
+          {block.eyebrow && (
+            <Typog
+              as="span"
+              className="shop-builder-eyebrow"
+              typography={block.typography}
+              area="eyebrow"
+            >
+              {block.eyebrow}
+            </Typog>
+          )}
           {block.title && (
-            <Typog as="h3" typography={block.typography}>
+            <Typog as="h3" typography={block.typography} area="title">
               {block.typewriterEnabled ? (
                 <TypewriterText
                   text={block.title}
@@ -2623,7 +2640,7 @@ function ContentLayoutBlock({
             </Typog>
           )}
           {block.body && (
-            <Typog as="p" typography={block.typography}>
+            <Typog as="p" typography={block.typography} area="body">
               {block.typewriterEnabled && !block.title ? (
                 <TypewriterText
                   text={block.body}
@@ -2661,6 +2678,7 @@ function ContentLayoutBlock({
             className="shop-builder-cta"
             href={block.buttonUrl}
             typography={block.typography}
+            area="button"
           >
             {block.buttonLabel}
           </Typog>
@@ -2674,6 +2692,7 @@ function ContentLayoutBlock({
             target={btn.target === "_blank" ? "_blank" : undefined}
             rel={btn.target === "_blank" ? "noreferrer" : undefined}
             typography={block.typography}
+            area="button"
           >
             {btn.label}
           </Typog>
@@ -3303,17 +3322,6 @@ function ContentLayoutSection({
       layoutScheme={layoutScheme}
       extra="shop-builder-content-layout"
     >
-      {(section.eyebrow || section.title || section.body) && (
-        <div className="shop-builder-content-layout-heading">
-          {section.eyebrow && (
-            <p className="shop-builder-eyebrow">{section.eyebrow}</p>
-          )}
-          {section.title && (
-            <h2 className="shop-builder-title">{section.title}</h2>
-          )}
-          <BodyText className="shop-builder-body">{section.body}</BodyText>
-        </div>
-      )}
       <div
         className="shop-builder-content-layout-rows-wrapper"
         style={{
@@ -3708,7 +3716,7 @@ function BuilderSectionRenderer({
   return content;
 }
 
-export default function StorefrontBuilderRenderer({
+function StorefrontBuilderRendererBase({
   layout,
   page,
   pageLabel,
@@ -3807,3 +3815,6 @@ export default function StorefrontBuilderRenderer({
     </>
   );
 }
+
+export const StorefrontBuilderRenderer = memo(StorefrontBuilderRendererBase);
+export default StorefrontBuilderRenderer;

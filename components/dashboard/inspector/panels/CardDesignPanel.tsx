@@ -44,7 +44,7 @@ export default function CardDesignPanel() {
 
   return (
     <div className="builder-inspector-stack">
-      {block.kind === "products" && (
+      {(block.kind === "products" || block.kind === "grid") && (
         <details className="builder-collapse" open>
           <summary>
             <span>Card Design</span>

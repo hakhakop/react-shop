@@ -1,17 +1,59 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { SiteIcon } from "@/components/ui/SiteIcon";
-import { useWordPressSession } from "./useWordPressSession";
 
-const wordpressBaseUrl = process.env.NEXT_PUBLIC_WORDPRESS_SITE_URL ?? null;
+type AuthUser = {
+  id?: string;
+  name?: string;
+  email?: string;
+} | null;
 
 export default function HeaderAccountButton() {
-  const { session } = useWordPressSession(wordpressBaseUrl);
-  const isLoggedIn = session.status === "logged-in";
-  const label = isLoggedIn ? session.name : "Account";
+  const [authState, setAuthState] = useState<{
+    status: "checking" | "logged-in" | "logged-out";
+    user: AuthUser;
+  }>({
+    status: "checking",
+    user: null,
+  });
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function checkAuth() {
+      try {
+        const res = await fetch("/api/auth/me", { cache: "no-store" });
+        if (!res.ok) {
+          if (!cancelled) setAuthState({ status: "logged-out", user: null });
+          return;
+        }
+        const data = (await res.json()) as { user?: AuthUser };
+        if (!cancelled) {
+          if (data.user) {
+            setAuthState({ status: "logged-in", user: data.user });
+          } else {
+            setAuthState({ status: "logged-out", user: null });
+          }
+        }
+      } catch {
+        if (!cancelled) setAuthState({ status: "logged-out", user: null });
+      }
+    }
+
+    checkAuth();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const isLoggedIn = authState.status === "logged-in";
+  const href = isLoggedIn ? "/app" : "/login";
+  const label = isLoggedIn ? (authState.user?.name || "Dashboard") : "Account";
   const statusLabel =
-    session.status === "checking"
+    authState.status === "checking"
       ? "Checking account"
       : isLoggedIn
         ? "Signed in"
@@ -19,9 +61,9 @@ export default function HeaderAccountButton() {
 
   return (
     <Link
-      href="/my-account"
-      className={`header-account-pill header-account-pill--${session.status}`}
-      aria-label={isLoggedIn ? `My account, signed in as ${session.name}` : "My account"}
+      href={href}
+      className={`header-account-pill header-account-pill--${authState.status}`}
+      aria-label={isLoggedIn ? `Dashboard, signed in as ${authState.user?.name ?? "user"}` : "Log in to account"}
     >
       <span className="header-account-icon">
         <SiteIcon name="user" className="h-4 w-4" />

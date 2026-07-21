@@ -22,6 +22,11 @@ export type HeaderBuilderElement = {
   columnFlex?: number;
   label?: string;
   url?: string;
+  loggedOutLabel?: string;
+  loggedInLabel?: string;
+  loggedOutUrl?: string;
+  loggedInUrl?: string;
+  previewState?: "auto" | "logged-out" | "logged-in";
   imageUrl?: string;
   imageAlt?: string;
   imageMaxWidth?: number;
@@ -35,6 +40,7 @@ export type HeaderBuilderElement = {
   menuActiveIndicator?: "princity" | "underline" | "none";
   headerBrandMode?: "logo" | "brand" | "both";
   headerBrandText?: string;
+  buttonStyle?: string;
   buttonBg?: string;
   buttonTextColor?: string;
   buttonBorderRadius?: string;
@@ -214,14 +220,70 @@ export function createLegacyEquivalentHeaderLayout(
   };
 }
 
+export function syncHeaderDocumentWithShellSettings(
+  layout: BuilderLayout,
+  settings: BuilderShellSettings,
+): BuilderLayout {
+  if (!layout?.sections?.length) return layout;
+
+  const sections = layout.sections.map((section, index) => {
+    if (index !== 0) return section;
+
+    const layoutItems = (section.layoutItems ?? []).map((item) => {
+      const blocks = (item.blocks ?? []).map((block) => {
+        if (block.id === "header-logo" || block.kind === "image") {
+          return {
+            ...block,
+            imageUrl: (block.imageUrl ?? settings.headerLogoUrl) || undefined,
+            imageAlt: block.imageAlt ?? settings.headerLogoAlt,
+            imageMaxWidth: block.imageMaxWidth ?? settings.headerLogoMaxWidth,
+            headerBrandMode: block.headerBrandMode ?? settings.headerBrandMode,
+            headerBrandText: block.headerBrandText ?? settings.headerBrandText,
+          };
+        }
+        if (block.id === "header-navigation" || block.kind === "menu") {
+          return {
+            ...block,
+            menuActiveIndicator: settings.headerActiveIndicator ?? block.menuActiveIndicator,
+          };
+        }
+        if (block.id === "header-button" || block.id === "starter-header-button" || block.kind === "button") {
+          return {
+            ...block,
+            buttonLabel: settings.headerButtonLabel ?? block.buttonLabel,
+            buttonUrl: settings.headerButtonUrl ?? block.buttonUrl,
+          };
+        }
+        return block;
+      });
+
+      return { ...item, blocks };
+    });
+
+    return {
+      ...section,
+      headerVisible: settings.headerVisible ?? section.headerVisible,
+      headerTransparent: settings.headerTransparent ?? section.headerTransparent,
+      headerOverlay: settings.headerOverlay ?? section.headerOverlay,
+      headerHeight: settings.headerHeight ?? section.headerHeight,
+      headerCustomHeight: settings.headerCustomHeight ?? section.headerCustomHeight,
+      layoutItems,
+    };
+  });
+
+  return { ...layout, sections };
+}
+
 export async function getOrCreateHeaderBuilderLayout(
   settings: BuilderShellSettings,
   scope: BuilderDataScope,
   showLegacyButton: boolean,
 ) {
-  return getOrCreateBuilderDocumentLayout({
+  const layout = await getOrCreateBuilderDocumentLayout({
     key: "header",
     scope,
     create: () => createLegacyEquivalentHeaderLayout(settings, showLegacyButton),
   });
+
+  return syncHeaderDocumentWithShellSettings(layout, settings);
 }

@@ -545,7 +545,7 @@
             "rowLayout": "thirds",
             "blocks": [
               {
-                "id": "starter-header-button",
+                "id": "header-button",
                 "kind": "button",
                 "buttonLabel": "Start a Project",
                 "buttonUrl": "#contact",

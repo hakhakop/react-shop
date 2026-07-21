@@ -1,6 +1,6 @@
 "use client";
 
-import type { CSSProperties, ReactNode } from "react";
+import { useMemo, type CSSProperties, type ReactNode } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -309,7 +309,10 @@ export default function HeaderShellView({
   ]
     .filter(Boolean)
     .join(" ");
-  const compositionTypes = new Set(headerComposition.elements.map((item) => item.type));
+  const allDocumentElements = useMemo(() => {
+    return headerComposition.elements;
+  }, [headerComposition.elements]);
+  const compositionTypes = new Set(allDocumentElements.map((item) => item.type));
   const showLogoElement = compositionTypes.has("logo");
   const showNavigationElement = compositionTypes.has("navigation");
   const showButtonElement = compositionTypes.has("button");
@@ -370,38 +373,55 @@ export default function HeaderShellView({
       activePageKey={scopedPreviewPage}
       scopedPreviewPages={scopedPreviewPages}
       scopedLinkMode={scopedLinkMode}
+      activeContentLanguage={activeContentLanguage}
     />
   ) : null;
   const renderLogoAndBrand = (element?: HeaderBuilderElement) => {
     const elementLogoUrl = element?.imageUrl || effectiveLogoUrl;
     const elementLogoAlt = element?.imageAlt || effectiveLogoAlt;
     const elementLogoMaxWidth = element?.imageMaxWidth || effectiveLogoMaxWidth;
-    return (
-    <div className="site-header-logo-wrap">
-      {showLogo && elementLogoUrl && (
-        <Link href={homeHref} className="site-header-logo-img-wrap">
-          <Image
-            src={elementLogoUrl}
-            alt={elementLogoAlt}
-            width={elementLogoMaxWidth}
-            height={elementLogoMaxWidth}
-            style={{ objectFit: "contain", maxWidth: elementLogoMaxWidth }}
-          />
-        </Link>
-      )}
+    const elementBrandMode = element?.headerBrandMode || effectiveBrandMode;
+    const elementBrandText = element?.headerBrandText || effectiveBrandText;
+    const elementImageAlignment = element?.imageAlignment || "left";
 
-      {showBrand && effectiveBrandText && (
-        <Link href={homeHref} className="site-header-brand">
-          <span style={{ color: primaryColor }}>{effectiveBrandText}</span>
-        </Link>
-      )}
-    </div>
+    const elementShowLogo = Boolean(elementLogoUrl) && (elementBrandMode === "logo" || elementBrandMode === "both");
+    const elementShowBrand = Boolean(elementBrandText) && (elementBrandMode === "brand" || elementBrandMode === "both" || !elementShowLogo);
+
+    const alignStyle: CSSProperties = {
+      display: "flex",
+      alignItems: "center",
+      gap: "12px",
+      justifyContent: elementImageAlignment === "center" ? "center" : elementImageAlignment === "right" ? "flex-end" : "flex-start",
+    };
+
+    return (
+      <div className="site-header-logo-wrap" style={alignStyle}>
+        {elementShowLogo && elementLogoUrl && (
+          <Link href={homeHref} className="site-header-logo-img-wrap">
+            <Image
+              src={elementLogoUrl}
+              alt={elementLogoAlt}
+              width={elementLogoMaxWidth}
+              height={elementLogoMaxWidth}
+              style={{ objectFit: "contain", maxWidth: elementLogoMaxWidth }}
+            />
+          </Link>
+        )}
+
+        {elementShowBrand && elementBrandText && (
+          <Link href={homeHref} className="site-header-brand">
+            <span style={{ color: primaryColor, ...typographyProps(element?.typography, "title").style }}>
+              {elementBrandText}
+            </span>
+          </Link>
+        )}
+      </div>
     );
   };
   const renderHeaderButton = (buttonElement?: HeaderBuilderElement) => showButtonElement ? (
     <Link
-      href={serviceHomepageMode ? "/register" : (buttonElement?.url || clientHref)}
-      className="site-header-action-pill site-header-service-cta"
+      href={buttonElement?.url || clientHref}
+      className={`site-header-button-element ${buttonElement?.buttonStyle ? `site-header-button--${buttonElement.buttonStyle}` : "site-header-button--primary"}`}
       style={{
         ...(buttonElement?.buttonBg ? { background: buttonElement.buttonBg } : {}),
         ...(buttonElement?.buttonTextColor ? { color: buttonElement.buttonTextColor } : {}),
@@ -415,10 +435,9 @@ export default function HeaderShellView({
         ...typographyProps(buttonElement?.typography, "button").style,
       }}
     >
-      {serviceHomepageMode ? "Start Free" : (buttonElement?.label || "Start")}
+      {buttonElement?.label || "Start"}
     </Link>
   ) : null;
-  const allDocumentElements = headerComposition.elements;
   const primaryRowId = headerComposition.columns?.[0]?.rowId ?? allDocumentElements[0]?.rowId;
   const orderedElements = primaryRowId
     ? allDocumentElements.filter((element) => element.rowId === primaryRowId)

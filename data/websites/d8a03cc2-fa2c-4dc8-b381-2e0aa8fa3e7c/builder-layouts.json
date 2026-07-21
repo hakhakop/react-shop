@@ -842,7 +842,7 @@
             "rowLayout": "thirds",
             "blocks": [
               {
-                "id": "starter-header-button",
+                "id": "header-button",
                 "kind": "button",
                 "buttonLabel": "Request a Quote",
                 "buttonUrl": "#contact",

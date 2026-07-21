@@ -60,6 +60,11 @@ export type BuilderDesign = {
 export type BuilderLayoutBlock = {
   id?: string;
   kind?: string;
+  loggedOutLabel?: string;
+  loggedInLabel?: string;
+  loggedOutUrl?: string;
+  loggedInUrl?: string;
+  previewState?: "auto" | "logged-out" | "logged-in";
   menuSource?: string;
   menuItemGap?: string;
   menuHoverColor?: string;
@@ -513,6 +518,16 @@ export function normalizeBuilderLayoutKey(
   }
   return "shop";
 }
+
+export function normalizeLayoutBlockKind(
+  block: { kind?: string; type?: string } | string | null | undefined,
+): string {
+  if (!block) return "text";
+  const raw = typeof block === "string" ? block : block.kind || block.type || "text";
+  if (raw === "accountAccess") return "headerAccount";
+  return raw;
+}
+
 
 export function getBuilderTargetType(key: BuilderLayoutKey) {
   return key === "header" || key === "footer"

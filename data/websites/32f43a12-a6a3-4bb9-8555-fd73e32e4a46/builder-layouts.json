@@ -815,13 +815,18 @@
           }
         ],
         "visible": true,
-        "headerPresetKey": "princity",
         "headerVisible": true,
         "headerTransparent": false,
-        "headerOverlay": false
+        "headerOverlay": false,
+        "headerHeight": "custom",
+        "headerCustomHeight": 40,
+        "topSpacing": "none",
+        "bottomSpacing": "none",
+        "topMargin": "none",
+        "bottomMargin": "none"
       }
     ],
-    "updatedAt": "2026-07-19T19:26:58.091Z"
+    "updatedAt": "2026-07-20T19:46:49.192Z"
   },
   "footer": {
     "version": 1,

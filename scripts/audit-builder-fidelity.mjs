@@ -19,6 +19,7 @@ const sources = {
   headerComposition: readFileSync(resolve(root, "lib/headerBuilderComposition.ts"), "utf8"),
   headerDropdown: readFileSync(resolve(root, "components/HeaderCategoriesDropdown.tsx"), "utf8"),
   headerHeight: readFileSync(resolve(root, "lib/headerHeight.ts"), "utf8"),
+  registry: readFileSync(resolve(root, "components/dashboard/builderRegistry.ts"), "utf8"),
 };
 
 const require = createRequire(import.meta.url);
@@ -256,6 +257,22 @@ const behavioralReport = [
     assert(sources.headerView.includes('compositionTypes.has("categories") ? categories : null'), "Mobile category content can render independently of the document element");
     assert(sources.headerDropdown.includes('aria-expanded={isOpen}') && sources.headerDropdown.includes('document.addEventListener("pointerdown"'), "Dropdown open state or outside dismissal is not wired");
     return "document block -> shared composition -> shared Header dropdown";
+  }),
+  behavioralCase("account access", "single canonical account control enforcement", () => {
+    assert(!sources.registry.includes("accountAccess"), "accountAccess block still registered in builderRegistry");
+    assert(!sources.inspector.includes('block.kind === "accountAccess"'), "accountAccess still present in DashboardInspector");
+    assert(!sources.storefront.includes('block.kind === "accountAccess"'), "accountAccess branch still present in StorefrontBuilderRenderer");
+    assert(!sources.headerView.includes('header-account-access'), "Virtual header-account-access injection still present in HeaderShellView");
+    assert(!sources.headerView.includes('AccountAccessElement'), "AccountAccessElement still imported or rendered in HeaderShellView");
+    return "accountAccess removed; headerAccount is single canonical control";
+  }),
+  behavioralCase("header preview parity", "shared header settings resolver enforcement", () => {
+    assert(!sources.builder.includes("dashboardHeaderSettings"), "Hardcoded dashboardHeaderSettings object still present in DashboardBuilder.tsx");
+    assert(sources.builder.includes("resolveHeaderBuilderComposition"), "DashboardBuilder does not call resolveHeaderBuilderComposition");
+    assert(sources.builder.includes("resolveHeaderDocumentSettings"), "DashboardBuilder does not call resolveHeaderDocumentSettings");
+    assert(sources.builder.includes("<HeaderShellView"), "DashboardBuilder does not use HeaderShellView as shared renderer");
+    assert(!sources.dashboardCss.includes("top: 18px !important"), "Dashboard CSS still overrides live header position");
+    return "shared resolvers -> HeaderShellView; zero hardcoded header override objects";
   }),
 ];
 

@@ -483,7 +483,7 @@
             "rowLayout": "thirds",
             "blocks": [
               {
-                "id": "starter-header-button",
+                "id": "header-button",
                 "kind": "button",
                 "buttonLabel": "Contact Us",
                 "buttonUrl": "#contact",

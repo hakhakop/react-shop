@@ -34,11 +34,13 @@ export default function WebsiteLanguageSwitcher({
 }: WebsiteLanguageSwitcherProps) {
   const router = useRouter();
 
-  const languagesToRender = (enabledLanguages.length <= 1 && previewOnly)
-    ? [...new Set([...enabledLanguages, "en", "ru"])]
-    : enabledLanguages;
+  const isBuilder = Boolean(onLanguageChange);
+  const languagesToRender =
+    enabledLanguages.length <= 1 && (previewOnly || isBuilder)
+      ? [...new Set([...enabledLanguages, "hy", "en", "ru"])]
+      : enabledLanguages;
 
-  if (languagesToRender.length <= 1) return null;
+  if (languagesToRender.length <= 1 && !isBuilder) return null;
 
   return (
     <label

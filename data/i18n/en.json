@@ -1,4 +1,8 @@
 {
+  "auth.login": "Log in",
+  "auth.dashboard": "Dashboard",
+  "auth.account": "Account",
+  "auth.startFree": "Start free",
   "common.save": "Save",
   "common.cancel": "Cancel",
   "common.delete": "Delete",

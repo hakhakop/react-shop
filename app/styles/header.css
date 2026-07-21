@@ -253,7 +253,9 @@
 
 /* Dark theme header + toggle */
 
-[data-theme="dark"] .site-header {
+[data-theme="dark"] .site-header,
+.dark .site-header,
+html.dark .site-header {
   background: rgba(15, 23, 42, 0.96);
   border-bottom-color: rgba(30, 64, 175, 0.7);
 }
@@ -848,12 +850,33 @@
   max-width: 100%;
 }
 
+.site-header-button-element {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 22px;
+  border-radius: 999px;
+  background: var(--button-bg, var(--accent, #111827));
+  color: var(--button-text-color, #ffffff);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.site-header-button-element:hover,
+.header-builder-element--button .site-header-button-element:hover,
 .header-builder-element--button .site-header-service-cta:hover {
-  background: var(--header-builder-button-hover-bg, var(--button-hover-bg, inherit));
-  color: var(--header-builder-button-hover-text, var(--button-hover-text-color, inherit));
-  border-color: var(--header-builder-button-hover-border, var(--button-hover-border-color, currentColor));
-  transform: var(--header-builder-button-hover-transform, var(--button-hover-transform, none));
-  box-shadow: var(--header-builder-button-hover-shadow, var(--button-hover-shadow, none));
+  background: var(--header-builder-button-hover-bg, var(--button-hover-bg, var(--text-main, #000000)));
+  color: var(--header-builder-button-hover-text, var(--button-hover-text-color, #ffffff));
+  border-color: var(--header-builder-button-hover-border, var(--button-hover-border-color, transparent));
+  transform: var(--header-builder-button-hover-transform, translateY(-2px));
+  box-shadow: var(--header-builder-button-hover-shadow, 0 6px 20px rgba(0, 0, 0, 0.14));
 }
 
 .header-builder-element--spacer {
@@ -1884,6 +1907,103 @@
   white-space: nowrap;
 }
 
+/* Marketing Header Auth Actions Group */
+.site-header-auth-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.site-header-auth-group--loading {
+  min-width: 140px;
+  height: 38px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.site-header-auth-skeleton {
+  width: 130px;
+  height: 36px;
+  border-radius: 999px;
+  background: color-mix(in srgb, currentColor 10%, transparent);
+  animation: headerAuthPulse 1.6s ease-in-out infinite;
+}
+
+@keyframes headerAuthPulse {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 0.75; }
+}
+
+.site-header-auth-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  height: 38px;
+  padding: 0 16px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background 180ms ease, color 180ms ease, border-color 180ms ease, transform 180ms ease;
+  white-space: nowrap;
+}
+
+.site-header-auth-btn .site-header-auth-icon {
+  flex-shrink: 0;
+  width: 15px;
+  height: 15px;
+}
+
+/* Secondary "Log in" button styling */
+.site-header-auth-btn--login {
+  background: color-mix(in srgb, currentColor 6%, transparent);
+  color: inherit;
+  border: 1px solid color-mix(in srgb, currentColor 16%, transparent);
+}
+
+.site-header-auth-btn--login:hover {
+  background: color-mix(in srgb, currentColor 12%, transparent);
+  color: inherit;
+  border-color: color-mix(in srgb, currentColor 30%, transparent);
+}
+
+/* Primary "Dashboard" button styling */
+.site-header-auth-btn--dashboard {
+  background: var(--text-main, #111111);
+  color: var(--accent-contrast, #ffffff);
+  border: 1px solid transparent;
+  font-weight: 800;
+}
+
+.site-header-auth-btn--dashboard:hover {
+  opacity: 0.92;
+  transform: translateY(-1px);
+}
+
+/* Dark mode overrides */
+[data-theme="dark"] .site-header-auth-btn--dashboard,
+.dark .site-header-auth-btn--dashboard {
+  background: #ffffff;
+  color: #09090b;
+}
+
+/* Transparent / Light text mode header overrides */
+.site-header[data-header-text-mode="light"]:not([data-scrolled="true"]) .site-header-auth-btn--login {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.site-header[data-header-text-mode="light"]:not([data-scrolled="true"]) .site-header-auth-btn--login:hover {
+  background: rgba(255, 255, 255, 0.24);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.site-header[data-header-text-mode="light"]:not([data-scrolled="true"]) .site-header-auth-btn--dashboard {
+  background: #ffffff;
+  color: #09090b;
+}
+
 .site-header--service .site-header-princity .site-header-brand {
   display: inline-flex;
   font-size: 20px;
@@ -1924,7 +2044,7 @@
   text-decoration: none;
 }
 
-.site-header-princity .site-header-action-pill:hover,
+.site-header-princity .site-header-action-pill:not(.site-header-button-element):hover,
 .site-header-princity .theme-toggle-btn:hover {
   background: var(--text-main, #111111);
   color: var(--accent-contrast, #ffffff);

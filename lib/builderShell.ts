@@ -157,7 +157,7 @@ export const defaultBuilderShellSettings: BuilderShellSettings = {
   headerTransparent: false,
   headerOverlay: false,
   headerWidthMode: "boxed",
-  headerHeight: "auto",
+  headerHeight: "comfortable",
   headerZIndex: 40,
   sectionPaddingTop: "medium",
   sectionPaddingBottom: "medium",

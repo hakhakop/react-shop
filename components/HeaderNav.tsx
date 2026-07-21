@@ -33,6 +33,7 @@ interface HeaderNavProps {
   activePageKey?: BuilderLayoutKey;
   scopedPreviewPages?: ScopedPreviewPage[];
   scopedLinkMode?: "builder" | "preview";
+  activeContentLanguage?: string;
 }
 
 function handleNavMouseMove(e: MouseEvent<HTMLAnchorElement>) {
@@ -346,6 +347,7 @@ export default function HeaderNav({
   activePageKey,
   scopedPreviewPages,
   scopedLinkMode = "preview",
+  activeContentLanguage,
 }: HeaderNavProps) {
   const rawPathname = usePathname();
   const dashboardMode = rawPathname === "/dashboard";
@@ -468,7 +470,7 @@ export default function HeaderNav({
 
           {/* 2. Top Actions (Account, Wishlist, Cart, Theme Toggle) */}
           <div className="mobile-drawer-top-actions">
-            <div className="mobile-drawer-top-action-wrapper" onClick={() => setIsMobileOpen(false)}>
+            <div className="mobile-drawer-top-action-wrapper mobile-drawer-account-wrap" onClick={() => setIsMobileOpen(false)}>
               <HeaderAccountButton />
             </div>
 

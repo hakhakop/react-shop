@@ -218,6 +218,11 @@ export type BuilderLayoutBlock = {
   contentTranslations?: BuilderContentTranslations;
   id?: string;
   kind?: LayoutBlockKind;
+  loggedOutLabel?: string;
+  loggedInLabel?: string;
+  loggedOutUrl?: string;
+  loggedInUrl?: string;
+  previewState?: "auto" | "logged-out" | "logged-in";
   eyebrow?: string;
   title?: string;
   body?: string;

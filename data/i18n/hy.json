@@ -1,4 +1,8 @@
 {
+  "auth.login": "Մուտք",
+  "auth.dashboard": "Վահանակ",
+  "auth.account": "Հաշիվ",
+  "auth.startFree": "Սկսել անվճար",
   "common.save": "Պահպանել",
   "common.cancel": "Չեղարկել",
   "common.delete": "Ջնջել",

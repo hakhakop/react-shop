@@ -201,13 +201,13 @@
     "name": "Hakob Jaghatspanyan",
     "role": "user",
     "createdAt": "2026-07-18T06:28:42.667Z",
-    "updatedAt": "2026-07-18T18:10:28.372Z",
+    "updatedAt": "2026-07-20T20:13:04.969Z",
     "subscription": {
-      "packageId": "website-blog",
-      "packageName": "🛍 Խանութ",
-      "packageType": "Կոմերցիոն",
-      "priceText": "12000 ֏ /ամիս",
-      "requestedAt": "2026-07-18T06:53:20.221Z"
+      "packageId": "411e6d1b-3688-4cbb-ad61-533760969d57",
+      "packageName": "🌱 Ստարտ",
+      "packageType": "Business Website",
+      "priceText": "5000 ֏/Ամիս",
+      "requestedAt": "2026-07-20T20:13:04.969Z"
     },
     "language": "en"
   }

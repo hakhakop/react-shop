@@ -365,7 +365,7 @@ const defaultShellSettings: BuilderShellSettings = {
   headerTransparent: false,
   headerOverlay: false,
   headerWidthMode: "boxed",
-  headerHeight: "auto",
+  headerHeight: "comfortable",
   headerZIndex: 40,
   sectionPaddingTop: "medium",
   sectionPaddingBottom: "medium",
@@ -1934,6 +1934,26 @@ export default function DashboardBuilder({
     ),
     [contentLanguage, footerDocumentState.sections, primaryContentLanguage],
   );
+  const footerPageContextLayout = useMemo(
+    () => ({
+      version: 1 as const,
+      key: footerPageContextState.page,
+      updatedAt: "",
+      ...footerPageContextState,
+      sections: footerPageContextSections,
+    }),
+    [footerPageContextState, footerPageContextSections],
+  );
+  const footerSlotLayout = useMemo(
+    () => ({
+      version: 1 as const,
+      key: (footerDocumentState.page ?? "footer") as BuilderLayoutKey,
+      updatedAt: "",
+      ...footerDocumentState,
+      sections: footerDocumentSections,
+    }),
+    [footerDocumentState, footerDocumentSections],
+  );
   const headerCompositionSections = useMemo(
     () => resolveContentSections(
       headerDocumentState.sections,
@@ -2220,14 +2240,14 @@ export default function DashboardBuilder({
       })),
     [customPages],
   );
-  const dashboardHeaderSettings = useMemo<HeaderSettings>(
+  const resolvedHeaderSettings = useMemo<HeaderSettings>(
     () => ({
       menuLocation: "primary",
-      logoMaxWidth: 160,
-      iconVariant: "muted",
-      iconOrder: defaultShellSettings.headerIconOrder,
+      logoMaxWidth: shellSettings.headerLogoMaxWidth ?? defaultShellSettings.headerLogoMaxWidth,
+      iconVariant: shellSettings.headerIconVariant ?? defaultShellSettings.headerIconVariant,
+      iconOrder: shellSettings.headerIconOrder ?? defaultShellSettings.headerIconOrder,
     }),
-    [],
+    [shellSettings.headerLogoMaxWidth, shellSettings.headerIconVariant, shellSettings.headerIconOrder],
   );
   const builderStateSignature = useMemo(
     () => JSON.stringify(builderState),
@@ -2871,11 +2891,13 @@ export default function DashboardBuilder({
     patch: Partial<BuilderLayoutBlock>,
   ) => {
     if (builderState.page !== "header") return;
-    if (blockKey === "header-logo") {
+    if (blockKey === "header-logo" || blockKey === "starter-brand") {
       updateShellSettings({
         ...(typeof patch.imageUrl === "string" ? { headerLogoUrl: patch.imageUrl || null } : {}),
         ...(typeof patch.imageAlt === "string" ? { headerLogoAlt: patch.imageAlt } : {}),
         ...(typeof patch.imageMaxWidth === "number" ? { headerLogoMaxWidth: patch.imageMaxWidth } : {}),
+        ...(patch.headerBrandMode ? { headerBrandMode: patch.headerBrandMode } : {}),
+        ...(typeof patch.headerBrandText === "string" ? { headerBrandText: patch.headerBrandText } : {}),
       });
     }
     if (blockKey === "header-navigation" && Array.isArray(patch.items)) {
@@ -2889,7 +2911,7 @@ export default function DashboardBuilder({
         })),
       });
     }
-    if (blockKey === "header-button") {
+    if (blockKey === "header-button" || blockKey === "starter-header-button") {
       updateShellSettings({
         ...(typeof patch.buttonLabel === "string" ? { headerButtonLabel: patch.buttonLabel } : {}),
         ...(typeof patch.buttonUrl === "string" ? { headerButtonUrl: patch.buttonUrl } : {}),
@@ -2902,15 +2924,17 @@ export default function DashboardBuilder({
     const blocks = state.sections.flatMap((section) =>
       (section.layoutItems ?? []).flatMap((item) => item.blocks ?? []),
     );
-    const logo = blocks.find((block) => block.id === "header-logo");
-    const navigation = blocks.find((block) => block.id === "header-navigation");
-    const button = blocks.find((block) => block.id === "header-button");
+    const logo = blocks.find((block) => block.id === "header-logo" || block.kind === "image");
+    const navigation = blocks.find((block) => block.id === "header-navigation" || block.kind === "menu");
+    const button = blocks.find((block) => block.id === "header-button" || block.id === "starter-header-button" || block.kind === "button");
     updateShellSettings({
       ...(logo
         ? {
             headerLogoUrl: logo.imageUrl || null,
             headerLogoAlt: logo.imageAlt ?? shellSettings.headerLogoAlt,
             headerLogoMaxWidth: logo.imageMaxWidth ?? shellSettings.headerLogoMaxWidth,
+            headerBrandMode: logo.headerBrandMode ?? shellSettings.headerBrandMode,
+            headerBrandText: logo.headerBrandText ?? shellSettings.headerBrandText,
           }
         : {}),
       ...(navigation?.items
@@ -8680,7 +8704,7 @@ export default function DashboardBuilder({
                   <HeaderShellView
                     layoutOverride={shellSettings.headerLayout}
                     shellSettings={shellSettings}
-                    headerSettings={dashboardHeaderSettings}
+                    headerSettings={resolvedHeaderSettings}
                     homeHref="#"
                     clientHref="#"
                     scopedPreviewWebsiteId={websiteRouteSegment}
@@ -8693,6 +8717,7 @@ export default function DashboardBuilder({
                     activeContentLanguage={contentLanguage}
                     enabledContentLanguages={enabledContentLanguages}
                     languagePreferenceKey={`website_content_language_${websiteId ?? "root"}`}
+                    languageSwitcherPreviewOnly={true}
                     onContentLanguageChange={setContentLanguage}
                     renderBuilderElement={(element, content, flexItemStyle) => {
                       const columnId = element.columnId ?? "header-main-row";
@@ -8953,7 +8978,7 @@ export default function DashboardBuilder({
                   <HeaderShellView
                     layoutOverride={shellSettings.headerLayout}
                     shellSettings={shellSettings}
-                    headerSettings={dashboardHeaderSettings}
+                    headerSettings={resolvedHeaderSettings}
                     homeHref={
                       websiteId
                         ? `/app/websites/${websiteRouteSegment}/builder?page=home`
@@ -8973,6 +8998,7 @@ export default function DashboardBuilder({
                     activeContentLanguage={contentLanguage}
                     enabledContentLanguages={enabledContentLanguages}
                     languagePreferenceKey={`website_content_language_${websiteId ?? "root"}`}
+                    languageSwitcherPreviewOnly={true}
                     onContentLanguageChange={setContentLanguage}
                   />
                   <div
@@ -9016,13 +9042,7 @@ export default function DashboardBuilder({
                   onClick={() => switchBuilderTarget(footerPageContextState.page)}
                 />
                 <StorefrontBuilderRenderer
-                  layout={{
-                    version: 1,
-                    key: footerPageContextState.page,
-                    updatedAt: "",
-                    ...footerPageContextState,
-                    sections: footerPageContextSections,
-                  }}
+                  layout={footerPageContextLayout}
                   page={footerPageContextState.page}
                   pageLabel={getLayoutLabel(footerPageContextState.page, customPages)}
                 />
@@ -9136,13 +9156,7 @@ export default function DashboardBuilder({
             {builderState.page !== "footer" ? (
               <div className="builder-preview-footer-slot" aria-label="Footer preview">
                 <StorefrontBuilderRenderer
-                  layout={{
-                    version: 1,
-                    key: "footer",
-                    updatedAt: "",
-                    ...footerDocumentState,
-                    sections: footerDocumentSections,
-                  }}
+                  layout={footerSlotLayout}
                   page="footer"
                   pageLabel="Footer"
                   rootElement="footer"
@@ -12732,37 +12746,6 @@ function PreviewSection({
     });
     return (
       <div className="shop-builder-section-content builder-preview-content-layout">
-        {(section.eyebrow || section.title || section.body) && (
-          <div className="shop-builder-content-layout-heading">
-            {section.eyebrow && (
-              <DashboardTypog
-                as="p"
-                className="shop-builder-eyebrow"
-                typography={section.typography}
-              >
-                {section.eyebrow}
-              </DashboardTypog>
-            )}
-            {section.title && (
-              <DashboardTypog
-                as="h2"
-                className="shop-builder-title"
-                typography={section.typography}
-              >
-                {section.title}
-              </DashboardTypog>
-            )}
-            {section.body && (
-              <DashboardTypog
-                as="p"
-                className="shop-builder-body"
-                typography={section.typography}
-              >
-                {section.body}
-              </DashboardTypog>
-            )}
-          </div>
-        )}
         <div
           className="shop-builder-content-layout-grid builder-preview-content-layout-grid"
           style={
@@ -14960,7 +14943,7 @@ function PreviewSection({
                                           }
                                           className={`shop-builder-grid-card is-image-${imagePaddingClass} is-content-${contentPaddingClass} is-frame-${
                                             block.gridImageFrame ?? "none"
-                                          } ${
+                                          } cards-${block.cardStyle ?? "flat"} preset-${block.cardPreset ?? "standard"} shop-card-preset--${block.panelStyle ?? "default"} ${
                                             draggingItem?.blockKey ===
                                               blockKey &&
                                             draggingItem?.fromIndex ===

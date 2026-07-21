@@ -80,6 +80,7 @@ export function resolveHeaderBuilderComposition(
       type: "button",
       label: block.buttonLabel,
       url: block.buttonUrl,
+      buttonStyle: block.buttonStyle,
       buttonBg: block.buttonBg,
       buttonTextColor: block.buttonTextColor,
       buttonBorderRadius: block.buttonBorderRadius,

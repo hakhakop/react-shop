@@ -323,36 +323,6 @@
     "updatedAt": "2026-07-18T05:15:05.133Z"
   },
   {
-    "id": "32f43a12-a6a3-4bb9-8555-fd73e32e4a46",
-    "ownerId": "e58db68c-2f41-4dcd-8159-9707b2a972ee",
-    "name": "fffff",
-    "slug": "fffff",
-    "type": "business",
-    "domain": "fffff.webpages.am",
-    "primaryDomain": "fffff.webpages.am",
-    "domains": [
-      "fffff.webpages.am"
-    ],
-    "description": "",
-    "websiteCategory": "Business",
-    "companyName": "",
-    "personName": "",
-    "logoUrl": "",
-    "contactPhone": "",
-    "contactEmail": "",
-    "socialLinks": "",
-    "timeZone": "Asia/Yerevan",
-    "language": "hy",
-    "primaryLanguage": "hy",
-    "enabledLanguages": [
-      "hy"
-    ],
-    "status": "active",
-    "creationRequestId": "ad2cb5fb-ecac-4414-89bd-1740e4416730",
-    "createdAt": "2026-07-18T06:28:56.365Z",
-    "updatedAt": "2026-07-18T06:53:20.223Z"
-  },
-  {
     "id": "d8a03cc2-fa2c-4dc8-b381-2e0aa8fa3e7c",
     "ownerId": "e58db68c-2f41-4dcd-8159-9707b2a972ee",
     "name": "hello dolly",
@@ -379,5 +349,36 @@
     "creationRequestId": "2c9cf7a0-821f-4abc-8eff-6826bffca281",
     "createdAt": "2026-07-18T17:11:19.149Z",
     "updatedAt": "2026-07-18T17:11:19.149Z"
+  },
+  {
+    "id": "e27fc2d8-6aec-4b50-9ccd-70aa5d72310f",
+    "ownerId": "e58db68c-2f41-4dcd-8159-9707b2a972ee",
+    "name": "new test",
+    "slug": "new-test",
+    "type": "e-commerce",
+    "domain": "new-test.webpages.am",
+    "primaryDomain": "new-test.webpages.am",
+    "domains": [
+      "new-test.webpages.am"
+    ],
+    "description": "",
+    "websiteCategory": "Online Store",
+    "companyName": "",
+    "personName": "",
+    "logoUrl": "",
+    "contactPhone": "",
+    "contactEmail": "",
+    "socialLinks": "",
+    "timeZone": "Asia/Yerevan",
+    "language": "hy",
+    "primaryLanguage": "hy",
+    "enabledLanguages": [
+      "hy",
+      "en"
+    ],
+    "status": "active",
+    "creationRequestId": "c9aa7fc6-f86b-4ce9-a301-944cb66384ae",
+    "createdAt": "2026-07-20T20:01:10.454Z",
+    "updatedAt": "2026-07-21T05:33:59.846Z"
   }
 ]

@@ -55,7 +55,7 @@ const section = (input: {
   const columns = layout === "whole" ? 1 : layout === "halves" ? 2 : 3;
   const rowId = `${input.id}-row`;
   return {
-    id: input.id, kind: "contentLayout", title: input.title, eyebrow: input.eyebrow, body: input.body,
+    id: input.id, kind: "contentLayout", title: input.title,
     background: input.background, backgroundMode: "full", contentMode: "boxed",
     colorScheme: input.colorScheme ?? "inherit", topSpacing: input.spacing ?? "large", bottomSpacing: input.spacing ?? "large",
     layout, layoutColumns: columns,
@@ -93,9 +93,9 @@ const heroBlock = (id: string, eyebrow: string, title: string, body: string, pri
 const makeHeader = (websiteName: string, now: string, theme: StarterTheme, cta: string): BuilderLayout => ({
   version: 1, key: "header", page: "header", targetType: "header", updatedAt: now, design: {},
   sections: [{ ...section({ id: "header-document", title: "Header", background: "#ffffff", spacing: "medium", layout: "thirds", blocks: [
-    [{ id: "starter-brand", kind: "image", headerBrandMode: "brand", headerBrandText: websiteName, imageAlt: `${websiteName} logo`, imageMaxWidth: 180 }],
-    [{ id: "starter-navigation", kind: "menu", title: "Navigation", menuSource: "main", menuActiveIndicator: "underline" }],
-    [{ id: "starter-header-button", kind: "button", buttonLabel: cta, buttonUrl: "#contact", buttonStyle: "primary" }],
+    [{ id: "header-logo", kind: "image", headerBrandMode: "brand", headerBrandText: websiteName, imageAlt: `${websiteName} logo`, imageMaxWidth: 180 }],
+    [{ id: "header-navigation", kind: "menu", title: "Navigation", menuSource: "main", menuActiveIndicator: "underline" }],
+    [{ id: "header-button", kind: "button", buttonLabel: cta, buttonUrl: "#contact", buttonStyle: "primary" }],
   ] }), headerUtilityMigrationVersion: 3 }],
 });
 

@@ -46,10 +46,16 @@ export default async function HeaderShell({
   website,
   activeContentLanguage,
 }: HeaderShellProps) {
+  const scope = website?.id
+    ? { websiteId: website.id }
+    : scopedPreviewWebsiteId
+      ? { websiteId: scopedPreviewWebsiteId }
+      : undefined;
+
   const [settingsRaw, shellSettingsRaw, homeLayout] = await Promise.all([
     getThemeSettings().catch(() => ({})),
-    getBuilderShellSettings(),
-    getPublishedBuilderLayout("home").catch(() => null),
+    getBuilderShellSettings(scope),
+    getPublishedBuilderLayout("home", scope).catch(() => null),
   ]);
 
   const settings = (settingsRaw || {}) as Record<string, unknown>;
@@ -72,7 +78,7 @@ export default async function HeaderShell({
   );
   const headerLayout = await getOrCreateHeaderBuilderLayout(
     shellSettings,
-    website ? { websiteId: website.id } : {},
+    scope ?? {},
     serviceHomepageMode,
   );
   const cookieStore = await cookies();

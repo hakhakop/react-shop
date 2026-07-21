@@ -5399,18 +5399,8 @@ body:has([data-scoped-preview-root]) [data-scoped-preview-root] .site-header {
 .builder-preview-header-slot
   #site-header-pill
   .site-header-princity {
-  position: absolute !important;
-  left: auto !important;
-  right: auto !important;
-  inset: auto !important;
-  top: 18px !important;
+  position: relative !important;
   width: 100% !important;
-}
-
-.builder-preview-header-slot
-  #site-header-pill[data-scrolled="true"]
-  .site-header-princity {
-  top: 18px !important;
 }
 
 .builder-preview-header-slot
@@ -5568,6 +5558,26 @@ body:has([data-scoped-preview-root]) [data-scoped-preview-root] .site-header {
     box-shadow 200ms ease,
     background-color 200ms ease,
     transform 200ms ease;
+}
+
+.builder-preview-shell[data-theme="dark"],
+.builder-preview-shell.dark,
+.builder-preview-shell.builder-preview-scheme-dark {
+  --builder-preview-text: #f4f4f5;
+  --builder-preview-muted: #a1a1aa;
+  --builder-preview-surface: #27272a;
+  --builder-preview-button-bg: #ffffff;
+  --builder-preview-button-text: #09090b;
+}
+
+.builder-preview-section[data-theme="dark"],
+.builder-preview-section.shop-builder-section--scheme-dark,
+.builder-preview-section.shop-builder-section--dark {
+  --builder-preview-section-text: #f4f4f5;
+  --builder-preview-section-muted: #a1a1aa;
+  --builder-preview-section-surface: #27272a;
+  --builder-preview-section-button-bg: #ffffff;
+  --builder-preview-section-button-text: #09090b;
 }
 
 .builder-preview-section.shop-builder-section--height-viewport,
@@ -9235,11 +9245,7 @@ body[data-storefront-preset="princity"]
 .builder-preview-header-slot
   #site-header-pill
   .site-header-princity {
-  position: absolute !important;
-  inset: auto !important;
-  top: 18px !important;
-  right: auto !important;
-  left: auto !important;
+  position: relative !important;
   width: 100% !important;
 }
 
@@ -12531,9 +12537,7 @@ article.is-selected-column > .builder-preview-box-spacing,
   .builder-preview-header-slot
   #site-header-pill.site-header-princity-shell
   .site-header-princity {
-  position: absolute !important;
-  top: 18px !important;
-  right: auto !important;
+  position: relative !important;
   left: var(--builder-preview-header-page-inset) !important;
   width: var(--builder-preview-header-page-width) !important;
   max-width: var(--builder-preview-header-page-width) !important;

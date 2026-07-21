@@ -3582,6 +3582,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                               <>
                                                 {block.kind !== "products" &&
                                                   block.kind !== "image" &&
+                                                  block.kind !== "button" &&
                                                   !isCardStyleBlock(
                                                     block.kind,
                                                   ) && (
@@ -3960,7 +3961,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                           {isSelectedBlock &&
                                             isElementSettingsTab && (
                                               <>
-                                                {block.kind !== "products" && (
+                                                {block.kind !== "products" && block.kind !== "button" && (
                                                   <details
                                                     className="builder-collapse"
                                                     open
@@ -5295,35 +5296,6 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                       </label>
                                                     </div>
                                                   </>
-                                                ) : selectedSection?.id === "header-document" && block.kind === "button" ? (
-                                                  <>
-                                                    <label className="builder-field">
-                                                      <span>Button Label</span>
-                                                      <input
-                                                        value={block.buttonLabel ?? ""}
-                                                        onChange={(event) =>
-                                                          updateSelectedLayoutBlock(
-                                                            index,
-                                                            blockIndex,
-                                                            { buttonLabel: event.target.value },
-                                                          )
-                                                        }
-                                                      />
-                                                    </label>
-                                                    <label className="builder-field">
-                                                      <span>Button URL</span>
-                                                      <input
-                                                        value={block.buttonUrl ?? ""}
-                                                        onChange={(event) =>
-                                                          updateSelectedLayoutBlock(
-                                                            index,
-                                                            blockIndex,
-                                                            { buttonUrl: event.target.value },
-                                                          )
-                                                        }
-                                                      />
-                                                    </label>
-                                                  </>
                                                 ) : block.kind === "menu" ? (
                                                   <>
                                                     <div className="builder-element-inspector-note">
@@ -5489,6 +5461,65 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                   </>
                                                 ) : block.kind === "button" ? (
                                                   <>
+                                                    <div className="builder-inspector-section" style={{ marginBottom: "16px" }}>
+                                                      <div className="builder-field-header" style={{ marginBottom: "8px" }}>
+                                                        <strong>Button Presets</strong>
+                                                        <small>
+                                                          {hasLocalButtonStyles(block)
+                                                            ? "Local style active"
+                                                            : "Inherits global button"}
+                                                        </small>
+                                                      </div>
+                                                      <div className="builder-header-presets-grid">
+                                                        <button
+                                                          type="button"
+                                                          className={`builder-preset-btn${!hasLocalButtonStyles(block) ? " is-active" : ""}`}
+                                                          onClick={() =>
+                                                            updateSelectedLayoutBlock(
+                                                              index,
+                                                              blockIndex,
+                                                              clearBuilderButtonOverrides(),
+                                                            )
+                                                          }
+                                                        >
+                                                          <span>Inherit Global</span>
+                                                          <small>Global Styles</small>
+                                                        </button>
+                                                        {BUILDER_BUTTON_PRESETS.map(
+                                                          (preset) => {
+                                                            const activePreset =
+                                                              hasLocalButtonStyles(block)
+                                                                ? getBuilderButtonPresetKey(
+                                                                    block,
+                                                                  )
+                                                                : "inherit";
+                                                            return (
+                                                              <button
+                                                                key={preset.key}
+                                                                type="button"
+                                                                className={`builder-preset-btn${activePreset === preset.key ? " is-active" : ""}`}
+                                                                onClick={() =>
+                                                                  updateSelectedLayoutBlock(
+                                                                    index,
+                                                                    blockIndex,
+                                                                    builderButtonPresetFields(
+                                                                      preset.key,
+                                                                    ),
+                                                                  )
+                                                                }
+                                                              >
+                                                                <span>
+                                                                  {preset.label}
+                                                                </span>
+                                                                <small>
+                                                                  {preset.description}
+                                                                </small>
+                                                              </button>
+                                                            );
+                                                          },
+                                                        )}
+                                                      </div>
+                                                    </div>
                                                     <div className="builder-section-heading">
                                                       <span>Buttons</span>
                                                       <span>

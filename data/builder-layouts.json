@@ -176,8 +176,8 @@
                 "kind": "hero",
                 "eyebrow": "Բարի գալուստ webpages ձեր վեբ էջերի ստեղծման գործիքը",
                 "title": "[Ընտրեք փաթեթը |տրամադրեք տեղեկությունը| ձեր կայքը պատրաստ է]",
-                "body": "Կայք, հոսթինգ և սպասարկում՝ մեկ պարզ փաթեթով",
-                "buttonLabel": "Բաժանորդագրվել",
+                "body": "<p><strong>Website</strong>, հոսթինգ և սպասարկում՝ մեկ պարզ փաթեթով</p>",
+                "buttonLabel": "Սկսել անվճար",
                 "buttonUrl": "https://webpages.am/#packages",
                 "carouselSettings": {
                   "variant": "default"
@@ -246,171 +246,71 @@
                     "mobile": false
                   }
                 },
-                "buttons": [
-                  {
-                    "id": "btn-mr7c1n3n-0",
-                    "label": "New Button",
-                    "url": "/",
-                    "target": "_self",
-                    "style": "primary"
-                  }
-                ],
+                "buttons": [],
                 "typewriterMobileReservedLines": 3,
                 "contentTranslations": {
                   "en": {
-                    "body": "<p><strong>Website</strong>, հոսթինգ և սպասարկում՝ մեկ պարզ փաթեթով</p>"
+                    "body": "<p><strong>Website</strong>, հոսթինգ և սպասարկում՝ մեկ պարզ փաթեթով</p>",
+                    "buttonLabel": "Start Free"
                   }
                 }
               },
               {
-                "id": "slider-block-mrp2hr8q-ptyuj",
-                "kind": "slider",
-                "title": "Explore what makes the difference",
-                "body": "Use a clear visual sequence to introduce services, benefits, projects, or important ideas.",
-                "slides": [
-                  {
-                    "id": "slider-block-mrp2hr8q-ptyuj-slide-1",
-                    "badge": "01",
-                    "title": "Enterprise Grade Security",
-                    "text": "Data protection is built into our core framework, ensuring your application remains safe and compliant.",
-                    "imagePadding": "medium",
-                    "typography": {
-                      "variant": "body",
-                      "fontFamily": "inherit",
-                      "fontSize": "16px",
-                      "fontWeight": "400",
-                      "lineHeight": "1.4",
-                      "letterSpacing": "0px",
-                      "color": "inherit",
-                      "textAlign": "left"
-                    }
-                  },
-                  {
-                    "id": "slider-block-mrp2hr8q-ptyuj-slide-2",
-                    "badge": "02",
-                    "title": "Sub-Second Page Speeds",
-                    "text": "Serve content globally through optimized CDN networks, providing visitors with instant load times.",
-                    "imagePadding": "medium",
-                    "typography": {
-                      "variant": "body",
-                      "fontFamily": "inherit",
-                      "fontSize": "16px",
-                      "fontWeight": "400",
-                      "lineHeight": "1.4",
-                      "letterSpacing": "0px",
-                      "color": "inherit",
-                      "textAlign": "left"
-                    }
-                  },
-                  {
-                    "id": "slider-block-mrp2hr8q-ptyuj-slide-3",
-                    "badge": "03",
-                    "title": "Dedicated Asset Hosting",
-                    "text": "Manage and deliver high-resolution media assets effortlessly without affecting site performance.",
-                    "imagePadding": "medium",
-                    "typography": {
-                      "variant": "body",
-                      "fontFamily": "inherit",
-                      "fontSize": "16px",
-                      "fontWeight": "400",
-                      "lineHeight": "1.4",
-                      "letterSpacing": "0px",
-                      "color": "inherit",
-                      "textAlign": "left"
-                    }
-                  }
-                ],
-                "carouselSettings": {
-                  "variant": "showcase",
-                  "loop": true,
-                  "autoplay": false,
-                  "autoplayDelayMs": 5000,
-                  "align": "start",
-                  "dragFree": false,
-                  "effect": "slide",
-                  "spaceBetween": 24,
-                  "coverflowRotate": 34,
-                  "coverflowDepth": 140,
-                  "coverflowStretch": 0,
-                  "cardsRotate": true,
-                  "cardsShadows": true,
-                  "creativePreset": "soft-stack",
-                  "fadeCrossFade": true,
-                  "freeModeMomentum": true,
-                  "cardsPerView": 1,
-                  "showArrows": true,
-                  "showDots": true,
-                  "pauseOnHover": true
-                }
-              },
-              {
-                "id": "button-block-mrp2hznt-vivxk",
+                "id": "button-block-mrtaiqm6-bht6i",
                 "kind": "button",
                 "buttonsLayout": "inline",
                 "buttons": [
                   {
-                    "id": "btn-mrp2hznt",
-                    "label": "Start Free Trial",
+                    "id": "btn-mrtaiqm6",
+                    "label": "Սկսել Անվճար",
                     "url": "/",
                     "target": "_self",
-                    "style": "primary"
+                    "style": "light",
+                    "contentTranslations": {
+                      "en": {
+                        "label": "Start Free"
+                      }
+                    }
                   }
                 ],
                 "elementPadding": "inherit",
-                "elementBackgroundMode": "transparent"
-              },
-              {
-                "id": "badgeGrid-block-mrp2ha21-um209",
-                "kind": "badgeGrid",
-                "title": "Built around the essentials",
-                "body": "Highlight the qualities that make your offer clear, dependable, and easy to choose.",
-                "columns": 3,
-                "badges": [
-                  {
-                    "id": "badgeGrid-block-mrp2ha21-um209-badge-1",
-                    "label": "99.99%",
-                    "title": "Enterprise SLA",
-                    "body": "Uptime guarantee backed by our priority support operations."
+                "elementBackgroundMode": "transparent",
+                "elementAlign": "center",
+                "visualStyle": {
+                  "effects": {
+                    "boxShadow": "",
+                    "maxWidth": ""
                   },
-                  {
-                    "id": "badgeGrid-block-mrp2ha21-um209-badge-2",
-                    "label": "250ms",
-                    "title": "Global CDN Delivery",
-                    "body": "Fast content loading worldwide via cloud caching."
+                  "padding": {
+                    "linked": true,
+                    "top": "inherit",
+                    "right": "inherit",
+                    "bottom": "inherit",
+                    "left": "inherit"
                   },
-                  {
-                    "id": "badgeGrid-block-mrp2ha21-um209-badge-3",
-                    "label": "12K+",
-                    "title": "Launches Completed",
-                    "body": "Websites successfully launched on our platform."
+                  "border": {
+                    "color": "#333333",
+                    "width": "0px",
+                    "style": "none"
                   }
-                ]
-              },
-              {
-                "id": "hero-block-mrp2gslq-6o6q3",
-                "kind": "hero",
-                "eyebrow": "PLATFORM OVERVIEW",
-                "title": "Build beautiful websites without writing code",
-                "body": "Create professional websites using a visual builder designed for speed, flexibility, and pixel-perfect control.",
-                "buttonLabel": "Start Building",
-                "buttonUrl": "/",
-                "buttonStyle": "primary",
-                "buttons": [
-                  {
-                    "id": "hero-block-mrp2gslq-6o6q3-secondary-action",
-                    "label": "Explore Templates",
-                    "url": "/",
-                    "target": "_self",
-                    "style": "outline"
-                  }
-                ],
-                "buttonsLayout": "inline",
-                "buttonGap": "0.75rem",
-                "elementAlign": "left",
-                "elementPadding": "lg",
-                "carouselSettings": {
-                  "variant": "default"
-                }
+                },
+                "buttonBg": "var(--builder-preview-section-button-bg, var(--builder-section-button-bg, var(--builder-button-bg, #111111)))",
+                "buttonTextColor": "var(--builder-preview-section-button-text, var(--builder-section-button-text, var(--builder-button-text, #ffffff)))",
+                "buttonBorderRadius": "999px",
+                "buttonBorderWidth": "0px",
+                "buttonBorderColor": "transparent",
+                "buttonPaddingY": "11px",
+                "buttonPaddingX": "18px",
+                "buttonFontWeight": "720",
+                "buttonLetterSpacing": "0px",
+                "buttonHoverBg": "var(--builder-preview-section-button-bg, var(--builder-section-button-bg, var(--builder-button-bg, #111111)))",
+                "buttonHoverTextColor": "var(--builder-preview-section-button-text, var(--builder-section-button-text, var(--builder-button-text, #ffffff)))",
+                "buttonHoverBorderColor": "transparent",
+                "buttonHoverEffect": "lift",
+                "contentTranslations": {
+                  "en": {}
+                },
+                "panelStyle": "princity-flat"
               }
             ]
           },
@@ -843,6 +743,96 @@
           {
             "id": "layout-item-mq02cfbq-1",
             "blocks": [
+              {
+                "id": "list-block-mrp2vdyh-0xehq",
+                "kind": "list",
+                "title": "What you can expect",
+                "items": [
+                  "Direct integration with premium design tokens",
+                  "Optimized media delivery and assets processing",
+                  "Advanced SEO meta management on every page",
+                  "Secure custom domain mappings and SSL certificates"
+                ],
+                "listIcon": "circleCheck",
+                "elementPadding": "sm"
+              },
+              {
+                "id": "grid-block-mrp2vjbt-4c5bi",
+                "kind": "grid",
+                "title": "Services designed around your goals",
+                "gridSource": "static",
+                "columns": 3,
+                "gridRows": 1,
+                "gridGap": "medium",
+                "gridMargin": "inherit",
+                "gridImagePadding": "frameless",
+                "gridContentPadding": "medium",
+                "gridImageFrame": "none",
+                "gridShowImage": true,
+                "gridShowEyebrow": true,
+                "gridShowMeta": true,
+                "gridShowText": true,
+                "gridShowButton": true,
+                "gridItems": [
+                  {
+                    "id": "grid-block-mrp2vjbt-4c5bi-1",
+                    "eyebrow": "01",
+                    "title": "Strategy & Consultation",
+                    "meta": "Align your objectives",
+                    "text": "Work with our experts to map out your digital product strategy and define key performance indicators.",
+                    "buttonLabel": "View Details",
+                    "buttonUrl": "/",
+                    "typography": {
+                      "variant": "body",
+                      "fontFamily": "inherit",
+                      "fontSize": "16px",
+                      "fontWeight": "400",
+                      "lineHeight": "1.4",
+                      "letterSpacing": "0px",
+                      "color": "inherit",
+                      "textAlign": "left"
+                    }
+                  },
+                  {
+                    "id": "grid-block-mrp2vjbt-4c5bi-2",
+                    "eyebrow": "02",
+                    "title": "Design & Engineering",
+                    "meta": "High-fidelity execution",
+                    "text": "Create modern, responsive interfaces backed by scalable frontend architectures and design systems.",
+                    "buttonLabel": "See Our Work",
+                    "buttonUrl": "/",
+                    "typography": {
+                      "variant": "body",
+                      "fontFamily": "inherit",
+                      "fontSize": "16px",
+                      "fontWeight": "400",
+                      "lineHeight": "1.4",
+                      "letterSpacing": "0px",
+                      "color": "inherit",
+                      "textAlign": "left"
+                    }
+                  },
+                  {
+                    "id": "grid-block-mrp2vjbt-4c5bi-3",
+                    "eyebrow": "03",
+                    "title": "Growth & Optimization",
+                    "meta": "Scale your reach",
+                    "text": "Continuously optimize page speeds, SEO metadata, and conversion paths to maximize your ROI.",
+                    "buttonLabel": "Contact Us",
+                    "buttonUrl": "/",
+                    "typography": {
+                      "variant": "body",
+                      "fontFamily": "inherit",
+                      "fontSize": "16px",
+                      "fontWeight": "400",
+                      "lineHeight": "1.4",
+                      "letterSpacing": "0px",
+                      "color": "inherit",
+                      "textAlign": "left"
+                    }
+                  }
+                ]
+              },
               {
                 "id": "hero-block-mq9wbhgw-7kgn1",
                 "kind": "hero",
@@ -1739,7 +1729,7 @@
         ]
       }
     ],
-    "updatedAt": "2026-07-17T15:09:02.573Z"
+    "updatedAt": "2026-07-20T19:00:56.520Z"
   },
   "shop": {
     "version": 1,
@@ -6279,25 +6269,40 @@
                 "kind": "headerCart",
                 "headerUtilityAction": "cart",
                 "headerUtilityVariant": "muted"
+              },
+              {
+                "id": "header-utility-theme",
+                "kind": "headerTheme",
+                "headerUtilityAction": "theme",
+                "headerUtilityVariant": "muted"
+              },
+              {
+                "id": "header-language",
+                "kind": "headerLanguage",
+                "headerLanguageDisplay": "native"
+              },
+              {
+                "id": "header-utility-account",
+                "kind": "headerAccount",
+                "headerUtilityAction": "account",
+                "headerUtilityVariant": "muted"
               }
             ]
           }
         ],
         "visible": true,
-        "topSpacing": "xs",
-        "bottomSpacing": "xs",
-        "topMargin": "xs",
-        "bottomMargin": "xs",
-        "contentTranslations": {
-          "en": {}
-        },
-        "headerHeight": "auto",
-        "headerCustomHeight": 40,
+        "headerVisible": true,
+        "headerTransparent": true,
         "headerOverlay": true,
-        "headerTransparent": false
+        "headerHeight": "showcase",
+        "headerCustomHeight": 40,
+        "topSpacing": "none",
+        "bottomSpacing": "none",
+        "topMargin": "none",
+        "bottomMargin": "none"
       }
     ],
-    "updatedAt": "2026-07-18T19:57:35.365Z"
+    "updatedAt": "2026-07-20T20:34:24.442Z"
   },
   "footer": {
     "version": 1,

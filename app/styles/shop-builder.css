@@ -41,6 +41,35 @@
   overflow-x: clip;
 }
 
+.builder-preview-shell[data-theme="dark"],
+.builder-preview-shell.dark,
+.shop-builder-main[data-theme="dark"],
+.shop-builder-main.dark,
+body.dark {
+  --builder-text: #f4f4f5;
+  --builder-muted: #a1a1aa;
+  --builder-surface: #27272a;
+  --builder-button-bg: #ffffff;
+  --builder-button-text: #09090b;
+  --builder-preview-text: #f4f4f5;
+  --builder-preview-muted: #a1a1aa;
+  --builder-preview-surface: #27272a;
+  --builder-preview-button-bg: #ffffff;
+  --builder-preview-button-text: #09090b;
+}
+
+.shop-builder-section[data-theme="dark"],
+.shop-builder-section.shop-builder-section--scheme-dark,
+.shop-builder-section.shop-builder-section--dark,
+.builder-preview-section[data-theme="dark"],
+.builder-preview-section.shop-builder-section--scheme-dark {
+  --builder-section-text: #f4f4f5;
+  --builder-section-muted: #a1a1aa;
+  --builder-section-surface: #27272a;
+  --builder-section-button-bg: #ffffff;
+  --builder-section-button-text: #09090b;
+}
+
 .shop-builder-main .shop-builder-section-content {
   animation: shopBuilderFadeUp 0.72s ease both;
 }
@@ -1292,27 +1321,27 @@
   place-items: center;
   width: 20px;
   height: 20px;
-  border: 0;
+  border: 1px solid var(--builder-preview-active-border, rgba(17, 17, 17, 0.12));
   border-radius: 4px;
-  background: rgba(255, 255, 255, 0.9);
-  color: #55554f;
+  background: var(--builder-preview-active-surface, #ffffff);
+  color: var(--builder-preview-active-muted, #55554f);
   cursor: pointer;
-  box-shadow: 0 1px 3px rgba(17, 17, 17, 0.12);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
   transition: background 100ms ease, color 100ms ease;
 }
 
 .builder-preview-button-tools button:hover {
-  background: #ffffff;
-  color: #111111;
+  background: var(--builder-preview-active-bg, #ffffff);
+  color: var(--builder-preview-active-text, #111111);
 }
 
 .builder-preview-button-tools button:last-child:hover {
-  color: #d32f2f;
+  color: #ef4444;
 }
 
 .builder-preview-button-drag-handle {
   cursor: grab;
-  color: rgba(17, 17, 17, 0.2);
+  color: var(--builder-preview-active-muted, currentColor);
   font-size: 14px;
   line-height: 1;
   opacity: 0;
@@ -1321,7 +1350,7 @@
 
 .builder-preview-button-item:hover .builder-preview-button-drag-handle,
 .builder-preview-button-item:focus-within .builder-preview-button-drag-handle {
-  opacity: 0.5;
+  opacity: 0.7;
 }
 
 .builder-preview-button-item.is-dragging {

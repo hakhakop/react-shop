@@ -35,3 +35,18 @@ export async function getAuthorizedWebsiteBuilderScope(request: NextRequest) {
   });
   return { scope: { websiteId: website.id }, website, user };
 }
+
+export function isRootSaaSWebsiteScope(scope?: { websiteId?: string } | null): boolean {
+  return !scope || !scope.websiteId;
+}
+
+export function isSuperAdminUser(user?: { role?: string } | null): boolean {
+  return user?.role === "admin";
+}
+
+export function canAccessSaaSComponents(
+  user?: { role?: string } | null,
+  scope?: { websiteId?: string } | null,
+): boolean {
+  return isSuperAdminUser(user) && isRootSaaSWebsiteScope(scope);
+}

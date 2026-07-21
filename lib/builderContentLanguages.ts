@@ -18,10 +18,10 @@ export function resolveContentEntity<T extends TranslatableEntity>(
   language: string,
   primaryLanguage: string,
 ): T {
-  if (language === primaryLanguage) return entity;
+  if (language === primaryLanguage || !entity) return entity;
   const translated = Object.fromEntries(
     Object.entries(entity.contentTranslations?.[language] ?? {}).filter(
-      ([, value]) => value !== "" && value !== null && value !== undefined,
+      ([, value]) => value !== undefined && value !== null,
     ),
   );
   return { ...entity, ...translated };
@@ -41,7 +41,7 @@ export function applyContentPatch<T extends TranslatableEntity>(
   Object.entries(patch).forEach(([key, value]) => {
     if (!TRANSLATABLE_FIELDS.has(key)) {
       shared[key] = value;
-    } else if (value === "" || value === null || value === undefined) {
+    } else if (value === undefined || value === null) {
       delete translated[key];
     } else {
       translated[key] = value;

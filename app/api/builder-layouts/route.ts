@@ -10,6 +10,7 @@ import {
   type BuilderLayout,
 } from "@/lib/builderLayouts";
 import { getAuthorizedWebsiteBuilderScope } from "@/lib/websiteBuilderAccess";
+import type { BuilderSection } from "@/components/dashboard/builderTypes";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -43,7 +44,7 @@ export async function POST(request: NextRequest) {
 
   const page = normalizeBuilderLayoutKey(body.key ?? body.template ?? body.page ?? null);
   const sections = Array.isArray(body.sections)
-    ? body.sections.filter(isValidBuilderSection)
+    ? (body.sections.filter(isValidBuilderSection) as unknown as BuilderSection[])
     : [];
 
   if (sections.length === 0) {
