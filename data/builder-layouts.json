@@ -35,7 +35,7 @@
         "kind": "contentLayout",
         "visible": true,
         "title": "",
-        "background": "#111111",
+        "background": "#f7f7f4",
         "backgroundMode": "full",
         "contentMode": "boxed",
         "colorScheme": "inherit",
@@ -1729,7 +1729,7 @@
         ]
       }
     ],
-    "updatedAt": "2026-07-20T19:00:56.520Z"
+    "updatedAt": "2026-07-22T05:16:19.925Z"
   },
   "shop": {
     "version": 1,
@@ -6296,13 +6296,13 @@
         "headerOverlay": true,
         "headerHeight": "compact",
         "headerCustomHeight": 40,
-        "topSpacing": "none",
-        "bottomSpacing": "none",
-        "topMargin": "none",
-        "bottomMargin": "none"
+        "topSpacing": "xs",
+        "bottomSpacing": "xs",
+        "topMargin": "xs",
+        "bottomMargin": "xs"
       }
     ],
-    "updatedAt": "2026-07-21T08:25:52.477Z"
+    "updatedAt": "2026-07-22T05:22:58.760Z"
   },
   "footer": {
     "version": 1,

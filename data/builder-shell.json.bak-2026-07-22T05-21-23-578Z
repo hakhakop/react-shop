@@ -27,7 +27,7 @@
   "headerTransparent": false,
   "headerOverlay": false,
   "headerWidthMode": "boxed",
-  "headerHeight": "compact",
+  "headerHeight": "auto",
   "headerZIndex": 40,
   "sectionPaddingTop": "lg",
   "sectionPaddingBottom": "lg",
@@ -177,6 +177,6 @@
     }
   ],
   "headerSticky": true,
-  "updatedAt": "2026-07-22T05:22:46.496Z",
+  "updatedAt": "2026-07-22T05:17:24.384Z",
   "headerCustomHeight": 92
 }

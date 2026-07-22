@@ -35,7 +35,7 @@
         "kind": "contentLayout",
         "visible": true,
         "title": "",
-        "background": "#111111",
+        "background": "#f7f7f4",
         "backgroundMode": "full",
         "contentMode": "boxed",
         "colorScheme": "inherit",
@@ -45,8 +45,8 @@
         "bottomMargin": "none",
         "layout": "whole",
         "layoutColumns": 1,
-        "layoutRows": 1,
-        "backgroundEffect": "aurora",
+        "layoutRows": 3,
+        "backgroundEffect": "antigravity2",
         "antigravitySpeed": 1.8,
         "antigravityParticleCount": 260,
         "antigravityColor": "#a855f7",
@@ -64,31 +64,34 @@
             "rowLayout": "whole",
             "blocks": [
               {
-                "id": "hero-block-mr4dbvdn-7u8g1",
-                "kind": "hero",
-                "eyebrow": "Featured",
-                "title": "SteelChef",
-                "body": "A strong visual opening with editable copy and action.",
-                "buttonLabel": "Learn more",
-                "buttonUrl": "/",
-                "carouselSettings": {
-                  "variant": "default"
-                },
-                "elementAlign": "center",
-                "typography": {
-                  "title": {
-                    "fontSize": "88px",
-                    "fontWeight": "800"
+                "id": "image-block-mqho93e8-k93hf",
+                "kind": "image",
+                "title": "Image",
+                "body": "A simple image block for banners, artwork, and visual breaks.",
+                "imageUrl": "https://cms.webpages.am/wp-content/uploads/2026/06/logo-2-1-scaled.png",
+                "imageAlt": "logo-2 (1)",
+                "imageAlignment": "center",
+                "imageMaxWidth": 300,
+                "imageBorderRadius": 0,
+                "imageCaption": "",
+                "panelStyle": "dark",
+                "borderRadius": 10,
+                "visualStyle": {
+                  "padding": {
+                    "linked": true,
+                    "top": "none",
+                    "right": "none",
+                    "bottom": "none",
+                    "left": "none"
+                  },
+                  "margin": {
+                    "linked": true,
+                    "top": "none",
+                    "right": "none",
+                    "bottom": "none",
+                    "left": "none"
                   }
-                },
-                "textGradientPreset": "custom",
-                "textGradientCustomMiddleOffset": 60,
-                "textGradientCustomStart": "#fb923c",
-                "textGradientCustomMiddle": "#ec4899",
-                "textGradientCustomEnd": "#a855f7",
-                "textGradientCustomStartOffset": 0,
-                "textGradientCustomEndOffset": 100,
-                "textGradientCustomAngle": 135
+                }
               },
               {
                 "id": "hero-block-mqkhhqgx-m82o9",
@@ -173,8 +176,8 @@
                 "kind": "hero",
                 "eyebrow": "Բարի գալուստ webpages ձեր վեբ էջերի ստեղծման գործիքը",
                 "title": "[Ընտրեք փաթեթը |տրամադրեք տեղեկությունը| ձեր կայքը պատրաստ է]",
-                "body": "<p><strong>Վեբկայք</strong>, հոսթինգ և սպասարկում՝ մեկ պարզ փաթեթով</p>",
-                "buttonLabel": "Բաժանորդագրվել",
+                "body": "<p><strong>Website</strong>, հոսթինգ և սպասարկում՝ մեկ պարզ փաթեթով</p>",
+                "buttonLabel": "Սկսել անվճար",
                 "buttonUrl": "https://webpages.am/#packages",
                 "carouselSettings": {
                   "variant": "default"
@@ -247,17 +250,267 @@
                 "typewriterMobileReservedLines": 3,
                 "contentTranslations": {
                   "en": {
-                    "body": "<p>Website, հոսթինգ և սպասարկում՝ մեկ պարզ փաթեթով</p>",
-                    "title": "[Choose the  Package",
-                    "typewriterPhrases": [
-                      "Choose the  Package",
-                      "Provide the information",
-                      "Your website is ready"
-                    ]
+                    "body": "<p><strong>Website</strong>, հոսթինգ և սպասարկում՝ մեկ պարզ փաթեթով</p>",
+                    "buttonLabel": "Start Free"
+                  }
+                }
+              },
+              {
+                "id": "button-block-mrtaiqm6-bht6i",
+                "kind": "button",
+                "buttonsLayout": "inline",
+                "buttons": [
+                  {
+                    "id": "btn-mrtaiqm6",
+                    "label": "Սկսել Անվճար",
+                    "url": "/",
+                    "target": "_self",
+                    "style": "light",
+                    "contentTranslations": {
+                      "en": {
+                        "label": "Start Free"
+                      }
+                    }
+                  }
+                ],
+                "elementPadding": "inherit",
+                "elementBackgroundMode": "transparent",
+                "elementAlign": "center",
+                "visualStyle": {
+                  "effects": {
+                    "boxShadow": "",
+                    "maxWidth": ""
+                  },
+                  "padding": {
+                    "linked": true,
+                    "top": "inherit",
+                    "right": "inherit",
+                    "bottom": "inherit",
+                    "left": "inherit"
+                  },
+                  "border": {
+                    "color": "#333333",
+                    "width": "0px",
+                    "style": "none"
+                  }
+                },
+                "buttonBg": "var(--builder-preview-section-button-bg, var(--builder-section-button-bg, var(--builder-button-bg, #111111)))",
+                "buttonTextColor": "var(--builder-preview-section-button-text, var(--builder-section-button-text, var(--builder-button-text, #ffffff)))",
+                "buttonBorderRadius": "999px",
+                "buttonBorderWidth": "0px",
+                "buttonBorderColor": "transparent",
+                "buttonPaddingY": "11px",
+                "buttonPaddingX": "18px",
+                "buttonFontWeight": "720",
+                "buttonLetterSpacing": "0px",
+                "buttonHoverBg": "var(--builder-preview-section-button-bg, var(--builder-section-button-bg, var(--builder-button-bg, #111111)))",
+                "buttonHoverTextColor": "var(--builder-preview-section-button-text, var(--builder-section-button-text, var(--builder-button-text, #ffffff)))",
+                "buttonHoverBorderColor": "transparent",
+                "buttonHoverEffect": "lift",
+                "contentTranslations": {
+                  "en": {}
+                },
+                "panelStyle": "princity-flat"
+              }
+            ]
+          },
+          {
+            "id": "layout-row-mrm3av9h-column-1",
+            "rowId": "layout-row-mrm3av9h",
+            "rowLayout": "halves",
+            "blocks": [
+              {
+                "id": "panel-block-mrm3x0qr-zlblp",
+                "kind": "panel",
+                "eyebrow": "A thoughtful approach",
+                "title": "Everything you need to move forward with confidence",
+                "body": "Bring your message, services, and next steps together in one clear and engaging content area.",
+                "buttonLabel": "Explore Services",
+                "buttonUrl": "/",
+                "imageUrl": "",
+                "imageAlt": "",
+                "elementPadding": "md",
+                "visualStyle": {
+                  "padding": {
+                    "top": "md",
+                    "right": "md",
+                    "bottom": "md",
+                    "left": "md",
+                    "linked": true
+                  },
+                  "margin": {
+                    "linked": true,
+                    "top": "xl",
+                    "right": "xl",
+                    "bottom": "xl",
+                    "left": "xl"
+                  },
+                  "card": {
+                    "preset": "none"
+                  }
+                },
+                "typography": {
+                  "title": {
+                    "fontSize": "16px"
+                  },
+                  "body": {
+                    "fontSize": "24px"
+                  },
+                  "button": {
+                    "fontSize": "18px"
+                  },
+                  "eyebrow": {
+                    "fontSize": "32px",
+                    "lineHeight": "1.6"
                   }
                 }
               }
-            ]
+            ],
+            "rowTopMargin": "lg",
+            "rowBottomMargin": "xl",
+            "rowBackground": "#050505",
+            "rowColorScheme": "light",
+            "rowVisualStyle": {
+              "border": {
+                "color": "#ff0000",
+                "width": "4px",
+                "style": "solid",
+                "radius": "20px"
+              },
+              "effects": {
+                "boxShadow": "0 8px 24px rgba(0,0,0,0.08)",
+                "opacity": 37
+              },
+              "background": {
+                "type": "color",
+                "color": "#d26565"
+              }
+            },
+            "rowBottomSpacing": "xl",
+            "rowGap": "inherit"
+          },
+          {
+            "id": "layout-row-mrm3av9h-column-2",
+            "rowId": "layout-row-mrm3av9h",
+            "rowLayout": "halves",
+            "blocks": [
+              {
+                "id": "grid-block-mrma14zr-gjmas",
+                "kind": "grid",
+                "title": "Services designed around your goals",
+                "gridSource": "static",
+                "columns": 2,
+                "gridRows": 1,
+                "gridGap": "medium",
+                "gridMargin": "inherit",
+                "gridImagePadding": "frameless",
+                "gridContentPadding": "medium",
+                "gridImageFrame": "none",
+                "gridShowImage": true,
+                "gridShowEyebrow": true,
+                "gridShowMeta": true,
+                "gridShowText": true,
+                "gridShowButton": true,
+                "gridItems": [
+                  {
+                    "id": "grid-block-mrma14zr-gjmas-1",
+                    "eyebrow": "01",
+                    "title": "Strategy and planning",
+                    "meta": "Build with clarity",
+                    "text": "Turn priorities into a focused plan with practical next steps and measurable outcomes.",
+                    "buttonLabel": "View Details",
+                    "buttonUrl": "/",
+                    "typography": {
+                      "variant": "body",
+                      "fontFamily": "inherit",
+                      "fontSize": "16px",
+                      "fontWeight": "400",
+                      "lineHeight": "1.4",
+                      "letterSpacing": "0px",
+                      "color": "inherit",
+                      "textAlign": "left"
+                    }
+                  },
+                  {
+                    "id": "grid-block-mrma14zr-gjmas-2",
+                    "eyebrow": "02",
+                    "title": "Design and delivery",
+                    "meta": "Make it memorable",
+                    "text": "Create a polished experience that communicates your value clearly across every screen.",
+                    "buttonLabel": "See Our Work",
+                    "buttonUrl": "/",
+                    "typography": {
+                      "variant": "body",
+                      "fontFamily": "inherit",
+                      "fontSize": "16px",
+                      "fontWeight": "400",
+                      "lineHeight": "1.4",
+                      "letterSpacing": "0px",
+                      "color": "inherit",
+                      "textAlign": "left"
+                    }
+                  },
+                  {
+                    "id": "grid-block-mrma14zr-gjmas-3",
+                    "eyebrow": "03",
+                    "title": "Support and growth",
+                    "meta": "Ready for what follows",
+                    "text": "Keep improving with flexible support that adapts as your audience and ambitions grow.",
+                    "buttonLabel": "Contact Us",
+                    "buttonUrl": "/",
+                    "typography": {
+                      "variant": "body",
+                      "fontFamily": "inherit",
+                      "fontSize": "16px",
+                      "fontWeight": "400",
+                      "lineHeight": "1.4",
+                      "letterSpacing": "0px",
+                      "color": "inherit",
+                      "textAlign": "left"
+                    }
+                  }
+                ],
+                "visualStyle": {
+                  "card": {
+                    "preset": "dark"
+                  }
+                }
+              }
+            ],
+            "rowTopMargin": "lg",
+            "rowBottomMargin": "xl",
+            "rowBackground": "#050505",
+            "rowColorScheme": "light",
+            "rowVisualStyle": {
+              "border": {
+                "color": "#ff0000",
+                "width": "4px",
+                "style": "solid",
+                "radius": "20px"
+              },
+              "effects": {
+                "boxShadow": "0 8px 24px rgba(0,0,0,0.08)",
+                "opacity": 37
+              },
+              "background": {
+                "type": "color",
+                "color": "#d26565"
+              }
+            },
+            "rowBottomSpacing": "xl",
+            "rowGap": "inherit"
+          },
+          {
+            "id": "layout-row-mrm3ighd-column-1",
+            "rowId": "layout-row-mrm3ighd",
+            "rowLayout": "halves",
+            "blocks": []
+          },
+          {
+            "id": "layout-row-mrm3ighd-column-2",
+            "rowId": "layout-row-mrm3ighd",
+            "rowLayout": "halves",
+            "blocks": []
           }
         ],
         "visualStyle": {
@@ -266,8 +519,8 @@
           }
         },
         "contentVerticalAlign": "center",
-        "sectionHeight": "viewport",
-        "pullUnderHeader": true,
+        "sectionHeight": "auto",
+        "pullUnderHeader": false,
         "contentTranslations": {
           "en": {}
         }
@@ -491,6 +744,96 @@
             "id": "layout-item-mq02cfbq-1",
             "blocks": [
               {
+                "id": "list-block-mrp2vdyh-0xehq",
+                "kind": "list",
+                "title": "What you can expect",
+                "items": [
+                  "Direct integration with premium design tokens",
+                  "Optimized media delivery and assets processing",
+                  "Advanced SEO meta management on every page",
+                  "Secure custom domain mappings and SSL certificates"
+                ],
+                "listIcon": "circleCheck",
+                "elementPadding": "sm"
+              },
+              {
+                "id": "grid-block-mrp2vjbt-4c5bi",
+                "kind": "grid",
+                "title": "Services designed around your goals",
+                "gridSource": "static",
+                "columns": 3,
+                "gridRows": 1,
+                "gridGap": "medium",
+                "gridMargin": "inherit",
+                "gridImagePadding": "frameless",
+                "gridContentPadding": "medium",
+                "gridImageFrame": "none",
+                "gridShowImage": true,
+                "gridShowEyebrow": true,
+                "gridShowMeta": true,
+                "gridShowText": true,
+                "gridShowButton": true,
+                "gridItems": [
+                  {
+                    "id": "grid-block-mrp2vjbt-4c5bi-1",
+                    "eyebrow": "01",
+                    "title": "Strategy & Consultation",
+                    "meta": "Align your objectives",
+                    "text": "Work with our experts to map out your digital product strategy and define key performance indicators.",
+                    "buttonLabel": "View Details",
+                    "buttonUrl": "/",
+                    "typography": {
+                      "variant": "body",
+                      "fontFamily": "inherit",
+                      "fontSize": "16px",
+                      "fontWeight": "400",
+                      "lineHeight": "1.4",
+                      "letterSpacing": "0px",
+                      "color": "inherit",
+                      "textAlign": "left"
+                    }
+                  },
+                  {
+                    "id": "grid-block-mrp2vjbt-4c5bi-2",
+                    "eyebrow": "02",
+                    "title": "Design & Engineering",
+                    "meta": "High-fidelity execution",
+                    "text": "Create modern, responsive interfaces backed by scalable frontend architectures and design systems.",
+                    "buttonLabel": "See Our Work",
+                    "buttonUrl": "/",
+                    "typography": {
+                      "variant": "body",
+                      "fontFamily": "inherit",
+                      "fontSize": "16px",
+                      "fontWeight": "400",
+                      "lineHeight": "1.4",
+                      "letterSpacing": "0px",
+                      "color": "inherit",
+                      "textAlign": "left"
+                    }
+                  },
+                  {
+                    "id": "grid-block-mrp2vjbt-4c5bi-3",
+                    "eyebrow": "03",
+                    "title": "Growth & Optimization",
+                    "meta": "Scale your reach",
+                    "text": "Continuously optimize page speeds, SEO metadata, and conversion paths to maximize your ROI.",
+                    "buttonLabel": "Contact Us",
+                    "buttonUrl": "/",
+                    "typography": {
+                      "variant": "body",
+                      "fontFamily": "inherit",
+                      "fontSize": "16px",
+                      "fontWeight": "400",
+                      "lineHeight": "1.4",
+                      "letterSpacing": "0px",
+                      "color": "inherit",
+                      "textAlign": "left"
+                    }
+                  }
+                ]
+              },
+              {
                 "id": "hero-block-mq9wbhgw-7kgn1",
                 "kind": "hero",
                 "eyebrow": "Featured",
@@ -685,12 +1028,15 @@
                   "color": "inherit",
                   "textAlign": "left",
                   "body": {
-                    "textAlign": "center"
+                    "textAlign": "center",
+                    "fontFamily": "inherit",
+                    "fontSize": "24px",
+                    "variant": "button"
                   },
                   "title": {
                     "variant": "body",
                     "fontFamily": "inherit",
-                    "fontSize": "16px",
+                    "fontSize": "32px",
                     "fontWeight": "400",
                     "lineHeight": "1.4",
                     "letterSpacing": "0px",
@@ -699,6 +1045,10 @@
                     "body": {
                       "textAlign": "left"
                     }
+                  },
+                  "eyebrow": {
+                    "fontSize": "24px",
+                    "fontFamily": "inherit"
                   }
                 },
                 "elementAlign": "center"
@@ -1379,7 +1729,7 @@
         ]
       }
     ],
-    "updatedAt": "2026-07-13T12:08:32.525Z"
+    "updatedAt": "2026-07-22T05:16:19.925Z"
   },
   "shop": {
     "version": 1,
@@ -5883,7 +6233,7 @@
                 "kind": "image",
                 "headerBrandMode": "logo",
                 "headerBrandText": "WebPages",
-                "imageMaxWidth": 161,
+                "imageMaxWidth": 300,
                 "imageUrl": "https://cms.webpages.am/wp-content/uploads/2026/06/logo-2-1-scaled.png",
                 "imageAlt": "WebPages logo"
               }
@@ -5899,13 +6249,7 @@
                 "kind": "menu",
                 "title": "Navigation",
                 "menuSource": "main",
-                "menuActiveIndicator": "princity",
-                "elementAlign": "center",
-                "typography": {
-                  "body": {
-                    "textAlign": "center"
-                  }
-                }
+                "menuActiveIndicator": "princity"
               }
             ]
           },
@@ -5927,6 +6271,12 @@
                 "headerUtilityVariant": "muted"
               },
               {
+                "id": "header-utility-theme",
+                "kind": "headerTheme",
+                "headerUtilityAction": "theme",
+                "headerUtilityVariant": "muted"
+              },
+              {
                 "id": "header-language",
                 "kind": "headerLanguage",
                 "headerLanguageDisplay": "native"
@@ -5941,16 +6291,18 @@
           }
         ],
         "visible": true,
-        "headerHeight": "compact",
-        "headerTransparent": true,
-        "headerOverlay": false,
+        "headerVisible": true,
+        "headerTransparent": false,
+        "headerOverlay": true,
+        "headerHeight": "showcase",
+        "headerCustomHeight": 40,
         "topSpacing": "none",
         "bottomSpacing": "none",
-        "topMargin": "xs",
-        "bottomMargin": "xs"
+        "topMargin": "none",
+        "bottomMargin": "none"
       }
     ],
-    "updatedAt": "2026-07-21T19:13:56.965Z"
+    "updatedAt": "2026-07-22T05:22:19.533Z"
   },
   "footer": {
     "version": 1,
@@ -5967,8 +6319,6 @@
         "backgroundMode": "full",
         "contentMode": "boxed",
         "colorScheme": "dark",
-        "topSpacing": "sm",
-        "bottomSpacing": "sm",
         "layout": "halves",
         "layoutColumns": 2,
         "layoutItems": [
@@ -6000,6 +6350,6 @@
         "visible": true
       }
     ],
-    "updatedAt": "2026-07-21T13:48:42.420Z"
+    "updatedAt": "2026-07-14T17:05:13.921Z"
   }
 }

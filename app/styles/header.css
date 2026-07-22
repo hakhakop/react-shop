@@ -843,10 +843,10 @@ html.dark .site-header {
   color: var(--header-builder-menu-hover, var(--text-main, #111827));
 }
 
-.header-builder-element--navigation .site-header-nav-link.is-active,
-.header-builder-element--navigation .site-header-nav-link[aria-current="page"],
-.header-builder-element--navigation .site-header-nav-link[data-active="true"] {
-  color: var(--header-builder-menu-active, var(--text-main, inherit));
+.header-builder-element--navigation[style*="--header-builder-menu-active"] .site-header-nav-link.is-active,
+.header-builder-element--navigation[style*="--header-builder-menu-active"] .site-header-nav-link[aria-current="page"],
+.header-builder-element--navigation[style*="--header-builder-menu-active"] .site-header-nav-link[data-active="true"] {
+  color: var(--header-builder-menu-active);
   background: none;
   -webkit-text-fill-color: initial;
 }
@@ -1273,11 +1273,12 @@ html.dark .site-header {
 }
 
 /* When the navigation element sets an explicit active color, use it instead of
-   the princity gradient so Dashboard preview and frontend render identically. */
-.site-header--indicator-princity .header-builder-element--navigation .site-header-nav-link.is-active,
-.site-header--indicator-princity .header-builder-element--navigation .site-header-nav-link[aria-current="page"],
-.site-header--indicator-princity .header-builder-element--navigation .site-header-nav-link[data-active="true"] {
-  color: var(--header-builder-menu-active, var(--text-main, inherit));
+   the princity gradient so Dashboard preview and frontend render identically.
+   Only override when the variable is actually set (non-empty). */
+.site-header--indicator-princity .header-builder-element--navigation[style*="--header-builder-menu-active"] .site-header-nav-link.is-active,
+.site-header--indicator-princity .header-builder-element--navigation[style*="--header-builder-menu-active"] .site-header-nav-link[aria-current="page"],
+.site-header--indicator-princity .header-builder-element--navigation[style*="--header-builder-menu-active"] .site-header-nav-link[data-active="true"] {
+  color: var(--header-builder-menu-active);
   background: none;
   -webkit-background-clip: initial;
   -webkit-text-fill-color: initial;

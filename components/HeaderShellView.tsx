@@ -610,8 +610,8 @@ export default function HeaderShellView({
       ...(element.type === "navigation"
         ? ({
             "--header-builder-menu-gap": element.menuItemGap,
-            "--header-builder-menu-hover": element.menuHoverColor,
-            "--header-builder-menu-active": element.menuActiveColor,
+            ...(element.menuHoverColor ? { "--header-builder-menu-hover": element.menuHoverColor } : {}),
+            ...(element.menuActiveColor ? { "--header-builder-menu-active": element.menuActiveColor } : {}),
             ...typographyProps(element.typography).style,
           } as CSSProperties)
         : {}),

@@ -11,7 +11,7 @@ export default function GlobalTypographyPanel() {
       {/* Live Typography Preview Card */}
       <div className="builder-typography-preview-card">
         <div className="builder-preview-label">Typography Preview</div>
-        <div className="builder-preview-canvas">
+        <div className="builder-typography-preview-canvas">
           {/* Heading 1 Preview */}
           <div className="builder-preview-item">
             <span className="builder-preview-item-label">Heading 1 (H1)</span>

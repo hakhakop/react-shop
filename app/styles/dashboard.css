@@ -5271,6 +5271,17 @@
   min-height: 100%;
 }
 
+/* When the Header is in normal document flow, it already occupies part of the
+   preview frame. Do not also give the page canvas the frame's full height or
+   the combined Header + page is pushed below the device boundary. Pull-under
+   previews keep the full-height canvas because their Header slot is collapsed. */
+.builder-preview-viewport-container:not(
+    :has(.builder-preview-page[data-overlap-header="true"])
+  )
+  .builder-preview-canvas {
+  min-height: calc(100% - var(--header-builder-height, 72px));
+}
+
 .builder-preview-desktop .builder-preview-canvas {
   width: 100%;
   transform: none;
@@ -11529,7 +11540,7 @@ article.is-selected-column > .builder-preview-box-spacing,
   margin-bottom: 6px;
 }
 
-.builder-dashboard .builder-preview-canvas {
+.builder-dashboard .builder-typography-preview-canvas {
   background: #09090b !important;
   border: 1px solid var(--builder-ui-border) !important;
   border-radius: var(--builder-ui-radius) !important;
@@ -11541,18 +11552,18 @@ article.is-selected-column > .builder-preview-box-spacing,
   background-size: 16px 16px;
 }
 
-.builder-dashboard .builder-preview-canvas h1 {
+.builder-dashboard .builder-typography-preview-canvas h1 {
   font-size: 22px;
   margin: 0;
 }
 
-.builder-dashboard .builder-preview-canvas h2 {
+.builder-dashboard .builder-typography-preview-canvas h2 {
   font-size: 18px;
   margin: 0;
   opacity: 0.9;
 }
 
-.builder-dashboard .builder-preview-canvas p {
+.builder-dashboard .builder-typography-preview-canvas p {
   font-size: 11px;
   line-height: 1.4;
   margin: 0;
@@ -11592,7 +11603,7 @@ article.is-selected-column > .builder-preview-box-spacing,
   display: block;
 }
 
-.builder-dashboard .builder-preview-canvas a {
+.builder-dashboard .builder-typography-preview-canvas a {
   font-size: 10.5px;
   text-decoration: underline;
   font-weight: 500;
@@ -13232,15 +13243,14 @@ article.is-selected-column > .builder-preview-box-spacing,
   margin-bottom: 0 !important;
 }
 
-/* If header is static (not sticky), stick the pill closer to the top edge (24px) when scrolled */
-.builder-preview-shell:has(.site-header[data-header-behavior="static"]) .builder-context-preview-status-sticky-wrapper .builder-context-preview-status--header-boundary {
-  top: 24px !important;
-}
-
+/* Default state: stick below the full-height header */
 .builder-context-preview-status-sticky-wrapper .builder-context-preview-status--header-boundary {
   position: sticky !important;
-  top: calc(var(--header-builder-height, 72px) + 24px) !important;
-  margin-top: 24px !important;
+  top: calc(var(--header-builder-height, 72px) + 32px) !important;
+  margin-top: 32px !important;
+  left: auto !important;
+  right: auto !important;
+  transform: none !important;
   height: max-content !important;
   display: inline-flex !important;
   align-items: center !important;
@@ -13257,6 +13267,16 @@ article.is-selected-column > .builder-preview-box-spacing,
   font-size: 11px !important;
   font-weight: 700 !important;
   pointer-events: auto !important;
+}
+
+/* Scrolled state: stick below the compact floating header pill (preventing collision/overlap) */
+.builder-preview-shell:has(#site-header-pill[data-scrolled="true"]) .builder-context-preview-status-sticky-wrapper .builder-context-preview-status--header-boundary {
+  top: 120px !important;
+}
+
+/* If header is static (not sticky), stick the pill closer to the top edge (32px) when scrolled */
+.builder-preview-shell:has(.site-header[data-header-behavior="static"]) .builder-context-preview-status-sticky-wrapper .builder-context-preview-status--header-boundary {
+  top: 32px !important;
 }
 
 .builder-context-preview-status-sticky-wrapper .builder-context-preview-status--header-boundary button {
@@ -13327,15 +13347,10 @@ body:has([data-scoped-builder-root]) #site-header-pill .site-header-pill-main {
   overflow: visible !important;
 }
 
-/* Remove default frame styling from the canvas since it is now on the viewport container */
-.builder-preview-canvas {
+/* On mobile/tablet the viewport container provides the frame, so remove duplicate frame from the canvas itself */
+.builder-preview-mobile .builder-preview-canvas,
+.builder-preview-tablet .builder-preview-canvas {
   border: none !important;
   border-radius: 0 !important;
   box-shadow: none !important;
-  background: transparent !important;
 }
-
-
-
-
-
