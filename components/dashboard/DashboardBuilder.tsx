@@ -98,8 +98,6 @@ import FluentFormClient from "@/components/builder/FluentFormClient";
 import ProductCarousel from "@/components/ProductCarousel";
 import ProductOptionsSelector from "@/components/ProductOptionsSelector";
 import DashboardInspector from "@/components/dashboard/DashboardInspector";
-import PublishFlowDialog from "@/components/dashboard/PublishFlowDialog";
-import type { SubscriptionPackage } from "@/lib/subscriptions";
 import { headerPresets } from "./headerPresets";
 import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
 import BuilderWireframePanel, {
@@ -1528,10 +1526,6 @@ export type DashboardBuilderProps = {
   saasUserRole?: SaaSUserRole;
   primaryContentLanguage?: string;
   enabledContentLanguages?: string[];
-  websiteName?: string;
-  websiteSlug?: string;
-  subscriptionPackages?: SubscriptionPackage[];
-  websiteIsPublished?: boolean;
 };
 
 export default function DashboardBuilder({
@@ -1541,10 +1535,6 @@ export default function DashboardBuilder({
   saasUserRole,
   primaryContentLanguage = "hy",
   enabledContentLanguages = [primaryContentLanguage],
-  websiteName = "Website",
-  websiteSlug = websiteRouteSegment ?? "website",
-  subscriptionPackages = [],
-  websiteIsPublished = false,
 }: DashboardBuilderProps) {
   const router = useRouter();
   const { t } = useTranslation();
@@ -1727,8 +1717,6 @@ export default function DashboardBuilder({
   const [draftReady, setDraftReady] = useState(false);
   const [publishStatus, setPublishStatus] = useState("Local draft autosaves");
   const [publishCelebration, setPublishCelebration] = useState(false);
-  const [publishFlowOpen, setPublishFlowOpen] = useState(false);
-  const [publishAccessGranted, setPublishAccessGranted] = useState(websiteIsPublished);
   const [uploadingSlide, setUploadingSlide] = useState<number | null>(null);
   const [uploadingNestedSlide, setUploadingNestedSlide] = useState<
     string | null
@@ -8383,7 +8371,7 @@ export default function DashboardBuilder({
             <button
               type="button"
               className="is-primary"
-              onClick={() => websiteId && !publishAccessGranted ? setPublishFlowOpen(true) : void publishLayout()}
+              onClick={() => void publishLayout()}
             >
               <CloudUpload size={15} />
               {t("builder.toolbar.publish")}
@@ -9301,17 +9289,6 @@ export default function DashboardBuilder({
           onClose={closeWordPressMediaPicker}
         />
       </div>
-      {websiteId ? (
-        <PublishFlowDialog
-          open={publishFlowOpen}
-          onClose={() => setPublishFlowOpen(false)}
-          onComplete={async () => { await publishLayout(); setPublishAccessGranted(true); }}
-          websiteId={websiteId}
-          websiteSlug={websiteSlug}
-          websiteName={websiteName}
-          packages={subscriptionPackages}
-        />
-      ) : null}
       {confirmPresetModal ? createPortal(confirmPresetModal, document.body) : null}
     </div>
   );

@@ -379,7 +379,7 @@
               },
               "effects": {
                 "boxShadow": "0 8px 24px rgba(0,0,0,0.08)",
-                "opacity": 100
+                "opacity": 37
               },
               "background": {
                 "type": "color",
@@ -490,7 +490,7 @@
               },
               "effects": {
                 "boxShadow": "0 8px 24px rgba(0,0,0,0.08)",
-                "opacity": 100
+                "opacity": 37
               },
               "background": {
                 "type": "color",
@@ -1729,7 +1729,7 @@
         ]
       }
     ],
-    "updatedAt": "2026-07-22T06:39:40.712Z"
+    "updatedAt": "2026-07-22T05:16:19.925Z"
   },
   "shop": {
     "version": 1,
@@ -6249,8 +6249,7 @@
                 "kind": "menu",
                 "title": "Navigation",
                 "menuSource": "main",
-                "menuActiveIndicator": "princity",
-                "elementAlign": "center"
+                "menuActiveIndicator": "princity"
               }
             ]
           },
@@ -6303,7 +6302,7 @@
         "bottomMargin": "xs"
       }
     ],
-    "updatedAt": "2026-07-22T05:58:47.540Z"
+    "updatedAt": "2026-07-22T05:48:11.445Z"
   },
   "footer": {
     "version": 1,

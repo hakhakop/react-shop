@@ -381,5 +381,33 @@
     "creationRequestId": "c9aa7fc6-f86b-4ce9-a301-944cb66384ae",
     "createdAt": "2026-07-20T20:01:10.454Z",
     "updatedAt": "2026-07-21T05:33:59.846Z"
+  },
+  {
+    "id": "2d7066ff-91ef-4ffa-ae5b-c55abf594892",
+    "ownerId": "e58db68c-2f41-4dcd-8159-9707b2a972ee",
+    "name": "new2",
+    "slug": "new2",
+    "type": "business",
+    "domain": null,
+    "primaryDomain": null,
+    "domains": [],
+    "description": "",
+    "websiteCategory": "Business",
+    "companyName": "",
+    "personName": "",
+    "logoUrl": "",
+    "contactPhone": "",
+    "contactEmail": "",
+    "socialLinks": "",
+    "timeZone": "Asia/Yerevan",
+    "language": "hy",
+    "primaryLanguage": "hy",
+    "enabledLanguages": [
+      "hy"
+    ],
+    "status": "creating",
+    "creationRequestId": "ef641b84-4abf-4835-848c-6657fc746636",
+    "createdAt": "2026-07-22T08:56:35.477Z",
+    "updatedAt": "2026-07-22T08:56:35.477Z"
   }
 ]

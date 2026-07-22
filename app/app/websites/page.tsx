@@ -11,12 +11,14 @@ import {
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import DeleteWebsiteButton from "@/components/saas/DeleteWebsiteButton";
+import GoLiveButton from "@/components/saas/GoLiveButton";
 import SaaSShell from "@/components/saas/SaaSShell";
 import { getCurrentUser } from "@/lib/auth";
 import { getWebsiteRouteSegment, getWebsitesForOwner } from "@/lib/websites";
 import { loginRedirectFor } from "@/lib/saasRoutes";
 import { getDefaultWebsiteBuilderLinks } from "@/lib/websiteBuilderLinks.server";
 import { T } from "@/components/i18n/LanguageProvider";
+import { readActiveSubscriptionPackages } from "@/lib/subscriptions";
 
 export const dynamic = "force-dynamic";
 
@@ -27,7 +29,10 @@ export default async function WebsitesPage() {
     redirect(loginRedirectFor("/app/websites"));
   }
 
-  const websites = await getWebsitesForOwner(user.id);
+  const [websites, subscriptionPackages] = await Promise.all([
+    getWebsitesForOwner(user.id),
+    readActiveSubscriptionPackages(),
+  ]);
   const showRootWebsite = user.role === "super_admin";
   const websiteCards = await Promise.all(
     websites.map(async (website) => {
@@ -130,8 +135,14 @@ export default async function WebsitesPage() {
                     <small>Created {new Date(website.createdAt).toLocaleDateString()}</small>
                   </div>
                   <div className="saas-premium-website-actions">
-                    <Link className="is-primary" href={builderHref}><LayoutDashboard size={15} /> <T k="websites.builder" /></Link>
+                    <Link href={builderHref}><LayoutDashboard size={15} /> Edit Website</Link>
                     <Link href={previewHref}><ExternalLink size={15} /> <T k="common.preview" /></Link>
+                    <GoLiveButton
+                      websiteId={website.id}
+                      websiteSlug={website.slug}
+                      websiteName={website.name}
+                      packages={subscriptionPackages}
+                    />
                     <Link href={`/app/websites/${getWebsiteRouteSegment(website)}/settings`}><Settings2 size={15} /> <T k="common.settings" /></Link>
                     <a href={`/api/websites/${getWebsiteRouteSegment(website)}/export-backup`} title="Export backup"><Download size={15} /><span><T k="common.export" /></span></a>
                     <DeleteWebsiteButton

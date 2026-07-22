@@ -24,8 +24,8 @@
   ],
   "headerActiveIndicator": "princity",
   "headerBehavior": "pill-on-scroll",
-  "headerTransparent": true,
-  "headerOverlay": true,
+  "headerTransparent": false,
+  "headerOverlay": false,
   "headerWidthMode": "boxed",
   "headerHeight": "compact",
   "headerZIndex": 40,
@@ -168,9 +168,15 @@
       "label": "Խանութ",
       "url": "/shop",
       "parentId": null
+    },
+    {
+      "id": "menu_9dbyct27z",
+      "label": "New Menu Item",
+      "url": "#new-way",
+      "parentId": null
     }
   ],
   "headerSticky": true,
-  "updatedAt": "2026-07-22T06:39:40.777Z",
+  "updatedAt": "2026-07-22T05:46:28.024Z",
   "headerCustomHeight": 92
 }
