@@ -26,7 +26,8 @@
   box-shadow: 0 14px 38px rgba(15, 23, 42, 0.18);
 }
 
-.site-header-wrapper {
+.site-header-wrapper,
+.site-header {
   container-type: inline-size;
   container-name: site-header-container;
   width: 100%;
@@ -258,8 +259,10 @@
 [data-theme="dark"] .site-header,
 .dark .site-header,
 html.dark .site-header {
-  background: rgba(15, 23, 42, 0.96);
-  border-bottom-color: rgba(30, 64, 175, 0.7);
+  /* The nearest storefront/preview theme boundary owns these tokens. A hard
+     color here let an unrelated dark Builder ancestor override a light page. */
+  background: var(--header-bg, rgba(15, 23, 42, 0.96));
+  border-bottom-color: var(--header-border, rgba(30, 64, 175, 0.7));
 }
 
 /* Theme toggle button – shadcn + header styling */
@@ -968,6 +971,27 @@ html.dark .site-header {
   gap: var(--header-builder-row-gap, 1rem);
 }
 
+/* Alignment is a resolved element property. Columns arbitrate the horizontal
+   group position so the same value works before and after Builder wrappers are
+   added, without requiring a second control change. */
+.header-builder-column:has(
+    .header-builder-element[style*="justify-content: flex-start"]
+  ) {
+  justify-content: flex-start;
+}
+
+.header-builder-column:has(
+    .header-builder-element[style*="justify-content: center"]
+  ) {
+  justify-content: center;
+}
+
+.header-builder-column:has(
+    .header-builder-element[style*="justify-content: flex-end"]
+  ) {
+  justify-content: flex-end;
+}
+
 .header-builder-columns {
   display: flex;
   width: 100%;
@@ -1022,7 +1046,7 @@ html.dark .site-header {
   letter-spacing: -0.02em;
   color: var(--text-main, #111827);
   opacity: 0.9;
-  display: none; /* logo-only header */
+  display: inline-flex;
 }
 
 .site-header-main-center {

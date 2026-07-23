@@ -26,7 +26,6 @@ import type { HeaderBuilderComposition, HeaderBuilderElement } from "@/lib/heade
 import { visualStyleClassName, visualStyleToCss } from "@/lib/builderVisualStyle";
 import { typographyProps } from "@/lib/builderTypography";
 import WebsiteLanguageSwitcher from "@/components/website/WebsiteLanguageSwitcher";
-import { resolveHeaderBehavior } from "@/lib/headerBehavior";
 import { resolveHeaderHeightCss } from "@/lib/headerHeight";
 import { resolveBuilderSpacing } from "@/lib/builderSpacing";
 import { resolveHeaderDocumentSettings } from "@/lib/headerDocumentSettings";
@@ -205,16 +204,17 @@ export default function HeaderShellView({
   );
   const supportPhone = asString(settings.support_phone, "+374 xx xx xx");
   const currencyLabel = asString(settings.currency_label, "AMD ֏");
-  const layoutValue =
-    layoutOverride && layoutOverride !== "wordpress"
-      ? layoutOverride
-      : asString(settings.layout, "centered");
-  const layout = normalizeLayout(layoutValue);
-  const headerBehavior = resolveHeaderBehavior(shellSettings);
   const documentSettings = resolveHeaderDocumentSettings(
     headerComposition,
     shellSettings,
   );
+  const layoutValue = documentSettings.layout !== "wordpress"
+    ? documentSettings.layout
+    : layoutOverride && layoutOverride !== "wordpress"
+      ? layoutOverride
+      : asString(settings.layout, "centered");
+  const layout = normalizeLayout(layoutValue);
+  const headerBehavior = documentSettings.behavior;
   const headerHeight = resolveHeaderHeightCss(
     documentSettings.height,
     documentSettings.customHeight,
@@ -239,18 +239,18 @@ export default function HeaderShellView({
     "sectionMargin",
     "none",
   ).css;
-  const topToolbarVisible = shellSettings.topToolbarVisible !== false;
+  const topToolbarVisible = documentSettings.topToolbarVisible;
   const effectiveTopBarText =
-    typeof shellSettings.topToolbarText === "string"
-      ? shellSettings.topToolbarText
+    typeof documentSettings.topToolbarText === "string"
+      ? documentSettings.topToolbarText
       : topBarText;
   const effectiveSupportPhone =
-    typeof shellSettings.topToolbarPhone === "string"
-      ? shellSettings.topToolbarPhone
+    typeof documentSettings.topToolbarPhone === "string"
+      ? documentSettings.topToolbarPhone
       : supportPhone;
   const effectiveToolbarMeta =
-    typeof shellSettings.topToolbarMeta === "string"
-      ? shellSettings.topToolbarMeta
+    typeof documentSettings.topToolbarMeta === "string"
+      ? documentSettings.topToolbarMeta
       : currencyLabel;
   const hasTopToolbarContent = Boolean(
     effectiveTopBarText?.trim() ||
@@ -259,7 +259,7 @@ export default function HeaderShellView({
   );
   const showTopToolbar = topToolbarVisible && hasTopToolbarContent;
   const effectiveHeaderBackgroundMode =
-    shellSettings.headerBackgroundMode || "default";
+    documentSettings.backgroundMode;
   const documentHeaderBackground =
     headerComposition.documentBackground &&
     headerComposition.documentBackground !== "transparent"
@@ -276,7 +276,7 @@ export default function HeaderShellView({
     documentHeaderBackground || documentVisualBackground || documentVisualBackgroundImage,
   );
   const headerMustBeTransparent = documentSettings.transparent;
-  const effectiveHeaderTextMode = shellSettings.headerTextMode || "auto";
+  const effectiveHeaderTextMode = documentSettings.textMode;
   const effectiveLogoUrl = documentLogo?.imageUrl || shellSettings.headerLogoUrl || logoUrl;
   const effectiveBrandText =
     documentLogo?.headerBrandText || shellSettings.headerBrandText ||
@@ -305,7 +305,7 @@ export default function HeaderShellView({
     hasDocumentBackground
       ? "site-header--document-background"
       : "",
-    `site-header--builder-width-${shellSettings.headerWidthMode ?? "boxed"}`,
+    `site-header--builder-width-${documentSettings.widthMode}`,
   ]
     .filter(Boolean)
     .join(" ");
@@ -410,7 +410,7 @@ export default function HeaderShellView({
 
         {elementShowBrand && elementBrandText && (
           <Link href={homeHref} className="site-header-brand">
-            <span style={{ color: primaryColor, ...typographyProps(element?.typography, "title").style }}>
+            <span style={typographyProps(element?.typography, "title").style}>
               {elementBrandText}
             </span>
           </Link>
@@ -644,17 +644,54 @@ export default function HeaderShellView({
   const usesColumnLayout = primaryColumns.length > 1 || Boolean(renderBuilderColumn && primaryColumns.length);
   const renderColumn = (column: { id: string; flex: number }) => {
     const columnElements = orderedElements.filter((element) => element.columnId === column.id);
+    const columnAlignment = columnElements[0]
+      ? columnElements[0].type === "logo"
+        ? columnElements[0].imageAlignment
+        : columnElements[0].elementAlign
+      : "left";
     const content = (
-      <div className={`header-builder-column${columnElements.length === 0 ? " is-empty" : ""}`} style={{ flex: column.flex }}>
-        {columnElements.map((element) => {
+      <div
+        className={`header-builder-column${columnElements.length === 0 ? " is-empty" : ""}`}
+        data-header-column-align={columnAlignment}
+        style={{
+          flex: column.flex,
+          justifyContent:
+            columnAlignment === "center"
+              ? "center"
+              : columnAlignment === "right"
+                ? "flex-end"
+                : "flex-start",
+        }}
+      >
+        {columnElements.map((element, elementIndex) => {
           const alignment = element.type === "logo" ? element.imageAlignment : element.elementAlign;
-          const wrapperStyle: CSSProperties = alignment
-            ? {
-                ...(alignment === "center" ? { marginLeft: "auto", marginRight: "auto" } : {}),
-                ...(alignment === "right" ? { marginLeft: "auto" } : {}),
-                ...(alignment === "left" ? { marginRight: "auto" } : {}),
-              }
-            : {};
+          const isFirst = elementIndex === 0;
+          const isLast = elementIndex === columnElements.length - 1;
+          const wrapperStyle: CSSProperties =
+            columnElements.length === 1
+              ? {
+                  ...(alignment === "center"
+                    ? { marginLeft: "auto", marginRight: "auto" }
+                    : {}),
+                  ...(alignment === "right" ? { marginLeft: "auto" } : {}),
+                  ...(alignment === "left" ? { marginRight: "auto" } : {}),
+                }
+              : {
+                  // Auto margins bound the group instead of being repeated on
+                  // every action, which previously created giant empty gaps.
+                  ...(alignment === "right" && isFirst
+                    ? { marginLeft: "auto" }
+                    : {}),
+                  ...(alignment === "left" && isLast
+                    ? { marginRight: "auto" }
+                    : {}),
+                  ...(alignment === "center" && isFirst
+                    ? { marginLeft: "auto" }
+                    : {}),
+                  ...(alignment === "center" && isLast
+                    ? { marginRight: "auto" }
+                    : {}),
+                };
           if (renderBuilderElement) {
             return <div key={element.id} style={{ display: "contents" }}>{renderCompositionElement(element, wrapperStyle)}</div>;
           }
@@ -718,6 +755,7 @@ export default function HeaderShellView({
       className={headerClassName}
       backgroundMode={headerMustBeTransparent ? "none" : effectiveHeaderBackgroundMode}
       textMode={effectiveHeaderTextMode}
+      overlapHeader={documentSettings.overlay}
       style={{
         ...documentVisualCss,
         ...visualStyleToCss(headerComposition.rowVisualStyle),
@@ -740,7 +778,7 @@ export default function HeaderShellView({
         paddingBottom: documentPaddingBottom,
         marginTop: documentMarginTop,
         marginBottom: documentMarginBottom,
-        zIndex: shellSettings.headerZIndex ?? 40,
+        zIndex: documentSettings.zIndex,
       } as CSSProperties}
     >
       {layout === "two-row" && (

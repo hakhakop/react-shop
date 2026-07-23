@@ -5924,7 +5924,21 @@
             ]
           }
         ],
-        "visible": true
+        "visible": true,
+        "headerArchitectureVersion": 2,
+        "headerVisible": true,
+        "headerTransparent": false,
+        "headerOverlay": false,
+        "headerLayout": "princity",
+        "headerBehavior": "pill-on-scroll",
+        "headerWidthMode": "boxed",
+        "headerBackgroundMode": "none",
+        "headerTextMode": "auto",
+        "headerZIndex": 40,
+        "headerTopToolbarVisible": false,
+        "headerTopToolbarText": "Fast support & setup by Webpages",
+        "headerTopToolbarPhone": "+374 xx xx xx",
+        "headerTopToolbarMeta": "AMD ֏"
       }
     ],
     "updatedAt": "2026-07-15T12:01:27.018Z"

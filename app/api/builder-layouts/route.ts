@@ -11,6 +11,8 @@ import {
 } from "@/lib/builderLayouts";
 import { getAuthorizedWebsiteBuilderScope } from "@/lib/websiteBuilderAccess";
 import type { BuilderSection } from "@/components/dashboard/builderTypes";
+import { getBuilderShellSettings } from "@/lib/builderShell";
+import { getOrCreateHeaderBuilderLayout, migrateLegacyHeaderDocument } from "@/lib/headerBuilderDocument";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -25,9 +27,14 @@ export async function GET(request: NextRequest) {
       request.nextUrl.searchParams.get("page")
   );
 
-  return NextResponse.json({
-    layout: await getPublishedBuilderLayout(page, access.scope),
-  });
+  const layout = page === "header"
+    ? await getOrCreateHeaderBuilderLayout(
+        await getBuilderShellSettings(access.scope),
+        access.scope,
+        !access.scope.websiteId,
+      )
+    : await getPublishedBuilderLayout(page, access.scope);
+  return NextResponse.json({ layout });
 }
 
 export async function POST(request: NextRequest) {
@@ -55,7 +62,7 @@ export async function POST(request: NextRequest) {
   }
 
   const store = await readBuilderLayoutStore(access.scope);
-  const layout: BuilderLayout = {
+  let layout: BuilderLayout = {
     version: 1,
     key: page,
     page,
@@ -65,6 +72,12 @@ export async function POST(request: NextRequest) {
     sections,
     updatedAt: new Date().toISOString(),
   };
+  if (page === "header") {
+    layout = migrateLegacyHeaderDocument(
+      layout,
+      await getBuilderShellSettings(access.scope),
+    );
+  }
 
   store[page] = layout;
   await writeBuilderLayoutStore(store, access.scope);

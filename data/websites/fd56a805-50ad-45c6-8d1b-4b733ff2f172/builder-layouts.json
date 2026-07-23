@@ -1,0 +1,1030 @@
+{
+  "home": {
+    "version": 1,
+    "key": "home",
+    "page": "home",
+    "targetType": "page",
+    "updatedAt": "2026-07-22T19:38:32.408Z",
+    "design": {
+      "preset": "princity",
+      "colorScheme": "auto",
+      "pageBackground": "#fbf8f3",
+      "textColor": "#2b211b",
+      "mutedTextColor": "#766960",
+      "accentColor": "#b45d3d",
+      "surfaceColor": "#f2e7dc",
+      "buttonBackground": "#2b211b",
+      "buttonTextColor": "#ffffff",
+      "radius": "12px",
+      "sectionMaxWidth": "1280px",
+      "sectionGutter": "clamp(20px, 4vw, 64px)",
+      "headingFontFamily": "inherit",
+      "headingSize": "clamp(42px, 6vw, 84px)",
+      "headingWeight": "720",
+      "headingLineHeight": "1.02",
+      "cardBg": "#ffffff",
+      "cardRadius": "12px",
+      "cardBorder": "rgba(20,20,20,0.09)",
+      "cardShadow": "0 10px 30px rgba(20,20,20,0.05)",
+      "cardShadowHover": "0 16px 38px rgba(20,20,20,0.09)"
+    },
+    "sections": [
+      {
+        "id": "hero",
+        "kind": "contentLayout",
+        "title": "Hero",
+        "background": "#fbf8f3",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "topSpacing": "large",
+        "bottomSpacing": "large",
+        "layout": "whole",
+        "layoutColumns": 1,
+        "layoutItems": [
+          {
+            "id": "hero-column-1",
+            "rowId": "hero-row",
+            "rowLayout": "whole",
+            "blocks": [
+              {
+                "id": "local-hero",
+                "kind": "hero",
+                "eyebrow": "Reliable help, close to home",
+                "title": "A dependable local service when you need it",
+                "body": "State what you do, where you work, and how quickly a customer can expect a response. Keep the first action direct and reassuring.",
+                "buttonLabel": "Request a Quote",
+                "buttonUrl": "#contact",
+                "buttonStyle": "primary",
+                "buttons": [
+                  {
+                    "id": "local-hero-secondary",
+                    "label": "View Services",
+                    "url": "#services",
+                    "target": "_self",
+                    "style": "outline"
+                  }
+                ],
+                "buttonsLayout": "inline",
+                "buttonGap": "0.75rem",
+                "elementAlign": "left",
+                "elementPadding": "lg",
+                "carouselSettings": {
+                  "variant": "default"
+                },
+                "typography": {
+                  "title": {
+                    "fontFamily": "inherit",
+                    "fontSize": "clamp(42px, 6vw, 84px)",
+                    "fontWeight": "720",
+                    "lineHeight": "1.02",
+                    "letterSpacing": "-0.035em",
+                    "color": "inherit",
+                    "textAlign": "left"
+                  },
+                  "body": {
+                    "fontFamily": "inherit",
+                    "fontSize": "18px",
+                    "fontWeight": "400",
+                    "lineHeight": "1.65",
+                    "letterSpacing": "0",
+                    "color": "inherit",
+                    "textAlign": "left"
+                  },
+                  "eyebrow": {
+                    "fontFamily": "inherit",
+                    "fontSize": "12px",
+                    "fontWeight": "700",
+                    "lineHeight": "1.2",
+                    "letterSpacing": "0.1em",
+                    "color": "inherit",
+                    "textAlign": "left",
+                    "textTransform": "uppercase"
+                  },
+                  "button": {
+                    "fontFamily": "inherit",
+                    "fontSize": "14px",
+                    "fontWeight": "700",
+                    "lineHeight": "1",
+                    "letterSpacing": "0",
+                    "textAlign": "left"
+                  }
+                }
+              }
+            ]
+          }
+        ],
+        "visible": true
+      },
+      {
+        "id": "services",
+        "kind": "contentLayout",
+        "title": "Service Categories",
+        "background": "#ffffff",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "topSpacing": "large",
+        "bottomSpacing": "large",
+        "layout": "whole",
+        "layoutColumns": 1,
+        "layoutItems": [
+          {
+            "id": "services-column-1",
+            "rowId": "services-row",
+            "rowLayout": "whole",
+            "blocks": [
+              {
+                "id": "local-services-grid",
+                "kind": "grid",
+                "title": "Practical support for common needs",
+                "gridSource": "static",
+                "columns": 3,
+                "gridRows": 1,
+                "gridGap": "medium",
+                "gridContentPadding": "large",
+                "gridShowImage": false,
+                "gridShowEyebrow": true,
+                "gridShowMeta": false,
+                "gridShowText": true,
+                "gridShowButton": true,
+                "gridItems": [
+                  {
+                    "id": "ls-1",
+                    "eyebrow": "01",
+                    "title": "Scheduled service",
+                    "text": "Plan routine work at a time that fits your day.",
+                    "buttonLabel": "View Details",
+                    "buttonUrl": "#contact",
+                    "buttonStyle": "link"
+                  },
+                  {
+                    "id": "ls-2",
+                    "eyebrow": "02",
+                    "title": "Repairs and solutions",
+                    "text": "Get a clear assessment and a practical route forward.",
+                    "buttonLabel": "View Details",
+                    "buttonUrl": "#contact",
+                    "buttonStyle": "link"
+                  },
+                  {
+                    "id": "ls-3",
+                    "eyebrow": "03",
+                    "title": "Ongoing care",
+                    "text": "Prevent recurring problems with dependable maintenance.",
+                    "buttonLabel": "View Details",
+                    "buttonUrl": "#contact",
+                    "buttonStyle": "link"
+                  }
+                ],
+                "typography": {
+                  "title": {
+                    "fontFamily": "inherit",
+                    "fontSize": "22px",
+                    "fontWeight": "700",
+                    "lineHeight": "1.15",
+                    "letterSpacing": "-0.01em",
+                    "color": "inherit",
+                    "textAlign": "left"
+                  },
+                  "body": {
+                    "fontFamily": "inherit",
+                    "fontSize": "15px",
+                    "fontWeight": "400",
+                    "lineHeight": "1.6",
+                    "letterSpacing": "0",
+                    "color": "inherit",
+                    "textAlign": "left"
+                  },
+                  "eyebrow": {
+                    "fontFamily": "inherit",
+                    "fontSize": "12px",
+                    "fontWeight": "700",
+                    "lineHeight": "1.2",
+                    "letterSpacing": "0.08em",
+                    "color": "inherit",
+                    "textAlign": "left",
+                    "textTransform": "uppercase"
+                  },
+                  "button": {
+                    "fontFamily": "inherit",
+                    "fontSize": "14px",
+                    "fontWeight": "700",
+                    "lineHeight": "1",
+                    "letterSpacing": "0",
+                    "textAlign": "left"
+                  }
+                }
+              }
+            ]
+          }
+        ],
+        "visible": true
+      },
+      {
+        "id": "about",
+        "kind": "contentLayout",
+        "title": "About the Company",
+        "background": "#f2e7dc",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "topSpacing": "large",
+        "bottomSpacing": "large",
+        "layout": "halves",
+        "layoutColumns": 2,
+        "layoutItems": [
+          {
+            "id": "about-column-1",
+            "rowId": "about-row",
+            "rowLayout": "halves",
+            "blocks": [
+              {
+                "id": "local-about",
+                "kind": "text",
+                "eyebrow": "About the company",
+                "title": "Local knowledge and straightforward service",
+                "body": "Explain how long you have served the area, what customers value about the experience, and the standards that guide every visit. Keep it warm, useful, and easy to verify.",
+                "typography": {
+                  "title": {
+                    "fontFamily": "inherit",
+                    "fontSize": "clamp(28px, 3.5vw, 48px)",
+                    "fontWeight": "700",
+                    "lineHeight": "1.08",
+                    "letterSpacing": "-0.02em",
+                    "color": "inherit",
+                    "textAlign": "left"
+                  },
+                  "body": {
+                    "fontFamily": "inherit",
+                    "fontSize": "16px",
+                    "fontWeight": "400",
+                    "lineHeight": "1.65",
+                    "letterSpacing": "0",
+                    "color": "inherit",
+                    "textAlign": "left"
+                  },
+                  "eyebrow": {
+                    "fontFamily": "inherit",
+                    "fontSize": "12px",
+                    "fontWeight": "700",
+                    "lineHeight": "1.2",
+                    "letterSpacing": "0.08em",
+                    "color": "inherit",
+                    "textAlign": "left",
+                    "textTransform": "uppercase"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "id": "about-column-2",
+            "rowId": "about-row",
+            "rowLayout": "halves",
+            "blocks": [
+              {
+                "id": "local-about-list",
+                "kind": "list",
+                "title": "What customers can expect",
+                "items": [
+                  "Clear arrival windows",
+                  "Upfront recommendations",
+                  "Respectful, tidy work"
+                ],
+                "listIcon": "circleCheck",
+                "elementPadding": "lg"
+              }
+            ]
+          }
+        ],
+        "visible": true
+      },
+      {
+        "id": "benefits",
+        "kind": "contentLayout",
+        "title": "Benefits and Trust Signals",
+        "background": "#2b211b",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "dark",
+        "topSpacing": "medium",
+        "bottomSpacing": "medium",
+        "layout": "whole",
+        "layoutColumns": 1,
+        "layoutItems": [
+          {
+            "id": "benefits-column-1",
+            "rowId": "benefits-row",
+            "rowLayout": "whole",
+            "blocks": [
+              {
+                "id": "benefit-grid",
+                "kind": "grid",
+                "title": "Confidence before the appointment",
+                "gridSource": "static",
+                "columns": 3,
+                "gridRows": 1,
+                "gridGap": "medium",
+                "gridContentPadding": "large",
+                "gridShowImage": false,
+                "gridShowEyebrow": true,
+                "gridShowMeta": false,
+                "gridShowText": true,
+                "gridShowButton": false,
+                "gridItems": [
+                  {
+                    "id": "benefit-1",
+                    "eyebrow": "Local",
+                    "title": "A team that knows the area",
+                    "text": "Show the towns, neighborhoods, or region you serve.",
+                    "buttonStyle": "link"
+                  },
+                  {
+                    "id": "benefit-2",
+                    "eyebrow": "Clear",
+                    "title": "Simple communication",
+                    "text": "Explain what happens next and keep customers informed.",
+                    "buttonStyle": "link"
+                  },
+                  {
+                    "id": "benefit-3",
+                    "eyebrow": "Reliable",
+                    "title": "Work completed with care",
+                    "text": "Set realistic expectations and follow through consistently.",
+                    "buttonStyle": "link"
+                  }
+                ],
+                "typography": {
+                  "title": {
+                    "fontFamily": "inherit",
+                    "fontSize": "22px",
+                    "fontWeight": "700",
+                    "lineHeight": "1.15",
+                    "letterSpacing": "-0.01em",
+                    "color": "inherit",
+                    "textAlign": "left"
+                  },
+                  "body": {
+                    "fontFamily": "inherit",
+                    "fontSize": "15px",
+                    "fontWeight": "400",
+                    "lineHeight": "1.6",
+                    "letterSpacing": "0",
+                    "color": "inherit",
+                    "textAlign": "left"
+                  },
+                  "eyebrow": {
+                    "fontFamily": "inherit",
+                    "fontSize": "12px",
+                    "fontWeight": "700",
+                    "lineHeight": "1.2",
+                    "letterSpacing": "0.08em",
+                    "color": "inherit",
+                    "textAlign": "left",
+                    "textTransform": "uppercase"
+                  },
+                  "button": {
+                    "fontFamily": "inherit",
+                    "fontSize": "14px",
+                    "fontWeight": "700",
+                    "lineHeight": "1",
+                    "letterSpacing": "0",
+                    "textAlign": "left"
+                  }
+                }
+              }
+            ]
+          }
+        ],
+        "visible": true
+      },
+      {
+        "id": "process",
+        "kind": "contentLayout",
+        "title": "Service Area and Process",
+        "background": "#fbf8f3",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "topSpacing": "large",
+        "bottomSpacing": "large",
+        "layout": "whole",
+        "layoutColumns": 1,
+        "layoutItems": [
+          {
+            "id": "process-column-1",
+            "rowId": "process-row",
+            "rowLayout": "whole",
+            "blocks": [
+              {
+                "id": "local-process",
+                "kind": "grid",
+                "title": "From first message to finished service",
+                "gridSource": "static",
+                "columns": 3,
+                "gridRows": 1,
+                "gridGap": "medium",
+                "gridContentPadding": "large",
+                "gridShowImage": false,
+                "gridShowEyebrow": true,
+                "gridShowMeta": false,
+                "gridShowText": true,
+                "gridShowButton": false,
+                "gridItems": [
+                  {
+                    "id": "lp-1",
+                    "eyebrow": "01",
+                    "title": "Tell us what you need",
+                    "text": "Share the location, timing, and a short description of the issue.",
+                    "buttonStyle": "link"
+                  },
+                  {
+                    "id": "lp-2",
+                    "eyebrow": "02",
+                    "title": "Receive a clear next step",
+                    "text": "We confirm availability and explain what to expect.",
+                    "buttonStyle": "link"
+                  },
+                  {
+                    "id": "lp-3",
+                    "eyebrow": "03",
+                    "title": "Get the work completed",
+                    "text": "The service is delivered carefully and reviewed with you.",
+                    "buttonStyle": "link"
+                  }
+                ],
+                "typography": {
+                  "title": {
+                    "fontFamily": "inherit",
+                    "fontSize": "22px",
+                    "fontWeight": "700",
+                    "lineHeight": "1.15",
+                    "letterSpacing": "-0.01em",
+                    "color": "inherit",
+                    "textAlign": "left"
+                  },
+                  "body": {
+                    "fontFamily": "inherit",
+                    "fontSize": "15px",
+                    "fontWeight": "400",
+                    "lineHeight": "1.6",
+                    "letterSpacing": "0",
+                    "color": "inherit",
+                    "textAlign": "left"
+                  },
+                  "eyebrow": {
+                    "fontFamily": "inherit",
+                    "fontSize": "12px",
+                    "fontWeight": "700",
+                    "lineHeight": "1.2",
+                    "letterSpacing": "0.08em",
+                    "color": "inherit",
+                    "textAlign": "left",
+                    "textTransform": "uppercase"
+                  },
+                  "button": {
+                    "fontFamily": "inherit",
+                    "fontSize": "14px",
+                    "fontWeight": "700",
+                    "lineHeight": "1",
+                    "letterSpacing": "0",
+                    "textAlign": "left"
+                  }
+                }
+              }
+            ]
+          }
+        ],
+        "visible": true
+      },
+      {
+        "id": "testimonials",
+        "kind": "contentLayout",
+        "title": "Testimonials",
+        "background": "#ffffff",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "topSpacing": "large",
+        "bottomSpacing": "large",
+        "layout": "whole",
+        "layoutColumns": 1,
+        "layoutItems": [
+          {
+            "id": "testimonials-column-1",
+            "rowId": "testimonials-row",
+            "rowLayout": "whole",
+            "blocks": [
+              {
+                "id": "local-quotes",
+                "kind": "grid",
+                "title": "Trust built through everyday service",
+                "gridSource": "static",
+                "columns": 3,
+                "gridRows": 1,
+                "gridGap": "medium",
+                "gridContentPadding": "large",
+                "gridShowImage": false,
+                "gridShowEyebrow": true,
+                "gridShowMeta": true,
+                "gridShowText": true,
+                "gridShowButton": false,
+                "gridItems": [
+                  {
+                    "id": "lq-1",
+                    "eyebrow": "“",
+                    "title": "Prompt, clear, and easy to work with",
+                    "text": "We knew when to expect the visit and everything was explained before work began.",
+                    "meta": "Jamie P. · Local customer",
+                    "buttonStyle": "link"
+                  },
+                  {
+                    "id": "lq-2",
+                    "eyebrow": "“",
+                    "title": "A straightforward experience",
+                    "text": "The recommendation was practical and the work was completed with care.",
+                    "meta": "Casey R. · Homeowner",
+                    "buttonStyle": "link"
+                  },
+                  {
+                    "id": "lq-3",
+                    "eyebrow": "“",
+                    "title": "The team followed through",
+                    "text": "Communication was reliable from the first call to the final check.",
+                    "meta": "Avery D. · Property manager",
+                    "buttonStyle": "link"
+                  }
+                ],
+                "typography": {
+                  "title": {
+                    "fontFamily": "inherit",
+                    "fontSize": "22px",
+                    "fontWeight": "700",
+                    "lineHeight": "1.15",
+                    "letterSpacing": "-0.01em",
+                    "color": "inherit",
+                    "textAlign": "left"
+                  },
+                  "body": {
+                    "fontFamily": "inherit",
+                    "fontSize": "15px",
+                    "fontWeight": "400",
+                    "lineHeight": "1.6",
+                    "letterSpacing": "0",
+                    "color": "inherit",
+                    "textAlign": "left"
+                  },
+                  "eyebrow": {
+                    "fontFamily": "inherit",
+                    "fontSize": "12px",
+                    "fontWeight": "700",
+                    "lineHeight": "1.2",
+                    "letterSpacing": "0.08em",
+                    "color": "inherit",
+                    "textAlign": "left",
+                    "textTransform": "uppercase"
+                  },
+                  "button": {
+                    "fontFamily": "inherit",
+                    "fontSize": "14px",
+                    "fontWeight": "700",
+                    "lineHeight": "1",
+                    "letterSpacing": "0",
+                    "textAlign": "left"
+                  }
+                }
+              }
+            ]
+          }
+        ],
+        "visible": true
+      },
+      {
+        "id": "faq",
+        "kind": "contentLayout",
+        "title": "FAQ",
+        "background": "#f2e7dc",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "topSpacing": "large",
+        "bottomSpacing": "large",
+        "layout": "whole",
+        "layoutColumns": 1,
+        "layoutItems": [
+          {
+            "id": "faq-column-1",
+            "rowId": "faq-row",
+            "rowLayout": "whole",
+            "blocks": [
+              {
+                "id": "local-faq",
+                "kind": "grid",
+                "title": "Helpful details before you book",
+                "gridSource": "static",
+                "columns": 2,
+                "gridRows": 2,
+                "gridGap": "medium",
+                "gridContentPadding": "large",
+                "gridShowImage": false,
+                "gridShowEyebrow": true,
+                "gridShowMeta": false,
+                "gridShowText": true,
+                "gridShowButton": false,
+                "gridItems": [
+                  {
+                    "id": "lf-1",
+                    "title": "Which areas do you serve?",
+                    "text": "List your core service area and explain whether nearby locations are available by request.",
+                    "buttonStyle": "link"
+                  },
+                  {
+                    "id": "lf-2",
+                    "title": "How soon can I schedule?",
+                    "text": "Give a realistic response window and explain how urgent requests are handled.",
+                    "buttonStyle": "link"
+                  },
+                  {
+                    "id": "lf-3",
+                    "title": "What should I prepare?",
+                    "text": "Ask for the location, a short description, and any useful photos before the visit.",
+                    "buttonStyle": "link"
+                  },
+                  {
+                    "id": "lf-4",
+                    "title": "How is pricing confirmed?",
+                    "text": "Explain when customers receive an estimate and what could affect the final scope.",
+                    "buttonStyle": "link"
+                  }
+                ],
+                "typography": {
+                  "title": {
+                    "fontFamily": "inherit",
+                    "fontSize": "22px",
+                    "fontWeight": "700",
+                    "lineHeight": "1.15",
+                    "letterSpacing": "-0.01em",
+                    "color": "inherit",
+                    "textAlign": "left"
+                  },
+                  "body": {
+                    "fontFamily": "inherit",
+                    "fontSize": "15px",
+                    "fontWeight": "400",
+                    "lineHeight": "1.6",
+                    "letterSpacing": "0",
+                    "color": "inherit",
+                    "textAlign": "left"
+                  },
+                  "eyebrow": {
+                    "fontFamily": "inherit",
+                    "fontSize": "12px",
+                    "fontWeight": "700",
+                    "lineHeight": "1.2",
+                    "letterSpacing": "0.08em",
+                    "color": "inherit",
+                    "textAlign": "left",
+                    "textTransform": "uppercase"
+                  },
+                  "button": {
+                    "fontFamily": "inherit",
+                    "fontSize": "14px",
+                    "fontWeight": "700",
+                    "lineHeight": "1",
+                    "letterSpacing": "0",
+                    "textAlign": "left"
+                  }
+                }
+              }
+            ]
+          }
+        ],
+        "visible": true
+      },
+      {
+        "id": "contact",
+        "kind": "contentLayout",
+        "title": "Contact",
+        "background": "#fbf8f3",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "topSpacing": "large",
+        "bottomSpacing": "large",
+        "layout": "halves",
+        "layoutColumns": 2,
+        "layoutItems": [
+          {
+            "id": "contact-column-1",
+            "rowId": "contact-row",
+            "rowLayout": "halves",
+            "blocks": [
+              {
+                "id": "local-contact",
+                "kind": "text",
+                "eyebrow": "Contact",
+                "title": "Request service with confidence",
+                "body": "Tell visitors when you answer enquiries, which locations you cover, and what information helps you respond faster.",
+                "typography": {
+                  "title": {
+                    "fontFamily": "inherit",
+                    "fontSize": "clamp(28px, 3.5vw, 48px)",
+                    "fontWeight": "700",
+                    "lineHeight": "1.08",
+                    "letterSpacing": "-0.02em",
+                    "color": "inherit",
+                    "textAlign": "left"
+                  },
+                  "body": {
+                    "fontFamily": "inherit",
+                    "fontSize": "16px",
+                    "fontWeight": "400",
+                    "lineHeight": "1.65",
+                    "letterSpacing": "0",
+                    "color": "inherit",
+                    "textAlign": "left"
+                  },
+                  "eyebrow": {
+                    "fontFamily": "inherit",
+                    "fontSize": "12px",
+                    "fontWeight": "700",
+                    "lineHeight": "1.2",
+                    "letterSpacing": "0.08em",
+                    "color": "inherit",
+                    "textAlign": "left",
+                    "textTransform": "uppercase"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "id": "contact-column-2",
+            "rowId": "contact-row",
+            "rowLayout": "halves",
+            "blocks": [
+              {
+                "id": "local-contact-panel",
+                "kind": "panel",
+                "eyebrow": "Request a quote",
+                "title": "Tell us how we can help",
+                "body": "Share the service, location, and preferred timing. We will reply with availability and a clear next step.",
+                "buttonLabel": "Request a Quote",
+                "buttonUrl": "mailto:hello@example.com",
+                "buttonStyle": "primary",
+                "elementPadding": "lg"
+              }
+            ]
+          }
+        ],
+        "visible": true
+      }
+    ]
+  },
+  "header": {
+    "version": 1,
+    "key": "header",
+    "page": "header",
+    "targetType": "header",
+    "design": {
+      "preset": "princity",
+      "colorScheme": "auto",
+      "pageBackground": "#f7f7f4",
+      "textColor": "#111111",
+      "mutedTextColor": "#5f5f58",
+      "accentColor": "#a4be7b",
+      "surfaceColor": "#efefe9",
+      "buttonBackground": "#111111",
+      "buttonTextColor": "#ffffff",
+      "radius": "8px",
+      "sectionMaxWidth": "1640px",
+      "sectionGutter": "48px",
+      "headingFontFamily": "inherit",
+      "headingSize": "clamp(42px, 8vw, 126px)",
+      "headingWeight": "760",
+      "headingLineHeight": "0.92",
+      "cardBg": "#efefe9",
+      "cardRadius": "8px",
+      "cardBorder": "transparent",
+      "cardShadow": "0 12px 30px rgba(17,17,17,0.06)",
+      "cardShadowHover": "0 18px 42px rgba(17,17,17,0.1)",
+      "cardImageBg": "#ffffff",
+      "cardImagePadding": "clamp(22px, 2.4vw, 36px)"
+    },
+    "sections": [
+      {
+        "id": "header-document",
+        "kind": "contentLayout",
+        "title": "Header",
+        "headerUtilityMigrationVersion": 3,
+        "background": "transparent",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "layout": "header-row",
+        "layoutColumns": 3,
+        "layoutItems": [
+          {
+            "id": "header-main-left",
+            "rowId": "header-main-row",
+            "rowLayout": "quarters-1-2-1",
+            "blocks": [
+              {
+                "id": "header-logo",
+                "kind": "image",
+                "headerBrandMode": "logo",
+                "headerBrandText": "header testfddsfdsfsd",
+                "imageMaxWidth": 180,
+                "imageUrl": "https://cms.webpages.am/wp-content/uploads/2026/06/premium-16.png",
+                "imageAlt": "header test logo"
+              }
+            ]
+          },
+          {
+            "id": "header-main-center",
+            "rowId": "header-main-row",
+            "rowLayout": "quarters-1-2-1",
+            "blocks": [
+              {
+                "id": "header-navigation",
+                "kind": "menu",
+                "title": "Navigation",
+                "menuSource": "main",
+                "menuActiveIndicator": "underline"
+              }
+            ]
+          },
+          {
+            "id": "header-main-right",
+            "rowId": "header-main-row",
+            "rowLayout": "quarters-1-2-1",
+            "blocks": [
+              {
+                "id": "header-utility-search",
+                "kind": "headerSearch",
+                "headerUtilityAction": "search",
+                "headerUtilityVariant": "muted"
+              },
+              {
+                "id": "header-utility-cart",
+                "kind": "headerCart",
+                "headerUtilityAction": "cart",
+                "headerUtilityVariant": "muted"
+              }
+            ]
+          }
+        ],
+        "visible": true,
+        "headerArchitectureVersion": 2,
+        "headerVisible": true,
+        "headerTransparent": false,
+        "headerOverlay": false,
+        "headerLayout": "princity",
+        "headerBehavior": "sticky-on-scroll-up",
+        "headerWidthMode": "boxed",
+        "headerBackgroundMode": "default",
+        "headerTextMode": "auto",
+        "headerZIndex": 40,
+        "headerTopToolbarVisible": false,
+        "headerTopToolbarText": "",
+        "headerTopToolbarPhone": "",
+        "headerTopToolbarMeta": "",
+        "headerHeight": "auto"
+      }
+    ],
+    "updatedAt": "2026-07-23T05:32:52.346Z"
+  },
+  "footer": {
+    "version": 1,
+    "key": "footer",
+    "page": "footer",
+    "targetType": "footer",
+    "updatedAt": "2026-07-22T19:38:32.408Z",
+    "design": {},
+    "sections": [
+      {
+        "id": "footer-document",
+        "kind": "contentLayout",
+        "title": "Footer",
+        "background": "#2b211b",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "dark",
+        "topSpacing": "medium",
+        "bottomSpacing": "medium",
+        "layout": "thirds",
+        "layoutColumns": 3,
+        "layoutItems": [
+          {
+            "id": "footer-document-column-1",
+            "rowId": "footer-document-row",
+            "rowLayout": "thirds",
+            "blocks": [
+              {
+                "id": "footer-about",
+                "kind": "text",
+                "title": "header test",
+                "body": "A concise closing statement that reinforces what you offer and who you help.",
+                "typography": {
+                  "title": {
+                    "fontFamily": "inherit",
+                    "fontSize": "clamp(28px, 3.5vw, 48px)",
+                    "fontWeight": "700",
+                    "lineHeight": "1.08",
+                    "letterSpacing": "-0.02em",
+                    "color": "inherit",
+                    "textAlign": "left"
+                  },
+                  "body": {
+                    "fontFamily": "inherit",
+                    "fontSize": "16px",
+                    "fontWeight": "400",
+                    "lineHeight": "1.65",
+                    "letterSpacing": "0",
+                    "color": "inherit",
+                    "textAlign": "left"
+                  },
+                  "eyebrow": {
+                    "fontFamily": "inherit",
+                    "fontSize": "12px",
+                    "fontWeight": "700",
+                    "lineHeight": "1.2",
+                    "letterSpacing": "0.08em",
+                    "color": "inherit",
+                    "textAlign": "left",
+                    "textTransform": "uppercase"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "id": "footer-document-column-2",
+            "rowId": "footer-document-row",
+            "rowLayout": "thirds",
+            "blocks": [
+              {
+                "id": "footer-links",
+                "kind": "list",
+                "title": "Explore",
+                "items": [
+                  "About",
+                  "Services",
+                  "Testimonials",
+                  "Contact"
+                ],
+                "listIcon": "arrowRight"
+              }
+            ]
+          },
+          {
+            "id": "footer-document-column-3",
+            "rowId": "footer-document-row",
+            "rowLayout": "thirds",
+            "blocks": [
+              {
+                "id": "footer-contact",
+                "kind": "text",
+                "eyebrow": "Contact",
+                "title": "Start a conversation",
+                "body": "hello@example.com\n+1 000 000 0000",
+                "typography": {
+                  "title": {
+                    "fontFamily": "inherit",
+                    "fontSize": "clamp(28px, 3.5vw, 48px)",
+                    "fontWeight": "700",
+                    "lineHeight": "1.08",
+                    "letterSpacing": "-0.02em",
+                    "color": "inherit",
+                    "textAlign": "left"
+                  },
+                  "body": {
+                    "fontFamily": "inherit",
+                    "fontSize": "16px",
+                    "fontWeight": "400",
+                    "lineHeight": "1.65",
+                    "letterSpacing": "0",
+                    "color": "inherit",
+                    "textAlign": "left"
+                  },
+                  "eyebrow": {
+                    "fontFamily": "inherit",
+                    "fontSize": "12px",
+                    "fontWeight": "700",
+                    "lineHeight": "1.2",
+                    "letterSpacing": "0.08em",
+                    "color": "inherit",
+                    "textAlign": "left",
+                    "textTransform": "uppercase"
+                  }
+                }
+              }
+            ]
+          }
+        ],
+        "visible": true
+      }
+    ]
+  }
+}

@@ -823,7 +823,18 @@
         "topSpacing": "none",
         "bottomSpacing": "none",
         "topMargin": "none",
-        "bottomMargin": "none"
+        "bottomMargin": "none",
+        "headerArchitectureVersion": 2,
+        "headerLayout": "princity",
+        "headerBehavior": "pill-on-scroll",
+        "headerWidthMode": "boxed",
+        "headerBackgroundMode": "default",
+        "headerTextMode": "auto",
+        "headerZIndex": 40,
+        "headerTopToolbarVisible": false,
+        "headerTopToolbarText": "",
+        "headerTopToolbarPhone": "",
+        "headerTopToolbarMeta": ""
       }
     ],
     "updatedAt": "2026-07-20T19:46:49.192Z"

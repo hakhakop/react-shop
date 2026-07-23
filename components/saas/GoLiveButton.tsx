@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Rocket } from "lucide-react";
+import { CreditCard, Rocket } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { createPortal } from "react-dom";
 import PublishFlowDialog from "@/components/dashboard/PublishFlowDialog";
@@ -12,6 +12,9 @@ type GoLiveButtonProps = {
   websiteSlug: string;
   websiteName: string;
   packages: SubscriptionPackage[];
+  isLive?: boolean;
+  activePackageId?: string;
+  activeDomain?: string;
 };
 
 export default function GoLiveButton({
@@ -19,6 +22,9 @@ export default function GoLiveButton({
   websiteSlug,
   websiteName,
   packages,
+  isLive = false,
+  activePackageId,
+  activeDomain,
 }: GoLiveButtonProps) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -26,7 +32,8 @@ export default function GoLiveButton({
   return (
     <>
       <button type="button" className="is-primary" onClick={() => setOpen(true)}>
-        <Rocket size={15} /> Go Live
+        {isLive ? <CreditCard size={15} /> : <Rocket size={15} />}
+        {isLive ? "Manage Plan" : "Go Live"}
       </button>
       {open && typeof document !== "undefined"
         ? createPortal(
@@ -40,6 +47,8 @@ export default function GoLiveButton({
               websiteSlug={websiteSlug}
               websiteName={websiteName}
               packages={packages}
+              initialPackageId={activePackageId}
+              initialDomain={activeDomain}
             />,
             document.body,
           )

@@ -1,6 +1,7 @@
 import { getBuilderRowLayoutPreset } from "@/components/dashboard/builderLayoutPresets";
 import type { BuilderLayout } from "@/lib/builderLayouts";
 import type { HeaderBuilderComposition, HeaderBuilderElement, HeaderRowComposition } from "@/lib/headerBuilderDocument";
+import { resolveHeaderElementAlignment } from "@/lib/headerElementAlignment";
 
 const headerActionFromKind = (kind?: string) => {
   if (kind === "headerSearch") return "search";
@@ -26,7 +27,10 @@ export function resolveHeaderBuilderComposition(
     (section.layoutItems ?? []).flatMap((item) => item.blocks ?? []),
   ) ?? [];
   const blockRowIds = new Map<object, string>();
-  const blockColumnMeta = new Map<object, { id?: string; flex?: number }>();
+  const blockColumnMeta = new Map<
+    object,
+    { id?: string; flex?: number; index: number; count: number }
+  >();
   layout?.sections.forEach((layoutSection) => {
     layoutSection.layoutItems?.forEach((item, itemIndex) => {
       const rowId = item.rowId ?? item.id ?? `header-row-${itemIndex}`;
@@ -40,6 +44,8 @@ export function resolveHeaderBuilderComposition(
         blockColumnMeta.set(block, {
           id: item.id,
           flex: preset?.ratios[columnIndex] ?? 1,
+          index: columnIndex,
+          count: rowItems.length,
         });
       });
     });
@@ -50,7 +56,11 @@ export function resolveHeaderBuilderComposition(
     rowId: blockRowIds.get(block),
     columnId: blockColumnMeta.get(block)?.id,
     columnFlex: blockColumnMeta.get(block)?.flex,
-    elementAlign: block.elementAlign,
+    elementAlign: resolveHeaderElementAlignment(
+      block,
+      blockColumnMeta.get(block)?.index,
+      blockColumnMeta.get(block)?.count,
+    ),
     visualStyle: block.visualStyle,
     typography: block.typography,
   });
@@ -61,7 +71,11 @@ export function resolveHeaderBuilderComposition(
       imageUrl: block.imageUrl,
       imageAlt: block.imageAlt,
       imageMaxWidth: block.imageMaxWidth,
-      imageAlignment: block.imageAlignment,
+      imageAlignment: resolveHeaderElementAlignment(
+        block,
+        blockColumnMeta.get(block)?.index,
+        blockColumnMeta.get(block)?.count,
+      ),
       headerBrandMode: block.headerBrandMode,
       headerBrandText: block.headerBrandText,
       ...sharedElementFields(block),
@@ -203,6 +217,16 @@ export function resolveHeaderBuilderComposition(
     documentOverlay: section?.headerOverlay,
     documentHeight: section?.headerHeight,
     documentCustomHeight: section?.headerCustomHeight,
+    documentLayout: section?.headerLayout,
+    documentBehavior: section?.headerBehavior,
+    documentWidthMode: section?.headerWidthMode,
+    documentBackgroundMode: section?.headerBackgroundMode,
+    documentTextMode: section?.headerTextMode,
+    documentZIndex: section?.headerZIndex,
+    documentTopToolbarVisible: section?.headerTopToolbarVisible,
+    documentTopToolbarText: section?.headerTopToolbarText,
+    documentTopToolbarPhone: section?.headerTopToolbarPhone,
+    documentTopToolbarMeta: section?.headerTopToolbarMeta,
     documentTopSpacing: section?.topSpacing,
     documentBottomSpacing: section?.bottomSpacing,
     documentTopMargin: section?.topMargin,

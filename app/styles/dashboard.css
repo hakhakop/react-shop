@@ -843,20 +843,12 @@
   z-index: 10030 !important;
 }
 
-/* Storefront fixed-header spacers are not content in the isolated Header editor. */
+/* Floating layouts keep their real document-flow spacer in the Builder. Hiding
+   it made the visible row look plausible while the Header's geometry differed
+   from the storefront by exactly one main-row height. */
 .builder-header-document-preview .site-header-pill-spacer,
 .builder-header-document-preview .site-header-princity-spacer {
-  display: none !important;
-}
-
-/* Keep the real pill row in the editing flow so its wireframe owns its height. */
-.builder-header-document-preview #site-header-pill .site-header-pill-main,
-.builder-header-document-preview #site-header-pill.site-header-princity-shell .site-header-princity {
-  position: relative !important;
-  inset: auto !important;
-  top: auto !important;
-  right: auto !important;
-  left: auto !important;
+  display: block;
 }
 
 .builder-header-document-preview .builder-header-live-row-tools {
@@ -13056,13 +13048,13 @@ article.is-selected-column > .builder-preview-box-spacing,
 
 /* Builder preview theme variables for the header */
 .builder-preview-shell {
-  --header-bg: rgba(255, 255, 255, 0.92);
+  --header-bg: rgba(255, 255, 255, 0.96);
   --header-border: rgba(209, 213, 219, 0.72);
 }
 
 .builder-preview-shell[data-theme="light"],
 .builder-preview-shell.builder-preview-scheme-light {
-  --header-bg: rgba(255, 255, 255, 0.92);
+  --header-bg: rgba(255, 255, 255, 0.96);
   --header-border: rgba(209, 213, 219, 0.72);
 }
 
@@ -13353,4 +13345,103 @@ body:has([data-scoped-builder-root]) #site-header-pill .site-header-pill-main {
   border: none !important;
   border-radius: 0 !important;
   box-shadow: none !important;
+}
+
+/* Header parity contract: the preview slot is the sole sticky owner in the
+   Builder. The shared Header itself owns stickiness on storefront pages. */
+.builder-preview-header-slot {
+  position: relative !important;
+  top: auto !important;
+}
+
+.builder-preview-header-slot:has(.site-header[data-header-behavior="sticky"]),
+.builder-preview-header-slot:has(.site-header[data-header-behavior="sticky-on-scroll-up"]),
+.builder-preview-header-slot:has(.site-header[data-header-behavior="pill-on-scroll"]) {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 1200 !important;
+}
+
+.builder-preview-header-slot .site-header,
+body.is-visual-builder-active .builder-preview-header-slot .site-header,
+body:has([data-scoped-builder-root]) .builder-preview-header-slot .site-header {
+  position: relative !important;
+  top: auto !important;
+  left: auto !important;
+  right: auto !important;
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+.builder-preview-header-slot .site-header[data-header-behavior="static"] {
+  position: relative !important;
+}
+
+/* Floating rows remain out of document flow just like the storefront. The
+   preview slot owns sticky scrolling; the canonical spacer owns Header height. */
+body.is-visual-builder-active
+  .builder-preview-header-slot
+  #site-header-pill
+  .site-header-pill-main,
+body:has([data-scoped-builder-root])
+  .builder-preview-header-slot
+  #site-header-pill
+  .site-header-pill-main,
+body.is-visual-builder-active
+  .builder-preview-header-slot
+  #site-header-pill.site-header-princity-shell
+  .site-header-princity,
+body:has([data-scoped-builder-root])
+  .builder-preview-header-slot
+  #site-header-pill.site-header-princity-shell
+  .site-header-princity {
+  position: absolute !important;
+}
+
+/* Locked page context belongs to page content, never to the sticky Header. */
+.builder-context-preview-status-sticky-wrapper,
+.builder-context-preview-status-sticky-wrapper .builder-context-preview-status--header-boundary,
+.builder-preview-shell:has(#site-header-pill[data-scrolled="true"])
+  .builder-context-preview-status-sticky-wrapper
+  .builder-context-preview-status--header-boundary,
+.builder-preview-shell:has(.site-header[data-header-behavior="static"])
+  .builder-context-preview-status-sticky-wrapper
+  .builder-context-preview-status--header-boundary {
+  position: relative !important;
+  top: auto !important;
+  margin-top: 12px !important;
+  z-index: 10 !important;
+}
+
+/* Pull-under keeps the page canvas beneath the Header. Its lock status stays in
+   the page-context layer, but clears the measured rendered Header box. */
+.builder-header-page-context[data-overlap-header="true"] {
+  position: relative;
+}
+
+.builder-header-page-context[data-overlap-header="true"]
+  .builder-context-preview-status-sticky-wrapper {
+  position: absolute !important;
+  top: calc(var(--builder-preview-rendered-header-height, 72px) + 12px) !important;
+  right: 0;
+  left: 0;
+  margin-top: 0 !important;
+  pointer-events: none;
+}
+
+.builder-header-page-context[data-overlap-header="true"]
+  .builder-context-preview-status {
+  pointer-events: auto;
+}
+
+.builder-header-page-context.is-locked .builder-preview-canvas,
+.builder-header-page-context.is-locked .builder-preview-page {
+  opacity: 0.58;
+  filter: saturate(0.58) contrast(0.92);
+  transition: opacity 160ms ease, filter 160ms ease;
+}
+
+.builder-header-page-context.is-locked:hover .builder-preview-canvas,
+.builder-header-page-context.is-locked:hover .builder-preview-page {
+  opacity: 0.7;
 }

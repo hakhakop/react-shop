@@ -47,7 +47,6 @@ import {
   ArrowUpRight,
 } from "lucide-react";
 import Image from "next/image";
-import { useTheme } from "@/components/ThemeProvider";
 import { useTranslation } from "@/components/i18n/LanguageProvider";
 import LanguageSwitcher from "@/components/i18n/LanguageSwitcher";
 import {
@@ -57,7 +56,6 @@ import {
 } from "@/lib/builderContentLanguages";
 import { resolveHeaderBuilderComposition } from "@/lib/headerBuilderComposition";
 import { resolveHeaderDocumentSettings } from "@/lib/headerDocumentSettings";
-import { resolveHeaderHeightCss } from "@/lib/headerHeight";
 import {
   decodeHeaderBlockDragPayload,
   encodeHeaderBlockDragPayload,
@@ -1192,14 +1190,39 @@ function getDefaultStateForKey(key: BuilderLayoutKey): BuilderState {
 
 function hydrateDocumentBuilderState(
   state: BuilderState,
-  _settings: BuilderShellSettings,
+  settings: BuilderShellSettings,
 ): BuilderState {
   if (state.page !== "header" && state.page !== "footer") return state;
-  // Document migration is a one-time creation concern. Once a Builder document
-  // exists, hydration must never repair, populate, or reshape its rows.
-  return state.targetType === state.page
+  const normalized = state.targetType === state.page
     ? state
     : { ...state, targetType: state.page };
+  if (state.page !== "header" || normalized.sections[0]?.headerArchitectureVersion === 2) {
+    return normalized;
+  }
+  const [header, ...rest] = normalized.sections;
+  if (!header) return normalized;
+  return {
+    ...normalized,
+    sections: [{
+      ...header,
+      headerArchitectureVersion: 2,
+      headerVisible: header.headerVisible ?? settings.headerVisible,
+      headerTransparent: header.headerTransparent ?? settings.headerTransparent,
+      headerOverlay: header.headerOverlay ?? settings.headerOverlay,
+      headerHeight: header.headerHeight ?? settings.headerHeight,
+      headerCustomHeight: header.headerCustomHeight ?? settings.headerCustomHeight,
+      headerLayout: header.headerLayout ?? settings.headerLayout,
+      headerBehavior: header.headerBehavior ?? settings.headerBehavior,
+      headerWidthMode: header.headerWidthMode ?? settings.headerWidthMode,
+      headerBackgroundMode: header.headerBackgroundMode ?? settings.headerBackgroundMode,
+      headerTextMode: header.headerTextMode ?? settings.headerTextMode,
+      headerZIndex: header.headerZIndex ?? settings.headerZIndex,
+      headerTopToolbarVisible: header.headerTopToolbarVisible ?? settings.topToolbarVisible,
+      headerTopToolbarText: header.headerTopToolbarText ?? settings.topToolbarText,
+      headerTopToolbarPhone: header.headerTopToolbarPhone ?? settings.topToolbarPhone,
+      headerTopToolbarMeta: header.headerTopToolbarMeta ?? settings.topToolbarMeta,
+    }, ...rest],
+  };
 }
 
 function loadInitialState(
@@ -1539,7 +1562,6 @@ export default function DashboardBuilder({
   const router = useRouter();
   const { t } = useTranslation();
   const [contentLanguage, setContentLanguage] = useState(primaryContentLanguage);
-  const { theme } = useTheme();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [headerContextKey, setHeaderContextKey] = useState<BuilderLayoutKey>(() => {
@@ -1684,11 +1706,11 @@ export default function DashboardBuilder({
     localStorage.setItem("builder-dashboard-theme", nextTheme);
   };
 
-  const layoutScheme =
-    builderState.design.colorScheme === "dark" ||
-    (builderState.design.colorScheme === "auto" && theme === "dark")
-      ? "dark"
-      : "light";
+  // `auto` is the storefront default, not the Builder UI theme. Letting the
+  // dashboard's dark mode resolve it made the same canonical Header inherit a
+  // dark --header-bg in the Builder while the published storefront stayed
+  // light.
+  const layoutScheme = builderState.design.colorScheme === "dark" ? "dark" : "light";
   const [selectedId, setSelectedId] = useState("");
   const [headerSelected, setHeaderSelected] = useState(false);
   const [headerHovered, setHeaderHovered] = useState(false);
@@ -1860,7 +1882,6 @@ export default function DashboardBuilder({
   const skipUndoCaptureRef = useRef(false);
   const [committedBuilderStateSignature, setCommittedBuilderStateSignature] =
     useState("");
-  const [headerContextStatusTop, setHeaderContextStatusTop] = useState<number | null>(null);
   const [committedShellSettingsSignature, setCommittedShellSettingsSignature] =
     useState("");
   const undoRef = useRef<() => void>(() => {});
@@ -1962,53 +1983,6 @@ export default function DashboardBuilder({
     () => resolveHeaderDocumentSettings(currentHeaderComposition, shellSettings),
     [currentHeaderComposition, shellSettings],
   );
-  useLayoutEffect(() => {
-    if (builderState.page !== "header" || !currentHeaderDocumentSettings.overlay) {
-      setHeaderContextStatusTop(null);
-      return;
-    }
-
-    const slot = headerPreviewSlotRef.current;
-    const pageContext = headerPageContextRef.current;
-    if (!slot || !pageContext) return;
-
-    let observedHeader: HTMLElement | null = null;
-    let resizeObserver: ResizeObserver | null = null;
-    const updateStatusPosition = () => {
-      const header = slot.querySelector<HTMLElement>(".site-header");
-      if (!header) return;
-
-      if (header !== observedHeader) {
-        if (observedHeader) resizeObserver?.unobserve(observedHeader);
-        observedHeader = header;
-        resizeObserver?.observe(header);
-      }
-
-      const nextTop = Math.max(
-        44,
-        Math.ceil(header.offsetTop + header.offsetHeight - pageContext.offsetTop + 8),
-      );
-      setHeaderContextStatusTop((current) => current === nextTop ? current : nextTop);
-    };
-
-    resizeObserver = new ResizeObserver(updateStatusPosition);
-    resizeObserver.observe(pageContext);
-    const mutationObserver = new MutationObserver(updateStatusPosition);
-    mutationObserver.observe(slot, {
-      attributes: true,
-      childList: true,
-      subtree: true,
-      attributeFilter: ["class", "style", "data-scrolled"],
-    });
-    window.addEventListener("resize", updateStatusPosition);
-    updateStatusPosition();
-
-    return () => {
-      resizeObserver.disconnect();
-      mutationObserver.disconnect();
-      window.removeEventListener("resize", updateStatusPosition);
-    };
-  }, [builderState.page, currentHeaderComposition, currentHeaderDocumentSettings.overlay]);
   const composedAnchorIdEntries = useMemo(() => {
     const sections = [
       ...builderState.sections,
@@ -3936,15 +3910,30 @@ export default function DashboardBuilder({
     );
 
     if (mergedSections.length > 0) {
+      const currentSettings = resolveHeaderDocumentSettings(
+        resolveHeaderBuilderComposition({ sections: currentHeaderSections }),
+        shellSettings,
+      );
       mergedSections[0] = {
         ...mergedSections[0],
         headerPresetKey: presetKey,
+        headerArchitectureVersion: 2,
         headerVisible:
           currentHeaderSections[0]?.headerVisible ??
           shellSettings.headerVisible ??
           true,
         headerTransparent: preset.headerTransparent,
         headerOverlay: preset.headerOverlay,
+        headerLayout: preset.headerLayout,
+        headerBehavior: currentSettings.behavior,
+        headerWidthMode: preset.headerWidthMode,
+        headerBackgroundMode: currentSettings.backgroundMode,
+        headerTextMode: currentSettings.textMode,
+        headerZIndex: currentSettings.zIndex,
+        headerTopToolbarVisible: currentSettings.topToolbarVisible,
+        headerTopToolbarText: currentSettings.topToolbarText,
+        headerTopToolbarPhone: currentSettings.topToolbarPhone,
+        headerTopToolbarMeta: currentSettings.topToolbarMeta,
         ...(currentHeaderSections[0]?.headerHeight !== undefined
           ? { headerHeight: currentHeaderSections[0].headerHeight }
           : {}),
@@ -3989,10 +3978,6 @@ export default function DashboardBuilder({
       });
     }
 
-    updateShellSettings({
-      headerLayout: preset.headerLayout,
-      headerWidthMode: preset.headerWidthMode,
-    });
   };
 
   const updateSelectedLayoutBlock = (
@@ -4015,6 +4000,19 @@ export default function DashboardBuilder({
       contentLanguage,
       primaryContentLanguage,
     );
+    const requestedHeaderAlignment =
+      builderState.page === "header"
+        ? patch.imageAlignment ?? patch.elementAlign
+        : undefined;
+    if (requestedHeaderAlignment) {
+      blocks.forEach((block, index) => {
+        if (index === blockIndex) return;
+        blocks[index] =
+          block.kind === "image" || block.id === "header-logo"
+            ? { ...block, imageAlignment: requestedHeaderAlignment }
+            : { ...block, elementAlign: requestedHeaderAlignment };
+      });
+    }
     layoutItems[columnIndex] = { ...item, blocks };
     updateSelected({ layoutItems });
   };
@@ -4701,8 +4699,11 @@ export default function DashboardBuilder({
           imageUrl: shellSettings.headerLogoUrl ?? undefined,
           imageAlt: shellSettings.headerLogoAlt,
           imageMaxWidth: shellSettings.headerLogoMaxWidth,
-          headerBrandMode: shellSettings.headerBrandMode,
-          headerBrandText: shellSettings.headerBrandText,
+          headerBrandMode: shellSettings.headerLogoUrl
+            ? shellSettings.headerBrandMode
+            : "brand",
+          headerBrandText: shellSettings.headerBrandText?.trim() || "WebPages",
+          imageAlignment: "left",
         },
         menu: {
           id: "header-navigation",
@@ -5599,11 +5600,7 @@ export default function DashboardBuilder({
     setPublishStatus("Reading published layout...");
     const requestedState = builderStateRef.current;
     const requestedSignature = JSON.stringify(requestedState);
-    if (restoredDraftKeysRef.current.has(requestedState.page)) {
-      setCommittedBuilderStateSignature(requestedSignature);
-      setPublishStatus("Local draft restored");
-      return;
-    }
+    const hasRestoredDraft = restoredDraftKeysRef.current.has(requestedState.page);
     const response = await fetch(builderApiUrl("/api/builder-layouts", {
       key: requestedState.page,
     }), {
@@ -5626,7 +5623,7 @@ export default function DashboardBuilder({
 
     if (!payload.layout?.sections?.length) {
       setPublishStatus("No published layout yet");
-      setCommittedBuilderStateSignature(requestedSignature);
+      setCommittedBuilderStateSignature(hasRestoredDraft ? "" : requestedSignature);
       return;
     }
 
@@ -5643,6 +5640,15 @@ export default function DashboardBuilder({
       }, requestedState.page);
 
     const nextSignature = JSON.stringify(nextPublishedState);
+    if (hasRestoredDraft) {
+      setCommittedBuilderStateSignature(nextSignature);
+      setPublishStatus(
+        nextSignature === requestedSignature
+          ? "Local draft matches published"
+          : "Local draft restored",
+      );
+      return;
+    }
     if (nextSignature === requestedSignature) {
       setCommittedBuilderStateSignature(nextSignature);
       setPublishStatus("Local draft matches published");
@@ -5671,24 +5677,26 @@ export default function DashboardBuilder({
     let layoutSuccess = true;
     let shellSuccess = true;
 
-    if (hasLayoutPendingChanges) {
-      const response = await fetch(builderApiUrl("/api/builder-layouts"), {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(builderState),
-      });
+    // Publishing is the authoritative save boundary. Always persist the exact
+    // document currently rendered by the Builder before recording publication;
+    // a stale committed signature or a restored local draft must never let this
+    // request be skipped.
+    const response = await fetch(builderApiUrl("/api/builder-layouts"), {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(builderState),
+    });
 
-      if (!response.ok) {
-        layoutSuccess = false;
-      } else {
-        setCommittedBuilderStateSignature(JSON.stringify(builderState));
-        setPublishedKeys((current) => {
-          if (current.includes(builderState.page)) return current;
-          return [...current, builderState.page];
-        });
-      }
+    if (!response.ok) {
+      layoutSuccess = false;
+    } else {
+      setCommittedBuilderStateSignature(JSON.stringify(builderState));
+      setPublishedKeys((current) => {
+        if (current.includes(builderState.page)) return current;
+        return [...current, builderState.page];
+      });
     }
 
     if (hasShellPendingChanges && canEditShellSettings) {
@@ -5715,6 +5723,17 @@ export default function DashboardBuilder({
         setPublishStatus("Settings publish failed");
       }
       return;
+    }
+
+    if (websiteId) {
+      const publicationResponse = await fetch(
+        `/api/websites/${websiteId}/publication`,
+        { method: "POST" },
+      );
+      if (!publicationResponse.ok) {
+        setPublishStatus("Published, but status tracking failed");
+        return;
+      }
     }
 
     setPublishStatus("Published successfully");
@@ -8630,14 +8649,6 @@ export default function DashboardBuilder({
                 transformOrigin: "top center",
                 "--builder-preview-device-width": `${previewCanvasWidth}px`,
                 "--builder-preview-header-width": `${previewCanvasWidth}px`,
-                "--header-builder-height": resolveHeaderHeightCss(
-                  currentHeaderDocumentSettings.height,
-                  currentHeaderDocumentSettings.customHeight,
-                ) ?? "72px",
-                "--header-main-h": resolveHeaderHeightCss(
-                  currentHeaderDocumentSettings.height,
-                  currentHeaderDocumentSettings.customHeight,
-                ) ?? "72px",
               } as CSSProperties
             }
           >
@@ -8732,6 +8743,27 @@ export default function DashboardBuilder({
                           draggable={Boolean(element.rowId && element.columnId)}
                           className={`builder-header-live-element builder-preview-layout-block is-${element.type}${selectedLayoutBlockKey === element.id ? " is-selected is-selected-block" : ""}${hoveredBuilderTarget?.type === "block" && hoveredBuilderTarget.blockKey === element.id ? " is-hovered-block" : ""}${draggingHeaderElementId === element.id ? " is-dragging-block" : ""}${dragPlacement ? ` is-drag-over-${dragPlacement}` : ""}`}
                           data-header-element={element.type}
+                          onClickCapture={(event) => {
+                            const target = event.target as HTMLElement;
+                            if (
+                              target.closest(".builder-preview-block-tools") ||
+                              !target.closest("a, button, [role='button']")
+                            ) {
+                              return;
+                            }
+                            // Capture before Next/Link or live Header controls
+                            // run their own handlers. In the Builder these are
+                            // editable content, not navigation.
+                            event.preventDefault();
+                            event.stopPropagation();
+                            if (selectedLayoutBlockKey !== element.id) {
+                              selectLayoutBlock(
+                                "header-document",
+                                columnId,
+                                element.id,
+                              );
+                            }
+                          }}
                           onMouseEnter={() => setHoveredBuilderTarget({ type: "block", sectionId: "header-document", columnKey: columnId, blockKey: element.id })}
                           onMouseLeave={() => setHoveredBuilderTarget(null)}
                           onMouseDown={(event) => {
@@ -8748,8 +8780,18 @@ export default function DashboardBuilder({
                           }}
                           onClick={(event) => {
                             const target = event.target as HTMLElement;
-                            if (target.closest("select, input, button, textarea, a, [role='button'], label, .website-language-switcher")) {
-                              // Select the block on click only if not already selected, and let the event bubble normally.
+                            if (target.closest("a, button, [role='button']")) {
+                              // Header links/actions are content while editing.
+                              // Activating them navigated away before the
+                              // controlled inspector could update the element.
+                              event.preventDefault();
+                              event.stopPropagation();
+                              if (selectedLayoutBlockKey !== element.id) {
+                                selectLayoutBlock("header-document", columnId, element.id);
+                              }
+                              return;
+                            }
+                            if (target.closest("select, input, textarea, label, .website-language-switcher")) {
                               if (selectedLayoutBlockKey !== element.id) {
                                 selectLayoutBlock("header-document", columnId, element.id);
                               }
@@ -9051,20 +9093,6 @@ export default function DashboardBuilder({
               className={builderState.page === "header" ? "builder-context-page-preview builder-header-page-context is-locked" : ""}
               aria-label={builderState.page === "header" ? "Locked page context" : undefined}
               onClick={builderState.page === "header" ? () => switchBuilderTarget(headerContextState.page) : undefined}
-              style={
-                builderState.page === "header"
-                  ? ({
-                      "--header-builder-height": resolveHeaderHeightCss(
-                        currentHeaderDocumentSettings.height,
-                        currentHeaderDocumentSettings.customHeight,
-                      ) ?? "72px",
-                      "--header-main-h": resolveHeaderHeightCss(
-                        currentHeaderDocumentSettings.height,
-                        currentHeaderDocumentSettings.customHeight,
-                      ) ?? "72px",
-                    } as CSSProperties)
-                  : undefined
-              }
             >
             {builderState.page === "header" ? (
               <div className="builder-context-preview-status-sticky-wrapper">
@@ -9585,12 +9613,7 @@ function PreviewCanvas({
     field: "topSpacing" | "bottomSpacing" | "topMargin" | "bottomMargin",
   ) => void;
 }) {
-  const { theme } = useTheme();
-  const layoutScheme =
-    design.colorScheme === "dark" ||
-    (design.colorScheme === "auto" && theme === "dark")
-      ? "dark"
-      : "light";
+  const layoutScheme = design.colorScheme === "dark" ? "dark" : "light";
 
   const [activeDragOver, setActiveDragOver] = useState<{
     type: "section" | "column" | "block";

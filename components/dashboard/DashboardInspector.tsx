@@ -79,6 +79,11 @@ import {
   normalizeBuilderAnchorId,
   validateBuilderAnchorId,
 } from "@/lib/builderAnchors";
+import {
+  resolveHeaderElementAlignment,
+  type HeaderElementAlignment,
+} from "@/lib/headerElementAlignment";
+
 import { useTranslation } from "@/components/i18n/LanguageProvider";
 import {
   BUILDER_BUTTON_PRESETS,
@@ -88,6 +93,22 @@ import {
   getBuilderButtonPresetKey,
   hasLocalButtonStyles,
 } from "@/lib/builderButtons";
+
+function resolveInspectorHeaderAlignment(
+  section: BuilderSection,
+  item: NonNullable<BuilderSection["layoutItems"]>[number],
+  block: BuilderLayoutBlock,
+): HeaderElementAlignment {
+  const rowId = item.rowId ?? item.id;
+  const rowItems = (section.layoutItems ?? []).filter(
+    (candidate) => (candidate.rowId ?? candidate.id) === rowId,
+  );
+  return resolveHeaderElementAlignment(
+    block,
+    Math.max(0, rowItems.indexOf(item)),
+    Math.max(1, rowItems.length),
+  );
+}
 
 const getSupportedTypographyAreas = (
   kind: string,
@@ -1132,6 +1153,31 @@ function HeaderDocumentSettings({
             <option value="pill-on-scroll">Pill on scroll</option>
           </select>
         </label>
+        <div className="builder-two-column">
+          <label className="builder-field">
+            <span>Background mode</span>
+            <select
+              value={settings.headerBackgroundMode ?? "default"}
+              onChange={(event) => onChange({ headerBackgroundMode: event.target.value as BuilderShellSettings["headerBackgroundMode"] })}
+            >
+              <option value="default">Default</option>
+              <option value="glass">Glass</option>
+              <option value="accent">Accent</option>
+              <option value="none">None</option>
+            </select>
+          </label>
+          <label className="builder-field">
+            <span>Text mode</span>
+            <select
+              value={settings.headerTextMode ?? "auto"}
+              onChange={(event) => onChange({ headerTextMode: event.target.value as BuilderShellSettings["headerTextMode"] })}
+            >
+              <option value="auto">Auto contrast</option>
+              <option value="light">Light</option>
+              <option value="dark">Dark</option>
+            </select>
+          </label>
+        </div>
         <label className="builder-check">
           <input
             data-testid="header-transparent-checkbox"
@@ -2150,8 +2196,29 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
             !selectedLayoutRow &&
             inspectorTab === "layout" ? (
               <HeaderDocumentSettings
-                settings={shellSettings}
-                onChange={updateShellSettings}
+                settings={{
+                  ...shellSettings,
+                  headerBehavior: selectedSection.headerBehavior ?? shellSettings.headerBehavior,
+                  headerWidthMode: selectedSection.headerWidthMode ?? shellSettings.headerWidthMode,
+                  headerBackgroundMode: selectedSection.headerBackgroundMode ?? shellSettings.headerBackgroundMode,
+                  headerTextMode: selectedSection.headerTextMode ?? shellSettings.headerTextMode,
+                  headerZIndex: selectedSection.headerZIndex ?? shellSettings.headerZIndex,
+                  topToolbarVisible: selectedSection.headerTopToolbarVisible ?? shellSettings.topToolbarVisible,
+                  topToolbarText: selectedSection.headerTopToolbarText ?? shellSettings.topToolbarText,
+                  topToolbarPhone: selectedSection.headerTopToolbarPhone ?? shellSettings.topToolbarPhone,
+                  topToolbarMeta: selectedSection.headerTopToolbarMeta ?? shellSettings.topToolbarMeta,
+                }}
+                onChange={(patch) => updateSelected({
+                  ...(patch.headerBehavior !== undefined ? { headerBehavior: patch.headerBehavior } : {}),
+                  ...(patch.headerWidthMode !== undefined ? { headerWidthMode: patch.headerWidthMode } : {}),
+                  ...(patch.headerBackgroundMode !== undefined ? { headerBackgroundMode: patch.headerBackgroundMode } : {}),
+                  ...(patch.headerTextMode !== undefined ? { headerTextMode: patch.headerTextMode } : {}),
+                  ...(patch.headerZIndex !== undefined ? { headerZIndex: patch.headerZIndex } : {}),
+                  ...(patch.topToolbarVisible !== undefined ? { headerTopToolbarVisible: patch.topToolbarVisible } : {}),
+                  ...(patch.topToolbarText !== undefined ? { headerTopToolbarText: patch.topToolbarText } : {}),
+                  ...(patch.topToolbarPhone !== undefined ? { headerTopToolbarPhone: patch.topToolbarPhone } : {}),
+                  ...(patch.topToolbarMeta !== undefined ? { headerTopToolbarMeta: patch.topToolbarMeta } : {}),
+                })}
                 headerVisible={selectedSection.headerVisible ?? shellSettings.headerVisible ?? true}
                 headerTransparent={selectedSection.headerTransparent ?? shellSettings.headerTransparent ?? false}
                 headerOverlay={selectedSection.headerOverlay ?? shellSettings.headerOverlay ?? false}
@@ -2159,11 +2226,9 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                 headerCustomHeight={selectedSection.headerCustomHeight ?? shellSettings.headerCustomHeight}
                 onHeaderDocumentChange={(patch) => {
                   updateSelected(patch);
-                  updateShellSettings(patch as Partial<BuilderShellSettings>);
                 }}
                 onHeaderHeightChange={(patch) => {
                   updateSelected(patch);
-                  updateShellSettings(patch as Partial<BuilderShellSettings>);
                 }}
                 onApplyHeaderPreset={onApplyHeaderPreset}
                 headerPresetKey={selectedSection.headerPresetKey}
@@ -5250,6 +5315,44 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                           {isSelectedBlock &&
                                             isElementContentTab && (
                                               <>
+                                                {selectedSection?.id === "header-document" && (
+                                                  <div className="builder-inspector-section builder-header-shared-properties">
+                                                    <div className="builder-field-header">
+                                                      <strong>Layout</strong>
+                                                      <small>Shared Header element properties</small>
+                                                    </div>
+                                                    <label className="builder-field">
+                                                      <span>Alignment</span>
+                                                      <select
+                                                        data-testid="header-element-alignment"
+                                                        value={resolveInspectorHeaderAlignment(
+                                                          selectedSection,
+                                                          item,
+                                                          block,
+                                                        )}
+                                                        onChange={(event) =>
+                                                          updateSelectedLayoutBlock(
+                                                            index,
+                                                            blockIndex,
+                                                            block.kind === "image"
+                                                              ? {
+                                                                  imageAlignment:
+                                                                    event.target.value as BuilderLayoutBlock["imageAlignment"],
+                                                                }
+                                                              : {
+                                                                  elementAlign:
+                                                                    event.target.value as BuilderLayoutBlock["elementAlign"],
+                                                                },
+                                                          )
+                                                        }
+                                                      >
+                                                        <option value="left">Left</option>
+                                                        <option value="center">Center</option>
+                                                        <option value="right">Right</option>
+                                                      </select>
+                                                    </label>
+                                                  </div>
+                                                )}
                                                 {selectedSection?.id === "header-document" && block.kind === "image" ? (
                                                   <>
                                                     <div className="builder-element-inspector-note">
@@ -5258,7 +5361,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                     </div>
                                                     <label className="builder-field">
                                                       <span>Presentation</span>
-                                                      <select value={block.headerBrandMode ?? "logo"} onChange={(event) => updateSelectedLayoutBlock(index, blockIndex, { headerBrandMode: event.target.value as BuilderLayoutBlock["headerBrandMode"] })}>
+                                                      <select value={block.headerBrandMode ?? (block.imageUrl ? "logo" : "brand")} onChange={(event) => updateSelectedLayoutBlock(index, blockIndex, { headerBrandMode: event.target.value as BuilderLayoutBlock["headerBrandMode"] })}>
                                                         <option value="logo">Logo only</option>
                                                         <option value="brand">Text brand</option>
                                                         <option value="both">Logo + text</option>
@@ -5266,7 +5369,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                     </label>
                                                     <label className="builder-field">
                                                       <span>Brand text</span>
-                                                      <input value={block.headerBrandText ?? ""} onChange={(event) => updateSelectedLayoutBlock(index, blockIndex, { headerBrandText: event.target.value })} placeholder="WebPages" />
+                                                      <input value={block.headerBrandText ?? "WebPages"} onChange={(event) => updateSelectedLayoutBlock(index, blockIndex, { headerBrandText: event.target.value })} placeholder="WebPages" />
                                                     </label>
                                                     <label className="builder-field">
                                                       <span>Logo image</span>
@@ -5287,20 +5390,10 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                       <span>Logo alt text</span>
                                                       <input value={block.imageAlt ?? ""} onChange={(event) => updateSelectedLayoutBlock(index, blockIndex, { imageAlt: event.target.value })} />
                                                     </label>
-                                                    <div className="builder-two-column">
-                                                      <label className="builder-field">
-                                                        <span>Max width</span>
-                                                        <input type="number" min={40} max={360} value={block.imageMaxWidth ?? 160} onChange={(event) => updateSelectedLayoutBlock(index, blockIndex, { imageMaxWidth: Number(event.target.value) })} />
-                                                      </label>
-                                                      <label className="builder-field">
-                                                        <span>Alignment</span>
-                                                        <select value={block.imageAlignment ?? "left"} onChange={(event) => updateSelectedLayoutBlock(index, blockIndex, { imageAlignment: event.target.value as BuilderLayoutBlock["imageAlignment"] })}>
-                                                          <option value="left">Left</option>
-                                                          <option value="center">Center</option>
-                                                          <option value="right">Right</option>
-                                                        </select>
-                                                      </label>
-                                                    </div>
+                                                    <label className="builder-field">
+                                                      <span>Max width</span>
+                                                      <input type="number" min={40} max={360} value={block.imageMaxWidth ?? 160} onChange={(event) => updateSelectedLayoutBlock(index, blockIndex, { imageMaxWidth: Number(event.target.value) })} />
+                                                    </label>
                                                   </>
                                                 ) : block.kind === "menu" ? (
                                                   <>
@@ -5328,20 +5421,10 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                         Additional menu sources can be added here later.
                                                       </small>
                                                     </label>
-                                                    <div className="builder-two-column">
-                                                      <label className="builder-field">
-                                                        <span>Item Spacing</span>
-                                                        <input value={block.menuItemGap ?? ""} placeholder="Inherit (for example 1.4rem)" onChange={(event) => updateSelectedLayoutBlock(index, blockIndex, { menuItemGap: event.target.value || undefined })} />
-                                                      </label>
-                                                      <label className="builder-field">
-                                                        <span>Alignment</span>
-                                                        <select value={block.elementAlign ?? "center"} onChange={(event) => updateSelectedLayoutBlock(index, blockIndex, { elementAlign: event.target.value as BuilderLayoutBlock["elementAlign"] })}>
-                                                          <option value="left">Left</option>
-                                                          <option value="center">Center</option>
-                                                          <option value="right">Right</option>
-                                                        </select>
-                                                      </label>
-                                                    </div>
+                                                    <label className="builder-field">
+                                                      <span>Item Spacing</span>
+                                                      <input value={block.menuItemGap ?? ""} placeholder="Inherit (for example 1.4rem)" onChange={(event) => updateSelectedLayoutBlock(index, blockIndex, { menuItemGap: event.target.value || undefined })} />
+                                                    </label>
                                                     <div className="builder-two-column">
                                                       <label className="builder-field"><span>Hover Color</span><input type="color" value={block.menuHoverColor ?? "#111827"} onChange={(event) => updateSelectedLayoutBlock(index, blockIndex, { menuHoverColor: event.target.value })} /></label>
                                                       <label className="builder-field"><span>Active Color</span><input type="color" value={block.menuActiveColor ?? "#111827"} onChange={(event) => updateSelectedLayoutBlock(index, blockIndex, { menuActiveColor: event.target.value })} /></label>
@@ -5398,14 +5481,6 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                         <option value="right">Right</option>
                                                       </select>
                                                     </label>
-                                                    <label className="builder-field">
-                                                      <span>Alignment</span>
-                                                      <select value={block.elementAlign ?? "center"} onChange={(event) => updateSelectedLayoutBlock(index, blockIndex, { elementAlign: event.target.value as BuilderLayoutBlock["elementAlign"] })}>
-                                                        <option value="left">Left</option>
-                                                        <option value="center">Center</option>
-                                                        <option value="right">Right</option>
-                                                      </select>
-                                                    </label>
                                                     <label className="builder-check">
                                                       <input type="checkbox" checked={block.headerCategoriesShowAll !== false} onChange={(event) => updateSelectedLayoutBlock(index, blockIndex, { headerCategoriesShowAll: event.target.checked })} />
                                                       <span>Show &quot;View full category list&quot; link</span>
@@ -5432,14 +5507,6 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                         <option value="code">Language codes</option>
                                                       </select>
                                                     </label>
-                                                    <label className="builder-field">
-                                                      <span>Alignment</span>
-                                                      <select value={block.elementAlign ?? "center"} onChange={(event) => updateSelectedLayoutBlock(index, blockIndex, { elementAlign: event.target.value as BuilderLayoutBlock["elementAlign"] })}>
-                                                        <option value="left">Left</option>
-                                                        <option value="center">Center</option>
-                                                        <option value="right">Right</option>
-                                                      </select>
-                                                    </label>
                                                   </>
                                                 ) : block.kind === "headerUtility" || ["headerSearch", "headerWishlist", "headerCart", "headerAccount", "headerTheme"].includes(block.kind ?? "") ? (
                                                   <>
@@ -5454,14 +5521,6 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                         <option value="ghost">Ghost</option>
                                                         <option value="solid">Solid</option>
                                                         <option value="icon">Icon only</option>
-                                                      </select>
-                                                    </label>
-                                                    <label className="builder-field">
-                                                      <span>Alignment</span>
-                                                      <select value={block.elementAlign ?? "center"} onChange={(event) => updateSelectedLayoutBlock(index, blockIndex, { elementAlign: event.target.value as BuilderLayoutBlock["elementAlign"] })}>
-                                                        <option value="left">Left</option>
-                                                        <option value="center">Center</option>
-                                                        <option value="right">Right</option>
                                                       </select>
                                                     </label>
                                                   </>

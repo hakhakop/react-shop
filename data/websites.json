@@ -26,12 +26,14 @@
     "ownerId": "a010b610-5c47-441c-b2ec-00a6e9eb3f88",
     "name": "GranitShin",
     "slug": "granit",
-    "domain": null,
-    "primaryDomain": null,
-    "domains": [],
-    "status": "creating",
+    "domain": "granit.webpages.am",
+    "primaryDomain": "granit.webpages.am",
+    "domains": [
+      "granit.webpages.am"
+    ],
+    "status": "active",
     "createdAt": "2026-06-30T07:03:11.484Z",
-    "updatedAt": "2026-06-30T07:03:11.484Z",
+    "updatedAt": "2026-07-22T17:38:17.509Z",
     "description": "",
     "timeZone": "Asia/Yerevan",
     "language": "hy",
@@ -39,7 +41,15 @@
     "primaryLanguage": "hy",
     "enabledLanguages": [
       "hy"
-    ]
+    ],
+    "plan": {
+      "packageId": "411e6d1b-3688-4cbb-ad61-533760969d57",
+      "packageName": "🌱 Ստարտ",
+      "packageType": "Business Website",
+      "priceText": "5000 ֏/Ամիս",
+      "activatedAt": "2026-07-22T17:38:17.509Z"
+    },
+    "lastPublishedAt": "2026-07-22T17:38:17.509Z"
   },
   {
     "id": "4fe2c519-6a13-4462-a67d-f547a2d71a08",
@@ -251,7 +261,8 @@
     ],
     "status": "creating",
     "createdAt": "2026-07-15T10:37:04.987Z",
-    "updatedAt": "2026-07-15T10:37:04.987Z"
+    "updatedAt": "2026-07-22T17:37:30.550Z",
+    "lastPublishedAt": "2026-07-22T17:37:30.550Z"
   },
   {
     "id": "1aa56d9f-ad12-4a8f-b8fb-808560842f47",
@@ -409,5 +420,121 @@
     "creationRequestId": "ef641b84-4abf-4835-848c-6657fc746636",
     "createdAt": "2026-07-22T08:56:35.477Z",
     "updatedAt": "2026-07-22T08:56:35.477Z"
+  },
+  {
+    "id": "eb65bd05-1299-4071-b432-f3c04e9eda2e",
+    "ownerId": "d01a2293-95d5-4a9f-b6fa-54917af92c76",
+    "name": "Header Parity Site",
+    "slug": "header-parity-site",
+    "type": "business",
+    "domain": null,
+    "primaryDomain": null,
+    "domains": [],
+    "description": "",
+    "websiteCategory": "Business",
+    "companyName": "",
+    "personName": "",
+    "logoUrl": "",
+    "contactPhone": "",
+    "contactEmail": "",
+    "socialLinks": "",
+    "timeZone": "Asia/Yerevan",
+    "language": "hy",
+    "primaryLanguage": "hy",
+    "enabledLanguages": [
+      "hy"
+    ],
+    "status": "creating",
+    "creationRequestId": "96747b45-74d9-43e4-993e-fc7970f987b7",
+    "createdAt": "2026-07-22T19:07:37.955Z",
+    "updatedAt": "2026-07-23T06:32:25.399Z",
+    "lastPublishedAt": "2026-07-23T06:32:25.399Z"
+  },
+  {
+    "id": "afa2e947-4df5-4117-88e2-d678dbceff4b",
+    "ownerId": "a010b610-5c47-441c-b2ec-00a6e9eb3f88",
+    "name": "new new new",
+    "slug": "new-new-new",
+    "type": "business",
+    "domain": null,
+    "primaryDomain": null,
+    "domains": [],
+    "description": "",
+    "websiteCategory": "Business",
+    "companyName": "",
+    "personName": "",
+    "logoUrl": "",
+    "contactPhone": "",
+    "contactEmail": "",
+    "socialLinks": "",
+    "timeZone": "Asia/Yerevan",
+    "language": "hy",
+    "primaryLanguage": "hy",
+    "enabledLanguages": [
+      "hy"
+    ],
+    "status": "creating",
+    "creationRequestId": "55b4e840-0881-4800-bf95-d960b6bf0119",
+    "createdAt": "2026-07-22T19:18:00.024Z",
+    "updatedAt": "2026-07-22T19:37:37.347Z",
+    "lastPublishedAt": "2026-07-22T19:37:37.347Z"
+  },
+  {
+    "id": "fd56a805-50ad-45c6-8d1b-4b733ff2f172",
+    "ownerId": "a010b610-5c47-441c-b2ec-00a6e9eb3f88",
+    "name": "header test",
+    "slug": "header-test",
+    "type": "business",
+    "domain": null,
+    "primaryDomain": null,
+    "domains": [],
+    "description": "",
+    "websiteCategory": "Business",
+    "companyName": "",
+    "personName": "",
+    "logoUrl": "",
+    "contactPhone": "",
+    "contactEmail": "",
+    "socialLinks": "",
+    "timeZone": "Asia/Yerevan",
+    "language": "hy",
+    "primaryLanguage": "hy",
+    "enabledLanguages": [
+      "hy"
+    ],
+    "status": "creating",
+    "creationRequestId": "c79fefd6-5d67-40b5-be44-945ce2074043",
+    "createdAt": "2026-07-22T19:38:32.407Z",
+    "updatedAt": "2026-07-23T05:32:52.433Z",
+    "lastPublishedAt": "2026-07-23T05:32:52.433Z"
+  },
+  {
+    "id": "051c8048-93c9-4a8b-b73b-c7022a1e910e",
+    "ownerId": "a010b610-5c47-441c-b2ec-00a6e9eb3f88",
+    "name": "header test 5",
+    "slug": "header-test-5",
+    "type": "business",
+    "domain": null,
+    "primaryDomain": null,
+    "domains": [],
+    "description": "",
+    "websiteCategory": "Business",
+    "companyName": "",
+    "personName": "",
+    "logoUrl": "",
+    "contactPhone": "",
+    "contactEmail": "",
+    "socialLinks": "",
+    "timeZone": "Asia/Yerevan",
+    "language": "hy",
+    "primaryLanguage": "hy",
+    "enabledLanguages": [
+      "hy"
+    ],
+    "status": "creating",
+    "creationRequestId": "ea57f2e5-3312-4d73-8b34-1915a183f230",
+    "createdAt": "2026-07-23T06:06:22.800Z",
+    "updatedAt": "2026-07-23T07:16:52.723Z",
+    "lastPublishedAt": "2026-07-23T07:16:52.723Z"
   }
 ]

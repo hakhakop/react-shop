@@ -6,14 +6,14 @@
     "name": "Hakob Jaghatspanyan",
     "role": "super_admin",
     "createdAt": "2026-06-29T19:14:12.875Z",
-    "updatedAt": "2026-07-21T13:49:18.841Z",
+    "updatedAt": "2026-07-22T17:38:17.507Z",
     "language": "hy",
     "subscription": {
       "packageId": "411e6d1b-3688-4cbb-ad61-533760969d57",
       "packageName": "🌱 Ստարտ",
       "packageType": "Business Website",
       "priceText": "5000 ֏/Ամիս",
-      "requestedAt": "2026-07-21T13:49:18.841Z"
+      "requestedAt": "2026-07-22T17:38:17.507Z"
     }
   },
   {
@@ -217,5 +217,14 @@
       "requestedAt": "2026-07-20T20:13:04.969Z"
     },
     "language": "en"
+  },
+  {
+    "id": "d01a2293-95d5-4a9f-b6fa-54917af92c76",
+    "email": "header-parity-20260722@example.test",
+    "passwordHash": "$2b$12$K9yXsE8r2usdMMRil1wRWOpWQDuq4DEJKSxkcJ1Lm5XQ9q9onFTyK",
+    "name": "Header Parity Tester",
+    "role": "user",
+    "createdAt": "2026-07-22T19:07:02.187Z",
+    "updatedAt": "2026-07-22T19:07:02.187Z"
   }
 ]

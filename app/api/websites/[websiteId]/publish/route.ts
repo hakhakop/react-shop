@@ -22,6 +22,14 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     if ("error" in domainResult) return NextResponse.json({ error: domainResult.error }, { status: 400 });
   }
   await updateUserSubscription(user.id, { packageId: selectedPackage.id, packageName: selectedPackage.name, packageType: selectedPackage.type, priceText: selectedPackage.priceText, requestedAt: new Date().toISOString() });
-  await activateWebsite({ websiteId: website.id });
+  await activateWebsite({
+    websiteId: website.id,
+    plan: {
+      packageId: selectedPackage.id,
+      packageName: selectedPackage.name,
+      packageType: selectedPackage.type,
+      priceText: selectedPackage.priceText,
+    },
+  });
   return NextResponse.json({ ok: true, domain: requestedDomain });
 }

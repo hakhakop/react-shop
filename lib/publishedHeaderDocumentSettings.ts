@@ -9,7 +9,7 @@ import {
   type ResolvedHeaderDocumentSettings,
 } from "@/lib/headerDocumentSettings";
 
-import { syncHeaderDocumentWithShellSettings } from "@/lib/headerBuilderDocument";
+import { migrateLegacyHeaderDocument } from "@/lib/headerBuilderDocument";
 
 /** Loads the same published Header document used by HeaderShell. */
 export async function getPublishedHeaderDocumentSettings(
@@ -19,7 +19,7 @@ export async function getPublishedHeaderDocumentSettings(
   const layout = await getPublishedBuilderLayout("header", scope).catch(
     () => null,
   );
-  const syncedLayout = layout ? syncHeaderDocumentWithShellSettings(layout, shellSettings) : null;
+  const syncedLayout = layout ? migrateLegacyHeaderDocument(layout, shellSettings) : null;
   return resolveHeaderDocumentSettings(
     resolveHeaderBuilderComposition(syncedLayout),
     shellSettings,

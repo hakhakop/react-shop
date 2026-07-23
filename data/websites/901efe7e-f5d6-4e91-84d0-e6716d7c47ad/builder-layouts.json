@@ -5880,13 +5880,16 @@
                 "kind": "image",
                 "imageAlt": "WebPages logo 1",
                 "imageMaxWidth": 360,
-                "imageUrl": "https://cms.webpages.am/wp-content/uploads/2026/07/sungoods-logo.svg"
+                "imageUrl": "https://cms.webpages.am/wp-content/uploads/2026/07/sungoods-logo.svg",
+                "headerBrandMode": "logo",
+                "headerBrandText": "WebPages"
               },
               {
                 "id": "header-navigation",
                 "kind": "menu",
                 "title": "Navigation",
-                "menuSource": "main"
+                "menuSource": "main",
+                "menuActiveIndicator": "princity"
               },
               {
                 "id": "header-button",
@@ -5903,7 +5906,21 @@
             ]
           }
         ],
-        "visible": true
+        "visible": true,
+        "headerArchitectureVersion": 2,
+        "headerVisible": true,
+        "headerTransparent": false,
+        "headerOverlay": false,
+        "headerLayout": "princity",
+        "headerBehavior": "sticky",
+        "headerWidthMode": "boxed",
+        "headerBackgroundMode": "none",
+        "headerTextMode": "auto",
+        "headerZIndex": 40,
+        "headerTopToolbarVisible": false,
+        "headerTopToolbarText": "Fast support & setup by Webpages",
+        "headerTopToolbarPhone": "+374 xx xx xx",
+        "headerTopToolbarMeta": "AMD ֏"
       }
     ],
     "updatedAt": "2026-07-12T20:04:04.399Z"

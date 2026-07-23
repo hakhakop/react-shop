@@ -1,4 +1,5 @@
 import type { BuilderSection } from "./builderTypes";
+import { resolveHeaderElementAlignment } from "@/lib/headerElementAlignment";
 
 export type HeaderPreset = {
   key: string;
@@ -11,7 +12,7 @@ export type HeaderPreset = {
   sections: BuilderSection[];
 };
 
-export const headerPresets: HeaderPreset[] = [
+const allHeaderPresets: HeaderPreset[] = [
   {
     key: "minimal",
     name: "Minimal",
@@ -987,3 +988,63 @@ export const headerPresets: HeaderPreset[] = [
     ],
   },
 ];
+
+const visiblePresetKeys = new Set([
+  "minimal",
+  "business",
+  "centered-logo",
+  "ecommerce",
+  "transparent",
+  "pill",
+  "princity",
+  "hero",
+]);
+
+function completeHeaderPreset(preset: HeaderPreset): HeaderPreset {
+  return {
+    ...preset,
+    sections: preset.sections.map((section) => ({
+      ...section,
+      layoutItems: (section.layoutItems ?? []).map((item, itemIndex, items) => {
+        const rowId = item.rowId ?? item.id ?? `header-row-${itemIndex}`;
+        const rowItems = items.filter(
+          (candidate, candidateIndex) =>
+            (candidate.rowId ?? candidate.id ?? `header-row-${candidateIndex}`) === rowId,
+        );
+        const columnIndex = rowItems.indexOf(item);
+        return {
+          ...item,
+          blocks: (item.blocks ?? []).map((block) => {
+            const alignment = resolveHeaderElementAlignment(
+              block,
+              columnIndex,
+              rowItems.length,
+            );
+            if (block.kind === "image" || block.id === "header-logo") {
+              return {
+                ...block,
+                headerBrandMode:
+                  block.headerBrandMode === "logo" && !block.imageUrl
+                    ? "brand"
+                    : block.headerBrandMode ?? "brand",
+                headerBrandText: block.headerBrandText?.trim() || "WebPages",
+                imageAlignment: alignment,
+              };
+            }
+            return { ...block, elementAlign: alignment };
+          }),
+        };
+      }),
+    })),
+  };
+}
+
+/** Product-ready presets shown for new applications. Legacy preset keys remain
+ * readable from existing Header documents but are not offered as new designs. */
+export const headerPresets: HeaderPreset[] = allHeaderPresets
+  .filter((preset) => visiblePresetKeys.has(preset.key))
+  .map(completeHeaderPreset);
+
+export const hiddenLegacyHeaderPresetKeys = allHeaderPresets
+  .filter((preset) => !visiblePresetKeys.has(preset.key))
+  .map((preset) => preset.key);

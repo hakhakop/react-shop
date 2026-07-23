@@ -19,6 +19,7 @@ type HeaderFrameProps = {
   textMode?: "auto" | "light" | "dark";
   style?: React.CSSProperties;
   id?: string;
+  overlapHeader?: boolean;
 };
 
 /**
@@ -35,6 +36,7 @@ export default function HeaderFrame({
   textMode = "auto",
   style,
   id,
+  overlapHeader = false,
 }: HeaderFrameProps) {
   const headerRef = React.useRef<HTMLElement>(null);
   const [scrolled, setScrolled] = React.useState(false);
@@ -44,8 +46,33 @@ export default function HeaderFrame({
     context: EffectiveHeaderBackgroundContext;
     textMode: EffectiveHeaderTextMode;
   } | null>(null);
-  const [overlapHeader, setOverlapHeader] = React.useState(false);
   const scheduleUpdateRef = React.useRef<() => void>(() => {});
+
+  React.useLayoutEffect(() => {
+    const header = headerRef.current;
+    const previewViewport = header?.closest<HTMLElement>(
+      ".builder-preview-viewport-container",
+    );
+    if (!header || !previewViewport) return;
+
+    const publishRenderedHeight = () => {
+      const headerRect = header.getBoundingClientRect();
+      const viewportRect = previewViewport.getBoundingClientRect();
+      previewViewport.style.setProperty(
+        "--builder-preview-rendered-header-height",
+        `${Math.max(headerRect.height, headerRect.bottom - viewportRect.top)}px`,
+      );
+    };
+    publishRenderedHeight();
+    const observer = new ResizeObserver(publishRenderedHeight);
+    observer.observe(header);
+    return () => {
+      observer.disconnect();
+      previewViewport.style.removeProperty(
+        "--builder-preview-rendered-header-height",
+      );
+    };
+  }, [children, behavior]);
 
   React.useEffect(() => {
     const getScrollY = () => {
@@ -64,11 +91,17 @@ export default function HeaderFrame({
       const nextScrollY = getScrollY();
       const threshold = behavior === "pill-on-scroll" ? 56 : 24;
       setScrolled(behavior === "static" ? false : nextScrollY > threshold);
-      setHiddenByScroll(
-        behavior === "sticky-on-scroll-up" &&
-          nextScrollY > 24 &&
-          nextScrollY > previousScrollYRef.current,
-      );
+      if (behavior === "sticky-on-scroll-up") {
+        const delta = nextScrollY - previousScrollYRef.current;
+        setHiddenByScroll((current) => {
+          if (nextScrollY <= 24) return false;
+          if (delta > 2) return true;
+          if (delta < -2) return false;
+          return current;
+        });
+      } else {
+        setHiddenByScroll(false);
+      }
       previousScrollYRef.current = nextScrollY;
       scheduleUpdateRef.current();
     };
@@ -87,28 +120,6 @@ export default function HeaderFrame({
       pill.dataset.scrolled = behavior === "pill-on-scroll" && scrolled ? "true" : "false";
     }
   }, [behavior, scrolled]);
-
-  React.useEffect(() => {
-    const updateOverlapState = () => {
-      const header = headerRef.current;
-      const previewShell = header?.closest<HTMLElement>(".builder-preview-shell");
-      const searchRoot: ParentNode = previewShell ?? document;
-      const pageRoot = searchRoot.querySelector<HTMLElement>(
-        "[data-builder-page-root]",
-      );
-      setOverlapHeader(pageRoot?.dataset.overlapHeader === "true");
-    };
-
-    updateOverlapState();
-    const observer = new MutationObserver(updateOverlapState);
-    observer.observe(document.body, {
-      childList: true,
-      subtree: true,
-      attributes: true,
-      attributeFilter: ["data-overlap-header"],
-    });
-    return () => observer.disconnect();
-  }, []);
 
   React.useEffect(() => {
     if (textMode !== "auto") {
@@ -176,17 +187,16 @@ export default function HeaderFrame({
       const fallbackTextMode = themeTextMode();
       // A Builder preview is its own storefront theme boundary. Page content and
       // the dashboard document must not override the scheme selected on the shell.
-      const pageTextMode = previewShell
-        ? fallbackTextMode
-        : (textModeFromBackground(pageRoot) ??
-          textModeFromBackground(document.body) ??
-          textModeFromBackground(document.documentElement) ??
-          textModeFromClasses(
-            pageRoot,
-            "shop-builder-main--scheme-dark",
-            "shop-builder-main--scheme-light",
-          ) ??
-          fallbackTextMode);
+      const pageTextMode =
+        textModeFromBackground(pageRoot) ??
+        textModeFromClasses(
+          pageRoot,
+          "shop-builder-main--scheme-dark",
+          "shop-builder-main--scheme-light",
+        ) ??
+        (previewShell ? null : textModeFromBackground(document.body)) ??
+        (previewShell ? null : textModeFromBackground(document.documentElement)) ??
+        fallbackTextMode;
       // Pull-under Headers resolve against the first section just like the
       // storefront. The preview shell remains the page-level theme boundary,
       // but it must not replace an explicit section scheme/background.
@@ -326,7 +336,6 @@ export default function HeaderFrame({
     textMode === "auto" ? (autoTextState?.textMode ?? "auto") : textMode;
 
   return (
-    <div className="site-header-wrapper">
       <header
         id={id}
         ref={headerRef}
@@ -345,6 +354,5 @@ export default function HeaderFrame({
       >
         {children}
       </header>
-    </div>
   );
 }

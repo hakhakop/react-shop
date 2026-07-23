@@ -848,7 +848,22 @@
           }
         ],
         "visible": true,
-        "headerUtilityMigrationVersion": 3
+        "headerUtilityMigrationVersion": 3,
+        "headerArchitectureVersion": 2,
+        "headerVisible": true,
+        "headerTransparent": false,
+        "headerOverlay": false,
+        "headerHeight": "auto",
+        "headerLayout": "simple",
+        "headerBehavior": "sticky",
+        "headerWidthMode": "boxed",
+        "headerBackgroundMode": "default",
+        "headerTextMode": "auto",
+        "headerZIndex": 40,
+        "headerTopToolbarVisible": false,
+        "headerTopToolbarText": "",
+        "headerTopToolbarPhone": "",
+        "headerTopToolbarMeta": ""
       }
     ]
   },

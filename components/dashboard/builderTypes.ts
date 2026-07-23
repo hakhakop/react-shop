@@ -423,12 +423,24 @@ export type WordPressMediaItem = {
 };
 
 export type BuilderSection = {
+  /** Version 2 makes the Header document the canonical owner of Header-wide settings. */
+  headerArchitectureVersion?: 2;
   headerPresetKey?: string;
   headerVisible?: boolean;
   headerTransparent?: boolean;
   headerOverlay?: boolean;
   headerHeight?: string;
   headerCustomHeight?: number;
+  headerLayout?: "wordpress" | "simple" | "two-row" | "hero" | "pill" | "princity";
+  headerBehavior?: "static" | "sticky" | "sticky-on-scroll-up" | "pill-on-scroll";
+  headerWidthMode?: "boxed" | "full";
+  headerBackgroundMode?: "default" | "glass" | "accent" | "none";
+  headerTextMode?: "auto" | "light" | "dark";
+  headerZIndex?: number;
+  headerTopToolbarVisible?: boolean;
+  headerTopToolbarText?: string;
+  headerTopToolbarPhone?: string;
+  headerTopToolbarMeta?: string;
   contentTranslations?: BuilderContentTranslations;
   headerUtilityMigrationVersion?: 1 | 2 | 3;
   id: string;

@@ -24,6 +24,7 @@
   "headerTransparent": false,
   "headerOverlay": false,
   "headerWidthMode": "boxed",
+  "headerHeight": "auto",
   "headerZIndex": 40,
   "sectionPaddingTop": "lg",
   "sectionPaddingBottom": "lg",
@@ -34,6 +35,7 @@
   "rowMarginTop": "none",
   "rowMarginBottom": "none",
   "rowGap": "lg",
+  "columnGap": "md",
   "elementPaddingTop": "sm",
   "elementPaddingRight": "sm",
   "elementPaddingBottom": "sm",
@@ -99,5 +101,5 @@
       "parentId": null
     }
   ],
-  "updatedAt": "2026-07-15T10:37:04.989Z"
+  "updatedAt": "2026-07-22T17:37:29.934Z"
 }

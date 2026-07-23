@@ -492,7 +492,21 @@
             ]
           }
         ],
-        "visible": true
+        "visible": true,
+        "headerArchitectureVersion": 2,
+        "headerVisible": true,
+        "headerTransparent": false,
+        "headerOverlay": false,
+        "headerLayout": "simple",
+        "headerBehavior": "sticky",
+        "headerWidthMode": "boxed",
+        "headerBackgroundMode": "default",
+        "headerTextMode": "auto",
+        "headerZIndex": 40,
+        "headerTopToolbarVisible": false,
+        "headerTopToolbarText": "",
+        "headerTopToolbarPhone": "",
+        "headerTopToolbarMeta": ""
       }
     ]
   },

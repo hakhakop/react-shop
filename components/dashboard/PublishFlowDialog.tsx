@@ -5,11 +5,14 @@ import { ArrowLeft, ArrowRight, Check, CreditCard, Globe2, Mail, Rocket, ShieldC
 
 type PublishPackage = { id: string; name: string; description: string; priceText: string; type: string; features: string[] };
 
-export default function PublishFlowDialog({ open, onClose, onComplete, websiteId, websiteSlug, websiteName, packages }: { open: boolean; onClose: () => void; onComplete: () => Promise<void>; websiteId: string; websiteSlug: string; websiteName: string; packages: PublishPackage[] }) {
+export default function PublishFlowDialog({ open, onClose, onComplete, websiteId, websiteSlug, websiteName, packages, initialPackageId, initialDomain }: { open: boolean; onClose: () => void; onComplete: () => Promise<void>; websiteId: string; websiteSlug: string; websiteName: string; packages: PublishPackage[]; initialPackageId?: string; initialDomain?: string }) {
   const [step, setStep] = useState(1);
-  const [packageId, setPackageId] = useState(packages[0]?.id ?? "");
-  const [domainMode, setDomainMode] = useState("subdomain");
-  const [domain, setDomain] = useState("");
+  const [packageId, setPackageId] = useState(initialPackageId ?? packages[0]?.id ?? "");
+  const defaultSubdomain = `${websiteSlug}.webpages.am`;
+  const [domainMode, setDomainMode] = useState(
+    initialDomain && initialDomain !== defaultSubdomain ? "connect" : "subdomain",
+  );
+  const [domain, setDomain] = useState(initialDomain ?? "");
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);

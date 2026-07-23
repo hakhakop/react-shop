@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 
 import { resolveHeaderDocumentSettings } from "../lib/headerDocumentSettings.ts";
+import { migrateLegacyHeaderDocument } from "../lib/headerDocumentMigration.ts";
 
 const legacyShell = {
   headerVisible: true,
@@ -65,6 +66,16 @@ test("transparency, pull-under, and height remain independent across sequential 
     overlay: true,
     height: "custom",
     customHeight: 118,
+    layout: "wordpress",
+    behavior: "sticky",
+    widthMode: "boxed",
+    backgroundMode: "default",
+    textMode: "auto",
+    zIndex: 40,
+    topToolbarVisible: true,
+    topToolbarText: "",
+    topToolbarPhone: "",
+    topToolbarMeta: "",
   });
 });
 
@@ -89,7 +100,68 @@ test("legacy Header documents still use shell values only when document fields a
     overlay: true,
     height: "compact",
     customHeight: 64,
+    layout: "wordpress",
+    behavior: "sticky",
+    widthMode: "boxed",
+    backgroundMode: "default",
+    textMode: "auto",
+    zIndex: 40,
+    topToolbarVisible: true,
+    topToolbarText: "",
+    topToolbarPhone: "",
+    topToolbarMeta: "",
   });
+});
+
+test("legacy shell settings seed a Header document once and never overwrite version 2", () => {
+  const layout = {
+    version: 1,
+    key: "header",
+    page: "header",
+    sections: [{
+      id: "header-document",
+      kind: "contentLayout",
+      title: "Header",
+      background: "transparent",
+      headerTransparent: false,
+      layoutItems: [],
+    }],
+  };
+  const migrated = migrateLegacyHeaderDocument(layout, {
+    ...legacyShell,
+    headerLayout: "hero",
+    headerBehavior: "sticky-on-scroll-up",
+    headerWidthMode: "full",
+    headerBackgroundMode: "glass",
+    headerTextMode: "light",
+    headerZIndex: 72,
+    topToolbarVisible: false,
+    topToolbarText: "Legacy",
+    topToolbarPhone: "",
+    topToolbarMeta: "",
+    headerBrandMode: "brand",
+    headerBrandText: "Test",
+    headerLogoUrl: null,
+    headerLogoAlt: "Test",
+    headerLogoMaxWidth: 160,
+    headerButtonLabel: "Start",
+    headerButtonUrl: "/",
+    headerIconVariant: "muted",
+    headerIconOrder: ["search"],
+    headerActiveIndicator: "underline",
+  });
+  assert.equal(migrated.sections[0].headerArchitectureVersion, 2);
+  assert.equal(migrated.sections[0].headerLayout, "hero");
+  assert.equal(migrated.sections[0].headerTransparent, false);
+
+  const unchanged = migrateLegacyHeaderDocument(migrated, {
+    ...legacyShell,
+    headerLayout: "pill",
+    headerBehavior: "static",
+    headerWidthMode: "boxed",
+  });
+  assert.equal(unchanged.sections[0].headerLayout, "hero");
+  assert.equal(unchanged.sections[0].headerTransparent, false);
 });
 
 test("Builder Preview and frontend use the shared Header document resolver", () => {
@@ -130,7 +202,8 @@ test("Builder Preview and frontend use the shared Header document resolver", () 
   assert.match(frontend, /getPublishedHeaderDocumentSettings\(/);
   assert.match(composition, /documentTransparent: section\?\.headerTransparent/);
   assert.match(composition, /documentOverlay: section\?\.headerOverlay/);
-  assert.match(inspector, /onHeaderDocumentChange=\{\(patch\) => updateSelected\(patch\)\}/);
+  assert.match(inspector, /onHeaderDocumentChange=\{\(patch\) => \{\s*updateSelected\(patch\);\s*\}\}/);
+  assert.doesNotMatch(inspector, /onHeaderDocumentChange[\s\S]{0,180}updateShellSettings/);
   assert.doesNotMatch(frame, /overlapHeader \? "site-header--no-background"/);
   assert.doesNotMatch(
     headerCss,
@@ -152,12 +225,14 @@ test("Builder Preview and frontend use the shared Header document resolver", () 
     dashboardCss,
     /:has\(\.site-header--no-background[^}]*\.builder-header-document-preview(?:\.is-selected|:hover)?\s*\{[^}]*outline:/s,
   );
-  assert.match(
+  assert.doesNotMatch(
     builder,
     /header\.offsetTop \+ header\.offsetHeight - pageContext\.offsetTop \+ 8/,
   );
+  assert.match(builder, /builder-context-preview-status-sticky-wrapper/);
   assert.match(
-    builder,
-    /currentHeaderDocumentSettings\.overlay && headerContextStatusTop !== null[\s\S]*?\{ top: headerContextStatusTop \}/,
+    dashboardCss,
+    /\.builder-context-preview-status-sticky-wrapper[\s\S]{0,500}position:\s*relative\s*!important/,
   );
+  assert.match(headerView, /overlapHeader=\{documentSettings\.overlay\}/);
 });

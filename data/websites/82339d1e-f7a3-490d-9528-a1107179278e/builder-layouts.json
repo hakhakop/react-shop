@@ -5947,7 +5947,20 @@
         "topSpacing": "none",
         "bottomSpacing": "none",
         "topMargin": "xs",
-        "bottomMargin": "xs"
+        "bottomMargin": "xs",
+        "headerArchitectureVersion": 2,
+        "headerVisible": true,
+        "headerCustomHeight": 200,
+        "headerLayout": "princity",
+        "headerBehavior": "pill-on-scroll",
+        "headerWidthMode": "boxed",
+        "headerBackgroundMode": "glass",
+        "headerTextMode": "auto",
+        "headerZIndex": 40,
+        "headerTopToolbarVisible": false,
+        "headerTopToolbarText": "Fast support & setup by Webpages",
+        "headerTopToolbarPhone": "+374 xx xx xx",
+        "headerTopToolbarMeta": "AMD ֏"
       }
     ],
     "updatedAt": "2026-07-21T19:13:56.965Z"

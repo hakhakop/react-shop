@@ -14,6 +14,14 @@ export type WebsiteType = "business" | "e-commerce";
 export type WebsiteContentLanguage = "hy" | "en" | "ru";
 export const websiteContentLanguages: WebsiteContentLanguage[] = ["hy", "en", "ru"];
 
+export type WebsitePlan = {
+  packageId: string;
+  packageName: string;
+  packageType: string;
+  priceText: string;
+  activatedAt: string;
+};
+
 export type SaaSWebsite = {
   id: string;
   ownerId: string;
@@ -37,6 +45,8 @@ export type SaaSWebsite = {
   contactPhone?: string;
   contactEmail?: string;
   socialLinks?: string;
+  plan?: WebsitePlan;
+  lastPublishedAt?: string;
   ecommerceSettings?: WebsiteEcommerceSettings;
   createdAt: string;
   updatedAt: string;
@@ -166,6 +176,27 @@ function isStoredWebsite(value: unknown): value is StoredWebsite {
     typeof website.createdAt === "string" &&
     typeof website.updatedAt === "string"
   );
+}
+
+function normalizeWebsitePlan(value: unknown): WebsitePlan | undefined {
+  if (!value || typeof value !== "object") return undefined;
+  const plan = value as Partial<WebsitePlan>;
+  if (
+    typeof plan.packageId !== "string" ||
+    typeof plan.packageName !== "string" ||
+    typeof plan.packageType !== "string" ||
+    typeof plan.priceText !== "string" ||
+    typeof plan.activatedAt !== "string"
+  ) {
+    return undefined;
+  }
+  return {
+    packageId: plan.packageId,
+    packageName: plan.packageName,
+    packageType: plan.packageType,
+    priceText: plan.priceText,
+    activatedAt: plan.activatedAt,
+  };
 }
 
 export function validateWebsiteInput(input: {
@@ -383,6 +414,11 @@ export async function readWebsites(): Promise<SaaSWebsite[]> {
           website.enabledLanguages,
           normalizeWebsiteContentLanguage(website.primaryLanguage ?? website.language),
         ),
+        plan: normalizeWebsitePlan(website.plan),
+        lastPublishedAt:
+          typeof website.lastPublishedAt === "string"
+            ? website.lastPublishedAt
+            : undefined,
         ecommerceSettings: normalizeWebsiteEcommerceSettings(
           website.ecommerceSettings,
         ),
@@ -531,15 +567,40 @@ export async function createWebsite(input: {
   return { website };
 }
 
-export async function activateWebsite(input: { websiteId: string }) {
+export async function activateWebsite(input: {
+  websiteId: string;
+  plan?: Omit<WebsitePlan, "activatedAt">;
+}) {
   const websites = await readWebsites();
   const website = websites.find((item) => item.id === input.websiteId);
   if (!website) return { error: "Website not found." };
 
+  const now = new Date().toISOString();
   const updatedWebsite: SaaSWebsite = {
     ...website,
     status: "active",
-    updatedAt: new Date().toISOString(),
+    plan: input.plan
+      ? { ...input.plan, activatedAt: now }
+      : website.plan,
+    lastPublishedAt: website.lastPublishedAt ?? now,
+    updatedAt: now,
+  };
+  await writeWebsites(
+    websites.map((item) => (item.id === website.id ? updatedWebsite : item)),
+  );
+  return { website: updatedWebsite };
+}
+
+export async function recordWebsitePublication(input: { websiteId: string }) {
+  const websites = await readWebsites();
+  const website = websites.find((item) => item.id === input.websiteId);
+  if (!website) return { error: "Website not found." };
+
+  const now = new Date().toISOString();
+  const updatedWebsite: SaaSWebsite = {
+    ...website,
+    lastPublishedAt: now,
+    updatedAt: now,
   };
   await writeWebsites(
     websites.map((item) => (item.id === website.id ? updatedWebsite : item)),
