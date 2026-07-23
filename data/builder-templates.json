@@ -1,5 +1,142 @@
 [
   {
+    "id": "grid-mrxcrx4u-dgnc",
+    "title": "Grid grey",
+    "templateType": "element",
+    "description": "Element template saved from Home",
+    "sourcePage": "home",
+    "sections": [
+      {
+        "id": "contentLayout-mrxcrx40-41om8",
+        "kind": "contentLayout",
+        "title": "Grid",
+        "background": "#ffffff",
+        "backgroundMode": "boxed",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "topSpacing": "inherit",
+        "bottomSpacing": "inherit",
+        "topMargin": "inherit",
+        "bottomMargin": "inherit",
+        "pullUnderHeader": false,
+        "visible": true,
+        "eyebrow": "",
+        "body": "",
+        "layout": "whole",
+        "layoutColumns": 1,
+        "layoutItems": [
+          {
+            "id": "layout-item-mrxcrx40-template-element",
+            "blocks": [
+              {
+                "id": "grid-block-mrxcrx40-qo591",
+                "kind": "grid",
+                "gridSource": "static",
+                "columns": 4,
+                "gridRows": 1,
+                "gridGap": "medium",
+                "gridMargin": "medium",
+                "gridImagePadding": "frameless",
+                "gridContentPadding": "large",
+                "gridImageFrame": "none",
+                "gridShowImage": false,
+                "gridShowButton": true,
+                "panelStyle": "dark",
+                "gridItems": [
+                  {
+                    "id": "package-start",
+                    "eyebrow": "Start",
+                    "title": "🌱 Start",
+                    "meta": "պարզ",
+                    "text": "<p>Հարմար է սկսելու համար</p>",
+                    "buttonLabel": "Հետաքրքրում է",
+                    "buttonUrl": "#contact",
+                    "typography": {
+                      "title": {
+                        "fontSize": "clamp(24px, 2.4vw, 42px)",
+                        "fontWeight": "760",
+                        "lineHeight": "1"
+                      },
+                      "body": {
+                        "fontSize": "16px",
+                        "lineHeight": "1.6"
+                      }
+                    },
+                    "listIcon": "circleCheck",
+                    "items": [
+                      " 1–5 էջ",
+                      "Կոնտակտային ձև",
+                      "Կայքի տեղակայում",
+                      " Կայքի տեղակայում",
+                      "Հիմնական աջակցություն"
+                    ],
+                    "listIconColorScheme": "gradient-cycle"
+                  },
+                  {
+                    "id": "package-commerce",
+                    "eyebrow": "Բիզնես",
+                    "title": "🚀 Business",
+                    "meta": "Բիզնես",
+                    "text": "<h3></h3><p>Բիզնեսի համար պատրաստ լուծում</p><p>✔ Ամեն ինչ Start-ից<br>✔ Ավելի շատ էջեր<br>✔ Ծառայությունների ներկայացում<br>✔ Հայտերի ընդունում<br>✔ Ընդլայնված կառուցվածք</p>",
+                    "buttonLabel": "Shop package",
+                    "buttonUrl": "#contact",
+                    "typography": {
+                      "title": {
+                        "fontSize": "clamp(24px, 2.4vw, 42px)",
+                        "fontWeight": "760",
+                        "lineHeight": "1"
+                      },
+                      "body": {
+                        "fontSize": "16px",
+                        "lineHeight": "1.6"
+                      }
+                    }
+                  },
+                  {
+                    "id": "package-growth",
+                    "eyebrow": "առևտուր",
+                    "title": "🛍 Store",
+                    "meta": "Խանութ Առցանց վաճառքի համար",
+                    "text": "<h3></h3><p></p><p>✔ Ամեն ինչ Business-ից<br>✔ Ապրանքների ցուցադրում<br>✔ Կատեգորիաներ<br>✔ Զամբյուղ<br>✔ Պատվերների ընդունում</p>",
+                    "buttonLabel": "Խոսենք",
+                    "buttonUrl": "#contact",
+                    "typography": {
+                      "title": {
+                        "fontSize": "clamp(24px, 2.4vw, 42px)",
+                        "fontWeight": "760",
+                        "lineHeight": "1"
+                      },
+                      "body": {
+                        "fontSize": "16px",
+                        "lineHeight": "1.6"
+                      }
+                    }
+                  },
+                  {
+                    "id": "grid-item-mptcn4jh",
+                    "eyebrow": "Հատուկ",
+                    "title": "✨ Custom",
+                    "meta": "Երբ պետք է ավելին",
+                    "text": "<h3></h3><p></p><p>✔ Անհատական կառուցվածք<br>✔ Հատուկ ֆունկցիաներ<br>✔ Ճկուն զարգացում</p>",
+                    "buttonLabel": "Learn more",
+                    "buttonUrl": "/"
+                  }
+                ],
+                "animation": {
+                  "preset": "none",
+                  "once": false
+                },
+                "elementPadding": "small"
+              }
+            ]
+          }
+        ],
+        "layoutRows": 1
+      }
+    ],
+    "updatedAt": "2026-07-23T10:13:01.670Z"
+  },
+  {
     "id": "grid-mrma1ieq-j8yc",
     "title": "Grid",
     "templateType": "element",

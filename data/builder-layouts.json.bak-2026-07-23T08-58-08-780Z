@@ -2826,7 +2826,8 @@
                 "kind": "menu",
                 "title": "Navigation",
                 "menuSource": "main",
-                "menuActiveIndicator": "princity"
+                "menuActiveIndicator": "princity",
+                "elementAlign": "center"
               }
             ]
           },
@@ -2842,21 +2843,20 @@
                 "headerUtilityVariant": "muted"
               },
               {
-                "id": "header-utility-cart",
-                "kind": "headerCart",
-                "headerUtilityAction": "cart",
-                "headerUtilityVariant": "muted"
-              },
-              {
                 "id": "header-utility-theme",
                 "kind": "headerTheme",
                 "headerUtilityAction": "theme",
                 "headerUtilityVariant": "muted"
               },
               {
-                "id": "header-utility-account",
-                "kind": "headerAccount",
-                "headerUtilityAction": "account",
+                "id": "header-language",
+                "kind": "headerLanguage",
+                "headerLanguageDisplay": "native"
+              },
+              {
+                "id": "header-utility-cart",
+                "kind": "headerCart",
+                "headerUtilityAction": "cart",
                 "headerUtilityVariant": "muted"
               }
             ]
@@ -2885,7 +2885,7 @@
         "bottomMargin": "xs"
       }
     ],
-    "updatedAt": "2026-07-23T08:58:08.773Z"
+    "updatedAt": "2026-07-23T04:57:56.944Z"
   },
   "footer": {
     "version": 1,
