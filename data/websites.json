@@ -164,7 +164,7 @@
     "language": "hy",
     "status": "active",
     "createdAt": "2026-07-09T18:59:07.392Z",
-    "updatedAt": "2026-07-11T07:13:19.745Z",
+    "updatedAt": "2026-07-24T17:21:37.616Z",
     "ecommerceSettings": {
       "wordpressCmsUrl": "https://sungoods.am",
       "wordpressGraphqlUrl": "https://sungoods.am/graphql",
@@ -181,7 +181,8 @@
     "primaryLanguage": "hy",
     "enabledLanguages": [
       "hy"
-    ]
+    ],
+    "lastPublishedAt": "2026-07-24T17:21:37.616Z"
   },
   {
     "id": "1fe31cd2-d036-4287-9fb6-8d1b996006d6",

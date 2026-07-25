@@ -35,7 +35,7 @@
         "kind": "contentLayout",
         "visible": true,
         "title": "",
-        "background": "#111111",
+        "background": "linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%)",
         "backgroundMode": "full",
         "contentMode": "boxed",
         "colorScheme": "inherit",
@@ -1377,7 +1377,7 @@
         ]
       }
     ],
-    "updatedAt": "2026-07-10T13:30:05.786Z"
+    "updatedAt": "2026-07-24T17:21:37.531Z"
   },
   "shop": {
     "version": 1,
@@ -5863,45 +5863,64 @@
         "id": "header-document",
         "kind": "contentLayout",
         "title": "Header",
+        "headerUtilityMigrationVersion": 3,
         "background": "transparent",
         "backgroundMode": "full",
         "contentMode": "boxed",
         "colorScheme": "inherit",
         "layout": "header-row",
-        "layoutColumns": 1,
+        "layoutColumns": 3,
         "layoutItems": [
           {
-            "id": "header-main-row",
+            "id": "header-main-left",
             "rowId": "header-main-row",
-            "rowLayout": "header-main-row",
+            "rowLayout": "quarters-1-2-1",
             "blocks": [
               {
                 "id": "header-logo",
                 "kind": "image",
-                "imageAlt": "WebPages logo 1",
-                "imageMaxWidth": 360,
-                "imageUrl": "https://cms.webpages.am/wp-content/uploads/2026/07/sungoods-logo.svg",
                 "headerBrandMode": "logo",
-                "headerBrandText": "WebPages"
-              },
+                "headerBrandText": "WebPages",
+                "imageMaxWidth": 360,
+                "imageAlignment": "left",
+                "imageUrl": "https://cms.webpages.am/wp-content/uploads/2026/07/sungoods-logo.svg",
+                "imageAlt": "WebPages logo 1"
+              }
+            ]
+          },
+          {
+            "id": "header-main-center",
+            "rowId": "header-main-row",
+            "rowLayout": "quarters-1-2-1",
+            "blocks": [
               {
                 "id": "header-navigation",
                 "kind": "menu",
                 "title": "Navigation",
                 "menuSource": "main",
-                "menuActiveIndicator": "princity"
+                "menuActiveIndicator": "underline",
+                "elementAlign": "center"
+              }
+            ]
+          },
+          {
+            "id": "header-main-right",
+            "rowId": "header-main-row",
+            "rowLayout": "quarters-1-2-1",
+            "blocks": [
+              {
+                "id": "header-utility-search",
+                "kind": "headerSearch",
+                "headerUtilityAction": "search",
+                "headerUtilityVariant": "muted",
+                "elementAlign": "right"
               },
               {
-                "id": "header-button",
-                "kind": "button",
-                "buttonLabel": "Start",
-                "buttonUrl": "/client"
-              },
-              {
-                "id": "header-spacer",
-                "kind": "embed",
-                "embedMode": "code",
-                "embedCode": ""
+                "id": "header-utility-cart",
+                "kind": "headerCart",
+                "headerUtilityAction": "cart",
+                "headerUtilityVariant": "muted",
+                "elementAlign": "right"
               }
             ]
           }
@@ -5910,8 +5929,8 @@
         "headerArchitectureVersion": 2,
         "headerVisible": true,
         "headerTransparent": false,
-        "headerOverlay": false,
-        "headerLayout": "princity",
+        "headerOverlay": true,
+        "headerLayout": "pill",
         "headerBehavior": "sticky",
         "headerWidthMode": "boxed",
         "headerBackgroundMode": "none",
@@ -5920,9 +5939,60 @@
         "headerTopToolbarVisible": false,
         "headerTopToolbarText": "Fast support & setup by Webpages",
         "headerTopToolbarPhone": "+374 xx xx xx",
-        "headerTopToolbarMeta": "AMD ֏"
+        "headerTopToolbarMeta": "AMD ֏",
+        "headerHeight": "compact"
       }
     ],
-    "updatedAt": "2026-07-12T20:04:04.399Z"
+    "updatedAt": "2026-07-24T17:17:00.542Z"
+  },
+  "footer": {
+    "version": 1,
+    "key": "footer",
+    "page": "footer",
+    "targetType": "footer",
+    "design": {},
+    "sections": [
+      {
+        "id": "footer-document",
+        "kind": "contentLayout",
+        "title": "Footer",
+        "background": "#111111",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "dark",
+        "topSpacing": "sm",
+        "bottomSpacing": "sm",
+        "layout": "halves",
+        "layoutColumns": 2,
+        "layoutItems": [
+          {
+            "id": "footer-main-left",
+            "rowId": "footer-main-row",
+            "rowLayout": "halves",
+            "blocks": [
+              {
+                "id": "footer-copyright",
+                "kind": "text",
+                "body": "© 2025 Webpages · Headless WooCommerce demo"
+              }
+            ]
+          },
+          {
+            "id": "footer-main-right",
+            "rowId": "footer-main-row",
+            "rowLayout": "halves",
+            "blocks": [
+              {
+                "id": "footer-platform",
+                "kind": "text",
+                "body": "Powered by WordPress · WooCommerce · WPGraphQL · Next.js"
+              }
+            ]
+          }
+        ],
+        "visible": true
+      }
+    ],
+    "updatedAt": "2026-07-24T17:13:13.296Z"
   }
 }
