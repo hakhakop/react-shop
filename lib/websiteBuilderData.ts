@@ -133,12 +133,13 @@ export async function backupRootBuilderFileBeforeWrite(fileName: BuilderFileName
   const state = await getBuilderFileState(target, fileName);
   if (state === "missing") return;
 
-  const backupPath = `${target}.bak-${getBackupTimestamp()}`;
-  await copyFile(target, backupPath);
+  const category = fileName.replace(/\.json$/, "");
+  const { backupDataFile } = await import("@/lib/dataBackup");
+  await backupDataFile(target, category);
   console.info("[webpages-data] backup root builder file", {
     fileName,
     source: target,
-    backupPath,
+    category,
     state,
   });
 }

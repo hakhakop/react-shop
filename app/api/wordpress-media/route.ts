@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getWordPressBaseUrl } from "@/lib/wordpressUrl";
+import { getWordPressMediaAuthHeaders } from "@/lib/cmsConnection";
+import { getCmsConnectionForRequest } from "@/lib/cmsConnectionServer";
 
 type WordPressMediaResponse = {
   id: number;
@@ -75,15 +76,6 @@ function getThumbnailUrl(item: WordPressMediaResponse) {
   );
 }
 
-function getGraphQLEndpoint(wordpressBaseUrl: string) {
-  return (
-    process.env.WORDPRESS_GRAPHQL_URL ||
-    process.env.NEXT_PUBLIC_WORDPRESS_GRAPHQL_URL ||
-    process.env.NEXT_PUBLIC_WPGRAPHQL_ENDPOINT ||
-    `${wordpressBaseUrl}/graphql`
-  );
-}
-
 function stripHtml(value?: string) {
   return value?.replace(/<[^>]*>/g, "").trim() ?? "";
 }
@@ -96,26 +88,6 @@ function getFilenameFromUrl(value?: string) {
   } catch {
     return value.split("/").pop() ?? "";
   }
-}
-
-function getWordPressMediaAuthHeaders() {
-  const username =
-    process.env.WORDPRESS_MEDIA_USERNAME ||
-    process.env.WORDPRESS_USERNAME ||
-    process.env.WP_USERNAME ||
-    "";
-  const password =
-    process.env.WORDPRESS_MEDIA_PASSWORD ||
-    process.env.WORDPRESS_APPLICATION_PASSWORD ||
-    process.env.WORDPRESS_PASSWORD ||
-    process.env.WP_APPLICATION_PASSWORD ||
-    "";
-
-  if (!username || !password) return null;
-
-  return {
-    Authorization: `Basic ${Buffer.from(`${username}:${password}`).toString("base64")}`,
-  };
 }
 
 function toMediaItem(item: WordPressMediaResponse) {
@@ -154,6 +126,7 @@ function getWordPressErrorMessage(payload: unknown, fallback: string) {
 
 async function loadMediaFromGraphQL({
   wordpressBaseUrl,
+  graphqlUrl,
   search,
   perPage,
   page,
@@ -161,14 +134,16 @@ async function loadMediaFromGraphQL({
   authHeaders,
 }: {
   wordpressBaseUrl: string;
+  graphqlUrl?: string;
   search: string;
   perPage: number;
   page: number;
   type: string;
-  authHeaders?: ReturnType<typeof getWordPressMediaAuthHeaders>;
+  authHeaders?: Record<string, string> | null;
 }) {
+  const endpoint = graphqlUrl || `${wordpressBaseUrl}/graphql`;
   async function loadPage(cursor: string | null, first: number) {
-    const response = await fetch(getGraphQLEndpoint(wordpressBaseUrl), {
+    const response = await fetch(endpoint, {
       method: "POST",
       headers: {
         ...(authHeaders ?? {}),
@@ -176,8 +151,8 @@ async function loadMediaFromGraphQL({
         Accept: "application/json",
       },
       cache: "no-store",
-        body: JSON.stringify({
-          query: `
+      body: JSON.stringify({
+        query: `
             query ReactShopMedia($first: Int!, $search: String, $after: String) {
               mediaItems(first: $first, after: $after, where: { search: $search }) {
               nodes {
@@ -201,7 +176,7 @@ async function loadMediaFromGraphQL({
             }
           }
           `,
-          variables: {
+        variables: {
           first,
           search: search || null,
           after: cursor,
@@ -210,73 +185,71 @@ async function loadMediaFromGraphQL({
     });
 
     if (!response.ok) {
-      throw new Error(`WordPress GraphQL returned ${response.status}.`);
+      throw new Error(`GraphQL media query failed: ${response.status}`);
     }
 
-    return (await response.json()) as GraphQLMediaResponse;
+    const payload = (await response.json()) as GraphQLMediaResponse;
+    const mediaItems = payload.data?.mediaItems;
+    const nodes = mediaItems?.nodes ?? [];
+    return {
+      nodes,
+      pageInfo: mediaItems?.pageInfo,
+    };
   }
 
+  const desiredStart = (page - 1) * perPage;
+  const targetEnd = desiredStart + perPage;
   let cursor: string | null = null;
-  let hasNextPage = true;
-  const targetCount = page * perPage;
-  const matchedItems: CachedGraphQLMedia["items"] = [];
-  const maxScanPages = type === "all" || type === "image" ? page + 2 : 8;
-  let scannedPages = 0;
+  let accumulated: any[] = [];
+  let hasMoreMatches = false;
 
-  const matchesType = (mimeType: string) => {
-    if (type === "all") return true;
-    if (type === "videos") return mimeType.startsWith("video/");
-    if (type === "documents") {
-      return (
-        mimeType.startsWith("application/") ||
-        mimeType.startsWith("text/") ||
-        mimeType === "image/vnd.adobe.photoshop"
-      );
+  while (accumulated.length < targetEnd) {
+    const batchSize = Math.min(Math.max(perPage * 2, 50), 100);
+    const result = await loadPage(cursor, batchSize);
+    const nodes = result.nodes;
+
+    const filtered = type === "all"
+      ? nodes
+      : nodes.filter((node: any) => {
+          const mime = (node.mimeType ?? "").toLowerCase();
+          if (type === "videos") return mime.startsWith("video/");
+          if (type === "documents") return !mime.startsWith("image/") && !mime.startsWith("video/");
+          return mime.startsWith("image/");
+        });
+
+    accumulated.push(...filtered);
+
+    if (!result.pageInfo?.hasNextPage || !result.pageInfo?.endCursor) {
+      hasMoreMatches = false;
+      break;
     }
-    return mimeType.startsWith("image/");
-  };
 
-  while (
-    matchedItems.length < targetCount &&
-    hasNextPage &&
-    scannedPages < maxScanPages
-  ) {
-    const payload = await loadPage(cursor, perPage);
-    scannedPages += 1;
-    const connection = payload.data?.mediaItems;
-    const allMedia = connection?.nodes ?? [];
-    const pageInfo = connection?.pageInfo;
-
-    const items = allMedia
-      .filter((item) => item.sourceUrl || item.mediaItemUrl)
-      .map((item) => {
-      const sizes = item.mediaDetails?.sizes ?? [];
-      const medium =
-        sizes.find((size) => size.name === "medium")?.sourceUrl ??
-        sizes.find((size) => size.name === "thumbnail")?.sourceUrl;
-      return {
-        id: item.databaseId ?? 0,
-        title: item.title || "Untitled image",
-        altText: item.altText ?? "",
-        mimeType: item.mimeType ?? "",
-        sourceUrl: item.sourceUrl ?? item.mediaItemUrl ?? "",
-        thumbnailUrl: medium ?? item.sourceUrl ?? item.mediaItemUrl ?? "",
-        date: "",
-      };
-      })
-      .filter((item) => matchesType(item.mimeType));
-
-    matchedItems.push(...items);
-    hasNextPage = Boolean(pageInfo?.hasNextPage);
-    cursor = pageInfo?.endCursor ?? null;
+    cursor = result.pageInfo.endCursor;
+    hasMoreMatches = result.pageInfo.hasNextPage;
   }
 
-  const start = (page - 1) * perPage;
-  const items = matchedItems.slice(start, start + perPage);
-  const scanCapped = hasNextPage && scannedPages >= maxScanPages;
-  const hasMoreMatches =
-    matchedItems.length > start + items.length ||
-    (hasNextPage && !scanCapped && matchedItems.length >= targetCount);
+  const start = Math.min(desiredStart, accumulated.length);
+  const items = accumulated.slice(start, start + perPage).map((node: any) => {
+    const sourceUrl = node.sourceUrl ?? node.mediaItemUrl ?? "";
+    const mediumSize = node.mediaDetails?.sizes?.find(
+      (size: any) => size.name === "medium" || size.name === "thumbnail",
+    );
+    const filename =
+      getFilenameFromUrl(sourceUrl) ||
+      (node.title ? node.title.toLowerCase().replace(/[^a-z0-9-]+/g, "-") : "") ||
+      `media-${node.databaseId ?? "item"}`;
+
+    return {
+      id: node.databaseId ?? Math.floor(Math.random() * 1000000),
+      title: node.title || filename || "Untitled media",
+      altText: node.altText ?? "",
+      mimeType: node.mimeType ?? "",
+      sourceUrl,
+      thumbnailUrl: mediumSize?.sourceUrl ?? sourceUrl,
+      date: new Date().toISOString(),
+      filename,
+    };
+  });
 
   const total = start + items.length + (hasMoreMatches ? 1 : 0);
   const totalPages = hasMoreMatches ? page + 1 : page;
@@ -291,13 +264,15 @@ async function loadMediaFromGraphQL({
 }
 
 export async function GET(request: NextRequest) {
-  const wordpressBaseUrl = getWordPressBaseUrl();
+  const cms = await getCmsConnectionForRequest(request);
+  const wordpressBaseUrl = cms.siteUrl;
+  const authHeaders = getWordPressMediaAuthHeaders(cms);
 
   if (!wordpressBaseUrl) {
     return NextResponse.json(
       {
         message:
-          "WordPress URL is not configured. Add WORDPRESS_SITE_URL or WC_API_URL.",
+          "WordPress URL is not configured.",
       },
       { status: 500 }
     );
@@ -327,12 +302,12 @@ export async function GET(request: NextRequest) {
     "id,date,slug,title,caption,description,alt_text,mime_type,source_url,media_details"
   );
   if (search) mediaUrl.searchParams.set("search", search);
-  const authHeaders = getWordPressMediaAuthHeaders();
 
   if (authHeaders) {
     try {
       const fallback = await loadMediaFromGraphQL({
         wordpressBaseUrl,
+        graphqlUrl: cms.graphqlUrl,
         search,
         perPage,
         page,
@@ -364,6 +339,7 @@ export async function GET(request: NextRequest) {
     if (!response.ok) {
       const fallback = await loadMediaFromGraphQL({
         wordpressBaseUrl,
+        graphqlUrl: cms.graphqlUrl,
         search,
         perPage,
         page,
@@ -399,6 +375,7 @@ export async function GET(request: NextRequest) {
     try {
       const fallback = await loadMediaFromGraphQL({
         wordpressBaseUrl,
+        graphqlUrl: cms.graphqlUrl,
         search,
         perPage,
         page,
@@ -423,8 +400,9 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  const wordpressBaseUrl = getWordPressBaseUrl();
-  const authHeaders = getWordPressMediaAuthHeaders();
+  const cms = await getCmsConnectionForRequest(request);
+  const wordpressBaseUrl = cms.siteUrl;
+  const authHeaders = getWordPressMediaAuthHeaders(cms);
 
   if (!wordpressBaseUrl) {
     return NextResponse.json(
@@ -437,7 +415,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         message:
-          "WordPress media upload requires WORDPRESS_MEDIA_USERNAME and WORDPRESS_MEDIA_PASSWORD or a WordPress application password.",
+          "WordPress media upload requires WordPress username and application password.",
       },
       { status: 501 }
     );
@@ -479,8 +457,9 @@ export async function POST(request: NextRequest) {
 }
 
 export async function PATCH(request: NextRequest) {
-  const wordpressBaseUrl = getWordPressBaseUrl();
-  const authHeaders = getWordPressMediaAuthHeaders();
+  const cms = await getCmsConnectionForRequest(request);
+  const wordpressBaseUrl = cms.siteUrl;
+  const authHeaders = getWordPressMediaAuthHeaders(cms);
 
   if (!wordpressBaseUrl) {
     return NextResponse.json(
@@ -545,8 +524,9 @@ export async function PATCH(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
-  const wordpressBaseUrl = getWordPressBaseUrl();
-  const authHeaders = getWordPressMediaAuthHeaders();
+  const cms = await getCmsConnectionForRequest(request);
+  const wordpressBaseUrl = cms.siteUrl;
+  const authHeaders = getWordPressMediaAuthHeaders(cms);
   const id = Number(request.nextUrl.searchParams.get("id"));
 
   if (!wordpressBaseUrl) {

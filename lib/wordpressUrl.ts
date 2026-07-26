@@ -1,32 +1,20 @@
-export function getWordPressBaseUrl() {
-  const explicit =
-    process.env.WORDPRESS_SITE_URL || process.env.NEXT_PUBLIC_WORDPRESS_SITE_URL;
+import { getCmsConnection } from "@/lib/cmsConnection";
+import type { SaaSWebsite } from "@/lib/websites";
 
-  if (explicit) return explicit.replace(/\/$/, "");
-
-  const apiUrl = process.env.WC_API_URL;
-  if (!apiUrl) return null;
-
-  try {
-    const url = new URL(apiUrl);
-    url.pathname = url.pathname.replace(/\/wp-json\/wc\/v\d+\/?$/, "");
-    url.search = "";
-    url.hash = "";
-    return url.toString().replace(/\/$/, "");
-  } catch {
-    return null;
-  }
+export function getWordPressBaseUrl(website?: SaaSWebsite | null) {
+  const cms = getCmsConnection(website);
+  return cms.siteUrl || null;
 }
 
-export function getFluentFormsBaseUrl() {
+export function getFluentFormsBaseUrl(website?: SaaSWebsite | null) {
   const explicit = process.env.FLUENT_FORMS_SITE_URL;
   if (explicit) return explicit.replace(/\/$/, "");
 
-  return getWordPressBaseUrl();
+  return getWordPressBaseUrl(website);
 }
 
-export function getWooAccountUrl(path = "") {
-  const baseUrl = getWordPressBaseUrl();
+export function getWooAccountUrl(path = "", website?: SaaSWebsite | null) {
+  const baseUrl = getWordPressBaseUrl(website);
   if (!baseUrl) return null;
 
   const cleanPath = path.replace(/^\/+/, "");

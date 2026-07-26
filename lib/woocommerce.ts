@@ -1,10 +1,7 @@
 import type { NextRequest } from "next/server";
-import {
-  getWebsiteByDomainHost,
-  normalizeWebsiteDomain,
-  type SaaSWebsite,
-  type WebsiteEcommerceSettings,
-} from "@/lib/websites";
+import { getCmsConnection, type CmsConnection } from "@/lib/cmsConnection";
+import { getCmsConnectionForRequest } from "@/lib/cmsConnectionServer";
+import type { SaaSWebsite } from "@/lib/websites";
 
 export type WooCommerceConnection = {
   wordpressBaseUrl: string | null;
@@ -16,99 +13,23 @@ export type WooCommerceConnection = {
   source: "website" | "env" | "none";
 };
 
-function trimTrailingSlash(value: string) {
-  return value.replace(/\/+$/, "");
-}
-
-function normalizeUrl(value: string | null | undefined) {
-  const text = value?.trim();
-  if (!text) return null;
-  return trimTrailingSlash(/^https?:\/\//i.test(text) ? text : `https://${text}`);
-}
-
-function getEnvWordPressBaseUrl() {
-  const explicit =
-    process.env.WORDPRESS_SITE_URL || process.env.NEXT_PUBLIC_WORDPRESS_SITE_URL;
-
-  if (explicit) return normalizeUrl(explicit);
-
-  const apiUrl = normalizeUrl(process.env.WC_API_URL);
-  if (!apiUrl) return null;
-
-  try {
-    const url = new URL(apiUrl);
-    url.pathname = url.pathname.replace(/\/wp-json\/wc\/v\d+\/?$/, "");
-    url.search = "";
-    url.hash = "";
-    return normalizeUrl(url.toString());
-  } catch {
-    return null;
-  }
-}
-
-function getRestApiUrlFromBase(baseUrl: string | null) {
-  return baseUrl ? `${baseUrl}/wp-json/wc/v3` : null;
-}
-
-function getWebsiteConnection(
-  settings: WebsiteEcommerceSettings | undefined,
-): WooCommerceConnection | null {
-  if (!settings?.wordpressCmsUrl) return null;
-
-  const wordpressBaseUrl = normalizeUrl(settings.wordpressCmsUrl);
-  const apiUrl =
-    normalizeUrl(settings.wooCommerceRestApiUrl) ||
-    getRestApiUrlFromBase(wordpressBaseUrl);
-
+export function getWooCommerceConnection(
+  website?: SaaSWebsite | null,
+): WooCommerceConnection {
+  const cms = getCmsConnection(website);
   return {
-    wordpressBaseUrl,
-    wordpressAdminUrl:
-      normalizeUrl(settings.wordpressAdminUrl) ||
-      (wordpressBaseUrl ? `${wordpressBaseUrl}/wp-admin` : null),
-    wooCommerceAdminUrl:
-      normalizeUrl(settings.wooCommerceAdminUrl) ||
-      (wordpressBaseUrl
-        ? `${wordpressBaseUrl}/wp-admin/admin.php?page=wc-admin`
-        : null),
-    apiUrl,
-    consumerKey: settings.wooCommerceConsumerKey || null,
-    consumerSecret: settings.wooCommerceConsumerSecret || null,
-    source: "website",
+    wordpressBaseUrl: cms.siteUrl || null,
+    wordpressAdminUrl: cms.adminUrl || null,
+    wooCommerceAdminUrl: cms.adminUrl || null,
+    apiUrl: cms.wooCommerceApiUrl || null,
+    consumerKey: cms.wooCommerceConsumerKey || null,
+    consumerSecret: cms.wooCommerceConsumerSecret || null,
+    source: website?.cmsConnection ? "website" : cms.wooCommerceApiUrl ? "env" : "none",
   };
 }
 
 export function getEnvWooCommerceConnection(): WooCommerceConnection {
-  const wordpressBaseUrl = getEnvWordPressBaseUrl();
-  const apiUrl = normalizeUrl(process.env.WC_API_URL) || getRestApiUrlFromBase(wordpressBaseUrl);
-
-  return {
-    wordpressBaseUrl,
-    wordpressAdminUrl: wordpressBaseUrl ? `${wordpressBaseUrl}/wp-admin` : null,
-    wooCommerceAdminUrl: wordpressBaseUrl
-      ? `${wordpressBaseUrl}/wp-admin/admin.php?page=wc-admin`
-      : null,
-    apiUrl,
-    consumerKey: process.env.WC_CONSUMER_KEY || null,
-    consumerSecret: process.env.WC_CONSUMER_SECRET || null,
-    source: apiUrl ? "env" : "none",
-  };
-}
-
-export function getWooCommerceConnection(
-  website?: SaaSWebsite | null,
-): WooCommerceConnection {
-  if (website?.type === "e-commerce") {
-    const websiteConnection = getWebsiteConnection(website.ecommerceSettings);
-    if (
-      websiteConnection?.apiUrl &&
-      websiteConnection.consumerKey &&
-      websiteConnection.consumerSecret
-    ) {
-      return websiteConnection;
-    }
-  }
-
-  return getEnvWooCommerceConnection();
+  return getWooCommerceConnection(null);
 }
 
 export function hasUsableWooCommerceConnection(connection: WooCommerceConnection) {
@@ -128,13 +49,17 @@ export function getWooAccountUrl(
 
 export async function getWooCommerceConnectionForRequest(
   request: NextRequest,
-) {
-  const host =
-    request.headers.get("x-forwarded-host") ||
-    request.headers.get("host") ||
-    "";
-  const website = await getWebsiteByDomainHost(normalizeWebsiteDomain(host));
-  return getWooCommerceConnection(website);
+): Promise<WooCommerceConnection> {
+  const cms = await getCmsConnectionForRequest(request);
+  return {
+    wordpressBaseUrl: cms.siteUrl || null,
+    wordpressAdminUrl: cms.adminUrl || null,
+    wooCommerceAdminUrl: cms.adminUrl || null,
+    apiUrl: cms.wooCommerceApiUrl || null,
+    consumerKey: cms.wooCommerceConsumerKey || null,
+    consumerSecret: cms.wooCommerceConsumerSecret || null,
+    source: cms.wooCommerceApiUrl ? "website" : "none",
+  };
 }
 
 export async function wooCommerceFetch<T>(

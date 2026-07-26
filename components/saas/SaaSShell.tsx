@@ -4,7 +4,7 @@ import ThemeToggle from "@/components/ThemeToggle";
 import LanguageSwitcher from "@/components/i18n/LanguageSwitcher";
 import SaaSI18nProvider from "@/components/i18n/SaaSI18nProvider";
 import { T } from "@/components/i18n/LanguageProvider";
-import { isSaaSAdmin, isSaaSSuperAdmin, type PublicSaaSUser } from "@/lib/auth";
+import { isSaaSAdmin, isSaaSSuperAdmin, type PublicSaaSUser } from "@/lib/authRoles";
 
 type SaaSShellProps = {
   user: PublicSaaSUser;

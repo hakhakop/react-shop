@@ -13,6 +13,7 @@ import {
   restoreStoredWebsiteBackup,
   restoreWebsiteBackup,
 } from "@/lib/websiteBackup";
+import { getCmsConnection, type CmsConnection } from "@/lib/cmsConnection";
 import {
   addWebsiteDomain,
   canAccessWebsiteBuilder,
@@ -22,9 +23,9 @@ import {
   removeWebsiteDomain,
   setWebsitePrimaryDomain,
   updateWebsiteDomain,
-  updateWebsiteEcommerceSettings,
+  updateWebsiteCmsConnection,
   updateWebsiteSettings,
-  validateWebsiteEcommerceSettingsInput,
+  validateWebsiteCmsConnectionInput,
   validateWebsiteSettingsInput,
   type WebsiteStatus,
   type WebsiteType,
@@ -42,13 +43,20 @@ type WebsiteSettingsPageProps = {
     error?: string;
     backupCreated?: string;
     backupRestored?: string;
+    cmsSaved?: string;
     ecommerceSaved?: string;
     restoreSource?: string;
     saved?: string;
   }>;
 };
 
-const baseSettingsSections = [
+type SettingSection = {
+  title: string;
+  id?: string;
+  available: boolean;
+};
+
+const baseSettingsSections: SettingSection[] = [
   { title: "General", available: true },
   { title: "Branding", available: false },
   { title: "Domains", available: true },
@@ -88,31 +96,28 @@ function getWordPressAdminLink(value: string, path: string) {
   return baseUrl ? `${baseUrl}/wp-admin/${path}` : "";
 }
 
-function getEcommerceActionLinks(settings: {
-  wordpressCmsUrl: string;
-  wordpressAdminUrl: string;
-  wooCommerceAdminUrl: string;
-}) {
+function getCmsActionLinks(cms: CmsConnection) {
+  const siteUrl = cms.siteUrl;
   const wordpressAdminUrl =
-    settings.wordpressAdminUrl ||
-    getWordPressAdminLink(settings.wordpressCmsUrl, "");
+    cms.adminUrl ||
+    getWordPressAdminLink(siteUrl, "");
   const wooCommerceAdminUrl =
-    settings.wooCommerceAdminUrl ||
-    getWordPressAdminLink(settings.wordpressCmsUrl, "admin.php?page=wc-admin");
+    cms.adminUrl ||
+    getWordPressAdminLink(siteUrl, "admin.php?page=wc-admin");
   return [
-    { label: "Open CMS", href: wordpressAdminUrl || settings.wordpressCmsUrl },
+    { label: "Open CMS", href: wordpressAdminUrl || siteUrl },
     { label: "Open WooCommerce", href: wooCommerceAdminUrl },
     {
       label: "Open Products",
-      href: getWordPressAdminLink(settings.wordpressCmsUrl, "edit.php?post_type=product"),
+      href: getWordPressAdminLink(siteUrl, "edit.php?post_type=product"),
     },
     {
       label: "Open Orders",
-      href: getWordPressAdminLink(settings.wordpressCmsUrl, "edit.php?post_type=shop_order"),
+      href: getWordPressAdminLink(siteUrl, "edit.php?post_type=shop_order"),
     },
     {
       label: "Open Settings",
-      href: getWordPressAdminLink(settings.wordpressCmsUrl, "admin.php?page=wc-settings"),
+      href: getWordPressAdminLink(siteUrl, "admin.php?page=wc-settings"),
     },
   ];
 }
@@ -182,7 +187,7 @@ async function saveWebsiteSettingsAction(formData: FormData) {
   );
 }
 
-async function saveWebsiteEcommerceSettingsAction(formData: FormData) {
+async function saveWebsiteCmsConnectionAction(formData: FormData) {
   "use server";
 
   const websiteId = String(formData.get("websiteId") ?? "");
@@ -190,7 +195,7 @@ async function saveWebsiteEcommerceSettingsAction(formData: FormData) {
   const errorRedirect = (message: string): never => {
     const params = new URLSearchParams({ error: message });
     redirect(
-      `/app/websites/${websiteId}/settings?${params.toString()}#e-commerce`,
+      `/app/websites/${websiteId}/settings?${params.toString()}#cms-connection`,
     );
   };
 
@@ -206,29 +211,33 @@ async function saveWebsiteEcommerceSettingsAction(formData: FormData) {
     return errorRedirect("Access denied.");
   }
 
-  const isEcommerceWebsite = targetWebsite.type === "e-commerce";
+  const existingConnection = targetWebsite.cmsConnection;
 
-  if (!isEcommerceWebsite) {
-    errorRedirect("E-Commerce settings are available only for E-Commerce websites.");
-  }
-
-  const existingSettings = targetWebsite.ecommerceSettings;
   const submittedSecret = String(
     formData.get("wooCommerceConsumerSecret") ?? "",
   ).trim();
   const clearSecret = formData.get("clearWooCommerceConsumerSecret") === "on";
-  const parsed = validateWebsiteEcommerceSettingsInput({
-    wordpressCmsUrl: formData.get("wordpressCmsUrl"),
-    wordpressGraphqlUrl: formData.get("wordpressGraphqlUrl"),
-    wordpressAdminUrl: formData.get("wordpressAdminUrl"),
-    wooCommerceAdminUrl: formData.get("wooCommerceAdminUrl"),
-    wooCommerceRestApiUrl: formData.get("wooCommerceRestApiUrl"),
-    wordpressAdminUser: formData.get("wordpressAdminUser"),
-    storeStatusNotes: formData.get("storeStatusNotes"),
+
+  const submittedPassword = String(
+    formData.get("wordpressApplicationPassword") ?? "",
+  ).trim();
+  const clearPassword = formData.get("clearWordpressApplicationPassword") === "on";
+
+  const parsed = validateWebsiteCmsConnectionInput({
+    provider: formData.get("provider") || "wordpress",
+    siteUrl: formData.get("siteUrl") || formData.get("wordpressCmsUrl"),
+    graphqlUrl: formData.get("graphqlUrl") || formData.get("wordpressGraphqlUrl"),
+    adminUrl: formData.get("adminUrl") || formData.get("wordpressAdminUrl"),
+    wooCommerceApiUrl: formData.get("wooCommerceApiUrl") || formData.get("wooCommerceRestApiUrl"),
+    wordpressUsername: formData.get("wordpressUsername") || formData.get("wordpressAdminUser"),
+    wordpressApplicationPassword: clearPassword
+      ? ""
+      : submittedPassword || existingConnection?.wordpressApplicationPassword || "",
     wooCommerceConsumerKey: formData.get("wooCommerceConsumerKey"),
     wooCommerceConsumerSecret: clearSecret
       ? ""
-      : submittedSecret || existingSettings?.wooCommerceConsumerSecret || "",
+      : submittedSecret || existingConnection?.wooCommerceConsumerSecret || "",
+    storeStatusNotes: formData.get("storeStatusNotes"),
     technicalNotes: formData.get("technicalNotes"),
   });
 
@@ -236,32 +245,20 @@ async function saveWebsiteEcommerceSettingsAction(formData: FormData) {
     errorRedirect(parsed.error);
   }
 
-  const result = await updateWebsiteEcommerceSettings({
+  const result = await updateWebsiteCmsConnection({
     websiteId,
-    ecommerceSettings: parsed as {
-      wordpressCmsUrl: string;
-      wordpressGraphqlUrl: string;
-      wordpressAdminUrl: string;
-      wooCommerceAdminUrl: string;
-      wooCommerceRestApiUrl: string;
-      wordpressAdminUser: string;
-      storeStatusNotes: string;
-      wooCommerceConsumerKey: string;
-      wooCommerceConsumerSecret: string;
-      technicalNotes: string;
-      updatedAt: string;
-    },
+    cmsConnection: parsed as CmsConnection,
   });
 
   if ("error" in result) {
-    errorRedirect(result.error ?? "E-Commerce settings could not be saved.");
+    errorRedirect(result.error ?? "CMS Connection settings could not be saved.");
   }
 
   const savedWebsite = "website" in result && result.website
     ? result.website
     : targetWebsite;
   redirect(
-    `/app/websites/${getWebsiteRouteSegment(savedWebsite)}/settings?ecommerceSaved=1#e-commerce`,
+    `/app/websites/${getWebsiteRouteSegment(savedWebsite)}/settings?cmsSaved=1#cms-connection`,
   );
 }
 
@@ -536,26 +533,14 @@ export default async function WebsiteSettingsPage({
   const settingsSections = isEcommerceWebsite
     ? [
         ...baseSettingsSections.slice(0, 3),
-        { title: "E-Commerce", available: true },
+        { title: "CMS Connection", id: "cms-connection", available: true },
         ...baseSettingsSections.slice(3),
       ]
     : baseSettingsSections;
   const websiteRouteSegment = getWebsiteRouteSegment(website);
   const restoreSource = query?.restoreSource === "upload" ? "upload" : "existing";
-  const ecommerceSettings = website.ecommerceSettings ?? {
-    wordpressCmsUrl: "",
-    wordpressGraphqlUrl: "",
-    wordpressAdminUrl: "",
-    wooCommerceAdminUrl: "",
-    wooCommerceRestApiUrl: "",
-    wordpressAdminUser: "",
-    storeStatusNotes: "",
-    wooCommerceConsumerKey: "",
-    wooCommerceConsumerSecret: "",
-    technicalNotes: "",
-    updatedAt: "",
-  };
-  const ecommerceActionLinks = getEcommerceActionLinks(ecommerceSettings).filter(
+  const cmsConnection = getCmsConnection(website);
+  const cmsActionLinks = getCmsActionLinks(cmsConnection).filter(
     (item) => item.href,
   );
 
@@ -583,7 +568,7 @@ export default async function WebsiteSettingsPage({
             <a
               key={section.title}
               className={section.title === "General" ? "is-active" : ""}
-              href={`#${section.title.toLowerCase()}`}
+              href={`#${section.id || section.title.toLowerCase().replace(/\s+/g, "-")}`}
             >
               {section.title}
               {!section.available && <span><T k="common.soon" /></span>}
@@ -814,15 +799,14 @@ export default async function WebsiteSettingsPage({
           {isEcommerceWebsite && (
             <details
               className="saas-settings-disclosure"
-              id="e-commerce"
-              open={Boolean(query?.ecommerceSaved)}
+              id="cms-connection"
+              open={Boolean(query?.cmsSaved || query?.ecommerceSaved)}
             >
               <summary>
                 <div>
-                  <h2><T k="settings.ecommerce" /></h2>
+                  <h2><T k="settings.cmsConnection" /></h2>
                   <p>
-                    Store backend links and manual WordPress/WooCommerce
-                    connection details.
+                    Store backend links and WordPress/WooCommerce connection details.
                   </p>
                 </div>
                 <span><T k="settings.openSettings" /></span>
@@ -830,9 +814,9 @@ export default async function WebsiteSettingsPage({
 
               <div className="saas-settings-disclosure-body">
 
-              {ecommerceActionLinks.length > 0 ? (
+              {cmsActionLinks.length > 0 ? (
                 <div className="saas-ecommerce-actions">
-                  {ecommerceActionLinks.map((item) => (
+                  {cmsActionLinks.map((item) => (
                     <a
                       className="saas-auth-secondary-button"
                       href={item.href}
@@ -850,16 +834,17 @@ export default async function WebsiteSettingsPage({
 
               <form
                 className="saas-settings-form"
-                action={saveWebsiteEcommerceSettingsAction}
+                action={saveWebsiteCmsConnectionAction}
               >
                 <input type="hidden" name="websiteId" value={website.id} />
+                <input type="hidden" name="provider" value={cmsConnection.provider || "wordpress"} />
 
                 <label className="saas-auth-field">
-                  <span>WordPress CMS URL</span>
+                  <span>WordPress CMS Site URL</span>
                   <input
-                    name="wordpressCmsUrl"
+                    name="siteUrl"
                     required
-                    defaultValue={ecommerceSettings.wordpressCmsUrl}
+                    defaultValue={cmsConnection.siteUrl}
                     placeholder="https://client-store.com"
                   />
                 </label>
@@ -867,68 +852,78 @@ export default async function WebsiteSettingsPage({
                 <label className="saas-auth-field">
                   <span>WordPress GraphQL URL</span>
                   <input
-                    name="wordpressGraphqlUrl"
-                    defaultValue={ecommerceSettings.wordpressGraphqlUrl}
+                    name="graphqlUrl"
+                    defaultValue={cmsConnection.graphqlUrl}
                     placeholder="https://client-store.com/graphql"
                   />
                 </label>
 
                 <label className="saas-auth-field">
-                  <span>WordPress admin URL</span>
+                  <span>WordPress Admin URL</span>
                   <input
-                    name="wordpressAdminUrl"
-                    defaultValue={ecommerceSettings.wordpressAdminUrl}
+                    name="adminUrl"
+                    defaultValue={cmsConnection.adminUrl}
                     placeholder="https://client-store.com/wp-admin"
                   />
                 </label>
 
                 <label className="saas-auth-field">
-                  <span>WooCommerce admin URL</span>
+                  <span>WooCommerce REST API Base URL</span>
                   <input
-                    name="wooCommerceAdminUrl"
-                    defaultValue={ecommerceSettings.wooCommerceAdminUrl}
-                    placeholder="https://client-store.com/wp-admin/admin.php?page=wc-admin"
-                  />
-                </label>
-
-                <label className="saas-auth-field">
-                  <span>WooCommerce REST API base URL</span>
-                  <input
-                    name="wooCommerceRestApiUrl"
-                    defaultValue={ecommerceSettings.wooCommerceRestApiUrl}
+                    name="wooCommerceApiUrl"
+                    defaultValue={cmsConnection.wooCommerceApiUrl}
                     placeholder="https://client-store.com/wp-json/wc/v3"
                   />
                 </label>
 
                 <label className="saas-auth-field">
-                  <span>WordPress admin username/email</span>
+                  <span>WordPress Username / Email</span>
                   <input
-                    name="wordpressAdminUser"
+                    name="wordpressUsername"
                     required
-                    defaultValue={ecommerceSettings.wordpressAdminUser}
+                    defaultValue={cmsConnection.wordpressUsername}
                     autoComplete="off"
                   />
                 </label>
 
                 <label className="saas-auth-field">
-                  <span>WooCommerce consumer key</span>
+                  <span>WordPress Application Password</span>
+                  <input
+                    name="wordpressApplicationPassword"
+                    type="password"
+                    autoComplete="new-password"
+                    placeholder={
+                      cmsConnection.wordpressApplicationPassword
+                        ? "Saved password hidden; enter a new one to replace"
+                        : "Optional application password"
+                    }
+                  />
+                </label>
+
+                <label className="saas-toggle-field">
+                  <input name="clearWordpressApplicationPassword" type="checkbox" />
+                  <span>Clear saved application password</span>
+                </label>
+
+                <label className="saas-auth-field">
+                  <span>WooCommerce Consumer Key</span>
                   <input
                     name="wooCommerceConsumerKey"
-                    defaultValue={ecommerceSettings.wooCommerceConsumerKey}
+                    defaultValue={cmsConnection.wooCommerceConsumerKey}
                     autoComplete="off"
                   />
                 </label>
 
                 <label className="saas-auth-field">
-                  <span>WooCommerce consumer secret</span>
+                  <span>WooCommerce Consumer Secret</span>
                   <input
                     name="wooCommerceConsumerSecret"
                     type="password"
                     autoComplete="new-password"
                     placeholder={
-                      ecommerceSettings.wooCommerceConsumerSecret
+                      cmsConnection.wooCommerceConsumerSecret
                         ? "Saved secret hidden; enter a new one to replace"
-                        : "Optional"
+                        : "Optional consumer secret"
                     }
                   />
                 </label>
@@ -939,32 +934,32 @@ export default async function WebsiteSettingsPage({
                 </label>
 
                 <label className="saas-auth-field saas-field-wide">
-                  <span>Store status notes</span>
+                  <span>Store Status Notes</span>
                   <textarea
                     name="storeStatusNotes"
                     rows={4}
-                    defaultValue={ecommerceSettings.storeStatusNotes}
+                    defaultValue={cmsConnection.storeStatusNotes}
                   />
                 </label>
 
                 <label className="saas-auth-field saas-field-wide">
-                  <span>Additional technical notes</span>
+                  <span>Additional Technical Notes</span>
                   <textarea
                     name="technicalNotes"
                     rows={4}
-                    defaultValue={ecommerceSettings.technicalNotes}
+                    defaultValue={cmsConnection.technicalNotes}
                   />
                 </label>
 
-                {query?.ecommerceSaved && (
-                  <p className="saas-auth-success"><T k="settings.ecommerceSaved" /></p>
+                {(query?.cmsSaved || query?.ecommerceSaved) && (
+                  <p className="saas-auth-success"><T k="settings.cmsConnectionSaved" /></p>
                 )}
                 {query?.error && (
                   <p className="saas-auth-error">{query.error}</p>
                 )}
 
                 <button className="saas-auth-submit" type="submit">
-                  Save E-Commerce Settings
+                  Save CMS Connection
                 </button>
               </form>
               </div>

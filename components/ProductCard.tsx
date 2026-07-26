@@ -6,7 +6,7 @@ import Link from "next/link";
 import Image from "next/image";
 import WishlistToggle from "./WishlistToggle";
 import AddToCartButton from "./AddToCartButton";
-import { safeDecodeURI } from "@/lib/graphql";
+import { safeDecodeURI } from "@/lib/safeDecodeURI";
 import { SiteIcon } from "@/components/ui/SiteIcon";
 import { motion, AnimatePresence } from "framer-motion";
 import type {

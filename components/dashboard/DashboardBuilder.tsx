@@ -64,7 +64,7 @@ import {
   type HeaderBlockDragPayload,
 } from "@/lib/headerBuilderBlockMove";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import type { SaaSUserRole } from "@/lib/auth";
+import type { SaaSUserRole } from "@/lib/authRoles";
 import type {
   CSSProperties,
   FocusEvent as ReactFocusEvent,

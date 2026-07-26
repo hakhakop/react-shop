@@ -30,7 +30,7 @@ import {
   type ProductImageRatio,
 } from "@/lib/productCardImage";
 import { useProductCategoryFilter } from "./ProductCategoryFilterProvider";
-import { safeDecodeURI } from "@/lib/graphql";
+import { safeDecodeURI } from "@/lib/safeDecodeURI";
 
 type Props = {
   products: ProductNode[];

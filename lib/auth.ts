@@ -5,7 +5,23 @@ import path from "node:path";
 import { getRuntimeDataDir } from "@/lib/runtimeDataDir";
 import type { Locale } from "@/lib/i18n";
 
-export type SaaSUserRole = "user" | "admin" | "super_admin";
+import {
+  isSaaSAdmin,
+  isSaaSSuperAdmin,
+  type PublicSaaSUser,
+  type SaaSUserOnboarding,
+  type SaaSUserRole,
+  type SaaSUserSubscription,
+} from "./authRoles";
+
+export {
+  isSaaSAdmin,
+  isSaaSSuperAdmin,
+  type PublicSaaSUser,
+  type SaaSUserOnboarding,
+  type SaaSUserRole,
+  type SaaSUserSubscription,
+};
 
 export type SaaSUser = {
   id: string;
@@ -17,33 +33,6 @@ export type SaaSUser = {
   subscription?: SaaSUserSubscription;
   onboarding?: SaaSUserOnboarding;
   createdAt: string;
-  updatedAt: string;
-};
-
-export type PublicSaaSUser = Omit<SaaSUser, "passwordHash">;
-
-export type SaaSUserSubscription = {
-  packageId: string;
-  packageName: string;
-  packageType: string;
-  priceText: string;
-  requestedAt: string;
-};
-
-export type SaaSUserOnboarding = {
-  companyName: string;
-  logoUrl: string;
-  businessCategory: string;
-  phone: string;
-  publicEmail: string;
-  address: string;
-  websiteName: string;
-  preferredDomain: string;
-  businessDescription: string;
-  facebookUrl: string;
-  instagramUrl: string;
-  styleNotes: string;
-  additionalNotes: string;
   updatedAt: string;
 };
 
@@ -199,13 +188,6 @@ export function toPublicUser(user: SaaSUser): PublicSaaSUser {
   };
 }
 
-export function isSaaSAdmin(user: PublicSaaSUser | null | undefined) {
-  return user?.role === "admin" || user?.role === "super_admin";
-}
-
-export function isSaaSSuperAdmin(user: PublicSaaSUser | null | undefined) {
-  return user?.role === "super_admin";
-}
 
 export function validateRegistrationInput(input: {
   email?: unknown;

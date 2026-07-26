@@ -1,3 +1,6 @@
+import { getCmsConnection } from "@/lib/cmsConnection";
+import type { SaaSWebsite } from "@/lib/websites";
+
 const ENDPOINT = process.env.NEXT_PUBLIC_WORDPRESS_GRAPHQL_URL;
 
 type GraphQLError = { message: string };
@@ -16,7 +19,7 @@ export async function graphqlFetch<T>(
 
   if (!endpoint) {
     throw new Error(
-      "NEXT_PUBLIC_WORDPRESS_GRAPHQL_URL is not set. Create .env.local for local development or .env.production for the server."
+      "NEXT_PUBLIC_WORDPRESS_GRAPHQL_URL is not set. Create .env.local for local development or .env.production for the server.",
     );
   }
 
@@ -29,7 +32,6 @@ export async function graphqlFetch<T>(
       query,
       variables,
     }),
-    // Server Component can revalidate, but this is optional
     next: { revalidate: 5 },
   });
 
@@ -50,33 +52,12 @@ export async function graphqlFetch<T>(
   return json.data;
 }
 
-function normalizeGraphQLBaseUrl(value: string) {
-  const text = value.trim();
-  if (!text) return null;
-  const url = /^https?:\/\//i.test(text) ? text : `https://${text}`;
-  return url.replace(/\/+$/, "");
-}
+import { safeDecodeURI } from "@/lib/safeDecodeURI";
+export { safeDecodeURI };
 
-export function safeDecodeURI(value: string): string {
-  if (/%[0-9a-fA-F]{2}/.test(value)) {
-    try {
-      return decodeURIComponent(value);
-    } catch {
-      return value;
-    }
-  }
-  return value;
-}
-
-export function getWebsiteGraphQLEndpoint(website?: {
-  type?: string;
-  ecommerceSettings?: {
-    wordpressGraphqlUrl?: string;
-  };
-} | null) {
-  if (website?.type !== "e-commerce") return null;
-
-  return normalizeGraphQLBaseUrl(
-    website.ecommerceSettings?.wordpressGraphqlUrl ?? "",
-  );
+export function getWebsiteGraphQLEndpoint(
+  website?: SaaSWebsite | null,
+): string | null {
+  const cms = getCmsConnection(website);
+  return cms.graphqlUrl || null;
 }

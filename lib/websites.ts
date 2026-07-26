@@ -1,12 +1,6 @@
-import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
-import crypto from "node:crypto";
-import path from "node:path";
-import { isSaaSAdmin, type PublicSaaSUser } from "@/lib/auth";
+import { isSaaSAdmin, type PublicSaaSUser } from "@/lib/authRoles";
 import { getRuntimeDataDir } from "@/lib/runtimeDataDir";
-import {
-  getWebsiteBuilderDir,
-  initializeWebsiteBuilderData,
-} from "@/lib/websiteBuilderData";
+import { type CmsConnection } from "@/lib/cmsConnection";
 import type { StarterWebsiteId } from "@/lib/starterWebsites";
 
 export type WebsiteStatus = "creating" | "active" | "maintenance" | "suspended";
@@ -47,7 +41,7 @@ export type SaaSWebsite = {
   socialLinks?: string;
   plan?: WebsitePlan;
   lastPublishedAt?: string;
-  ecommerceSettings?: WebsiteEcommerceSettings;
+  cmsConnection?: CmsConnection;
   createdAt: string;
   updatedAt: string;
 };
@@ -55,23 +49,13 @@ export type SaaSWebsite = {
 type StoredWebsite = Omit<SaaSWebsite, "status"> & {
   type?: WebsiteType;
   status: WebsiteStatus | "draft";
+  ecommerceSettings?: Record<string, unknown>;
 };
 
-export type WebsiteEcommerceSettings = {
-  wordpressCmsUrl: string;
-  wordpressGraphqlUrl: string;
-  wordpressAdminUrl: string;
-  wooCommerceAdminUrl: string;
-  wooCommerceRestApiUrl: string;
-  wordpressAdminUser: string;
-  storeStatusNotes: string;
-  wooCommerceConsumerKey: string;
-  wooCommerceConsumerSecret: string;
-  technicalNotes: string;
-  updatedAt: string;
+const WEBSITES_FILE = async () => {
+  const path = await import("node:path");
+  return path.join(getRuntimeDataDir(), "websites.json");
 };
-
-const WEBSITES_FILE = () => path.join(getRuntimeDataDir(), "websites.json");
 const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const DOMAIN_LABEL_PATTERN = /^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/;
 export const ROOT_WEBSITE_ID = "root";
@@ -242,39 +226,49 @@ function normalizeUrl(value: unknown) {
   return /^https?:\/\//i.test(text) ? text : `https://${text}`;
 }
 
-function isWebsiteEcommerceSettings(
-  value: unknown,
-): value is Partial<WebsiteEcommerceSettings> {
-  if (!value || typeof value !== "object") return false;
-  const settings = value as Partial<WebsiteEcommerceSettings>;
-  return (
-    typeof settings.wordpressCmsUrl === "string" &&
-    typeof settings.wordpressAdminUser === "string" &&
-    typeof settings.storeStatusNotes === "string" &&
-    typeof settings.wooCommerceConsumerKey === "string" &&
-    typeof settings.wooCommerceConsumerSecret === "string" &&
-    typeof settings.technicalNotes === "string" &&
-    typeof settings.updatedAt === "string"
-  );
-}
+function normalizeCmsConnection(
+  cmsVal: unknown,
+  ecomVal?: unknown,
+): CmsConnection | undefined {
+  const cms = (cmsVal && typeof cmsVal === "object" ? cmsVal : {}) as Partial<CmsConnection>;
+  const ecom = (ecomVal && typeof ecomVal === "object" ? ecomVal : {}) as Record<string, unknown>;
 
-function normalizeWebsiteEcommerceSettings(
-  value: unknown,
-): WebsiteEcommerceSettings | undefined {
-  if (!isWebsiteEcommerceSettings(value)) return undefined;
+  const siteUrl = normalizeUrl(cms.siteUrl || ecom.wordpressCmsUrl);
+  const graphqlUrl = normalizeUrl(cms.graphqlUrl || ecom.wordpressGraphqlUrl);
+  const adminUrl = normalizeUrl(cms.adminUrl || ecom.wordpressAdminUrl);
+  const wooCommerceApiUrl = normalizeUrl(
+    cms.wooCommerceApiUrl || ecom.wooCommerceRestApiUrl,
+  );
+  const wooCommerceConsumerKey =
+    cms.wooCommerceConsumerKey ?? (typeof ecom.wooCommerceConsumerKey === "string" ? ecom.wooCommerceConsumerKey : "");
+  const wooCommerceConsumerSecret =
+    cms.wooCommerceConsumerSecret ?? (typeof ecom.wooCommerceConsumerSecret === "string" ? ecom.wooCommerceConsumerSecret : "");
+  const wordpressUsername =
+    cms.wordpressUsername ?? (typeof ecom.wordpressAdminUser === "string" ? ecom.wordpressAdminUser : "");
+  const wordpressApplicationPassword = cms.wordpressApplicationPassword ?? "";
+  const storeStatusNotes =
+    cms.storeStatusNotes ?? (typeof ecom.storeStatusNotes === "string" ? ecom.storeStatusNotes : "");
+  const technicalNotes =
+    cms.technicalNotes ?? (typeof ecom.technicalNotes === "string" ? ecom.technicalNotes : "");
+  const updatedAt = cms.updatedAt || (typeof ecom.updatedAt === "string" ? ecom.updatedAt : "");
+
+  if (!siteUrl && !wordpressUsername && !wooCommerceConsumerKey) {
+    return undefined;
+  }
 
   return {
-    wordpressCmsUrl: value.wordpressCmsUrl ?? "",
-    wordpressGraphqlUrl: value.wordpressGraphqlUrl ?? "",
-    wordpressAdminUrl: value.wordpressAdminUrl ?? "",
-    wooCommerceAdminUrl: value.wooCommerceAdminUrl ?? "",
-    wooCommerceRestApiUrl: value.wooCommerceRestApiUrl ?? "",
-    wordpressAdminUser: value.wordpressAdminUser ?? "",
-    storeStatusNotes: value.storeStatusNotes ?? "",
-    wooCommerceConsumerKey: value.wooCommerceConsumerKey ?? "",
-    wooCommerceConsumerSecret: value.wooCommerceConsumerSecret ?? "",
-    technicalNotes: value.technicalNotes ?? "",
-    updatedAt: value.updatedAt ?? "",
+    provider: cms.provider || "wordpress",
+    siteUrl,
+    adminUrl,
+    graphqlUrl,
+    wooCommerceApiUrl,
+    wooCommerceConsumerKey,
+    wooCommerceConsumerSecret,
+    wordpressUsername,
+    wordpressApplicationPassword,
+    storeStatusNotes,
+    technicalNotes,
+    updatedAt,
   };
 }
 
@@ -335,25 +329,28 @@ export function validateWebsiteSettingsInput(input: {
   };
 }
 
-export function validateWebsiteEcommerceSettingsInput(input: {
-  wordpressCmsUrl?: unknown;
-  wordpressGraphqlUrl?: unknown;
-  wordpressAdminUrl?: unknown;
-  wooCommerceAdminUrl?: unknown;
-  wooCommerceRestApiUrl?: unknown;
-  wordpressAdminUser?: unknown;
-  storeStatusNotes?: unknown;
+export function validateWebsiteCmsConnectionInput(input: {
+  provider?: unknown;
+  siteUrl?: unknown;
+  graphqlUrl?: unknown;
+  adminUrl?: unknown;
+  wooCommerceApiUrl?: unknown;
   wooCommerceConsumerKey?: unknown;
   wooCommerceConsumerSecret?: unknown;
+  wordpressUsername?: unknown;
+  wordpressApplicationPassword?: unknown;
+  storeStatusNotes?: unknown;
   technicalNotes?: unknown;
 }) {
-  const wordpressCmsUrl = normalizeUrl(input.wordpressCmsUrl);
-  const wordpressGraphqlUrl = normalizeUrl(input.wordpressGraphqlUrl);
-  const wordpressAdminUrl = normalizeUrl(input.wordpressAdminUrl);
-  const wooCommerceAdminUrl = normalizeUrl(input.wooCommerceAdminUrl);
-  const wooCommerceRestApiUrl = normalizeUrl(input.wooCommerceRestApiUrl);
-  const wordpressAdminUser = normalizeOption(input.wordpressAdminUser, "");
-  const storeStatusNotes = normalizeLongText(input.storeStatusNotes, 1000);
+  const siteUrl = normalizeUrl(input.siteUrl);
+  const graphqlUrl = normalizeUrl(input.graphqlUrl);
+  const adminUrl = normalizeUrl(input.adminUrl);
+  const wooCommerceApiUrl = normalizeUrl(input.wooCommerceApiUrl);
+  const wordpressUsername = normalizeOption(input.wordpressUsername, "");
+  const wordpressApplicationPassword = normalizeLongText(
+    input.wordpressApplicationPassword,
+    240,
+  );
   const wooCommerceConsumerKey = normalizeLongText(
     input.wooCommerceConsumerKey,
     240,
@@ -362,26 +359,28 @@ export function validateWebsiteEcommerceSettingsInput(input: {
     input.wooCommerceConsumerSecret,
     240,
   );
+  const storeStatusNotes = normalizeLongText(input.storeStatusNotes, 1000);
   const technicalNotes = normalizeLongText(input.technicalNotes, 1200);
 
-  if (!wordpressCmsUrl) {
-    return { error: "WordPress CMS URL is required." };
+  if (!siteUrl) {
+    return { error: "WordPress CMS Site URL is required." };
   }
 
-  if (!wordpressAdminUser) {
-    return { error: "WordPress admin username/email is required." };
+  if (!wordpressUsername) {
+    return { error: "WordPress username/email is required." };
   }
 
   return {
-    wordpressCmsUrl,
-    wordpressGraphqlUrl,
-    wordpressAdminUrl,
-    wooCommerceAdminUrl,
-    wooCommerceRestApiUrl,
-    wordpressAdminUser,
-    storeStatusNotes,
+    provider: normalizeOption(input.provider, "wordpress"),
+    siteUrl,
+    adminUrl,
+    graphqlUrl,
+    wooCommerceApiUrl,
     wooCommerceConsumerKey,
     wooCommerceConsumerSecret,
+    wordpressUsername,
+    wordpressApplicationPassword,
+    storeStatusNotes,
     technicalNotes,
     updatedAt: new Date().toISOString(),
   };
@@ -389,7 +388,8 @@ export function validateWebsiteEcommerceSettingsInput(input: {
 
 export async function readWebsites(): Promise<SaaSWebsite[]> {
   try {
-    const raw = await readFile(WEBSITES_FILE(), "utf8");
+    const { readFile } = await import("node:fs/promises");
+    const raw = await readFile(await WEBSITES_FILE(), "utf8");
     const parsed = JSON.parse(raw) as unknown;
     if (!Array.isArray(parsed)) return [];
     return parsed.filter(isStoredWebsite).map((website) => {
@@ -419,7 +419,8 @@ export async function readWebsites(): Promise<SaaSWebsite[]> {
           typeof website.lastPublishedAt === "string"
             ? website.lastPublishedAt
             : undefined,
-        ecommerceSettings: normalizeWebsiteEcommerceSettings(
+        cmsConnection: normalizeCmsConnection(
+          website.cmsConnection,
           website.ecommerceSettings,
         ),
       };
@@ -430,11 +431,20 @@ export async function readWebsites(): Promise<SaaSWebsite[]> {
 }
 
 async function writeWebsites(websites: SaaSWebsite[]) {
-  const websitesFile = WEBSITES_FILE();
+  const { mkdir, writeFile } = await import("node:fs/promises");
+  const path = await import("node:path");
+  const websitesFile = await WEBSITES_FILE();
+  const { backupDataFile } = await import("@/lib/dataBackup");
+  await backupDataFile(websitesFile, "websites");
+  const cleanWebsites = websites.map((w) => {
+    const copy = { ...w };
+    delete (copy as { ecommerceSettings?: unknown }).ecommerceSettings;
+    return copy;
+  });
   await mkdir(path.dirname(websitesFile), { recursive: true });
   await writeFile(
     websitesFile,
-    `${JSON.stringify(websites, null, 2)}\n`,
+    `${JSON.stringify(cleanWebsites, null, 2)}\n`,
     "utf8",
   );
 }
@@ -521,8 +531,12 @@ export async function createWebsite(input: {
   }
 
   const now = new Date().toISOString();
+  const websiteId =
+    typeof globalThis.crypto?.randomUUID === "function"
+      ? globalThis.crypto.randomUUID()
+      : Math.random().toString(36).slice(2);
   const website: SaaSWebsite = {
-    id: crypto.randomUUID(),
+    id: websiteId,
     ownerId: input.ownerId,
     name: normalizeName(input.name),
     slug,
@@ -549,8 +563,9 @@ export async function createWebsite(input: {
   };
 
   try {
-    // Persist every starter document before exposing the website record. The
-    // Builder route can therefore never observe a half-generated website.
+    const { initializeWebsiteBuilderData } = await import(
+      "@/lib/websiteBuilderData"
+    );
     await initializeWebsiteBuilderData({
       websiteId: website.id,
       websiteName: website.name,
@@ -558,6 +573,8 @@ export async function createWebsite(input: {
     });
     await writeWebsites([...websites, website]);
   } catch (error) {
+    const { getWebsiteBuilderDir } = await import("@/lib/websiteBuilderData");
+    const { rm } = await import("node:fs/promises");
     await rm(getWebsiteBuilderDir(website.id), { recursive: true, force: true }).catch(
       () => undefined,
     );
@@ -660,9 +677,9 @@ export async function updateWebsiteSettings(input: {
   return { website: updatedWebsite };
 }
 
-export async function updateWebsiteEcommerceSettings(input: {
+export async function updateWebsiteCmsConnection(input: {
   websiteId: string;
-  ecommerceSettings: WebsiteEcommerceSettings;
+  cmsConnection: CmsConnection;
 }) {
   const websites = await readWebsites();
   const website = websites.find((item) => item.id === input.websiteId);
@@ -673,7 +690,7 @@ export async function updateWebsiteEcommerceSettings(input: {
 
   const updatedWebsite: SaaSWebsite = {
     ...website,
-    ecommerceSettings: input.ecommerceSettings,
+    cmsConnection: input.cmsConnection,
     updatedAt: new Date().toISOString(),
   };
 

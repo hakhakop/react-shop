@@ -37,7 +37,7 @@ import { getCategoryTree } from "@/lib/categories";
 import type { CategoryTreeItem } from "@/lib/categories";
 import { getProductCategories, type ProductCategory } from "@/lib/navigation";
 import { getProductsForGrid, type ProductNode } from "@/lib/products";
-import { safeDecodeURI } from "@/lib/graphql";
+import { safeDecodeURI } from "@/lib/safeDecodeURI";
 import type { SaaSWebsite } from "@/lib/websites";
 import type {
   BuilderLayout,

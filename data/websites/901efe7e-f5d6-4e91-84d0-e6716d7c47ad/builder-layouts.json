@@ -172,6 +172,87 @@
                 "typewriterMobileReservedLines": 3
               },
               {
+                "id": "slider-block-mrz7jrqa-ptdj0",
+                "kind": "slider",
+                "title": "Explore what makes the difference",
+                "body": "Use a clear visual sequence to introduce services, benefits, projects, or important ideas.",
+                "slides": [
+                  {
+                    "id": "slider-block-mrz7jrqa-ptdj0-slide-1",
+                    "badge": "01",
+                    "title": "Enterprise Grade Security",
+                    "text": "Data protection is built into our core framework, ensuring your application remains safe and compliant.",
+                    "imagePadding": "medium",
+                    "typography": {
+                      "variant": "body",
+                      "fontFamily": "inherit",
+                      "fontSize": "16px",
+                      "fontWeight": "400",
+                      "lineHeight": "1.4",
+                      "letterSpacing": "0px",
+                      "color": "inherit",
+                      "textAlign": "left"
+                    }
+                  },
+                  {
+                    "id": "slider-block-mrz7jrqa-ptdj0-slide-2",
+                    "badge": "02",
+                    "title": "Sub-Second Page Speeds",
+                    "text": "Serve content globally through optimized CDN networks, providing visitors with instant load times.",
+                    "imagePadding": "medium",
+                    "typography": {
+                      "variant": "body",
+                      "fontFamily": "inherit",
+                      "fontSize": "16px",
+                      "fontWeight": "400",
+                      "lineHeight": "1.4",
+                      "letterSpacing": "0px",
+                      "color": "inherit",
+                      "textAlign": "left"
+                    }
+                  },
+                  {
+                    "id": "slider-block-mrz7jrqa-ptdj0-slide-3",
+                    "badge": "03",
+                    "title": "Dedicated Asset Hosting",
+                    "text": "Manage and deliver high-resolution media assets effortlessly without affecting site performance.",
+                    "imagePadding": "medium",
+                    "typography": {
+                      "variant": "body",
+                      "fontFamily": "inherit",
+                      "fontSize": "16px",
+                      "fontWeight": "400",
+                      "lineHeight": "1.4",
+                      "letterSpacing": "0px",
+                      "color": "inherit",
+                      "textAlign": "left"
+                    }
+                  }
+                ],
+                "carouselSettings": {
+                  "variant": "showcase",
+                  "loop": true,
+                  "autoplay": false,
+                  "autoplayDelayMs": 5000,
+                  "align": "start",
+                  "dragFree": false,
+                  "effect": "slide",
+                  "spaceBetween": 24,
+                  "coverflowRotate": 34,
+                  "coverflowDepth": 140,
+                  "coverflowStretch": 0,
+                  "cardsRotate": true,
+                  "cardsShadows": true,
+                  "creativePreset": "soft-stack",
+                  "fadeCrossFade": true,
+                  "freeModeMomentum": true,
+                  "cardsPerView": 1,
+                  "showArrows": true,
+                  "showDots": true,
+                  "pauseOnHover": true
+                }
+              },
+              {
                 "id": "hero-block-mqxvovas-174fd",
                 "kind": "hero",
                 "eyebrow": "Բարի գալուստ webpages ձեր վեբ էջերի ստեղծման գործիքը",
@@ -292,13 +373,40 @@
             "id": "layout-row-mq4zixkd-column-1",
             "rowId": "layout-row-mq4zixkd",
             "rowLayout": "whole",
+            "blocks": [],
+            "rowTopMargin": "inherit"
+          },
+          {
+            "id": "layout-row-ms03h0oa-column-1",
+            "rowId": "layout-row-ms03h0oa",
+            "rowLayout": "halves",
+            "blocks": [
+              {
+                "id": "image-block-ms03hbnf-k3ufm",
+                "kind": "image",
+                "title": "",
+                "body": "",
+                "imageUrl": "https://cms.webpages.am/wp-content/uploads/2026/07/pasted-image.png",
+                "imageAlt": "Abstract globe illustration",
+                "imageAlignment": "center",
+                "imageMaxWidth": 960,
+                "imageFit": "contain",
+                "imageRatio": "square",
+                "imageCaption": ""
+              }
+            ]
+          },
+          {
+            "id": "layout-row-ms03h0oa-column-2",
+            "rowId": "layout-row-ms03h0oa",
+            "rowLayout": "halves",
             "blocks": [
               {
                 "id": "hero-block-mq4zjajy-8s75n",
                 "kind": "hero",
-                "eyebrow": "Featured",
-                "title": "Ո՞ւմ համար է WebPages-ը",
-                "body": "WebPages-ը հարմար է ինչպես անհատների, այնպես էլ տարբեր ոլորտների բիզնեսների համար։Անկախ նրանից՝ ցանկանում եք ներկայացնել ձեր ծառայությունները, ստեղծել անձնական էջ, ընդունել հայտեր կամ գործարկել առցանց խանութ, կարող եք սկսել պատրաստի և պարզ փաթեթից։",
+                "eyebrow": "Միայն որակյալ արտադրանք",
+                "title": "Մեր մասին",
+                "body": "<p></p><p></p><p>Սանգուդզ ընկերությունը հիմնադրվել է 2014թ. Աշոտ Ասլիկյանի կողմից, ով գյուղատնտեսության և հատկապես չրերի արտադրության ոլորտում բավականին մեծ փորձ ունի: Ընկերությունը զբաղվում է չոր մրգերի և բանջարեղենների արտադրությամբ, մասնավորապես` սև սալորի, ծիրանի, դեղձի, տանձի, խնձորի, սեխի, բալի և լոլիկի:&nbsp;</p><p>Սանգուդզի չրերն առանձնանում են իրենց բարձր որակով` հաշվի առնելով բարձրորակ հումքը և արտադրման տեխնոլոգիան: Հումքն ընտրվում է խիստ չափանիշներով, և արտադրության ընթացքում քիմիկատներ չեն օգտագործվում:</p><p><a target=\"_blank\" rel=\"noopener noreferrer\" href=\"http://xtemos.com/\"><strong><em>&nbsp; Ընկերությունը ստեղծվել&nbsp; է&nbsp; 2014 թվականին Աշոտ Ասլիկյանի կողմից:</em></strong></a></p>",
                 "buttonLabel": "",
                 "buttonUrl": "/",
                 "carouselSettings": {
@@ -306,7 +414,8 @@
                 },
                 "typography": {
                   "body": {
-                    "fontWeight": "600"
+                    "fontWeight": "600",
+                    "textAlign": "left"
                   }
                 },
                 "elementAlign": "center",
@@ -325,8 +434,7 @@
                 "buttonHoverEffect": "lift",
                 "buttons": []
               }
-            ],
-            "rowTopMargin": "inherit"
+            ]
           },
           {
             "id": "layout-item-mq4z4n9g-1",
@@ -456,9 +564,22 @@
                 }
               }
             ]
+          },
+          {
+            "id": "layout-row-ms03rngd-column-1",
+            "rowId": "layout-row-ms03rngd",
+            "rowLayout": "whole",
+            "blocks": [
+              {
+                "id": "categoryFilters-block-ms03s18k-aecfx",
+                "kind": "categoryFilters",
+                "title": "Browse by category",
+                "body": "Help customers narrow the collection and find the right products faster."
+              }
+            ]
           }
         ],
-        "layoutRows": 2,
+        "layoutRows": 4,
         "backgroundEffect": "webgl_waves",
         "antigravityGridDensity": "normal",
         "antigravityVisualMode": "no-grid",
@@ -1377,7 +1498,7 @@
         ]
       }
     ],
-    "updatedAt": "2026-07-24T17:21:37.531Z"
+    "updatedAt": "2026-07-25T08:24:31.846Z"
   },
   "shop": {
     "version": 1,

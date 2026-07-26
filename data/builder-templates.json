@@ -1,5 +1,75 @@
 [
   {
+    "id": "hero-ms03j2rp-f2uh",
+    "title": "Hero",
+    "templateType": "element",
+    "description": "Element template saved from Home",
+    "sourcePage": "home",
+    "sections": [
+      {
+        "id": "contentLayout-ms03j2r3-t0ndq",
+        "kind": "contentLayout",
+        "title": "Hero",
+        "background": "#ffffff",
+        "backgroundMode": "boxed",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "topSpacing": "inherit",
+        "bottomSpacing": "inherit",
+        "topMargin": "inherit",
+        "bottomMargin": "inherit",
+        "pullUnderHeader": false,
+        "visible": true,
+        "eyebrow": "",
+        "body": "",
+        "layout": "whole",
+        "layoutColumns": 1,
+        "layoutItems": [
+          {
+            "id": "layout-item-ms03j2r3-template-element",
+            "blocks": [
+              {
+                "id": "hero-block-ms03j2r3-l8zdv",
+                "kind": "hero",
+                "eyebrow": "Միայն որակյալ արտադրանք",
+                "title": "Մեր մասին",
+                "body": "<p></p><p></p><p>Սանգուդզ ընկերությունը հիմնադրվել է 2014թ. Աշոտ Ասլիկյանի կողմից, ով գյուղատնտեսության և հատկապես չրերի արտադրության ոլորտում բավականին մեծ փորձ ունի: Ընկերությունը զբաղվում է չոր մրգերի և բանջարեղենների արտադրությամբ, մասնավորապես` սև սալորի, ծիրանի, դեղձի, տանձի, խնձորի, սեխի, բալի և լոլիկի:&nbsp;</p><p>Սանգուդզի չրերն առանձնանում են իրենց բարձր որակով` հաշվի առնելով բարձրորակ հումքը և արտադրման տեխնոլոգիան: Հումքն ընտրվում է խիստ չափանիշներով, և արտադրության ընթացքում քիմիկատներ չեն օգտագործվում:</p><p><a target=\"_blank\" rel=\"noopener noreferrer\" href=\"http://xtemos.com/\"><strong><em>&nbsp; Ընկերությունը ստեղծվել&nbsp; է&nbsp; 2014 թվականին Աշոտ Ասլիկյանի կողմից:</em></strong></a></p>",
+                "buttonLabel": "",
+                "buttonUrl": "/",
+                "carouselSettings": {
+                  "variant": "default"
+                },
+                "typography": {
+                  "body": {
+                    "fontWeight": "600",
+                    "textAlign": "left"
+                  }
+                },
+                "elementAlign": "center",
+                "buttonBg": "#111111",
+                "buttonTextColor": "#ffffff",
+                "buttonBorderRadius": "999px",
+                "buttonBorderWidth": "0px",
+                "buttonBorderColor": "transparent",
+                "buttonPaddingY": "11px",
+                "buttonPaddingX": "18px",
+                "buttonFontWeight": "720",
+                "buttonLetterSpacing": "0px",
+                "buttonHoverBg": "#000000",
+                "buttonHoverTextColor": "#ffffff",
+                "buttonHoverBorderColor": "transparent",
+                "buttonHoverEffect": "lift",
+                "buttons": []
+              }
+            ]
+          }
+        ],
+        "layoutRows": 1
+      }
+    ],
+    "updatedAt": "2026-07-25T08:17:24.421Z"
+  },
+  {
     "id": "grid-mrxcrx4u-dgnc",
     "title": "Grid grey",
     "templateType": "element",
