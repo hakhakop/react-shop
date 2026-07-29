@@ -34,9 +34,11 @@ function mergeMedia(
 export function useMediaLibrary({
   open,
   perPage = DEFAULT_PER_PAGE,
+  websiteId,
 }: {
   open: boolean;
   perPage?: number;
+  websiteId?: string;
 }) {
   const [items, setItems] = useState<WordPressMediaItem[]>([]);
   const [selectedItem, setSelectedItem] = useState<WordPressMediaItem | null>(
@@ -83,6 +85,7 @@ export function useMediaLibrary({
         });
         const searchTerm = search.trim();
         if (searchTerm) params.set("search", searchTerm);
+        if (websiteId) params.set("websiteId", websiteId);
 
         const response = await fetch(`/api/wordpress-media?${params}`, {
           cache: "no-store",
@@ -136,7 +139,7 @@ export function useMediaLibrary({
         }
       }
     },
-    [filter, perPage, search],
+    [filter, perPage, search, websiteId],
   );
 
   const refresh = useCallback(() => {
@@ -160,10 +163,16 @@ export function useMediaLibrary({
         const formData = new FormData();
         formData.append("file", file);
         setUploadProgress(45);
-        const response = await fetch("/api/wordpress-media", {
+        const params = new URLSearchParams();
+        if (websiteId) params.set("websiteId", websiteId);
+        const query = params.toString();
+        const response = await fetch(
+          query ? `/api/wordpress-media?${query}` : "/api/wordpress-media",
+          {
           method: "POST",
           body: formData,
-        });
+          },
+        );
         setUploadProgress(80);
         const payload = (await response.json()) as {
           media?: WordPressMediaItem;
@@ -192,13 +201,18 @@ export function useMediaLibrary({
         }, 450);
       }
     },
-    [],
+    [websiteId],
   );
 
   const updateMedia = useCallback(
     async (id: number, patch: Partial<WordPressMediaItem>) => {
       setError(null);
-      const response = await fetch("/api/wordpress-media", {
+      const params = new URLSearchParams();
+      if (websiteId) params.set("websiteId", websiteId);
+      const query = params.toString();
+      const response = await fetch(
+        query ? `/api/wordpress-media?${query}` : "/api/wordpress-media",
+        {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -208,7 +222,8 @@ export function useMediaLibrary({
           caption: patch.caption,
           description: patch.description,
         }),
-      });
+        },
+      );
       const payload = (await response.json()) as {
         media?: WordPressMediaItem;
         message?: string;
@@ -228,12 +243,14 @@ export function useMediaLibrary({
       setStatus("Media details updated");
       return payload.media;
     },
-    [],
+    [websiteId],
   );
 
   const deleteMedia = useCallback(async (id: number) => {
     setError(null);
-    const response = await fetch(`/api/wordpress-media?id=${id}`, {
+    const params = new URLSearchParams({ id: String(id) });
+    if (websiteId) params.set("websiteId", websiteId);
+    const response = await fetch(`/api/wordpress-media?${params}`, {
       method: "DELETE",
     });
     const payload = (await response.json().catch(() => null)) as
@@ -251,7 +268,7 @@ export function useMediaLibrary({
     setSelectedItem((current) => (current?.id === id ? null : current));
     setStatus("Media deleted from WordPress");
     return true;
-  }, []);
+  }, [websiteId]);
 
   useEffect(() => {
     if (!open) return;

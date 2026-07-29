@@ -87,38 +87,33 @@ export function getEnvCmsConnection(): CmsConnection {
 export function getCmsConnection(
   website?: { cmsConnection?: Partial<CmsConnection> | null } | null,
 ): CmsConnection {
-  const envConnection = getEnvCmsConnection();
-
   if (!website || !website.cmsConnection) {
-    return envConnection;
+    return getEnvCmsConnection();
   }
 
   const conn = website.cmsConnection;
-  const siteUrl = normalizeUrl(conn.siteUrl) || envConnection.siteUrl;
+  const siteUrl = normalizeUrl(conn.siteUrl);
   const adminUrl =
     normalizeUrl(conn.adminUrl) ||
-    (siteUrl ? `${siteUrl}/wp-admin` : envConnection.adminUrl);
+    (siteUrl ? `${siteUrl}/wp-admin` : "");
   const graphqlUrl =
     normalizeUrl(conn.graphqlUrl) ||
-    (siteUrl ? `${siteUrl}/graphql` : envConnection.graphqlUrl);
+    (siteUrl ? `${siteUrl}/graphql` : "");
   const wooCommerceApiUrl =
     normalizeUrl(conn.wooCommerceApiUrl) ||
-    (siteUrl ? `${siteUrl}/wp-json/wc/v3` : envConnection.wooCommerceApiUrl);
+    (siteUrl ? `${siteUrl}/wp-json/wc/v3` : "");
 
   return {
-    provider: conn.provider || envConnection.provider,
+    provider: conn.provider?.trim() || "wordpress",
     siteUrl,
     adminUrl,
     graphqlUrl,
     wooCommerceApiUrl,
-    wooCommerceConsumerKey:
-      conn.wooCommerceConsumerKey || envConnection.wooCommerceConsumerKey,
-    wooCommerceConsumerSecret:
-      conn.wooCommerceConsumerSecret || envConnection.wooCommerceConsumerSecret,
-    wordpressUsername:
-      conn.wordpressUsername || envConnection.wordpressUsername,
+    wooCommerceConsumerKey: conn.wooCommerceConsumerKey?.trim() || "",
+    wooCommerceConsumerSecret: conn.wooCommerceConsumerSecret?.trim() || "",
+    wordpressUsername: conn.wordpressUsername?.trim() || "",
     wordpressApplicationPassword:
-      conn.wordpressApplicationPassword || envConnection.wordpressApplicationPassword,
+      conn.wordpressApplicationPassword?.trim() || "",
     storeStatusNotes: conn.storeStatusNotes || "",
     technicalNotes: conn.technicalNotes || "",
     updatedAt: conn.updatedAt || "",

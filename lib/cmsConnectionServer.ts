@@ -4,7 +4,12 @@ import { getWebsiteByDomainHost, normalizeWebsiteDomain } from "@/lib/websites";
 
 export async function getCmsConnectionForRequest(
   request: NextRequest,
+  scopedWebsite?: { cmsConnection?: Partial<CmsConnection> | null } | null,
 ): Promise<CmsConnection> {
+  if (scopedWebsite) {
+    return getCmsConnection(scopedWebsite);
+  }
+
   const host =
     request.headers.get("x-forwarded-host") ||
     request.headers.get("host") ||

@@ -123,7 +123,7 @@
         "id": "contentLayout-ms3hmva4-81jv6",
         "kind": "contentLayout",
         "title": "",
-        "background": "#ffffff",
+        "background": "",
         "backgroundMode": "boxed",
         "contentMode": "boxed",
         "colorScheme": "inherit",
@@ -152,88 +152,6 @@
                 "imageFit": "contain",
                 "imageRatio": "square",
                 "imageCaption": ""
-              },
-              {
-                "id": "grid-block-ms3u5sji-ewf4f",
-                "kind": "grid",
-                "title": "Services designed around your goals",
-                "gridSource": "static",
-                "columns": 3,
-                "gridRows": 1,
-                "gridGap": "medium",
-                "gridMargin": "inherit",
-                "gridImagePadding": "frameless",
-                "gridContentPadding": "medium",
-                "gridImageFrame": "none",
-                "gridShowImage": true,
-                "gridShowEyebrow": true,
-                "gridShowMeta": true,
-                "gridShowText": true,
-                "gridShowButton": true,
-                "gridItems": [
-                  {
-                    "id": "grid-block-ms3u5sji-ewf4f-1",
-                    "eyebrow": "01",
-                    "title": "Strategy & Consultation",
-                    "meta": "Align your objectives",
-                    "text": "Work with our experts to map out your digital product strategy and define key performance indicators.",
-                    "buttonLabel": "View Details",
-                    "buttonUrl": "/",
-                    "typography": {
-                      "variant": "body",
-                      "fontFamily": "inherit",
-                      "fontSize": "16px",
-                      "fontWeight": "400",
-                      "lineHeight": "1.4",
-                      "letterSpacing": "0px",
-                      "color": "inherit",
-                      "textAlign": "left"
-                    }
-                  },
-                  {
-                    "id": "grid-block-ms3u5sji-ewf4f-2",
-                    "eyebrow": "02",
-                    "title": "Design & Engineering",
-                    "meta": "High-fidelity execution",
-                    "text": "Create modern, responsive interfaces backed by scalable frontend architectures and design systems.",
-                    "buttonLabel": "See Our Work",
-                    "buttonUrl": "/",
-                    "typography": {
-                      "variant": "body",
-                      "fontFamily": "inherit",
-                      "fontSize": "16px",
-                      "fontWeight": "400",
-                      "lineHeight": "1.4",
-                      "letterSpacing": "0px",
-                      "color": "inherit",
-                      "textAlign": "left"
-                    }
-                  },
-                  {
-                    "id": "grid-block-ms3u5sji-ewf4f-3",
-                    "eyebrow": "03",
-                    "title": "Growth & Optimization",
-                    "meta": "Scale your reach",
-                    "text": "Continuously optimize page speeds, SEO metadata, and conversion paths to maximize your ROI.",
-                    "buttonLabel": "Contact Us",
-                    "buttonUrl": "/",
-                    "typography": {
-                      "variant": "body",
-                      "fontFamily": "inherit",
-                      "fontSize": "16px",
-                      "fontWeight": "400",
-                      "lineHeight": "1.4",
-                      "letterSpacing": "0px",
-                      "color": "inherit",
-                      "textAlign": "left"
-                    }
-                  }
-                ],
-                "visualStyle": {
-                  "card": {
-                    "preset": "gradient"
-                  }
-                }
               }
             ],
             "rowId": "layout-row-ms49ih7t"
@@ -423,6 +341,32 @@
                       "blocks": []
                     }
                   ]
+                },
+                {
+                  "id": "nested-row-ms5vn2f9",
+                  "weight": 1,
+                  "layout": "whole",
+                  "columns": [
+                    {
+                      "id": "nested-column-ms5vn2f9",
+                      "rowId": "nested-row-ms5vn2f9",
+                      "rowLayout": "whole",
+                      "blocks": []
+                    }
+                  ]
+                },
+                {
+                  "id": "nested-row-ms5vnb0e",
+                  "weight": 1,
+                  "layout": "whole",
+                  "columns": [
+                    {
+                      "id": "nested-column-ms5vnb0e",
+                      "rowId": "nested-row-ms5vnb0e",
+                      "rowLayout": "whole",
+                      "blocks": []
+                    }
+                  ]
                 }
               ]
             }
@@ -431,7 +375,55 @@
             "id": "layout-row-ms51mbvi-column-3",
             "rowId": "layout-row-ms51mbvi",
             "rowLayout": "thirds",
-            "blocks": []
+            "blocks": [],
+            "nestedLayout": {
+              "version": 1,
+              "direction": "vertical",
+              "distribution": "equal",
+              "gap": "inherit",
+              "rows": [
+                {
+                  "id": "nested-row-ms5vneow-1",
+                  "weight": 1,
+                  "layout": "whole",
+                  "columns": [
+                    {
+                      "id": "nested-column-ms5vneow-1",
+                      "rowId": "nested-row-ms5vneow-1",
+                      "rowLayout": "whole",
+                      "blocks": []
+                    }
+                  ]
+                },
+                {
+                  "id": "nested-row-ms5vneow-2",
+                  "weight": 1,
+                  "layout": "whole",
+                  "columns": [
+                    {
+                      "id": "nested-column-ms5vneow-2",
+                      "rowId": "nested-row-ms5vneow-2",
+                      "rowLayout": "whole",
+                      "blocks": [
+                        {
+                          "id": "image-block-ms65y6lp-ex9jh",
+                          "kind": "image",
+                          "title": "",
+                          "body": "",
+                          "imageUrl": "/globe.svg",
+                          "imageAlt": "Abstract globe illustration",
+                          "imageAlignment": "center",
+                          "imageMaxWidth": 960,
+                          "imageFit": "contain",
+                          "imageRatio": "square",
+                          "imageCaption": ""
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
           },
           {
             "id": "layout-row-ms51r1vh-column-1",
@@ -452,7 +444,20 @@
                       "id": "nested-column-ms5200t3-1",
                       "rowId": "nested-row-ms5200t3-1",
                       "rowLayout": "whole",
-                      "blocks": []
+                      "blocks": [
+                        {
+                          "id": "panel-block-ms5u8mw8-jojmj",
+                          "kind": "panel",
+                          "eyebrow": "DESIGN SYSTEM",
+                          "title": "Maintain brand consistency across all pages",
+                          "body": "Define your global typography, color palettes, and spacing rules once. Our visual builder applies them dynamically to ensure a premium, unified experience.",
+                          "buttonLabel": "See Features",
+                          "buttonUrl": "/",
+                          "imageUrl": "",
+                          "imageAlt": "",
+                          "elementPadding": "md"
+                        }
+                      ]
                     }
                   ]
                 },
@@ -504,20 +509,27 @@
                       "id": "nested-column-ms52nmt8-1",
                       "rowId": "nested-row-ms52nmt8-1",
                       "rowLayout": "whole",
-                      "blocks": []
-                    }
-                  ]
-                },
-                {
-                  "id": "nested-row-ms52nmt8-2",
-                  "weight": 1,
-                  "layout": "whole",
-                  "columns": [
-                    {
-                      "id": "nested-column-ms52nmt8-2",
-                      "rowId": "nested-row-ms52nmt8-2",
-                      "rowLayout": "whole",
-                      "blocks": []
+                      "blocks": [
+                        {
+                          "id": "text-block-ms5u8h3f-m5f6r",
+                          "kind": "text",
+                          "eyebrow": "A better way forward",
+                          "title": "Make every interaction clear and useful",
+                          "body": "Thoughtful content helps visitors understand your value, find what they need, and take the next step with confidence.",
+                          "buttonLabel": "",
+                          "buttonUrl": "",
+                          "typography": {
+                            "variant": "body",
+                            "fontFamily": "inherit",
+                            "fontSize": "16px",
+                            "fontWeight": "400",
+                            "lineHeight": "1.4",
+                            "letterSpacing": "0px",
+                            "color": "inherit",
+                            "textAlign": "left"
+                          }
+                        }
+                      ]
                     }
                   ]
                 },
@@ -530,7 +542,21 @@
                       "id": "nested-column-ms52noot",
                       "rowId": "nested-row-ms52noot",
                       "rowLayout": "whole",
-                      "blocks": []
+                      "blocks": [
+                        {
+                          "id": "image-block-ms5u8atb-vkk51",
+                          "kind": "image",
+                          "title": "",
+                          "body": "",
+                          "imageUrl": "/globe.svg",
+                          "imageAlt": "Abstract globe illustration",
+                          "imageAlignment": "center",
+                          "imageMaxWidth": 960,
+                          "imageFit": "contain",
+                          "imageRatio": "square",
+                          "imageCaption": ""
+                        }
+                      ]
                     }
                   ]
                 }
@@ -540,7 +566,41 @@
           {
             "id": "layout-item-ms52mavt",
             "rowId": "layout-row-ms51r1vh",
-            "blocks": []
+            "blocks": [],
+            "nestedLayout": {
+              "version": 1,
+              "direction": "vertical",
+              "distribution": "equal",
+              "gap": "inherit",
+              "rows": [
+                {
+                  "id": "nested-row-ms5wl0tr-1",
+                  "weight": 1,
+                  "layout": "whole",
+                  "columns": [
+                    {
+                      "id": "nested-column-ms5wl0tr-1",
+                      "rowId": "nested-row-ms5wl0tr-1",
+                      "rowLayout": "whole",
+                      "blocks": []
+                    }
+                  ]
+                },
+                {
+                  "id": "nested-row-ms5wl0tr-2",
+                  "weight": 1,
+                  "layout": "whole",
+                  "columns": [
+                    {
+                      "id": "nested-column-ms5wl0tr-2",
+                      "rowId": "nested-row-ms5wl0tr-2",
+                      "rowLayout": "whole",
+                      "blocks": []
+                    }
+                  ]
+                }
+              ]
+            }
           },
           {
             "id": "layout-row-ms51r1vh-column-2",
@@ -571,6 +631,19 @@
                     {
                       "id": "nested-column-ms52opfp-1",
                       "rowId": "nested-row-ms52opfp-1",
+                      "rowLayout": "whole",
+                      "blocks": []
+                    }
+                  ]
+                },
+                {
+                  "id": "nested-row-ms5ug2ui",
+                  "weight": 1,
+                  "layout": "whole",
+                  "columns": [
+                    {
+                      "id": "nested-column-ms5ug2ui",
+                      "rowId": "nested-row-ms5ug2ui",
                       "rowLayout": "whole",
                       "blocks": []
                     }
@@ -1265,8 +1338,7 @@
         "visible": true,
         "eyebrow": "",
         "body": "",
-        "layout": "halves",
-        "layoutColumns": 2,
+        "layoutColumns": 3,
         "layoutItems": [
           {
             "id": "layout-item-ms3hjz7h-1",
@@ -1311,12 +1383,174 @@
             "id": "layout-row-ms3ju0kl-column-1",
             "rowId": "layout-row-ms3ju0kl",
             "rowLayout": "halves",
-            "blocks": []
+            "blocks": [],
+            "nestedLayout": {
+              "version": 1,
+              "direction": "vertical",
+              "distribution": "equal",
+              "gap": "inherit",
+              "rows": [
+                {
+                  "id": "nested-row-ms6hns9a-1",
+                  "weight": 1,
+                  "layout": "whole",
+                  "columns": [
+                    {
+                      "id": "nested-column-ms6hns9a-1",
+                      "rowId": "nested-row-ms6hns9a-1",
+                      "rowLayout": "whole",
+                      "blocks": [
+                        {
+                          "id": "panel-block-ms6hnwsf-zi9xv",
+                          "kind": "panel",
+                          "eyebrow": "DESIGN SYSTEM",
+                          "title": "Maintain brand consistency across all pages",
+                          "body": "Define your global typography, color palettes, and spacing rules once. Our visual builder applies them dynamically to ensure a premium, unified experience.",
+                          "buttonLabel": "See Features",
+                          "buttonUrl": "/",
+                          "imageUrl": "",
+                          "imageAlt": "",
+                          "elementPadding": "md"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "id": "nested-row-ms6hns9a-2",
+                  "weight": 1,
+                  "layout": "whole",
+                  "columns": [
+                    {
+                      "id": "nested-column-ms6hns9a-2",
+                      "rowId": "nested-row-ms6hns9a-2",
+                      "rowLayout": "whole",
+                      "blocks": [
+                        {
+                          "id": "image-block-ms6hpmg5-8mfjv",
+                          "kind": "image",
+                          "title": "",
+                          "body": "",
+                          "imageUrl": "https://cms.webpages.am/wp-content/uploads/2026/07/sungoods-logo.svg",
+                          "imageAlt": "Abstract globe illustration",
+                          "imageAlignment": "center",
+                          "imageMaxWidth": 960,
+                          "imageFit": "contain",
+                          "imageRatio": "square",
+                          "imageCaption": ""
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
           },
           {
             "id": "layout-row-ms3ju0kl-column-2",
             "rowId": "layout-row-ms3ju0kl",
             "rowLayout": "halves",
+            "blocks": []
+          },
+          {
+            "id": "layout-row-ms5urr88-column-1",
+            "rowId": "layout-row-ms5urr88",
+            "blocks": [],
+            "nestedLayout": {
+              "version": 1,
+              "direction": "vertical",
+              "distribution": "equal",
+              "gap": "inherit",
+              "rows": [
+                {
+                  "id": "nested-row-ms5uvhi3-1",
+                  "weight": 1,
+                  "layout": "whole",
+                  "columns": [
+                    {
+                      "id": "nested-column-ms5uvhi3-1",
+                      "rowId": "nested-row-ms5uvhi3-1",
+                      "rowLayout": "whole",
+                      "blocks": []
+                    }
+                  ]
+                },
+                {
+                  "id": "nested-row-ms5uwcln",
+                  "weight": 1,
+                  "layout": "whole",
+                  "columns": [
+                    {
+                      "id": "nested-column-ms5uwcln",
+                      "rowId": "nested-row-ms5uwcln",
+                      "rowLayout": "whole",
+                      "blocks": []
+                    }
+                  ]
+                },
+                {
+                  "id": "nested-row-ms5uvhi3-2",
+                  "weight": 1,
+                  "layout": "whole",
+                  "columns": [
+                    {
+                      "id": "nested-column-ms5uvhi3-2",
+                      "rowId": "nested-row-ms5uvhi3-2",
+                      "rowLayout": "whole",
+                      "blocks": []
+                    }
+                  ]
+                },
+                {
+                  "id": "nested-row-ms5uvsbt",
+                  "weight": 1,
+                  "layout": "whole",
+                  "columns": [
+                    {
+                      "id": "nested-column-ms5uvsbt",
+                      "rowId": "nested-row-ms5uvsbt",
+                      "rowLayout": "whole",
+                      "blocks": []
+                    }
+                  ]
+                },
+                {
+                  "id": "nested-row-ms5uviwf",
+                  "weight": 1,
+                  "layout": "whole",
+                  "columns": [
+                    {
+                      "id": "nested-column-ms5uviwf",
+                      "rowId": "nested-row-ms5uviwf",
+                      "rowLayout": "whole",
+                      "blocks": []
+                    }
+                  ]
+                },
+                {
+                  "id": "nested-row-ms5uvmfq",
+                  "weight": 1,
+                  "layout": "whole",
+                  "columns": [
+                    {
+                      "id": "nested-column-ms5uvmfq",
+                      "rowId": "nested-row-ms5uvmfq",
+                      "rowLayout": "whole",
+                      "blocks": []
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "id": "layout-item-ms5uvpwc",
+            "rowId": "layout-row-ms5urr88",
+            "blocks": []
+          },
+          {
+            "id": "layout-row-ms5urr88-column-2",
+            "rowId": "layout-row-ms5urr88",
             "blocks": []
           },
           {
@@ -1497,7 +1731,7 @@
             ]
           }
         ],
-        "layoutRows": 7
+        "layoutRows": 8
       },
       {
         "id": "contentLayout-mq02cfbq-x0edv",
@@ -2289,7 +2523,7 @@
         ]
       }
     ],
-    "updatedAt": "2026-07-29T08:18:24.332Z"
+    "updatedAt": "2026-07-29T19:41:16.391Z"
   },
   "shop": {
     "version": 1,

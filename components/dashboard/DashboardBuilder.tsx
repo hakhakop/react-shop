@@ -9939,6 +9939,7 @@ export default function DashboardBuilder({
           open={mediaPickerOpen}
           title={mediaPickerTitle}
           currentUrl={mediaPickerCurrentUrl}
+          websiteId={websiteId}
           onSelect={selectWordPressMedia}
           onClose={closeWordPressMediaPicker}
         />

@@ -165,7 +165,7 @@
     "language": "hy",
     "status": "active",
     "createdAt": "2026-07-09T18:59:07.392Z",
-    "updatedAt": "2026-07-29T19:50:29.301Z",
+    "updatedAt": "2026-07-29T14:22:53.387Z",
     "cmsConnection": {
       "provider": "wordpress",
       "siteUrl": "https://sungoods.am",
@@ -175,10 +175,10 @@
       "wooCommerceConsumerKey": "ck_529c7edcb75f73c5013ceb4afb7ec1ce1e31a983",
       "wooCommerceConsumerSecret": "cs_3a15ac6cfed3bf16e9980efa343af65ae6cf36c3",
       "wordpressUsername": "hakop28ol@yahoo.com",
-      "wordpressApplicationPassword": "sNX5 tbsd AHLT oE8J pHhp UTbC",
+      "wordpressApplicationPassword": "fsfdfdsfs",
       "storeStatusNotes": "",
       "technicalNotes": "",
-      "updatedAt": "2026-07-29T19:50:29.299Z"
+      "updatedAt": "2026-07-29T13:10:22.909Z"
     },
     "primaryLanguage": "hy",
     "enabledLanguages": [

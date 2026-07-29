@@ -37,6 +37,7 @@ type MediaManagerProps = {
   open: boolean;
   title: string;
   currentUrl?: string;
+  websiteId?: string;
   multiple?: boolean;
   onSelect: (media: WordPressMediaItem) => void;
   onSelectMany?: (media: WordPressMediaItem[]) => void;
@@ -93,6 +94,7 @@ export default function MediaManager({
   open,
   title,
   currentUrl,
+  websiteId,
   multiple = false,
   onSelect,
   onSelectMany,
@@ -119,7 +121,7 @@ export default function MediaManager({
     uploadFile,
     updateMedia,
     deleteMedia,
-  } = useMediaLibrary({ open });
+  } = useMediaLibrary({ open, websiteId });
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
   const [dragging, setDragging] = useState(false);
   const [sizeMode, setSizeMode] = useState<MediaManagerSize>("comfortable");

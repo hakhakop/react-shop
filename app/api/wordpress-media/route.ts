@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getWordPressMediaAuthHeaders } from "@/lib/cmsConnection";
 import { getCmsConnectionForRequest } from "@/lib/cmsConnectionServer";
+import { getAuthorizedWebsiteBuilderScope } from "@/lib/websiteBuilderAccess";
 
 type WordPressMediaResponse = {
   id: number;
@@ -45,6 +46,16 @@ type GraphQLMediaResponse = {
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+
+async function resolveMediaCms(request: NextRequest) {
+  const access = await getAuthorizedWebsiteBuilderScope(request);
+  if ("error" in access && access.error) {
+    return { error: access.error };
+  }
+  return {
+    cms: await getCmsConnectionForRequest(request, access.website),
+  };
+}
 
 type CachedGraphQLMedia = {
   items: {
@@ -264,7 +275,9 @@ async function loadMediaFromGraphQL({
 }
 
 export async function GET(request: NextRequest) {
-  const cms = await getCmsConnectionForRequest(request);
+  const resolved = await resolveMediaCms(request);
+  if ("error" in resolved) return resolved.error;
+  const cms = resolved.cms;
   const wordpressBaseUrl = cms.siteUrl;
   const authHeaders = getWordPressMediaAuthHeaders(cms);
 
@@ -400,7 +413,9 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  const cms = await getCmsConnectionForRequest(request);
+  const resolved = await resolveMediaCms(request);
+  if ("error" in resolved) return resolved.error;
+  const cms = resolved.cms;
   const wordpressBaseUrl = cms.siteUrl;
   const authHeaders = getWordPressMediaAuthHeaders(cms);
 
@@ -457,7 +472,9 @@ export async function POST(request: NextRequest) {
 }
 
 export async function PATCH(request: NextRequest) {
-  const cms = await getCmsConnectionForRequest(request);
+  const resolved = await resolveMediaCms(request);
+  if ("error" in resolved) return resolved.error;
+  const cms = resolved.cms;
   const wordpressBaseUrl = cms.siteUrl;
   const authHeaders = getWordPressMediaAuthHeaders(cms);
 
@@ -524,7 +541,9 @@ export async function PATCH(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
-  const cms = await getCmsConnectionForRequest(request);
+  const resolved = await resolveMediaCms(request);
+  if ("error" in resolved) return resolved.error;
+  const cms = resolved.cms;
   const wordpressBaseUrl = cms.siteUrl;
   const authHeaders = getWordPressMediaAuthHeaders(cms);
   const id = Number(request.nextUrl.searchParams.get("id"));
