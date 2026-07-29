@@ -14447,7 +14447,21 @@ body:has([data-scoped-builder-root])
   top: 6px !important;
   right: 6px !important;
   bottom: auto !important;
+  z-index: 12 !important;
   transform: none !important;
+}
+
+.builder-preview-canvas
+  .builder-nested-layout
+  .is-interaction-selected {
+  position: relative;
+  z-index: 11;
+}
+
+.builder-preview-canvas
+  .builder-nested-row-frame:has(.is-interaction-selected) {
+  position: relative;
+  z-index: 10;
 }
 
 /* The row frame is a visual affordance only. It must never become an

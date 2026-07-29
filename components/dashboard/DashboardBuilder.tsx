@@ -5232,6 +5232,7 @@ export default function DashboardBuilder({
     sectionId: string,
     outerColumnKey: string,
     rowId: string,
+    nestedColumnKey: string,
   ) => {
     setBuilderState((current) => ({
       ...current,
@@ -5239,16 +5240,27 @@ export default function DashboardBuilder({
         if (section.id !== sectionId) return section;
         return {
           ...section,
-          layoutItems: (section.layoutItems ?? []).map((column, index) => {
-            if (
-              (column.id ?? `layout-item-${index}`) !== outerColumnKey ||
-              !column.nestedLayout
-            ) {
+          layoutItems: (section.layoutItems ?? []).map((column) => {
+            if (!column.nestedLayout) {
               return column;
             }
+            const isRequestedColumn =
+              column.id === outerColumnKey ||
+              column.nestedLayout.rows.some(
+                (row) =>
+                  row.id === rowId ||
+                  row.columns.some(
+                    (nestedColumn) => nestedColumn.id === nestedColumnKey,
+                  ),
+              );
+            if (!isRequestedColumn) return column;
 
             const remainingRows = column.nestedLayout.rows.filter(
-              (row) => row.id !== rowId,
+              (row) =>
+                row.id !== rowId &&
+                !row.columns.some(
+                  (nestedColumn) => nestedColumn.id === nestedColumnKey,
+                ),
             );
             if (remainingRows.length === column.nestedLayout.rows.length) {
               return column;
@@ -10175,6 +10187,7 @@ function PreviewCanvas({
     sectionId: string,
     outerColumnKey: string,
     rowId: string,
+    nestedColumnKey: string,
   ) => void;
   onUnwrapNestedColumn: (sectionId: string, columnKey: string) => void;
   onDeleteRow: (sectionId: string, rowIndex: number) => void;
@@ -13068,6 +13081,7 @@ function PreviewSection({
     sectionId: string,
     outerColumnKey: string,
     rowId: string,
+    nestedColumnKey: string,
   ) => void;
   onUnwrapNestedColumn: (sectionId: string, columnKey: string) => void;
   onDeleteRow: (sectionId: string, rowIndex: number) => void;
@@ -14191,17 +14205,18 @@ function PreviewSection({
                         <Settings2 size={13} />
                       </button>
                       {nestingDepth > 0 &&
-                        nestedOwnerColumnKey &&
-                        typedItem.rowId && (
+                        nestedOwnerColumnKey && (
                           <button
                             type="button"
-                            onClick={() =>
+                            onClick={(event) => {
+                              event.stopPropagation();
                               onDeleteNestedRow(
                                 section.id,
                                 nestedOwnerColumnKey,
-                                typedItem.rowId!,
-                              )
-                            }
+                                layoutRow.id,
+                                columnKey,
+                              );
+                            }}
                             title="Delete stacked row"
                             aria-label="Delete stacked row"
                           >
