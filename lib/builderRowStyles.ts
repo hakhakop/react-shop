@@ -38,34 +38,44 @@ function inheritedSpacing(
   return resolveBuilderSpacing(value ?? "inherit", context, inherited).css;
 }
 
+function explicitSpacing(
+  value: string | undefined,
+  context: "rowPadding" | "rowMargin",
+) {
+  if (!value || value === "inherit") return "0px";
+  return resolveBuilderSpacing(value, context).css;
+}
+
 export function resolveBuilderRowStyle(
   row: BuilderRowStyleInput | undefined,
   global: BuilderRowGlobalSpacing = {},
 ): CSSProperties {
+  const hasSurface = Boolean(
+    row?.rowBackground || row?.rowVisualStyle?.background,
+  );
   return {
     background: row?.rowBackground || undefined,
-    paddingTop: inheritedSpacing(
-      row?.rowTopSpacing,
-      "rowPadding",
-      global.rowPaddingTop,
-    ),
-    paddingBottom: inheritedSpacing(
-      row?.rowBottomSpacing,
-      "rowPadding",
-      global.rowPaddingBottom,
-    ),
-    marginTop: inheritedSpacing(
-      row?.rowTopMargin,
-      "rowMargin",
-      global.rowMarginTop,
-    ),
-    marginBottom: inheritedSpacing(
-      row?.rowBottomMargin,
-      "rowMargin",
-      global.rowMarginBottom,
-    ),
+    paddingTop: hasSurface
+      ? inheritedSpacing(
+          row?.rowTopSpacing,
+          "rowPadding",
+          global.rowPaddingTop,
+        )
+      : "0px",
+    paddingBottom: hasSurface
+      ? inheritedSpacing(
+          row?.rowBottomSpacing,
+          "rowPadding",
+          global.rowPaddingBottom,
+        )
+      : "0px",
+    // Global row margins are intentionally not inherited. Row siblings use
+    // rowGap; an explicit local margin replaces that boundary's gap.
+    marginTop: explicitSpacing(row?.rowTopMargin, "rowMargin"),
+    marginBottom: explicitSpacing(row?.rowBottomMargin, "rowMargin"),
     borderRadius:
-      row?.rowBorderRadius !== undefined
+      row?.rowBorderRadius !== undefined &&
+      Boolean(row.rowBackground || row.rowVisualStyle?.background)
         ? `${row.rowBorderRadius}px`
         : undefined,
     ...visualStyleToCss(row?.rowVisualStyle),
@@ -75,7 +85,15 @@ export function resolveBuilderRowStyle(
 export function resolveBuilderRowGap(
   row: BuilderRowStyleInput | undefined,
   globalRowGap: string | undefined,
+  previousRow?: BuilderRowStyleInput,
 ) {
+  const ownsBoundaryWithMargin =
+    (row?.rowTopMargin && row.rowTopMargin !== "inherit") ||
+    (previousRow?.rowBottomMargin &&
+      previousRow.rowBottomMargin !== "inherit");
+  if (ownsBoundaryWithMargin) {
+    return resolveBuilderSpacing("none", "rowGap");
+  }
   return resolveBuilderSpacing(
     row?.rowGap ?? "inherit",
     "rowGap",

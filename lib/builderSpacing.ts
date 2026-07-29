@@ -59,19 +59,22 @@ export const BUILDER_SPACING_SCALE: Record<
   "3xl": 192,
 };
 
+// Kept here (instead of importing builderGeometry) to avoid a module cycle:
+// builderGeometry consumes the public scale above. These values mirror the
+// canonical ownership contract in builderGeometry.ts.
 const DEFAULT_SPACING_BY_CONTEXT: Record<
   BuilderSpacingContext,
   Exclude<BuilderSpacingToken, "inherit">
 > = {
-  sectionPadding: "2xl",
+  sectionPadding: "lg",
   sectionMargin: "none",
-  rowGap: "lg",
-  rowPadding: "md",
+  rowGap: "md",
+  rowPadding: "none",
   rowMargin: "none",
-  columnGap: "lg",
-  columnPadding: "md",
-  elementPadding: "sm",
-  elementMargin: "md",
+  columnGap: "md",
+  columnPadding: "none",
+  elementPadding: "xs",
+  elementMargin: "none",
 };
 
 const LEGACY_SPACING_BY_CONTEXT: Record<

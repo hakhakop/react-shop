@@ -1,5 +1,6 @@
 import { Suspense, memo } from "react";
 import type { CSSProperties, ReactNode } from "react";
+import { builderGeometryCssVariables } from "@/lib/builderGeometry";
 import AntigravityTerminal from "@/components/builder/AntigravityTerminal";
 import AntigravityCanvas from "@/components/builder/AntigravityCanvas";
 import TypewriterText from "@/components/builder/TypewriterText";
@@ -3062,6 +3063,12 @@ function blockSurfaceStyle(
   const isCustomBg =
     block.elementBackgroundMode === "custom" ||
     block.elementBackgroundMode === "transparent";
+  const hasSurface =
+    block.elementBackgroundMode === "custom" ||
+    (block.panelStyle !== undefined && block.panelStyle !== "default") ||
+    (block.premiumCardStyle !== undefined &&
+      block.premiumCardStyle !== "none") ||
+    Boolean(visual?.background);
   if (bg !== undefined && isCustomBg) {
     legacy["--builder-element-bg"] = bg;
   }
@@ -3070,27 +3077,27 @@ function blockSurfaceStyle(
     legacy["--builder-card-radius"] = `${block.borderRadius}px`;
   }
   if (!hasBuilderVisualSpacing(visual?.padding)) {
-    if (block.elementPadding && block.elementPadding !== "inherit") {
+    if (
+      block.elementPadding &&
+      block.elementPadding !== "inherit"
+    ) {
       legacy.padding = resolveBuilderSpacing(
         block.elementPadding,
         "elementPadding",
       ).css;
     } else {
-      legacy.paddingTop = "var(--builder-global-element-padding-top, 16px)";
-      legacy.paddingRight = "var(--builder-global-element-padding-right, 16px)";
+      legacy.paddingTop = "var(--builder-global-element-padding-top, 0px)";
+      legacy.paddingRight = "var(--builder-global-element-padding-right, 0px)";
       legacy.paddingBottom =
-        "var(--builder-global-element-padding-bottom, 16px)";
-      legacy.paddingLeft = "var(--builder-global-element-padding-left, 16px)";
+        "var(--builder-global-element-padding-bottom, 0px)";
+      legacy.paddingLeft = "var(--builder-global-element-padding-left, 0px)";
     }
   }
   if (
     !hasBuilderVisualSpacing(visual?.margin) &&
     (!block.gridMargin || block.gridMargin === "inherit")
   ) {
-    legacy.marginTop = "var(--builder-global-element-margin-top, 0px)";
-    legacy.marginRight = "var(--builder-global-element-margin-right, 0px)";
-    legacy.marginBottom = "var(--builder-global-element-margin-bottom, 0px)";
-    legacy.marginLeft = "var(--builder-global-element-margin-left, 0px)";
+    legacy.margin = 0;
   }
 
   Object.assign(legacy, builderButtonOverrideCssVars(block));
@@ -3230,8 +3237,8 @@ function rowStyle(
   parentScheme: "light" | "dark" | "auto" = "light",
 ): CSSProperties {
   const styleObj = resolveBuilderRowStyle(rowItem, {
-    rowPaddingTop: "var(--builder-global-row-padding-top, 32px)",
-    rowPaddingBottom: "var(--builder-global-row-padding-bottom, 32px)",
+    rowPaddingTop: "var(--builder-global-row-padding-top, 0px)",
+    rowPaddingBottom: "var(--builder-global-row-padding-bottom, 0px)",
     rowMarginTop: "var(--builder-global-row-margin-top, 0px)",
     rowMarginBottom: "var(--builder-global-row-margin-bottom, 0px)",
   }) as CSSProperties & Record<string, string | undefined>;
@@ -3360,10 +3367,13 @@ function ContentLayoutSection({
           const typedRowItem = rowItem as
             | NonNullable<BuilderSection["layoutItems"]>[number]
             | undefined;
-          const rowGap =
-            typedRowItem?.rowGap && typedRowItem.rowGap !== "inherit"
-            ? resolveBuilderRowGap(typedRowItem, undefined).css
-            : "var(--builder-global-row-gap, 64px)";
+          const rowGap = resolveBuilderRowGap(
+            typedRowItem,
+            "var(--builder-global-row-gap, 32px)",
+            layoutRows[rowIndex - 1]?.items[0] as
+              | NonNullable<BuilderSection["layoutItems"]>[number]
+              | undefined,
+          ).css;
           return (
             <div key={row.id} style={{ paddingTop: rowIndex > 0 ? rowGap : 0 }}>
               <div
@@ -3444,66 +3454,104 @@ function ContentLayoutSection({
                 const hasScrollPinned = blocks.some(
                   (b) => b.kind === "scrollPinnedDemo",
                 );
+                const renderColumnBlocks = (
+                  columnBlocks: BuilderLayoutBlock[],
+                ) =>
+                  columnBlocks.map((block, blockIndex) => {
+                    if (block.kind === "scrollPinnedDemo") {
+                      return (
+                        <ContentLayoutBlock
+                          key={block.id ?? blockIndex}
+                          block={block}
+                          product={product}
+                          breadcrumbItems={breadcrumbItems}
+                          page={page}
+                          pageContent={pageContent}
+                          categoryTree={categoryTree}
+                          activeCategorySlug={activeCategorySlug}
+                          website={website}
+                          parentScheme={rowColorScheme}
+                        />
+                      );
+                    }
+
+                    const blockAnimationAttrs = animationDataAttributes(
+                      block.animation,
+                    );
+                    return (
+                      <div
+                        key={block.id ?? blockIndex}
+                        className={blockShellClassName(block)}
+                        style={{
+                          ...blockSurfaceStyle(block, rowColorScheme),
+                          ...blockAnimationAttrs.style,
+                        }}
+                        {...blockAnimationAttrs.data}
+                      >
+                        <ContentLayoutBlock
+                          block={block}
+                          product={product}
+                          breadcrumbItems={breadcrumbItems}
+                          page={page}
+                          pageContent={pageContent}
+                          categoryTree={categoryTree}
+                          activeCategorySlug={activeCategorySlug}
+                          website={website}
+                          parentScheme={rowColorScheme}
+                        />
+                      </div>
+                    );
+                  });
+                const nestedLayout =
+                  (
+                    item as NonNullable<
+                      BuilderSection["layoutItems"]
+                    >[number]
+                  ).nestedLayout ?? null;
                 return (
                   <article
                     key={columnKey}
-                    className={
+                    className={`${nestedLayout ? "builder-nested-layout-container " : ""}${
                       hasScrollPinned
                         ? "w-full col-span-12"
                         : `shop-builder-content-layout-card shop-card-preset--${cardStyle}`
-                    }
+                    }`}
                     style={
                       hasScrollPinned
                         ? { gridColumn: "span 12" }
                         : { gridColumn: `span ${span}` }
                     }
                   >
-                    {blocks.map((block, blockIndex) => {
-                      if (block.kind === "scrollPinnedDemo") {
-                        return (
-                          <ContentLayoutBlock
-                            key={block.id ?? blockIndex}
-                            block={block}
-                            product={product}
-                            breadcrumbItems={breadcrumbItems}
-                            page={page}
-                            pageContent={pageContent}
-                            categoryTree={categoryTree}
-                            activeCategorySlug={activeCategorySlug}
-                            website={website}
-                            parentScheme={rowColorScheme}
-                          />
-                        );
-                      }
-
-                      const blockAnimationAttrs = animationDataAttributes(
-                        block.animation,
-                      );
-
-                      return (
-                        <div
-                          key={block.id ?? blockIndex}
-                          className={blockShellClassName(block)}
-                          style={{
-                            ...blockSurfaceStyle(block, rowColorScheme),
-                            ...blockAnimationAttrs.style,
-                          }}
-                          {...blockAnimationAttrs.data}
-                        >
-                          <ContentLayoutBlock
-                            block={block}
-                            product={product}
-                            breadcrumbItems={breadcrumbItems}
-                            page={page}
-                            pageContent={pageContent}
-                            categoryTree={categoryTree}
-                            activeCategorySlug={activeCategorySlug}
-                            website={website}
-                            parentScheme={rowColorScheme}
-                          />
-                        </div>
-                      );
-                    })}
+                    {nestedLayout ? (
+                      <div
+                        className="builder-nested-layout"
+                        style={
+                          {
+                            "--builder-nested-row-count":
+                              nestedLayout.rows.length,
+                          } as CSSProperties
+                        }
+                      >
+                        {nestedLayout.rows.map((nestedRow) => (
+                          <div
+                            key={nestedRow.id}
+                            className="builder-nested-row"
+                            style={{ "--builder-nested-row-weight": nestedRow.weight } as CSSProperties}
+                          >
+                            {nestedRow.columns.map((nestedColumn) => (
+                              <div
+                                key={nestedColumn.id}
+                                className="builder-nested-column"
+                              >
+                                {renderColumnBlocks(nestedColumn.blocks)}
+                              </div>
+                            ))}
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      renderColumnBlocks(blocks)
+                    )}
                   </article>
                 );
               })}
@@ -3787,7 +3835,12 @@ function StorefrontBuilderRendererBase({
       /> : null}
       <RootElement
         className={`${designClassName(layout)}${rootElement === "footer" ? " site-footer-builder" : ""}`}
-        style={designStyle(layout)}
+        style={
+          {
+            ...designStyle(layout),
+            ...builderGeometryCssVariables(),
+          } as CSSProperties
+        }
         data-builder-page-root
         data-gsap-home={isHomePage ? true : undefined}
         data-overlap-header={isPageDocument && (pullUnderHeader || headerOverlay) ? "true" : undefined}

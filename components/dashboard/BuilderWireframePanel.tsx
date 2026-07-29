@@ -39,12 +39,11 @@ import {
   getBuilderLayoutRows,
   getBuilderRowLayoutPreset,
 } from "@/components/dashboard/builderLayoutPresets";
+import { layoutColumnHasContent } from "@/lib/builderNestedLayout";
 
-export type BuilderHoverTarget =
-  | { type: "section"; sectionId: string }
-  | { type: "row"; sectionId: string; rowIndex: number }
-  | { type: "column"; sectionId: string; columnKey: string }
-  | { type: "block"; sectionId: string; columnKey: string; blockKey: string };
+import type { BuilderInteractionTarget } from "@/components/dashboard/builderInteraction";
+
+export type BuilderHoverTarget = BuilderInteractionTarget;
 
 type BuilderWireframePanelProps = {
   page: BuilderLayoutKey;
@@ -601,7 +600,12 @@ export default function BuilderWireframePanel({
 
                         // Check if row is empty (safe delete condition)
                         const isEmptyRow = row.items.every(
-                          (item) => (item.blocks ?? []).length === 0,
+                          (item) =>
+                            !layoutColumnHasContent(
+                              item as NonNullable<
+                                BuilderSection["layoutItems"]
+                              >[number],
+                            ),
                         );
 
                         const preset = getBuilderRowLayoutPreset(row.layoutKey ?? null);
@@ -720,6 +724,10 @@ export default function BuilderWireframePanel({
                             {!rowCollapsed && (
                               <div className="builder-wireframe-children builder-wireframe-children--columns">
                                 {row.items.map((item, columnIndex) => {
+                                  const typedItem =
+                                    item as NonNullable<
+                                      BuilderSection["layoutItems"]
+                                    >[number];
                                   const flatIndex = row.startIndex + columnIndex;
                                   const columnKey =
                                     item.id ?? `layout-item-${flatIndex}`;
@@ -768,7 +776,89 @@ export default function BuilderWireframePanel({
                                         </span>
                                       </button>
 
-                                      <div className="builder-wireframe-children builder-wireframe-children--blocks">
+                                      {typedItem.nestedLayout && (
+                                        <div className="builder-wireframe-children builder-wireframe-children--blocks builder-wireframe-nested-layout">
+                                          {typedItem.nestedLayout.rows.map(
+                                            (nestedRow, nestedRowIndex) => (
+                                              <div
+                                                key={nestedRow.id}
+                                                className="builder-wireframe-nested-row"
+                                              >
+                                                <span className="builder-wireframe-nested-row-label">
+                                                  Nested row {nestedRowIndex + 1}
+                                                </span>
+                                                {nestedRow.columns.map(
+                                                  (nestedColumn, nestedColumnIndex) => {
+                                                    const nestedSelected =
+                                                      selectedSectionId === section.id &&
+                                                      selectedLayoutColumnKey === nestedColumn.id &&
+                                                      selectedLayoutBlockKey === null;
+                                                    return (
+                                                      <div key={nestedColumn.id}>
+                                                        <button
+                                                          type="button"
+                                                          className={`builder-wireframe-item builder-wireframe-item--column${nestedSelected ? " is-selected" : ""}`}
+                                                          onClick={() =>
+                                                            onSelectColumn(
+                                                              section.id,
+                                                              nestedColumn.id,
+                                                            )
+                                                          }
+                                                        >
+                                                          <Columns3 size={12} className="builder-wireframe-icon builder-wireframe-icon--column" />
+                                                          <span className="builder-wireframe-label-wrap">
+                                                            <strong>
+                                                              Column {nestedColumnIndex + 1}
+                                                            </strong>
+                                                          </span>
+                                                          <em className="builder-wireframe-count">
+                                                            {nestedColumn.blocks.length}
+                                                          </em>
+                                                        </button>
+                                                        {nestedColumn.blocks.map(
+                                                          (block, blockIndex) => {
+                                                            const blockKey =
+                                                              block.id ??
+                                                              `${nestedColumn.id}-block-${blockIndex}`;
+                                                            const blockSelected =
+                                                              selectedSectionId === section.id &&
+                                                              selectedLayoutColumnKey === nestedColumn.id &&
+                                                              selectedLayoutBlockKey === blockKey;
+                                                            return (
+                                                              <button
+                                                                type="button"
+                                                                key={blockKey}
+                                                                className={`builder-wireframe-item builder-wireframe-item--block${blockSelected ? " is-selected" : ""}`}
+                                                                onClick={() =>
+                                                                  onSelectBlock(
+                                                                    section.id,
+                                                                    nestedColumn.id,
+                                                                    blockKey,
+                                                                  )
+                                                                }
+                                                              >
+                                                                {getBlockIcon(block.kind ?? "text")}
+                                                                <span className="builder-wireframe-label-wrap">
+                                                                  <strong>
+                                                                    {layoutBlockLabels[
+                                                                      (block.kind ?? "text") as LayoutBlockKind
+                                                                    ] ?? "Element"}
+                                                                  </strong>
+                                                                </span>
+                                                              </button>
+                                                            );
+                                                          },
+                                                        )}
+                                                      </div>
+                                                    );
+                                                  },
+                                                )}
+                                              </div>
+                                            ),
+                                          )}
+                                        </div>
+                                      )}
+                                      {!typedItem.nestedLayout && <div className="builder-wireframe-children builder-wireframe-children--blocks">
                                         {blocks.length === 0 ? (
                                           <button
                                             type="button"
@@ -912,7 +1002,7 @@ export default function BuilderWireframePanel({
                                             );
                                           })
                                         )}
-                                      </div>
+                                      </div>}
                                     </div>
                                   );
                                 })}

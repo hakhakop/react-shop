@@ -236,6 +236,24 @@
   grid-column: 2 / -1;
 }
 
+.builder-dashboard.is-inspector-docked {
+  grid-template-columns:
+    var(--builder-sidebar-width, 390px)
+    minmax(0, 1fr)
+    var(--builder-inspector-width, 360px);
+}
+
+.builder-dashboard.is-sidebar-collapsed.is-inspector-docked {
+  grid-template-columns:
+    64px
+    minmax(0, 1fr)
+    var(--builder-inspector-width, 360px);
+}
+
+.builder-dashboard.is-sidebar-collapsed.is-inspector-docked .builder-workspace {
+  grid-column: 2;
+}
+
 .builder-sidebar-top {
   display: flex;
   align-items: center;
@@ -5315,20 +5333,45 @@ body:has([data-scoped-preview-root]) [data-scoped-preview-root] .site-header {
   display: block !important;
 }
 
-[data-theme="dark"] .builder-dashboard.builder-preview-scheme-auto,
-.dark .builder-dashboard.builder-preview-scheme-auto {
+.builder-preview-shell[data-theme="dark"] {
   --builder-preview-effective-bg: #101010 !important;
   --builder-preview-real-bg: #101010 !important;
+  --surface-main: #101010;
+  --surface-muted: #24241f;
+  --surface-soft: #24241f;
+  --text-main: #f7f7f1;
+  --text-muted: #c8c8be;
+  color-scheme: dark;
 }
 
-[data-theme="dark"] .builder-preview-canvas,
-.dark .builder-preview-canvas {
+.builder-preview-shell[data-theme="light"] {
+  --builder-preview-effective-bg: var(
+    --builder-preview-shell-bg,
+    #f7f7f4
+  ) !important;
+  --builder-preview-real-bg: var(
+    --builder-preview-shell-bg,
+    #f7f7f4
+  ) !important;
+  --surface-main: var(--builder-preview-shell-bg, #f7f7f4);
+  --surface-muted: #efefe9;
+  --surface-soft: #efefe9;
+  --text-main: #111111;
+  --text-muted: #5f5f58;
+  color-scheme: light;
+}
+
+.builder-preview-shell[data-theme="dark"] .builder-preview-canvas {
   background: #101010 !important;
   color: #f7f7f1;
 }
 
-[data-theme="dark"] .builder-preview-page,
-.dark .builder-preview-page {
+.builder-preview-shell[data-theme="light"] .builder-preview-canvas {
+  background: var(--builder-preview-shell-bg, #f7f7f4) !important;
+  color: #111111;
+}
+
+.builder-preview-shell[data-theme="dark"] .builder-preview-page {
   --builder-page-bg: #101010;
   --builder-text: #f7f7f1;
   --builder-muted: #c8c8be;
@@ -5337,6 +5380,83 @@ body:has([data-scoped-preview-root]) [data-scoped-preview-root] .site-header {
   --builder-button-text: #101010;
   background: #101010 !important;
   color: #f7f7f1 !important;
+}
+
+.builder-preview-shell[data-theme="light"] .builder-preview-page {
+  background: var(
+    --builder-page-bg,
+    var(--builder-preview-shell-bg, #f7f7f4)
+  ) !important;
+  color: var(--builder-preview-text, #111111) !important;
+}
+
+/* The preview is a storefront theme boundary. Builder chrome may use the
+   opposite theme, but Princity header surfaces and controls resolve only from
+   this boundary. */
+.builder-preview-shell[data-theme="light"]
+  #site-header-pill
+  .site-header-princity-inner {
+  --surface-main: var(--builder-preview-shell-bg, #f7f7f4);
+  --surface-muted: #efefe9;
+  --text-main: #111111;
+  --text-muted: #5f5f58;
+  color: #111111;
+}
+
+.builder-preview-shell[data-theme="light"]
+  #site-header-pill
+  .site-header-princity
+  .site-header-nav-link,
+.builder-preview-shell[data-theme="light"]
+  #site-header-pill
+  .site-header-princity
+  .site-header-action-pill,
+.builder-preview-shell[data-theme="light"]
+  #site-header-pill
+  .site-header-princity
+  .theme-toggle-btn {
+  color: #111111 !important;
+}
+
+.builder-preview-shell[data-theme="light"]
+  #site-header-pill
+  .site-header-princity
+  .site-header-logo-img-wrap
+  img {
+  filter: grayscale(1) contrast(1.1) !important;
+}
+
+.builder-preview-shell[data-theme="dark"]
+  #site-header-pill
+  .site-header-princity-inner {
+  --surface-main: #101010;
+  --surface-muted: #24241f;
+  --text-main: #f7f7f1;
+  --text-muted: #c8c8be;
+  color: #f7f7f1;
+}
+
+.builder-preview-shell[data-theme="dark"]
+  #site-header-pill
+  .site-header-princity
+  .site-header-nav-link,
+.builder-preview-shell[data-theme="dark"]
+  #site-header-pill
+  .site-header-princity
+  .site-header-action-pill,
+.builder-preview-shell[data-theme="dark"]
+  #site-header-pill
+  .site-header-princity
+  .theme-toggle-btn {
+  color: #f7f7f1 !important;
+}
+
+.builder-preview-shell[data-theme="dark"]
+  #site-header-pill
+  .site-header-princity
+  .site-header-logo-img-wrap
+  img {
+  filter: grayscale(1) contrast(1.1) invert(1) !important;
 }
 
 .builder-preview-header-slot:has(
@@ -5444,12 +5564,12 @@ body:has([data-scoped-preview-root]) [data-scoped-preview-root] .site-header {
 .builder-preview-mobile .builder-preview-section {
   padding: var(
       --builder-section-padding-top,
-      var(--builder-global-section-padding-top, clamp(28px, 5vw, 72px))
+      var(--builder-global-section-padding-top, 64px)
     )
     clamp(28px, 5vw, 72px)
     var(
       --builder-section-padding-bottom,
-      var(--builder-global-section-padding-bottom, clamp(28px, 5vw, 72px))
+      var(--builder-global-section-padding-bottom, 64px)
     );
 }
 
@@ -6702,19 +6822,23 @@ body[data-storefront-preset="princity"]
 }
 
 .builder-preview-row-insert {
-  position: relative;
+  position: absolute;
   z-index: 22;
-  grid-column: 1 / -1;
-  height: 0;
-  min-height: 0;
+  right: 0;
+  bottom: calc(var(--builder-editor-row-interaction-gutter, 10px) / -2);
+  left: 0;
+  height: var(--builder-editor-row-interaction-gutter, 10px);
+  min-height: var(--builder-editor-row-interaction-gutter, 10px);
   margin: 0;
   overflow: visible;
+  transform: none;
 }
 
 .builder-preview-row-insert-trigger {
   position: absolute;
   z-index: 1;
-  top: 0;
+  top: 50%;
+  right: auto;
   left: 50%;
   min-height: 26px;
   padding: 4px 10px;
@@ -6765,8 +6889,8 @@ body[data-storefront-preset="princity"]
 .builder-preview-content-layout-grid article {
   position: relative;
   min-width: 0;
-  padding: 8px;
-  border-radius: 6px;
+  padding: 0;
+  border-radius: 0;
   background: transparent;
   box-shadow: inset 0 0 0 1px transparent;
   cursor: pointer;
@@ -6861,7 +6985,7 @@ body[data-storefront-preset="princity"]
 }
 
 .builder-preview-content-layout-grid article.is-empty-column {
-  min-height: 96px;
+  min-height: 0;
 }
 
 .builder-preview-column-label {
@@ -6885,12 +7009,18 @@ body[data-storefront-preset="princity"]
 }
 
 .builder-preview-drop-zone {
-  min-height: 74px;
-  border: 1px dashed rgba(17, 17, 17, 0.16);
-  border-radius: 6px;
-  padding: 10px;
-  display: grid;
-  place-items: center;
+  min-height: var(--builder-structure-empty-column-min-height, 64px);
+  border: 1px dashed
+    rgb(
+      17 17 17 /
+        var(--builder-structure-placeholder-border-opacity, 0.12)
+    );
+  border-radius: 0;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
   color: color-mix(
     in srgb,
     var(--builder-preview-section-text, var(--builder-preview-text, #111111))
@@ -6898,18 +7028,79 @@ body[data-storefront-preset="princity"]
     transparent
   );
   text-align: center;
-  background: transparent;
+  background: rgb(
+    17 17 17 /
+      var(--builder-structure-placeholder-surface-opacity, 0.025)
+  );
   transition:
     border-color 0.14s ease,
     color 0.14s ease,
     background-color 0.14s ease;
 }
 
+.builder-structural-placeholder-mark {
+  width: 24px;
+  height: 24px;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 auto;
+  opacity: 0.52;
+}
+
+.builder-structural-placeholder-copy {
+  display: grid;
+  justify-items: start;
+  line-height: 1.15;
+  opacity: var(--builder-structure-placeholder-label-opacity, 0.58);
+}
+
+.builder-structural-placeholder-copy strong {
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.builder-structural-placeholder-copy small {
+  margin-top: 3px;
+  font-size: 10px;
+}
+
+.builder-preview-content-row:has(.builder-preview-drop-zone) {
+  min-height: var(--builder-structure-empty-row-min-height, 72px);
+  position: relative;
+}
+
+.builder-structural-row-identity {
+  position: absolute;
+  z-index: 1;
+  top: 4px;
+  left: 6px;
+  display: inline-flex;
+  gap: 5px;
+  pointer-events: none;
+  color: var(
+    --builder-preview-section-text,
+    var(--builder-preview-text, #111111)
+  );
+  font-size: 9px;
+  line-height: 1;
+  opacity: 0.38;
+}
+
+.builder-structural-row-identity span {
+  font-weight: 750;
+}
+
+.builder-structural-row-identity small {
+  font: inherit;
+}
+
 .builder-preview-content-layout-grid article:hover .builder-preview-drop-zone,
 .builder-preview-content-layout-grid
   article.is-selected-column
   .builder-preview-drop-zone {
-  border-color: rgba(17, 17, 17, 0.24);
+  border-color: rgba(13, 115, 255, 0.28);
   color: var(
     --builder-preview-section-text,
     var(--builder-preview-text, #111111)
@@ -6951,15 +7142,15 @@ body[data-storefront-preset="princity"]
 }
 
 .builder-preview-layout-block + .builder-preview-layout-block {
-  margin-top: 14px;
-  padding-top: 14px;
-  border-top: 1px solid rgba(17, 17, 17, 0.06);
+  margin-top: 0;
+  padding-top: 0;
+  border-top: 0;
 }
 
 .builder-preview-layout-block {
   position: relative;
-  padding: 8px;
-  border-radius: var(--builder-card-radius, var(--builder-radius, 8px));
+  padding: 0;
+  border-radius: 0;
   background: var(--builder-element-bg, transparent);
   box-shadow: inset 0 0 0 1px transparent;
   cursor: grab;
@@ -7858,6 +8049,47 @@ body[data-storefront-preset="princity"]
 .shop-builder-grid-image > span:not(.builder-preview-image-upload span) {
   color: #7a7a73;
   font-size: 12px;
+}
+
+.builder-preview-canvas .shop-builder-grid-image.is-empty {
+  aspect-ratio: var(--builder-structure-card-placeholder-ratio, 4 / 3);
+  min-height: 0;
+  background:
+    linear-gradient(
+      135deg,
+      rgb(17 17 17 / 0.035),
+      rgb(17 17 17 / 0.012)
+    );
+}
+
+.builder-structural-card-placeholder {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 7px;
+  color: currentColor;
+  opacity: var(--builder-structure-placeholder-label-opacity, 0.58);
+  pointer-events: none;
+}
+
+.builder-structural-card-placeholder > span {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.builder-structural-card-placeholder i {
+  width: min(58%, 120px);
+  height: 3px;
+  background: currentColor;
+  opacity: 0.22;
+}
+
+.builder-structural-card-placeholder i:last-child {
+  width: min(38%, 76px);
 }
 
 .shop-builder-grid-meta {
@@ -10515,8 +10747,8 @@ body[data-storefront-preset="princity"]
 /* Larger template drop targets. These keep the visible layout tight while
    giving drag/drop a forgiving target area. */
 .builder-preview-section-insert {
-  width: min(560px, calc(100% - 32px)) !important;
-  min-height: 58px !important;
+  width: min(420px, calc(100% - 32px)) !important;
+  min-height: var(--builder-editor-insertion-hit-size, 32px) !important;
   align-items: center;
   justify-content: center;
   pointer-events: auto;
@@ -10551,21 +10783,26 @@ body[data-storefront-preset="princity"]
 }
 
 .builder-preview-row-insert {
-  min-height: 38px !important;
-  height: 38px !important;
-  margin: -19px 0 !important;
-  display: grid;
-  place-items: center;
+  min-height: var(--builder-editor-row-interaction-gutter, 10px) !important;
+  height: var(--builder-editor-row-interaction-gutter, 10px) !important;
+  margin: 0 !important;
+  display: block;
   overflow: visible;
   pointer-events: auto;
+  transform: none;
 }
 
 .builder-preview-row-insert::before {
   content: "";
   position: absolute;
-  inset: 4px 18px;
-  border: 1px dashed rgba(13, 115, 255, 0);
-  border-radius: 999px;
+  top: 50%;
+  right: 18px;
+  bottom: auto;
+  left: 18px;
+  height: 0;
+  border: 0;
+  border-top: 1px dashed rgba(13, 115, 255, 0);
+  border-radius: 0;
   background: rgba(13, 115, 255, 0);
   transition:
     background 140ms ease,
@@ -13098,6 +13335,603 @@ article.is-selected-column > .builder-preview-box-spacing,
   box-shadow: inset 0 0 0 1.5px var(--builder-ui-accent, #3b82f6) !important;
 }
 
+/* Canonical canvas chrome contract.
+   State comes from builderInteraction.ts; native nested :hover is intentionally
+   neutralized so only the directly resolved object can own visible chrome. */
+.builder-preview-canvas .builder-interaction-object {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.builder-preview-canvas
+  .builder-interaction-object.is-interaction-hovered {
+  outline: 1px solid color-mix(in srgb, var(--builder-ui-accent) 38%, transparent) !important;
+  outline-offset: -1px !important;
+}
+
+.builder-preview-canvas
+  .builder-interaction-object.is-interaction-selected,
+.builder-preview-canvas
+  .builder-interaction-object.is-interaction-editing {
+  outline: 1.5px solid var(--builder-ui-accent, #0d73ff) !important;
+  outline-offset: -1px !important;
+}
+
+.builder-preview-canvas
+  .builder-interaction-object.is-interaction-insertion-target {
+  outline: 2px solid #8b5cf6 !important;
+  outline-offset: -2px !important;
+}
+
+.builder-preview-content-row.builder-interaction-row {
+  position: relative;
+  z-index: 1;
+}
+
+/* Editor-only row geometry. The frame has the exact website dimensions;
+   pseudo-elements extend hit testing without contributing to layout. */
+.builder-preview-canvas .builder-interaction-row-frame {
+  position: relative;
+  min-width: 0;
+  outline: none;
+}
+
+.builder-preview-canvas .builder-interaction-row-frame::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  top: calc(var(--builder-editor-row-interaction-gutter, 10px) / -2);
+  right: 0;
+  bottom: calc(var(--builder-editor-row-interaction-gutter, 10px) / -2);
+  left: 0;
+  pointer-events: auto;
+}
+
+.builder-preview-canvas
+  .builder-interaction-row-frame:has(
+    > .builder-interaction-row > article.is-empty-column
+  )::after {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  inset: calc(var(--builder-editor-row-interaction-gutter, 10px) / -2) 0;
+  border: 1px solid rgba(15, 23, 42, 0.045);
+  background: rgba(15, 23, 42, 0.012);
+  pointer-events: none;
+}
+
+.builder-preview-canvas
+  .builder-interaction-row-frame:focus-visible
+  > .builder-interaction-row {
+  outline: 1px solid
+    color-mix(in srgb, var(--builder-ui-accent) 48%, transparent) !important;
+  outline-offset: calc(
+    var(--builder-editor-row-interaction-gutter, 10px) / 2
+  ) !important;
+}
+
+.builder-preview-canvas
+  .builder-interaction-row.is-interaction-hovered,
+.builder-preview-canvas
+  .builder-interaction-row.is-interaction-selected {
+  outline-offset: calc(
+    var(--builder-editor-row-interaction-gutter, 10px) / 2
+  ) !important;
+}
+
+.builder-preview-canvas
+  .builder-interaction-row.is-interaction-hovered {
+  outline-style: dashed !important;
+}
+
+.builder-preview-canvas
+  .builder-interaction-column.is-interaction-hovered {
+  outline-color: color-mix(
+    in srgb,
+    var(--builder-ui-accent) 46%,
+    transparent
+  ) !important;
+}
+
+.builder-preview-canvas
+  .builder-interaction-row.is-interaction-selected {
+  outline-width: 2px !important;
+  background: transparent;
+}
+
+/* A boundary is dormant chrome: its transparent hit strip is available, but
+   neither rail nor button is painted until it owns hover/focus/drag state. */
+.builder-preview-canvas .builder-interaction-row-boundary {
+  opacity: 1;
+}
+
+.builder-preview-canvas
+  .builder-interaction-row-boundary::before {
+  opacity: 0;
+}
+
+.builder-preview-canvas
+  .builder-interaction-row-boundary:hover::before,
+.builder-preview-canvas
+  .builder-interaction-row-boundary:focus-within::before,
+.builder-preview-canvas
+  .builder-interaction-row-boundary.is-template-drag-over::before {
+  opacity: 1;
+}
+
+/* Selected row/column chrome owns both adjoining edges. Suppress those rails
+   so a toolbar and an insertion boundary can never compete. */
+.builder-preview-canvas
+  .builder-interaction-row-frame:has(.is-interaction-selected)
+  > .builder-interaction-row-boundary,
+.builder-preview-canvas
+  .builder-interaction-row-frame:has(
+    + .builder-interaction-row-frame .is-interaction-selected
+  )
+  > .builder-interaction-row-boundary {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.builder-preview-canvas
+  .builder-interaction-column.is-interaction-selected {
+  outline-width: 1.5px !important;
+  background: transparent;
+}
+
+.builder-preview-canvas .builder-preview-section-tools,
+.builder-preview-canvas .builder-preview-row-toolbar,
+.builder-preview-canvas .builder-preview-block-tools {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transition:
+    opacity 120ms ease,
+    transform 120ms ease !important;
+}
+
+.builder-preview-canvas
+  .is-interaction-selected
+  > .builder-preview-section-tools,
+.builder-preview-canvas
+  .is-interaction-selected
+  > .builder-preview-row-toolbar,
+.builder-preview-canvas
+  .is-interaction-selected
+  > .builder-preview-block-tools {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  transform: scale(1) !important;
+}
+
+/* Fine-pointer discovery: the resolver mounts one toolbar only after its
+   hover dwell has elapsed. Touch remains selection-first. */
+@media (hover: hover) and (pointer: fine) {
+  .builder-preview-canvas
+    .is-interaction-hovered
+    > .builder-preview-section-tools,
+  .builder-preview-canvas
+    .is-interaction-hovered
+    > .builder-preview-row-toolbar,
+  .builder-preview-canvas
+    .is-interaction-hovered
+    > .builder-preview-block-tools {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    transform: scale(1) !important;
+  }
+}
+
+/* Row tools sit outside the rendered row and claim the same edge as the
+   suppressed boundary. They therefore clear both drop targets and rails. */
+.builder-preview-canvas
+  .builder-interaction-row:is(
+    .is-interaction-selected,
+    .is-interaction-hovered
+  )
+  > .builder-preview-row-toolbar {
+  top: 0 !important;
+  right: 8px !important;
+  bottom: auto !important;
+  transform: translateY(calc(-100% - 6px)) !important;
+}
+
+.builder-preview-canvas
+  .builder-interaction-column:is(
+    .is-interaction-selected,
+    .is-interaction-hovered
+  )
+  > .builder-preview-column-toolbar {
+  top: 0 !important;
+  right: 6px !important;
+  bottom: auto !important;
+  transform: translateY(calc(-100% - 6px)) !important;
+}
+
+.builder-preview-canvas.is-text-editing .builder-preview-section-tools,
+.builder-preview-canvas.is-text-editing .builder-preview-row-toolbar,
+.builder-preview-canvas.is-text-editing .builder-preview-block-tools,
+.builder-preview-canvas.is-text-editing .builder-preview-section-insert,
+.builder-preview-canvas.is-text-editing .builder-preview-row-insert,
+.builder-preview-canvas.is-text-editing .builder-preview-drag-handle,
+.builder-preview-canvas.is-text-editing .builder-preview-column-label,
+.builder-preview-canvas.is-text-editing .builder-preview-spacing-layer,
+.builder-preview-canvas.is-text-editing .builder-preview-box-spacing {
+  display: none !important;
+}
+
+.builder-preview-canvas .builder-preview-column-label {
+  display: none !important;
+}
+
+.builder-preview-canvas
+  .is-interaction-selected
+  > .builder-preview-drag-handle {
+  display: inline-flex !important;
+  opacity: 0.62 !important;
+  pointer-events: none;
+}
+
+/* Canonical insertion affordances: one calm boundary control per owner. */
+.builder-preview-canvas:not(.is-dragging-template-section)
+  .builder-preview-section-insert--top {
+  pointer-events: none !important;
+}
+
+.builder-preview-canvas:not(.is-dragging-template-section)
+  .builder-preview-section-insert--top
+  .builder-preview-section-insert-trigger {
+  display: none !important;
+}
+
+.builder-preview-section-insert-trigger,
+.builder-preview-row-insert-trigger,
+.builder-preview-column-insert-trigger {
+  width: 28px !important;
+  height: 28px !important;
+  min-width: 28px;
+  min-height: 28px;
+  border: 1px solid
+    color-mix(in srgb, var(--builder-ui-accent, #0d73ff) 26%, transparent);
+  border-radius: 999px !important;
+  padding: 0 !important;
+  display: inline-grid !important;
+  place-items: center;
+  background: color-mix(
+    in srgb,
+    var(--builder-ui-panel-solid, #ffffff) 90%,
+    transparent
+  ) !important;
+  color: color-mix(
+    in srgb,
+    var(--builder-ui-accent, #0d73ff) 72%,
+    var(--builder-ui-text, #111111)
+  ) !important;
+  box-shadow:
+    0 4px 14px rgba(15, 23, 42, 0.1),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.3) !important;
+  cursor: pointer;
+  opacity: 0.2 !important;
+  overflow: visible !important;
+  transition:
+    opacity 140ms ease,
+    color 140ms ease,
+    background-color 140ms ease,
+    border-color 140ms ease,
+    box-shadow 140ms ease,
+    transform 140ms ease !important;
+}
+
+.builder-preview-section-insert-trigger > span,
+.builder-preview-row-insert-trigger > span,
+.builder-preview-column-insert-trigger > span {
+  position: absolute;
+  left: calc(100% + 8px);
+  top: 50%;
+  width: max-content;
+  padding: 5px 8px;
+  border-radius: 6px;
+  background: var(--builder-ui-panel-solid, #111827);
+  color: var(--builder-ui-text, #ffffff);
+  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.18);
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-3px, -50%);
+  transition:
+    opacity 120ms ease,
+    transform 120ms ease;
+}
+
+.builder-preview-section-insert-trigger:hover > span,
+.builder-preview-section-insert-trigger:focus-visible > span,
+.builder-preview-row-insert-trigger:hover > span,
+.builder-preview-row-insert-trigger:focus-visible > span,
+.builder-preview-column-insert-trigger:hover > span,
+.builder-preview-column-insert-trigger:focus-visible > span {
+  opacity: 1;
+  transform: translate(0, -50%);
+}
+
+.builder-preview-section-insert:hover .builder-preview-section-insert-trigger,
+.builder-preview-section-insert:focus-within
+  .builder-preview-section-insert-trigger,
+.builder-preview-row-insert:hover .builder-preview-row-insert-trigger,
+.builder-preview-row-insert:focus-within .builder-preview-row-insert-trigger,
+.builder-interaction-column:hover > .builder-preview-column-insert-trigger,
+.builder-preview-column-insert-trigger:focus-visible {
+  opacity: 0.88 !important;
+}
+
+.builder-preview-section-insert-trigger:hover,
+.builder-preview-section-insert-trigger:focus-visible,
+.builder-preview-row-insert-trigger:hover,
+.builder-preview-row-insert-trigger:focus-visible,
+.builder-preview-column-insert-trigger:hover,
+.builder-preview-column-insert-trigger:focus-visible {
+  border-color: color-mix(
+    in srgb,
+    var(--builder-ui-accent, #0d73ff) 72%,
+    transparent
+  ) !important;
+  background: var(--builder-ui-accent, #0d73ff) !important;
+  color: #ffffff !important;
+  box-shadow: 0 8px 22px rgba(13, 115, 255, 0.24) !important;
+}
+
+.builder-preview-section-insert-trigger:hover,
+.builder-preview-section-insert-trigger:focus-visible {
+  transform: scale(1.05) !important;
+}
+
+.builder-preview-row-insert-trigger:hover,
+.builder-preview-row-insert-trigger:focus-visible {
+  transform: translate(-50%, -50%) scale(1.05) !important;
+}
+
+.builder-preview-column-insert-trigger {
+  position: absolute;
+  z-index: 8;
+  right: 8px;
+  bottom: 7px;
+  width: 22px !important;
+  height: 22px !important;
+  min-width: 22px;
+  min-height: 22px;
+  opacity: 0 !important;
+}
+
+.builder-preview-column-insert-trigger.is-beside {
+  top: 50%;
+  right: -11px;
+  bottom: auto;
+  transform: translateY(-50%);
+}
+
+.builder-preview-column-insert-trigger.is-below {
+  right: auto;
+  bottom: -11px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* A full-width editor-only boundary owns discovery while the visible control
+   remains the same compact 22px button centered on the column border. */
+.builder-preview-column-insert-boundary.is-below-boundary {
+  position: absolute;
+  z-index: 8;
+  right: 0;
+  bottom: -14px;
+  left: 0;
+  height: 28px;
+}
+
+.builder-preview-column-insert-boundary.is-below-boundary
+  > .builder-preview-column-insert-trigger.is-below {
+  bottom: 3px;
+}
+
+.builder-interaction-column:is(:hover, .is-interaction-hovered, :focus-within)
+  > .builder-preview-column-insert-boundary
+  > .builder-preview-column-insert-trigger.is-below,
+.builder-preview-column-insert-boundary:is(:hover, :focus-within)
+  > .builder-preview-column-insert-trigger.is-below {
+  opacity: 0.88 !important;
+}
+
+.builder-nested-row-frame:hover
+  > .builder-preview-column-insert-boundary
+  > .builder-preview-column-insert-trigger.is-below {
+  opacity: 0.88 !important;
+}
+
+.builder-preview-column-insert-trigger.is-beside:hover,
+.builder-preview-column-insert-trigger.is-beside:focus-visible {
+  transform: translateY(-50%) scale(1.05) !important;
+}
+
+.builder-preview-column-insert-trigger.is-below:hover,
+.builder-preview-column-insert-trigger.is-below:focus-visible {
+  transform: translateX(-50%) scale(1.05) !important;
+}
+
+.builder-nested-layout-container > .builder-nested-layout {
+  min-height: 0;
+}
+
+.builder-nested-layout-container > .builder-preview-column-toolbar,
+.builder-nested-layout .builder-preview-column-toolbar {
+  top: 6px !important;
+  right: 6px !important;
+  transform: scale(0.96) !important;
+}
+
+.builder-nested-layout-container.is-interaction-selected
+  > .builder-preview-column-toolbar,
+.builder-nested-layout
+  .is-interaction-selected
+  > .builder-preview-column-toolbar,
+.builder-nested-layout-container > .builder-preview-column-toolbar:hover,
+.builder-nested-layout .builder-preview-column-toolbar:hover {
+  transform: scale(1) !important;
+}
+
+.builder-preview-canvas
+  .builder-nested-layout
+{
+  display: block;
+  height: 100%;
+}
+
+.builder-preview-canvas
+  .builder-nested-layout
+  > .shop-builder-section-content {
+  height: 100%;
+  min-height: 0;
+}
+
+.builder-preview-canvas
+  .builder-nested-layout
+  > .shop-builder-section-content
+  > .shop-builder-content-layout-grid {
+  display: grid !important;
+  height: 100%;
+  grid-template-rows: repeat(
+    var(--builder-nested-row-count, 2),
+    minmax(var(--builder-structure-empty-column-min-height, 64px), 1fr)
+  );
+  gap: var(--builder-global-row-gap, 32px) !important;
+  align-content: stretch;
+}
+
+.builder-preview-canvas
+  .builder-nested-layout
+  .builder-interaction-row-frame {
+  min-height: 0;
+}
+
+.builder-preview-canvas
+  .builder-nested-layout
+  .builder-preview-content-row {
+  height: 100%;
+  min-height: var(--builder-structure-empty-column-min-height, 64px);
+}
+
+.builder-wireframe-nested-layout {
+  margin-left: 10px;
+  padding-left: 8px;
+  border-left: 1px solid var(--builder-ui-border);
+}
+
+.builder-wireframe-nested-row + .builder-wireframe-nested-row {
+  margin-top: 6px;
+}
+
+.builder-wireframe-nested-row-label {
+  display: block;
+  margin: 0 0 3px 7px;
+  color: var(--builder-ui-muted);
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.builder-preview-column-insert-trigger > span {
+  right: 0;
+  bottom: calc(100% + 7px);
+  left: auto;
+  top: auto;
+  transform: translateY(3px);
+}
+
+.builder-preview-column-insert-trigger:hover > span,
+.builder-preview-column-insert-trigger:focus-visible > span {
+  transform: translateY(0);
+}
+
+.builder-preview-canvas.is-text-editing
+  .builder-preview-column-insert-trigger,
+.builder-preview-canvas[class*="is-dragging-template-"]
+  .builder-preview-column-insert-trigger,
+.is-resizing-device .builder-preview-column-insert-trigger {
+  display: none !important;
+}
+
+.builder-preview-canvas:not(.is-dragging-template-section)
+  .builder-preview-section-insert-trigger,
+.builder-preview-canvas:not(.is-dragging-template-row)
+  .builder-preview-row-insert-trigger {
+  opacity: 0 !important;
+}
+
+.builder-preview-canvas
+  .builder-interaction-row-frame
+  > .builder-interaction-row-boundary {
+  visibility: visible !important;
+  pointer-events: auto !important;
+}
+
+.builder-preview-canvas:not(.is-text-editing)
+  .builder-preview-section-insert:hover
+  .builder-preview-section-insert-trigger,
+.builder-preview-canvas:not(.is-text-editing)
+  .builder-preview-section-insert:focus-within
+  .builder-preview-section-insert-trigger,
+.builder-preview-canvas:not(.is-text-editing)
+  .builder-preview-row-insert:hover
+  .builder-preview-row-insert-trigger,
+.builder-preview-canvas:not(.is-text-editing)
+  .builder-preview-row-insert:focus-within
+  .builder-preview-row-insert-trigger {
+  opacity: 1 !important;
+}
+
+.builder-preview-column-toolbar {
+  top: 6px !important;
+  right: 6px !important;
+  bottom: auto !important;
+  left: auto !important;
+}
+
+.builder-preview-shell:not(.is-spacing-overlay-enabled)
+  .builder-preview-canvas
+  .builder-preview-spacing-layer,
+.builder-preview-shell:not(.is-spacing-overlay-enabled)
+  .builder-preview-canvas
+  .builder-preview-box-spacing {
+  display: none !important;
+}
+
+/* Header-document compatibility: it uses the same one-owner rule while its
+   document-specific renderer is migrated through the legacy selection IDs. */
+.builder-header-document-preview:not(.is-selected)
+  > .builder-header-document-tools,
+.builder-header-document-preview
+  .builder-header-live-row:not(.is-selected)
+  > .builder-header-live-row-tools,
+.builder-header-document-preview
+  .builder-header-live-element:not(.is-selected-block)
+  > .builder-preview-block-tools {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+.builder-header-document-preview.is-selected
+  > .builder-header-document-tools,
+.builder-header-document-preview
+  .builder-header-live-row.is-selected
+  > .builder-header-live-row-tools,
+.builder-header-document-preview
+  .builder-header-live-element.is-selected-block
+  > .builder-preview-block-tools {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  transform: scale(1) !important;
+}
+
 /* In the Header editor the slot owns the scroll relationship with the locked
    page preview. Mirror document behavior on that slot without changing the
    shared Header renderer's geometry. */
@@ -13114,19 +13948,106 @@ article.is-selected-column > .builder-preview-box-spacing,
   z-index: 10000;
 }
 
-/* Phase 4 workspace: navigation stays left; the one shared Inspector floats right. */
+/* Inspector workspace modes: docked owns a real grid column; floating alone
+   overlays the canvas and can be moved/resized inside the viewport. */
 .builder-floating-inspector {
-  position: fixed;
   z-index: 12000;
-  top: 82px;
-  right: 14px;
-  bottom: 14px;
-  width: min(360px, calc(100vw - 92px));
-  max-width: calc(100vw - 92px);
   min-height: 0;
   overflow: visible;
   border-radius: var(--builder-ui-radius, 12px);
   pointer-events: auto;
+}
+
+.builder-floating-inspector.is-docked {
+  position: sticky;
+  grid-column: 3;
+  grid-row: 1;
+  align-self: start;
+  top: 0;
+  right: auto;
+  bottom: auto;
+  height: 100vh;
+  max-width: var(--builder-inspector-width, 360px);
+  border-radius: 0;
+  border-left: 1px solid var(--builder-ui-border);
+  background: var(--builder-ui-panel-solid, #121216);
+}
+
+.builder-floating-inspector.is-floating {
+  position: fixed;
+  max-width: calc(100vw - 24px);
+  max-height: calc(100vh - 24px);
+  min-width: 300px;
+  min-height: 360px;
+  filter: drop-shadow(0 18px 48px rgba(0, 0, 0, 0.34));
+}
+
+.builder-inspector-mode-bar {
+  height: 34px;
+  padding: 0 8px 0 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  border-bottom: 1px solid var(--builder-ui-border);
+  border-radius: inherit;
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+  background: var(--builder-ui-panel-solid, #121216);
+  color: var(--builder-ui-muted);
+  cursor: default;
+  user-select: none;
+  touch-action: none;
+}
+
+.builder-floating-inspector.is-floating .builder-inspector-mode-bar {
+  cursor: grab;
+}
+
+.builder-floating-inspector.is-floating.is-dragging
+  .builder-inspector-mode-bar {
+  cursor: grabbing;
+}
+
+.builder-inspector-mode-bar > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.builder-inspector-mode-bar > div {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.builder-inspector-mode-bar button {
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--builder-ui-muted);
+  cursor: pointer;
+}
+
+.builder-inspector-mode-bar button:hover:not(:disabled) {
+  border-color: var(--builder-ui-border);
+  background: var(--builder-ui-surface-hover);
+  color: var(--builder-ui-text-strong);
+}
+
+.builder-inspector-mode-bar button:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
 }
 
 .builder-inspector-resize-handle {
@@ -13170,7 +14091,7 @@ article.is-selected-column > .builder-preview-box-spacing,
   position: relative;
   inset: auto;
   width: 100%;
-  height: 100%;
+  height: calc(100% - 34px);
   min-height: 0;
   padding: 14px;
   overflow-x: hidden;
@@ -13183,13 +14104,81 @@ article.is-selected-column > .builder-preview-box-spacing,
   -webkit-backdrop-filter: blur(18px);
 }
 
+.builder-floating-inspector.is-docked .builder-inspector {
+  border-width: 0;
+  border-radius: 0;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.builder-inspector-floating-resize-handle {
+  position: absolute;
+  z-index: 40;
+  right: -3px;
+  bottom: -3px;
+  width: 22px;
+  height: 22px;
+  cursor: nwse-resize;
+  touch-action: none;
+}
+
+.builder-inspector-floating-resize-handle::after {
+  content: "";
+  position: absolute;
+  right: 5px;
+  bottom: 5px;
+  width: 9px;
+  height: 9px;
+  border-right: 2px solid var(--builder-ui-border-strong);
+  border-bottom: 2px solid var(--builder-ui-border-strong);
+  border-radius: 0 0 3px;
+}
+
+.builder-inspector-collapsed-rail {
+  position: fixed;
+  z-index: 11950;
+  top: 50%;
+  right: 0;
+  min-height: 96px;
+  padding: 10px 7px;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border: 1px solid var(--builder-ui-border);
+  border-right: 0;
+  border-radius: 10px 0 0 10px;
+  background: var(--builder-ui-panel-solid, #121216);
+  color: var(--builder-ui-muted);
+  box-shadow: -8px 10px 26px rgba(0, 0, 0, 0.2);
+  transform: translateY(-50%);
+  cursor: pointer;
+}
+
+.builder-inspector-collapsed-rail:hover {
+  color: var(--builder-ui-text-strong);
+  background: color-mix(
+    in srgb,
+    var(--builder-ui-panel-solid, #121216) 88%,
+    var(--builder-ui-accent)
+  );
+}
+
+.builder-inspector-collapsed-rail span {
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+}
+
 @media (max-width: 760px) {
-  .builder-floating-inspector {
-    top: 72px;
-    right: 8px;
-    bottom: 8px;
-    width: min(340px, calc(100vw - 80px));
-    max-width: calc(100vw - 80px);
+  .builder-floating-inspector.is-floating {
+    min-width: min(300px, calc(100vw - 24px));
+    min-height: min(360px, calc(100vh - 24px));
   }
 
   .builder-inspector-resize-handle {
@@ -13444,4 +14433,200 @@ body:has([data-scoped-builder-root])
 .builder-header-page-context.is-locked:hover .builder-preview-canvas,
 .builder-header-page-context.is-locked:hover .builder-preview-page {
   opacity: 0.7;
+}
+
+/* Stacked-column controls stay inside their owning surface. Allowing either
+   toolbar to translate above its column places it beneath an adjacent row rail
+   even when it looks visually clickable. */
+.builder-preview-canvas
+  .builder-nested-layout-container
+  > .builder-preview-column-toolbar,
+.builder-preview-canvas
+  .builder-nested-layout
+  .builder-preview-column-toolbar {
+  top: 6px !important;
+  right: 6px !important;
+  bottom: auto !important;
+  transform: none !important;
+}
+
+/* The row frame is a visual affordance only. It must never become an
+   invisible click shield over columns, elements, toolbars, or insertion
+   boundaries. */
+.builder-preview-canvas .builder-interaction-row-frame::before {
+  pointer-events: none !important;
+}
+
+/* A sibling of a stacked column stretches with the parent CSS-grid row.
+   Its empty interaction surface must stretch too, otherwise only the small
+   placeholder at the top is selectable even though the column is full-height. */
+.builder-preview-canvas
+  .builder-preview-content-row
+  > .builder-interaction-column {
+  align-self: stretch;
+  height: 100%;
+}
+
+.builder-preview-canvas
+  .builder-preview-content-row
+  > .builder-interaction-column.is-empty-column
+  > .builder-preview-drop-zone {
+  flex: 1 1 auto;
+  width: 100%;
+  min-height: 100%;
+  height: 100%;
+}
+
+/* Boundary rails own only their restrained gutter. Toolbars remain above
+   them, but no rail receives events across a row or column surface. */
+.builder-preview-canvas .builder-preview-row-insert {
+  z-index: 6 !important;
+}
+
+/* Editor-only pointer corridor between sibling rows. This is deliberately
+   roomier than the published layout so users can move, pause, and insert
+   without precision pointing. It never changes document spacing values. */
+.builder-preview-canvas {
+  --builder-editor-row-interaction-gutter: 20px;
+}
+
+.builder-preview-canvas .builder-preview-row-insert {
+  min-height: var(--builder-editor-row-interaction-gutter) !important;
+  height: var(--builder-editor-row-interaction-gutter) !important;
+}
+
+/* Actual editor-only margin between top-level row frames. Unlike the
+   insertion hit strip, this participates in layout and creates visible room. */
+.builder-preview-canvas
+  .builder-main-row-frame:not(:last-child) {
+  margin-bottom: var(--builder-editor-main-row-margin, 24px);
+}
+
+.builder-preview-canvas
+  .builder-main-row-frame
+  > .builder-preview-row-insert {
+  bottom: calc(
+    (
+        var(--builder-editor-main-row-margin, 24px) +
+          var(--builder-editor-row-interaction-gutter, 20px)
+      ) /
+      -2
+  ) !important;
+}
+
+.builder-preview-canvas .builder-preview-row-insert:hover,
+.builder-preview-canvas .builder-preview-row-insert:focus-within {
+  background: color-mix(
+    in srgb,
+    var(--builder-ui-accent, #0d73ff) 3%,
+    transparent
+  );
+}
+
+.builder-preview-canvas .builder-preview-section-tools,
+.builder-preview-canvas .builder-preview-row-toolbar,
+.builder-preview-canvas .builder-preview-block-tools {
+  z-index: 20 !important;
+}
+
+/* Empty placeholders communicate availability through their content and
+   surface only. The canonical interaction object owns the sole hover/selected
+   outline; descendants never paint a second technical rectangle. */
+.builder-preview-canvas .builder-preview-drop-zone {
+  border-color: transparent !important;
+  outline: none !important;
+  background: color-mix(
+    in srgb,
+    var(--builder-preview-section-text, var(--builder-preview-text, #111111))
+      2.25%,
+    transparent
+  ) !important;
+}
+
+.builder-preview-canvas
+  .builder-preview-content-layout-grid
+  article:hover
+  .builder-preview-drop-zone,
+.builder-preview-canvas
+  .builder-preview-content-layout-grid
+  article.is-selected-column
+  .builder-preview-drop-zone {
+  border-color: transparent !important;
+}
+
+.builder-preview-canvas
+  .builder-interaction-row-frame:has(
+    > .builder-interaction-row > article.is-empty-column
+  )::after {
+  border: 0 !important;
+  background: transparent !important;
+}
+
+.builder-preview-canvas
+  .builder-interaction-column.is-interaction-hovered
+  > .builder-preview-drop-zone,
+.builder-preview-canvas
+  .builder-interaction-column.is-interaction-selected
+  > .builder-preview-drop-zone {
+  background: color-mix(
+    in srgb,
+    var(--builder-ui-accent, #0d73ff) 2.5%,
+    transparent
+  ) !important;
+}
+
+.builder-preview-canvas
+  .builder-interaction-column.is-interaction-selected
+  .builder-interaction-object:not(.is-interaction-selected),
+.builder-preview-canvas
+  .builder-nested-layout-container.is-interaction-selected
+  .builder-interaction-object:not(.is-interaction-selected) {
+  outline: none !important;
+}
+
+/* Empty structural rows need genuine internal room, not only a boundary hit
+   strip. This padding is editor-only; populated rows and storefront geometry
+   continue to resolve from document values. */
+.builder-preview-canvas
+  .builder-main-row-frame
+  > .builder-preview-content-row:has(> .builder-interaction-column.is-empty-column) {
+  box-sizing: border-box;
+  padding-top: 10px !important;
+  padding-right: 10px !important;
+  padding-bottom: 10px !important;
+  padding-left: 10px !important;
+}
+
+/* Nested composition already sits inside the padded main row. Remove the
+   generic content-grid top offset and second padding layer so its first and
+   last row surfaces align with an unsplit sibling column. */
+.builder-preview-canvas
+  .builder-nested-layout
+  .builder-preview-content-layout-grid {
+  margin-top: 0 !important;
+}
+
+.builder-preview-canvas
+  .builder-nested-row-frame
+  > .builder-preview-content-row {
+  padding: 0 !important;
+}
+
+/* The centered column placeholder is sufficient context. Repeated technical
+   row labels in the top-left create visual flies and break symmetry. */
+.builder-preview-canvas .builder-structural-row-identity {
+  display: none !important;
+}
+
+/* Main rows read as distinct composition groups through a quiet surface,
+   without introducing another border or outline system. */
+.builder-preview-canvas
+  .builder-main-row-frame
+  > .builder-preview-content-row {
+  background: color-mix(
+    in srgb,
+    var(--builder-preview-section-text, var(--builder-preview-text, #111111))
+      1.25%,
+    transparent
+  );
 }

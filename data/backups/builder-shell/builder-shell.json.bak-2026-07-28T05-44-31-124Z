@@ -6,7 +6,7 @@
   "topToolbarMeta": "AMD ֏",
   "headerBackgroundMode": "none",
   "headerTextMode": "auto",
-  "headerLayout": "simple",
+  "headerLayout": "two-row",
   "headerBrandMode": "logo",
   "headerBrandText": "WebPages",
   "headerLogoUrl": "https://cms.webpages.am/wp-content/uploads/2026/06/logo-2-1-scaled.png",
@@ -23,7 +23,7 @@
     "search"
   ],
   "headerActiveIndicator": "princity",
-  "headerBehavior": "pill-on-scroll",
+  "headerBehavior": "sticky-on-scroll-up",
   "headerTransparent": true,
   "headerOverlay": true,
   "headerWidthMode": "boxed",
@@ -171,6 +171,6 @@
     }
   ],
   "headerSticky": true,
-  "updatedAt": "2026-07-22T17:56:03.000Z",
+  "updatedAt": "2026-07-28T05:44:21.875Z",
   "headerCustomHeight": 92
 }

@@ -68,9 +68,8 @@ export function resolveContentSections(
     const localized = resolveContentEntity(section, language, primaryLanguage);
     return {
       ...localized,
-      layoutItems: localized.layoutItems?.map((item) => ({
-        ...item,
-        blocks: item.blocks?.map((block: BuilderLayoutBlock): BuilderLayoutBlock =>
+      layoutItems: localized.layoutItems?.map((item) => {
+        const resolveBlock = (block: BuilderLayoutBlock): BuilderLayoutBlock =>
           (() => {
             const localizedBlock = resolveContentEntity(block, language, primaryLanguage);
             return {
@@ -80,9 +79,24 @@ export function resolveContentSections(
               gridItems: localizedBlock.gridItems?.map((entry) => resolveContentEntity(entry, language, primaryLanguage)),
               buttons: localizedBlock.buttons?.map((entry) => resolveContentEntity(entry, language, primaryLanguage)),
             } as BuilderLayoutBlock;
-          })(),
-        ),
-      })),
+          })();
+        return {
+          ...item,
+          blocks: item.blocks?.map(resolveBlock),
+          nestedLayout: item.nestedLayout
+            ? {
+                ...item.nestedLayout,
+                rows: item.nestedLayout.rows.map((row) => ({
+                  ...row,
+                  columns: row.columns.map((column) => ({
+                    ...column,
+                    blocks: column.blocks.map(resolveBlock),
+                  })),
+                })),
+              }
+            : undefined,
+        };
+      }),
       slides: localized.slides?.map((entry) => resolveContentEntity(entry, language, primaryLanguage)),
       badges: localized.badges?.map((entry) => resolveContentEntity(entry, language, primaryLanguage)),
     } as BuilderSection;

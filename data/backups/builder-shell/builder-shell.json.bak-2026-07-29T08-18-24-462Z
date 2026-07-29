@@ -23,7 +23,7 @@
     "search"
   ],
   "headerActiveIndicator": "princity",
-  "headerBehavior": "sticky",
+  "headerBehavior": "sticky-on-scroll-up",
   "headerTransparent": true,
   "headerOverlay": true,
   "headerWidthMode": "boxed",
@@ -39,10 +39,10 @@
   "rowMarginBottom": "md",
   "rowGap": "sm",
   "columnGap": "md",
-  "elementPaddingTop": "xs",
-  "elementPaddingRight": "xs",
-  "elementPaddingBottom": "xs",
-  "elementPaddingLeft": "xs",
+  "elementPaddingTop": "md",
+  "elementPaddingRight": "md",
+  "elementPaddingBottom": "md",
+  "elementPaddingLeft": "md",
   "elementMarginTop": "xs",
   "elementMarginRight": "xs",
   "elementMarginBottom": "xs",
@@ -171,6 +171,6 @@
     }
   ],
   "headerSticky": true,
-  "updatedAt": "2026-07-22T17:56:25.245Z",
+  "updatedAt": "2026-07-28T05:44:35.715Z",
   "headerCustomHeight": 92
 }

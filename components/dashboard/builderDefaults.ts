@@ -14,6 +14,7 @@ import type {
   TypographySettings,
 } from "@/components/dashboard/builderTypes";
 import { sectionLabels } from "@/components/dashboard/builderRegistry";
+import { BUILDER_STRUCTURAL_DESIGN } from "@/lib/builderGeometry";
 
 export const designPresets: Record<
   NonNullable<BuilderDesign["preset"]>,
@@ -567,7 +568,7 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
       buttonUrl: "/",
       imageUrl: "",
       imageAlt: "",
-      elementPadding: "md",
+      elementPadding: BUILDER_STRUCTURAL_DESIGN.panel.padding,
     };
   }
 
@@ -1214,19 +1215,41 @@ export function createWireframeSection(
                 ? "fifths"
                 : "sixths"
       : undefined);
+  const preset = getBuilderRowLayoutPreset(layout);
+  const rowLayout = preset?.key ?? layout ?? "whole";
+  const columnCount = preset?.ratios.length ?? safeColumns;
+  const layoutItems = Array.from({ length: safeRows }, (_, rowIndex) => {
+    const rowId = `layout-row-${Date.now().toString(36)}-${rowIndex + 1}`;
+    return Array.from({ length: columnCount }, (_, columnIndex) => ({
+      id: `${rowId}-column-${columnIndex + 1}`,
+      rowId,
+      rowLayout,
+      blocks: [],
+    }));
+  }).flat();
   return {
     ...createSection("contentLayout"),
     title: "",
     eyebrow: "",
     body: "",
-    layout,
-    layoutColumns: safeColumns,
+    contentMode: BUILDER_STRUCTURAL_DESIGN.section.widthPreset,
+    layout: rowLayout,
+    layoutColumns: columnCount,
     layoutRows: safeRows,
-    layoutItems: Array.from({ length: safeColumns * safeRows }, (_, index) => ({
-      id: `layout-item-${Date.now().toString(36)}-${index + 1}`,
-      blocks: [],
-    })),
+    layoutItems,
   };
+}
+
+export function createStructuralRowItems(presetKey: string) {
+  const preset = getBuilderRowLayoutPreset(presetKey);
+  if (!preset) return [];
+  const rowId = `layout-row-${Date.now().toString(36)}`;
+  return preset.ratios.map((_, index) => ({
+    id: `${rowId}-column-${index + 1}`,
+    rowId,
+    rowLayout: preset.key,
+    blocks: [],
+  }));
 }
 export const elementBackgroundPresets = [
   { label: "White", value: "#ffffff" },

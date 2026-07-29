@@ -5,6 +5,7 @@
     "page": "home",
     "targetType": "page",
     "design": {
+      "preset": "princity",
       "colorScheme": "auto",
       "pageBackground": "#f7f7f4",
       "textColor": "#111111",
@@ -34,7 +35,7 @@
         "kind": "contentLayout",
         "visible": true,
         "title": "",
-        "background": "",
+        "background": "transparent",
         "backgroundMode": "full",
         "contentMode": "boxed",
         "colorScheme": "inherit",
@@ -45,7 +46,7 @@
         "layout": "whole",
         "layoutColumns": 1,
         "layoutRows": 1,
-        "backgroundEffect": "none",
+        "backgroundEffect": "antigravity2",
         "antigravitySpeed": 1.5,
         "antigravityParticleCount": 185,
         "antigravityColor": "#a855f7",
@@ -908,7 +909,7 @@
         ]
       }
     ],
-    "updatedAt": "2026-06-04T22:26:06.225Z"
+    "updatedAt": "2026-07-23T07:55:21.110Z"
   },
   "shop": {
     "version": 1,
@@ -2800,9 +2801,9 @@
         "layoutColumns": 3,
         "layoutItems": [
           {
-            "id": "header-top-left",
-            "rowId": "header-top-row",
-            "rowLayout": "halves",
+            "id": "header-main-left",
+            "rowId": "header-main-row",
+            "rowLayout": "quarters-1-2-1",
             "blocks": [
               {
                 "id": "header-logo",
@@ -2816,50 +2817,6 @@
             ]
           },
           {
-            "id": "header-top-right",
-            "rowId": "header-top-row",
-            "rowLayout": "halves",
-            "blocks": [
-              {
-                "id": "header-utility-search",
-                "kind": "headerSearch",
-                "headerUtilityAction": "search",
-                "headerUtilityVariant": "muted"
-              },
-              {
-                "id": "header-utility-wishlist",
-                "kind": "headerWishlist",
-                "headerUtilityAction": "wishlist",
-                "headerUtilityVariant": "muted"
-              },
-              {
-                "id": "header-utility-account",
-                "kind": "headerAccount",
-                "headerUtilityAction": "account",
-                "headerUtilityVariant": "muted"
-              },
-              {
-                "id": "header-utility-cart",
-                "kind": "headerCart",
-                "headerUtilityAction": "cart",
-                "headerUtilityVariant": "muted"
-              }
-            ]
-          },
-          {
-            "id": "header-main-left",
-            "rowId": "header-main-row",
-            "rowLayout": "quarters-1-2-1",
-            "blocks": [
-              {
-                "id": "header-categories",
-                "kind": "headerCategories",
-                "headerCategoriesLabel": "Browse Categories",
-                "headerCategoriesShowLabel": true
-              }
-            ]
-          },
-          {
             "id": "header-main-center",
             "rowId": "header-main-row",
             "rowLayout": "quarters-1-2-1",
@@ -2869,7 +2826,7 @@
                 "kind": "menu",
                 "title": "Navigation",
                 "menuSource": "main",
-                "menuActiveIndicator": "underline"
+                "menuActiveIndicator": "princity"
               }
             ]
           },
@@ -2879,23 +2836,41 @@
             "rowLayout": "quarters-1-2-1",
             "blocks": [
               {
-                "id": "header-language",
-                "kind": "headerLanguage",
-                "headerLanguageDisplay": "native"
+                "id": "header-utility-search",
+                "kind": "headerSearch",
+                "headerUtilityAction": "search",
+                "headerUtilityVariant": "muted"
+              },
+              {
+                "id": "header-utility-cart",
+                "kind": "headerCart",
+                "headerUtilityAction": "cart",
+                "headerUtilityVariant": "muted"
+              },
+              {
+                "id": "header-utility-theme",
+                "kind": "headerTheme",
+                "headerUtilityAction": "theme",
+                "headerUtilityVariant": "muted"
+              },
+              {
+                "id": "header-utility-account",
+                "kind": "headerAccount",
+                "headerUtilityAction": "account",
+                "headerUtilityVariant": "muted"
               }
             ]
           }
         ],
         "visible": true,
-        "headerPresetKey": "ecommerce",
         "headerArchitectureVersion": 2,
         "headerVisible": true,
-        "headerTransparent": false,
-        "headerOverlay": false,
-        "headerLayout": "two-row",
-        "headerBehavior": "sticky",
+        "headerTransparent": true,
+        "headerOverlay": true,
+        "headerLayout": "princity",
+        "headerBehavior": "pill-on-scroll",
         "headerWidthMode": "boxed",
-        "headerBackgroundMode": "default",
+        "headerBackgroundMode": "glass",
         "headerTextMode": "auto",
         "headerZIndex": 40,
         "headerTopToolbarVisible": false,
@@ -2903,10 +2878,14 @@
         "headerTopToolbarPhone": "+374 xx xx xx",
         "headerTopToolbarMeta": "AMD ֏",
         "headerHeight": "compact",
-        "headerCustomHeight": 40
+        "headerCustomHeight": 40,
+        "topSpacing": "xs",
+        "bottomSpacing": "xs",
+        "topMargin": "xs",
+        "bottomMargin": "xs"
       }
     ],
-    "updatedAt": "2026-07-22T18:54:27.817Z"
+    "updatedAt": "2026-07-23T08:58:08.773Z"
   },
   "footer": {
     "version": 1,

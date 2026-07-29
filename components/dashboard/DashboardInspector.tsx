@@ -69,6 +69,7 @@ import {
   type TypographyArea,
 } from "@/lib/builderTypography";
 import type { BuilderShellSettings } from "@/lib/builderShell";
+import { findLayoutColumn } from "@/lib/builderNestedLayout";
 import {
   getInitialHeaderCustomHeight,
   HEADER_CUSTOM_HEIGHT_MAX,
@@ -877,6 +878,7 @@ type DashboardInspectorProps = {
   updateSelected: (patch: Partial<BuilderSection>) => void;
   updateSelectedBadge: LooseHandler;
   updateSelectedLayoutBlock: LooseHandler;
+  updateLayoutBlockByKey: LooseHandler;
   updateSelectedLayoutBlockButton: LooseHandler;
   updateSelectedLayoutBlockBadge: LooseHandler;
   updateSelectedLayoutBlockGridItem: LooseHandler;
@@ -1416,6 +1418,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
     updateSelected,
     updateSelectedBadge,
     updateSelectedLayoutBlock,
+    updateLayoutBlockByKey,
     updateSelectedLayoutBlockBadge,
     updateSelectedLayoutBlockGridItem,
     updateSelectedLayoutBlockSlide,
@@ -1702,6 +1705,15 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
     }>,
   ) {
     if (selectedLayoutBlock && selectedLayoutBlockKey && selectedSection) {
+      if (selectedLayoutColumnKey) {
+        updateLayoutBlockByKey(
+          selectedSection.id,
+          selectedLayoutColumnKey,
+          selectedLayoutBlockKey,
+          patch,
+        );
+        return;
+      }
       const layoutItems = selectedSection.layoutItems ?? [];
       for (let ci = 0; ci < layoutItems.length; ci++) {
         const item = layoutItems[ci];
@@ -1744,6 +1756,15 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
     }
 
     if (selectedLayoutBlock && selectedLayoutBlockKey && selectedSection) {
+      if (selectedLayoutColumnKey) {
+        updateLayoutBlockByKey(
+          selectedSection.id,
+          selectedLayoutColumnKey,
+          selectedLayoutBlockKey,
+          { animation: nextAnimation },
+        );
+        return;
+      }
       const layoutItems = selectedSection.layoutItems ?? [];
       for (let ci = 0; ci < layoutItems.length; ci++) {
         const item = layoutItems[ci];
@@ -1921,17 +1942,26 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
           (item.id ?? `layout-item-${index}`) === selectedLayoutColumnKey,
       )
     : -1;
+  const selectedColumn = layoutContainerSection && selectedLayoutColumnKey
+    ? findLayoutColumn(layoutContainerSection, selectedLayoutColumnKey)
+    : null;
+  const selectedNestedColumn =
+    selectedColumnIndex < 0 && selectedColumn !== null;
   const selectedColumnLabel =
-    selectedColumnIndex >= 0 ? `Column ${selectedColumnIndex + 1}` : "None";
+    selectedColumnIndex >= 0
+      ? `Column ${selectedColumnIndex + 1}`
+      : selectedNestedColumn
+        ? "Nested column"
+        : "None";
   const selectedElementLabel = selectedLayoutBlock
     ? (layoutBlockLabels[selectedLayoutBlock.kind ?? "text"] ?? "Element")
     : "None";
   const activeTrailLevel = selectedLayoutBlock
     ? "element"
-    : selectedLayoutRow
-      ? "row"
-      : selectedColumnIndex >= 0
-        ? "column"
+    : selectedColumnIndex >= 0 || selectedNestedColumn
+      ? "column"
+      : selectedLayoutRow
+        ? "row"
         : "section";
   const isElementContentTab = inspectorTab === "content";
   const isElementLayoutTab = inspectorTab === "layout";
@@ -1943,6 +1973,15 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
     patch: Partial<BuilderLayoutBlock>,
   ) => {
     if (!selectedLayoutBlockKey || !selectedSection?.layoutItems) return;
+    if (selectedLayoutColumnKey) {
+      updateLayoutBlockByKey(
+        selectedSection.id,
+        selectedLayoutColumnKey,
+        selectedLayoutBlockKey,
+        patch,
+      );
+      return;
+    }
     for (
       let itemIndex = 0;
       itemIndex < selectedSection.layoutItems.length;
@@ -1977,13 +2016,21 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
               ? "Element Typography"
               : "Element Advanced"
     : selectedLayoutRow
-      ? inspectorTab === "layout"
-        ? "Row Layout"
-        : inspectorTab === "spacing"
-          ? "Row Spacing"
-          : inspectorTab === "style"
-            ? "Row Styling"
-            : "Row Advanced"
+      ? selectedColumnIndex >= 0 || selectedNestedColumn
+        ? inspectorTab === "layout"
+          ? "Column Layout"
+          : inspectorTab === "spacing"
+            ? "Column Spacing"
+            : inspectorTab === "style"
+              ? "Column Styling"
+              : "Column Advanced"
+        : inspectorTab === "layout"
+          ? "Row Layout"
+          : inspectorTab === "spacing"
+            ? "Row Spacing"
+            : inspectorTab === "style"
+              ? "Row Styling"
+              : "Row Advanced"
       : inspectorTab === "layout"
         ? "Section Layout"
         : inspectorTab === "spacing"
@@ -2037,8 +2084,10 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                 <strong>
                   {selectedLayoutBlock
                     ? `${selectedElementLabel} · Element`
-                    : selectedLayoutRow
-                      ? `Row ${(selectedLayoutRowIndex ?? 0) + 1} · Row`
+                    : selectedColumnIndex >= 0
+                      ? `${selectedColumnLabel} · Column`
+                      : selectedLayoutRow
+                        ? `Row ${(selectedLayoutRowIndex ?? 0) + 1} · Row`
                       : `${selectedSection.name || sectionLabels[selectedSection.kind] || selectedSection.title || "Section"} · Section`}
                 </strong>
                 {selectedLayoutBlock && (

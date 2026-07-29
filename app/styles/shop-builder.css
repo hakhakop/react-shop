@@ -1,7 +1,7 @@
 .shop-builder-main {
   display: flow-root;
   width: 100%;
-  padding: 28px 0 52px;
+  padding: 0;
   background: var(--builder-page-bg, transparent);
   color: var(--builder-text, #111111);
   overflow-x: clip;
@@ -29,7 +29,7 @@
   position: relative;
   width: 100%;
   margin: var(--builder-section-margin-top, var(--builder-global-section-margin-top, 0px)) auto var(--builder-section-margin-bottom, var(--builder-global-section-margin-bottom, 0px));
-  padding: var(--builder-section-padding-top, var(--builder-global-section-padding-top, clamp(28px, 5vw, 72px))) clamp(28px, 5vw, 72px) var(--builder-section-padding-bottom, var(--builder-global-section-padding-bottom, clamp(28px, 5vw, 72px)));
+  padding: var(--builder-section-padding-top, var(--builder-global-section-padding-top, 64px)) clamp(28px, 5vw, 72px) var(--builder-section-padding-bottom, var(--builder-global-section-padding-bottom, 64px));
   border: 0;
   border-radius: 0;
   box-shadow: none;
@@ -654,8 +654,46 @@ body.dark {
 
 .shop-builder-column-block--panel {
   display: grid;
-  gap: 16px;
+  gap: var(--builder-structure-panel-gap, 16px);
   padding: var(--builder-card-padding, 0);
+}
+
+.builder-nested-layout-container {
+  min-height: 0;
+  align-self: stretch;
+}
+
+.builder-nested-layout {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: repeat(
+    var(--builder-nested-row-count, 2),
+    minmax(0, 1fr)
+  );
+  gap: var(--builder-global-row-gap, 32px);
+  align-content: stretch;
+}
+
+.builder-nested-row,
+.builder-nested-column {
+  min-width: 0;
+  min-height: 0;
+}
+
+.builder-nested-column {
+  display: flex;
+  flex-direction: column;
+  gap: var(--builder-element-stack-gap, 16px);
+}
+
+@media (max-width: 679px) {
+  .builder-nested-layout {
+    height: auto;
+    grid-template-rows: none;
+    grid-auto-rows: auto;
+  }
 }
 
 .shop-builder-column-block--hero {
@@ -904,7 +942,7 @@ body.dark {
 .shop-builder-grid {
   display: grid;
   grid-template-columns: repeat(var(--shop-builder-grid-columns, 3), minmax(0, 1fr));
-  gap: var(--shop-builder-grid-gap, 18px);
+  gap: var(--shop-builder-grid-gap, var(--builder-structure-card-gap, 16px));
 }
 
 .shop-builder-grid--gap-none {
@@ -912,19 +950,19 @@ body.dark {
 }
 
 .shop-builder-grid--gap-small {
-  --shop-builder-grid-gap: 10px;
+  --shop-builder-grid-gap: 8px;
 }
 
 .shop-builder-grid--gap-medium {
-  --shop-builder-grid-gap: 18px;
+  --shop-builder-grid-gap: var(--builder-structure-card-gap, 16px);
 }
 
 .shop-builder-grid--gap-large {
-  --shop-builder-grid-gap: 28px;
+  --shop-builder-grid-gap: 32px;
 }
 
 .shop-builder-grid--gap-max {
-  --shop-builder-grid-gap: 40px;
+  --shop-builder-grid-gap: 64px;
 }
 
 .shop-builder-grid--margin-none {
@@ -1778,7 +1816,7 @@ body.dark {
 
 .shop-builder-grid-content {
   display: grid;
-  gap: var(--builder-card-gap, 8px);
+  gap: var(--builder-card-gap, var(--builder-structure-card-gap, 16px));
 }
 
 .shop-builder-grid-card.is-content-none .shop-builder-grid-content {
@@ -1786,11 +1824,14 @@ body.dark {
 }
 
 .shop-builder-grid-card.is-content-small .shop-builder-grid-content {
-  padding: var(--shop-builder-grid-content-padding, var(--builder-card-padding, 12px));
+  padding: var(--shop-builder-grid-content-padding, var(--builder-card-padding, 8px));
 }
 
 .shop-builder-grid-card.is-content-medium .shop-builder-grid-content {
-  padding: var(--shop-builder-grid-content-padding, var(--builder-card-padding, 20px));
+  padding: var(
+    --shop-builder-grid-content-padding,
+    var(--builder-card-padding, var(--builder-structure-card-padding, 16px))
+  );
 }
 
 .shop-builder-grid-card.is-content-large .shop-builder-grid-content {
@@ -1798,7 +1839,10 @@ body.dark {
 }
 
 .shop-builder-grid-card.is-content-custom .shop-builder-grid-content {
-  padding: var(--shop-builder-grid-content-padding, var(--builder-card-padding, 20px));
+  padding: var(
+    --shop-builder-grid-content-padding,
+    var(--builder-card-padding, var(--builder-structure-card-padding, 16px))
+  );
 }
 
 .shop-builder-grid-content h3,
@@ -2078,6 +2122,9 @@ ul.is-icon-gradient-cycle li:nth-child(3n) svg {
   padding: 0;
   border-radius: 0;
   background: transparent;
+  display: flex;
+  flex-direction: column;
+  gap: var(--builder-element-stack-gap, 16px);
   transition: box-shadow 0.14s ease, background 0.14s ease;
 }
 

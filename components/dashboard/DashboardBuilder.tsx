@@ -92,6 +92,7 @@ import CategoryBar from "@/components/CategoryBar";
 import CategoryWithFilters from "@/components/CategoryWithFilters";
 import ProductCategoryFilterProvider from "@/components/ProductCategoryFilterProvider";
 import HeaderShellView from "@/components/HeaderShellView";
+import { useTheme } from "@/components/ThemeProvider";
 import FluentFormClient from "@/components/builder/FluentFormClient";
 import ProductCarousel from "@/components/ProductCarousel";
 import ProductOptionsSelector from "@/components/ProductOptionsSelector";
@@ -101,6 +102,18 @@ import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
 import BuilderWireframePanel, {
   type BuilderHoverTarget,
 } from "@/components/dashboard/BuilderWireframePanel";
+import {
+  BUILDER_HOVER_TOOLBAR_DELAY_MS,
+  builderInteractionClassName,
+  builderInteractionFrameClassName,
+  builderInsertionBoundaryClassName,
+  builderTargetsEqual,
+  builderTargetFromElement,
+  resolveBuilderInteractionChrome,
+  resolveBuilderInteractionState,
+  selectedBuilderTarget,
+  type BuilderInteractionTarget,
+} from "@/components/dashboard/builderInteraction";
 import MediaManager from "@/components/dashboard/media/MediaManager";
 import ScrollPinnedDemo from "@/components/animations/ScrollPinnedDemo";
 import { AntigravityTerminal } from "@/components/builder/AntigravityTerminal";
@@ -151,6 +164,7 @@ import {
   createId,
   createLayoutBlock,
   createWireframeSection,
+  createStructuralRowItems,
   defaultDesign,
   defaultState,
   defaultTemplateStates,
@@ -162,6 +176,13 @@ import type { CategoryTreeItem } from "@/lib/categories";
 import type { MenuItem } from "@/lib/navigation";
 import type { ProductNode } from "@/lib/products";
 import type { PageTemplateLibraryItem } from "@/components/dashboard/pageTemplateLibrary";
+import {
+  createVerticalNestedLayout,
+  findLayoutColumn,
+  layoutColumnHasContent,
+  updateBlockInLayoutColumn,
+  updateLayoutColumn,
+} from "@/lib/builderNestedLayout";
 import {
   GLOBAL_STYLE_PRESETS,
   type GlobalStylePreset,
@@ -192,6 +213,7 @@ import {
   type BuilderSpacingContext,
   getDefaultSpacingToken,
 } from "@/lib/builderSpacing";
+import { builderGeometryCssVariables } from "@/lib/builderGeometry";
 import {
   BUILDER_BUTTON_PRESETS,
   builderButtonCssVars,
@@ -211,10 +233,25 @@ const BUILDER_TEMPLATE_SECTION_DND_TYPE =
   "application/x-builder-template-section";
 const BUILDER_TEMPLATE_ROW_DND_TYPE = "application/x-builder-template-row";
 const INSPECTOR_WIDTH_STORAGE_KEY = "webpages-builder-inspector-width";
+const INSPECTOR_MODE_STORAGE_KEY = "webpages-builder-inspector-mode";
+const INSPECTOR_FLOATING_RECT_STORAGE_KEY =
+  "webpages-builder-inspector-floating-rect";
 const INSPECTOR_DEFAULT_WIDTH = 360;
 const INSPECTOR_MIN_WIDTH = 300;
+const INSPECTOR_MAX_WIDTH = 520;
+const INSPECTOR_MIN_HEIGHT = 360;
+const INSPECTOR_DEFAULT_HEIGHT = 720;
 const INSPECTOR_MIN_CANVAS_WIDTH = 320;
-const INSPECTOR_RESIZE_BREAKPOINT = 760;
+const INSPECTOR_RESIZE_BREAKPOINT = 1180;
+const INSPECTOR_VIEWPORT_GUTTER = 12;
+
+type InspectorMode = "docked" | "floating";
+type InspectorFloatingRect = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+};
 
 function readInspectorWidthPreference() {
   if (typeof window === "undefined") return INSPECTOR_DEFAULT_WIDTH;
@@ -224,6 +261,92 @@ function readInspectorWidthPreference() {
   return Number.isFinite(storedWidth) && storedWidth >= INSPECTOR_MIN_WIDTH
     ? storedWidth
     : INSPECTOR_DEFAULT_WIDTH;
+}
+
+function readInspectorModePreference(): InspectorMode {
+  if (typeof window === "undefined") return "docked";
+  return window.localStorage.getItem(INSPECTOR_MODE_STORAGE_KEY) === "floating"
+    ? "floating"
+    : "docked";
+}
+
+function readInspectorFloatingRectPreference(): InspectorFloatingRect {
+  const fallback = {
+    x:
+      typeof window === "undefined"
+        ? 960
+        : Math.max(
+            INSPECTOR_VIEWPORT_GUTTER,
+            window.innerWidth -
+              INSPECTOR_DEFAULT_WIDTH -
+              INSPECTOR_VIEWPORT_GUTTER,
+          ),
+    y: 82,
+    width: INSPECTOR_DEFAULT_WIDTH,
+    height:
+      typeof window === "undefined"
+        ? INSPECTOR_DEFAULT_HEIGHT
+        : Math.min(
+            INSPECTOR_DEFAULT_HEIGHT,
+            window.innerHeight - 82 - INSPECTOR_VIEWPORT_GUTTER,
+          ),
+  };
+  if (typeof window === "undefined") return fallback;
+  try {
+    const stored = JSON.parse(
+      window.localStorage.getItem(INSPECTOR_FLOATING_RECT_STORAGE_KEY) ?? "",
+    ) as Partial<InspectorFloatingRect>;
+    return {
+      x: Number.isFinite(stored.x) ? Number(stored.x) : fallback.x,
+      y: Number.isFinite(stored.y) ? Number(stored.y) : fallback.y,
+      width: Number.isFinite(stored.width)
+        ? Number(stored.width)
+        : fallback.width,
+      height: Number.isFinite(stored.height)
+        ? Number(stored.height)
+        : fallback.height,
+    };
+  } catch {
+    return fallback;
+  }
+}
+
+function clampInspectorFloatingRect(
+  rect: InspectorFloatingRect,
+): InspectorFloatingRect {
+  if (typeof window === "undefined") return rect;
+  const width = Math.min(
+    Math.max(INSPECTOR_MIN_WIDTH, rect.width),
+    Math.max(
+      INSPECTOR_MIN_WIDTH,
+      window.innerWidth - INSPECTOR_VIEWPORT_GUTTER * 2,
+    ),
+  );
+  const height = Math.min(
+    Math.max(INSPECTOR_MIN_HEIGHT, rect.height),
+    Math.max(
+      INSPECTOR_MIN_HEIGHT,
+      window.innerHeight - INSPECTOR_VIEWPORT_GUTTER * 2,
+    ),
+  );
+  return {
+    x: Math.min(
+      Math.max(INSPECTOR_VIEWPORT_GUTTER, rect.x),
+      Math.max(
+        INSPECTOR_VIEWPORT_GUTTER,
+        window.innerWidth - width - INSPECTOR_VIEWPORT_GUTTER,
+      ),
+    ),
+    y: Math.min(
+      Math.max(INSPECTOR_VIEWPORT_GUTTER, rect.y),
+      Math.max(
+        INSPECTOR_VIEWPORT_GUTTER,
+        window.innerHeight - height - INSPECTOR_VIEWPORT_GUTTER,
+      ),
+    ),
+    width,
+    height,
+  };
 }
 const BUILDER_TEMPLATE_ELEMENT_DND_TYPE =
   "application/x-builder-template-element";
@@ -364,20 +487,20 @@ const defaultShellSettings: BuilderShellSettings = {
   headerWidthMode: "boxed",
   headerHeight: "comfortable",
   headerZIndex: 40,
-  sectionPaddingTop: "medium",
-  sectionPaddingBottom: "medium",
+  sectionPaddingTop: "lg",
+  sectionPaddingBottom: "lg",
   sectionMarginTop: "none",
   sectionMarginBottom: "none",
-  rowPaddingTop: "md",
-  rowPaddingBottom: "md",
+  rowPaddingTop: "none",
+  rowPaddingBottom: "none",
   rowMarginTop: "none",
   rowMarginBottom: "none",
-  rowGap: "lg",
+  rowGap: "md",
   columnGap: "md",
-  elementPaddingTop: "sm",
-  elementPaddingRight: "sm",
-  elementPaddingBottom: "sm",
-  elementPaddingLeft: "sm",
+  elementPaddingTop: "none",
+  elementPaddingRight: "none",
+  elementPaddingBottom: "none",
+  elementPaddingLeft: "none",
   elementMarginTop: "none",
   elementMarginRight: "none",
   elementMarginBottom: "none",
@@ -708,13 +831,20 @@ const darkScheme = {
   buttonTextColor: "#101010",
 };
 
-function resolveDesignColors(design: BuilderDesign) {
+function resolveDesignColors(
+  design: BuilderDesign,
+  resolvedScheme?: "light" | "dark",
+) {
   if (design.colorScheme === "dark") {
     return { ...design, ...darkScheme };
   }
 
   if (design.colorScheme === "light") {
     return { ...design, ...lightScheme };
+  }
+
+  if (resolvedScheme === "dark") {
+    return { ...design, ...darkScheme };
   }
 
   return design;
@@ -1561,6 +1691,7 @@ export default function DashboardBuilder({
 }: DashboardBuilderProps) {
   const router = useRouter();
   const { t } = useTranslation();
+  const { theme: storefrontTheme } = useTheme();
   const [contentLanguage, setContentLanguage] = useState(primaryContentLanguage);
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -1706,11 +1837,13 @@ export default function DashboardBuilder({
     localStorage.setItem("builder-dashboard-theme", nextTheme);
   };
 
-  // `auto` is the storefront default, not the Builder UI theme. Letting the
-  // dashboard's dark mode resolve it made the same canonical Header inherit a
-  // dark --header-bg in the Builder while the published storefront stayed
-  // light.
-  const layoutScheme = builderState.design.colorScheme === "dark" ? "dark" : "light";
+  // Builder chrome and storefront preview themes are separate. A forced
+  // document scheme wins; `auto` follows the canonical visitor/header toggle.
+  const layoutScheme =
+    builderState.design.colorScheme === "dark" ||
+    builderState.design.colorScheme === "light"
+      ? builderState.design.colorScheme
+      : storefrontTheme;
   const [selectedId, setSelectedId] = useState("");
   const [headerSelected, setHeaderSelected] = useState(false);
   const [headerHovered, setHeaderHovered] = useState(false);
@@ -1767,9 +1900,15 @@ export default function DashboardBuilder({
   >(null);
   const [inspectorTab, setInspectorTab] = useState<InspectorTab>("layout");
   const [inspectorOpen, setInspectorOpen] = useState(false);
+  const [inspectorMode, setInspectorMode] = useState<InspectorMode>(
+    readInspectorModePreference,
+  );
   const [inspectorWidth, setInspectorWidth] = useState(
     readInspectorWidthPreference,
   );
+  const [inspectorFloatingRect, setInspectorFloatingRect] =
+    useState<InspectorFloatingRect>(readInspectorFloatingRectPreference);
+  const [inspectorDragging, setInspectorDragging] = useState(false);
   const [inspectorWorkspaceWidth, setInspectorWorkspaceWidth] = useState(0);
   const [inspectorDesktopLayout, setInspectorDesktopLayout] = useState(false);
   const [inspectorResizing, setInspectorResizing] = useState(false);
@@ -1873,6 +2012,20 @@ export default function DashboardBuilder({
     currentWidth: number;
     previousCursor: string;
     previousUserSelect: string;
+  } | null>(null);
+  const inspectorDragRef = useRef<{
+    pointerId: number;
+    startX: number;
+    startY: number;
+    originX: number;
+    originY: number;
+  } | null>(null);
+  const inspectorFloatingResizeRef = useRef<{
+    pointerId: number;
+    startX: number;
+    startY: number;
+    startWidth: number;
+    startHeight: number;
   } | null>(null);
   const mediaSelectRef = useRef<((media: WordPressMediaItem) => void) | null>(
     null,
@@ -2071,14 +2224,19 @@ export default function DashboardBuilder({
     [localizedSections, selectedId],
   );
 
+  const effectiveInspectorMode: InspectorMode = inspectorDesktopLayout
+    ? inspectorMode
+    : "floating";
   const inspectorMaxWidth = Math.floor(
     Math.min(
-      inspectorWorkspaceWidth * 0.5,
+      INSPECTOR_MAX_WIDTH,
       inspectorWorkspaceWidth - INSPECTOR_MIN_CANVAS_WIDTH,
     ),
   );
   const inspectorResizeEnabled =
-    inspectorDesktopLayout && inspectorMaxWidth >= INSPECTOR_MIN_WIDTH;
+    effectiveInspectorMode === "docked" &&
+    inspectorDesktopLayout &&
+    inspectorMaxWidth >= INSPECTOR_MIN_WIDTH;
   const clampedInspectorWidth = inspectorResizeEnabled
     ? Math.min(
         inspectorMaxWidth,
@@ -2088,10 +2246,16 @@ export default function DashboardBuilder({
 
   const restoreInspectorResizeDocumentStyles = useCallback(() => {
     const resizeState = inspectorResizeRef.current;
-    if (!resizeState) return;
-    document.documentElement.style.cursor = resizeState.previousCursor;
-    document.body.style.userSelect = resizeState.previousUserSelect;
+    if (resizeState) {
+      document.documentElement.style.cursor = resizeState.previousCursor;
+      document.body.style.userSelect = resizeState.previousUserSelect;
+    } else {
+      document.documentElement.style.cursor = "";
+      document.body.style.userSelect = "";
+    }
     inspectorResizeRef.current = null;
+    inspectorDragRef.current = null;
+    inspectorFloatingResizeRef.current = null;
   }, []);
 
   useEffect(() => {
@@ -2101,7 +2265,10 @@ export default function DashboardBuilder({
     const updateWorkspaceSize = () => {
       setInspectorWorkspaceWidth(workspace.getBoundingClientRect().width);
       setInspectorDesktopLayout(
-        window.innerWidth > INSPECTOR_RESIZE_BREAKPOINT,
+        window.innerWidth >= INSPECTOR_RESIZE_BREAKPOINT,
+      );
+      setInspectorFloatingRect((current) =>
+        clampInspectorFloatingRect(current),
       );
     };
     updateWorkspaceSize();
@@ -2136,9 +2303,8 @@ export default function DashboardBuilder({
         return;
       }
 
-      // Canvas selection handlers reopen the Inspector with the new target.
-      // Treat editable preview objects as part of the interaction boundary so
-      // capture-phase ordering cannot produce a close/reopen flash.
+      // Canvas selection is independent from inspection. Keep an already-open
+      // Inspector stable while the user changes the selected canvas object.
       if (
         target.closest(
           ".builder-preview-section, .builder-preview-layout-block, .builder-header-document-preview, [data-builder-section-id]",
@@ -2161,14 +2327,33 @@ export default function DashboardBuilder({
   }, [inspectorOpen]);
 
   useEffect(() => {
-    setInspectorOpen(Boolean(selectedSection));
-  }, [selectedSection]);
+    if (!inspectorOpen || effectiveInspectorMode !== "floating") return;
+    const closeFloatingInspector = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setInspectorOpen(false);
+    };
+    window.addEventListener("keydown", closeFloatingInspector);
+    return () => window.removeEventListener("keydown", closeFloatingInspector);
+  }, [effectiveInspectorMode, inspectorOpen]);
+
   const selectedSectionIsFirstVisible =
     builderState.sections.find((section) => section.visible)?.id ===
     selectedSection?.id;
   const selectedLayoutBlock = useMemo(() => {
     if (!selectedSection || !isLayoutContainerSection(selectedSection))
       return null;
+    if (selectedLayoutColumnKey) {
+      const selectedColumn = findLayoutColumn(
+        selectedSection,
+        selectedLayoutColumnKey,
+      );
+      const selectedBlock = (selectedColumn?.blocks ?? []).find(
+        (entry, index) =>
+          (entry.id ??
+            `${selectedLayoutColumnKey}-block-${index}`) ===
+          selectedLayoutBlockKey,
+      );
+      if (selectedBlock) return selectedBlock;
+    }
     for (const item of selectedSection.layoutItems ?? []) {
       const block = (item.blocks ?? []).find(
         (entry, index) =>
@@ -2245,7 +2430,10 @@ export default function DashboardBuilder({
     }
     return publishStatus;
   }, [hasLayoutPendingChanges, hasShellPendingChanges, builderState.page, customPages, publishStatus]);
-  const previewColors = resolveDesignColors(builderState.design);
+  const previewColors = resolveDesignColors(
+    builderState.design,
+    layoutScheme,
+  );
   const previewPageBackground =
     previewColors.pageBackground ??
     builderState.design.pageBackground ??
@@ -2932,16 +3120,11 @@ export default function DashboardBuilder({
       ...current,
       sections: current.sections.map((section) => {
         if (section.id !== sectionId) return section;
-        return {
-          ...section,
-          layoutItems: (section.layoutItems ?? []).map((item, columnIndex) => {
-            const itemKey = item.id ?? `layout-item-${columnIndex}`;
-            if (itemKey !== columnKey) return item;
-            return {
+        return updateLayoutColumn(section, columnKey, (item) => ({
               ...item,
-              blocks: getLayoutItemBlocks(item).map((block, blockIndex) => {
+              blocks: (item.blocks ?? []).map((block, blockIndex) => {
                 const currentBlockKey =
-                  block.id ?? `${itemKey}-block-${blockIndex}`;
+                  block.id ?? `${columnKey}-block-${blockIndex}`;
                 return currentBlockKey === blockKey
                   ? applyContentPatch(
                       block,
@@ -2951,9 +3134,7 @@ export default function DashboardBuilder({
                     )
                   : block;
               }),
-            };
-          }),
-        };
+            }));
       }),
     }));
   };
@@ -3536,7 +3717,6 @@ export default function DashboardBuilder({
     setSelectedLayoutColumnKey(null);
     setSelectedLayoutBlockKey(null);
     setOpenLayoutItemId(null);
-    openInspectorPanel();
     setInspectorTab("layout");
     setSectionSettingsOpen(true);
     setSectionStructureOpen(false);
@@ -3551,7 +3731,6 @@ export default function DashboardBuilder({
     setSelectedLayoutBlockKey(null);
     setOpenLayoutItemId(columnKey);
     setInspectorTab("layout");
-    openInspectorPanel();
     revealCanvasTarget(columnKey);
   };
 
@@ -3568,7 +3747,6 @@ export default function DashboardBuilder({
     setOpenLayoutItemId(columnKey);
     setSectionStructureOpen(false);
     setInspectorTab("content");
-    openInspectorPanel();
     revealCanvasTarget(blockKey);
   };
 
@@ -3581,7 +3759,6 @@ export default function DashboardBuilder({
     setOpenLayoutItemId(null);
     setSectionStructureOpen(false);
     setInspectorTab("layout");
-    openInspectorPanel();
     const section = builderState.sections.find((item) => item.id === sectionId);
     const row = section
       ? getPreviewLayoutRows(section, section.layoutItems ?? [])[rowIndex]
@@ -4319,14 +4496,9 @@ export default function DashboardBuilder({
           return section;
         }
 
-        const layoutItems = [...(section.layoutItems ?? [])];
-        const columnIndex = layoutItems.findIndex(
-          (item, index) => (item.id ?? `layout-item-${index}`) === columnKey,
-        );
-        if (columnIndex < 0) return section;
-
-        const item = layoutItems[columnIndex] ?? {};
-        const blocks = [...getLayoutItemBlocks(item)];
+        const item = findLayoutColumn(section, columnKey);
+        if (!item) return section;
+        const blocks = [...(item.blocks ?? [])];
         const blockIndex = blocks.findIndex(
           (block, index) =>
             (block.id ?? `${columnKey}-block-${index}`) === blockKey,
@@ -4338,8 +4510,10 @@ export default function DashboardBuilder({
           ...block,
           id: createBlockId(block.kind ?? "text"),
         });
-        layoutItems[columnIndex] = { ...item, blocks };
-        return { ...section, layoutItems };
+        return updateLayoutColumn(section, columnKey, (column) => ({
+          ...column,
+          blocks,
+        }));
       }),
     }));
   };
@@ -4362,14 +4536,9 @@ export default function DashboardBuilder({
           return section;
         }
 
-        const layoutItems = [...(section.layoutItems ?? [])];
-        const columnIndex = layoutItems.findIndex(
-          (item, index) => (item.id ?? `layout-item-${index}`) === columnKey,
-        );
-        if (columnIndex < 0) return section;
-
-        const item = layoutItems[columnIndex] ?? {};
-        const blocks = [...getLayoutItemBlocks(item)];
+        const item = findLayoutColumn(section, columnKey);
+        if (!item) return section;
+        const blocks = [...(item.blocks ?? [])];
         const blockIndex = blocks.findIndex(
           (block, index) =>
             (block.id ?? `${columnKey}-block-${index}`) === blockKey,
@@ -4382,8 +4551,10 @@ export default function DashboardBuilder({
         const [movedBlock] = blocks.splice(blockIndex, 1);
         if (!movedBlock) return section;
         blocks.splice(nextIndex, 0, movedBlock);
-        layoutItems[columnIndex] = { ...item, blocks };
-        return { ...section, layoutItems };
+        return updateLayoutColumn(section, columnKey, (column) => ({
+          ...column,
+          blocks,
+        }));
       }),
     }));
 
@@ -4410,21 +4581,14 @@ export default function DashboardBuilder({
           return section;
         }
 
-        const layoutItems = [...(section.layoutItems ?? [])];
-        const columnIndex = layoutItems.findIndex(
-          (item, index) => (item.id ?? `layout-item-${index}`) === columnKey,
-        );
-        if (columnIndex < 0) return section;
-
-        const item = layoutItems[columnIndex] ?? {};
-        layoutItems[columnIndex] = {
-          ...item,
-          blocks: getLayoutItemBlocks(item).filter(
+        if (!findLayoutColumn(section, columnKey)) return section;
+        return updateLayoutColumn(section, columnKey, (column) => ({
+          ...column,
+          blocks: (column.blocks ?? []).filter(
             (block, index) =>
               (block.id ?? `${columnKey}-block-${index}`) !== blockKey,
           ),
-        };
-        return { ...section, layoutItems };
+        }));
       }),
     }));
 
@@ -4456,10 +4620,9 @@ export default function DashboardBuilder({
         (section) =>
           section.id === targetSectionId && isLayoutContainerSection(section),
       );
-      const hasTargetColumn = (targetSection?.layoutItems ?? []).some(
-        (item, index) =>
-          (item.id ?? `layout-item-${index}`) === targetColumnKey,
-      );
+      const hasTargetColumn = targetSection
+        ? Boolean(findLayoutColumn(targetSection, targetColumnKey))
+        : false;
 
       if (!hasTargetColumn) return current;
 
@@ -4468,15 +4631,9 @@ export default function DashboardBuilder({
           return section;
         }
 
-        const layoutItems = [...(section.layoutItems ?? [])];
-        const sourceColumnIndex = layoutItems.findIndex(
-          (item, index) =>
-            (item.id ?? `layout-item-${index}`) === sourceColumnKey,
-        );
-        if (sourceColumnIndex < 0) return section;
-
-        const sourceItem = layoutItems[sourceColumnIndex] ?? {};
-        const sourceBlocks = [...getLayoutItemBlocks(sourceItem)];
+        const sourceItem = findLayoutColumn(section, sourceColumnKey);
+        if (!sourceItem) return section;
+        const sourceBlocks = [...(sourceItem.blocks ?? [])];
         const sourceBlockIndex = sourceBlocks.findIndex(
           (block, index) =>
             (block.id ?? `${sourceColumnKey}-block-${index}`) ===
@@ -4488,11 +4645,10 @@ export default function DashboardBuilder({
         if (!removedBlock) return section;
 
         movingBlock = removedBlock;
-        layoutItems[sourceColumnIndex] = {
-          ...sourceItem,
+        return updateLayoutColumn(section, sourceColumnKey, (column) => ({
+          ...column,
           blocks: sourceBlocks,
-        };
-        return { ...section, layoutItems };
+        }));
       });
 
       const blockToMove = movingBlock;
@@ -4508,15 +4664,9 @@ export default function DashboardBuilder({
             return section;
           }
 
-          const layoutItems = [...(section.layoutItems ?? [])];
-          const targetColumnIndex = layoutItems.findIndex(
-            (item, index) =>
-              (item.id ?? `layout-item-${index}`) === targetColumnKey,
-          );
-          if (targetColumnIndex < 0) return section;
-
-          const targetItem = layoutItems[targetColumnIndex] ?? {};
-          const targetBlocks = [...getLayoutItemBlocks(targetItem)];
+          const targetItem = findLayoutColumn(section, targetColumnKey);
+          if (!targetItem) return section;
+          const targetBlocks = [...(targetItem.blocks ?? [])];
           const targetIndex = targetBlockKey
             ? targetBlocks.findIndex(
                 (block, index) =>
@@ -4532,12 +4682,10 @@ export default function DashboardBuilder({
           }
 
           targetBlocks.splice(insertIndex, 0, blockToMove);
-          layoutItems[targetColumnIndex] = {
-            ...targetItem,
+          return updateLayoutColumn(section, targetColumnKey, (column) => ({
+            ...column,
             blocks: targetBlocks,
-          };
-
-          return { ...section, layoutItems };
+          }));
         }),
       };
     });
@@ -4647,15 +4795,9 @@ export default function DashboardBuilder({
           return section;
         }
 
-        const layoutItems = [...(section.layoutItems ?? [])];
-        const targetColumnIndex = layoutItems.findIndex(
-          (item, index) =>
-            (item.id ?? `layout-item-${index}`) === targetColumnKey,
-        );
-        if (targetColumnIndex < 0) return section;
-
-        const targetItem = layoutItems[targetColumnIndex] ?? {};
-        const targetBlocks = [...getLayoutItemBlocks(targetItem)];
+        const targetItem = findLayoutColumn(section, targetColumnKey);
+        if (!targetItem) return section;
+        const targetBlocks = [...(targetItem.blocks ?? [])];
         const targetIndex = targetBlockKey
           ? targetBlocks.findIndex(
               (item, index) =>
@@ -4670,12 +4812,10 @@ export default function DashboardBuilder({
         }
 
         targetBlocks.splice(insertIndex, 0, block);
-        layoutItems[targetColumnIndex] = {
-          ...targetItem,
+        return updateLayoutColumn(section, targetColumnKey, (column) => ({
+          ...column,
           blocks: targetBlocks,
-        };
-
-        return { ...section, layoutItems };
+        }));
       }),
     }));
 
@@ -4841,10 +4981,9 @@ export default function DashboardBuilder({
 
     const layoutItems = targetSection.layoutItems ?? [];
     const targetColumn =
-      layoutItems.find(
-        (item, index) =>
-          (item.id ?? `layout-item-${index}`) === selectedLayoutColumnKey,
-      ) ?? layoutItems[0];
+      (selectedLayoutColumnKey
+        ? findLayoutColumn(targetSection, selectedLayoutColumnKey)
+        : null) ?? layoutItems[0];
     const targetColumnIndex = layoutItems.findIndex(
       (item) => item === targetColumn,
     );
@@ -4864,25 +5003,285 @@ export default function DashboardBuilder({
     });
   };
 
-  const addSelectedLayoutItem = () => {
-    if (!selectedSection) return;
-    const layoutItems = selectedSection.layoutItems ?? [];
+  const addSelectedLayoutItem = (target?: {
+    sectionId: string;
+    columnKey: string;
+  }) => {
+    const sectionId = target?.sectionId ?? selectedSection?.id;
+    const anchorColumnKey = target?.columnKey ?? selectedLayoutColumnKey;
+    if (!sectionId) return;
+    const sourceSection = builderState.sections.find(
+      (section) => section.id === sectionId,
+    );
+    if (!sourceSection || !isLayoutContainerSection(sourceSection)) return;
+    const sourceItems = sourceSection.layoutItems ?? [];
+    const sourceAnchorIndex = anchorColumnKey
+      ? sourceItems.findIndex(
+          (item, index) =>
+            (item.id ?? `layout-item-${index}`) === anchorColumnKey,
+        )
+      : sourceItems.length - 1;
+    const sourceRows = getPreviewLayoutRows(sourceSection, sourceItems);
+    const sourceTargetRow =
+      sourceRows.find(
+        (row) =>
+          sourceAnchorIndex >= row.startIndex &&
+          sourceAnchorIndex < row.startIndex + row.items.length,
+      ) ?? sourceRows[sourceRows.length - 1];
+    if (sourceTargetRow && sourceTargetRow.items.length >= 6) {
+      setPublishStatus("Rows support up to 6 columns");
+      return;
+    }
+
     const id = `layout-item-${Date.now().toString(36)}`;
-    updateSelected({
-      layoutItems: [
-        ...layoutItems,
-        {
+
+    setBuilderState((current) => ({
+      ...current,
+      sections: current.sections.map((section) => {
+        if (section.id !== sectionId || !isLayoutContainerSection(section)) {
+          return section;
+        }
+
+        const layoutItems = section.layoutItems ?? [];
+        const anchorIndex = anchorColumnKey
+          ? layoutItems.findIndex(
+              (item, index) =>
+                (item.id ?? `layout-item-${index}`) === anchorColumnKey,
+            )
+          : layoutItems.length - 1;
+        const safeAnchorIndex = anchorIndex >= 0 ? anchorIndex : layoutItems.length - 1;
+        const layoutRows = getPreviewLayoutRows(section, layoutItems);
+        const targetRow =
+          layoutRows.find(
+            (row) =>
+              safeAnchorIndex >= row.startIndex &&
+              safeAnchorIndex < row.startIndex + row.items.length,
+          ) ?? layoutRows[layoutRows.length - 1];
+
+        if (targetRow && targetRow.items.length >= 6) {
+          return section;
+        }
+
+        const insertIndex =
+          safeAnchorIndex >= 0 ? safeAnchorIndex + 1 : layoutItems.length;
+        const rowId =
+          targetRow?.items.find((item) => item.rowId)?.rowId ??
+          `layout-row-${Date.now().toString(36)}`;
+        const nextLayoutItems = layoutItems.map((item, index) =>
+          targetRow &&
+          index >= targetRow.startIndex &&
+          index < targetRow.startIndex + targetRow.items.length
+            ? { ...item, rowId, rowLayout: undefined }
+            : item,
+        );
+        nextLayoutItems.splice(insertIndex, 0, {
           id,
+          rowId,
+          rowLayout: undefined,
           blocks: [],
-        },
-      ],
-      layout: undefined,
-      layoutColumns: Math.min(
-        Math.max(selectedSection.layoutColumns ?? 2, 1),
-        6,
-      ),
-    });
+        });
+        return {
+          ...section,
+          layout: undefined,
+          layoutItems: nextLayoutItems,
+          layoutColumns: Math.max(
+            section.layoutColumns ?? 1,
+            (targetRow?.items.length ?? 0) + 1,
+          ),
+        };
+      }),
+    }));
+
+    setSelectedId(sectionId);
+    setSelectedLayoutColumnKey(id);
+    setSelectedLayoutRowIndex(null);
+    setSelectedLayoutBlockKey(null);
     setOpenLayoutItemId(id);
+    setPublishStatus("Column added");
+  };
+
+  const stackColumnBelow = (sectionId: string, columnKey: string) => {
+    const sourceSection = builderState.sections.find(
+      (section) => section.id === sectionId,
+    );
+    const sourceColumn = sourceSection
+      ? findLayoutColumn(sourceSection, columnKey)
+      : null;
+    if (!sourceSection || !sourceColumn || "nestedLayout" in sourceColumn && sourceColumn.nestedLayout) {
+      return;
+    }
+    const nestedLayout = createVerticalNestedLayout(sourceColumn);
+    const nextColumnKey = nestedLayout.rows[1]?.columns[0]?.id ?? null;
+
+    setBuilderState((current) => ({
+      ...current,
+      sections: current.sections.map((section) => {
+        if (section.id !== sectionId) return section;
+        return {
+          ...section,
+          layoutItems: (section.layoutItems ?? []).map((column, index) =>
+            (column.id ?? `layout-item-${index}`) === columnKey
+              ? {
+                  ...column,
+                  blocks: [],
+                  nestedLayout,
+                }
+              : column,
+          ),
+        };
+      }),
+    }));
+
+    setSelectedId(sectionId);
+    setSelectedLayoutRowIndex(null);
+    setSelectedLayoutColumnKey(nextColumnKey);
+    setSelectedLayoutBlockKey(null);
+    setOpenLayoutItemId(nextColumnKey);
+    setPublishStatus("Column converted to a stacked layout");
+  };
+
+  const unwrapNestedColumn = (sectionId: string, columnKey: string) => {
+    setBuilderState((current) => ({
+      ...current,
+      sections: current.sections.map((section) => {
+        if (section.id !== sectionId) return section;
+        return {
+          ...section,
+          layoutItems: (section.layoutItems ?? []).map((column, index) => {
+            if (
+              (column.id ?? `layout-item-${index}`) !== columnKey ||
+              !column.nestedLayout
+            ) {
+              return column;
+            }
+            return {
+              ...column,
+              blocks: column.nestedLayout.rows.flatMap((row) =>
+                row.columns.flatMap((nestedColumn) => nestedColumn.blocks),
+              ),
+              nestedLayout: undefined,
+            };
+          }),
+        };
+      }),
+    }));
+    setSelectedId(sectionId);
+    setSelectedLayoutColumnKey(columnKey);
+    setSelectedLayoutBlockKey(null);
+    setPublishStatus("Stacked layout removed");
+  };
+
+  const appendNestedRow = (
+    sectionId: string,
+    outerColumnKey: string,
+    afterRowId: string,
+  ) => {
+    const seed = Date.now().toString(36);
+    const rowId = `nested-row-${seed}`;
+    const columnId = `nested-column-${seed}`;
+
+    setBuilderState((current) => ({
+      ...current,
+      sections: current.sections.map((section) => {
+        if (section.id !== sectionId) return section;
+        return {
+          ...section,
+          layoutItems: (section.layoutItems ?? []).map((column, index) => {
+            if (
+              (column.id ?? `layout-item-${index}`) !== outerColumnKey ||
+              !column.nestedLayout
+            ) {
+              return column;
+            }
+            const rows = [...column.nestedLayout.rows];
+            const anchorIndex = rows.findIndex((row) => row.id === afterRowId);
+            rows.splice(anchorIndex >= 0 ? anchorIndex + 1 : rows.length, 0, {
+              id: rowId,
+              weight: 1,
+              layout: "whole",
+              columns: [
+                {
+                  id: columnId,
+                  rowId,
+                  rowLayout: "whole",
+                  blocks: [],
+                },
+              ],
+            });
+            return {
+              ...column,
+              nestedLayout: {
+                ...column.nestedLayout,
+                rows,
+              },
+            };
+          }),
+        };
+      }),
+    }));
+
+    setSelectedId(sectionId);
+    setSelectedLayoutRowIndex(null);
+    setSelectedLayoutColumnKey(columnId);
+    setSelectedLayoutBlockKey(null);
+    setOpenLayoutItemId(columnId);
+    setPublishStatus("Nested row added");
+  };
+
+  const deleteNestedRow = (
+    sectionId: string,
+    outerColumnKey: string,
+    rowId: string,
+  ) => {
+    setBuilderState((current) => ({
+      ...current,
+      sections: current.sections.map((section) => {
+        if (section.id !== sectionId) return section;
+        return {
+          ...section,
+          layoutItems: (section.layoutItems ?? []).map((column, index) => {
+            if (
+              (column.id ?? `layout-item-${index}`) !== outerColumnKey ||
+              !column.nestedLayout
+            ) {
+              return column;
+            }
+
+            const remainingRows = column.nestedLayout.rows.filter(
+              (row) => row.id !== rowId,
+            );
+            if (remainingRows.length === column.nestedLayout.rows.length) {
+              return column;
+            }
+
+            if (remainingRows.length === 1) {
+              return {
+                ...column,
+                blocks: remainingRows[0].columns.flatMap(
+                  (nestedColumn) => nestedColumn.blocks,
+                ),
+                nestedLayout: undefined,
+              };
+            }
+
+            return {
+              ...column,
+              nestedLayout: {
+                ...column.nestedLayout,
+                rows: remainingRows,
+              },
+            };
+          }),
+        };
+      }),
+    }));
+
+    setSelectedId(sectionId);
+    setSelectedLayoutRowIndex(null);
+    setSelectedLayoutColumnKey(outerColumnKey);
+    setSelectedLayoutBlockKey(null);
+    setOpenLayoutItemId(outerColumnKey);
+    setPublishStatus("Nested row deleted");
   };
 
   const deleteSelectedLayoutItem = (index: number) => {
@@ -5114,13 +5513,7 @@ export default function DashboardBuilder({
     const preset = rowInsertionPresets.find((item) => item.key === presetKey);
     if (!preset) return;
 
-    const rowId = `layout-row-${Date.now().toString(36)}`;
-    const newItems: PreviewLayoutItem[] = preset.ratios.map((_, index) => ({
-      id: `${rowId}-column-${index + 1}`,
-      rowId,
-      rowLayout: preset.key,
-      blocks: [],
-    }));
+    const newItems: PreviewLayoutItem[] = createStructuralRowItems(preset.key);
     const firstColumnKey: string | null = newItems[0]?.id ?? null;
 
     setBuilderState((current) => ({
@@ -6794,6 +7187,134 @@ export default function DashboardBuilder({
     setInspectorResizing(true);
   };
 
+  const setInspectorModePreference = (mode: InspectorMode) => {
+    setInspectorMode(mode);
+    window.localStorage.setItem(INSPECTOR_MODE_STORAGE_KEY, mode);
+    if (mode === "floating") {
+      setInspectorFloatingRect((current) => {
+        const next = clampInspectorFloatingRect({
+          ...current,
+          x: Math.max(
+            INSPECTOR_VIEWPORT_GUTTER,
+            window.innerWidth - current.width - 24,
+          ),
+          y: Math.max(72, current.y),
+        });
+        window.localStorage.setItem(
+          INSPECTOR_FLOATING_RECT_STORAGE_KEY,
+          JSON.stringify(next),
+        );
+        return next;
+      });
+    }
+  };
+
+  const startInspectorDrag = (
+    event: ReactPointerEvent<HTMLDivElement>,
+  ) => {
+    if (
+      effectiveInspectorMode !== "floating" ||
+      event.button !== 0 ||
+      (event.target instanceof Element &&
+        event.target.closest("button, input, select, textarea"))
+    ) {
+      return;
+    }
+    event.preventDefault();
+    inspectorDragRef.current = {
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      startY: event.clientY,
+      originX: inspectorFloatingRect.x,
+      originY: inspectorFloatingRect.y,
+    };
+    event.currentTarget.setPointerCapture(event.pointerId);
+    document.documentElement.style.cursor = "grabbing";
+    document.body.style.userSelect = "none";
+    setInspectorDragging(true);
+  };
+
+  const moveInspectorDrag = (
+    event: ReactPointerEvent<HTMLDivElement>,
+  ) => {
+    const dragState = inspectorDragRef.current;
+    if (!dragState || dragState.pointerId !== event.pointerId) return;
+    event.preventDefault();
+    setInspectorFloatingRect((current) =>
+      clampInspectorFloatingRect({
+        ...current,
+        x: dragState.originX + event.clientX - dragState.startX,
+        y: dragState.originY + event.clientY - dragState.startY,
+      }),
+    );
+  };
+
+  const stopInspectorDrag = (
+    event: ReactPointerEvent<HTMLDivElement>,
+  ) => {
+    const dragState = inspectorDragRef.current;
+    if (!dragState || dragState.pointerId !== event.pointerId) return;
+    window.localStorage.setItem(
+      INSPECTOR_FLOATING_RECT_STORAGE_KEY,
+      JSON.stringify(inspectorFloatingRect),
+    );
+    restoreInspectorResizeDocumentStyles();
+    setInspectorDragging(false);
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+  };
+
+  const startInspectorFloatingResize = (
+    event: ReactPointerEvent<HTMLDivElement>,
+  ) => {
+    if (effectiveInspectorMode !== "floating" || event.button !== 0) return;
+    event.preventDefault();
+    event.stopPropagation();
+    inspectorFloatingResizeRef.current = {
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      startY: event.clientY,
+      startWidth: inspectorFloatingRect.width,
+      startHeight: inspectorFloatingRect.height,
+    };
+    event.currentTarget.setPointerCapture(event.pointerId);
+    document.documentElement.style.cursor = "nwse-resize";
+    document.body.style.userSelect = "none";
+    setInspectorResizing(true);
+  };
+
+  const moveInspectorFloatingResize = (
+    event: ReactPointerEvent<HTMLDivElement>,
+  ) => {
+    const resizeState = inspectorFloatingResizeRef.current;
+    if (!resizeState || resizeState.pointerId !== event.pointerId) return;
+    event.preventDefault();
+    setInspectorFloatingRect((current) =>
+      clampInspectorFloatingRect({
+        ...current,
+        width: resizeState.startWidth + event.clientX - resizeState.startX,
+        height: resizeState.startHeight + event.clientY - resizeState.startY,
+      }),
+    );
+  };
+
+  const stopInspectorFloatingResize = (
+    event: ReactPointerEvent<HTMLDivElement>,
+  ) => {
+    const resizeState = inspectorFloatingResizeRef.current;
+    if (!resizeState || resizeState.pointerId !== event.pointerId) return;
+    window.localStorage.setItem(
+      INSPECTOR_FLOATING_RECT_STORAGE_KEY,
+      JSON.stringify(inspectorFloatingRect),
+    );
+    restoreInspectorResizeDocumentStyles();
+    setInspectorResizing(false);
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+  };
+
   const moveInspectorResize = (
     event: ReactPointerEvent<HTMLDivElement>,
   ) => {
@@ -6898,6 +7419,7 @@ export default function DashboardBuilder({
       updateSelected={updateSelected}
       updateSelectedBadge={updateSelectedBadge}
       updateSelectedLayoutBlock={updateSelectedLayoutBlock}
+      updateLayoutBlockByKey={updateLayoutBlockByKey}
       updateSelectedLayoutBlockButton={updateSelectedLayoutBlockButton}
       updateSelectedLayoutBlockBadge={updateSelectedLayoutBlockBadge}
       updateSelectedLayoutBlockGridItem={updateSelectedLayoutBlockGridItem}
@@ -8530,7 +9052,9 @@ export default function DashboardBuilder({
     <div
       className={`builder-dashboard ${inspectorOpen ? "" : "is-inspector-closed"}${
         sidebarCollapsed ? " is-sidebar-collapsed" : ""
-      }${sidebarResizing ? " is-sidebar-resizing" : ""} builder-preview-scheme-${
+      }${inspectorOpen ? ` is-inspector-${effectiveInspectorMode}` : " is-inspector-collapsed"}${
+        sidebarResizing ? " is-sidebar-resizing" : ""
+      } builder-preview-scheme-${
         builderState.design.colorScheme ?? "auto"
       }`}
       data-theme={dashboardTheme}
@@ -8540,6 +9064,7 @@ export default function DashboardBuilder({
             builderState.design.pageBackground ?? "#dfdfd7",
           "--builder-preview-real-bg": previewPageBackground,
           "--builder-sidebar-width": `${sidebarWidth}px`,
+          "--builder-inspector-width": `${clampedInspectorWidth}px`,
         } as CSSProperties
       }
     >
@@ -8659,7 +9184,7 @@ export default function DashboardBuilder({
             >
               {builderState.page === "header" && (
                 <div
-                  className={`builder-header-document-preview builder-preview-section${currentHeaderDocumentSettings.overlay ? " is-header-overlay" : ""}${selectedId === "header-document" ? " is-selected" : ""}${hoveredBuilderTarget?.type === "section" && hoveredBuilderTarget.sectionId === "header-document" ? " is-hovered" : ""}${draggingHeaderElementId ? " is-header-element-dragging" : ""}${draggingHeaderRowId ? " is-header-row-dragging" : ""}${!currentHeaderDocumentSettings.visible ? " is-header-hidden" : ""}`}
+                  className={`builder-header-document-preview builder-preview-section${currentHeaderDocumentSettings.overlay ? " is-header-overlay" : ""}${selectedId === "header-document" && selectedLayoutRowIndex === null && selectedLayoutColumnKey === null && selectedLayoutBlockKey === null ? " is-selected" : ""}${hoveredBuilderTarget?.type === "section" && hoveredBuilderTarget.sectionId === "header-document" ? " is-hovered" : ""}${draggingHeaderElementId ? " is-header-element-dragging" : ""}${draggingHeaderRowId ? " is-header-row-dragging" : ""}${!currentHeaderDocumentSettings.visible ? " is-header-hidden" : ""}`}
                   onMouseEnter={() => setHoveredBuilderTarget({ type: "section", sectionId: "header-document" })}
                   onMouseLeave={() => setHoveredBuilderTarget(null)}
                   onDragOver={(event) => {
@@ -9119,6 +9644,7 @@ export default function DashboardBuilder({
             <ProductCategoryFilterProvider key={headerContextState.page}>
               <PreviewCanvas
                 device={device}
+                interactionScale={device === "desktop" ? 1 : previewScale}
                 sections={headerContextSections}
                 page={headerContextState.page}
                 previewProducts={previewProducts}
@@ -9126,6 +9652,7 @@ export default function DashboardBuilder({
                 previewCategoryCounts={previewCategoryCounts}
                 pageLabel={getLayoutLabel(headerContextState.page, customPages)}
                 design={headerContextState.design}
+                layoutScheme={layoutScheme}
                 shellSettings={shellSettings}
                 headerOverlay={currentHeaderDocumentSettings.overlay}
                 spacingOverlayEnabled={spacingOverlayEnabled}
@@ -9141,6 +9668,7 @@ export default function DashboardBuilder({
                 onSelectColumn={selectLayoutColumn}
                 onSelectRow={selectLayoutRow}
                 onSelectBlock={selectLayoutBlock}
+                onOpenInspector={openInspectorPanel}
                 onDragStart={setDraggingSectionId}
                 onDragEnd={() => setDraggingSectionId(null)}
                 onReorder={reorderSection}
@@ -9170,6 +9698,11 @@ export default function DashboardBuilder({
                 onUploadGridItemImage={pickGridItemImage}
                 onAddWireframe={addWireframeNear}
                 onAddRow={addRowNear}
+                onAddColumnAfter={addSelectedLayoutItem}
+                onStackColumnBelow={stackColumnBelow}
+                onAppendNestedRow={appendNestedRow}
+                onDeleteNestedRow={deleteNestedRow}
+                onUnwrapNestedColumn={unwrapNestedColumn}
                 onDeleteRow={deleteEmptyRow}
                 onDuplicateRow={duplicateLayoutRow}
                 onMoveRow={moveLayoutRow}
@@ -9275,15 +9808,69 @@ export default function DashboardBuilder({
       {inspectorOpen && selectedSection ? (
         <div
           ref={inspectorPanelRef}
-          className={`builder-floating-inspector${inspectorResizing ? " is-resizing" : ""}`}
+          className={`builder-floating-inspector is-${effectiveInspectorMode}${
+            inspectorResizing ? " is-resizing" : ""
+          }${inspectorDragging ? " is-dragging" : ""}`}
           onMouseDown={(event) => event.stopPropagation()}
           onClick={(event) => event.stopPropagation()}
           style={
-            inspectorResizeEnabled
-              ? { width: `${clampedInspectorWidth}px` }
-              : undefined
+            effectiveInspectorMode === "floating"
+              ? {
+                  left: `${inspectorFloatingRect.x}px`,
+                  top: `${inspectorFloatingRect.y}px`,
+                  width: `${inspectorFloatingRect.width}px`,
+                  height: `${inspectorFloatingRect.height}px`,
+                }
+              : { width: `${clampedInspectorWidth}px` }
           }
         >
+          <div
+            className="builder-inspector-mode-bar"
+            onPointerDown={startInspectorDrag}
+            onPointerMove={moveInspectorDrag}
+            onPointerUp={stopInspectorDrag}
+            onPointerCancel={stopInspectorDrag}
+            onLostPointerCapture={stopInspectorDrag}
+          >
+            <span>
+              <GripVertical size={14} aria-hidden="true" />
+              Inspector
+            </span>
+            <div>
+              <button
+                type="button"
+                onClick={() =>
+                  setInspectorModePreference(
+                    effectiveInspectorMode === "docked"
+                      ? "floating"
+                      : "docked",
+                  )
+                }
+                disabled={
+                  effectiveInspectorMode === "floating" &&
+                  !inspectorDesktopLayout
+                }
+                aria-label={
+                  effectiveInspectorMode === "docked"
+                    ? "Undock Inspector"
+                    : "Dock Inspector right"
+                }
+                title={
+                  effectiveInspectorMode === "docked"
+                    ? "Undock Inspector"
+                    : inspectorDesktopLayout
+                      ? "Dock Inspector right"
+                      : "Docking is available on wider screens"
+                }
+              >
+                {effectiveInspectorMode === "docked" ? (
+                  <SquareMousePointer size={14} />
+                ) : (
+                  <PanelRightOpen size={14} />
+                )}
+              </button>
+            </div>
+          </div>
           {inspectorResizeEnabled ? (
             <div
               className="builder-inspector-resize-handle"
@@ -9301,7 +9888,32 @@ export default function DashboardBuilder({
             />
           ) : null}
           {inspectorPanel}
+          {effectiveInspectorMode === "floating" ? (
+            <div
+              className="builder-inspector-floating-resize-handle"
+              role="separator"
+              aria-label="Resize floating Inspector"
+              onPointerDown={startInspectorFloatingResize}
+              onPointerMove={moveInspectorFloatingResize}
+              onPointerUp={stopInspectorFloatingResize}
+              onPointerCancel={stopInspectorFloatingResize}
+              onLostPointerCapture={stopInspectorFloatingResize}
+            />
+          ) : null}
         </div>
+      ) : null}
+
+      {!inspectorOpen && selectedSection ? (
+        <button
+          type="button"
+          className="builder-inspector-collapsed-rail"
+          onClick={openInspectorPanel}
+          aria-label="Open Inspector"
+          title="Open Inspector"
+        >
+          <PanelRightOpen size={15} />
+          <span>Inspector</span>
+        </button>
       ) : null}
 
       <div
@@ -9324,6 +9936,7 @@ export default function DashboardBuilder({
 
 function PreviewCanvas({
   device,
+  interactionScale,
   sections,
   page,
   previewProducts,
@@ -9331,6 +9944,7 @@ function PreviewCanvas({
   previewCategoryCounts,
   pageLabel,
   design,
+  layoutScheme,
   shellSettings,
   headerOverlay,
   spacingOverlayEnabled,
@@ -9346,6 +9960,7 @@ function PreviewCanvas({
   onSelectColumn,
   onSelectRow,
   onSelectBlock,
+  onOpenInspector,
   onDragStart,
   onDragEnd,
   onReorder,
@@ -9375,6 +9990,11 @@ function PreviewCanvas({
   onUploadGridItemImage,
   onAddWireframe,
   onAddRow,
+  onAddColumnAfter,
+  onStackColumnBelow,
+  onAppendNestedRow,
+  onDeleteNestedRow,
+  onUnwrapNestedColumn,
   onDeleteRow,
   onDuplicateRow,
   onMoveRow,
@@ -9394,6 +10014,7 @@ function PreviewCanvas({
   onCycleSectionSpacing,
 }: {
   device: PreviewDevice;
+  interactionScale: number;
   sections: BuilderSection[];
   page: BuilderLayoutKey;
   previewProducts: ProductNode[];
@@ -9401,6 +10022,7 @@ function PreviewCanvas({
   previewCategoryCounts: Record<string, number>;
   pageLabel: string;
   design: BuilderDesign;
+  layoutScheme: "light" | "dark";
   shellSettings: BuilderShellSettings;
   headerOverlay: boolean;
   spacingOverlayEnabled: boolean;
@@ -9420,6 +10042,7 @@ function PreviewCanvas({
     columnKey: string,
     blockKey: string,
   ) => void;
+  onOpenInspector: () => void;
   onDragStart: (sectionId: string) => void;
   onDragEnd: () => void;
   onReorder: (
@@ -9538,6 +10161,22 @@ function PreviewCanvas({
     placement: "before" | "after",
     presetKey: string,
   ) => void;
+  onAddColumnAfter: (target: {
+    sectionId: string;
+    columnKey: string;
+  }) => void;
+  onStackColumnBelow: (sectionId: string, columnKey: string) => void;
+  onAppendNestedRow: (
+    sectionId: string,
+    outerColumnKey: string,
+    afterRowId: string,
+  ) => void;
+  onDeleteNestedRow: (
+    sectionId: string,
+    outerColumnKey: string,
+    rowId: string,
+  ) => void;
+  onUnwrapNestedColumn: (sectionId: string, columnKey: string) => void;
   onDeleteRow: (sectionId: string, rowIndex: number) => void;
   onDuplicateRow: (sectionId: string, rowIndex: number) => void;
   onMoveRow: (sectionId: string, rowIndex: number, direction: -1 | 1) => void;
@@ -9613,8 +10252,6 @@ function PreviewCanvas({
     field: "topSpacing" | "bottomSpacing" | "topMargin" | "bottomMargin",
   ) => void;
 }) {
-  const layoutScheme = design.colorScheme === "dark" ? "dark" : "light";
-
   const [activeDragOver, setActiveDragOver] = useState<{
     type: "section" | "column" | "block";
     sectionId: string;
@@ -9628,6 +10265,44 @@ function PreviewCanvas({
     sectionId: string | null;
     placement: "above" | "below";
   } | null>(null);
+  const [editingTarget, setEditingTarget] =
+    useState<BuilderInteractionTarget | null>(null);
+  const selectedTarget = selectedBuilderTarget({
+    sectionId: selectedId,
+    rowIndex: selectedLayoutRowIndex,
+    columnKey: selectedLayoutColumnKey,
+    blockKey: selectedLayoutBlockKey,
+  });
+  const [hoverToolbarTarget, setHoverToolbarTarget] =
+    useState<BuilderInteractionTarget | null>(null);
+
+  useEffect(() => {
+    setHoverToolbarTarget(null);
+    if (
+      !hoveredTarget ||
+      selectedTarget ||
+      editingTarget ||
+      draggingSectionId ||
+      draggingLayoutBlockKey ||
+      templateDragType
+    ) {
+      return;
+    }
+    const timer = window.setTimeout(() => {
+      setHoverToolbarTarget(hoveredTarget);
+    }, BUILDER_HOVER_TOOLBAR_DELAY_MS);
+    return () => window.clearTimeout(timer);
+  }, [
+    hoveredTarget,
+    selectedId,
+    selectedLayoutRowIndex,
+    selectedLayoutColumnKey,
+    selectedLayoutBlockKey,
+    editingTarget,
+    draggingSectionId,
+    draggingLayoutBlockKey,
+    templateDragType,
+  ]);
   const visibleSections = sections.filter((section) => section.visible);
   const animationSignature = visibleSections
     .map((section) => {
@@ -9725,7 +10400,31 @@ function PreviewCanvas({
         selectedLayoutBlockKey === null
           ? " has-selected-section"
           : ""
-      }`}
+      }${editingTarget ? " is-text-editing" : ""}`}
+      onFocusCapture={(event) => {
+        if (!(event.target instanceof HTMLElement) || !event.target.isContentEditable) {
+          return;
+        }
+        const target = builderTargetFromElement(event.target);
+        if (target?.type === "block") {
+          setEditingTarget(target);
+          onHoverTarget(null);
+          onSelectBlock(target.sectionId, target.columnKey, target.blockKey);
+        }
+      }}
+      onBlurCapture={(event) => {
+        if (!(event.target instanceof HTMLElement) || !event.target.isContentEditable) {
+          return;
+        }
+        const next = event.relatedTarget;
+        if (!(next instanceof Node) || !event.currentTarget.contains(next)) {
+          setEditingTarget(null);
+          return;
+        }
+        if (!(next instanceof HTMLElement) || !next.isContentEditable) {
+          setEditingTarget(null);
+        }
+      }}
       style={
         {
           "--builder-global-section-padding-top": resolveBuilderSpacing(
@@ -9801,6 +10500,13 @@ function PreviewCanvas({
             shellSettings.elementMarginLeft,
             "elementMargin",
           ),
+          ...builderGeometryCssVariables({ includeEditorAffordances: true }),
+          "--builder-editor-row-interaction-gutter": `${
+            20 / Math.max(interactionScale, 0.25)
+          }px`,
+          "--builder-editor-main-row-margin": `${
+            24 / Math.max(interactionScale, 0.25)
+          }px`,
           ...builderButtonCssVars(shellSettings),
         } as CSSProperties
       }
@@ -9850,7 +10556,7 @@ function PreviewCanvas({
           design.colorScheme ?? "auto"
         } builder-preview-page${draggingSectionId ? " is-dragging-section" : ""}`}
         data-theme={layoutScheme}
-        style={previewDesignStyle(design)}
+        style={previewDesignStyle(design, layoutScheme)}
         data-builder-page-root
         data-builder-page={page}
         data-gsap-home={page === "home" ? true : undefined}
@@ -9874,6 +10580,25 @@ function PreviewCanvas({
                 selectedLayoutRowIndex === null &&
                 selectedLayoutColumnKey === null &&
                 selectedLayoutBlockKey === null;
+              const sectionTarget: BuilderInteractionTarget = {
+                type: "section",
+                sectionId: section.id,
+              };
+              const sectionInteractionState = resolveBuilderInteractionState({
+                target: sectionTarget,
+                selected: selectedTarget,
+                hovered: hoveredTarget,
+                editing: editingTarget,
+              });
+              const sectionChrome = resolveBuilderInteractionChrome({
+                state: sectionInteractionState,
+                spacingActive: spacingOverlayEnabled,
+                dragging: Boolean(draggingSectionId),
+                hoverToolbarReady: builderTargetsEqual(
+                  sectionTarget,
+                  hoverToolbarTarget,
+                ),
+              });
               const animationAttrs = previewAnimationAttrs(section.animation);
               const isAnimatedBg =
                 section.backgroundEffect === "antigravity" ||
@@ -9924,6 +10649,8 @@ function PreviewCanvas({
                   <div
                     id={section.anchorId || section.id}
                     data-builder-section-id={section.id}
+                    data-builder-object-type="section"
+                    data-builder-interaction-state={sectionInteractionState}
                     role="button"
                     tabIndex={0}
                     draggable
@@ -9938,7 +10665,10 @@ function PreviewCanvas({
                         sectionLabels[section.kind] || "Section",
                       );
                     }}
-                    className={`builder-preview-section ${getStorefrontPreviewClass(
+                    className={`builder-preview-section ${builderInteractionClassName(
+                      sectionTarget,
+                      sectionInteractionState,
+                    )} ${getStorefrontPreviewClass(
                       section,
                     )} builder-preview-${section.kind} builder-preview-section--${
                       section.backgroundMode === "boxed" ? "boxed" : "full"
@@ -9950,7 +10680,7 @@ function PreviewCanvas({
                         : isAnimatedBg
                           ? "relative overflow-hidden"
                           : ""
-                    } ${isSelected ? "is-selected" : ""} ${
+                    } ${isSectionActive ? "is-selected" : ""} ${
                       hoveredTarget?.type === "section" &&
                       hoveredTarget.sectionId === section.id
                         ? "is-hovered"
@@ -9993,6 +10723,11 @@ function PreviewCanvas({
                     }
                     {...animationAttrs.data}
                     onClick={() => onSelect(section.id)}
+                    onDoubleClick={(event) => {
+                      event.stopPropagation();
+                      onSelect(section.id);
+                      onOpenInspector();
+                    }}
                     onKeyDown={(event) => {
                       if (event.key === "Enter" || event.key === " ") {
                         event.preventDefault();
@@ -10073,7 +10808,7 @@ function PreviewCanvas({
                       onDragEnd();
                     }}
                   >
-                    {isSectionActive && (
+                    {sectionChrome.showSpacing && (
                       <SectionSpacingOverlay
                         section={section}
                         shellSettings={shellSettings}
@@ -10123,7 +10858,7 @@ function PreviewCanvas({
                           )}
                       </>
                     )}
-                    <div
+                    {sectionChrome.showToolbar && <div
                       className={`builder-preview-section-tools ${
                         isSelected ? "is-selected-tools" : ""
                       }`}
@@ -10135,7 +10870,10 @@ function PreviewCanvas({
                         <span>{sectionLabels[section.kind]}</span>
                         <button
                           type="button"
-                          onClick={() => onSelect(section.id)}
+                          onClick={() => {
+                            onSelect(section.id);
+                            onOpenInspector();
+                          }}
                           aria-label="Open section settings"
                           title="Section settings"
                         >
@@ -10182,7 +10920,7 @@ function PreviewCanvas({
                           <Trash2 size={14} />
                         </button>
                       </div>
-                    </div>
+                    </div>}
                     <div
                       className="builder-preview-section-insert builder-preview-section-insert--top"
                       onClick={(event) => event.stopPropagation()}
@@ -10271,10 +11009,11 @@ function PreviewCanvas({
                             placement: "below",
                           })
                         }
-                        aria-label="Add section below"
-                        title="Add section below"
+                        aria-label="Add section"
+                        title="Add section"
                       >
                         <Plus size={16} />
+                        <span>Add section</span>
                       </button>
                     </div>
                     <PreviewSection
@@ -10288,6 +11027,9 @@ function PreviewCanvas({
                       selectedLayoutRowIndex={selectedLayoutRowIndex}
                       selectedSectionId={selectedId}
                       selectedLayoutBlockKey={selectedLayoutBlockKey}
+                      selectedTarget={selectedTarget}
+                      editingTarget={editingTarget}
+                      hoverToolbarTarget={hoverToolbarTarget}
                       hoveredTarget={hoveredTarget}
                       onHoverTarget={onHoverTarget}
                       draggingLayoutBlockKey={draggingLayoutBlockKey}
@@ -10296,6 +11038,7 @@ function PreviewCanvas({
                       onSelectColumn={onSelectColumn}
                       onSelectRow={onSelectRow}
                       onSelectBlock={onSelectBlock}
+                      onOpenInspector={onOpenInspector}
                       onBlockDragStart={onBlockDragStart}
                       onBlockDragEnd={onBlockDragEnd}
                       onMoveBlock={onMoveBlock}
@@ -10321,6 +11064,11 @@ function PreviewCanvas({
                       onMoveSectionBadge={onMoveSectionBadge}
                       onUploadGridItemImage={onUploadGridItemImage}
                       onAddRow={onAddRow}
+                      onAddColumnAfter={onAddColumnAfter}
+                      onStackColumnBelow={onStackColumnBelow}
+                      onAppendNestedRow={onAppendNestedRow}
+                      onDeleteNestedRow={onDeleteNestedRow}
+                      onUnwrapNestedColumn={onUnwrapNestedColumn}
                       onDeleteRow={onDeleteRow}
                       onDuplicateRow={onDuplicateRow}
                       onMoveRow={onMoveRow}
@@ -10347,8 +11095,11 @@ function PreviewCanvas({
   );
 }
 
-function previewDesignStyle(design: BuilderDesign) {
-  const colors = resolveDesignColors(design);
+function previewDesignStyle(
+  design: BuilderDesign,
+  layoutScheme: "light" | "dark",
+) {
+  const colors = resolveDesignColors(design, layoutScheme);
   return {
     background: colors.pageBackground,
     color: colors.textColor,
@@ -11057,10 +11808,12 @@ function InlineEditableText({
 
 function RowInsertControl({
   placement,
+  owner,
   onClick,
   onTemplateDrop,
 }: {
   placement: "after";
+  owner: BuilderInteractionTarget;
   onClick: () => void;
   onTemplateDrop?: (templateId: string) => void;
 }) {
@@ -11068,7 +11821,7 @@ function RowInsertControl({
 
   return (
     <div
-      className={`builder-preview-row-insert builder-preview-row-insert--${placement}${
+      className={`${builderInsertionBoundaryClassName(owner)} builder-preview-row-insert builder-preview-row-insert--${placement}${
         templateDragOver ? " is-template-drag-over" : ""
       }`}
       onClick={(event) => event.stopPropagation()}
@@ -11104,11 +11857,11 @@ function RowInsertControl({
         type="button"
         className="builder-preview-row-insert-trigger"
         onClick={onClick}
-        aria-label={`Add row ${placement}`}
-        title={`Add row ${placement}`}
+        aria-label="Add row"
+        title="Add row"
       >
         <Plus size={14} />
-        <span>Add Row</span>
+        <span>Add row</span>
       </button>
     </div>
   );
@@ -11148,7 +11901,7 @@ function RowLayoutToolbar({
       onMouseEnter={() => onHoverChange?.(true)}
       onMouseLeave={() => onHoverChange?.(false)}
     >
-      <span>Row Layout</span>
+      <span>Row {rowIndex + 1}</span>
       <button
         type="button"
         onClick={onSettings}
@@ -11792,18 +12545,21 @@ function dashboardElementBoxStyle(block: BuilderLayoutBlock): CSSProperties {
   const style: CSSProperties = {};
 
   if (!hasBuilderVisualSpacing(visual?.padding)) {
-    if (block.elementPadding && block.elementPadding !== "inherit") {
+    if (
+      block.elementPadding &&
+      block.elementPadding !== "inherit"
+    ) {
       const padding = resolveBuilderSpacing(
         block.elementPadding,
         "elementPadding",
       ).css;
       style.padding = padding;
     } else {
-      style.paddingTop = "var(--builder-global-element-padding-top, 16px)";
-      style.paddingRight = "var(--builder-global-element-padding-right, 16px)";
+      style.paddingTop = "var(--builder-global-element-padding-top, 0px)";
+      style.paddingRight = "var(--builder-global-element-padding-right, 0px)";
       style.paddingBottom =
-        "var(--builder-global-element-padding-bottom, 16px)";
-      style.paddingLeft = "var(--builder-global-element-padding-left, 16px)";
+        "var(--builder-global-element-padding-bottom, 0px)";
+      style.paddingLeft = "var(--builder-global-element-padding-left, 0px)";
     }
   }
 
@@ -11811,10 +12567,7 @@ function dashboardElementBoxStyle(block: BuilderLayoutBlock): CSSProperties {
     !hasBuilderVisualSpacing(visual?.margin) &&
     (!block.gridMargin || block.gridMargin === "inherit")
   ) {
-    style.marginTop = "var(--builder-global-element-margin-top, 0px)";
-    style.marginRight = "var(--builder-global-element-margin-right, 0px)";
-    style.marginBottom = "var(--builder-global-element-margin-bottom, 0px)";
-    style.marginLeft = "var(--builder-global-element-margin-left, 0px)";
+    style.margin = 0;
   }
 
   return style;
@@ -11953,18 +12706,46 @@ function columnSpacingOverlayLabels(
         columnIndex: number;
         span: number;
         isRowStart: boolean;
+        isRowEnd: boolean;
       }
     | undefined,
+  shellSettings: BuilderShellSettings,
+  sectionId: string,
+  columnKey: string,
 ) {
   const labels: Array<BuilderSpacingOverlayLabel | null> = [];
+  const target: SpacingInspectorTarget = {
+    scope: "column",
+    sectionId,
+    columnKey,
+  };
 
   if (rowMeta && rowMeta.columnIndex > 0) {
     labels.push(
       spacingLabel(
         "Column Gap",
-        resolveBuilderSpacing(undefined, "columnGap"),
+        resolveBuilderSpacing(
+          undefined,
+          "columnGap",
+          shellSettings.columnGap,
+        ),
         "gap",
         "outside-left",
+        target,
+      ),
+    );
+  } else if (rowMeta && !rowMeta.isRowEnd) {
+    labels.push(
+      spacingLabel(
+        "Column Gap",
+        resolveBuilderSpacing(
+          undefined,
+          "columnGap",
+          shellSettings.columnGap,
+        ),
+        "gap",
+        "outside-right",
+        target,
       ),
     );
   }
@@ -12071,6 +12852,9 @@ function PreviewSection({
   selectedLayoutRowIndex,
   selectedSectionId,
   selectedLayoutBlockKey,
+  selectedTarget,
+  editingTarget,
+  hoverToolbarTarget,
   hoveredTarget,
   onHoverTarget,
   draggingLayoutBlockKey,
@@ -12079,6 +12863,7 @@ function PreviewSection({
   onSelectColumn,
   onSelectRow,
   onSelectBlock,
+  onOpenInspector,
   onBlockDragStart,
   onBlockDragEnd,
   onMoveBlock,
@@ -12104,6 +12889,11 @@ function PreviewSection({
   onMoveSectionBadge,
   onUploadGridItemImage,
   onAddRow,
+  onAddColumnAfter,
+  onStackColumnBelow,
+  onAppendNestedRow,
+  onDeleteNestedRow,
+  onUnwrapNestedColumn,
   onDeleteRow,
   onDuplicateRow,
   onMoveRow,
@@ -12115,6 +12905,8 @@ function PreviewSection({
   onOpenSpacingSettings,
   onOpenElementsPanel,
   spacingOverlayEnabled,
+  nestingDepth = 0,
+  nestedOwnerColumnKey = null,
 }: {
   device: PreviewDevice;
   section: BuilderSection;
@@ -12126,6 +12918,9 @@ function PreviewSection({
   selectedLayoutRowIndex: number | null;
   selectedSectionId: string;
   selectedLayoutBlockKey: string | null;
+  selectedTarget: BuilderInteractionTarget | null;
+  editingTarget: BuilderInteractionTarget | null;
+  hoverToolbarTarget: BuilderInteractionTarget | null;
   hoveredTarget: BuilderHoverTarget | null;
   onHoverTarget: (target: BuilderHoverTarget | null) => void;
   draggingLayoutBlockKey: string | null;
@@ -12152,6 +12947,7 @@ function PreviewSection({
     columnKey: string,
     blockKey: string,
   ) => void;
+  onOpenInspector: () => void;
   onBlockDragStart: (blockKey: string) => void;
   onBlockDragEnd: () => void;
   onMoveBlock: (payload: {
@@ -12258,6 +13054,22 @@ function PreviewSection({
     placement: "before" | "after",
     presetKey: string,
   ) => void;
+  onAddColumnAfter: (target: {
+    sectionId: string;
+    columnKey: string;
+  }) => void;
+  onStackColumnBelow: (sectionId: string, columnKey: string) => void;
+  onAppendNestedRow: (
+    sectionId: string,
+    outerColumnKey: string,
+    afterRowId: string,
+  ) => void;
+  onDeleteNestedRow: (
+    sectionId: string,
+    outerColumnKey: string,
+    rowId: string,
+  ) => void;
+  onUnwrapNestedColumn: (sectionId: string, columnKey: string) => void;
   onDeleteRow: (sectionId: string, rowIndex: number) => void;
   onDuplicateRow: (sectionId: string, rowIndex: number) => void;
   onMoveRow: (sectionId: string, rowIndex: number, direction: -1 | 1) => void;
@@ -12320,6 +13132,8 @@ function PreviewSection({
   onOpenSpacingSettings: (target: SpacingInspectorTarget) => void;
   onOpenElementsPanel: () => void;
   spacingOverlayEnabled: boolean;
+  nestingDepth?: number;
+  nestedOwnerColumnKey?: string | null;
 }) {
   const [draggingItem, setDraggingItem] = useState<{
     kind: "grid" | "badge" | "button" | "list" | "sectionBadge";
@@ -12781,9 +13595,39 @@ function PreviewSection({
         >
           {layoutRows.map((layoutRow, layoutRowIndex) => {
             const rowItem = layoutRow.items[0];
+            const rowTarget: BuilderInteractionTarget = {
+              type: "row",
+              sectionId: section.id,
+              rowIndex: layoutRowIndex,
+            };
+            const rowInteractionState =
+              nestingDepth > 0
+                ? "idle"
+                : resolveBuilderInteractionState({
+                    target: rowTarget,
+                    selected: selectedTarget,
+                    hovered: hoveredTarget,
+                    editing: editingTarget,
+                  });
+            const rowChrome = resolveBuilderInteractionChrome({
+              state: rowInteractionState,
+              spacingActive: spacingOverlayEnabled,
+              dragging: Boolean(draggingLayoutBlockKey),
+              hoverToolbarReady: builderTargetsEqual(
+                rowTarget,
+                hoverToolbarTarget,
+              ),
+            });
+            const isEmptyRow = layoutRow.items.every(
+              (item) =>
+                !layoutColumnHasContent(item as PreviewLayoutItem),
+            );
             const rowGap = resolveBuilderRowGap(
               rowItem as NonNullable<BuilderSection["layoutItems"]>[number],
               shellSettings.rowGap,
+              layoutRows[layoutRowIndex - 1]?.items[0] as
+                | NonNullable<BuilderSection["layoutItems"]>[number]
+                | undefined,
             ).css;
             const rowStyle = resolveBuilderRowStyle(
               rowItem as NonNullable<BuilderSection["layoutItems"]>[number],
@@ -12797,10 +13641,77 @@ function PreviewSection({
             return (
               <div
                 key={layoutRow.id}
-                style={{ paddingTop: layoutRowIndex > 0 ? rowGap : 0 }}
+                className={`${builderInteractionFrameClassName(rowTarget)} ${
+                  nestingDepth === 0
+                    ? "builder-main-row-frame"
+                    : "builder-nested-row-frame"
+                }`}
+                data-builder-row-frame={layoutRowIndex}
+                tabIndex={nestingDepth > 0 ? -1 : 0}
+                aria-label={`Row ${layoutRowIndex + 1}`}
+                onMouseEnter={() => {
+                  if (nestingDepth === 0) onHoverTarget(rowTarget);
+                }}
+                onMouseLeave={() => {
+                  if (nestingDepth === 0) onHoverTarget(null);
+                }}
+                onFocus={(event) => {
+                  if (nestingDepth > 0) return;
+                  if (event.target === event.currentTarget) {
+                    onSelectRow(section.id, layoutRowIndex);
+                  }
+                }}
+                onKeyDown={(event) => {
+                  if (nestingDepth > 0) return;
+                  if (
+                    event.target === event.currentTarget &&
+                    (event.key === "Enter" || event.key === " ")
+                  ) {
+                    event.preventDefault();
+                    onSelectRow(section.id, layoutRowIndex);
+                  }
+                }}
+                onClick={(event) => {
+                  if (nestingDepth > 0) return;
+                  if (
+                    event.target instanceof HTMLElement &&
+                    event.target.closest(
+                      ".builder-interaction-column, .builder-preview-layout-block, .builder-preview-row-toolbar, .builder-preview-row-insert",
+                    )
+                  ) {
+                    return;
+                  }
+                  event.stopPropagation();
+                  onSelectRow(section.id, layoutRowIndex);
+                }}
+                onDoubleClick={(event) => {
+                  if (nestingDepth > 0) return;
+                  if (
+                    event.target instanceof HTMLElement &&
+                    event.target.closest(
+                      ".builder-interaction-column, .builder-preview-layout-block, .builder-preview-row-toolbar, .builder-preview-row-insert",
+                    )
+                  ) {
+                    return;
+                  }
+                  event.stopPropagation();
+                  onSelectRow(section.id, layoutRowIndex);
+                  onOpenInspector();
+                }}
+                style={{
+                  paddingTop:
+                    nestingDepth === 0 && layoutRowIndex > 0 ? rowGap : 0,
+                }}
               >
                 <div
-                  className="shop-builder-content-row builder-preview-content-row"
+                  className={`shop-builder-content-row builder-preview-content-row ${builderInteractionClassName(
+                    rowTarget,
+                    rowInteractionState,
+                  )}`}
+                  data-builder-object-type="row"
+                  data-builder-section-id={section.id}
+                  data-builder-row-index={layoutRowIndex}
+                  data-builder-interaction-state={rowInteractionState}
                   style={{
                     display: "grid",
                     gridTemplateColumns:
@@ -12814,8 +13725,49 @@ function PreviewSection({
                     ...rowStyle,
                   }}
                 >
+                  {rowChrome.showSpacing && (
+                    <RowSpacingOverlay
+                      item={rowItem}
+                      shellSettings={shellSettings}
+                      sectionId={section.id}
+                      rowIndex={layoutRowIndex}
+                      isRowStart
+                      showZeroLabels={spacingOverlayEnabled}
+                      onOpenSpacingSettings={onOpenSpacingSettings}
+                    />
+                  )}
+                  {rowChrome.showToolbar && (
+                    <RowLayoutToolbar
+                      rowIndex={layoutRowIndex}
+                      canMoveUp={layoutRowIndex > 0}
+                      canMoveDown={layoutRowIndex < layoutRows.length - 1}
+                      isEmpty={isEmptyRow}
+                      onSettings={() => {
+                        onSelectRow(section.id, layoutRowIndex);
+                        onOpenInspector();
+                      }}
+                      onMoveUp={() => onMoveRow(section.id, layoutRowIndex, -1)}
+                      onMoveDown={() => onMoveRow(section.id, layoutRowIndex, 1)}
+                      onSave={() => onSaveRowTemplate(section.id, layoutRowIndex)}
+                      onDuplicate={() => onDuplicateRow(section.id, layoutRowIndex)}
+                      onDelete={() => onDeleteRow(section.id, layoutRowIndex)}
+                    />
+                  )}
+                  {isEmptyRow && (
+                    <div
+                      className="builder-structural-row-identity"
+                      aria-hidden="true"
+                    >
+                      <span>Row {layoutRowIndex + 1}</span>
+                      <small>
+                        {layoutRow.items.length}{" "}
+                        {layoutRow.items.length === 1 ? "column" : "columns"}
+                      </small>
+                    </div>
+                  )}
                   {layoutRow.items.map((item, columnIndex) => {
             const index = layoutRow.startIndex + columnIndex;
+            const typedItem = item as PreviewLayoutItem;
             const columnKey = item.id ?? `layout-item-${index}`;
             const rowMeta = rowMetaByColumnKey.get(columnKey);
             const blocks = getPreviewLayoutBlocks(item);
@@ -12835,34 +13787,214 @@ function PreviewSection({
               selectedSectionId === section.id &&
               selectedLayoutColumnKey === columnKey &&
               selectedLayoutBlockKey === null;
-            const isRowActive =
-              selectedSectionId === section.id &&
-              rowMeta !== undefined &&
-              selectedLayoutRowIndex === rowMeta.rowIndex &&
-              selectedLayoutColumnKey === null &&
-              selectedLayoutBlockKey === null;
-            const isEmptyRow =
-              rowMeta !== undefined &&
-              (layoutRows[rowMeta.rowIndex]?.items ?? []).every(
-                (rowItem) => (rowItem.blocks ?? []).length === 0,
+            const columnTarget: BuilderInteractionTarget = {
+              type: "column",
+              sectionId: section.id,
+              columnKey,
+            };
+            const columnInteractionState = resolveBuilderInteractionState({
+              target: columnTarget,
+              selected: selectedTarget,
+              hovered: hoveredTarget,
+              editing: editingTarget,
+            });
+            const columnChrome = resolveBuilderInteractionChrome({
+              state: columnInteractionState,
+              spacingActive: spacingOverlayEnabled,
+              dragging: activeDragOver?.type === "column",
+              hoverToolbarReady:
+                nestingDepth === 0 &&
+                builderTargetsEqual(columnTarget, hoverToolbarTarget),
+            });
+            if (typedItem.nestedLayout) {
+              const nestedSection: BuilderSection = {
+                ...section,
+                layout: undefined,
+                layoutColumns: 1,
+                layoutRows: typedItem.nestedLayout.rows.length,
+                layoutItems: typedItem.nestedLayout.rows.flatMap((nestedRow) =>
+                  nestedRow.columns.map((nestedColumn) => ({
+                    ...nestedColumn,
+                    rowId: nestedRow.id,
+                    rowLayout: nestedRow.layout,
+                  })),
+                ),
+              };
+
+              return (
+                <article
+                  key={columnKey}
+                  id={columnKey}
+                  data-builder-object-type="column"
+                  data-builder-section-id={section.id}
+                  data-builder-row-index={rowMeta?.rowIndex}
+                  data-builder-column-key={columnKey}
+                  data-builder-interaction-state={columnInteractionState}
+                  className={`${builderInteractionClassName(
+                    columnTarget,
+                    columnInteractionState,
+                  )} shop-builder-content-layout-card builder-nested-layout-container`}
+                  style={{
+                    gridColumn:
+                      device === "mobile"
+                        ? "1 / -1"
+                        : `span ${rowMeta?.span ?? 12}`,
+                    "--builder-nested-row-count": typedItem.nestedLayout.rows.length,
+                  } as CSSProperties}
+                  onMouseEnter={() => onHoverTarget(columnTarget)}
+                  onMouseLeave={() => onHoverTarget(null)}
+                  onClick={(event) => {
+                    if (
+                      event.target instanceof HTMLElement &&
+                      event.target.closest(
+                        ".builder-nested-layout, .builder-preview-column-insert-trigger",
+                      )
+                    ) {
+                      return;
+                    }
+                    event.stopPropagation();
+                    onSelectColumn(section.id, columnKey);
+                  }}
+                >
+                  {columnChrome.showToolbar && (
+                    <div
+                      className="builder-preview-block-tools builder-preview-column-toolbar"
+                      onClick={(event) => event.stopPropagation()}
+                    >
+                      <span>Stacked column</span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          onSelectColumn(section.id, columnKey);
+                          onOpenInspector();
+                        }}
+                        title="Open column settings"
+                        aria-label="Open column settings"
+                      >
+                        <Settings2 size={13} />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          onUnwrapNestedColumn(section.id, columnKey)
+                        }
+                        title="Remove stacked layout"
+                        aria-label="Remove stacked layout"
+                      >
+                        <Layers3 size={13} />
+                      </button>
+                    </div>
+                  )}
+                  <div className="builder-nested-layout">
+                    <PreviewSection
+                      device={device}
+                      section={nestedSection}
+                      shellSettings={shellSettings}
+                      previewProducts={previewProducts}
+                      previewCategoryTree={previewCategoryTree}
+                      previewCategoryCounts={previewCategoryCounts}
+                      selectedLayoutColumnKey={selectedLayoutColumnKey}
+                      selectedLayoutRowIndex={selectedLayoutRowIndex}
+                      selectedSectionId={selectedSectionId}
+                      selectedLayoutBlockKey={selectedLayoutBlockKey}
+                      selectedTarget={selectedTarget}
+                      editingTarget={editingTarget}
+                      hoverToolbarTarget={hoverToolbarTarget}
+                      hoveredTarget={hoveredTarget}
+                      onHoverTarget={onHoverTarget}
+                      draggingLayoutBlockKey={draggingLayoutBlockKey}
+                      activeDragOver={activeDragOver}
+                      onCanvasDragOverChange={onCanvasDragOverChange}
+                      onSelectColumn={onSelectColumn}
+                      onSelectRow={onSelectRow}
+                      onSelectBlock={onSelectBlock}
+                      onOpenInspector={onOpenInspector}
+                      onBlockDragStart={onBlockDragStart}
+                      onBlockDragEnd={onBlockDragEnd}
+                      onMoveBlock={onMoveBlock}
+                      onCreateBlock={onCreateBlock}
+                      onDuplicateBlock={onDuplicateBlock}
+                      onDeleteBlock={onDeleteBlock}
+                      onUpdateBlock={onUpdateBlock}
+                      onUpdateGridItem={onUpdateGridItem}
+                      onDeleteGridItem={onDeleteGridItem}
+                      onDuplicateGridItem={onDuplicateGridItem}
+                      onMoveGridItem={onMoveGridItem}
+                      onMoveBadge={onMoveBadge}
+                      onMoveButton={onMoveButton}
+                      onMoveListItem={onMoveListItem}
+                      onDeleteBadge={onDeleteBadge}
+                      onDuplicateBadge={onDuplicateBadge}
+                      onDeleteButton={onDeleteButton}
+                      onDuplicateButton={onDuplicateButton}
+                      onDeleteListItem={onDeleteListItem}
+                      onDuplicateListItem={onDuplicateListItem}
+                      onDeleteSectionBadge={onDeleteSectionBadge}
+                      onDuplicateSectionBadge={onDuplicateSectionBadge}
+                      onMoveSectionBadge={onMoveSectionBadge}
+                      onUploadGridItemImage={onUploadGridItemImage}
+                      onAddRow={onAddRow}
+                      onAddColumnAfter={onAddColumnAfter}
+                      onStackColumnBelow={onStackColumnBelow}
+                      onAppendNestedRow={onAppendNestedRow}
+                      onDeleteNestedRow={onDeleteNestedRow}
+                      onUnwrapNestedColumn={onUnwrapNestedColumn}
+                      onDeleteRow={onDeleteRow}
+                      onDuplicateRow={onDuplicateRow}
+                      onMoveRow={onMoveRow}
+                      onSaveRowTemplate={onSaveRowTemplate}
+                      onSaveElementTemplate={onSaveElementTemplate}
+                      onMoveBlockWithinColumn={onMoveBlockWithinColumn}
+                      onDropRowTemplate={onDropRowTemplate}
+                      onDropElementTemplate={onDropElementTemplate}
+                      onOpenSpacingSettings={onOpenSpacingSettings}
+                      onOpenElementsPanel={onOpenElementsPanel}
+                      spacingOverlayEnabled={spacingOverlayEnabled}
+                      nestingDepth={nestingDepth + 1}
+                      nestedOwnerColumnKey={columnKey}
+                    />
+                  </div>
+                  {nestingDepth === 0 && layoutRow.items.length < 6 && (
+                    <button
+                      type="button"
+                      className="builder-preview-column-insert-trigger is-beside"
+                      aria-label={`Add column after column ${(rowMeta?.columnIndex ?? index) + 1}`}
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        onAddColumnAfter({
+                          sectionId: section.id,
+                          columnKey,
+                        });
+                      }}
+                    >
+                      <Plus size={12} />
+                      <span>Add beside</span>
+                    </button>
+                  )}
+                </article>
               );
-            const isSelectedRow =
-              rowMeta !== undefined &&
-              selectedSectionId === section.id &&
-              selectedLayoutRowIndex === rowMeta.rowIndex;
+            }
             return (
               <Fragment key={columnKey}>
                 <article
                   key={columnKey}
                   id={columnKey}
+                  data-builder-object-type="column"
+                  data-builder-section-id={section.id}
+                  data-builder-row-index={rowMeta?.rowIndex}
+                  data-builder-column-key={columnKey}
+                  data-builder-interaction-state={columnInteractionState}
                   onMouseEnter={() =>
                     onHoverTarget({ type: "column", sectionId: section.id, columnKey })
                   }
                   onMouseLeave={() => onHoverTarget(null)}
-                  className={
+                  className={`${builderInteractionClassName(
+                    columnTarget,
+                    columnInteractionState,
+                  )} ${
                     hasScrollPinned
                       ? `w-full col-span-12 ${
-                          selectedLayoutColumnKey === columnKey
+                          isColumnActive
                             ? "is-selected-column"
                             : ""
                         } ${
@@ -12871,7 +14003,7 @@ function PreviewSection({
                           hoveredTarget.columnKey === columnKey
                             ? "is-hovered-column"
                             : ""
-                        } ${isSelectedRow ? "is-selected-row" : ""} ${
+                        } ${
                           hoveredTarget?.type === "row" &&
                           hoveredTarget.sectionId === section.id &&
                           hoveredTarget.rowIndex === rowMeta?.rowIndex
@@ -12886,7 +14018,7 @@ function PreviewSection({
                       : `shop-builder-content-layout-card shop-card-preset--${cardStyle} ${
                           blocks.length === 0 ? "is-empty-column" : ""
                         } ${
-                          selectedLayoutColumnKey === columnKey
+                          isColumnActive
                             ? "is-selected-column"
                             : ""
                         } ${
@@ -12895,7 +14027,7 @@ function PreviewSection({
                           hoveredTarget.columnKey === columnKey
                             ? "is-hovered-column"
                             : ""
-                        } ${isSelectedRow ? "is-selected-row" : ""} ${
+                        } ${
                           hoveredTarget?.type === "row" &&
                           hoveredTarget.sectionId === section.id &&
                           hoveredTarget.rowIndex === rowMeta?.rowIndex
@@ -12907,7 +14039,7 @@ function PreviewSection({
                             ? "is-drag-over"
                             : ""
                         }`
-                  }
+                  }`}
                   style={
                     {
                       ...(hasScrollPinned
@@ -12932,6 +14064,17 @@ function PreviewSection({
                     }
                     event.stopPropagation();
                     onSelectColumn(section.id, columnKey);
+                  }}
+                  onDoubleClick={(event) => {
+                    if (
+                      event.target instanceof HTMLElement &&
+                      event.target.closest(".builder-preview-layout-block")
+                    ) {
+                      return;
+                    }
+                    event.stopPropagation();
+                    onSelectColumn(section.id, columnKey);
+                    onOpenInspector();
                   }}
                   onDragOver={(event) => {
                     const types = Array.from(event.dataTransfer.types);
@@ -13017,74 +14160,110 @@ function PreviewSection({
                     onBlockDragEnd();
                   }}
                 >
-                  {isColumnActive && (
+                  {columnChrome.showSpacing && (
                     <BoxSpacingOverlay
                       kind="column"
-                      labels={columnSpacingOverlayLabels(rowMeta)}
+                      labels={columnSpacingOverlayLabels(
+                        rowMeta,
+                        shellSettings,
+                        section.id,
+                        columnKey,
+                      )}
                       onOpenSpacingSettings={onOpenSpacingSettings}
                     />
                   )}
-                  {isRowActive && rowMeta?.isRowStart && (
-                    <RowSpacingOverlay
-                      item={item}
-                      shellSettings={shellSettings}
-                      sectionId={section.id}
-                      rowIndex={rowMeta.rowIndex}
-                      isRowStart
-                      showZeroLabels={spacingOverlayEnabled}
-                      onOpenSpacingSettings={onOpenSpacingSettings}
-                    />
+                  {columnChrome.showToolbar && (
+                    <div
+                      className="builder-preview-block-tools builder-preview-column-toolbar"
+                      onClick={(event) => event.stopPropagation()}
+                      onMouseDown={(event) => event.stopPropagation()}
+                    >
+                      <span>Column</span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          onSelectColumn(section.id, columnKey);
+                          onOpenInspector();
+                        }}
+                        title="Open column settings"
+                        aria-label="Open column settings"
+                      >
+                        <Settings2 size={13} />
+                      </button>
+                      {nestingDepth > 0 &&
+                        nestedOwnerColumnKey &&
+                        typedItem.rowId && (
+                          <button
+                            type="button"
+                            onClick={() =>
+                              onDeleteNestedRow(
+                                section.id,
+                                nestedOwnerColumnKey,
+                                typedItem.rowId!,
+                              )
+                            }
+                            title="Delete stacked row"
+                            aria-label="Delete stacked row"
+                          >
+                            <Trash2 size={13} />
+                          </button>
+                        )}
+                    </div>
                   )}
-                  {rowMeta?.isRowStart && (
-                    <RowLayoutToolbar
-                      rowIndex={rowMeta.rowIndex}
-                      canMoveUp={rowMeta.rowIndex > 0}
-                      canMoveDown={rowMeta.rowIndex < layoutRows.length - 1}
-                      isEmpty={isEmptyRow}
-                      onSettings={() =>
-                        onSelectRow(section.id, rowMeta.rowIndex)
-                      }
-                      onMoveUp={() =>
-                        onMoveRow(section.id, rowMeta.rowIndex, -1)
-                      }
-                      onMoveDown={() =>
-                        onMoveRow(section.id, rowMeta.rowIndex, 1)
-                      }
-                      onSave={() =>
-                        onSaveRowTemplate(section.id, rowMeta.rowIndex)
-                      }
-                      onDuplicate={() =>
-                        onDuplicateRow(section.id, rowMeta.rowIndex)
-                      }
-                      onDelete={() => onDeleteRow(section.id, rowMeta.rowIndex)}
-                      onHoverChange={(hovered) =>
-                        onHoverTarget(
-                          hovered
-                            ? {
-                                type: "row",
-                                sectionId: section.id,
-                                rowIndex: rowMeta.rowIndex,
-                              }
-                            : null,
-                        )
-                      }
-                    />
-                  )}
-                  <div className="builder-preview-column-label">
-                    Row {(rowMeta?.rowIndex ?? 0) + 1} / Column{" "}
-                    {(rowMeta?.columnIndex ?? index) + 1}
-                  </div>
                   {blocks.length === 0 && (
                     <div
                       className="builder-preview-drop-zone"
                       aria-label={`Drop element into row ${(rowMeta?.rowIndex ?? 0) + 1}, column ${(rowMeta?.columnIndex ?? index) + 1}`}
-                      title={`Drop element into row ${(rowMeta?.rowIndex ?? 0) + 1}, column ${(rowMeta?.columnIndex ?? index) + 1}`}
                       onClick={(event) => {
                         event.stopPropagation();
+                        onSelectColumn(section.id, columnKey);
                         onOpenElementsPanel();
                       }}
                     >
-                      <Plus size={16} />
+                      <span className="builder-structural-placeholder-mark">
+                        <Plus size={14} />
+                      </span>
+                      <span className="builder-structural-placeholder-copy">
+                        <strong>
+                          Column {(rowMeta?.columnIndex ?? index) + 1}
+                        </strong>
+                        <small>Add element</small>
+                      </span>
+                    </div>
+                  )}
+                  {nestingDepth === 0 && layoutRow.items.length < 6 && (
+                    <button
+                      type="button"
+                      className="builder-preview-column-insert-trigger is-beside"
+                      aria-label={`Add column after column ${(rowMeta?.columnIndex ?? index) + 1}`}
+                      onMouseDown={(event) => event.stopPropagation()}
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        onAddColumnAfter({
+                          sectionId: section.id,
+                          columnKey,
+                        });
+                      }}
+                    >
+                      <Plus size={12} />
+                      <span>Add beside</span>
+                    </button>
+                  )}
+                  {nestingDepth === 0 && (
+                    <div className="builder-preview-column-insert-boundary is-below-boundary">
+                      <button
+                        type="button"
+                        className="builder-preview-column-insert-trigger is-below"
+                        aria-label={`Stack a column below column ${(rowMeta?.columnIndex ?? index) + 1}`}
+                        onMouseDown={(event) => event.stopPropagation()}
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          onStackColumnBelow(section.id, columnKey);
+                        }}
+                      >
+                        <Plus size={12} />
+                        <span>Add below</span>
+                      </button>
                     </div>
                   )}
                   {blocks.map((block, blockIndex) => {
@@ -13097,11 +14276,40 @@ function PreviewSection({
                       selectedSectionId === section.id &&
                       selectedLayoutColumnKey === columnKey &&
                       selectedLayoutBlockKey === blockKey;
+                    const blockTarget: BuilderInteractionTarget = {
+                      type: "block",
+                      sectionId: section.id,
+                      columnKey,
+                      blockKey,
+                    };
+                    const blockInteractionState = resolveBuilderInteractionState({
+                      target: blockTarget,
+                      selected: selectedTarget,
+                      hovered: hoveredTarget,
+                      editing: editingTarget,
+                      insertionTarget:
+                        activeDragOver?.type === "block" &&
+                        activeDragOver.blockKey === blockKey,
+                    });
+                    const blockChrome = resolveBuilderInteractionChrome({
+                      state: blockInteractionState,
+                      spacingActive: spacingOverlayEnabled,
+                      dragging: draggingLayoutBlockKey === blockKey,
+                      hoverToolbarReady: builderTargetsEqual(
+                        blockTarget,
+                        hoverToolbarTarget,
+                      ),
+                    });
 
                     return (
                       <div
                         key={blockKey}
                         id={blockKey}
+                        data-builder-object-type="block"
+                        data-builder-section-id={section.id}
+                        data-builder-column-key={columnKey}
+                        data-builder-block-key={blockKey}
+                        data-builder-interaction-state={blockInteractionState}
                         draggable
                         onMouseEnter={() =>
                           onHoverTarget({
@@ -13112,7 +14320,10 @@ function PreviewSection({
                           })
                         }
                         onMouseLeave={() => onHoverTarget(null)}
-                        className={`builder-preview-layout-block shop-builder-element-shell is-${
+                        className={`builder-preview-layout-block ${builderInteractionClassName(
+                          blockTarget,
+                          blockInteractionState,
+                        )} shop-builder-element-shell is-${
                           block.kind ?? "text"
                         } ${
                           block.kind === "scrollPinnedDemo"
@@ -13179,6 +14390,17 @@ function PreviewSection({
                         onClick={(event) => {
                           event.stopPropagation();
                           onSelectBlock(section.id, columnKey, blockKey);
+                        }}
+                        onDoubleClick={(event) => {
+                          event.stopPropagation();
+                          if (
+                            event.target instanceof HTMLElement &&
+                            event.target.closest('[contenteditable="true"]')
+                          ) {
+                            return;
+                          }
+                          onSelectBlock(section.id, columnKey, blockKey);
+                          onOpenInspector();
                         }}
                         onDragStart={(event) => {
                           event.stopPropagation();
@@ -13313,7 +14535,7 @@ function PreviewSection({
                           onBlockDragEnd();
                         }}
                       >
-                        {isElementActive && (
+                        {blockChrome.showSpacing && (
                           <BoxSpacingOverlay
                             kind="element"
                             labels={elementSpacingOverlayLabels(
@@ -13326,23 +14548,29 @@ function PreviewSection({
                             onOpenSpacingSettings={onOpenSpacingSettings}
                           />
                         )}
-                        <BuilderElementToolbar
+                        {blockChrome.showToolbar && <BuilderElementToolbar
                           label={layoutBlockLabels[block.kind ?? "text"] ?? "Block"}
                           canMoveUp={blockIndex > 0}
                           canMoveDown={blockIndex < blocks.length - 1}
-                          onSettings={() => onSelectBlock(section.id, columnKey, blockKey)}
+                          onSettings={() => {
+                            onSelectBlock(section.id, columnKey, blockKey);
+                            onOpenInspector();
+                          }}
                           onMoveUp={() => onMoveBlockWithinColumn({ sectionId: section.id, columnKey, blockKey, direction: -1 })}
                           onMoveDown={() => onMoveBlockWithinColumn({ sectionId: section.id, columnKey, blockKey, direction: 1 })}
                           onSave={() => onSaveElementTemplate(section.id, columnKey, blockKey)}
                           onDuplicate={() => onDuplicateBlock({ sectionId: section.id, columnKey, blockKey })}
                           onDelete={() => onDeleteBlock({ sectionId: section.id, columnKey, blockKey })}
-                        />
-                        <span
-                          className="builder-preview-drag-handle"
-                          aria-hidden="true"
-                        >
-                          ::
-                        </span>
+                        />}
+                        {blockChrome.showDragHandle && (
+                          <span
+                            className="builder-preview-drag-handle"
+                            aria-hidden="true"
+                            title="Drag element"
+                          >
+                            ::
+                          </span>
+                        )}
                         {block.kind !== "products" &&
                         block.kind?.startsWith("product") ? (
                           <PreviewProductBlockContent
@@ -15134,7 +16362,11 @@ function PreviewSection({
                                                 />
                                               ) : block.gridSource !==
                                                 "products" ? (
-                                                <span>No image</span>
+                                                <span className="builder-structural-card-placeholder">
+                                                  <span>Card media</span>
+                                                  <i />
+                                                  <i />
+                                                </span>
                                               ) : null}
                                               {block.gridSource !==
                                                 "products" && (
@@ -15631,29 +16863,49 @@ function PreviewSection({
                     );
                   })}
                 </article>
-                {rowMeta?.isRowEnd && (
-                  <RowInsertControl
-                    placement="after"
-                    onClick={() =>
-                      setRowInsertTarget({
-                        rowIndex: rowMeta.rowIndex,
-                        placement: "after",
-                      })
-                    }
-                    onTemplateDrop={(templateId) =>
-                      onDropRowTemplate(
-                        templateId,
-                        section.id,
-                        rowMeta.rowIndex,
-                        "after",
-                      )
-                    }
-                  />
-                )}
               </Fragment>
             );
                   })}
                 </div>
+                {nestingDepth > 0 && nestedOwnerColumnKey && (
+                  <div className="builder-preview-column-insert-boundary is-below-boundary is-nested-row-boundary">
+                    <button
+                      type="button"
+                      className="builder-preview-column-insert-trigger is-below"
+                      aria-label={`Add nested row after row ${layoutRowIndex + 1}`}
+                      onMouseDown={(event) => event.stopPropagation()}
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        onAppendNestedRow(
+                          section.id,
+                          nestedOwnerColumnKey,
+                          layoutRow.id,
+                        );
+                      }}
+                    >
+                      <Plus size={12} />
+                      <span>Add below</span>
+                    </button>
+                  </div>
+                )}
+                {nestingDepth === 0 && <RowInsertControl
+                  placement="after"
+                  owner={rowTarget}
+                  onClick={() =>
+                    setRowInsertTarget({
+                      rowIndex: layoutRowIndex,
+                      placement: "after",
+                    })
+                  }
+                  onTemplateDrop={(templateId) =>
+                    onDropRowTemplate(
+                      templateId,
+                      section.id,
+                      layoutRowIndex,
+                      "after",
+                    )
+                  }
+                />}
               </div>
             );
           })}

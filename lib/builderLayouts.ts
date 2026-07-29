@@ -377,6 +377,23 @@ export type BuilderSection = {
     buttonLabel?: string;
     buttonUrl?: string;
     blocks?: BuilderLayoutBlock[];
+    nestedLayout?: {
+      version: 1;
+      direction: "vertical";
+      distribution: "equal";
+      gap?: string;
+      rows: {
+        id: string;
+        weight: number;
+        layout: "whole";
+        columns: {
+          id: string;
+          rowId: string;
+          rowLayout: "whole";
+          blocks: BuilderLayoutBlock[];
+        }[];
+      }[];
+    };
     rowBackground?: string;
     rowBackgroundMode?: string;
     rowBackgroundEffect?: string;
