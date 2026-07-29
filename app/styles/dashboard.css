@@ -14451,6 +14451,28 @@ body:has([data-scoped-builder-root])
   transform: none !important;
 }
 
+/* Element toolbars inside stacked rows cannot borrow the element's outer top
+   edge: that edge is also owned by the nested-row boundary and may be clipped
+   by an adjacent stacked cell. Keep the canonical toolbar inside its selected
+   element surface so newly inserted blocks retain usable controls. */
+.builder-preview-canvas
+  .builder-nested-layout
+  .builder-preview-layout-block
+  > .builder-preview-block-tools {
+  top: 6px !important;
+  right: 6px !important;
+  bottom: auto !important;
+  z-index: 22 !important;
+  transform: none !important;
+}
+
+.builder-preview-canvas
+  .builder-nested-layout
+  .builder-preview-layout-block.is-interaction-selected {
+  position: relative;
+  z-index: 21;
+}
+
 .builder-preview-canvas
   .builder-nested-layout
   .is-interaction-selected {

@@ -71,6 +71,40 @@ export function findLayoutColumn(
   return null;
 }
 
+export function findLayoutBlock(
+  section: BuilderSection,
+  blockKey: string,
+  preferredColumnKey?: string | null,
+): BuilderLayoutBlock | null {
+  const preferredColumn = preferredColumnKey
+    ? findLayoutColumn(section, preferredColumnKey)
+    : null;
+  const findInColumn = (
+    column: BuilderLayoutColumn | BuilderNestedColumn,
+  ) =>
+    (column.blocks ?? []).find(
+      (block, index) =>
+        (block.id ??
+          `${column.id ?? preferredColumnKey ?? "layout-item"}-block-${index}`) ===
+        blockKey,
+    ) ?? null;
+
+  if (preferredColumn) {
+    const preferredBlock = findInColumn(preferredColumn);
+    if (preferredBlock) return preferredBlock;
+  }
+
+  for (const outerColumn of section.layoutItems ?? []) {
+    const outerBlock = findInColumn(outerColumn);
+    if (outerBlock) return outerBlock;
+    for (const nestedColumn of nestedLayoutItems(outerColumn)) {
+      const nestedBlock = findInColumn(nestedColumn);
+      if (nestedBlock) return nestedBlock;
+    }
+  }
+  return null;
+}
+
 export function mapLayoutColumns(
   section: BuilderSection,
   mapper: (

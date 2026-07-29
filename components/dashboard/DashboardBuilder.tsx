@@ -178,6 +178,7 @@ import type { ProductNode } from "@/lib/products";
 import type { PageTemplateLibraryItem } from "@/components/dashboard/pageTemplateLibrary";
 import {
   createVerticalNestedLayout,
+  findLayoutBlock,
   findLayoutColumn,
   layoutColumnHasContent,
   updateBlockInLayoutColumn,
@@ -2341,29 +2342,17 @@ export default function DashboardBuilder({
   const selectedLayoutBlock = useMemo(() => {
     if (!selectedSection || !isLayoutContainerSection(selectedSection))
       return null;
-    if (selectedLayoutColumnKey) {
-      const selectedColumn = findLayoutColumn(
-        selectedSection,
-        selectedLayoutColumnKey,
-      );
-      const selectedBlock = (selectedColumn?.blocks ?? []).find(
-        (entry, index) =>
-          (entry.id ??
-            `${selectedLayoutColumnKey}-block-${index}`) ===
-          selectedLayoutBlockKey,
-      );
-      if (selectedBlock) return selectedBlock;
-    }
-    for (const item of selectedSection.layoutItems ?? []) {
-      const block = (item.blocks ?? []).find(
-        (entry, index) =>
-          (entry.id ?? `${item.id ?? "layout-item"}-block-${index}`) ===
-          selectedLayoutBlockKey,
-      );
-      if (block) return block;
-    }
-    return null;
-  }, [selectedLayoutBlockKey, selectedSection]);
+    if (!selectedLayoutBlockKey) return null;
+    return findLayoutBlock(
+      selectedSection,
+      selectedLayoutBlockKey,
+      selectedLayoutColumnKey,
+    );
+  }, [
+    selectedLayoutBlockKey,
+    selectedLayoutColumnKey,
+    selectedSection,
+  ]);
   const availableLayoutBlockKinds = useMemo(
     () =>
       builderState.page === "header"
@@ -4163,6 +4152,19 @@ export default function DashboardBuilder({
     patch: BuilderLayoutBlock,
   ) => {
     if (!rawSelectedSection) return;
+    if (
+      selectedLayoutColumnKey &&
+      selectedLayoutBlockKey &&
+      findLayoutColumn(rawSelectedSection, selectedLayoutColumnKey)
+    ) {
+      updateLayoutBlockByKey(
+        rawSelectedSection.id,
+        selectedLayoutColumnKey,
+        selectedLayoutBlockKey,
+        patch,
+      );
+      return;
+    }
     const layoutItems = [...(rawSelectedSection.layoutItems ?? [])];
     const item = layoutItems[columnIndex] ?? {};
     const blocks = [...getLayoutItemBlocks(item)];

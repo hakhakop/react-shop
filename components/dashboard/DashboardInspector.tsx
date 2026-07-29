@@ -69,7 +69,10 @@ import {
   type TypographyArea,
 } from "@/lib/builderTypography";
 import type { BuilderShellSettings } from "@/lib/builderShell";
-import { findLayoutColumn } from "@/lib/builderNestedLayout";
+import {
+  findLayoutColumn,
+  nestedLayoutItems,
+} from "@/lib/builderNestedLayout";
 import {
   getInitialHeaderCustomHeight,
   HEADER_CUSTOM_HEIGHT_MAX,
@@ -1945,6 +1948,12 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
   const selectedColumn = layoutContainerSection && selectedLayoutColumnKey
     ? findLayoutColumn(layoutContainerSection, selectedLayoutColumnKey)
     : null;
+  const inspectorLayoutItems = layoutContainerSection
+    ? (layoutContainerSection.layoutItems ?? []).flatMap((item) => [
+        item,
+        ...nestedLayoutItems(item),
+      ])
+    : [];
   const selectedNestedColumn =
     selectedColumnIndex < 0 && selectedColumn !== null;
   const selectedColumnLabel =
@@ -3165,7 +3174,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                           </div>
                         ) : null}
 
-                        {(selectedSection.layoutItems ?? []).map(
+                        {inspectorLayoutItems.map(
                           (item, index) => {
                             if (
                               selectedLayoutBlock &&
