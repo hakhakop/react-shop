@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { typographyProps } from "@/lib/builderTypography";
+import { normalizeBuilderLineBreaks } from "@/lib/builderText";
 
 interface TypewriterTextProps {
   text: string;
@@ -65,19 +66,20 @@ export default function TypewriterText({
     }
 
     if (!text) return { prefix: "", words: [], suffix: "" };
+    const normalizedText = normalizeBuilderLineBreaks(text);
 
-    const bracketStart = text.indexOf("[");
-    const bracketEnd = text.indexOf("]");
+    const bracketStart = normalizedText.indexOf("[");
+    const bracketEnd = normalizedText.indexOf("]");
 
     if (bracketStart !== -1 && bracketEnd !== -1 && bracketEnd > bracketStart) {
-      const prefix = text.substring(0, bracketStart);
-      const inner = text.substring(bracketStart + 1, bracketEnd);
-      const suffix = text.substring(bracketEnd + 1);
+      const prefix = normalizedText.substring(0, bracketStart);
+      const inner = normalizedText.substring(bracketStart + 1, bracketEnd);
+      const suffix = normalizedText.substring(bracketEnd + 1);
       const words = inner.split("|").map((w) => w.trim()).filter(Boolean);
       return { prefix, words, suffix };
     }
 
-    return { prefix: "", words: [text], suffix: "" };
+    return { prefix: "", words: [normalizedText], suffix: "" };
   }, [phrases, text]);
 
   const { prefix, words, suffix } = parsed;
@@ -143,6 +145,7 @@ export default function TypewriterText({
   }
 
   const outerStyle: React.CSSProperties = { ...tp.style };
+  outerStyle.whiteSpace = "pre-line";
   if (preserveHeight) {
     outerStyle.display = "inline-block";
     outerStyle.minHeight = "var(--typewriter-min-height, auto)";

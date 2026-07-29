@@ -45,11 +45,13 @@ export default function GridItemsPanel() {
         <div className="builder-inspector-section">
           <label className="builder-field">
             <span>Block Title</span>
-            <input
+            <textarea
+              rows={2}
               value={block.title ?? ""}
               onChange={(event) => handleUpdate({ title: event.target.value })}
               placeholder="Badge grid title..."
             />
+            <small>Press Enter for a line break. Existing &lt;br&gt; tags also work.</small>
           </label>
           <label className="builder-field">
             <span>Body</span>
@@ -284,7 +286,8 @@ export default function GridItemsPanel() {
           </label>
           <label className="builder-field">
             <span>Title</span>
-            <input
+            <textarea
+              rows={2}
               value={block.title ?? ""}
               onChange={(event) => handleUpdate({ title: event.target.value })}
               placeholder="Panel title..."

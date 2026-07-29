@@ -214,6 +214,7 @@ import {
   type BuilderSpacingContext,
   getDefaultSpacingToken,
 } from "@/lib/builderSpacing";
+import { normalizeBuilderLineBreaks } from "@/lib/builderText";
 import { builderGeometryCssVariables } from "@/lib/builderGeometry";
 import {
   BUILDER_BUTTON_PRESETS,
@@ -11766,10 +11767,8 @@ function InlineEditableText({
   typography?: any;
   style?: React.CSSProperties;
 }) {
-  const tp = typographyProps(
-    typography,
-    area ?? inferTypographyArea(Tag, className),
-  );
+  const resolvedArea = area ?? inferTypographyArea(Tag, className);
+  const tp = typographyProps(typography, resolvedArea);
   const combinedClassName = ["builder-inline-editable", className, tp.className]
     .filter(Boolean)
     .join(" ");
@@ -11777,7 +11776,11 @@ function InlineEditableText({
     ...style,
     ...tp.style,
   });
-  const isRich = isRichPreviewText(value);
+  const supportsLineBreaks = resolvedArea === "title";
+  const displayValue = supportsLineBreaks
+    ? normalizeBuilderLineBreaks(value)
+    : value;
+  const isRich = isRichPreviewText(displayValue);
   const EditableTag = (isRich ? getRichTextSafeTag(Tag) : Tag) as any;
   const stopInlineEvent = (event: ReactMouseEvent<HTMLElement>) => {
     event.stopPropagation();
@@ -11785,21 +11788,21 @@ function InlineEditableText({
   const handleBlur = (event: ReactFocusEvent<HTMLElement>) => {
     const nextValue = isRich
       ? event.currentTarget.innerHTML.trim()
-      : (event.currentTarget.textContent?.trim() ?? "");
+      : (event.currentTarget.innerText?.trim() ?? "");
     if (nextValue !== value) onChange(nextValue);
   };
   const handleKeyDown = (event: ReactKeyboardEvent<HTMLElement>) => {
     event.stopPropagation();
-    if (event.key === "Enter" && Tag !== "p") {
+    if (event.key === "Enter" && Tag !== "p" && !supportsLineBreaks) {
       event.preventDefault();
       event.currentTarget.blur();
     }
     if (event.key === "Escape") {
       event.preventDefault();
       if (isRich) {
-        event.currentTarget.innerHTML = value;
+        event.currentTarget.innerHTML = displayValue;
       } else {
-        event.currentTarget.textContent = value;
+        event.currentTarget.innerText = displayValue;
       }
       event.currentTarget.blur();
     }
@@ -11808,16 +11811,21 @@ function InlineEditableText({
   return (
     <EditableTag
       className={combinedClassName}
-      style={combinedStyle}
+      style={{
+        ...combinedStyle,
+        ...(supportsLineBreaks ? { whiteSpace: "pre-line" } : {}),
+      }}
       contentEditable
       suppressContentEditableWarning
-      {...(isRich ? { dangerouslySetInnerHTML: { __html: value } } : {})}
+      {...(isRich
+        ? { dangerouslySetInnerHTML: { __html: displayValue } }
+        : {})}
       onClick={stopInlineEvent}
       onMouseDown={stopInlineEvent}
       onBlur={handleBlur}
       onKeyDown={handleKeyDown}
     >
-      {isRich ? null : value}
+      {isRich ? null : displayValue}
     </EditableTag>
   );
 }

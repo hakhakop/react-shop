@@ -22,7 +22,8 @@ export default function ProductQueryPanel() {
         <div className="builder-inspector-section">
           <label className="builder-field">
             <span>Block Title</span>
-            <input
+            <textarea
+              rows={2}
               value={block.title ?? ""}
               onChange={(event) =>
                 updateSelectedLayoutBlockByKey({
@@ -30,6 +31,7 @@ export default function ProductQueryPanel() {
                 })
               }
             />
+            <small>Press Enter for a line break.</small>
           </label>
           <div className="builder-two-column">
             <label className="builder-field">

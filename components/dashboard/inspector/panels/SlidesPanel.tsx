@@ -39,7 +39,8 @@ export default function SlidesPanel() {
       <div className="builder-inspector-section">
         <label className="builder-field">
           <span>Block Title</span>
-          <input
+          <textarea
+            rows={2}
             value={block.title ?? ""}
             onChange={(event) => updateSelectedLayoutBlockByKey({ title: event.target.value })}
             placeholder="Slider block label..."

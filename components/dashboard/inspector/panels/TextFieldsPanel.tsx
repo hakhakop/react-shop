@@ -77,12 +77,14 @@ export default function TextFieldsPanel() {
         <div className="builder-inspector-section">
           <label className="builder-field">
             <span>Heading Text</span>
-            <input
+            <textarea
+              rows={2}
               value={block.headingText ?? ""}
               onChange={(event) =>
                 updateSelectedLayoutBlockByKey({ headingText: event.target.value })
               }
             />
+            <small>Press Enter for a line break. Existing &lt;br&gt; tags also work.</small>
           </label>
 
           <label className="builder-field">
@@ -458,12 +460,14 @@ export default function TextFieldsPanel() {
         <div className="builder-inspector-section">
           <label className="builder-field">
             <span>Block Title</span>
-            <input
+            <textarea
+              rows={2}
               value={block.title ?? ""}
               onChange={(event) =>
                 updateSelectedLayoutBlockByKey({ title: event.target.value })
               }
             />
+            <small>Press Enter for a line break. Existing &lt;br&gt; tags also work.</small>
           </label>
           <label className="builder-field">
             <span>Fluent Form ID</span>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import BuilderLineBreakText from "@/components/builder/BuilderLineBreakText";
 
 type FluentFormClientProps = {
   formId?: string | number | null;
@@ -494,7 +495,7 @@ export default function FluentFormClient({
   if (previewMode) {
     return (
       <div className="shop-builder-fluent-form" data-preview-mode="true">
-        {title && <h3>{title}</h3>}
+        {title && <h3><BuilderLineBreakText text={title} /></h3>}
         <div className="builder-preview-form-lines" aria-hidden="true">
           <i />
           <i />
@@ -519,7 +520,7 @@ export default function FluentFormClient({
       data-form-id={safeFormId}
       data-status={status}
     >
-      {title && <h3>{title}</h3>}
+      {title && <h3><BuilderLineBreakText text={title} /></h3>}
       {status === "loading" && (
         <div className="shop-builder-fluent-form-empty">Loading form...</div>
       )}

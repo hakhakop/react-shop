@@ -4,6 +4,7 @@ import { builderGeometryCssVariables } from "@/lib/builderGeometry";
 import AntigravityTerminal from "@/components/builder/AntigravityTerminal";
 import AntigravityCanvas from "@/components/builder/AntigravityCanvas";
 import TypewriterText from "@/components/builder/TypewriterText";
+import BuilderLineBreakText from "@/components/builder/BuilderLineBreakText";
 import {
   ArrowRight,
   CalendarDays,
@@ -1086,7 +1087,9 @@ function BadgeGridSection({
         {badges.map((badge, index) => (
           <article key={badge.id ?? index} className="shop-builder-badge-card">
             {badge.label && <span>{badge.label}</span>}
-            {badge.title && <h3>{badge.title}</h3>}
+            {badge.title && (
+              <h3><BuilderLineBreakText text={badge.title} /></h3>
+            )}
             <BodyText>{badge.body}</BodyText>
             {badge.items && badge.items.length > 0 && (
               <RenderChecklist
@@ -1482,7 +1485,7 @@ function GridCards({
                 area="title"
                 style={gridTitleStyle}
               >
-                {item.title}
+                <BuilderLineBreakText text={item.title} />
               </Typog>
             )}
             {block.gridShowMeta !== false && item.meta && (
@@ -2011,7 +2014,7 @@ function ContentLayoutBlock({
       <div className="shop-builder-column-block shop-builder-column-block--slider">
         {block.title && (
           <Typog as="h3" typography={block.typography}>
-            {block.title}
+            <BuilderLineBreakText text={block.title} />
           </Typog>
         )}
         {block.body && (
@@ -2047,7 +2050,7 @@ function ContentLayoutBlock({
       <div className="shop-builder-column-block shop-builder-column-block--embed">
         {block.title && (
           <Typog as="h3" typography={block.typography}>
-            {block.title}
+            <BuilderLineBreakText text={block.title} />
           </Typog>
         )}
         {block.body && (
@@ -2096,7 +2099,7 @@ function ContentLayoutBlock({
       <div className="shop-builder-column-block shop-builder-column-block--badges">
         {block.title && (
           <Typog as="h3" typography={block.typography}>
-            {block.title}
+            <BuilderLineBreakText text={block.title} />
           </Typog>
         )}
         {block.body && (
@@ -2117,7 +2120,7 @@ function ContentLayoutBlock({
               {badge.label && <span>{badge.label}</span>}
               {badge.title && (
                 <Typog as="strong" typography={block.typography}>
-                  {badge.title}
+                  <BuilderLineBreakText text={badge.title} />
                 </Typog>
               )}
               {badge.body && (
@@ -2146,7 +2149,7 @@ function ContentLayoutBlock({
       <div className="shop-builder-column-block shop-builder-column-block--products">
         {block.title && (
           <Typog as="h3" typography={block.typography}>
-            {block.title}
+            <BuilderLineBreakText text={block.title} />
           </Typog>
         )}
         <Suspense fallback={<ProductsSkeleton />}>
@@ -2177,7 +2180,7 @@ function ContentLayoutBlock({
         <GoodieIcon iconName={block.iconName} />
         {block.title && (
           <Typog as="h3" typography={block.typography}>
-            {block.title}
+            <BuilderLineBreakText text={block.title} />
           </Typog>
         )}
         {block.body && (
@@ -2195,7 +2198,7 @@ function ContentLayoutBlock({
       <div className="shop-builder-column-block shop-builder-column-block--list">
         {block.title && (
           <Typog as="h3" typography={block.typography}>
-            {block.title}
+            <BuilderLineBreakText text={block.title} />
           </Typog>
         )}
         <ul className={isGradientCycle ? "is-icon-gradient-cycle" : undefined}>
@@ -2326,7 +2329,9 @@ function ContentLayoutBlock({
               mobileReservedLines={block.typewriterMobileReservedLines ?? 2}
             />
           ) : (
-            (block.headingText ?? "Your Heading Text")
+            <BuilderLineBreakText
+              text={block.headingText ?? "Your Heading Text"}
+            />
           )}
         </Typog>
       </div>
@@ -2339,7 +2344,7 @@ function ContentLayoutBlock({
         <CalendarDays size={24} />
         {block.title && (
           <Typog as="h3" typography={block.typography}>
-            {block.title}
+            <BuilderLineBreakText text={block.title} />
           </Typog>
         )}
         {block.body && (
@@ -2501,7 +2506,7 @@ function ContentLayoutBlock({
                   mobileReservedLines={block.typewriterMobileReservedLines ?? 2}
                 />
               ) : (
-                block.title
+                <BuilderLineBreakText text={block.title} />
               )}
             </Typog>
           )}
@@ -2636,7 +2641,7 @@ function ContentLayoutBlock({
                   mobileReservedLines={block.typewriterMobileReservedLines ?? 2}
                 />
               ) : (
-                block.title
+                <BuilderLineBreakText text={block.title} />
               )}
             </Typog>
           )}
@@ -2779,7 +2784,7 @@ function ContentLayoutBlock({
                   mobileReservedLines={block.typewriterMobileReservedLines ?? 2}
                 />
               ) : (
-                block.title
+                <BuilderLineBreakText text={block.title} />
               )}
             </Typog>
           )}
@@ -2952,7 +2957,7 @@ function ContentLayoutBlock({
       )}
       {block.title && (
         <Typog as="h3" area="title" typography={block.typography}>
-          {block.title}
+          <BuilderLineBreakText text={block.title} />
         </Typog>
       )}
       {block.body && (

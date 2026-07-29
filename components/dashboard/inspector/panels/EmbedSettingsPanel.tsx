@@ -32,7 +32,8 @@ export default function EmbedSettingsPanel() {
 
         <label className="builder-field">
           <span>Block Title</span>
-          <input
+          <textarea
+            rows={2}
             value={block.title ?? ""}
             onChange={(event) => handleUpdate({ title: event.target.value })}
             placeholder="Embed block label..."
