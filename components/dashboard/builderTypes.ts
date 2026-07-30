@@ -336,7 +336,7 @@ export type BuilderLayoutBlock = {
   cardPadding?: "none" | "small" | "medium" | "large" | "max" | string;
   imagePadding?: "none" | "small" | "medium" | "large" | "max" | string;
   imageFit?: "contain" | "cover" | "fill";
-  imageRatio?: "auto" | "square" | "4:5" | "3:4";
+  imageRatio?: "auto" | "square" | "4:5" | "3:4" | "16:9";
   gridImagePadding?: "frameless" | "small" | "medium" | "max" | string;
   gridContentPadding?: "none" | "small" | "medium" | "large" | string;
   gridImageFrame?: "none" | "soft";
@@ -501,7 +501,7 @@ export type BuilderSection = {
   cardPadding?: "none" | "small" | "medium" | "large" | "max" | string;
   imagePadding?: "none" | "small" | "medium" | "large" | "max" | string;
   imageFit?: "contain" | "cover" | "fill";
-  imageRatio?: "auto" | "square" | "4:5" | "3:4";
+  imageRatio?: "auto" | "square" | "4:5" | "3:4" | "16:9";
   borderRadius?: number;
   addToCartStyle?: "blue" | "dark" | "light" | "inherit";
   addToCartSize?: "compact" | "medium" | "large" | "full";
@@ -607,9 +607,11 @@ export type BuilderSection = {
   }[];
   carouselSettings?: {
     variant?: string;
+    slideMode?: string;
     loop?: boolean;
     autoplay?: boolean;
     autoplayDelayMs?: number;
+    speed?: number;
     align?: "center" | "start";
     dragFree?: boolean;
     effect?: "slide" | "fade";
@@ -627,6 +629,16 @@ export type BuilderSection = {
     showDots?: boolean;
     showNavigation?: boolean;
     pauseOnHover?: boolean;
+    arrowStyle?: string;
+    arrowPosition?: string;
+    paginationStyle?: string;
+    paginationPosition?: string;
+    aspectRatio?: string;
+    overlayGradient?: string;
+    overlayPosition?: string;
+    overlayColor?: string;
+    overlayTextColor?: string;
+    kenBurns?: boolean;
     scrubSpeed?: number;
     pinHeightFactor?: number;
   };

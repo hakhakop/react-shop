@@ -76,6 +76,7 @@ import type {
 } from "react";
 import {
   Fragment,
+  memo,
   useEffect,
   useLayoutEffect,
   useMemo,
@@ -370,6 +371,64 @@ function getBuilderTemplateDragType(
   if (dragTypes.includes(BUILDER_TEMPLATE_ELEMENT_DND_TYPE)) return "element";
   return null;
 }
+
+// Memoized to prevent Swiper from remounting on every DashboardBuilder state change
+const PreviewSliderBlock = memo(function PreviewSliderBlock({
+  section,
+}: {
+  section: BuilderSection;
+}) {
+  const slides = (section.slides ?? []).map(
+    (slide, index) =>
+      ({
+        id: slide.id ?? `preview-slide-${index}`,
+        imageUrl: slide.imageUrl,
+        imageAlt: slide.imageAlt,
+        title: slide.title,
+        subtitle: slide.subtitle,
+        text: slide.text,
+        buttonLabel: slide.buttonLabel,
+        buttonUrl: slide.buttonUrl,
+        badge: slide.badge,
+        imagePadding: slide.imagePadding,
+      }) satisfies CarouselSlide,
+  );
+  const showSliderHeading = Boolean(
+    section.title?.trim() || section.body?.trim(),
+  );
+  return (
+    <div className="shop-builder-section-content builder-preview-slider">
+      {showSliderHeading && (
+        <div className="shop-builder-slider-heading">
+          <p className="shop-builder-eyebrow">
+            <GalleryHorizontal size={18} />
+            {section.carouselSettings?.variant ?? "hero"} slider
+          </p>
+          {section.title?.trim() ? (
+            <h2 className="shop-builder-title">{section.title}</h2>
+          ) : null}
+          {section.body?.trim() ? (
+            <p className="shop-builder-body">{section.body}</p>
+          ) : null}
+        </div>
+      )}
+      <CarouselBlock
+        slides={slides}
+        settings={section.carouselSettings}
+        className="builder-preview-carousel"
+      />
+    </div>
+  );
+},
+// Only re-render when slides or carousel settings change, not on selection/hover state changes
+(prev, next) => {
+  return (
+    prev.section.slides === next.section.slides &&
+    prev.section.carouselSettings === next.section.carouselSettings &&
+    prev.section.title === next.section.title &&
+    prev.section.body === next.section.body
+  );
+});
 
 function RenderDashboardChecklist({
   items,
@@ -3738,6 +3797,7 @@ export default function DashboardBuilder({
     setOpenLayoutItemId(columnKey);
     setSectionStructureOpen(false);
     setInspectorTab("content");
+    openInspectorPanel();
     revealCanvasTarget(blockKey);
   };
 
@@ -9340,21 +9400,7 @@ export default function DashboardBuilder({
                           }}
                           onClick={(event) => {
                             const target = event.target as HTMLElement;
-                            if (target.closest("a, button, [role='button']")) {
-                              // Header links/actions are content while editing.
-                              // Activating them navigated away before the
-                              // controlled inspector could update the element.
-                              event.preventDefault();
-                              event.stopPropagation();
-                              if (selectedLayoutBlockKey !== element.id) {
-                                selectLayoutBlock("header-document", columnId, element.id);
-                              }
-                              return;
-                            }
-                            if (target.closest("select, input, textarea, label, .website-language-switcher")) {
-                              if (selectedLayoutBlockKey !== element.id) {
-                                selectLayoutBlock("header-document", columnId, element.id);
-                              }
+                            if (target.closest(".builder-preview-block-tools")) {
                               return;
                             }
                             event.preventDefault();
@@ -13512,45 +13558,7 @@ function PreviewSection({
   }
 
   if (section.kind === "slider") {
-    const slides = (section.slides ?? []).map((slide, index) => ({
-      id: slide.id ?? `preview-slide-${index}`,
-      imageUrl: slide.imageUrl,
-      imageAlt: slide.imageAlt,
-      title: slide.title,
-      subtitle: slide.subtitle,
-      text: slide.text,
-      buttonLabel: slide.buttonLabel,
-      buttonUrl: slide.buttonUrl,
-      badge: slide.badge,
-      imagePadding: slide.imagePadding,
-    })) satisfies CarouselSlide[];
-    const showSliderHeading = Boolean(
-      section.title?.trim() || section.body?.trim(),
-    );
-
-    return (
-      <div className="shop-builder-section-content builder-preview-slider">
-        {showSliderHeading && (
-          <div className="shop-builder-slider-heading">
-            <p className="shop-builder-eyebrow">
-              <GalleryHorizontal size={18} />
-              {section.carouselSettings?.variant ?? "hero"} slider
-            </p>
-            {section.title?.trim() ? (
-              <h2 className="shop-builder-title">{section.title}</h2>
-            ) : null}
-            <BodyText className="shop-builder-body">
-              {section.body?.trim() ? section.body : null}
-            </BodyText>
-          </div>
-        )}
-        <CarouselBlock
-          slides={slides}
-          settings={section.carouselSettings}
-          className="builder-preview-carousel"
-        />
-      </div>
-    );
+    return <PreviewSliderBlock section={section} />;
   }
 
   if (section.kind === "scrollPinnedDemo") {
@@ -15574,8 +15582,7 @@ function PreviewSection({
                           (() => {
                             const isPanelImagePlaceholder =
                               !block.imageUrl ||
-                              !block.imageUrl.trim() ||
-                              block.imageUrl.includes("builder-image-placeholder.svg");
+                              !block.imageUrl.trim();
 
                             const handlePanelImageClick = (event: React.MouseEvent) => {
                               event.stopPropagation();
@@ -15620,6 +15627,9 @@ function PreviewSection({
                                 "var(--builder-card-content-max-width, none)",
                             } as React.CSSProperties;
 
+                            const isPanelFrameless = block.imagePadding === "frameless" || block.imagePadding === "none" || !block.imagePadding;
+                            const panelMediaAspect = getBuilderImageAspectRatio(block.imageRatio) || "16 / 9";
+
                             return (
                               <div className="shop-builder-column-block shop-builder-column-block--panel">
                                 <div
@@ -15627,11 +15637,14 @@ function PreviewSection({
                                     isPanelImagePlaceholder ? "is-empty" : ""
                                   }`}
                                   style={{
-                                    minHeight: "180px",
-                                    borderRadius: "var(--builder-card-radius, 12px)",
+                                    aspectRatio: panelMediaAspect,
+                                    borderRadius: isPanelFrameless ? "16px 16px 0 0" : "16px",
+                                    margin: isPanelFrameless ? "-24px -24px 20px -24px" : "0 0 20px 0",
                                     position: "relative",
                                     overflow: "hidden",
                                     cursor: "pointer",
+                                    backgroundSize: "cover",
+                                    backgroundPosition: "center",
                                     ...(!isPanelImagePlaceholder
                                       ? { backgroundImage: `url(${block.imageUrl})` }
                                       : {}),
@@ -15933,8 +15946,7 @@ function PreviewSection({
                             const imageRadius = `${block.imageBorderRadius ?? 12}px`;
                             const isBlockImagePlaceholder =
                               !block.imageUrl ||
-                              !block.imageUrl.trim() ||
-                              block.imageUrl.includes("builder-image-placeholder.svg");
+                              !block.imageUrl.trim();
 
                             const handleImageClick = (event: React.MouseEvent) => {
                               event.stopPropagation();
@@ -16246,6 +16258,18 @@ function PreviewSection({
                               )}
                               settings={block.carouselSettings}
                               className="builder-preview-carousel"
+                              onUploadSlideImage={(slideIndex, currentUrl) => {
+                                if (onUploadBlockImage) {
+                                  onUploadBlockImage(
+                                    section.id,
+                                    columnKey,
+                                    blockKey,
+                                    currentUrl,
+                                  );
+                                } else {
+                                  onSelectBlock(section.id, columnKey, blockKey);
+                                }
+                              }}
                             />
                           </div>
                         ) : block.kind === "products" ? (
@@ -16661,8 +16685,7 @@ function PreviewSection({
                                           {block.gridShowImage !== false && (() => {
                                             const isItemImagePlaceholder =
                                               !item.imageUrl ||
-                                              !item.imageUrl.trim() ||
-                                              item.imageUrl.includes("builder-image-placeholder.svg");
+                                              !item.imageUrl.trim();
 
                                             return (
                                               <div

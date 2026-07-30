@@ -8972,11 +8972,150 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                             <option value="showcase">
                                                               Showcase
                                                             </option>
-                                                            <option value="free-mode">
-                                                              Free mode
-                                                            </option>
                                                           </select>
                                                         </label>
+                                                        <div className="builder-two-column">
+                                                          <label className="builder-field">
+                                                            <span>Slide Render Mode</span>
+                                                            <select
+                                                              value={
+                                                                block.carouselSettings?.slideMode ?? "auto"
+                                                              }
+                                                              onChange={(event) =>
+                                                                updateSelectedLayoutBlock(
+                                                                  index,
+                                                                  blockIndex,
+                                                                  {
+                                                                    carouselSettings: {
+                                                                      ...(block.carouselSettings ?? {}),
+                                                                      slideMode: event.target.value,
+                                                                    },
+                                                                  },
+                                                                )
+                                                              }
+                                                            >
+                                                              <option value="auto">Auto (Detect)</option>
+                                                              <option value="overlay">Image Text Overlay (Gradient)</option>
+                                                              <option value="glass-card">Glass Floating Card</option>
+                                                              <option value="hero">Hero Banner Overlay</option>
+                                                              <option value="card">Standard Polaroid Card (Text Below)</option>
+                                                              <option value="image-only">Image-Only (No Text)</option>
+                                                            </select>
+                                                          </label>
+                                                          <label className="builder-field">
+                                                            <span>Overlay Gradient</span>
+                                                            <select
+                                                              value={
+                                                                block.carouselSettings?.overlayGradient ?? "none"
+                                                              }
+                                                              onChange={(event) =>
+                                                                updateSelectedLayoutBlock(
+                                                                  index,
+                                                                  blockIndex,
+                                                                  {
+                                                                    carouselSettings: {
+                                                                      ...(block.carouselSettings ?? {}),
+                                                                      overlayGradient: event.target.value,
+                                                                    },
+                                                                  },
+                                                                )
+                                                              }
+                                                            >
+                                                              <option value="none">None (Clean Image)</option>
+                                                              <option value="subtle">Subtle Dark Vignette</option>
+                                                              <option value="dark-glass">Dark Glass Gradient</option>
+                                                              <option value="vibrant">Vibrant Modern Gradient</option>
+                                                            </select>
+                                                          </label>
+                                                        </div>
+
+                                                        {["overlay", "glass-card", "hero"].includes(block.carouselSettings?.slideMode ?? "auto") && (
+                                                          <>
+                                                            <div className="builder-two-column">
+                                                              <label className="builder-field">
+                                                                <span>Overlay Position</span>
+                                                                <select
+                                                                  value={
+                                                                    block.carouselSettings?.overlayPosition ?? "bottom-left"
+                                                                  }
+                                                                  onChange={(event) =>
+                                                                    updateSelectedLayoutBlock(
+                                                                      index,
+                                                                      blockIndex,
+                                                                      {
+                                                                        carouselSettings: {
+                                                                          ...(block.carouselSettings ?? {}),
+                                                                          overlayPosition: event.target.value,
+                                                                        },
+                                                                      },
+                                                                    )
+                                                                  }
+                                                                >
+                                                                  <option value="bottom-left">Bottom Left (Default)</option>
+                                                                  <option value="bottom-center">Bottom Center</option>
+                                                                  <option value="bottom-right">Bottom Right</option>
+                                                                  <option value="center">Centered</option>
+                                                                  <option value="top-left">Top Left</option>
+                                                                  <option value="top-right">Top Right</option>
+                                                                </select>
+                                                              </label>
+
+                                                              <label className="builder-field">
+                                                                <span>Overlay Backdrop Color</span>
+                                                                <select
+                                                                  value={
+                                                                    block.carouselSettings?.overlayColor ?? "dark"
+                                                                  }
+                                                                  onChange={(event) =>
+                                                                    updateSelectedLayoutBlock(
+                                                                      index,
+                                                                      blockIndex,
+                                                                      {
+                                                                        carouselSettings: {
+                                                                          ...(block.carouselSettings ?? {}),
+                                                                          overlayColor: event.target.value,
+                                                                        },
+                                                                      },
+                                                                    )
+                                                                  }
+                                                                >
+                                                                  <option value="dark">Dark Vignette (Default)</option>
+                                                                  <option value="light">Light / White Vignette</option>
+                                                                  <option value="glass-dark">Frosted Dark Glass</option>
+                                                                  <option value="glass-light">Frosted Light Glass</option>
+                                                                  <option value="brand">Brand Accent Gradient</option>
+                                                                </select>
+                                                              </label>
+                                                            </div>
+
+                                                            <label className="builder-field">
+                                                              <span>Overlay Text Color Theme</span>
+                                                              <select
+                                                                value={
+                                                                  block.carouselSettings?.overlayTextColor ?? "auto"
+                                                                }
+                                                                onChange={(event) =>
+                                                                  updateSelectedLayoutBlock(
+                                                                    index,
+                                                                    blockIndex,
+                                                                    {
+                                                                      carouselSettings: {
+                                                                        ...(block.carouselSettings ?? {}),
+                                                                        overlayTextColor: event.target.value,
+                                                                      },
+                                                                    },
+                                                                  )
+                                                                }
+                                                              >
+                                                                <option value="auto">Auto (Color-Aware to Overlay)</option>
+                                                                <option value="light">Always Light (White Text)</option>
+                                                                <option value="dark">Always Dark (Slate Text)</option>
+                                                                <option value="brand">Brand Colored</option>
+                                                              </select>
+                                                            </label>
+                                                          </>
+                                                        )}
+
                                                         <div className="builder-two-column">
                                                           <label className="builder-field">
                                                             <span>
@@ -9131,29 +9270,131 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                             />
                                                           </label>
                                                         </div>
+                                                        <div className="builder-two-column">
+                                                          <label className="builder-field">
+                                                            <span>Arrow Style</span>
+                                                            <select
+                                                              value={
+                                                                (block.carouselSettings as any)?.arrowStyle ?? "chevron"
+                                                              }
+                                                              onChange={(event) =>
+                                                                updateSelectedLayoutBlock(
+                                                                  index,
+                                                                  blockIndex,
+                                                                  {
+                                                                    carouselSettings: {
+                                                                      ...(block.carouselSettings ?? {}),
+                                                                      arrowStyle: event.target.value,
+                                                                      showArrows: event.target.value !== "hidden",
+                                                                    },
+                                                                  },
+                                                                )
+                                                              }
+                                                            >
+                                                              <option value="chevron">Chevron (Swiper Official)</option>
+                                                              <option value="glass-circle">Glass Circle</option>
+                                                              <option value="solid-dark">Solid Dark</option>
+                                                              <option value="minimal-light">Minimal Light</option>
+                                                              <option value="hidden">Hidden</option>
+                                                            </select>
+                                                          </label>
+                                                          <label className="builder-field">
+                                                            <span>Navigation Position</span>
+                                                            <select
+                                                              value={
+                                                                (block.carouselSettings as any)?.arrowPosition ?? "overlay"
+                                                              }
+                                                              onChange={(event) =>
+                                                                updateSelectedLayoutBlock(
+                                                                  index,
+                                                                  blockIndex,
+                                                                  {
+                                                                    carouselSettings: {
+                                                                      ...(block.carouselSettings ?? {}),
+                                                                      arrowPosition: event.target.value,
+                                                                    },
+                                                                  },
+                                                                )
+                                                              }
+                                                            >
+                                                              <option value="overlay">Overlay (Sides Inside)</option>
+                                                              <option value="outer">Outer (Sides Outside)</option>
+                                                              <option value="bottom">Bottom Center</option>
+                                                              <option value="bottom-right">Bottom Right Corner</option>
+                                                              <option value="bottom-left">Bottom Left Corner</option>
+                                                              <option value="top-right">Top Right Corner</option>
+                                                              <option value="top-left">Top Left Corner</option>
+                                                            </select>
+                                                          </label>
+                                                        </div>
+                                                        <div className="builder-two-column">
+                                                          <label className="builder-field">
+                                                            <span>Pagination Style</span>
+                                                            <select
+                                                              value={
+                                                                (block.carouselSettings as any)?.paginationStyle ?? "minimal-dots"
+                                                              }
+                                                              onChange={(event) =>
+                                                                updateSelectedLayoutBlock(
+                                                                  index,
+                                                                  blockIndex,
+                                                                  {
+                                                                    carouselSettings: {
+                                                                      ...(block.carouselSettings ?? {}),
+                                                                      paginationStyle: event.target.value,
+                                                                      showDots: event.target.value !== "hidden",
+                                                                    },
+                                                                  },
+                                                                )
+                                                              }
+                                                            >
+                                                              <option value="minimal-dots">Minimal Dots (Official)</option>
+                                                              <option value="expanding-pills">Expanding Pills</option>
+                                                              <option value="fraction">Fraction Counter</option>
+                                                              <option value="progress">Progress Line</option>
+                                                              <option value="hidden">Hidden</option>
+                                                            </select>
+                                                          </label>
+                                                          {((block.carouselSettings as any)?.paginationStyle ?? "minimal-dots") !== "hidden" && (
+                                                            <label className="builder-field">
+                                                              <span>Pagination Position</span>
+                                                              <select
+                                                                value={
+                                                                  (block.carouselSettings as any)?.paginationPosition ?? "bottom"
+                                                                }
+                                                                onChange={(event) =>
+                                                                  updateSelectedLayoutBlock(
+                                                                    index,
+                                                                    blockIndex,
+                                                                    {
+                                                                      carouselSettings: {
+                                                                        ...(block.carouselSettings ?? {}),
+                                                                        paginationPosition: event.target.value,
+                                                                      },
+                                                                    },
+                                                                  )
+                                                                }
+                                                              >
+                                                                <option value="bottom">Below Slider (Center)</option>
+                                                                <option value="bottom-left">Below Slider (Left)</option>
+                                                                <option value="bottom-right">Below Slider (Right)</option>
+                                                                <option value="top">Above Slider (Center)</option>
+                                                                <option value="top-left">Above Slider (Left)</option>
+                                                                <option value="top-right">Above Slider (Right)</option>
+                                                                <option value="overlay">Overlay Bottom (Inside)</option>
+                                                                <option value="overlay-left">Overlay Bottom-Left</option>
+                                                                <option value="overlay-right">Overlay Bottom-Right</option>
+                                                                <option value="overlay-top">Overlay Top (Inside)</option>
+                                                              </select>
+                                                            </label>
+                                                          )}
+                                                        </div>
                                                         <div className="builder-slider-options">
                                                           {[
-                                                            [
-                                                              "autoplay",
-                                                              "Autoplay",
-                                                            ],
+                                                            ["autoplay", "Autoplay"],
                                                             ["loop", "Loop"],
-                                                            [
-                                                              "showArrows",
-                                                              "Arrows",
-                                                            ],
-                                                            [
-                                                              "showDots",
-                                                              "Dots",
-                                                            ],
-                                                            [
-                                                              "dragFree",
-                                                              "Drag free",
-                                                            ],
-                                                            [
-                                                              "pauseOnHover",
-                                                              "Pause hover",
-                                                            ],
+                                                            ["kenBurns", "Ken Burns"],
+                                                            ["pauseOnHover", "Pause Hover"],
                                                           ].map(
                                                             ([key, label]) => (
                                                               <label
@@ -9163,16 +9404,8 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                                 <input
                                                                   type="checkbox"
                                                                   checked={Boolean(
-                                                                    block
-                                                                      .carouselSettings?.[
-                                                                      key as keyof NonNullable<
-                                                                        BuilderLayoutBlock["carouselSettings"]
-                                                                      >
-                                                                    ] ??
-                                                                    (key ===
-                                                                      "dragFree" ||
-                                                                    key ===
-                                                                      "autoplay"
+                                                                    (block.carouselSettings as any)?.[key] ??
+                                                                    (key === "autoplay" || key === "kenBurns"
                                                                       ? false
                                                                       : true),
                                                                   )}
@@ -15342,123 +15575,301 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
 
                         {selectedSection.kind === "slider" && (
                           <>
+                            <div className="flex items-center justify-between mb-2">
+                              <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Preset Customizer</span>
+                              <button
+                                type="button"
+                                className="px-2.5 py-1 rounded-lg bg-indigo-600/10 text-indigo-600 hover:bg-indigo-600 hover:text-white dark:bg-indigo-400/10 dark:text-indigo-400 font-semibold text-[11px] transition-all flex items-center gap-1 border border-indigo-500/20"
+                                onClick={() =>
+                                  updateSelected({
+                                    carouselSettings: {
+                                      ...(selectedSection.carouselSettings ?? {}),
+                                      variant: "hero",
+                                      slideMode: "overlay",
+                                      arrowStyle: "minimal-light",
+                                      arrowPosition: "overlay",
+                                      paginationStyle: "expanding-pills",
+                                      paginationPosition: "bottom",
+                                      aspectRatio: "16:9",
+                                      overlayGradient: "dark-glass",
+                                      overlayColor: "dark",
+                                      overlayTextColor: "light",
+                                      showArrows: true,
+                                      showDots: true,
+                                    },
+                                  })
+                                }
+                              >
+                                ✨ Apply Minimalist Clean
+                              </button>
+                            </div>
+
                             <label className="builder-field">
-                              <span>Slider Variant</span>
+                              <span>Preset Variant</span>
                               <select
                                 value={
-                                  selectedSection.carouselSettings?.variant ??
-                                  "hero"
+                                  selectedSection.carouselSettings?.variant ?? "hero"
                                 }
                                 onChange={(event) =>
                                   updateSelected({
                                     carouselSettings: {
-                                      ...(selectedSection.carouselSettings ??
-                                        {}),
+                                      ...(selectedSection.carouselSettings ?? {}),
                                       variant: event.target.value,
                                     },
                                   })
                                 }
                               >
-                                <option value="hero">Hero</option>
-                                <option value="basic">Basic</option>
-                                <option value="overlay">Overlay</option>
+                                <option value="hero">Hero (Fullscreen Parallax)</option>
+                                <option value="coverflow">3D Coverflow Showcase</option>
+                                <option value="cards">3D Stacked Cards</option>
+                                <option value="creative">Creative Perspective</option>
+                                <option value="thumbs">Filmstrip Thumbs Gallery</option>
+                                <option value="split">Split-Screen Showcase</option>
+                                <option value="multi-card">Multi-Card Slider</option>
+                                <option value="marquee">Infinite Marquee Loop</option>
+                                <option value="basic">Basic Slider</option>
+                                <option value="fade">Crossfade Gallery</option>
                               </select>
                             </label>
 
-                            <label className="builder-field">
-                              <span>Cards Per View</span>
-                              <input
-                                type="number"
-                                min={1}
-                                max={4}
-                                value={
-                                  selectedSection.carouselSettings
-                                    ?.cardsPerView ?? 1
-                                }
-                                onChange={(event) =>
-                                  updateSelected({
-                                    carouselSettings: {
-                                      ...(selectedSection.carouselSettings ??
-                                        {}),
-                                      cardsPerView: Number(event.target.value),
-                                    },
-                                  })
-                                }
-                              />
-                            </label>
+                            <div className="builder-two-column">
+                              <label className="builder-field">
+                                <span>Slide Render Mode</span>
+                                <select
+                                  value={
+                                    selectedSection.carouselSettings?.slideMode ?? "auto"
+                                  }
+                                  onChange={(event) =>
+                                    updateSelected({
+                                      carouselSettings: {
+                                        ...(selectedSection.carouselSettings ?? {}),
+                                        slideMode: event.target.value,
+                                      },
+                                    })
+                                  }
+                                >
+                                  <option value="auto">Auto (Detect)</option>
+                                  <option value="overlay">Image Text Overlay (Gradient)</option>
+                                  <option value="glass-card">Glass Floating Card</option>
+                                  <option value="hero">Hero Banner Overlay</option>
+                                  <option value="card">Standard Polaroid Card (Text Below)</option>
+                                  <option value="image-only">Image-Only (No Text)</option>
+                                </select>
+                              </label>
 
-                            <label className="builder-field">
-                              <span>Autoplay Delay (ms)</span>
-                              <input
-                                type="number"
-                                min={2000}
-                                max={30000}
-                                step={500}
-                                value={
-                                  selectedSection.carouselSettings
-                                    ?.autoplayDelayMs ?? 5000
-                                }
-                                onChange={(event) =>
-                                  updateSelected({
-                                    carouselSettings: {
-                                      ...(selectedSection.carouselSettings ??
-                                        {}),
-                                      autoplayDelayMs: Number(
-                                        event.target.value,
-                                      ),
-                                    },
-                                  })
-                                }
-                              />
-                            </label>
+                              <label className="builder-field">
+                                <span>Overlay Gradient</span>
+                                <select
+                                  value={
+                                    selectedSection.carouselSettings?.overlayGradient ?? "none"
+                                  }
+                                  onChange={(event) =>
+                                    updateSelected({
+                                      carouselSettings: {
+                                        ...(selectedSection.carouselSettings ?? {}),
+                                        overlayGradient: event.target.value,
+                                      },
+                                    })
+                                  }
+                                >
+                                  <option value="none">None (Clean Image)</option>
+                                  <option value="subtle">Subtle Dark Vignette</option>
+                                  <option value="dark-glass">Dark Glass Gradient</option>
+                                  <option value="vibrant">Vibrant Modern Gradient</option>
+                                </select>
+                              </label>
+                              {["multi-card", "basic", "free-mode", "marquee"].includes(selectedSection.carouselSettings?.variant ?? "hero") && (
+                                <label className="builder-field">
+                                  <span>Cards Per View</span>
+                                  <input
+                                    type="number"
+                                    min={1}
+                                    max={6}
+                                    value={
+                                      selectedSection.carouselSettings?.cardsPerView ?? 1
+                                    }
+                                    onChange={(event) =>
+                                      updateSelected({
+                                        carouselSettings: {
+                                          ...(selectedSection.carouselSettings ?? {}),
+                                          cardsPerView: Number(event.target.value),
+                                        },
+                                      })
+                                    }
+                                  />
+                                </label>
+                              )}
+                            </div>
 
-                            <label className="builder-field">
-                              <span>Align</span>
-                              <select
-                                value={
-                                  selectedSection.carouselSettings?.align ??
-                                  "center"
-                                }
-                                onChange={(event) =>
-                                  updateSelected({
-                                    carouselSettings: {
-                                      ...(selectedSection.carouselSettings ??
-                                        {}),
-                                      align: event.target.value as NonNullable<
-                                        BuilderSection["carouselSettings"]
-                                      >["align"],
-                                    },
-                                  })
-                                }
-                              >
-                                <option value="center">Center</option>
-                                <option value="start">Start</option>
-                              </select>
-                            </label>
+                            <div className="builder-two-column">
+                              <label className="builder-field">
+                                <span>Arrow Style</span>
+                                <select
+                                  value={
+                                    (selectedSection.carouselSettings as any)?.arrowStyle ?? "chevron"
+                                  }
+                                  onChange={(event) =>
+                                    updateSelected({
+                                      carouselSettings: {
+                                        ...(selectedSection.carouselSettings ?? {}),
+                                        arrowStyle: event.target.value,
+                                        showArrows: event.target.value !== "hidden",
+                                      },
+                                    })
+                                  }
+                                >
+                                  <option value="chevron">Chevron (Swiper Official)</option>
+                                  <option value="glass-circle">Floating Glass Circle</option>
+                                  <option value="solid-dark">Solid Dark Circle</option>
+                                  <option value="minimal-light">Minimal Light Circle</option>
+                                  <option value="hidden">Hidden</option>
+                                </select>
+                              </label>
+
+                              <label className="builder-field">
+                                <span>Navigation Position</span>
+                                <select
+                                  value={
+                                    selectedSection.carouselSettings?.arrowPosition ?? "overlay"
+                                  }
+                                  onChange={(event) =>
+                                    updateSelected({
+                                      carouselSettings: {
+                                        ...(selectedSection.carouselSettings ?? {}),
+                                        arrowPosition: event.target.value,
+                                      },
+                                    })
+                                  }
+                                >
+                                  <option value="overlay">Overlay (Sides Inside)</option>
+                                  <option value="outer">Outer (Sides Outside)</option>
+                                  <option value="bottom">Bottom Center</option>
+                                  <option value="bottom-right">Bottom Right Corner</option>
+                                  <option value="bottom-left">Bottom Left Corner</option>
+                                  <option value="top-right">Top Right Corner</option>
+                                  <option value="top-left">Top Left Corner</option>
+                                </select>
+                              </label>
+                            </div>
+
+                            <div className="builder-two-column">
+                              <label className="builder-field">
+                                <span>Pagination Style</span>
+                                <select
+                                  value={
+                                    selectedSection.carouselSettings?.paginationStyle ?? "minimal-dots"
+                                  }
+                                  onChange={(event) =>
+                                    updateSelected({
+                                      carouselSettings: {
+                                        ...(selectedSection.carouselSettings ?? {}),
+                                        paginationStyle: event.target.value,
+                                        showDots: event.target.value !== "hidden",
+                                      },
+                                    })
+                                  }
+                                >
+                                  <option value="minimal-dots">Minimal Dots</option>
+                                  <option value="simple-dots">Simple Dots</option>
+                                  <option value="expanding-pills">Expanding Pills</option>
+                                  <option value="fraction">Fraction Counter</option>
+                                  <option value="progress">Progress Line</option>
+                                  <option value="hidden">Hidden</option>
+                                </select>
+                              </label>
+
+                              {(selectedSection.carouselSettings?.paginationStyle ?? "minimal-dots") !== "hidden" && (
+                                <label className="builder-field">
+                                  <span>Pagination Position</span>
+                                  <select
+                                    value={
+                                      selectedSection.carouselSettings?.paginationPosition ?? "bottom"
+                                    }
+                                    onChange={(event) =>
+                                      updateSelected({
+                                        carouselSettings: {
+                                          ...(selectedSection.carouselSettings ?? {}),
+                                          paginationPosition: event.target.value,
+                                        },
+                                      })
+                                    }
+                                  >
+                                    <option value="bottom">Below Slider (Center)</option>
+                                    <option value="bottom-left">Below Slider (Left)</option>
+                                    <option value="bottom-right">Below Slider (Right)</option>
+                                    <option value="top">Above Slider (Center)</option>
+                                    <option value="top-left">Above Slider (Left)</option>
+                                    <option value="top-right">Above Slider (Right)</option>
+                                    <option value="overlay">Overlay Bottom (Inside)</option>
+                                    <option value="overlay-left">Overlay Bottom-Left</option>
+                                    <option value="overlay-right">Overlay Bottom-Right</option>
+                                    <option value="overlay-top">Overlay Top (Inside)</option>
+                                  </select>
+                                </label>
+                              )}
+                            </div>
+
+                            <div className="builder-two-column">
+                              <label className="builder-field">
+                                <span>Autoplay Delay (ms)</span>
+                                <input
+                                  type="number"
+                                  min={1500}
+                                  max={30000}
+                                  step={500}
+                                  value={
+                                    selectedSection.carouselSettings?.autoplayDelayMs ?? 5000
+                                  }
+                                  onChange={(event) =>
+                                    updateSelected({
+                                      carouselSettings: {
+                                        ...(selectedSection.carouselSettings ?? {}),
+                                        autoplayDelayMs: Number(event.target.value),
+                                      },
+                                    })
+                                  }
+                                />
+                              </label>
+                              <label className="builder-field">
+                                <span>Transition Speed (ms)</span>
+                                <input
+                                  type="number"
+                                  min={200}
+                                  max={3000}
+                                  step={100}
+                                  value={
+                                    (selectedSection.carouselSettings as any)?.speed ?? 600
+                                  }
+                                  onChange={(event) =>
+                                    updateSelected({
+                                      carouselSettings: {
+                                        ...(selectedSection.carouselSettings ?? {}),
+                                        speed: Number(event.target.value),
+                                      },
+                                    })
+                                  }
+                                />
+                              </label>
+                            </div>
 
                             <div className="builder-slider-options">
                               {[
                                 ["autoplay", "Autoplay"],
-                                ["showArrows", "Arrows"],
-                                ["showDots", "Dots"],
-                                ["dragFree", "Drag free"],
-                                ["pauseOnHover", "Pause hover"],
+                                ["loop", "Loop"],
+                                ["kenBurns", "Ken Burns Zoom"],
+                                ["pauseOnHover", "Pause Hover"],
                               ].map(([key, label]) => (
                                 <label key={key} className="builder-check">
                                   <input
                                     type="checkbox"
                                     checked={Boolean(
-                                      selectedSection.carouselSettings?.[
-                                        key as keyof NonNullable<
-                                          BuilderSection["carouselSettings"]
-                                        >
-                                      ] ?? (key === "dragFree" ? false : true),
+                                      (selectedSection.carouselSettings as any)?.[key] ??
+                                        (key === "autoplay" || key === "kenBurns" ? false : true)
                                     )}
                                     onChange={(event) =>
                                       updateSelected({
                                         carouselSettings: {
-                                          ...(selectedSection.carouselSettings ??
-                                            {}),
+                                          ...(selectedSection.carouselSettings ?? {}),
                                           [key]: event.target.checked,
                                         },
                                       })

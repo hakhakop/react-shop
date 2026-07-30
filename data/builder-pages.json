@@ -1,5 +1,11 @@
 [
   {
+    "key": "page:new-clean-page",
+    "title": "New Clean Page",
+    "slug": "new-clean-page",
+    "updatedAt": "2026-07-30T16:24:13.095Z"
+  },
+  {
     "key": "page:fashion-store",
     "title": "Fashion Store",
     "slug": "fashion-store",
@@ -52,5 +58,11 @@
     "title": "New Builder test",
     "slug": "new-builder-test",
     "updatedAt": "2026-07-30T05:23:39.475Z"
+  },
+  {
+    "key": "page:slider-tests",
+    "title": "slider tests",
+    "slug": "slider-tests",
+    "updatedAt": "2026-07-30T08:58:21.676Z"
   }
 ]

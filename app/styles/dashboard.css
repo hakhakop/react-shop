@@ -13999,13 +13999,13 @@ article.is-selected-column > .builder-preview-box-spacing,
 
 /* Header-document compatibility: it uses the same one-owner rule while its
    document-specific renderer is migrated through the legacy selection IDs. */
-.builder-header-document-preview:not(.is-selected)
+.builder-header-document-preview:not(.is-selected):not(:hover)
   > .builder-header-document-tools,
 .builder-header-document-preview
-  .builder-header-live-row:not(.is-selected)
+  .builder-header-live-row:not(.is-selected):not(:hover)
   > .builder-header-live-row-tools,
 .builder-header-document-preview
-  .builder-header-live-element:not(.is-selected-block)
+  .builder-header-live-element:not(.is-selected-block):not(:hover)
   > .builder-preview-block-tools {
   opacity: 0 !important;
   pointer-events: none !important;
@@ -14013,11 +14013,19 @@ article.is-selected-column > .builder-preview-box-spacing,
 
 .builder-header-document-preview.is-selected
   > .builder-header-document-tools,
+.builder-header-document-preview:hover
+  > .builder-header-document-tools,
 .builder-header-document-preview
   .builder-header-live-row.is-selected
   > .builder-header-live-row-tools,
 .builder-header-document-preview
+  .builder-header-live-row:hover
+  > .builder-header-live-row-tools,
+.builder-header-document-preview
   .builder-header-live-element.is-selected-block
+  > .builder-preview-block-tools,
+.builder-header-document-preview
+  .builder-header-live-element:hover
   > .builder-preview-block-tools {
   opacity: 1 !important;
   pointer-events: auto !important;
@@ -14763,24 +14771,161 @@ body:has([data-scoped-builder-root])
    Modern Swiper & Slideshow System Styles
    ========================================== */
 
+/* ==========================================
+   Modern Swiper & Slideshow System Styles
+   ========================================== */
+
 .shop-builder-swiper {
   position: relative;
   width: 100%;
   border-radius: var(--builder-card-radius, 16px);
+}
+
+.shop-builder-swiper:not(.shop-builder-swiper--3d) {
   overflow: hidden;
 }
 
-.shop-builder-swiper-slide-card {
+.shop-builder-swiper--3d {
+  overflow: visible !important;
+  padding: 24px 16px !important;
+}
+
+.shop-builder-swiper--3d .swiper {
+  overflow: visible !important;
+}
+
+.shop-builder-swiper--marquee .swiper-wrapper {
+  transition-timing-function: linear !important;
+}
+
+/* Hero Slide Card (Mode A) */
+.shop-builder-hero-slide-card {
   position: relative;
   width: 100%;
-  height: 100%;
-  min-height: 380px;
+  min-height: 420px;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
   border-radius: var(--builder-card-radius, 16px);
   overflow: hidden;
+  background: transparent;
+}
+
+@media (min-width: 768px) {
+  .shop-builder-hero-slide-card {
+    min-height: 520px;
+  }
+}
+
+/* Standard Slide Card (Mode B) */
+.shop-builder-standard-slide-card {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--builder-card-radius, 16px);
+  overflow: hidden;
+  background: #ffffff !important;
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+}
+
+.dark .shop-builder-standard-slide-card {
+  background: #0f172a !important;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.shop-builder-slide-media-container {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  background: #f1f5f9;
+  cursor: pointer;
+}
+
+.shop-builder-slide-media-placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: #f8fafc;
+  border: 2px dashed #cbd5e1;
+  margin: 12px;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+}
+
+.shop-builder-slide-media-placeholder:hover {
+  background: #f1f5f9;
+  border-color: #94a3b8;
+}
+
+.shop-builder-slide-content {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+  background: #ffffff !important;
+}
+
+.dark .shop-builder-slide-content {
+  background: #0f172a !important;
+}
+
+.shop-builder-slide-badge {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  padding: 3px 10px;
+  border-radius: 9999px;
+  background: #f1f5f9;
+  color: #475569;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.shop-builder-slide-title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.25;
+  color: #0f172a;
+  letter-spacing: -0.01em;
+}
+
+.shop-builder-slide-text {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #64748b;
+}
+
+.shop-builder-slide-btn {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: 6px;
+  padding: 9px 18px;
+  border-radius: 8px;
   background: #0f172a;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  margin-top: 4px;
+  transition: background 0.15s ease;
+}
+
+.shop-builder-slide-btn:hover {
+  background: #1e293b;
 }
 
 /* Media Layer */
@@ -14854,11 +14999,51 @@ body:has([data-scoped-builder-root])
   background: rgba(255, 255, 255, 0.18);
   border: 1px solid rgba(255, 255, 255, 0.25);
   backdrop-filter: blur(12px);
-  color: #ffffff;
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
+}
+
+/* Aspect ratio helper rules */
+.shop-builder-aspect--16-9 .shop-builder-image-slide-card,
+.shop-builder-aspect--16-9 .shop-builder-overlay-slide-card,
+.shop-builder-aspect--16-9 .shop-builder-hero-slide-card,
+.shop-builder-aspect--16-9 .shop-builder-image-slide-card > div,
+.shop-builder-aspect--16-9 .shop-builder-overlay-slide-card > div,
+.shop-builder-aspect--16-9 .shop-builder-hero-slide-card > div {
+  aspect-ratio: 16 / 9 !important;
+  min-height: auto !important;
+}
+
+.shop-builder-aspect--4-3 .shop-builder-image-slide-card,
+.shop-builder-aspect--4-3 .shop-builder-overlay-slide-card,
+.shop-builder-aspect--4-3 .shop-builder-hero-slide-card,
+.shop-builder-aspect--4-3 .shop-builder-image-slide-card > div,
+.shop-builder-aspect--4-3 .shop-builder-overlay-slide-card > div,
+.shop-builder-aspect--4-3 .shop-builder-hero-slide-card > div {
+  aspect-ratio: 4 / 3 !important;
+  min-height: auto !important;
+}
+
+.shop-builder-aspect--1-1 .shop-builder-image-slide-card,
+.shop-builder-aspect--1-1 .shop-builder-overlay-slide-card,
+.shop-builder-aspect--1-1 .shop-builder-hero-slide-card,
+.shop-builder-aspect--1-1 .shop-builder-image-slide-card > div,
+.shop-builder-aspect--1-1 .shop-builder-overlay-slide-card > div,
+.shop-builder-aspect--1-1 .shop-builder-hero-slide-card > div {
+  aspect-ratio: 1 / 1 !important;
+  min-height: auto !important;
+}
+
+.shop-builder-aspect--21-9 .shop-builder-image-slide-card,
+.shop-builder-aspect--21-9 .shop-builder-overlay-slide-card,
+.shop-builder-aspect--21-9 .shop-builder-hero-slide-card,
+.shop-builder-aspect--21-9 .shop-builder-image-slide-card > div,
+.shop-builder-aspect--21-9 .shop-builder-overlay-slide-card > div,
+.shop-builder-aspect--21-9 .shop-builder-hero-slide-card > div {
+  aspect-ratio: 21 / 9 !important;
+  min-height: auto !important;
 }
 
 .shop-builder-swiper-title {
@@ -14900,54 +15085,539 @@ body:has([data-scoped-builder-root])
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
 }
 
-/* Swiper Controls Customization */
+/* ============================================================
+   Swiper Controls Customisation
+   ============================================================ */
+
+/* ── Base reset so all styles start from zero ── */
 .shop-builder-swiper .swiper-button-next,
 .shop-builder-swiper .swiper-button-prev {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  transition: all 0.2s ease;
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+              opacity 0.22s ease,
+              background 0.22s ease,
+              box-shadow 0.22s ease;
+  z-index: 30;
 }
 
-.shop-builder-swiper .swiper-button-next::after,
-.shop-builder-swiper .swiper-button-prev::after {
-  font-size: 16px;
-  font-weight: bold;
+/* ── 1. Chevron — thin vector chevron, no background ── */
+.shop-builder-arrow--chevron .swiper-button-next,
+.shop-builder-arrow--chevron .swiper-button-prev {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  width: 36px !important;
+  height: 48px !important;
+  color: #ffffff !important;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.55));
+  opacity: 0.88;
+  border-radius: 0 !important;
 }
 
-.shop-builder-arrow--glass .swiper-button-next,
-.shop-builder-arrow--glass .swiper-button-prev {
-  background: rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  color: #ffffff;
-}
-
-.shop-builder-arrow--glass .swiper-button-next:hover,
-.shop-builder-arrow--glass .swiper-button-prev:hover {
-  background: rgba(255, 255, 255, 0.95);
-  color: #0f172a;
-}
-
-.shop-builder-arrow--dark .swiper-button-next,
-.shop-builder-arrow--dark .swiper-button-prev {
-  background: #1e293b;
-  color: #ffffff;
-}
-
-/* Swiper Pagination */
-.shop-builder-pag--expanding-bullets .swiper-pagination-bullet {
-  width: 8px;
-  height: 8px;
-  border-radius: 9999px;
-  background: rgba(255, 255, 255, 0.5);
-  transition: all 0.3s ease;
+.shop-builder-arrow--chevron .swiper-button-next:hover,
+.shop-builder-arrow--chevron .swiper-button-prev:hover {
+  background: transparent !important;
+  transform: scale(1.2);
   opacity: 1;
 }
 
-.shop-builder-pag--expanding-bullets .swiper-pagination-bullet-active {
-  width: 24px;
-  background: #ffffff;
+.shop-builder-arrow--chevron .swiper-button-next::after,
+.shop-builder-arrow--chevron .swiper-button-prev::after {
+  font-size: 34px !important;
+  font-weight: 300 !important;
+}
+
+/* ── 2. Glass Circle — frosted glass pill, white icon ── */
+.shop-builder-arrow--glass-circle .swiper-button-next,
+.shop-builder-arrow--glass-circle .swiper-button-prev {
+  width: 48px !important;
+  height: 48px !important;
+  border-radius: 50% !important;
+  background: rgba(255, 255, 255, 0.14) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.35) !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.22),
+              inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+}
+
+.shop-builder-arrow--glass-circle .swiper-button-next:hover,
+.shop-builder-arrow--glass-circle .swiper-button-prev:hover {
+  background: rgba(255, 255, 255, 0.92) !important;
+  color: #0f172a !important;
+  border-color: transparent !important;
+  transform: scale(1.08);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.28) !important;
+}
+
+.shop-builder-arrow--glass-circle .swiper-button-next::after,
+.shop-builder-arrow--glass-circle .swiper-button-prev::after {
+  font-size: 16px !important;
+  font-weight: 700 !important;
+}
+
+/* ── 3. Solid Dark — sharp rounded rectangle, no circle ── */
+.shop-builder-arrow--solid-dark .swiper-button-next,
+.shop-builder-arrow--solid-dark .swiper-button-prev {
+  width: 40px !important;
+  height: 56px !important;
+  border-radius: 10px !important;
+  background: rgba(15, 23, 42, 0.88) !important;
+  color: #f8fafc !important;
+  border: none !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35) !important;
+}
+
+.shop-builder-arrow--solid-dark .swiper-button-next:hover,
+.shop-builder-arrow--solid-dark .swiper-button-prev:hover {
+  background: #0f172a !important;
+  transform: scaleY(1.06);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45) !important;
+}
+
+.shop-builder-arrow--solid-dark .swiper-button-next::after,
+.shop-builder-arrow--solid-dark .swiper-button-prev::after {
+  font-size: 18px !important;
+  font-weight: 700 !important;
+}
+
+/* ── 4. Minimal Light — ghost outline, fills on hover ── */
+.shop-builder-arrow--minimal-light .swiper-button-next,
+.shop-builder-arrow--minimal-light .swiper-button-prev {
+  width: 44px !important;
+  height: 44px !important;
+  border-radius: 50% !important;
+  background: transparent !important;
+  border: 2px solid rgba(15, 23, 42, 0.28) !important;
+  color: #0f172a !important;
+  box-shadow: none !important;
+}
+
+.shop-builder-arrow--minimal-light .swiper-button-next:hover,
+.shop-builder-arrow--minimal-light .swiper-button-prev:hover {
+  background: #0f172a !important;
+  border-color: #0f172a !important;
+  color: #ffffff !important;
+  transform: scale(1.08);
+}
+
+.shop-builder-arrow--minimal-light .swiper-button-next::after,
+.shop-builder-arrow--minimal-light .swiper-button-prev::after {
+  font-size: 16px !important;
+  font-weight: 700 !important;
+}
+
+/* ============================================================
+   Swiper Navigation Positioning
+   ============================================================ */
+
+/* 1. Default Overlay Position (Sides inside slide) */
+.shop-builder-arrow-pos--overlay .swiper-button-prev {
+  left: 14px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+}
+
+.shop-builder-arrow-pos--overlay .swiper-button-next {
+  right: 14px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+}
+
+/* 2. Outer Position (Outside slider boundaries) */
+.shop-builder-arrow-pos--outer {
+  padding-left: 56px;
+  padding-right: 56px;
+  position: relative;
+}
+
+.shop-builder-arrow-pos--outer .swiper-button-prev {
+  left: 4px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+}
+
+.shop-builder-arrow-pos--outer .swiper-button-next {
+  right: 4px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+}
+
+/* 3. Bottom Toolbar Center Position */
+.shop-builder-arrow-pos--bottom .swiper-button-prev {
+  top: auto !important;
+  bottom: 8px !important;
+  left: calc(50% - 44px) !important;
+  transform: none !important;
+}
+
+.shop-builder-arrow-pos--bottom .swiper-button-next {
+  top: auto !important;
+  bottom: 8px !important;
+  right: calc(50% - 44px) !important;
+  transform: none !important;
+}
+
+/* 4. Bottom Right Corner Position */
+.shop-builder-arrow-pos--bottom-right .swiper-button-prev {
+  top: auto !important;
+  bottom: 12px !important;
+  left: auto !important;
+  right: 68px !important;
+  transform: none !important;
+}
+
+.shop-builder-arrow-pos--bottom-right .swiper-button-next {
+  top: auto !important;
+  bottom: 12px !important;
+  right: 16px !important;
+  transform: none !important;
+}
+
+/* 5. Bottom Left Corner Position */
+.shop-builder-arrow-pos--bottom-left .swiper-button-prev {
+  top: auto !important;
+  bottom: 12px !important;
+  left: 16px !important;
+  right: auto !important;
+  transform: none !important;
+}
+
+.shop-builder-arrow-pos--bottom-left .swiper-button-next {
+  top: auto !important;
+  bottom: 12px !important;
+  left: 68px !important;
+  right: auto !important;
+  transform: none !important;
+}
+
+/* 6. Top Right Corner Position */
+.shop-builder-arrow-pos--top-right .swiper-button-prev {
+  top: 16px !important;
+  bottom: auto !important;
+  left: auto !important;
+  right: 68px !important;
+  transform: none !important;
+}
+
+.shop-builder-arrow-pos--top-right .swiper-button-next {
+  top: 16px !important;
+  bottom: auto !important;
+  right: 16px !important;
+  transform: none !important;
+}
+
+/* 7. Top Left Corner Position */
+.shop-builder-arrow-pos--top-left .swiper-button-prev {
+  top: 16px !important;
+  bottom: auto !important;
+  left: 16px !important;
+  right: auto !important;
+  transform: none !important;
+}
+
+.shop-builder-arrow-pos--top-left .swiper-button-next {
+  top: 16px !important;
+  bottom: auto !important;
+  left: 68px !important;
+  right: auto !important;
+  transform: none !important;
+}
+
+/* ============================================================
+   Swiper Pagination Overrides
+   ============================================================ */
+
+/* ── Base pagination container ── */
+.shop-builder-swiper .swiper-pagination {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  z-index: 25 !important;
+  pointer-events: auto !important;
+}
+
+/* Default: overlay inside at the bottom */
+.shop-builder-pag-pos--overlay .swiper-pagination,
+.shop-builder-pag-pos--overlay-bottom .swiper-pagination,
+.shop-builder-swiper:not([class*="shop-builder-pag-pos--"]) .swiper-pagination {
+  position: absolute !important;
+  bottom: 14px !important;
+  top: auto !important;
+  left: 0 !important;
+  right: 0 !important;
+  width: 100% !important;
+  justify-content: center !important;
+}
+
+.shop-builder-pag-pos--overlay-left .swiper-pagination {
+  position: absolute !important;
+  bottom: 14px !important;
+  top: auto !important;
+  left: 16px !important;
+  right: auto !important;
+  justify-content: flex-start !important;
+}
+
+.shop-builder-pag-pos--overlay-right .swiper-pagination {
+  position: absolute !important;
+  bottom: 14px !important;
+  top: auto !important;
+  left: auto !important;
+  right: 16px !important;
+  justify-content: flex-end !important;
+}
+
+.shop-builder-pag-pos--overlay-top .swiper-pagination {
+  position: absolute !important;
+  top: 14px !important;
+  bottom: auto !important;
+  left: 0 !important;
+  right: 0 !important;
+  width: 100% !important;
+  justify-content: center !important;
+}
+
+/* Below slider variants */
+.shop-builder-pag-pos--bottom .swiper-pagination,
+.shop-builder-pag-pos--bottom-center .swiper-pagination {
+  position: relative !important;
+  bottom: unset !important;
+  margin-top: 16px !important;
+  width: 100% !important;
+  justify-content: center !important;
+}
+
+.shop-builder-pag-pos--bottom-left .swiper-pagination {
+  position: relative !important;
+  bottom: unset !important;
+  margin-top: 16px !important;
+  width: 100% !important;
+  justify-content: flex-start !important;
+  padding-left: 8px !important;
+}
+
+.shop-builder-pag-pos--bottom-right .swiper-pagination {
+  position: relative !important;
+  bottom: unset !important;
+  margin-top: 16px !important;
+  width: 100% !important;
+  justify-content: flex-end !important;
+  padding-right: 8px !important;
+}
+
+/* Above slider variants */
+.shop-builder-pag-pos--top .swiper-pagination,
+.shop-builder-pag-pos--top-center .swiper-pagination,
+.shop-builder-pag-pos--top-left .swiper-pagination,
+.shop-builder-pag-pos--top-right .swiper-pagination {
+  position: relative !important;
+  bottom: unset !important;
+  margin-bottom: 16px !important;
+  width: 100% !important;
+}
+
+/* Wrapper flex ordering for top position */
+.shop-builder-pag-pos--top,
+.shop-builder-pag-pos--top-center,
+.shop-builder-pag-pos--top-left,
+.shop-builder-pag-pos--top-right {
+  display: flex;
+  flex-direction: column;
+}
+
+.shop-builder-pag-pos--top .swiper-pagination,
+.shop-builder-pag-pos--top-center .swiper-pagination {
+  order: -1;
+  justify-content: center !important;
+}
+
+.shop-builder-pag-pos--top-left .swiper-pagination {
+  order: -1;
+  justify-content: flex-start !important;
+  padding-left: 8px !important;
+}
+
+.shop-builder-pag-pos--top-right .swiper-pagination {
+  order: -1;
+  justify-content: flex-end !important;
+  padding-right: 8px !important;
+}
+
+/* ── Bullet base ── */
+.shop-builder-swiper .swiper-pagination-bullet {
+  margin: 0 !important;
+  width: 8px;
+  height: 8px;
+  border-radius: 9999px;
+  background: rgba(15, 23, 42, 0.3);
+  opacity: 1;
+  transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+}
+
+.shop-builder-swiper--hero .swiper-pagination-bullet {
+  background: rgba(255, 255, 255, 0.45);
+}
+
+.shop-builder-swiper .swiper-pagination-bullet-active {
+  background: #0f172a !important;
+}
+
+.shop-builder-swiper--hero .swiper-pagination-bullet-active {
+  background: #ffffff !important;
+}
+
+/* ── Simple Dots — static size, color-only change ── */
+.shop-builder-pag--simple-dots .swiper-pagination-bullet {
+  width: 7px;
+  height: 7px;
+  background: rgba(100, 116, 139, 0.4);
+  border-radius: 50%;
+}
+
+.shop-builder-pag--simple-dots .swiper-pagination-bullet-active {
+  background: #334155 !important;
+  transform: none !important;
+}
+
+.shop-builder-swiper--hero.shop-builder-pag--simple-dots .swiper-pagination-bullet {
+  background: rgba(255, 255, 255, 0.35);
+}
+
+.shop-builder-swiper--hero.shop-builder-pag--simple-dots .swiper-pagination-bullet-active {
+  background: rgba(255, 255, 255, 0.95) !important;
+}
+
+/* ── Minimal Dots — gentle scale on active ── */
+.shop-builder-pag--minimal-dots .swiper-pagination-bullet {
+  width: 8px;
+  height: 8px;
+}
+
+.shop-builder-pag--minimal-dots .swiper-pagination-bullet-active {
+  transform: scale(1.4) !important;
+}
+
+/* ── Expanding Pills — active dot widens into a pill ── */
+.shop-builder-pag--expanding-pills .swiper-pagination-bullet {
+  width: 8px;
+  height: 8px;
+}
+
+.shop-builder-pag--expanding-pills .swiper-pagination-bullet-active {
+  width: 26px !important;
+  border-radius: 9999px !important;
+}
+
+/* ── Fraction Counter — elegant floating card ── */
+.shop-builder-swiper .swiper-pagination-fraction {
+  /* reset bullet container styles */
+  gap: 0 !important;
+  /* floating card */
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: auto !important;
+  max-width: max-content !important;
+  margin: 0 auto !important;
+  padding: 6px 18px !important;
+  border-radius: 12px !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.03em !important;
+  line-height: 1 !important;
+  pointer-events: none !important;
+  /* light-mode card */
+  background: rgba(255, 255, 255, 0.92) !important;
+  border: 1px solid rgba(15, 23, 42, 0.1) !important;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.06) !important;
+  color: #0f172a !important;
+  backdrop-filter: blur(8px) !important;
+}
+
+/* Dark background variant (hero slides) */
+.shop-builder-swiper--hero .swiper-pagination-fraction {
+  background: rgba(15, 23, 42, 0.75) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.3) !important;
+  color: #ffffff !important;
+}
+
+/* Current number is larger */
+.shop-builder-swiper .swiper-pagination-current {
+  font-size: 20px !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+  letter-spacing: -0.02em !important;
+  color: inherit !important;
+}
+
+/* Separator */
+.shop-builder-swiper .swiper-pagination-fraction::before {
+  display: none !important;
+}
+
+.shop-builder-swiper .swiper-pagination-total {
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  opacity: 0.55 !important;
+  margin-left: 4px !important;
+  color: inherit !important;
+  align-self: flex-end !important;
+  padding-bottom: 2px !important;
+}
+
+/* ── Progress Line ── */
+.shop-builder-swiper .swiper-pagination-progressbar {
+  background: rgba(15, 23, 42, 0.12) !important;
+  border-radius: 9999px !important;
+  overflow: hidden !important;
+  height: 4px !important;
+  width: 100% !important;
+}
+
+.shop-builder-swiper .swiper-pagination-progressbar-fill {
+  background: #0f172a !important;
+  border-radius: 9999px !important;
+}
+
+.shop-builder-swiper--hero .swiper-pagination-progressbar {
+  background: rgba(255, 255, 255, 0.2) !important;
+}
+
+.shop-builder-swiper--hero .swiper-pagination-progressbar-fill {
+  background: #ffffff !important;
+}
+
+/* Progress overlay position (inside, at bottom) */
+.shop-builder-pag--progress.shop-builder-pag-pos--overlay .swiper-pagination-progressbar,
+.shop-builder-pag--progress:not(.shop-builder-pag-pos--top):not(.shop-builder-pag-pos--bottom) .swiper-pagination-progressbar {
+  position: absolute !important;
+  bottom: 0 !important;
+  top: unset !important;
+  left: 0 !important;
+  right: 0 !important;
+  width: 100% !important;
+  border-radius: 0 !important;
+  height: 3px !important;
+}
+
+/* Progress above slider */
+.shop-builder-pag--progress.shop-builder-pag-pos--top .swiper-pagination-progressbar {
+  position: relative !important;
+  top: unset !important;
+  height: 4px !important;
+  border-radius: 9999px !important;
+}
+
+/* Progress below slider */
+.shop-builder-pag--progress.shop-builder-pag-pos--bottom .swiper-pagination-progressbar {
+  position: relative !important;
+  top: unset !important;
+  height: 4px !important;
+  border-radius: 9999px !important;
 }
 
 .shop-builder-thumbs-wrapper {
@@ -14967,4 +15637,36 @@ body:has([data-scoped-builder-root])
 .swiper-slide-thumb-active .shop-builder-thumb-item {
   border-color: #3b82f6;
   box-shadow: 0 0 12px rgba(59, 130, 246, 0.4);
+}
+
+/* Fix Swiper 3D Slide Shadow Corner Tint Clipping */
+.shop-builder-swiper .swiper-slide {
+  border-radius: var(--builder-card-radius, 16px) !important;
+  overflow: hidden !important;
+}
+
+.shop-builder-swiper [class*="swiper-slide-shadow"] {
+  border-radius: var(--builder-card-radius, 16px) !important;
+  overflow: hidden !important;
+}
+
+/* Hide text content on non-active slides in single-slide/3D modes to prevent dashboard overlap */
+.shop-builder-swiper--3d .swiper-slide:not(.swiper-slide-active) .shop-builder-slide-content,
+.shop-builder-swiper--3d .swiper-slide:not(.swiper-slide-active) .shop-builder-swiper-content,
+.shop-builder-swiper--thumbs .swiper-slide:not(.swiper-slide-active) .shop-builder-slide-content,
+.shop-builder-swiper--hero .swiper-slide:not(.swiper-slide-active) .shop-builder-swiper-content,
+.shop-builder-swiper--fade .swiper-slide:not(.swiper-slide-active) .shop-builder-slide-content {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  transition: opacity 0.25s ease, visibility 0.25s ease;
+}
+
+.shop-builder-swiper--3d .swiper-slide-active .shop-builder-slide-content,
+.shop-builder-swiper--3d .swiper-slide-active .shop-builder-swiper-content,
+.shop-builder-swiper--thumbs .swiper-slide-active .shop-builder-slide-content,
+.shop-builder-swiper--hero .swiper-slide-active .shop-builder-swiper-content,
+.shop-builder-swiper--fade .swiper-slide-active .shop-builder-slide-content {
+  opacity: 1 !important;
+  visibility: visible !important;
 }

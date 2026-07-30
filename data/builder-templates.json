@@ -1,5 +1,402 @@
 [
   {
+    "id": "row-1-ms7kywi0-i6k6",
+    "title": "Row 1",
+    "templateType": "row",
+    "description": "Row template saved from Home",
+    "sourcePage": "home",
+    "sections": [
+      {
+        "id": "contentLayout-ms7kywgw-wk5br",
+        "kind": "contentLayout",
+        "title": "Row 1",
+        "background": "#ffffff",
+        "backgroundMode": "boxed",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "topSpacing": "inherit",
+        "bottomSpacing": "inherit",
+        "topMargin": "inherit",
+        "bottomMargin": "inherit",
+        "pullUnderHeader": false,
+        "visible": true,
+        "eyebrow": "",
+        "body": "",
+        "layout": "whole",
+        "layoutColumns": 1,
+        "layoutItems": [
+          {
+            "id": "layout-item-ms7kywgw-row-template-0",
+            "rowId": "layout-row-ms7kywgw-template",
+            "rowLayout": "whole",
+            "blocks": []
+          }
+        ],
+        "layoutRows": 1
+      }
+    ],
+    "updatedAt": "2026-07-30T13:59:59.496Z"
+  },
+  {
+    "id": "hero-ms7a7axi-aumb",
+    "title": "Hero",
+    "templateType": "element",
+    "description": "Element template saved from slider tests",
+    "sourcePage": "page:slider-tests",
+    "sections": [
+      {
+        "id": "contentLayout-ms7a7awy-52zsy",
+        "kind": "contentLayout",
+        "title": "Hero",
+        "background": "#ffffff",
+        "backgroundMode": "boxed",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "topSpacing": "inherit",
+        "bottomSpacing": "inherit",
+        "topMargin": "inherit",
+        "bottomMargin": "inherit",
+        "pullUnderHeader": false,
+        "visible": true,
+        "eyebrow": "",
+        "body": "",
+        "layout": "whole",
+        "layoutColumns": 1,
+        "layoutItems": [
+          {
+            "id": "layout-item-ms7a7awy-template-element",
+            "rowId": "layout-row-ms7a7awy-1",
+            "rowLayout": "whole",
+            "blocks": [
+              {
+                "id": "hero-block-ms7a7awy-7tc1n",
+                "kind": "hero",
+                "eyebrow": "New page",
+                "title": "Slider Tests",
+                "body": "Introduce this page with a clear headline, useful context, and a focused next step.",
+                "buttonLabel": "Get Started",
+                "buttonUrl": "#",
+                "buttonStyle": "primary",
+                "elementPadding": "lg"
+              }
+            ]
+          }
+        ],
+        "layoutRows": 1
+      }
+    ],
+    "updatedAt": "2026-07-30T08:58:35.670Z"
+  },
+  {
+    "id": "swiper-carousel-ms79jnpg-zir2",
+    "title": "Swiper / Carousel",
+    "templateType": "element",
+    "description": "Element template saved from Home",
+    "sourcePage": "home",
+    "sections": [
+      {
+        "id": "contentLayout-ms79jnon-9ulrr",
+        "kind": "contentLayout",
+        "title": "Swiper / Carousel",
+        "background": "#ffffff",
+        "backgroundMode": "boxed",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "topSpacing": "inherit",
+        "bottomSpacing": "inherit",
+        "topMargin": "inherit",
+        "bottomMargin": "inherit",
+        "pullUnderHeader": false,
+        "visible": true,
+        "eyebrow": "",
+        "body": "",
+        "layout": "whole",
+        "layoutColumns": 1,
+        "layoutItems": [
+          {
+            "id": "layout-item-ms79jnon-template-element",
+            "rowId": "layout-row-ms79jnon-1",
+            "rowLayout": "whole",
+            "blocks": [
+              {
+                "id": "slider-block-ms79jnoo-7c6is",
+                "kind": "slider",
+                "title": "Explore what makes the difference",
+                "body": "Use a clear visual sequence to introduce services, benefits, projects, or important ideas.",
+                "slides": [
+                  {
+                    "id": "slider-block-ms79jgux-6vish-slide-1",
+                    "badge": "01",
+                    "title": "A point of view, made visible",
+                    "text": "Translate the character of the business into a visual direction that feels confident, relevant, and recognizably yours.",
+                    "imageUrl": "https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=1200&auto=format&fit=crop",
+                    "imageAlt": "Editorial image illustrating a distinctive creative direction",
+                    "imagePadding": "medium"
+                  },
+                  {
+                    "id": "slider-block-ms79jgux-6vish-slide-2",
+                    "badge": "02",
+                    "title": "A journey designed around people",
+                    "text": "Give every visitor a clear sense of where they are, what matters, and the most useful action to take next.",
+                    "imageUrl": "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=1200&auto=format&fit=crop",
+                    "imageAlt": "Editorial image illustrating a clear customer journey",
+                    "imagePadding": "medium"
+                  },
+                  {
+                    "id": "slider-block-ms79jgux-6vish-slide-3",
+                    "badge": "03",
+                    "title": "A system ready to evolve",
+                    "text": "Create flexible foundations that keep the experience consistent as new stories, services, and ambitions are added.",
+                    "imageUrl": "https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=1200&auto=format&fit=crop",
+                    "imageAlt": "Editorial image illustrating a flexible design system",
+                    "imagePadding": "medium"
+                  }
+                ],
+                "carouselSettings": {
+                  "variant": "showcase",
+                  "loop": true,
+                  "autoplay": false,
+                  "autoplayDelayMs": 5000,
+                  "align": "start",
+                  "dragFree": false,
+                  "effect": "slide",
+                  "spaceBetween": 24,
+                  "coverflowRotate": 34,
+                  "coverflowDepth": 140,
+                  "coverflowStretch": 0,
+                  "cardsRotate": true,
+                  "cardsShadows": true,
+                  "creativePreset": "soft-stack",
+                  "fadeCrossFade": true,
+                  "freeModeMomentum": true,
+                  "cardsPerView": 1,
+                  "showArrows": true,
+                  "showDots": true,
+                  "pauseOnHover": true
+                },
+                "elementPadding": "sm",
+                "typography": {
+                  "eyebrow": {
+                    "variant": "subheading",
+                    "fontSize": "12px",
+                    "fontWeight": "700",
+                    "lineHeight": "1.2",
+                    "letterSpacing": "0.12em",
+                    "textTransform": "uppercase"
+                  },
+                  "title": {
+                    "variant": "heading",
+                    "fontSize": "clamp(28px, 3vw, 46px)",
+                    "fontWeight": "720",
+                    "lineHeight": "1.06",
+                    "letterSpacing": "-0.025em"
+                  },
+                  "body": {
+                    "variant": "body",
+                    "fontSize": "16px",
+                    "fontWeight": "400",
+                    "lineHeight": "1.7"
+                  },
+                  "button": {
+                    "variant": "button",
+                    "fontSize": "14px",
+                    "fontWeight": "700",
+                    "lineHeight": "1",
+                    "letterSpacing": "0.01em"
+                  }
+                },
+                "visualStyle": {
+                  "customClass": "builder-premium-starter",
+                  "card": {
+                    "preset": "elevated",
+                    "hoverPreset": "lift-soft",
+                    "imageRatio": "4:5",
+                    "imageFit": "cover",
+                    "imageRadius": "14px",
+                    "titleSize": "clamp(22px, 2vw, 30px)",
+                    "titleWeight": "720",
+                    "titleMargin": "0",
+                    "metaSize": "11px",
+                    "metaTransform": "uppercase",
+                    "metaSpacing": "0",
+                    "contentSize": "15px",
+                    "contentLineHeight": "1.65",
+                    "buttonMargin": "8px 0 0",
+                    "cardGap": "14px",
+                    "cardPadding": "clamp(20px, 2.4vw, 30px)"
+                  },
+                  "border": {
+                    "radius": "18px"
+                  }
+                }
+              }
+            ]
+          }
+        ],
+        "layoutRows": 1
+      }
+    ],
+    "updatedAt": "2026-07-30T08:40:12.484Z"
+  },
+  {
+    "id": "swiper-carousel-ms785229-dz35",
+    "title": "Swiper / Carousel",
+    "templateType": "element",
+    "description": "Element template saved from Home",
+    "sourcePage": "home",
+    "sections": [
+      {
+        "id": "contentLayout-ms78521o-0a7qt",
+        "kind": "contentLayout",
+        "title": "Swiper / Carousel",
+        "background": "#ffffff",
+        "backgroundMode": "boxed",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "topSpacing": "inherit",
+        "bottomSpacing": "inherit",
+        "topMargin": "inherit",
+        "bottomMargin": "inherit",
+        "pullUnderHeader": false,
+        "visible": true,
+        "eyebrow": "",
+        "body": "",
+        "layout": "whole",
+        "layoutColumns": 1,
+        "layoutItems": [
+          {
+            "id": "layout-item-ms78521p-template-element",
+            "rowId": "layout-row-ms78521o-1",
+            "rowLayout": "whole",
+            "blocks": [
+              {
+                "id": "slider-block-ms78521p-jisaf",
+                "kind": "slider",
+                "title": "Explore what makes the difference",
+                "body": "Use a clear visual sequence to introduce services, benefits, projects, or important ideas.",
+                "slides": [
+                  {
+                    "id": "slider-block-ms77zhaj-n8abn-slide-1",
+                    "badge": "01",
+                    "title": "A point of view, made visible",
+                    "text": "Translate the character of the business into a visual direction that feels confident, relevant, and recognizably yours.",
+                    "imageUrl": "https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=1200&auto=format&fit=crop",
+                    "imageAlt": "Editorial image illustrating a distinctive creative direction",
+                    "imagePadding": "medium"
+                  },
+                  {
+                    "id": "slider-block-ms77zhaj-n8abn-slide-2",
+                    "badge": "02",
+                    "title": "A journey designed around people",
+                    "text": "Give every visitor a clear sense of where they are, what matters, and the most useful action to take next.",
+                    "imageUrl": "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=1200&auto=format&fit=crop",
+                    "imageAlt": "Editorial image illustrating a clear customer journey",
+                    "imagePadding": "medium"
+                  },
+                  {
+                    "id": "slider-block-ms77zhaj-n8abn-slide-3",
+                    "badge": "03",
+                    "title": "A system ready to evolve",
+                    "text": "Create flexible foundations that keep the experience consistent as new stories, services, and ambitions are added.",
+                    "imageUrl": "https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=1200&auto=format&fit=crop",
+                    "imageAlt": "Editorial image illustrating a flexible design system",
+                    "imagePadding": "medium"
+                  },
+                  {
+                    "id": "nested-slide-ms783qd3",
+                    "badge": "04",
+                    "title": "Slide 4",
+                    "text": "Edit this nested slider slide.",
+                    "imagePadding": "medium"
+                  }
+                ],
+                "carouselSettings": {
+                  "variant": "fade",
+                  "loop": true,
+                  "autoplay": false,
+                  "autoplayDelayMs": 5000,
+                  "align": "start",
+                  "dragFree": false,
+                  "effect": "slide",
+                  "spaceBetween": 24,
+                  "coverflowRotate": 34,
+                  "coverflowDepth": 140,
+                  "coverflowStretch": 0,
+                  "cardsRotate": true,
+                  "cardsShadows": true,
+                  "creativePreset": "soft-stack",
+                  "fadeCrossFade": true,
+                  "freeModeMomentum": true,
+                  "cardsPerView": 1,
+                  "showArrows": true,
+                  "showDots": true,
+                  "pauseOnHover": true
+                },
+                "elementPadding": "sm",
+                "typography": {
+                  "eyebrow": {
+                    "variant": "subheading",
+                    "fontSize": "12px",
+                    "fontWeight": "700",
+                    "lineHeight": "1.2",
+                    "letterSpacing": "0.12em",
+                    "textTransform": "uppercase"
+                  },
+                  "title": {
+                    "variant": "heading",
+                    "fontSize": "clamp(28px, 3vw, 46px)",
+                    "fontWeight": "720",
+                    "lineHeight": "1.06",
+                    "letterSpacing": "-0.025em"
+                  },
+                  "body": {
+                    "variant": "body",
+                    "fontSize": "16px",
+                    "fontWeight": "400",
+                    "lineHeight": "1.7"
+                  },
+                  "button": {
+                    "variant": "button",
+                    "fontSize": "14px",
+                    "fontWeight": "700",
+                    "lineHeight": "1",
+                    "letterSpacing": "0.01em"
+                  }
+                },
+                "visualStyle": {
+                  "customClass": "builder-premium-starter",
+                  "card": {
+                    "preset": "elevated",
+                    "hoverPreset": "lift-soft",
+                    "imageRatio": "4:5",
+                    "imageFit": "cover",
+                    "imageRadius": "14px",
+                    "titleSize": "clamp(22px, 2vw, 30px)",
+                    "titleWeight": "720",
+                    "titleMargin": "0",
+                    "metaSize": "11px",
+                    "metaTransform": "uppercase",
+                    "metaSpacing": "0",
+                    "contentSize": "15px",
+                    "contentLineHeight": "1.65",
+                    "buttonMargin": "8px 0 0",
+                    "cardGap": "14px",
+                    "cardPadding": "clamp(20px, 2.4vw, 30px)"
+                  },
+                  "border": {
+                    "radius": "18px"
+                  }
+                }
+              }
+            ]
+          }
+        ],
+        "layoutRows": 1
+      }
+    ],
+    "updatedAt": "2026-07-30T08:00:51.633Z"
+  },
+  {
     "id": "swiper-carousel-ms76okex-t0os",
     "title": "Swiper / Carousel",
     "templateType": "element",

@@ -1,0 +1,182 @@
+{
+  "headerVisible": true,
+  "topToolbarVisible": false,
+  "topToolbarText": "Fast support & setup by Webpages",
+  "topToolbarPhone": "+374 xx xx xx",
+  "topToolbarMeta": "AMD ֏",
+  "headerBackgroundMode": "none",
+  "headerTextMode": "auto",
+  "headerLayout": "two-row",
+  "headerBrandMode": "logo",
+  "headerBrandText": "WebPages",
+  "headerLogoUrl": "https://cms.webpages.am/wp-content/uploads/2026/06/logo-2-1-scaled.png",
+  "headerLogoAlt": "WebPages logo",
+  "headerLogoMaxWidth": 300,
+  "headerButtonLabel": "Start",
+  "headerButtonUrl": "/client",
+  "headerIconVariant": "muted",
+  "headerIconOrder": [
+    "wishlist",
+    "cart",
+    "account",
+    "theme",
+    "search"
+  ],
+  "headerActiveIndicator": "princity",
+  "headerBehavior": "sticky-on-scroll-up",
+  "headerTransparent": true,
+  "headerOverlay": true,
+  "headerWidthMode": "boxed",
+  "headerHeight": "compact",
+  "headerZIndex": 40,
+  "sectionPaddingTop": "large",
+  "sectionPaddingBottom": "large",
+  "sectionMarginTop": "none",
+  "sectionMarginBottom": "none",
+  "rowPaddingTop": "md",
+  "rowPaddingBottom": "md",
+  "rowMarginTop": "none",
+  "rowMarginBottom": "none",
+  "rowGap": "lg",
+  "columnGap": "md",
+  "elementPaddingTop": "sm",
+  "elementPaddingRight": "sm",
+  "elementPaddingBottom": "sm",
+  "elementPaddingLeft": "sm",
+  "elementMarginTop": "none",
+  "elementMarginRight": "none",
+  "elementMarginBottom": "none",
+  "elementMarginLeft": "none",
+  "menuPresentation": {
+    "cG9zdDo1MzQ2": {
+      "showHeading": false,
+      "icon": "home",
+      "submenuLayout": "list",
+      "submenuColumns": 3,
+      "badgeText": null
+    },
+    "cG9zdDo4MQ==": {
+      "showHeading": false,
+      "icon": null,
+      "submenuLayout": "list",
+      "submenuColumns": 3,
+      "badgeText": null
+    },
+    "cG9zdDo3OQ==": {
+      "showHeading": false,
+      "icon": null,
+      "submenuLayout": "list",
+      "submenuColumns": 3,
+      "badgeText": null
+    },
+    "cG9zdDo3Nw==": {
+      "showHeading": false,
+      "icon": null,
+      "submenuLayout": "grid",
+      "submenuColumns": 3,
+      "badgeText": null
+    },
+    "cG9zdDo1NTA3": {
+      "showHeading": false,
+      "icon": null,
+      "submenuLayout": "list",
+      "submenuColumns": 3,
+      "badgeText": null
+    }
+  },
+  "storefrontPreset": "elevated",
+  "primaryColor": "#d7ff63",
+  "accentColor": "#d7ff63",
+  "productCardRadius": "10px",
+  "productCardBg": "#24241f",
+  "productCardShadow": "0 16px 40px rgba(0, 0, 0, 0.3)",
+  "productCardShadowHover": "0 22px 54px rgba(0, 0, 0, 0.42)",
+  "productCardMinHeight": "0px",
+  "productCardMaxWidth": "100%",
+  "productImageWidth": "100%",
+  "productImageHeight": "270px",
+  "productImageMaxWidth": "100%",
+  "productImageMaxHeight": "100%",
+  "productImageAspectRatio": "auto",
+  "productImageNoPadding": false,
+  "productImagePadding": "clamp(22px, 2.4vw, 36px)",
+  "productImageObjectFit": "contain",
+  "buttonBg": "#d7ff63",
+  "buttonTextColor": "#101010",
+  "buttonBorderRadius": "999px",
+  "buttonBorderWidth": "1px",
+  "buttonBorderColor": "#d7ff63",
+  "buttonPaddingY": "11px",
+  "buttonPaddingX": "20px",
+  "buttonFontWeight": "780",
+  "buttonLetterSpacing": "0px",
+  "buttonHoverBg": "#f1ffad",
+  "buttonHoverTextColor": "#101010",
+  "buttonHoverBorderColor": "#f1ffad",
+  "buttonHoverEffect": "lift",
+  "menuItems": [
+    {
+      "id": "menu_nlbej8tax",
+      "label": "New Clean Page",
+      "url": "/new-clean-page",
+      "parentId": null
+    },
+    {
+      "id": "home",
+      "label": "Գլխավոր",
+      "url": "/",
+      "parentId": null
+    },
+    {
+      "id": "menu_sbyhyzc43",
+      "label": "Օրինակներ",
+      "url": "/demos",
+      "parentId": null
+    },
+    {
+      "id": "menu_c8gxt1zuo",
+      "label": "Cart",
+      "url": "/cart",
+      "parentId": "menu_sbyhyzc43"
+    },
+    {
+      "id": "menu_xrvt3q0ps",
+      "label": "My Account",
+      "url": "/my-account",
+      "parentId": "menu_sbyhyzc43"
+    },
+    {
+      "id": "menu_s2il6v58h",
+      "label": "Builder",
+      "url": "/builder",
+      "parentId": "menu_sbyhyzc43"
+    },
+    {
+      "id": "menu_6hb0ecunh",
+      "label": "Վճարում",
+      "url": "/checkout",
+      "parentId": "menu_sbyhyzc43"
+    },
+    {
+      "id": "menu_07porwk43",
+      "label": "Fashion Store",
+      "url": "/fashion-store",
+      "parentId": "menu_sbyhyzc43"
+    },
+    {
+      "id": "menu_3fwu3xn75",
+      "label": "Furniture Store",
+      "url": "/furniture-store",
+      "parentId": "menu_sbyhyzc43"
+    },
+    {
+      "id": "shop",
+      "label": "Խանութ",
+      "url": "/shop",
+      "parentId": null
+    }
+  ],
+  "headerSticky": true,
+  "updatedAt": "2026-07-30T16:50:23.747Z",
+  "headerCustomHeight": 92
+}

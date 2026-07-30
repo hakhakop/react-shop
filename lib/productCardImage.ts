@@ -1,7 +1,7 @@
 import type { CSSProperties } from "react";
 
 export type ProductImageFit = "contain" | "cover" | "fill";
-export type ProductImageRatio = "auto" | "square" | "4:5" | "3:4";
+export type ProductImageRatio = "auto" | "square" | "4:5" | "3:4" | "16:9";
 
 export function getProductImageStyleVars(
   fit?: ProductImageFit | null,
@@ -16,7 +16,7 @@ export function getProductImageStyleVars(
   if (ratio && ratio !== "auto") {
     style["--product-image-height"] = "auto";
     style["--product-image-aspect-ratio"] =
-      ratio === "square" ? "1 / 1" : ratio === "4:5" ? "4 / 5" : "3 / 4";
+      ratio === "square" ? "1 / 1" : ratio === "4:5" ? "4 / 5" : ratio === "3:4" ? "3 / 4" : "16 / 9";
   }
 
   return style;

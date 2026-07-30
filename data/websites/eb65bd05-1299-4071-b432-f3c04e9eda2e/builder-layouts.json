@@ -790,13 +790,12 @@
           }
         ],
         "visible": true,
-        "headerPresetKey": "hero",
         "headerArchitectureVersion": 2,
         "headerVisible": true,
         "headerTransparent": true,
         "headerOverlay": true,
         "headerLayout": "hero",
-        "headerBehavior": "sticky-on-scroll-up",
+        "headerBehavior": "sticky",
         "headerWidthMode": "full",
         "headerBackgroundMode": "accent",
         "headerTextMode": "light",
@@ -808,7 +807,7 @@
         "headerHeight": "compact"
       }
     ],
-    "updatedAt": "2026-07-23T06:32:25.380Z"
+    "updatedAt": "2026-07-30T15:22:24.204Z"
   },
   "footer": {
     "version": 1,

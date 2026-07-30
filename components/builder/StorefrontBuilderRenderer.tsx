@@ -2729,6 +2729,9 @@ function ContentLayoutBlock({
       lineHeight: "var(--builder-card-content-line-height, inherit)",
       maxWidth: "var(--builder-card-content-max-width, none)",
     } as CSSProperties;
+    const isPanelFrameless = block.imagePadding === "frameless" || block.imagePadding === "none" || !block.imagePadding;
+    const panelMediaAspect = getBuilderImageAspectRatio(block.imageRatio) || "16 / 9";
+
     return (
       <div className="shop-builder-column-block shop-builder-column-block--panel">
         {block.imageUrl && (
@@ -2736,7 +2739,16 @@ function ContentLayoutBlock({
             className="shop-builder-panel-media"
             role="img"
             aria-label={block.imageAlt || block.title || "Panel image"}
-            style={{ backgroundImage: `url(${block.imageUrl})` }}
+            style={{
+              aspectRatio: panelMediaAspect,
+              borderRadius: isPanelFrameless ? "16px 16px 0 0" : "16px",
+              margin: isPanelFrameless ? "-24px -24px 20px -24px" : "0 0 20px 0",
+              position: "relative",
+              overflow: "hidden",
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+              backgroundImage: `url(${block.imageUrl})`,
+            }}
           />
         )}
         <div>
