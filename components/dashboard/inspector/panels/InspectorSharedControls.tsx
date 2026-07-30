@@ -1,7 +1,7 @@
 "use client";
 
 import React, { ChangeEvent } from "react";
-import { GalleryHorizontal, Sliders } from "lucide-react";
+import { GalleryHorizontal, Sliders, Image as ImageIcon } from "lucide-react";
 import {
   resolveBuilderSpacing,
   BUILDER_SPACING_SCALE,
@@ -178,10 +178,28 @@ export function BuilderImageUrlControl({
   onChange: (event: ChangeEvent<HTMLInputElement>) => void;
   onChoose: () => void;
 }) {
+  const hasImage = Boolean(value && value.trim());
+
   return (
     <div className="builder-media-url-row">
-      <input value={value} placeholder={placeholder} onChange={onChange} />
-      <button type="button" onClick={onChoose}>
+      <div className="builder-media-url-input-wrap">
+        {hasImage ? (
+          <img
+            src={value}
+            alt="Preview"
+            className="builder-media-url-thumbnail"
+            onError={(e) => {
+              (e.target as HTMLElement).style.display = "none";
+            }}
+          />
+        ) : (
+          <div className="builder-media-url-thumbnail-empty">
+            <ImageIcon size={16} />
+          </div>
+        )}
+        <input value={value} placeholder={placeholder} onChange={onChange} />
+      </div>
+      <button type="button" onClick={onChoose} className="builder-media-url-choose-btn">
         <GalleryHorizontal size={14} />
         Library
       </button>

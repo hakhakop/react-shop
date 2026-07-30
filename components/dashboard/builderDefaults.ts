@@ -11,7 +11,6 @@ import type {
   SectionContentMode,
   SectionKind,
   SectionSpacing,
-  TypographySettings,
 } from "@/components/dashboard/builderTypes";
 import { sectionLabels } from "@/components/dashboard/builderRegistry";
 import { BUILDER_STRUCTURAL_DESIGN } from "@/lib/builderGeometry";
@@ -124,16 +123,68 @@ export const defaultState: BuilderState = {
   sections: [],
 };
 
-const defaultTypography: TypographySettings = {
-  variant: "body",
-  fontFamily: "inherit",
-  fontSize: "16px",
-  fontWeight: "400",
-  lineHeight: "1.4",
-  letterSpacing: "0px",
-  color: "inherit",
-  textAlign: "left",
+const PREMIUM_IMAGE_PLACEHOLDER = "/builder-image-placeholder.svg";
+
+const premiumContentTypography = {
+  eyebrow: {
+    variant: "subheading" as const,
+    fontSize: "12px",
+    fontWeight: "700",
+    lineHeight: "1.2",
+    letterSpacing: "0.12em",
+    textTransform: "uppercase" as const,
+  },
+  title: {
+    variant: "heading" as const,
+    fontSize: "clamp(28px, 3vw, 46px)",
+    fontWeight: "720",
+    lineHeight: "1.06",
+    letterSpacing: "-0.025em",
+  },
+  body: {
+    variant: "body" as const,
+    fontSize: "16px",
+    fontWeight: "400",
+    lineHeight: "1.7",
+  },
+  button: {
+    variant: "button" as const,
+    fontSize: "14px",
+    fontWeight: "700",
+    lineHeight: "1",
+    letterSpacing: "0.01em",
+  },
 };
+
+function premiumCardVisualStyle(options?: {
+  elevated?: boolean;
+  imageRatio?: "4:5" | "3:4" | "16:9" | "square";
+}) {
+  return {
+    customClass: "builder-premium-starter",
+    card: {
+      preset: options?.elevated ? ("elevated" as const) : ("soft" as const),
+      hoverPreset: "lift-soft" as const,
+      imageRatio: options?.imageRatio ?? ("4:5" as const),
+      imageFit: "cover" as const,
+      imageRadius: "14px",
+      titleSize: "clamp(22px, 2vw, 30px)",
+      titleWeight: "720",
+      titleMargin: "0",
+      metaSize: "11px",
+      metaTransform: "uppercase" as const,
+      metaSpacing: "0",
+      contentSize: "15px",
+      contentLineHeight: "1.65",
+      buttonMargin: "8px 0 0",
+      cardGap: "14px",
+      cardPadding: "clamp(20px, 2.4vw, 30px)",
+    },
+    border: {
+      radius: "18px",
+    },
+  };
+}
 
 export const defaultTemplateStates: Record<BuilderTemplate, BuilderState> = {
   "product-single": {
@@ -397,16 +448,16 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
     return {
       id,
       kind,
-      eyebrow: "PLATFORM OVERVIEW",
-      title: "Build beautiful websites without writing code",
-      body: "Create professional websites using a visual builder designed for speed, flexibility, and pixel-perfect control.",
-      buttonLabel: "Start Building",
+      eyebrow: "A considered digital presence",
+      title: "Turn a clear idea into a website people remember",
+      body: "Bring your story, services, and next steps together in a polished experience designed to earn attention and build trust.",
+      buttonLabel: "Start a Project",
       buttonUrl: "/",
       buttonStyle: "primary",
       buttons: [
         {
           id: `${id}-secondary-action`,
-          label: "Explore Templates",
+          label: "See Our Work",
           url: "/",
           target: "_self",
           style: "outline",
@@ -415,7 +466,8 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
       buttonsLayout: "inline",
       buttonGap: "0.75rem",
       elementAlign: "left",
-      elementPadding: "lg",
+      elementPadding: "xl",
+      typography: premiumContentTypography,
       carouselSettings: {
         variant: "default",
       },
@@ -426,12 +478,15 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
     return {
       id,
       kind,
-      eyebrow: "LIMITED TIME OFFER",
-      title: "Get 30% off your first year of Premium plan",
-      body: "Unlock advanced collaboration features, custom domain support, and priority hosting. Offer ends this week.",
-      buttonLabel: "Claim Discount",
+      eyebrow: "Now booking autumn projects",
+      title: "A sharper digital presence starts with one good conversation",
+      body: "Reserve a complimentary 30-minute planning session and leave with a clearer next step.",
+      buttonLabel: "Book a Session",
       buttonUrl: "/",
-      elementPadding: "sm",
+      buttonStyle: "primary",
+      elementPadding: "md",
+      typography: premiumContentTypography,
+      visualStyle: premiumCardVisualStyle(),
     };
   }
 
@@ -443,13 +498,17 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
       buttons: [
         {
           id: `btn-${Date.now().toString(36)}`,
-          label: "Start Free Trial",
+          label: "Schedule a Consultation",
           url: "/",
           target: "_self",
           style: "primary",
         }
       ],
-      elementPadding: "inherit",
+      buttonPaddingY: "0.9rem",
+      buttonPaddingX: "1.35rem",
+      buttonBorderRadius: "999px",
+      buttonFontWeight: "700",
+      elementPadding: "xs",
       elementBackgroundMode: "transparent",
     };
   }
@@ -476,34 +535,39 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
         {
           id: `${id}-1`,
           eyebrow: "01",
-          title: "Strategy & Consultation",
-          meta: "Align your objectives",
-          text: "Work with our experts to map out your digital product strategy and define key performance indicators.",
-          buttonLabel: "View Details",
+          title: "Strategy with a practical point of view",
+          meta: "Clarity before complexity",
+          text: "Define the audience, message, and priorities that will make every design decision easier.",
+          buttonLabel: "Explore Strategy",
           buttonUrl: "/",
-          typography: defaultTypography,
+          imageUrl: PREMIUM_IMAGE_PLACEHOLDER,
+          imageAlt: "Warm architectural forms representing strategic planning",
         },
         {
           id: `${id}-2`,
           eyebrow: "02",
-          title: "Design & Engineering",
-          meta: "High-fidelity execution",
-          text: "Create modern, responsive interfaces backed by scalable frontend architectures and design systems.",
-          buttonLabel: "See Our Work",
+          title: "Design that feels distinctive and effortless",
+          meta: "Made for real people",
+          text: "Shape a responsive experience with a strong visual rhythm and thoughtful interactions.",
+          buttonLabel: "View Selected Work",
           buttonUrl: "/",
-          typography: defaultTypography,
+          imageUrl: PREMIUM_IMAGE_PLACEHOLDER,
+          imageAlt: "Editorial composition representing interface design",
         },
         {
           id: `${id}-3`,
           eyebrow: "03",
-          title: "Growth & Optimization",
-          meta: "Scale your reach",
-          text: "Continuously optimize page speeds, SEO metadata, and conversion paths to maximize your ROI.",
-          buttonLabel: "Contact Us",
+          title: "A foundation designed to keep improving",
+          meta: "Built beyond launch",
+          text: "Measure what matters, refine the journey, and evolve the site as the business grows.",
+          buttonLabel: "Discuss Your Goals",
           buttonUrl: "/",
-          typography: defaultTypography,
+          imageUrl: PREMIUM_IMAGE_PLACEHOLDER,
+          imageAlt: "Abstract rising forms representing sustainable growth",
         },
       ],
+      typography: premiumContentTypography,
+      visualStyle: premiumCardVisualStyle({ elevated: true, imageRatio: "4:5" }),
     };
   }
 
@@ -511,16 +575,11 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
     return {
       id,
       kind,
-      headingText: "Ideas shaped into meaningful results",
+      headingText: "Thoughtful work creates momentum that lasts",
       headingLevel: "h2",
       headingAlign: "left",
-      typography: {
-        ...defaultTypography,
-        variant: "heading",
-        fontSize: "",
-        fontWeight: "",
-        lineHeight: "",
-      },
+      typography: premiumContentTypography,
+      elementPadding: "sm",
     };
   }
 
@@ -530,13 +589,15 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
       kind,
       title: "",
       body: "",
-      imageUrl: "/globe.svg",
-      imageAlt: "Abstract globe illustration",
+      imageUrl: PREMIUM_IMAGE_PLACEHOLDER,
+      imageAlt: "Modern editorial image placeholder",
       imageAlignment: "center",
-      imageMaxWidth: 960,
-      imageFit: "contain",
-      imageRatio: "square",
-      imageCaption: "",
+      imageMaxWidth: 1200,
+      imageFit: "cover",
+      imageRatio: "4:5",
+      imageBorderRadius: 18,
+      imageCaption: "A considered image can carry the story before a word is read.",
+      elementPadding: "xs",
     };
   }
 
@@ -544,16 +605,18 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
     return {
       id,
       kind,
-      title: "Pricing Comparison",
-      body: "Compare plan features and choose the right level of support for your team.",
-      tableHeadings: ["Feature", "Starter", "Professional", "Enterprise"],
+      title: "Choose the partnership that fits your next chapter",
+      body: "Every engagement begins with the same care; choose the level of collaboration your goals require.",
+      tableHeadings: ["What’s included", "Essential", "Signature", "Partnership"],
       tableRows: [
-        ["Custom Domains", "1 Domain", "5 Domains", "Unlimited"],
-        ["SSD Storage", "10 GB", "100 GB", "Dedicated"],
-        ["API Access", "None", "Standard", "Full Access"],
-        ["Support SLA", "Email", "24/7 Priority", "Dedicated Manager"],
+        ["Discovery workshop", "90 minutes", "Half day", "Full day"],
+        ["Design directions", "1 direction", "2 directions", "3 directions"],
+        ["Launch support", "7 days", "30 days", "90 days"],
+        ["Ongoing guidance", "By request", "Monthly", "Dedicated"],
       ],
       tableStyle: "striped",
+      elementPadding: "sm",
+      typography: premiumContentTypography,
     };
   }
 
@@ -561,14 +624,20 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
     return {
       id,
       kind,
-      eyebrow: "DESIGN SYSTEM",
-      title: "Maintain brand consistency across all pages",
-      body: "Define your global typography, color palettes, and spacing rules once. Our visual builder applies them dynamically to ensure a premium, unified experience.",
-      buttonLabel: "See Features",
+      eyebrow: "A more considered approach",
+      title: "Build a brand experience that feels unmistakably yours",
+      body: "From the first headline to the smallest interaction, every detail works together to create clarity, confidence, and recognition.",
+      buttonLabel: "Discover the Process",
       buttonUrl: "/",
-      imageUrl: "",
-      imageAlt: "",
-      elementPadding: BUILDER_STRUCTURAL_DESIGN.panel.padding,
+      buttonStyle: "primary",
+      imageUrl: PREMIUM_IMAGE_PLACEHOLDER,
+      imageAlt: "Editorial placeholder for a featured brand story",
+      imageRatio: "4:5",
+      imageFit: "cover",
+      panelStyle: "clean-shadow",
+      elementPadding: "lg",
+      typography: premiumContentTypography,
+      visualStyle: premiumCardVisualStyle({ elevated: true, imageRatio: "4:5" }),
     };
   }
 
@@ -579,7 +648,9 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
       eyebrow: "Featured selection",
       title: "Discover a product worth remembering",
       body: "Showcase the current product with its gallery, key details, price, options, and purchase action in one balanced introduction.",
-      elementPadding: "md",
+      elementPadding: "lg",
+      typography: premiumContentTypography,
+      visualStyle: premiumCardVisualStyle({ elevated: true, imageRatio: "4:5" }),
     };
   }
 
@@ -589,7 +660,8 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
       kind,
       title: "Everything you need to choose with confidence",
       body: "The current product title, price, description, options, and purchase action appear here automatically.",
-      elementPadding: "md",
+      elementPadding: "lg",
+      typography: premiumContentTypography,
     };
   }
 
@@ -599,7 +671,9 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
       kind,
       title: "Ready when you are",
       body: "A focused purchase panel using the current product price, available options, and add-to-cart action.",
-      elementPadding: "md",
+      elementPadding: "lg",
+      typography: premiumContentTypography,
+      visualStyle: premiumCardVisualStyle({ elevated: true }),
     };
   }
 
@@ -609,7 +683,9 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
       kind,
       title: "Product details",
       body: "Materials, dimensions, options, and other current product attributes are organized here automatically.",
-      elementPadding: "md",
+      elementPadding: "lg",
+      typography: premiumContentTypography,
+      visualStyle: premiumCardVisualStyle(),
     };
   }
 
@@ -623,6 +699,8 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
       galleryThumbnailPosition: "bottom",
       galleryImageFit: "contain",
       galleryHeight: 420,
+      elementPadding: "sm",
+      visualStyle: premiumCardVisualStyle({ imageRatio: "4:5" }),
     };
   }
 
@@ -632,6 +710,7 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
       kind,
       title: "Signature Everyday Collection",
       body: "The current product name appears here automatically.",
+      typography: premiumContentTypography,
     };
   }
 
@@ -641,6 +720,7 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
       kind,
       title: "$89.00",
       body: "The current product price and sale price appear here automatically.",
+      typography: premiumContentTypography,
     };
   }
 
@@ -650,7 +730,8 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
       kind,
       title: "Add to cart",
       body: "Let customers choose available options and add the current product to their cart.",
-      addToCartSize: "medium",
+      addToCartSize: "large",
+      elementPadding: "xs",
     };
   }
 
@@ -660,6 +741,7 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
       kind,
       title: "Details and specifications",
       body: "The current product’s materials, sizes, colors, and other attributes appear here automatically.",
+      typography: premiumContentTypography,
     };
   }
 
@@ -669,6 +751,7 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
       kind,
       title: "Made for everyday use",
       body: "The current product description appears here, giving customers the context they need before purchasing.",
+      typography: premiumContentTypography,
     };
   }
 
@@ -678,6 +761,8 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
       kind,
       title: "Your cart",
       body: "Review selected items, update quantities, and continue securely when you are ready.",
+      elementPadding: "md",
+      typography: premiumContentTypography,
     };
   }
 
@@ -687,6 +772,8 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
       kind,
       title: "Secure checkout",
       body: "Complete delivery and payment details through the live storefront checkout.",
+      elementPadding: "md",
+      typography: premiumContentTypography,
     };
   }
 
@@ -696,6 +783,8 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
       kind,
       title: "Your account",
       body: "Customers can review orders, manage account details, and keep their information up to date.",
+      elementPadding: "md",
+      typography: premiumContentTypography,
     };
   }
 
@@ -738,6 +827,8 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
         "Responsive presentation on every screen",
       ],
       listIcon: "circleCheck",
+      elementPadding: "lg",
+      typography: premiumContentTypography,
     };
   }
 
@@ -751,26 +842,29 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
         {
           id: `${id}-slide-1`,
           badge: "01",
-          title: "Enterprise Grade Security",
-          text: "Data protection is built into our core framework, ensuring your application remains safe and compliant.",
+          title: "A point of view, made visible",
+          text: "Translate the character of the business into a visual direction that feels confident, relevant, and recognizably yours.",
+          imageUrl: PREMIUM_IMAGE_PLACEHOLDER,
+          imageAlt: "Editorial placeholder illustrating a distinctive creative direction",
           imagePadding: "medium",
-          typography: defaultTypography,
         },
         {
           id: `${id}-slide-2`,
           badge: "02",
-          title: "Sub-Second Page Speeds",
-          text: "Serve content globally through optimized CDN networks, providing visitors with instant load times.",
+          title: "A journey designed around people",
+          text: "Give every visitor a clear sense of where they are, what matters, and the most useful action to take next.",
+          imageUrl: PREMIUM_IMAGE_PLACEHOLDER,
+          imageAlt: "Editorial placeholder illustrating a clear customer journey",
           imagePadding: "medium",
-          typography: defaultTypography,
         },
         {
           id: `${id}-slide-3`,
           badge: "03",
-          title: "Dedicated Asset Hosting",
-          text: "Manage and deliver high-resolution media assets effortlessly without affecting site performance.",
+          title: "A system ready to evolve",
+          text: "Create flexible foundations that keep the experience consistent as new stories, services, and ambitions are added.",
+          imageUrl: PREMIUM_IMAGE_PLACEHOLDER,
+          imageAlt: "Editorial placeholder illustrating a flexible design system",
           imagePadding: "medium",
-          typography: defaultTypography,
         },
       ],
       carouselSettings: {
@@ -795,6 +889,9 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
         showDots: true,
         pauseOnHover: true,
       },
+      elementPadding: "sm",
+      typography: premiumContentTypography,
+      visualStyle: premiumCardVisualStyle({ elevated: true, imageRatio: "4:5" }),
     };
   }
 
@@ -808,6 +905,8 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
       embedCode: "<div><strong>Connect your preferred service</strong><p>Paste trusted embed code here to display it on the page.</p></div>",
       embedUrl: "",
       embedHeight: 260,
+      elementPadding: "sm",
+      typography: premiumContentTypography,
     };
   }
 
@@ -818,6 +917,8 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
       title: "Let’s start a conversation",
       body: "Choose a Fluent Forms form to help visitors ask a question, request details, or book a consultation.",
       fluentFormId: "",
+      elementPadding: "sm",
+      typography: premiumContentTypography,
     };
   }
 
@@ -831,23 +932,26 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
       badges: [
         {
           id: `${id}-badge-1`,
-          label: "99.99%",
-          title: "Enterprise SLA",
-          body: "Uptime guarantee backed by our priority support operations.",
+          label: "12+",
+          title: "Years of focused experience",
+          body: "Senior thinking applied from the first conversation through launch.",
         },
         {
           id: `${id}-badge-2`,
-          label: "250ms",
-          title: "Global CDN Delivery",
-          body: "Fast content loading worldwide via cloud caching.",
+          label: "38",
+          title: "Brands moved forward",
+          body: "Distinctive digital foundations shaped around real business goals.",
         },
         {
           id: `${id}-badge-3`,
-          label: "12K+",
-          title: "Launches Completed",
-          body: "Websites successfully launched on our platform.",
+          label: "94%",
+          title: "Work from recommendations",
+          body: "Long-term relationships built through clarity, care, and dependable delivery.",
         },
       ],
+      elementPadding: "sm",
+      typography: premiumContentTypography,
+      visualStyle: premiumCardVisualStyle(),
     };
   }
 
@@ -858,7 +962,10 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
       iconName: "sparkles",
       title: "Designed with care",
       body: "A focused experience that makes important information easier to notice and understand.",
-      elementPadding: "sm",
+      listIconSize: 28,
+      elementPadding: "md",
+      typography: premiumContentTypography,
+      visualStyle: premiumCardVisualStyle(),
     };
   }
 
@@ -868,13 +975,15 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
       kind,
       title: "What you can expect",
       items: [
-        "Direct integration with premium design tokens",
-        "Optimized media delivery and assets processing",
-        "Advanced SEO meta management on every page",
-        "Secure custom domain mappings and SSL certificates"
+        "A focused discovery session before design begins",
+        "Clear recommendations grounded in your goals",
+        "Responsive design considered at every stage",
+        "A flexible system your team can confidently maintain"
       ],
       listIcon: "circleCheck",
-      elementPadding: "sm",
+      listIconSize: 20,
+      elementPadding: "md",
+      typography: premiumContentTypography,
     };
   }
 
@@ -885,7 +994,9 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
       title: "Book a consultation",
       dateLabel: "Choose your preferred date",
       body: "Select a convenient date and we’ll follow up to confirm the details.",
-      elementPadding: "sm",
+      elementPadding: "md",
+      typography: premiumContentTypography,
+      visualStyle: premiumCardVisualStyle(),
     };
   }
 
@@ -893,15 +1004,18 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
     return {
       id,
       kind,
-      title: "Shop the collection",
+      title: "Objects chosen for everyday rituals",
       source: "all",
       layoutVariant: "grid",
       columns: 4,
       gridLimit: 8,
       filterPosition: "left",
-      cardStyle: "flat",
-      cardPreset: "standard",
-      panelStyle: "default",
+      cardStyle: "soft",
+      cardPreset: "editorial",
+      panelStyle: "clean-shadow",
+      elementPadding: "sm",
+      typography: premiumContentTypography,
+      visualStyle: premiumCardVisualStyle({ imageRatio: "4:5" }),
     };
   }
 
@@ -911,6 +1025,8 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
       kind,
       title: "Browse by category",
       body: "Help customers narrow the collection and find the right products faster.",
+      elementPadding: "xs",
+      typography: premiumContentTypography,
     };
   }
 
@@ -920,18 +1036,24 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
       kind,
       title: "You are here",
       body: "A clear navigation path helps visitors understand where they are and move back easily.",
+      elementPadding: "xs",
+      typography: premiumContentTypography,
     };
   }
 
   return {
     id,
     kind: "text",
-    eyebrow: "A better way forward",
-    title: "Make every interaction clear and useful",
-    body: "Thoughtful content helps visitors understand your value, find what they need, and take the next step with confidence.",
+    eyebrow: "",
+    title: "Good work begins with a clear point of view",
+    body: "<p>We help ambitious teams turn complex ideas into focused, useful experiences.</p><p>Every decision is shaped around what your audience needs to understand, feel, and do next.</p><blockquote>Clarity is not the absence of personality—it is what gives personality room to be understood.</blockquote>",
     buttonLabel: "",
     buttonUrl: "",
-    typography: defaultTypography,
+    elementPadding: "sm",
+    typography: premiumContentTypography,
+    visualStyle: {
+      customClass: "builder-premium-starter",
+    },
   };
 }
 

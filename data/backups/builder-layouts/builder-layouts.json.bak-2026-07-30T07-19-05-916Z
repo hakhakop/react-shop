@@ -5,6 +5,7 @@
     "page": "home",
     "targetType": "page",
     "design": {
+      "preset": "princity",
       "colorScheme": "auto",
       "pageBackground": "#f7f7f4",
       "textColor": "#111111",
@@ -34,7 +35,7 @@
         "kind": "contentLayout",
         "visible": true,
         "title": "",
-        "background": "",
+        "background": "transparent",
         "backgroundMode": "full",
         "contentMode": "boxed",
         "colorScheme": "inherit",
@@ -45,7 +46,7 @@
         "layout": "whole",
         "layoutColumns": 1,
         "layoutRows": 1,
-        "backgroundEffect": "none",
+        "backgroundEffect": "antigravity2",
         "antigravitySpeed": 1.5,
         "antigravityParticleCount": 185,
         "antigravityColor": "#a855f7",
@@ -117,6 +118,2280 @@
             ]
           }
         ]
+      },
+      {
+        "id": "contentLayout-ms3hmva4-81jv6",
+        "kind": "contentLayout",
+        "title": "",
+        "background": "",
+        "backgroundMode": "boxed",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "topSpacing": "inherit",
+        "bottomSpacing": "inherit",
+        "topMargin": "inherit",
+        "bottomMargin": "inherit",
+        "pullUnderHeader": false,
+        "visible": true,
+        "eyebrow": "",
+        "body": "",
+        "layoutColumns": 6,
+        "layoutItems": [
+          {
+            "id": "layout-item-ms3hmva4-1",
+            "blocks": [
+              {
+                "id": "image-block-ms3hpu5t-vg5ux",
+                "kind": "image",
+                "title": "",
+                "body": "",
+                "imageUrl": "/globe.svg",
+                "imageAlt": "Abstract globe illustration",
+                "imageAlignment": "center",
+                "imageMaxWidth": 960,
+                "imageFit": "contain",
+                "imageRatio": "square",
+                "imageCaption": ""
+              }
+            ],
+            "rowId": "layout-row-ms49ih7t"
+          },
+          {
+            "id": "layout-item-2",
+            "blocks": [
+              {
+                "id": "panel-block-ms3tmck3-12sim",
+                "kind": "panel",
+                "eyebrow": "DESIGN SYSTEM",
+                "title": "Maintain brand consistency across all pages",
+                "body": "Define your global typography, color palettes, and spacing rules once. Our visual builder applies them dynamically to ensure a premium, unified experience.",
+                "buttonLabel": "See Features",
+                "buttonUrl": "/",
+                "imageUrl": "",
+                "imageAlt": "",
+                "elementPadding": "md"
+              },
+              {
+                "id": "text-block-ms72ab2r-2yny1",
+                "kind": "text",
+                "eyebrow": "",
+                "title": "Good work begins with a clear point of view",
+                "body": "<p>We help ambitious teams turn complex ideas into focused, useful experiences.</p><p>Every decision is shaped around what your audience needs to understand, feel, and do next.</p><blockquote>Clarity is not the absence of personality—it is what gives personality room to be understood.</blockquote>",
+                "buttonLabel": "",
+                "buttonUrl": "",
+                "elementPadding": "sm",
+                "typography": {
+                  "eyebrow": {
+                    "variant": "subheading",
+                    "fontSize": "12px",
+                    "fontWeight": "700",
+                    "lineHeight": "1.2",
+                    "letterSpacing": "0.12em",
+                    "textTransform": "uppercase"
+                  },
+                  "title": {
+                    "variant": "heading",
+                    "fontSize": "clamp(28px, 3vw, 46px)",
+                    "fontWeight": "720",
+                    "lineHeight": "1.06",
+                    "letterSpacing": "-0.025em"
+                  },
+                  "body": {
+                    "variant": "body",
+                    "fontSize": "16px",
+                    "fontWeight": "400",
+                    "lineHeight": "1.7"
+                  },
+                  "button": {
+                    "variant": "button",
+                    "fontSize": "14px",
+                    "fontWeight": "700",
+                    "lineHeight": "1",
+                    "letterSpacing": "0.01em"
+                  }
+                },
+                "visualStyle": {
+                  "customClass": "builder-premium-starter"
+                }
+              },
+              {
+                "id": "panel-block-ms3tmewa-fdtxi",
+                "kind": "panel",
+                "eyebrow": "DESIGN SYSTEM",
+                "title": "Maintain brand consistency across all pages",
+                "body": "Define your global typography, color palettes, and spacing rules once. Our visual builder applies them dynamically to ensure a premium, unified experience.",
+                "buttonLabel": "See Features",
+                "buttonUrl": "/",
+                "imageUrl": "",
+                "imageAlt": "",
+                "elementPadding": "md"
+              },
+              {
+                "id": "hero-block-ms48ho8q-u45cu",
+                "kind": "hero",
+                "eyebrow": "PLATFORM OVERVIEW",
+                "title": "Build beautiful websites without writing code",
+                "body": "Create professional websites using a visual builder designed for speed, flexibility, and pixel-perfect control.",
+                "buttonLabel": "Start Building",
+                "buttonUrl": "/",
+                "buttonStyle": "primary",
+                "buttons": [
+                  {
+                    "id": "hero-block-ms48ho8q-u45cu-secondary-action",
+                    "label": "Explore Templates",
+                    "url": "/",
+                    "target": "_self",
+                    "style": "outline"
+                  }
+                ],
+                "buttonsLayout": "inline",
+                "buttonGap": "0.75rem",
+                "elementAlign": "left",
+                "elementPadding": "lg",
+                "carouselSettings": {
+                  "variant": "default"
+                }
+              }
+            ],
+            "rowId": "layout-row-ms49ih7t"
+          },
+          {
+            "id": "layout-item-ms49ih7t",
+            "rowId": "layout-row-ms49ih7t",
+            "blocks": [
+              {
+                "id": "heading-block-ms6jj9jh-7heb6",
+                "kind": "heading",
+                "headingText": "Thoughtful work creates momentum that lasts",
+                "headingLevel": "h2",
+                "headingAlign": "left",
+                "typography": {
+                  "eyebrow": {
+                    "variant": "subheading",
+                    "fontSize": "12px",
+                    "fontWeight": "700",
+                    "lineHeight": "1.2",
+                    "letterSpacing": "0.12em",
+                    "textTransform": "uppercase"
+                  },
+                  "title": {
+                    "variant": "heading",
+                    "fontSize": "clamp(28px, 3vw, 46px)",
+                    "fontWeight": "720",
+                    "lineHeight": "1.06",
+                    "letterSpacing": "-0.025em"
+                  },
+                  "body": {
+                    "variant": "body",
+                    "fontSize": "16px",
+                    "fontWeight": "400",
+                    "lineHeight": "1.7"
+                  },
+                  "button": {
+                    "variant": "button",
+                    "fontSize": "14px",
+                    "fontWeight": "700",
+                    "lineHeight": "1",
+                    "letterSpacing": "0.01em"
+                  }
+                },
+                "elementPadding": "sm"
+              },
+              {
+                "id": "image-block-ms6jjlo7-hxs8t",
+                "kind": "image",
+                "title": "",
+                "body": "",
+                "imageUrl": "https://cms.webpages.am/wp-content/uploads/2026/07/pasted-image-4.png",
+                "imageAlt": "pasted-image-4",
+                "imageAlignment": "center",
+                "imageMaxWidth": 1200,
+                "imageFit": "cover",
+                "imageRatio": "4:5",
+                "imageBorderRadius": 18,
+                "imageCaption": "",
+                "elementPadding": "xs"
+              }
+            ]
+          },
+          {
+            "id": "layout-row-ms49ilz1-column-1",
+            "rowId": "layout-row-ms49ilz1",
+            "blocks": []
+          },
+          {
+            "id": "layout-row-ms49ilz1-column-2",
+            "rowId": "layout-row-ms49ilz1",
+            "blocks": []
+          },
+          {
+            "id": "layout-row-ms49ilz1-column-3",
+            "rowId": "layout-row-ms49ilz1",
+            "blocks": [],
+            "nestedLayout": {
+              "version": 1,
+              "direction": "vertical",
+              "distribution": "equal",
+              "gap": "inherit",
+              "rows": [
+                {
+                  "id": "nested-row-ms51jq4h-1",
+                  "weight": 1,
+                  "layout": "whole",
+                  "columns": [
+                    {
+                      "id": "nested-column-ms51jq4h-1",
+                      "rowId": "nested-row-ms51jq4h-1",
+                      "rowLayout": "whole",
+                      "blocks": []
+                    }
+                  ]
+                },
+                {
+                  "id": "nested-row-ms51jq4h-2",
+                  "weight": 1,
+                  "layout": "whole",
+                  "columns": [
+                    {
+                      "id": "nested-column-ms51jq4h-2",
+                      "rowId": "nested-row-ms51jq4h-2",
+                      "rowLayout": "whole",
+                      "blocks": []
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "id": "layout-item-ms51jefl",
+            "rowId": "layout-row-ms49ilz1",
+            "blocks": []
+          },
+          {
+            "id": "layout-item-ms49ipl0",
+            "rowId": "layout-row-ms49ilz1",
+            "blocks": []
+          },
+          {
+            "id": "layout-item-ms51jj4r",
+            "rowId": "layout-row-ms49ilz1",
+            "blocks": []
+          },
+          {
+            "id": "layout-row-ms49wwgd-column-1",
+            "rowId": "layout-row-ms49wwgd",
+            "rowLayout": "thirds",
+            "blocks": []
+          },
+          {
+            "id": "layout-row-ms49wwgd-column-2",
+            "rowId": "layout-row-ms49wwgd",
+            "rowLayout": "thirds",
+            "blocks": []
+          },
+          {
+            "id": "layout-row-ms49wwgd-column-3",
+            "rowId": "layout-row-ms49wwgd",
+            "rowLayout": "thirds",
+            "blocks": []
+          },
+          {
+            "id": "layout-row-ms51mbvi-column-1",
+            "rowId": "layout-row-ms51mbvi",
+            "rowLayout": "thirds",
+            "blocks": []
+          },
+          {
+            "id": "layout-row-ms51mbvi-column-2",
+            "rowId": "layout-row-ms51mbvi",
+            "rowLayout": "thirds",
+            "blocks": [],
+            "nestedLayout": {
+              "version": 1,
+              "direction": "vertical",
+              "distribution": "equal",
+              "gap": "inherit",
+              "rows": [
+                {
+                  "id": "nested-row-ms51mel1-1",
+                  "weight": 1,
+                  "layout": "whole",
+                  "columns": [
+                    {
+                      "id": "nested-column-ms51mel1-1",
+                      "rowId": "nested-row-ms51mel1-1",
+                      "rowLayout": "whole",
+                      "blocks": []
+                    }
+                  ]
+                },
+                {
+                  "id": "nested-row-ms51mel1-2",
+                  "weight": 1,
+                  "layout": "whole",
+                  "columns": [
+                    {
+                      "id": "nested-column-ms51mel1-2",
+                      "rowId": "nested-row-ms51mel1-2",
+                      "rowLayout": "whole",
+                      "blocks": []
+                    }
+                  ]
+                },
+                {
+                  "id": "nested-row-ms5vn2f9",
+                  "weight": 1,
+                  "layout": "whole",
+                  "columns": [
+                    {
+                      "id": "nested-column-ms5vn2f9",
+                      "rowId": "nested-row-ms5vn2f9",
+                      "rowLayout": "whole",
+                      "blocks": []
+                    }
+                  ]
+                },
+                {
+                  "id": "nested-row-ms5vnb0e",
+                  "weight": 1,
+                  "layout": "whole",
+                  "columns": [
+                    {
+                      "id": "nested-column-ms5vnb0e",
+                      "rowId": "nested-row-ms5vnb0e",
+                      "rowLayout": "whole",
+                      "blocks": []
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "id": "layout-row-ms51mbvi-column-3",
+            "rowId": "layout-row-ms51mbvi",
+            "rowLayout": "thirds",
+            "blocks": [],
+            "nestedLayout": {
+              "version": 1,
+              "direction": "vertical",
+              "distribution": "equal",
+              "gap": "inherit",
+              "rows": [
+                {
+                  "id": "nested-row-ms5vneow-1",
+                  "weight": 1,
+                  "layout": "whole",
+                  "columns": [
+                    {
+                      "id": "nested-column-ms5vneow-1",
+                      "rowId": "nested-row-ms5vneow-1",
+                      "rowLayout": "whole",
+                      "blocks": [
+                        {
+                          "id": "image-block-ms74jpa7-0vx1q",
+                          "kind": "image",
+                          "title": "",
+                          "body": "",
+                          "imageUrl": "/builder-image-placeholder.svg",
+                          "imageAlt": "Modern editorial image placeholder",
+                          "imageAlignment": "center",
+                          "imageMaxWidth": 1200,
+                          "imageFit": "cover",
+                          "imageRatio": "4:5",
+                          "imageBorderRadius": 18,
+                          "imageCaption": "A considered image can carry the story before a word is read.",
+                          "elementPadding": "xs"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "id": "nested-row-ms5vneow-2",
+                  "weight": 1,
+                  "layout": "whole",
+                  "columns": [
+                    {
+                      "id": "nested-column-ms5vneow-2",
+                      "rowId": "nested-row-ms5vneow-2",
+                      "rowLayout": "whole",
+                      "blocks": [
+                        {
+                          "id": "image-block-ms761bvr-luir5",
+                          "kind": "image",
+                          "title": "",
+                          "body": "",
+                          "imageUrl": "/builder-image-placeholder.svg",
+                          "imageAlt": "Modern editorial image placeholder",
+                          "imageAlignment": "center",
+                          "imageMaxWidth": 1200,
+                          "imageFit": "cover",
+                          "imageRatio": "4:5",
+                          "imageBorderRadius": 18,
+                          "imageCaption": "A considered image can carry the story before a word is read.",
+                          "elementPadding": "xs"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "id": "layout-row-ms6jlv8p-column-1",
+            "rowId": "layout-row-ms6jlv8p",
+            "rowLayout": "whole",
+            "blocks": [
+              {
+                "id": "grid-block-ms6jm0t6-9jieu",
+                "kind": "grid",
+                "title": "Services designed around your goals",
+                "gridSource": "static",
+                "columns": 3,
+                "gridRows": 1,
+                "gridGap": "large",
+                "gridMargin": "inherit",
+                "gridImagePadding": "frameless",
+                "gridContentPadding": "medium",
+                "gridImageFrame": "none",
+                "gridShowImage": true,
+                "gridShowEyebrow": true,
+                "gridShowMeta": true,
+                "gridShowText": true,
+                "gridShowButton": true,
+                "gridItems": [
+                  {
+                    "id": "grid-block-ms6jm0t6-9jieu-1",
+                    "eyebrow": "01",
+                    "title": "Strategy with a practical point of view",
+                    "meta": "Clarity before complexity",
+                    "text": "Define the audience, message, and priorities that will make every design decision easier.",
+                    "buttonLabel": "Explore Strategy",
+                    "buttonUrl": "/",
+                    "imageUrl": "/builder-image-placeholder.svg",
+                    "imageAlt": "Warm architectural forms representing strategic planning"
+                  },
+                  {
+                    "id": "grid-block-ms6jm0t6-9jieu-2",
+                    "eyebrow": "02",
+                    "title": "Design that feels distinctive and effortless",
+                    "meta": "Made for real people",
+                    "text": "Shape a responsive experience with a strong visual rhythm and thoughtful interactions.",
+                    "buttonLabel": "View Selected Work",
+                    "buttonUrl": "/",
+                    "imageUrl": "/builder-image-placeholder.svg",
+                    "imageAlt": "Editorial composition representing interface design"
+                  },
+                  {
+                    "id": "grid-block-ms6jm0t6-9jieu-3",
+                    "eyebrow": "03",
+                    "title": "A foundation designed to keep improving",
+                    "meta": "Built beyond launch",
+                    "text": "Measure what matters, refine the journey, and evolve the site as the business grows.",
+                    "buttonLabel": "Discuss Your Goals",
+                    "buttonUrl": "/",
+                    "imageUrl": "/builder-image-placeholder.svg",
+                    "imageAlt": "Abstract rising forms representing sustainable growth"
+                  },
+                  {
+                    "id": "grid-ms720dj5",
+                    "eyebrow": "03",
+                    "title": "A foundation designed to keep improving",
+                    "meta": "Built beyond launch",
+                    "text": "Measure what matters, refine the journey, and evolve the site as the business grows.",
+                    "buttonLabel": "Discuss Your Goals",
+                    "buttonUrl": "/",
+                    "imageUrl": "/builder-image-placeholder.svg",
+                    "imageAlt": "Abstract rising forms representing sustainable growth"
+                  }
+                ],
+                "typography": {
+                  "eyebrow": {
+                    "variant": "subheading",
+                    "fontSize": "12px",
+                    "fontWeight": "700",
+                    "lineHeight": "1.2",
+                    "letterSpacing": "0.12em",
+                    "textTransform": "uppercase"
+                  },
+                  "title": {
+                    "variant": "heading",
+                    "fontSize": "clamp(28px, 3vw, 46px)",
+                    "fontWeight": "720",
+                    "lineHeight": "1.06",
+                    "letterSpacing": "-0.025em"
+                  },
+                  "body": {
+                    "variant": "body",
+                    "fontSize": "16px",
+                    "fontWeight": "400",
+                    "lineHeight": "1.7"
+                  },
+                  "button": {
+                    "variant": "button",
+                    "fontSize": "14px",
+                    "fontWeight": "700",
+                    "lineHeight": "1",
+                    "letterSpacing": "0.01em"
+                  }
+                },
+                "visualStyle": {
+                  "customClass": "builder-premium-starter",
+                  "card": {
+                    "preset": "elevated",
+                    "hoverPreset": "lift-soft",
+                    "imageRatio": "4:5",
+                    "imageFit": "cover",
+                    "imageRadius": "14px",
+                    "titleSize": "clamp(22px, 2vw, 30px)",
+                    "titleWeight": "720",
+                    "titleMargin": "0",
+                    "metaSize": "11px",
+                    "metaTransform": "uppercase",
+                    "metaSpacing": "0",
+                    "contentSize": "15px",
+                    "contentLineHeight": "1.65",
+                    "buttonMargin": "8px 0 0",
+                    "cardGap": "14px",
+                    "cardPadding": "clamp(20px, 2.4vw, 30px)"
+                  },
+                  "border": {
+                    "radius": "18px"
+                  },
+                  "margin": {
+                    "linked": true,
+                    "top": "xs",
+                    "right": "xs",
+                    "bottom": "xs",
+                    "left": "xs"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "id": "layout-row-ms51r1vh-column-1",
+            "rowId": "layout-row-ms51r1vh",
+            "blocks": [],
+            "nestedLayout": {
+              "version": 1,
+              "direction": "vertical",
+              "distribution": "equal",
+              "gap": "inherit",
+              "rows": [
+                {
+                  "id": "nested-row-ms5200t3-1",
+                  "weight": 1,
+                  "layout": "whole",
+                  "columns": [
+                    {
+                      "id": "nested-column-ms5200t3-1",
+                      "rowId": "nested-row-ms5200t3-1",
+                      "rowLayout": "whole",
+                      "blocks": [
+                        {
+                          "id": "panel-block-ms5u8mw8-jojmj",
+                          "kind": "panel",
+                          "eyebrow": "DESIGN SYSTEM",
+                          "title": "Maintain brand consistency across all pages",
+                          "body": "Define your global typography, color palettes, and spacing rules once. Our visual builder applies them dynamically to ensure a premium, unified experience.",
+                          "buttonLabel": "See Features",
+                          "buttonUrl": "/",
+                          "imageUrl": "",
+                          "imageAlt": "",
+                          "elementPadding": "md"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "id": "nested-row-ms52lngv",
+                  "weight": 1,
+                  "layout": "whole",
+                  "columns": [
+                    {
+                      "id": "nested-column-ms52lngv",
+                      "rowId": "nested-row-ms52lngv",
+                      "rowLayout": "whole",
+                      "blocks": []
+                    }
+                  ]
+                },
+                {
+                  "id": "nested-row-ms5200t3-2",
+                  "weight": 1,
+                  "layout": "whole",
+                  "columns": [
+                    {
+                      "id": "nested-column-ms5200t3-2",
+                      "rowId": "nested-row-ms5200t3-2",
+                      "rowLayout": "whole",
+                      "blocks": []
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "id": "layout-item-ms52m6uu",
+            "rowId": "layout-row-ms51r1vh",
+            "blocks": [],
+            "nestedLayout": {
+              "version": 1,
+              "direction": "vertical",
+              "distribution": "equal",
+              "gap": "inherit",
+              "rows": [
+                {
+                  "id": "nested-row-ms52nmt8-1",
+                  "weight": 1,
+                  "layout": "whole",
+                  "columns": [
+                    {
+                      "id": "nested-column-ms52nmt8-1",
+                      "rowId": "nested-row-ms52nmt8-1",
+                      "rowLayout": "whole",
+                      "blocks": [
+                        {
+                          "id": "text-block-ms5u8h3f-m5f6r",
+                          "kind": "text",
+                          "eyebrow": "A better way forward",
+                          "title": "Make every interaction clear and useful",
+                          "body": "Thoughtful content helps visitors understand your value, find what they need, and take the next step with confidence.",
+                          "buttonLabel": "",
+                          "buttonUrl": "",
+                          "typography": {
+                            "variant": "body",
+                            "fontFamily": "inherit",
+                            "fontSize": "16px",
+                            "fontWeight": "400",
+                            "lineHeight": "1.4",
+                            "letterSpacing": "0px",
+                            "color": "inherit",
+                            "textAlign": "left"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "id": "nested-row-ms52noot",
+                  "weight": 1,
+                  "layout": "whole",
+                  "columns": [
+                    {
+                      "id": "nested-column-ms52noot",
+                      "rowId": "nested-row-ms52noot",
+                      "rowLayout": "whole",
+                      "blocks": [
+                        {
+                          "id": "image-block-ms5u8atb-vkk51",
+                          "kind": "image",
+                          "title": "",
+                          "body": "",
+                          "imageUrl": "/globe.svg",
+                          "imageAlt": "Abstract globe illustration",
+                          "imageAlignment": "center",
+                          "imageMaxWidth": 960,
+                          "imageFit": "contain",
+                          "imageRatio": "square",
+                          "imageCaption": ""
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "id": "layout-item-ms52mavt",
+            "rowId": "layout-row-ms51r1vh",
+            "blocks": [],
+            "nestedLayout": {
+              "version": 1,
+              "direction": "vertical",
+              "distribution": "equal",
+              "gap": "inherit",
+              "rows": [
+                {
+                  "id": "nested-row-ms5wl0tr-1",
+                  "weight": 1,
+                  "layout": "whole",
+                  "columns": [
+                    {
+                      "id": "nested-column-ms5wl0tr-1",
+                      "rowId": "nested-row-ms5wl0tr-1",
+                      "rowLayout": "whole",
+                      "blocks": []
+                    }
+                  ]
+                },
+                {
+                  "id": "nested-row-ms5wl0tr-2",
+                  "weight": 1,
+                  "layout": "whole",
+                  "columns": [
+                    {
+                      "id": "nested-column-ms5wl0tr-2",
+                      "rowId": "nested-row-ms5wl0tr-2",
+                      "rowLayout": "whole",
+                      "blocks": []
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "id": "layout-row-ms51r1vh-column-2",
+            "rowId": "layout-row-ms51r1vh",
+            "blocks": []
+          },
+          {
+            "id": "layout-row-ms540rhj-column-1",
+            "rowId": "layout-row-ms540rhj",
+            "rowLayout": "whole",
+            "blocks": [
+              {
+                "id": "grid-block-ms71v8yw-l2es3",
+                "kind": "grid",
+                "title": "Services designed around your goals",
+                "gridSource": "static",
+                "columns": 3,
+                "gridRows": 1,
+                "gridGap": "large",
+                "gridMargin": "inherit",
+                "gridImagePadding": "frameless",
+                "gridContentPadding": "medium",
+                "gridImageFrame": "none",
+                "gridShowImage": true,
+                "gridShowEyebrow": true,
+                "gridShowMeta": true,
+                "gridShowText": true,
+                "gridShowButton": true,
+                "gridItems": [],
+                "typography": {
+                  "eyebrow": {
+                    "variant": "subheading",
+                    "fontSize": "12px",
+                    "fontWeight": "700",
+                    "lineHeight": "1.2",
+                    "letterSpacing": "0.12em",
+                    "textTransform": "uppercase"
+                  },
+                  "title": {
+                    "variant": "heading",
+                    "fontSize": "clamp(28px, 3vw, 46px)",
+                    "fontWeight": "720",
+                    "lineHeight": "1.06",
+                    "letterSpacing": "-0.025em"
+                  },
+                  "body": {
+                    "variant": "body",
+                    "fontSize": "16px",
+                    "fontWeight": "400",
+                    "lineHeight": "1.7"
+                  },
+                  "button": {
+                    "variant": "button",
+                    "fontSize": "14px",
+                    "fontWeight": "700",
+                    "lineHeight": "1",
+                    "letterSpacing": "0.01em"
+                  }
+                },
+                "visualStyle": {
+                  "customClass": "builder-premium-starter",
+                  "card": {
+                    "preset": "dark",
+                    "hoverPreset": "glow-subtle",
+                    "imageRatio": "4:5",
+                    "imageFit": "cover",
+                    "imageRadius": "14px",
+                    "titleSize": "clamp(22px, 2vw, 30px)",
+                    "titleWeight": "720",
+                    "titleMargin": "0",
+                    "metaSize": "11px",
+                    "metaTransform": "uppercase",
+                    "metaSpacing": "0",
+                    "contentSize": "15px",
+                    "contentLineHeight": "1.65",
+                    "buttonMargin": "8px 0 0",
+                    "cardGap": "14px",
+                    "cardPadding": "clamp(20px, 2.4vw, 30px)"
+                  },
+                  "border": {
+                    "radius": "18px"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "id": "layout-row-ms52onh1-column-1",
+            "rowId": "layout-row-ms52onh1",
+            "blocks": [],
+            "nestedLayout": {
+              "version": 1,
+              "direction": "vertical",
+              "distribution": "equal",
+              "gap": "inherit",
+              "rows": [
+                {
+                  "id": "nested-row-ms52opfp-1",
+                  "weight": 1,
+                  "layout": "whole",
+                  "columns": [
+                    {
+                      "id": "nested-column-ms52opfp-1",
+                      "rowId": "nested-row-ms52opfp-1",
+                      "rowLayout": "whole",
+                      "blocks": []
+                    }
+                  ]
+                },
+                {
+                  "id": "nested-row-ms5ug2ui",
+                  "weight": 1,
+                  "layout": "whole",
+                  "columns": [
+                    {
+                      "id": "nested-column-ms5ug2ui",
+                      "rowId": "nested-row-ms5ug2ui",
+                      "rowLayout": "whole",
+                      "blocks": []
+                    }
+                  ]
+                },
+                {
+                  "id": "nested-row-ms52ustb",
+                  "weight": 1,
+                  "layout": "whole",
+                  "columns": [
+                    {
+                      "id": "nested-column-ms52ustb",
+                      "rowId": "nested-row-ms52ustb",
+                      "rowLayout": "whole",
+                      "blocks": []
+                    }
+                  ]
+                },
+                {
+                  "id": "nested-row-ms52opfp-2",
+                  "weight": 1,
+                  "layout": "whole",
+                  "columns": [
+                    {
+                      "id": "nested-column-ms52opfp-2",
+                      "rowId": "nested-row-ms52opfp-2",
+                      "rowLayout": "whole",
+                      "blocks": []
+                    }
+                  ]
+                },
+                {
+                  "id": "nested-row-ms52v12d",
+                  "weight": 1,
+                  "layout": "whole",
+                  "columns": [
+                    {
+                      "id": "nested-column-ms52v12d",
+                      "rowId": "nested-row-ms52v12d",
+                      "rowLayout": "whole",
+                      "blocks": []
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "id": "layout-item-ms53gist",
+            "rowId": "layout-row-ms52onh1",
+            "blocks": [
+              {
+                "id": "hero-block-ms6jnl9z-ww7hj",
+                "kind": "hero",
+                "eyebrow": "A considered digital presence",
+                "title": "Turn a clear idea into a website people remember",
+                "body": "Bring your story, services, and next steps together in a polished experience designed to earn attention and build trust.",
+                "buttonLabel": "Start a Project",
+                "buttonUrl": "/",
+                "buttonStyle": "primary",
+                "buttons": [
+                  {
+                    "id": "hero-block-ms6jnl9z-ww7hj-secondary-action",
+                    "label": "See Our Work",
+                    "url": "/",
+                    "target": "_self",
+                    "style": "outline"
+                  }
+                ],
+                "buttonsLayout": "inline",
+                "buttonGap": "0.75rem",
+                "elementAlign": "left",
+                "elementPadding": "xl",
+                "typography": {
+                  "eyebrow": {
+                    "variant": "subheading",
+                    "fontSize": "12px",
+                    "fontWeight": "700",
+                    "lineHeight": "1.2",
+                    "letterSpacing": "0.12em",
+                    "textTransform": "uppercase"
+                  },
+                  "title": {
+                    "variant": "heading",
+                    "fontSize": "clamp(28px, 3vw, 46px)",
+                    "fontWeight": "720",
+                    "lineHeight": "1.06",
+                    "letterSpacing": "-0.025em"
+                  },
+                  "body": {
+                    "variant": "body",
+                    "fontSize": "16px",
+                    "fontWeight": "400",
+                    "lineHeight": "1.7"
+                  },
+                  "button": {
+                    "variant": "button",
+                    "fontSize": "14px",
+                    "fontWeight": "700",
+                    "lineHeight": "1",
+                    "letterSpacing": "0.01em"
+                  }
+                },
+                "carouselSettings": {
+                  "variant": "default"
+                }
+              }
+            ]
+          },
+          {
+            "id": "layout-row-ms52onh1-column-2",
+            "rowId": "layout-row-ms52onh1",
+            "blocks": [],
+            "nestedLayout": {
+              "version": 1,
+              "direction": "vertical",
+              "distribution": "equal",
+              "gap": "inherit",
+              "rows": [
+                {
+                  "id": "nested-row-ms53g5ww-1",
+                  "weight": 1,
+                  "layout": "whole",
+                  "columns": [
+                    {
+                      "id": "nested-column-ms53g5ww-1",
+                      "rowId": "nested-row-ms53g5ww-1",
+                      "rowLayout": "whole",
+                      "blocks": []
+                    }
+                  ]
+                },
+                {
+                  "id": "nested-row-ms53g5ww-2",
+                  "weight": 1,
+                  "layout": "whole",
+                  "columns": [
+                    {
+                      "id": "nested-column-ms53g5ww-2",
+                      "rowId": "nested-row-ms53g5ww-2",
+                      "rowLayout": "whole",
+                      "blocks": []
+                    }
+                  ]
+                },
+                {
+                  "id": "nested-row-ms53gdeg",
+                  "weight": 1,
+                  "layout": "whole",
+                  "columns": [
+                    {
+                      "id": "nested-column-ms53gdeg",
+                      "rowId": "nested-row-ms53gdeg",
+                      "rowLayout": "whole",
+                      "blocks": []
+                    }
+                  ]
+                },
+                {
+                  "id": "nested-row-ms53getd",
+                  "weight": 1,
+                  "layout": "whole",
+                  "columns": [
+                    {
+                      "id": "nested-column-ms53getd",
+                      "rowId": "nested-row-ms53getd",
+                      "rowLayout": "whole",
+                      "blocks": []
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "id": "layout-row-ms53kqaw-column-1",
+            "rowId": "layout-row-ms53kqaw",
+            "rowLayout": "whole",
+            "blocks": [
+              {
+                "id": "promoStrip-block-ms6jntsg-xc49w",
+                "kind": "promoStrip",
+                "eyebrow": "Now booking autumn projects",
+                "title": "A sharper digital presence starts with one good conversation",
+                "body": "Reserve a complimentary 30-minute planning session and leave with a clearer next step.",
+                "buttonLabel": "Book a Session",
+                "buttonUrl": "/",
+                "buttonStyle": "primary",
+                "elementPadding": "md",
+                "typography": {
+                  "eyebrow": {
+                    "variant": "subheading",
+                    "fontSize": "12px",
+                    "fontWeight": "700",
+                    "lineHeight": "1.2",
+                    "letterSpacing": "0.12em",
+                    "textTransform": "uppercase"
+                  },
+                  "title": {
+                    "variant": "heading",
+                    "fontSize": "clamp(28px, 3vw, 46px)",
+                    "fontWeight": "720",
+                    "lineHeight": "1.06",
+                    "letterSpacing": "-0.025em"
+                  },
+                  "body": {
+                    "variant": "body",
+                    "fontSize": "16px",
+                    "fontWeight": "400",
+                    "lineHeight": "1.7"
+                  },
+                  "button": {
+                    "variant": "button",
+                    "fontSize": "14px",
+                    "fontWeight": "700",
+                    "lineHeight": "1",
+                    "letterSpacing": "0.01em"
+                  }
+                },
+                "visualStyle": {
+                  "customClass": "builder-premium-starter",
+                  "card": {
+                    "preset": "soft",
+                    "hoverPreset": "lift-soft",
+                    "imageRatio": "4:5",
+                    "imageFit": "cover",
+                    "imageRadius": "14px",
+                    "titleSize": "clamp(22px, 2vw, 30px)",
+                    "titleWeight": "720",
+                    "titleMargin": "0",
+                    "metaSize": "11px",
+                    "metaTransform": "uppercase",
+                    "metaSpacing": "0",
+                    "contentSize": "15px",
+                    "contentLineHeight": "1.65",
+                    "buttonMargin": "8px 0 0",
+                    "cardGap": "14px",
+                    "cardPadding": "clamp(20px, 2.4vw, 30px)"
+                  },
+                  "border": {
+                    "radius": "18px"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "id": "layout-row-ms53stcc-column-1",
+            "rowId": "layout-row-ms53stcc",
+            "rowLayout": "thirds-1-2",
+            "blocks": [],
+            "nestedLayout": {
+              "version": 1,
+              "direction": "vertical",
+              "distribution": "equal",
+              "gap": "inherit",
+              "rows": [
+                {
+                  "id": "nested-row-ms6jqz28-1",
+                  "weight": 1,
+                  "layout": "whole",
+                  "columns": [
+                    {
+                      "id": "nested-column-ms6jqz28-1",
+                      "rowId": "nested-row-ms6jqz28-1",
+                      "rowLayout": "whole",
+                      "blocks": [
+                        {
+                          "id": "panel-block-ms5nsq2g-zdozk",
+                          "kind": "panel",
+                          "eyebrow": "DESIGN SYSTEM",
+                          "title": "Maintain brand consistency across all pages",
+                          "body": "Define your global typography, color palettes, and spacing rules once. Our visual builder applies them dynamically to ensure a premium, unified experience.",
+                          "buttonLabel": "See Features",
+                          "buttonUrl": "/",
+                          "imageUrl": "",
+                          "imageAlt": "",
+                          "elementPadding": "md"
+                        },
+                        {
+                          "id": "panel-block-ms5nt0iu-i9njp",
+                          "kind": "panel",
+                          "eyebrow": "DESIGN SYSTEM",
+                          "title": "Maintain brand consistency across all pages",
+                          "body": "Define your global typography, color palettes, and spacing rules once. Our visual builder applies them dynamically to ensure a premium, unified experience.",
+                          "buttonLabel": "See Features",
+                          "buttonUrl": "/",
+                          "imageUrl": "",
+                          "imageAlt": "",
+                          "elementPadding": "md"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "id": "nested-row-ms6jsaqz",
+                  "weight": 1,
+                  "layout": "whole",
+                  "columns": [
+                    {
+                      "id": "nested-column-ms6jsaqz",
+                      "rowId": "nested-row-ms6jsaqz",
+                      "rowLayout": "whole",
+                      "blocks": [
+                        {
+                          "id": "panel-block-ms6jsx4y-f83pq",
+                          "kind": "panel",
+                          "eyebrow": "A more considered approach",
+                          "title": "Build a brand experience that feels unmistakably yours",
+                          "body": "From the first headline to the smallest interaction, every detail works together to create clarity, confidence, and recognition.",
+                          "buttonLabel": "Discover the Process",
+                          "buttonUrl": "/",
+                          "buttonStyle": "primary",
+                          "imageUrl": "",
+                          "imageAlt": "Editorial placeholder for a featured brand story",
+                          "imageRatio": "4:5",
+                          "imageFit": "cover",
+                          "panelStyle": "clean-shadow",
+                          "elementPadding": "lg",
+                          "typography": {
+                            "eyebrow": {
+                              "variant": "subheading",
+                              "fontSize": "12px",
+                              "fontWeight": "700",
+                              "lineHeight": "1.2",
+                              "letterSpacing": "0.12em",
+                              "textTransform": "uppercase"
+                            },
+                            "title": {
+                              "variant": "heading",
+                              "fontSize": "clamp(28px, 3vw, 46px)",
+                              "fontWeight": "720",
+                              "lineHeight": "1.06",
+                              "letterSpacing": "-0.025em"
+                            },
+                            "body": {
+                              "variant": "body",
+                              "fontSize": "16px",
+                              "fontWeight": "400",
+                              "lineHeight": "1.7"
+                            },
+                            "button": {
+                              "variant": "button",
+                              "fontSize": "14px",
+                              "fontWeight": "700",
+                              "lineHeight": "1",
+                              "letterSpacing": "0.01em"
+                            }
+                          },
+                          "visualStyle": {
+                            "customClass": "builder-premium-starter",
+                            "card": {
+                              "preset": "elevated",
+                              "hoverPreset": "lift-soft",
+                              "imageRatio": "4:5",
+                              "imageFit": "cover",
+                              "imageRadius": "14px",
+                              "titleSize": "clamp(22px, 2vw, 30px)",
+                              "titleWeight": "720",
+                              "titleMargin": "0",
+                              "metaSize": "11px",
+                              "metaTransform": "uppercase",
+                              "metaSpacing": "0",
+                              "contentSize": "15px",
+                              "contentLineHeight": "1.65",
+                              "buttonMargin": "8px 0 0",
+                              "cardGap": "14px",
+                              "cardPadding": "clamp(20px, 2.4vw, 30px)"
+                            },
+                            "border": {
+                              "radius": "18px"
+                            },
+                            "padding": {
+                              "top": "sm",
+                              "right": "sm",
+                              "bottom": "sm",
+                              "left": "sm",
+                              "linked": true
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "id": "nested-row-ms6jqz28-2",
+                  "weight": 1,
+                  "layout": "whole",
+                  "columns": [
+                    {
+                      "id": "nested-column-ms6jqz28-2",
+                      "rowId": "nested-row-ms6jqz28-2",
+                      "rowLayout": "whole",
+                      "blocks": [
+                        {
+                          "id": "panel-block-ms6jr4sf-a2lm2",
+                          "kind": "panel",
+                          "eyebrow": "A more considered approach",
+                          "title": "Build a brand experience that feels unmistakably yours",
+                          "body": "From the first headline to the smallest interaction, every detail works together to create clarity, confidence, and recognition.",
+                          "buttonLabel": "Discover the Process",
+                          "buttonUrl": "/",
+                          "buttonStyle": "primary",
+                          "imageUrl": "",
+                          "imageAlt": "Editorial placeholder for a featured brand story",
+                          "imageRatio": "4:5",
+                          "imageFit": "cover",
+                          "panelStyle": "clean-shadow",
+                          "elementPadding": "lg",
+                          "typography": {
+                            "eyebrow": {
+                              "variant": "subheading",
+                              "fontSize": "12px",
+                              "fontWeight": "700",
+                              "lineHeight": "1.2",
+                              "letterSpacing": "0.12em",
+                              "textTransform": "uppercase"
+                            },
+                            "title": {
+                              "variant": "heading",
+                              "fontSize": "clamp(28px, 3vw, 46px)",
+                              "fontWeight": "720",
+                              "lineHeight": "1.06",
+                              "letterSpacing": "-0.025em"
+                            },
+                            "body": {
+                              "variant": "body",
+                              "fontSize": "16px",
+                              "fontWeight": "400",
+                              "lineHeight": "1.7"
+                            },
+                            "button": {
+                              "variant": "button",
+                              "fontSize": "14px",
+                              "fontWeight": "700",
+                              "lineHeight": "1",
+                              "letterSpacing": "0.01em"
+                            }
+                          },
+                          "visualStyle": {
+                            "customClass": "builder-premium-starter",
+                            "card": {
+                              "preset": "elevated",
+                              "hoverPreset": "lift-soft",
+                              "imageRatio": "4:5",
+                              "imageFit": "cover",
+                              "imageRadius": "14px",
+                              "titleSize": "clamp(22px, 2vw, 30px)",
+                              "titleWeight": "720",
+                              "titleMargin": "0",
+                              "metaSize": "11px",
+                              "metaTransform": "uppercase",
+                              "metaSpacing": "0",
+                              "contentSize": "15px",
+                              "contentLineHeight": "1.65",
+                              "buttonMargin": "8px 0 0",
+                              "cardGap": "14px",
+                              "cardPadding": "clamp(20px, 2.4vw, 30px)"
+                            },
+                            "border": {
+                              "radius": "18px"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "id": "layout-row-ms53stcc-column-2",
+            "rowId": "layout-row-ms53stcc",
+            "blocks": [
+              {
+                "id": "grid-block-ms5nstoj-oxigq",
+                "kind": "grid",
+                "title": "Services designed around your goals",
+                "gridSource": "static",
+                "columns": 3,
+                "gridRows": 1,
+                "gridGap": "medium",
+                "gridMargin": "inherit",
+                "gridImagePadding": "frameless",
+                "gridContentPadding": "medium",
+                "gridImageFrame": "none",
+                "gridShowImage": true,
+                "gridShowEyebrow": true,
+                "gridShowMeta": true,
+                "gridShowText": true,
+                "gridShowButton": true,
+                "gridItems": [
+                  {
+                    "id": "grid-block-ms5nstoj-oxigq-1",
+                    "eyebrow": "01",
+                    "title": "Strategy & Consultation",
+                    "meta": "Align your objectives",
+                    "text": "Work with our experts to map out your digital product strategy and define key performance indicators.",
+                    "buttonLabel": "View Details",
+                    "buttonUrl": "/",
+                    "typography": {
+                      "variant": "body",
+                      "fontFamily": "inherit",
+                      "fontSize": "16px",
+                      "fontWeight": "400",
+                      "lineHeight": "1.4",
+                      "letterSpacing": "0px",
+                      "color": "inherit",
+                      "textAlign": "left"
+                    }
+                  },
+                  {
+                    "id": "grid-block-ms5nstoj-oxigq-2",
+                    "eyebrow": "02",
+                    "title": "Design & Engineering",
+                    "meta": "High-fidelity execution",
+                    "text": "Create modern, responsive interfaces backed by scalable frontend architectures and design systems.",
+                    "buttonLabel": "See Our Work",
+                    "buttonUrl": "/",
+                    "typography": {
+                      "variant": "body",
+                      "fontFamily": "inherit",
+                      "fontSize": "16px",
+                      "fontWeight": "400",
+                      "lineHeight": "1.4",
+                      "letterSpacing": "0px",
+                      "color": "inherit",
+                      "textAlign": "left"
+                    }
+                  },
+                  {
+                    "id": "grid-block-ms5nstoj-oxigq-3",
+                    "eyebrow": "03",
+                    "title": "Growth & Optimization",
+                    "meta": "Scale your reach",
+                    "text": "Continuously optimize page speeds, SEO metadata, and conversion paths to maximize your ROI.",
+                    "buttonLabel": "Contact Us",
+                    "buttonUrl": "/",
+                    "typography": {
+                      "variant": "body",
+                      "fontFamily": "inherit",
+                      "fontSize": "16px",
+                      "fontWeight": "400",
+                      "lineHeight": "1.4",
+                      "letterSpacing": "0px",
+                      "color": "inherit",
+                      "textAlign": "left"
+                    }
+                  }
+                ]
+              }
+            ],
+            "rowLayout": "thirds-1-2"
+          },
+          {
+            "id": "layout-row-ms48216v-column-1",
+            "rowId": "layout-row-ms48216v",
+            "rowLayout": "halves",
+            "blocks": [
+              {
+                "id": "text-block-ms48ccy3-lzu33",
+                "kind": "text",
+                "eyebrow": "A better way forward",
+                "title": "Make every interaction clear and useful",
+                "body": "Thoughtful content helps visitors understand your value, find what they need, and take the next step with confidence.",
+                "buttonLabel": "",
+                "buttonUrl": "",
+                "typography": {
+                  "variant": "body",
+                  "fontFamily": "inherit",
+                  "fontSize": "16px",
+                  "fontWeight": "400",
+                  "lineHeight": "1.4",
+                  "letterSpacing": "0px",
+                  "color": "inherit",
+                  "textAlign": "left"
+                },
+                "visualStyle": {
+                  "padding": {
+                    "linked": true,
+                    "top": "md",
+                    "right": "md",
+                    "bottom": "md",
+                    "left": "md"
+                  },
+                  "margin": {
+                    "linked": true,
+                    "top": "inherit",
+                    "right": "inherit",
+                    "bottom": "inherit",
+                    "left": "inherit"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "id": "layout-row-ms48216v-column-2",
+            "rowId": "layout-row-ms48216v",
+            "rowLayout": "halves",
+            "blocks": [],
+            "nestedLayout": {
+              "version": 1,
+              "direction": "vertical",
+              "distribution": "equal",
+              "gap": "inherit",
+              "rows": [
+                {
+                  "id": "nested-row-ms51iki6-1",
+                  "weight": 1,
+                  "layout": "whole",
+                  "columns": [
+                    {
+                      "id": "nested-column-ms51iki6-1",
+                      "rowId": "nested-row-ms51iki6-1",
+                      "rowLayout": "whole",
+                      "blocks": [
+                        {
+                          "id": "panel-block-ms48ecrh-lc40p",
+                          "kind": "panel",
+                          "eyebrow": "DESIGN SYSTEM",
+                          "title": "Maintain brand consistency across all pages",
+                          "body": "Define your global typography, color palettes, and spacing rules once. Our visual builder applies them dynamically to ensure a premium, unified experience.",
+                          "buttonLabel": "See Features",
+                          "buttonUrl": "/",
+                          "imageUrl": "",
+                          "imageAlt": "",
+                          "elementPadding": "md"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "id": "nested-row-ms51iki6-2",
+                  "weight": 1,
+                  "layout": "whole",
+                  "columns": [
+                    {
+                      "id": "nested-column-ms51iki6-2",
+                      "rowId": "nested-row-ms51iki6-2",
+                      "rowLayout": "whole",
+                      "blocks": []
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "id": "layout-row-ms51p7uv-column-1",
+            "rowId": "layout-row-ms51p7uv",
+            "rowLayout": "thirds-1-2",
+            "blocks": [],
+            "nestedLayout": {
+              "version": 1,
+              "direction": "vertical",
+              "distribution": "equal",
+              "gap": "inherit",
+              "rows": [
+                {
+                  "id": "nested-row-ms51pbij-1",
+                  "weight": 1,
+                  "layout": "whole",
+                  "columns": [
+                    {
+                      "id": "nested-column-ms51pbij-1",
+                      "rowId": "nested-row-ms51pbij-1",
+                      "rowLayout": "whole",
+                      "blocks": []
+                    }
+                  ]
+                },
+                {
+                  "id": "nested-row-ms51pbij-2",
+                  "weight": 1,
+                  "layout": "whole",
+                  "columns": [
+                    {
+                      "id": "nested-column-ms51pbij-2",
+                      "rowId": "nested-row-ms51pbij-2",
+                      "rowLayout": "whole",
+                      "blocks": []
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "id": "layout-row-ms51p7uv-column-2",
+            "rowId": "layout-row-ms51p7uv",
+            "rowLayout": "thirds-1-2",
+            "blocks": []
+          },
+          {
+            "id": "layout-row-ms6jtvd3-column-1",
+            "rowId": "layout-row-ms6jtvd3",
+            "blocks": [
+              {
+                "id": "panel-block-ms6jtzyq-774bh",
+                "kind": "panel",
+                "eyebrow": "A more considered approach",
+                "title": "Build a brand experience that feels unmistakably yours",
+                "body": "From the first headline to the smallest interaction, every detail works together to create clarity, confidence, and recognition.",
+                "buttonLabel": "Discover the Process",
+                "buttonUrl": "/",
+                "buttonStyle": "primary",
+                "imageUrl": "/builder-image-placeholder.svg",
+                "imageAlt": "Editorial placeholder for a featured brand story",
+                "imageRatio": "4:5",
+                "imageFit": "cover",
+                "panelStyle": "clean-shadow",
+                "elementPadding": "lg",
+                "typography": {
+                  "eyebrow": {
+                    "variant": "subheading",
+                    "fontSize": "12px",
+                    "fontWeight": "700",
+                    "lineHeight": "1.2",
+                    "letterSpacing": "0.12em",
+                    "textTransform": "uppercase"
+                  },
+                  "title": {
+                    "variant": "heading",
+                    "fontSize": "clamp(28px, 3vw, 46px)",
+                    "fontWeight": "720",
+                    "lineHeight": "1.06",
+                    "letterSpacing": "-0.025em"
+                  },
+                  "body": {
+                    "variant": "body",
+                    "fontSize": "16px",
+                    "fontWeight": "400",
+                    "lineHeight": "1.7"
+                  },
+                  "button": {
+                    "variant": "button",
+                    "fontSize": "14px",
+                    "fontWeight": "700",
+                    "lineHeight": "1",
+                    "letterSpacing": "0.01em"
+                  }
+                },
+                "visualStyle": {
+                  "customClass": "builder-premium-starter",
+                  "card": {
+                    "preset": "elevated",
+                    "hoverPreset": "lift-soft",
+                    "imageRatio": "4:5",
+                    "imageFit": "cover",
+                    "imageRadius": "14px",
+                    "titleSize": "clamp(22px, 2vw, 30px)",
+                    "titleWeight": "720",
+                    "titleMargin": "0",
+                    "metaSize": "11px",
+                    "metaTransform": "uppercase",
+                    "metaSpacing": "0",
+                    "contentSize": "15px",
+                    "contentLineHeight": "1.65",
+                    "buttonMargin": "8px 0 0",
+                    "cardGap": "14px",
+                    "cardPadding": "clamp(20px, 2.4vw, 30px)"
+                  },
+                  "border": {
+                    "radius": "18px"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "id": "layout-item-ms6jtxdq",
+            "rowId": "layout-row-ms6jtvd3",
+            "blocks": []
+          },
+          {
+            "id": "layout-row-ms48id9b-column-1",
+            "rowId": "layout-row-ms48id9b",
+            "rowLayout": "whole",
+            "blocks": [
+              {
+                "id": "products-block-ms48ifqu-wv03s",
+                "kind": "products",
+                "title": "Shop the collection",
+                "source": "all",
+                "layoutVariant": "grid",
+                "columns": 4,
+                "gridLimit": 8,
+                "filterPosition": "left",
+                "cardStyle": "flat",
+                "cardPreset": "standard",
+                "panelStyle": "light",
+                "imageFit": "cover",
+                "imageRatio": "4:5",
+                "imagePadding": "none"
+              }
+            ]
+          },
+          {
+            "id": "layout-row-ms3hn2yx-column-1",
+            "rowId": "layout-row-ms3hn2yx",
+            "rowLayout": "halves",
+            "blocks": [
+              {
+                "id": "hero-block-ms3ui9lo-48hau",
+                "kind": "hero",
+                "eyebrow": "PLATFORM OVERVIEW",
+                "title": "Build beautiful websites without writing code",
+                "body": "Create professional websites using a visual builder designed for speed, flexibility, and pixel-perfect control.",
+                "buttonLabel": "Start Building",
+                "buttonUrl": "/",
+                "buttonStyle": "primary",
+                "buttons": [
+                  {
+                    "id": "hero-block-ms3ui9lo-48hau-secondary-action",
+                    "label": "Explore Templates",
+                    "url": "/",
+                    "target": "_self",
+                    "style": "outline"
+                  }
+                ],
+                "buttonsLayout": "inline",
+                "buttonGap": "0.75rem",
+                "elementAlign": "left",
+                "elementPadding": "lg",
+                "carouselSettings": {
+                  "variant": "default"
+                }
+              }
+            ]
+          },
+          {
+            "id": "layout-row-ms3hnbf4-column-1",
+            "rowId": "layout-row-ms3hnbf4",
+            "rowLayout": "halves",
+            "blocks": [
+              {
+                "id": "panel-block-ms3ui40i-0oz0j",
+                "kind": "panel",
+                "eyebrow": "DESIGN SYSTEM",
+                "title": "Maintain brand consistency across all pages",
+                "body": "Define your global typography, color palettes, and spacing rules once. Our visual builder applies them dynamically to ensure a premium, unified experience.",
+                "buttonLabel": "See Features",
+                "buttonUrl": "/",
+                "imageUrl": "",
+                "imageAlt": "",
+                "elementPadding": "md"
+              }
+            ]
+          },
+          {
+            "id": "layout-row-ms3hnbf4-column-2",
+            "rowId": "layout-row-ms3hnbf4",
+            "rowLayout": "halves",
+            "blocks": [
+              {
+                "id": "image-block-ms3uigd2-w94cg",
+                "kind": "image",
+                "title": "",
+                "body": "",
+                "imageUrl": "/globe.svg",
+                "imageAlt": "Abstract globe illustration",
+                "imageAlignment": "center",
+                "imageMaxWidth": 960,
+                "imageFit": "contain",
+                "imageRatio": "square",
+                "imageCaption": ""
+              }
+            ]
+          },
+          {
+            "id": "layout-row-ms3sa72h-column-1",
+            "rowId": "layout-row-ms3sa72h",
+            "rowLayout": "whole",
+            "blocks": [
+              {
+                "id": "hero-block-ms3t561k-llo0x",
+                "kind": "hero",
+                "eyebrow": "PLATFORM OVERVIEW",
+                "title": "Build beautiful websites without writing code",
+                "body": "Create professional websites using a visual builder designed for speed, flexibility, and pixel-perfect control.",
+                "buttonLabel": "Start Building",
+                "buttonUrl": "/",
+                "buttonStyle": "primary",
+                "buttons": [
+                  {
+                    "id": "hero-block-ms3t561k-llo0x-secondary-action",
+                    "label": "Explore Templates",
+                    "url": "/",
+                    "target": "_self",
+                    "style": "outline"
+                  }
+                ],
+                "buttonsLayout": "inline",
+                "buttonGap": "0.75rem",
+                "elementAlign": "left",
+                "elementPadding": "lg",
+                "carouselSettings": {
+                  "variant": "default"
+                }
+              }
+            ]
+          },
+          {
+            "id": "layout-row-ms3t3hso-column-1",
+            "rowId": "layout-row-ms3t3hso",
+            "rowLayout": "whole",
+            "blocks": [
+              {
+                "id": "text-block-ms3t4ssi-llc9q",
+                "kind": "text",
+                "eyebrow": "A better way forward",
+                "title": "Make every interaction clear and useful",
+                "body": "Thoughtful content helps visitors understand your value, find what they need, and take the next step with confidence.",
+                "buttonLabel": "",
+                "buttonUrl": "",
+                "typography": {
+                  "variant": "body",
+                  "fontFamily": "inherit",
+                  "fontSize": "16px",
+                  "fontWeight": "400",
+                  "lineHeight": "1.4",
+                  "letterSpacing": "0px",
+                  "color": "inherit",
+                  "textAlign": "left"
+                }
+              }
+            ]
+          },
+          {
+            "id": "layout-row-ms3t45ne-column-1",
+            "rowId": "layout-row-ms3t45ne",
+            "rowLayout": "whole",
+            "blocks": [
+              {
+                "id": "panel-block-ms3t4nf2-uypis",
+                "kind": "panel",
+                "eyebrow": "DESIGN SYSTEM",
+                "title": "Maintain brand consistency across all pages",
+                "body": "Define your global typography, color palettes, and spacing rules once. Our visual builder applies them dynamically to ensure a premium, unified experience.",
+                "buttonLabel": "See Features",
+                "buttonUrl": "/",
+                "imageUrl": "",
+                "imageAlt": "",
+                "elementPadding": "md"
+              }
+            ]
+          }
+        ],
+        "layoutRows": 19
+      },
+      {
+        "id": "contentLayout-mrx8tsoh-sb9cq",
+        "kind": "contentLayout",
+        "title": "",
+        "background": "#ffffff",
+        "backgroundMode": "boxed",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "topSpacing": "inherit",
+        "bottomSpacing": "inherit",
+        "topMargin": "inherit",
+        "bottomMargin": "inherit",
+        "pullUnderHeader": false,
+        "visible": true,
+        "eyebrow": "",
+        "body": "",
+        "layout": "whole",
+        "layoutColumns": 1,
+        "layoutItems": [
+          {
+            "id": "layout-item-mrx8tsoh-1",
+            "blocks": [
+              {
+                "id": "grid-block-ms3sxcq9-z9971",
+                "kind": "grid",
+                "title": "Services designed around your goals",
+                "gridSource": "static",
+                "columns": 3,
+                "gridRows": 1,
+                "gridGap": "max",
+                "gridMargin": "inherit",
+                "gridImagePadding": "frameless",
+                "gridContentPadding": "medium",
+                "gridImageFrame": "none",
+                "gridShowImage": true,
+                "gridShowEyebrow": true,
+                "gridShowMeta": true,
+                "gridShowText": true,
+                "gridShowButton": true,
+                "gridItems": [
+                  {
+                    "id": "grid-block-ms3sxcq9-z9971-1",
+                    "eyebrow": "01",
+                    "title": "Strategy & Consultation",
+                    "meta": "Align your objectives",
+                    "text": "Work with our experts to map out your digital product strategy and define key performance indicators.",
+                    "buttonLabel": "View Details",
+                    "buttonUrl": "/",
+                    "typography": {
+                      "variant": "body",
+                      "fontFamily": "inherit",
+                      "fontSize": "16px",
+                      "fontWeight": "400",
+                      "lineHeight": "1.4",
+                      "letterSpacing": "0px",
+                      "color": "inherit",
+                      "textAlign": "left"
+                    }
+                  },
+                  {
+                    "id": "grid-block-ms3sxcq9-z9971-2",
+                    "eyebrow": "02",
+                    "title": "Design & Engineering",
+                    "meta": "High-fidelity execution",
+                    "text": "Create modern, responsive interfaces backed by scalable frontend architectures and design systems.",
+                    "buttonLabel": "See Our Work",
+                    "buttonUrl": "/",
+                    "typography": {
+                      "variant": "body",
+                      "fontFamily": "inherit",
+                      "fontSize": "16px",
+                      "fontWeight": "400",
+                      "lineHeight": "1.4",
+                      "letterSpacing": "0px",
+                      "color": "inherit",
+                      "textAlign": "left"
+                    }
+                  },
+                  {
+                    "id": "grid-block-ms3sxcq9-z9971-3",
+                    "eyebrow": "03",
+                    "title": "Growth & Optimization",
+                    "meta": "Scale your reach",
+                    "text": "Continuously optimize page speeds, SEO metadata, and conversion paths to maximize your ROI.",
+                    "buttonLabel": "Contact Us",
+                    "buttonUrl": "/",
+                    "typography": {
+                      "variant": "body",
+                      "fontFamily": "inherit",
+                      "fontSize": "16px",
+                      "fontWeight": "400",
+                      "lineHeight": "1.4",
+                      "letterSpacing": "0px",
+                      "color": "inherit",
+                      "textAlign": "left"
+                    }
+                  }
+                ],
+                "visualStyle": {
+                  "card": {
+                    "preset": "dark"
+                  },
+                  "padding": {
+                    "linked": true,
+                    "top": "sm",
+                    "right": "sm",
+                    "bottom": "sm",
+                    "left": "sm"
+                  },
+                  "margin": {
+                    "linked": true,
+                    "top": "sm",
+                    "right": "sm",
+                    "bottom": "sm",
+                    "left": "sm"
+                  }
+                }
+              }
+            ]
+          }
+        ],
+        "layoutRows": 1
+      },
+      {
+        "id": "contentLayout-ms3hjz7h-bv63s",
+        "kind": "contentLayout",
+        "title": "",
+        "background": "#ffffff",
+        "backgroundMode": "boxed",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "topSpacing": "inherit",
+        "bottomSpacing": "inherit",
+        "topMargin": "inherit",
+        "bottomMargin": "inherit",
+        "pullUnderHeader": false,
+        "visible": true,
+        "eyebrow": "",
+        "body": "",
+        "layoutColumns": 3,
+        "layoutItems": [
+          {
+            "id": "layout-item-ms3hjz7h-1",
+            "blocks": [
+              {
+                "id": "categoryFilters-block-ms3s6298-oo9wh",
+                "kind": "categoryFilters",
+                "title": "Browse by category",
+                "body": "Help customers narrow the collection and find the right products faster."
+              }
+            ]
+          },
+          {
+            "id": "layout-item-2",
+            "blocks": []
+          },
+          {
+            "id": "layout-row-ms3hl8rj-column-1",
+            "rowId": "layout-row-ms3hl8rj",
+            "rowLayout": "halves",
+            "blocks": []
+          },
+          {
+            "id": "layout-row-ms3hl8rj-column-2",
+            "rowId": "layout-row-ms3hl8rj",
+            "rowLayout": "halves",
+            "blocks": []
+          },
+          {
+            "id": "layout-row-ms3hkzab-column-1",
+            "rowId": "layout-row-ms3hkzab",
+            "rowLayout": "halves",
+            "blocks": []
+          },
+          {
+            "id": "layout-row-ms3hkzab-column-2",
+            "rowId": "layout-row-ms3hkzab",
+            "rowLayout": "halves",
+            "blocks": []
+          },
+          {
+            "id": "layout-row-ms3ju0kl-column-1",
+            "rowId": "layout-row-ms3ju0kl",
+            "rowLayout": "halves",
+            "blocks": []
+          },
+          {
+            "id": "layout-row-ms3ju0kl-column-2",
+            "rowId": "layout-row-ms3ju0kl",
+            "rowLayout": "halves",
+            "blocks": []
+          },
+          {
+            "id": "layout-row-ms5urr88-column-1",
+            "rowId": "layout-row-ms5urr88",
+            "blocks": [],
+            "nestedLayout": {
+              "version": 1,
+              "direction": "vertical",
+              "distribution": "equal",
+              "gap": "inherit",
+              "rows": [
+                {
+                  "id": "nested-row-ms5uvhi3-1",
+                  "weight": 1,
+                  "layout": "whole",
+                  "columns": [
+                    {
+                      "id": "nested-column-ms5uvhi3-1",
+                      "rowId": "nested-row-ms5uvhi3-1",
+                      "rowLayout": "whole",
+                      "blocks": []
+                    }
+                  ]
+                },
+                {
+                  "id": "nested-row-ms5uwcln",
+                  "weight": 1,
+                  "layout": "whole",
+                  "columns": [
+                    {
+                      "id": "nested-column-ms5uwcln",
+                      "rowId": "nested-row-ms5uwcln",
+                      "rowLayout": "whole",
+                      "blocks": []
+                    }
+                  ]
+                },
+                {
+                  "id": "nested-row-ms5uvhi3-2",
+                  "weight": 1,
+                  "layout": "whole",
+                  "columns": [
+                    {
+                      "id": "nested-column-ms5uvhi3-2",
+                      "rowId": "nested-row-ms5uvhi3-2",
+                      "rowLayout": "whole",
+                      "blocks": []
+                    }
+                  ]
+                },
+                {
+                  "id": "nested-row-ms5uvsbt",
+                  "weight": 1,
+                  "layout": "whole",
+                  "columns": [
+                    {
+                      "id": "nested-column-ms5uvsbt",
+                      "rowId": "nested-row-ms5uvsbt",
+                      "rowLayout": "whole",
+                      "blocks": []
+                    }
+                  ]
+                },
+                {
+                  "id": "nested-row-ms5uviwf",
+                  "weight": 1,
+                  "layout": "whole",
+                  "columns": [
+                    {
+                      "id": "nested-column-ms5uviwf",
+                      "rowId": "nested-row-ms5uviwf",
+                      "rowLayout": "whole",
+                      "blocks": []
+                    }
+                  ]
+                },
+                {
+                  "id": "nested-row-ms5uvmfq",
+                  "weight": 1,
+                  "layout": "whole",
+                  "columns": [
+                    {
+                      "id": "nested-column-ms5uvmfq",
+                      "rowId": "nested-row-ms5uvmfq",
+                      "rowLayout": "whole",
+                      "blocks": []
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "id": "layout-item-ms5uvpwc",
+            "rowId": "layout-row-ms5urr88",
+            "blocks": []
+          },
+          {
+            "id": "layout-row-ms5urr88-column-2",
+            "rowId": "layout-row-ms5urr88",
+            "blocks": []
+          },
+          {
+            "id": "layout-row-ms3ju3h4-column-1",
+            "rowId": "layout-row-ms3ju3h4",
+            "rowLayout": "thirds",
+            "blocks": [
+              {
+                "id": "text-block-ms3sqssx-w96zx",
+                "kind": "text",
+                "eyebrow": "A better way forward",
+                "title": "Make every interaction clear and useful",
+                "body": "Thoughtful content helps visitors understand your value, find what they need, and take the next step with confidence.",
+                "buttonLabel": "",
+                "buttonUrl": "",
+                "typography": {
+                  "variant": "body",
+                  "fontFamily": "inherit",
+                  "fontSize": "16px",
+                  "fontWeight": "400",
+                  "lineHeight": "1.4",
+                  "letterSpacing": "0px",
+                  "color": "inherit",
+                  "textAlign": "left"
+                }
+              }
+            ]
+          },
+          {
+            "id": "layout-row-ms3ju3h4-column-2",
+            "rowId": "layout-row-ms3ju3h4",
+            "rowLayout": "thirds",
+            "blocks": []
+          },
+          {
+            "id": "layout-row-ms3ju3h4-column-3",
+            "rowId": "layout-row-ms3ju3h4",
+            "rowLayout": "thirds",
+            "blocks": [
+              {
+                "id": "panel-block-ms3stxi0-7f1h2",
+                "kind": "panel",
+                "eyebrow": "DESIGN SYSTEM",
+                "title": "Maintain brand consistency across all pages",
+                "body": "Define your global typography, color palettes, and spacing rules once. Our visual builder applies them dynamically to ensure a premium, unified experience.",
+                "buttonLabel": "See Features",
+                "buttonUrl": "/",
+                "imageUrl": "",
+                "imageAlt": "",
+                "elementPadding": "md"
+              }
+            ]
+          },
+          {
+            "id": "layout-row-ms3kb432-column-1",
+            "rowId": "layout-row-ms3kb432",
+            "rowLayout": "halves",
+            "blocks": [
+              {
+                "id": "text-block-ms3sq3n0-vg7bf",
+                "kind": "text",
+                "eyebrow": "A better way forward",
+                "title": "Make every interaction clear and useful",
+                "body": "Thoughtful content helps visitors understand your value, find what they need, and take the next step with confidence.",
+                "buttonLabel": "",
+                "buttonUrl": "",
+                "typography": {
+                  "variant": "body",
+                  "fontFamily": "inherit",
+                  "fontSize": "16px",
+                  "fontWeight": "400",
+                  "lineHeight": "1.4",
+                  "letterSpacing": "0px",
+                  "color": "inherit",
+                  "textAlign": "left"
+                }
+              }
+            ]
+          },
+          {
+            "id": "layout-row-ms3kb432-column-2",
+            "rowId": "layout-row-ms3kb432",
+            "rowLayout": "halves",
+            "blocks": []
+          },
+          {
+            "id": "layout-row-ms3s5pv5-column-1",
+            "rowId": "layout-row-ms3s5pv5",
+            "rowLayout": "halves",
+            "blocks": [
+              {
+                "id": "text-block-ms3s6790-co5a3",
+                "kind": "text",
+                "eyebrow": "A better way forward",
+                "title": "Make every interaction clear and useful",
+                "body": "Thoughtful content helps visitors understand your value, find what they need, and take the next step with confidence.",
+                "buttonLabel": "",
+                "buttonUrl": "",
+                "typography": {
+                  "variant": "body",
+                  "fontFamily": "inherit",
+                  "fontSize": "16px",
+                  "fontWeight": "400",
+                  "lineHeight": "1.4",
+                  "letterSpacing": "0px",
+                  "color": "inherit",
+                  "textAlign": "left"
+                },
+                "visualStyle": {
+                  "padding": {
+                    "linked": true,
+                    "top": "md",
+                    "right": "md",
+                    "bottom": "md",
+                    "left": "md"
+                  },
+                  "margin": {
+                    "linked": true,
+                    "top": "sm",
+                    "right": "sm",
+                    "bottom": "sm",
+                    "left": "sm"
+                  }
+                }
+              },
+              {
+                "id": "text-block-ms3s8qyb-e5cfk",
+                "kind": "text",
+                "eyebrow": "A better way forward",
+                "title": "Make every interaction clear and useful",
+                "body": "Thoughtful content helps visitors understand your value, find what they need, and take the next step with confidence.",
+                "buttonLabel": "",
+                "buttonUrl": "",
+                "typography": {
+                  "variant": "body",
+                  "fontFamily": "inherit",
+                  "fontSize": "16px",
+                  "fontWeight": "400",
+                  "lineHeight": "1.4",
+                  "letterSpacing": "0px",
+                  "color": "inherit",
+                  "textAlign": "left"
+                }
+              }
+            ]
+          },
+          {
+            "id": "layout-row-ms3s5pv5-column-2",
+            "rowId": "layout-row-ms3s5pv5",
+            "rowLayout": "halves",
+            "blocks": [
+              {
+                "id": "hero-block-ms3sblmd-nidji",
+                "kind": "hero",
+                "eyebrow": "PLATFORM OVERVIEW",
+                "title": "Build beautiful websites without writing code",
+                "body": "Create professional websites using a visual builder designed for speed, flexibility, and pixel-perfect control.",
+                "buttonLabel": "Start Building",
+                "buttonUrl": "/",
+                "buttonStyle": "primary",
+                "buttons": [
+                  {
+                    "id": "hero-block-ms3sblmd-nidji-secondary-action",
+                    "label": "Explore Templates",
+                    "url": "/",
+                    "target": "_self",
+                    "style": "outline"
+                  }
+                ],
+                "buttonsLayout": "inline",
+                "buttonGap": "0.75rem",
+                "elementAlign": "left",
+                "elementPadding": "lg",
+                "carouselSettings": {
+                  "variant": "default"
+                }
+              }
+            ]
+          }
+        ],
+        "layoutRows": 8
       },
       {
         "id": "contentLayout-mq02cfbq-x0edv",
@@ -908,7 +3183,7 @@
         ]
       }
     ],
-    "updatedAt": "2026-06-04T22:26:06.225Z"
+    "updatedAt": "2026-07-30T07:03:04.069Z"
   },
   "shop": {
     "version": 1,
@@ -961,17 +3236,89 @@
         "layoutItems": [
           {
             "id": "layout-item-mpnqitz6-1",
-            "blocks": [
-              {
-                "id": "categoryFilters-block-mpnqivv5-dxr9u",
-                "kind": "categoryFilters",
-                "title": "Category Filters",
-                "body": "Dynamic WooCommerce category pills.",
-                "hiddenCategorySlugs": [
-                  "uncategorized"
-                ]
-              }
-            ]
+            "blocks": [],
+            "nestedLayout": {
+              "version": 1,
+              "direction": "vertical",
+              "distribution": "equal",
+              "gap": "inherit",
+              "rows": [
+                {
+                  "id": "nested-row-ms735vex-1",
+                  "weight": 1,
+                  "layout": "whole",
+                  "columns": [
+                    {
+                      "id": "nested-column-ms735vex-1",
+                      "rowId": "nested-row-ms735vex-1",
+                      "rowLayout": "whole",
+                      "blocks": [
+                        {
+                          "id": "categoryFilters-block-mpnqivv5-dxr9u",
+                          "kind": "categoryFilters",
+                          "title": "Category Filters",
+                          "body": "Dynamic WooCommerce category pills.",
+                          "hiddenCategorySlugs": [
+                            "uncategorized"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "id": "nested-row-ms735vex-2",
+                  "weight": 1,
+                  "layout": "whole",
+                  "columns": [
+                    {
+                      "id": "nested-column-ms735vex-2",
+                      "rowId": "nested-row-ms735vex-2",
+                      "rowLayout": "whole",
+                      "blocks": [
+                        {
+                          "id": "breadcrumbs-block-ms735y1b-jo9yp",
+                          "kind": "breadcrumbs",
+                          "title": "You are here",
+                          "body": "A clear navigation path helps visitors understand where they are and move back easily.",
+                          "elementPadding": "xs",
+                          "typography": {
+                            "eyebrow": {
+                              "variant": "subheading",
+                              "fontSize": "12px",
+                              "fontWeight": "700",
+                              "lineHeight": "1.2",
+                              "letterSpacing": "0.12em",
+                              "textTransform": "uppercase"
+                            },
+                            "title": {
+                              "variant": "heading",
+                              "fontSize": "clamp(28px, 3vw, 46px)",
+                              "fontWeight": "720",
+                              "lineHeight": "1.06",
+                              "letterSpacing": "-0.025em"
+                            },
+                            "body": {
+                              "variant": "body",
+                              "fontSize": "16px",
+                              "fontWeight": "400",
+                              "lineHeight": "1.7"
+                            },
+                            "button": {
+                              "variant": "button",
+                              "fontSize": "14px",
+                              "fontWeight": "700",
+                              "lineHeight": "1",
+                              "letterSpacing": "0.01em"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
           }
         ],
         "layoutRows": 1
@@ -1012,9 +3359,21 @@
                 "cardPadding": "none"
               }
             ]
+          },
+          {
+            "id": "layout-row-ms3hzkuf-column-1",
+            "rowId": "layout-row-ms3hzkuf",
+            "rowLayout": "halves",
+            "blocks": []
+          },
+          {
+            "id": "layout-row-ms3hzkuf-column-2",
+            "rowId": "layout-row-ms3hzkuf",
+            "rowLayout": "halves",
+            "blocks": []
           }
         ],
-        "layoutRows": 1
+        "layoutRows": 2
       },
       {
         "id": "contentLayout-mpnqb6ry-onf5w",
@@ -1057,7 +3416,7 @@
         "layoutRows": 1
       }
     ],
-    "updatedAt": "2026-06-02T15:10:40.626Z"
+    "updatedAt": "2026-07-30T05:41:37.141Z"
   },
   "client": {
     "version": 1,
@@ -1367,9 +3726,82 @@
       "headingFontFamily": "inherit",
       "headingSize": "clamp(42px, 8vw, 126px)",
       "headingWeight": "760",
-      "headingLineHeight": "0.92"
+      "headingLineHeight": "0.92",
+      "cardBg": "#efefe9",
+      "cardRadius": "8px",
+      "cardBorder": "transparent",
+      "cardShadow": "0 12px 30px rgba(17,17,17,0.06)",
+      "cardShadowHover": "0 18px 42px rgba(17,17,17,0.1)",
+      "cardImageBg": "#ffffff",
+      "cardImagePadding": "clamp(22px, 2.4vw, 36px)"
     },
     "sections": [
+      {
+        "id": "contentLayout-ms7371xc-w6cef",
+        "kind": "contentLayout",
+        "title": "",
+        "background": "#ffffff",
+        "backgroundMode": "boxed",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "topSpacing": "inherit",
+        "bottomSpacing": "inherit",
+        "topMargin": "inherit",
+        "bottomMargin": "inherit",
+        "pullUnderHeader": false,
+        "visible": true,
+        "eyebrow": "",
+        "body": "",
+        "layout": "whole",
+        "layoutColumns": 1,
+        "layoutItems": [
+          {
+            "id": "layout-row-ms7371xc-1-column-1",
+            "rowId": "layout-row-ms7371xc-1",
+            "rowLayout": "whole",
+            "blocks": [
+              {
+                "id": "breadcrumbs-block-ms73770q-mh17r",
+                "kind": "breadcrumbs",
+                "title": "You are here",
+                "body": "A clear navigation path helps visitors understand where they are and move back easily.",
+                "elementPadding": "xs",
+                "typography": {
+                  "eyebrow": {
+                    "variant": "subheading",
+                    "fontSize": "12px",
+                    "fontWeight": "700",
+                    "lineHeight": "1.2",
+                    "letterSpacing": "0.12em",
+                    "textTransform": "uppercase"
+                  },
+                  "title": {
+                    "variant": "heading",
+                    "fontSize": "clamp(28px, 3vw, 46px)",
+                    "fontWeight": "720",
+                    "lineHeight": "1.06",
+                    "letterSpacing": "-0.025em"
+                  },
+                  "body": {
+                    "variant": "body",
+                    "fontSize": "16px",
+                    "fontWeight": "400",
+                    "lineHeight": "1.7"
+                  },
+                  "button": {
+                    "variant": "button",
+                    "fontSize": "14px",
+                    "fontWeight": "700",
+                    "lineHeight": "1",
+                    "letterSpacing": "0.01em"
+                  }
+                }
+              }
+            ]
+          }
+        ],
+        "layoutRows": 1
+      },
       {
         "id": "template-product-layout",
         "kind": "contentLayout",
@@ -1445,7 +3877,7 @@
         "visible": true
       }
     ],
-    "updatedAt": "2026-05-18T05:10:17.093Z"
+    "updatedAt": "2026-07-30T05:42:35.968Z"
   },
   "page:home-2": {
     "version": 1,
@@ -2792,7 +5224,7 @@
         "kind": "contentLayout",
         "title": "Header",
         "headerUtilityMigrationVersion": 3,
-        "background": "#f0ece5",
+        "background": "transparent",
         "backgroundMode": "full",
         "contentMode": "boxed",
         "colorScheme": "inherit",
@@ -2825,7 +5257,7 @@
                 "kind": "menu",
                 "title": "Navigation",
                 "menuSource": "main",
-                "menuActiveIndicator": "underline"
+                "menuActiveIndicator": "princity"
               }
             ]
           },
@@ -2845,6 +5277,18 @@
                 "kind": "headerCart",
                 "headerUtilityAction": "cart",
                 "headerUtilityVariant": "muted"
+              },
+              {
+                "id": "header-utility-theme",
+                "kind": "headerTheme",
+                "headerUtilityAction": "theme",
+                "headerUtilityVariant": "muted"
+              },
+              {
+                "id": "header-utility-account",
+                "kind": "headerAccount",
+                "headerUtilityAction": "account",
+                "headerUtilityVariant": "muted"
               }
             ]
           }
@@ -2853,8 +5297,8 @@
         "headerArchitectureVersion": 2,
         "headerVisible": true,
         "headerTransparent": true,
-        "headerOverlay": false,
-        "headerLayout": "simple",
+        "headerOverlay": true,
+        "headerLayout": "princity",
         "headerBehavior": "pill-on-scroll",
         "headerWidthMode": "boxed",
         "headerBackgroundMode": "glass",
@@ -2866,13 +5310,13 @@
         "headerTopToolbarMeta": "AMD ֏",
         "headerHeight": "compact",
         "headerCustomHeight": 40,
-        "topSpacing": "sm",
-        "bottomSpacing": "sm",
+        "topSpacing": "xs",
+        "bottomSpacing": "xs",
         "topMargin": "xs",
         "bottomMargin": "xs"
       }
     ],
-    "updatedAt": "2026-07-22T19:03:17.302Z"
+    "updatedAt": "2026-07-23T08:58:08.773Z"
   },
   "footer": {
     "version": 1,

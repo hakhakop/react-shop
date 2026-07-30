@@ -1,5 +1,320 @@
 [
   {
+    "id": "swiper-carousel-ms76okex-t0os",
+    "title": "Swiper / Carousel",
+    "templateType": "element",
+    "description": "Element template saved from Home",
+    "sourcePage": "home",
+    "sections": [
+      {
+        "id": "contentLayout-ms76okea-y2awa",
+        "kind": "contentLayout",
+        "title": "Swiper / Carousel",
+        "background": "#ffffff",
+        "backgroundMode": "boxed",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "topSpacing": "inherit",
+        "bottomSpacing": "inherit",
+        "topMargin": "inherit",
+        "bottomMargin": "inherit",
+        "pullUnderHeader": false,
+        "visible": true,
+        "eyebrow": "",
+        "body": "",
+        "layout": "whole",
+        "layoutColumns": 1,
+        "layoutItems": [
+          {
+            "id": "layout-item-ms76okea-template-element",
+            "rowId": "layout-row-ms76okea-1",
+            "rowLayout": "whole",
+            "blocks": [
+              {
+                "id": "slider-block-ms76okea-i9ydc",
+                "kind": "slider",
+                "title": "Explore what makes the difference",
+                "body": "Use a clear visual sequence to introduce services, benefits, projects, or important ideas.",
+                "slides": [
+                  {
+                    "id": "slider-block-ms76mesj-zxvq8-slide-1",
+                    "badge": "01",
+                    "title": "A point of view, made visible",
+                    "text": "Translate the character of the business into a visual direction that feels confident, relevant, and recognizably yours.",
+                    "imageUrl": "/builder-image-placeholder.svg",
+                    "imageAlt": "Editorial placeholder illustrating a distinctive creative direction",
+                    "imagePadding": "medium"
+                  },
+                  {
+                    "id": "slider-block-ms76mesj-zxvq8-slide-2",
+                    "badge": "02",
+                    "title": "A journey designed around people",
+                    "text": "Give every visitor a clear sense of where they are, what matters, and the most useful action to take next.",
+                    "imageUrl": "/builder-image-placeholder.svg",
+                    "imageAlt": "Editorial placeholder illustrating a clear customer journey",
+                    "imagePadding": "medium"
+                  },
+                  {
+                    "id": "slider-block-ms76mesj-zxvq8-slide-3",
+                    "badge": "03",
+                    "title": "A system ready to evolve",
+                    "text": "Create flexible foundations that keep the experience consistent as new stories, services, and ambitions are added.",
+                    "imageUrl": "/builder-image-placeholder.svg",
+                    "imageAlt": "Editorial placeholder illustrating a flexible design system",
+                    "imagePadding": "medium"
+                  }
+                ],
+                "carouselSettings": {
+                  "variant": "creative",
+                  "loop": true,
+                  "autoplay": false,
+                  "autoplayDelayMs": 5000,
+                  "align": "start",
+                  "dragFree": false,
+                  "effect": "slide",
+                  "spaceBetween": 24,
+                  "coverflowRotate": 34,
+                  "coverflowDepth": 140,
+                  "coverflowStretch": 0,
+                  "cardsRotate": true,
+                  "cardsShadows": true,
+                  "creativePreset": "soft-stack",
+                  "fadeCrossFade": true,
+                  "freeModeMomentum": true,
+                  "cardsPerView": 1,
+                  "showArrows": true,
+                  "showDots": true,
+                  "pauseOnHover": true
+                },
+                "elementPadding": "sm",
+                "typography": {
+                  "eyebrow": {
+                    "variant": "subheading",
+                    "fontSize": "12px",
+                    "fontWeight": "700",
+                    "lineHeight": "1.2",
+                    "letterSpacing": "0.12em",
+                    "textTransform": "uppercase"
+                  },
+                  "title": {
+                    "variant": "heading",
+                    "fontSize": "clamp(28px, 3vw, 46px)",
+                    "fontWeight": "720",
+                    "lineHeight": "1.06",
+                    "letterSpacing": "-0.025em"
+                  },
+                  "body": {
+                    "variant": "body",
+                    "fontSize": "16px",
+                    "fontWeight": "400",
+                    "lineHeight": "1.7"
+                  },
+                  "button": {
+                    "variant": "button",
+                    "fontSize": "14px",
+                    "fontWeight": "700",
+                    "lineHeight": "1",
+                    "letterSpacing": "0.01em"
+                  }
+                },
+                "visualStyle": {
+                  "customClass": "builder-premium-starter",
+                  "card": {
+                    "preset": "elevated",
+                    "hoverPreset": "lift-soft",
+                    "imageRatio": "4:5",
+                    "imageFit": "cover",
+                    "imageRadius": "14px",
+                    "titleSize": "clamp(22px, 2vw, 30px)",
+                    "titleWeight": "720",
+                    "titleMargin": "0",
+                    "metaSize": "11px",
+                    "metaTransform": "uppercase",
+                    "metaSpacing": "0",
+                    "contentSize": "15px",
+                    "contentLineHeight": "1.65",
+                    "buttonMargin": "8px 0 0",
+                    "cardGap": "14px",
+                    "cardPadding": "clamp(20px, 2.4vw, 30px)"
+                  },
+                  "border": {
+                    "radius": "18px"
+                  }
+                }
+              }
+            ]
+          }
+        ],
+        "layoutRows": 1
+      }
+    ],
+    "updatedAt": "2026-07-30T07:20:02.649Z"
+  },
+  {
+    "id": "grid-ms720gzk-m2vi",
+    "title": "Grid",
+    "templateType": "element",
+    "description": "Element template saved from Home",
+    "sourcePage": "home",
+    "sections": [
+      {
+        "id": "contentLayout-ms720gyv-fqxan",
+        "kind": "contentLayout",
+        "title": "Grid",
+        "background": "#ffffff",
+        "backgroundMode": "boxed",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "topSpacing": "inherit",
+        "bottomSpacing": "inherit",
+        "topMargin": "inherit",
+        "bottomMargin": "inherit",
+        "pullUnderHeader": false,
+        "visible": true,
+        "eyebrow": "",
+        "body": "",
+        "layout": "whole",
+        "layoutColumns": 1,
+        "layoutItems": [
+          {
+            "id": "layout-item-ms720gyv-template-element",
+            "rowId": "layout-row-ms720gyu-1",
+            "rowLayout": "whole",
+            "blocks": [
+              {
+                "id": "grid-block-ms720gyv-gbfbm",
+                "kind": "grid",
+                "title": "Services designed around your goals",
+                "gridSource": "static",
+                "columns": 3,
+                "gridRows": 1,
+                "gridGap": "large",
+                "gridMargin": "inherit",
+                "gridImagePadding": "frameless",
+                "gridContentPadding": "medium",
+                "gridImageFrame": "none",
+                "gridShowImage": true,
+                "gridShowEyebrow": true,
+                "gridShowMeta": true,
+                "gridShowText": true,
+                "gridShowButton": true,
+                "gridItems": [
+                  {
+                    "id": "grid-block-ms6jm0t6-9jieu-1",
+                    "eyebrow": "01",
+                    "title": "Strategy with a practical point of view",
+                    "meta": "Clarity before complexity",
+                    "text": "Define the audience, message, and priorities that will make every design decision easier.",
+                    "buttonLabel": "Explore Strategy",
+                    "buttonUrl": "/",
+                    "imageUrl": "/builder-image-placeholder.svg",
+                    "imageAlt": "Warm architectural forms representing strategic planning"
+                  },
+                  {
+                    "id": "grid-block-ms6jm0t6-9jieu-2",
+                    "eyebrow": "02",
+                    "title": "Design that feels distinctive and effortless",
+                    "meta": "Made for real people",
+                    "text": "Shape a responsive experience with a strong visual rhythm and thoughtful interactions.",
+                    "buttonLabel": "View Selected Work",
+                    "buttonUrl": "/",
+                    "imageUrl": "/builder-image-placeholder.svg",
+                    "imageAlt": "Editorial composition representing interface design"
+                  },
+                  {
+                    "id": "grid-block-ms6jm0t6-9jieu-3",
+                    "eyebrow": "03",
+                    "title": "A foundation designed to keep improving",
+                    "meta": "Built beyond launch",
+                    "text": "Measure what matters, refine the journey, and evolve the site as the business grows.",
+                    "buttonLabel": "Discuss Your Goals",
+                    "buttonUrl": "/",
+                    "imageUrl": "/builder-image-placeholder.svg",
+                    "imageAlt": "Abstract rising forms representing sustainable growth"
+                  },
+                  {
+                    "id": "grid-ms720dj5",
+                    "eyebrow": "03",
+                    "title": "A foundation designed to keep improving",
+                    "meta": "Built beyond launch",
+                    "text": "Measure what matters, refine the journey, and evolve the site as the business grows.",
+                    "buttonLabel": "Discuss Your Goals",
+                    "buttonUrl": "/",
+                    "imageUrl": "/builder-image-placeholder.svg",
+                    "imageAlt": "Abstract rising forms representing sustainable growth"
+                  }
+                ],
+                "typography": {
+                  "eyebrow": {
+                    "variant": "subheading",
+                    "fontSize": "12px",
+                    "fontWeight": "700",
+                    "lineHeight": "1.2",
+                    "letterSpacing": "0.12em",
+                    "textTransform": "uppercase"
+                  },
+                  "title": {
+                    "variant": "heading",
+                    "fontSize": "clamp(28px, 3vw, 46px)",
+                    "fontWeight": "720",
+                    "lineHeight": "1.06",
+                    "letterSpacing": "-0.025em"
+                  },
+                  "body": {
+                    "variant": "body",
+                    "fontSize": "16px",
+                    "fontWeight": "400",
+                    "lineHeight": "1.7"
+                  },
+                  "button": {
+                    "variant": "button",
+                    "fontSize": "14px",
+                    "fontWeight": "700",
+                    "lineHeight": "1",
+                    "letterSpacing": "0.01em"
+                  }
+                },
+                "visualStyle": {
+                  "customClass": "builder-premium-starter",
+                  "card": {
+                    "preset": "elevated",
+                    "hoverPreset": "lift-soft",
+                    "imageRatio": "4:5",
+                    "imageFit": "cover",
+                    "imageRadius": "14px",
+                    "titleSize": "clamp(22px, 2vw, 30px)",
+                    "titleWeight": "720",
+                    "titleMargin": "0",
+                    "metaSize": "11px",
+                    "metaTransform": "uppercase",
+                    "metaSpacing": "0",
+                    "contentSize": "15px",
+                    "contentLineHeight": "1.65",
+                    "buttonMargin": "8px 0 0",
+                    "cardGap": "14px",
+                    "cardPadding": "clamp(20px, 2.4vw, 30px)"
+                  },
+                  "border": {
+                    "radius": "18px"
+                  },
+                  "margin": {
+                    "linked": true,
+                    "top": "xs",
+                    "right": "xs",
+                    "bottom": "xs",
+                    "left": "xs"
+                  }
+                }
+              }
+            ]
+          }
+        ],
+        "layoutRows": 1
+      }
+    ],
+    "updatedAt": "2026-07-30T05:09:20.000Z"
+  },
+  {
     "id": "hero-ms03j2rp-f2uh",
     "title": "Hero",
     "templateType": "element",

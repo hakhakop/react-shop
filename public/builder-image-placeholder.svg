@@ -1,0 +1,57 @@
+<svg width="800" height="520" viewBox="0 0 800 520" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="800" y2="520" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#F2F4F8"/>
+      <stop offset="100%" stop-color="#EAEEF4"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Base background -->
+  <rect width="800" height="520" rx="16" fill="url(#bgGrad)"/>
+
+  <!-- Organic corner glow blobs -->
+  <circle cx="760" cy="40" r="230" fill="#FFFFFF" fill-opacity="0.5"/>
+  <circle cx="40" cy="480" r="220" fill="#FFFFFF" fill-opacity="0.45"/>
+
+  <!-- Outer dashed frame -->
+  <rect x="24" y="24" width="752" height="472" rx="18" fill="none" stroke="#CBD5E1" stroke-width="2" stroke-dasharray="6 6"/>
+
+  <!-- Top-left 5x3 dot array -->
+  <g fill="#BCC6D5">
+    <circle cx="56" cy="56" r="2.2"/><circle cx="70" cy="56" r="2.2"/><circle cx="84" cy="56" r="2.2"/><circle cx="98" cy="56" r="2.2"/><circle cx="112" cy="56" r="2.2"/>
+    <circle cx="56" cy="70" r="2.2"/><circle cx="70" cy="70" r="2.2"/><circle cx="84" cy="70" r="2.2"/><circle cx="98" cy="70" r="2.2"/><circle cx="112" cy="70" r="2.2"/>
+    <circle cx="56" cy="84" r="2.2"/><circle cx="70" cy="84" r="2.2"/><circle cx="84" cy="84" r="2.2"/><circle cx="98" cy="84" r="2.2"/><circle cx="112" cy="84" r="2.2"/>
+  </g>
+
+  <!-- Bottom-right 5x3 dot array -->
+  <g fill="#BCC6D5">
+    <circle cx="688" cy="436" r="2.2"/><circle cx="702" cy="436" r="2.2"/><circle cx="716" cy="436" r="2.2"/><circle cx="730" cy="436" r="2.2"/><circle cx="744" cy="436" r="2.2"/>
+    <circle cx="688" cy="450" r="2.2"/><circle cx="702" cy="450" r="2.2"/><circle cx="716" cy="450" r="2.2"/><circle cx="730" cy="450" r="2.2"/><circle cx="744" cy="450" r="2.2"/>
+    <circle cx="688" cy="464" r="2.2"/><circle cx="702" cy="464" r="2.2"/><circle cx="716" cy="464" r="2.2"/><circle cx="730" cy="464" r="2.2"/><circle cx="744" cy="464" r="2.2"/>
+  </g>
+
+  <!-- Center Image Graphic Container -->
+  <g transform="translate(325, 120)">
+    <!-- Frame -->
+    <rect width="150" height="110" rx="16" fill="none" stroke="#B8C3D2" stroke-width="4.5"/>
+    <!-- Sun -->
+    <circle cx="112" cy="38" r="13" fill="#B8C3D2"/>
+    <!-- Mountain Peaks -->
+    <path d="M 10 96 L 56 46 C 59 43 65 43 68 46 L 104 86 L 114 74 C 117 71 123 71 126 74 L 140 96 Z" fill="#B8C3D2"/>
+  </g>
+
+  <!-- Title -->
+  <text x="400" y="278" text-anchor="middle" fill="#334155" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="22" font-weight="600">Select an image</text>
+
+  <!-- Subtitle -->
+  <text x="400" y="312" text-anchor="middle" fill="#64748B" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="14" font-weight="400">Drag and drop, upload, or choose from your media library</text>
+
+  <!-- Action Button -->
+  <g transform="translate(320, 345)">
+    <rect width="160" height="42" rx="10" fill="#374151"/>
+    <!-- Upload Icon -->
+    <path d="M66 27V29C66 30.1 66.9 31 68 31H92C93.1 31 94 30.1 94 29V27M80 15V26M80 15L74 21M80 15L86 21" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- Button Text -->
+    <text x="101" y="26" text-anchor="start" fill="#FFFFFF" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="14" font-weight="500">Choose Image</text>
+  </g>
+</svg>

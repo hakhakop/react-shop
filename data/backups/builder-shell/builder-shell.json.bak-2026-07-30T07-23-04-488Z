@@ -39,10 +39,10 @@
   "rowMarginBottom": "md",
   "rowGap": "sm",
   "columnGap": "md",
-  "elementPaddingTop": "xs",
-  "elementPaddingRight": "xs",
-  "elementPaddingBottom": "xs",
-  "elementPaddingLeft": "xs",
+  "elementPaddingTop": "md",
+  "elementPaddingRight": "md",
+  "elementPaddingBottom": "md",
+  "elementPaddingLeft": "md",
   "elementMarginTop": "xs",
   "elementMarginRight": "xs",
   "elementMarginBottom": "xs",
@@ -171,6 +171,6 @@
     }
   ],
   "headerSticky": true,
-  "updatedAt": "2026-07-22T17:56:34.717Z",
+  "updatedAt": "2026-07-30T07:19:06.153Z",
   "headerCustomHeight": 92
 }

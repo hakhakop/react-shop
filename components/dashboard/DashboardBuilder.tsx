@@ -40,6 +40,7 @@ import {
   Truck,
   UserRound,
   Trash2,
+  Upload,
   X,
   Sun,
   Moon,
@@ -5448,6 +5449,25 @@ export default function DashboardBuilder({
     });
   };
 
+  const pickBlockImage = (
+    sectionId: string,
+    columnKey: string,
+    blockKey: string,
+    currentUrl?: string,
+  ) => {
+    openWordPressMediaPicker({
+      title: "Choose image",
+      currentUrl,
+      onSelect: (media) => {
+        updateLayoutBlockByKey(sectionId, columnKey, blockKey, {
+          imageUrl: media.sourceUrl,
+          imageAlt: media.altText || media.title || media.filename || "",
+        });
+        setPublishStatus("Image selected");
+      },
+    });
+  };
+
   const addWireframeNear = (
     columns: number,
     rows: number,
@@ -9711,6 +9731,7 @@ export default function DashboardBuilder({
                 onDuplicateSectionBadge={duplicateSectionBadgeByKey}
                 onMoveSectionBadge={moveSectionBadgeByKey}
                 onUploadGridItemImage={pickGridItemImage}
+                onUploadBlockImage={pickBlockImage}
                 onAddWireframe={addWireframeNear}
                 onAddRow={addRowNear}
                 onAddColumnAfter={addSelectedLayoutItem}
@@ -10004,6 +10025,7 @@ function PreviewCanvas({
   onDuplicateSectionBadge,
   onMoveSectionBadge,
   onUploadGridItemImage,
+  onUploadBlockImage,
   onAddWireframe,
   onAddRow,
   onAddColumnAfter,
@@ -10162,6 +10184,12 @@ function PreviewCanvas({
     columnKey: string,
     blockKey: string,
     itemIndex: number,
+    currentUrl?: string,
+  ) => void;
+  onUploadBlockImage?: (
+    sectionId: string,
+    columnKey: string,
+    blockKey: string,
     currentUrl?: string,
   ) => void;
   onAddWireframe: (
@@ -11080,6 +11108,7 @@ function PreviewCanvas({
                       onDuplicateSectionBadge={onDuplicateSectionBadge}
                       onMoveSectionBadge={onMoveSectionBadge}
                       onUploadGridItemImage={onUploadGridItemImage}
+                      onUploadBlockImage={onUploadBlockImage}
                       onAddRow={onAddRow}
                       onAddColumnAfter={onAddColumnAfter}
                       onStackColumnBelow={onStackColumnBelow}
@@ -12912,6 +12941,7 @@ function PreviewSection({
   onDuplicateSectionBadge,
   onMoveSectionBadge,
   onUploadGridItemImage,
+  onUploadBlockImage,
   onAddRow,
   onAddColumnAfter,
   onStackColumnBelow,
@@ -13070,6 +13100,12 @@ function PreviewSection({
     columnKey: string,
     blockKey: string,
     itemIndex: number,
+    currentUrl?: string,
+  ) => void;
+  onUploadBlockImage?: (
+    sectionId: string,
+    columnKey: string,
+    blockKey: string,
     currentUrl?: string,
   ) => void;
   onAddRow: (
@@ -13958,6 +13994,7 @@ function PreviewSection({
                       onDuplicateSectionBadge={onDuplicateSectionBadge}
                       onMoveSectionBadge={onMoveSectionBadge}
                       onUploadGridItemImage={onUploadGridItemImage}
+                      onUploadBlockImage={onUploadBlockImage}
                       onAddRow={onAddRow}
                       onAddColumnAfter={onAddColumnAfter}
                       onStackColumnBelow={onStackColumnBelow}
@@ -15535,6 +15572,25 @@ function PreviewSection({
                           </div>
                         ) : block.kind === "panel" ? (
                           (() => {
+                            const isPanelImagePlaceholder =
+                              !block.imageUrl ||
+                              !block.imageUrl.trim() ||
+                              block.imageUrl.includes("builder-image-placeholder.svg");
+
+                            const handlePanelImageClick = (event: React.MouseEvent) => {
+                              event.stopPropagation();
+                              if (onUploadBlockImage) {
+                                onUploadBlockImage(
+                                  section.id,
+                                  columnKey,
+                                  blockKey,
+                                  block.imageUrl,
+                                );
+                              } else {
+                                onSelectBlock(section.id, columnKey, blockKey);
+                              }
+                            };
+
                             const panelTitleStyle = {
                               color: "var(--builder-card-title-color, inherit)",
                               fontSize:
@@ -15566,14 +15622,79 @@ function PreviewSection({
 
                             return (
                               <div className="shop-builder-column-block shop-builder-column-block--panel">
-                                {block.imageUrl && (
-                                  <div
-                                    className="shop-builder-panel-media"
-                                    style={{
-                                      backgroundImage: `url(${block.imageUrl})`,
-                                    }}
-                                  />
-                                )}
+                                <div
+                                  className={`shop-builder-panel-media ${
+                                    isPanelImagePlaceholder ? "is-empty" : ""
+                                  }`}
+                                  style={{
+                                    minHeight: "180px",
+                                    borderRadius: "var(--builder-card-radius, 12px)",
+                                    position: "relative",
+                                    overflow: "hidden",
+                                    cursor: "pointer",
+                                    ...(!isPanelImagePlaceholder
+                                      ? { backgroundImage: `url(${block.imageUrl})` }
+                                      : {}),
+                                  }}
+                                  onClick={handlePanelImageClick}
+                                >
+                                  {!isPanelImagePlaceholder ? (
+                                    <button
+                                      type="button"
+                                      className="builder-preview-image-upload"
+                                      onClick={handlePanelImageClick}
+                                    >
+                                      <ImageIcon size={13} />
+                                      <span>Change image</span>
+                                    </button>
+                                  ) : (
+                                    <div className="builder-media-placeholder-container">
+                                      <svg
+                                        className="builder-media-placeholder-bg"
+                                        viewBox="0 0 800 520"
+                                        preserveAspectRatio="none"
+                                        fill="none"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                      >
+                                        <defs>
+                                          <linearGradient id="bgGradPanel" x1="0" y1="0" x2="800" y2="520" gradientUnits="userSpaceOnUse">
+                                            <stop offset="0%" stopColor="#F2F4F8"/>
+                                            <stop offset="100%" stopColor="#EAEEF4"/>
+                                          </linearGradient>
+                                        </defs>
+                                        <rect width="800" height="520" rx="16" fill="url(#bgGradPanel)"/>
+                                        <circle cx="760" cy="40" r="230" fill="#FFFFFF" fillOpacity="0.5"/>
+                                        <circle cx="40" cy="480" r="220" fill="#FFFFFF" fillOpacity="0.45"/>
+                                        <rect x="24" y="24" width="752" height="472" rx="18" fill="none" stroke="#CBD5E1" strokeWidth="2" strokeDasharray="6 6"/>
+                                        <g fill="#BCC6D5">
+                                          <circle cx="56" cy="56" r="2.2"/><circle cx="70" cy="56" r="2.2"/><circle cx="84" cy="56" r="2.2"/><circle cx="98" cy="56" r="2.2"/><circle cx="112" cy="56" r="2.2"/>
+                                          <circle cx="56" cy="70" r="2.2"/><circle cx="70" cy="70" r="2.2"/><circle cx="84" cy="70" r="2.2"/><circle cx="98" cy="70" r="2.2"/><circle cx="112" cy="70" r="2.2"/>
+                                          <circle cx="56" cy="84" r="2.2"/><circle cx="70" cy="84" r="2.2"/><circle cx="84" cy="84" r="2.2"/><circle cx="98" cy="84" r="2.2"/><circle cx="112" cy="84" r="2.2"/>
+                                        </g>
+                                        <g fill="#BCC6D5">
+                                          <circle cx="688" cy="436" r="2.2"/><circle cx="702" cy="436" r="2.2"/><circle cx="716" cy="436" r="2.2"/><circle cx="730" cy="436" r="2.2"/><circle cx="744" cy="436" r="2.2"/>
+                                          <circle cx="688" cy="450" r="2.2"/><circle cx="702" cy="450" r="2.2"/><circle cx="716" cy="450" r="2.2"/><circle cx="730" cy="450" r="2.2"/><circle cx="744" cy="450" r="2.2"/>
+                                          <circle cx="688" cy="464" r="2.2"/><circle cx="702" cy="464" r="2.2"/><circle cx="716" cy="464" r="2.2"/><circle cx="730" cy="464" r="2.2"/><circle cx="744" cy="464" r="2.2"/>
+                                        </g>
+                                      </svg>
+                                      <div className="builder-media-placeholder-content">
+                                        <div className="builder-media-placeholder-icon-frame">
+                                          <svg viewBox="0 0 120 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <rect width="120" height="90" rx="14" fill="none" stroke="#B8C3D2" strokeWidth="4.5"/>
+                                            <circle cx="90" cy="30" r="10" fill="#B8C3D2"/>
+                                            <path d="M 8 78 L 46 36 C 48.5 33.5 53.5 33.5 56 36 L 84 68 L 92 58 C 94.5 55.5 99.5 55.5 102 58 L 112 78 Z" fill="#B8C3D2"/>
+                                          </svg>
+                                        </div>
+                                        <h4 className="builder-media-placeholder-title">Select an image</h4>
+                                        <p className="builder-media-placeholder-subtitle">Drag and drop, upload, or choose from your media library</p>
+                                        <button type="button" className="builder-media-placeholder-btn">
+                                          <Upload size={14} />
+                                          <span>Choose Image</span>
+                                        </button>
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
                                 <div>
                                   {block.eyebrow && (
                                     <InlineEditableText
@@ -15810,6 +15931,24 @@ function PreviewSection({
                               block.imageFit,
                             );
                             const imageRadius = `${block.imageBorderRadius ?? 12}px`;
+                            const isBlockImagePlaceholder =
+                              !block.imageUrl ||
+                              !block.imageUrl.trim() ||
+                              block.imageUrl.includes("builder-image-placeholder.svg");
+
+                            const handleImageClick = (event: React.MouseEvent) => {
+                              event.stopPropagation();
+                              if (onUploadBlockImage) {
+                                onUploadBlockImage(
+                                  section.id,
+                                  columnKey,
+                                  blockKey,
+                                  block.imageUrl,
+                                );
+                              } else {
+                                onSelectBlock(section.id, columnKey, blockKey);
+                              }
+                            };
 
                             return (
                               <div className="shop-builder-column-block shop-builder-column-block--image">
@@ -15824,29 +15963,179 @@ function PreviewSection({
                                   }}
                                 >
                                   <div
-                                    className="shop-builder-image-media"
+                                    className={`shop-builder-image-media ${
+                                      isBlockImagePlaceholder ? "is-empty" : ""
+                                    }`}
                                     style={{
                                       aspectRatio: imageAspectRatio,
                                       borderRadius: imageRadius,
+                                      position: "relative",
                                     }}
                                   >
-                                    {block.imageUrl ? (
-                                      <Image
-                                        src={block.imageUrl}
-                                        alt={block.imageAlt ?? ""}
-                                        width={1200}
-                                        height={800}
-                                        style={{
-                                          width: "100%",
-                                          height: imageAspectRatio
-                                            ? "100%"
-                                            : "auto",
-                                          objectFit: imageObjectFit,
-                                        }}
-                                      />
+                                    {!isBlockImagePlaceholder ? (
+                                      <>
+                                        <Image
+                                          src={block.imageUrl!}
+                                          alt={block.imageAlt ?? ""}
+                                          width={1200}
+                                          height={800}
+                                          style={{
+                                            width: "100%",
+                                            height: imageAspectRatio
+                                              ? "100%"
+                                              : "auto",
+                                            objectFit: imageObjectFit,
+                                          }}
+                                        />
+                                        <button
+                                          type="button"
+                                          className="builder-preview-image-upload"
+                                          onClick={handleImageClick}
+                                        >
+                                          <ImageIcon size={13} />
+                                          <span>Change image</span>
+                                        </button>
+                                      </>
                                     ) : (
-                                      <div className="builder-mini-empty builder-mini-empty--image">
-                                        Choose an image in the inspector.
+                                      <div
+                                        className="builder-media-placeholder-container"
+                                        style={{ minHeight: "180px" }}
+                                        onClick={handleImageClick}
+                                      >
+                                        <svg
+                                          className="builder-media-placeholder-bg"
+                                          viewBox="0 0 800 520"
+                                          preserveAspectRatio="none"
+                                          fill="none"
+                                          xmlns="http://www.w3.org/2000/svg"
+                                        >
+                                          <defs>
+                                            <linearGradient
+                                              id="bgGradImage"
+                                              x1="0"
+                                              y1="0"
+                                              x2="800"
+                                              y2="520"
+                                              gradientUnits="userSpaceOnUse"
+                                            >
+                                              <stop
+                                                offset="0%"
+                                                stopColor="#F2F4F8"
+                                              />
+                                              <stop
+                                                offset="100%"
+                                                stopColor="#EAEEF4"
+                                              />
+                                            </linearGradient>
+                                          </defs>
+                                          <rect
+                                            width="800"
+                                            height="520"
+                                            rx="16"
+                                            fill="url(#bgGradImage)"
+                                          />
+                                          <circle
+                                            cx="760"
+                                            cy="40"
+                                            r="230"
+                                            fill="#FFFFFF"
+                                            fillOpacity="0.5"
+                                          />
+                                          <circle
+                                            cx="40"
+                                            cy="480"
+                                            r="220"
+                                            fill="#FFFFFF"
+                                            fillOpacity="0.45"
+                                          />
+                                          <rect
+                                            x="24"
+                                            y="24"
+                                            width="752"
+                                            height="472"
+                                            rx="18"
+                                            fill="none"
+                                            stroke="#CBD5E1"
+                                            strokeWidth="2"
+                                            strokeDasharray="6 6"
+                                          />
+                                          <g fill="#BCC6D5">
+                                            <circle cx="56" cy="56" r="2.2" />
+                                            <circle cx="70" cy="56" r="2.2" />
+                                            <circle cx="84" cy="56" r="2.2" />
+                                            <circle cx="98" cy="56" r="2.2" />
+                                            <circle cx="112" cy="56" r="2.2" />
+                                            <circle cx="56" cy="70" r="2.2" />
+                                            <circle cx="70" cy="70" r="2.2" />
+                                            <circle cx="84" cy="70" r="2.2" />
+                                            <circle cx="98" cy="70" r="2.2" />
+                                            <circle cx="112" cy="70" r="2.2" />
+                                            <circle cx="56" cy="84" r="2.2" />
+                                            <circle cx="70" cy="84" r="2.2" />
+                                            <circle cx="84" cy="84" r="2.2" />
+                                            <circle cx="98" cy="84" r="2.2" />
+                                            <circle cx="112" cy="84" r="2.2" />
+                                          </g>
+                                          <g fill="#BCC6D5">
+                                            <circle cx="688" cy="436" r="2.2" />
+                                            <circle cx="702" cy="436" r="2.2" />
+                                            <circle cx="716" cy="436" r="2.2" />
+                                            <circle cx="730" cy="436" r="2.2" />
+                                            <circle cx="744" cy="436" r="2.2" />
+                                            <circle cx="688" cy="450" r="2.2" />
+                                            <circle cx="702" cy="450" r="2.2" />
+                                            <circle cx="716" cy="450" r="2.2" />
+                                            <circle cx="730" cy="450" r="2.2" />
+                                            <circle cx="744" cy="450" r="2.2" />
+                                            <circle cx="688" cy="464" r="2.2" />
+                                            <circle cx="702" cy="464" r="2.2" />
+                                            <circle cx="716" cy="464" r="2.2" />
+                                            <circle cx="730" cy="464" r="2.2" />
+                                            <circle cx="744" cy="464" r="2.2" />
+                                          </g>
+                                        </svg>
+                                        <div className="builder-media-placeholder-content">
+                                          <div className="builder-media-placeholder-icon-frame">
+                                            <svg
+                                              viewBox="0 0 120 90"
+                                              fill="none"
+                                              xmlns="http://www.w3.org/2000/svg"
+                                            >
+                                              <rect
+                                                width="120"
+                                                height="90"
+                                                rx="14"
+                                                fill="none"
+                                                stroke="#B8C3D2"
+                                                strokeWidth="4.5"
+                                              />
+                                              <circle
+                                                cx="90"
+                                                cy="30"
+                                                r="10"
+                                                fill="#B8C3D2"
+                                              />
+                                              <path
+                                                d="M 8 78 L 46 36 C 48.5 33.5 53.5 33.5 56 36 L 84 68 L 92 58 C 94.5 55.5 99.5 55.5 102 58 L 112 78 Z"
+                                                fill="#B8C3D2"
+                                              />
+                                            </svg>
+                                          </div>
+                                          <h4 className="builder-media-placeholder-title">
+                                            Select an image
+                                          </h4>
+                                          <p className="builder-media-placeholder-subtitle">
+                                            Drag and drop, upload, or choose from
+                                            your media library
+                                          </p>
+                                          <button
+                                            type="button"
+                                            className="builder-media-placeholder-btn"
+                                          >
+                                            <Upload size={14} />
+                                            <span>Choose Image</span>
+                                          </button>
+                                        </div>
                                       </div>
                                     )}
                                   </div>
@@ -16369,37 +16658,19 @@ function PreviewSection({
                                               </span>
                                             </>
                                           )}
-                                          {block.gridShowImage !== false && (
-                                            <div
-                                              className={`shop-builder-grid-image ${
-                                                item.imageUrl ? "" : "is-empty"
-                                              }`}
-                                            >
-                                              {item.imageUrl ? (
-                                                <Image
-                                                  src={item.imageUrl}
-                                                  alt={
-                                                    item.imageAlt ||
-                                                    item.title ||
-                                                    ""
-                                                  }
-                                                  width={420}
-                                                  height={420}
-                                                />
-                                              ) : block.gridSource !==
-                                                "products" ? (
-                                                <span className="builder-structural-card-placeholder">
-                                                  <span>Card media</span>
-                                                  <i />
-                                                  <i />
-                                                </span>
-                                              ) : null}
-                                              {block.gridSource !==
-                                                "products" && (
-                                                <button
-                                                  type="button"
-                                                  className="builder-preview-image-upload"
-                                                  onClick={(event) => {
+                                          {block.gridShowImage !== false && (() => {
+                                            const isItemImagePlaceholder =
+                                              !item.imageUrl ||
+                                              !item.imageUrl.trim() ||
+                                              item.imageUrl.includes("builder-image-placeholder.svg");
+
+                                            return (
+                                              <div
+                                                className={`shop-builder-grid-image ${
+                                                  isItemImagePlaceholder ? "is-empty" : ""
+                                                }`}
+                                                onClick={(event) => {
+                                                  if (block.gridSource !== "products") {
                                                     event.stopPropagation();
                                                     onUploadGridItemImage(
                                                       section.id,
@@ -16408,18 +16679,93 @@ function PreviewSection({
                                                       itemIndex,
                                                       item.imageUrl,
                                                     );
-                                                  }}
-                                                >
-                                                  <ImageIcon size={14} />
-                                                  <span>
-                                                    {item.imageUrl
-                                                      ? "Change image"
-                                                      : "Select image"}
-                                                  </span>
-                                                </button>
-                                              )}
-                                            </div>
-                                          )}
+                                                  }
+                                                }}
+                                              >
+                                                {!isItemImagePlaceholder ? (
+                                                  <>
+                                                    <Image
+                                                      src={item.imageUrl!}
+                                                      alt={
+                                                        item.imageAlt ||
+                                                        item.title ||
+                                                        ""
+                                                      }
+                                                      width={420}
+                                                      height={420}
+                                                    />
+                                                    {block.gridSource !==
+                                                      "products" && (
+                                                      <button
+                                                        type="button"
+                                                        className="builder-preview-image-upload"
+                                                        onClick={(event) => {
+                                                          event.stopPropagation();
+                                                          onUploadGridItemImage(
+                                                            section.id,
+                                                            columnKey,
+                                                            blockKey,
+                                                            itemIndex,
+                                                            item.imageUrl,
+                                                          );
+                                                        }}
+                                                      >
+                                                        <ImageIcon size={13} />
+                                                        <span>Change image</span>
+                                                      </button>
+                                                    )}
+                                                  </>
+                                                ) : block.gridSource !==
+                                                  "products" ? (
+                                                  <div className="builder-media-placeholder-container">
+                                                    <svg
+                                                      className="builder-media-placeholder-bg"
+                                                      viewBox="0 0 800 520"
+                                                      preserveAspectRatio="none"
+                                                      fill="none"
+                                                      xmlns="http://www.w3.org/2000/svg"
+                                                    >
+                                                      <defs>
+                                                        <linearGradient id="bgGradGrid" x1="0" y1="0" x2="800" y2="520" gradientUnits="userSpaceOnUse">
+                                                          <stop offset="0%" stopColor="#F2F4F8"/>
+                                                          <stop offset="100%" stopColor="#EAEEF4"/>
+                                                        </linearGradient>
+                                                      </defs>
+                                                      <rect width="800" height="520" rx="16" fill="url(#bgGradGrid)"/>
+                                                      <circle cx="760" cy="40" r="230" fill="#FFFFFF" fillOpacity="0.5"/>
+                                                      <circle cx="40" cy="480" r="220" fill="#FFFFFF" fillOpacity="0.45"/>
+                                                      <rect x="24" y="24" width="752" height="472" rx="18" fill="none" stroke="#CBD5E1" strokeWidth="2" strokeDasharray="6 6"/>
+                                                      <g fill="#BCC6D5">
+                                                        <circle cx="56" cy="56" r="2.2"/><circle cx="70" cy="56" r="2.2"/><circle cx="84" cy="56" r="2.2"/><circle cx="98" cy="56" r="2.2"/><circle cx="112" cy="56" r="2.2"/>
+                                                        <circle cx="56" cy="70" r="2.2"/><circle cx="70" cy="70" r="2.2"/><circle cx="84" cy="70" r="2.2"/><circle cx="98" cy="70" r="2.2"/><circle cx="112" cy="70" r="2.2"/>
+                                                        <circle cx="56" cy="84" r="2.2"/><circle cx="70" cy="84" r="2.2"/><circle cx="84" cy="84" r="2.2"/><circle cx="98" cy="84" r="2.2"/><circle cx="112" cy="84" r="2.2"/>
+                                                      </g>
+                                                      <g fill="#BCC6D5">
+                                                        <circle cx="688" cy="436" r="2.2"/><circle cx="702" cy="436" r="2.2"/><circle cx="716" cy="436" r="2.2"/><circle cx="730" cy="436" r="2.2"/><circle cx="744" cy="436" r="2.2"/>
+                                                        <circle cx="688" cy="450" r="2.2"/><circle cx="702" cy="450" r="2.2"/><circle cx="716" cy="450" r="2.2"/><circle cx="730" cy="450" r="2.2"/><circle cx="744" cy="450" r="2.2"/>
+                                                        <circle cx="688" cy="464" r="2.2"/><circle cx="702" cy="464" r="2.2"/><circle cx="716" cy="464" r="2.2"/><circle cx="730" cy="464" r="2.2"/><circle cx="744" cy="464" r="2.2"/>
+                                                      </g>
+                                                    </svg>
+                                                    <div className="builder-media-placeholder-content">
+                                                      <div className="builder-media-placeholder-icon-frame">
+                                                        <svg viewBox="0 0 120 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                          <rect width="120" height="90" rx="14" fill="none" stroke="#B8C3D2" strokeWidth="4.5"/>
+                                                          <circle cx="90" cy="30" r="10" fill="#B8C3D2"/>
+                                                          <path d="M 8 78 L 46 36 C 48.5 33.5 53.5 33.5 56 36 L 84 68 L 92 58 C 94.5 55.5 99.5 55.5 102 58 L 112 78 Z" fill="#B8C3D2"/>
+                                                        </svg>
+                                                      </div>
+                                                      <h4 className="builder-media-placeholder-title">Select an image</h4>
+                                                      <p className="builder-media-placeholder-subtitle">Drag and drop, upload, or choose from your media library</p>
+                                                      <button type="button" className="builder-media-placeholder-btn">
+                                                        <Upload size={14} />
+                                                        <span>Choose Image</span>
+                                                      </button>
+                                                    </div>
+                                                  </div>
+                                                ) : null}
+                                              </div>
+                                            );
+                                          })()}
                                           <div className="shop-builder-grid-content">
                                             {block.gridSource !== "products" ? (
                                               <>

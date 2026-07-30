@@ -2164,6 +2164,67 @@ ul.is-icon-gradient-cycle li:nth-child(3n) svg {
   line-height: 1.6;
 }
 
+.builder-premium-starter .shop-builder-column-block--text {
+  max-width: 760px;
+}
+
+.builder-premium-starter .shop-builder-column-block--text > div {
+  color: var(--builder-active-muted, var(--builder-muted, #55554f));
+  font-size: 1rem;
+  line-height: 1.75;
+}
+
+.builder-premium-starter .shop-builder-column-block--text > div > :first-child {
+  margin-top: 0;
+}
+
+.builder-premium-starter .shop-builder-column-block--text > div > :last-child {
+  margin-bottom: 0;
+}
+
+.builder-premium-starter .shop-builder-column-block--text > div p {
+  margin: 0 0 1em;
+  max-width: 68ch;
+  line-height: inherit;
+}
+
+.builder-premium-starter .shop-builder-column-block--text > div h2,
+.builder-premium-starter .shop-builder-column-block--text > div h3,
+.builder-premium-starter .shop-builder-column-block--text > div h4 {
+  margin: 1.35em 0 0.45em;
+  color: var(--builder-section-text, var(--builder-text, #111111));
+  font-weight: 720;
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+}
+
+.builder-premium-starter .shop-builder-column-block--text > div ul,
+.builder-premium-starter .shop-builder-column-block--text > div ol {
+  margin: 1.1em 0;
+  padding-left: 1.35em;
+}
+
+.builder-premium-starter .shop-builder-column-block--text > div li + li {
+  margin-top: 0.5em;
+}
+
+.builder-premium-starter .shop-builder-column-block--text > div blockquote {
+  margin: 1.4em 0 0;
+  padding: 0.25em 0 0.25em 1.25em;
+  border-left: 3px solid var(--builder-accent, currentColor);
+  color: var(--builder-section-text, var(--builder-text, #111111));
+  font-size: clamp(1.08rem, 1.5vw, 1.3rem);
+  font-weight: 580;
+  line-height: 1.5;
+}
+
+.builder-premium-starter .shop-builder-column-block--text > div a {
+  color: inherit;
+  text-decoration-color: color-mix(in srgb, currentColor 45%, transparent);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+}
+
 .shop-builder-column-block--product-media,
 .shop-builder-column-block--product-summary {
   padding-left: 0;

@@ -8939,26 +8939,38 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                               )
                                                             }
                                                           >
-                                                            <option value="basic">
-                                                              Basic
-                                                            </option>
                                                             <option value="hero">
-                                                              Hero
+                                                              Hero (Fullscreen Parallax)
+                                                            </option>
+                                                            <option value="coverflow">
+                                                              3D Coverflow
+                                                            </option>
+                                                            <option value="cards">
+                                                              3D Stacked Cards
+                                                            </option>
+                                                            <option value="creative">
+                                                              Creative Perspective
+                                                            </option>
+                                                            <option value="thumbs">
+                                                              Filmstrip Thumbs Gallery
+                                                            </option>
+                                                            <option value="split">
+                                                              Split-Screen Showcase
+                                                            </option>
+                                                            <option value="multi-card">
+                                                              Multi-Card Slider
+                                                            </option>
+                                                            <option value="marquee">
+                                                              Infinite Marquee Loop
+                                                            </option>
+                                                            <option value="basic">
+                                                              Basic Slider
+                                                            </option>
+                                                            <option value="fade">
+                                                              Crossfade Slider
                                                             </option>
                                                             <option value="showcase">
                                                               Showcase
-                                                            </option>
-                                                            <option value="coverflow">
-                                                              Coverflow
-                                                            </option>
-                                                            <option value="cards">
-                                                              Cards
-                                                            </option>
-                                                            <option value="creative">
-                                                              Creative
-                                                            </option>
-                                                            <option value="fade">
-                                                              Fade
                                                             </option>
                                                             <option value="free-mode">
                                                               Free mode
