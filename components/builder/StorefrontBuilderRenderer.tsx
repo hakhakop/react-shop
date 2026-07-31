@@ -2742,7 +2742,12 @@ function ContentLayoutBlock({
             style={{
               aspectRatio: panelMediaAspect,
               borderRadius: isPanelFrameless ? "16px 16px 0 0" : "16px",
-              margin: isPanelFrameless ? "-24px -24px 20px -24px" : "0 0 20px 0",
+              margin: isPanelFrameless
+                ? "calc(-1 * var(--builder-card-padding, 24px)) calc(-1 * var(--builder-card-padding, 24px)) 20px calc(-1 * var(--builder-card-padding, 24px))"
+                : "0 0 20px 0",
+              width: isPanelFrameless
+                ? "calc(100% + 2 * var(--builder-card-padding, 24px))"
+                : "100%",
               position: "relative",
               overflow: "hidden",
               backgroundSize: "cover",

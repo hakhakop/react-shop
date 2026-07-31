@@ -567,7 +567,7 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
         },
       ],
       typography: premiumContentTypography,
-      visualStyle: premiumCardVisualStyle({ elevated: true, imageRatio: "4:5" }),
+      visualStyle: premiumCardVisualStyle({ elevated: false, imageRatio: "16:9" }),
     };
   }
 
@@ -635,7 +635,7 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
       imageRatio: "16:9",
       imagePadding: "frameless",
       imageFit: "cover",
-      panelStyle: "default",
+      panelStyle: "flat-white",
       elementPadding: "xs",
       typography: premiumContentTypography,
       visualStyle: premiumCardVisualStyle({ elevated: false, imageRatio: "16:9" }),

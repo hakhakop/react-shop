@@ -126,9 +126,10 @@ export default function CardSpacingPanel() {
             <label className="builder-field">
               <span>Image Padding</span>
               <InspectorChoiceGroup
-                value={block.imagePadding ?? "large"}
+                value={block.imagePadding ?? "frameless"}
                 options={[
-                  { label: "Frameless", value: "none" },
+                  { label: "Frameless", value: "frameless" },
+                  { label: "None", value: "none" },
                   { label: "Small", value: "small" },
                   { label: "Medium", value: "medium" },
                   { label: "Large", value: "large" },

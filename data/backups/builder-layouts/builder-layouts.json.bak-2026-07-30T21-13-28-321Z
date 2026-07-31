@@ -4989,7 +4989,7 @@
             "rowId": "layout-row-ms7qgn8k",
             "blocks": [
               {
-                "id": "image-block-ms7vdj4t-myvij",
+                "id": "image-block-ms7vzhbk-2daqo",
                 "kind": "image",
                 "title": "",
                 "body": "",
@@ -5120,54 +5120,88 @@
           {
             "id": "layout-item-ms7r8m13",
             "rowId": "layout-row-ms7r8iqu",
-            "blocks": [
-              {
-                "id": "slider-block-ms7vdp27-is7p0",
-                "kind": "slider",
-                "slides": [
-                  {
-                    "id": "slider-block-ms7vdp27-is7p0-slide-1",
-                    "imageUrl": "/builder-image-placeholder.svg",
-                    "imageAlt": "Slideshow image 1",
-                    "imagePadding": "frameless"
-                  },
-                  {
-                    "id": "slider-block-ms7vdp27-is7p0-slide-2",
-                    "imageUrl": "/builder-image-placeholder.svg",
-                    "imageAlt": "Slideshow image 2",
-                    "imagePadding": "frameless"
-                  },
-                  {
-                    "id": "slider-block-ms7vdp27-is7p0-slide-3",
-                    "imageUrl": "/builder-image-placeholder.svg",
-                    "imageAlt": "Slideshow image 3",
-                    "imagePadding": "frameless"
-                  }
-                ],
-                "carouselSettings": {
-                  "variant": "image-only",
-                  "slideMode": "image-only",
-                  "aspectRatio": "16:9",
-                  "loop": true,
-                  "autoplay": false,
-                  "autoplayDelayMs": 5000,
-                  "align": "start",
-                  "dragFree": false,
-                  "effect": "slide",
-                  "spaceBetween": 24,
-                  "cardsPerView": 1,
-                  "showArrows": true,
-                  "showDots": true,
-                  "arrowStyle": "chevron",
-                  "arrowPosition": "overlay",
-                  "paginationStyle": "minimal-dots",
-                  "paginationPosition": "bottom",
-                  "overlayGradient": "none",
-                  "pauseOnHover": true
+            "blocks": [],
+            "nestedLayout": {
+              "version": 1,
+              "direction": "vertical",
+              "distribution": "equal",
+              "gap": "inherit",
+              "rows": [
+                {
+                  "id": "nested-row-ms7u201p-1",
+                  "weight": 1,
+                  "layout": "whole",
+                  "columns": [
+                    {
+                      "id": "nested-column-ms7u201p-1",
+                      "rowId": "nested-row-ms7u201p-1",
+                      "rowLayout": "whole",
+                      "blocks": [
+                        {
+                          "id": "slider-block-ms7vdp27-is7p0",
+                          "kind": "slider",
+                          "slides": [
+                            {
+                              "id": "slider-block-ms7vdp27-is7p0-slide-1",
+                              "imageUrl": "/builder-image-placeholder.svg",
+                              "imageAlt": "Slideshow image 1",
+                              "imagePadding": "frameless"
+                            },
+                            {
+                              "id": "slider-block-ms7vdp27-is7p0-slide-2",
+                              "imageUrl": "/builder-image-placeholder.svg",
+                              "imageAlt": "Slideshow image 2",
+                              "imagePadding": "frameless"
+                            },
+                            {
+                              "id": "slider-block-ms7vdp27-is7p0-slide-3",
+                              "imageUrl": "/builder-image-placeholder.svg",
+                              "imageAlt": "Slideshow image 3",
+                              "imagePadding": "frameless"
+                            }
+                          ],
+                          "carouselSettings": {
+                            "variant": "image-only",
+                            "slideMode": "image-only",
+                            "aspectRatio": "16:9",
+                            "loop": true,
+                            "autoplay": false,
+                            "autoplayDelayMs": 5000,
+                            "align": "start",
+                            "dragFree": false,
+                            "effect": "slide",
+                            "spaceBetween": 24,
+                            "cardsPerView": 1,
+                            "showArrows": true,
+                            "showDots": true,
+                            "arrowStyle": "chevron",
+                            "arrowPosition": "overlay",
+                            "paginationStyle": "minimal-dots",
+                            "paginationPosition": "bottom",
+                            "overlayGradient": "none",
+                            "pauseOnHover": true
+                          },
+                          "elementPadding": "xs"
+                        }
+                      ]
+                    }
+                  ]
                 },
-                "elementPadding": "xs"
-              }
-            ]
+                {
+                  "id": "nested-row-ms7u201p-2",
+                  "weight": 1,
+                  "layout": "whole",
+                  "columns": [
+                    {
+                      "id": "nested-column-ms7u201p-2",
+                      "rowId": "nested-row-ms7u201p-2",
+                      "rowLayout": "whole",
+                      "blocks": []
+                    }
+                  ]
+                }
+              ]
+            }
           },
           {
             "id": "layout-item-ms7rs5mn",
@@ -5186,312 +5220,6 @@
                 "imageRatio": "4:5",
                 "imageBorderRadius": 18,
                 "imageCaption": "A considered image can carry the story before a word is read.",
-                "elementPadding": "xs"
-              }
-            ]
-          },
-          {
-            "id": "layout-row-ms7wcvfl-column-1",
-            "rowId": "layout-row-ms7wcvfl",
-            "blocks": [
-              {
-                "id": "slider-block-ms7we9si-6c6ru",
-                "kind": "slider",
-                "slides": [
-                  {
-                    "id": "slider-block-ms7we9si-6c6ru-slide-1",
-                    "imageUrl": "/builder-image-placeholder.svg",
-                    "imageAlt": "Slideshow image 1",
-                    "imagePadding": "frameless"
-                  },
-                  {
-                    "id": "slider-block-ms7we9si-6c6ru-slide-2",
-                    "imageUrl": "/builder-image-placeholder.svg",
-                    "imageAlt": "Slideshow image 2",
-                    "imagePadding": "frameless"
-                  },
-                  {
-                    "id": "slider-block-ms7we9si-6c6ru-slide-3",
-                    "imageUrl": "/builder-image-placeholder.svg",
-                    "imageAlt": "Slideshow image 3",
-                    "imagePadding": "frameless"
-                  }
-                ],
-                "carouselSettings": {
-                  "variant": "image-only",
-                  "slideMode": "image-only",
-                  "aspectRatio": "16:9",
-                  "loop": true,
-                  "autoplay": false,
-                  "autoplayDelayMs": 5000,
-                  "align": "start",
-                  "dragFree": false,
-                  "effect": "slide",
-                  "spaceBetween": 24,
-                  "cardsPerView": 1,
-                  "showArrows": true,
-                  "showDots": true,
-                  "arrowStyle": "chevron",
-                  "arrowPosition": "overlay",
-                  "paginationStyle": "minimal-dots",
-                  "paginationPosition": "bottom",
-                  "overlayGradient": "none",
-                  "pauseOnHover": true
-                },
-                "elementPadding": "xs"
-              }
-            ]
-          },
-          {
-            "id": "layout-item-ms7wcx0a",
-            "rowId": "layout-row-ms7wcvfl",
-            "blocks": [
-              {
-                "id": "image-block-ms7wd0ga-9eznk",
-                "kind": "image",
-                "title": "",
-                "body": "",
-                "imageUrl": "/builder-image-placeholder.svg",
-                "imageAlt": "Modern editorial image placeholder",
-                "imageAlignment": "center",
-                "imageMaxWidth": 1200,
-                "imageFit": "cover",
-                "imageRatio": "4:5",
-                "imageBorderRadius": 18,
-                "imageCaption": "A considered image can carry the story before a word is read.",
-                "elementPadding": "xs"
-              }
-            ]
-          },
-          {
-            "id": "layout-item-ms7wcxxk",
-            "rowId": "layout-row-ms7wcvfl",
-            "blocks": [
-              {
-                "id": "panel-block-ms7wenws-77lfe",
-                "kind": "panel",
-                "eyebrow": "A more considered approach",
-                "title": "Build a brand experience that feels unmistakably yours",
-                "body": "From the first headline to the smallest interaction, every detail works together to create clarity, confidence, and recognition.",
-                "buttonLabel": "Discover the Process",
-                "buttonUrl": "/",
-                "buttonStyle": "primary",
-                "imageUrl": "/builder-image-placeholder.svg",
-                "imageAlt": "Editorial placeholder for a featured brand story",
-                "imageRatio": "16:9",
-                "imageFit": "cover",
-                "panelStyle": "default",
-                "elementPadding": "xs",
-                "typography": {
-                  "eyebrow": {
-                    "variant": "subheading",
-                    "fontSize": "12px",
-                    "fontWeight": "700",
-                    "lineHeight": "1.2",
-                    "letterSpacing": "0.12em",
-                    "textTransform": "uppercase"
-                  },
-                  "title": {
-                    "variant": "heading",
-                    "fontSize": "clamp(28px, 3vw, 46px)",
-                    "fontWeight": "720",
-                    "lineHeight": "1.06",
-                    "letterSpacing": "-0.025em"
-                  },
-                  "body": {
-                    "variant": "body",
-                    "fontSize": "16px",
-                    "fontWeight": "400",
-                    "lineHeight": "1.7"
-                  },
-                  "button": {
-                    "variant": "button",
-                    "fontSize": "14px",
-                    "fontWeight": "700",
-                    "lineHeight": "1",
-                    "letterSpacing": "0.01em"
-                  }
-                },
-                "visualStyle": {
-                  "customClass": "builder-premium-starter",
-                  "card": {
-                    "preset": "soft",
-                    "hoverPreset": "lift-soft",
-                    "imageRatio": "16:9",
-                    "imageFit": "cover",
-                    "imageRadius": "14px",
-                    "titleSize": "clamp(22px, 2vw, 30px)",
-                    "titleWeight": "720",
-                    "titleMargin": "0",
-                    "metaSize": "11px",
-                    "metaTransform": "uppercase",
-                    "metaSpacing": "0",
-                    "contentSize": "15px",
-                    "contentLineHeight": "1.65",
-                    "buttonMargin": "8px 0 0",
-                    "cardGap": "14px",
-                    "cardPadding": "clamp(20px, 2.4vw, 30px)"
-                  },
-                  "border": {
-                    "radius": "18px"
-                  }
-                }
-              }
-            ]
-          },
-          {
-            "id": "layout-row-ms7wnyld-column-1",
-            "rowId": "layout-row-ms7wnyld",
-            "blocks": [
-              {
-                "id": "panel-block-ms80g0tu-6yk01",
-                "kind": "panel",
-                "eyebrow": "A more considered approach",
-                "title": "Build a brand experience that feels unmistakably yours",
-                "body": "From the first headline to the smallest interaction, every detail works together to create clarity, confidence, and recognition.",
-                "buttonLabel": "Discover the Process",
-                "buttonUrl": "/",
-                "buttonStyle": "primary",
-                "imageUrl": "/builder-image-placeholder.svg",
-                "imageAlt": "Editorial placeholder for a featured brand story",
-                "imageRatio": "16:9",
-                "imagePadding": "frameless",
-                "imageFit": "cover",
-                "panelStyle": "flat-white",
-                "elementPadding": "xs",
-                "typography": {
-                  "eyebrow": {
-                    "variant": "subheading",
-                    "fontSize": "12px",
-                    "fontWeight": "700",
-                    "lineHeight": "1.2",
-                    "letterSpacing": "0.12em",
-                    "textTransform": "uppercase"
-                  },
-                  "title": {
-                    "variant": "heading",
-                    "fontSize": "clamp(28px, 3vw, 46px)",
-                    "fontWeight": "720",
-                    "lineHeight": "1.06",
-                    "letterSpacing": "-0.025em"
-                  },
-                  "body": {
-                    "variant": "body",
-                    "fontSize": "16px",
-                    "fontWeight": "400",
-                    "lineHeight": "1.7"
-                  },
-                  "button": {
-                    "variant": "button",
-                    "fontSize": "14px",
-                    "fontWeight": "700",
-                    "lineHeight": "1",
-                    "letterSpacing": "0.01em"
-                  }
-                },
-                "visualStyle": {
-                  "customClass": "builder-premium-starter",
-                  "card": {
-                    "preset": "none",
-                    "hoverPreset": "lift-soft",
-                    "imageRatio": "16:9",
-                    "imageFit": "cover",
-                    "imageRadius": "14px",
-                    "titleSize": "clamp(22px, 2vw, 30px)",
-                    "titleWeight": "720",
-                    "titleMargin": "0",
-                    "metaSize": "11px",
-                    "metaTransform": "uppercase",
-                    "metaSpacing": "0",
-                    "contentSize": "15px",
-                    "contentLineHeight": "1.65",
-                    "buttonMargin": "8px 0 0",
-                    "cardGap": "14px",
-                    "cardPadding": "clamp(20px, 2.4vw, 30px)"
-                  },
-                  "border": {
-                    "radius": "18px"
-                  },
-                  "padding": {
-                    "top": "xs",
-                    "right": "xs",
-                    "bottom": "xs",
-                    "left": "xs",
-                    "linked": true
-                  }
-                }
-              }
-            ]
-          },
-          {
-            "id": "layout-item-ms7wo4t2",
-            "rowId": "layout-row-ms7wnyld",
-            "blocks": [
-              {
-                "id": "slider-block-ms7wohq8-mwj4z",
-                "kind": "slider",
-                "slides": [
-                  {
-                    "id": "slider-block-ms7wohq8-mwj4z-slide-1",
-                    "imageUrl": "/builder-image-placeholder.svg",
-                    "imageAlt": "Slideshow image 1",
-                    "imagePadding": "frameless"
-                  },
-                  {
-                    "id": "slider-block-ms7wohq8-mwj4z-slide-2",
-                    "imageUrl": "/builder-image-placeholder.svg",
-                    "imageAlt": "Slideshow image 2",
-                    "imagePadding": "frameless"
-                  },
-                  {
-                    "id": "slider-block-ms7wohq8-mwj4z-slide-3",
-                    "imageUrl": "/builder-image-placeholder.svg",
-                    "imageAlt": "Slideshow image 3",
-                    "imagePadding": "frameless"
-                  }
-                ],
-                "carouselSettings": {
-                  "variant": "image-only",
-                  "slideMode": "image-only",
-                  "aspectRatio": "16:9",
-                  "loop": true,
-                  "autoplay": false,
-                  "autoplayDelayMs": 5000,
-                  "align": "start",
-                  "dragFree": false,
-                  "effect": "slide",
-                  "spaceBetween": 24,
-                  "cardsPerView": 1,
-                  "showArrows": true,
-                  "showDots": true,
-                  "arrowStyle": "chevron",
-                  "arrowPosition": "overlay",
-                  "paginationStyle": "minimal-dots",
-                  "paginationPosition": "bottom",
-                  "overlayGradient": "none",
-                  "pauseOnHover": true
-                },
-                "elementPadding": "xs"
-              }
-            ]
-          },
-          {
-            "id": "layout-item-ms7wo5wp",
-            "rowId": "layout-row-ms7wnyld",
-            "blocks": [
-              {
-                "id": "image-block-ms7wok3z-dcu4c",
-                "kind": "image",
-                "title": "",
-                "body": "",
-                "imageUrl": "/builder-image-placeholder.svg",
-                "imageAlt": "Modern editorial image placeholder",
-                "imageAlignment": "center",
-                "imageMaxWidth": 1200,
-                "imageFit": "cover",
-                "imageRatio": "16:9",
-                "imageBorderRadius": 16,
-                "imageCaption": "",
                 "elementPadding": "xs"
               }
             ]
@@ -5889,9 +5617,9 @@
             ]
           }
         ],
-        "layoutRows": 8
+        "layoutRows": 6
       }
     ],
-    "updatedAt": "2026-07-30T21:13:28.318Z"
+    "updatedAt": "2026-07-30T19:08:38.594Z"
   }
 }

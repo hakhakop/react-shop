@@ -539,5 +539,33 @@
     "createdAt": "2026-07-23T06:06:22.800Z",
     "updatedAt": "2026-07-23T07:16:52.723Z",
     "lastPublishedAt": "2026-07-23T07:16:52.723Z"
+  },
+  {
+    "id": "0d9e4271-6eee-4c08-a70a-6b02ab708e4d",
+    "ownerId": "a010b610-5c47-441c-b2ec-00a6e9eb3f88",
+    "name": "swiper",
+    "slug": "swiper",
+    "type": "business",
+    "domain": null,
+    "primaryDomain": null,
+    "domains": [],
+    "description": "",
+    "websiteCategory": "Business",
+    "companyName": "",
+    "personName": "",
+    "logoUrl": "",
+    "contactPhone": "",
+    "contactEmail": "",
+    "socialLinks": "",
+    "timeZone": "Asia/Yerevan",
+    "language": "hy",
+    "primaryLanguage": "hy",
+    "enabledLanguages": [
+      "hy"
+    ],
+    "status": "creating",
+    "creationRequestId": "bfceeeaf-588a-44cc-bf90-58c396496d9d",
+    "createdAt": "2026-07-30T21:25:35.426Z",
+    "updatedAt": "2026-07-30T21:25:35.426Z"
   }
 ]
