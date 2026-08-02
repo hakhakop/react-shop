@@ -7,31 +7,304 @@
     "design": {
       "preset": "princity",
       "colorScheme": "auto",
-      "pageBackground": "#f7f7f4",
-      "textColor": "#111111",
-      "mutedTextColor": "#5f5f58",
-      "accentColor": "#a4be7b",
-      "surfaceColor": "#efefe9",
-      "buttonBackground": "#111111",
+      "pageBackground": "#f7f7f3",
+      "textColor": "#17211d",
+      "mutedTextColor": "#66716c",
+      "accentColor": "#2f6657",
+      "surfaceColor": "#e9eee9",
+      "buttonBackground": "#17211d",
       "buttonTextColor": "#ffffff",
-      "radius": "8px",
-      "sectionMaxWidth": "1640px",
-      "sectionGutter": "48px",
+      "radius": "14px",
+      "sectionMaxWidth": "1280px",
+      "sectionGutter": "clamp(20px, 4vw, 64px)",
       "headingFontFamily": "inherit",
-      "headingSize": "clamp(42px, 8vw, 126px)",
-      "headingWeight": "760",
-      "headingLineHeight": "0.92",
-      "cardBg": "#efefe9",
-      "cardRadius": "8px",
-      "cardBorder": "transparent",
-      "cardShadow": "0 12px 30px rgba(17,17,17,0.06)",
-      "cardShadowHover": "0 18px 42px rgba(17,17,17,0.1)",
+      "headingSize": "clamp(42px, 6vw, 84px)",
+      "headingWeight": "720",
+      "headingLineHeight": "1.02",
+      "cardBg": "#ffffff",
+      "cardRadius": "14px",
+      "cardBorder": "rgba(20,20,20,0.09)",
+      "cardShadow": "0 10px 30px rgba(20,20,20,0.05)",
+      "cardShadowHover": "0 16px 38px rgba(20,20,20,0.09)",
       "cardImageBg": "#ffffff",
       "cardImagePadding": "clamp(22px, 2.4vw, 36px)"
     },
     "sections": [
       {
-        "id": "contentLayout-msaucbea-lcno0",
+        "id": "hero",
+        "kind": "contentLayout",
+        "title": "Hero",
+        "background": "#f7f7f3",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "topSpacing": "large",
+        "bottomSpacing": "large",
+        "layout": "whole",
+        "layoutColumns": 1,
+        "layoutItems": [
+          {
+            "id": "hero-column-1",
+            "rowId": "hero-row",
+            "rowLayout": "whole",
+            "blocks": [],
+            "nestedLayout": {
+              "version": 1,
+              "direction": "vertical",
+              "distribution": "equal",
+              "gap": "inherit",
+              "rows": [
+                {
+                  "id": "nested-row-ms65vfi8-1",
+                  "weight": 1,
+                  "layout": "whole",
+                  "columns": [
+                    {
+                      "id": "nested-column-ms65vfi8-1",
+                      "rowId": "nested-row-ms65vfi8-1",
+                      "rowLayout": "whole",
+                      "blocks": [
+                        {
+                          "id": "business-hero",
+                          "kind": "hero",
+                          "eyebrow": "A clear foundation for growth",
+                          "title": "Build trust from the\nfirst impression",
+                          "body": "Introduce your company with a focused promise, useful context, and a simple path for visitors to take the next step.",
+                          "buttonLabel": "Get Started",
+                          "buttonUrl": "#contact",
+                          "buttonStyle": "secondary",
+                          "buttons": [
+                            {
+                              "id": "business-hero-secondary",
+                              "label": "Explore Services",
+                              "url": "#services",
+                              "target": "_self",
+                              "style": "outline"
+                            }
+                          ],
+                          "buttonsLayout": "inline",
+                          "buttonGap": "0.75rem",
+                          "elementAlign": "left",
+                          "elementPadding": "lg",
+                          "carouselSettings": {
+                            "variant": "default"
+                          },
+                          "typography": {
+                            "title": {
+                              "fontFamily": "inherit",
+                              "fontSize": "clamp(42px, 6vw, 84px)",
+                              "fontWeight": "720",
+                              "lineHeight": "1.02",
+                              "letterSpacing": "-0.035em",
+                              "color": "inherit",
+                              "textAlign": "left"
+                            },
+                            "body": {
+                              "fontFamily": "inherit",
+                              "fontSize": "18px",
+                              "fontWeight": "400",
+                              "lineHeight": "1.65",
+                              "letterSpacing": "0",
+                              "color": "inherit",
+                              "textAlign": "left"
+                            },
+                            "eyebrow": {
+                              "fontFamily": "inherit",
+                              "fontSize": "12px",
+                              "fontWeight": "700",
+                              "lineHeight": "1.2",
+                              "letterSpacing": "0.1em",
+                              "color": "inherit",
+                              "textAlign": "left",
+                              "textTransform": "uppercase"
+                            },
+                            "button": {
+                              "fontFamily": "inherit",
+                              "fontSize": "14px",
+                              "fontWeight": "700",
+                              "lineHeight": "1",
+                              "letterSpacing": "0",
+                              "textAlign": "left"
+                            }
+                          },
+                          "secondaryButtonLabel": "Explore Services",
+                          "secondaryButtonUrl": "/services",
+                          "size": "large"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "id": "nested-row-ms65vfi8-2",
+                  "weight": 1,
+                  "layout": "whole",
+                  "columns": [
+                    {
+                      "id": "nested-column-ms65vfi8-2",
+                      "rowId": "nested-row-ms65vfi8-2",
+                      "rowLayout": "whole",
+                      "blocks": [
+                        {
+                          "id": "grid-block-msbsowbr-kun6w",
+                          "kind": "grid",
+                          "title": "Services designed around your goals",
+                          "gridSource": "static",
+                          "columns": 3,
+                          "gridRows": 1,
+                          "gridGap": "medium",
+                          "gridMargin": "inherit",
+                          "gridImagePadding": "frameless",
+                          "gridContentPadding": "medium",
+                          "gridImageFrame": "none",
+                          "gridShowImage": true,
+                          "gridShowEyebrow": true,
+                          "gridShowMeta": true,
+                          "gridShowText": true,
+                          "gridShowButton": true,
+                          "gridItemRenderer": "card",
+                          "gridCardVariant": "secondary",
+                          "gridCardSize": "default",
+                          "gridCardHover": false,
+                          "gridRowGap": "medium",
+                          "gridStacking": "inherit",
+                          "gridItems": [
+                            {
+                              "id": "grid-block-msbsowbr-kun6w-1",
+                              "eyebrow": "01",
+                              "title": "Strategy with a practical point of view",
+                              "meta": "Clarity before complexity",
+                              "text": "Define the audience, message, and priorities that will make every design decision easier.",
+                              "buttonLabel": "Explore Strategy",
+                              "buttonUrl": "/",
+                              "mediaPlacement": "top",
+                              "mediaRatio": "natural",
+                              "mediaFit": "cover",
+                              "titleElement": "h3",
+                              "titleStyle": "inherit",
+                              "actionStyle": "secondary",
+                              "actionSize": "large",
+                              "imageUrl": "/builder-image-placeholder.svg",
+                              "imageAlt": "Warm architectural forms representing strategic planning"
+                            },
+                            {
+                              "id": "grid-block-msbsowbr-kun6w-2",
+                              "eyebrow": "02",
+                              "title": "Design that feels distinctive and effortless",
+                              "meta": "Made for real people",
+                              "text": "Shape a responsive experience with a strong visual rhythm and thoughtful interactions.",
+                              "buttonLabel": "View Selected Work",
+                              "buttonUrl": "/",
+                              "imageUrl": "/builder-image-placeholder.svg",
+                              "imageAlt": "Editorial composition representing interface design",
+                              "actionStyle": "default",
+                              "actionSize": "small"
+                            },
+                            {
+                              "id": "grid-block-msbsowbr-kun6w-3",
+                              "eyebrow": "03",
+                              "title": "A foundation designed to keep improving",
+                              "meta": "Built beyond launch",
+                              "text": "Measure what matters, refine the journey, and evolve the site as the business grows.",
+                              "buttonLabel": "Discuss Your Goals",
+                              "buttonUrl": "/",
+                              "imageUrl": "/builder-image-placeholder.svg",
+                              "imageAlt": "Abstract rising forms representing sustainable growth"
+                            }
+                          ],
+                          "typography": {
+                            "eyebrow": {
+                              "variant": "subheading",
+                              "fontSize": "12px",
+                              "fontWeight": "700",
+                              "lineHeight": "1.2",
+                              "letterSpacing": "0.12em",
+                              "textTransform": "uppercase"
+                            },
+                            "title": {
+                              "variant": "heading",
+                              "fontSize": "clamp(28px, 3vw, 46px)",
+                              "fontWeight": "720",
+                              "lineHeight": "1.06",
+                              "letterSpacing": "-0.025em"
+                            },
+                            "body": {
+                              "variant": "body",
+                              "fontSize": "16px",
+                              "fontWeight": "400",
+                              "lineHeight": "1.7"
+                            },
+                            "button": {
+                              "variant": "button",
+                              "fontSize": "14px",
+                              "fontWeight": "700",
+                              "lineHeight": "1",
+                              "letterSpacing": "0.01em"
+                            }
+                          },
+                          "visualStyle": {
+                            "customClass": "builder-premium-starter",
+                            "card": {
+                              "preset": "soft",
+                              "hoverPreset": "lift-soft",
+                              "imageRatio": "16:9",
+                              "imageFit": "cover",
+                              "imageRadius": "14px",
+                              "titleSize": "clamp(22px, 2vw, 30px)",
+                              "titleWeight": "720",
+                              "titleMargin": "0",
+                              "metaSize": "11px",
+                              "metaTransform": "uppercase",
+                              "metaSpacing": "0",
+                              "contentSize": "15px",
+                              "contentLineHeight": "1.65",
+                              "buttonMargin": "8px 0 0",
+                              "cardGap": "14px",
+                              "cardPadding": "clamp(20px, 2.4vw, 30px)"
+                            },
+                            "border": {
+                              "radius": "18px"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "id": "nested-row-ms65vkj0",
+                  "weight": 1,
+                  "layout": "whole",
+                  "columns": [
+                    {
+                      "id": "nested-column-ms65vkj0",
+                      "rowId": "nested-row-ms65vkj0",
+                      "rowLayout": "whole",
+                      "blocks": []
+                    }
+                  ]
+                },
+                {
+                  "id": "nested-row-ms65vhif",
+                  "weight": 1,
+                  "layout": "whole",
+                  "columns": [
+                    {
+                      "id": "nested-column-ms65vhif",
+                      "rowId": "nested-row-ms65vhif",
+                      "rowLayout": "whole",
+                      "blocks": []
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ],
+        "visible": true
+      },
+      {
+        "id": "contentLayout-ms65x3lh-eu9rv",
         "kind": "contentLayout",
         "title": "",
         "background": "#ffffff",
@@ -46,229 +319,773 @@
         "visible": true,
         "eyebrow": "",
         "body": "",
-        "layout": "1-col",
-        "layoutColumns": 1,
+        "layoutColumns": 2,
         "layoutItems": [
           {
-            "id": "layout-row-msaucbea-1-column-1",
-            "rowId": "layout-row-msaucbea-1",
-            "rowLayout": "1-col",
-            "blocks": [
-              {
-                "id": "button-block-msaucbeb-0qm48",
-                "kind": "button",
-                "buttonLabel": "Schedule a Consultation",
-                "buttonUrl": "/",
-                "buttonStyle": "secondary",
-                "size": "large"
-              },
-              {
-                "id": "accordion-block-msauce0e-nzmu9",
-                "kind": "accordion",
-                "accordionItems": [
-                  {
-                    "id": "accordion-block-msauce0e-nzmu9-item-1",
-                    "title": "What is the delivery timeline?",
-                    "content": "Most projects begin within two weeks."
-                  },
-                  {
-                    "id": "accordion-block-msauce0e-nzmu9-item-2",
-                    "title": "How does it work?",
-                    "content": "Explain the next step in a concise, helpful answer."
-                  },
-                  {
-                    "id": "accordion-block-msauce0e-nzmu9-item-3",
-                    "title": "Can I ask a question?",
-                    "content": "Give visitors a clear path to contact you or continue exploring."
-                  }
-                ],
-                "accordionMultiple": true,
-                "accordionCollapsible": true,
-                "accordionOpenItems": [
-                  0
-                ],
-                "accordionIndicator": "plus-minus",
-                "accordionIndicatorPosition": "start",
-                "accordionRowStyle": "striped",
-                "accordionSpacing": "large",
-                "accordionTitleEmphasis": "bold",
-                "accordionOpenEmphasis": "primary"
-              },
-              {
-                "id": "alert-block-msaucm3a-btz8o",
-                "kind": "alert",
-                "alertStyle": "danger",
-                "title": "Heads up",
-                "body": "This is a UIkit alert callout. Change the variant or edit the text in the inspector.",
-                "elementPadding": "sm"
-              },
-              {
-                "id": "button-block-msaucqo9-3reo8",
-                "kind": "button",
-                "buttonLabel": "Schedule a Consultation",
-                "buttonUrl": "/",
-                "buttonStyle": "secondary",
-                "size": "large"
-              },
-              {
-                "id": "text-block-msaucz13-8gud0",
-                "kind": "text",
-                "eyebrow": "",
-                "title": "Good work begins with a clear point of view",
-                "body": "<p>Text parity content</p>",
-                "buttonLabel": "",
-                "buttonUrl": "",
-                "textVariant": "muted",
-                "textAlign": "center",
-                "elementPadding": "sm",
-                "typography": {
-                  "eyebrow": {
-                    "variant": "subheading",
-                    "fontSize": "12px",
-                    "fontWeight": "700",
-                    "lineHeight": "1.2",
-                    "letterSpacing": "0.12em",
-                    "textTransform": "uppercase"
-                  },
-                  "title": {
-                    "variant": "heading",
-                    "fontSize": "clamp(28px, 3vw, 46px)",
-                    "fontWeight": "720",
-                    "lineHeight": "1.06",
-                    "letterSpacing": "-0.025em"
-                  },
-                  "body": {
-                    "variant": "body",
-                    "fontSize": "16px",
-                    "fontWeight": "700",
-                    "lineHeight": "1.7"
-                  },
-                  "button": {
-                    "variant": "button",
-                    "fontSize": "14px",
-                    "fontWeight": "700",
-                    "lineHeight": "1",
-                    "letterSpacing": "0.01em"
-                  }
+            "id": "layout-row-ms65x3lh-1-column-1",
+            "rowId": "layout-row-ms65x3lh-1",
+            "blocks": [],
+            "nestedLayout": {
+              "version": 1,
+              "direction": "vertical",
+              "distribution": "equal",
+              "gap": "inherit",
+              "rows": [
+                {
+                  "id": "nested-row-ms65xa9i-1",
+                  "weight": 1,
+                  "layout": "whole",
+                  "columns": [
+                    {
+                      "id": "nested-column-ms65xa9i-1",
+                      "rowId": "nested-row-ms65xa9i-1",
+                      "rowLayout": "whole",
+                      "blocks": [
+                        {
+                          "id": "image-block-ms65xgzk-t793i",
+                          "kind": "image",
+                          "title": "",
+                          "body": "",
+                          "imageUrl": "/globe.svg",
+                          "imageAlt": "Abstract globe illustration",
+                          "imageAlignment": "center",
+                          "imageMaxWidth": 960,
+                          "imageFit": "contain",
+                          "imageRatio": "square",
+                          "imageCaption": ""
+                        }
+                      ]
+                    }
+                  ]
                 },
-                "visualStyle": {
-                  "customClass": "builder-premium-starter"
+                {
+                  "id": "nested-row-ms65xa9i-2",
+                  "weight": 1,
+                  "layout": "whole",
+                  "columns": [
+                    {
+                      "id": "nested-column-ms65xa9i-2",
+                      "rowId": "nested-row-ms65xa9i-2",
+                      "rowLayout": "whole",
+                      "blocks": []
+                    }
+                  ]
                 }
-              },
-              {
-                "id": "heading-block-msaud3na-5lht5",
-                "kind": "heading",
-                "headingText": "UIkit Preset Font Size Test 2026",
-                "headingLevel": "h3",
-                "headingAlign": "left",
-                "headingSize": "xlarge",
-                "typography": {
-                  "eyebrow": {
-                    "variant": "subheading",
-                    "fontSize": "12px",
-                    "fontWeight": "700",
-                    "lineHeight": "1.2",
-                    "letterSpacing": "0.12em",
-                    "textTransform": "uppercase"
-                  },
-                  "title": {
-                    "variant": "heading",
-                    "fontSize": "clamp(28px, 3vw, 46px)",
-                    "fontWeight": "800",
-                    "lineHeight": "1.06",
-                    "letterSpacing": "-0.025em"
-                  },
-                  "body": {
-                    "variant": "body",
-                    "fontSize": "16px",
-                    "fontWeight": "400",
-                    "lineHeight": "1.7"
-                  },
-                  "button": {
-                    "variant": "button",
-                    "fontSize": "14px",
-                    "fontWeight": "700",
-                    "lineHeight": "1",
-                    "letterSpacing": "0.01em"
-                  }
-                },
-                "elementPadding": "sm",
-                "textGradientPreset": "indigo-purple"
-              },
-              {
-                "id": "panel-block-msaud8ia-2xgc9",
-                "kind": "panel",
-                "eyebrow": "A more considered approach",
-                "title": "Build a brand experience that feels unmistakably yours",
-                "body": "From the first headline to the smallest interaction, every detail works together to create clarity, confidence, and recognition.",
-                "buttonLabel": "Discover the Process",
-                "buttonUrl": "/",
-                "buttonStyle": "primary",
-                "imageUrl": "/builder-image-placeholder.svg",
-                "imageAlt": "Editorial placeholder for a featured brand story",
-                "imageRatio": "16:9",
-                "imagePadding": "frameless",
-                "imageFit": "cover",
-                "panelVariant": "secondary",
-                "panelHover": true,
-                "panelSize": "default"
-              },
-              {
-                "id": "text-block-msaudcxc-hmdso",
-                "kind": "text",
-                "eyebrow": "",
-                "title": "Good work begins with a clear point of view",
-                "body": "<p>Text parity content</p>",
-                "buttonLabel": "",
-                "buttonUrl": "",
-                "textVariant": "muted",
-                "textAlign": "center",
-                "elementPadding": "sm",
-                "typography": {
-                  "eyebrow": {
-                    "variant": "subheading",
-                    "fontSize": "12px",
-                    "fontWeight": "700",
-                    "lineHeight": "1.2",
-                    "letterSpacing": "0.12em",
-                    "textTransform": "uppercase"
-                  },
-                  "title": {
-                    "variant": "heading",
-                    "fontSize": "clamp(28px, 3vw, 46px)",
-                    "fontWeight": "720",
-                    "lineHeight": "1.06",
-                    "letterSpacing": "-0.025em"
-                  },
-                  "body": {
-                    "variant": "body",
-                    "fontSize": "16px",
-                    "fontWeight": "700",
-                    "lineHeight": "1.7"
-                  },
-                  "button": {
-                    "variant": "button",
-                    "fontSize": "14px",
-                    "fontWeight": "700",
-                    "lineHeight": "1",
-                    "letterSpacing": "0.01em"
-                  }
-                },
-                "visualStyle": {
-                  "customClass": "builder-premium-starter"
-                }
-              }
-            ],
-            "columnHorizontalAlign": "center",
-            "columnVerticalAlign": "bottom",
-            "columnFlex": "expand",
-            "columnResponsiveWidth": "stack"
+              ]
+            }
+          },
+          {
+            "id": "layout-item-ms65xccf",
+            "rowId": "layout-row-ms65x3lh-1",
+            "blocks": []
           }
         ],
         "layoutRows": 1
+      },
+      {
+        "id": "trust",
+        "kind": "contentLayout",
+        "title": "Trust and Key Benefits",
+        "background": "#e9eee9",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "topSpacing": "medium",
+        "bottomSpacing": "medium",
+        "layout": "whole",
+        "layoutColumns": 1,
+        "layoutItems": [
+          {
+            "id": "trust-column-1",
+            "rowId": "trust-row",
+            "rowLayout": "whole",
+            "blocks": [
+              {
+                "id": "trust-grid",
+                "kind": "grid",
+                "title": "Why clients choose this approach",
+                "gridSource": "static",
+                "columns": 3,
+                "gridRows": 1,
+                "gridGap": "medium",
+                "gridContentPadding": "large",
+                "gridShowImage": false,
+                "gridShowEyebrow": true,
+                "gridShowMeta": false,
+                "gridShowText": true,
+                "gridShowButton": false,
+                "gridItems": [
+                  {
+                    "id": "trust-1",
+                    "eyebrow": "01",
+                    "title": "Clear communication",
+                    "text": "Set expectations early and keep every step easy to understand.",
+                    "buttonStyle": "link"
+                  },
+                  {
+                    "id": "trust-2",
+                    "eyebrow": "02",
+                    "title": "Thoughtful delivery",
+                    "text": "Balance quality, pace, and attention to the details that matter.",
+                    "buttonStyle": "link"
+                  },
+                  {
+                    "id": "trust-3",
+                    "eyebrow": "03",
+                    "title": "Built to adapt",
+                    "text": "Create a foundation that can evolve as priorities change.",
+                    "buttonStyle": "link"
+                  }
+                ],
+                "typography": {
+                  "title": {
+                    "fontFamily": "inherit",
+                    "fontSize": "22px",
+                    "fontWeight": "700",
+                    "lineHeight": "1.15",
+                    "letterSpacing": "-0.01em",
+                    "color": "inherit",
+                    "textAlign": "left"
+                  },
+                  "body": {
+                    "fontFamily": "inherit",
+                    "fontSize": "15px",
+                    "fontWeight": "400",
+                    "lineHeight": "1.6",
+                    "letterSpacing": "0",
+                    "color": "inherit",
+                    "textAlign": "left"
+                  },
+                  "eyebrow": {
+                    "fontFamily": "inherit",
+                    "fontSize": "12px",
+                    "fontWeight": "700",
+                    "lineHeight": "1.2",
+                    "letterSpacing": "0.08em",
+                    "color": "inherit",
+                    "textAlign": "left",
+                    "textTransform": "uppercase"
+                  },
+                  "button": {
+                    "fontFamily": "inherit",
+                    "fontSize": "14px",
+                    "fontWeight": "700",
+                    "lineHeight": "1",
+                    "letterSpacing": "0",
+                    "textAlign": "left"
+                  }
+                }
+              }
+            ]
+          }
+        ],
+        "visible": true
+      },
+      {
+        "id": "about",
+        "kind": "contentLayout",
+        "title": "About Company",
+        "background": "#ffffff",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "topSpacing": "large",
+        "bottomSpacing": "large",
+        "layout": "halves",
+        "layoutColumns": 2,
+        "layoutItems": [
+          {
+            "id": "about-column-1",
+            "rowId": "about-row",
+            "rowLayout": "halves",
+            "blocks": [
+              {
+                "id": "about-copy",
+                "kind": "text",
+                "eyebrow": "About the company",
+                "title": "Explain the company in a human, confident way",
+                "body": "Use two short paragraphs to introduce your experience, point of view, and the kind of customer you serve. This is enough detail to build credibility without slowing the page down.",
+                "typography": {
+                  "title": {
+                    "fontFamily": "inherit",
+                    "fontSize": "clamp(28px, 3.5vw, 48px)",
+                    "fontWeight": "700",
+                    "lineHeight": "1.08",
+                    "letterSpacing": "-0.02em",
+                    "color": "inherit",
+                    "textAlign": "left"
+                  },
+                  "body": {
+                    "fontFamily": "inherit",
+                    "fontSize": "16px",
+                    "fontWeight": "400",
+                    "lineHeight": "1.65",
+                    "letterSpacing": "0",
+                    "color": "inherit",
+                    "textAlign": "left"
+                  },
+                  "eyebrow": {
+                    "fontFamily": "inherit",
+                    "fontSize": "12px",
+                    "fontWeight": "700",
+                    "lineHeight": "1.2",
+                    "letterSpacing": "0.08em",
+                    "color": "inherit",
+                    "textAlign": "left",
+                    "textTransform": "uppercase"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "id": "about-column-2",
+            "rowId": "about-row",
+            "rowLayout": "halves",
+            "blocks": [
+              {
+                "id": "about-highlights",
+                "kind": "list",
+                "title": "Useful supporting highlights",
+                "items": [
+                  "A focused company introduction",
+                  "A meaningful point of difference",
+                  "Two or three proof points"
+                ],
+                "elementPadding": "lg",
+                "listItems": [
+                  {
+                    "id": "about-highlights-item-1",
+                    "text": "A focused company introduction"
+                  },
+                  {
+                    "id": "about-highlights-item-2",
+                    "text": "A meaningful point of difference"
+                  },
+                  {
+                    "id": "about-highlights-item-3",
+                    "text": "Two or three proof points"
+                  }
+                ],
+                "listPresentation": "default",
+                "listMarker": "none",
+                "listAlign": "left",
+                "listSpacing": "default"
+              }
+            ]
+          }
+        ],
+        "visible": true
+      },
+      {
+        "id": "contentLayout-ms65wh07-7l3k7",
+        "kind": "contentLayout",
+        "title": "",
+        "background": "#ffffff",
+        "backgroundMode": "boxed",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "topSpacing": "inherit",
+        "bottomSpacing": "inherit",
+        "topMargin": "inherit",
+        "bottomMargin": "inherit",
+        "pullUnderHeader": false,
+        "visible": true,
+        "eyebrow": "",
+        "body": "",
+        "layout": "whole",
+        "layoutColumns": 1,
+        "layoutItems": [
+          {
+            "id": "layout-row-ms65wh07-1-column-1",
+            "rowId": "layout-row-ms65wh07-1",
+            "rowLayout": "whole",
+            "blocks": [],
+            "nestedLayout": {
+              "version": 1,
+              "direction": "vertical",
+              "distribution": "equal",
+              "gap": "inherit",
+              "rows": [
+                {
+                  "id": "nested-row-ms65wjt1-1",
+                  "weight": 1,
+                  "layout": "whole",
+                  "columns": [
+                    {
+                      "id": "nested-column-ms65wjt1-1",
+                      "rowId": "nested-row-ms65wjt1-1",
+                      "rowLayout": "whole",
+                      "blocks": [
+                        {
+                          "id": "image-block-ms65wmmb-q5anw",
+                          "kind": "image",
+                          "title": "",
+                          "body": "",
+                          "imageUrl": "/globe.svg",
+                          "imageAlt": "Abstract globe illustration",
+                          "imageAlignment": "center",
+                          "imageMaxWidth": 960,
+                          "imageFit": "contain",
+                          "imageRatio": "square",
+                          "imageCaption": ""
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "id": "nested-row-ms65wjt1-2",
+                  "weight": 1,
+                  "layout": "whole",
+                  "columns": [
+                    {
+                      "id": "nested-column-ms65wjt1-2",
+                      "rowId": "nested-row-ms65wjt1-2",
+                      "rowLayout": "whole",
+                      "blocks": []
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ],
+        "layoutRows": 1
+      },
+      {
+        "id": "services",
+        "kind": "contentLayout",
+        "title": "Services",
+        "background": "#f7f7f3",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "topSpacing": "large",
+        "bottomSpacing": "large",
+        "layout": "whole",
+        "layoutColumns": 1,
+        "layoutItems": [
+          {
+            "id": "services-column-1",
+            "rowId": "services-row",
+            "rowLayout": "whole",
+            "blocks": [
+              {
+                "id": "services-grid",
+                "kind": "grid",
+                "title": "Services designed around real priorities",
+                "gridSource": "static",
+                "columns": 3,
+                "gridRows": 1,
+                "gridGap": "medium",
+                "gridContentPadding": "large",
+                "gridShowImage": false,
+                "gridShowEyebrow": true,
+                "gridShowMeta": false,
+                "gridShowText": true,
+                "gridShowButton": true,
+                "gridItems": [
+                  {
+                    "id": "service-1",
+                    "eyebrow": "01",
+                    "title": "Strategy and planning",
+                    "text": "Turn an initial idea into a clear, practical direction.",
+                    "buttonLabel": "View Details",
+                    "buttonUrl": "#contact",
+                    "buttonStyle": "link"
+                  },
+                  {
+                    "id": "service-2",
+                    "eyebrow": "02",
+                    "title": "Implementation",
+                    "text": "Bring the plan to life through a focused and collaborative process.",
+                    "buttonLabel": "View Details",
+                    "buttonUrl": "#contact",
+                    "buttonStyle": "link"
+                  },
+                  {
+                    "id": "service-3",
+                    "eyebrow": "03",
+                    "title": "Ongoing support",
+                    "text": "Keep improving after launch with dependable guidance.",
+                    "buttonLabel": "View Details",
+                    "buttonUrl": "#contact",
+                    "buttonStyle": "link"
+                  }
+                ],
+                "typography": {
+                  "title": {
+                    "fontFamily": "inherit",
+                    "fontSize": "22px",
+                    "fontWeight": "700",
+                    "lineHeight": "1.15",
+                    "letterSpacing": "-0.01em",
+                    "color": "inherit",
+                    "textAlign": "left"
+                  },
+                  "body": {
+                    "fontFamily": "inherit",
+                    "fontSize": "15px",
+                    "fontWeight": "400",
+                    "lineHeight": "1.6",
+                    "letterSpacing": "0",
+                    "color": "inherit",
+                    "textAlign": "left"
+                  },
+                  "eyebrow": {
+                    "fontFamily": "inherit",
+                    "fontSize": "12px",
+                    "fontWeight": "700",
+                    "lineHeight": "1.2",
+                    "letterSpacing": "0.08em",
+                    "color": "inherit",
+                    "textAlign": "left",
+                    "textTransform": "uppercase"
+                  },
+                  "button": {
+                    "fontFamily": "inherit",
+                    "fontSize": "14px",
+                    "fontWeight": "700",
+                    "lineHeight": "1",
+                    "letterSpacing": "0",
+                    "textAlign": "left"
+                  }
+                }
+              }
+            ]
+          }
+        ],
+        "visible": true
+      },
+      {
+        "id": "why-us",
+        "kind": "contentLayout",
+        "title": "Why Choose Us",
+        "background": "#e9eee9",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "topSpacing": "large",
+        "bottomSpacing": "large",
+        "layout": "halves",
+        "layoutColumns": 2,
+        "layoutItems": [
+          {
+            "id": "why-us-column-1",
+            "rowId": "why-us-row",
+            "rowLayout": "halves",
+            "blocks": [
+              {
+                "id": "why-copy",
+                "kind": "text",
+                "eyebrow": "Why choose us",
+                "title": "Make the decision easier",
+                "body": "Use this section to connect your working style to outcomes customers care about: clarity, reliability, and a result that supports what comes next.",
+                "typography": {
+                  "title": {
+                    "fontFamily": "inherit",
+                    "fontSize": "clamp(28px, 3.5vw, 48px)",
+                    "fontWeight": "700",
+                    "lineHeight": "1.08",
+                    "letterSpacing": "-0.02em",
+                    "color": "inherit",
+                    "textAlign": "left"
+                  },
+                  "body": {
+                    "fontFamily": "inherit",
+                    "fontSize": "16px",
+                    "fontWeight": "400",
+                    "lineHeight": "1.65",
+                    "letterSpacing": "0",
+                    "color": "inherit",
+                    "textAlign": "left"
+                  },
+                  "eyebrow": {
+                    "fontFamily": "inherit",
+                    "fontSize": "12px",
+                    "fontWeight": "700",
+                    "lineHeight": "1.2",
+                    "letterSpacing": "0.08em",
+                    "color": "inherit",
+                    "textAlign": "left",
+                    "textTransform": "uppercase"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "id": "why-us-column-2",
+            "rowId": "why-us-row",
+            "rowLayout": "halves",
+            "blocks": [
+              {
+                "id": "why-list",
+                "kind": "list",
+                "title": "A dependable way of working",
+                "items": [
+                  "Practical recommendations",
+                  "Transparent collaboration",
+                  "A flexible long-term foundation"
+                ],
+                "elementPadding": "lg",
+                "listItems": [
+                  {
+                    "id": "why-list-item-1",
+                    "text": "Practical recommendations"
+                  },
+                  {
+                    "id": "why-list-item-2",
+                    "text": "Transparent collaboration"
+                  },
+                  {
+                    "id": "why-list-item-3",
+                    "text": "A flexible long-term foundation"
+                  }
+                ],
+                "listPresentation": "default",
+                "listMarker": "none",
+                "listAlign": "left",
+                "listSpacing": "default"
+              }
+            ]
+          }
+        ],
+        "visible": true
+      },
+      {
+        "id": "testimonials",
+        "kind": "contentLayout",
+        "title": "Testimonials",
+        "background": "#ffffff",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "topSpacing": "large",
+        "bottomSpacing": "large",
+        "layout": "whole",
+        "layoutColumns": 1,
+        "layoutItems": [
+          {
+            "id": "testimonials-column-1",
+            "rowId": "testimonials-row",
+            "rowLayout": "whole",
+            "blocks": [
+              {
+                "id": "testimonial-grid",
+                "kind": "grid",
+                "title": "What a strong experience feels like",
+                "gridSource": "static",
+                "columns": 3,
+                "gridRows": 1,
+                "gridGap": "medium",
+                "gridContentPadding": "large",
+                "gridShowImage": false,
+                "gridShowEyebrow": true,
+                "gridShowMeta": true,
+                "gridShowText": true,
+                "gridShowButton": false,
+                "gridItems": [
+                  {
+                    "id": "quote-1",
+                    "eyebrow": "“",
+                    "title": "Clear from the first conversation",
+                    "text": "The process stayed focused, and we always understood the next step.",
+                    "meta": "Alex Morgan · Project Lead",
+                    "buttonStyle": "link"
+                  },
+                  {
+                    "id": "quote-2",
+                    "eyebrow": "“",
+                    "title": "A result we can build on",
+                    "text": "We now have a stronger structure and a much clearer direction.",
+                    "meta": "Jordan Lee · Business Owner",
+                    "buttonStyle": "link"
+                  },
+                  {
+                    "id": "quote-3",
+                    "eyebrow": "“",
+                    "title": "Thoughtful and practical",
+                    "text": "Every recommendation was useful, realistic, and easy to act on.",
+                    "meta": "Taylor Reed · Operations Manager",
+                    "buttonStyle": "link"
+                  }
+                ],
+                "typography": {
+                  "title": {
+                    "fontFamily": "inherit",
+                    "fontSize": "22px",
+                    "fontWeight": "700",
+                    "lineHeight": "1.15",
+                    "letterSpacing": "-0.01em",
+                    "color": "inherit",
+                    "textAlign": "left"
+                  },
+                  "body": {
+                    "fontFamily": "inherit",
+                    "fontSize": "15px",
+                    "fontWeight": "400",
+                    "lineHeight": "1.6",
+                    "letterSpacing": "0",
+                    "color": "inherit",
+                    "textAlign": "left"
+                  },
+                  "eyebrow": {
+                    "fontFamily": "inherit",
+                    "fontSize": "12px",
+                    "fontWeight": "700",
+                    "lineHeight": "1.2",
+                    "letterSpacing": "0.08em",
+                    "color": "inherit",
+                    "textAlign": "left",
+                    "textTransform": "uppercase"
+                  },
+                  "button": {
+                    "fontFamily": "inherit",
+                    "fontSize": "14px",
+                    "fontWeight": "700",
+                    "lineHeight": "1",
+                    "letterSpacing": "0",
+                    "textAlign": "left"
+                  }
+                }
+              }
+            ]
+          }
+        ],
+        "visible": true
+      },
+      {
+        "id": "cta",
+        "kind": "contentLayout",
+        "title": "Call to Action",
+        "background": "#2f6657",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "dark",
+        "topSpacing": "medium",
+        "bottomSpacing": "medium",
+        "layout": "whole",
+        "layoutColumns": 1,
+        "layoutItems": [
+          {
+            "id": "cta-column-1",
+            "rowId": "cta-row",
+            "rowLayout": "whole",
+            "blocks": [
+              {
+                "id": "business-cta",
+                "kind": "promoStrip",
+                "eyebrow": "Ready when you are",
+                "title": "Start with a focused conversation",
+                "body": "Share what you are working toward and discover a practical next step.",
+                "buttonLabel": "Contact Us",
+                "buttonUrl": "#contact",
+                "buttonStyle": "light",
+                "elementPadding": "md"
+              }
+            ]
+          }
+        ],
+        "visible": true
+      },
+      {
+        "id": "contact",
+        "kind": "contentLayout",
+        "title": "Contact",
+        "background": "#f7f7f3",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "topSpacing": "large",
+        "bottomSpacing": "large",
+        "layout": "halves",
+        "layoutColumns": 2,
+        "layoutItems": [
+          {
+            "id": "contact-column-1",
+            "rowId": "contact-row",
+            "rowLayout": "halves",
+            "blocks": [
+              {
+                "id": "contact-copy",
+                "kind": "text",
+                "eyebrow": "Contact",
+                "title": "Make it easy to get in touch",
+                "body": "Set expectations for the first conversation and tell visitors what information will help you respond well.",
+                "typography": {
+                  "title": {
+                    "fontFamily": "inherit",
+                    "fontSize": "clamp(28px, 3.5vw, 48px)",
+                    "fontWeight": "700",
+                    "lineHeight": "1.08",
+                    "letterSpacing": "-0.02em",
+                    "color": "inherit",
+                    "textAlign": "left"
+                  },
+                  "body": {
+                    "fontFamily": "inherit",
+                    "fontSize": "16px",
+                    "fontWeight": "400",
+                    "lineHeight": "1.65",
+                    "letterSpacing": "0",
+                    "color": "inherit",
+                    "textAlign": "left"
+                  },
+                  "eyebrow": {
+                    "fontFamily": "inherit",
+                    "fontSize": "12px",
+                    "fontWeight": "700",
+                    "lineHeight": "1.2",
+                    "letterSpacing": "0.08em",
+                    "color": "inherit",
+                    "textAlign": "left",
+                    "textTransform": "uppercase"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "id": "contact-column-2",
+            "rowId": "contact-row",
+            "rowLayout": "halves",
+            "blocks": [
+              {
+                "id": "contact-panel",
+                "kind": "panel",
+                "eyebrow": "Start a conversation",
+                "title": "Tell us what you are planning",
+                "body": "Share your goal, preferred timeline, and the best way to reach you.",
+                "buttonLabel": "Book a Consultation",
+                "buttonUrl": "mailto:hello@example.com",
+                "buttonStyle": "primary",
+                "panelVariant": "default",
+                "panelHover": true,
+                "panelSize": "large",
+                "panelShowMedia": true,
+                "panelMediaPlacement": "top",
+                "panelMediaFit": "cover",
+                "panelMediaWidth": "medium",
+                "panelMediaAlignment": "center",
+                "panelTextAlign": "left",
+                "panelVerticalAlign": "top",
+                "panelTitleElement": "h3",
+                "panelTitleStyle": "inherit",
+                "panelContentWidth": "auto",
+                "panelActionVisible": true,
+                "panelActionStyle": "primary",
+                "panelActionSize": "default",
+                "panelActionAlign": "inherit"
+              }
+            ]
+          }
+        ],
+        "visible": true
       }
     ],
-    "updatedAt": "2026-08-01T20:46:32.432Z"
+    "updatedAt": "2026-08-02T13:13:20.501Z"
   },
   "header": {
     "version": 1,
@@ -314,6 +1131,40 @@
         "layoutColumns": 3,
         "layoutItems": [
           {
+            "id": "header-top-left",
+            "rowId": "header-top-row",
+            "rowLayout": "halves",
+            "blocks": [
+              {
+                "id": "header-language",
+                "kind": "headerLanguage",
+                "headerLanguageDisplay": "native",
+                "elementAlign": "left"
+              }
+            ]
+          },
+          {
+            "id": "header-top-right",
+            "rowId": "header-top-row",
+            "rowLayout": "halves",
+            "blocks": [
+              {
+                "id": "header-utility-account",
+                "kind": "headerAccount",
+                "headerUtilityAction": "account",
+                "headerUtilityVariant": "muted",
+                "elementAlign": "right"
+              },
+              {
+                "id": "header-utility-search",
+                "kind": "headerSearch",
+                "headerUtilityAction": "search",
+                "headerUtilityVariant": "muted",
+                "elementAlign": "right"
+              }
+            ]
+          },
+          {
             "id": "header-main-left",
             "rowId": "header-main-row",
             "rowLayout": "quarters-1-2-1",
@@ -349,30 +1200,34 @@
             "rowLayout": "quarters-1-2-1",
             "blocks": [
               {
-                "id": "header-utility-search",
-                "kind": "headerSearch",
-                "headerUtilityAction": "search",
-                "headerUtilityVariant": "ghost",
+                "id": "header-button",
+                "kind": "button",
+                "buttonLabel": "Contact Us",
+                "buttonUrl": "/contact",
+                "buttonBorderRadius": "8px",
+                "buttonPaddingY": "8px",
+                "buttonPaddingX": "16px",
                 "elementAlign": "right"
               },
               {
                 "id": "header-utility-cart",
                 "kind": "headerCart",
                 "headerUtilityAction": "cart",
-                "headerUtilityVariant": "ghost",
+                "headerUtilityVariant": "muted",
                 "elementAlign": "right"
               }
             ]
           }
         ],
         "visible": true,
+        "headerPresetKey": "business",
         "headerArchitectureVersion": 2,
         "headerVisible": true,
-        "headerTransparent": true,
-        "headerOverlay": true,
-        "headerLayout": "hero",
+        "headerTransparent": false,
+        "headerOverlay": false,
+        "headerLayout": "two-row",
         "headerBehavior": "sticky-on-scroll-up",
-        "headerWidthMode": "full",
+        "headerWidthMode": "boxed",
         "headerBackgroundMode": "accent",
         "headerTextMode": "light",
         "headerZIndex": 40,
@@ -383,7 +1238,7 @@
         "headerHeight": "compact"
       }
     ],
-    "updatedAt": "2026-08-01T00:11:17.058Z"
+    "updatedAt": "2026-08-02T02:22:04.779Z"
   },
   "footer": {
     "version": 1,

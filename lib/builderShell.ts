@@ -228,6 +228,31 @@ export type BuilderShellSettings = {
   cardDefaultHoverBackground?: string;
   cardPrimaryHoverBackground?: string;
   cardSecondaryHoverBackground?: string;
+  cardDefaultText?: string;
+  cardPrimaryText?: string;
+  cardSecondaryText?: string;
+  cardDefaultHoverText?: string;
+  cardPrimaryHoverText?: string;
+  cardSecondaryHoverText?: string;
+  cardDefaultTitle?: string;
+  cardPrimaryTitle?: string;
+  cardSecondaryTitle?: string;
+  cardDefaultHoverTitle?: string;
+  cardPrimaryHoverTitle?: string;
+  cardSecondaryHoverTitle?: string;
+  cardDefaultBorder?: string;
+  cardPrimaryBorder?: string;
+  cardSecondaryBorder?: string;
+  cardDefaultHoverBorder?: string;
+  cardPrimaryHoverBorder?: string;
+  cardSecondaryHoverBorder?: string;
+  cardBorderWidth?: string;
+  cardTransitionDuration?: string;
+  cardImageBodySpacing?: string;
+  cardTitleSpacing?: string;
+  cardMetaSpacing?: string;
+  cardHeaderSpacing?: string;
+  cardFooterSpacing?: string;
   cardHoverShadow?: string;
   cardDefaultShadow?: string;
   cardDefaultHoverShadow?: string;
@@ -384,9 +409,34 @@ export const defaultBuilderShellSettings: BuilderShellSettings = {
   containerXLarge: "1600px",
   containerExpand: false,
   cardBackground: "#ffffff",
+  cardPrimaryBackground: "#1991ee",
+  cardSecondaryBackground: "#0c273a",
   cardBorderRadius: "8px",
   cardBorderColor: "#e5e7eb",
+  cardBorderWidth: "1px",
   cardShadow: "0 8px 24px rgba(0, 0, 0, 0.08)",
+  cardShadowHover: "0 12px 30px rgba(0, 0, 0, 0.12)",
+  cardDefaultHoverBackground: "#ffffff",
+  cardPrimaryHoverBackground: "#1991ee",
+  cardSecondaryHoverBackground: "#0c273a",
+  cardDefaultText: "#6b7280",
+  cardPrimaryText: "#ffffff",
+  cardSecondaryText: "#ffffff",
+  cardDefaultTitle: "#111827",
+  cardPrimaryTitle: "#ffffff",
+  cardSecondaryTitle: "#ffffff",
+  cardDefaultBorder: "#e5e7eb",
+  cardPrimaryBorder: "transparent",
+  cardSecondaryBorder: "transparent",
+  cardTransitionDuration: "0.1s",
+  cardImageBodySpacing: "20px",
+  cardTitleSpacing: "0px",
+  cardMetaSpacing: "10px",
+  cardHeaderSpacing: "20px",
+  cardFooterSpacing: "20px",
+  cardPaddingSmall: "15px",
+  cardPaddingDefault: "30px",
+  cardPaddingLarge: "40px",
   buttonPrimaryBackground: "#111111",
   buttonPrimaryText: "#ffffff",
   buttonSecondaryBackground: "#e5e7eb",

@@ -1,5 +1,5 @@
 import type { LayoutBlockKind } from "@/components/dashboard/builderTypes";
-import type { LayoutBlockIconName } from "@/components/dashboard/builderRegistry";
+import type { LayoutBlockIconName } from "@/components/dashboard/elementIconRegistry";
 
 /**
  * Register a new builder block in one place. After adding an entry here:

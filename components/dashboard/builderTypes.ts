@@ -62,6 +62,12 @@ export type SectionKind =
 export type PreviewDevice = "desktop" | "tablet" | "mobile";
 export type GlobalSectionSpacing = "none" | "xs" | "sm" | "md" | "lg" | "xl" | "2xl" | "3xl" | "small" | "medium" | "large" | string;
 export type SectionSpacing = "inherit" | GlobalSectionSpacing;
+export type BuilderListItem = {
+  id: string;
+  text: string;
+  url?: string;
+  target?: "_self" | "_blank";
+};
 export type InspectorTab =
   | "content"
   | "layout"
@@ -240,6 +246,7 @@ export type BuilderLayoutBlock = {
   secondaryButtonUrl?: string;
   secondaryButtonTarget?: "_self" | "_blank";
   secondaryButtonStyle?: "primary" | "secondary" | "outline" | "ghost" | "light";
+  secondaryButtonSize?: "small" | "default" | "large";
   buttonsLayout?: "inline" | "stacked";
   buttonGap?: string;
   buttons?: {
@@ -270,6 +277,12 @@ export type BuilderLayoutBlock = {
   imageAlignment?: "left" | "center" | "right";
   imageMaxWidth?: number;
   imageBorderRadius?: number;
+  imageShape?: "none" | "rounded" | "circle";
+  imageShadow?: "none" | "small" | "medium" | "large" | "xlarge";
+  imageWidth?: "auto" | "full" | "small" | "medium" | "large" | "xlarge";
+  imageLoading?: "lazy" | "eager";
+  imageLinkUrl?: string;
+  imageLinkTarget?: "_self" | "_blank";
   borderRadius?: number;
   imageCaption?: string;
   elementBackgroundMode?: "default" | "transparent" | "custom";
@@ -280,6 +293,20 @@ export type BuilderLayoutBlock = {
   panelVariant?: "default" | "primary" | "secondary" | "blank";
   panelHover?: boolean;
   panelSize?: "small" | "default" | "large";
+  panelShowMedia?: boolean;
+  panelMediaPlacement?: "top" | "left" | "right";
+  panelMediaFit?: "cover" | "contain";
+  panelMediaWidth?: "small" | "medium" | "large";
+  panelMediaAlignment?: "left" | "center" | "right";
+  panelTextAlign?: "left" | "center" | "right";
+  panelVerticalAlign?: "top" | "center" | "bottom";
+  panelTitleElement?: "h2" | "h3" | "h4" | "div";
+  panelTitleStyle?: "inherit" | "h3" | "h4" | "h5";
+  panelContentWidth?: "auto" | "small" | "medium" | "large" | "full";
+  panelActionVisible?: boolean;
+  panelActionStyle?: "default" | "primary" | "secondary" | "text";
+  panelActionSize?: "small" | "default" | "large";
+  panelActionAlign?: "inherit" | "left" | "center" | "right";
   hoverPreset?: string;
   embedMode?: EmbedMode;
   embedCode?: string;
@@ -308,6 +335,20 @@ export type BuilderLayoutBlock = {
   badges?: BuilderSection["badges"];
   slides?: BuilderSection["slides"];
   carouselSettings?: BuilderSection["carouselSettings"];
+  heroHeadingElement?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
+  heroHeadingStyle?: "inherit" | "h1" | "h2" | "h3" | "h4" | "h5" | "article-title" | "small" | "medium" | "large" | "xlarge";
+  heroContentAlign?: "left" | "center" | "right";
+  heroVerticalAlign?: "top" | "center" | "bottom";
+  heroContentWidth?: "small" | "medium" | "large" | "full";
+  heroMediaPlacement?: "none" | "right" | "left" | "background";
+  heroMediaFit?: "contain" | "cover";
+  heroMediaRatio?: "natural" | "square" | "4:3" | "3:2" | "16:9" | "portrait";
+  heroHeight?: "auto" | "small" | "medium" | "large" | "viewport";
+  heroOverlayStrength?: "none" | "light" | "medium" | "strong";
+  heroInverse?: boolean;
+  heroPrimaryActionVisible?: boolean;
+  heroSecondaryActionVisible?: boolean;
+  heroMediaLoading?: "lazy" | "eager";
   iconName?: "sparkles" | "heart" | "truck" | "shield";
   items?: string[];
   menuSource?: "main" | string;
@@ -332,6 +373,11 @@ export type BuilderLayoutBlock = {
   listIcon?: "check" | "circleCheck" | "arrowRight" | "star" | "heart" | "sparkles" | "shield";
   listIconColorScheme?: "default" | "gradient-cycle";
   listIconSize?: number;
+  listItems?: BuilderListItem[];
+  listPresentation?: "default" | "bullet" | "divider" | "striped" | "large";
+  listMarker?: "none" | "disc" | "circle" | "square";
+  listAlign?: "left" | "center" | "right";
+  listSpacing?: "compact" | "default" | "large";
   headingText?: string;
   headingLevel?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
   headingAlign?: "left" | "center" | "right";
@@ -359,7 +405,7 @@ export type BuilderLayoutBlock = {
   cardPadding?: "none" | "small" | "medium" | "large" | "max" | string;
   imagePadding?: "none" | "small" | "medium" | "large" | "max" | string;
   imageFit?: "contain" | "cover" | "fill";
-  imageRatio?: "auto" | "square" | "4:5" | "3:4" | "16:9";
+  imageRatio?: "auto" | "natural" | "square" | "4:3" | "3:2" | "4:5" | "3:4" | "16:9" | "portrait";
   gridImagePadding?: "frameless" | "small" | "medium" | "max" | string;
   gridContentPadding?: "none" | "small" | "medium" | "large" | string;
   gridImageFrame?: "none" | "soft";
@@ -373,6 +419,13 @@ export type BuilderLayoutBlock = {
   gridShowMeta?: boolean;
   gridShowText?: boolean;
   gridShowButton?: boolean;
+  gridRowGap?: "none" | "small" | "medium" | "large";
+  gridItemRenderer?: "plain" | "card";
+  gridCardVariant?: "default" | "primary" | "secondary" | "blank";
+  gridCardSize?: "small" | "default" | "large";
+  gridCardHover?: boolean;
+  gridItemAlign?: "left" | "center" | "right";
+  gridStacking?: "inherit" | "stack";
   gridItems?: {
     contentTranslations?: BuilderContentTranslations;
     id?: string;
@@ -386,6 +439,19 @@ export type BuilderLayoutBlock = {
     buttonUrl?: string;
     buttonStyle?: "primary" | "secondary" | "outline" | "ghost" | "link";
     buttonAlign?: "left" | "center" | "right";
+    buttonTarget?: "_self" | "_blank";
+    renderer?: "plain" | "card";
+    cardVariant?: "default" | "primary" | "secondary" | "blank";
+    cardSize?: "small" | "default" | "large";
+    cardHover?: boolean;
+    mediaPlacement?: "top" | "left" | "right";
+    mediaRatio?: "natural" | "square" | "4:3" | "3:2" | "16:9" | "portrait";
+    mediaFit?: "cover" | "contain";
+    textAlign?: "left" | "center" | "right";
+    titleElement?: "h2" | "h3" | "h4" | "div";
+    titleStyle?: "inherit" | "h3" | "h4" | "h5";
+    actionStyle?: "default" | "primary" | "secondary" | "text";
+    actionSize?: "small" | "default" | "large";
     typography?: TypographySettings;
     items?: string[];
     listIcon?: "check" | "circleCheck" | "arrowRight" | "star" | "heart" | "sparkles" | "shield";

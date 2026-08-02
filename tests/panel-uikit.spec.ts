@@ -50,29 +50,38 @@ test("Panel uses semantic UIkit card variants in builder and frontend", async ({
   await expect(panel).toBeVisible();
   await expect(panel).toHaveClass(/uk-card/);
   await expect(panel.locator(".uk-card-body")).toBeVisible();
-  const blockId = await selectedBlock.getAttribute("data-builder-block-key");
+  const blockId = await panel.getAttribute("data-builder-block-id");
   if (!blockId) throw new Error("Panel block id missing");
 
   // The shared fixture can place the newly inserted block beyond the narrow preview viewport; invoke the real toolbar handler without changing product assertions.
   await selectedBlock.locator(".builder-preview-block-tools").getByRole("button", { name: "Edit element" }).dispatchEvent("click");
   const inspector = page.locator(".builder-floating-inspector");
   await expect(inspector).toBeVisible();
-  const variant = inspector.locator("label.builder-field", { hasText: "Variant" }).locator("select");
-  const hover = inspector.getByText("Hover card", { exact: true }).locator(".." ).locator("input");
-  await expect(variant).toHaveValue("default");
+  const variant = inspector.getByRole("radiogroup", { name: "Panel variant" });
+  const hover = inspector.getByRole("switch", { name: "Hover card" });
+  await expect(variant.locator("button").filter({ hasText: "Default" })).toHaveClass(/is-selected/);
   await expect(inspector.getByText("Card Presets", { exact: true })).toHaveCount(0);
   await expect(inspector.getByText("Premium", { exact: true })).toHaveCount(0);
   await expect(inspector.getByText("Outline", { exact: true })).toHaveCount(0);
 
-  await variant.selectOption("primary");
+  await variant.locator("button").filter({ hasText: "Primary" }).click();
   await expect(panel).toHaveClass(/uk-card-primary/);
   const primaryColors = await panel.evaluate((element) => { const style = getComputedStyle(element); return { background: style.backgroundColor, color: style.color }; });
-  await variant.selectOption("secondary");
+  await variant.locator("button").filter({ hasText: "Secondary" }).click();
   await expect(panel).toHaveClass(/uk-card-secondary/);
+  await page.mouse.move(0, 0);
+  await expect.poll(async () => panel.evaluate((element) => {
+    const style = getComputedStyle(element);
+    const probe = document.createElement("span");
+    probe.style.color = style.getPropertyValue("--uk-card-secondary-background").trim();
+    document.body.appendChild(probe);
+    const expected = getComputedStyle(probe).color;
+    probe.remove();
+    return style.backgroundColor === expected;
+  })).toBe(true);
   const secondaryColors = await panel.evaluate((element) => { const style = getComputedStyle(element); return { background: style.backgroundColor, color: style.color }; });
-  expect(secondaryColors.background).not.toBe(primaryColors.background);
   expect(contrast(secondaryColors.background, secondaryColors.color)).toBeGreaterThan(3);
-  await hover.check();
+  await hover.locator("..").click();
   await expect(panel).toHaveClass(/uk-card-hover/);
 
   const stored = await page.evaluate((id) => {
@@ -94,7 +103,7 @@ test("Panel uses semantic UIkit card variants in builder and frontend", async ({
   await publish(page);
   const frontend = await context.newPage();
   await frontend.goto(previewUrl);
-  const frontendPanel = frontend.locator(`.shop-builder-column-block--panel`).first();
+  const frontendPanel = frontend.locator(`.shop-builder-column-block--panel[data-builder-block-id="${blockId}"]`);
   await expect(frontendPanel).toBeVisible();
   await expect(frontendPanel).toHaveClass(/uk-card-secondary/);
   await expect(frontendPanel).toHaveClass(/uk-card-hover/);

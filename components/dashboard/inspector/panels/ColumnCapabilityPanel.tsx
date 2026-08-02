@@ -2,6 +2,7 @@
 
 import type { BuilderSection, InspectorTab } from "@/components/dashboard/builderTypes";
 import { UIKIT_COLUMN_CAPABILITY } from "@/lib/uikitCapabilities";
+import { InspectorFieldRow, InspectorPillGroup, InspectorSelect } from "@/components/dashboard/inspector/InspectorControls";
 
 type Column = NonNullable<BuilderSection["layoutItems"]>[number];
 
@@ -12,6 +13,7 @@ type Props = {
 };
 
 export default function ColumnCapabilityPanel({ column, tab, update }: Props) {
+  const labels = <T extends string>(values: readonly T[]) => values.map((value) => ({ value, label: value.replace(/-/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase()) }));
   if (tab === "layout") {
     return (
       <div className="builder-inspector-stack" data-uikit-capability="column-layout">
@@ -19,33 +21,10 @@ export default function ColumnCapabilityPanel({ column, tab, update }: Props) {
           <strong>UIkit Column</strong>
           <span>Column alignment and flex behavior are semantic values mapped through the shared UIkit adapter. Row presets remain the owner of column widths.</span>
         </div>
-        <div className="builder-two-column">
-          <label className="builder-field">
-            <span>Horizontal alignment</span>
-            <select value={column.columnHorizontalAlign ?? "left"} onChange={(event) => update({ columnHorizontalAlign: event.target.value as Column["columnHorizontalAlign"] })}>
-              {UIKIT_COLUMN_CAPABILITY.properties.horizontalAlignment.values.map((value) => <option key={value} value={value}>{value}</option>)}
-            </select>
-          </label>
-          <label className="builder-field">
-            <span>Vertical alignment</span>
-            <select value={column.columnVerticalAlign ?? "top"} onChange={(event) => update({ columnVerticalAlign: event.target.value as Column["columnVerticalAlign"] })}>
-              {UIKIT_COLUMN_CAPABILITY.properties.verticalAlignment.values.map((value) => <option key={value} value={value}>{value}</option>)}
-            </select>
-          </label>
-        </div>
-        <label className="builder-field">
-          <span>Flex behavior</span>
-          <select value={column.columnFlex ?? "none"} onChange={(event) => update({ columnFlex: event.target.value as Column["columnFlex"] })}>
-            {UIKIT_COLUMN_CAPABILITY.properties.flexBehavior.values.map((value) => <option key={value} value={value}>{value}</option>)}
-          </select>
-        </label>
-        <label className="builder-field">
-          <span>Responsive width</span>
-          <select value={column.columnResponsiveWidth ?? "inherit"} onChange={(event) => update({ columnResponsiveWidth: event.target.value as Column["columnResponsiveWidth"] })}>
-            {UIKIT_COLUMN_CAPABILITY.properties.responsiveWidth.values.map((value) => <option key={value} value={value}>{value}</option>)}
-          </select>
-          <small>Row layout presets remain the source of desktop width ratios.</small>
-        </label>
+        <InspectorFieldRow label="Horizontal alignment"><InspectorPillGroup value={(column.columnHorizontalAlign ?? "left") as Column["columnHorizontalAlign"]} options={labels(UIKIT_COLUMN_CAPABILITY.properties.horizontalAlignment.values)} onChange={(value) => update({ columnHorizontalAlign: value })} ariaLabel="Horizontal alignment" /></InspectorFieldRow>
+        <InspectorFieldRow label="Vertical alignment"><InspectorPillGroup value={(column.columnVerticalAlign ?? "top") as Column["columnVerticalAlign"]} options={labels(UIKIT_COLUMN_CAPABILITY.properties.verticalAlignment.values)} onChange={(value) => update({ columnVerticalAlign: value })} ariaLabel="Vertical alignment" /></InspectorFieldRow>
+        <InspectorFieldRow label="Flex behavior"><InspectorSelect value={(column.columnFlex ?? "none") as Column["columnFlex"]} options={labels(UIKIT_COLUMN_CAPABILITY.properties.flexBehavior.values)} onChange={(value) => update({ columnFlex: value })} ariaLabel="Flex behavior" /></InspectorFieldRow>
+        <InspectorFieldRow label="Responsive width" help="Row presets remain the source of desktop width ratios."><InspectorSelect value={(column.columnResponsiveWidth ?? "inherit") as Column["columnResponsiveWidth"]} options={labels(UIKIT_COLUMN_CAPABILITY.properties.responsiveWidth.values)} onChange={(value) => update({ columnResponsiveWidth: value })} ariaLabel="Responsive width" /></InspectorFieldRow>
       </div>
     );
   }

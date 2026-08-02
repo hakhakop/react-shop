@@ -275,6 +275,42 @@ export function getUikitCardClass(
   return classes.join(" ");
 }
 
+export type UikitPanelMediaPlacement = "top" | "left" | "right";
+
+export function getUikitPanelMediaClass(
+  placement: UikitPanelMediaPlacement = "top",
+): string {
+  if (placement === "left") return "uk-card-media-left";
+  if (placement === "right") return "uk-card-media-right";
+  return "uk-card-media-top";
+}
+
+export function getUikitPanelLayoutClass(
+  placement: UikitPanelMediaPlacement = "top",
+  mediaWidth: "small" | "medium" | "large" = "medium",
+): string {
+  return `shop-builder-panel--media-${placement} shop-builder-panel--media-width-${mediaWidth}`;
+}
+
+export function getUikitPanelMediaStyle(options: {
+  ratio?: string;
+  fit?: "cover" | "contain";
+  alignment?: "left" | "center" | "right";
+}): { aspectRatio?: string; backgroundSize: string; backgroundPosition: string } {
+  const ratioMap: Record<string, string> = {
+    square: "1 / 1",
+    "4:3": "4 / 3",
+    "3:2": "3 / 2",
+    "16:9": "16 / 9",
+    portrait: "3 / 4",
+  };
+  return {
+    aspectRatio: ratioMap[options.ratio ?? ""] || undefined,
+    backgroundSize: options.fit === "contain" ? "contain" : "cover",
+    backgroundPosition: options.alignment === "left" ? "left center" : options.alignment === "right" ? "right center" : "center",
+  };
+}
+
 /**
  * Maps WebPages button presets and sizes to canonical UIkit button classes.
  */
@@ -385,6 +421,33 @@ export function getUikitTextClass(variant?: string): string {
   return "";
 }
 
+export type UikitListPresentation = "default" | "bullet" | "divider" | "striped" | "large";
+export type UikitListMarker = "none" | "disc" | "circle" | "square";
+export type UikitListSpacing = "compact" | "default" | "large";
+
+/** Maps semantic WebPages List settings to installed UIkit list modifiers. */
+export function getUikitListClass(options?: {
+  presentation?: UikitListPresentation;
+  marker?: UikitListMarker;
+  align?: "left" | "center" | "right";
+  spacing?: UikitListSpacing;
+}): string {
+  const classes = ["uk-list"];
+  const presentation = options?.presentation ?? "default";
+  const marker = options?.marker ?? "none";
+  const spacing = options?.spacing ?? "default";
+
+  if (presentation === "bullet") classes.push("uk-list-bullet");
+  if (presentation === "divider") classes.push("uk-list-divider");
+  if (presentation === "striped") classes.push("uk-list-striped");
+  if (presentation === "large" || spacing === "large") classes.push("uk-list-large");
+  if (spacing === "compact") classes.push("uk-list-collapse");
+  if (marker !== "none") classes.push(`uk-list-${marker}`);
+  if (options?.align) classes.push(`uk-text-${options.align}`);
+
+  return classes.join(" ");
+}
+
 /**
  * Maps WebPages badge/label visual presets to UIkit badge and label component classes.
  */
@@ -437,4 +500,74 @@ export function getUikitAlertClass(status?: string): string {
   }
 
   return classes.join(" ");
+}
+
+export type UikitImageSemantics = {
+  fit?: "contain" | "cover" | "fill" | string;
+  ratio?: "auto" | "natural" | "square" | "4:3" | "3:2" | "4:5" | "3:4" | "16:9" | "portrait" | string;
+  shape?: "none" | "rounded" | "circle" | string;
+  shadow?: "none" | "small" | "medium" | "large" | "xlarge" | string;
+  alignment?: "left" | "center" | "right" | string;
+  width?: "auto" | "full" | "small" | "medium" | "large" | "xlarge" | string;
+};
+
+/** Maps semantic Image settings to UIkit 3.25-compatible classes and attributes. */
+export function getUikitImageClass(image: UikitImageSemantics): string {
+  const classes = ["uk-img"];
+  if (image.shape === "rounded") classes.push("uk-border-rounded");
+  if (image.shape === "circle") classes.push("uk-border-circle");
+  if (image.shadow && image.shadow !== "none") classes.push(`uk-box-shadow-${image.shadow}`);
+  return classes.join(" ");
+}
+
+export function getUikitImageWrapperClass(image: UikitImageSemantics): string {
+  const classes: string[] = [];
+  if (image.ratio && image.ratio !== "auto" && image.ratio !== "natural") classes.push("uk-cover-container");
+  if (image.shape === "rounded") classes.push("uk-border-rounded");
+  if (image.shape === "circle") classes.push("uk-border-circle");
+  if (image.shadow && image.shadow !== "none") classes.push(`uk-box-shadow-${image.shadow}`);
+  if (image.alignment === "left" || image.alignment === "center" || image.alignment === "right") classes.push(`uk-align-${image.alignment}`);
+  return classes.join(" ");
+}
+
+export function getUikitImageStyle(image: UikitImageSemantics): {
+  aspectRatio?: string;
+  maxWidth?: string;
+  width?: string;
+  objectFit: "contain" | "cover" | "fill";
+  position?: "absolute";
+  inset?: 0;
+} {
+  const ratioMap: Record<string, string> = {
+    square: "1 / 1",
+    "4:3": "4 / 3",
+    "3:2": "3 / 2",
+    "4:5": "4 / 5",
+    "3:4": "3 / 4",
+    "16:9": "16 / 9",
+    portrait: "3 / 4",
+  };
+  const widthMap: Record<string, string> = {
+    small: "320px",
+    medium: "640px",
+    large: "960px",
+    xlarge: "1280px",
+  };
+  const ratio = ratioMap[image.ratio ?? ""];
+  const contained = Boolean(ratio);
+  return {
+    aspectRatio: ratio,
+    maxWidth: image.width && image.width !== "auto" && image.width !== "full" ? widthMap[image.width] : undefined,
+    width: image.width === "full" ? "100%" : undefined,
+    objectFit: image.fit === "contain" || image.fit === "fill" ? image.fit : "cover",
+    ...(contained ? { position: "absolute", inset: 0 as const } : {}),
+  };
+}
+
+export function getUikitImageAttributes(image: UikitImageSemantics) {
+  const ratio = image.ratio && image.ratio !== "auto" && image.ratio !== "natural";
+  return {
+    "data-uk-cover": ratio && image.fit !== "contain" && image.fit !== "fill" ? "" : undefined,
+    "data-uk-img": undefined,
+  };
 }

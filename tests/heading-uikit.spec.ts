@@ -59,15 +59,13 @@ test("Heading UIkit visual presets (small, medium, xlarge) visibly change comput
   if (await headingTextInput.isVisible()) {
     await headingTextInput.fill(uniqueText);
   }
-  const levelSelect = inspector.locator("label.builder-field", { hasText: "Semantic level" }).locator("select");
+  const levelSelect = inspector.getByRole("combobox", { name: "Heading semantic level" });
   await levelSelect.selectOption("h3");
   await expect(canvasHeadingContainer.locator("h3")).toBeVisible();
 
   await inspector.getByRole("button", { name: "Styling", exact: true }).click();
 
-  const presetSelect = inspector
-    .locator("label.builder-field", { hasText: "Visual Preset" })
-    .locator("select");
+  const presetSelect = inspector.getByRole("combobox", { name: "Heading visual preset" });
 
   // 1. Test "small" preset
   await presetSelect.selectOption("small");
@@ -93,13 +91,13 @@ test("Heading UIkit visual presets (small, medium, xlarge) visibly change comput
   expect(valMedium).toBeLessThan(valXlarge);
 
   await inspector.getByRole("button", { name: "Typography", exact: true }).click();
-  const weightSelect = inspector.locator("label.builder-field", { hasText: "Font weight" }).locator("select");
+  const weightSelect = inspector.locator(".builder-field", { hasText: "Font weight" }).locator("select");
   await weightSelect.selectOption("800");
   await expect(canvasHeading).toHaveCSS("font-weight", "800");
   await expect(inspector.getByText("Font Size", { exact: true })).toHaveCount(0);
   await expect(inspector.getByText("Clamp", { exact: true })).toHaveCount(0);
   await inspector.getByRole("button", { name: "Styling", exact: true }).click();
-  await inspector.locator("label.builder-field", { hasText: "Gradient preset" }).locator("select").selectOption("indigo-purple");
+  await inspector.locator(".builder-field", { hasText: "Gradient preset" }).locator("select").selectOption("indigo-purple");
   await expect(canvasHeading).toHaveClass(/text-gradient--indigo-purple/);
   const gradientBackground = await canvasHeading.evaluate((el) => getComputedStyle(el).backgroundImage);
   expect(gradientBackground).not.toBe("none");

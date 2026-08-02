@@ -6,6 +6,7 @@ const TRANSLATABLE_FIELDS = new Set([
   "headingText", "dateLabel", "imageAlt", "imageCaption", "caption",
   "description", "ctaLabel", "items", "tableHeadings", "tableRows",
   "typewriterPhrases",
+  "listItems",
 ]);
 
 type TranslatableEntity = {
@@ -78,6 +79,7 @@ export function resolveContentSections(
               badges: localizedBlock.badges?.map((entry) => resolveContentEntity(entry, language, primaryLanguage)),
               gridItems: localizedBlock.gridItems?.map((entry) => resolveContentEntity(entry, language, primaryLanguage)),
               buttons: localizedBlock.buttons?.map((entry) => resolveContentEntity(entry, language, primaryLanguage)),
+              listItems: localizedBlock.listItems?.map((entry) => resolveContentEntity(entry, language, primaryLanguage)),
             } as BuilderLayoutBlock;
           })();
         return {

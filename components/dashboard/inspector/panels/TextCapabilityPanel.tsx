@@ -4,6 +4,7 @@ import type { BuilderLayoutBlock, InspectorTab } from "@/components/dashboard/bu
 import RichTextEditor from "@/components/dashboard/RichTextEditor";
 import { resolveTypographyInput, updateTypographyArea, type TypographySettings } from "@/lib/builderTypography";
 import { UIKIT_TEXT_CAPABILITY } from "@/lib/uikitCapabilities";
+import { InspectorColorField, InspectorFieldRow, InspectorPillGroup, InspectorSelect, InspectorTextField } from "@/components/dashboard/inspector/InspectorControls";
 
 type Props = {
   block: BuilderLayoutBlock;
@@ -12,6 +13,7 @@ type Props = {
 };
 
 export default function TextCapabilityPanel({ block, tab, update }: Props) {
+  const labels = <T extends string>(values: readonly T[]) => values.map((value) => ({ value, label: value.replace(/-/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase()) }));
   const typography = resolveTypographyInput(block.typography, "body") ?? {};
   const updateTypography = (patch: Partial<TypographySettings>) =>
     update({ typography: updateTypographyArea(block.typography, "body", { ...typography, ...patch }) });
@@ -30,8 +32,8 @@ export default function TextCapabilityPanel({ block, tab, update }: Props) {
     return (
       <div className="builder-inspector-stack" data-uikit-capability="text-style">
         <div className="builder-element-inspector-note"><strong>UIkit Text</strong><span>Semantic values map to UIkit text helpers in builder and frontend.</span></div>
-        <label className="builder-field"><span>Variant</span><select value={block.textVariant ?? "default"} onChange={(event) => update({ textVariant: event.target.value as BuilderLayoutBlock["textVariant"] })}>{properties.variant.values.map((value) => <option key={value} value={value}>{value}</option>)}</select></label>
-        <label className="builder-field"><span>Alignment</span><select value={block.textAlign ?? "left"} onChange={(event) => update({ textAlign: event.target.value as BuilderLayoutBlock["textAlign"] })}>{properties.alignment.values.map((value) => <option key={value} value={value}>{value}</option>)}</select></label>
+        <InspectorFieldRow label="Variant"><InspectorPillGroup value={block.textVariant ?? "default"} options={labels(properties.variant.values)} onChange={(value) => update({ textVariant: value })} ariaLabel="Text variant" /></InspectorFieldRow>
+        <InspectorFieldRow label="Alignment"><InspectorPillGroup value={block.textAlign ?? "left"} options={labels(properties.alignment.values)} onChange={(value) => update({ textAlign: value })} ariaLabel="Text alignment" /></InspectorFieldRow>
       </div>
     );
   }
@@ -40,10 +42,10 @@ export default function TextCapabilityPanel({ block, tab, update }: Props) {
     return (
       <div className="builder-inspector-stack" data-uikit-capability="text-typography">
         <div className="builder-element-inspector-note"><strong>Complementary typography</strong><span>Font size and generic typography variants remain UIkit-owned and are not duplicated here.</span></div>
-        <label className="builder-field"><span>Font family</span><input value={typography.fontFamily ?? ""} placeholder="inherit" onChange={(event) => updateTypography({ fontFamily: event.target.value || undefined })} /></label>
-        <div className="builder-two-column"><label className="builder-field"><span>Font weight</span><select value={String(typography.fontWeight ?? "")} onChange={(event) => updateTypography({ fontWeight: event.target.value || undefined })}><option value="">inherit</option>{[400, 500, 600, 700, 800].map((value) => <option key={value} value={value}>{value}</option>)}</select></label><label className="builder-field"><span>Line height</span><input value={typography.lineHeight ?? ""} placeholder="inherit" onChange={(event) => updateTypography({ lineHeight: event.target.value || undefined })} /></label></div>
-        <div className="builder-two-column"><label className="builder-field"><span>Letter spacing</span><input value={typography.letterSpacing ?? ""} placeholder="inherit" onChange={(event) => updateTypography({ letterSpacing: event.target.value || undefined })} /></label><label className="builder-field"><span>Text color</span><input type="color" value={typography.color?.startsWith("#") ? typography.color : "#111827"} onChange={(event) => updateTypography({ color: event.target.value })} /></label></div>
-        <div className="builder-two-column"><label className="builder-field"><span>Text transform</span><select value={typography.textTransform ?? "none"} onChange={(event) => updateTypography({ textTransform: event.target.value as TypographySettings["textTransform"] })}><option value="none">none</option><option value="uppercase">uppercase</option><option value="lowercase">lowercase</option><option value="capitalize">capitalize</option></select></label><label className="builder-field"><span>Text decoration</span><select value={typography.textDecoration ?? "none"} onChange={(event) => updateTypography({ textDecoration: event.target.value as TypographySettings["textDecoration"] })}><option value="none">none</option><option value="underline">underline</option><option value="line-through">line-through</option></select></label></div>
+        <InspectorFieldRow label="Font family"><InspectorTextField value={typography.fontFamily ?? ""} placeholder="inherit" onChange={(value) => updateTypography({ fontFamily: value || undefined })} ariaLabel="Text font family" /></InspectorFieldRow>
+        <div className="builder-two-column"><InspectorFieldRow label="Font weight"><InspectorSelect value={String(typography.fontWeight ?? "")} options={[{ value: "", label: "Inherit" }, ...[400, 500, 600, 700, 800].map((value) => ({ value: String(value), label: String(value) }))]} onChange={(value) => updateTypography({ fontWeight: value || undefined })} ariaLabel="Text font weight" /></InspectorFieldRow><InspectorFieldRow label="Line height"><InspectorTextField value={typography.lineHeight ?? ""} placeholder="inherit" onChange={(value) => updateTypography({ lineHeight: value || undefined })} ariaLabel="Text line height" /></InspectorFieldRow></div>
+        <div className="builder-two-column"><InspectorFieldRow label="Letter spacing"><InspectorTextField value={typography.letterSpacing ?? ""} placeholder="inherit" onChange={(value) => updateTypography({ letterSpacing: value || undefined })} ariaLabel="Text letter spacing" /></InspectorFieldRow><InspectorFieldRow label="Text color"><InspectorColorField value={typography.color?.startsWith("#") ? typography.color : "#111827"} onChange={(value) => updateTypography({ color: value })} ariaLabel="Text color" /></InspectorFieldRow></div>
+        <div className="builder-two-column"><InspectorFieldRow label="Text transform"><InspectorSelect value={typography.textTransform ?? "none"} options={["none", "uppercase", "lowercase", "capitalize"].map((value) => ({ value, label: value }))} onChange={(value) => updateTypography({ textTransform: value as TypographySettings["textTransform"] })} ariaLabel="Text transform" /></InspectorFieldRow><InspectorFieldRow label="Text decoration"><InspectorSelect value={typography.textDecoration ?? "none"} options={["none", "underline", "line-through"].map((value) => ({ value, label: value }))} onChange={(value) => updateTypography({ textDecoration: value as TypographySettings["textDecoration"] })} ariaLabel="Text decoration" /></InspectorFieldRow></div>
       </div>
     );
   }

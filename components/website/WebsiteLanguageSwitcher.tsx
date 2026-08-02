@@ -50,11 +50,14 @@ export default function WebsiteLanguageSwitcher({
     >
       <span aria-hidden="true">文</span>
       <select
+        aria-label="Website language"
         value={activeLanguage}
-        disabled={previewOnly}
+        disabled={previewOnly && !onLanguageChange}
         onChange={(event) => {
           const language = event.target.value;
-          document.cookie = `${preferenceKey}=${encodeURIComponent(language)}; path=/; max-age=31536000; samesite=lax`;
+          if (!previewOnly) {
+            document.cookie = `${preferenceKey}=${encodeURIComponent(language)}; path=/; max-age=31536000; samesite=lax`;
+          }
 
           if (onLanguageChange) {
             // Builder path – update shared React state directly

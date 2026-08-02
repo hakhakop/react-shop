@@ -66,7 +66,6 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import { useTranslation } from "@/components/i18n/LanguageProvider";
-import LanguageSwitcher from "@/components/i18n/LanguageSwitcher";
 import {
   applyContentPatch,
   isUsingPrimaryFallback,
@@ -123,6 +122,14 @@ import {
   getUikitDividerClass,
   getUikitAlertClass,
   getUikitColumnClass,
+  getUikitImageClass,
+  getUikitImageWrapperClass,
+  getUikitImageStyle,
+  getUikitImageAttributes,
+  getUikitListClass,
+  getUikitPanelMediaClass,
+  getUikitPanelLayoutClass,
+  getUikitPanelMediaStyle,
 } from "@/lib/uikitTokens";
 import {
   getUikitColumnWidthClass,
@@ -141,6 +148,7 @@ import ProductOptionsSelector from "@/components/ProductOptionsSelector";
 import DashboardInspector from "@/components/dashboard/DashboardInspector";
 import { headerPresets } from "./headerPresets";
 import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
+import { ElementLibraryIcon } from "@/components/dashboard/elementIconRegistry";
 import BuilderWireframePanel, {
   type BuilderHoverTarget,
 } from "@/components/dashboard/BuilderWireframePanel";
@@ -169,6 +177,7 @@ import type {
   BuilderDesign,
   BuilderHeaderIconId,
   BuilderLayoutBlock,
+  BuilderListItem,
   BuilderLayoutKey,
   BuilderSavedTemplate,
   BuilderSection,
@@ -188,7 +197,6 @@ import type {
 import {
   builderLayoutKeys,
   getLayoutBlockKindsForState,
-  layoutBlockIcons,
   layoutBlockLabels,
   layoutLabels,
   sectionLabels,
@@ -1645,6 +1653,40 @@ function normalizeBuilderState(
               panelVariant,
               panelHover: block.panelHover ?? hoverPreset !== "none",
               panelSize,
+              panelShowMedia: block.panelShowMedia ?? true,
+              panelMediaPlacement: block.panelMediaPlacement === "left" || block.panelMediaPlacement === "right" ? block.panelMediaPlacement : "top",
+              panelMediaFit: block.panelMediaFit === "contain" ? "contain" : "cover",
+              panelMediaWidth: block.panelMediaWidth === "small" || block.panelMediaWidth === "large" ? block.panelMediaWidth : "medium",
+              panelMediaAlignment: block.panelMediaAlignment === "left" || block.panelMediaAlignment === "right" ? block.panelMediaAlignment : "center",
+              panelTextAlign: block.panelTextAlign === "center" || block.panelTextAlign === "right" ? block.panelTextAlign : "left",
+              panelVerticalAlign: block.panelVerticalAlign === "center" || block.panelVerticalAlign === "bottom" ? block.panelVerticalAlign : "top",
+              panelTitleElement: block.panelTitleElement === "h2" || block.panelTitleElement === "h4" || block.panelTitleElement === "div" ? block.panelTitleElement : "h3",
+              panelTitleStyle: block.panelTitleStyle === "h3" || block.panelTitleStyle === "h4" || block.panelTitleStyle === "h5" ? block.panelTitleStyle : "inherit",
+              panelContentWidth: block.panelContentWidth === "small" || block.panelContentWidth === "medium" || block.panelContentWidth === "large" || block.panelContentWidth === "full" ? block.panelContentWidth : "auto",
+              panelActionVisible: block.panelActionVisible ?? true,
+              panelActionStyle: block.panelActionStyle === "default" || block.panelActionStyle === "secondary" || block.panelActionStyle === "text" ? block.panelActionStyle : "primary",
+              panelActionSize: block.panelActionSize === "small" || block.panelActionSize === "large" ? block.panelActionSize : "default",
+              panelActionAlign: block.panelActionAlign === "left" || block.panelActionAlign === "center" || block.panelActionAlign === "right" ? block.panelActionAlign : "inherit",
+            } as BuilderLayoutBlock;
+          }
+          if (block.kind === "list") {
+            const { listIcon, listIconColorScheme, listIconSize, ...semanticList } = block;
+            void listIcon;
+            void listIconColorScheme;
+            void listIconSize;
+            const listItems = block.listItems?.length
+              ? block.listItems
+              : (block.items ?? []).map((text, index) => ({
+                  id: `${block.id ?? "list"}-item-${index + 1}`,
+                  text,
+                }));
+            return {
+              ...semanticList,
+              listItems,
+              listPresentation: block.listPresentation === "bullet" || block.listPresentation === "divider" || block.listPresentation === "striped" || block.listPresentation === "large" ? block.listPresentation : "default",
+              listMarker: block.listMarker === "disc" || block.listMarker === "circle" || block.listMarker === "square" ? block.listMarker : "none",
+              listAlign: block.listAlign === "center" || block.listAlign === "right" ? block.listAlign : "left",
+              listSpacing: block.listSpacing === "compact" || block.listSpacing === "large" ? block.listSpacing : "default",
             } as BuilderLayoutBlock;
           }
           if (block.kind !== "button") return block;
@@ -2033,12 +2075,27 @@ export default function DashboardBuilder({
   const { t } = useTranslation();
   const { theme: storefrontTheme } = useTheme();
   const [contentLanguage, setContentLanguage] = useState(primaryContentLanguage);
+  const previewLanguageStorageKey = useMemo(
+    () => `builder_preview_language_${websiteId ?? "root"}`,
+    [websiteId],
+  );
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [headerContextKey, setHeaderContextKey] = useState<BuilderLayoutKey>(() => {
     const requestedContext = parseBuilderLayoutKey(searchParams.get("context"));
     return requestedContext && requestedContext !== "header" ? requestedContext : "shop";
   });
+
+  useEffect(() => {
+    const storedLanguage = window.sessionStorage.getItem(previewLanguageStorageKey);
+    if (storedLanguage && enabledContentLanguages.includes(storedLanguage)) {
+      setContentLanguage(storedLanguage);
+    }
+  }, [enabledContentLanguages, previewLanguageStorageKey]);
+
+  useEffect(() => {
+    window.sessionStorage.setItem(previewLanguageStorageKey, contentLanguage);
+  }, [contentLanguage, previewLanguageStorageKey]);
   const storageKeys = useMemo(() => getBuilderStorageKeys(websiteId), [websiteId]);
   const builderApiUrl = useCallback(
     (path: string, params: Record<string, string | number | boolean> = {}) => {
@@ -3799,10 +3856,12 @@ export default function DashboardBuilder({
                 const currentBlockKey =
                   block.id ?? `${itemKey}-block-${blockIndex}`;
                 if (currentBlockKey !== blockKey) return block;
-                const items = [...(block.items ?? [])];
-                const [moved] = items.splice(fromIndex, 1);
-                items.splice(toIndex, 0, moved);
-                return { ...block, items };
+                const items = block.listItems ?? (block.items ?? []).map((text, index) => ({ id: `${block.id ?? currentBlockKey}-item-${index}`, text }));
+                const [moved] = [...items].splice(fromIndex, 1);
+                const next = [...items];
+                next.splice(fromIndex, 1);
+                next.splice(toIndex, 0, moved);
+                return { ...block, listItems: next };
               }),
             };
           }),
@@ -3904,12 +3963,8 @@ export default function DashboardBuilder({
                 const currentBlockKey =
                   block.id ?? `${itemKey}-block-${blockIndex}`;
                 if (currentBlockKey !== blockKey) return block;
-                return {
-                  ...block,
-                  items: (block.items ?? []).filter(
-                    (_, index) => index !== itemIndex,
-                  ),
-                };
+                const items = block.listItems ?? (block.items ?? []).map((text, index) => ({ id: `${block.id ?? currentBlockKey}-item-${index}`, text }));
+                return { ...block, listItems: items.filter((_, index) => index !== itemIndex) };
               }),
             };
           }),
@@ -3939,11 +3994,11 @@ export default function DashboardBuilder({
                 const currentBlockKey =
                   block.id ?? `${itemKey}-block-${blockIndex}`;
                 if (currentBlockKey !== blockKey) return block;
-                const items = [...(block.items ?? [])];
+                const items = block.listItems ?? (block.items ?? []).map((text, index) => ({ id: `${block.id ?? currentBlockKey}-item-${index}`, text }));
                 const source = items[itemIndex];
                 if (!source) return block;
                 items.splice(itemIndex + 1, 0, source);
-                return { ...block, items };
+                return { ...block, listItems: items };
               }),
             };
           }),
@@ -9418,7 +9473,25 @@ export default function DashboardBuilder({
       <div className="builder-sidebar-utility-language" title={t("language.label")}>
         <Languages size={18} aria-hidden="true" />
         <span>{t("language.label")}</span>
-        <LanguageSwitcher />
+        <label className="saas-language-switcher">
+          <span className="sr-only">Language</span>
+          <select
+            aria-label="Language"
+            data-testid="builder-language-selector"
+            value={contentLanguage}
+            onChange={(event) => {
+              if (enabledContentLanguages.includes(event.target.value)) {
+                setContentLanguage(event.target.value);
+              }
+            }}
+          >
+            {enabledContentLanguages.map((language) => (
+              <option key={language} value={language}>
+                {language === "hy" ? "Հայերեն" : language === "en" ? "English" : "Русский"}
+              </option>
+            ))}
+          </select>
+        </label>
       </div>
     </>
   );
@@ -9519,7 +9592,7 @@ export default function DashboardBuilder({
       data-theme={dashboardTheme}
       style={
         {
-          ...getUikitGlobalsCssVars(shellSettings, builderState.design),
+          ...getUikitGlobalsCssVars(shellSettings),
           "--builder-dashboard-bg":
             builderState.design.pageBackground ?? "#dfdfd7",
           "--builder-preview-real-bg": previewPageBackground,
@@ -12002,50 +12075,7 @@ function getPreviewGoodieIcon(iconName: BuilderLayoutBlock["iconName"]) {
 }
 
 function getLayoutBlockLibraryIcon(kind: LayoutBlockKind) {
-  if (kind === "alert") return <AlertCircle size={16} />;
-  if (kind === "heading") return <Equal size={16} />;
-  if (kind === "text") return <AlignLeft size={16} />;
-  if (kind === "embed" || kind === "fluentForm") return <Code2 size={16} />;
-  if (kind === "datePicker") return <Timer size={16} />;
-  if (kind === "divider") return <Minus size={16} />;
-  if (kind === "icon") return <Star size={16} />;
-  if (kind === "image" || kind === "productGallery") return <ImageIcon size={16} />;
-  if (kind === "panel") return <Frame size={16} />;
-  if (kind === "table" || kind === "productSpecsPanel") return <Table size={16} />;
-  if (kind === "slider") return <Presentation size={16} />;
-  if (kind === "scrollPinnedDemo") return <Sliders size={16} />;
-  if (kind === "grid") return <Grid3X3 size={16} />;
-  if (kind === "badgeGrid") return <LayoutGrid size={16} />;
-  if (kind === "button") return <MousePointerClick size={16} />;
-  if (kind === "list") return <ListChecks size={16} />;
-  if (kind === "menu" || kind === "headerCategories") return <Menu size={16} />;
-  if (kind === "breadcrumbs") return <ChevronRight size={16} />;
-  if (kind === "products" || kind === "cartContent" || kind === "productAddToCart" || kind === "headerCart") return <ShoppingBag size={16} />;
-  if (kind === "checkoutContent") return <LockKeyhole size={16} />;
-  if (kind === "accountContent" || kind === "headerAccount") return <UserRound size={16} />;
-  if (kind === "hero" || kind === "productHero") return <Layout size={16} />;
-  if (kind === "promoStrip") return <Zap size={16} />;
-  if (kind === "productInfoStack" || kind === "productAttributes") return <FileText size={16} />;
-  if (kind === "productPrice") return <Tag size={16} />;
-  if (kind === "productDescription") return <AlignLeft size={16} />;
-
-  const icon = layoutBlockIcons[kind];
-
-  if (icon === "text") return <AlignLeft size={16} />;
-  if (icon === "gallery") return <GalleryHorizontal size={16} />;
-  if (icon === "image") return <ImageIcon size={16} />;
-  if (icon === "code") return <Code2 size={16} />;
-  if (icon === "grid") return <Grid3X3 size={16} />;
-  if (icon === "list") return <ListChecks size={16} />;
-  if (icon === "calendar") return <Timer size={16} />;
-  if (icon === "shoppingBag") return <ShoppingBag size={16} />;
-  if (icon === "panel") return <Frame size={16} />;
-  if (icon === "navigation") return <Menu size={16} />;
-  if (icon === "pointer") return <MousePointerClick size={16} />;
-  if (icon === "lock") return <LockKeyhole size={16} />;
-  if (icon === "user") return <UserRound size={16} />;
-
-  return <Sparkles size={16} />;
+  return <ElementLibraryIcon kind={kind} />;
 }
 
 function PreviewProductGallery({
@@ -12273,7 +12303,7 @@ function InlineEditableText({
   typography,
   style,
 }: {
-  as: "span" | "em" | "strong" | "p" | "h2" | "h3";
+  as: "span" | "em" | "strong" | "p" | "h2" | "h3" | "h4" | "div";
   area?: TypographyArea;
   value: string;
   className?: string;
@@ -14702,6 +14732,9 @@ function PreviewSection({
                     const blockAnimationAttrs = previewAnimationAttrs(
                       block.animation,
                     );
+                    const legacySurfaceClass = ["panel", "grid", "hero"].includes(block.kind ?? "")
+                      ? ""
+                      : `shop-card-preset--${block.panelStyle ?? "default"}`;
                     const isElementActive =
                       selectedSectionId === section.id &&
                       selectedLayoutColumnKey === columnKey &&
@@ -14755,10 +14788,10 @@ function PreviewSection({
                           blockInteractionState,
                         )} ${getUikitMarginClass((block as any).elementMargin ?? block.gridMargin)} shop-builder-element-shell is-${
                           block.kind ?? "text"
-                        } ${
+                        } ${legacySurfaceClass} ${
                           block.kind === "scrollPinnedDemo"
                             ? ""
-                            : `shop-card-preset--${block.panelStyle ?? "default"} is-padding-${hasBuilderVisualSpacing(block.visualStyle?.padding) || !block.elementPadding || block.elementPadding === "inherit" ? "none" : block.elementPadding} is-align-${block.elementAlign ?? "left"} ${visualStyleClassName(block.visualStyle)} ${block.premiumCardStyle && block.premiumCardStyle !== "none" ? `shop-builder-card--${block.premiumCardStyle}` : ""}`
+                            : `is-padding-${hasBuilderVisualSpacing(block.visualStyle?.padding) || !block.elementPadding || block.elementPadding === "inherit" ? "none" : block.elementPadding} is-align-${block.elementAlign ?? "left"} ${block.kind === "grid" ? "" : visualStyleClassName(block.visualStyle)} ${block.premiumCardStyle && block.premiumCardStyle !== "none" ? `shop-builder-card--${block.premiumCardStyle}` : ""}`
                         } ${
                           selectedLayoutBlockKey === blockKey
                             ? "is-selected-block"
@@ -15207,16 +15240,10 @@ function PreviewSection({
                                 {block.title}
                               </DashboardTypog>
                             )}
-                            <ul
-                              className={
-                                block.listIconColorScheme === "gradient-cycle"
-                                  ? "is-icon-gradient-cycle"
-                                  : undefined
-                              }
-                            >
-                              {(block.items ?? []).map((item, index) => (
+                            <ul className={getUikitListClass({ presentation: block.listPresentation, marker: block.listMarker, align: block.listAlign, spacing: block.listSpacing })}>
+                              {(block.listItems ?? (block.items ?? []).map((text, index): BuilderListItem => ({ id: `${block.id ?? blockKey}-item-${index}`, text }))).map((item, index) => (
                                 <li
-                                  key={`${item}-${index}`}
+                                  key={item.id}
                                   className={`builder-preview-list-item ${draggingItem?.kind === "list" && draggingItem?.fromIndex === index && draggingItem?.blockKey === blockKey ? "is-dragging" : ""} ${draggingItem?.kind === "list" && dropHoverIndex === index ? "is-drag-over" : ""}`}
                                   draggable
                                   onDragStart={(event) => {
@@ -15281,12 +15308,7 @@ function PreviewSection({
                                     setDraggingItem(null);
                                     setDropHoverIndex(null);
                                   }}
-                                  style={{
-                                    position: "relative",
-                                    display: "flex",
-                                    alignItems: "center",
-                                    gap: "4px",
-                                  }}
+                                  style={{ position: "relative" }}
                                 >
                                   <div className="builder-preview-list-item-tools">
                                     <button
@@ -15328,23 +15350,7 @@ function PreviewSection({
                                   >
                                     ⠿
                                   </span>
-                                  {{
-                                    check: <Check size={14} />,
-                                    circleCheck: <CircleCheck size={14} />,
-                                    arrowRight: <ArrowRight size={14} />,
-                                    star: <Star size={14} />,
-                                    heart: <Heart size={14} />,
-                                    sparkles: <Sparkles size={14} />,
-                                    shield: <ShieldCheck size={14} />,
-                                  }[block.listIcon ?? "check"] ?? (
-                                    <Check size={14} />
-                                  )}
-                                  <DashboardTypog
-                                    as="span"
-                                    typography={block.typography}
-                                  >
-                                    {item}
-                                  </DashboardTypog>
+                                  {item.url ? <a href={item.url} target={item.target === "_blank" ? "_blank" : undefined} rel={item.target === "_blank" ? "noreferrer" : undefined}><DashboardTypog as="span" typography={block.typography}>{item.text}</DashboardTypog></a> : <DashboardTypog as="span" typography={block.typography}>{item.text}</DashboardTypog>}
                                 </li>
                               ))}
                             </ul>
@@ -15515,7 +15521,8 @@ function PreviewSection({
                           </div>
                         ) : block.kind === "hero" ? (
                           <div
-                            className={`shop-builder-column-block shop-builder-column-block--hero ${block.carouselSettings?.variant === "antigravity" ? "shop-builder-hero--antigravity shop-builder-hero--antigravity-block" : ""} ${block.premiumCardStyle && block.premiumCardStyle !== "none" ? `shop-builder-card--${block.premiumCardStyle}` : ""}`}
+                            className={`shop-builder-column-block shop-builder-column-block--hero ${block.heroContentAlign ? `shop-builder-hero--align-${block.heroContentAlign}` : ""} ${block.heroVerticalAlign ? `shop-builder-hero--valign-${block.heroVerticalAlign}` : ""} ${block.heroHeight ? `shop-builder-hero--height-${block.heroHeight}` : ""} ${block.heroMediaPlacement ? `shop-builder-hero--media-${block.heroMediaPlacement}` : ""} ${block.heroInverse ? "uk-light" : ""} ${block.carouselSettings?.variant === "antigravity" ? "shop-builder-hero--antigravity shop-builder-hero--antigravity-block" : ""} ${block.premiumCardStyle && block.premiumCardStyle !== "none" ? `shop-builder-card--${block.premiumCardStyle}` : ""}`}
+                            style={{ textAlign: block.heroContentAlign, maxWidth: block.heroContentWidth === "full" ? "none" : block.heroContentWidth === "small" ? "42rem" : block.heroContentWidth === "medium" ? "56rem" : "72rem" }}
                           >
                             <div
                               className={
@@ -15548,7 +15555,7 @@ function PreviewSection({
                                 block.carouselSettings?.variant ===
                                   "antigravity" ? (
                                   <DashboardTypog
-                                    as="h3"
+                                    as={block.heroHeadingElement ?? "h2"}
                                     className={
                                       block.textGradientPreset &&
                                       block.textGradientPreset !== "none"
@@ -15606,8 +15613,8 @@ function PreviewSection({
                                   </DashboardTypog>
                                 ) : (
                                   <InlineEditableText
-                                    as="h3"
-                                    className={
+                                    as={(block.heroHeadingElement ?? "h2") as any}
+                                    className={`${getUikitHeadingClass(block.heroHeadingElement ?? "h2", block.heroHeadingStyle ?? "xlarge")} ${
                                       block.textGradientPreset &&
                                       block.textGradientPreset !== "none" &&
                                       block.textGradientPreset !== "custom"
@@ -15615,8 +15622,7 @@ function PreviewSection({
                                         : block.carouselSettings?.variant ===
                                             "antigravity"
                                           ? "shop-builder-title--gradient"
-                                          : ""
-                                    }
+                                          : ""}`}
                                     typography={block.typography}
                                     value={block.title}
                                     onChange={(title) =>
@@ -15718,38 +15724,25 @@ function PreviewSection({
                                 )}
                               >
                                 {block.buttonLabel && (
-                                  <DashboardTypog
-                                    as="span"
-                                    className={`builder-preview-cta ${
-                                      block.premiumButtonStyle &&
-                                      block.premiumButtonStyle !== "default"
-                                        ? `shop-builder-cta--${block.premiumButtonStyle}`
-                                        : block.carouselSettings?.variant ===
-                                            "antigravity"
-                                          ? "shop-builder-cta--antigravity"
-                                          : `builder-preview-cta--${block.buttonStyle ?? "primary"}`
-                                    }`}
-                                    typography={block.typography}
+                                  <a
+                                    className={`builder-hero-action ${getUikitButtonClass(block.buttonStyle ?? "primary", block.size ?? "default")}`}
+                                    href={block.buttonUrl || "#"}
+                                    target={block.buttonTarget === "_blank" ? "_blank" : undefined}
+                                    rel={block.buttonTarget === "_blank" ? "noreferrer" : undefined}
                                   >
                                     {block.buttonLabel}
-                                  </DashboardTypog>
+                                  </a>
                                 )}
-                                {(block.buttons ?? []).map((btn, btnIdx) => (
-                                  <DashboardTypog
-                                    key={btn.id ?? btnIdx}
-                                    as="span"
-                                    className={`builder-preview-cta ${
-                                      block.premiumButtonStyle &&
-                                      block.premiumButtonStyle !== "default"
-                                        ? `shop-builder-cta--${block.premiumButtonStyle}`
-                                        : `builder-preview-cta--${btn.style ?? "primary"}`
-                                    }`}
-                                    style={{ display: "inline-flex" }}
-                                    typography={block.typography}
+                                {block.heroSecondaryActionVisible !== false && block.secondaryButtonLabel && (
+                                  <a
+                                    className={`builder-hero-action ${getUikitButtonClass(block.secondaryButtonStyle ?? "secondary", block.secondaryButtonSize ?? "default")}`}
+                                    href={block.secondaryButtonUrl || "#"}
+                                    target={block.secondaryButtonTarget === "_blank" ? "_blank" : undefined}
+                                    rel={block.secondaryButtonTarget === "_blank" ? "noreferrer" : undefined}
                                   >
-                                    {btn.label || "Button"}
-                                  </DashboardTypog>
-                                ))}
+                                    {block.secondaryButtonLabel}
+                                  </a>
+                                )}
                               </div>
                             </div>
                             {block.carouselSettings?.variant ===
@@ -15961,10 +15954,6 @@ function PreviewSection({
 
                             const panelTitleStyle = {
                               color: "var(--builder-card-title-color, inherit)",
-                              fontSize:
-                                "var(--builder-card-title-size, inherit)",
-                              fontWeight:
-                                "var(--builder-card-title-weight, inherit)",
                               textAlign:
                                 "var(--builder-card-title-align, inherit)" as React.CSSProperties["textAlign"],
                               margin: "var(--builder-card-title-margin, 0)",
@@ -15988,29 +15977,24 @@ function PreviewSection({
                                 "var(--builder-card-content-max-width, none)",
                             } as React.CSSProperties;
 
-                            const isPanelFrameless = block.imagePadding === "frameless" || block.imagePadding === "none" || !block.imagePadding;
-                            const panelMediaAspect = getBuilderImageAspectRatio(block.imageRatio) || "16 / 9";
+                            const panelMediaPlacement = block.panelMediaPlacement ?? "top";
+                            const panelMediaPresentation = getUikitPanelMediaStyle({ ratio: block.imageRatio, fit: block.panelMediaFit ?? "cover", alignment: block.panelMediaAlignment ?? "center" });
+                            const panelMediaClass = getUikitPanelMediaClass(panelMediaPlacement);
+                            const panelLayoutClass = getUikitPanelLayoutClass(panelMediaPlacement, block.panelMediaWidth ?? "medium");
+                            const panelTitleClass = block.panelTitleStyle && block.panelTitleStyle !== "inherit" ? getUikitHeadingClass(block.panelTitleStyle, block.panelTitleStyle) : "";
 
                             return (
-                              <div className={`shop-builder-column-block shop-builder-column-block--panel ${getUikitCardClass(block.panelVariant ?? block.panelStyle ?? "default", { hover: block.panelHover ? "hover" : "none", padding: block.panelSize })}`}>
+                              <div data-builder-block-id={block.id} className={`shop-builder-column-block shop-builder-column-block--panel ${panelLayoutClass} ${getUikitCardClass(block.panelVariant ?? block.panelStyle ?? "default", { hover: block.panelHover ? "hover" : "none", padding: block.panelSize })}`} style={{ textAlign: block.panelTextAlign ?? "left" }}>
+                                {block.panelShowMedia !== false && (
                                 <div
-                                  className={`shop-builder-panel-media ${
-                                    isPanelImagePlaceholder ? "is-empty" : ""
-                                  }`}
+                                  className={`${panelMediaClass} shop-builder-panel-media${isPanelImagePlaceholder ? " is-empty" : ""}`}
                                   style={{
-                                    aspectRatio: panelMediaAspect,
-                                    borderRadius: isPanelFrameless ? "16px 16px 0 0" : "16px",
-                                    margin: isPanelFrameless
-                                      ? "calc(-1 * var(--builder-card-padding, 24px)) calc(-1 * var(--builder-card-padding, 24px)) 20px calc(-1 * var(--builder-card-padding, 24px))"
-                                      : "0 0 20px 0",
-                                    width: isPanelFrameless
-                                      ? "calc(100% + 2 * var(--builder-card-padding, 24px))"
-                                      : "100%",
+                                    aspectRatio: panelMediaPresentation.aspectRatio,
                                     position: "relative",
                                     overflow: "hidden",
                                     cursor: "pointer",
-                                    backgroundSize: "cover",
-                                    backgroundPosition: "center",
+                                    backgroundSize: panelMediaPresentation.backgroundSize,
+                                    backgroundPosition: panelMediaPresentation.backgroundPosition,
                                     ...(!isPanelImagePlaceholder
                                       ? { backgroundImage: `url(${block.imageUrl})` }
                                       : {}),
@@ -16070,11 +16054,17 @@ function PreviewSection({
                                           <Upload size={14} />
                                           <span>Choose Image</span>
                                         </button>
-                                      </div>
-                                    </div>
-                                  )}
                                 </div>
-                                <div className="uk-card-body">
+                              </div>
+                            )}
+                            {block.carouselSettings?.variant !== "antigravity" && block.imageUrl && block.heroMediaPlacement && block.heroMediaPlacement !== "none" && (
+                              <div className={`shop-builder-hero-media shop-builder-hero-media--${block.heroMediaPlacement}`}>
+                                <img src={block.imageUrl} alt={block.imageAlt || block.title || ""} loading={block.heroMediaLoading ?? "lazy"} style={{ width: "100%", height: "100%", objectFit: block.heroMediaFit === "contain" ? "contain" : "cover" }} />
+                              </div>
+                            )}
+                                </div>
+                                )}
+                                <div className={`uk-card-body shop-builder-panel-content-width-${block.panelContentWidth ?? "auto"}`} style={{ textAlign: block.panelTextAlign ?? "left", alignSelf: block.panelVerticalAlign === "center" ? "center" : block.panelVerticalAlign === "bottom" ? "end" : "start" }}>
                                   {block.eyebrow && (
                                     <InlineEditableText
                                       as="span"
@@ -16096,9 +16086,10 @@ function PreviewSection({
                                   {block.title &&
                                     (block.typewriterEnabled ? (
                                       <DashboardTypog
-                                        as="h3"
+                                        as={block.panelTitleElement ?? "h3"}
+                                        className={panelTitleClass}
                                         area="title"
-                                        typography={block.typography}
+                                        typography={undefined}
                                         style={panelTitleStyle}
                                       >
                                         <TypewriterText
@@ -16155,9 +16146,10 @@ function PreviewSection({
                                       </DashboardTypog>
                                     ) : (
                                       <InlineEditableText
-                                        as="h3"
+                                        as={block.panelTitleElement ?? "h3"}
+                                        className={panelTitleClass}
                                         area="title"
-                                        typography={block.typography}
+                                        typography={undefined}
                                         style={panelTitleStyle}
                                         value={block.title}
                                         onChange={(title) =>
@@ -16272,29 +16264,15 @@ function PreviewSection({
                                       })`,
                                     }}
                                   >
-                                    {block.buttonLabel && (
+                                    {block.panelActionVisible !== false && block.buttonLabel && (
                                       <DashboardTypog
                                         as="span"
                                         area="button"
-                                        className="builder-preview-cta"
+                                        className={`builder-preview-cta ${getUikitButtonClass(block.panelActionStyle ?? "primary", block.panelActionSize ?? "default")} shop-builder-panel-action--${block.panelActionAlign ?? "inherit"}`}
                                         typography={block.typography}
                                       >
                                         {block.buttonLabel}
                                       </DashboardTypog>
-                                    )}
-                                    {(block.buttons ?? []).map(
-                                      (btn, btnIdx) => (
-                                        <DashboardTypog
-                                          key={btn.id ?? btnIdx}
-                                          as="span"
-                                          area="button"
-                                          className={`builder-preview-cta builder-preview-cta--${btn.style ?? "primary"}`}
-                                          style={{ display: "inline-flex" }}
-                                          typography={block.typography}
-                                        >
-                                          {btn.label || "Button"}
-                                        </DashboardTypog>
-                                      ),
                                     )}
                                   </div>
                                 </div>
@@ -16303,13 +16281,18 @@ function PreviewSection({
                           })()
                         ) : block.kind === "image" ? (
                           (() => {
-                            const imageAspectRatio = getBuilderImageAspectRatio(
-                              block.imageRatio,
-                            );
-                            const imageObjectFit = getBuilderImageObjectFit(
-                              block.imageFit,
-                            );
-                            const imageRadius = `${block.imageBorderRadius ?? 12}px`;
+                            const imageSemantics = {
+                              fit: block.imageFit,
+                              ratio: block.imageRatio,
+                              shape: block.imageShape ?? (block.imageBorderRadius ? "rounded" : "none"),
+                              shadow: block.imageShadow,
+                              alignment: block.imageAlignment,
+                              width: block.imageWidth,
+                            } as const;
+                            const imageStyle = getUikitImageStyle(imageSemantics);
+                            const imageAttributes = getUikitImageAttributes(imageSemantics);
+                            const imageClass = getUikitImageClass(imageSemantics);
+                            const figureClass = getUikitImageWrapperClass(imageSemantics);
                             const isBlockImagePlaceholder =
                               !block.imageUrl ||
                               !block.imageUrl.trim();
@@ -16331,40 +16314,32 @@ function PreviewSection({
                             return (
                               <div className="shop-builder-column-block shop-builder-column-block--image">
                                 <figure
-                                  className="shop-builder-image-figure"
+                                  className={`shop-builder-image-figure ${figureClass}`}
                                   style={{
                                     textAlign: block.imageAlignment ?? "center",
-                                    maxWidth: block.imageMaxWidth
-                                      ? `${block.imageMaxWidth}px`
-                                      : undefined,
-                                    marginInline: "auto",
+                                    maxWidth: imageStyle.maxWidth ?? (block.imageMaxWidth ? `${block.imageMaxWidth}px` : undefined),
+                                    width: imageStyle.width,
+                                    marginInline: block.imageAlignment === "left" ? "0 auto" : block.imageAlignment === "right" ? "0 0 0 auto" : "auto",
                                   }}
                                 >
                                   <div
-                                    className={`shop-builder-image-media ${
-                                      isBlockImagePlaceholder ? "is-empty" : ""
-                                    }`}
+                                    className={`shop-builder-image-media ${imageStyle.aspectRatio ? "uk-cover-container" : ""} ${isBlockImagePlaceholder ? "is-empty" : ""}`}
+                                    data-image-ratio={imageStyle.aspectRatio ? "true" : undefined}
                                     style={{
-                                      aspectRatio: imageAspectRatio,
-                                      borderRadius: imageRadius,
-                                      position: "relative",
+                                      aspectRatio: imageStyle.aspectRatio,
+                                      width: "100%",
+                                      position: imageStyle.aspectRatio ? "relative" : undefined,
                                     }}
                                   >
                                     {!isBlockImagePlaceholder ? (
                                       <>
-                                        <Image
-                                          src={block.imageUrl!}
-                                          alt={block.imageAlt ?? ""}
-                                          width={1200}
-                                          height={800}
-                                          style={{
-                                            width: "100%",
-                                            height: imageAspectRatio
-                                              ? "100%"
-                                              : "auto",
-                                            objectFit: imageObjectFit,
-                                          }}
-                                        />
+                                        {block.imageLinkUrl ? (
+                                          <a href={block.imageLinkUrl} target={block.imageLinkTarget === "_blank" ? "_blank" : undefined} rel={block.imageLinkTarget === "_blank" ? "noreferrer" : undefined}>
+                                            <Image className={imageClass} src={block.imageUrl!} alt={block.imageAlt ?? ""} width={1200} height={800} loading={block.imageLoading ?? "lazy"} {...imageAttributes} style={{ width: "100%", height: imageStyle.aspectRatio ? "100%" : "auto", objectFit: imageStyle.objectFit, ...(imageStyle.position ? { position: imageStyle.position, inset: imageStyle.inset } : {}) }} />
+                                          </a>
+                                        ) : (
+                                          <Image className={imageClass} src={block.imageUrl!} alt={block.imageAlt ?? ""} width={1200} height={800} loading={block.imageLoading ?? "lazy"} {...imageAttributes} style={{ width: "100%", height: imageStyle.aspectRatio ? "100%" : "auto", objectFit: imageStyle.objectFit, ...(imageStyle.position ? { position: imageStyle.position, inset: imageStyle.inset } : {}) }} />
+                                        )}
                                         <button
                                           type="button"
                                           className="builder-preview-image-upload"
@@ -16699,7 +16674,7 @@ function PreviewSection({
                                       gridImageFrame={block.gridImageFrame}
                                       imagePadding={block.imagePadding}
                                       imageFit={block.imageFit}
-                                      imageRatio={block.imageRatio}
+                                      imageRatio={block.imageRatio as "auto" | "square" | "4:5" | "3:4" | "16:9" | undefined}
                                       borderRadius={block.borderRadius}
                                       addToCartStyle={block.addToCartStyle}
                                       addToCartSize={block.addToCartSize}
@@ -16747,7 +16722,7 @@ function PreviewSection({
                                       cardPadding={block.cardPadding}
                                       imagePadding={block.imagePadding}
                                       imageFit={block.imageFit}
-                                      imageRatio={block.imageRatio}
+                                      imageRatio={block.imageRatio as "auto" | "square" | "4:5" | "3:4" | "16:9" | undefined}
                                       imageFrame={block.gridImageFrame}
                                       borderRadius={block.borderRadius}
                                       addToCartStyle={block.addToCartStyle}
@@ -16819,7 +16794,7 @@ function PreviewSection({
                             return (
                               <div className="shop-builder-column-block shop-builder-column-block--grid">
                                 <div
-                                  className={`shop-builder-grid shop-builder-grid--gap-${gridGapClass} shop-builder-grid--margin-${hasBuilderVisualSpacing(block.visualStyle?.margin) || !block.gridMargin || block.gridMargin === "inherit" ? "none" : block.gridMargin} shop-card-preset--${block.panelStyle ?? "default"} ${visualStyleClassName(block.visualStyle as BuilderVisualStyle | undefined)}`}
+                                  className={`shop-builder-grid shop-builder-grid--gap-${gridGapClass} shop-builder-grid--margin-${hasBuilderVisualSpacing(block.visualStyle?.margin) || !block.gridMargin || block.gridMargin === "inherit" ? "none" : block.gridMargin}`}
                                   style={
                                     {
                                       "--shop-builder-grid-columns":
@@ -16830,10 +16805,6 @@ function PreviewSection({
                                               gridGapCustom,
                                           }
                                         : {}),
-                                      ...visualStyleToCss(
-                                        block.visualStyle as
-                                          BuilderVisualStyle | undefined,
-                                      ),
                                     } as CSSProperties
                                   }
                                 >
@@ -16868,7 +16839,7 @@ function PreviewSection({
                                           (block.gridRows ?? 1),
                                       ),
                                     )
-                                    .map((item, itemIndex) => {
+                                    .map((item: any, itemIndex) => {
                                       const itemTypography =
                                         ("typography" in item
                                           ? item.typography
@@ -16895,9 +16866,9 @@ function PreviewSection({
                                           draggable={
                                             block.gridSource !== "products"
                                           }
-                                          className={`shop-builder-grid-card is-image-${imagePaddingClass} is-content-${contentPaddingClass} is-frame-${
+                                          className={`${block.gridItemRenderer === "card" ? getUikitCardClass(block.gridCardVariant ?? "default", { padding: block.gridCardSize ?? "default", hover: block.gridCardHover ? "hover" : "none" }) : ""} shop-builder-grid-card is-image-${imagePaddingClass} is-content-${contentPaddingClass} is-frame-${
                                             block.gridImageFrame ?? "none"
-                                          } cards-${block.cardStyle ?? "flat"} preset-${block.cardPreset ?? "standard"} shop-card-preset--${block.panelStyle ?? "default"} ${
+                                          } ${
                                             draggingItem?.blockKey ===
                                               blockKey &&
                                             draggingItem?.fromIndex ===
@@ -16913,6 +16884,7 @@ function PreviewSection({
                                           }`}
                                           style={
                                             {
+                                              textAlign: item.textAlign ?? "left",
                                               ...(imagePaddingCustom
                                                 ? {
                                                     "--shop-builder-grid-image-padding":
@@ -17055,9 +17027,10 @@ function PreviewSection({
 
                                             return (
                                               <div
-                                                className={`shop-builder-grid-image ${
+                                                className={`${block.gridItemRenderer === "card" ? getUikitPanelMediaClass(item.mediaPlacement === "left" || item.mediaPlacement === "right" ? item.mediaPlacement : "top") : ""} shop-builder-grid-image ${
                                                   isItemImagePlaceholder ? "is-empty" : ""
                                                 }`}
+                                                style={{ aspectRatio: item.mediaRatio && item.mediaRatio !== "natural" ? ({ square: "1 / 1", "4:3": "4 / 3", "3:2": "3 / 2", "16:9": "16 / 9", portrait: "3 / 4" } as Record<string, string>)[item.mediaRatio] : undefined, overflow: "hidden" }}
                                                 onClick={(event) => {
                                                   if (block.gridSource !== "products") {
                                                     event.stopPropagation();
@@ -17082,6 +17055,16 @@ function PreviewSection({
                                                       }
                                                       width={420}
                                                       height={420}
+                                                      style={{
+                                                        position: "absolute",
+                                                        inset: 0,
+                                                        width: "100%",
+                                                        height: "100%",
+                                                        objectFit:
+                                                          item.mediaFit === "contain"
+                                                            ? "contain"
+                                                            : "cover",
+                                                      }}
                                                     />
                                                     {block.gridSource !==
                                                       "products" && (
@@ -17155,7 +17138,7 @@ function PreviewSection({
                                               </div>
                                             );
                                           })()}
-                                          <div className="shop-builder-grid-content">
+                                          <div className={`${block.gridItemRenderer === "card" ? "uk-card-body " : ""}shop-builder-grid-content`}>
                                             {block.gridSource !== "products" ? (
                                               <>
                                                 {block.gridShowEyebrow !==
@@ -17183,8 +17166,8 @@ function PreviewSection({
                                                   )}
                                                 {item.title && (
                                                   <InlineEditableText
-                                                    as="h3"
-                                                    className="shop-builder-title"
+                                                    as={(item.titleElement ?? "h3") as any}
+                                                    className={`shop-builder-title ${item.titleStyle && item.titleStyle !== "inherit" ? getUikitHeadingClass(item.titleStyle, item.titleStyle) : ""}`}
                                                     typography={itemTypography}
                                                     style={gridTitleStyle}
                                                     value={item.title}
@@ -17272,27 +17255,14 @@ function PreviewSection({
                                                     <div
                                                       className={`shop-builder-grid-button shop-builder-grid-button--${item.buttonAlign ?? "left"}`}
                                                     >
-                                                      <InlineEditableText
-                                                        as="span"
-                                                        className={`builder-preview-cta builder-preview-cta--${item.buttonStyle ?? "primary"}`}
-                                                        typography={
-                                                          itemTypography
-                                                        }
-                                                        value={item.buttonLabel}
-                                                        onChange={(
-                                                          buttonLabel,
-                                                        ) =>
-                                                          onUpdateGridItem(
-                                                            section.id,
-                                                            columnKey,
-                                                            blockKey,
-                                                            itemIndex,
-                                                            {
-                                                              buttonLabel,
-                                                            },
-                                                          )
-                                                        }
-                                                      />
+                                                      <a
+                                                        className={`builder-grid-action ${getUikitButtonClass(item.actionStyle ?? item.buttonStyle ?? "primary", item.actionSize ?? "default")}`}
+                                                        href={item.buttonUrl || "#"}
+                                                        target={item.buttonTarget === "_blank" ? "_blank" : undefined}
+                                                        rel={item.buttonTarget === "_blank" ? "noreferrer" : undefined}
+                                                      >
+                                                        {item.buttonLabel}
+                                                      </a>
                                                     </div>
                                                   )}
                                               </>

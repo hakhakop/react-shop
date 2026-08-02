@@ -58,6 +58,10 @@ import ColumnCapabilityPanel from "@/components/dashboard/inspector/panels/Colum
 import HeadingCapabilityPanel from "@/components/dashboard/inspector/panels/HeadingCapabilityPanel";
 import AccordionCapabilityPanel from "@/components/dashboard/inspector/panels/AccordionCapabilityPanel";
 import TextCapabilityPanel from "@/components/dashboard/inspector/panels/TextCapabilityPanel";
+import ImageCapabilityPanel from "@/components/dashboard/inspector/panels/ImageCapabilityPanel";
+import ListCapabilityPanel from "@/components/dashboard/inspector/panels/ListCapabilityPanel";
+import CoreContentCapabilityPanel from "@/components/dashboard/inspector/panels/CoreContentCapabilityPanel";
+import { HeroCapabilityPanel, GridCapabilityPanel } from "@/components/dashboard/inspector/panels/HeroGridCapabilityPanel";
 import type { InspectorElementKind } from "@/lib/uikitCapabilities";
 import AnimationControl from "@/components/dashboard/style/AnimationControl";
 import {
@@ -1030,6 +1034,25 @@ function isLayoutContainerSection(section: BuilderSection | null | undefined) {
   );
 }
 
+const canonicalCapabilityBlockKinds = new Set<LayoutBlockKind>([
+  "button",
+  "panel",
+  "heading",
+  "text",
+  "list",
+  "accordion",
+  "image",
+  "hero",
+  "grid",
+  "icon",
+  "badgeGrid",
+  "table",
+  "divider",
+  "alert",
+  "breadcrumbs",
+  "datePicker",
+]);
+
 function BuilderImageUrlControl({
   value,
   placeholder = "https://... or /uploads/image.jpg",
@@ -1618,12 +1641,19 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
   blockTabs.push(["advanced", t("builder.inspector.advanced")]);
 
   const canonicalBlockTabs: [InspectorTab, string][] =
-    selectedLayoutBlock?.kind === "button" || selectedLayoutBlock?.kind === "panel"
+    selectedLayoutBlock?.kind === "button"
       ? [
           ["content", t("builder.inspector.content")],
           ["style", t("builder.inspector.styling")],
           ["advanced", t("builder.inspector.advanced")],
         ]
+      : selectedLayoutBlock?.kind === "panel"
+        ? [
+            ["content", t("builder.inspector.content")],
+            ["layout", t("builder.inspector.layout")],
+            ["style", t("builder.inspector.styling")],
+            ["advanced", t("builder.inspector.advanced")],
+          ]
       : selectedLayoutBlock?.kind === "heading"
         ? [
             ["content", t("builder.inspector.content")],
@@ -1638,11 +1668,32 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
             ["style", t("builder.inspector.styling")],
             ["advanced", t("builder.inspector.advanced")],
           ]
+      : selectedLayoutBlock?.kind === "image" && selectedSection?.id !== "header-document"
+        ? [
+            ["content", t("builder.inspector.content")],
+            ["style", t("builder.inspector.styling")],
+            ["behavior", "Behavior"],
+            ["advanced", t("builder.inspector.advanced")],
+          ]
       : selectedLayoutBlock?.kind === "text"
         ? [
             ["content", t("builder.inspector.content")],
             ["style", t("builder.inspector.styling")],
             ["typography", t("builder.inspector.typography")],
+            ["advanced", t("builder.inspector.advanced")],
+          ]
+      : selectedLayoutBlock?.kind === "list"
+        ? [
+            ["content", t("builder.inspector.content")],
+            ["style", t("builder.inspector.styling")],
+            ["behavior", "Behavior"],
+            ["advanced", t("builder.inspector.advanced")],
+          ]
+      : selectedLayoutBlock && ["hero", "grid", "icon", "badgeGrid", "table", "divider", "alert", "breadcrumbs", "datePicker"].includes(selectedLayoutBlock.kind as string)
+        ? [
+            ["content", t("builder.inspector.content")],
+            ["style", t("builder.inspector.styling")],
+            ["behavior", "Behavior"],
             ["advanced", t("builder.inspector.advanced")],
           ]
         : blockTabs;
@@ -2264,7 +2315,9 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
               : inspectorTab === "advanced"
                 ? "Section Advanced"
                 : "Section Layout";
-  const showLegacySectionContentControls: boolean = true;
+  // Normal sections use SectionCapabilityPanel; the historical generic content
+  // controls are intentionally retired from the page-builder inspector.
+  const showLegacySectionContentControls: boolean = false;
   const currentRowLayoutPreset = getBuilderRowLayoutPreset(
     layoutContainerSection?.layout ?? null,
   );
@@ -2505,89 +2558,6 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                 headerPresetKey={selectedSection.headerPresetKey}
               />
             ) : null}
-
-          {selectedLayoutBlock?.kind === "image" && isElementSettingsTab && (
-            <div className="builder-inspector-stack">
-              <details className="builder-collapse" open>
-                <summary>
-                  <InspectorGroupSummary
-                    title="Image Styling"
-                    description="Control the selected image crop, fit, and corner shape."
-                    meta={`${selectedLayoutBlock.imageRatio ?? "auto"} · ${
-                      selectedLayoutBlock.imageFit ?? "cover"
-                    }`}
-                  />
-                </summary>
-                <div className="builder-two-column">
-                  <label className="builder-field">
-                    <span>Image Ratio</span>
-                    <select
-                      value={selectedLayoutBlock.imageRatio ?? "auto"}
-                      onChange={(event) =>
-                        updateSelectedLayoutBlockByKey({
-                          imageRatio: event.target
-                            .value as BuilderLayoutBlock["imageRatio"],
-                        })
-                      }
-                    >
-                      <option value="auto">Auto</option>
-                      <option value="square">Square 1:1</option>
-                      <option value="4:5">Portrait 4:5</option>
-                      <option value="3:4">Portrait 3:4</option>
-                    </select>
-                  </label>
-                  <label className="builder-field">
-                    <span>Image Fit</span>
-                    <select
-                      value={selectedLayoutBlock.imageFit ?? "cover"}
-                      onChange={(event) =>
-                        updateSelectedLayoutBlockByKey({
-                          imageFit: event.target
-                            .value as BuilderLayoutBlock["imageFit"],
-                        })
-                      }
-                    >
-                      <option value="cover">Cover</option>
-                      <option value="contain">Contain</option>
-                      <option value="fill">Fill / stretch</option>
-                    </select>
-                  </label>
-                </div>
-                <div className="builder-two-column">
-                  <label className="builder-field">
-                    <span>Size / Max Width</span>
-                    <input
-                      type="number"
-                      min={100}
-                      max={2400}
-                      value={selectedLayoutBlock.imageMaxWidth ?? 1200}
-                      onChange={(event) =>
-                        updateSelectedLayoutBlockByKey({
-                          imageMaxWidth:
-                            Number(event.target.value) || undefined,
-                        })
-                      }
-                    />
-                  </label>
-                  <label className="builder-field">
-                    <span>Corner Radius</span>
-                    <input
-                      type="number"
-                      min={0}
-                      max={100}
-                      value={selectedLayoutBlock.imageBorderRadius ?? 12}
-                      onChange={(event) =>
-                        updateSelectedLayoutBlockByKey({
-                          imageBorderRadius:
-                            Number(event.target.value) || undefined,
-                        })
-                      }
-                    />
-                  </label>
-                </div>
-              </details>
-            </div>
-          )}
 
           {selectedLayoutRow && !isCanonicalRowSelection && inspectorTab === "layout" && (
             <div className="builder-inspector-stack">
@@ -2957,6 +2927,41 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
             />
           )}
 
+          {selectedLayoutBlock?.kind === "image" && selectedSection.id !== "header-document" && (
+            <ImageCapabilityPanel
+              block={selectedLayoutBlock}
+              tab={inspectorTab}
+              update={updateSelectedLayoutBlockByKey}
+              openWordPressMediaPicker={openWordPressMediaPicker}
+            />
+          )}
+
+          {selectedLayoutBlock?.kind === "button" && (
+            <ButtonCapabilityPanel block={selectedLayoutBlock} tab={inspectorTab} update={updateSelectedLayoutBlockByKey} />
+          )}
+          {selectedLayoutBlock?.kind === "panel" && (
+            <PanelCapabilityPanel block={selectedLayoutBlock} tab={inspectorTab} update={updateSelectedLayoutBlockByKey} />
+          )}
+          {selectedLayoutBlock?.kind === "heading" && (
+            <HeadingCapabilityPanel block={selectedLayoutBlock} tab={inspectorTab} update={updateSelectedLayoutBlockByKey} />
+          )}
+          {selectedLayoutBlock?.kind === "text" && (
+            <TextCapabilityPanel block={selectedLayoutBlock} tab={inspectorTab} update={updateSelectedLayoutBlockByKey} />
+          )}
+          {selectedLayoutBlock?.kind === "list" && (
+            <ListCapabilityPanel block={selectedLayoutBlock} tab={inspectorTab} update={updateSelectedLayoutBlockByKey} />
+          )}
+          {selectedLayoutBlock?.kind === "hero" && (
+            <HeroCapabilityPanel block={selectedLayoutBlock} tab={inspectorTab} update={updateSelectedLayoutBlockByKey} />
+          )}
+          {selectedLayoutBlock?.kind === "grid" && (
+            <GridCapabilityPanel block={selectedLayoutBlock} tab={inspectorTab} update={updateSelectedLayoutBlockByKey} />
+          )}
+          {selectedLayoutBlock && ["hero", "grid", "icon", "badgeGrid", "table", "divider", "alert", "breadcrumbs", "datePicker"].includes(selectedLayoutBlock.kind as string) && (
+            selectedLayoutBlock.kind !== "hero" && selectedLayoutBlock.kind !== "grid" &&
+            <CoreContentCapabilityPanel block={selectedLayoutBlock} tab={inspectorTab} update={updateSelectedLayoutBlockByKey} />
+          )}
+
           {!isCanonicalSectionSelection && !isCanonicalColumnSelection && (( !selectedLayoutBlock &&
             !selectedLayoutRow &&
             inspectorTab === "layout" &&
@@ -2964,6 +2969,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
             (selectedLayoutBlock &&
               (isLayoutContainerSection(selectedSection) ||
                 selectedLayoutBlock.kind === "accordion") &&
+              (selectedLayoutBlock.kind !== "image" || isElementAdvancedTab) &&
               (isElementContentTab ||
                 isElementLayoutTab ||
                 isElementSpacingTab ||
@@ -3280,9 +3286,11 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                     isElementTypographyTab ||
                     isElementAdvancedTab ||
                     isElementBehaviorTab) &&
-                      selectedLayoutBlock &&
+                    selectedLayoutBlock &&
+                    !canonicalCapabilityBlockKinds.has(selectedLayoutBlock.kind as LayoutBlockKind) &&
                     (isLayoutContainerSection(selectedSection) ||
-                      selectedLayoutBlock.kind === "accordion") && (
+                      selectedLayoutBlock.kind === "accordion" ||
+                      selectedLayoutBlock.kind === "list") && (
                       <>
                         {selectedLayoutBlock.kind === "button" ? (
                           <ButtonCapabilityPanel
@@ -3304,6 +3312,12 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                           />
                         ) : selectedLayoutBlock.kind === "text" ? (
                           <TextCapabilityPanel
+                            block={selectedLayoutBlock}
+                            tab={inspectorTab}
+                            update={updateSelectedLayoutBlockByKey}
+                          />
+                        ) : selectedLayoutBlock.kind === "list" ? (
+                          <ListCapabilityPanel
                             block={selectedLayoutBlock}
                             tab={inspectorTab}
                             update={updateSelectedLayoutBlockByKey}

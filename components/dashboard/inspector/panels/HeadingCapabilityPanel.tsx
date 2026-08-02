@@ -3,6 +3,7 @@
 import type { BuilderLayoutBlock, InspectorTab } from "@/components/dashboard/builderTypes";
 import { UIKIT_HEADING_CAPABILITY } from "@/lib/uikitCapabilities";
 import { resolveTypographyInput, updateTypographyArea, type TypographySettings } from "@/lib/builderTypography";
+import { InspectorColorField, InspectorFieldRow, InspectorNumberUnit, InspectorPillGroup, InspectorSelect, InspectorSwitch, InspectorTextField, InspectorTextarea } from "@/components/dashboard/inspector/InspectorControls";
 
 type Props = {
   block: BuilderLayoutBlock;
@@ -11,6 +12,7 @@ type Props = {
 };
 
 const gradientPresets = UIKIT_HEADING_CAPABILITY.properties.gradient.values;
+const labels = <T extends string>(values: readonly T[]) => values.map((value) => ({ value, label: value.replace(/-/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase()) }));
 
 export default function HeadingCapabilityPanel({ block, tab, update }: Props) {
   const typography = resolveTypographyInput(block.typography, "title") ?? {};
@@ -27,8 +29,8 @@ export default function HeadingCapabilityPanel({ block, tab, update }: Props) {
     return (
       <div className="builder-inspector-stack" data-uikit-capability="heading-content">
         <div className="builder-element-inspector-note"><strong>Heading content</strong><span>WebPages owns the text and semantic HTML level.</span></div>
-        <label className="builder-field"><span>Heading Text</span><input value={block.headingText ?? ""} onChange={(event) => update({ headingText: event.target.value })} /></label>
-        <label className="builder-field"><span>Semantic level</span><select value={block.headingLevel ?? "h2"} onChange={(event) => update({ headingLevel: event.target.value as BuilderLayoutBlock["headingLevel"] })}>{UIKIT_HEADING_CAPABILITY.properties.level.values.map((value) => <option key={value} value={value}>{value.toUpperCase()}</option>)}</select></label>
+        <InspectorFieldRow label="Heading text"><InspectorTextField value={block.headingText ?? ""} onChange={(value) => update({ headingText: value })} ariaLabel="Heading text" /></InspectorFieldRow>
+        <InspectorFieldRow label="Semantic level"><InspectorSelect value={(block.headingLevel ?? "h2") as BuilderLayoutBlock["headingLevel"]} options={UIKIT_HEADING_CAPABILITY.properties.level.values.map((value) => ({ value, label: value.toUpperCase() }))} onChange={(value) => update({ headingLevel: value })} ariaLabel="Heading semantic level" /></InspectorFieldRow>
       </div>
     );
   }
@@ -38,19 +40,19 @@ export default function HeadingCapabilityPanel({ block, tab, update }: Props) {
     return (
       <div className="builder-inspector-stack" data-uikit-capability="heading-style">
         <div className="builder-element-inspector-note"><strong>UIkit Heading</strong><span>Semantic visual presets map to UIkit heading classes in builder and frontend.</span></div>
-        <label className="builder-field"><span>Visual Preset</span><select value={block.headingSize ?? "medium"} onChange={(event) => update({ headingSize: event.target.value as BuilderLayoutBlock["headingSize"] })}>{UIKIT_HEADING_CAPABILITY.properties.visualPreset.values.map((value) => <option key={value} value={value}>{value}</option>)}</select></label>
-        <label className="builder-field"><span>Alignment</span><select value={block.headingAlign ?? "left"} onChange={(event) => update({ headingAlign: event.target.value as BuilderLayoutBlock["headingAlign"] })}>{UIKIT_HEADING_CAPABILITY.properties.alignment.values.map((value) => <option key={value} value={value}>{value}</option>)}</select></label>
-        <label className="builder-field"><span>Gradient preset</span><select value={gradient} onChange={(event) => update({ textGradientPreset: event.target.value as BuilderLayoutBlock["textGradientPreset"] })}>{gradientPresets.map((value) => <option key={value} value={value}>{value}</option>)}</select></label>
+        <InspectorFieldRow label="Visual preset"><InspectorSelect value={(block.headingSize ?? "medium") as BuilderLayoutBlock["headingSize"]} options={labels(UIKIT_HEADING_CAPABILITY.properties.visualPreset.values)} onChange={(value) => update({ headingSize: value })} ariaLabel="Heading visual preset" /></InspectorFieldRow>
+        <InspectorFieldRow label="Alignment"><InspectorPillGroup value={(block.headingAlign ?? "left") as BuilderLayoutBlock["headingAlign"]} options={labels(UIKIT_HEADING_CAPABILITY.properties.alignment.values)} onChange={(value) => update({ headingAlign: value })} ariaLabel="Heading alignment" /></InspectorFieldRow>
+        <InspectorFieldRow label="Gradient preset"><InspectorSelect value={gradient} options={labels(gradientPresets)} onChange={(value) => update({ textGradientPreset: value })} ariaLabel="Gradient preset" /></InspectorFieldRow>
         {gradient === "custom" && <div className="builder-two-column">
-          <label className="builder-field"><span>Start color</span><input type="color" value={block.textGradientCustomStart ?? "#ffffff"} onChange={(event) => update({ textGradientCustomStart: event.target.value })} /></label>
-          <label className="builder-field"><span>End color</span><input type="color" value={block.textGradientCustomEnd ?? "#c084fc"} onChange={(event) => update({ textGradientCustomEnd: event.target.value })} /></label>
-          <label className="builder-field"><span>Angle</span><input type="number" min={0} max={360} value={block.textGradientCustomAngle ?? 135} onChange={(event) => update({ textGradientCustomAngle: Number(event.target.value) })} /></label>
+          <InspectorFieldRow label="Start color"><InspectorColorField value={block.textGradientCustomStart ?? "#ffffff"} onChange={(value) => update({ textGradientCustomStart: value })} ariaLabel="Gradient start color" /></InspectorFieldRow>
+          <InspectorFieldRow label="End color"><InspectorColorField value={block.textGradientCustomEnd ?? "#c084fc"} onChange={(value) => update({ textGradientCustomEnd: value })} ariaLabel="Gradient end color" /></InspectorFieldRow>
+          <InspectorFieldRow label="Angle"><InspectorNumberUnit value={block.textGradientCustomAngle ?? 135} unit="deg" units={["deg"]} onValueChange={(value) => update({ textGradientCustomAngle: Number(value) })} onUnitChange={() => undefined} ariaLabel="Gradient angle" /></InspectorFieldRow>
         </div>}
-        <label className="builder-check"><input type="checkbox" checked={block.typewriterEnabled ?? false} onChange={(event) => update({ typewriterEnabled: event.target.checked })} /><span>Enable typewriter</span></label>
+        <InspectorFieldRow label="Typewriter"><InspectorSwitch checked={block.typewriterEnabled ?? false} onChange={(checked) => update({ typewriterEnabled: checked })} label="Enable typewriter" /></InspectorFieldRow>
         {block.typewriterEnabled && <>
-          <label className="builder-field"><span>Typewriter phrases</span><textarea value={(block.typewriterPhrases ?? []).join("\n")} onChange={(event) => update({ typewriterPhrases: event.target.value.split("\n").map((value) => value.trim()).filter(Boolean) })} /></label>
-          <div className="builder-two-column"><label className="builder-field"><span>Speed</span><input type="number" min={10} value={block.typewriterSpeed ?? 80} onChange={(event) => update({ typewriterSpeed: Number(event.target.value) })} /></label><label className="builder-field"><span>Delay</span><input type="number" min={0} value={block.typewriterDelay ?? 1200} onChange={(event) => update({ typewriterDelay: Number(event.target.value) })} /></label></div>
-          <label className="builder-check"><input type="checkbox" checked={block.typewriterLoop ?? true} onChange={(event) => update({ typewriterLoop: event.target.checked })} /><span>Loop phrases</span></label>
+          <InspectorFieldRow label="Typewriter phrases"><InspectorTextarea value={(block.typewriterPhrases ?? []).join("\n")} onChange={(value) => update({ typewriterPhrases: value.split("\n").map((entry) => entry.trim()).filter(Boolean) })} ariaLabel="Typewriter phrases" /></InspectorFieldRow>
+          <div className="builder-two-column"><InspectorFieldRow label="Speed"><input className="inspector-control" type="number" min={10} value={block.typewriterSpeed ?? 80} onChange={(event) => update({ typewriterSpeed: Number(event.target.value) })} /></InspectorFieldRow><InspectorFieldRow label="Delay"><input className="inspector-control" type="number" min={0} value={block.typewriterDelay ?? 1200} onChange={(event) => update({ typewriterDelay: Number(event.target.value) })} /></InspectorFieldRow></div>
+          <InspectorFieldRow label="Loop phrases"><InspectorSwitch checked={block.typewriterLoop ?? true} onChange={(checked) => update({ typewriterLoop: checked })} label="Loop phrases" /></InspectorFieldRow>
         </>}
       </div>
     );
@@ -60,11 +62,11 @@ export default function HeadingCapabilityPanel({ block, tab, update }: Props) {
     return (
       <div className="builder-inspector-stack" data-uikit-capability="heading-typography">
         <div className="builder-element-inspector-note"><strong>Complementary typography</strong><span>These controls complement the UIkit visual preset; font size and typography variants are intentionally absent.</span></div>
-        <label className="builder-field"><span>Font family</span><input value={typography.fontFamily ?? ""} placeholder="inherit" onChange={(event) => updateTypography({ fontFamily: event.target.value || undefined })} /></label>
-        <div className="builder-two-column"><label className="builder-field"><span>Font weight</span><select value={String(typography.fontWeight ?? "")} onChange={(event) => updateTypography({ fontWeight: event.target.value || undefined })}><option value="">inherit</option>{[400, 500, 600, 700, 800].map((value) => <option key={value} value={value}>{value}</option>)}</select></label><label className="builder-field"><span>Line height</span><input value={typography.lineHeight ?? ""} placeholder="inherit" onChange={(event) => updateTypography({ lineHeight: event.target.value || undefined })} /></label></div>
-        <div className="builder-two-column"><label className="builder-field"><span>Letter spacing</span><input value={typography.letterSpacing ?? ""} placeholder="inherit" onChange={(event) => updateTypography({ letterSpacing: event.target.value || undefined })} /></label><label className="builder-field"><span>Text color</span><input type="color" value={typography.color?.startsWith("#") ? typography.color : "#111827"} onChange={(event) => updateTypography({ color: event.target.value })} /></label></div>
-        <div className="builder-two-column"><label className="builder-field"><span>Text transform</span><select value={typography.textTransform ?? "none"} onChange={(event) => updateTypography({ textTransform: event.target.value as TypographySettings["textTransform"] })}><option value="none">none</option><option value="uppercase">uppercase</option><option value="lowercase">lowercase</option><option value="capitalize">capitalize</option></select></label><label className="builder-field"><span>Text decoration</span><select value={typography.textDecoration ?? "none"} onChange={(event) => updateTypography({ textDecoration: event.target.value as TypographySettings["textDecoration"] })}><option value="none">none</option><option value="underline">underline</option><option value="line-through">line-through</option></select></label></div>
-        <label className="builder-field"><span>Text shadow</span><input value={typography.textShadow ?? ""} placeholder="none or CSS shadow" onChange={(event) => updateTypography({ textShadow: event.target.value || undefined })} /></label>
+        <InspectorFieldRow label="Font family"><InspectorTextField value={typography.fontFamily ?? ""} placeholder="inherit" onChange={(value) => updateTypography({ fontFamily: value || undefined })} ariaLabel="Heading font family" /></InspectorFieldRow>
+        <div className="builder-two-column"><InspectorFieldRow label="Font weight"><InspectorSelect value={String(typography.fontWeight ?? "")} options={[{ value: "", label: "Inherit" }, ...[400, 500, 600, 700, 800].map((value) => ({ value: String(value), label: String(value) }))]} onChange={(value) => updateTypography({ fontWeight: value || undefined })} ariaLabel="Heading font weight" /></InspectorFieldRow><InspectorFieldRow label="Line height"><InspectorTextField value={typography.lineHeight ?? ""} placeholder="inherit" onChange={(value) => updateTypography({ lineHeight: value || undefined })} ariaLabel="Heading line height" /></InspectorFieldRow></div>
+        <div className="builder-two-column"><InspectorFieldRow label="Letter spacing"><InspectorTextField value={typography.letterSpacing ?? ""} placeholder="inherit" onChange={(value) => updateTypography({ letterSpacing: value || undefined })} ariaLabel="Heading letter spacing" /></InspectorFieldRow><InspectorFieldRow label="Text color"><InspectorColorField value={typography.color?.startsWith("#") ? typography.color : "#111827"} onChange={(value) => updateTypography({ color: value })} ariaLabel="Heading text color" /></InspectorFieldRow></div>
+        <div className="builder-two-column"><InspectorFieldRow label="Text transform"><InspectorSelect value={typography.textTransform ?? "none"} options={["none", "uppercase", "lowercase", "capitalize"].map((value) => ({ value, label: value }))} onChange={(value) => updateTypography({ textTransform: value as TypographySettings["textTransform"] })} ariaLabel="Heading text transform" /></InspectorFieldRow><InspectorFieldRow label="Text decoration"><InspectorSelect value={typography.textDecoration ?? "none"} options={["none", "underline", "line-through"].map((value) => ({ value, label: value }))} onChange={(value) => updateTypography({ textDecoration: value as TypographySettings["textDecoration"] })} ariaLabel="Heading text decoration" /></InspectorFieldRow></div>
+        <InspectorFieldRow label="Text shadow"><InspectorTextField value={typography.textShadow ?? ""} placeholder="none or CSS shadow" onChange={(value) => updateTypography({ textShadow: value || undefined })} ariaLabel="Heading text shadow" /></InspectorFieldRow>
       </div>
     );
   }

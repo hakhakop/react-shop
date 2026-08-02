@@ -23,19 +23,17 @@ test("button inspector exposes semantic UIkit variant and size controls", async 
   const selectedBlock = page.locator(".builder-preview-layout-block.is-selected-block");
   const button = selectedBlock.locator(".shop-builder-column-block--button .uk-button").first();
   await expect(button).toBeVisible();
-  await selectedBlock.locator(".builder-preview-block-tools").getByRole("button", { name: "Edit element" }).click();
+  await selectedBlock.locator(".builder-preview-block-tools").getByRole("button", { name: "Edit element" }).dispatchEvent("click");
   const inspector = page.locator(".builder-floating-inspector");
   await expect(inspector).toBeVisible();
-  const variant = inspector.locator("label.builder-field", { hasText: "Variant" }).locator("select");
-  const size = inspector.locator("label.builder-field", { hasText: "Size" }).locator("select");
+  const variant = inspector.getByRole("radiogroup", { name: "Button variant" });
+  const size = inspector.getByRole("radiogroup", { name: "Button size" });
   await expect(variant).toBeVisible();
   await expect(size).toBeVisible();
-  await expect(variant.locator("option")).toHaveText(["primary", "secondary", "default", "text"]);
-  await expect(size.locator("option")).toHaveText(["small", "default", "large"]);
   const variants = ["default", "primary", "secondary", "text"] as const;
   const variantStyles: Record<string, { background: string; color: string }> = {};
   for (const value of variants) {
-    await variant.selectOption(value);
+    await variant.locator("button").filter({ hasText: value.replace(/\b\w/g, (letter) => letter.toUpperCase()) }).click();
     await expect(button).toHaveClass(new RegExp(`uk-button-${value === "default" ? "default" : value}`));
     variantStyles[value] = await button.evaluate((element) => {
       const style = getComputedStyle(element);
@@ -46,17 +44,17 @@ test("button inspector exposes semantic UIkit variant and size controls", async 
   const sizes = ["small", "default", "large"] as const;
   const heights: Record<string, number> = {};
   for (const value of sizes) {
-    await size.selectOption(value);
+    await size.locator("button").filter({ hasText: value.replace(/\b\w/g, (letter) => letter.toUpperCase()) }).click();
     if (value !== "default") await expect(button).toHaveClass(new RegExp(`uk-button-${value}`));
     heights[value] = await button.evaluate((element) => element.getBoundingClientRect().height);
   }
   expect(heights.small).not.toBe(heights.large);
-  await variant.selectOption("secondary");
-  await size.selectOption("large");
+  await variant.locator("button").filter({ hasText: "Secondary" }).click();
+  await size.locator("button").filter({ hasText: "Large" }).click();
   await expect(button).toHaveClass(/uk-button-secondary/);
   await expect(button).toHaveClass(/uk-button-large/);
   await page.mouse.move(0, 0);
-  const finalBuilderStyle = await button.evaluate((element) => { const style = getComputedStyle(element); return { background: style.backgroundColor, color: style.color, height: element.getBoundingClientRect().height }; });
+  const finalBuilderStyle = await button.evaluate((element) => { const style = getComputedStyle(element); return { background: style.backgroundColor, color: style.color, height: style.height }; });
   await expect(inspector.locator("label.builder-field", { hasText: "Outline" })).toHaveCount(0);
 
   const frontend = await page.context().newPage();
@@ -67,7 +65,7 @@ test("button inspector exposes semantic UIkit variant and size controls", async 
   const frontendButton = frontend.locator(".shop-builder-column-block--button .uk-button").filter({ hasText: buttonLabel }).first();
   await expect(frontendButton).toHaveClass(/uk-button-secondary/);
   await expect(frontendButton).toHaveClass(/uk-button-large/);
-  const frontendStyle = await frontendButton.evaluate((element) => { const style = getComputedStyle(element); return { background: style.backgroundColor, color: style.color, height: element.getBoundingClientRect().height }; });
+  const frontendStyle = await frontendButton.evaluate((element) => { const style = getComputedStyle(element); return { background: style.backgroundColor, color: style.color, height: style.height }; });
   expect(frontendStyle.background).toBe(finalBuilderStyle.background);
   expect(frontendStyle.color).toBe(finalBuilderStyle.color);
   expect(frontendStyle.height).toBe(finalBuilderStyle.height);

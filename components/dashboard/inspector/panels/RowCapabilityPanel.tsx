@@ -4,6 +4,7 @@ import type { BuilderSection, InspectorTab } from "@/components/dashboard/builde
 import { builderRowLayoutPresets } from "@/components/dashboard/builderLayoutPresets";
 import { UIKIT_ROW_CAPABILITY } from "@/lib/uikitCapabilities";
 import { normalizeLayoutToUikitPreset } from "@/lib/uikitLayoutEngine";
+import { InspectorFieldRow, InspectorPillGroup, InspectorSelect, InspectorSwitch } from "@/components/dashboard/inspector/InspectorControls";
 
 type RowItem = NonNullable<BuilderSection["layoutItems"]>[number];
 
@@ -32,6 +33,7 @@ export default function RowCapabilityPanel({
   )
     ? row.rowGap
     : "medium";
+  const labels = <T extends string>(values: readonly T[]) => values.map((value) => ({ value, label: value.replace(/-/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase()) }));
 
   if (tab === "layout") {
     return (
@@ -40,41 +42,11 @@ export default function RowCapabilityPanel({
           <strong>UIkit Row</strong>
           <span>Layout, gutter, alignment, and equal-height behavior are stored semantically and mapped by the shared UIkit grid adapter.</span>
         </div>
-        <label className="builder-field">
-          <span>Layout preset</span>
-          <select value={normalizedLayoutKey} onChange={(event) => applyLayoutPreset(event.target.value)}>
-            {builderRowLayoutPresets.map((preset) => (
-              <option key={preset.key} value={preset.key}>{preset.label} ({preset.description})</option>
-            ))}
-          </select>
-          <small>{layoutSummary}</small>
-        </label>
-        <label className="builder-field">
-          <span>Gutter</span>
-          <select value={selectedGutter} onChange={(event) => update({ rowGap: event.target.value as RowItem["rowGap"] })}>
-            {UIKIT_ROW_CAPABILITY.properties.gutter.values.map((value) => <option key={value} value={value}>{value}</option>)}
-          </select>
-        </label>
-        <div className="builder-two-column">
-          <label className="builder-field">
-            <span>Alignment</span>
-            <select value={row.rowAlignment ?? "top"} onChange={(event) => update({ rowAlignment: event.target.value as RowItem["rowAlignment"] })}>
-              {UIKIT_ROW_CAPABILITY.properties.alignment.values.map((value) => <option key={value} value={value}>{value}</option>)}
-            </select>
-          </label>
-          <label className="builder-field">
-            <span>Justification</span>
-            <select value={row.rowJustify ?? "start"} onChange={(event) => update({ rowJustify: event.target.value as RowItem["rowJustify"] })}>
-              {UIKIT_ROW_CAPABILITY.properties.justification.values.map((value) => <option key={value} value={value}>{value}</option>)}
-            </select>
-          </label>
-        </div>
-        <label className="builder-field">
-          <span>Match column heights</span>
-          <select value={row.rowMatchHeight === false ? "disabled" : "enabled"} onChange={(event) => update({ rowMatchHeight: event.target.value === "enabled" })}>
-            {UIKIT_ROW_CAPABILITY.properties.matchHeight.values.map((value) => <option key={value} value={value}>{value}</option>)}
-          </select>
-        </label>
+        <InspectorFieldRow label="Layout preset" help={layoutSummary}><InspectorSelect value={normalizedLayoutKey} options={builderRowLayoutPresets.map((preset) => ({ value: preset.key, label: preset.label }))} onChange={applyLayoutPreset} ariaLabel="Row layout preset" /></InspectorFieldRow>
+        <InspectorFieldRow label="Gutter"><InspectorPillGroup value={selectedGutter} options={labels(UIKIT_ROW_CAPABILITY.properties.gutter.values)} onChange={(value) => update({ rowGap: value })} ariaLabel="Row gutter" /></InspectorFieldRow>
+        <InspectorFieldRow label="Alignment"><InspectorPillGroup value={row.rowAlignment ?? "top"} options={labels(UIKIT_ROW_CAPABILITY.properties.alignment.values)} onChange={(value) => update({ rowAlignment: value })} ariaLabel="Row alignment" /></InspectorFieldRow>
+        <InspectorFieldRow label="Justification"><InspectorPillGroup value={row.rowJustify ?? "start"} options={labels(UIKIT_ROW_CAPABILITY.properties.justification.values)} onChange={(value) => update({ rowJustify: value })} ariaLabel="Row justification" /></InspectorFieldRow>
+        <InspectorFieldRow label="Match column heights"><InspectorSwitch checked={row.rowMatchHeight !== false} onChange={(checked) => update({ rowMatchHeight: checked })} label="Match column heights" /></InspectorFieldRow>
       </div>
     );
   }
@@ -88,13 +60,7 @@ export default function RowCapabilityPanel({
         </div>
         <div className="builder-two-column">
           {(["rowTopSpacing", "rowBottomSpacing"] as const).map((field) => (
-            <label className="builder-field" key={field}>
-              <span>{field === "rowTopSpacing" ? "Top padding" : "Bottom padding"}</span>
-              <select value={row[field] ?? "inherit"} onChange={(event) => update({ [field]: event.target.value } as Partial<RowItem>)}>
-                <option value="inherit">inherit</option>
-                {spacingOptions.map((value) => <option key={value} value={value}>{value}</option>)}
-              </select>
-            </label>
+            <InspectorFieldRow key={field} label={field === "rowTopSpacing" ? "Top padding" : "Bottom padding"}><InspectorSelect value={row[field] ?? "inherit"} options={[{ value: "inherit", label: "Inherit" }, ...labels(spacingOptions)]} onChange={(value) => update({ [field]: value } as Partial<RowItem>)} ariaLabel={field === "rowTopSpacing" ? "Top padding" : "Bottom padding"} /></InspectorFieldRow>
           ))}
         </div>
       </div>
@@ -116,7 +82,7 @@ export default function RowCapabilityPanel({
     <div className="builder-inspector-stack" data-uikit-capability="row-style">
       <div className="builder-element-inspector-note">
         <strong>UIkit Row appearance</strong>
-        <span>Gutter and alignment are owned by the Layout tab. Legacy row backgrounds, radius, arbitrary borders, shadows, and visual-style presets are not retained.</span>
+        <span>Gutter, alignment, and justification are owned by Layout. Visual appearance follows the shared row and global design settings.</span>
       </div>
     </div>
   );

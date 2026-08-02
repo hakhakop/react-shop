@@ -1,7 +1,7 @@
 /** Canonical UIkit capability contract used by the inspector and renderers. */
 export type InspectorElementKind =
   | "section" | "row" | "column" | "heading" | "button" | "text"
-  | "card" | "panel" | "divider" | "alert" | "accordion";
+  | "card" | "panel" | "divider" | "alert" | "accordion" | "image";
 
 export const UIKIT_CAPABILITIES = {
   section: { variants: ["default", "muted", "primary", "secondary"], sizes: [], spacing: ["none", "small", "medium", "large"], alignment: ["left", "center", "right"], responsive: ["stack", "matchHeight"], typography: [], appearance: ["background", "container", "radius"], behavior: [] },
@@ -15,7 +15,21 @@ export const UIKIT_CAPABILITIES = {
   divider: { variants: ["default", "small", "icon", "vertical"], sizes: [], spacing: [], alignment: [], responsive: [], typography: [], appearance: [], behavior: [] },
   alert: { variants: ["primary", "success", "warning", "danger"], sizes: [], spacing: [], alignment: [], responsive: [], typography: [], appearance: [], behavior: [] },
   accordion: { variants: [], sizes: [], spacing: [], alignment: [], responsive: [], typography: [], appearance: [], behavior: ["multiple", "collapsible", "initialOpen"] },
+  image: { variants: [], sizes: ["auto", "full", "small", "medium", "large", "xlarge"], spacing: [], alignment: ["left", "center", "right"], responsive: ["lazy"], typography: [], appearance: ["fit", "ratio", "shape", "shadow"], behavior: ["link", "target"] },
 } as const satisfies Record<InspectorElementKind, Record<string, readonly string[]>>;
+
+export const UIKIT_IMAGE_CAPABILITY = {
+  properties: {
+    fit: { values: ["contain", "cover", "fill"] as const, owner: "uikit" },
+    ratio: { values: ["natural", "square", "4:3", "3:2", "16:9", "portrait"] as const, owner: "uikit" },
+    shape: { values: ["none", "rounded", "circle"] as const, owner: "uikit" },
+    shadow: { values: ["none", "small", "medium", "large", "xlarge"] as const, owner: "uikit" },
+    alignment: { values: ["left", "center", "right"] as const, owner: "uikit" },
+    width: { values: ["auto", "full", "small", "medium", "large", "xlarge"] as const, owner: "uikit" },
+    loading: { values: ["lazy", "eager"] as const, owner: "webpages" },
+    lightbox: { values: ["disabled"] as const, owner: "uikit", supported: false },
+  },
+} as const;
 
 export const UIKIT_ACCORDION_CAPABILITY = {
   properties: {
@@ -72,6 +86,16 @@ export const UIKIT_TEXT_CAPABILITY = {
   },
 } as const;
 
+export const UIKIT_LIST_CAPABILITY = {
+  properties: {
+    presentation: { values: ["default", "bullet", "divider", "striped", "large"] as const, owner: "uikit" },
+    marker: { values: ["none", "disc", "circle", "square"] as const, owner: "uikit" },
+    alignment: { values: ["left", "center", "right"] as const, owner: "uikit" },
+    spacing: { values: ["compact", "default", "large"] as const, owner: "uikit" },
+    itemContent: { values: ["text", "link", "target"] as const, owner: "webpages" },
+  },
+} as const;
+
 export const UIKIT_BUTTON_CAPABILITY = {
   properties: {
     variant: { values: ["primary", "secondary", "default", "text"] as const, owner: "uikit" },
@@ -94,6 +118,75 @@ export const UIKIT_BUTTON_GLOBAL_CAPABILITY = {
   variants: ["default", "primary", "secondary", "danger", "disabled", "text", "link"],
   states: ["background", "text", "border", "shadow", "hoverBackground", "hoverText", "hoverBorder", "hoverShadow", "activeBackground", "activeText", "activeBorder", "activeShadow"],
   unsupported: ["textMode", "textIconMode", "textArrowImage", "inverseVariants"],
+} as const;
+
+/** Semantic Global Style ownership for the UIkit Card/Panel surface domain. */
+export const UIKIT_CARD_GLOBAL_CAPABILITY = {
+  shared: ["borderWidth", "borderRadius", "transitionDuration", "bodyPadding", "smallPadding", "largePadding"],
+  variants: ["default", "primary", "secondary", "blank"],
+  states: ["background", "text", "title", "border", "shadow", "hoverBackground", "hoverText", "hoverTitle", "hoverBorder", "hoverShadow"],
+  content: ["imageBodySpacing", "titleSpacing", "metaSpacing", "headerSpacing", "footerSpacing"],
+  unsupported: ["badgeHeight", "badgePadding", "badgeFontSize", "badgeRadius", "hoverTranslate", "variantGradients", "inverseVariants"],
+} as const;
+
+export const UIKIT_PANEL_CAPABILITY = {
+  properties: {
+    variant: { values: ["default", "primary", "secondary", "blank"] as const, owner: "uikit" },
+    size: { values: ["small", "default", "large"] as const, owner: "uikit" },
+    hover: { values: ["enabled", "disabled"] as const, owner: "uikit" },
+    showMedia: { values: ["enabled", "disabled"] as const, owner: "webpages" },
+    mediaPlacement: { values: ["top", "left", "right"] as const, owner: "webpages" },
+    mediaRatio: { values: ["natural", "square", "4:3", "3:2", "16:9", "portrait"] as const, owner: "uikit" },
+    mediaFit: { values: ["cover", "contain"] as const, owner: "uikit" },
+    mediaWidth: { values: ["small", "medium", "large"] as const, owner: "webpages" },
+    mediaAlignment: { values: ["left", "center", "right"] as const, owner: "webpages" },
+    textAlign: { values: ["left", "center", "right"] as const, owner: "webpages" },
+    verticalAlign: { values: ["top", "center", "bottom"] as const, owner: "webpages" },
+    titleElement: { values: ["h2", "h3", "h4", "div"] as const, owner: "webpages" },
+    titleStyle: { values: ["inherit", "h3", "h4", "h5"] as const, owner: "uikit" },
+    contentWidth: { values: ["auto", "small", "medium", "large", "full"] as const, owner: "webpages" },
+    actionVisible: { values: ["enabled", "disabled"] as const, owner: "webpages" },
+    actionStyle: { values: ["default", "primary", "secondary", "text"] as const, owner: "uikit" },
+    actionSize: { values: ["small", "default", "large"] as const, owner: "uikit" },
+    actionAlign: { values: ["inherit", "left", "center", "right"] as const, owner: "webpages" },
+  },
+} as const;
+
+export const UIKIT_HERO_CAPABILITY = {
+  properties: {
+    headingElement: { values: ["h1", "h2", "h3", "h4", "h5", "h6"] as const, owner: "webpages" },
+    headingStyle: { values: ["inherit", "h1", "h2", "h3", "article-title", "small", "medium", "large", "xlarge"] as const, owner: "uikit" },
+    contentAlign: { values: ["left", "center", "right"] as const, owner: "uikit" },
+    verticalAlign: { values: ["top", "center", "bottom"] as const, owner: "uikit" },
+    contentWidth: { values: ["small", "medium", "large", "full"] as const, owner: "uikit" },
+    mediaPlacement: { values: ["none", "right", "left", "background"] as const, owner: "webpages" },
+    mediaRatio: { values: ["natural", "square", "4:3", "3:2", "16:9", "portrait"] as const, owner: "uikit" },
+    mediaFit: { values: ["contain", "cover"] as const, owner: "uikit" },
+    height: { values: ["auto", "small", "medium", "large", "viewport"] as const, owner: "uikit" },
+    actionStyle: { values: ["default", "primary", "secondary", "text"] as const, owner: "uikit" },
+    actionSize: { values: ["small", "default", "large"] as const, owner: "uikit" },
+    mediaLoading: { values: ["lazy", "eager"] as const, owner: "webpages" },
+  },
+} as const;
+
+export const UIKIT_GRID_CAPABILITY = {
+  properties: {
+    source: { values: ["static", "products"] as const, owner: "webpages" },
+    renderer: { values: ["plain", "card"] as const, owner: "webpages" },
+    columns: { values: [1, 2, 3, 4, 5, 6] as const, owner: "uikit" },
+    gutter: { values: ["none", "small", "medium", "large", "max"] as const, owner: "uikit" },
+    rowGap: { values: ["none", "small", "medium", "large"] as const, owner: "uikit" },
+    stacking: { values: ["inherit", "stack"] as const, owner: "uikit" },
+    cardVariant: { values: ["default", "primary", "secondary", "blank"] as const, owner: "uikit" },
+    cardSize: { values: ["small", "default", "large"] as const, owner: "uikit" },
+    mediaPlacement: { values: ["top", "left", "right"] as const, owner: "webpages" },
+    mediaRatio: { values: ["natural", "square", "4:3", "3:2", "16:9", "portrait"] as const, owner: "uikit" },
+    mediaFit: { values: ["cover", "contain"] as const, owner: "uikit" },
+    titleElement: { values: ["h2", "h3", "h4", "div"] as const, owner: "webpages" },
+    titleStyle: { values: ["inherit", "h3", "h4", "h5"] as const, owner: "uikit" },
+    actionStyle: { values: ["default", "primary", "secondary", "text"] as const, owner: "uikit" },
+    actionSize: { values: ["small", "default", "large"] as const, owner: "uikit" },
+  },
 } as const;
 
 export function getUikitCapabilities(kind?: string) {

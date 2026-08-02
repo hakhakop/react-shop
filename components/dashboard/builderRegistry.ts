@@ -5,22 +5,6 @@ import type {
   SectionKind,
 } from "@/components/dashboard/builderTypes";
 
-export type LayoutBlockIconName =
-  | "calendar"
-  | "code"
-  | "gallery"
-  | "grid"
-  | "image"
-  | "list"
-  | "lock"
-  | "navigation"
-  | "panel"
-  | "pointer"
-  | "shoppingBag"
-  | "sparkles"
-  | "text"
-  | "user";
-
 export const sectionLabels: Record<SectionKind, string> = {
   hero: "Hero",
   productArchive: "Product Archive",
@@ -178,115 +162,62 @@ export const layoutBlockGroups: {
   kinds: LayoutBlockKind[];
 }[] = [
   {
-    id: "woocommerce-product",
-    label: "WooCommerce Product",
+    id: "basic",
+    label: "Basic",
     kinds: [
+      "hero",
+      "heading",
+      "text",
+      "button",
+      "image",
+      "panel",
+      "divider",
+      "alert",
+      "icon",
+      "list",
+    ],
+  },
+  {
+    id: "multiple-items",
+    label: "Multiple Items",
+    kinds: ["accordion", "grid", "table", "slider", "badgeGrid", "categoryFilters"],
+  },
+  {
+    id: "commerce",
+    label: "Commerce",
+    kinds: [
+      "products",
       "productHero",
       "productInfoStack",
       "productPurchasePanel",
       "productSpecsPanel",
-    ],
-  },
-  {
-    id: "woocommerce-fields",
-    label: "Product Fields",
-    kinds: [
       "productGallery",
       "productTitle",
       "productPrice",
       "productAddToCart",
       "productAttributes",
       "productDescription",
+      "cartContent",
+      "checkoutContent",
+      "accountContent",
     ],
   },
   {
-    id: "woocommerce-pages",
-    label: "WooCommerce Pages",
-    kinds: ["cartContent", "checkoutContent", "accountContent"],
+    id: "forms",
+    label: "Forms",
+    kinds: ["fluentForm", "datePicker"],
   },
   {
-    id: "woocommerce-catalog",
-    label: "WooCommerce Catalog",
-    kinds: ["products", "categoryFilters"],
+    id: "system",
+    label: "System",
+    kinds: ["breadcrumbs", "menu", "headerUtility", "headerSearch", "headerWishlist", "headerCart", "headerAccount", "headerTheme", "headerCategories", "headerLanguage"],
   },
   {
-    id: "content",
-    label: "Content",
-    kinds: [
-      "hero",
-      "button",
-      "promoStrip",
-      "grid",
-      "heading",
-      "image",
-      "panel",
-      "table",
-      "text",
-      "slider",
-      "scrollPinnedDemo",
-      "badgeGrid",
-      "icon",
-      "list",
-      "datePicker",
-      "divider",
-      "accordion",
-      "alert",
-    ],
-  },
-  {
-    id: "wordpress",
-    label: "WordPress & Utility",
-    kinds: ["fluentForm", "embed", "breadcrumbs"],
+    id: "advanced",
+    label: "Advanced",
+    kinds: ["promoStrip", "embed", "scrollPinnedDemo"],
   },
 ];
-
-export const layoutBlockIcons: Record<LayoutBlockKind, LayoutBlockIconName> = {
-  hero: "sparkles",
-  button: "navigation",
-  promoStrip: "sparkles",
-  grid: "grid",
-  heading: "text",
-  image: "image",
-  panel: "sparkles",
-  accordion: "list",
-  table: "grid",
-  text: "text",
-  slider: "gallery",
-  scrollPinnedDemo: "gallery",
-  embed: "code",
-  fluentForm: "text",
-  badgeGrid: "grid",
-  icon: "sparkles",
-  list: "list",
-  menu: "navigation",
-  headerUtility: "sparkles",
-  headerSearch: "navigation",
-  headerWishlist: "sparkles",
-  headerCart: "shoppingBag",
-  headerAccount: "user",
-  headerTheme: "sparkles",
-  headerCategories: "navigation",
-  headerLanguage: "navigation",
-  datePicker: "calendar",
-  products: "shoppingBag",
-  categoryFilters: "panel",
-  breadcrumbs: "navigation",
-  productHero: "sparkles",
-  productInfoStack: "sparkles",
-  productPurchasePanel: "sparkles",
-  productSpecsPanel: "sparkles",
-  productGallery: "image",
-  productTitle: "text",
-  productPrice: "pointer",
-  productAddToCart: "shoppingBag",
-  productAttributes: "list",
-  productDescription: "text",
-  cartContent: "shoppingBag",
-  checkoutContent: "lock",
-  accountContent: "user",
-  divider: "panel",
-  alert: "sparkles",
-};
 
 export const basePageLabels: Record<string, string> = {
   home: "Home",

@@ -46,6 +46,7 @@ import type { SaaSWebsite } from "@/lib/websites";
 import type {
   BuilderLayout,
   BuilderLayoutBlock,
+  BuilderListItem,
   BuilderLayoutKey,
   BuilderPage,
   BuilderSection,
@@ -80,6 +81,14 @@ import {
   getUikitDividerClass,
   getUikitAlertClass,
   getUikitColumnClass,
+  getUikitImageClass,
+  getUikitImageWrapperClass,
+  getUikitImageStyle,
+  getUikitImageAttributes,
+  getUikitListClass,
+  getUikitPanelMediaClass,
+  getUikitPanelLayoutClass,
+  getUikitPanelMediaStyle,
 } from "@/lib/uikitTokens";
 import { getUikitColumnWidthClass } from "@/lib/uikitLayoutEngine";
 import {
@@ -1164,6 +1173,7 @@ function getBlockButtonItems(block: BuilderLayoutBlock) {
     url: string;
     target?: "_self" | "_blank" | string;
     style?: string;
+    size?: string;
   }[] = [];
 
   if (block.buttonLabel && block.buttonUrl) {
@@ -1173,8 +1183,22 @@ function getBlockButtonItems(block: BuilderLayoutBlock) {
       url: block.buttonUrl,
       target: block.buttonTarget,
       style: block.buttonStyle ?? "primary",
+      size: block.size ?? "default",
     });
   }
+
+  if (block.secondaryButtonLabel && block.secondaryButtonUrl) {
+    items.push({
+      key: "secondary",
+      label: block.secondaryButtonLabel,
+      url: block.secondaryButtonUrl,
+      target: block.secondaryButtonTarget,
+      style: block.secondaryButtonStyle ?? "secondary",
+      size: block.secondaryButtonSize ?? "default",
+    });
+  }
+
+  if (block.kind === "hero") return items;
 
   (block.buttons ?? []).forEach((button, index) => {
     if (!button.label || !button.url) return;
@@ -1184,6 +1208,7 @@ function getBlockButtonItems(block: BuilderLayoutBlock) {
       url: button.url,
       target: button.target,
       style: button.style ?? "primary",
+      size: button.size ?? "default",
     });
   });
 
@@ -1286,7 +1311,7 @@ async function ContentProductsBlock({
           gridImageFrame={block.gridImageFrame}
           imagePadding={block.imagePadding}
           imageFit={block.imageFit}
-          imageRatio={block.imageRatio}
+          imageRatio={block.imageRatio as "auto" | "square" | "4:5" | "3:4" | "16:9" | undefined}
           borderRadius={block.borderRadius}
           addToCartStyle={block.addToCartStyle}
           addToCartSize={block.addToCartSize}
@@ -1319,7 +1344,7 @@ async function ContentProductsBlock({
         cardPadding={block.cardPadding}
         imagePadding={block.imagePadding}
         imageFit={block.imageFit}
-        imageRatio={block.imageRatio}
+        imageRatio={block.imageRatio as "auto" | "square" | "4:5" | "3:4" | "16:9" | undefined}
         imageFrame={block.gridImageFrame}
         borderRadius={block.borderRadius}
         addToCartStyle={block.addToCartStyle}
@@ -1407,7 +1432,20 @@ function GridCards({
     buttonLabel?: string;
     buttonUrl?: string;
     buttonStyle?: "primary" | "secondary" | "outline" | "ghost" | "link";
+    buttonTarget?: "_self" | "_blank";
     buttonAlign?: "left" | "center" | "right";
+    renderer?: "plain" | "card";
+    cardVariant?: "default" | "primary" | "secondary" | "blank";
+    cardSize?: "small" | "default" | "large";
+    cardHover?: boolean;
+    mediaPlacement?: "top" | "left" | "right";
+    mediaRatio?: "natural" | "square" | "4:3" | "3:2" | "16:9" | "portrait";
+    mediaFit?: "cover" | "contain";
+    textAlign?: "left" | "center" | "right";
+    titleElement?: "h2" | "h3" | "h4" | "div";
+    titleStyle?: "inherit" | "h3" | "h4" | "h5";
+    actionStyle?: "default" | "primary" | "secondary" | "text";
+    actionSize?: "small" | "default" | "large";
     typography?: BuilderLayoutBlock["typography"];
     items?: string[];
     listIcon?: string;
@@ -1416,9 +1454,6 @@ function GridCards({
   }>;
 }) {
   const limit = Math.max(1, (block.columns ?? 3) * (block.gridRows ?? 1));
-  const visualClass = visualStyleClassName(
-    block.visualStyle as BuilderVisualStyle | undefined,
-  );
   const gridTitleStyle = {
     color: "var(--builder-card-title-color, inherit)",
     fontSize: "var(--builder-card-title-size, inherit)",
@@ -1454,25 +1489,32 @@ function GridCards({
       : null;
   return (
     <div
-      className={`shop-builder-grid shop-builder-grid--gap-${gridGapClass} shop-builder-grid--margin-${blockLegacyGridMargin(block)} shop-card-preset--${block.panelStyle ?? "default"} ${visualClass}`}
+      className={`shop-builder-grid shop-builder-grid--gap-${gridGapClass} shop-builder-grid--margin-${blockLegacyGridMargin(block)}`}
       style={
         {
           "--shop-builder-grid-columns": block.columns ?? 3,
           ...(gridGapCustom
             ? { "--shop-builder-grid-gap": gridGapCustom }
             : {}),
-          ...visualStyleToCss(
-            block.visualStyle as BuilderVisualStyle | undefined,
-          ),
         } as CSSProperties
       }
     >
       {items.slice(0, limit).map((item) => (
+        (() => {
+        const isCard = block.gridItemRenderer === "card";
+        const cardVariant = block.gridCardVariant ?? "default";
+        const cardSize = item.cardSize ?? block.gridCardSize ?? "default";
+        const cardHover = item.cardHover ?? block.gridCardHover;
+        const Title = (item.titleElement ?? "h3") as any;
+        const titleClass = item.titleStyle && item.titleStyle !== "inherit" ? getUikitHeadingClass(item.titleStyle, item.titleStyle) : "";
+        const mediaStyle = getUikitPanelMediaStyle({ ratio: item.mediaRatio ?? block.imageRatio, fit: (item.mediaFit ?? block.imageFit ?? "cover") === "contain" ? "contain" : "cover", alignment: "center" });
+        return (
         <article
           key={item.id}
-          className={`shop-builder-grid-card is-image-${imagePaddingClass} is-content-${contentPaddingClass} is-frame-${block.gridImageFrame ?? "none"} cards-${block.cardStyle ?? "flat"} preset-${block.cardPreset ?? "standard"} shop-card-preset--${block.panelStyle ?? "default"}`}
+          className={`${isCard ? getUikitCardClass(cardVariant, { padding: cardSize, hover: cardHover ? "hover" : "none" }) : ""} shop-builder-grid-card is-image-${imagePaddingClass} is-content-${contentPaddingClass} is-frame-${block.gridImageFrame ?? "none"}`}
           style={
             {
+              textAlign: item.textAlign ?? "left",
               ...(imagePaddingCustom
                 ? { "--shop-builder-grid-image-padding": imagePaddingCustom }
                 : {}),
@@ -1485,18 +1527,15 @@ function GridCards({
           }
         >
           {block.gridShowImage !== false && item.imageUrl && (
-            <div className="shop-builder-grid-image">
-              <img
-                src={item.imageUrl}
-                alt={item.imageAlt || item.title || ""}
-              />
+            <div className={`${isCard ? getUikitPanelMediaClass(item.mediaPlacement === "left" || item.mediaPlacement === "right" ? item.mediaPlacement : "top") : ""} shop-builder-grid-image ${item.mediaPlacement === "left" ? "shop-builder-grid-image--left" : item.mediaPlacement === "right" ? "shop-builder-grid-image--right" : ""}`} style={{ aspectRatio: mediaStyle.aspectRatio, overflow: "hidden" }}>
+              <img src={item.imageUrl} alt={item.imageAlt || item.title || ""} loading="lazy" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: mediaStyle.backgroundSize as CSSProperties["objectFit"] }} />
             </div>
           )}
-          <div className="shop-builder-grid-content">
+          <div className={`${isCard ? "uk-card-body " : ""}shop-builder-grid-content`}>
             {block.gridShowEyebrow !== false && item.eyebrow && (
               <Typog
                 as="span"
-                className="uk-label uk-label-primary"
+                className="shop-builder-eyebrow"
                 typography={item.typography ?? block.typography}
                 area="eyebrow"
               >
@@ -1505,7 +1544,8 @@ function GridCards({
             )}
             {item.title && (
               <Typog
-                as="h3"
+                as={Title}
+                className={`shop-builder-title ${titleClass}`.trim()}
                 typography={item.typography ?? block.typography}
                 area="title"
                 style={gridTitleStyle}
@@ -1536,18 +1576,19 @@ function GridCards({
                 <div
                   className={`shop-builder-grid-button shop-builder-grid-button--${item.buttonAlign ?? "left"}`}
                 >
-                  <Typog
-                    as="a"
-                    className={`shop-builder-cta shop-builder-cta--${item.buttonStyle ?? "primary"}`}
-                    href={item.buttonUrl}
-                    typography={item.typography ?? block.typography}
+                <a
+                  className={`shop-builder-grid-action ${getUikitButtonClass(item.actionStyle ?? item.buttonStyle ?? "primary", item.actionSize ?? "default")}`}
+                  href={item.buttonUrl}
+                  target={item.buttonTarget === "_blank" ? "_blank" : undefined}
+                  rel={item.buttonTarget === "_blank" ? "noreferrer" : undefined}
                   >
                     {item.buttonLabel}
-                  </Typog>
+                  </a>
                 </div>
               )}
           </div>
-        </article>
+        </article>);
+        })()
       ))}
     </div>
   );
@@ -2224,7 +2265,8 @@ function ContentLayoutBlock({
   }
 
   if (block.kind === "list") {
-    const isGradientCycle = block.listIconColorScheme === "gradient-cycle";
+    const listClass = getUikitListClass({ presentation: block.listPresentation, marker: block.listMarker, align: block.listAlign, spacing: block.listSpacing });
+    const listItems: BuilderListItem[] = block.listItems ?? (block.items ?? []).map((text, index) => ({ id: `${block.id ?? "list"}-item-${index}`, text }));
     return (
       <div className="shop-builder-column-block shop-builder-column-block--list">
         {block.title && (
@@ -2232,21 +2274,10 @@ function ContentLayoutBlock({
             <BuilderLineBreakText text={block.title} />
           </Typog>
         )}
-        <ul className={isGradientCycle ? "is-icon-gradient-cycle" : undefined}>
-          {(block.items ?? []).map((item, index) => (
-            <li key={`${item}-${index}`}>
-              {{
-                check: <Check size={block.listIconSize ?? 16} />,
-                circleCheck: <CircleCheck size={block.listIconSize ?? 16} />,
-                arrowRight: <ArrowRight size={block.listIconSize ?? 16} />,
-                star: <Star size={block.listIconSize ?? 16} />,
-                heart: <Heart size={block.listIconSize ?? 16} />,
-                sparkles: <Sparkles size={block.listIconSize ?? 16} />,
-                shield: <ShieldCheck size={block.listIconSize ?? 16} />,
-              }[block.listIcon ?? "check"] ?? (
-                <Check size={block.listIconSize ?? 16} />
-              )}
-              <span>{item}</span>
+        <ul className={listClass}>
+          {listItems.map((item) => (
+            <li key={item.id}>
+              {item.url ? <a href={item.url} target={item.target === "_blank" ? "_blank" : undefined} rel={item.target === "_blank" ? "noreferrer" : undefined}>{item.text}</a> : item.text}
             </li>
           ))}
         </ul>
@@ -2427,6 +2458,12 @@ function ContentLayoutBlock({
         : isBlockAntigravity
           ? "shop-builder-title--gradient"
           : "";
+    const heroHeadingClass = [
+      getUikitHeadingClass(block.heroHeadingElement ?? "h2", block.heroHeadingStyle ?? "xlarge"),
+      titleClassName,
+      block.heroContentAlign ? `uk-text-${block.heroContentAlign}` : "",
+    ].filter(Boolean).join(" ");
+    const HeroHeading = (block.heroHeadingElement ?? "h2") as any;
     const customStyle = isCustom
       ? {
           backgroundImage: `linear-gradient(${block.textGradientCustomAngle ?? 135}deg, ${block.textGradientCustomStart ?? "#ffffff"} ${block.textGradientCustomStartOffset ?? 0}%, ${block.textGradientCustomMiddle ?? "#60a5fa"} ${block.textGradientCustomMiddleOffset ?? 50}%, ${block.textGradientCustomEnd ?? "#c084fc"} ${block.textGradientCustomEndOffset ?? 100}%)`,
@@ -2440,15 +2477,17 @@ function ContentLayoutBlock({
 
     return (
       <div
-        className={`shop-builder-column-block shop-builder-column-block--hero ${isBlockAntigravity ? "shop-builder-hero--antigravity shop-builder-hero--antigravity-block" : ""} ${block.premiumCardStyle && block.premiumCardStyle !== "none" ? `shop-builder-card--${block.premiumCardStyle}` : ""}`}
+        className={`shop-builder-column-block shop-builder-column-block--hero ${block.heroContentAlign ? `shop-builder-hero--align-${block.heroContentAlign}` : ""} ${block.heroVerticalAlign ? `shop-builder-hero--valign-${block.heroVerticalAlign}` : ""} ${block.heroHeight ? `shop-builder-hero--height-${block.heroHeight}` : ""} ${block.heroMediaPlacement ? `shop-builder-hero--media-${block.heroMediaPlacement}` : ""} ${block.heroInverse ? "uk-light" : ""} ${isBlockAntigravity ? "shop-builder-hero--antigravity shop-builder-hero--antigravity-block" : ""} ${block.premiumCardStyle && block.premiumCardStyle !== "none" ? `shop-builder-card--${block.premiumCardStyle}` : ""}`}
+        style={{ textAlign: block.heroContentAlign, maxWidth: block.heroContentWidth === "full" ? "none" : block.heroContentWidth === "small" ? "42rem" : block.heroContentWidth === "medium" ? "56rem" : "72rem" }}
       >
         <div
           className={isBlockAntigravity ? "shop-builder-hero-content-left" : ""}
         >
           {block.eyebrow && (
             <Typog
-              as="span"
-              className="uk-label uk-label-primary"
+              as="p"
+              className="shop-builder-eyebrow"
+              area="eyebrow"
               typography={block.typography}
             >
               {block.eyebrow}
@@ -2456,9 +2495,9 @@ function ContentLayoutBlock({
           )}
           {block.title && (
             <Typog
-              as="h3"
+              as={HeroHeading}
               area="title"
-              className={titleClassName}
+              className={heroHeadingClass}
               typography={block.typography}
               style={customStyle}
             >
@@ -2562,6 +2601,7 @@ function ContentLayoutBlock({
                   display: "flex",
                   width: "fit-content",
                   maxWidth: "100%",
+                  alignItems: "center",
                   flexDirection:
                     block.buttonsLayout === "stacked" ? "column" : "row",
                   flexWrap: "wrap",
@@ -2570,28 +2610,20 @@ function ContentLayoutBlock({
                 } as CSSProperties
               }
             >
-              {buttonItems.map((button) => {
+              {buttonItems.filter((button) => button.key === "primary" ? block.heroPrimaryActionVisible !== false : button.key === "secondary" ? block.heroSecondaryActionVisible !== false : true).map((button) => {
                 const isPremium =
                   block.premiumButtonStyle &&
                   block.premiumButtonStyle !== "default";
                 return (
-                  <Typog
+                  <a
                     key={button.key}
-                    as="a"
-                    className={`shop-builder-cta ${
-                      isPremium
-                        ? `shop-builder-cta--${block.premiumButtonStyle}`
-                        : isBlockAntigravity
-                          ? "shop-builder-cta--antigravity"
-                          : `shop-builder-cta--${button.style ?? "primary"}`
-                    }`}
+                    className={`shop-builder-hero-action ${getUikitButtonClass(button.style ?? "primary", button.size ?? "default")}`}
                     href={button.url}
                     target={button.target === "_blank" ? "_blank" : undefined}
                     rel={button.target === "_blank" ? "noreferrer" : undefined}
-                    typography={block.typography}
                   >
                     {button.label}
-                  </Typog>
+                  </a>
                 );
               })}
             </div>
@@ -2600,6 +2632,11 @@ function ContentLayoutBlock({
         {isBlockAntigravity && (
           <div className="shop-builder-hero-media shop-builder-hero-media--antigravity">
             <AntigravityTerminal />
+          </div>
+        )}
+        {!isBlockAntigravity && block.imageUrl && block.heroMediaPlacement && block.heroMediaPlacement !== "none" && (
+          <div className={`shop-builder-hero-media shop-builder-hero-media--${block.heroMediaPlacement}`} style={{ aspectRatio: block.heroMediaRatio && block.heroMediaRatio !== "natural" ? ({ square: "1 / 1", "4:3": "4 / 3", "3:2": "3 / 2", "16:9": "16 / 9", portrait: "3 / 4" } as Record<string, string>)[block.heroMediaRatio] : undefined, overflow: "hidden" }}>
+            <img src={block.imageUrl} alt={block.imageAlt || block.title || ""} loading={block.heroMediaLoading ?? "lazy"} style={{ width: "100%", height: "100%", objectFit: block.heroMediaFit === "contain" ? "contain" : "cover" }} />
           </div>
         )}
       </div>
@@ -2717,8 +2754,6 @@ function ContentLayoutBlock({
   if (block.kind === "panel") {
     const panelTitleStyle = {
       color: "var(--builder-card-title-color, inherit)",
-      fontSize: "var(--builder-card-title-size, inherit)",
-      fontWeight: "var(--builder-card-title-weight, inherit)",
       textAlign:
         "var(--builder-card-title-align, inherit)" as CSSProperties["textAlign"],
       margin: "var(--builder-card-title-margin, 0)",
@@ -2736,34 +2771,32 @@ function ContentLayoutBlock({
       lineHeight: "var(--builder-card-content-line-height, inherit)",
       maxWidth: "var(--builder-card-content-max-width, none)",
     } as CSSProperties;
-    const isPanelFrameless = block.imagePadding === "frameless" || block.imagePadding === "none" || !block.imagePadding;
-    const panelMediaAspect = getBuilderImageAspectRatio(block.imageRatio) || "16 / 9";
+    const panelMediaPlacement = block.panelMediaPlacement ?? "top";
+    const panelMediaPresentation = getUikitPanelMediaStyle({ ratio: block.imageRatio, fit: block.panelMediaFit ?? "cover", alignment: block.panelMediaAlignment ?? "center" });
+    const panelMediaClass = getUikitPanelMediaClass(panelMediaPlacement);
+    const panelLayoutClass = getUikitPanelLayoutClass(panelMediaPlacement, block.panelMediaWidth ?? "medium");
+    const panelTitleClass = block.panelTitleStyle && block.panelTitleStyle !== "inherit" ? getUikitHeadingClass(block.panelTitleStyle, block.panelTitleStyle) : "";
+    const panelShowMedia = block.panelShowMedia !== false;
+    const panelTextAlign = block.panelTextAlign ?? "left";
 
     return (
-      <div className={`shop-builder-column-block shop-builder-column-block--panel ${getUikitCardClass(block.panelVariant ?? block.panelStyle ?? "default", { hover: block.panelHover ? "hover" : "none", padding: block.panelSize })}`}>
-        {block.imageUrl && (
+      <div data-builder-block-id={block.id} className={`shop-builder-column-block shop-builder-column-block--panel ${panelLayoutClass} ${getUikitCardClass(block.panelVariant ?? block.panelStyle ?? "default", { hover: block.panelHover ? "hover" : "none", padding: block.panelSize })}`} style={{ textAlign: panelTextAlign }}>
+        {panelShowMedia && (
           <div
-            className="shop-builder-panel-media"
+            className={`${panelMediaClass} shop-builder-panel-media${block.imageUrl ? "" : " is-empty"}`}
             role="img"
             aria-label={block.imageAlt || block.title || "Panel image"}
             style={{
-              aspectRatio: panelMediaAspect,
-              borderRadius: isPanelFrameless ? "16px 16px 0 0" : "16px",
-              margin: isPanelFrameless
-                ? "calc(-1 * var(--builder-card-padding, 24px)) calc(-1 * var(--builder-card-padding, 24px)) 20px calc(-1 * var(--builder-card-padding, 24px))"
-                : "0 0 20px 0",
-              width: isPanelFrameless
-                ? "calc(100% + 2 * var(--builder-card-padding, 24px))"
-                : "100%",
+              aspectRatio: panelMediaPresentation.aspectRatio,
               position: "relative",
               overflow: "hidden",
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-              backgroundImage: `url(${block.imageUrl})`,
+              backgroundSize: panelMediaPresentation.backgroundSize,
+              backgroundPosition: panelMediaPresentation.backgroundPosition,
+              ...(block.imageUrl ? { backgroundImage: `url(${block.imageUrl})` } : {}),
             }}
           />
         )}
-        <div className="uk-card-body">
+        <div className={`uk-card-body shop-builder-panel-content-width-${block.panelContentWidth ?? "auto"}`} style={{ textAlign: panelTextAlign, alignSelf: block.panelVerticalAlign === "center" ? "center" : block.panelVerticalAlign === "bottom" ? "end" : "start" }}>
           {block.eyebrow && (
             <Typog
               as="span"
@@ -2777,9 +2810,10 @@ function ContentLayoutBlock({
           )}
           {block.title && (
             <Typog
-              as="h3"
+              as={block.panelTitleElement ?? "h3"}
+              className={panelTitleClass}
               area="title"
-              typography={block.typography}
+              typography={undefined}
               style={panelTitleStyle}
             >
               {block.typewriterEnabled ? (
@@ -2858,73 +2892,82 @@ function ContentLayoutBlock({
             iconSize={block.listIconSize}
           />
 
-          {block.buttonLabel && block.buttonUrl && (
+          {block.panelActionVisible !== false && block.buttonLabel && block.buttonUrl && (
             <Typog
               as="a"
               area="button"
-              className="shop-builder-cta"
+              className={`shop-builder-cta ${getUikitButtonClass(block.panelActionStyle ?? "primary", block.panelActionSize ?? "default")} shop-builder-panel-action--${block.panelActionAlign ?? "inherit"}`}
               href={block.buttonUrl}
+              target={block.buttonTarget === "_blank" ? "_blank" : undefined}
+              rel={block.buttonTarget === "_blank" ? "noreferrer" : undefined}
               typography={block.typography}
             >
               {block.buttonLabel}
             </Typog>
           )}
-          {(block.buttons ?? []).map((btn, btnIdx) => (
-            <Typog
-              key={btn.id ?? btnIdx}
-              as="a"
-              area="button"
-              className={`shop-builder-cta shop-builder-cta--${btn.style ?? "primary"}`}
-              href={btn.url}
-              target={btn.target === "_blank" ? "_blank" : undefined}
-              rel={btn.target === "_blank" ? "noreferrer" : undefined}
-              typography={block.typography}
-            >
-              {btn.label}
-            </Typog>
-          ))}
         </div>
       </div>
     );
   }
 
   if (block.kind === "image") {
-    const imageAspectRatio = getBuilderImageAspectRatio(block.imageRatio);
-    const imageObjectFit = getBuilderImageObjectFit(block.imageFit);
-    const imageRadius = `${block.imageBorderRadius ?? 12}px`;
+    const imageSemantics = {
+      fit: block.imageFit,
+      ratio: block.imageRatio,
+      shape: block.imageShape ?? (block.imageBorderRadius ? "rounded" : "none"),
+      shadow: block.imageShadow,
+      alignment: block.imageAlignment,
+      width: block.imageWidth,
+    } as const;
+    const imageStyle = getUikitImageStyle(imageSemantics);
+    const imageAttributes = getUikitImageAttributes(imageSemantics);
+    const imageClass = getUikitImageClass(imageSemantics);
+    const figureClass = getUikitImageWrapperClass(imageSemantics);
 
     if (!block.imageUrl) {
       return null;
     }
 
+    const image = (
+      <img
+        className={imageClass}
+        src={block.imageUrl}
+        alt={block.imageAlt ?? ""}
+        width={1200}
+        height={800}
+        loading={block.imageLoading ?? "lazy"}
+        {...imageAttributes}
+        style={{
+          width: "100%",
+          height: imageStyle.aspectRatio ? "100%" : "auto",
+          objectFit: imageStyle.objectFit,
+          ...(imageStyle.position ? { position: imageStyle.position, inset: imageStyle.inset } : {}),
+        }}
+      />
+    );
+
     return (
       <div className="shop-builder-column-block shop-builder-column-block--image">
         <figure
-          className="shop-builder-image-figure"
+          className={`shop-builder-image-figure ${figureClass}`}
           style={{
             textAlign: block.imageAlignment ?? "center",
-            maxWidth: block.imageMaxWidth
-              ? `${block.imageMaxWidth}px`
-              : undefined,
-            marginInline: "auto",
+            maxWidth: imageStyle.maxWidth ?? (block.imageMaxWidth ? `${block.imageMaxWidth}px` : undefined),
+            width: imageStyle.width,
+            marginInline: block.imageAlignment === "left" ? "0 auto" : block.imageAlignment === "right" ? "0 0 0 auto" : "auto",
           }}
         >
           <div
-            className="shop-builder-image-media"
+            className={`shop-builder-image-media ${imageStyle.aspectRatio ? "uk-cover-container" : ""}`}
+            data-image-ratio={imageStyle.aspectRatio ? "true" : undefined}
             style={{
-              aspectRatio: imageAspectRatio,
-              borderRadius: imageRadius,
+              aspectRatio: imageStyle.aspectRatio,
+              width: "100%",
             }}
           >
-            <img
-              src={block.imageUrl}
-              alt={block.imageAlt ?? ""}
-              style={{
-                width: "100%",
-                height: imageAspectRatio ? "100%" : "auto",
-                objectFit: imageObjectFit,
-              }}
-            />
+            {block.imageLinkUrl ? (
+              <a href={block.imageLinkUrl} target={block.imageLinkTarget === "_blank" ? "_blank" : undefined} rel={block.imageLinkTarget === "_blank" ? "noreferrer" : undefined}>{image}</a>
+            ) : image}
           </div>
           {block.imageCaption && <figcaption>{block.imageCaption}</figcaption>}
         </figure>
@@ -3143,9 +3186,10 @@ function blockShellClassName(block: BuilderLayoutBlock) {
       ? `shop-builder-card--${block.premiumCardStyle}`
       : "";
   const uikitMarginClass = getUikitMarginClass((block as any).elementMargin ?? block.gridMargin);
-  return `${uikitMarginClass} shop-builder-element-shell shop-card-preset--${
-    block.panelStyle ?? "default"
-  } is-padding-${
+  const legacySurfaceClass = ["panel", "grid", "hero"].includes(block.kind ?? "")
+    ? ""
+    : `shop-card-preset--${block.panelStyle ?? "default"}`;
+  return `${uikitMarginClass} shop-builder-element-shell ${legacySurfaceClass} is-padding-${
     hasBuilderVisualSpacing(
       (block.visualStyle as BuilderVisualStyle | undefined)?.padding,
     )

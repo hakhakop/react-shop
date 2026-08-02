@@ -30,6 +30,13 @@ export type BuilderPanelStyle =
   | "flat-white"
   | "antigravity";
 
+export type BuilderListItem = {
+  id: string;
+  text: string;
+  url?: string;
+  target?: "_self" | "_blank";
+};
+
 export type BuilderDesign = {
   preset?: string;
   colorScheme?: string;
@@ -91,10 +98,12 @@ export type BuilderLayoutBlock = {
   buttonUrl?: string;
   buttonTarget?: string;
   buttonStyle?: string;
+  size?: "small" | "default" | "large";
   secondaryButtonLabel?: string;
   secondaryButtonUrl?: string;
   secondaryButtonTarget?: string;
   secondaryButtonStyle?: string;
+  secondaryButtonSize?: "small" | "default" | "large";
   buttonsLayout?: "inline" | "stacked";
   buttonGap?: string;
   buttons?: {
@@ -103,6 +112,7 @@ export type BuilderLayoutBlock = {
     url?: string;
     target?: string;
     style?: string;
+    size?: "small" | "default" | "large";
   }[];
   buttonBg?: string;
   buttonTextColor?: string;
@@ -124,6 +134,14 @@ export type BuilderLayoutBlock = {
   imageAlignment?: "left" | "center" | "right";
   imageMaxWidth?: number;
   imageBorderRadius?: number;
+  imageFit?: "contain" | "cover" | "fill";
+  imageRatio?: "auto" | "natural" | "square" | "4:3" | "3:2" | "4:5" | "3:4" | "16:9" | "portrait";
+  imageShape?: "none" | "rounded" | "circle";
+  imageShadow?: "none" | "small" | "medium" | "large" | "xlarge";
+  imageWidth?: "auto" | "full" | "small" | "medium" | "large" | "xlarge";
+  imageLoading?: "lazy" | "eager";
+  imageLinkUrl?: string;
+  imageLinkTarget?: "_self" | "_blank";
   borderRadius?: number;
   imageCaption?: string;
   elementBackgroundMode?: string;
@@ -134,6 +152,20 @@ export type BuilderLayoutBlock = {
   panelVariant?: "default" | "primary" | "secondary" | "blank";
   panelHover?: boolean;
   panelSize?: "small" | "default" | "large";
+  panelShowMedia?: boolean;
+  panelMediaPlacement?: "top" | "left" | "right";
+  panelMediaFit?: "cover" | "contain";
+  panelMediaWidth?: "small" | "medium" | "large";
+  panelMediaAlignment?: "left" | "center" | "right";
+  panelTextAlign?: "left" | "center" | "right";
+  panelVerticalAlign?: "top" | "center" | "bottom";
+  panelTitleElement?: "h2" | "h3" | "h4" | "div";
+  panelTitleStyle?: "inherit" | "h3" | "h4" | "h5";
+  panelContentWidth?: "auto" | "small" | "medium" | "large" | "full";
+  panelActionVisible?: boolean;
+  panelActionStyle?: "default" | "primary" | "secondary" | "text";
+  panelActionSize?: "small" | "default" | "large";
+  panelActionAlign?: "inherit" | "left" | "center" | "right";
   hoverPreset?: string;
   embedMode?: string;
   embedCode?: string;
@@ -147,8 +179,6 @@ export type BuilderLayoutBlock = {
   gridLimit?: number;
   cardPadding?: string;
   imagePadding?: string;
-  imageFit?: "contain" | "cover" | "fill";
-  imageRatio?: "auto" | "square" | "4:5" | "3:4" | "16:9";
   source?: string;
   categoryId?: string;
   hiddenCategorySlugs?: string[];
@@ -212,11 +242,29 @@ export type BuilderLayoutBlock = {
     overlayColor?: string;
     overlayTextColor?: string;
   };
+  heroHeadingElement?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
+  heroHeadingStyle?: "inherit" | "h1" | "h2" | "h3" | "h4" | "h5" | "article-title" | "small" | "medium" | "large" | "xlarge";
+  heroContentAlign?: "left" | "center" | "right";
+  heroVerticalAlign?: "top" | "center" | "bottom";
+  heroContentWidth?: "small" | "medium" | "large" | "full";
+  heroMediaPlacement?: "none" | "right" | "left" | "background";
+  heroMediaFit?: "contain" | "cover";
+  heroMediaRatio?: "natural" | "square" | "4:3" | "3:2" | "16:9" | "portrait";
+  heroHeight?: "auto" | "small" | "medium" | "large" | "viewport";
+  heroInverse?: boolean;
+  heroPrimaryActionVisible?: boolean;
+  heroSecondaryActionVisible?: boolean;
+  heroMediaLoading?: "lazy" | "eager";
   iconName?: string;
   items?: string[];
   listIcon?: string;
   listIconColorScheme?: "default" | "gradient-cycle";
   listIconSize?: number;
+  listItems?: BuilderListItem[];
+  listPresentation?: "default" | "bullet" | "divider" | "striped" | "large";
+  listMarker?: "none" | "disc" | "circle" | "square";
+  listAlign?: "left" | "center" | "right";
+  listSpacing?: "compact" | "default" | "large";
   headingText?: string;
   headingLevel?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
   accordionItems?: { id: string; title: string; content: string }[];
@@ -253,6 +301,11 @@ export type BuilderLayoutBlock = {
   gridShowMeta?: boolean;
   gridShowText?: boolean;
   gridShowButton?: boolean;
+  gridRowGap?: "none" | "small" | "medium" | "large";
+  gridItemRenderer?: "plain" | "card";
+  gridCardVariant?: "default" | "primary" | "secondary" | "blank";
+  gridCardSize?: "small" | "default" | "large";
+  gridCardHover?: boolean;
   gridItems?: {
     id?: string;
     imageUrl?: string;
@@ -264,7 +317,20 @@ export type BuilderLayoutBlock = {
     buttonLabel?: string;
     buttonUrl?: string;
     buttonStyle?: "primary" | "secondary" | "outline" | "ghost" | "link";
+    buttonTarget?: "_self" | "_blank";
     buttonAlign?: "left" | "center" | "right";
+    renderer?: "plain" | "card";
+    cardVariant?: "default" | "primary" | "secondary" | "blank";
+    cardSize?: "small" | "default" | "large";
+    cardHover?: boolean;
+    mediaPlacement?: "top" | "left" | "right";
+    mediaRatio?: "natural" | "square" | "4:3" | "3:2" | "16:9" | "portrait";
+    mediaFit?: "cover" | "contain";
+    textAlign?: "left" | "center" | "right";
+    titleElement?: "h2" | "h3" | "h4" | "div";
+    titleStyle?: "inherit" | "h3" | "h4" | "h5";
+    actionStyle?: "default" | "primary" | "secondary" | "text";
+    actionSize?: "small" | "default" | "large";
     typography?: Record<string, unknown>;
     items?: string[];
     listIcon?: "check" | "circleCheck" | "arrowRight" | "star" | "heart" | "sparkles" | "shield";

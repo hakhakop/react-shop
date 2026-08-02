@@ -2,6 +2,7 @@
 
 import type { BuilderLayoutBlock, InspectorTab } from "@/components/dashboard/builderTypes";
 import { UIKIT_ACCORDION_CAPABILITY } from "@/lib/uikitCapabilities";
+import { InspectorFieldRow, InspectorPillGroup, InspectorSelect, InspectorSwitch, InspectorTextField, InspectorTextarea } from "@/components/dashboard/inspector/InspectorControls";
 
 type Props = {
   block: BuilderLayoutBlock;
@@ -11,6 +12,7 @@ type Props = {
 
 export default function AccordionCapabilityPanel({ block, tab, update }: Props) {
   const items = block.accordionItems ?? [];
+  const labels = <T extends string>(values: readonly T[]) => values.map((value) => ({ value, label: value.replace(/-/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase()) }));
   const updateItems = (next: typeof items) => update({ accordionItems: next });
   const updateItem = (index: number, patch: Partial<(typeof items)[number]>) =>
     updateItems(items.map((item, itemIndex) => itemIndex === index ? { ...item, ...patch } : item));
@@ -31,10 +33,10 @@ export default function AccordionCapabilityPanel({ block, tab, update }: Props) 
           <details className="builder-collapse" open key={item.id}>
             <summary><span>Item {index + 1}</span><small>{item.title || "Untitled"}</small></summary>
             <div className="builder-two-column">
-              <label className="builder-field"><span>Title</span><input value={item.title} onChange={(event) => updateItem(index, { title: event.target.value })} /></label>
+              <InspectorFieldRow label="Title"><InspectorTextField value={item.title} onChange={(value) => updateItem(index, { title: value })} ariaLabel={`Accordion item ${index + 1} title`} /></InspectorFieldRow>
               <div className="builder-field"><span>Order</span><div className="builder-two-column"><button type="button" className="builder-secondary-button" disabled={index === 0} onClick={() => moveItem(index, -1)}>Up</button><button type="button" className="builder-secondary-button" disabled={index === items.length - 1} onClick={() => moveItem(index, 1)}>Down</button></div></div>
             </div>
-            <label className="builder-field"><span>Content</span><textarea value={item.content} onChange={(event) => updateItem(index, { content: event.target.value })} /></label>
+            <InspectorFieldRow label="Content"><InspectorTextarea value={item.content} onChange={(value) => updateItem(index, { content: value })} ariaLabel={`Accordion item ${index + 1} content`} /></InspectorFieldRow>
             <button type="button" className="builder-secondary-button" onClick={() => { const next = items.filter((_, itemIndex) => itemIndex !== index); update({ accordionItems: next, accordionOpenItems: (block.accordionOpenItems ?? []).filter((openIndex) => openIndex !== index).map((openIndex) => openIndex > index ? openIndex - 1 : openIndex) }); }}>Remove item</button>
           </details>
         ))}
@@ -49,9 +51,9 @@ export default function AccordionCapabilityPanel({ block, tab, update }: Props) 
     return (
       <div className="builder-inspector-stack" data-uikit-capability="accordion-behavior">
         <div className="builder-element-inspector-note"><strong>UIkit Accordion behavior</strong><span>UIkit owns disclosure interaction, animation, focus, and keyboard behavior.</span></div>
-        <label className="builder-field"><span>Allow multiple open</span><select value={block.accordionMultiple === false ? "disabled" : "enabled"} onChange={(event) => update({ accordionMultiple: event.target.value === "enabled" })}>{UIKIT_ACCORDION_CAPABILITY.properties.multiple.values.map((value) => <option key={value} value={value}>{value}</option>)}</select></label>
-        <label className="builder-field"><span>Collapsible</span><select value={block.accordionCollapsible === false ? "disabled" : "enabled"} onChange={(event) => update({ accordionCollapsible: event.target.value === "enabled" })}>{UIKIT_ACCORDION_CAPABILITY.properties.collapsible.values.map((value) => <option key={value} value={value}>{value}</option>)}</select></label>
-        <label className="builder-field"><span>Initially open</span><select value={initialOpen} onChange={(event) => update({ accordionOpenItems: event.target.value === "none" ? [] : event.target.value === "first" ? [0] : openItems.length > 0 ? openItems : [0] })}>{UIKIT_ACCORDION_CAPABILITY.properties.initialOpen.values.map((value) => <option key={value} value={value}>{value}</option>)}</select></label>
+        <InspectorFieldRow label="Allow multiple open"><InspectorSwitch checked={block.accordionMultiple !== false} onChange={(checked) => update({ accordionMultiple: checked })} label="Allow multiple open" /></InspectorFieldRow>
+        <InspectorFieldRow label="Collapsible"><InspectorSwitch checked={block.accordionCollapsible !== false} onChange={(checked) => update({ accordionCollapsible: checked })} label="Collapsible" /></InspectorFieldRow>
+        <InspectorFieldRow label="Initially open"><InspectorSelect value={initialOpen} options={labels(UIKIT_ACCORDION_CAPABILITY.properties.initialOpen.values)} onChange={(value) => update({ accordionOpenItems: value === "none" ? [] : value === "first" ? [0] : openItems.length > 0 ? openItems : [0] })} ariaLabel="Initially open" /></InspectorFieldRow>
         {initialOpen === "custom" && <div className="builder-field"><span>Open items</span>{items.map((item, index) => <label className="builder-check" key={item.id}><input type="checkbox" checked={openItems.includes(index)} onChange={(event) => { const next = event.target.checked ? [...new Set([...openItems, index])] : openItems.filter((openIndex) => openIndex !== index); update({ accordionOpenItems: block.accordionMultiple === false ? (next.length ? [next[next.length - 1]] : []) : next }); }} /><span>{index + 1}. {item.title}</span></label>)}</div>}
       </div>
     );
@@ -61,12 +63,12 @@ export default function AccordionCapabilityPanel({ block, tab, update }: Props) 
     const properties = UIKIT_ACCORDION_CAPABILITY.properties;
     return <div className="builder-inspector-stack" data-uikit-capability="accordion-style">
       <div className="builder-element-inspector-note"><strong>Accordion presentation</strong><span>Semantic presentation values map to UIkit structure and scoped presentation rules.</span></div>
-      <label className="builder-field"><span>Indicator</span><select value={block.accordionIndicator ?? "none"} onChange={(event) => update({ accordionIndicator: event.target.value as BuilderLayoutBlock["accordionIndicator"] })}>{properties.indicator.values.map((value) => <option key={value} value={value}>{value}</option>)}</select></label>
-      <label className="builder-field"><span>Indicator position</span><select value={block.accordionIndicatorPosition ?? "end"} onChange={(event) => update({ accordionIndicatorPosition: event.target.value as BuilderLayoutBlock["accordionIndicatorPosition"] })}>{properties.indicatorPosition.values.map((value) => <option key={value} value={value}>{value}</option>)}</select></label>
-      <label className="builder-field"><span>Row treatment</span><select value={block.accordionRowStyle ?? "plain"} onChange={(event) => update({ accordionRowStyle: event.target.value as BuilderLayoutBlock["accordionRowStyle"] })}>{properties.rowStyle.values.map((value) => <option key={value} value={value}>{value}</option>)}</select></label>
-      <label className="builder-field"><span>Vertical spacing</span><select value={block.accordionSpacing ?? "default"} onChange={(event) => update({ accordionSpacing: event.target.value as BuilderLayoutBlock["accordionSpacing"] })}>{properties.spacing.values.map((value) => <option key={value} value={value}>{value}</option>)}</select></label>
-      <label className="builder-field"><span>Title weight</span><select value={block.accordionTitleEmphasis ?? "default"} onChange={(event) => update({ accordionTitleEmphasis: event.target.value as BuilderLayoutBlock["accordionTitleEmphasis"] })}>{properties.titleEmphasis.values.map((value) => <option key={value} value={value}>{value}</option>)}</select></label>
-      <label className="builder-field"><span>Open-item treatment</span><select value={block.accordionOpenEmphasis ?? "none"} onChange={(event) => update({ accordionOpenEmphasis: event.target.value as BuilderLayoutBlock["accordionOpenEmphasis"] })}>{properties.openEmphasis.values.map((value) => <option key={value} value={value}>{value}</option>)}</select></label>
+      <InspectorFieldRow label="Indicator"><InspectorPillGroup value={(block.accordionIndicator ?? "none") as BuilderLayoutBlock["accordionIndicator"]} options={labels(properties.indicator.values)} onChange={(value) => update({ accordionIndicator: value })} ariaLabel="Accordion indicator" /></InspectorFieldRow>
+      <InspectorFieldRow label="Indicator position"><InspectorPillGroup value={(block.accordionIndicatorPosition ?? "end") as BuilderLayoutBlock["accordionIndicatorPosition"]} options={labels(properties.indicatorPosition.values)} onChange={(value) => update({ accordionIndicatorPosition: value })} ariaLabel="Indicator position" /></InspectorFieldRow>
+      <InspectorFieldRow label="Row treatment"><InspectorPillGroup value={(block.accordionRowStyle ?? "plain") as BuilderLayoutBlock["accordionRowStyle"]} options={labels(properties.rowStyle.values)} onChange={(value) => update({ accordionRowStyle: value })} ariaLabel="Accordion row treatment" /></InspectorFieldRow>
+      <InspectorFieldRow label="Vertical spacing"><InspectorPillGroup value={(block.accordionSpacing ?? "default") as BuilderLayoutBlock["accordionSpacing"]} options={labels(properties.spacing.values)} onChange={(value) => update({ accordionSpacing: value })} ariaLabel="Accordion vertical spacing" /></InspectorFieldRow>
+      <InspectorFieldRow label="Title weight"><InspectorSelect value={(block.accordionTitleEmphasis ?? "default") as BuilderLayoutBlock["accordionTitleEmphasis"]} options={labels(properties.titleEmphasis.values)} onChange={(value) => update({ accordionTitleEmphasis: value })} ariaLabel="Accordion title weight" /></InspectorFieldRow>
+      <InspectorFieldRow label="Open-item treatment"><InspectorSelect value={(block.accordionOpenEmphasis ?? "none") as BuilderLayoutBlock["accordionOpenEmphasis"]} options={labels(properties.openEmphasis.values)} onChange={(value) => update({ accordionOpenEmphasis: value })} ariaLabel="Open-item treatment" /></InspectorFieldRow>
     </div>;
   }
 
