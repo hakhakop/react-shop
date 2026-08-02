@@ -200,23 +200,35 @@ export function normalizeButtonStyleFields(
   values: BuilderButtonStyleFields,
   fallback: BuilderButtonStyleFields = {},
 ): BuilderButtonStyleFields {
+  const semantic = values as BuilderButtonStyleFields & Record<string, unknown>;
+  const semanticFallback = fallback as BuilderButtonStyleFields & Record<string, unknown>;
+  const first = (...candidates: unknown[]) =>
+    candidates.find((candidate) => candidate !== undefined && candidate !== null && candidate !== "") as string | undefined;
   return {
-    buttonBg: values.buttonBg || fallback.buttonBg || "#111111",
+    buttonBg:
+      first(semantic.buttonPrimaryBackground, values.buttonBg, semanticFallback.buttonPrimaryBackground, fallback.buttonBg) ||
+      "#111111",
     buttonTextColor:
-      values.buttonTextColor || fallback.buttonTextColor || "#ffffff",
+      first(semantic.buttonPrimaryText, values.buttonTextColor, semanticFallback.buttonPrimaryText, fallback.buttonTextColor) ||
+      "#ffffff",
     buttonBorderRadius:
-      values.buttonBorderRadius || fallback.buttonBorderRadius || "999px",
+      first(semantic.buttonRadius, values.buttonBorderRadius, semanticFallback.buttonRadius, fallback.buttonBorderRadius) ||
+      "999px",
     buttonBorderWidth:
-      values.buttonBorderWidth || fallback.buttonBorderWidth || "0px",
+      first(semantic.buttonBorderWidth, values.buttonBorderWidth, semanticFallback.buttonBorderWidth, fallback.buttonBorderWidth) ||
+      "0px",
     buttonBorderColor:
-      values.buttonBorderColor || fallback.buttonBorderColor || "transparent",
-    buttonPaddingY: values.buttonPaddingY || fallback.buttonPaddingY || "11px",
-    buttonPaddingX: values.buttonPaddingX || fallback.buttonPaddingX || "18px",
+      first(semantic.buttonBorderColor, values.buttonBorderColor, semanticFallback.buttonBorderColor, fallback.buttonBorderColor) ||
+      "transparent",
+    buttonPaddingY: first(semantic.buttonPaddingY, values.buttonPaddingY, semanticFallback.buttonPaddingY, fallback.buttonPaddingY) || "11px",
+    buttonPaddingX: first(semantic.buttonPaddingX, values.buttonPaddingX, semanticFallback.buttonPaddingX, fallback.buttonPaddingX) || "18px",
     buttonFontWeight:
       values.buttonFontWeight || fallback.buttonFontWeight || "720",
     buttonLetterSpacing:
       values.buttonLetterSpacing || fallback.buttonLetterSpacing || "0px",
-    buttonHoverBg: values.buttonHoverBg || fallback.buttonHoverBg || values.buttonBg || fallback.buttonBg || "#111111",
+    buttonHoverBg:
+      first(semantic.buttonHoverBg, values.buttonHoverBg, semantic.buttonPrimaryBackground, values.buttonBg, semanticFallback.buttonHoverBg, fallback.buttonHoverBg) ||
+      "#111111",
     buttonHoverTextColor:
       values.buttonHoverTextColor ||
       fallback.buttonHoverTextColor ||

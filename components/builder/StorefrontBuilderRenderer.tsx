@@ -5,6 +5,8 @@ import AntigravityTerminal from "@/components/builder/AntigravityTerminal";
 import AntigravityCanvas from "@/components/builder/AntigravityCanvas";
 import TypewriterText from "@/components/builder/TypewriterText";
 import BuilderLineBreakText from "@/components/builder/BuilderLineBreakText";
+import UikitAccordion from "@/components/builder/UikitAccordion";
+import UikitText from "@/components/builder/UikitText";
 import {
   ArrowRight,
   CalendarDays,
@@ -48,7 +50,7 @@ import type {
   BuilderPage,
   BuilderSection,
 } from "@/lib/builderLayouts";
-import { typographyProps, type TypographyArea } from "@/lib/builderTypography";
+import { typographyProps, getHeadingTypographyStyles, type TypographyArea } from "@/lib/builderTypography";
 import {
   resolveBuilderRowGap,
   resolveBuilderRowStyle,
@@ -63,6 +65,23 @@ import {
   getBuilderLayoutRows,
   getBuilderRowLayoutPreset,
 } from "@/components/dashboard/builderLayoutPresets";
+import {
+  getUikitMarginClass,
+  getUikitSectionPaddingClass,
+  getUikitSectionStyleClass,
+  getUikitContainerClass,
+  getUikitGridClass,
+  getUikitWidthClass,
+  getUikitCardClass,
+  getUikitButtonClass,
+  getUikitHeadingClass,
+  getUikitTextClass,
+  getUikitBadgeClass,
+  getUikitDividerClass,
+  getUikitAlertClass,
+  getUikitColumnClass,
+} from "@/lib/uikitTokens";
+import { getUikitColumnWidthClass } from "@/lib/uikitLayoutEngine";
 import {
   resolveBuilderSpacing,
   type BuilderSpacingContext,
@@ -636,7 +655,13 @@ function sectionClassName(
     : "";
   const heightClass = `shop-builder-section--height-${section.sectionHeight ?? "auto"}`;
   const verticalAlignClass = `shop-builder-section--align-${section.contentVerticalAlign ?? "top"}`;
-  return `shop-builder-section shop-builder-section--${mode} shop-builder-section--content-${contentMode} shop-builder-section--scheme-${scheme} ${heightClass} ${verticalAlignClass} ${visualClass} ${animationClassName(section.animation)} ${srClass} ${extra}`.trim();
+  const uikitSectionPad = getUikitSectionPaddingClass(
+    (section as any).sectionPadding ?? (section as any).topSpacing ?? (section as any).sectionPaddingTop,
+  );
+  const uikitSectionStyle = getUikitSectionStyleClass(
+    section.sectionVariant || section.colorScheme || (section.visualStyle as any)?.preset,
+  );
+  return `${uikitSectionPad} ${uikitSectionStyle} shop-builder-section shop-builder-section--${mode} shop-builder-section--content-${contentMode} shop-builder-section--scheme-${scheme} ${heightClass} ${verticalAlignClass} ${visualClass} ${animationClassName(section.animation)} ${srClass} ${extra}`.trim();
 }
 
 const scrollRevealPresets = new Set([
@@ -846,7 +871,7 @@ function SectionFrame({
         </>
       )}
       <div
-        className="shop-builder-section-content"
+        className={`shop-builder-section-content ${getUikitContainerClass(section.contentMode)}`}
         data-gsap-stagger={
           section.kind === "hero" || section.kind === "embed" ? undefined : true
         }
@@ -900,7 +925,7 @@ function HeroSection({
         {section.eyebrow && (
           <Typog
             as="p"
-            className="shop-builder-eyebrow"
+            className="uk-label uk-label-primary"
             typography={section.typography}
           >
             {section.eyebrow}
@@ -1073,7 +1098,7 @@ function BadgeGridSection({
     >
       <div>
         {section.eyebrow && (
-          <p className="shop-builder-eyebrow">{section.eyebrow}</p>
+          <p className="uk-label uk-label-primary">{section.eyebrow}</p>
         )}
         <h2 className="shop-builder-title">{section.title}</h2>
         <BodyText className="shop-builder-body">{section.body}</BodyText>
@@ -1471,7 +1496,7 @@ function GridCards({
             {block.gridShowEyebrow !== false && item.eyebrow && (
               <Typog
                 as="span"
-                className="shop-builder-eyebrow"
+                className="uk-label uk-label-primary"
                 typography={item.typography ?? block.typography}
                 area="eyebrow"
               >
@@ -1870,60 +1895,66 @@ function ContentLayoutBlock({
   website?: SaaSWebsite | null;
   parentScheme?: "light" | "dark";
 }) {
-  if (block.kind === "button") {
+  if (block.kind === "accordion") {
     return (
-      <div
-        className={`shop-builder-column-block shop-builder-column-block--button ${block.premiumCardStyle && block.premiumCardStyle !== "none" ? `shop-builder-card--${block.premiumCardStyle}` : ""}`}
-      >
+      <div className="shop-builder-column-block shop-builder-column-block--accordion">
+        <UikitAccordion
+          items={block.accordionItems ?? []}
+          multiple={block.accordionMultiple}
+          collapsible={block.accordionCollapsible}
+         active={block.accordionOpenItems}
+          indicator={block.accordionIndicator}
+          indicatorPosition={block.accordionIndicatorPosition}
+          rowStyle={block.accordionRowStyle}
+          spacing={block.accordionSpacing}
+          titleEmphasis={block.accordionTitleEmphasis}
+          openEmphasis={block.accordionOpenEmphasis}
+        />
+      </div>
+    );
+  }
+
+  if (block.kind === "text") {
+    return (
+      <UikitText
+        eyebrow={block.eyebrow}
+        title={block.title}
+        content={block.body}
+        variant={block.textVariant}
+        align={block.textAlign}
+        typography={block.typography}
+      />
+    );
+  }
+
+  if (block.kind === "button") {
+    const rawBlock = block as any;
+    return (
+      <div className="shop-builder-column-block shop-builder-column-block--button">
         <div
-          className={`shop-builder-buttons ${block.premiumButtonStyle && block.premiumButtonStyle !== "default" ? "" : `shop-builder-buttons--${block.buttonsLayout ?? "inline"}`}`}
-          style={
-            {
-              display: "flex",
-              width: "fit-content",
-              maxWidth: "100%",
-              flexDirection:
-                block.buttonsLayout === "stacked" ? "column" : "row",
-              flexWrap: "wrap",
-              "--button-group-gap": block.buttonGap || "0.75rem",
-              gap: "var(--button-group-gap, 0.75rem)",
-            } as CSSProperties
-          }
+          className={`uk-flex uk-flex-wrap ${rawBlock.buttonsLayout === "stacked" ? "uk-flex-column" : "uk-flex-middle"}`}
+          style={{ gap: rawBlock.buttonGap || "0.75rem" }}
         >
-          {block.buttonLabel && block.buttonUrl && (
-            <Typog
-              as="a"
-              className={`shop-builder-cta ${
-                block.premiumButtonStyle &&
-                block.premiumButtonStyle !== "default"
-                  ? `shop-builder-cta--${block.premiumButtonStyle}`
-                  : `shop-builder-cta--${block.buttonStyle ?? "primary"}`
-              }`}
-              href={block.buttonUrl}
-              target={block.buttonTarget === "_blank" ? "_blank" : undefined}
-              rel={block.buttonTarget === "_blank" ? "noreferrer" : undefined}
-              typography={block.typography}
+          {rawBlock.buttonLabel && rawBlock.buttonUrl && (
+            <a
+              className={getUikitButtonClass(rawBlock.buttonStyle ?? "primary", rawBlock.size)}
+              href={rawBlock.buttonUrl}
+              target={rawBlock.buttonTarget === "_blank" ? "_blank" : undefined}
+              rel={rawBlock.buttonTarget === "_blank" ? "noreferrer" : undefined}
             >
-              {block.buttonLabel}
-            </Typog>
+              {rawBlock.buttonLabel}
+            </a>
           )}
-          {(block.buttons ?? []).map((btn, btnIdx) => (
-            <Typog
+          {(rawBlock.buttons ?? []).map((btn: any, btnIdx: number) => (
+            <a
               key={btn.id ?? btnIdx}
-              as="a"
-              className={`shop-builder-cta ${
-                block.premiumButtonStyle &&
-                block.premiumButtonStyle !== "default"
-                  ? `shop-builder-cta--${block.premiumButtonStyle}`
-                  : `shop-builder-cta--${btn.style ?? "primary"}`
-              }`}
+              className={getUikitButtonClass(btn.style ?? "primary", btn.size ?? rawBlock.size)}
               href={btn.url}
               target={btn.target === "_blank" ? "_blank" : undefined}
               rel={btn.target === "_blank" ? "noreferrer" : undefined}
-              typography={block.typography}
             >
               {btn.label}
-            </Typog>
+            </a>
           ))}
         </div>
       </div>
@@ -2117,7 +2148,7 @@ function ContentLayoutBlock({
         >
           {badges.map((badge, index) => (
             <article key={badge.id ?? index}>
-              {badge.label && <span>{badge.label}</span>}
+              {badge.label && <span className={getUikitBadgeClass((badge as any).style ?? "primary")}>{badge.label}</span>}
               {badge.title && (
                 <Typog as="strong" typography={block.typography}>
                   <BuilderLineBreakText text={badge.title} />
@@ -2223,86 +2254,63 @@ function ContentLayoutBlock({
     );
   }
 
+  if (block.kind === "divider") {
+    const rawBlock = block as any;
+    const dividerClass = getUikitDividerClass(rawBlock.dividerStyle || rawBlock.preset);
+    return (
+      <div className="shop-builder-column-block shop-builder-column-block--divider uk-margin">
+        <hr className={dividerClass} />
+      </div>
+    );
+  }
+
+  if (block.kind === "alert") {
+    const rawBlock = block as any;
+    const alertClass = getUikitAlertClass(rawBlock.status || rawBlock.alertStyle || rawBlock.preset);
+    return (
+      <div className="shop-builder-column-block shop-builder-column-block--alert">
+        <div className={alertClass}>
+          {rawBlock.title && <h4 className="uk-margin-remove-top">{rawBlock.title}</h4>}
+          {rawBlock.body && <p className="uk-margin-remove-bottom">{rawBlock.body}</p>}
+          {rawBlock.content && <p className="uk-margin-remove-bottom">{rawBlock.content}</p>}
+        </div>
+      </div>
+    );
+  }
+
   if (block.kind === "heading") {
-    const Tag = block.headingLevel ?? "h2";
-    const levelDefaults: Record<
-      string,
-      { fontSize: string; fontWeight: string; lineHeight: string }
-    > = {
-      h1: {
-        fontSize: "clamp(42px, 8vw, 126px)",
-        fontWeight: "760",
-        lineHeight: "0.92",
-      },
-      h2: {
-        fontSize: "clamp(32px, 5vw, 64px)",
-        fontWeight: "700",
-        lineHeight: "1.1",
-      },
-      h3: {
-        fontSize: "clamp(24px, 4vw, 40px)",
-        fontWeight: "700",
-        lineHeight: "1.2",
-      },
-      h4: {
-        fontSize: "clamp(20px, 3vw, 32px)",
-        fontWeight: "600",
-        lineHeight: "1.2",
-      },
-      h5: { fontSize: "20px", fontWeight: "600", lineHeight: "1.3" },
-      h6: { fontSize: "16px", fontWeight: "600", lineHeight: "1.4" },
-    };
-    const defaultForLevel = levelDefaults[Tag] ?? levelDefaults.h2;
+    const rawBlock = block as any;
+    const Tag = (rawBlock.headingLevel ?? "h2") as any;
+    const uikitHeadingClass = getUikitHeadingClass(rawBlock.headingLevel ?? "h2", rawBlock.headingSize);
+    const alignClass = rawBlock.headingAlign ? `uk-text-${rawBlock.headingAlign}` : "";
+    const isGradient = rawBlock.textGradientPreset && rawBlock.textGradientPreset !== "none";
+    const isCustom = rawBlock.textGradientPreset === "custom";
+    const titleClassName = [
+      uikitHeadingClass,
+      alignClass,
+      isGradient && !isCustom ? `text-gradient--${rawBlock.textGradientPreset}` : "",
+    ].filter(Boolean).join(" ");
 
-    const userTitleTyp =
-      (block.typography as any)?.title ??
-      (typeof block.typography === "object" && !(block.typography as any).title
-        ? block.typography
-        : {});
+    const compStyle = getHeadingTypographyStyles(rawBlock.typography, Boolean(isGradient));
 
-    const resolvedTypography = {
-      variant: "heading",
-      fontSize: userTitleTyp.fontSize || defaultForLevel.fontSize,
-      fontWeight: userTitleTyp.fontWeight || defaultForLevel.fontWeight,
-      lineHeight: userTitleTyp.lineHeight || defaultForLevel.lineHeight,
-      fontFamily: userTitleTyp.fontFamily,
-      letterSpacing: userTitleTyp.letterSpacing,
-      color: userTitleTyp.color,
-      textTransform: userTitleTyp.textTransform,
-      textDecoration: userTitleTyp.textDecoration,
-    };
-
-    const isGradient =
-      block.textGradientPreset && block.textGradientPreset !== "none";
-    const isCustom = block.textGradientPreset === "custom";
-    const titleClassName =
-      isGradient && !isCustom
-        ? `text-gradient--${block.textGradientPreset}`
-        : "";
-    const customStyle = isCustom
+    const gradientStyle = isCustom
       ? {
-          backgroundImage: `linear-gradient(${block.textGradientCustomAngle ?? 135}deg, ${block.textGradientCustomStart ?? "#ffffff"} ${block.textGradientCustomStartOffset ?? 0}%, ${block.textGradientCustomMiddle ?? "#60a5fa"} ${block.textGradientCustomMiddleOffset ?? 50}%, ${block.textGradientCustomEnd ?? "#c084fc"} ${block.textGradientCustomEndOffset ?? 100}%)`,
+          backgroundImage: `linear-gradient(${rawBlock.textGradientCustomAngle ?? 135}deg, ${rawBlock.textGradientCustomStart ?? "#ffffff"} ${rawBlock.textGradientCustomStartOffset ?? 0}%, ${rawBlock.textGradientCustomMiddle ?? "#60a5fa"} ${rawBlock.textGradientCustomMiddleOffset ?? 50}%, ${rawBlock.textGradientCustomEnd ?? "#c084fc"} ${rawBlock.textGradientCustomEndOffset ?? 100}%)`,
           WebkitBackgroundClip: "text",
           WebkitTextFillColor: "transparent",
           backgroundClip: "text",
           display: "inline-block",
         }
       : {};
+
+    const combinedStyle = {
+      ...compStyle,
+      ...gradientStyle,
+    };
+
     return (
-      <div
-        className={`shop-builder-column-block shop-builder-column-block--heading ${block.premiumCardStyle && block.premiumCardStyle !== "none" ? `shop-builder-card--${block.premiumCardStyle}` : ""}`}
-        style={{ textAlign: block.headingAlign ?? "left" }}
-      >
-        <Typog
-          as={Tag}
-          className={titleClassName}
-          typography={resolvedTypography}
-          style={{
-            textAlign: block.headingAlign ?? "left",
-            margin: 0,
-            ...customStyle,
-          }}
-        >
+      <div className="shop-builder-column-block shop-builder-column-block--heading">
+        <Tag className={titleClassName} style={Object.keys(combinedStyle).length > 0 ? combinedStyle : undefined}>
           {block.typewriterEnabled ? (
             <TypewriterText
               text={block.headingText ?? "Your Heading Text"}
@@ -2322,7 +2330,6 @@ function ContentLayoutBlock({
               customStartOffset={block.textGradientCustomStartOffset}
               customMiddleOffset={block.textGradientCustomMiddleOffset}
               customEndOffset={block.textGradientCustomEndOffset}
-              typography={resolvedTypography}
               area="title"
               preserveHeight={block.typewriterPreserveHeight !== false}
               reservedLines={block.typewriterReservedLines ?? 1}
@@ -2333,7 +2340,7 @@ function ContentLayoutBlock({
               text={block.headingText ?? "Your Heading Text"}
             />
           )}
-        </Typog>
+        </Tag>
       </div>
     );
   }
@@ -2441,7 +2448,7 @@ function ContentLayoutBlock({
           {block.eyebrow && (
             <Typog
               as="span"
-              className="shop-builder-eyebrow"
+              className="uk-label uk-label-primary"
               typography={block.typography}
             >
               {block.eyebrow}
@@ -2606,7 +2613,7 @@ function ContentLayoutBlock({
           {block.eyebrow && (
             <Typog
               as="span"
-              className="shop-builder-eyebrow"
+              className="uk-label uk-label-primary"
               typography={block.typography}
               area="eyebrow"
             >
@@ -2733,7 +2740,7 @@ function ContentLayoutBlock({
     const panelMediaAspect = getBuilderImageAspectRatio(block.imageRatio) || "16 / 9";
 
     return (
-      <div className="shop-builder-column-block shop-builder-column-block--panel">
+      <div className={`shop-builder-column-block shop-builder-column-block--panel ${getUikitCardClass(block.panelVariant ?? block.panelStyle ?? "default", { hover: block.panelHover ? "hover" : "none", padding: block.panelSize })}`}>
         {block.imageUrl && (
           <div
             className="shop-builder-panel-media"
@@ -2756,7 +2763,7 @@ function ContentLayoutBlock({
             }}
           />
         )}
-        <div>
+        <div className="uk-card-body">
           {block.eyebrow && (
             <Typog
               as="span"
@@ -3135,7 +3142,8 @@ function blockShellClassName(block: BuilderLayoutBlock) {
     block.premiumCardStyle && block.premiumCardStyle !== "none"
       ? `shop-builder-card--${block.premiumCardStyle}`
       : "";
-  return `shop-builder-element-shell shop-card-preset--${
+  const uikitMarginClass = getUikitMarginClass((block as any).elementMargin ?? block.gridMargin);
+  return `${uikitMarginClass} shop-builder-element-shell shop-card-preset--${
     block.panelStyle ?? "default"
   } is-padding-${
     hasBuilderVisualSpacing(
@@ -3189,11 +3197,14 @@ function Typog({
   style,
   ...props
 }: any) {
-  const tp = typographyProps(
-    typography,
-    area ?? inferTypographyArea(String(As), className),
-  );
-  const combined = [className, tp.className].filter(Boolean).join(" ");
+  const resolvedArea = area ?? inferTypographyArea(String(As), className);
+  const tp = typographyProps(typography, resolvedArea);
+  const isHeading = /^h[1-6]$/i.test(String(As)) || resolvedArea === "title";
+  const uikitHeading = isHeading ? getUikitHeadingClass(As, typography?.preset) : "";
+  const uikitText = resolvedArea === "eyebrow" ? getUikitTextClass("meta") : resolvedArea === "lead" ? getUikitTextClass("lead") : "";
+  const isCta = String(className || "").includes("cta");
+  const uikitBtn = isCta ? getUikitButtonClass(props.buttonStyle || "primary", props.buttonSize) : "";
+  const combined = [className, tp.className, uikitHeading, uikitText, uikitBtn].filter(Boolean).join(" ");
   const combinedStyle = buttonTypographyStyle(combined, {
     ...style,
     ...tp.style,
@@ -3399,7 +3410,7 @@ function ContentLayoutSection({
           return (
             <div key={row.id} style={{ paddingTop: rowIndex > 0 ? rowGap : 0 }}>
               <div
-              className={`shop-builder-content-row ${
+              className={`${getUikitGridClass({ gutter: typedRowItem?.rowGap, matchHeight: typedRowItem?.rowMatchHeight !== false, alignItems: typedRowItem?.rowAlignment, justifyContent: typedRowItem?.rowJustify })} shop-builder-content-row ${
                 isFullRowTheme
                   ? "shop-builder-section--effect-antigravity"
                   : isRowAnimatedBg
@@ -3407,9 +3418,6 @@ function ContentLayoutSection({
                     : ""
               }`}
               style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(12, minmax(0, 1fr))",
-                columnGap: "var(--builder-global-column-gap, 32px)",
                 ...rowStyle(rowItem, sectionColorScheme),
                 ...rowAnimationAttrs.style,
               }}
@@ -3533,16 +3541,13 @@ function ContentLayoutSection({
                 return (
                   <article
                     key={columnKey}
-                    className={`${nestedLayout ? "builder-nested-layout-container " : ""}${
+                    data-builder-object-type="column"
+                    data-builder-column-key={columnKey}
+                    className={`${getUikitColumnWidthClass(row.layoutKey, index)} ${getUikitColumnClass({ horizontalAlign: (item as NonNullable<BuilderSection["layoutItems"]>[number]).columnHorizontalAlign, verticalAlign: (item as NonNullable<BuilderSection["layoutItems"]>[number]).columnVerticalAlign, flex: (item as NonNullable<BuilderSection["layoutItems"]>[number]).columnFlex, responsiveWidth: (item as NonNullable<BuilderSection["layoutItems"]>[number]).columnResponsiveWidth })} ${nestedLayout ? "builder-nested-layout-container " : ""}${
                       hasScrollPinned
-                        ? "w-full col-span-12"
+                        ? "w-full"
                         : `shop-builder-content-layout-card shop-card-preset--${cardStyle}`
                     }`}
-                    style={
-                      hasScrollPinned
-                        ? { gridColumn: "span 12" }
-                        : { gridColumn: `span ${span}` }
-                    }
                   >
                     {nestedLayout ? (
                       <div
@@ -3644,7 +3649,7 @@ function EmbedSection({
     >
       <div className="shop-builder-embed-heading">
         {section.eyebrow && (
-          <p className="shop-builder-eyebrow">{section.eyebrow}</p>
+          <p className="uk-label uk-label-primary">{section.eyebrow}</p>
         )}
         <h2 className="shop-builder-title">{section.title}</h2>
         <BodyText className="shop-builder-body">{section.body}</BodyText>
@@ -3687,7 +3692,7 @@ function BuilderSectionRenderer({
 
   let content: ReactNode;
 
-  if (section.kind === "hero") {
+  if (section.kind === "hero" && !section.layoutItems?.length) {
     content = (
       <HeroSection
         section={section}
@@ -3733,7 +3738,7 @@ function BuilderSectionRenderer({
     content = (
       <BadgeGridSection section={section} layoutScheme={layoutScheme} />
     );
-  } else if (section.kind === "contentLayout") {
+  } else if (section.kind === "contentLayout" || section.kind === "hero") {
     content = (
       <ContentLayoutSection
         section={section}

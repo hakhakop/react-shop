@@ -90,7 +90,6 @@ export function resolveBuilderInteractionChrome({
   state,
   spacingActive = false,
   dragging = false,
-  hoverToolbarReady = false,
 }: {
   state: BuilderInteractionState;
   spacingActive?: boolean;
@@ -98,8 +97,7 @@ export function resolveBuilderInteractionChrome({
   hoverToolbarReady?: boolean;
 }): BuilderInteractionChrome {
   return {
-    showToolbar:
-      state === "selected" || (state === "hovered" && hoverToolbarReady),
+    showToolbar: state === "selected" || state === "hovered",
     showSpacing:
       (state === "selected" && spacingActive) ||
       (state === "insertion-target" && dragging),

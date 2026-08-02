@@ -34,6 +34,7 @@ interface HeaderNavProps {
   scopedPreviewPages?: ScopedPreviewPage[];
   scopedLinkMode?: "builder" | "preview";
   activeContentLanguage?: string;
+  style?: CSSProperties;
 }
 
 function handleNavMouseMove(e: MouseEvent<HTMLAnchorElement>) {
@@ -348,6 +349,7 @@ export default function HeaderNav({
   scopedPreviewPages,
   scopedLinkMode = "preview",
   activeContentLanguage,
+  style,
 }: HeaderNavProps) {
   const rawPathname = usePathname();
   const dashboardMode = rawPathname === "/dashboard";
@@ -433,7 +435,7 @@ export default function HeaderNav({
         </div>
       </button>
 
-      <nav className="site-header-nav">
+      <nav className="site-header-nav" style={style}>
         {renderMenuItems(
           items,
           currentPath,

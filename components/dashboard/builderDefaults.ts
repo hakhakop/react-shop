@@ -494,22 +494,10 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
     return {
       id,
       kind,
-      buttonsLayout: "inline",
-      buttons: [
-        {
-          id: `btn-${Date.now().toString(36)}`,
-          label: "Schedule a Consultation",
-          url: "/",
-          target: "_self",
-          style: "primary",
-        }
-      ],
-      buttonPaddingY: "0.9rem",
-      buttonPaddingX: "1.35rem",
-      buttonBorderRadius: "999px",
-      buttonFontWeight: "700",
-      elementPadding: "xs",
-      elementBackgroundMode: "transparent",
+      buttonLabel: "Schedule a Consultation",
+      buttonUrl: "/",
+      buttonStyle: "primary",
+      size: "default",
     };
   }
 
@@ -578,8 +566,30 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
       headingText: "Thoughtful work creates momentum that lasts",
       headingLevel: "h2",
       headingAlign: "left",
+      headingSize: "medium",
       typography: premiumContentTypography,
       elementPadding: "sm",
+    };
+  }
+
+  if (kind === "accordion") {
+    return {
+      id,
+      kind,
+      accordionItems: [
+        { id: `${id}-item-1`, title: "What does this include?", content: "Add the key details your visitors need to understand the offer." },
+        { id: `${id}-item-2`, title: "How does it work?", content: "Explain the next step in a concise, helpful answer." },
+        { id: `${id}-item-3`, title: "Can I ask a question?", content: "Give visitors a clear path to contact you or continue exploring." },
+      ],
+      accordionMultiple: false,
+      accordionCollapsible: true,
+      accordionOpenItems: [0],
+      accordionIndicator: "none",
+      accordionIndicatorPosition: "end",
+      accordionRowStyle: "plain",
+      accordionSpacing: "default",
+      accordionTitleEmphasis: "default",
+      accordionOpenEmphasis: "none",
     };
   }
 
@@ -635,10 +645,9 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
       imageRatio: "16:9",
       imagePadding: "frameless",
       imageFit: "cover",
-      panelStyle: "flat-white",
-      elementPadding: "xs",
-      typography: premiumContentTypography,
-      visualStyle: premiumCardVisualStyle({ elevated: false, imageRatio: "16:9" }),
+      panelVariant: "default",
+      panelHover: false,
+      panelSize: "default",
     };
   }
 
@@ -1028,6 +1037,25 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
     };
   }
 
+  if (kind === "divider") {
+    return {
+      id,
+      kind,
+      dividerStyle: "default",
+    };
+  }
+
+  if (kind === "alert") {
+    return {
+      id,
+      kind,
+      alertStyle: "primary",
+      title: "Heads up",
+      body: "This is a UIkit alert callout. Change the variant or edit the text in the inspector.",
+      elementPadding: "sm",
+    };
+  }
+
   return {
     id,
     kind: "text",
@@ -1036,6 +1064,8 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
     body: "<p>We help ambitious teams turn complex ideas into focused, useful experiences.</p><p>Every decision is shaped around what your audience needs to understand, feel, and do next.</p><blockquote>Clarity is not the absence of personality—it is what gives personality room to be understood.</blockquote>",
     buttonLabel: "",
     buttonUrl: "",
+    textVariant: "default",
+    textAlign: "left",
     elementPadding: "sm",
     typography: premiumContentTypography,
     visualStyle: {

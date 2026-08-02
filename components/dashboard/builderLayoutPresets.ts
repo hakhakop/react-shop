@@ -1,3 +1,12 @@
+import {
+  UIKIT_LAYOUT_PRESETS,
+  UIKIT_LAYOUT_PRESET_LIST,
+  normalizeLayoutToUikitPreset,
+  getUikitColumnWidthClass,
+  type UikitLayoutPresetKey,
+  type UikitLayoutPreset,
+} from "@/lib/uikitLayoutEngine";
+
 export type BuilderRowLayoutPreset = {
   key: string;
   label: string;
@@ -5,155 +14,24 @@ export type BuilderRowLayoutPreset = {
   ratios: number[];
 };
 
-export const builderRowLayoutPresets: BuilderRowLayoutPreset[] = [
-  {
-    key: "whole",
-    label: "Whole",
-    description: "1 column",
-    ratios: [1],
-  },
-  {
-    key: "halves",
-    label: "Halves",
-    description: "1-1",
-    ratios: [1, 1],
-  },
-  {
-    key: "thirds",
-    label: "Thirds",
-    description: "1-1-1",
-    ratios: [1, 1, 1],
-  },
-  {
-    key: "quarters",
-    label: "Quarters",
-    description: "1-1-1-1",
-    ratios: [1, 1, 1, 1],
-  },
-  {
-    key: "fifths",
-    label: "Fifths",
-    description: "1-1-1-1-1",
-    ratios: [1, 1, 1, 1, 1],
-  },
-  {
-    key: "sixths",
-    label: "Sixths",
-    description: "1-1-1-1-1-1",
-    ratios: [1, 1, 1, 1, 1, 1],
-  },
-  {
-    key: "thirds-2-1",
-    label: "Thirds",
-    description: "2-1",
-    ratios: [2, 1],
-  },
-  {
-    key: "thirds-1-2",
-    label: "Thirds",
-    description: "1-2",
-    ratios: [1, 2],
-  },
-  {
-    key: "quarters-3-1",
-    label: "Quarters",
-    description: "3-1",
-    ratios: [3, 1],
-  },
-  {
-    key: "quarters-1-3",
-    label: "Quarters",
-    description: "1-3",
-    ratios: [1, 3],
-  },
-  {
-    key: "quarters-2-1-1",
-    label: "Quarters",
-    description: "2-1-1",
-    ratios: [2, 1, 1],
-  },
-  {
-    key: "quarters-1-1-2",
-    label: "Quarters",
-    description: "1-1-2",
-    ratios: [1, 1, 2],
-  },
-  {
-    key: "quarters-1-2-1",
-    label: "Quarters",
-    description: "1-2-1",
-    ratios: [1, 2, 1],
-  },
-  {
-    key: "fifths-2-3",
-    label: "Fifths",
-    description: "2-3",
-    ratios: [2, 3],
-  },
-  {
-    key: "fifths-3-2",
-    label: "Fifths",
-    description: "3-2",
-    ratios: [3, 2],
-  },
-  {
-    key: "fifths-1-4",
-    label: "Fifths",
-    description: "1-4",
-    ratios: [1, 4],
-  },
-  {
-    key: "fifths-4-1",
-    label: "Fifths",
-    description: "4-1",
-    ratios: [4, 1],
-  },
-  {
-    key: "fifths-3-1-1",
-    label: "Fifths",
-    description: "3-1-1",
-    ratios: [3, 1, 1],
-  },
-  {
-    key: "fifths-1-1-3",
-    label: "Fifths",
-    description: "1-1-3",
-    ratios: [1, 1, 3],
-  },
-  {
-    key: "fifths-1-3-1",
-    label: "Fifths",
-    description: "1-3-1",
-    ratios: [1, 3, 1],
-  },
-  {
-    key: "fifths-2-1-1-1",
-    label: "Fifths",
-    description: "2-1-1-1",
-    ratios: [2, 1, 1, 1],
-  },
-  {
-    key: "fifths-1-1-1-2",
-    label: "Fifths",
-    description: "1-1-1-2",
-    ratios: [1, 1, 1, 2],
-  },
-  {
-    key: "sixths-1-5",
-    label: "Sixths",
-    description: "1-5",
-    ratios: [1, 5],
-  },
-  {
-    key: "sixths-5-1",
-    label: "Sixths",
-    description: "5-1",
-    ratios: [5, 1],
-  },
-];
+export const builderRowLayoutPresets: BuilderRowLayoutPreset[] = UIKIT_LAYOUT_PRESET_LIST.map(
+  (preset) => ({
+    key: preset.key,
+    label: preset.label,
+    description: preset.description,
+    ratios: preset.columnClasses.map(() => 1),
+  })
+);
 
 export function getBuilderRowLayoutPreset(key: string | null | undefined) {
-  return builderRowLayoutPresets.find((preset) => preset.key === key) ?? null;
+  const normalizedKey = normalizeLayoutToUikitPreset(key || undefined);
+  const uikitPreset = UIKIT_LAYOUT_PRESETS[normalizedKey];
+  return {
+    key: uikitPreset.key,
+    label: uikitPreset.label,
+    description: uikitPreset.description,
+    ratios: uikitPreset.columnClasses.map(() => 1),
+  };
 }
 
 export function getBuilderRowLayoutPreviewTemplate(
@@ -161,7 +39,7 @@ export function getBuilderRowLayoutPreviewTemplate(
 ) {
   const preset = getBuilderRowLayoutPreset(key);
   if (!preset) return null;
-  return preset.ratios.map((ratio) => `${ratio}fr`).join(" ");
+  return preset.ratios.map(() => "1fr").join(" ");
 }
 
 export function getBuilderRowLayoutSummary(
@@ -169,7 +47,7 @@ export function getBuilderRowLayoutSummary(
   fallbackColumns?: number | null,
 ) {
   const preset = getBuilderRowLayoutPreset(key);
-  if (preset) return `${preset.label} ${preset.description}`;
+  if (preset) return `${preset.label} (${preset.description})`;
   if (typeof fallbackColumns === "number" && fallbackColumns > 0) {
     return `${fallbackColumns} columns`;
   }
@@ -180,7 +58,6 @@ export type LayoutItem = {
   id?: string;
   rowId?: string;
   rowLayout?: string;
-  // Row grouping only reads id/rowId/rowLayout, but callers keep richer row data.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   blocks?: any[];
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -201,11 +78,9 @@ export function getBuilderLayoutRows(
   if (items.length === 0) return [];
 
   const rows: BuilderLayoutRow[] = [];
-  const fallbackPreset = getBuilderRowLayoutPreset(section.layout);
-  const fallbackColumns = Math.max(
-    fallbackPreset?.ratios.length ?? section.layoutColumns ?? 2,
-    1,
-  );
+  const normalizedKey = normalizeLayoutToUikitPreset(section.layout);
+  const uikitPreset = UIKIT_LAYOUT_PRESETS[normalizedKey];
+  const fallbackColumns = Math.max(uikitPreset.columnCount, 1);
   let index = 0;
 
   while (index < items.length) {

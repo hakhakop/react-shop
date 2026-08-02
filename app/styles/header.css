@@ -1069,7 +1069,6 @@ html.dark .site-header {
   display: flex;
   flex-wrap: wrap;
   gap: 1.4rem;
-  font-size: 1rem;
   align-items: center;
 }
 

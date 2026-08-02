@@ -356,8 +356,6 @@ export default function HeaderShellView({
           ...(element?.buttonBorderColor ? { borderColor: element.buttonBorderColor } : {}),
           ...(element?.buttonPaddingY ? { paddingTop: element.buttonPaddingY, paddingBottom: element.buttonPaddingY } : {}),
           ...(element?.buttonPaddingX ? { paddingLeft: element.buttonPaddingX, paddingRight: element.buttonPaddingX } : {}),
-          ...(element?.buttonFontWeight ? { fontWeight: element.buttonFontWeight } : {}),
-          ...(element?.buttonLetterSpacing ? { letterSpacing: element.buttonLetterSpacing } : {}),
         }}
       >
         {categories}
@@ -374,6 +372,11 @@ export default function HeaderShellView({
       scopedPreviewPages={scopedPreviewPages}
       scopedLinkMode={scopedLinkMode}
       activeContentLanguage={activeContentLanguage}
+      style={typographyProps(
+        allDocumentElements.find((candidate) => candidate.type === "navigation")
+          ?.typography,
+        "body",
+      ).style}
     />
   ) : null;
   const renderLogoAndBrand = (element?: HeaderBuilderElement) => {
@@ -430,8 +433,6 @@ export default function HeaderShellView({
         ...(buttonElement?.buttonBorderColor ? { borderColor: buttonElement.buttonBorderColor } : {}),
         ...(buttonElement?.buttonPaddingY ? { paddingTop: buttonElement.buttonPaddingY, paddingBottom: buttonElement.buttonPaddingY } : {}),
         ...(buttonElement?.buttonPaddingX ? { paddingLeft: buttonElement.buttonPaddingX, paddingRight: buttonElement.buttonPaddingX } : {}),
-        ...(buttonElement?.buttonFontWeight ? { fontWeight: buttonElement.buttonFontWeight } : {}),
-        ...(buttonElement?.buttonLetterSpacing ? { letterSpacing: buttonElement.buttonLetterSpacing } : {}),
         ...typographyProps(buttonElement?.typography, "button").style,
       }}
     >
@@ -575,8 +576,6 @@ export default function HeaderShellView({
         ...(element.buttonBorderColor ? { borderColor: element.buttonBorderColor } : {}),
         ...(element.buttonPaddingY ? { paddingTop: element.buttonPaddingY, paddingBottom: element.buttonPaddingY } : {}),
         ...(element.buttonPaddingX ? { paddingLeft: element.buttonPaddingX, paddingRight: element.buttonPaddingX } : {}),
-        ...(element.buttonFontWeight ? { fontWeight: element.buttonFontWeight } : {}),
-        ...(element.buttonLetterSpacing ? { letterSpacing: element.buttonLetterSpacing } : {}),
         ...typographyProps(element.typography, "button").style,
       };
       content = (
@@ -612,7 +611,6 @@ export default function HeaderShellView({
             "--header-builder-menu-gap": element.menuItemGap,
             ...(element.menuHoverColor ? { "--header-builder-menu-hover": element.menuHoverColor } : {}),
             ...(element.menuActiveColor ? { "--header-builder-menu-active": element.menuActiveColor } : {}),
-            ...typographyProps(element.typography).style,
           } as CSSProperties)
         : {}),
       ...(element.type === "button" || element.type === "categories" || element.type === "language"

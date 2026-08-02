@@ -50,6 +50,15 @@ import {
 import TypographyPanel from "@/components/dashboard/TypographyPanel";
 import { headerPresets } from "./headerPresets";
 import StyleTabPanel from "@/components/dashboard/style/StyleTabPanel";
+import ButtonCapabilityPanel from "@/components/dashboard/inspector/panels/ButtonCapabilityPanel";
+import PanelCapabilityPanel from "@/components/dashboard/inspector/panels/PanelCapabilityPanel";
+import SectionCapabilityPanel from "@/components/dashboard/inspector/panels/SectionCapabilityPanel";
+import RowCapabilityPanel from "@/components/dashboard/inspector/panels/RowCapabilityPanel";
+import ColumnCapabilityPanel from "@/components/dashboard/inspector/panels/ColumnCapabilityPanel";
+import HeadingCapabilityPanel from "@/components/dashboard/inspector/panels/HeadingCapabilityPanel";
+import AccordionCapabilityPanel from "@/components/dashboard/inspector/panels/AccordionCapabilityPanel";
+import TextCapabilityPanel from "@/components/dashboard/inspector/panels/TextCapabilityPanel";
+import type { InspectorElementKind } from "@/lib/uikitCapabilities";
 import AnimationControl from "@/components/dashboard/style/AnimationControl";
 import {
   legacySpacingToSides,
@@ -97,6 +106,111 @@ import {
   getBuilderButtonPresetKey,
   hasLocalButtonStyles,
 } from "@/lib/builderButtons";
+import {
+  normalizeLayoutToUikitPreset,
+  UIKIT_LAYOUT_PRESETS,
+} from "@/lib/uikitLayoutEngine";
+
+const uikitPresetGroups = [
+  {
+    title: "Equal Widths",
+    keys: ["1-col", "2-col-equal", "3-col-equal", "4-col-equal", "5-col-equal", "6-col-equal"],
+  },
+  {
+    title: "Asymmetric Proportions",
+    keys: [
+      "thirds-2-1",
+      "thirds-1-2",
+      "quarters-3-1",
+      "quarters-1-3",
+      "quarters-2-1-1",
+      "quarters-1-1-2",
+      "quarters-1-2-1",
+      "fifths-2-3",
+      "fifths-3-2",
+      "fifths-1-4",
+      "fifths-4-1",
+      "fifths-3-1-1",
+      "fifths-1-1-3",
+      "fifths-1-3-1",
+      "fifths-2-1-1-1",
+      "fifths-1-1-1-2",
+      "sixths-1-5",
+      "sixths-5-1",
+    ],
+  },
+  {
+    title: "Fixed & Expanding",
+    keys: ["fixed-left", "fixed-right", "fixed-inner", "fixed-outer", "auto-expand"],
+  },
+];
+
+function UikitPresetWireframeDiagram({ presetKey }: { presetKey: string }) {
+  const normalizedKey = normalizeLayoutToUikitPreset(presetKey);
+  const preset = UIKIT_LAYOUT_PRESETS[normalizedKey];
+
+  return (
+    <div className="builder-preset-wireframe-container" aria-hidden="true">
+      {preset.columnClasses.map((cls, index) => {
+        let flexVal = "1";
+        let showArrow = false;
+
+        if (preset.key === "1-col") flexVal = "1";
+        else if (preset.key === "2-col-equal") flexVal = "1";
+        else if (preset.key === "3-col-equal") flexVal = "1";
+        else if (preset.key === "4-col-equal") flexVal = "1";
+        else if (preset.key === "5-col-equal") flexVal = "1";
+        else if (preset.key === "6-col-equal") flexVal = "1";
+        else if (preset.key === "thirds-2-1") flexVal = index === 0 ? "2" : "1";
+        else if (preset.key === "thirds-1-2") flexVal = index === 0 ? "1" : "2";
+        else if (preset.key === "quarters-3-1") flexVal = index === 0 ? "3" : "1";
+        else if (preset.key === "quarters-1-3") flexVal = index === 0 ? "1" : "3";
+        else if (preset.key === "quarters-2-1-1") flexVal = index === 0 ? "2" : "1";
+        else if (preset.key === "quarters-1-1-2") flexVal = index === 2 ? "2" : "1";
+        else if (preset.key === "quarters-1-2-1") flexVal = index === 1 ? "2" : "1";
+        else if (preset.key === "fifths-2-3") flexVal = index === 0 ? "2" : "3";
+        else if (preset.key === "fifths-3-2") flexVal = index === 0 ? "3" : "2";
+        else if (preset.key === "fifths-1-4") flexVal = index === 0 ? "1" : "4";
+        else if (preset.key === "fifths-4-1") flexVal = index === 0 ? "4" : "1";
+        else if (preset.key === "fifths-3-1-1") flexVal = index === 0 ? "3" : "1";
+        else if (preset.key === "fifths-1-1-3") flexVal = index === 2 ? "3" : "1";
+        else if (preset.key === "fifths-1-3-1") flexVal = index === 1 ? "3" : "1";
+        else if (preset.key === "fifths-2-1-1-1") flexVal = index === 0 ? "2" : "1";
+        else if (preset.key === "fifths-1-1-1-2") flexVal = index === 3 ? "2" : "1";
+        else if (preset.key === "sixths-1-5") flexVal = index === 0 ? "1" : "5";
+        else if (preset.key === "sixths-5-1") flexVal = index === 0 ? "5" : "1";
+        else if (preset.key === "fixed-left") {
+          flexVal = index === 0 ? "0 0 24%" : "1";
+          if (index === 1) showArrow = true;
+        } else if (preset.key === "fixed-right") {
+          flexVal = index === 0 ? "1" : "0 0 24%";
+          if (index === 0) showArrow = true;
+        } else if (preset.key === "fixed-inner") {
+          flexVal = index === 1 ? "0 0 24%" : "1";
+          if (index === 0 || index === 2) showArrow = true;
+        } else if (preset.key === "fixed-outer") {
+          flexVal = index === 1 ? "1" : "0 0 24%";
+          if (index === 1) showArrow = true;
+        } else if (preset.key === "auto-expand") {
+          flexVal = index === 0 ? "0 0 28%" : "1";
+          if (index === 1) showArrow = true;
+        }
+
+        return (
+          <div
+            key={`${preset.key}-${index}`}
+            className="builder-preset-wireframe-col"
+            style={{ flex: flexVal }}
+          >
+            {showArrow ? (
+              <span className="builder-preset-wireframe-arrow">← →</span>
+            ) : null}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
 
 function resolveInspectorHeaderAlignment(
   section: BuilderSection,
@@ -116,7 +230,9 @@ function resolveInspectorHeaderAlignment(
 
 const getSupportedTypographyAreas = (
   kind: string,
+  sectionId?: string,
 ): readonly TypographyArea[] => {
+  const isHeader = sectionId === "header-document";
   if (kind === "heading") return ["title"] as const;
   if (kind === "text") return ["title", "body", "button", "eyebrow"] as const;
   if (kind === "button") return ["button"] as const;
@@ -124,14 +240,29 @@ const getSupportedTypographyAreas = (
   if (kind === "list") return ["body"] as const;
   if (kind === "menu") return ["body"] as const;
   if (kind === "table") return ["body"] as const;
+  if (kind === "image") return isHeader ? (["title"] as const) : ([] as const);
   if (
-    kind === "image" ||
     kind === "icon" ||
     kind === "fluentForm" ||
     kind === "embed" ||
     kind === "breadcrumbs"
   ) {
     return [] as const;
+  }
+  if (isHeader) {
+    if (kind === "headerCategories") return ["button"] as const;
+    if (kind === "headerLanguage") return ["button"] as const;
+    if (
+      kind === "headerUtility" ||
+      kind === "headerSearch" ||
+      kind === "headerWishlist" ||
+      kind === "headerCart" ||
+      kind === "headerAccount" ||
+      kind === "headerTheme"
+    ) {
+      return [] as const;
+    }
+    return ["title", "body", "button", "eyebrow"] as const;
   }
   return ["title", "body", "button", "eyebrow"] as const;
 };
@@ -876,6 +1007,7 @@ type DashboardInspectorProps = {
   setSelectedLayoutRowIndex?: Dispatch<SetStateAction<number | null>>;
   onUpdateRowLayout?: LooseHandler;
   onUpdateRowStyle?: LooseHandler;
+  onUpdateColumnStyle?: LooseHandler;
   onAddRow?: LooseHandler;
   onDeleteRow?: LooseHandler;
   updateSelected: (patch: Partial<BuilderSection>) => void;
@@ -1407,6 +1539,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
     onApplyHeaderPreset,
     deleteSelectedRow = () => undefined,
     onUpdateRowStyle = () => undefined,
+    onUpdateColumnStyle = () => undefined,
     moveSelected,
     openWordPressMediaPicker,
     onOpenGlobalSpacingSettings,
@@ -1452,8 +1585,26 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
     selectedLayoutRow?.items.every(
       (item) => (item.blocks ?? []).length === 0,
     ) ?? false;
+  const selectedColumnForInspector =
+    layoutContainerSection && selectedLayoutColumnKey
+      ? findLayoutColumn(layoutContainerSection, selectedLayoutColumnKey)
+      : null;
+  const isCanonicalColumnSelection = Boolean(
+    selectedColumnForInspector &&
+      !selectedLayoutBlock &&
+      !selectedLayoutRow &&
+      selectedSection?.id !== "header-document",
+  );
+  const isCanonicalRowSelection = Boolean(
+    selectedLayoutRow &&
+      selectedRowItem &&
+      selectedSection?.id !== "header-document",
+  );
   const supportedAreas = selectedLayoutBlock
-    ? getSupportedTypographyAreas(selectedLayoutBlock.kind ?? "text")
+    ? getSupportedTypographyAreas(
+        selectedLayoutBlock.kind ?? "text",
+        selectedSection?.id,
+      )
     : [];
   const blockTabs: [InspectorTab, string][] = [
     ["content", t("builder.inspector.content")],
@@ -1466,8 +1617,38 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
   }
   blockTabs.push(["advanced", t("builder.inspector.advanced")]);
 
+  const canonicalBlockTabs: [InspectorTab, string][] =
+    selectedLayoutBlock?.kind === "button" || selectedLayoutBlock?.kind === "panel"
+      ? [
+          ["content", t("builder.inspector.content")],
+          ["style", t("builder.inspector.styling")],
+          ["advanced", t("builder.inspector.advanced")],
+        ]
+      : selectedLayoutBlock?.kind === "heading"
+        ? [
+            ["content", t("builder.inspector.content")],
+            ["style", t("builder.inspector.styling")],
+            ["typography", t("builder.inspector.typography")],
+            ["advanced", t("builder.inspector.advanced")],
+          ]
+      : selectedLayoutBlock?.kind === "accordion"
+        ? [
+            ["content", t("builder.inspector.content")],
+            ["behavior", "Behavior"],
+            ["style", t("builder.inspector.styling")],
+            ["advanced", t("builder.inspector.advanced")],
+          ]
+      : selectedLayoutBlock?.kind === "text"
+        ? [
+            ["content", t("builder.inspector.content")],
+            ["style", t("builder.inspector.styling")],
+            ["typography", t("builder.inspector.typography")],
+            ["advanced", t("builder.inspector.advanced")],
+          ]
+        : blockTabs;
+
   const inspectorTabs: [InspectorTab, string][] = selectedLayoutBlock
-    ? blockTabs
+    ? canonicalBlockTabs
     : selectedLayoutRow
       ? [
           ["layout", t("builder.inspector.layout")],
@@ -1475,6 +1656,11 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
           ["style", t("builder.inspector.styling")],
           ["advanced", t("builder.inspector.advanced")],
         ]
+      : isCanonicalColumnSelection
+        ? [
+            ["layout", t("builder.inspector.layout")],
+            ["advanced", t("builder.inspector.advanced")],
+          ]
       : [
           ["layout", t("builder.inspector.layout")],
           ["spacing", t("builder.inspector.spacing")],
@@ -1585,6 +1771,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
     if (selectedLayoutBlock) {
       const supported = getSupportedTypographyAreas(
         selectedLayoutBlock.kind ?? "text",
+        selectedSection?.id,
       );
       if (supported.length === 0 && inspectorTab === "typography") {
         setInspectorTab("content");
@@ -1597,10 +1784,16 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
       }
       return;
     }
+    if (isCanonicalColumnSelection) {
+      if (inspectorTab !== "layout" && inspectorTab !== "advanced") {
+        setInspectorTab("layout");
+      }
+      return;
+    }
     if (inspectorTab === "typography") {
       setInspectorTab("style");
     }
-  }, [inspectorTab, selectedLayoutBlock, selectedLayoutRow, setInspectorTab]);
+  }, [inspectorTab, selectedLayoutBlock, selectedLayoutRow, isCanonicalColumnSelection, setInspectorTab]);
 
   useEffect(() => {
     if (!spacingFocusRequest?.field) return;
@@ -1652,6 +1845,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
     : undefined;
   const styleTarget = selectedLayoutBlock
     ? {
+        kind: (selectedLayoutBlock.kind === "heading" ? "heading" : selectedLayoutBlock.kind === "button" ? "button" : selectedLayoutBlock.kind === "divider" ? "divider" : selectedLayoutBlock.kind === "alert" ? "alert" : selectedLayoutBlock.kind === "panel" || selectedLayoutBlock.kind === "products" ? "card" : "section") as InspectorElementKind,
         visualStyle: {
           ...selectedBlockVisualStyle,
           padding:
@@ -1680,8 +1874,11 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
         addToCartDisplay: selectedLayoutBlock.addToCartDisplay,
         addToCartVisibility: selectedLayoutBlock.addToCartVisibility,
         addToCartPosition: selectedLayoutBlock.addToCartPosition,
+        buttonVariant: selectedLayoutBlock.buttonStyle,
+        buttonSize: selectedLayoutBlock.size,
       }
     : {
+        kind: "section" as const,
         visualStyle: selectedSection?.visualStyle,
         typography: selectedSection?.typography,
       };
@@ -1705,15 +1902,20 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
       addToCartDisplay?: string;
       addToCartVisibility?: string;
       addToCartPosition?: string;
+      buttonVariant?: string;
+      buttonSize?: string;
     }>,
   ) {
     if (selectedLayoutBlock && selectedLayoutBlockKey && selectedSection) {
       if (selectedLayoutColumnKey) {
+        const nextPatch = { ...patch } as any;
+        if ("buttonVariant" in nextPatch) { nextPatch.buttonStyle = nextPatch.buttonVariant; delete nextPatch.buttonVariant; }
+        if ("buttonSize" in nextPatch) { nextPatch.size = nextPatch.buttonSize === "default" ? undefined : nextPatch.buttonSize; delete nextPatch.buttonSize; }
         updateLayoutBlockByKey(
           selectedSection.id,
           selectedLayoutColumnKey,
           selectedLayoutBlockKey,
-          patch,
+          nextPatch,
         );
         return;
       }
@@ -1726,7 +1928,10 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
           const block = blocks[bi];
           const blockKey = block.id ?? `${item.id ?? `item-${ci}`}-block-${bi}`;
           if (blockKey === selectedLayoutBlockKey) {
-            updateSelectedLayoutBlock(ci, bi, patch);
+            const nextPatch = { ...patch } as any;
+            if ("buttonVariant" in nextPatch) { nextPatch.buttonStyle = nextPatch.buttonVariant; delete nextPatch.buttonVariant; }
+            if ("buttonSize" in nextPatch) { nextPatch.size = nextPatch.buttonSize === "default" ? undefined : nextPatch.buttonSize; delete nextPatch.buttonSize; }
+            updateSelectedLayoutBlock(ci, bi, nextPatch);
             return;
           }
         }
@@ -1977,7 +2182,15 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
   const isElementSpacingTab = inspectorTab === "spacing";
   const isElementSettingsTab = inspectorTab === "style";
   const isElementTypographyTab = inspectorTab === "typography";
+  const isElementBehaviorTab = inspectorTab === "behavior";
   const isElementAdvancedTab = inspectorTab === "advanced";
+  const isCanonicalSectionSelection = Boolean(
+    selectedSection &&
+      !selectedLayoutBlock &&
+      !selectedLayoutRow &&
+      !selectedLayoutColumnKey &&
+      selectedSection.id !== "header-document",
+  );
   const updateSelectedLayoutBlockByKey = (
     patch: Partial<BuilderLayoutBlock>,
   ) => {
@@ -2376,7 +2589,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
             </div>
           )}
 
-          {selectedLayoutRow && inspectorTab === "layout" && (
+          {selectedLayoutRow && !isCanonicalRowSelection && inspectorTab === "layout" && (
             <div className="builder-inspector-stack">
               <details className="builder-collapse" open>
                 <summary>
@@ -2497,7 +2710,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
               </details>
 
               <StyleTabPanel
-                target={{ visualStyle: selectedRowItem?.rowVisualStyle }}
+                target={{ kind: "row", visualStyle: selectedRowItem?.rowVisualStyle }}
                 showSpacing={false}
                 showBackground={false}
                 showAppearance={false}
@@ -2510,7 +2723,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
             </div>
           )}
 
-          {selectedLayoutRow && inspectorTab === "spacing" && (
+          {selectedLayoutRow && !isCanonicalRowSelection && inspectorTab === "spacing" && (
             <div className="builder-inspector-stack">
               <details className="builder-collapse" open>
                 <summary>
@@ -2599,7 +2812,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
             </div>
           )}
 
-          {selectedLayoutRow && inspectorTab === "style" && (
+          {selectedLayoutRow && !isCanonicalRowSelection && inspectorTab === "style" && (
             <div className="builder-inspector-stack">
               <details className="builder-collapse" open>
                 <summary>
@@ -2666,7 +2879,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                 </div>
               </details>
               <StyleTabPanel
-                target={{ visualStyle: selectedRowItem?.rowVisualStyle }}
+                target={{ kind: "row", visualStyle: selectedRowItem?.rowVisualStyle }}
                 showSpacing={false}
                 showLayout={false}
                 showAdvanced={false}
@@ -2678,7 +2891,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
             </div>
           )}
 
-          {selectedLayoutRow && inspectorTab === "advanced" && (
+          {selectedLayoutRow && !isCanonicalRowSelection && inspectorTab === "advanced" && (
             <div className="builder-inspector-stack">
               <details className="builder-collapse" open>
                 <summary>
@@ -2696,7 +2909,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                 />
               </details>
               <StyleTabPanel
-                target={{ visualStyle: selectedRowItem?.rowVisualStyle }}
+                target={{ kind: "row", visualStyle: selectedRowItem?.rowVisualStyle }}
                 showSpacing={false}
                 showBackground={false}
                 showAppearance={false}
@@ -2709,18 +2922,55 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
             </div>
           )}
 
-          {((!selectedLayoutBlock &&
+          {isCanonicalSectionSelection && (
+            <SectionCapabilityPanel
+              section={selectedSection!}
+              tab={inspectorTab}
+              update={updateSelected}
+            />
+          )}
+
+          {isCanonicalRowSelection && (
+            <RowCapabilityPanel
+              row={selectedRowItem!}
+              layoutKey={selectedLayoutRow?.layoutKey}
+              layoutSummary={selectedRowLayoutSummary}
+              tab={inspectorTab}
+              update={onUpdateRowStyle}
+              applyLayoutPreset={applySelectedRowLayoutPreset}
+            />
+          )}
+
+          {isCanonicalColumnSelection && (
+            <ColumnCapabilityPanel
+              column={selectedColumnForInspector!}
+              tab={inspectorTab}
+              update={onUpdateColumnStyle}
+            />
+          )}
+
+          {selectedLayoutBlock?.kind === "accordion" && (
+            <AccordionCapabilityPanel
+              block={selectedLayoutBlock}
+              tab={inspectorTab}
+              update={updateSelectedLayoutBlockByKey}
+            />
+          )}
+
+          {!isCanonicalSectionSelection && !isCanonicalColumnSelection && (( !selectedLayoutBlock &&
             !selectedLayoutRow &&
             inspectorTab === "layout" &&
             selectedSection.id !== "header-document") ||
             (selectedLayoutBlock &&
-              isLayoutContainerSection(selectedSection) &&
+              (isLayoutContainerSection(selectedSection) ||
+                selectedLayoutBlock.kind === "accordion") &&
               (isElementContentTab ||
                 isElementLayoutTab ||
                 isElementSpacingTab ||
                 isElementSettingsTab ||
                 isElementTypographyTab ||
-                isElementAdvancedTab))) && (
+                isElementAdvancedTab ||
+                isElementBehaviorTab))) && (
             <details
               className={`builder-collapse builder-section-settings-toggle ${
                 selectedLayoutBlock ? "is-element-focus" : ""
@@ -2943,33 +3193,11 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                     isLayoutContainerSection(selectedSection) && (
                       <>
                         <label className="builder-field">
-                          <span>Current Row Layout</span>
-                          <input value={currentRowLayoutSummary} readOnly />
-                          <small>
-                            {currentRowLayoutPreset
-                              ? "Chosen preset"
-                              : "Custom or manual column count"}
-                          </small>
-                        </label>
-
-                        <label className="builder-field">
-                          <span>Layout Columns</span>
-                          <select
-                            value={selectedSection.layoutColumns ?? 2}
-                            onChange={(event) =>
-                              updateSelected({
-                                layoutColumns: Number(event.target.value),
-                                layout: undefined,
-                              })
-                            }
-                          >
-                            <option value={1}>Full width</option>
-                            <option value={2}>2 columns</option>
-                            <option value={3}>3 columns</option>
-                            <option value={4}>4 columns</option>
-                            <option value={5}>5 columns</option>
-                            <option value={6}>6 columns</option>
-                          </select>
+                          <span>Layout</span>
+                          <input
+                            value={currentRowLayoutPreset?.label ?? "Whole"}
+                            readOnly
+                          />
                         </label>
 
                         <button
@@ -2978,7 +3206,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                           onClick={() => setLayoutPickerOpen(true)}
                         >
                           <Layers3 size={15} />
-                          Choose row layout
+                          Change Layout
                         </button>
 
                         <details
@@ -3050,11 +3278,37 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                     isElementSpacingTab ||
                     isElementSettingsTab ||
                     isElementTypographyTab ||
-                    isElementAdvancedTab) &&
-                    selectedLayoutBlock &&
-                    isLayoutContainerSection(selectedSection) && (
+                    isElementAdvancedTab ||
+                    isElementBehaviorTab) &&
+                      selectedLayoutBlock &&
+                    (isLayoutContainerSection(selectedSection) ||
+                      selectedLayoutBlock.kind === "accordion") && (
                       <>
-                        {isElementSettingsTab ? (
+                        {selectedLayoutBlock.kind === "button" ? (
+                          <ButtonCapabilityPanel
+                            block={selectedLayoutBlock}
+                            tab={inspectorTab}
+                            update={updateSelectedLayoutBlockByKey}
+                          />
+                        ) : selectedLayoutBlock.kind === "panel" ? (
+                          <PanelCapabilityPanel
+                            block={selectedLayoutBlock}
+                            tab={inspectorTab}
+                            update={updateSelectedLayoutBlockByKey}
+                          />
+                        ) : selectedLayoutBlock.kind === "heading" ? (
+                          <HeadingCapabilityPanel
+                            block={selectedLayoutBlock}
+                            tab={inspectorTab}
+                            update={updateSelectedLayoutBlockByKey}
+                          />
+                        ) : selectedLayoutBlock.kind === "text" ? (
+                          <TextCapabilityPanel
+                            block={selectedLayoutBlock}
+                            tab={inspectorTab}
+                            update={updateSelectedLayoutBlockByKey}
+                          />
+                        ) : isElementSettingsTab ? (
                           <div className="builder-element-styling-panel">
                             {selectedLayoutBlock.kind !== "image" && (
                               <div className="builder-element-inspector-note">
@@ -3247,7 +3501,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                             </button>
                                           </div>
 
-                                          {isSelectedBlock &&
+                                          {isSelectedBlock && selectedLayoutBlock?.kind !== "heading" && selectedLayoutBlock?.kind !== "text" &&
                                             isElementTypographyTab && (
                                               <div className="builder-element-typography-panel">
                                                 {supportedAreas.length > 1 && (
@@ -3301,6 +3555,8 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                           : "Eyebrow typography"}
                                                   </span>
                                                   <TypographyPanel
+                                                    hideVariant={block.kind === "heading"}
+                                                    hideFontSize={block.kind === "heading"}
                                                     value={{
                                                       ...resolveTypographyInput(
                                                         block.typography,
@@ -3359,7 +3615,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                               </div>
                                             )}
 
-                                          {isSelectedBlock &&
+                                          {isSelectedBlock && selectedLayoutBlock?.kind !== "heading" && selectedLayoutBlock?.kind !== "text" &&
                                             isElementLayoutTab && (
                                               <>
                                                 {block.kind !== "products" &&
@@ -3377,6 +3633,143 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                             "left"}
                                                         </small>
                                                       </summary>
+                                                      {block.kind === "heading" && (
+                                                        <>
+                                                          <label className="builder-field">
+                                                            <span>Heading Text</span>
+                                                            <input
+                                                              value={
+                                                                block.headingText ??
+                                                                ""
+                                                              }
+                                                              onChange={(event) =>
+                                                                updateSelectedLayoutBlockByKey(
+                                                                  {
+                                                                    headingText:
+                                                                      event.target
+                                                                        .value,
+                                                                  },
+                                                                )
+                                                              }
+                                                            />
+                                                          </label>
+                                                          <label className="builder-field">
+                                                            <span>Level</span>
+                                                            <select
+                                                              value={
+                                                                block.headingLevel ??
+                                                                "h2"
+                                                              }
+                                                              onChange={(event) =>
+                                                                updateSelectedLayoutBlockByKey(
+                                                                  {
+                                                                    headingLevel:
+                                                                      event.target
+                                                                        .value as any,
+                                                                  },
+                                                                )
+                                                              }
+                                                            >
+                                                              <option value="h1">
+                                                                H1
+                                                              </option>
+                                                              <option value="h2">
+                                                                H2
+                                                              </option>
+                                                              <option value="h3">
+                                                                H3
+                                                              </option>
+                                                              <option value="h4">
+                                                                H4
+                                                              </option>
+                                                              <option value="h5">
+                                                                H5
+                                                              </option>
+                                                              <option value="h6">
+                                                                H6
+                                                              </option>
+                                                            </select>
+                                                          </label>
+
+                                                          <label className="builder-field">
+                                                            <span>
+                                                              Visual Preset (UIkit)
+                                                            </span>
+                                                            <select
+                                                              value={
+                                                                block.headingSize ??
+                                                                "medium"
+                                                              }
+                                                              onChange={(event) =>
+                                                                updateSelectedLayoutBlockByKey(
+                                                                  {
+                                                                    headingSize:
+                                                                      event.target
+                                                                        .value as any,
+                                                                  },
+                                                                )
+                                                              }
+                                                            >
+                                                              <option value="h1">
+                                                                H1
+                                                              </option>
+                                                              <option value="h2">
+                                                                H2
+                                                              </option>
+                                                              <option value="h3">
+                                                                H3
+                                                              </option>
+                                                              <option value="h4">
+                                                                H4
+                                                              </option>
+                                                              <option value="h5">
+                                                                H5
+                                                              </option>
+                                                              <option value="h6">
+                                                                H6
+                                                              </option>
+                                                              <option value="article-title">
+                                                                Article Title
+                                                              </option>
+                                                              <option value="small">
+                                                                Small
+                                                              </option>
+                                                              <option value="medium">
+                                                                Medium
+                                                              </option>
+                                                              <option value="large">
+                                                                Large
+                                                              </option>
+                                                              <option value="xlarge">
+                                                                X-Large
+                                                              </option>
+                                                            </select>
+                                                          </label>
+
+                                                          <label className="builder-field">
+                                                            <span>
+                                                              Heading Gradient Preset
+                                                            </span>
+                                                            <select
+                                                              value={
+                                                                block.textGradientPreset ??
+                                                                "none"
+                                                              }
+                                                              onChange={(event) =>
+                                                                updateSelectedLayoutBlockByKey(
+                                                                  {
+                                                                    textGradientPreset:
+                                                                      event.target
+                                                                        .value as any,
+                                                                  },
+                                                                )
+                                                              }
+                                                            >
+                                                              <option value="none">None</option>
+                                                            </select>
+                                                          </label>
+                                                        </>
+                                                      )}
                                                       <label className="builder-field">
                                                         <span>
                                                           Content Align
@@ -3706,7 +4099,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                               </>
                                             )}
 
-                                          {isSelectedBlock &&
+                                          {isSelectedBlock && selectedLayoutBlock?.kind !== "heading" && selectedLayoutBlock?.kind !== "text" &&
                                             isElementSettingsTab && (
                                               <>
                                                 {block.kind !== "products" &&
@@ -3803,7 +4196,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                               </>
                                             )}
 
-                                          {isSelectedBlock &&
+                                          {isSelectedBlock && selectedLayoutBlock?.kind !== "heading" && selectedLayoutBlock?.kind !== "text" &&
                                             isElementSpacingTab && (
                                               <>
                                                 {block.kind === "grid" && (
@@ -4090,7 +4483,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                           {isSelectedBlock &&
                                             isElementSettingsTab && (
                                               <>
-                                                {block.kind !== "products" && block.kind !== "button" && (
+                                                {block.kind !== "products" && block.kind !== "button" && block.kind !== "panel" && (
                                                   <details
                                                     className="builder-collapse"
                                                     open
@@ -4243,7 +4636,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                   "headerLanguage",
                                                 ].includes(
                                                   block.kind ?? "",
-                                                ) && (
+                                                ) && block.kind !== "panel" && (
                                                   <details className="builder-collapse">
                                                     <summary>
                                                       <span>Buttons</span>
@@ -4988,102 +5381,6 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                         </label>
                                                       </div>
 
-                                                      <div className="builder-two-column">
-                                                        <label className="builder-field">
-                                                          <span>
-                                                            Font Weight
-                                                          </span>
-                                                          <select
-                                                            value={
-                                                              block.buttonFontWeight ||
-                                                              "inherit"
-                                                            }
-                                                            onChange={(event) =>
-                                                              updateSelectedLayoutBlock(
-                                                                index,
-                                                                blockIndex,
-                                                                {
-                                                                  buttonFontWeight:
-                                                                    event.target
-                                                                      .value ===
-                                                                    "inherit"
-                                                                      ? undefined
-                                                                      : event
-                                                                          .target
-                                                                          .value,
-                                                                },
-                                                              )
-                                                            }
-                                                          >
-                                                            <option value="inherit">
-                                                              Inherit global
-                                                            </option>
-                                                            <option value="400">
-                                                              Normal (400)
-                                                            </option>
-                                                            <option value="500">
-                                                              Medium (500)
-                                                            </option>
-                                                            <option value="600">
-                                                              Semibold (600)
-                                                            </option>
-                                                            <option value="700">
-                                                              Bold (700)
-                                                            </option>
-                                                            <option value="720">
-                                                              Heavy (720)
-                                                            </option>
-                                                            <option value="800">
-                                                              Extra Bold (800)
-                                                            </option>
-                                                          </select>
-                                                        </label>
-
-                                                        <label className="builder-field">
-                                                          <span>
-                                                            Letter Spacing
-                                                          </span>
-                                                          <select
-                                                            value={
-                                                              block.buttonLetterSpacing ||
-                                                              "inherit"
-                                                            }
-                                                            onChange={(event) =>
-                                                              updateSelectedLayoutBlock(
-                                                                index,
-                                                                blockIndex,
-                                                                {
-                                                                  buttonLetterSpacing:
-                                                                    event.target
-                                                                      .value ===
-                                                                    "inherit"
-                                                                      ? undefined
-                                                                      : event
-                                                                          .target
-                                                                          .value,
-                                                                },
-                                                              )
-                                                            }
-                                                          >
-                                                            <option value="inherit">
-                                                              Inherit global
-                                                            </option>
-                                                            <option value="0px">
-                                                              None (0px)
-                                                            </option>
-                                                            <option value="0.02em">
-                                                              Tight (0.02em)
-                                                            </option>
-                                                            <option value="0.05em">
-                                                              Medium (0.05em)
-                                                            </option>
-                                                            <option value="0.1em">
-                                                              Wide (0.1em)
-                                                            </option>
-                                                          </select>
-                                                        </label>
-                                                      </div>
-
                                                       <div className="builder-card-title">
                                                         <strong>
                                                           Hover Overrides
@@ -5363,15 +5660,17 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                               </>
                                             )}
 
-                                          {isSelectedBlock &&
+                                          {isSelectedBlock && selectedLayoutBlock?.kind !== "heading" && selectedLayoutBlock?.kind !== "text" &&
                                             isElementAdvancedTab && (
                                               <>
                                                 {renderAnimationControls(block)}
                                               </>
                                             )}
 
-                                          {isSelectedBlock &&
-                                            isElementContentTab && (
+                                          {isSelectedBlock && selectedLayoutBlock?.kind !== "heading" && selectedLayoutBlock?.kind !== "text" &&
+                                            isElementContentTab &&
+                                            selectedLayoutBlock?.kind !== "button" &&
+                                            selectedLayoutBlock?.kind !== "panel" && (
                                               <>
                                                 {selectedSection?.id === "header-document" && (
                                                   <div className="builder-inspector-section builder-header-shared-properties">
@@ -5828,22 +6127,12 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                                       )
                                                                     }
                                                                   >
-                                                                    <option value="primary">
-                                                                      Solid
-                                                                      Primary
-                                                                    </option>
+                                                                    <option value="primary">Primary</option>
                                                                     <option value="secondary">
                                                                       Secondary
                                                                     </option>
-                                                                    <option value="outline">
-                                                                      Outline
-                                                                    </option>
-                                                                    <option value="ghost">
-                                                                      Ghost
-                                                                    </option>
-                                                                    <option value="light">
-                                                                      Light
-                                                                    </option>
+                                                                    <option value="default">Default</option>
+                                                                    <option value="text">Text</option>
                                                                   </select>
                                                                 </label>
                                                               </div>
@@ -10643,55 +10932,17 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                           block.headingLevel ??
                                                           "h2"
                                                         }
-                                                        onChange={(event) => {
-                                                          const newLevel = event
-                                                            .target.value as
-                                                            | "h1"
-                                                            | "h2"
-                                                            | "h3"
-                                                            | "h4"
-                                                            | "h5"
-                                                            | "h6";
-                                                          const currentTyp =
-                                                            block.typography ??
-                                                            {};
-                                                          let updatedTyp = {
-                                                            ...currentTyp,
-                                                          };
-                                                          if (
-                                                            (updatedTyp as any)
-                                                              .title
-                                                          ) {
-                                                            updatedTyp = {
-                                                              ...updatedTyp,
-                                                              title: {
-                                                                ...((
-                                                                  updatedTyp as any
-                                                                ).title ?? {}),
-                                                                fontSize: "",
-                                                                fontWeight: "",
-                                                                lineHeight: "",
-                                                              },
-                                                            };
-                                                          } else {
-                                                            updatedTyp = {
-                                                              ...updatedTyp,
-                                                              fontSize: "",
-                                                              fontWeight: "",
-                                                              lineHeight: "",
-                                                            };
-                                                          }
+                                                        onChange={(event) =>
                                                           updateSelectedLayoutBlock(
                                                             index,
                                                             blockIndex,
                                                             {
                                                               headingLevel:
-                                                                newLevel,
-                                                              typography:
-                                                                updatedTyp,
+                                                                event.target
+                                                                  .value as any,
                                                             },
-                                                          );
-                                                        }}
+                                                          )
+                                                        }
                                                       >
                                                         <option value="h1">
                                                           H1
@@ -10710,6 +10961,63 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                         </option>
                                                         <option value="h6">
                                                           H6
+                                                        </option>
+                                                      </select>
+                                                    </label>
+
+                                                    <label className="builder-field">
+                                                      <span>
+                                                        Visual Preset (UIkit)
+                                                      </span>
+                                                      <select
+                                                        value={
+                                                          block.headingSize ??
+                                                          "medium"
+                                                        }
+                                                        onChange={(event) =>
+                                                          updateSelectedLayoutBlock(
+                                                            index,
+                                                            blockIndex,
+                                                            {
+                                                              headingSize:
+                                                                event.target
+                                                                  .value as any,
+                                                            },
+                                                          )
+                                                        }
+                                                      >
+                                                        <option value="h1">
+                                                          H1
+                                                        </option>
+                                                        <option value="h2">
+                                                          H2
+                                                        </option>
+                                                        <option value="h3">
+                                                          H3
+                                                        </option>
+                                                        <option value="h4">
+                                                          H4
+                                                        </option>
+                                                        <option value="h5">
+                                                          H5
+                                                        </option>
+                                                        <option value="h6">
+                                                          H6
+                                                        </option>
+                                                        <option value="article-title">
+                                                          Article Title
+                                                        </option>
+                                                        <option value="small">
+                                                          Small
+                                                        </option>
+                                                        <option value="medium">
+                                                          Medium
+                                                        </option>
+                                                        <option value="large">
+                                                          Large
+                                                        </option>
+                                                        <option value="xlarge">
+                                                          X-Large
                                                         </option>
                                                       </select>
                                                     </label>
@@ -12947,6 +13255,139 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                         )}
                                                       </>
                                                     )}
+                                                  </>
+                                                ) : block.kind === "alert" ? (
+                                                  <>
+                                                    <div className="builder-section-heading">
+                                                      <span>Alert</span>
+                                                    </div>
+                                                    <label className="builder-field">
+                                                      <span>Variant</span>
+                                                      <select
+                                                        value={
+                                                          block.alertStyle ??
+                                                          "primary"
+                                                        }
+                                                        onChange={(event) =>
+                                                          updateSelectedLayoutBlock(
+                                                            index,
+                                                            blockIndex,
+                                                            {
+                                                              alertStyle:
+                                                                event.target
+                                                                  .value as BuilderLayoutBlock["alertStyle"],
+                                                            },
+                                                          )
+                                                        }
+                                                      >
+                                                        <option value="primary">
+                                                          Primary
+                                                        </option>
+                                                        <option value="success">
+                                                          Success
+                                                        </option>
+                                                        <option value="warning">
+                                                          Warning
+                                                        </option>
+                                                        <option value="danger">
+                                                          Danger
+                                                        </option>
+                                                      </select>
+                                                    </label>
+                                                    <label className="builder-field">
+                                                      <span>Title</span>
+                                                      <input
+                                                        value={
+                                                          block.title ?? ""
+                                                        }
+                                                        onChange={(event) =>
+                                                          updateSelectedLayoutBlock(
+                                                            index,
+                                                            blockIndex,
+                                                            {
+                                                              title:
+                                                                event.target
+                                                                  .value,
+                                                            },
+                                                          )
+                                                        }
+                                                      />
+                                                    </label>
+                                                    <label className="builder-field">
+                                                      <span>Body</span>
+                                                      <textarea
+                                                        rows={3}
+                                                        value={
+                                                          block.body ?? ""
+                                                        }
+                                                        onChange={(event) =>
+                                                          updateSelectedLayoutBlock(
+                                                            index,
+                                                            blockIndex,
+                                                            {
+                                                              body:
+                                                                event.target
+                                                                  .value,
+                                                            },
+                                                          )
+                                                        }
+                                                      />
+                                                    </label>
+                                                    <div className="builder-element-inspector-note">
+                                                      <strong>UIkit Alert</strong>
+                                                      <span>
+                                                        Rendered with canonical
+                                                        UIkit alert classes via
+                                                        getUikitAlertClass().
+                                                      </span>
+                                                    </div>
+                                                  </>
+                                                ) : block.kind === "divider" ? (
+                                                  <>
+                                                    <div className="builder-section-heading">
+                                                      <span>Divider</span>
+                                                    </div>
+                                                    <label className="builder-field">
+                                                      <span>Style</span>
+                                                      <select
+                                                        value={
+                                                          block.dividerStyle ??
+                                                          "default"
+                                                        }
+                                                        onChange={(event) =>
+                                                          updateSelectedLayoutBlock(
+                                                            index,
+                                                            blockIndex,
+                                                            {
+                                                              dividerStyle:
+                                                                event.target
+                                                                  .value as BuilderLayoutBlock["dividerStyle"],
+                                                            },
+                                                          )
+                                                        }
+                                                      >
+                                                        <option value="default">
+                                                          Solid line
+                                                        </option>
+                                                        <option value="small">
+                                                          Short line
+                                                        </option>
+                                                        <option value="icon">
+                                                          Icon divider
+                                                        </option>
+                                                        <option value="vertical">
+                                                          Vertical
+                                                        </option>
+                                                      </select>
+                                                    </label>
+                                                    <div className="builder-element-inspector-note">
+                                                      <strong>UIkit Divider</strong>
+                                                      <span>
+                                                        Rendered with canonical UIkit
+                                                        divider classes via
+                                                        getUikitDividerClass().
+                                                      </span>
+                                                    </div>
                                                   </>
                                                 ) : (
                                                   <>
@@ -16230,7 +16671,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
             </details>
           )}
 
-          {inspectorTab === "spacing" &&
+          {!isCanonicalSectionSelection && inspectorTab === "spacing" &&
             !selectedLayoutBlock &&
             !selectedLayoutRow &&
             selectedSection && (
@@ -16310,7 +16751,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
               </div>
             )}
 
-          {inspectorTab === "style" &&
+          {!isCanonicalSectionSelection && inspectorTab === "style" &&
             !selectedLayoutBlock &&
             !selectedLayoutRow &&
             selectedSection && (
@@ -16810,7 +17251,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
               </div>
             )}
 
-          {inspectorTab === "advanced" && !selectedLayoutRow && (
+          {!isCanonicalSectionSelection && inspectorTab === "advanced" && !selectedLayoutRow && (
             <>
               {!selectedLayoutBlock ? (
                 <>
@@ -16955,54 +17396,57 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
             <div className="builder-layout-header">
               <div>
                 <strong id="builder-layout-picker-title">
-                  Choose row layout
+                  Choose layout
                 </strong>
-                <span>
-                  Pick a preset. Existing blocks stay in place if columns are
-                  reduced.
-                </span>
+                <span>Select the column structure for this layout.</span>
               </div>
               <button
                 type="button"
                 className="builder-layout-close"
                 onClick={() => setLayoutPickerOpen(false)}
-                aria-label="Close row layout picker"
+                aria-label="Close layout picker"
               >
                 <X size={15} />
               </button>
             </div>
 
-            <div className="builder-layout-picker-grid">
-              {builderRowLayoutPresets.map((preset) => {
-                const isActive = currentRowLayoutPreset?.key === preset.key;
+            <div className="builder-layout-picker-body">
+              {uikitPresetGroups.map((group) => {
+                const groupPresets = group.keys
+                  .map((key) => builderRowLayoutPresets.find((p) => p.key === key))
+                  .filter(Boolean);
+
+                if (groupPresets.length === 0) return null;
+
                 return (
-                  <button
-                    key={preset.key}
-                    type="button"
-                    className={`builder-layout-picker-card ${
-                      isActive ? "is-active" : ""
-                    }`}
-                    onClick={() => {
-                      applyLayoutPreset(layoutContainerSection.id, preset.key);
-                      setLayoutPickerOpen(false);
-                    }}
-                  >
-                    <span className="builder-layout-picker-card-copy">
-                      <strong>{preset.label}</strong>
-                      <small>{preset.description}</small>
-                    </span>
-                    <span
-                      className="builder-layout-picker-preview"
-                      aria-hidden="true"
-                    >
-                      {preset.ratios.map((ratio, index) => (
-                        <i
-                          key={`${preset.key}-${index}`}
-                          style={{ flex: ratio }}
-                        />
-                      ))}
-                    </span>
-                  </button>
+                  <div key={group.title} className="builder-layout-picker-group">
+                    <div className="builder-layout-picker-group-title">
+                      {group.title}
+                    </div>
+                    <div className="builder-layout-picker-grid">
+                      {groupPresets.map((preset) => {
+                        const isActive = currentRowLayoutPreset?.key === preset!.key;
+                        return (
+                          <button
+                            key={preset!.key}
+                            type="button"
+                            className={`builder-layout-picker-card ${
+                              isActive ? "is-active" : ""
+                            }`}
+                            onClick={() => {
+                              applyLayoutPreset(layoutContainerSection.id, preset!.key);
+                              setLayoutPickerOpen(false);
+                            }}
+                          >
+                            <UikitPresetWireframeDiagram presetKey={preset!.key} />
+                            <span className="builder-layout-picker-card-copy">
+                              <strong>{preset!.label}</strong>
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
                 );
               })}
             </div>

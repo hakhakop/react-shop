@@ -22,6 +22,7 @@ import {
   Navigation,
   PanelLeft,
   PanelRightOpen,
+  Pencil,
   Languages,
   Plus,
   ShoppingBag,
@@ -44,6 +45,22 @@ import {
   X,
   Sun,
   Moon,
+  AlertCircle,
+  AlignLeft,
+  Clock,
+  Equal,
+  FileText,
+  Frame,
+  Layout,
+  LayoutGrid,
+  Menu,
+  Minus,
+  MousePointerClick,
+  Presentation,
+  Table,
+  Tag,
+  Timer,
+  Zap,
   ChevronRight,
   ArrowUpRight,
 } from "lucide-react";
@@ -90,6 +107,29 @@ import CarouselBlock, {
 } from "@/components/blocks/CarouselBlock";
 import BuilderScrollAnimations from "@/components/builder/BuilderScrollAnimations";
 import StorefrontBuilderRenderer from "@/components/builder/StorefrontBuilderRenderer";
+import UikitAccordion from "@/components/builder/UikitAccordion";
+import UikitText from "@/components/builder/UikitText";
+import {
+  getUikitMarginClass,
+  getUikitSectionPaddingClass,
+  getUikitSectionStyleClass,
+  getUikitContainerClass,
+  getUikitGridClass,
+  getUikitWidthClass,
+  getUikitCardClass,
+  getUikitButtonClass,
+  getUikitHeadingClass,
+  getUikitTextClass,
+  getUikitDividerClass,
+  getUikitAlertClass,
+  getUikitColumnClass,
+} from "@/lib/uikitTokens";
+import {
+  getUikitColumnWidthClass,
+  normalizeLayoutToUikitPreset,
+  UIKIT_LAYOUT_PRESETS,
+} from "@/lib/uikitLayoutEngine";
+import { getUikitGlobalsCssVars } from "@/lib/uikitGlobals";
 import CategoryBar from "@/components/CategoryBar";
 import CategoryWithFilters from "@/components/CategoryWithFilters";
 import ProductCategoryFilterProvider from "@/components/ProductCategoryFilterProvider";
@@ -121,6 +161,7 @@ import ScrollPinnedDemo from "@/components/animations/ScrollPinnedDemo";
 import { AntigravityTerminal } from "@/components/builder/AntigravityTerminal";
 import AntigravityCanvas from "@/components/builder/AntigravityCanvas";
 import TypewriterText from "@/components/builder/TypewriterText";
+import BuilderLineBreakText from "@/components/builder/BuilderLineBreakText";
 import type {
   BuilderCustomPage,
   BuilderCustomPageKey,
@@ -191,7 +232,9 @@ import {
   type GlobalStylePreset,
 } from "@/components/dashboard/globalStylePresets";
 import type { BuilderVisualStyle } from "@/lib/builderVisualStyle";
-import { typographyProps, type TypographyArea } from "@/lib/builderTypography";
+import YoothemeImportPanel from "@/components/dashboard/global-styles/YoothemeImportPanel";
+import CanonicalGlobalStylesPanel from "@/components/dashboard/global-styles/CanonicalGlobalStylesPanel";
+import { typographyProps, getHeadingTypographyStyles, type TypographyArea } from "@/lib/builderTypography";
 import {
   resolveBuilderRowGap,
   resolveBuilderRowStyle,
@@ -1076,13 +1119,108 @@ const previewButtonsStyle = (
     alignItems: "center",
   }) as CSSProperties;
 
-const rowInsertionPresets = [
-  { key: "whole", label: "1/1", ratios: [1] },
-  { key: "halves", label: "1/2 + 1/2", ratios: [1, 1] },
-  { key: "thirds", label: "1/3 + 1/3 + 1/3", ratios: [1, 1, 1] },
-  { key: "thirds-1-2", label: "1/3 + 2/3", ratios: [1, 2] },
-  { key: "thirds-2-1", label: "2/3 + 1/3", ratios: [2, 1] },
-] as const;
+const rowInsertionPresets = builderRowLayoutPresets;
+
+const uikitPresetGroups = [
+  {
+    title: "Equal Widths",
+    keys: ["1-col", "2-col-equal", "3-col-equal", "4-col-equal", "5-col-equal", "6-col-equal"],
+  },
+  {
+    title: "Asymmetric Proportions",
+    keys: [
+      "thirds-2-1",
+      "thirds-1-2",
+      "quarters-3-1",
+      "quarters-1-3",
+      "quarters-2-1-1",
+      "quarters-1-1-2",
+      "quarters-1-2-1",
+      "fifths-2-3",
+      "fifths-3-2",
+      "fifths-1-4",
+      "fifths-4-1",
+      "fifths-3-1-1",
+      "fifths-1-1-3",
+      "fifths-1-3-1",
+      "fifths-2-1-1-1",
+      "fifths-1-1-1-2",
+      "sixths-1-5",
+      "sixths-5-1",
+    ],
+  },
+  {
+    title: "Fixed & Expanding",
+    keys: ["fixed-left", "fixed-right", "fixed-inner", "fixed-outer", "auto-expand"],
+  },
+];
+
+function UikitPresetWireframeDiagram({ presetKey }: { presetKey: string }) {
+  const normalizedKey = normalizeLayoutToUikitPreset(presetKey);
+  const preset = UIKIT_LAYOUT_PRESETS[normalizedKey];
+
+  return (
+    <div className="builder-preset-wireframe-container" aria-hidden="true">
+      {preset.columnClasses.map((cls, index) => {
+        let flexVal = "1";
+        let showArrow = false;
+
+        if (preset.key === "1-col") flexVal = "1";
+        else if (preset.key === "2-col-equal") flexVal = "1";
+        else if (preset.key === "3-col-equal") flexVal = "1";
+        else if (preset.key === "4-col-equal") flexVal = "1";
+        else if (preset.key === "5-col-equal") flexVal = "1";
+        else if (preset.key === "6-col-equal") flexVal = "1";
+        else if (preset.key === "thirds-2-1") flexVal = index === 0 ? "2" : "1";
+        else if (preset.key === "thirds-1-2") flexVal = index === 0 ? "1" : "2";
+        else if (preset.key === "quarters-3-1") flexVal = index === 0 ? "3" : "1";
+        else if (preset.key === "quarters-1-3") flexVal = index === 0 ? "1" : "3";
+        else if (preset.key === "quarters-2-1-1") flexVal = index === 0 ? "2" : "1";
+        else if (preset.key === "quarters-1-1-2") flexVal = index === 2 ? "2" : "1";
+        else if (preset.key === "quarters-1-2-1") flexVal = index === 1 ? "2" : "1";
+        else if (preset.key === "fifths-2-3") flexVal = index === 0 ? "2" : "3";
+        else if (preset.key === "fifths-3-2") flexVal = index === 0 ? "3" : "2";
+        else if (preset.key === "fifths-1-4") flexVal = index === 0 ? "1" : "4";
+        else if (preset.key === "fifths-4-1") flexVal = index === 0 ? "4" : "1";
+        else if (preset.key === "fifths-3-1-1") flexVal = index === 0 ? "3" : "1";
+        else if (preset.key === "fifths-1-1-3") flexVal = index === 2 ? "3" : "1";
+        else if (preset.key === "fifths-1-3-1") flexVal = index === 1 ? "3" : "1";
+        else if (preset.key === "fifths-2-1-1-1") flexVal = index === 0 ? "2" : "1";
+        else if (preset.key === "fifths-1-1-1-2") flexVal = index === 3 ? "2" : "1";
+        else if (preset.key === "sixths-1-5") flexVal = index === 0 ? "1" : "5";
+        else if (preset.key === "sixths-5-1") flexVal = index === 0 ? "5" : "1";
+        else if (preset.key === "fixed-left") {
+          flexVal = index === 0 ? "0 0 24%" : "1";
+          if (index === 1) showArrow = true;
+        } else if (preset.key === "fixed-right") {
+          flexVal = index === 0 ? "1" : "0 0 24%";
+          if (index === 0) showArrow = true;
+        } else if (preset.key === "fixed-inner") {
+          flexVal = index === 1 ? "0 0 24%" : "1";
+          if (index === 0 || index === 2) showArrow = true;
+        } else if (preset.key === "fixed-outer") {
+          flexVal = index === 1 ? "1" : "0 0 24%";
+          if (index === 1) showArrow = true;
+        } else if (preset.key === "auto-expand") {
+          flexVal = index === 0 ? "0 0 28%" : "1";
+          if (index === 1) showArrow = true;
+        }
+
+        return (
+          <div
+            key={`${preset.key}-${index}`}
+            className="builder-preset-wireframe-col"
+            style={{ flex: flexVal }}
+          >
+            {showArrow ? (
+              <span className="builder-preset-wireframe-arrow">← →</span>
+            ) : null}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
 
 const HAS_RICH_TEXT_HTML = /<[a-z][\s\S]*>/i;
 
@@ -1454,7 +1592,145 @@ function normalizeBuilderState(
     key === "product-single"
       ? migrateProductTemplateSections(state.sections)
       : state.sections;
-  const sections = migratedSections.map(normalizeScrollPinnedDemoSection);
+  const sections = migratedSections
+    .map(normalizeScrollPinnedDemoSection)
+    .map((section) => ({
+      ...section,
+      layoutItems: section.layoutItems?.map((item) => ({
+        ...item,
+        blocks: (item.blocks ?? []).map((block) => {
+          if (block.kind === "panel") {
+            const {
+              panelStyle,
+              cardPreset,
+              premiumCardStyle,
+              borderRadius,
+              elementBackgroundMode,
+              elementBackground,
+              elementPadding,
+              visualStyle,
+              hoverPreset,
+              cardStyle,
+              ...semanticPanel
+            } = block;
+            void cardPreset;
+            void premiumCardStyle;
+            void borderRadius;
+            void elementBackgroundMode;
+            void elementBackground;
+            void visualStyle;
+            void cardStyle;
+            const rawVariant = String(
+              block.panelVariant ?? panelStyle ?? "default",
+            ).toLowerCase();
+            const panelVariant =
+              rawVariant === "primary" ||
+              rawVariant === "secondary" ||
+              rawVariant === "blank" ||
+              rawVariant === "panel"
+                ? rawVariant === "panel"
+                  ? "blank"
+                  : rawVariant
+                : "default";
+            const panelSize =
+              block.panelSize === "small" || elementPadding === "sm"
+                ? "small"
+                : block.panelSize === "large" ||
+                    elementPadding === "lg" ||
+                    elementPadding === "xl"
+                  ? "large"
+                  : "default";
+            return {
+              ...semanticPanel,
+              panelVariant,
+              panelHover: block.panelHover ?? hoverPreset !== "none",
+              panelSize,
+            } as BuilderLayoutBlock;
+          }
+          if (block.kind !== "button") return block;
+          const {
+            buttonBg,
+            buttonTextColor,
+            buttonBorderRadius,
+            buttonBorderWidth,
+            buttonBorderColor,
+            buttonPaddingY,
+            buttonPaddingX,
+            buttonFontWeight,
+            buttonLetterSpacing,
+            buttonHoverBg,
+            buttonHoverTextColor,
+            buttonHoverBorderColor,
+            buttonHoverTransform,
+            buttonHoverBoxShadow,
+            buttonHoverEffect,
+            secondaryButtonLabel,
+            secondaryButtonUrl,
+            secondaryButtonTarget,
+            secondaryButtonStyle,
+            premiumButtonStyle,
+            premiumCardStyle,
+            buttonsLayout,
+            buttonGap,
+            elementAlign,
+            elementPadding,
+            elementBackgroundMode,
+            typography,
+            ...semanticButton
+          } = block;
+          void buttonBg;
+          void buttonTextColor;
+          void buttonBorderRadius;
+          void buttonBorderWidth;
+          void buttonBorderColor;
+          void buttonPaddingY;
+          void buttonPaddingX;
+          void buttonFontWeight;
+          void buttonLetterSpacing;
+          void buttonHoverBg;
+          void buttonHoverTextColor;
+          void buttonHoverBorderColor;
+          void buttonHoverTransform;
+          void buttonHoverBoxShadow;
+          void buttonHoverEffect;
+          void secondaryButtonLabel;
+          void secondaryButtonUrl;
+          void secondaryButtonTarget;
+          void secondaryButtonStyle;
+          void premiumButtonStyle;
+          void premiumCardStyle;
+          void buttonsLayout;
+          void buttonGap;
+          void elementAlign;
+          void elementPadding;
+          void elementBackgroundMode;
+          void typography;
+          const rawButtonStyle = block.buttonStyle as string | undefined;
+          const normalizedButtonStyle =
+            rawButtonStyle === "primary" ||
+            rawButtonStyle === "secondary" ||
+            rawButtonStyle === "default" ||
+            rawButtonStyle === "text"
+              ? rawButtonStyle
+              : "default";
+          return {
+            ...semanticButton,
+            buttonStyle: normalizedButtonStyle,
+            buttons: block.buttons?.map((button) => ({
+              ...button,
+              style:
+                (button.style as string | undefined) === "primary" ||
+                (button.style as string | undefined) === "secondary" ||
+                (button.style as string | undefined) === "default" ||
+                (button.style as string | undefined) === "text"
+                  ? (button.style as string)
+                  : "default",
+            })),
+            size: block.size ?? "default",
+          } as BuilderLayoutBlock;
+        }),
+      })),
+    }));
   return {
     ...state,
     page: key,
@@ -1516,7 +1792,9 @@ function migrateProductTemplateSections(sections: BuilderSection[]) {
 
 function isLayoutContainerSection(section: BuilderSection | null | undefined) {
   return (
-    section?.kind === "contentLayout" || section?.kind === "scrollPinnedDemo"
+    section?.kind === "contentLayout" ||
+    section?.kind === "hero" ||
+    section?.kind === "scrollPinnedDemo"
   );
 }
 
@@ -1951,6 +2229,22 @@ export default function DashboardBuilder({
   >(null);
   const [hoveredBuilderTarget, setHoveredBuilderTarget] =
     useState<BuilderHoverTarget | null>(null);
+  const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const handleHoverTarget = useCallback((target: BuilderHoverTarget | null) => {
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+      hoverTimeoutRef.current = null;
+    }
+
+    if (target === null) {
+      hoverTimeoutRef.current = setTimeout(() => {
+        setHoveredBuilderTarget(null);
+      }, 280);
+    } else {
+      setHoveredBuilderTarget(target);
+    }
+  }, []);
   const [renameSectionRequestId, setRenameSectionRequestId] = useState<
     string | null
   >(null);
@@ -1979,10 +2273,12 @@ export default function DashboardBuilder({
   const [globalStylesTab, setGlobalStylesTab] = useState<
     | "presets"
     | "siteDesign"
+    | "semantic"
     | "spacing"
     | "cards"
     | "typography"
     | "buttons"
+    | "import"
   >("presets");
   const [globalSpacingFocus, setGlobalSpacingFocus] = useState<
     "section" | "row" | "element" | null
@@ -2021,6 +2317,7 @@ export default function DashboardBuilder({
   );
   const publishCelebrationTimer = useRef<number | null>(null);
   const shellAutoSaveTimer = useRef<number | null>(null);
+  const shellSaveRevision = useRef(0);
   const spacingFocusRequestId = useRef(0);
 
   useEffect(() => {
@@ -2118,11 +2415,14 @@ export default function DashboardBuilder({
     [builderState, headerContextKey, storageKeys],
   );
   const headerContextSections = useMemo(
-    () => resolveContentSections(
-      headerContextState.sections,
-      contentLanguage,
-      primaryContentLanguage,
-    ),
+    () => {
+      const resolved = resolveContentSections(
+        headerContextState.sections,
+        contentLanguage,
+        primaryContentLanguage,
+      );
+      return resolved;
+    },
     [contentLanguage, headerContextState.sections, primaryContentLanguage],
   );
   const footerPageContextState = useMemo(
@@ -3796,7 +4096,14 @@ export default function DashboardBuilder({
     setSelectedLayoutBlockKey(blockKey);
     setOpenLayoutItemId(columnKey);
     setSectionStructureOpen(false);
-    setInspectorTab("content");
+    const selectedBlock = selectedSection
+      ? findLayoutBlock(selectedSection, blockKey, columnKey)
+      : null;
+    setInspectorTab(
+      selectedBlock?.kind === "button" || selectedBlock?.kind === "panel"
+        ? "style"
+        : "content",
+    );
     openInspectorPanel();
     revealCanvasTarget(blockKey);
   };
@@ -5028,6 +5335,15 @@ export default function DashboardBuilder({
 
     if (!targetSection || !isLayoutContainerSection(targetSection)) {
       const nextSection = createWireframeSection(1, 1);
+      const nextColumn = nextSection.layoutItems?.[0];
+      const initialBlock = createLayoutBlock(kind);
+      if (nextColumn) {
+        nextSection.layoutItems = nextSection.layoutItems?.map((item) =>
+          item === nextColumn
+            ? { ...item, blocks: [...(item.blocks ?? []), initialBlock] }
+            : item,
+        );
+      }
       setBuilderState((current) => {
         const selectedIndex = current.sections.findIndex(
           (section) => section.id === selectedId,
@@ -5041,6 +5357,10 @@ export default function DashboardBuilder({
       targetSection = nextSection;
       setSelectedId(nextSection.id);
       setPublishStatus(`${layoutBlockLabels[kind]} added in a new layout`);
+      setSelectedLayoutColumnKey(nextColumn?.id ?? null);
+      setSelectedLayoutBlockKey(initialBlock.id ?? null);
+      setOpenLayoutItemId(nextColumn?.id ?? null);
+      return;
     }
 
     const layoutItems = targetSection.layoutItems ?? [];
@@ -5818,6 +6138,25 @@ export default function DashboardBuilder({
     setPublishStatus("Row spacing updated");
   };
 
+  const updateSelectedColumnStyle = (
+    patch: Partial<NonNullable<BuilderSection["layoutItems"]>[number]>,
+  ) => {
+    if (!selectedSection || !selectedLayoutColumnKey) return;
+    setBuilderState((current) => ({
+      ...current,
+      sections: current.sections.map((section) => {
+        if (section.id !== selectedSection.id || !isLayoutContainerSection(section)) {
+          return section;
+        }
+        return updateLayoutColumn(section, selectedLayoutColumnKey, (column) => ({
+          ...column,
+          ...patch,
+        }));
+      }),
+    }));
+    setPublishStatus("Column alignment updated");
+  };
+
   const duplicateSelectedRow = () => {
     if (!selectedSection || selectedLayoutRowIndex === null) return;
     duplicateLayoutRow(selectedSection.id, selectedLayoutRowIndex);
@@ -6237,6 +6576,7 @@ export default function DashboardBuilder({
   const saveShellSettings = async (
     nextSettings: BuilderShellSettings,
     status?: string,
+    revision = shellSaveRevision.current,
   ) => {
     if (!canEditShellSettings) {
       setShellStatus("Platform global settings require super admin access.");
@@ -6260,6 +6600,7 @@ export default function DashboardBuilder({
     });
 
     if (!response.ok) {
+      if (revision !== shellSaveRevision.current) return false;
       setShellStatus("Shell save failed");
       return false;
     }
@@ -6268,10 +6609,12 @@ export default function DashboardBuilder({
       settings?: BuilderShellSettings;
     };
 
-    if (payload.settings) {
+    if (payload.settings && revision === shellSaveRevision.current) {
       setShellSettings(payload.settings);
     }
-    setShellStatus(status ?? `${shellSettingsStatusLabel} saved`);
+    if (revision === shellSaveRevision.current) {
+      setShellStatus(status ?? `${shellSettingsStatusLabel} saved`);
+    }
     return true;
   };
 
@@ -6281,6 +6624,7 @@ export default function DashboardBuilder({
       return;
     }
 
+    const revision = ++shellSaveRevision.current;
     const nextSettings = { ...shellSettings, ...patch };
     setShellSettings(nextSettings);
     setShellStatus(`Updating ${isWebsiteScopedBuilder ? "website" : "global"} preview...`);
@@ -6293,6 +6637,7 @@ export default function DashboardBuilder({
       void saveShellSettings(
         nextSettings,
         `${isWebsiteScopedBuilder ? "Website" : "Global"} preview updated`,
+        revision,
       );
     }, 220);
   };
@@ -7501,6 +7846,7 @@ export default function DashboardBuilder({
       onApplyHeaderPreset={applyHeaderPreset}
       applySelectedRowLayoutPreset={applySelectedRowLayoutPreset}
       onUpdateRowStyle={updateSelectedRowStyle}
+      onUpdateColumnStyle={updateSelectedColumnStyle}
       deleteSelectedRow={deleteSelectedRow}
       moveSelected={moveSelected}
       openWordPressMediaPicker={openWordPressMediaPicker}
@@ -7556,7 +7902,7 @@ export default function DashboardBuilder({
       onSelectColumn={selectLayoutColumn}
       onSelectBlock={selectLayoutBlock}
       hoveredTarget={hoveredBuilderTarget}
-      onHoverTarget={setHoveredBuilderTarget}
+      onHoverTarget={handleHoverTarget}
       onAddSection={() => {
         if (builderState.page === "header") return;
         const lastSectionId = builderState.sections.at(-1)?.id ?? "__empty-page__";
@@ -7604,10 +7950,12 @@ export default function DashboardBuilder({
           [
             ["presets", "Presets"],
             ["siteDesign", "Site Design"],
+            ["semantic", "Global Style Editor"],
             ["spacing", "Spacing"],
             ["cards", "Cards"],
             ["buttons", "Buttons"],
             ["typography", "Typography"],
+            ["import", "Import LESS"],
           ] as const
         ).map(([tab, label]) => (
           <button
@@ -7666,6 +8014,22 @@ export default function DashboardBuilder({
             ))}
           </div>
         </div>
+      )}
+
+      {globalStylesTab === "import" && (
+        <YoothemeImportPanel
+          design={builderState.design}
+          shellSettings={shellSettings}
+          updateDesign={updateDesign}
+          updateShellSettings={updateShellSettings}
+        />
+      )}
+
+      {globalStylesTab === "semantic" && (
+        <CanonicalGlobalStylesPanel
+          shellSettings={shellSettings}
+          updateShellSettings={updateShellSettings}
+        />
       )}
 
       {globalStylesTab === "siteDesign" && (
@@ -9155,6 +9519,7 @@ export default function DashboardBuilder({
       data-theme={dashboardTheme}
       style={
         {
+          ...getUikitGlobalsCssVars(shellSettings, builderState.design),
           "--builder-dashboard-bg":
             builderState.design.pageBackground ?? "#dfdfd7",
           "--builder-preview-real-bg": previewPageBackground,
@@ -9225,7 +9590,7 @@ export default function DashboardBuilder({
               <i />
               <i />
             </span>
-            <strong>Layout published.</strong>
+            <strong>Published successfully</strong>
             <small>Looking beautiful.</small>
           </div>
         )}
@@ -9742,7 +10107,7 @@ export default function DashboardBuilder({
                 selectedLayoutRowIndex={selectedLayoutRowIndex}
                 selectedLayoutBlockKey={selectedLayoutBlockKey}
                 hoveredTarget={hoveredBuilderTarget}
-                onHoverTarget={setHoveredBuilderTarget}
+                onHoverTarget={handleHoverTarget}
                 draggingSectionId={draggingSectionId}
                 draggingLayoutBlockKey={draggingLayoutBlockKey}
                 onSelect={selectSection}
@@ -9802,6 +10167,7 @@ export default function DashboardBuilder({
                 onSetSidebarTab={setSidebarTab}
                 onOpenElementsPanel={openElementsPanel}
                 onCycleSectionSpacing={cycleSectionSpacing}
+                onApplyLayoutPreset={applyContentLayoutPreset}
               />
             </ProductCategoryFilterProvider>
             </div>
@@ -10096,6 +10462,7 @@ function PreviewCanvas({
   onSetSidebarTab,
   onOpenElementsPanel,
   onCycleSectionSpacing,
+  onApplyLayoutPreset,
 }: {
   device: PreviewDevice;
   interactionScale: number;
@@ -10342,6 +10709,7 @@ function PreviewCanvas({
     sectionId: string,
     field: "topSpacing" | "bottomSpacing" | "topMargin" | "bottomMargin",
   ) => void;
+  onApplyLayoutPreset: (sectionId: string, presetKey: string) => void;
 }) {
   const [activeDragOver, setActiveDragOver] = useState<{
     type: "section" | "column" | "block";
@@ -10356,6 +10724,7 @@ function PreviewCanvas({
     sectionId: string | null;
     placement: "above" | "below";
   } | null>(null);
+  const [changeLayoutTargetSectionId, setChangeLayoutTargetSectionId] = useState<string | null>(null);
   const [editingTarget, setEditingTarget] =
     useState<BuilderInteractionTarget | null>(null);
   const selectedTarget = selectedBuilderTarget({
@@ -10422,14 +10791,8 @@ function PreviewCanvas({
       >
         <div className="builder-layout-header">
           <div>
-            <strong id="builder-layout-picker-title">Choose row layout</strong>
-            <span>
-              {insertTargetSection
-                ? `Insert a section ${insertTarget.placement} ${sectionLabels[
-                    insertTargetSection.kind
-                  ].toLowerCase()} and pick a preset layout.`
-                : "Choose a preset layout for the first section on this page."}
-            </span>
+            <strong id="builder-layout-picker-title">Choose layout</strong>
+            <span>Select the column structure for this layout.</span>
           </div>
           <button
             type="button"
@@ -10441,37 +10804,115 @@ function PreviewCanvas({
           </button>
         </div>
 
-        <div className="builder-layout-picker-grid">
-          {builderRowLayoutPresets.map((preset) => (
-            <button
-              key={preset.key}
-              type="button"
-              className="builder-layout-picker-card"
-              onClick={() => {
-                onAddWireframe(
-                  preset.ratios.length,
-                  1,
-                  insertTarget.sectionId ?? "__empty-page__",
-                  insertTarget.placement,
-                  preset.key,
-                );
-                setInsertTarget(null);
-              }}
-            >
-              <span className="builder-layout-picker-card-copy">
-                <strong>{preset.label}</strong>
-                <small>{preset.description}</small>
-              </span>
-              <span
-                className="builder-layout-picker-preview"
-                aria-hidden="true"
-              >
-                {preset.ratios.map((ratio, index) => (
-                  <i key={`${preset.key}-${index}`} style={{ flex: ratio }} />
-                ))}
-              </span>
-            </button>
-          ))}
+        <div className="builder-layout-picker-body">
+          {uikitPresetGroups.map((group) => {
+            const groupPresets = group.keys
+              .map((key) => builderRowLayoutPresets.find((p) => p.key === key))
+              .filter(Boolean);
+
+            if (groupPresets.length === 0) return null;
+
+            return (
+              <div key={group.title} className="builder-layout-picker-group">
+                <div className="builder-layout-picker-group-title">
+                  {group.title}
+                </div>
+                <div className="builder-layout-picker-grid">
+                  {groupPresets.map((preset) => (
+                    <button
+                      key={preset!.key}
+                      type="button"
+                      className="builder-layout-picker-card"
+                      onClick={() => {
+                        onAddWireframe(
+                          preset!.ratios.length,
+                          1,
+                          insertTarget.sectionId ?? "__empty-page__",
+                          insertTarget.placement,
+                          preset!.key,
+                        );
+                        setInsertTarget(null);
+                      }}
+                    >
+                      <UikitPresetWireframeDiagram presetKey={preset!.key} />
+                      <span className="builder-layout-picker-card-copy">
+                        <strong>{preset!.label}</strong>
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  ) : null;
+
+  const changeLayoutModal = changeLayoutTargetSectionId ? (
+    <div
+      className="builder-layout-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="builder-change-layout-picker-title"
+      onClick={() => setChangeLayoutTargetSectionId(null)}
+    >
+      <div
+        className="builder-layout-dialog"
+        onClick={(event) => event.stopPropagation()}
+      >
+        <div className="builder-layout-header">
+          <div>
+            <strong id="builder-change-layout-picker-title">Choose layout</strong>
+            <span>Select the column structure for this layout.</span>
+          </div>
+          <button
+            type="button"
+            className="builder-layout-close"
+            onClick={() => setChangeLayoutTargetSectionId(null)}
+            aria-label="Close layout picker"
+          >
+            <X size={15} />
+          </button>
+        </div>
+
+        <div className="builder-layout-picker-body">
+          {uikitPresetGroups.map((group) => {
+            const groupPresets = group.keys
+              .map((key) => builderRowLayoutPresets.find((p) => p.key === key))
+              .filter(Boolean);
+
+            if (groupPresets.length === 0) return null;
+
+            return (
+              <div key={group.title} className="builder-layout-picker-group">
+                <div className="builder-layout-picker-group-title">
+                  {group.title}
+                </div>
+                <div className="builder-layout-picker-grid">
+                  {groupPresets.map((preset) => (
+                    <button
+                      key={preset!.key}
+                      type="button"
+                      className="builder-layout-picker-card"
+                      onClick={() => {
+                        onApplyLayoutPreset(
+                          changeLayoutTargetSectionId,
+                          preset!.key,
+                        );
+                        setChangeLayoutTargetSectionId(null);
+                      }}
+                    >
+                      <UikitPresetWireframeDiagram presetKey={preset!.key} />
+                      <span className="builder-layout-picker-card-copy">
+                        <strong>{preset!.label}</strong>
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>
@@ -10949,69 +11390,30 @@ function PreviewCanvas({
                           )}
                       </>
                     )}
-                    {sectionChrome.showToolbar && <div
-                      className={`builder-preview-section-tools ${
-                        isSelected ? "is-selected-tools" : ""
-                      }`}
-                      onClick={(event) => event.stopPropagation()}
-                      onMouseDown={(event) => event.stopPropagation()}
-                      onDragStart={(event) => event.stopPropagation()}
-                    >
-                      <div className="builder-preview-section-tools-main">
-                        <span>{sectionLabels[section.kind]}</span>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            onSelect(section.id);
-                            onOpenInspector();
-                          }}
-                          aria-label="Open section settings"
-                          title="Section settings"
-                        >
-                          <Settings2 size={14} />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => onSaveSectionTemplate(section.id)}
-                          title="Save section as template"
-                        >
-                          <Save size={14} />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => onMoveSection(section.id, -1)}
-                          disabled={sourceIndex <= 0}
-                          title="Move section up"
-                        >
-                          <ArrowUp size={14} />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => onMoveSection(section.id, 1)}
-                          disabled={
-                            sourceIndex < 0 ||
-                            sourceIndex >= sections.length - 1
-                          }
-                          title="Move section down"
-                        >
-                          <ArrowDown size={14} />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => onDuplicateSection(section.id)}
-                          title="Duplicate section"
-                        >
-                          <Copy size={14} />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => onDeleteSection(section.id)}
-                          title="Delete section"
-                        >
-                          <Trash2 size={14} />
-                        </button>
+                    {((isSectionActive || (hoveredTarget?.type === "section" && hoveredTarget.sectionId === section.id)) && !editingTarget) && (
+                      <div
+                        className={`builder-preview-section-tools${isSelected ? " is-selected-tools" : ""}`}
+                        onClick={(event) => event.stopPropagation()}
+                        onMouseDown={(event) => event.stopPropagation()}
+                        onDragStart={(event) => event.stopPropagation()}
+                        onMouseEnter={() => onHoverTarget({ type: "section", sectionId: section.id })}
+                        onMouseLeave={() => onHoverTarget(null)}
+                      >
+                        <BuilderContextToolbar
+                          context="section"
+                          label={sectionLabels[section.kind] ?? "Section"}
+                          canMoveUp={sourceIndex > 0}
+                          canMoveDown={sourceIndex >= 0 && sourceIndex < sections.length - 1}
+                          canDelete={true}
+                          onSettings={() => { onSelect(section.id); onOpenInspector(); }}
+                          onMoveUp={() => onMoveSection(section.id, -1)}
+                          onMoveDown={() => onMoveSection(section.id, 1)}
+                          onSave={() => onSaveSectionTemplate(section.id)}
+                          onDuplicate={() => onDuplicateSection(section.id)}
+                          onDelete={() => onDeleteSection(section.id)}
+                        />
                       </div>
-                    </div>}
+                    )}
                     <div
                       className="builder-preview-section-insert builder-preview-section-insert--top"
                       onClick={(event) => event.stopPropagation()}
@@ -11171,6 +11573,7 @@ function PreviewCanvas({
                       onDropElementTemplate={onDropElementTemplate}
                       onOpenSpacingSettings={onOpenSpacingSettings}
                       onOpenElementsPanel={onOpenElementsPanel}
+                      onChangeLayout={setChangeLayoutTargetSectionId}
                       spacingOverlayEnabled={spacingOverlayEnabled}
                     />
                   </div>
@@ -11182,6 +11585,9 @@ function PreviewCanvas({
       </div>
       {insertLayoutPicker
         ? createPortal(insertLayoutPicker, document.body)
+        : null}
+      {changeLayoutModal
+        ? createPortal(changeLayoutModal, document.body)
         : null}
     </div>
   );
@@ -11458,7 +11864,13 @@ function getStorefrontPreviewClass(section: BuilderSection) {
                       ? "shop-builder-embed"
                       : "";
 
-  return `shop-builder-section shop-builder-section--${
+  const uikitSectionPad = getUikitSectionPaddingClass(
+    (section as any).sectionPadding ?? (section as any).topSpacing ?? (section as any).sectionPaddingTop
+  );
+  const uikitSectionStyle = getUikitSectionStyleClass(
+    section.sectionVariant || section.colorScheme || (section.visualStyle as any)?.preset
+  );
+  return `${uikitSectionPad} ${uikitSectionStyle} shop-builder-section shop-builder-section--${
     section.backgroundMode === "boxed" ? "boxed" : "full"
   } shop-builder-section--content-${section.contentMode ?? "boxed"} shop-builder-section--height-${
     section.sectionHeight ?? "auto"
@@ -11590,19 +12002,46 @@ function getPreviewGoodieIcon(iconName: BuilderLayoutBlock["iconName"]) {
 }
 
 function getLayoutBlockLibraryIcon(kind: LayoutBlockKind) {
+  if (kind === "alert") return <AlertCircle size={16} />;
+  if (kind === "heading") return <Equal size={16} />;
+  if (kind === "text") return <AlignLeft size={16} />;
+  if (kind === "embed" || kind === "fluentForm") return <Code2 size={16} />;
+  if (kind === "datePicker") return <Timer size={16} />;
+  if (kind === "divider") return <Minus size={16} />;
+  if (kind === "icon") return <Star size={16} />;
+  if (kind === "image" || kind === "productGallery") return <ImageIcon size={16} />;
+  if (kind === "panel") return <Frame size={16} />;
+  if (kind === "table" || kind === "productSpecsPanel") return <Table size={16} />;
+  if (kind === "slider") return <Presentation size={16} />;
+  if (kind === "scrollPinnedDemo") return <Sliders size={16} />;
+  if (kind === "grid") return <Grid3X3 size={16} />;
+  if (kind === "badgeGrid") return <LayoutGrid size={16} />;
+  if (kind === "button") return <MousePointerClick size={16} />;
+  if (kind === "list") return <ListChecks size={16} />;
+  if (kind === "menu" || kind === "headerCategories") return <Menu size={16} />;
+  if (kind === "breadcrumbs") return <ChevronRight size={16} />;
+  if (kind === "products" || kind === "cartContent" || kind === "productAddToCart" || kind === "headerCart") return <ShoppingBag size={16} />;
+  if (kind === "checkoutContent") return <LockKeyhole size={16} />;
+  if (kind === "accountContent" || kind === "headerAccount") return <UserRound size={16} />;
+  if (kind === "hero" || kind === "productHero") return <Layout size={16} />;
+  if (kind === "promoStrip") return <Zap size={16} />;
+  if (kind === "productInfoStack" || kind === "productAttributes") return <FileText size={16} />;
+  if (kind === "productPrice") return <Tag size={16} />;
+  if (kind === "productDescription") return <AlignLeft size={16} />;
+
   const icon = layoutBlockIcons[kind];
 
-  if (icon === "text") return <TextCursorInput size={16} />;
+  if (icon === "text") return <AlignLeft size={16} />;
   if (icon === "gallery") return <GalleryHorizontal size={16} />;
   if (icon === "image") return <ImageIcon size={16} />;
   if (icon === "code") return <Code2 size={16} />;
   if (icon === "grid") return <Grid3X3 size={16} />;
   if (icon === "list") return <ListChecks size={16} />;
-  if (icon === "calendar") return <CalendarDays size={16} />;
+  if (icon === "calendar") return <Timer size={16} />;
   if (icon === "shoppingBag") return <ShoppingBag size={16} />;
-  if (icon === "panel") return <PanelLeft size={16} />;
-  if (icon === "navigation") return <Navigation size={16} />;
-  if (icon === "pointer") return <SquareMousePointer size={16} />;
+  if (icon === "panel") return <Frame size={16} />;
+  if (icon === "navigation") return <Menu size={16} />;
+  if (icon === "pointer") return <MousePointerClick size={16} />;
   if (icon === "lock") return <LockKeyhole size={16} />;
   if (icon === "user") return <UserRound size={16} />;
 
@@ -11966,94 +12405,111 @@ function RowInsertControl({
   );
 }
 
-function RowLayoutToolbar({
-  rowIndex,
+/**
+ * BuilderContextToolbar — single unified floating pill for Section and Layout contexts.
+ * Section context  → label + Settings | Move Up/Down | Save | Duplicate | Delete
+ * Layout context   → label + [Change Layout] | sep | Settings | Move Up/Down | Save | Duplicate | Delete
+ * Column context   → no floating toolbar (outline only).
+ */
+function BuilderContextToolbar({
+  context,
+  label,
   canMoveUp,
   canMoveDown,
-  isEmpty,
+  canDelete,
+  onChangeLayout,
   onSettings,
   onMoveUp,
   onMoveDown,
   onSave,
   onDuplicate,
   onDelete,
-  onHoverChange,
 }: {
-  rowIndex: number;
+  context: "section" | "layout";
+  label: string;
   canMoveUp: boolean;
   canMoveDown: boolean;
-  isEmpty: boolean;
+  canDelete: boolean;
+  onChangeLayout?: () => void;
   onSettings: () => void;
   onMoveUp: () => void;
   onMoveDown: () => void;
   onSave: () => void;
   onDuplicate: () => void;
   onDelete: () => void;
-  onHoverChange?: (hovered: boolean) => void;
 }) {
+  const cls =
+    context === "section"
+      ? "builder-context-toolbar builder-preview-section-tools-main"
+      : "builder-context-toolbar builder-preview-row-toolbar";
+
   return (
     <div
-      className="builder-preview-row-toolbar"
+      className={cls}
       onClick={(event) => event.stopPropagation()}
       onMouseDown={(event) => event.stopPropagation()}
       onDragStart={(event) => event.stopPropagation()}
-      onMouseEnter={() => onHoverChange?.(true)}
-      onMouseLeave={() => onHoverChange?.(false)}
     >
-      <span>Row {rowIndex + 1}</span>
+      <span>{label}</span>
+      {context === "layout" && onChangeLayout && (
+        <>
+          <button
+            type="button"
+            className="builder-context-toolbar-change-layout"
+            onClick={onChangeLayout}
+            aria-label="Change layout composition"
+            title="Change layout composition"
+          >
+            <Layers3 size={13} />
+          </button>
+          <span className="builder-context-toolbar-sep" aria-hidden="true" />
+        </>
+      )}
       <button
         type="button"
         onClick={onSettings}
-        aria-label={`Open row ${rowIndex + 1} settings`}
-        title={`Open row ${rowIndex + 1} settings`}
+        aria-label={context === "section" ? "Section settings" : "Layout settings"}
+        title={context === "section" ? "Section settings" : "Layout settings"}
       >
-        <Settings2 size={13} />
+        <Pencil size={13} />
       </button>
-      <button
-        type="button"
-        onClick={onMoveUp}
-        disabled={!canMoveUp}
-        aria-label={`Move row ${rowIndex + 1} up`}
-        title="Move row up"
+      <button type="button" onClick={onMoveUp} disabled={!canMoveUp}
+        aria-label={context === "section" ? "Move section up" : "Move layout up"}
+        title={context === "section" ? "Move section up" : "Move layout up"}
       >
         <ArrowUp size={13} />
       </button>
-      <button
-        type="button"
-        onClick={onMoveDown}
-        disabled={!canMoveDown}
-        aria-label={`Move row ${rowIndex + 1} down`}
-        title="Move row down"
+      <button type="button" onClick={onMoveDown} disabled={!canMoveDown}
+        aria-label={context === "section" ? "Move section down" : "Move layout down"}
+        title={context === "section" ? "Move section down" : "Move layout down"}
       >
         <ArrowDown size={13} />
       </button>
-      <button
-        type="button"
-        onClick={onSave}
-        aria-label={`Save row ${rowIndex + 1} as template`}
-        title={`Save row ${rowIndex + 1} as template`}
+      <button type="button" onClick={onSave}
+        aria-label={context === "section" ? "Save section as template" : "Save layout as template"}
+        title={context === "section" ? "Save section as template" : "Save layout as template"}
       >
         <Save size={13} />
       </button>
-      <button
-        type="button"
-        onClick={onDuplicate}
-        aria-label={`Duplicate row ${rowIndex + 1}`}
-        title={`Duplicate row ${rowIndex + 1}`}
+      <button type="button" onClick={onDuplicate}
+        aria-label={context === "section" ? "Duplicate section" : "Duplicate layout"}
+        title={context === "section" ? "Duplicate section" : "Duplicate layout"}
       >
         <Copy size={13} />
       </button>
       <button
         type="button"
         onClick={onDelete}
-        disabled={!isEmpty}
+        disabled={!canDelete}
         aria-label={
-          isEmpty
-            ? `Delete row ${rowIndex + 1}`
-            : `Row ${rowIndex + 1} must be empty before deleting`
+          context === "layout" && !canDelete
+            ? "Layout must be empty before deleting"
+            : context === "section" ? "Delete section" : "Delete layout"
         }
         title={
-          isEmpty ? "Delete empty row" : "Delete is available for empty rows"
+          context === "layout" && !canDelete
+            ? "Delete is available for empty layouts"
+            : context === "section" ? "Delete section" : "Delete empty layout"
         }
       >
         <Trash2 size={13} />
@@ -12061,6 +12517,8 @@ function RowLayoutToolbar({
     </div>
   );
 }
+
+
 
 function BuilderElementToolbar({
   label,
@@ -13004,6 +13462,7 @@ function PreviewSection({
   onDropElementTemplate,
   onOpenSpacingSettings,
   onOpenElementsPanel,
+  onChangeLayout,
   spacingOverlayEnabled,
   nestingDepth = 0,
   nestedOwnerColumnKey = null,
@@ -13238,6 +13697,7 @@ function PreviewSection({
   ) => void;
   onOpenSpacingSettings: (target: SpacingInspectorTarget) => void;
   onOpenElementsPanel: () => void;
+  onChangeLayout: (sectionId: string) => void;
   spacingOverlayEnabled: boolean;
   nestingDepth?: number;
   nestedOwnerColumnKey?: string | null;
@@ -13267,11 +13727,9 @@ function PreviewSection({
         <div className="builder-layout-header">
           <div>
             <strong id="builder-row-layout-picker-title">
-              Choose row layout
+              Choose layout
             </strong>
-            <span>
-              Insert a row {rowInsertTarget.placement} the selected row.
-            </span>
+            <span>Select the column structure for this layout.</span>
           </div>
           <button
             type="button"
@@ -13283,42 +13741,51 @@ function PreviewSection({
           </button>
         </div>
 
-        <div className="builder-layout-picker-grid">
-          {rowInsertionPresets.map((preset) => (
-            <button
-              key={preset.key}
-              type="button"
-              className="builder-layout-picker-card"
-              onClick={() => {
-                onAddRow(
-                  section.id,
-                  rowInsertTarget.rowIndex,
-                  rowInsertTarget.placement,
-                  preset.key,
-                );
-                setRowInsertTarget(null);
-              }}
-            >
-              <span className="builder-layout-picker-card-copy">
-                <strong>{preset.label}</strong>
-                <small>Add row</small>
-              </span>
-              <span
-                className="builder-layout-picker-preview"
-                aria-hidden="true"
-              >
-                {preset.ratios.map((ratio, index) => (
-                  <i key={`${preset.key}-${index}`} style={{ flex: ratio }} />
-                ))}
-              </span>
-            </button>
-          ))}
+        <div className="builder-layout-picker-body">
+          {uikitPresetGroups.map((group) => {
+            const groupPresets = group.keys
+              .map((key) => rowInsertionPresets.find((p) => p.key === key))
+              .filter(Boolean);
+
+            if (groupPresets.length === 0) return null;
+
+            return (
+              <div key={group.title} className="builder-layout-picker-group">
+                <div className="builder-layout-picker-group-title">
+                  {group.title}
+                </div>
+                <div className="builder-layout-picker-grid">
+                  {groupPresets.map((preset) => (
+                    <button
+                      key={preset!.key}
+                      type="button"
+                      className="builder-layout-picker-card"
+                      onClick={() => {
+                        onAddRow(
+                          section.id,
+                          rowInsertTarget.rowIndex,
+                          rowInsertTarget.placement,
+                          preset!.key,
+                        );
+                        setRowInsertTarget(null);
+                      }}
+                    >
+                      <UikitPresetWireframeDiagram presetKey={preset!.key} />
+                      <span className="builder-layout-picker-card-copy">
+                        <strong>{preset!.label}</strong>
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>
   ) : null;
 
-  if (section.kind === "hero") {
+  if (section.kind === "hero" && !section.layoutItems?.length) {
     const isAntigravity = section.carouselSettings?.variant === "antigravity";
     return (
       <div
@@ -13687,6 +14154,30 @@ function PreviewSection({
                 hoverToolbarTarget,
               ),
             });
+            const rowLayoutPreset = getBuilderRowLayoutPreset(layoutRow.layoutKey);
+            const rowLayoutLabel = rowLayoutPreset?.label
+              ? `Layout · ${rowLayoutPreset.label}`
+              : "Layout";
+            const isRowHoveredOrActive =
+              nestingDepth === 0 &&
+              hoveredTarget?.sectionId === section.id &&
+              (
+                (hoveredTarget.type === "row" && hoveredTarget.rowIndex === layoutRowIndex) ||
+                (hoveredTarget.type === "column" && rowMetaByColumnKey.get(hoveredTarget.columnKey)?.rowIndex === layoutRowIndex) ||
+                (hoveredTarget.type === "block" && rowMetaByColumnKey.get(hoveredTarget.columnKey)?.rowIndex === layoutRowIndex)
+              );
+
+            const isRowSelectedOrActive =
+              nestingDepth === 0 &&
+              selectedTarget?.sectionId === section.id &&
+              (
+                (selectedTarget.type === "row" && selectedTarget.rowIndex === layoutRowIndex) ||
+                (selectedTarget.type === "column" && rowMetaByColumnKey.get(selectedTarget.columnKey)?.rowIndex === layoutRowIndex) ||
+                (selectedTarget.type === "block" && rowMetaByColumnKey.get(selectedTarget.columnKey)?.rowIndex === layoutRowIndex)
+              );
+
+            const showRowToolbar = (isRowHoveredOrActive || isRowSelectedOrActive) && !editingTarget;
+
             const isEmptyRow = layoutRow.items.every(
               (item) =>
                 !layoutColumnHasContent(item as PreviewLayoutItem),
@@ -13773,7 +14264,7 @@ function PreviewSection({
                 }}
               >
                 <div
-                  className={`shop-builder-content-row builder-preview-content-row ${builderInteractionClassName(
+                  className={`${getUikitGridClass({ gutter: rowItem?.rowGap, matchHeight: rowItem?.rowMatchHeight !== false, alignItems: rowItem?.rowAlignment, justifyContent: rowItem?.rowJustify })} shop-builder-content-row builder-preview-content-row ${builderInteractionClassName(
                     rowTarget,
                     rowInteractionState,
                   )}`}
@@ -13782,15 +14273,6 @@ function PreviewSection({
                   data-builder-row-index={layoutRowIndex}
                   data-builder-interaction-state={rowInteractionState}
                   style={{
-                    display: "grid",
-                    gridTemplateColumns:
-                      device === "mobile"
-                        ? "minmax(0, 1fr)"
-                        : "repeat(12, minmax(0, 1fr))",
-                    columnGap:
-                      device === "mobile"
-                        ? "0px"
-                        : "var(--builder-global-column-gap, 32px)",
                     ...rowStyle,
                   }}
                 >
@@ -13805,22 +14287,30 @@ function PreviewSection({
                       onOpenSpacingSettings={onOpenSpacingSettings}
                     />
                   )}
-                  {rowChrome.showToolbar && (
-                    <RowLayoutToolbar
-                      rowIndex={layoutRowIndex}
-                      canMoveUp={layoutRowIndex > 0}
-                      canMoveDown={layoutRowIndex < layoutRows.length - 1}
-                      isEmpty={isEmptyRow}
-                      onSettings={() => {
-                        onSelectRow(section.id, layoutRowIndex);
-                        onOpenInspector();
-                      }}
-                      onMoveUp={() => onMoveRow(section.id, layoutRowIndex, -1)}
-                      onMoveDown={() => onMoveRow(section.id, layoutRowIndex, 1)}
-                      onSave={() => onSaveRowTemplate(section.id, layoutRowIndex)}
-                      onDuplicate={() => onDuplicateRow(section.id, layoutRowIndex)}
-                      onDelete={() => onDeleteRow(section.id, layoutRowIndex)}
-                    />
+                  {showRowToolbar && (
+                    <div
+                      className="builder-preview-row-toolbar"
+                      onMouseEnter={() => onHoverTarget(rowTarget)}
+                      onMouseLeave={() => onHoverTarget(null)}
+                    >
+                      <BuilderContextToolbar
+                        context="layout"
+                        label={rowLayoutLabel}
+                        canMoveUp={layoutRowIndex > 0}
+                        canMoveDown={layoutRowIndex < layoutRows.length - 1}
+                        canDelete={isEmptyRow}
+                        onChangeLayout={() => onChangeLayout(section.id)}
+                        onSettings={() => {
+                          onSelectRow(section.id, layoutRowIndex);
+                          onOpenInspector();
+                        }}
+                        onMoveUp={() => onMoveRow(section.id, layoutRowIndex, -1)}
+                        onMoveDown={() => onMoveRow(section.id, layoutRowIndex, 1)}
+                        onSave={() => onSaveRowTemplate(section.id, layoutRowIndex)}
+                        onDuplicate={() => onDuplicateRow(section.id, layoutRowIndex)}
+                        onDelete={() => onDeleteRow(section.id, layoutRowIndex)}
+                      />
+                    </div>
                   )}
                   {isEmptyRow && (
                     <div
@@ -13925,35 +14415,7 @@ function PreviewSection({
                     onSelectColumn(section.id, columnKey);
                   }}
                 >
-                  {columnChrome.showToolbar && (
-                    <div
-                      className="builder-preview-block-tools builder-preview-column-toolbar"
-                      onClick={(event) => event.stopPropagation()}
-                    >
-                      <span>Stacked column</span>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          onSelectColumn(section.id, columnKey);
-                          onOpenInspector();
-                        }}
-                        title="Open column settings"
-                        aria-label="Open column settings"
-                      >
-                        <Settings2 size={13} />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() =>
-                          onUnwrapNestedColumn(section.id, columnKey)
-                        }
-                        title="Remove stacked layout"
-                        aria-label="Remove stacked layout"
-                      >
-                        <Layers3 size={13} />
-                      </button>
-                    </div>
-                  )}
+
                   <div className="builder-nested-layout">
                     <PreviewSection
                       device={device}
@@ -14019,28 +14481,12 @@ function PreviewSection({
                       onDropElementTemplate={onDropElementTemplate}
                       onOpenSpacingSettings={onOpenSpacingSettings}
                       onOpenElementsPanel={onOpenElementsPanel}
+                      onChangeLayout={onChangeLayout}
                       spacingOverlayEnabled={spacingOverlayEnabled}
                       nestingDepth={nestingDepth + 1}
                       nestedOwnerColumnKey={columnKey}
                     />
                   </div>
-                  {nestingDepth === 0 && layoutRow.items.length < 6 && (
-                    <button
-                      type="button"
-                      className="builder-preview-column-insert-trigger is-beside"
-                      aria-label={`Add column after column ${(rowMeta?.columnIndex ?? index) + 1}`}
-                      onClick={(event) => {
-                        event.stopPropagation();
-                        onAddColumnAfter({
-                          sectionId: section.id,
-                          columnKey,
-                        });
-                      }}
-                    >
-                      <Plus size={12} />
-                      <span>Add beside</span>
-                    </button>
-                  )}
                 </article>
               );
             }
@@ -14058,12 +14504,12 @@ function PreviewSection({
                     onHoverTarget({ type: "column", sectionId: section.id, columnKey })
                   }
                   onMouseLeave={() => onHoverTarget(null)}
-                  className={`${builderInteractionClassName(
+                  className={`${getUikitColumnWidthClass(layoutRow.layoutKey, index)} ${getUikitColumnClass({ horizontalAlign: typedItem.columnHorizontalAlign, verticalAlign: typedItem.columnVerticalAlign, flex: typedItem.columnFlex, responsiveWidth: typedItem.columnResponsiveWidth })} ${builderInteractionClassName(
                     columnTarget,
                     columnInteractionState,
                   )} ${
                     hasScrollPinned
-                      ? `w-full col-span-12 ${
+                      ? `w-full ${
                           isColumnActive
                             ? "is-selected-column"
                             : ""
@@ -14110,21 +14556,6 @@ function PreviewSection({
                             : ""
                         }`
                   }`}
-                  style={
-                    {
-                      ...(hasScrollPinned
-                        ? {
-                            gridColumn:
-                              device === "mobile" ? "1 / -1" : "span 12",
-                          }
-                        : {
-                            gridColumn:
-                              device === "mobile"
-                                ? "1 / -1"
-                                : `span ${rowMeta?.span ?? 12}`,
-                          }),
-                    } as CSSProperties
-                  }
                   onClick={(event) => {
                     if (
                       event.target instanceof HTMLElement &&
@@ -14242,45 +14673,7 @@ function PreviewSection({
                       onOpenSpacingSettings={onOpenSpacingSettings}
                     />
                   )}
-                  {columnChrome.showToolbar && (
-                    <div
-                      className="builder-preview-block-tools builder-preview-column-toolbar"
-                      onClick={(event) => event.stopPropagation()}
-                      onMouseDown={(event) => event.stopPropagation()}
-                    >
-                      <span>Column</span>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          onSelectColumn(section.id, columnKey);
-                          onOpenInspector();
-                        }}
-                        title="Open column settings"
-                        aria-label="Open column settings"
-                      >
-                        <Settings2 size={13} />
-                      </button>
-                      {nestingDepth > 0 &&
-                        nestedOwnerColumnKey && (
-                          <button
-                            type="button"
-                            onClick={(event) => {
-                              event.stopPropagation();
-                              onDeleteNestedRow(
-                                section.id,
-                                nestedOwnerColumnKey,
-                                layoutRow.id,
-                                columnKey,
-                              );
-                            }}
-                            title="Delete stacked row"
-                            aria-label="Delete stacked row"
-                          >
-                            <Trash2 size={13} />
-                          </button>
-                        )}
-                    </div>
-                  )}
+
                   {blocks.length === 0 && (
                     <div
                       className="builder-preview-drop-zone"
@@ -14302,41 +14695,7 @@ function PreviewSection({
                       </span>
                     </div>
                   )}
-                  {nestingDepth === 0 && layoutRow.items.length < 6 && (
-                    <button
-                      type="button"
-                      className="builder-preview-column-insert-trigger is-beside"
-                      aria-label={`Add column after column ${(rowMeta?.columnIndex ?? index) + 1}`}
-                      onMouseDown={(event) => event.stopPropagation()}
-                      onClick={(event) => {
-                        event.stopPropagation();
-                        onAddColumnAfter({
-                          sectionId: section.id,
-                          columnKey,
-                        });
-                      }}
-                    >
-                      <Plus size={12} />
-                      <span>Add beside</span>
-                    </button>
-                  )}
-                  {nestingDepth === 0 && (
-                    <div className="builder-preview-column-insert-boundary is-below-boundary">
-                      <button
-                        type="button"
-                        className="builder-preview-column-insert-trigger is-below"
-                        aria-label={`Stack a column below column ${(rowMeta?.columnIndex ?? index) + 1}`}
-                        onMouseDown={(event) => event.stopPropagation()}
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          onStackColumnBelow(section.id, columnKey);
-                        }}
-                      >
-                        <Plus size={12} />
-                        <span>Add below</span>
-                      </button>
-                    </div>
-                  )}
+
                   {blocks.map((block, blockIndex) => {
                     const blockKey =
                       block.id ?? `${columnKey}-block-${blockIndex}`;
@@ -14394,7 +14753,7 @@ function PreviewSection({
                         className={`builder-preview-layout-block ${builderInteractionClassName(
                           blockTarget,
                           blockInteractionState,
-                        )} shop-builder-element-shell is-${
+                        )} ${getUikitMarginClass((block as any).elementMargin ?? block.gridMargin)} shop-builder-element-shell is-${
                           block.kind ?? "text"
                         } ${
                           block.kind === "scrollPinnedDemo"
@@ -14648,7 +15007,7 @@ function PreviewSection({
                             block={block}
                             product={previewProduct}
                           />
-                        ) : block.kind === "button" ? (
+                        ) : (block as any).kind === "button" ? (
                           <div
                             className={`shop-builder-column-block shop-builder-column-block--button ${block.premiumCardStyle && block.premiumCardStyle !== "none" ? `shop-builder-card--${block.premiumCardStyle}` : ""}`}
                           >
@@ -14661,18 +15020,25 @@ function PreviewSection({
                               )}
                             >
                               {block.buttonLabel && (
-                                <DashboardTypog
-                                  as="span"
-                                  className={`builder-preview-cta ${
-                                    block.premiumButtonStyle &&
-                                    block.premiumButtonStyle !== "default"
-                                      ? `shop-builder-cta--${block.premiumButtonStyle}`
-                                      : `builder-preview-cta--${block.buttonStyle ?? "primary"}`
-                                  }`}
-                                  typography={block.typography}
+                                <a
+                                  className={getUikitButtonClass(
+                                    block.buttonStyle ?? "primary",
+                                    block.size,
+                                  )}
+                                  href={block.buttonUrl || "#"}
+                                  target={
+                                    block.buttonTarget === "_blank"
+                                      ? "_blank"
+                                      : undefined
+                                  }
+                                  rel={
+                                    block.buttonTarget === "_blank"
+                                      ? "noreferrer"
+                                      : undefined
+                                  }
                                 >
                                   {block.buttonLabel}
-                                </DashboardTypog>
+                                </a>
                               )}
                               {(block.buttons ?? []).map((btn, btnIdx) => (
                                 <div
@@ -14788,18 +15154,25 @@ function PreviewSection({
                                   >
                                     ⠿
                                   </span>
-                                  <DashboardTypog
-                                    as="span"
-                                    className={`builder-preview-cta ${
-                                      block.premiumButtonStyle &&
-                                      block.premiumButtonStyle !== "default"
-                                        ? `shop-builder-cta--${block.premiumButtonStyle}`
-                                        : `builder-preview-cta--${btn.style ?? "primary"}`
-                                    }`}
-                                    typography={block.typography}
+                                  <a
+                                    className={getUikitButtonClass(
+                                      btn.style ?? block.buttonStyle ?? "primary",
+                                      (btn as any).size ?? block.size,
+                                    )}
+                                    href={btn.url || "#"}
+                                    target={
+                                      btn.target === "_blank"
+                                        ? "_blank"
+                                        : undefined
+                                    }
+                                    rel={
+                                      btn.target === "_blank"
+                                        ? "noreferrer"
+                                        : undefined
+                                    }
                                   >
                                     {btn.label || "Button"}
-                                  </DashboardTypog>
+                                  </a>
                                 </div>
                               ))}
                             </div>
@@ -14976,116 +15349,99 @@ function PreviewSection({
                               ))}
                             </ul>
                           </div>
+                        ) : block.kind === "accordion" ? (
+                          <div className="shop-builder-column-block shop-builder-column-block--accordion">
+                            <UikitAccordion
+                              items={block.accordionItems ?? []}
+                              multiple={block.accordionMultiple}
+                              collapsible={block.accordionCollapsible}
+                             active={block.accordionOpenItems}
+                              indicator={block.accordionIndicator}
+                              indicatorPosition={block.accordionIndicatorPosition}
+                              rowStyle={block.accordionRowStyle}
+                              spacing={block.accordionSpacing}
+                              titleEmphasis={block.accordionTitleEmphasis}
+                              openEmphasis={block.accordionOpenEmphasis}
+                            />
+                          </div>
+                        ) : block.kind === "text" ? (
+                          <UikitText
+                            eyebrow={block.eyebrow}
+                            title={block.title}
+                            content={block.body}
+                            variant={block.textVariant}
+                            align={block.textAlign}
+                            typography={block.typography}
+                          />
                         ) : block.kind === "heading" ? (
-                          <div
-                            className={`shop-builder-column-block shop-builder-column-block--heading ${block.premiumCardStyle && block.premiumCardStyle !== "none" ? `shop-builder-card--${block.premiumCardStyle}` : ""}`}
-                            style={{ textAlign: block.headingAlign ?? "left" }}
-                          >
+                          <div className="shop-builder-column-block shop-builder-column-block--heading">
                             {(() => {
                               const Tag = block.headingLevel ?? "h2";
-                              const levelDefaults: Record<
-                                string,
-                                {
-                                  fontSize: string;
-                                  fontWeight: string;
-                                  lineHeight: string;
-                                }
-                              > = {
-                                h1: {
-                                  fontSize: "clamp(42px, 8vw, 126px)",
-                                  fontWeight: "760",
-                                  lineHeight: "0.92",
-                                },
-                                h2: {
-                                  fontSize: "clamp(32px, 5vw, 64px)",
-                                  fontWeight: "700",
-                                  lineHeight: "1.1",
-                                },
-                                h3: {
-                                  fontSize: "clamp(24px, 4vw, 40px)",
-                                  fontWeight: "700",
-                                  lineHeight: "1.2",
-                                },
-                                h4: {
-                                  fontSize: "clamp(20px, 3vw, 32px)",
-                                  fontWeight: "600",
-                                  lineHeight: "1.2",
-                                },
-                                h5: {
-                                  fontSize: "20px",
-                                  fontWeight: "600",
-                                  lineHeight: "1.3",
-                                },
-                                h6: {
-                                  fontSize: "16px",
-                                  fontWeight: "600",
-                                  lineHeight: "1.4",
-                                },
-                              };
-                              const defaultForLevel =
-                                levelDefaults[Tag] ?? levelDefaults.h2;
+                              const uikitHeadingClass = getUikitHeadingClass(
+                                block.headingLevel ?? "h2",
+                                block.headingSize,
+                              );
+                              const alignClass = block.headingAlign
+                                ? `uk-text-${block.headingAlign}`
+                                : "";
+                              const isGradient =
+                                block.textGradientPreset &&
+                                block.textGradientPreset !== "none";
+                              const isCustom =
+                                block.textGradientPreset === "custom";
+                              const titleClassName = [
+                                uikitHeadingClass,
+                                alignClass,
+                                isGradient && !isCustom
+                                  ? `text-gradient--${block.textGradientPreset}`
+                                  : "",
+                              ]
+                                .filter(Boolean)
+                                .join(" ");
 
-                              const userTitleTyp =
-                                (block.typography as any)?.title ??
-                                (typeof block.typography === "object" &&
-                                !(block.typography as any).title
-                                  ? block.typography
-                                  : {});
+                              const compStyle = getHeadingTypographyStyles(
+                                block.typography,
+                                Boolean(isGradient),
+                              );
 
-                              const resolvedTypography = {
-                                variant: "heading",
-                                fontSize:
-                                  userTitleTyp.fontSize ||
-                                  defaultForLevel.fontSize,
-                                fontWeight:
-                                  userTitleTyp.fontWeight ||
-                                  defaultForLevel.fontWeight,
-                                lineHeight:
-                                  userTitleTyp.lineHeight ||
-                                  defaultForLevel.lineHeight,
-                                fontFamily: userTitleTyp.fontFamily,
-                                letterSpacing: userTitleTyp.letterSpacing,
-                                color: userTitleTyp.color,
-                                textTransform: userTitleTyp.textTransform,
-                                textDecoration: userTitleTyp.textDecoration,
+                              const gradientStyle = isCustom
+                                ? {
+                                    backgroundImage: `linear-gradient(${block.textGradientCustomAngle ?? 135}deg, ${block.textGradientCustomStart ?? "#ffffff"} ${block.textGradientCustomStartOffset ?? 0}%, ${block.textGradientCustomMiddle ?? "#60a5fa"} ${block.textGradientCustomMiddleOffset ?? 50}%, ${block.textGradientCustomEnd ?? "#c084fc"} ${block.textGradientCustomEndOffset ?? 100}%)`,
+                                    WebkitBackgroundClip: "text",
+                                    WebkitTextFillColor: "transparent",
+                                    backgroundClip: "text",
+                                    display: "inline-block",
+                                  }
+                                : {};
+
+                              const combinedStyle = {
+                                ...compStyle,
+                                ...gradientStyle,
                               };
 
                               return (
-                                <DashboardTypog
-                                  as={Tag}
-                                  className={
-                                    block.textGradientPreset &&
-                                    block.textGradientPreset !== "none" &&
-                                    block.textGradientPreset !== "custom"
-                                      ? `text-gradient--${block.textGradientPreset}`
-                                      : ""
+                                <Tag
+                                  className={titleClassName}
+                                  style={
+                                    Object.keys(combinedStyle).length > 0
+                                      ? combinedStyle
+                                      : undefined
                                   }
-                                  typography={resolvedTypography}
-                                  style={{
-                                    textAlign: block.headingAlign ?? "left",
-                                    margin: 0,
-                                    ...(block.textGradientPreset === "custom"
-                                      ? {
-                                          backgroundImage: `linear-gradient(${block.textGradientCustomAngle ?? 135}deg, ${block.textGradientCustomStart ?? "#ffffff"} ${block.textGradientCustomStartOffset ?? 0}%, ${block.textGradientCustomMiddle ?? "#60a5fa"} ${block.textGradientCustomMiddleOffset ?? 50}%, ${block.textGradientCustomEnd ?? "#c084fc"} ${block.textGradientCustomEndOffset ?? 100}%)`,
-                                          WebkitBackgroundClip: "text",
-                                          WebkitTextFillColor: "transparent",
-                                          backgroundClip: "text",
-                                          display: "inline-block",
-                                        }
-                                      : {}),
-                                  }}
                                 >
                                   {block.typewriterEnabled ? (
                                     <TypewriterText
                                       text={
-                                        block.headingText ?? "Your Heading Text"
+                                        block.headingText ??
+                                        "Your Heading Text"
                                       }
                                       phrases={block.typewriterPhrases}
                                       speed={block.typewriterSpeed}
                                       eraseSpeed={block.typewriterEraseSpeed}
                                       delay={block.typewriterDelay}
                                       loop={block.typewriterLoop}
-                                      useGradient={block.typewriterUseGradient}
+                                      useGradient={
+                                        block.typewriterUseGradient
+                                      }
                                       gradientPreset={
                                         block.textGradientPreset ??
                                         block.typewriterGradientPreset
@@ -15109,7 +15465,6 @@ function PreviewSection({
                                       customEndOffset={
                                         block.textGradientCustomEndOffset
                                       }
-                                      typography={resolvedTypography}
                                       area="title"
                                       preserveHeight={
                                         block.typewriterPreserveHeight !== false
@@ -15118,13 +15473,19 @@ function PreviewSection({
                                         block.typewriterReservedLines ?? 1
                                       }
                                       mobileReservedLines={
-                                        block.typewriterMobileReservedLines ?? 2
+                                        block.typewriterMobileReservedLines ??
+                                        2
                                       }
                                     />
                                   ) : (
-                                    (block.headingText ?? "Your Heading Text")
+                                    <BuilderLineBreakText
+                                      text={
+                                        block.headingText ??
+                                        "Your Heading Text"
+                                      }
+                                    />
                                   )}
-                                </DashboardTypog>
+                                </Tag>
                               );
                             })()}
                           </div>
@@ -15631,7 +15992,7 @@ function PreviewSection({
                             const panelMediaAspect = getBuilderImageAspectRatio(block.imageRatio) || "16 / 9";
 
                             return (
-                              <div className="shop-builder-column-block shop-builder-column-block--panel">
+                              <div className={`shop-builder-column-block shop-builder-column-block--panel ${getUikitCardClass(block.panelVariant ?? block.panelStyle ?? "default", { hover: block.panelHover ? "hover" : "none", padding: block.panelSize })}`}>
                                 <div
                                   className={`shop-builder-panel-media ${
                                     isPanelImagePlaceholder ? "is-empty" : ""
@@ -15713,7 +16074,7 @@ function PreviewSection({
                                     </div>
                                   )}
                                 </div>
-                                <div>
+                                <div className="uk-card-body">
                                   {block.eyebrow && (
                                     <InlineEditableText
                                       as="span"
@@ -17156,6 +17517,25 @@ function PreviewSection({
                               previewMode
                             />
                           </div>
+                        ) : block.kind === "alert" ? (
+                          <div className="shop-builder-column-block shop-builder-column-block--alert">
+                            <div className={getUikitAlertClass(block.alertStyle)}>
+                              {block.title && (
+                                <h4 className="uk-margin-remove-top">
+                                  {block.title}
+                                </h4>
+                              )}
+                              {block.body && (
+                                <p className="uk-margin-remove-bottom">
+                                  {block.body}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        ) : block.kind === "divider" ? (
+                          <div className="shop-builder-column-block shop-builder-column-block--divider uk-margin">
+                            <hr className={getUikitDividerClass(block.dividerStyle)} />
+                          </div>
                         ) : (
                           <div className="shop-builder-column-block shop-builder-column-block--text">
                             {block.eyebrow && (
@@ -17267,27 +17647,7 @@ function PreviewSection({
             );
                   })}
                 </div>
-                {nestingDepth > 0 && nestedOwnerColumnKey && (
-                  <div className="builder-preview-column-insert-boundary is-below-boundary is-nested-row-boundary">
-                    <button
-                      type="button"
-                      className="builder-preview-column-insert-trigger is-below"
-                      aria-label={`Add nested row after row ${layoutRowIndex + 1}`}
-                      onMouseDown={(event) => event.stopPropagation()}
-                      onClick={(event) => {
-                        event.stopPropagation();
-                        onAppendNestedRow(
-                          section.id,
-                          nestedOwnerColumnKey,
-                          layoutRow.id,
-                        );
-                      }}
-                    >
-                      <Plus size={12} />
-                      <span>Add below</span>
-                    </button>
-                  </div>
-                )}
+
                 {nestingDepth === 0 && <RowInsertControl
                   placement="after"
                   owner={rowTarget}

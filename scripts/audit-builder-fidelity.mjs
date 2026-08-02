@@ -20,6 +20,8 @@ const sources = {
   headerDropdown: readFileSync(resolve(root, "components/HeaderCategoriesDropdown.tsx"), "utf8"),
   headerHeight: readFileSync(resolve(root, "lib/headerHeight.ts"), "utf8"),
   registry: readFileSync(resolve(root, "components/dashboard/builderRegistry.ts"), "utf8"),
+  types: readFileSync(resolve(root, "components/dashboard/builderTypes.ts"), "utf8"),
+  defaults: readFileSync(resolve(root, "components/dashboard/builderDefaults.ts"), "utf8"),
 };
 
 const require = createRequire(import.meta.url);
@@ -59,7 +61,7 @@ const headerHeightRuntime = loadTypeScriptModule(
 const contracts = [
   { element: "all text-capable elements", field: "typography", inspector: ["TypographyPanel", "updateTypographyArea"], builder: ["typographyProps"], storefront: ["typographyProps"], shared: ["resolveTypographyInput"] },
   { element: "text", field: "title/body/button/eyebrow typography", inspector: ['kind === "text"', '"title", "body", "button", "eyebrow"'], builder: ["InlineEditableText", "block.typography"], storefront: ["Typog", "block.typography"], shared: ["updateTypographyArea"] },
-  { element: "heading", field: "headingAlign", inspector: ["headingAlign"], builder: ["block.headingAlign"], storefront: ["block.headingAlign"], shared: [] },
+  { element: "heading", field: "headingAlign", inspector: ["headingAlign"], builder: ["block.headingAlign"], storefront: ["rawBlock.headingAlign"], shared: [] },
   { element: "button-capable elements", field: "button typography and style", inspector: ["buttonStyle", "buttonPaddingY", "buttonPaddingX"], builder: ["blockButtonCssVars", "shop-builder-cta"], storefront: ["builderButtonOverrideCssVars", "shop-builder-cta"], shared: [] },
   { element: "all elements", field: "elementAlign", inspector: ["elementAlign"], builder: ["shop-builder-element-shell", "block.elementAlign"], storefront: ["shop-builder-element-shell", "block.elementAlign"], shared: [] },
   { element: "all elements", field: "spacing", inspector: ["visualStyle", "elementPadding"], builder: ["visualStyleToCss", "resolveBuilderSpacing"], storefront: ["visualStyleToCss", "resolveBuilderSpacing"], shared: ["resolveBuilderSpacing"] },
@@ -181,11 +183,11 @@ const behavioralReport = [
     assert(value === "192px", `Expected distinct section padding 192px, received ${value}`);
     return value;
   }),
-  behavioralCase("row/column", "gap", () => {
+  behavioralCase("row/column", "canonical UIkit grid gutter resolution", () => {
     const row = spacingRuntime.resolveBuilderSpacing("2xl", "rowGap").css;
     const column = spacingRuntime.resolveBuilderSpacing("sm", "columnGap").css;
     assert(row === "128px" && column === "16px" && row !== column, `Unexpected row/column gaps ${row}/${column}`);
-    assert(sources.builder.includes("--builder-global-column-gap") && sources.storefront.includes("--builder-global-column-gap"), "Shared column-gap variable is not used by both renderers");
+    assert(sources.builder.includes("getUikitGridClass") && sources.storefront.includes("getUikitGridClass"), "Shared getUikitGridClass is not used by both renderers");
     return `row ${row}; column ${column}`;
   }),
   behavioralCase("row", "inherited and explicit row gap", () => {
@@ -199,11 +201,11 @@ const behavioralReport = [
   }),
   behavioralCase("row", "padding and responsive inherited value", () => {
     const desktop = rowStyleRuntime.resolveBuilderRowStyle(
-      { rowTopSpacing: "inherit", rowBottomSpacing: "sm" },
+      { rowBackground: "#ffffff", rowTopSpacing: "inherit", rowBottomSpacing: "sm" },
       { rowPaddingTop: "2xl", rowPaddingBottom: "lg" },
     );
     const compact = rowStyleRuntime.resolveBuilderRowStyle(
-      { rowTopSpacing: "inherit", rowBottomSpacing: "sm" },
+      { rowBackground: "#ffffff", rowTopSpacing: "inherit", rowBottomSpacing: "sm" },
       { rowPaddingTop: "md", rowPaddingBottom: "lg" },
     );
     assert(desktop.paddingTop === "128px", `Desktop inherited padding was ${desktop.paddingTop}`);
@@ -273,6 +275,56 @@ const behavioralReport = [
     assert(sources.builder.includes("<HeaderShellView"), "DashboardBuilder does not use HeaderShellView as shared renderer");
     assert(!sources.dashboardCss.includes("top: 18px !important"), "Dashboard CSS still overrides live header position");
     return "shared resolvers -> HeaderShellView; zero hardcoded header override objects";
+  }),
+  behavioralCase("uikit layout engine", "canonical UIkit row and column grid enforcement", () => {
+    assert(sources.builder.includes("getUikitGridClass"), "DashboardBuilder.tsx does not call getUikitGridClass");
+    assert(sources.builder.includes("getUikitColumnWidthClass"), "DashboardBuilder.tsx does not call getUikitColumnWidthClass");
+    assert(sources.storefront.includes("getUikitGridClass"), "StorefrontBuilderRenderer.tsx does not call getUikitGridClass");
+    assert(sources.storefront.includes("getUikitColumnWidthClass"), "StorefrontBuilderRenderer.tsx does not call getUikitColumnWidthClass");
+    assert(!sources.builder.includes("repeat(12,"), "DashboardBuilder.tsx still contains repeat(12, ...) grid math");
+    assert(!sources.storefront.includes("repeat(12,"), "StorefrontBuilderRenderer.tsx still contains repeat(12, ...) grid math");
+    return "Both renderers call getUikitGridClass & getUikitColumnWidthClass with zero 12-column grid math";
+  }),
+  behavioralCase("uikit divider", "canonical UIkit divider element enforcement", () => {
+    assert(sources.inspector.includes('block.kind === "divider"'), "DashboardInspector.tsx has no divider branch");
+    assert(sources.inspector.includes("dividerStyle"), "DashboardInspector.tsx does not edit dividerStyle");
+    assert(sources.builder.includes('block.kind === "divider"'), "DashboardBuilder.tsx has no divider branch");
+    assert(sources.builder.includes("getUikitDividerClass"), "DashboardBuilder.tsx does not call getUikitDividerClass");
+    assert(sources.builder.includes("shop-builder-column-block--divider"), "DashboardBuilder.tsx does not render the divider wrapper class");
+    assert(sources.storefront.includes("getUikitDividerClass"), "StorefrontBuilderRenderer.tsx does not call getUikitDividerClass");
+    assert(sources.storefront.includes("shop-builder-column-block--divider"), "StorefrontBuilderRenderer.tsx does not render the divider wrapper class");
+    assert(sources.registry.includes("divider"), "divider not registered in builderRegistry");
+    return "divider registered in palette, defaults, inspector, and both renderers via getUikitDividerClass";
+  }),
+  behavioralCase("uikit alert", "canonical UIkit alert element enforcement", () => {
+    assert(sources.inspector.includes('block.kind === "alert"'), "DashboardInspector.tsx has no alert branch");
+    assert(sources.inspector.includes("alertStyle"), "DashboardInspector.tsx does not edit alertStyle");
+    assert(sources.builder.includes('block.kind === "alert"'), "DashboardBuilder.tsx has no alert branch");
+    assert(sources.builder.includes("getUikitAlertClass"), "DashboardBuilder.tsx does not call getUikitAlertClass");
+    assert(sources.builder.includes("shop-builder-column-block--alert"), "DashboardBuilder.tsx does not render the alert wrapper class");
+    assert(sources.storefront.includes("getUikitAlertClass"), "StorefrontBuilderRenderer.tsx does not call getUikitAlertClass");
+    assert(sources.storefront.includes("shop-builder-column-block--alert"), "StorefrontBuilderRenderer.tsx does not render the alert wrapper class");
+    assert(sources.registry.includes("alert"), "alert not registered in builderRegistry");
+    const invalidVariants = ['"error"', '"caution"', '"info"'].filter((v) => sources.inspector.includes(v));
+    assert(invalidVariants.length === 0, `Alert inspector offers non-UIkit variants: ${invalidVariants.join(", ")}`);
+    return "alert registered in palette, defaults, inspector, and both renderers via getUikitAlertClass; inspector exposes only primary/success/warning/danger";
+  }),
+  behavioralCase("uikit heading", "canonical UIkit heading element enforcement", () => {
+    assert(sources.inspector.includes('block.kind === "heading"'), "DashboardInspector.tsx has no heading branch");
+    assert(sources.inspector.includes("headingSize"), "DashboardInspector.tsx does not edit headingSize");
+    assert(sources.builder.includes('block.kind === "heading"'), "DashboardBuilder.tsx has no heading branch");
+    assert(sources.builder.includes("getUikitHeadingClass"), "DashboardBuilder.tsx does not call getUikitHeadingClass");
+    assert(sources.builder.includes("shop-builder-column-block--heading"), "DashboardBuilder.tsx does not render the heading wrapper class");
+    assert(sources.storefront.includes("getUikitHeadingClass"), "StorefrontBuilderRenderer.tsx does not call getUikitHeadingClass");
+    assert(sources.storefront.includes("shop-builder-column-block--heading"), "StorefrontBuilderRenderer.tsx does not render the heading wrapper class");
+    assert(sources.registry.includes("heading"), "heading not registered in builderRegistry");
+    assert(sources.types.includes('headingSize?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "article-title" | "small" | "medium" | "large" | "xlarge"'), "BuilderLayoutBlock is missing the headingSize UIkit preset union");
+    assert(sources.defaults.includes('headingSize: "medium"'), "createLayoutBlock heading defaults omit headingSize");
+    assert(!sources.builder.includes("levelDefaults"), "DashboardBuilder.tsx still contains the old levelDefaults clamp system");
+    assert(!sources.builder.includes('fontWeight: "760"'), "DashboardBuilder.tsx still contains the old heading h1 inline sizing");
+    const rawClassValues = ['value="uk-h', 'value="uk-heading'].filter((v) => sources.inspector.includes(v));
+    assert(rawClassValues.length === 0, `Heading inspector offers raw UIkit classes as option values: ${rawClassValues.join(", ")}`);
+    return "heading registered in palette, defaults, inspector, and both renderers via getUikitHeadingClass; clamp system removed; inspector exposes only semantic preset values";
   }),
 ];
 

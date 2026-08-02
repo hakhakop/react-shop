@@ -55,8 +55,6 @@ export type HeaderBuilderElement = {
   buttonBorderColor?: string;
   buttonPaddingY?: string;
   buttonPaddingX?: string;
-  buttonFontWeight?: string;
-  buttonLetterSpacing?: string;
   buttonHoverBg?: string;
   buttonHoverTextColor?: string;
   buttonHoverBorderColor?: string;

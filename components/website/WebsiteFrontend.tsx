@@ -26,6 +26,7 @@ import { cookies } from "next/headers";
 import { resolveContentSections } from "@/lib/builderContentLanguages";
 import { Sparkles } from "lucide-react";
 import { getPublishedHeaderDocumentSettings } from "@/lib/publishedHeaderDocumentSettings";
+import { getUikitGlobalsCssVars } from "@/lib/uikitGlobals";
 
 type WebsiteFrontendMode = "preview" | "domain";
 
@@ -46,8 +47,13 @@ function spacing(value: string | undefined, context: BuilderSpacingContext) {
 }
 
 function scopedShellCss(shellSettings: BuilderShellSettings) {
+  const uikitGlobals = getUikitGlobalsCssVars(shellSettings);
+  const uikitCss = Object.entries(uikitGlobals)
+    .map(([key, value]) => `  ${key}: ${value};`)
+    .join("\n");
   return `
 :root {
+${uikitCss}
   --builder-global-section-padding-top: ${spacing(shellSettings.sectionPaddingTop, "sectionPadding")};
   --builder-global-section-padding-bottom: ${spacing(shellSettings.sectionPaddingBottom, "sectionPadding")};
   --builder-global-section-margin-top: ${spacing(shellSettings.sectionMarginTop, "sectionMargin")};

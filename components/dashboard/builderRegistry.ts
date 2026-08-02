@@ -42,6 +42,7 @@ export const layoutBlockLabels: Record<LayoutBlockKind, string> = {
   heading: "Heading",
   image: "Image",
   panel: "Panel",
+  accordion: "Accordion",
   table: "Table",
   text: "Text",
   slider: "Swiper / Carousel",
@@ -77,6 +78,8 @@ export const layoutBlockLabels: Record<LayoutBlockKind, string> = {
   cartContent: "Cart Content",
   checkoutContent: "Checkout Content",
   accountContent: "My Account Content",
+  divider: "Divider",
+  alert: "Alert",
 };
 
 export const baseLayoutBlockKinds: LayoutBlockKind[] = [
@@ -103,6 +106,9 @@ export const baseLayoutBlockKinds: LayoutBlockKind[] = [
   "cartContent",
   "checkoutContent",
   "accountContent",
+  "divider",
+  "accordion",
+  "alert",
 ];
 
 export const productLayoutBlockKinds: LayoutBlockKind[] = [
@@ -126,6 +132,7 @@ export const layoutBlockDescriptions: Record<LayoutBlockKind, string> = {
   heading: "A standalone heading with level and alignment options.",
   image: "Simple image block with optional caption metadata.",
   panel: "Image, eyebrow, title, copy, and button in one content block.",
+  accordion: "Accessible disclosure list with editable titles and content.",
   text: "Static copy, button, and small editorial content.",
   table: "Editable data table with headers and styled rows.",
   slider: "Swiper carousel with editable slides and images.",
@@ -161,6 +168,8 @@ export const layoutBlockDescriptions: Record<LayoutBlockKind, string> = {
   cartContent: "Live cart page content slot.",
   checkoutContent: "Live checkout page content slot.",
   accountContent: "Live my-account page content slot.",
+  divider: "UIkit horizontal line or icon divider.",
+  alert: "UIkit notification or alert callout box.",
 };
 
 export const layoutBlockGroups: {
@@ -219,6 +228,9 @@ export const layoutBlockGroups: {
       "icon",
       "list",
       "datePicker",
+      "divider",
+      "accordion",
+      "alert",
     ],
   },
   {
@@ -236,6 +248,7 @@ export const layoutBlockIcons: Record<LayoutBlockKind, LayoutBlockIconName> = {
   heading: "text",
   image: "image",
   panel: "sparkles",
+  accordion: "list",
   table: "grid",
   text: "text",
   slider: "gallery",
@@ -271,6 +284,8 @@ export const layoutBlockIcons: Record<LayoutBlockKind, LayoutBlockIconName> = {
   cartContent: "shoppingBag",
   checkoutContent: "lock",
   accountContent: "user",
+  divider: "panel",
+  alert: "sparkles",
 };
 
 export const basePageLabels: Record<string, string> = {

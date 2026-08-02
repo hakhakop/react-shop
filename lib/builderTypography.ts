@@ -266,3 +266,55 @@ export function typographyProps(
     style: Object.keys(style).length ? style : undefined,
   };
 }
+
+/**
+  * Extracts allowed complementary typography styles for a heading block.
+  * Explicitly excludes fontSize and variant so UIkit heading size presets remain in full control.
+  * Excludes color when a gradient is active.
+  */
+export function getHeadingTypographyStyles(
+  typ?: TypographySettings | TypographyGroup,
+  hasGradient?: boolean,
+): CSSProperties {
+  const resolved = resolveTypographyInput(typ, "title");
+  if (!resolved) return {};
+
+  const style: CSSProperties = {};
+
+  if (resolved.fontFamily) {
+    if (!isClassLike(resolved.fontFamily) || !resolved.fontFamily.startsWith("font-")) {
+      style.fontFamily = resolved.fontFamily;
+    }
+  }
+
+  if (resolved.fontWeight) {
+    style.fontWeight = resolved.fontWeight as CSSProperties["fontWeight"];
+  }
+
+  if (resolved.lineHeight) {
+    style.lineHeight = resolved.lineHeight;
+  }
+
+  if (resolved.letterSpacing) {
+    style.letterSpacing = resolved.letterSpacing;
+  }
+
+  if (resolved.textTransform && resolved.textTransform !== "none") {
+    style.textTransform = resolved.textTransform as CSSProperties["textTransform"];
+  }
+
+  if (resolved.textDecoration && resolved.textDecoration !== "none") {
+    style.textDecoration = resolved.textDecoration as CSSProperties["textDecoration"];
+  }
+
+  if (resolved.textShadow && resolved.textShadow !== "none") {
+    style.textShadow = resolved.textShadow;
+  }
+
+  if (resolved.color && !hasGradient) {
+    style.color = resolved.color;
+  }
+
+  return style;
+}
+

@@ -14,6 +14,8 @@ type Props = {
   value?: TypographySettings;
   onChange: (v: TypographySettings) => void;
   onOpenGlobalTypographySettings?: () => void;
+  hideVariant?: boolean;
+  hideFontSize?: boolean;
 };
 
 const SHADOW_PRESETS = [
@@ -44,6 +46,8 @@ export default function TypographyPanel({
   value,
   onChange,
   onOpenGlobalTypographySettings,
+  hideVariant = false,
+  hideFontSize = false,
 }: Props) {
   const v = value || {};
 
@@ -133,25 +137,27 @@ export default function TypographyPanel({
 
   return (
     <div className="builder-style-typography-new">
-      <div className="builder-typography-field is-fullwidth">
-        <span className="builder-style-side-label-wrapper">Variant</span>
-        <div className="builder-style-chips-row">
-          {(["heading", "subheading", "body", "button"] as const).map((variant) => {
-            const isSelected = (v.variant || "body") === variant;
-            return (
-              <button
-                key={variant}
-                type="button"
-                className={`builder-style-chip${isSelected ? " is-active" : ""}`}
-                onClick={() => set("variant", variant)}
-                style={{ textTransform: "capitalize" }}
-              >
-                {variant}
-              </button>
-            );
-          })}
+      {!hideVariant && (
+        <div className="builder-typography-field is-fullwidth">
+          <span className="builder-style-side-label-wrapper">Variant</span>
+          <div className="builder-style-chips-row">
+            {(["heading", "subheading", "body", "button"] as const).map((variant) => {
+              const isSelected = (v.variant || "body") === variant;
+              return (
+                <button
+                  key={variant}
+                  type="button"
+                  className={`builder-style-chip${isSelected ? " is-active" : ""}`}
+                  onClick={() => set("variant", variant)}
+                  style={{ textTransform: "capitalize" }}
+                >
+                  {variant}
+                </button>
+              );
+            })}
+          </div>
         </div>
-      </div>
+      )}
 
       <div className="builder-typography-two-col-grid">
         {/* Font Family */}
@@ -222,50 +228,52 @@ export default function TypographyPanel({
         </div>
 
         {/* Font Size */}
-        <div className="builder-typography-field">
-          <span className="builder-style-side-label-wrapper">Font Size</span>
-          <div className="builder-style-chips-row">
-            {FONT_SIZE_PRESETS.map((preset) => {
-              const isSelected = !showCustomSize && activeSizePreset === preset.value;
-              return (
-                <button
-                  key={preset.value}
-                  type="button"
-                  className={`builder-style-chip${isSelected ? " is-active" : ""}`}
-                  onClick={() => {
-                    setCustomFields((prev) => ({ ...prev, fontSize: false }));
-                    set("fontSize", preset.value);
-                  }}
-                >
-                  {preset.label}
-                </button>
-              );
-            })}
-            <button
-              type="button"
-              className={`builder-style-chip builder-style-chip--custom${showCustomSize ? " is-active" : ""}`}
-              onClick={() => {
-                setCustomFields((prev) => ({ ...prev, fontSize: true }));
-                if (!v.fontSize) {
-                  set("fontSize", "16px");
-                }
-              }}
-            >
-              <Sliders size={11} style={{ marginRight: "4px" }} />
-              Custom
-            </button>
-            {showCustomSize && (
-              <div className="builder-style-custom-input-wrapper" style={{ width: "80px" }}>
-                <input
-                  type="text"
-                  value={v.fontSize || ""}
-                  onChange={handleCustomSizeChange}
-                  placeholder="16px"
-                />
-              </div>
-            )}
+        {!hideFontSize && (
+          <div className="builder-typography-field">
+            <span className="builder-style-side-label-wrapper">Font Size</span>
+            <div className="builder-style-chips-row">
+              {FONT_SIZE_PRESETS.map((preset) => {
+                const isSelected = !showCustomSize && activeSizePreset === preset.value;
+                return (
+                  <button
+                    key={preset.value}
+                    type="button"
+                    className={`builder-style-chip${isSelected ? " is-active" : ""}`}
+                    onClick={() => {
+                      setCustomFields((prev) => ({ ...prev, fontSize: false }));
+                      set("fontSize", preset.value);
+                    }}
+                  >
+                    {preset.label}
+                  </button>
+                );
+              })}
+              <button
+                type="button"
+                className={`builder-style-chip builder-style-chip--custom${showCustomSize ? " is-active" : ""}`}
+                onClick={() => {
+                  setCustomFields((prev) => ({ ...prev, fontSize: true }));
+                  if (!v.fontSize) {
+                    set("fontSize", "16px");
+                  }
+                }}
+              >
+                <Sliders size={11} style={{ marginRight: "4px" }} />
+                Custom
+              </button>
+              {showCustomSize && (
+                <div className="builder-style-custom-input-wrapper" style={{ width: "80px" }}>
+                  <input
+                    type="text"
+                    value={v.fontSize || ""}
+                    onChange={handleCustomSizeChange}
+                    placeholder="16px"
+                  />
+                </div>
+              )}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Line Height */}
         <div className="builder-typography-field">

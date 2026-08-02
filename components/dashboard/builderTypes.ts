@@ -68,6 +68,7 @@ export type InspectorTab =
   | "spacing"
   | "style"
   | "typography"
+  | "behavior"
   | "advanced";
 export type SidebarTab =
   | "builder"
@@ -163,7 +164,11 @@ export type LayoutBlockKind =
   | "productDescription"
   | "cartContent"
   | "checkoutContent"
-  | "accountContent";
+  | "accountContent"
+  | "divider"
+  | "accordion"
+  | "alert";
+  
 
 export type BuilderDesign = {
   preset?: "princity" | "editorial" | "contrast";
@@ -230,6 +235,7 @@ export type BuilderLayoutBlock = {
   buttonUrl?: string;
   buttonTarget?: "_self" | "_blank";
   buttonStyle?: "primary" | "secondary" | "outline" | "ghost" | "light";
+  size?: "small" | "default" | "large";
   secondaryButtonLabel?: string;
   secondaryButtonUrl?: string;
   secondaryButtonTarget?: "_self" | "_blank";
@@ -271,6 +277,10 @@ export type BuilderLayoutBlock = {
   elementPadding?: "none" | "xs" | "sm" | "md" | "lg" | "xl" | "2xl" | "3xl" | "small" | "medium" | "large" | string;
   elementAlign?: "left" | "center" | "right";
   panelStyle?: BuilderPanelStyle;
+  panelVariant?: "default" | "primary" | "secondary" | "blank";
+  panelHover?: boolean;
+  panelSize?: "small" | "default" | "large";
+  hoverPreset?: string;
   embedMode?: EmbedMode;
   embedCode?: string;
   embedUrl?: string;
@@ -325,6 +335,19 @@ export type BuilderLayoutBlock = {
   headingText?: string;
   headingLevel?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
   headingAlign?: "left" | "center" | "right";
+  headingSize?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "article-title" | "small" | "medium" | "large" | "xlarge";
+  textVariant?: "default" | "lead" | "meta" | "small" | "large" | "muted";
+  textAlign?: "left" | "center" | "right";
+  accordionItems?: { id: string; title: string; content: string }[];
+  accordionMultiple?: boolean;
+  accordionCollapsible?: boolean;
+  accordionOpenItems?: number[];
+  accordionIndicator?: "none" | "chevron" | "plus-minus";
+  accordionIndicatorPosition?: "start" | "end";
+  accordionRowStyle?: "plain" | "divided" | "striped";
+  accordionSpacing?: "compact" | "default" | "large";
+  accordionTitleEmphasis?: "default" | "bold";
+  accordionOpenEmphasis?: "none" | "muted" | "primary";
   dateLabel?: string;
   tableHeadings?: string[];
   tableRows?: string[][];
@@ -389,7 +412,7 @@ export type BuilderLayoutBlock = {
   typewriterMobileReservedLines?: number;
   premiumButtonStyle?: "neon-glow" | "cyber-glitch" | "glassmorphic" | "default";
   premiumCardStyle?: "neon-border" | "glass-morph" | "cyber-grid" | "none";
-  textGradientPreset?: "indigo-purple" | "cyan-blue" | "emerald-teal" | "sunset-orange" | "none" | "custom";
+  textGradientPreset?: "indigo-purple" | "cyan-blue" | "emerald-teal" | "sunset-orange" | "indigo-purple-cyan" | "sunset-pink" | "gold-amber" | "none" | "custom";
   textGradientCustomStart?: string;
   textGradientCustomMiddle?: string;
   textGradientCustomEnd?: string;
@@ -404,6 +427,8 @@ export type BuilderLayoutBlock = {
     infiniteScroll?: boolean;
     style?: "standard" | "solid" | "minimal" | "rounded";
   };
+  dividerStyle?: "default" | "small" | "icon" | "vertical";
+  alertStyle?: "primary" | "success" | "warning" | "danger";
 };
 
 export type WordPressMediaItem = {
@@ -473,6 +498,7 @@ export type BuilderSection = {
   contentMode?: SectionContentMode;
   sectionHeight?: SectionHeight;
   contentVerticalAlign?: SectionContentVerticalAlign;
+  sectionVariant?: "default" | "muted" | "primary" | "secondary";
   pullUnderHeader?: boolean;
   colorScheme?: SectionColorScheme;
   layout?: string;
@@ -569,6 +595,13 @@ export type BuilderSection = {
     rowTopMargin?: SectionSpacing;
     rowBottomMargin?: SectionSpacing;
     rowGap?: SectionSpacing;
+    rowAlignment?: "top" | "center" | "bottom";
+    rowJustify?: "start" | "center" | "between" | "around";
+    rowMatchHeight?: boolean;
+    columnHorizontalAlign?: "left" | "center" | "right";
+    columnVerticalAlign?: "top" | "center" | "bottom";
+    columnFlex?: "none" | "expand";
+    columnResponsiveWidth?: "inherit" | "stack";
     rowBorderRadius?: number;
     rowVisualStyle?: BuilderVisualStyle;
     headerGap?: string;
@@ -666,7 +699,7 @@ export type BuilderSection = {
   typewriterMobileReservedLines?: number;
   premiumButtonStyle?: "neon-glow" | "cyber-glitch" | "glassmorphic" | "default";
   premiumCardStyle?: "neon-border" | "glass-morph" | "cyber-grid" | "none";
-  textGradientPreset?: "indigo-purple" | "cyan-blue" | "emerald-teal" | "sunset-orange" | "none" | "custom";
+  textGradientPreset?: "indigo-purple" | "cyan-blue" | "emerald-teal" | "sunset-orange" | "indigo-purple-cyan" | "sunset-pink" | "gold-amber" | "none" | "custom";
   textGradientCustomStart?: string;
   textGradientCustomMiddle?: string;
   textGradientCustomEnd?: string;

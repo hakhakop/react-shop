@@ -1,5 +1,7 @@
 /* wc-store/app/globals.css */
 
+@import "uikit/dist/css/uikit.min.css";
+
 @import "swiper/css";
 @import "swiper/css/effect-cards";
 @import "swiper/css/effect-coverflow";
@@ -1473,4 +1475,433 @@ a {
   line-height: 1.08 !important;
   font-weight: 650 !important;
   letter-spacing: 0 !important;
+}
+
+/* ──────────────────────────────────────────────────────────────────────────────
+   UIkit component reinforcement — restores UIkit styles stripped by Tailwind
+   preflight. Scoped to .shop-builder-main so only builder/storefront
+   rendered content is affected, not the dashboard shell or toolbar UI.
+   ────────────────────────────────────────────────────────────────────────── */
+
+/* --- UIkit Buttons --- */
+.shop-builder-main .uk-button {
+  display: inline-block;
+  box-sizing: border-box;
+  padding: 0 var(--uk-button-padding-x, 30px);
+  vertical-align: middle;
+  font-family: var(--uk-button-font-family, inherit);
+  font-style: var(--uk-button-font-style, normal);
+  font-weight: var(--uk-button-font-weight, 600);
+  font-size: var(--uk-button-font-size, 14px);
+  line-height: var(--uk-button-line-height, 1.5);
+  text-transform: var(--uk-button-text-transform, uppercase);
+  letter-spacing: var(--uk-button-letter-spacing, 0);
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  border: var(--uk-button-border-width, 1px) var(--uk-button-border-mode, solid) transparent;
+  backdrop-filter: var(--uk-button-backdrop-filter, none);
+  border-radius: var(--uk-button-border-radius, 0);
+  transition: var(--uk-button-transition-duration, 0.1s) ease-in-out;
+  transition-property: color, background-color, border-color;
+}
+
+.shop-builder-main .uk-button-default {
+  background-color: var(--uk-button-default-background, transparent) !important;
+  color: var(--uk-button-default-text, #333) !important;
+  border-color: var(--uk-button-default-border, var(--uk-global-border-color, #e5e5e5)) !important;
+  box-shadow: var(--uk-button-default-shadow, none);
+}
+.shop-builder-main .uk-button-default:hover {
+  background-color: var(--uk-button-default-hover-background, var(--uk-button-default-background, transparent));
+  color: var(--uk-button-default-hover-text, var(--uk-button-default-text, #333));
+  border-color: var(--uk-button-default-hover-border, #b2b2b2);
+  box-shadow: var(--uk-button-default-hover-shadow, var(--uk-button-default-shadow, none));
+}
+
+.shop-builder-main .uk-button-primary {
+  background-image: var(--uk-button-primary-gradient, none);
+  background-color: var(--uk-button-primary-background, #1e87f0) !important;
+  color: var(--uk-button-primary-text, #fff) !important;
+  border-color: transparent !important;
+  box-shadow: var(--uk-button-primary-shadow, none);
+}
+.shop-builder-main .uk-button-primary:hover {
+  background-image: var(--uk-button-primary-hover-gradient, var(--uk-button-primary-gradient, none));
+  background-color: var(--uk-button-primary-hover-background, #0f7ae5);
+  color: var(--uk-button-primary-hover-text, var(--uk-button-primary-text, #fff));
+  border-color: var(--uk-button-primary-hover-border, transparent);
+  box-shadow: var(--uk-button-primary-hover-shadow, var(--uk-button-primary-shadow, none));
+}
+
+.shop-builder-main .uk-button-secondary {
+  background-color: var(--uk-button-secondary-background, #222) !important;
+  color: var(--uk-button-secondary-text, #fff) !important;
+  border-color: var(--uk-button-secondary-border, transparent) !important;
+  box-shadow: var(--uk-button-secondary-shadow, none);
+}
+.shop-builder-main .uk-button-secondary:hover {
+  background-image: var(--uk-button-secondary-hover-gradient, none);
+  background-color: var(--uk-button-secondary-hover-background, #151515);
+  color: var(--uk-button-secondary-hover-text, var(--uk-button-secondary-text, #fff));
+  border-color: var(--uk-button-secondary-hover-border, var(--uk-button-secondary-border, transparent));
+  box-shadow: var(--uk-button-secondary-hover-shadow, var(--uk-button-secondary-shadow, none));
+}
+.shop-builder-main .uk-button-default:active {
+  background-color: var(--uk-button-default-active-background, var(--uk-button-default-background, transparent));
+  color: var(--uk-button-default-active-text, var(--uk-button-default-text, #333));
+  border-color: var(--uk-button-default-active-border, var(--uk-button-default-border, transparent));
+  box-shadow: var(--uk-button-default-active-shadow, var(--uk-button-default-shadow, none));
+}
+.shop-builder-main .uk-button-primary:active {
+  background-image: var(--uk-button-primary-active-gradient, var(--uk-button-primary-gradient, none));
+  background-color: var(--uk-button-primary-active-background, var(--uk-button-primary-background, #1e87f0));
+  color: var(--uk-button-primary-active-text, var(--uk-button-primary-text, #fff));
+  border-color: var(--uk-button-primary-active-border, transparent);
+  box-shadow: var(--uk-button-primary-active-shadow, var(--uk-button-primary-shadow, none));
+}
+.shop-builder-main .uk-button-secondary:active {
+  background-image: var(--uk-button-secondary-active-gradient, none);
+  background-color: var(--uk-button-secondary-active-background, var(--uk-button-secondary-background, #222));
+  color: var(--uk-button-secondary-active-text, var(--uk-button-secondary-text, #fff));
+  border-color: var(--uk-button-secondary-active-border, var(--uk-button-secondary-border, transparent));
+  box-shadow: var(--uk-button-secondary-active-shadow, var(--uk-button-secondary-shadow, none));
+}
+.shop-builder-main .uk-button-danger {
+  background-color: var(--uk-button-danger-background, #f0506e);
+  color: var(--uk-button-danger-text, #fff);
+  border-color: var(--uk-button-danger-border, transparent);
+  box-shadow: var(--uk-button-danger-shadow, none);
+}
+.shop-builder-main .uk-button-danger:hover {
+  background-color: var(--uk-button-danger-hover-background, var(--uk-button-danger-background, #f0506e));
+  color: var(--uk-button-danger-hover-text, var(--uk-button-danger-text, #fff));
+  border-color: var(--uk-button-danger-hover-border, var(--uk-button-danger-border, transparent));
+  box-shadow: var(--uk-button-danger-hover-shadow, var(--uk-button-danger-shadow, none));
+}
+.shop-builder-main .uk-button-danger:active {
+  background-color: var(--uk-button-danger-active-background, var(--uk-button-danger-background, #f0506e));
+  color: var(--uk-button-danger-active-text, var(--uk-button-danger-text, #fff));
+  border-color: var(--uk-button-danger-active-border, var(--uk-button-danger-border, transparent));
+  box-shadow: var(--uk-button-danger-active-shadow, var(--uk-button-danger-shadow, none));
+}
+.shop-builder-main .uk-button:disabled,
+.shop-builder-main .uk-button.uk-disabled {
+  background-color: var(--uk-button-disabled-background, #f8f8f8);
+  color: var(--uk-button-disabled-text, #999);
+  border-color: var(--uk-button-disabled-border, transparent);
+  cursor: not-allowed;
+}
+
+.shop-builder-main .uk-button-text {
+  padding: 0;
+  line-height: 1.5;
+  background: var(--uk-button-text-background, transparent);
+  color: var(--uk-button-text-color, #333) !important;
+  border: var(--uk-button-border-width, 1px) var(--uk-button-border-mode, solid) var(--uk-button-text-border, transparent);
+  position: relative;
+}
+.shop-builder-main .uk-button-text::before {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 100%;
+  border-bottom: 1px solid currentColor;
+  transition: right 0.3s ease-out;
+}
+.shop-builder-main .uk-button-text:hover::before {
+  right: 0;
+}
+.shop-builder-main .uk-button-text:hover {
+  color: var(--uk-button-text-hover-color, var(--uk-button-text-color, #333));
+  border-color: var(--uk-button-text-hover-border, var(--uk-button-text-border, transparent));
+}
+.shop-builder-main .uk-button-text:active {
+  color: var(--uk-button-text-active-color, var(--uk-button-text-hover-color, var(--uk-button-text-color, #333)));
+}
+.shop-builder-main .uk-button-link { color: var(--uk-button-link-color, var(--uk-button-text-color, #333)); }
+.shop-builder-main .uk-button-link:hover { color: var(--uk-button-link-hover-color, var(--uk-button-link-color, #333)); }
+
+.shop-builder-main .uk-button-small {
+  padding: 0 var(--uk-button-small-padding-x, var(--uk-button-padding-x, 15px));
+  line-height: var(--uk-button-small-line-height, var(--uk-button-height-small, 28px));
+  font-size: var(--uk-button-small-font-size, 12px);
+  border-radius: var(--uk-button-small-radius, var(--uk-button-border-radius, 0));
+}
+.shop-builder-main .uk-button-large {
+  padding: 0 var(--uk-button-large-padding-x, var(--uk-button-padding-x, 40px));
+  line-height: var(--uk-button-large-line-height, var(--uk-button-height-large, 53px));
+  font-size: var(--uk-button-large-font-size, 16px);
+  border-radius: var(--uk-button-large-radius, var(--uk-button-border-radius, 0));
+}
+.shop-builder-main .uk-button-primary,
+.shop-builder-main .uk-button-secondary {
+  background-size: var(--uk-button-background-size, auto);
+  background-position: var(--uk-button-background-position, 100%);
+}
+.shop-builder-main .uk-button-primary:hover,
+.shop-builder-main .uk-button-secondary:hover {
+  background-position: var(--uk-button-hover-background-position, 0%);
+}
+
+/* --- UIkit Labels --- */
+.shop-builder-main .uk-label {
+  display: inline-block;
+  padding: 0 10px;
+  background: #1e87f0;
+  line-height: 1.5;
+  font-size: 11px;
+  color: #fff;
+  vertical-align: middle;
+  white-space: nowrap;
+  border-radius: 2px;
+  text-transform: uppercase;
+}
+.shop-builder-main .uk-label-success {
+  background-color: #32d296;
+  color: #fff;
+}
+.shop-builder-main .uk-label-warning {
+  background-color: #faa05a;
+  color: #fff;
+}
+.shop-builder-main .uk-label-danger {
+  background-color: #f0506e;
+  color: #fff;
+}
+
+/* --- UIkit Badges --- */
+.shop-builder-main .uk-badge {
+  box-sizing: border-box;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 5px;
+  border-radius: 500px;
+  vertical-align: middle;
+  background: #1e87f0;
+  color: #fff;
+  font-size: 11px;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* --- UIkit Alerts --- */
+.shop-builder-main .uk-alert {
+  position: relative;
+  margin-bottom: 20px;
+  padding: 15px 29px 15px 15px;
+  background: #f8f8f8;
+  color: #666;
+}
+.shop-builder-main .uk-alert-primary {
+  background: #d8eafc;
+  color: #1e87f0;
+}
+.shop-builder-main .uk-alert-success {
+  background: #edfbf6;
+  color: #32d296;
+}
+.shop-builder-main .uk-alert-warning {
+  background: #fef5ee;
+  color: #faa05a;
+}
+.shop-builder-main .uk-alert-danger {
+  background: #fef4f6;
+  color: #f0506e;
+}
+
+/* --- UIkit Dividers --- */
+.shop-builder-main .uk-hr,
+.shop-builder-main .uk-divider-icon,
+.shop-builder-main .uk-divider-small {
+  border: 0;
+  overflow: visible;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+.shop-builder-main .uk-hr {
+  border-top: 1px solid #e5e5e5;
+}
+.shop-builder-main .uk-divider-icon {
+  position: relative;
+  height: 20px;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2220%22%20height%3D%2220%22%20viewBox%3D%220%200%2020%2020%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Ccircle%20fill%3D%22none%22%20stroke%3D%22%23e5e5e5%22%20stroke-width%3D%222%22%20cx%3D%2210%22%20cy%3D%2210%22%20r%3D%227%22%20%2F%3E%3C%2Fsvg%3E");
+  background-repeat: no-repeat;
+  background-position: 50% 50%;
+}
+.shop-builder-main .uk-divider-icon::before,
+.shop-builder-main .uk-divider-icon::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  max-width: calc(50% - 25px);
+  border-bottom: 1px solid #e5e5e5;
+}
+.shop-builder-main .uk-divider-icon::before {
+  right: calc(50% + 25px);
+  width: 100%;
+}
+.shop-builder-main .uk-divider-icon::after {
+  left: calc(50% + 25px);
+  width: 100%;
+}
+.shop-builder-main .uk-divider-small {
+  border-top: 1px solid #e5e5e5;
+  width: 100px;
+}
+
+/* --- UIkit Headings --- */
+.shop-builder-main h1,
+.shop-builder-main h2,
+.shop-builder-main h3,
+.shop-builder-main h4,
+.shop-builder-main h5,
+.shop-builder-main h6 {
+  font-weight: normal;
+  color: inherit;
+  font-family: inherit;
+}
+.shop-builder-main h1 { font-size: 2.23125rem; line-height: 1.2; }
+.shop-builder-main h2 { font-size: 1.7rem; line-height: 1.3; }
+.shop-builder-main h3 { font-size: 1.5rem; line-height: 1.4; }
+.shop-builder-main h4 { font-size: 1.25rem; line-height: 1.4; }
+
+.shop-builder-main .uk-h1 { font-size: 2.23125rem; line-height: 1.2; }
+.shop-builder-main .uk-h2 { font-size: 1.7rem; line-height: 1.3; }
+.shop-builder-main .uk-h3 { font-size: 1.5rem; line-height: 1.4; }
+.shop-builder-main .uk-h4 { font-size: 1.25rem; line-height: 1.4; }
+.shop-builder-main .uk-h5 { font-size: 1rem; line-height: 1.4; }
+.shop-builder-main .uk-h6 { font-size: 0.875rem; line-height: 1.4; }
+.shop-builder-main .uk-article-title { font-size: 2.6rem; line-height: 1.2; }
+
+.shop-builder-main .uk-heading-small { font-size: var(--uk-heading-small-font-size, 2.6rem); line-height: var(--uk-base-line-height, 1.2); font-weight: var(--uk-heading-small-font-weight, var(--uk-heading-font-weight, 700)); }
+.shop-builder-main .uk-heading-medium { font-size: var(--uk-heading-medium-font-size, 2.8875rem); line-height: var(--uk-heading-medium-line-height, var(--uk-base-line-height, 1.1)); font-weight: var(--uk-heading-medium-font-weight, var(--uk-heading-font-weight, 700)); }
+.shop-builder-main .uk-heading-large { font-size: var(--uk-heading-large-font-size, 3.4rem); line-height: var(--uk-base-line-height, 1.1); }
+.shop-builder-main .uk-heading-xlarge { font-size: var(--uk-heading-xlarge-font-size, 4rem); line-height: var(--uk-base-line-height, 1); }
+.shop-builder-main .uk-heading-2xlarge { font-size: var(--uk-heading-xlarge-font-size, 6rem); line-height: var(--uk-base-line-height, 1); }
+
+@media (min-width: 960px) {
+  .shop-builder-main .uk-heading-small { font-size: var(--uk-heading-small-font-size-responsive, 3.25rem); }
+  .shop-builder-main .uk-heading-medium { font-size: var(--uk-heading-medium-font-size-responsive, 3.5rem); }
+  .shop-builder-main .uk-heading-large { font-size: 4rem; }
+  .shop-builder-main .uk-heading-xlarge { font-size: 6rem; }
+  .shop-builder-main .uk-heading-2xlarge { font-size: 8rem; }
+}
+
+/* --- UIkit Text utilities --- */
+.shop-builder-main .uk-text-lead {
+  font-size: 1.5rem;
+  line-height: 1.5;
+  color: #333;
+}
+.shop-builder-main .uk-text-meta {
+  font-size: 12px;
+  line-height: 1.4;
+  color: #999;
+}
+.shop-builder-main .uk-text-center { text-align: center; }
+.shop-builder-main .uk-text-left { text-align: left; }
+.shop-builder-main .uk-text-right { text-align: right; }
+
+/* --- UIkit Base --- */
+.shop-builder-main ::selection {
+  background: var(--uk-base-selection-background, var(--uk-global-primary-color, #1e87f0));
+  color: var(--uk-base-selection-color, #fff);
+}
+.shop-builder-main ins { background: var(--uk-base-ins-background, transparent); color: var(--uk-base-ins-color, inherit); }
+.shop-builder-main mark { background: var(--uk-base-mark-background, #fffb8a); color: var(--uk-base-mark-color, inherit); }
+
+/* --- UIkit Cards --- */
+.shop-builder-main .uk-card {
+  position: relative;
+  box-sizing: border-box;
+  transition: box-shadow 0.1s ease-in-out;
+  border-radius: var(--uk-card-border-radius, 0);
+}
+.shop-builder-main .uk-card-body {
+  padding: var(--uk-card-padding, 30px);
+}
+.shop-builder-main .uk-card-default {
+  background: var(--uk-card-default-background, #fff);
+  color: var(--uk-global-muted-text-color, #666);
+  box-shadow: var(--uk-card-shadow, 0 5px 15px rgba(0,0,0,0.08));
+}
+.shop-builder-main .uk-card-primary {
+  background: var(--uk-card-primary-background, #1e87f0);
+  color: var(--uk-button-primary-text, #fff);
+  box-shadow: var(--uk-card-primary-shadow, var(--uk-card-shadow, 0 5px 15px rgba(0,0,0,0.08)));
+}
+.shop-builder-main .uk-card-secondary {
+  background: var(--uk-card-secondary-background, #222);
+  color: var(--uk-button-secondary-text, #fff);
+  box-shadow: var(--uk-card-secondary-shadow, var(--uk-card-shadow, 0 5px 15px rgba(0,0,0,0.08)));
+}
+.shop-builder-main .uk-card-hover:hover { box-shadow: var(--uk-card-hover-shadow, var(--uk-card-shadow, none)); }
+.shop-builder-main .uk-card-primary.uk-card-hover:hover { box-shadow: var(--uk-card-primary-hover-shadow, var(--uk-card-hover-shadow, none)); }
+.shop-builder-main .uk-card-secondary.uk-card-hover:hover { box-shadow: var(--uk-card-secondary-hover-shadow, var(--uk-card-hover-shadow, none)); }
+.shop-builder-main .uk-card-title {
+  font-size: 1.5rem;
+  line-height: 1.4;
+}
+
+/* --- UIkit Spacing --- */
+.shop-builder-main .uk-margin { margin-bottom: 20px; }
+.shop-builder-main .uk-margin-small { margin-bottom: 10px; }
+.shop-builder-main .uk-margin-medium { margin-bottom: 40px; }
+.shop-builder-main .uk-margin-large { margin-bottom: 70px; }
+.shop-builder-main .uk-margin-remove-top { margin-top: 0; }
+.shop-builder-main .uk-margin-remove-bottom { margin-bottom: 0; }
+
+/* --- UIkit Flex --- */
+.shop-builder-main .uk-flex { display: flex; }
+.shop-builder-main .uk-flex-wrap { flex-wrap: wrap; }
+.shop-builder-main .uk-flex-middle { align-items: center; }
+.shop-builder-main .uk-flex-column { flex-direction: column; }
+
+/* --- Dark mode adjustments --- */
+[data-theme="dark"] .shop-builder-main .uk-button-default {
+  color: #e0e0e0;
+  border-color: #444;
+}
+[data-theme="dark"] .shop-builder-main .uk-button-text {
+  color: #e0e0e0;
+}
+[data-theme="dark"] .shop-builder-main .uk-text-lead {
+  color: #d0d0d0;
+}
+[data-theme="dark"] .shop-builder-main .uk-card-default {
+  background: #1e1e1e;
+  color: #ccc;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+[data-theme="dark"] .shop-builder-main .uk-card-title {
+  color: #f0f0f0;
+}
+[data-theme="dark"] .shop-builder-main .uk-alert {
+  color: #ccc;
+  background: #1a1a1a;
+}
+[data-theme="dark"] .shop-builder-main .uk-alert-primary {
+  background: #0d2d4d;
+  color: #8ec8f6;
+}
+[data-theme="dark"] .shop-builder-main .uk-alert-success {
+  background: #0d3d26;
+  color: #6ee7b0;
+}
+[data-theme="dark"] .shop-builder-main .uk-alert-warning {
+  background: #3d2a0d;
+  color: #fbbf6e;
+}
+[data-theme="dark"] .shop-builder-main .uk-alert-danger {
+  background: #3d0d18;
+  color: #f8889e;
+}
+[data-theme="dark"] .shop-builder-main .uk-hr,
+[data-theme="dark"] .shop-builder-main .uk-divider-small,
+[data-theme="dark"] .shop-builder-main .uk-divider-icon::before,
+[data-theme="dark"] .shop-builder-main .uk-divider-icon::after {
+  border-color: #444;
 }

@@ -93,29 +93,8 @@ export default function TextFieldsPanel() {
               value={block.headingLevel ?? "h2"}
               onChange={(event) => {
                 const newLevel = event.target.value as "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
-                const currentTyp = block.typography ?? {};
-                let updatedTyp = { ...currentTyp };
-                if ((updatedTyp as any).title) {
-                  updatedTyp = {
-                    ...updatedTyp,
-                    title: {
-                      ...((updatedTyp as any).title ?? {}),
-                      fontSize: "",
-                      fontWeight: "",
-                      lineHeight: "",
-                    }
-                  };
-                } else {
-                  updatedTyp = {
-                    ...updatedTyp,
-                    fontSize: "",
-                    fontWeight: "",
-                    lineHeight: "",
-                  };
-                }
                 updateSelectedLayoutBlockByKey({
                   headingLevel: newLevel,
-                  typography: updatedTyp,
                 });
               }}
             >

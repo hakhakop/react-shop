@@ -34,8 +34,10 @@ import type {
   TypographySettings,
 } from "@/lib/builderTypography";
 import type { BuilderPanelStyle } from "../builderTypes";
+import { getUikitCapabilities, UIKIT_BUTTON_CAPABILITY, type InspectorElementKind } from "@/lib/uikitCapabilities";
 
 type StyleTarget = {
+  kind?: InspectorElementKind;
   visualStyle?: BuilderVisualStyle;
   typography?: TypographySettings | TypographyGroup;
   cardPreset?: string;
@@ -53,6 +55,8 @@ type StyleTarget = {
   addToCartDisplay?: string;
   addToCartVisibility?: string;
   addToCartPosition?: string;
+  buttonVariant?: string;
+  buttonSize?: string;
 };
 
 type Props = {
@@ -77,6 +81,8 @@ type Props = {
   onChange: (patch: Partial<StyleTarget>) => void;
   onPickBackgroundImage?: () => void;
   onOpenGlobalTypographySettings?: () => void;
+  /** Semantic UIkit kind; controls are never inferred from arbitrary JSON fields. */
+  kind?: InspectorElementKind;
 };
 
 const panelStyleOptions = [
@@ -179,9 +185,26 @@ export default function StyleTabPanel({
   onChange,
   onPickBackgroundImage,
   onOpenGlobalTypographySettings,
+  kind,
 }: Props) {
+  const resolvedKind = kind ?? target.kind ?? "section";
+  const capabilities = getUikitCapabilities(resolvedKind);
   const style = target.visualStyle ?? {};
-
+  if (resolvedKind === "button") {
+    const button = UIKIT_BUTTON_CAPABILITY.properties;
+    return (
+      <div className="builder-style-tab-panel builder-style-tab-panel--button">
+        <div className="builder-style-section-content">
+          <div className="builder-card-title"><strong>Button</strong><span>UIkit semantic controls</span></div>
+          <label className="builder-field"><span>Variant</span><select value={target.buttonVariant ?? "primary"} onChange={e => onChange({ buttonVariant: e.target.value })}>{button.variant.values.map(v => <option key={v} value={v}>{v}</option>)}</select></label>
+          <label className="builder-field"><span>Size</span><select value={target.buttonSize ?? "default"} onChange={e => onChange({ buttonSize: e.target.value })}>{button.size.values.map(v => <option key={v} value={v}>{v}</option>)}</select></label>
+          <TypographyPanel value={target.typography as TypographySettings | undefined} onChange={typography => onChange({ typography })} onOpenGlobalTypographySettings={onOpenGlobalTypographySettings} />
+          {showSpacing && <SpacingControl value={style.padding} onChange={padding => patchStyle({ padding })} label="Padding" />}
+        </div>
+      </div>
+    );
+  }
+  const supports = (group: "spacing" | "typography" | "appearance" | "behavior" | "responsive") => (capabilities[group] as readonly string[]).length > 0;
   function patchStyle(patch: Partial<BuilderVisualStyle>) {
     onChange({ visualStyle: { ...style, ...patch } });
   }
@@ -192,14 +215,14 @@ export default function StyleTabPanel({
 
   // Derive sub-tabs dynamically based on show-flags
   const tabs: { id: string; label: string }[] = [];
-  if (showSpacing) {
+  if (showSpacing && supports("spacing")) {
     tabs.push({ id: "spacing", label: "Spacing" });
   }
-  if (showBackground) {
+  if (showBackground && (capabilities.appearance as readonly string[]).includes("background")) {
     tabs.push({ id: "background", label: "Background" });
   }
-  if (showAppearance) {
-    if (showCardParts) {
+  if (showAppearance && supports("appearance")) {
+    if (showCardParts && (resolvedKind === "card" || resolvedKind === "panel")) {
       tabs.push({ id: "appearance", label: isProductsBlock ? "Card" : "Card Preset" });
       tabs.push({ id: "imageStyle", label: isProductsBlock ? "Image" : "Image Style" });
       tabs.push({ id: "titleStyle", label: "Title" });
@@ -214,13 +237,13 @@ export default function StyleTabPanel({
       tabs.push({ id: "shadows", label: "Shadows" });
     }
   }
-  if (showLayout) {
+  if (showLayout && (resolvedKind === "section" || resolvedKind === "row" || resolvedKind === "column")) {
     tabs.push({ id: "layout", label: "Dimensions" });
   }
-  if (showAdvanced) {
+  if (showAdvanced && supports("behavior")) {
     tabs.push({ id: "advanced", label: "Visibility & CSS" });
   }
-  if (showTypography) {
+  if (showTypography && supports("typography")) {
     tabs.push({ id: "typography", label: "Typography" });
   }
 

@@ -25,6 +25,7 @@ import {
   type BuilderSpacingContext,
 } from "../lib/builderSpacing";
 import { normalizeButtonStyleFields } from "../lib/builderButtons";
+import { getUikitGlobalsCssVars } from "../lib/uikitGlobals";
 import {
   getWebsiteByDomainHost,
   getWebsiteRouteSegment,
@@ -91,6 +92,9 @@ export default async function RootLayout({
   } as Record<string, string>;
 
   const designTokensCss = Object.entries(designTokens)
+    .map(([key, value]) => `${key}: ${value};`)
+    .join("\n  ");
+  const uikitGlobalsCss = Object.entries(getUikitGlobalsCssVars(shellSettings, settings))
     .map(([key, value]) => `${key}: ${value};`)
     .join("\n  ");
 
@@ -279,6 +283,7 @@ export default async function RootLayout({
             __html: `
 :root {
   ${designTokensCss}
+  ${uikitGlobalsCss}
 
   --button-bg: ${buttonStyle.buttonBg};
   --button-text-color: ${buttonStyle.buttonTextColor};
