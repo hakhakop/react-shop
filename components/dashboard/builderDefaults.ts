@@ -462,7 +462,7 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
       buttonsLayout: "inline",
       buttonGap: "0.75rem",
       elementAlign: "left",
-      elementPadding: "xl",
+      elementPadding: "sm",
       heroHeadingElement: "h1",
       heroHeadingStyle: "xlarge",
       heroContentAlign: "left",
@@ -606,12 +606,15 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
       accordionMultiple: false,
       accordionCollapsible: true,
       accordionOpenItems: [0],
-      accordionIndicator: "none",
+      accordionStyle: "default",
+      accordionIndicator: "default",
       accordionIndicatorPosition: "end",
-      accordionRowStyle: "plain",
-      accordionSpacing: "default",
-      accordionTitleEmphasis: "default",
-      accordionOpenEmphasis: "none",
+      accordionTitleEmphasis: "inherit",
+      accordionItemSpacing: "inherit",
+      accordionContentSpacing: "inherit",
+      accordionDivider: true,
+      accordionTitleStyle: "inherit",
+      accordionContentStyle: "inherit",
     };
   }
 
@@ -995,7 +998,7 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
     return {
       id,
       kind,
-      iconName: "sparkles",
+      iconName: "star",
       title: "Designed with care",
       body: "A focused experience that makes important information easier to notice and understand.",
       listIconSize: 28,

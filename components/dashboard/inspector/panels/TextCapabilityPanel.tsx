@@ -5,14 +5,17 @@ import RichTextEditor from "@/components/dashboard/RichTextEditor";
 import { resolveTypographyInput, updateTypographyArea, type TypographySettings } from "@/lib/builderTypography";
 import { UIKIT_TEXT_CAPABILITY } from "@/lib/uikitCapabilities";
 import { InspectorColorField, InspectorFieldRow, InspectorPillGroup, InspectorSelect, InspectorTextField } from "@/components/dashboard/inspector/InspectorControls";
+import GeneralSettingsPanel from "@/components/dashboard/inspector/panels/GeneralSettingsPanel";
+import type { BuilderShellSettings } from "@/lib/builderShell";
 
 type Props = {
   block: BuilderLayoutBlock;
   tab: InspectorTab;
+  shellSettings: BuilderShellSettings;
   update: (patch: Partial<BuilderLayoutBlock>) => void;
 };
 
-export default function TextCapabilityPanel({ block, tab, update }: Props) {
+export default function TextCapabilityPanel({ block, tab, shellSettings, update }: Props) {
   const labels = <T extends string>(values: readonly T[]) => values.map((value) => ({ value, label: value.replace(/-/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase()) }));
   const typography = resolveTypographyInput(block.typography, "body") ?? {};
   const updateTypography = (patch: Partial<TypographySettings>) =>
@@ -31,6 +34,7 @@ export default function TextCapabilityPanel({ block, tab, update }: Props) {
     const properties = UIKIT_TEXT_CAPABILITY.properties;
     return (
       <div className="builder-inspector-stack" data-uikit-capability="text-style">
+        <GeneralSettingsPanel block={block} shellSettings={shellSettings} tab={tab} update={update} />
         <div className="builder-element-inspector-note"><strong>UIkit Text</strong><span>Semantic values map to UIkit text helpers in builder and frontend.</span></div>
         <InspectorFieldRow label="Variant"><InspectorPillGroup value={block.textVariant ?? "default"} options={labels(properties.variant.values)} onChange={(value) => update({ textVariant: value })} ariaLabel="Text variant" /></InspectorFieldRow>
         <InspectorFieldRow label="Alignment"><InspectorPillGroup value={block.textAlign ?? "left"} options={labels(properties.alignment.values)} onChange={(value) => update({ textAlign: value })} ariaLabel="Text alignment" /></InspectorFieldRow>

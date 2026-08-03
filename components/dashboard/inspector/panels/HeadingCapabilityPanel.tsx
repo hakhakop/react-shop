@@ -4,17 +4,20 @@ import type { BuilderLayoutBlock, InspectorTab } from "@/components/dashboard/bu
 import { UIKIT_HEADING_CAPABILITY } from "@/lib/uikitCapabilities";
 import { resolveTypographyInput, updateTypographyArea, type TypographySettings } from "@/lib/builderTypography";
 import { InspectorColorField, InspectorFieldRow, InspectorNumberUnit, InspectorPillGroup, InspectorSelect, InspectorSwitch, InspectorTextField, InspectorTextarea } from "@/components/dashboard/inspector/InspectorControls";
+import GeneralSettingsPanel from "@/components/dashboard/inspector/panels/GeneralSettingsPanel";
+import type { BuilderShellSettings } from "@/lib/builderShell";
 
 type Props = {
   block: BuilderLayoutBlock;
   tab: InspectorTab;
+  shellSettings: BuilderShellSettings;
   update: (patch: Partial<BuilderLayoutBlock>) => void;
 };
 
 const gradientPresets = UIKIT_HEADING_CAPABILITY.properties.gradient.values;
 const labels = <T extends string>(values: readonly T[]) => values.map((value) => ({ value, label: value.replace(/-/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase()) }));
 
-export default function HeadingCapabilityPanel({ block, tab, update }: Props) {
+export default function HeadingCapabilityPanel({ block, tab, shellSettings, update }: Props) {
   const typography = resolveTypographyInput(block.typography, "title") ?? {};
   const updateTypography = (patch: Partial<TypographySettings>) => {
     update({
@@ -39,6 +42,7 @@ export default function HeadingCapabilityPanel({ block, tab, update }: Props) {
     const gradient = block.textGradientPreset ?? "none";
     return (
       <div className="builder-inspector-stack" data-uikit-capability="heading-style">
+        <GeneralSettingsPanel block={block} shellSettings={shellSettings} tab={tab} update={update} />
         <div className="builder-element-inspector-note"><strong>UIkit Heading</strong><span>Semantic visual presets map to UIkit heading classes in builder and frontend.</span></div>
         <InspectorFieldRow label="Visual preset"><InspectorSelect value={(block.headingSize ?? "medium") as BuilderLayoutBlock["headingSize"]} options={labels(UIKIT_HEADING_CAPABILITY.properties.visualPreset.values)} onChange={(value) => update({ headingSize: value })} ariaLabel="Heading visual preset" /></InspectorFieldRow>
         <InspectorFieldRow label="Alignment"><InspectorPillGroup value={(block.headingAlign ?? "left") as BuilderLayoutBlock["headingAlign"]} options={labels(UIKIT_HEADING_CAPABILITY.properties.alignment.values)} onChange={(value) => update({ headingAlign: value })} ariaLabel="Heading alignment" /></InspectorFieldRow>

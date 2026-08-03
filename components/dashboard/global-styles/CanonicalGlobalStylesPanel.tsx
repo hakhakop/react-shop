@@ -1,25 +1,23 @@
 "use client";
 
 import { Search } from "lucide-react";
-import { useMemo, useState } from "react";
-import type { CSSProperties, ReactNode } from "react";
+import { useEffect, useState } from "react";
+import type { ReactNode } from "react";
 import type { BuilderShellSettings } from "@/lib/builderShell";
-import { getUikitButtonClass, getUikitCardClass, getUikitHeadingClass } from "@/lib/uikitTokens";
-import { getUikitGlobalsCssVars } from "@/lib/uikitGlobals";
+import { GLOBAL_STYLE_GROUPS } from "@/lib/globalStyleTokens";
 
 type Props = { shellSettings: BuilderShellSettings; updateShellSettings: (patch: Partial<BuilderShellSettings>) => void };
 type Screen = "root" | "global" | "button" | "card" | "heading" | "accordion" | "background" | "base";
 type Key = keyof BuilderShellSettings;
-type PreviewMode = "off" | "selected" | "all";
-type PreviewScheme = "light" | "dark";
 
 const labels: Record<string, string> = {
   small: "Small", default: "Default", medium: "Medium", large: "Large", xlarge: "Xlarge",
+  none: "None", xs: "XS", sm: "Small", md: "Medium", lg: "Large", xl: "XL", "2xl": "2XL", "3xl": "3XL",
   primary: "Primary", secondary: "Secondary", text: "Text", muted: "Muted", danger: "Danger",
 };
 
 const supported: { id: Screen; label: string; description: string; enabled?: boolean }[] = [
-  { id: "global", label: "Global", description: "Typography, colors, borders, spacing, and containers" },
+  { id: "global", label: "General", description: "Typography, colors, borders, spacing, and containers" },
   { id: "background", label: "Background", description: "Page and muted background surfaces" },
   { id: "base", label: "Base", description: "Base typography and global rhythm" },
   { id: "button", label: "Button", description: "UIkit button colors, size, radius, and hover" },
@@ -83,22 +81,19 @@ function Group({ title, children }: { title: string; children: ReactNode }) { re
 export default function CanonicalGlobalStylesPanel({ shellSettings, updateShellSettings }: Props) {
   const [screen, setScreen] = useState<Screen>("root");
   const [navQuery, setNavQuery] = useState("");
-  const [previewMode, setPreviewMode] = useState<PreviewMode>("selected");
-  const [previewScheme, setPreviewScheme] = useState<PreviewScheme>("light");
   const [draft, setDraft] = useState<BuilderShellSettings>(shellSettings);
   const [snapshot, setSnapshot] = useState<BuilderShellSettings>(shellSettings);
-  const vars = useMemo(() => getUikitGlobalsCssVars(draft), [draft]);
+  useEffect(() => {
+    setDraft(shellSettings);
+    if (screen === "root") setSnapshot(shellSettings);
+  }, [screen, shellSettings]);
+
   const open = (next: Screen) => { setDraft({ ...shellSettings }); setSnapshot({ ...shellSettings }); setScreen(next); };
   const set = (key: Key, value: string) => { const next = { ...draft, [key]: value }; setDraft(next); updateShellSettings({ [key]: value }); };
   const cancel = () => { setDraft(snapshot); updateShellSettings(snapshot); setScreen("root"); };
   const save = () => { setSnapshot(draft); setScreen("root"); };
-  const generalItems = [
-    supported.find((item) => item.id === "global")!,
-    { id: "background" as Screen, label: "Theme", description: "Theme-wide page presentation", enabled: false },
-    { id: "base" as Screen, label: "Inverse", description: "Inverse theme values", enabled: false },
-    { id: "global" as Screen, label: "Fonts", description: "Font families and type controls" },
-  ];
-  const componentItems = supported.filter((item) => ["background", "base", "button", "card", "heading", "accordion"].includes(item.id));
+  const generalItems = supported.filter((item) => ["global", "background", "base"].includes(item.id));
+  const componentItems = supported.filter((item) => ["button", "card", "heading", "accordion"].includes(item.id));
   const matchesNav = (item: { label: string; description: string }) => {
     const query = navQuery.trim().toLowerCase();
     return !query || `${item.label} ${item.description}`.toLowerCase().includes(query);
@@ -107,6 +102,7 @@ export default function CanonicalGlobalStylesPanel({ shellSettings, updateShellS
   if (screen !== "root") {
     return <div className="builder-global-design-editor" data-testid={`global-editor-${screen}`}>
       <div className="builder-design-editor-header"><button type="button" className="builder-design-back" onClick={cancel}>← <span>Back</span></button><div className="builder-design-editor-title"><small>STYLE / COMPONENT</small><strong>{supported.find((item) => item.id === screen)?.label ?? "Global"}</strong></div><div className="builder-design-editor-actions"><button type="button" onClick={cancel}>Cancel</button><button type="button" className="is-primary" onClick={save}>Save</button></div></div>
+      <div className="builder-design-inheritance-banner" data-token-inheritance="global-component-local"><strong>Appearance ownership</strong><span>Global Style → Component Default → Current Element Override</span><small>These controls define the global layer. Element inspectors only override values intentionally owned by that instance.</small></div>
       <div className="builder-design-editor-body">
         <div className="builder-design-in-page-index" aria-label="Editor sections"><span>Sections</span>{(editorSections[screen] ?? []).map((label) => <a key={label} href={`#design-group-${label.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}>{label}</a>)}</div>
         <div className="builder-design-editor-fields">
@@ -118,19 +114,19 @@ export default function CanonicalGlobalStylesPanel({ shellSettings, updateShellS
           {screen === "base" && <><Group title="Base"><Length label="Base font size" value={draft.baseFontSize} onChange={(value) => set("baseFontSize", value)} /><Length label="Base line height" value={draft.baseLineHeight} onChange={(value) => set("baseLineHeight", value)} units={["", "px", "rem"]} /><Select label="Font weight" value={draft.headingFontWeight} options={["400", "500", "600", "700", "800"]} onChange={(value) => set("headingFontWeight", value)} /></Group><Group title="Selection"><Color label="Selection background" value={draft.selectionBackground} onChange={(value) => set("selectionBackground", value)} /><Color label="Selection text" value={draft.selectionColor} onChange={(value) => set("selectionColor", value)} /></Group><Group title="Inline emphasis"><Color label="Inserted background" value={draft.baseInsBackground} onChange={(value) => set("baseInsBackground", value)} /><Color label="Inserted text" value={draft.baseInsColor} onChange={(value) => set("baseInsColor", value)} /><Color label="Marked background" value={draft.baseMarkBackground} onChange={(value) => set("baseMarkBackground", value)} /><Color label="Marked text" value={draft.baseMarkColor} onChange={(value) => set("baseMarkColor", value)} /></Group></>}
           {screen === "accordion" && <AccordionEditor draft={draft} set={set} />}
         </div>
-        <LivePreview vars={vars} draft={draft} mode={previewMode} target={screen} scheme={previewScheme} setScheme={setPreviewScheme} />
       </div>
     </div>;
   }
 
   return <div className="builder-global-design-root" data-testid="global-design-root">
     <div className="builder-design-root-heading"><div><small>DESIGN SYSTEM</small><span>STYLE</span></div><p>WebPages semantic design system</p></div>
+    <div className="builder-design-inheritance-banner" data-token-inheritance="global-component-local"><strong>Canonical token source</strong><span>Global Style → Component Default → Current Element Override</span><small>Builder and published frontend consume the same generated UIkit variables.</small></div>
     <label className="builder-design-nav-search"><Search size={16} aria-hidden="true" /><input value={navQuery} onChange={(event) => setNavQuery(event.target.value)} placeholder="Search styles and components" aria-label="Search styles and components" /></label>
-    <PreviewModePicker value={previewMode} onChange={setPreviewMode} />
-    <div className={`builder-design-root-layout${previewMode === "off" ? " is-preview-off" : ""}`}><nav className="builder-design-nav">
+    <div className="builder-design-root-layout is-preview-off"><nav className="builder-design-nav">
       <div className="builder-design-nav-section"><h3>General <small>{generalItems.length}</small></h3>{generalItems.filter(matchesNav).map((item, index) => <NavItem key={`${item.label}-${index}`} item={item} onClick={open} />)}</div>
+      <div className="builder-design-nav-section"><h3>Token groups <small>{GLOBAL_STYLE_GROUPS.length}</small></h3>{GLOBAL_STYLE_GROUPS.map((group) => <div key={group.id} className="builder-design-token-group"><strong>{group.label}</strong><span>{group.items.join(" · ")}</span></div>)}</div>
       <div className="builder-design-nav-section"><h3>Components <small>{componentItems.filter(matchesNav).length}</small></h3>{componentItems.filter(matchesNav).map((item) => <NavItem key={item.id} item={item} onClick={open} />)}{disabledComponents.filter((label) => !navQuery.trim() || label.toLowerCase().includes(navQuery.trim().toLowerCase())).map((label) => <button key={label} type="button" className="builder-design-nav-item is-disabled" disabled><strong>{label}</strong><span>Not yet supported</span></button>)}</div>
-    </nav><LivePreview vars={vars} draft={draft} mode={previewMode} target="global" scheme={previewScheme} setScheme={setPreviewScheme} /></div>
+    </nav></div>
   </div>;
 }
 
@@ -141,10 +137,25 @@ function GlobalEditor({ draft, set }: { draft: BuilderShellSettings; set: (key: 
   <Group title="Primary"><Select label="Font family" value={draft.fontFamilyHeading} options={["inherit", "Manrope", "Inter", "Georgia"]} onChange={(value) => set("fontFamilyHeading", value)} /><Select label="Style" value="normal" options={["normal", "italic"]} onChange={() => undefined} /><Select label="Weight" value={draft.headingFontWeight} options={["400", "500", "600", "700", "800"]} onChange={(value) => set("headingFontWeight", value)} /><Length label="Letter spacing" value="0px" onChange={() => undefined} /></Group>
   <Group title="Secondary"><Select label="Font family" value={draft.fontFamilyBody} options={["Manrope", "Inter", "system-ui", "Georgia"]} onChange={(value) => set("fontFamilyBody", value)} /><Select label="Style" value="normal" options={["normal", "italic"]} onChange={() => undefined} disabled /><Select label="Weight" value={draft.headingFontWeight} options={["400", "500", "600", "700", "800"]} onChange={(value) => set("headingFontWeight", value)} /></Group>
   <Group title="Tertiary"><div className="builder-import-readonly"><strong>Not yet supported</strong><span>The semantic schema has no tertiary typography owner.</span></div></Group>
-  <ColorGroup draft={draft} set={set} /><BorderGroup draft={draft} set={set} /><SpacingGroup draft={draft} set={set} /><ControlGroup draft={draft} set={set} /><ContainerGroup draft={draft} set={set} /></>; }
+  <ColorGroup draft={draft} set={set} /><BorderGroup draft={draft} set={set} /><ShellSpacingGroup draft={draft} set={set} /><SpacingGroup draft={draft} set={set} /><ControlGroup draft={draft} set={set} /><ContainerGroup draft={draft} set={set} /></>; }
 
 function ColorGroup({ draft, set }: { draft: BuilderShellSettings; set: (key: Key, value: string) => void }) { return <Group title="Colors">{([["textColor", "Text"], ["emphasisColor", "Emphasis"], ["mutedTextColor", "Muted"], ["linkColor", "Link"], ["linkHoverColor", "Link hover"], ["primaryColor", "Primary background"], ["secondaryColor", "Secondary background"], ["successColor", "Success"], ["warningColor", "Warning"], ["dangerColor", "Danger"], ["backgroundColor", "Page background"], ["mutedBackgroundColor", "Muted background"]] as [Key, string][]).map(([key, label]) => <Color key={key} label={label} value={draft[key]} onChange={(value) => set(key, value)} />)}</Group>; }
 function BorderGroup({ draft, set }: { draft: BuilderShellSettings; set: (key: Key, value: string) => void }) { return <Group title="Borders"><Color label="Color" value={draft.borderColor} onChange={(value) => set("borderColor", value)} /><Length label="Radius" value={draft.borderRadius} onChange={(value) => set("borderRadius", value)} /><Length label="Width" value={draft.borderWidth} onChange={(value) => set("borderWidth", value)} /></Group>; }
+function ShellSpacingGroup({ draft, set }: { draft: BuilderShellSettings; set: (key: Key, value: string) => void }) {
+  const fields: [Key, string][] = [
+    ["sectionPaddingTop", "Section padding top"], ["sectionPaddingBottom", "Section padding bottom"],
+    ["sectionMarginTop", "Section margin top"], ["sectionMarginBottom", "Section margin bottom"],
+    ["rowPaddingTop", "Row padding top"], ["rowPaddingBottom", "Row padding bottom"],
+    ["rowMarginTop", "Row margin top"], ["rowMarginBottom", "Row margin bottom"],
+    ["rowGap", "Row gap"], ["columnGap", "Column gap"],
+    ["elementPaddingTop", "Element padding top"], ["elementPaddingRight", "Element padding right"],
+    ["elementPaddingBottom", "Element padding bottom"], ["elementPaddingLeft", "Element padding left"],
+    ["elementMarginTop", "Element margin top"], ["elementMarginRight", "Element margin right"],
+    ["elementMarginBottom", "Element margin bottom"], ["elementMarginLeft", "Element margin left"],
+  ];
+  const options = ["none", "xs", "sm", "md", "lg", "xl", "2xl", "3xl"];
+  return <Group title="Layout defaults">{fields.map(([key, label]) => <Select key={key} label={label} value={draft[key]} options={options} onChange={(value) => set(key, value)} />)}</Group>;
+}
 function SpacingGroup({ draft, set }: { draft: BuilderShellSettings; set: (key: Key, value: string) => void }) { return <Group title="Spacing">{([["marginSmall", "Small margin"], ["marginDefault", "Default margin"], ["marginMedium", "Medium margin"], ["marginLarge", "Large margin"], ["marginXLarge", "Xlarge margin"], ["gridGutterSmall", "Small gutter"], ["gridGutterDefault", "Default gutter"], ["gridGutterMedium", "Medium gutter"], ["gridGutterLarge", "Large gutter"]] as [Key, string][]).map(([key, label]) => <Length key={key} label={label} value={draft[key]} onChange={(value) => set(key, value)} />)}</Group>; }
 function ControlGroup({ draft, set }: { draft: BuilderShellSettings; set: (key: Key, value: string) => void }) { return <Group title="Controls"><Length label="Small height" value={draft.controlHeightSmall} onChange={(value) => set("controlHeightSmall", value)} /><Length label="Default height" value={draft.buttonHeight} onChange={(value) => set("buttonHeight", value)} /><Length label="Large height" value={draft.controlHeightLarge} onChange={(value) => set("controlHeightLarge", value)} /></Group>; }
 function ContainerGroup({ draft, set }: { draft: BuilderShellSettings; set: (key: Key, value: string) => void }) { return <Group title="Containers">{([["containerSmall", "Small"], ["containerDefault", "Default"], ["containerLarge", "Large"], ["containerXLarge", "Xlarge"], ["pageContainerMaxWidth", "Page max width"]] as [Key, string][]).map(([key, label]) => <Length key={key} label={label} value={draft[key]} onChange={(value) => set(key, value)} />)}</Group>; }
@@ -173,39 +184,8 @@ function CardEditor({ draft, set }: { draft: BuilderShellSettings; set: (key: Ke
     <Group title="Hover states">{hoverFields.map(([key, label]) => <Color key={key} label={label} value={draft[key]} onChange={(value) => set(key, value)} />)}</Group>
     <Group title="Content rhythm"><Length label="Image to body spacing" value={draft.cardImageBodySpacing} onChange={(value) => set("cardImageBodySpacing", value)} /><Length label="Title spacing" value={draft.cardTitleSpacing} onChange={(value) => set("cardTitleSpacing", value)} /><Length label="Meta spacing" value={draft.cardMetaSpacing} onChange={(value) => set("cardMetaSpacing", value)} /><Length label="Header spacing" value={draft.cardHeaderSpacing} onChange={(value) => set("cardHeaderSpacing", value)} /><Length label="Footer spacing" value={draft.cardFooterSpacing} onChange={(value) => set("cardFooterSpacing", value)} /></Group>
     <Group title="Elevation"><Shadow label="Default shadow" value={draft.cardShadow} onChange={(value) => set("cardShadow", value)} /><Shadow label="Default hover shadow" value={draft.cardDefaultHoverShadow} onChange={(value) => set("cardDefaultHoverShadow", value)} /><Shadow label="Primary shadow" value={draft.cardPrimaryShadow} onChange={(value) => set("cardPrimaryShadow", value)} /><Shadow label="Primary hover shadow" value={draft.cardPrimaryHoverShadow} onChange={(value) => set("cardPrimaryHoverShadow", value)} /><Shadow label="Secondary shadow" value={draft.cardSecondaryShadow} onChange={(value) => set("cardSecondaryShadow", value)} /><Shadow label="Secondary hover shadow" value={draft.cardSecondaryHoverShadow} onChange={(value) => set("cardSecondaryHoverShadow", value)} /></Group>
-    <CardPreviewMatrix />
   </>;
 }
-function HeadingEditor({ draft, set }: { draft: BuilderShellSettings; set: (key: Key, value: string) => void }) { return <><Group title="Scale"><Select label="Font family" value={draft.fontFamilyHeading} options={["inherit", "Manrope", "Inter", "Georgia"]} onChange={(value) => set("fontFamilyHeading", value)} /><Select label="Weight" value={draft.headingFontWeight} options={["400", "500", "600", "700", "800"]} onChange={(value) => set("headingFontWeight", value)} /><Select label="Small weight" value={draft.headingSmallFontWeight} options={["400", "500", "600", "700", "800"]} onChange={(value) => set("headingSmallFontWeight", value)} /><Select label="Medium weight" value={draft.headingMediumFontWeight} options={["400", "500", "600", "700", "800"]} onChange={(value) => set("headingMediumFontWeight", value)} />{([["headingSmallFontSize", "Small"], ["headingMediumFontSize", "Medium"], ["headingLargeFontSize", "Large"], ["headingXLargeFontSize", "Xlarge"], ["headingSmallFontSizeResponsive", "Small responsive"], ["headingMediumFontSizeResponsive", "Medium responsive"]] as [Key, string][]).map(([key, label]) => <Length key={key} label={`${label} size`} value={draft[key]} onChange={(value) => set(key, value)} />)}<Length label="Medium line height" value={draft.headingMediumLineHeight} onChange={(value) => set("headingMediumLineHeight", value)} units={["", "px"]} /></Group><div className="builder-design-live-type-preview" style={{ fontFamily: asString(draft.fontFamilyHeading), fontWeight: Number(draft.headingFontWeight) || 600 }}>Aa Heading preview</div></>; }
+function HeadingEditor({ draft, set }: { draft: BuilderShellSettings; set: (key: Key, value: string) => void }) { return <><Group title="Scale"><Select label="Font family" value={draft.fontFamilyHeading} options={["inherit", "Manrope", "Inter", "Georgia"]} onChange={(value) => set("fontFamilyHeading", value)} /><Select label="Weight" value={draft.headingFontWeight} options={["400", "500", "600", "700", "800"]} onChange={(value) => set("headingFontWeight", value)} /><Select label="Small weight" value={draft.headingSmallFontWeight} options={["400", "500", "600", "700", "800"]} onChange={(value) => set("headingSmallFontWeight", value)} /><Select label="Medium weight" value={draft.headingMediumFontWeight} options={["400", "500", "600", "700", "800"]} onChange={(value) => set("headingMediumFontWeight", value)} />{([["headingSmallFontSize", "Small"], ["headingMediumFontSize", "Medium"], ["headingLargeFontSize", "Large"], ["headingXLargeFontSize", "Xlarge"], ["headingSmallFontSizeResponsive", "Small responsive"], ["headingMediumFontSizeResponsive", "Medium responsive"]] as [Key, string][]).map(([key, label]) => <Length key={key} label={`${label} size`} value={draft[key]} onChange={(value) => set(key, value)} />)}<Length label="Medium line height" value={draft.headingMediumLineHeight} onChange={(value) => set("headingMediumLineHeight", value)} units={["", "px"]} /></Group></>; }
 function AccordionEditor({ draft, set }: { draft: BuilderShellSettings; set: (key: Key, value: string) => void }) { return <><Group title="Title"><Length label="Font size" value={draft.accordionTitleFontSize} onChange={(value) => set("accordionTitleFontSize", value)} /><Select label="Weight" value={draft.accordionTitleFontWeight} options={["400", "500", "600", "700"]} onChange={(value) => set("accordionTitleFontWeight", value)} /><Length label="Letter spacing" value={draft.accordionTitleLetterSpacing} onChange={(value) => set("accordionTitleLetterSpacing", value)} /></Group><Group title="Icon and interaction"><Color label="Icon color" value={draft.accordionIconColor} onChange={(value) => set("accordionIconColor", value)} /><Color label="Hover color" value={draft.accordionTitleHoverColor} onChange={(value) => set("accordionTitleHoverColor", value)} /><Length label="Title vertical padding" value={draft.accordionTitlePaddingVertical} onChange={(value) => set("accordionTitlePaddingVertical", value)} /><Length label="Content top spacing" value={draft.accordionContentMarginTop} onChange={(value) => set("accordionContentMarginTop", value)} /></Group><Group title="Rows"><Length label="Border width" value={draft.accordionItemBorderWidth} onChange={(value) => set("accordionItemBorderWidth", value)} /><Color label="Border color" value={draft.accordionItemBorder} onChange={(value) => set("accordionItemBorder", value)} /><Shadow label="Row shadow" value={draft.accordionItemBoxShadow} onChange={(value) => set("accordionItemBoxShadow", value)} /></Group></>; }
 function UnsupportedEditor({ name }: { name: string }) { return <div className="builder-import-readonly builder-design-unsupported"><strong>{name} is not yet supported</strong><span>Imported values remain available in the Import LESS report only.</span></div>; }
-
-function ButtonPreviewMatrix() {
-  const variants = ["default", "primary", "secondary", "text"] as const;
-  const sizes = ["small", "default", "large"] as const;
-  return <section className="builder-design-button-matrix" data-testid="global-button-preview-matrix"><h3>Button preview matrix</h3><div className="builder-design-button-matrix-grid">{variants.flatMap((variant) => sizes.map((size) => <div key={`${variant}-${size}`} className="builder-design-button-matrix-cell"><span>{variant} / {size}</span><button className={getUikitButtonClass(variant, size)} data-button-variant={variant} data-button-size={size}>{variant}</button><button className={getUikitButtonClass(variant, size)} disabled>disabled</button></div>))}</div></section>;
-}
-
-function PreviewModePicker({ value, onChange }: { value: PreviewMode; onChange: (value: PreviewMode) => void }) {
-  return <section className="builder-design-preview-picker" aria-label="Preview mode"><span>Preview</span><div role="group" aria-label="Preview mode options">{(["off", "selected", "all"] as PreviewMode[]).map((mode) => <button key={mode} type="button" className={value === mode ? "is-active" : ""} aria-pressed={value === mode} onClick={() => onChange(mode)}>{mode === "off" ? "Off" : mode === "selected" ? "Selected component" : "All components"}</button>)}</div></section>;
-}
-
-function CardPreviewMatrix() {
-  const variants = ["default", "primary", "secondary", "blank"] as const;
-  const sizes = ["small", "default", "large"] as const;
-  return <section className="builder-design-card-matrix" data-testid="global-card-preview-matrix"><h3>Card preview matrix</h3><div className="builder-design-card-matrix-grid">{variants.flatMap((variant) => sizes.flatMap((size) => ["normal", "hover"].map((state) => <article key={`${variant}-${size}-${state}`} className="builder-design-card-matrix-cell"><span>{variant} / {size} / {state}</span><div className={getUikitCardClass(variant, { padding: size, hover: state === "hover" ? "enabled" : "none" })}><div className="uk-card-body"><strong className="uk-card-title">Card title</strong><p>Readable content and action spacing.</p></div></div></article>)))}</div></section>;
-}
-
-function PreviewContent({ target, draft }: { target: Screen; draft: BuilderShellSettings }) {
-  if (target === "button") return <ButtonPreviewMatrix />;
-  if (target === "card") return <CardPreviewMatrix />;
-  if (target === "heading") return <><h2 className={getUikitHeadingClass("h2", "medium")}>A thoughtful heading</h2><p style={{ color: "var(--uk-global-text-color)", fontFamily: "var(--uk-global-font-family)" }}>Heading scale and supporting text at normal reading size.</p></>;
-  if (target === "accordion") return <div className="builder-design-preview-accordion"><div className="uk-accordion"><div><a className="uk-accordion-title" href="#preview">What does this include?</a><div className="uk-accordion-content">A focused accordion preview with comfortable row spacing and readable content.</div></div><div><a className="uk-accordion-title" href="#preview">How does it work?</a></div></div></div>;
-  return <><h2 className={getUikitHeadingClass("h2", "medium")}>A thoughtful heading</h2><p style={{ color: "var(--uk-global-text-color)", fontFamily: "var(--uk-global-font-family)" }}>Body text with a <a href="#preview">link</a> and the current global rhythm.</p></>;
-}
-
-function LivePreview({ vars, draft, mode, target, scheme, setScheme }: { vars: Record<string, string>; draft: BuilderShellSettings; mode: PreviewMode; target: Screen; scheme: PreviewScheme; setScheme: (scheme: PreviewScheme) => void }) {
-  if (mode === "off") return null;
-  const title = mode === "all" ? "All components" : target === "root" ? "Global" : supported.find((item) => item.id === target)?.label ?? "Global";
-  return <aside className="builder-design-preview-pane" data-preview-mode={mode}><div className="builder-design-preview-header"><div><small>DESIGN SYSTEM</small><strong>Live Preview — {title}</strong></div><button type="button" className="builder-design-preview-theme" aria-label={`Switch preview to ${scheme === "light" ? "dark" : "light"}`} onClick={() => setScheme(scheme === "light" ? "dark" : "light")}>{scheme === "light" ? "Dark" : "Light"}</button></div><section className="builder-design-preview" style={{ ...vars, colorScheme: scheme } as CSSProperties} data-testid="global-components-preview">{mode === "all" ? <><h2 className={getUikitHeadingClass("h2", "medium")}>A thoughtful heading</h2><p style={{ color: "var(--uk-global-text-color)", fontFamily: "var(--uk-global-font-family)" }}>Body text with a <a href="#preview">link</a> and the current global rhythm.</p><ButtonPreviewMatrix /><div className="builder-design-preview-row"><article className={getUikitCardClass("default", { hover: "enabled" })}><div className="uk-card-body"><strong>Card surface</strong><p>Panel content preview</p></div></article><div className="uk-alert-primary" role="status">Alert preview</div></div><div className="builder-design-preview-row"><div className="uk-accordion"><div><a className="uk-accordion-title" href="#preview">Accordion title</a><div className="uk-accordion-content">Accordion content preview</div></div></div><input className="uk-input" placeholder="Form control" /><ul className="uk-list"><li>List item</li></ul><table className="uk-table"><tbody><tr><td>Table preview</td></tr></tbody></table></div></> : <PreviewContent target={target} draft={draft} />}<small className="builder-design-preview-caption">Theme: {draft.globalStylePresetName ?? "Custom"}</small></section></aside>;
-}

@@ -1,4 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
+import { waitForSeededBuilderLayout } from "./builderFixture";
 
 const email = "header-parity-20260722@example.test";
 const password = "HeaderParity!2026";
@@ -38,7 +39,7 @@ test.beforeEach(async ({ page }) => {
 
 test("Panel uses semantic UIkit card variants in builder and frontend", async ({ page, context }) => {
   await page.goto(builderUrl);
-  await expect(page.locator(".builder-preview-shell").first()).toBeVisible();
+  await waitForSeededBuilderLayout(page);
   await page.locator(".builder-sidebar-nav-tile", { hasText: "Blocks" }).first().click();
   await page.locator(".builder-element-library-search input").fill("panel");
   const panelCard = page.locator(".builder-element-library-card").filter({ has: page.locator("strong", { hasText: "Panel" }).filter({ hasText: /^Panel$/ }) }).first();

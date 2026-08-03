@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { waitForSeededBuilderLayout } from "./builderFixture";
 
 const email = "header-parity-20260722@example.test";
 const password = "HeaderParity!2026";
@@ -13,6 +14,7 @@ test("Panel title element and UIkit visual style stay independent", async ({ pag
   await page.getByRole("button", { name: "Sign in", exact: true }).click();
   await expect(page).toHaveURL(/\/app(?:\?|$)/);
   await page.goto(builderUrl);
+  await waitForSeededBuilderLayout(page);
   await page.locator(".builder-sidebar-nav-tile", { hasText: "Blocks" }).first().click();
   await page.locator(".builder-element-library-search input").fill("panel");
   const panelCard = page.locator(".builder-element-library-card").filter({ has: page.locator("strong", { hasText: /^Panel$/ }) }).first();
@@ -28,12 +30,12 @@ test("Panel title element and UIkit visual style stay independent", async ({ pag
   const inspector = page.locator(".builder-floating-inspector");
   await inspector.getByRole("button", { name: "Layout", exact: true }).click();
   const layout = inspector.locator('[data-uikit-capability="panel-layout"]');
-  await layout.locator("label.builder-field", { hasText: "Title element" }).locator("select").selectOption("h2");
+  await layout.getByLabel("Title element", { exact: true }).selectOption("h2");
   const title = panel.locator("h2").first();
 
   const measurements: Record<string, { fontSize: number; lineHeight: number; className: string; tag: string }> = {};
   for (const style of ["h3", "h4", "h5"] as const) {
-    await layout.locator("label.builder-field", { hasText: "Title visual style" }).locator("select").selectOption(style);
+    await layout.getByLabel("Title visual style", { exact: true }).selectOption(style);
     const measurement = await title.evaluate((element) => {
       const computed = getComputedStyle(element);
       return { fontSize: parseFloat(computed.fontSize), lineHeight: parseFloat(computed.lineHeight), className: element.className, tag: element.tagName.toLowerCase() };

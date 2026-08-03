@@ -653,6 +653,23 @@ body.dark {
   gap: 10px;
 }
 
+/* Shared List item presentation: the builder adds editing controls, while the
+   published renderer supplies only document content. This class keeps the
+   actual icon-and-text row identical in both contexts. */
+.builder-preview-goodie-list > .uk-list > .webpages-list-item,
+.shop-builder-column-block--list > .uk-list > .webpages-list-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: inherit;
+}
+
+.builder-preview-goodie-list > .uk-list > .webpages-list-item > .webpages-icon,
+.shop-builder-column-block--list > .uk-list > .webpages-list-item > .webpages-icon {
+  flex: 0 0 auto;
+  color: inherit;
+}
+
 .shop-builder-column-block--panel {
   display: grid;
   gap: 0;
@@ -2176,6 +2193,26 @@ body.dark {
 .shop-builder-content-layout .shop-builder-section-content {
   display: grid;
   gap: clamp(22px, 4vw, 48px);
+}
+
+/* Content-layout sections already own their responsive horizontal gutters.
+   Keep the shared UIkit container marker for parity, but prevent its
+   content-box padding and grid's negative gutter from offsetting the row. */
+.shop-builder-main[data-builder-page-root]
+  .shop-builder-section--boxed.shop-builder-content-layout
+  > .shop-builder-section-content.uk-container {
+  box-sizing: border-box;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.shop-builder-main[data-builder-page-root]
+  .shop-builder-section--boxed.shop-builder-content-layout
+  > .shop-builder-section-content.uk-container
+  > .shop-builder-content-layout-rows-wrapper
+  > div
+  > .shop-builder-content-row {
+  margin-left: 0;
 }
 
 
@@ -4765,63 +4802,6 @@ body.dark {
   }
 }
 
-/* Accordion presentation modifiers. UIkit owns disclosure structure and state; these selectors only express semantic presentation options not provided by UIkit. */
-.shop-builder-accordion[data-accordion-indicator="chevron"] .shop-builder-accordion-indicator {
-  width: 8px;
-  height: 8px;
-  flex: none;
-  border-right: 1.5px solid currentColor;
-  border-bottom: 1.5px solid currentColor;
-  transform: rotate(45deg) translateY(-2px);
-  transition: transform 180ms ease;
-}
-.shop-builder-accordion[data-accordion-indicator="chevron"] .uk-open .shop-builder-accordion-indicator {
-  transform: rotate(225deg) translate(-1px, -1px);
-}
-.shop-builder-accordion[data-accordion-indicator-position="start"] .uk-accordion-title > .uk-accordion-icon,
-.shop-builder-accordion[data-accordion-indicator-position="start"] .uk-accordion-title > .shop-builder-accordion-indicator {
-  order: -1;
-  margin-left: 0;
-  margin-right: 15px;
-}
-.shop-builder-accordion[data-accordion-indicator-position="end"] .uk-accordion-title > .uk-accordion-icon,
-.shop-builder-accordion[data-accordion-indicator-position="end"] .uk-accordion-title > .shop-builder-accordion-indicator {
-  order: 2;
-  margin-left: auto;
-}
-.shop-builder-accordion[data-accordion-title-emphasis="bold"] .uk-accordion-title {
-  font-weight: 700;
-}
-.shop-builder-accordion[data-accordion-spacing="compact"] > :nth-child(n+2) {
-  margin-top: 10px;
-}
-.shop-builder-accordion[data-accordion-spacing="compact"] .uk-accordion-content {
-  margin-top: 10px;
-}
-.shop-builder-accordion[data-accordion-spacing="large"] > :nth-child(n+2) {
-  margin-top: 32px;
-}
-.shop-builder-accordion[data-accordion-spacing="large"] .uk-accordion-content {
-  margin-top: 32px;
-}
-.shop-builder-accordion[data-accordion-row-style="divided"] > :nth-child(n+2) {
-  padding-top: 16px;
-  border-top: 1px solid color-mix(in srgb, currentColor 18%, transparent);
-}
-.shop-builder-accordion[data-accordion-row-style="striped"] > :nth-child(odd) {
-  padding: 12px 16px;
-  background: color-mix(in srgb, currentColor 5%, transparent);
-}
-.shop-builder-accordion[data-accordion-open-emphasis="muted"] > .uk-open {
-  padding: 12px 16px;
-  background: color-mix(in srgb, currentColor 6%, transparent);
-  border-radius: 4px;
-}
-.shop-builder-accordion[data-accordion-open-emphasis="primary"] > .uk-open {
-  padding: 12px 16px;
-  background: color-mix(in srgb, var(--accent, #1e87f0) 10%, transparent);
-  border-radius: 4px;
-}
 .shop-builder-accordion {
   margin: 0;
   color: inherit;
@@ -4829,6 +4809,52 @@ body.dark {
 .shop-builder-column-block--accordion {
   text-align: left;
 }
+.shop-builder-accordion .uk-accordion-title {
+  display: flex;
+  align-items: center;
+  text-align: left;
+}
+.shop-builder-accordion--indicator-start .uk-accordion-title > .shop-builder-accordion-indicator {
+  order: -1;
+  margin-right: 12px;
+}
+.shop-builder-accordion--indicator-end .uk-accordion-title > .shop-builder-accordion-indicator {
+  order: 2;
+  margin-left: auto;
+}
+.shop-builder-accordion .shop-builder-accordion-indicator {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--uk-accordion-icon-color, currentColor);
+}
+.shop-builder-accordion--indicator-none .shop-builder-accordion-indicator {
+  display: none;
+}
+.shop-builder-accordion--indicator-plus-minus .shop-builder-accordion-indicator--minus {
+  display: none;
+}
+.shop-builder-accordion .uk-open .shop-builder-accordion-indicator--plus {
+  display: none;
+}
+.shop-builder-accordion .uk-open .shop-builder-accordion-indicator--minus {
+  display: inline-flex;
+}
+.shop-builder-accordion--indicator-chevron .uk-open .shop-builder-accordion-indicator {
+  transform: rotate(180deg);
+}
+.shop-builder-accordion--title-muted .uk-accordion-title { color: var(--uk-global-muted-text-color, #6b7280); }
+.shop-builder-accordion--title-emphasis .uk-accordion-title { color: var(--uk-global-emphasis-color, inherit); font-weight: 700; }
+.shop-builder-accordion--style-divided > li + li { border-top: var(--uk-accordion-item-border-width, 1px) solid var(--uk-accordion-item-border, rgba(0,0,0,.12)); }
+.shop-builder-accordion--style-minimal > li { border: 0; }
+.shop-builder-accordion--items-small > :nth-child(n+2) { margin-top: var(--uk-global-margin-small, 15px); }
+.shop-builder-accordion--items-default > :nth-child(n+2) { margin-top: var(--uk-global-margin, 30px); }
+.shop-builder-accordion--items-large > :nth-child(n+2) { margin-top: var(--uk-global-margin-medium, 40px); }
+.shop-builder-accordion--content-small .uk-accordion-content { margin-top: var(--uk-global-margin-small, 15px); }
+.shop-builder-accordion--content-default .uk-accordion-content { margin-top: var(--uk-accordion-content-margin-top, 12px); }
+.shop-builder-accordion--content-large .uk-accordion-content { margin-top: var(--uk-global-margin-medium, 40px); }
+.shop-builder-accordion:not(.shop-builder-accordion--divider) > li { border: 0; }
 .shop-builder-accordion .uk-accordion-title {
   min-height: 44px;
   padding: var(--uk-accordion-title-padding-vertical, 10px) 0;
@@ -4860,59 +4886,6 @@ body.dark {
   margin-top: var(--uk-accordion-content-margin-top, 12px);
   padding-bottom: 4px;
   line-height: 1.65;
-}
-.shop-builder-accordion .uk-accordion-icon {
-  width: 16px;
-  height: 16px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-.shop-builder-accordion .uk-accordion-icon svg {
-  width: 16px;
-  height: 16px;
-}
-.shop-builder-accordion[data-accordion-indicator-position="start"] .uk-accordion-title > .uk-accordion-icon,
-.shop-builder-accordion[data-accordion-indicator-position="start"] .uk-accordion-title > .shop-builder-accordion-indicator {
-  order: 0;
-  flex: 0 0 auto;
-  margin-left: 0 !important;
-  margin-right: 12px !important;
-}
-.shop-builder-accordion[data-accordion-indicator-position="end"] .uk-accordion-title > .uk-accordion-icon,
-.shop-builder-accordion[data-accordion-indicator-position="end"] .uk-accordion-title > .shop-builder-accordion-indicator {
-  order: 2;
-  flex: 0 0 auto;
-  margin-left: 12px !important;
-  margin-right: 0 !important;
-}
-.shop-builder-accordion[data-accordion-row-style="divided"] > :nth-child(n+2) {
-  margin-top: 0;
-  padding-top: 20px;
-}
-.shop-builder-accordion[data-accordion-row-style="striped"] > :nth-child(odd) {
-  border-radius: 5px;
-}
-.shop-builder-accordion[data-accordion-row-style="striped"] > li {
-  box-sizing: border-box;
-  padding: 12px 16px;
-  border-radius: 5px;
-}
-.shop-builder-accordion[data-accordion-row-style="striped"] > li:nth-child(odd) {
-  background: color-mix(in srgb, currentColor 5%, transparent);
-}
-.shop-builder-accordion[data-accordion-row-style="striped"] > li:nth-child(even) {
-  background: transparent;
-}
-.shop-builder-accordion[data-accordion-row-style="striped"] .uk-accordion-title {
-  padding: 10px 0;
-}
-.shop-builder-accordion[data-accordion-row-style="striped"] .uk-accordion-content {
-  padding-bottom: 0;
-}
-.shop-builder-accordion[data-accordion-open-emphasis="muted"] > .uk-open,
-.shop-builder-accordion[data-accordion-open-emphasis="primary"] > .uk-open {
-  transition: background-color 160ms ease, padding 160ms ease;
 }
 @media (max-width: 760px) {
   .shop-builder-accordion .uk-accordion-title {

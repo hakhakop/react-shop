@@ -105,7 +105,14 @@ import CarouselBlock, {
   type CarouselSlide,
 } from "@/components/blocks/CarouselBlock";
 import BuilderScrollAnimations from "@/components/builder/BuilderScrollAnimations";
-import StorefrontBuilderRenderer from "@/components/builder/StorefrontBuilderRenderer";
+import StorefrontBuilderRenderer, {
+  BodyText,
+  ContentLayoutBlock,
+  isRichPreviewText,
+  Typog as DashboardTypog,
+} from "@/components/builder/StorefrontBuilderRenderer";
+import { WebPagesIcon } from "@/components/builder/WebPagesIcon";
+import { resolveUikitIconName, UIKIT_ICON_OPTIONS } from "@/lib/uikitIconRegistry";
 import UikitAccordion from "@/components/builder/UikitAccordion";
 import UikitText from "@/components/builder/UikitText";
 import {
@@ -242,7 +249,7 @@ import {
 import type { BuilderVisualStyle } from "@/lib/builderVisualStyle";
 import YoothemeImportPanel from "@/components/dashboard/global-styles/YoothemeImportPanel";
 import CanonicalGlobalStylesPanel from "@/components/dashboard/global-styles/CanonicalGlobalStylesPanel";
-import { typographyProps, getHeadingTypographyStyles, type TypographyArea } from "@/lib/builderTypography";
+import { type TypographyArea } from "@/lib/builderTypography";
 import {
   resolveBuilderRowGap,
   resolveBuilderRowStyle,
@@ -698,151 +705,6 @@ function normalizeMenuPresentation(
   };
 }
 
-const UIKIT_ICON_ALIASES: Record<string, string> = {
-  sparkles: "star",
-  shield: "lock",
-  truck: "cart",
-};
-
-const UIKIT_ICON_OPTIONS = [
-  { name: "home", label: "Home", keywords: "home" },
-  { name: "search", label: "Search", keywords: "search" },
-  { name: "menu", label: "Menu", keywords: "menu" },
-  { name: "grid", label: "Grid", keywords: "grid" },
-  { name: "list", label: "List", keywords: "list" },
-  { name: "plus", label: "Plus", keywords: "plus" },
-  { name: "check", label: "Check", keywords: "check" },
-  { name: "close", label: "Close", keywords: "close" },
-  { name: "cart", label: "Cart", keywords: "cart" },
-  { name: "bag", label: "Bag", keywords: "bag" },
-  { name: "heart", label: "Heart", keywords: "heart" },
-  { name: "user", label: "User", keywords: "user" },
-  { name: "settings", label: "Settings", keywords: "settings" },
-  { name: "star", label: "Star", keywords: "star" },
-  { name: "tag", label: "Tag", keywords: "tag" },
-  { name: "mail", label: "Mail", keywords: "mail" },
-  { name: "phone", label: "Phone", keywords: "phone" },
-  { name: "lock", label: "Lock", keywords: "lock" },
-  { name: "world", label: "World", keywords: "world" },
-  { name: "image", label: "Image", keywords: "image" },
-  { name: "folder", label: "Folder", keywords: "folder" },
-  { name: "warning", label: "Warning", keywords: "warning" },
-  { name: "info", label: "Info", keywords: "info" },
-  {
-    name: "arrow-right",
-    label: "Arrow Right",
-    keywords: "arrow right",
-  },
-  {
-    name: "chevron-right",
-    label: "Chevron Right",
-    keywords: "chevron right",
-  },
-  {
-    name: "chevron-down",
-    label: "Chevron Down",
-    keywords: "chevron down",
-  },
-  { name: "refresh", label: "Refresh", keywords: "refresh" },
-  { name: "calendar", label: "Calendar", keywords: "calendar" },
-  { name: "clock", label: "Clock", keywords: "clock" },
-  { name: "download", label: "Download", keywords: "download" },
-  { name: "upload", label: "Upload", keywords: "upload" },
-  { name: "pencil", label: "Pencil", keywords: "pencil" },
-  { name: "trash", label: "Trash", keywords: "trash" },
-  { name: "bookmark", label: "Bookmark", keywords: "bookmark" },
-  { name: "link", label: "Link", keywords: "link" },
-  { name: "sign-in", label: "Sign In", keywords: "sign in" },
-  { name: "sign-out", label: "Sign Out", keywords: "sign out" },
-] as const;
-
-const UIKIT_ICON_INNER_HTML: Record<string, string> = {
-  home: `<polygon points="18.65 11.35 10 2.71 1.35 11.35 0.65 10.65 10 1.29 19.35 10.65" /> <polygon points="15 4 18 4 18 7 17 7 17 5 15 5" /> <polygon points="3 11 4 11 4 18 7 18 7 12 12 12 12 18 16 18 16 11 17 11 17 19 11 19 11 13 8 13 8 19 3 19" />`,
-  search: `<circle fill="none" stroke="#000" stroke-width="1.1" cx="9" cy="9" r="7" /> <path fill="none" stroke="#000" stroke-width="1.1" d="M14,14 L18,18 L14,14 Z" />`,
-  menu: `<rect x="2" y="4" width="16" height="1" /> <rect x="2" y="9" width="16" height="1" /> <rect x="2" y="14" width="16" height="1" />`,
-  grid: `<rect x="2" y="2" width="3" height="3" /> <rect x="8" y="2" width="3" height="3" /> <rect x="14" y="2" width="3" height="3" /> <rect x="2" y="8" width="3" height="3" /> <rect x="8" y="8" width="3" height="3" /> <rect x="14" y="8" width="3" height="3" /> <rect x="2" y="14" width="3" height="3" /> <rect x="8" y="14" width="3" height="3" /> <rect x="14" y="14" width="3" height="3" />`,
-  list: `<rect x="6" y="4" width="12" height="1" /> <rect x="6" y="9" width="12" height="1" /> <rect x="6" y="14" width="12" height="1" /> <rect x="2" y="4" width="2" height="1" /> <rect x="2" y="9" width="2" height="1" /> <rect x="2" y="14" width="2" height="1" />`,
-  plus: `<rect x="9" y="1" width="1" height="17" /> <rect x="1" y="9" width="17" height="1" />`,
-  check: `<polyline fill="none" stroke="#000" stroke-width="1.1" points="4,10 8,15 17,4" />`,
-  close: `<path fill="none" stroke="#000" stroke-width="1.06" d="M16,16 L4,4" /> <path fill="none" stroke="#000" stroke-width="1.06" d="M16,4 L4,16" />`,
-  cart: `<circle cx="7.3" cy="17.3" r="1.4" /> <circle cx="13.3" cy="17.3" r="1.4" /> <polyline fill="none" stroke="#000" points="0 2 3.2 4 5.3 12.5 16 12.5 18 6.5 8 6.5" />`,
-  bag: `<path fill="none" stroke="#000" d="M7.5,7.5V4A2.48,2.48,0,0,1,10,1.5,2.54,2.54,0,0,1,12.5,4V7.5" /> <polygon fill="none" stroke="#000" points="16.5 7.5 3.5 7.5 2.5 18.5 17.5 18.5 16.5 7.5" />`,
-  heart: `<path fill="none" stroke="#000" stroke-width="1.03" d="M10,4 C10,4 8.1,2 5.74,2 C3.38,2 1,3.55 1,6.73 C1,8.84 2.67,10.44 2.67,10.44 L10,18 L17.33,10.44 C17.33,10.44 19,8.84 19,6.73 C19,3.55 16.62,2 14.26,2 C11.9,2 10,4 10,4 L10,4 Z" />`,
-  user: `<circle fill="none" stroke="#000" stroke-width="1.1" cx="9.9" cy="6.4" r="4.4" /> <path fill="none" stroke="#000" stroke-width="1.1" d="M1.5,19 C2.3,14.5 5.8,11.2 10,11.2 C14.2,11.2 17.7,14.6 18.5,19.2" />`,
-  settings: `<ellipse fill="none" stroke="#000" cx="6.11" cy="3.55" rx="2.11" ry="2.15" /> <ellipse fill="none" stroke="#000" cx="6.11" cy="15.55" rx="2.11" ry="2.15" /> <circle fill="none" stroke="#000" cx="13.15" cy="9.55" r="2.15" /> <rect x="1" y="3" width="3" height="1" /> <rect x="10" y="3" width="8" height="1" /> <rect x="1" y="9" width="8" height="1" /> <rect x="15" y="9" width="3" height="1" /> <rect x="1" y="15" width="3" height="1" /> <rect x="10" y="15" width="8" height="1" />`,
-  star: `<polygon fill="none" stroke="#000" stroke-width="1.01" points="10 2 12.63 7.27 18.5 8.12 14.25 12.22 15.25 18 10 15.27 4.75 18 5.75 12.22 1.5 8.12 7.37 7.27" />`,
-  tag: `<path fill="none" stroke="#000" stroke-width="1.1" d="M17.5,3.71 L17.5,7.72 C17.5,7.96 17.4,8.2 17.21,8.39 L8.39,17.2 C7.99,17.6 7.33,17.6 6.93,17.2 L2.8,13.07 C2.4,12.67 2.4,12.01 2.8,11.61 L11.61,2.8 C11.81,2.6 12.08,2.5 12.34,2.5 L16.19,2.5 C16.52,2.5 16.86,2.63 17.11,2.88 C17.35,3.11 17.48,3.4 17.5,3.71 L17.5,3.71 Z" /> <circle cx="14" cy="6" r="1" />`,
-  mail: `<polyline fill="none" stroke="#000" points="1.4,6.5 10,11 18.6,6.5" /> <path d="M 1,4 1,16 19,16 19,4 1,4 Z M 18,15 2,15 2,5 18,5 18,15 Z" />`,
-  phone: `<path fill="none" stroke="#000" d="M15.5,17 C15.5,17.8 14.8,18.5 14,18.5 L7,18.5 C6.2,18.5 5.5,17.8 5.5,17 L5.5,3 C5.5,2.2 6.2,1.5 7,1.5 L14,1.5 C14.8,1.5 15.5,2.2 15.5,3 L15.5,17 L15.5,17 L15.5,17 Z" /> <circle cx="10.5" cy="16.5" r="0.8" />`,
-  lock: `<rect fill="none" stroke="#000" height="10" width="13" y="8.5" x="3.5" /> <path fill="none" stroke="#000" d="M6.5,8 L6.5,4.88 C6.5,3.01 8.07,1.5 10,1.5 C11.93,1.5 13.5,3.01 13.5,4.88 L13.5,8" />`,
-  world: `<path fill="none" stroke="#000" d="M1,10.5 L19,10.5" /> <path fill="none" stroke="#000" d="M2.35,15.5 L17.65,15.5" /> <path fill="none" stroke="#000" d="M2.35,5.5 L17.523,5.5" /> <path fill="none" stroke="#000" d="M10,19.46 L9.98,19.46 C7.31,17.33 5.61,14.141 5.61,10.58 C5.61,7.02 7.33,3.83 10,1.7 C10.01,1.7 9.99,1.7 10,1.7 L10,1.7 C12.67,3.83 14.4,7.02 14.4,10.58 C14.4,14.141 12.67,17.33 10,19.46 L10,19.46 L10,19.46 L10,19.46 Z" /> <circle fill="none" stroke="#000" cx="10" cy="10.5" r="9" />`,
-  image: `<circle cx="16.1" cy="6.1" r="1.1" /> <rect fill="none" stroke="#000" x="0.5" y="2.5" width="19" height="15" /> <polyline fill="none" stroke="#000" stroke-width="1.01" points="4,13 8,9 13,14" /> <polyline fill="none" stroke="#000" stroke-width="1.01" points="11,12 12.5,10.5 16,14" />`,
-  folder: `<polygon fill="none" stroke="#000" points="9.5 5.5 8.5 3.5 1.5 3.5 1.5 16.5 18.5 16.5 18.5 5.5" />`,
-  warning: `<circle cx="10" cy="14" r="1" /> <circle fill="none" stroke="#000" stroke-width="1.1" cx="10" cy="10" r="9" /> <path d="M10.97,7.72 C10.85,9.54 10.56,11.29 10.56,11.29 C10.51,11.87 10.27,12 9.99,12 C9.69,12 9.49,11.87 9.43,11.29 C9.43,11.29 9.16,9.54 9.03,7.72 C8.96,6.54 9.03,6 9.03,6 C9.03,5.45 9.46,5.02 9.99,5 C10.53,5.01 10.97,5.44 10.97,6 C10.97,6 11.04,6.54 10.97,7.72 L10.97,7.72 Z" />`,
-  info: `<path d="M12.13,11.59 C11.97,12.84 10.35,14.12 9.1,14.16 C6.17,14.2 9.89,9.46 8.74,8.37 C9.3,8.16 10.62,7.83 10.62,8.81 C10.62,9.63 10.12,10.55 9.88,11.32 C8.66,15.16 12.13,11.15 12.14,11.18 C12.16,11.21 12.16,11.35 12.13,11.59 C12.08,11.95 12.16,11.35 12.13,11.59 L12.13,11.59 Z M11.56,5.67 C11.56,6.67 9.36,7.15 9.36,6.03 C9.36,5 11.56,4.54 11.56,5.67 L11.56,5.67 Z" /> <circle fill="none" stroke="#000" stroke-width="1.1" cx="10" cy="10" r="9" />`,
-  "arrow-right": `<line fill="none" stroke="#000" x1="3.47" y1="10" x2="15.47" y2="10" /> <polyline fill="none" stroke="#000" points="11.98 13.84 15.82 10 11.98 6.16" />`,
-  "chevron-right": `<polyline fill="none" stroke="#000" stroke-width="1.03" points="7 4 13 10 7 16" />`,
-  "chevron-down": `<polyline fill="none" stroke="#000" stroke-width="1.03" points="16 7 10 13 4 7" />`,
-  refresh: `<path fill="none" stroke="#000" stroke-width="1.1" d="M17.08,11.15 C17.09,11.31 17.1,11.47 17.1,11.64 C17.1,15.53 13.94,18.69 10.05,18.69 C6.16,18.68 3,15.53 3,11.63 C3,7.74 6.16,4.58 10.05,4.58 C10.9,4.58 11.71,4.73 12.46,5" /> <polyline fill="none" stroke="#000" points="9.9 2 12.79 4.89 9.79 7.9" />`,
-  calendar: `<path d="M 2,3 2,17 18,17 18,3 2,3 Z M 17,16 3,16 3,8 17,8 17,16 Z M 17,7 3,7 3,4 17,4 17,7 Z" /> <rect width="1" height="3" x="6" y="2" /> <rect width="1" height="3" x="13" y="2" />`,
-  clock: `<circle fill="none" stroke="#000" stroke-width="1.1" cx="10" cy="10" r="9" /> <rect x="9" y="4" width="1" height="7" /> <path fill="none" stroke="#000" stroke-width="1.1" d="M13.018,14.197 L9.445,10.625" />`,
-  download: `<line fill="none" stroke="#000" x1="10" y1="2.09" x2="10" y2="14.09" /> <polyline fill="none" stroke="#000" points="6.16 10.62 10 14.46 13.84 10.62" /> <line stroke="#000" x1="3.5" y1="17.5" x2="16.5" y2="17.5" />`,
-  upload: `<line fill="none" stroke="#000" x1="10" y1="15.17" x2="10" y2="3.17" /> <polyline fill="none" stroke="#000" points="13.84 6.63 10 2.8 6.16 6.64" /> <line fill="#fff" stroke="#000" x1="3.5" y1="17.5" x2="16.5" y2="17.5" />`,
-  pencil: `<path fill="none" stroke="#000" d="M17.25,6.01 L7.12,16.1 L3.82,17.2 L5.02,13.9 L15.12,3.88 C15.71,3.29 16.66,3.29 17.25,3.88 C17.83,4.47 17.83,5.42 17.25,6.01 L17.25,6.01 Z" /> <path fill="none" stroke="#000" d="M15.98,7.268 L13.851,5.148" />`,
-  trash: `<polyline fill="none" stroke="#000" points="6.5 3 6.5 1.5 13.5 1.5 13.5 3" /> <polyline fill="none" stroke="#000" points="4.5 4 4.5 18.5 15.5 18.5 15.5 4" /> <rect x="8" y="7" width="1" height="9" /> <rect x="11" y="7" width="1" height="9" /> <rect x="2" y="3" width="16" height="1" />`,
-  bookmark: `<polygon fill="none" stroke="#000" points="5.5 1.5 15.5 1.5 15.5 17.5 10.5 12.5 5.5 17.5" />`,
-  link: `<path fill="none" stroke="#000" stroke-width="1.1" d="M10.625,12.375 L7.525,15.475 C6.825,16.175 5.925,16.175 5.225,15.475 L4.525,14.775 C3.825,14.074 3.825,13.175 4.525,12.475 L7.625,9.375" /> <path fill="none" stroke="#000" stroke-width="1.1" d="M9.325,7.375 L12.425,4.275 C13.125,3.575 14.025,3.575 14.724,4.275 L15.425,4.975 C16.125,5.675 16.125,6.575 15.425,7.275 L12.325,10.375" /> <path fill="none" stroke="#000" stroke-width="1.1" d="M7.925,11.875 L11.925,7.975" />`,
-  "sign-in": `<polygon points="7 2 17 2 17 17 7 17 7 16 16 16 16 3 7 3 7 2" /> <line stroke="#000" x1="3" y1="9.5" x2="12" y2="9.5" /> <polyline fill="none" stroke="#000" points="9.2 6.33 12.37 9.5 9.2 12.67" />`,
-  "sign-out": `<polygon points="13 2 3 2 3 17 13 17 13 16 4 16 4 3 13 3 13 2" /> <line stroke="#000" x1="7.96" y1="9.49" x2="16.96" y2="9.49" /> <polyline fill="none" stroke="#000" points="14.17 6.31 17.35 9.48 14.17 12.66" />`,
-};
-
-function resolveUIKitIconName(icon: string | null): string | null {
-  if (!icon) return null;
-  const normalized = icon.trim();
-  if (normalized.length === 0) return null;
-  return UIKIT_ICON_INNER_HTML[normalized]
-    ? normalized
-    : (UIKIT_ICON_ALIASES[normalized] ?? null);
-}
-
-function getMenuIconLabel(icon: string | null): string {
-  if (!icon) return "None";
-
-  const direct = UIKIT_ICON_OPTIONS.find((option) => option.name === icon);
-  if (direct) return direct.label;
-
-  const alias = UIKIT_ICON_ALIASES[icon];
-  if (alias) {
-    const resolved = UIKIT_ICON_OPTIONS.find((option) => option.name === alias);
-    return resolved ? `${resolved.label} (legacy ${icon})` : icon;
-  }
-
-  return icon;
-}
-
-function renderUIKitIcon(icon: string | null, size = 14) {
-  const iconName = resolveUIKitIconName(icon);
-  const innerHtml = iconName ? UIKIT_ICON_INNER_HTML[iconName] : null;
-
-  if (!innerHtml) return null;
-
-  return (
-    <svg
-      className="uikit-icon"
-      viewBox="0 0 20 20"
-      width={size}
-      height={size}
-      aria-hidden="true"
-      focusable="false"
-      fill="currentColor"
-      stroke="currentColor"
-      dangerouslySetInnerHTML={{
-        __html: innerHtml.replace(/#000/g, "currentColor"),
-      }}
-    />
-  );
-}
-
 function parseBuilderLayoutKey(value: string | null): BuilderLayoutKey | null {
   if (!value) return null;
   if (isBuilderCustomPageKey(value)) return value;
@@ -1230,26 +1092,6 @@ function UikitPresetWireframeDiagram({ presetKey }: { presetKey: string }) {
   );
 }
 
-const HAS_RICH_TEXT_HTML = /<[a-z][\s\S]*>/i;
-
-function isRichPreviewText(value: string | null | undefined) {
-  return typeof value === "string" && HAS_RICH_TEXT_HTML.test(value);
-}
-
-function getRichTextSafeTag(tag: string) {
-  return tag === "p" ? "div" : tag;
-}
-
-function buttonTypographyStyle(
-  className: string | undefined,
-  style: CSSProperties | undefined,
-) {
-  if (!style || !String(className || "").includes("cta")) return style;
-  const buttonSafeStyle = { ...style };
-  delete buttonSafeStyle.color;
-  return buttonSafeStyle;
-}
-
 function blockButtonCssVars(block: BuilderLayoutBlock): CSSProperties {
   return builderButtonOverrideCssVars(block);
 }
@@ -1273,44 +1115,6 @@ function gridSpacingClass(
   return presets.includes(key) ? key : "custom";
 }
 
-function DashboardTypog({
-  as: As = "div",
-  area,
-  typography,
-  className,
-  children,
-  style,
-  ...props
-}: any) {
-  const Tag = As as any;
-  const tp = typographyProps(
-    typography,
-    area ?? inferTypographyArea(String(As), className),
-  );
-  const combined = [className, tp.className].filter(Boolean).join(" ");
-  const combinedStyle = buttonTypographyStyle(combined, {
-    ...style,
-    ...tp.style,
-  });
-  const isRich = isRichPreviewText(children);
-  if (isRich) {
-    const RichTag = getRichTextSafeTag(String(As)) as any;
-    return (
-      <RichTag
-        className={combined || undefined}
-        style={combinedStyle}
-        {...props}
-        dangerouslySetInnerHTML={{ __html: children }}
-      />
-    );
-  }
-  return (
-    <Tag className={combined || undefined} style={combinedStyle} {...props}>
-      {children}
-    </Tag>
-  );
-}
-
 function inferTypographyArea(
   tagName: string,
   className?: string,
@@ -1326,25 +1130,6 @@ function inferTypographyArea(
     return "title";
   }
   return "body";
-}
-
-function BodyText({
-  children,
-  className,
-}: {
-  children: string | null | undefined;
-  className?: string;
-}) {
-  if (!children) return null;
-  if (isRichPreviewText(children)) {
-    return (
-      <div
-        className={className}
-        dangerouslySetInnerHTML={{ __html: children }}
-      />
-    );
-  }
-  return <p className={className}>{children}</p>;
 }
 
 function getDefaultStateForKey(key: BuilderLayoutKey): BuilderState {
@@ -7985,7 +7770,7 @@ export default function DashboardBuilder({
     />
   );
 
-  const globalStylesPanel = (
+  const legacyGlobalStylesPanel = (
     <div className="builder-sidebar-panel builder-sidebar-global-styles">
       <div className="builder-sidebar-panel-header">
         <div>
@@ -8081,10 +7866,10 @@ export default function DashboardBuilder({
       )}
 
       {globalStylesTab === "semantic" && (
-        <CanonicalGlobalStylesPanel
-          shellSettings={shellSettings}
-          updateShellSettings={updateShellSettings}
-        />
+        <div className="builder-import-readonly">
+          <strong>Canonical editor</strong>
+          <span>This legacy tab is retired. Use the Global Styles editor navigation.</span>
+        </div>
       )}
 
       {globalStylesTab === "siteDesign" && (
@@ -9299,6 +9084,13 @@ export default function DashboardBuilder({
       )}
 
     </div>
+  );
+
+  const globalStylesPanel = (
+    <CanonicalGlobalStylesPanel
+      shellSettings={shellSettings}
+      updateShellSettings={updateShellSettings}
+    />
   );
 
   const sidebarTopActions = (
@@ -12067,11 +11859,8 @@ function getPreviewLayoutBlocks(
 
 type PreviewLayoutItem = NonNullable<BuilderSection["layoutItems"]>[number];
 
-function getPreviewGoodieIcon(iconName: BuilderLayoutBlock["iconName"]) {
-  if (iconName === "heart") return <Heart size={24} />;
-  if (iconName === "truck") return <Truck size={24} />;
-  if (iconName === "shield") return <ShieldCheck size={24} />;
-  return <Sparkles size={24} />;
+function getPreviewGoodieIcon(block: BuilderLayoutBlock) {
+  return <WebPagesIcon name={block.iconName} size={block.iconSize ?? block.listIconSize ?? 28} />;
 }
 
 function getLayoutBlockLibraryIcon(kind: LayoutBlockKind) {
@@ -12312,20 +12101,11 @@ function InlineEditableText({
   style?: React.CSSProperties;
 }) {
   const resolvedArea = area ?? inferTypographyArea(Tag, className);
-  const tp = typographyProps(typography, resolvedArea);
-  const combinedClassName = ["builder-inline-editable", className, tp.className]
-    .filter(Boolean)
-    .join(" ");
-  const combinedStyle = buttonTypographyStyle(combinedClassName, {
-    ...style,
-    ...tp.style,
-  });
   const supportsLineBreaks = resolvedArea === "title";
   const displayValue = supportsLineBreaks
     ? normalizeBuilderLineBreaks(value)
     : value;
   const isRich = isRichPreviewText(displayValue);
-  const EditableTag = (isRich ? getRichTextSafeTag(Tag) : Tag) as any;
   const stopInlineEvent = (event: ReactMouseEvent<HTMLElement>) => {
     event.stopPropagation();
   };
@@ -12353,24 +12133,24 @@ function InlineEditableText({
   };
 
   return (
-    <EditableTag
-      className={combinedClassName}
+    <DashboardTypog
+      as={Tag}
+      area={resolvedArea}
+      typography={typography}
+      className={["builder-inline-editable", className].filter(Boolean).join(" ")}
       style={{
-        ...combinedStyle,
+        ...style,
         ...(supportsLineBreaks ? { whiteSpace: "pre-line" } : {}),
       }}
       contentEditable
       suppressContentEditableWarning
-      {...(isRich
-        ? { dangerouslySetInnerHTML: { __html: displayValue } }
-        : {})}
       onClick={stopInlineEvent}
       onMouseDown={stopInlineEvent}
       onBlur={handleBlur}
       onKeyDown={handleKeyDown}
     >
-      {isRich ? null : displayValue}
-    </EditableTag>
+      {displayValue}
+    </DashboardTypog>
   );
 }
 
@@ -14146,7 +13926,11 @@ function PreviewSection({
       });
     });
     return (
-      <div className="shop-builder-section-content builder-preview-content-layout">
+      <div
+        className={`shop-builder-section-content ${
+          nestingDepth === 0 ? getUikitContainerClass(section.contentMode) : ""
+        } builder-preview-content-layout`}
+      >
         <div
           className="shop-builder-content-layout-grid builder-preview-content-layout-grid"
           style={
@@ -15212,7 +14996,7 @@ function PreviewSection({
                           </div>
                         ) : block.kind === "icon" ? (
                           <div className="builder-preview-goodie builder-preview-goodie-icon">
-                            {getPreviewGoodieIcon(block.iconName)}
+                            {getPreviewGoodieIcon(block)}
                             {block.title && (
                               <DashboardTypog
                                 as="strong"
@@ -15244,7 +15028,7 @@ function PreviewSection({
                               {(block.listItems ?? (block.items ?? []).map((text, index): BuilderListItem => ({ id: `${block.id ?? blockKey}-item-${index}`, text }))).map((item, index) => (
                                 <li
                                   key={item.id}
-                                  className={`builder-preview-list-item ${draggingItem?.kind === "list" && draggingItem?.fromIndex === index && draggingItem?.blockKey === blockKey ? "is-dragging" : ""} ${draggingItem?.kind === "list" && dropHoverIndex === index ? "is-drag-over" : ""}`}
+                                  className={`builder-preview-list-item webpages-list-item ${draggingItem?.kind === "list" && draggingItem?.fromIndex === index && draggingItem?.blockKey === blockKey ? "is-dragging" : ""} ${draggingItem?.kind === "list" && dropHoverIndex === index ? "is-drag-over" : ""}`}
                                   draggable
                                   onDragStart={(event) => {
                                     event.stopPropagation();
@@ -15350,6 +15134,7 @@ function PreviewSection({
                                   >
                                     ⠿
                                   </span>
+                                  {resolveUikitIconName(item.iconName ?? block.listIcon) && <WebPagesIcon name={item.iconName ?? block.listIcon} size={item.iconSize ?? block.listIconSize ?? 16} />}
                                   {item.url ? <a href={item.url} target={item.target === "_blank" ? "_blank" : undefined} rel={item.target === "_blank" ? "noreferrer" : undefined}><DashboardTypog as="span" typography={block.typography}>{item.text}</DashboardTypog></a> : <DashboardTypog as="span" typography={block.typography}>{item.text}</DashboardTypog>}
                                 </li>
                               ))}
@@ -15361,13 +15146,19 @@ function PreviewSection({
                               items={block.accordionItems ?? []}
                               multiple={block.accordionMultiple}
                               collapsible={block.accordionCollapsible}
-                             active={block.accordionOpenItems}
+                              active={block.accordionOpenItems}
+                              style={block.accordionStyle}
                               indicator={block.accordionIndicator}
                               indicatorPosition={block.accordionIndicatorPosition}
-                              rowStyle={block.accordionRowStyle}
-                              spacing={block.accordionSpacing}
                               titleEmphasis={block.accordionTitleEmphasis}
-                              openEmphasis={block.accordionOpenEmphasis}
+                              itemSpacing={block.accordionItemSpacing}
+                              contentSpacing={block.accordionContentSpacing}
+                              divider={block.accordionDivider}
+                              titleStyle={block.accordionTitleStyle}
+                              contentStyle={block.accordionContentStyle}
+                              legacyRowStyle={block.accordionRowStyle}
+                              legacySpacing={block.accordionSpacing}
+                              legacyOpenEmphasis={block.accordionOpenEmphasis}
                             />
                           </div>
                         ) : block.kind === "text" ? (
@@ -15380,121 +15171,10 @@ function PreviewSection({
                             typography={block.typography}
                           />
                         ) : block.kind === "heading" ? (
-                          <div className="shop-builder-column-block shop-builder-column-block--heading">
-                            {(() => {
-                              const Tag = block.headingLevel ?? "h2";
-                              const uikitHeadingClass = getUikitHeadingClass(
-                                block.headingLevel ?? "h2",
-                                block.headingSize,
-                              );
-                              const alignClass = block.headingAlign
-                                ? `uk-text-${block.headingAlign}`
-                                : "";
-                              const isGradient =
-                                block.textGradientPreset &&
-                                block.textGradientPreset !== "none";
-                              const isCustom =
-                                block.textGradientPreset === "custom";
-                              const titleClassName = [
-                                uikitHeadingClass,
-                                alignClass,
-                                isGradient && !isCustom
-                                  ? `text-gradient--${block.textGradientPreset}`
-                                  : "",
-                              ]
-                                .filter(Boolean)
-                                .join(" ");
-
-                              const compStyle = getHeadingTypographyStyles(
-                                block.typography,
-                                Boolean(isGradient),
-                              );
-
-                              const gradientStyle = isCustom
-                                ? {
-                                    backgroundImage: `linear-gradient(${block.textGradientCustomAngle ?? 135}deg, ${block.textGradientCustomStart ?? "#ffffff"} ${block.textGradientCustomStartOffset ?? 0}%, ${block.textGradientCustomMiddle ?? "#60a5fa"} ${block.textGradientCustomMiddleOffset ?? 50}%, ${block.textGradientCustomEnd ?? "#c084fc"} ${block.textGradientCustomEndOffset ?? 100}%)`,
-                                    WebkitBackgroundClip: "text",
-                                    WebkitTextFillColor: "transparent",
-                                    backgroundClip: "text",
-                                    display: "inline-block",
-                                  }
-                                : {};
-
-                              const combinedStyle = {
-                                ...compStyle,
-                                ...gradientStyle,
-                              };
-
-                              return (
-                                <Tag
-                                  className={titleClassName}
-                                  style={
-                                    Object.keys(combinedStyle).length > 0
-                                      ? combinedStyle
-                                      : undefined
-                                  }
-                                >
-                                  {block.typewriterEnabled ? (
-                                    <TypewriterText
-                                      text={
-                                        block.headingText ??
-                                        "Your Heading Text"
-                                      }
-                                      phrases={block.typewriterPhrases}
-                                      speed={block.typewriterSpeed}
-                                      eraseSpeed={block.typewriterEraseSpeed}
-                                      delay={block.typewriterDelay}
-                                      loop={block.typewriterLoop}
-                                      useGradient={
-                                        block.typewriterUseGradient
-                                      }
-                                      gradientPreset={
-                                        block.textGradientPreset ??
-                                        block.typewriterGradientPreset
-                                      }
-                                      customStart={
-                                        block.textGradientCustomStart
-                                      }
-                                      customMiddle={
-                                        block.textGradientCustomMiddle
-                                      }
-                                      customEnd={block.textGradientCustomEnd}
-                                      customAngle={
-                                        block.textGradientCustomAngle
-                                      }
-                                      customStartOffset={
-                                        block.textGradientCustomStartOffset
-                                      }
-                                      customMiddleOffset={
-                                        block.textGradientCustomMiddleOffset
-                                      }
-                                      customEndOffset={
-                                        block.textGradientCustomEndOffset
-                                      }
-                                      area="title"
-                                      preserveHeight={
-                                        block.typewriterPreserveHeight !== false
-                                      }
-                                      reservedLines={
-                                        block.typewriterReservedLines ?? 1
-                                      }
-                                      mobileReservedLines={
-                                        block.typewriterMobileReservedLines ??
-                                        2
-                                      }
-                                    />
-                                  ) : (
-                                    <BuilderLineBreakText
-                                      text={
-                                        block.headingText ??
-                                        "Your Heading Text"
-                                      }
-                                    />
-                                  )}
-                                </Tag>
-                              );
-                            })()}
-                          </div>
+                          <ContentLayoutBlock
+                            block={block}
+                            breadcrumbItems={[]}
+                          />
                         ) : block.kind === "datePicker" ? (
                           <div className="builder-preview-goodie builder-preview-goodie-date">
                             <CalendarDays size={24} />
@@ -15724,24 +15404,28 @@ function PreviewSection({
                                 )}
                               >
                                 {block.buttonLabel && (
-                                  <a
+                                  <DashboardTypog
+                                    as="a"
+                                    area="button"
                                     className={`builder-hero-action ${getUikitButtonClass(block.buttonStyle ?? "primary", block.size ?? "default")}`}
                                     href={block.buttonUrl || "#"}
                                     target={block.buttonTarget === "_blank" ? "_blank" : undefined}
                                     rel={block.buttonTarget === "_blank" ? "noreferrer" : undefined}
                                   >
                                     {block.buttonLabel}
-                                  </a>
+                                  </DashboardTypog>
                                 )}
                                 {block.heroSecondaryActionVisible !== false && block.secondaryButtonLabel && (
-                                  <a
+                                  <DashboardTypog
+                                    as="a"
+                                    area="button"
                                     className={`builder-hero-action ${getUikitButtonClass(block.secondaryButtonStyle ?? "secondary", block.secondaryButtonSize ?? "default")}`}
                                     href={block.secondaryButtonUrl || "#"}
                                     target={block.secondaryButtonTarget === "_blank" ? "_blank" : undefined}
                                     rel={block.secondaryButtonTarget === "_blank" ? "noreferrer" : undefined}
                                   >
                                     {block.secondaryButtonLabel}
-                                  </a>
+                                  </DashboardTypog>
                                 )}
                               </div>
                             </div>
@@ -16826,7 +16510,6 @@ function PreviewSection({
                                           .join(", "),
                                         buttonLabel: "View product",
                                         buttonUrl: `/product/${product.slug}`,
-                                        buttonStyle: "primary" as const,
                                         buttonAlign: "left" as const,
                                       }))
                                     : (block.gridItems ?? [])
@@ -17141,6 +16824,7 @@ function PreviewSection({
                                           <div className={`${block.gridItemRenderer === "card" ? "uk-card-body " : ""}shop-builder-grid-content`}>
                                             {block.gridSource !== "products" ? (
                                               <>
+                                                {item.iconName && <WebPagesIcon name={item.iconName} size={item.iconSize ?? 20} />}
                                                 {block.gridShowEyebrow !==
                                                   false &&
                                                   item.eyebrow && (
@@ -17256,7 +16940,7 @@ function PreviewSection({
                                                       className={`shop-builder-grid-button shop-builder-grid-button--${item.buttonAlign ?? "left"}`}
                                                     >
                                                       <a
-                                                        className={`builder-grid-action ${getUikitButtonClass(item.actionStyle ?? item.buttonStyle ?? "primary", item.actionSize ?? "default")}`}
+                                                        className={`shop-builder-grid-action builder-grid-action ${getUikitButtonClass(item.actionStyle ?? item.buttonStyle ?? block.buttonStyle ?? "primary", item.actionSize ?? block.size ?? "default")}`}
                                                         href={item.buttonUrl || "#"}
                                                         target={item.buttonTarget === "_blank" ? "_blank" : undefined}
                                                         rel={item.buttonTarget === "_blank" ? "noreferrer" : undefined}
@@ -17268,23 +16952,47 @@ function PreviewSection({
                                               </>
                                             ) : (
                                               <>
+                                                {item.iconName && <WebPagesIcon name={item.iconName} size={item.iconSize ?? 20} />}
                                                 {block.gridShowEyebrow !==
                                                   false &&
                                                   item.eyebrow && (
-                                                    <span>{item.eyebrow}</span>
+                                                    <DashboardTypog
+                                                      as="span"
+                                                      area="eyebrow"
+                                                      typography={itemTypography}
+                                                    >
+                                                      {item.eyebrow}
+                                                    </DashboardTypog>
                                                   )}
                                                 {item.title && (
-                                                  <h3 style={gridTitleStyle}>
+                                                  <DashboardTypog
+                                                    as={(item.titleElement ?? "h3") as any}
+                                                    area="title"
+                                                    typography={itemTypography}
+                                                    style={gridTitleStyle}
+                                                  >
                                                     {item.title}
-                                                  </h3>
+                                                  </DashboardTypog>
                                                 )}
                                                 {block.gridShowMeta !== false &&
                                                   item.meta && (
-                                                    <small>{item.meta}</small>
+                                                    <DashboardTypog
+                                                      as="small"
+                                                      area="body"
+                                                      typography={itemTypography}
+                                                    >
+                                                      {item.meta}
+                                                    </DashboardTypog>
                                                   )}
                                                 {block.gridShowText !== false &&
                                                   item.text && (
-                                                    <p>{item.text}</p>
+                                                    <DashboardTypog
+                                                      as="p"
+                                                      area="body"
+                                                      typography={itemTypography}
+                                                    >
+                                                      {item.text}
+                                                    </DashboardTypog>
                                                   )}
                                                 {block.gridShowButton !==
                                                   false &&
@@ -17292,11 +17000,14 @@ function PreviewSection({
                                                     <div
                                                       className={`shop-builder-grid-button shop-builder-grid-button--${item.buttonAlign ?? "left"}`}
                                                     >
-                                                      <span
-                                                        className={`builder-preview-cta builder-preview-cta--${item.buttonStyle ?? "primary"}`}
+                                                      <a
+                                                        className={`shop-builder-grid-action builder-grid-action ${getUikitButtonClass(item.actionStyle ?? item.buttonStyle ?? block.buttonStyle ?? "primary", item.actionSize ?? block.size ?? "default")}`}
+                                                        href={item.buttonUrl || "#"}
+                                                        target={item.buttonTarget === "_blank" ? "_blank" : undefined}
+                                                        rel={item.buttonTarget === "_blank" ? "noreferrer" : undefined}
                                                       >
                                                         {item.buttonLabel}
-                                                      </span>
+                                                      </a>
                                                     </div>
                                                   )}
                                               </>

@@ -7732,6 +7732,24 @@ body[data-storefront-preset="princity"]
   border-color: var(--builder-ui-border);
 }
 
+.builder-nested-card.is-drag-over {
+  border-color: var(--builder-ui-accent, #3b82f6);
+  box-shadow: inset 0 0 0 1px var(--builder-ui-accent, #3b82f6);
+}
+
+.builder-nested-card-drag-handle {
+  flex: 0 0 auto;
+  color: var(--builder-ui-muted);
+  cursor: grab;
+  font-size: 16px;
+  line-height: 1;
+  touch-action: none;
+}
+
+.builder-nested-card-drag-handle:active {
+  cursor: grabbing;
+}
+
 .builder-nested-card.is-selected-column-card {
   border: 1px solid rgba(17, 17, 17, 0.14);
   box-shadow: inset 0 0 0 1px rgba(17, 17, 17, 0.04);
@@ -14848,19 +14866,6 @@ body:has([data-scoped-builder-root])
   display: none !important;
 }
 
-/* Main rows read as distinct composition groups through a quiet surface,
-   without introducing another border or outline system. */
-.builder-preview-canvas
-  .builder-main-row-frame
-  > .builder-preview-content-row {
-  background: color-mix(
-    in srgb,
-    var(--builder-preview-section-text, var(--builder-preview-text, #111111))
-      1.25%,
-    transparent
-  );
-}
-
 /* ==========================================
    Modern Swiper & Slideshow System Styles
    ========================================== */
@@ -15995,6 +16000,52 @@ body:has([data-scoped-builder-root])
   text-align: right;
 }
 
+.builder-design-inheritance-banner {
+  display: grid;
+  gap: 3px;
+  padding: 10px 12px;
+  border: 1px solid color-mix(in srgb, var(--builder-ui-accent) 22%, var(--builder-ui-border));
+  border-radius: 9px;
+  background: color-mix(in srgb, var(--builder-ui-accent) 6%, var(--builder-ui-panel-solid));
+  color: var(--builder-ui-text);
+}
+
+.builder-design-inheritance-banner strong {
+  font-size: 11px;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.builder-design-inheritance-banner span {
+  color: var(--builder-ui-accent);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.builder-design-inheritance-banner small {
+  color: var(--builder-ui-muted);
+  font-size: 10px;
+  line-height: 1.4;
+}
+
+.builder-design-token-group {
+  display: grid;
+  gap: 2px;
+  padding: 8px 10px;
+  border-left: 2px solid var(--builder-ui-border);
+}
+
+.builder-design-token-group strong {
+  color: var(--builder-ui-text);
+  font-size: 11px;
+}
+
+.builder-design-token-group span {
+  color: var(--builder-ui-muted);
+  font-size: 10px;
+  line-height: 1.4;
+}
+
 .builder-design-nav-search {
   min-height: 38px;
   display: grid;
@@ -16553,3 +16604,167 @@ body:has([data-scoped-builder-root])
 .builder-design-button-matrix-cell { display: grid; gap: 8px; align-items: center; }
 .builder-design-button-matrix-cell > span { font-size: 11px; color: #64748b; text-transform: capitalize; }
 @media (max-width: 900px) { .builder-design-button-matrix-grid { grid-template-columns: repeat(2, minmax(140px, 1fr)); } }
+
+/* WebPages Icon System v1 */
+.webpages-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+  color: currentColor;
+}
+
+.webpages-icon > svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.webpages-icon-picker {
+  min-width: 0;
+  display: grid;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid var(--builder-ui-border, #d7dce5);
+  border-radius: 10px;
+  background: var(--builder-ui-surface, #fff);
+}
+
+.webpages-icon-picker__toolbar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.webpages-icon-picker__search {
+  grid-column: 1 / -1;
+}
+
+.webpages-icon-picker__search input {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 9px 11px;
+  border: 1px solid var(--builder-ui-border, #d7dce5);
+  border-radius: 8px;
+  background: var(--builder-ui-input, #fff);
+  color: inherit;
+}
+
+.webpages-icon-picker__count {
+  grid-column: 1;
+  white-space: nowrap;
+  color: var(--builder-ui-soft-muted, #64748b);
+  font-size: 11px;
+}
+
+.webpages-icon-picker__clear {
+  grid-column: 2;
+  grid-row: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  justify-self: end;
+  padding: 7px 10px;
+  border: 1px solid var(--builder-ui-border, #d7dce5);
+  border-radius: 7px;
+  background: transparent;
+  color: inherit;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.webpages-icon-picker__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(56px, 1fr));
+  gap: 8px;
+  max-height: min(520px, 58vh);
+  overflow-y: auto;
+  padding: 3px;
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+}
+
+.webpages-icon-picker__option {
+  min-width: 0;
+  min-height: 68px;
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 6px;
+  padding: 8px 4px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.webpages-icon-picker__option:hover,
+.webpages-icon-picker__option:focus-visible {
+  border-color: var(--builder-ui-accent, #3b82f6);
+  background: color-mix(in srgb, var(--builder-ui-accent, #3b82f6) 9%, transparent);
+  outline: none;
+}
+
+.webpages-icon-picker__option.is-selected {
+  border-color: var(--builder-ui-accent, #3b82f6);
+  background: color-mix(in srgb, var(--builder-ui-accent, #3b82f6) 14%, transparent);
+  box-shadow: inset 0 0 0 1px var(--builder-ui-accent, #3b82f6);
+}
+
+.webpages-icon-picker__option > span:last-child {
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: center;
+  color: var(--builder-ui-soft-muted, #64748b);
+  font-size: 10px;
+}
+
+.webpages-icon-picker__empty {
+  grid-column: 1 / -1;
+  margin: 16px 4px;
+  color: var(--builder-ui-soft-muted, #64748b);
+  font-size: 12px;
+  text-align: center;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (max-width: 540px) {
+  .webpages-icon-picker__toolbar {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .webpages-icon-picker__search {
+    grid-column: 1 / -1;
+  }
+
+  .webpages-icon-picker__count {
+    grid-column: 1 / 2;
+    grid-row: 2;
+  }
+
+  .webpages-icon-picker__clear {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+  }
+
+  .webpages-icon-picker__grid {
+    grid-template-columns: repeat(auto-fill, minmax(54px, 1fr));
+    max-height: min(460px, 56vh);
+  }
+}

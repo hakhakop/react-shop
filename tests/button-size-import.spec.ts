@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { waitForSeededBuilderLayout } from "./builderFixture";
 
 const builderUrl = "/app/websites/header-parity-site/builder?page=home";
 const previewUrl = "/app/websites/header-parity-site/preview?page=home";
@@ -16,7 +17,7 @@ test("imported DevStack Button sizes preserve small/default/large ordering and p
   await expect(page).toHaveURL(/\/app(?:\?|$)/);
 
   await page.goto(builderUrl);
-  await expect(page.locator(".builder-preview-shell").first()).toBeVisible();
+  await waitForSeededBuilderLayout(page);
   await page.getByRole("button", { name: "Website", exact: true }).click();
   await page.getByRole("button", { name: "Import LESS", exact: true }).click();
   const importer = page.getByTestId("yootheme-import-panel");
@@ -24,6 +25,7 @@ test("imported DevStack Button sizes preserve small/default/large ordering and p
   await expect(importer).toContainText("DevStack Light Blue");
   await importer.getByRole("button", { name: "Apply DevStack Light Blue", exact: true }).click();
   await expect(page.getByText("Website preview updated", { exact: true })).toBeVisible();
+  await waitForSeededBuilderLayout(page);
 
   await page.getByRole("button", { name: "Blocks", exact: true }).click();
   await page.locator(".builder-element-library-search input").fill("button");
@@ -35,7 +37,7 @@ test("imported DevStack Button sizes preserve small/default/large ordering and p
   await expect(button).toBeVisible();
   await selectedBlock.locator(".builder-preview-block-tools").getByRole("button", { name: "Edit element" }).click();
   const inspector = page.locator(".builder-floating-inspector");
-  const size = inspector.locator("label.builder-field", { hasText: "Size" }).locator("select");
+  const size = inspector.getByRole("radiogroup", { name: "Button size" });
   await expect(size).toBeVisible();
 
   const readMetrics = (locator: typeof button) => locator.evaluate((element) => {
@@ -52,7 +54,7 @@ test("imported DevStack Button sizes preserve small/default/large ordering and p
 
   const metrics: Record<string, Awaited<ReturnType<typeof readMetrics>>> = {};
   for (const value of ["small", "default", "large"] as const) {
-    await size.selectOption(value);
+    await size.getByRole("radio", { name: value.replace(/\b\w/g, (letter) => letter.toUpperCase()) }).click();
     await expect(button).toHaveClass(value === "default" ? /uk-button/ : new RegExp(`uk-button-${value}`));
     metrics[value] = await readMetrics(button);
   }

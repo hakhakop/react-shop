@@ -4,10 +4,13 @@ import type { InspectorTab, BuilderLayoutBlock, WordPressMediaItem } from "@/com
 import { UIKIT_IMAGE_CAPABILITY } from "@/lib/uikitCapabilities";
 import { BuilderImageUrlControl } from "./InspectorSharedControls";
 import { InspectorFieldRow, InspectorPillGroup, InspectorSelect, InspectorTextField } from "@/components/dashboard/inspector/InspectorControls";
+import GeneralSettingsPanel from "@/components/dashboard/inspector/panels/GeneralSettingsPanel";
+import type { BuilderShellSettings } from "@/lib/builderShell";
 
 type Props = {
   block: BuilderLayoutBlock;
   tab: InspectorTab;
+  shellSettings: BuilderShellSettings;
   update: (patch: Partial<BuilderLayoutBlock>) => void;
   openWordPressMediaPicker: (options: { title: string; currentUrl?: string; onSelect: (media: WordPressMediaItem) => void }) => void;
 };
@@ -21,7 +24,7 @@ const legacyImageFields = {
 const labelFor = (value: string) => value.charAt(0).toUpperCase() + value.slice(1).replaceAll("-", " ");
 const optionsFor = <T extends string>(values: readonly T[]) => values.map((value) => ({ value, label: labelFor(value) }));
 
-export default function ImageCapabilityPanel({ block, tab, update, openWordPressMediaPicker }: Props) {
+export default function ImageCapabilityPanel({ block, tab, shellSettings, update, openWordPressMediaPicker }: Props) {
   const updateSemantic = (patch: Partial<BuilderLayoutBlock>) => update({ ...legacyImageFields, ...patch });
   const image = block;
 
@@ -57,6 +60,7 @@ export default function ImageCapabilityPanel({ block, tab, update, openWordPress
   if (tab === "style") {
     return (
       <div className="builder-inspector-stack" data-uikit-capability="image-style">
+        <GeneralSettingsPanel block={block} shellSettings={shellSettings} tab={tab} update={update} />
         <div className="builder-element-inspector-note">
           <strong>UIkit Image</strong>
           <span>Semantic presentation settings map to shared UIkit classes and attributes.</span>

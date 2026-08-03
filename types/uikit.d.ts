@@ -8,3 +8,8 @@ declare module "uikit" {
   };
   export default UIkit;
 }
+
+declare module "uikit/dist/js/uikit-icons" {
+  const UIkitIcons: unknown;
+  export default UIkitIcons;
+}

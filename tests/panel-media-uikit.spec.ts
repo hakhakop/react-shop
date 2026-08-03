@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { waitForSeededBuilderLayout } from "./builderFixture";
 
 const email = "header-parity-20260722@example.test";
 const password = "HeaderParity!2026";
@@ -31,7 +32,7 @@ async function geometry(panel: import("@playwright/test").Locator) {
 test("Panel media stays inside the UIkit Card boundary in builder and frontend", async ({ page, context }) => {
   await login(page);
   await page.goto(builderUrl);
-  await expect(page.locator(".builder-preview-shell").first()).toBeVisible();
+  await waitForSeededBuilderLayout(page);
   await page.locator(".builder-sidebar-nav-tile", { hasText: "Blocks" }).first().click();
   await page.locator(".builder-element-library-search input").fill("panel");
   const panelCard = page.locator(".builder-element-library-card").filter({ hasText: "Panel" }).first();
@@ -80,7 +81,7 @@ test("Panel media stays inside the UIkit Card boundary in builder and frontend",
   expect(seeded).toBeTruthy();
   await page.evaluate(() => Object.keys(localStorage).filter((key) => ["react-shop-visual-builder-drafts-v2", "react-shop-visual-builder-v1", "react-shop-visual-builder-pages-v1"].some((prefix) => key.startsWith(prefix))).forEach((key) => localStorage.removeItem(key)));
   await page.reload();
-  await expect(page.locator(".builder-preview-shell").first()).toBeVisible();
+  await waitForSeededBuilderLayout(page);
   const realPanel = page.locator(`[data-builder-block-key="${seeded}"] .shop-builder-column-block--panel`);
   await expect.poll(() => realPanel.locator(".shop-builder-panel-media").evaluate((element) => getComputedStyle(element).backgroundImage)).toContain("example.com");
   const realImageGeometry = await geometry(realPanel);

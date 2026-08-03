@@ -1,7 +1,10 @@
 "use client";
 
-import { Plus, Trash2, ArrowUp, ArrowDown } from "lucide-react";
+import { useRef } from "react";
 import type { BuilderLayoutBlock, InspectorTab } from "@/components/dashboard/builderTypes";
+import { UIKIT_BUTTON_CAPABILITY } from "@/lib/uikitCapabilities";
+import IconPicker from "@/components/dashboard/inspector/IconPicker";
+import RepeatableItemShell from "@/components/dashboard/inspector/RepeatableItemShell";
 import {
   InspectorFieldRow,
   InspectorPillGroup,
@@ -78,37 +81,95 @@ export function HeroCapabilityPanel({ block, tab, update }: Props) {
 }
 
 type GridItem = NonNullable<BuilderLayoutBlock["gridItems"]>[number];
-function GridItemEditor({ item, index, count, updateItem, remove, move }: { item: GridItem; index: number; count: number; updateItem: (patch: Partial<GridItem>) => void; remove: () => void; move: (direction: -1 | 1) => void }) {
-  const Title = (item.titleElement ?? "h3") as string;
-  return <div className="builder-nested-card is-open" data-grid-item-id={item.id ?? index}>
-    <div className="builder-nested-card-header"><strong>Item {index + 1}</strong><span>{item.title || "Untitled"}</span><button type="button" aria-label="Move item up" disabled={index === 0} onClick={() => move(-1)}><ArrowUp size={14} /></button><button type="button" aria-label="Move item down" disabled={index === count - 1} onClick={() => move(1)}><ArrowDown size={14} /></button><button type="button" aria-label="Remove grid item" onClick={remove}><Trash2 size={14} /></button></div>
-    <div className="builder-nested-card-body">
-      <InspectorFieldRow label="Image"><InspectorTextField value={item.imageUrl ?? ""} onChange={(value) => updateItem({ imageUrl: value })} ariaLabel={`Grid item ${index + 1} image`} /></InspectorFieldRow>
-      <InspectorFieldRow label="Alt text"><InspectorTextField value={item.imageAlt ?? ""} onChange={(value) => updateItem({ imageAlt: value })} ariaLabel={`Grid item ${index + 1} alt`} /></InspectorFieldRow>
-      <InspectorFieldRow label="Eyebrow"><InspectorTextField value={item.eyebrow ?? ""} onChange={(value) => updateItem({ eyebrow: value })} ariaLabel={`Grid item ${index + 1} eyebrow`} /></InspectorFieldRow>
-      <InspectorFieldRow label="Title"><InspectorTextField value={item.title ?? ""} onChange={(value) => updateItem({ title: value })} ariaLabel={`Grid item ${index + 1} title`} /></InspectorFieldRow>
-      <InspectorFieldRow label="Meta"><InspectorTextField value={item.meta ?? ""} onChange={(value) => updateItem({ meta: value })} ariaLabel={`Grid item ${index + 1} meta`} /></InspectorFieldRow>
-      <InspectorFieldRow label="Body"><InspectorTextarea value={item.text ?? ""} onChange={(value) => updateItem({ text: value })} ariaLabel={`Grid item ${index + 1} body`} /></InspectorFieldRow>
-      <InspectorFieldRow label="Action label"><InspectorTextField value={item.buttonLabel ?? ""} onChange={(value) => updateItem({ buttonLabel: value })} ariaLabel={`Grid item ${index + 1} action label`} /></InspectorFieldRow>
-      <InspectorFieldRow label="Action URL"><InspectorTextField value={item.buttonUrl ?? ""} onChange={(value) => updateItem({ buttonUrl: value })} ariaLabel={`Grid item ${index + 1} action URL`} /></InspectorFieldRow>
-      <InspectorFieldRow label="Action target"><InspectorSelect value={item.buttonTarget ?? "_self"} options={targets} onChange={(value) => updateItem({ buttonTarget: value })} ariaLabel={`Grid item ${index + 1} action target`} /></InspectorFieldRow>
-      <InspectorFieldRow label="Media placement"><InspectorPillGroup value={item.mediaPlacement ?? "top"} options={opts(["top", "left", "right"] as const)} onChange={(value) => updateItem({ mediaPlacement: value })} ariaLabel={`Grid item ${index + 1} media placement`} /></InspectorFieldRow>
-      <InspectorFieldRow label="Media ratio"><InspectorSelect value={item.mediaRatio ?? "natural"} options={opts(["natural", "square", "4:3", "3:2", "16:9", "portrait"] as const)} onChange={(value) => updateItem({ mediaRatio: value })} ariaLabel={`Grid item ${index + 1} media ratio`} /></InspectorFieldRow>
-      <InspectorFieldRow label="Media fit"><InspectorPillGroup value={item.mediaFit ?? "cover"} options={opts(["cover", "contain"] as const)} onChange={(value) => updateItem({ mediaFit: value })} ariaLabel={`Grid item ${index + 1} media fit`} /></InspectorFieldRow>
-      <InspectorFieldRow label="Text alignment"><InspectorPillGroup value={item.textAlign ?? "left"} options={opts(["left", "center", "right"] as const)} onChange={(value) => updateItem({ textAlign: value })} ariaLabel={`Grid item ${index + 1} text alignment`} /></InspectorFieldRow>
-      <InspectorFieldRow label="Title element"><InspectorSelect value={item.titleElement ?? "h3"} options={opts(["h2", "h3", "h4", "div"] as const)} onChange={(value) => updateItem({ titleElement: value })} ariaLabel={`Grid item ${index + 1} title element`} /></InspectorFieldRow>
-      <InspectorFieldRow label="Title style"><InspectorSelect value={item.titleStyle ?? "inherit"} options={opts(["inherit", "h3", "h4", "h5"] as const)} onChange={(value) => updateItem({ titleStyle: value })} ariaLabel={`Grid item ${index + 1} title style`} /></InspectorFieldRow>
-      <InspectorFieldRow label="Action style"><InspectorPillGroup value={item.actionStyle ?? "primary"} options={opts(["default", "primary", "secondary", "text"] as const)} onChange={(value) => updateItem({ actionStyle: value })} ariaLabel={`Grid item ${index + 1} action style`} /></InspectorFieldRow>
-      <InspectorFieldRow label="Action size"><InspectorPillGroup value={item.actionSize ?? "default"} options={opts(["small", "default", "large"] as const)} onChange={(value) => updateItem({ actionSize: value })} ariaLabel={`Grid item ${index + 1} action size`} /></InspectorFieldRow>
-    </div>
-  </div>;
-}
 
 export function GridCapabilityPanel({ block, tab, update }: Props) {
   const items = block.gridItems ?? [];
+  const copySequenceRef = useRef(0);
   const updateItems = (next: GridItem[]) => update({ gridItems: next });
-  if (tab === "content") return <div className="builder-inspector-stack" data-uikit-capability="grid-content"><InspectorSection title="Grid content" description="Manage the collection and each item’s content."><InspectorFieldRow label="Source"><InspectorPillGroup value={block.gridSource ?? "static"} options={opts(["static", "products"] as const)} onChange={(value) => update({ gridSource: value })} ariaLabel="Grid source" /></InspectorFieldRow><InspectorFieldRow label="Show image"><InspectorSwitch checked={block.gridShowImage !== false} onChange={(checked) => update({ gridShowImage: checked })} label="Show image" /></InspectorFieldRow><InspectorFieldRow label="Show eyebrow"><InspectorSwitch checked={block.gridShowEyebrow !== false} onChange={(checked) => update({ gridShowEyebrow: checked })} label="Show eyebrow" /></InspectorFieldRow><InspectorFieldRow label="Show meta"><InspectorSwitch checked={block.gridShowMeta !== false} onChange={(checked) => update({ gridShowMeta: checked })} label="Show meta" /></InspectorFieldRow><InspectorFieldRow label="Show body"><InspectorSwitch checked={block.gridShowText !== false} onChange={(checked) => update({ gridShowText: checked })} label="Show body" /></InspectorFieldRow><InspectorFieldRow label="Show actions"><InspectorSwitch checked={block.gridShowButton === true} onChange={(checked) => update({ gridShowButton: checked })} label="Show actions" /></InspectorFieldRow></InspectorSection><InspectorSection title="Items" description={`${items.length} items`}><button type="button" className="builder-inline-add" onClick={() => updateItems([...items, { id: `grid-item-${Date.now().toString(36)}`, title: `Grid item ${items.length + 1}`, text: "Edit this item.", buttonLabel: "Learn more", buttonUrl: "/" }])}><Plus size={15} /> Add item</button>{items.map((item, index) => <GridItemEditor key={item.id ?? index} item={item} index={index} count={items.length} updateItem={(patch) => updateItems(items.map((entry, i) => i === index ? { ...entry, ...patch } : entry))} remove={() => updateItems(items.filter((_, i) => i !== index))} move={(direction) => { const next = [...items]; const target = index + direction; [next[index], next[target]] = [next[target], next[index]]; updateItems(next); }} />)}</InspectorSection></div>;
-  if (tab === "style") return <div className="builder-inspector-stack" data-uikit-capability="grid-style"><InspectorSection title="Grid layout"><InspectorFieldRow label="Columns"><InspectorSelect value={String(block.columns ?? 3)} options={[1, 2, 3, 4, 5, 6].map((value) => ({ value: String(value), label: String(value) }))} onChange={(value) => update({ columns: Number(value) })} ariaLabel="Grid columns" /></InspectorFieldRow><InspectorFieldRow label="Gutter"><InspectorPillGroup value={block.gridGap ?? "medium"} options={opts(["none", "small", "medium", "large", "max"] as const)} onChange={(value) => update({ gridGap: value })} ariaLabel="Grid gutter" /></InspectorFieldRow><InspectorFieldRow label="Row gap"><InspectorPillGroup value={block.gridRowGap ?? block.gridGap ?? "medium"} options={opts(["none", "small", "medium", "large"] as const)} onChange={(value) => update({ gridRowGap: value })} ariaLabel="Grid row gap" /></InspectorFieldRow><InspectorFieldRow label="Rows"><InspectorSelect value={String(block.gridRows ?? 1)} options={[1, 2, 3, 4, 5, 6].map((value) => ({ value: String(value), label: String(value) }))} onChange={(value) => update({ gridRows: Number(value) })} ariaLabel="Grid rows" /></InspectorFieldRow><InspectorFieldRow label="Stacking"><InspectorPillGroup value={block.gridStacking ?? "inherit"} options={opts(["inherit", "stack"] as const)} onChange={(value) => update({ gridStacking: value })} ariaLabel="Grid stacking" /></InspectorFieldRow></InspectorSection><InspectorSection title="Default card mapping"><InspectorFieldRow label="Item renderer"><InspectorPillGroup value={block.gridItemRenderer ?? "plain"} options={opts(["plain", "card"] as const)} onChange={(value) => update({ gridItemRenderer: value })} ariaLabel="Grid item renderer" /></InspectorFieldRow>{block.gridItemRenderer === "card" && <><InspectorFieldRow label="Card variant"><InspectorPillGroup value={block.gridCardVariant ?? "default"} options={opts(["default", "primary", "secondary", "blank"] as const)} onChange={(value) => update({ gridCardVariant: value })} ariaLabel="Grid card variant" /></InspectorFieldRow><InspectorFieldRow label="Card size"><InspectorPillGroup value={block.gridCardSize ?? "default"} options={opts(["small", "default", "large"] as const)} onChange={(value) => update({ gridCardSize: value })} ariaLabel="Grid card size" /></InspectorFieldRow><InspectorFieldRow label="Card hover"><InspectorSwitch checked={block.gridCardHover === true} onChange={(checked) => update({ gridCardHover: checked })} label="Enable card hover" /></InspectorFieldRow></>}</InspectorSection></div>;
+  const reorderItems = (sourceIndex: number, targetIndex: number) => {
+    if (sourceIndex < 0 || targetIndex < 0 || sourceIndex === targetIndex || sourceIndex >= items.length || targetIndex >= items.length) return;
+    const next = [...items];
+    const [moved] = next.splice(sourceIndex, 1);
+    next.splice(targetIndex, 0, moved);
+    updateItems(next);
+  };
+
+  const removeItem = (index: number) => updateItems(items.filter((_, itemIndex) => itemIndex !== index));
+
+  const copyItem = (index: number) => {
+    const source = items[index];
+    if (!source) return;
+    let id = "";
+    do {
+      copySequenceRef.current += 1;
+      id = `grid-item-copy-${copySequenceRef.current}`;
+    } while (items.some((item) => item.id === id));
+    const copy = { ...source, id, title: source.title ? `${source.title} Copy` : "Copy of item" };
+    const next = [...items];
+    next.splice(index + 1, 0, copy);
+    updateItems(next);
+    return id;
+  };
+
+  if (tab === "content") return (
+    <div className="builder-inspector-stack" data-uikit-capability="grid-content">
+      <InspectorSection title="Grid content" description="Manage the collection and each item’s content.">
+        <InspectorFieldRow label="Source"><InspectorPillGroup value={block.gridSource ?? "static"} options={opts(["static", "products"] as const)} onChange={(value) => update({ gridSource: value })} ariaLabel="Grid source" /></InspectorFieldRow>
+        <InspectorFieldRow label="Show image"><InspectorSwitch checked={block.gridShowImage !== false} onChange={(checked) => update({ gridShowImage: checked })} label="Show image" /></InspectorFieldRow>
+        <InspectorFieldRow label="Show eyebrow"><InspectorSwitch checked={block.gridShowEyebrow !== false} onChange={(checked) => update({ gridShowEyebrow: checked })} label="Show eyebrow" /></InspectorFieldRow>
+        <InspectorFieldRow label="Show meta"><InspectorSwitch checked={block.gridShowMeta !== false} onChange={(checked) => update({ gridShowMeta: checked })} label="Show meta" /></InspectorFieldRow>
+        <InspectorFieldRow label="Show body"><InspectorSwitch checked={block.gridShowText !== false} onChange={(checked) => update({ gridShowText: checked })} label="Show body" /></InspectorFieldRow>
+        <InspectorFieldRow label="Show actions"><InspectorSwitch checked={block.gridShowButton === true} onChange={(checked) => update({ gridShowButton: checked })} label="Show actions" /></InspectorFieldRow>
+      </InspectorSection>
+      <InspectorSection title="Items" description={`${items.length} items`}>
+        <RepeatableItemShell
+          items={items}
+          getItemKey={(item, index) => item.id ?? index}
+          itemLabel="Item"
+          itemDataAttribute="data-grid-item-id"
+          addPosition="before"
+          getItemSummary={(item) => item.title || "Untitled item"}
+          onAdd={() => {
+            const id = `grid-item-${Date.now().toString(36)}`;
+            updateItems([...items, { id, title: `Grid item ${items.length + 1}`, text: "Edit this item.", buttonLabel: "Learn more", buttonUrl: "/" }]);
+            return id;
+          }}
+          onCopy={copyItem}
+          onDelete={removeItem}
+          onReorder={reorderItems}
+          renderItem={(item, index) => <>
+            <InspectorFieldRow label="Image"><InspectorTextField value={item.imageUrl ?? ""} onChange={(value) => updateItems(items.map((entry, itemIndex) => itemIndex === index ? { ...entry, imageUrl: value } : entry))} ariaLabel={`Grid item ${index + 1} image`} /></InspectorFieldRow>
+            <InspectorFieldRow label="Alt text"><InspectorTextField value={item.imageAlt ?? ""} onChange={(value) => updateItems(items.map((entry, itemIndex) => itemIndex === index ? { ...entry, imageAlt: value } : entry))} ariaLabel={`Grid item ${index + 1} alt`} /></InspectorFieldRow>
+            <InspectorFieldRow label="Eyebrow"><InspectorTextField value={item.eyebrow ?? ""} onChange={(value) => updateItems(items.map((entry, itemIndex) => itemIndex === index ? { ...entry, eyebrow: value } : entry))} ariaLabel={`Grid item ${index + 1} eyebrow`} /></InspectorFieldRow>
+            <InspectorFieldRow label="Title"><InspectorTextField value={item.title ?? ""} onChange={(value) => updateItems(items.map((entry, itemIndex) => itemIndex === index ? { ...entry, title: value } : entry))} ariaLabel={`Grid item ${index + 1} title`} /></InspectorFieldRow>
+            <InspectorFieldRow label="Meta"><InspectorTextField value={item.meta ?? ""} onChange={(value) => updateItems(items.map((entry, itemIndex) => itemIndex === index ? { ...entry, meta: value } : entry))} ariaLabel={`Grid item ${index + 1} meta`} /></InspectorFieldRow>
+            <InspectorFieldRow label="Body"><InspectorTextarea value={item.text ?? ""} onChange={(value) => updateItems(items.map((entry, itemIndex) => itemIndex === index ? { ...entry, text: value } : entry))} ariaLabel={`Grid item ${index + 1} body`} /></InspectorFieldRow>
+            <InspectorFieldRow label="Icon">
+              <IconPicker
+                value={item.iconName}
+                onChange={(value) => updateItems(items.map((entry, itemIndex) => itemIndex === index ? { ...entry, iconName: value } : entry))}
+                onClear={() => updateItems(items.map((entry, itemIndex) => itemIndex === index ? { ...entry, iconName: undefined } : entry))}
+                ariaLabel={`Grid item ${index + 1} icon`}
+              />
+            </InspectorFieldRow>
+            <InspectorFieldRow label="Icon size"><InspectorSelect value={String(item.iconSize ?? 20)} options={[12, 14, 16, 20, 24, 28, 32].map((value) => ({ value: String(value), label: `${value}px` }))} onChange={(value) => updateItems(items.map((entry, itemIndex) => itemIndex === index ? { ...entry, iconSize: Number(value) } : entry))} ariaLabel={`Grid item ${index + 1} icon size`} /></InspectorFieldRow>
+            <InspectorFieldRow label="Action label"><InspectorTextField value={item.buttonLabel ?? ""} onChange={(value) => updateItems(items.map((entry, itemIndex) => itemIndex === index ? { ...entry, buttonLabel: value } : entry))} ariaLabel={`Grid item ${index + 1} action label`} /></InspectorFieldRow>
+            <InspectorFieldRow label="Action URL"><InspectorTextField value={item.buttonUrl ?? ""} onChange={(value) => updateItems(items.map((entry, itemIndex) => itemIndex === index ? { ...entry, buttonUrl: value } : entry))} ariaLabel={`Grid item ${index + 1} action URL`} /></InspectorFieldRow>
+            <InspectorFieldRow label="Action target"><InspectorSelect value={item.buttonTarget ?? "_self"} options={targets} onChange={(value) => updateItems(items.map((entry, itemIndex) => itemIndex === index ? { ...entry, buttonTarget: value } : entry))} ariaLabel={`Grid item ${index + 1} action target`} /></InspectorFieldRow>
+            <InspectorFieldRow label="Media placement"><InspectorPillGroup value={item.mediaPlacement ?? "top"} options={opts(["top", "left", "right"] as const)} onChange={(value) => updateItems(items.map((entry, itemIndex) => itemIndex === index ? { ...entry, mediaPlacement: value } : entry))} ariaLabel={`Grid item ${index + 1} media placement`} /></InspectorFieldRow>
+            <InspectorFieldRow label="Media ratio"><InspectorSelect value={item.mediaRatio ?? "natural"} options={opts(["natural", "square", "4:3", "3:2", "16:9", "portrait"] as const)} onChange={(value) => updateItems(items.map((entry, itemIndex) => itemIndex === index ? { ...entry, mediaRatio: value } : entry))} ariaLabel={`Grid item ${index + 1} media ratio`} /></InspectorFieldRow>
+            <InspectorFieldRow label="Media fit"><InspectorPillGroup value={item.mediaFit ?? "cover"} options={opts(["cover", "contain"] as const)} onChange={(value) => updateItems(items.map((entry, itemIndex) => itemIndex === index ? { ...entry, mediaFit: value } : entry))} ariaLabel={`Grid item ${index + 1} media fit`} /></InspectorFieldRow>
+            <InspectorFieldRow label="Text alignment"><InspectorPillGroup value={item.textAlign ?? "left"} options={opts(["left", "center", "right"] as const)} onChange={(value) => updateItems(items.map((entry, itemIndex) => itemIndex === index ? { ...entry, textAlign: value } : entry))} ariaLabel={`Grid item ${index + 1} text alignment`} /></InspectorFieldRow>
+            <InspectorFieldRow label="Title element"><InspectorSelect value={item.titleElement ?? "h3"} options={opts(["h2", "h3", "h4", "div"] as const)} onChange={(value) => updateItems(items.map((entry, itemIndex) => itemIndex === index ? { ...entry, titleElement: value } : entry))} ariaLabel={`Grid item ${index + 1} title element`} /></InspectorFieldRow>
+            <InspectorFieldRow label="Title style"><InspectorSelect value={item.titleStyle ?? "inherit"} options={opts(["inherit", "h3", "h4", "h5"] as const)} onChange={(value) => updateItems(items.map((entry, itemIndex) => itemIndex === index ? { ...entry, titleStyle: value } : entry))} ariaLabel={`Grid item ${index + 1} title style`} /></InspectorFieldRow>
+            <InspectorFieldRow label="Action style"><InspectorPillGroup value={item.actionStyle ?? "primary"} options={opts(["default", "primary", "secondary", "text"] as const)} onChange={(value) => updateItems(items.map((entry, itemIndex) => itemIndex === index ? { ...entry, actionStyle: value } : entry))} ariaLabel={`Grid item ${index + 1} action style`} /></InspectorFieldRow>
+            <InspectorFieldRow label="Action size"><InspectorPillGroup value={item.actionSize ?? "default"} options={opts(["small", "default", "large"] as const)} onChange={(value) => updateItems(items.map((entry, itemIndex) => itemIndex === index ? { ...entry, actionSize: value } : entry))} ariaLabel={`Grid item ${index + 1} action size`} /></InspectorFieldRow>
+          </>}
+        />
+      </InspectorSection>
+    </div>
+  );
+  if (tab === "style") return <div className="builder-inspector-stack" data-uikit-capability="grid-style"><InspectorSection title="Grid layout"><InspectorFieldRow label="Columns"><InspectorSelect value={String(block.columns ?? 3)} options={[1, 2, 3, 4, 5, 6].map((value) => ({ value: String(value), label: String(value) }))} onChange={(value) => update({ columns: Number(value) })} ariaLabel="Grid columns" /></InspectorFieldRow><InspectorFieldRow label="Gutter"><InspectorPillGroup value={block.gridGap ?? "medium"} options={opts(["none", "small", "medium", "large", "max"] as const)} onChange={(value) => update({ gridGap: value })} ariaLabel="Grid gutter" /></InspectorFieldRow><InspectorFieldRow label="Row gap"><InspectorPillGroup value={block.gridRowGap ?? block.gridGap ?? "medium"} options={opts(["none", "small", "medium", "large"] as const)} onChange={(value) => update({ gridRowGap: value })} ariaLabel="Grid row gap" /></InspectorFieldRow><InspectorFieldRow label="Rows"><InspectorSelect value={String(block.gridRows ?? 1)} options={[1, 2, 3, 4, 5, 6].map((value) => ({ value: String(value), label: String(value) }))} onChange={(value) => update({ gridRows: Number(value) })} ariaLabel="Grid rows" /></InspectorFieldRow><InspectorFieldRow label="Stacking"><InspectorPillGroup value={block.gridStacking ?? "inherit"} options={opts(["inherit", "stack"] as const)} onChange={(value) => update({ gridStacking: value })} ariaLabel="Grid stacking" /></InspectorFieldRow></InspectorSection><InspectorSection title="Default card mapping"><InspectorFieldRow label="Item renderer"><InspectorPillGroup value={block.gridItemRenderer ?? "plain"} options={opts(["plain", "card"] as const)} onChange={(value) => update({ gridItemRenderer: value })} ariaLabel="Grid item renderer" /></InspectorFieldRow>{block.gridItemRenderer === "card" && <><InspectorFieldRow label="Card variant"><InspectorPillGroup value={block.gridCardVariant ?? "default"} options={opts(["default", "primary", "secondary", "blank"] as const)} onChange={(value) => update({ gridCardVariant: value })} ariaLabel="Grid card variant" /></InspectorFieldRow><InspectorFieldRow label="Card size"><InspectorPillGroup value={block.gridCardSize ?? "default"} options={opts(["small", "default", "large"] as const)} onChange={(value) => update({ gridCardSize: value })} ariaLabel="Grid card size" /></InspectorFieldRow><InspectorFieldRow label="Card hover"><InspectorSwitch checked={block.gridCardHover === true} onChange={(checked) => update({ gridCardHover: checked })} label="Enable card hover" /></InspectorFieldRow></>}</InspectorSection><InspectorSection title="Default action mapping" description="Applies to every Grid action unless an item override is set."><InspectorFieldRow label="Button variant"><InspectorPillGroup value={block.buttonStyle ?? "primary"} options={opts(UIKIT_BUTTON_CAPABILITY.properties.variant.values)} onChange={(value) => update({ buttonStyle: value })} ariaLabel="Grid button variant" /></InspectorFieldRow><InspectorFieldRow label="Button size"><InspectorPillGroup value={block.size ?? "default"} options={opts(UIKIT_BUTTON_CAPABILITY.properties.size.values)} onChange={(value) => update({ size: value })} ariaLabel="Grid button size" /></InspectorFieldRow></InspectorSection></div>;
   if (tab === "behavior") return <div className="builder-inspector-stack" data-uikit-capability="grid-behavior"><InspectorSection title="Behavior"><InspectorFieldRow label="Item actions"><InspectorSwitch checked={block.gridShowButton === true} onChange={(checked) => update({ gridShowButton: checked })} label="Show item actions" /></InspectorFieldRow></InspectorSection></div>;
   return <div className="builder-inspector-stack" data-uikit-capability="grid-advanced"><InspectorSection title="Advanced"><p className="inspector-help-text">Global Styles and the shared Card adapter remain authoritative for visual tokens.</p></InspectorSection></div>;
 }

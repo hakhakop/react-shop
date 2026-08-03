@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { waitForSeededBuilderLayout } from "./builderFixture";
 
 const builderUrl = "/app/websites/header-parity-site/builder?page=home";
 const email = "header-parity-20260722@example.test";
@@ -15,7 +16,7 @@ test.beforeEach(async ({ page }) => {
 
 test("button inspector exposes semantic UIkit variant and size controls", async ({ page }) => {
   await page.goto(builderUrl);
-  await expect(page.locator(".builder-preview-shell").first()).toBeVisible();
+  await waitForSeededBuilderLayout(page);
   await page.locator(".builder-sidebar-nav-tile", { hasText: "Blocks" }).first().click();
   await page.locator(".builder-element-library-search input").fill("button");
   const buttonCard = page.locator(".builder-element-library-card").filter({ has: page.getByText("Button", { exact: true }) }).first();

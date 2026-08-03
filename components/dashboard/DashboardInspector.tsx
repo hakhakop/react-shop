@@ -1696,7 +1696,15 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
             ["behavior", "Behavior"],
             ["advanced", t("builder.inspector.advanced")],
           ]
-        : blockTabs;
+      : blockTabs;
+
+  const usesGeneralSettings =
+    ["heading", "text", "button"].includes(selectedLayoutBlock?.kind ?? "") ||
+    (selectedLayoutBlock?.kind === "image" && selectedSection?.id !== "header-document");
+  if (usesGeneralSettings) {
+    const styleTabIndex = canonicalBlockTabs.findIndex(([tab]) => tab === "style");
+    if (styleTabIndex >= 0) canonicalBlockTabs[styleTabIndex] = ["style", "Settings"];
+  }
 
   const inspectorTabs: [InspectorTab, string][] = selectedLayoutBlock
     ? canonicalBlockTabs
@@ -2931,22 +2939,23 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
             <ImageCapabilityPanel
               block={selectedLayoutBlock}
               tab={inspectorTab}
+              shellSettings={shellSettings}
               update={updateSelectedLayoutBlockByKey}
               openWordPressMediaPicker={openWordPressMediaPicker}
             />
           )}
 
           {selectedLayoutBlock?.kind === "button" && (
-            <ButtonCapabilityPanel block={selectedLayoutBlock} tab={inspectorTab} update={updateSelectedLayoutBlockByKey} />
+            <ButtonCapabilityPanel block={selectedLayoutBlock} tab={inspectorTab} shellSettings={shellSettings} update={updateSelectedLayoutBlockByKey} />
           )}
           {selectedLayoutBlock?.kind === "panel" && (
             <PanelCapabilityPanel block={selectedLayoutBlock} tab={inspectorTab} update={updateSelectedLayoutBlockByKey} />
           )}
           {selectedLayoutBlock?.kind === "heading" && (
-            <HeadingCapabilityPanel block={selectedLayoutBlock} tab={inspectorTab} update={updateSelectedLayoutBlockByKey} />
+            <HeadingCapabilityPanel block={selectedLayoutBlock} tab={inspectorTab} shellSettings={shellSettings} update={updateSelectedLayoutBlockByKey} />
           )}
           {selectedLayoutBlock?.kind === "text" && (
-            <TextCapabilityPanel block={selectedLayoutBlock} tab={inspectorTab} update={updateSelectedLayoutBlockByKey} />
+            <TextCapabilityPanel block={selectedLayoutBlock} tab={inspectorTab} shellSettings={shellSettings} update={updateSelectedLayoutBlockByKey} />
           )}
           {selectedLayoutBlock?.kind === "list" && (
             <ListCapabilityPanel block={selectedLayoutBlock} tab={inspectorTab} update={updateSelectedLayoutBlockByKey} />
@@ -3296,6 +3305,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                           <ButtonCapabilityPanel
                             block={selectedLayoutBlock}
                             tab={inspectorTab}
+                            shellSettings={shellSettings}
                             update={updateSelectedLayoutBlockByKey}
                           />
                         ) : selectedLayoutBlock.kind === "panel" ? (
@@ -3308,12 +3318,14 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                           <HeadingCapabilityPanel
                             block={selectedLayoutBlock}
                             tab={inspectorTab}
+                            shellSettings={shellSettings}
                             update={updateSelectedLayoutBlockByKey}
                           />
                         ) : selectedLayoutBlock.kind === "text" ? (
                           <TextCapabilityPanel
                             block={selectedLayoutBlock}
                             tab={inspectorTab}
+                            shellSettings={shellSettings}
                             update={updateSelectedLayoutBlockByKey}
                           />
                         ) : selectedLayoutBlock.kind === "list" ? (

@@ -7,6 +7,7 @@ import TypewriterText from "@/components/builder/TypewriterText";
 import BuilderLineBreakText from "@/components/builder/BuilderLineBreakText";
 import UikitAccordion from "@/components/builder/UikitAccordion";
 import UikitText from "@/components/builder/UikitText";
+import { WebPagesIcon } from "@/components/builder/WebPagesIcon";
 import {
   ArrowRight,
   CalendarDays,
@@ -96,6 +97,7 @@ import {
   type BuilderSpacingContext,
 } from "@/lib/builderSpacing";
 import { builderButtonOverrideCssVars } from "@/lib/builderButtons";
+import { resolveUikitIconName } from "@/lib/uikitIconRegistry";
 import {
   getBuilderImageAspectRatio,
   getBuilderImageObjectFit,
@@ -1368,15 +1370,26 @@ function RenderChecklist({
   colorScheme = "default",
   typography,
   iconSize = 15,
+  renderWithUikit = false,
 }: {
   items?: string[];
   iconName?: string;
   colorScheme?: string;
   typography?: any;
   iconSize?: number;
+  renderWithUikit?: boolean;
 }) {
   if (!items || items.length === 0) return null;
   const isGradientCycle = colorScheme === "gradient-cycle";
+  const legacyIcon = {
+    check: <Check size={iconSize} />,
+    circleCheck: <CircleCheck size={iconSize} />,
+    arrowRight: <ArrowRight size={iconSize} />,
+    star: <Star size={iconSize} />,
+    heart: <Heart size={iconSize} />,
+    sparkles: <Sparkles size={iconSize} />,
+    shield: <ShieldCheck size={iconSize} />,
+  }[iconName] ?? <Check size={iconSize} />;
   return (
     <ul
       className={`shop-builder-column-block--list-items ${isGradientCycle ? "is-icon-gradient-cycle" : ""}`}
@@ -1398,15 +1411,11 @@ function RenderChecklist({
             fontSize: "0.95rem",
           }}
         >
-          {{
-            check: <Check size={iconSize} />,
-            circleCheck: <CircleCheck size={iconSize} />,
-            arrowRight: <ArrowRight size={iconSize} />,
-            star: <Star size={iconSize} />,
-            heart: <Heart size={iconSize} />,
-            sparkles: <Sparkles size={iconSize} />,
-            shield: <ShieldCheck size={iconSize} />,
-          }[iconName] ?? <Check size={iconSize} />}
+          {renderWithUikit && resolveUikitIconName(iconName) ? (
+            <WebPagesIcon name={iconName} size={iconSize} />
+          ) : (
+            legacyIcon
+          )}
           <Typog as="span" typography={typography}>
             {item}
           </Typog>
@@ -1451,6 +1460,8 @@ function GridCards({
     listIcon?: string;
     listIconColorScheme?: string;
     listIconSize?: number;
+    iconName?: string;
+    iconSize?: number;
   }>;
 }) {
   const limit = Math.max(1, (block.columns ?? 3) * (block.gridRows ?? 1));
@@ -1532,6 +1543,7 @@ function GridCards({
             </div>
           )}
           <div className={`${isCard ? "uk-card-body " : ""}shop-builder-grid-content`}>
+            {item.iconName && <WebPagesIcon name={item.iconName} size={item.iconSize ?? 20} />}
             {block.gridShowEyebrow !== false && item.eyebrow && (
               <Typog
                 as="span"
@@ -1554,7 +1566,13 @@ function GridCards({
               </Typog>
             )}
             {block.gridShowMeta !== false && item.meta && (
-              <small>{item.meta}</small>
+              <Typog
+                as="small"
+                area="body"
+                typography={item.typography ?? block.typography}
+              >
+                {item.meta}
+              </Typog>
             )}
             {block.gridShowText !== false && item.text && (
               <Typog as="p" typography={item.typography ?? block.typography} area="body">
@@ -1577,7 +1595,7 @@ function GridCards({
                   className={`shop-builder-grid-button shop-builder-grid-button--${item.buttonAlign ?? "left"}`}
                 >
                 <a
-                  className={`shop-builder-grid-action ${getUikitButtonClass(item.actionStyle ?? item.buttonStyle ?? "primary", item.actionSize ?? "default")}`}
+                  className={`shop-builder-grid-action ${getUikitButtonClass(item.actionStyle ?? item.buttonStyle ?? block.buttonStyle ?? "primary", item.actionSize ?? block.size ?? "default")}`}
                   href={item.buttonUrl}
                   target={item.buttonTarget === "_blank" ? "_blank" : undefined}
                   rel={item.buttonTarget === "_blank" ? "noreferrer" : undefined}
@@ -1908,14 +1926,11 @@ function ProductDynamicBlock({
   return null;
 }
 
-function GoodieIcon({ iconName }: { iconName: string | undefined }) {
-  if (iconName === "heart") return <Heart size={24} />;
-  if (iconName === "truck") return <Truck size={24} />;
-  if (iconName === "shield") return <ShieldCheck size={24} />;
-  return <Sparkles size={24} />;
+function GoodieIcon({ iconName, size = 24 }: { iconName: string | undefined; size?: number }) {
+  return <WebPagesIcon name={iconName} size={size} />;
 }
 
-function ContentLayoutBlock({
+export function ContentLayoutBlock({
   block,
   product,
   breadcrumbItems,
@@ -1929,7 +1944,7 @@ function ContentLayoutBlock({
   block: BuilderLayoutBlock;
   product?: StorefrontBuilderProduct;
   breadcrumbItems: { label: string; href?: string }[];
-  page: BuilderLayoutKey;
+  page?: BuilderLayoutKey;
   pageContent?: ReactNode;
   categoryTree?: CategoryTreeItem[];
   activeCategorySlug?: string | null;
@@ -1943,13 +1958,19 @@ function ContentLayoutBlock({
           items={block.accordionItems ?? []}
           multiple={block.accordionMultiple}
           collapsible={block.accordionCollapsible}
-         active={block.accordionOpenItems}
+          active={block.accordionOpenItems}
+          style={block.accordionStyle}
           indicator={block.accordionIndicator}
           indicatorPosition={block.accordionIndicatorPosition}
-          rowStyle={block.accordionRowStyle}
-          spacing={block.accordionSpacing}
           titleEmphasis={block.accordionTitleEmphasis}
-          openEmphasis={block.accordionOpenEmphasis}
+          itemSpacing={block.accordionItemSpacing}
+          contentSpacing={block.accordionContentSpacing}
+          divider={block.accordionDivider}
+          titleStyle={block.accordionTitleStyle}
+          contentStyle={block.accordionContentStyle}
+          legacyRowStyle={block.accordionRowStyle}
+          legacySpacing={block.accordionSpacing}
+          legacyOpenEmphasis={block.accordionOpenEmphasis}
         />
       </div>
     );
@@ -2249,7 +2270,7 @@ function ContentLayoutBlock({
   if (block.kind === "icon") {
     return (
       <div className="shop-builder-column-block shop-builder-column-block--icon">
-        <GoodieIcon iconName={block.iconName} />
+        <GoodieIcon iconName={block.iconName} size={block.iconSize ?? block.listIconSize ?? 28} />
         {block.title && (
           <Typog as="h3" typography={block.typography}>
             <BuilderLineBreakText text={block.title} />
@@ -2276,7 +2297,10 @@ function ContentLayoutBlock({
         )}
         <ul className={listClass}>
           {listItems.map((item) => (
-            <li key={item.id}>
+            <li key={item.id} className="webpages-list-item">
+              {resolveUikitIconName(item.iconName ?? block.listIcon) && (
+                <WebPagesIcon name={item.iconName ?? block.listIcon} size={item.iconSize ?? block.listIconSize ?? 16} />
+              )}
               {item.url ? <a href={item.url} target={item.target === "_blank" ? "_blank" : undefined} rel={item.target === "_blank" ? "noreferrer" : undefined}>{item.text}</a> : item.text}
             </li>
           ))}
@@ -3214,15 +3238,15 @@ function blockLegacyGridMargin(block: BuilderLayoutBlock) {
 
 const HAS_RICH_TEXT_HTML = /<[a-z][\s\S]*>/i;
 
-function isRichPreviewText(value: string | null | undefined) {
+export function isRichPreviewText(value: string | null | undefined) {
   return typeof value === "string" && HAS_RICH_TEXT_HTML.test(value);
 }
 
-function getRichTextSafeTag(tag: string) {
+export function getRichTextSafeTag(tag: string) {
   return tag === "p" ? "div" : tag;
 }
 
-function buttonTypographyStyle(
+export function buttonTypographyStyle(
   className: string | undefined,
   style: CSSProperties | undefined,
 ) {
@@ -3232,7 +3256,7 @@ function buttonTypographyStyle(
   return buttonSafeStyle;
 }
 
-function Typog({
+export function Typog({
   as: As = "div",
   area,
   typography,
@@ -3273,7 +3297,7 @@ function Typog({
   );
 }
 
-function BodyText({
+export function BodyText({
   children,
   className,
 }: {

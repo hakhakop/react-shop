@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { waitForSeededBuilderLayout } from "./builderFixture";
 
 const email = "header-parity-20260722@example.test";
 const password = "HeaderParity!2026";
@@ -16,6 +17,7 @@ test.beforeEach(async ({ page }) => {
 
 test("Panel inspector exposes semantic instance controls and keeps builder/frontend parity", async ({ page, context }) => {
   await page.goto(builderUrl);
+  await waitForSeededBuilderLayout(page);
   await page.locator(".builder-sidebar-nav-tile", { hasText: "Blocks" }).first().click();
   await page.locator(".builder-element-library-search input").fill("panel");
   const panelCard = page.locator(".builder-element-library-card").filter({ has: page.locator("strong", { hasText: /^Panel$/ }) }).first();
@@ -38,13 +40,13 @@ test("Panel inspector exposes semantic instance controls and keeps builder/front
   await inspector.getByRole("button", { name: "Layout", exact: true }).click();
   const layout = inspector.locator('[data-uikit-capability="panel-layout"]');
   await expect(layout.locator('[data-uikit-capability="panel-media"]')).toBeVisible();
-  await layout.locator("label.builder-field", { hasText: "Placement" }).locator("select").selectOption("left");
-  await layout.locator("label.builder-field", { hasText: "Aspect ratio" }).locator("select").selectOption("square");
-  await layout.locator("label.builder-field", { hasText: "Fit" }).locator("select").selectOption("contain");
-  await layout.locator("label.builder-field", { hasText: "Side media width" }).locator("select").selectOption("large");
-  await layout.locator("label.builder-field", { hasText: "Text alignment" }).locator("select").selectOption("center");
-  await layout.locator("label.builder-field", { hasText: "Title element" }).locator("select").selectOption("h2");
-  await layout.locator("label.builder-field", { hasText: "Content width" }).locator("select").selectOption("medium");
+  await layout.getByRole("radiogroup", { name: "Media placement" }).getByRole("radio", { name: "Left" }).click();
+  await layout.getByLabel("Media aspect ratio", { exact: true }).selectOption("square");
+  await layout.getByRole("radiogroup", { name: "Media fit" }).getByRole("radio", { name: "Contain" }).click();
+  await layout.getByLabel("Side media width", { exact: true }).selectOption("large");
+  await layout.getByRole("radiogroup", { name: "Text alignment" }).getByRole("radio", { name: "Center" }).click();
+  await layout.getByLabel("Title element", { exact: true }).selectOption("h2");
+  await layout.getByLabel("Content width", { exact: true }).selectOption("medium");
 
   const panel = selectedBlock.locator(".shop-builder-column-block--panel");
   await expect(panel).toHaveClass(/shop-builder-panel--media-left/);
@@ -53,10 +55,9 @@ test("Panel inspector exposes semantic instance controls and keeps builder/front
   await expect(panel.locator("h2")).toBeVisible();
 
   await inspector.getByRole("button", { name: "Styling", exact: true }).click();
-  await inspector.locator("label.builder-field", { hasText: "Variant" }).locator("select").selectOption("secondary");
-  await inspector.locator("label.builder-field", { hasText: "Size" }).locator("select").selectOption("large");
-  const hover = inspector.getByText("Hover card", { exact: true }).locator("..").locator("input");
-  await hover.check();
+  await inspector.getByRole("radiogroup", { name: "Panel variant" }).getByRole("radio", { name: "Secondary" }).click();
+  await inspector.getByRole("radiogroup", { name: "Panel size" }).getByRole("radio", { name: "Large" }).click();
+  await inspector.locator("label.inspector-switch", { hasText: "Hover card" }).click();
 
   const stored = await page.evaluate((id) => {
     const found: Record<string, unknown>[] = [];
@@ -80,7 +81,7 @@ test("Panel inspector exposes semantic instance controls and keeps builder/front
   await expect(page.locator(".builder-publish-celebration").getByText("Published successfully", { exact: true })).toBeVisible();
   const frontend = await context.newPage();
   await frontend.goto(previewUrl);
-  const frontendPanel = frontend.locator(".shop-builder-column-block--panel").filter({ has: frontend.locator("h2") }).first();
+  const frontendPanel = frontend.locator(`.shop-builder-column-block--panel[data-builder-block-id="${blockId}"]`);
   await expect(frontendPanel).toHaveClass(/shop-builder-panel--media-left/);
   await expect(frontendPanel).toHaveClass(/shop-builder-panel--media-width-large/);
   await expect(frontendPanel).toHaveClass(/uk-card-secondary/);

@@ -1,4 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
+import { waitForSeededBuilderLayout } from "./builderFixture";
 
 const email = "header-parity-20260722@example.test";
 const password = "HeaderParity!2026";
@@ -31,6 +32,7 @@ test.beforeEach(async ({ page }) => {
 
 test("Hero exposes semantic content/actions and keeps builder/frontend parity", async ({ page }) => {
   await page.goto(builderUrl);
+  await waitForSeededBuilderLayout(page);
   const inspector = await addBlock(page, "Hero");
   await expect(inspector.locator('[data-uikit-capability="hero-content"]')).toBeVisible();
   await inspector.getByLabel("Hero eyebrow").fill("Proof eyebrow");
@@ -64,12 +66,17 @@ test("Hero exposes semantic content/actions and keeps builder/frontend parity", 
 
 test("Grid supports item CRUD, layout controls, and shared card semantics", async ({ page }) => {
   await page.goto(builderUrl);
+  await waitForSeededBuilderLayout(page);
   const inspector = await addBlock(page, "Grid");
   await expect(inspector.locator('[data-uikit-capability="grid-content"]')).toBeVisible();
   const before = await inspector.locator("[data-grid-item-id]").count();
   await inspector.getByRole("button", { name: /Add item/ }).click();
   await expect(inspector.locator("[data-grid-item-id]")).toHaveCount(before + 1);
-  await inspector.locator("[data-grid-item-id]").first().getByRole("button", { name: "Remove grid item" }).click();
+  await inspector.locator("[data-grid-item-id]").first().getByRole("button", { name: "Copy grid item 1", exact: true }).click();
+  await expect(inspector.locator("[data-grid-item-id]")).toHaveCount(before + 2);
+  await inspector.locator("[data-grid-item-id]").nth(1).getByRole("button", { name: "Delete grid item 2", exact: true }).click();
+  await expect(inspector.locator("[data-grid-item-id]")).toHaveCount(before + 1);
+  await inspector.locator("[data-grid-item-id]").first().getByRole("button", { name: "Delete grid item 1", exact: true }).click();
   await expect(inspector.locator("[data-grid-item-id]")).toHaveCount(before);
   await inspector.getByRole("button", { name: /Add item/ }).click();
   await expect(inspector.locator("[data-grid-item-id]")).toHaveCount(before + 1);
@@ -77,10 +84,48 @@ test("Grid supports item CRUD, layout controls, and shared card semantics", asyn
   await inspector.getByLabel("Grid columns").selectOption("2");
   await inspector.getByLabel("Grid gutter").getByRole("radio").filter({ hasText: "Small" }).click();
   await inspector.getByLabel("Grid item renderer").getByRole("radio").filter({ hasText: "Card" }).click();
-  await expect(page.locator(".shop-builder-column-block--grid .uk-card").first()).toBeVisible();
+  await inspector.getByRole("radiogroup", { name: "Grid button variant" }).getByRole("radio", { name: "Secondary" }).click();
+  await inspector.getByRole("radiogroup", { name: "Grid button size" }).getByRole("radio", { name: "Large" }).click();
+  const builderGrid = page.locator(".builder-preview-layout-block.is-selected-block .shop-builder-column-block--grid");
+  await expect(builderGrid.locator(".uk-card").first()).toBeVisible();
+  const builderGridActions = builderGrid.locator(".shop-builder-grid-action");
+  await expect(builderGridActions.first()).toHaveClass(/uk-button-secondary/);
+  await expect(builderGridActions.first()).toHaveClass(/uk-button-large/);
+
+  await inspector.getByRole("button", { name: "Content", exact: true }).click();
+  await inspector.getByRole("radiogroup", { name: "Grid source" }).getByRole("radio", { name: "Products" }).click();
+  await expect.poll(() => builderGrid.locator(".shop-builder-grid-action").count()).toBeGreaterThan(0);
+  await inspector.getByRole("button", { name: "Styling", exact: true }).click();
+  const builderProductAction = builderGrid.locator(".shop-builder-grid-action").first();
+  const readButtonMetrics = (button: typeof builderProductAction) => button.evaluate((element) => {
+    const style = getComputedStyle(element);
+    return {
+      height: Number.parseFloat(style.height),
+      fontSize: Number.parseFloat(style.fontSize),
+      paddingX: Number.parseFloat(style.paddingLeft) + Number.parseFloat(style.paddingRight),
+    };
+  });
+  const sizes = {} as Record<"small" | "default" | "large", Awaited<ReturnType<typeof readButtonMetrics>>>;
+  for (const value of ["small", "default", "large"] as const) {
+    await inspector.getByRole("radiogroup", { name: "Grid button size" }).getByRole("radio", { name: value.replace(/\b\w/g, (letter) => letter.toUpperCase()) }).click();
+    sizes[value] = await readButtonMetrics(builderProductAction);
+  }
+  await expect(builderProductAction).toHaveClass(/uk-button-secondary/);
+  await expect(builderProductAction).toHaveClass(/uk-button-large/);
+  expect(sizes.small.height).toBeLessThan(sizes.default.height);
+  expect(sizes.default.height).toBeLessThan(sizes.large.height);
+  expect(sizes.small.paddingX).toBeLessThan(sizes.default.paddingX);
+  expect(sizes.default.paddingX).toBeLessThan(sizes.large.paddingX);
   await page.getByRole("button", { name: "Publish", exact: true }).click();
   await expect(page.locator(".builder-publish-celebration").getByText("Published successfully", { exact: true })).toBeVisible();
   const frontend = await page.context().newPage();
   await frontend.goto("/app/websites/header-parity-site/preview?page=home");
-  await expect(frontend.locator(".shop-builder-column-block--grid .uk-card").first()).toBeVisible();
+  const frontendGrid = frontend.locator(".shop-builder-column-block--grid").filter({
+    has: frontend.locator(".shop-builder-grid-action.uk-button-secondary.uk-button-large"),
+  }).first();
+  await expect(frontendGrid.locator(".uk-card").first()).toBeVisible();
+  const frontendProductAction = frontendGrid.locator(".shop-builder-grid-action").first();
+  await expect(frontendProductAction).toHaveClass(/uk-button-secondary/);
+  await expect(frontendProductAction).toHaveClass(/uk-button-large/);
+  expect(await readButtonMetrics(frontendProductAction)).toEqual(sizes.large);
 });

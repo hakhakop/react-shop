@@ -311,6 +311,34 @@ export function getUikitPanelMediaStyle(options: {
   };
 }
 
+export type UikitAccordionStyle = "default" | "divided" | "striped" | "minimal";
+type UikitAccordionStyleInput = UikitAccordionStyle | "boxed";
+export type UikitAccordionIndicator = "default" | "plus-minus" | "chevron" | "none";
+
+/** Canonical semantic Accordion presentation mapping. */
+export function getUikitAccordionClass(options: {
+  style?: UikitAccordionStyleInput;
+  indicator?: UikitAccordionIndicator;
+  indicatorPosition?: "start" | "end";
+  titleEmphasis?: "inherit" | "muted" | "default" | "emphasis";
+  itemSpacing?: "inherit" | "small" | "default" | "large";
+  contentSpacing?: "inherit" | "small" | "default" | "large";
+  divider?: boolean;
+} = {}): string {
+  // Older documents may still contain "boxed"; render that legacy value using the new native UIkit treatment.
+  const style = options.style === "boxed" ? "striped" : options.style ?? "default";
+  const indicator = options.indicator ?? "default";
+  const classes = ["uk-accordion", "uk-accordion-default", ...(style === "striped" ? ["uk-list-striped"] : []), `shop-builder-accordion--style-${style}`, `shop-builder-accordion--indicator-${indicator}`, `shop-builder-accordion--indicator-${options.indicatorPosition ?? "end"}`, `shop-builder-accordion--title-${options.titleEmphasis ?? "inherit"}`, `shop-builder-accordion--items-${options.itemSpacing ?? "inherit"}`, `shop-builder-accordion--content-${options.contentSpacing ?? "inherit"}`];
+  if (options.divider !== false) classes.push("shop-builder-accordion--divider");
+  return classes.join(" ");
+}
+
+/** Compatibility hook retained while Accordion presentation is owned by the root UIkit modifier. */
+export function getUikitAccordionItemClass(_style: UikitAccordionStyleInput = "default"): string {
+  void _style;
+  return "";
+}
+
 /**
  * Maps WebPages button presets and sizes to canonical UIkit button classes.
  */

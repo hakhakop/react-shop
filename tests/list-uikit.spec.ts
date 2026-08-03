@@ -1,6 +1,7 @@
 import { expect, test } from "@playwright/test";
 import { readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
+import { waitForSeededBuilderLayout } from "./builderFixture";
 
 const email = "header-parity-20260722@example.test";
 const password = "HeaderParity!2026";
@@ -50,13 +51,14 @@ test.beforeEach(async ({ page }) => {
 
 test("List uses semantic UIkit presentation, item links, and frontend parity", async ({ page, context }) => {
   await page.goto(builderUrl);
+  await waitForSeededBuilderLayout(page);
   await page.locator(".builder-sidebar-nav-tile", { hasText: "Blocks" }).first().click();
   await page.locator(".builder-element-library-search input").fill("list");
   const card = page.locator(".builder-element-library-card").filter({ has: page.locator("strong", { hasText: /^List$/ }) }).first();
   await expect(card).toBeVisible();
   await card.click();
 
-  const selected = page.locator(".builder-preview-layout-block.is-selected-block");
+  const selected = page.locator(".builder-preview-layout-block.is-selected-block").last();
   const list = selected.locator(".builder-preview-goodie-list");
   await expect(list.locator("ul.uk-list")).toBeVisible();
   const blockId = await selected.getAttribute("data-builder-block-key");
@@ -67,17 +69,32 @@ test("List uses semantic UIkit presentation, item links, and frontend parity", a
   await inspector.getByRole("button", { name: "Content", exact: true }).click();
   const content = inspector.locator('[data-uikit-capability="list-content"]');
   await expect(content.getByText("Icon type", { exact: true })).toHaveCount(0);
+  const before = await content.locator('[data-list-item-id]').count();
   const firstText = content.locator('[data-list-item-id]').first().locator("input").first();
   await firstText.fill("Localized list item");
   await content.getByRole("button", { name: "Add item", exact: true }).click();
-  await content.locator('[data-list-item-id]').nth(1).getByRole("button", { name: "Move up", exact: true }).click();
-  await content.locator('[data-list-item-id]').first().getByText("Link URL", { exact: true }).locator(".. ").locator("input").fill("/details");
+  const secondItem = content.locator('[data-list-item-id]').nth(1);
+  await secondItem.getByRole("button", { name: "Copy list item 2", exact: true }).click();
+  await expect(content.locator('[data-list-item-id]')).toHaveCount(before + 2);
+  await content.locator('[data-list-item-id]').nth(2).getByRole("button", { name: "Delete list item 3", exact: true }).click();
+  await expect(content.locator('[data-list-item-id]')).toHaveCount(before + 1);
+  await secondItem.getByRole("button", { name: "Edit list item 2", exact: true }).click();
+  await secondItem.getByRole("button", { name: "Up", exact: true }).click();
+  const listItemCards = content.locator('[data-list-item-id]');
+  const secondItemSummary = await listItemCards.nth(1).locator(".builder-slide-toggle small").innerText();
+  await listItemCards.nth(1).locator(".builder-nested-card-drag-handle").dragTo(listItemCards.nth(0).locator(".builder-nested-card-header"));
+  await expect(listItemCards.nth(0).locator(".builder-slide-toggle small")).toHaveText(secondItemSummary);
+  const firstItemAfterDrag = content.locator('[data-list-item-id]').first();
+  if (await firstItemAfterDrag.locator(".builder-nested-card-body").count() === 0) {
+    await firstItemAfterDrag.getByRole("button", { name: "Edit list item 1", exact: true }).click();
+  }
+  await firstItemAfterDrag.getByLabel("List item 1 URL", { exact: true }).fill("/details");
 
   await inspector.getByRole("button", { name: "Styling", exact: true }).click();
   const style = inspector.locator('[data-uikit-capability="list-style"]');
-  await style.locator("label.builder-field", { hasText: "Presentation" }).locator("select").selectOption("divider");
-  await style.locator("label.builder-field", { hasText: "Marker" }).locator("select").selectOption("disc");
-  await style.locator("label.builder-field", { hasText: "Spacing" }).locator("select").selectOption("large");
+  await style.getByLabel("List presentation", { exact: true }).selectOption("divider");
+  await style.getByRole("radiogroup", { name: "List marker" }).getByRole("radio", { name: "Disc" }).click();
+  await style.getByRole("radiogroup", { name: "List spacing" }).getByRole("radio", { name: "Large" }).click();
   await expect(list.locator("ul.uk-list")).toHaveClass(/uk-list-divider/);
   await expect(list.locator("ul.uk-list")).toHaveClass(/uk-list-large/);
   await expect(list.locator("ul.uk-list")).toHaveClass(/uk-list-disc/);

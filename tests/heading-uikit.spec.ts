@@ -1,4 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
+import { waitForSeededBuilderLayout } from "./builderFixture";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
@@ -33,7 +34,7 @@ test.beforeEach(async ({ page }) => {
 
 test("Heading UIkit visual presets (small, medium, xlarge) visibly change computed font-size on canvas and frontend", async ({ page, context }) => {
   await page.goto(builderUrl);
-  await expect(page.locator(".builder-preview-shell").first()).toBeVisible();
+  await waitForSeededBuilderLayout(page);
 
   await page.locator(".builder-sidebar-nav-tile", { hasText: "Blocks" }).first().click();
   await page.locator(".builder-element-library-search input").fill("heading");
@@ -55,7 +56,7 @@ test("Heading UIkit visual presets (small, medium, xlarge) visibly change comput
   await expect(inspector).toBeVisible();
   // Set unique text to target this exact block
   const uniqueText = "UIkit Preset Font Size Test 2026";
-  const headingTextInput = inspector.locator("label.builder-field", { hasText: "Heading Text" }).locator("input, textarea");
+  const headingTextInput = inspector.getByLabel("Heading text", { exact: true });
   if (await headingTextInput.isVisible()) {
     await headingTextInput.fill(uniqueText);
   }

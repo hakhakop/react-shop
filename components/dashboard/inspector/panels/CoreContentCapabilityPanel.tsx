@@ -2,6 +2,7 @@
 
 import type { BuilderLayoutBlock, InspectorTab } from "@/components/dashboard/builderTypes";
 import { InspectorFieldRow, InspectorPillGroup, InspectorSelect, InspectorSwitch, InspectorTextField, InspectorTextarea } from "@/components/dashboard/inspector/InspectorControls";
+import IconPicker from "@/components/dashboard/inspector/IconPicker";
 
 type Props = { block: BuilderLayoutBlock; tab: InspectorTab; update: (patch: Partial<BuilderLayoutBlock>) => void };
 type CoreKind = "hero" | "grid" | "icon" | "badgeGrid" | "table" | "divider" | "alert" | "breadcrumbs" | "datePicker";
@@ -26,7 +27,25 @@ export default function CoreContentCapabilityPanel({ block, tab, update }: Props
         <InspectorFieldRow label="Title"><InspectorTextField value={block.title ?? ""} onChange={(value) => update({ title: value })} ariaLabel="Hero title" /></InspectorFieldRow>
         <InspectorFieldRow label="Body"><InspectorTextarea value={block.body ?? ""} onChange={(value) => update({ body: value })} ariaLabel="Hero body" /></InspectorFieldRow>
       </>}
-      {kind === "icon" && <><InspectorFieldRow label="Icon"><InspectorSelect value={block.iconName ?? "sparkles"} options={labels(["sparkles", "heart", "truck", "shield"] as const)} onChange={(value) => update({ iconName: value })} ariaLabel="Icon name" /></InspectorFieldRow><TextContent block={block} update={update} /></>}
+      {kind === "icon" && <>
+        <InspectorFieldRow label="Icon">
+          <IconPicker
+            value={block.iconName}
+            onChange={(value) => update({ iconName: value })}
+            onClear={() => update({ iconName: undefined })}
+            ariaLabel="Icon"
+          />
+        </InspectorFieldRow>
+        <InspectorFieldRow label="Icon size">
+          <InspectorSelect
+            value={String(block.iconSize ?? block.listIconSize ?? 28)}
+            options={[16, 20, 24, 28, 32, 40, 48].map((value) => ({ value: String(value), label: `${value}px` }))}
+            onChange={(value) => update({ iconSize: Number(value) })}
+            ariaLabel="Icon size"
+          />
+        </InspectorFieldRow>
+        <TextContent block={block} update={update} />
+      </>}
       {kind === "alert" && <TextContent block={block} update={update} />}
       {kind === "datePicker" && <InspectorFieldRow label="Field label"><InspectorTextField value={block.dateLabel ?? ""} onChange={(value) => update({ dateLabel: value })} ariaLabel="Date picker label" /></InspectorFieldRow>}
       {kind === "breadcrumbs" && <div className="builder-element-inspector-note"><strong>Dynamic breadcrumbs</strong><span>Breadcrumbs are resolved from the active page and current navigation context.</span></div>}

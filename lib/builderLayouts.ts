@@ -35,6 +35,8 @@ export type BuilderListItem = {
   text: string;
   url?: string;
   target?: "_self" | "_blank";
+  iconName?: string;
+  iconSize?: number;
 };
 
 export type BuilderDesign = {
@@ -256,6 +258,7 @@ export type BuilderLayoutBlock = {
   heroSecondaryActionVisible?: boolean;
   heroMediaLoading?: "lazy" | "eager";
   iconName?: string;
+  iconSize?: number;
   items?: string[];
   listIcon?: string;
   listIconColorScheme?: "default" | "gradient-cycle";
@@ -271,11 +274,20 @@ export type BuilderLayoutBlock = {
   accordionMultiple?: boolean;
   accordionCollapsible?: boolean;
   accordionOpenItems?: number[];
-  accordionIndicator?: "none" | "chevron" | "plus-minus";
+  accordionStyle?: "default" | "divided" | "striped" | "minimal";
+  accordionIndicator?: "default" | "plus-minus" | "chevron" | "none";
   accordionIndicatorPosition?: "start" | "end";
+  accordionTitleEmphasis?: "inherit" | "muted" | "default" | "emphasis" | "bold";
+  accordionItemSpacing?: "inherit" | "small" | "default" | "large";
+  accordionContentSpacing?: "inherit" | "small" | "default" | "large";
+  accordionDivider?: boolean;
+  accordionTitleStyle?: "inherit" | "h3" | "h4" | "h5";
+  accordionContentStyle?: "inherit" | "default" | "lead" | "small" | "large" | "muted";
+  /** @deprecated Read-only migration fallback for older Accordion documents. */
   accordionRowStyle?: "plain" | "divided" | "striped";
+  /** @deprecated Read-only migration fallback for older Accordion documents. */
   accordionSpacing?: "compact" | "default" | "large";
-  accordionTitleEmphasis?: "default" | "bold";
+  /** @deprecated Read-only migration fallback for older Accordion documents. */
   accordionOpenEmphasis?: "none" | "muted" | "primary";
   headingAlign?: "left" | "center" | "right";
   textVariant?: "default" | "lead" | "meta" | "small" | "large" | "muted";
@@ -333,6 +345,8 @@ export type BuilderLayoutBlock = {
     actionSize?: "small" | "default" | "large";
     typography?: Record<string, unknown>;
     items?: string[];
+    iconName?: string;
+    iconSize?: number;
     listIcon?: "check" | "circleCheck" | "arrowRight" | "star" | "heart" | "sparkles" | "shield";
     listIconColorScheme?: "default" | "gradient-cycle";
     listIconSize?: number;

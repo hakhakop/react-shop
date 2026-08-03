@@ -1,8 +1,10 @@
 "use client";
 
+import { useRef } from "react";
 import type { BuilderLayoutBlock, InspectorTab } from "@/components/dashboard/builderTypes";
 import { UIKIT_ACCORDION_CAPABILITY } from "@/lib/uikitCapabilities";
 import { InspectorFieldRow, InspectorPillGroup, InspectorSelect, InspectorSwitch, InspectorTextField, InspectorTextarea } from "@/components/dashboard/inspector/InspectorControls";
+import RepeatableItemShell from "@/components/dashboard/inspector/RepeatableItemShell";
 
 type Props = {
   block: BuilderLayoutBlock;
@@ -10,37 +12,90 @@ type Props = {
   update: (patch: Partial<BuilderLayoutBlock>) => void;
 };
 
+type AccordionItem = NonNullable<BuilderLayoutBlock["accordionItems"]>[number];
+
+function remapOpenIndexes(openIndexes: number[], sourceIndex: number, targetIndex: number) {
+  return [...new Set(openIndexes.map((openIndex) => {
+    if (openIndex === sourceIndex) return targetIndex;
+    if (sourceIndex < targetIndex && openIndex > sourceIndex && openIndex <= targetIndex) return openIndex - 1;
+    if (sourceIndex > targetIndex && openIndex >= targetIndex && openIndex < sourceIndex) return openIndex + 1;
+    return openIndex;
+  }))].sort((a, b) => a - b);
+}
+
 export default function AccordionCapabilityPanel({ block, tab, update }: Props) {
   const items = block.accordionItems ?? [];
   const labels = <T extends string>(values: readonly T[]) => values.map((value) => ({ value, label: value.replace(/-/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase()) }));
-  const updateItems = (next: typeof items) => update({ accordionItems: next });
-  const updateItem = (index: number, patch: Partial<(typeof items)[number]>) =>
-    updateItems(items.map((item, itemIndex) => itemIndex === index ? { ...item, ...patch } : item));
-  const moveItem = (index: number, direction: -1 | 1) => {
-    const target = index + direction;
-    if (target < 0 || target >= items.length) return;
+  const copySequenceRef = useRef(0);
+
+  const updateItems = (next: AccordionItem[]) => update({ accordionItems: next });
+  const updateItem = (index: number, patch: Partial<AccordionItem>) => updateItems(items.map((item, itemIndex) => itemIndex === index ? { ...item, ...patch } : item));
+
+  const reorderItems = (sourceIndex: number, targetIndex: number) => {
+    if (sourceIndex < 0 || targetIndex < 0 || sourceIndex === targetIndex) return;
     const next = [...items];
-    const [item] = next.splice(index, 1);
-    next.splice(target, 0, item);
-    updateItems(next);
+    const [moved] = next.splice(sourceIndex, 1);
+    next.splice(targetIndex, 0, moved);
+    update({
+      accordionItems: next,
+      ...(block.accordionOpenItems
+        ? { accordionOpenItems: remapOpenIndexes(block.accordionOpenItems, sourceIndex, targetIndex) }
+        : {}),
+    });
+  };
+
+  const removeItem = (index: number) => {
+    const next = items.filter((_, itemIndex) => itemIndex !== index);
+    const nextOpenItems = (block.accordionOpenItems ?? [])
+      .filter((openIndex) => openIndex !== index)
+      .map((openIndex) => openIndex > index ? openIndex - 1 : openIndex);
+    update({ accordionItems: next, accordionOpenItems: nextOpenItems });
+  };
+
+  const copyItem = (index: number) => {
+    const source = items[index];
+    if (!source) return;
+    let id = "";
+    do {
+      copySequenceRef.current += 1;
+      id = `${block.id ?? "accordion"}-item-copy-${copySequenceRef.current}`;
+    } while (items.some((item) => item.id === id));
+    const copy = {
+      ...source,
+      id,
+      title: source.title ? `${source.title} Copy` : "Copy of item",
+    };
+    const next = [...items];
+    next.splice(index + 1, 0, copy);
+    const nextOpenItems = (block.accordionOpenItems ?? []).map((openIndex) => openIndex > index ? openIndex + 1 : openIndex);
+    update({ accordionItems: next, accordionOpenItems: nextOpenItems });
+    return id;
   };
 
   if (tab === "content") {
     return (
       <div className="builder-inspector-stack" data-uikit-capability="accordion-content">
         <div className="builder-element-inspector-note"><strong>Accordion items</strong><span>WebPages owns titles, content, ordering, and JSON persistence.</span></div>
-        {items.map((item, index) => (
-          <details className="builder-collapse" open key={item.id}>
-            <summary><span>Item {index + 1}</span><small>{item.title || "Untitled"}</small></summary>
-            <div className="builder-two-column">
-              <InspectorFieldRow label="Title"><InspectorTextField value={item.title} onChange={(value) => updateItem(index, { title: value })} ariaLabel={`Accordion item ${index + 1} title`} /></InspectorFieldRow>
-              <div className="builder-field"><span>Order</span><div className="builder-two-column"><button type="button" className="builder-secondary-button" disabled={index === 0} onClick={() => moveItem(index, -1)}>Up</button><button type="button" className="builder-secondary-button" disabled={index === items.length - 1} onClick={() => moveItem(index, 1)}>Down</button></div></div>
-            </div>
+        <RepeatableItemShell
+          items={items}
+          getItemKey={(item) => item.id}
+          itemLabel="Item"
+          itemDataAttribute="data-accordion-item-id"
+          orderLabel="Order"
+          getItemSummary={(item) => item.title || "Untitled item"}
+          onAdd={() => {
+            const id = `${block.id ?? "accordion"}-item-${Date.now().toString(36)}`;
+            updateItems([...items, { id, title: "New item", content: "Add accordion content." }]);
+            return id;
+          }}
+          onCopy={copyItem}
+          onDelete={removeItem}
+          onReorder={reorderItems}
+          renderItem={(item, index) => <>
+            <InspectorFieldRow label="Title"><InspectorTextField value={item.title} onChange={(value) => updateItem(index, { title: value })} ariaLabel={`Accordion item ${index + 1} title`} /></InspectorFieldRow>
             <InspectorFieldRow label="Content"><InspectorTextarea value={item.content} onChange={(value) => updateItem(index, { content: value })} ariaLabel={`Accordion item ${index + 1} content`} /></InspectorFieldRow>
-            <button type="button" className="builder-secondary-button" onClick={() => { const next = items.filter((_, itemIndex) => itemIndex !== index); update({ accordionItems: next, accordionOpenItems: (block.accordionOpenItems ?? []).filter((openIndex) => openIndex !== index).map((openIndex) => openIndex > index ? openIndex - 1 : openIndex) }); }}>Remove item</button>
-          </details>
-        ))}
-        <button type="button" className="builder-inline-add" onClick={() => updateItems([...items, { id: `${block.id ?? "accordion"}-item-${Date.now().toString(36)}`, title: "New item", content: "Add accordion content." }])}>Add item</button>
+          </>}
+        />
       </div>
     );
   }
@@ -59,18 +114,22 @@ export default function AccordionCapabilityPanel({ block, tab, update }: Props) 
     );
   }
 
- if (tab === "style") {
+  if (tab === "style") {
     const properties = UIKIT_ACCORDION_CAPABILITY.properties;
+    const options = <T extends string>(values: readonly T[]) => labels(values);
     return <div className="builder-inspector-stack" data-uikit-capability="accordion-style">
-      <div className="builder-element-inspector-note"><strong>Accordion presentation</strong><span>Semantic presentation values map to UIkit structure and scoped presentation rules.</span></div>
-      <InspectorFieldRow label="Indicator"><InspectorPillGroup value={(block.accordionIndicator ?? "none") as BuilderLayoutBlock["accordionIndicator"]} options={labels(properties.indicator.values)} onChange={(value) => update({ accordionIndicator: value })} ariaLabel="Accordion indicator" /></InspectorFieldRow>
-      <InspectorFieldRow label="Indicator position"><InspectorPillGroup value={(block.accordionIndicatorPosition ?? "end") as BuilderLayoutBlock["accordionIndicatorPosition"]} options={labels(properties.indicatorPosition.values)} onChange={(value) => update({ accordionIndicatorPosition: value })} ariaLabel="Indicator position" /></InspectorFieldRow>
-      <InspectorFieldRow label="Row treatment"><InspectorPillGroup value={(block.accordionRowStyle ?? "plain") as BuilderLayoutBlock["accordionRowStyle"]} options={labels(properties.rowStyle.values)} onChange={(value) => update({ accordionRowStyle: value })} ariaLabel="Accordion row treatment" /></InspectorFieldRow>
-      <InspectorFieldRow label="Vertical spacing"><InspectorPillGroup value={(block.accordionSpacing ?? "default") as BuilderLayoutBlock["accordionSpacing"]} options={labels(properties.spacing.values)} onChange={(value) => update({ accordionSpacing: value })} ariaLabel="Accordion vertical spacing" /></InspectorFieldRow>
-      <InspectorFieldRow label="Title weight"><InspectorSelect value={(block.accordionTitleEmphasis ?? "default") as BuilderLayoutBlock["accordionTitleEmphasis"]} options={labels(properties.titleEmphasis.values)} onChange={(value) => update({ accordionTitleEmphasis: value })} ariaLabel="Accordion title weight" /></InspectorFieldRow>
-      <InspectorFieldRow label="Open-item treatment"><InspectorSelect value={(block.accordionOpenEmphasis ?? "none") as BuilderLayoutBlock["accordionOpenEmphasis"]} options={labels(properties.openEmphasis.values)} onChange={(value) => update({ accordionOpenEmphasis: value })} ariaLabel="Open-item treatment" /></InspectorFieldRow>
+      <div className="builder-element-inspector-note"><strong>Accordion appearance</strong><span>Semantic overrides resolve Global Style → Accordion defaults → this Accordion.</span></div>
+      <InspectorFieldRow label="Style"><InspectorPillGroup value={block.accordionStyle ?? (block.accordionRowStyle === "divided" ? "divided" : "default")} options={options(properties.style.values)} onChange={(value) => update({ accordionStyle: value as BuilderLayoutBlock["accordionStyle"] })} ariaLabel="Accordion style" /></InspectorFieldRow>
+      <InspectorFieldRow label="Indicator"><InspectorPillGroup value={block.accordionIndicator ?? "default"} options={options(properties.indicator.values)} onChange={(value) => update({ accordionIndicator: value as BuilderLayoutBlock["accordionIndicator"] })} ariaLabel="Accordion indicator" /></InspectorFieldRow>
+      <InspectorFieldRow label="Indicator position"><InspectorPillGroup value={block.accordionIndicatorPosition ?? "end"} options={options(properties.indicatorPosition.values)} onChange={(value) => update({ accordionIndicatorPosition: value as BuilderLayoutBlock["accordionIndicatorPosition"] })} ariaLabel="Accordion indicator position" /></InspectorFieldRow>
+      <InspectorFieldRow label="Title emphasis"><InspectorSelect value={block.accordionTitleEmphasis === "bold" ? "emphasis" : block.accordionTitleEmphasis ?? "inherit"} options={options(properties.titleEmphasis.values)} onChange={(value) => update({ accordionTitleEmphasis: value as BuilderLayoutBlock["accordionTitleEmphasis"] })} ariaLabel="Accordion title emphasis" /></InspectorFieldRow>
+      <InspectorFieldRow label="Item spacing"><InspectorPillGroup value={block.accordionItemSpacing ?? "inherit"} options={options(properties.itemSpacing.values)} onChange={(value) => update({ accordionItemSpacing: value as BuilderLayoutBlock["accordionItemSpacing"] })} ariaLabel="Accordion item spacing" /></InspectorFieldRow>
+      <InspectorFieldRow label="Content spacing"><InspectorPillGroup value={block.accordionContentSpacing ?? "inherit"} options={options(properties.contentSpacing.values)} onChange={(value) => update({ accordionContentSpacing: value as BuilderLayoutBlock["accordionContentSpacing"] })} ariaLabel="Accordion content spacing" /></InspectorFieldRow>
+      <InspectorFieldRow label="Show dividers"><InspectorSwitch checked={block.accordionDivider !== false} onChange={(checked) => update({ accordionDivider: checked })} label="Show dividers" /></InspectorFieldRow>
+      <InspectorFieldRow label="Title style"><InspectorSelect value={block.accordionTitleStyle ?? "inherit"} options={options(properties.titleStyle.values)} onChange={(value) => update({ accordionTitleStyle: value as BuilderLayoutBlock["accordionTitleStyle"] })} ariaLabel="Accordion title style" /></InspectorFieldRow>
+      <InspectorFieldRow label="Content style"><InspectorSelect value={block.accordionContentStyle ?? "inherit"} options={options(properties.contentStyle.values)} onChange={(value) => update({ accordionContentStyle: value as BuilderLayoutBlock["accordionContentStyle"] })} ariaLabel="Accordion content style" /></InspectorFieldRow>
     </div>;
   }
 
-  return <div className="builder-inspector-stack" data-uikit-capability="accordion-advanced"><div className="builder-element-inspector-note"><strong>Accordion advanced settings</strong><span>Visibility and custom class behavior remain shared document controls.</span></div></div>;
+  return <div className="builder-inspector-stack" data-uikit-capability="accordion-advanced"><div className="builder-element-inspector-note"><strong>Accordion advanced settings</strong><span>Visibility and custom class behavior remain in shared Advanced controls.</span></div></div>;
 }

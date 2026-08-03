@@ -4,10 +4,13 @@ import type { InspectorTab } from "@/components/dashboard/builderTypes";
 import type { BuilderLayoutBlock } from "@/components/dashboard/builderTypes";
 import { UIKIT_BUTTON_CAPABILITY } from "@/lib/uikitCapabilities";
 import { InspectorFieldRow, InspectorPillGroup, InspectorSection, InspectorSelect, InspectorTextField } from "@/components/dashboard/inspector/InspectorControls";
+import GeneralSettingsPanel from "@/components/dashboard/inspector/panels/GeneralSettingsPanel";
+import type { BuilderShellSettings } from "@/lib/builderShell";
 
 type Props = {
   block: BuilderLayoutBlock;
   tab: InspectorTab;
+  shellSettings: BuilderShellSettings;
   update: (patch: Partial<BuilderLayoutBlock>) => void;
 };
 
@@ -45,7 +48,7 @@ function selectValue(value: string | undefined, fallback: string) {
 const targetOptions = [{ value: "_self", label: "Same tab" }, { value: "_blank", label: "New tab" }] as const;
 const named = <T extends string>(values: readonly T[]) => values.map((value) => ({ value, label: value.replace(/-/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase()) }));
 
-export default function ButtonCapabilityPanel({ block, tab, update }: Props) {
+export default function ButtonCapabilityPanel({ block, tab, shellSettings, update }: Props) {
   const updateSemantic = (patch: Partial<BuilderLayoutBlock>) => {
     update({ ...legacyButtonFields, ...patch });
   };
@@ -67,6 +70,7 @@ export default function ButtonCapabilityPanel({ block, tab, update }: Props) {
   if (tab === "style") {
     return (
       <div className="builder-inspector-stack" data-uikit-capability="button-style">
+        <GeneralSettingsPanel block={block} shellSettings={shellSettings} tab={tab} update={update} />
         <div className="builder-element-inspector-note">
           <strong>UIkit Button</strong>
           <span>Semantic values map to UIkit classes in the builder and frontend.</span>

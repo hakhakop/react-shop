@@ -31,6 +31,7 @@ import {
 } from "@/lib/productCardImage";
 import { useProductCategoryFilter } from "./ProductCategoryFilterProvider";
 import { safeDecodeURI } from "@/lib/safeDecodeURI";
+import { typographyProps as resolveTypographyProps } from "@/lib/builderTypography";
 
 type Props = {
   products: ProductNode[];
@@ -440,60 +441,6 @@ export default function CategoryWithFilters({
     "--product-image-padding": productSpaceToCss(imagePadding, "large"),
     "--archive-columns": archiveColumns,
   } as CSSProperties;
-
-  function typographyProps(typ?: any) {
-    if (!typ) return { className: undefined, style: undefined };
-    const classes: string[] = [];
-    const style: CSSProperties = {};
-
-    function isClassLike(value?: string) {
-      return typeof value === "string" && /^[a-z-]+[0-9a-z-]*$/.test(value);
-    }
-
-    if (typ.fontSize) {
-      if (isClassLike(typ.fontSize) && typ.fontSize.startsWith("text-")) {
-        classes.push(typ.fontSize);
-      } else {
-        style.fontSize = typ.fontSize as any;
-      }
-    }
-
-    if (typ.fontWeight) {
-      if (isClassLike(String(typ.fontWeight)) && String(typ.fontWeight).startsWith("font-")) {
-        classes.push(String(typ.fontWeight));
-      } else {
-        style.fontWeight = typ.fontWeight as any;
-      }
-    }
-
-    if (typ.lineHeight) {
-      if (isClassLike(typ.lineHeight) && typ.lineHeight.startsWith("leading-")) {
-        classes.push(typ.lineHeight);
-      } else {
-        style.lineHeight = typ.lineHeight as any;
-      }
-    }
-
-    if (typ.color) {
-      if (isClassLike(typ.color) && typ.color.startsWith("text-")) {
-        classes.push(typ.color);
-      } else {
-        style.color = typ.color as any;
-      }
-    }
-
-    if (typ.textAlign) {
-      const map: Record<string, string> = {
-        left: "text-left",
-        center: "text-center",
-        right: "text-right",
-        justify: "text-justify",
-      };
-      classes.push(map[typ.textAlign] ?? "");
-    }
-
-    return { className: classes.filter(Boolean).join(" ") || undefined, style: Object.keys(style).length ? style : undefined };
-  }
 
   const gridStyle =
     viewMode === "compact"
@@ -1368,7 +1315,7 @@ export default function CategoryWithFilters({
                     <div className="product-main">
                       <Link href={`/product/${p.slug}`} className="product-card-title-link">
                           {(() => {
-                          const tp = typographyProps((typography as any)?.title ?? typography);
+                          const tp = resolveTypographyProps(typography, "title");
                           return (
                             <h2
                               className={["product-title product-title-2lines", tp.className]

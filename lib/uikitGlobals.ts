@@ -6,6 +6,7 @@
  */
 
 import type { BuilderShellSettings } from "@/lib/builderShell";
+import { resolveGlobalStyleToken } from "@/lib/globalStyleTokens";
 
 export type UikitGlobalsConfig = {
   // Spacing Scale
@@ -60,9 +61,10 @@ export function getUikitGlobalsCssVars(
   shellSettings?: Partial<BuilderShellSettings>,
   design?: Record<string, any>
 ): Record<string, string> {
-  const primary = shellSettings?.primaryColor || design?.primaryColor || "#db2777";
-  const accent = shellSettings?.accentColor || design?.accentColor || "#be185d";
-  const value = (key: string, fallback: string) => String((shellSettings as Record<string, unknown> | undefined)?.[key] ?? design?.[key] ?? fallback);
+  const primary = resolveGlobalStyleToken("primaryColor", shellSettings, design, "#111111").value;
+  const accent = resolveGlobalStyleToken("accentColor", shellSettings, design, "#111111").value;
+  const value = (key: string, fallback: string) =>
+    resolveGlobalStyleToken(key, shellSettings, design, fallback).value;
   const globalRadius = value("borderRadius", design?.radius || "8px");
   const cardRadius = value("cardBorderRadius", shellSettings?.productCardRadius || globalRadius);
 
