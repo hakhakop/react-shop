@@ -13,3 +13,187 @@
 - [x] Task 5b.2b.2 — Validate Panel content already uses canonical `DashboardTypog`/`InlineEditableText` paths.
 - [x] Task 5b.2b.3 — Route remaining Grid product-content labels through canonical typography rendering.
 - [x] Task 5b.2b.4 — Consolidate Grid action button parity and add block-level UIkit button defaults with item overrides.
+
+## Completed architectural foundations
+
+These foundations are complete and are prerequisites for the Builder Core
+milestones below:
+
+- [x] Global Settings editor and inheritance foundation.
+- [x] General Settings capability vertical slice for Heading, Text, Button,
+  and Image.
+- [x] Canonical Typography capability and shared builder/frontend resolution.
+- [x] Canonical UIkit icon registry, picker, and shared icon renderer.
+- [x] Repeatable item interaction contract and shared `RepeatableItemShell` for
+  Accordion, List, and Grid.
+- [x] Capability-driven Inspector composition.
+- [x] WebPages Capability Architecture constitution.
+
+## Builder Core roadmap
+
+The Builder Core roadmap is organized by capability family, not by isolated
+element settings. Each family must have one canonical capability panel,
+resolver, document contract, and builder/frontend rendering path. Elements
+compose capabilities; they do not recreate them.
+
+### Phase 0 — Builder Core contract
+
+- [x] Define the permanent capability ownership and inheritance constitution.
+- [x] Make Inspector composition declaration-driven.
+- [x] Establish focused validation and roadmap completion rules.
+
+### Phase 1 — Button and Link capability
+
+- [x] Consolidate the canonical Button vocabulary across the active Button,
+  Grid, Hero, and Panel consumers.
+- [x] Consolidate Link target choices and security behavior so compatible
+  inspectors and builder/frontend renderers reuse the same link contract.
+- [x] Verify builder/frontend parity, inheritance, overrides, reset, and
+  persistence for the family.
+
+### Phase 2 — Layout and Spacing capability
+
+- [x] Route canonical Row padding controls through the shared spacing
+  capability control while preserving existing row fields and renderer paths.
+- [x] Route canonical Section padding controls through the shared spacing
+  capability control while preserving existing section fields and UIkit output.
+- [x] Retire the duplicate legacy scalar Row spacing control and route its
+  fallback callers through the shared spacing capability control.
+- [x] Retire the duplicate legacy Section spacing control and route its
+  fallback callers through the shared spacing capability control.
+- [x] Establish one reusable layout/spacing composition path for applicable
+  structural and content elements through the shared `SpacingControl`,
+  canonical structural capability panels, and the generic element style path.
+- [x] Verify component defaults, global inheritance, local overrides, and
+  builder/frontend parity. The focused Section parity test retains one
+  pre-existing strict-selector failure in its second fixture; the affected
+  production assertions pass.
+
+### Phase 3 — Media and Image capability
+
+- [x] Route legacy DashboardInspector media URL controls through the shared
+  `BuilderImageUrlControl` while preserving existing document update callbacks.
+- [x] Consolidate the duplicated Image document-to-UIkit semantic mapping in
+  the shared `uikitTokens` resolver used by builder and frontend renderers.
+- [x] Route Grid item media ratio and fit resolution through the existing
+  `getUikitPanelMediaStyle` helper in both builder and frontend paths.
+- [x] Route Hero media source selection through the shared
+  `BuilderImageUrlControl` while preserving the existing URL and alt fields.
+- [x] Route the canonical Panel inspector image source through the shared
+  `BuilderImageUrlControl` and existing WordPress media-picker flow, preserving
+  the existing `imageUrl` and `imageAlt` document fields.
+- [x] Route Grid item image selection through the shared
+  `BuilderImageUrlControl` and existing WordPress media-picker flow, preserving
+  each item’s existing `imageUrl` and `imageAlt` fields.
+- [x] Consolidate shared media/image controls and resolution for applicable
+  elements. Image, Hero, Panel, and Grid item source paths now reuse the shared
+  media control; applicable semantic presentation paths reuse the existing
+  UIkit resolvers.
+- [x] Verify Image source and alt text remain document-owned while semantic
+  presentation fields are stored without UIkit class values and resolve
+  identically in builder and frontend.
+- [!] Verify inherited defaults and explicit overrides for media presentation
+  when a canonical global media owner exists; do not invent one in Phase 3.
+  Blocked because the current Global Settings document has no generic media
+  presentation owner. Existing image fields are document-owned, while the
+  shell image fields are product-specific; creating a new global media owner
+  would expand the approved Phase 3 scope.
+
+### Phase 4 — Visibility and Responsive capability
+
+- [x] Consolidate visibility and responsive behavior through existing UIkit and
+  WebPages mappings. Dashboard and frontend column paths now both consume
+  `getUikitColumnClass`, including nested columns; visual-style visibility
+  continues to use the shared `visualStyleClassName` path.
+- [x] Verify inherited defaults, explicit local overrides, and responsive
+  builder/frontend parity for column responsive behavior. Column responsive
+  defaults (`inherit`), explicit `stack`, reset, reload persistence, and
+  builder/frontend parity are verified in `tests/column-uikit.spec.ts`.
+- [x] Implement and verify Global Visibility v1. `BuilderShellSettings` owns
+  desktop, tablet, and mobile defaults; content-element and section inspectors
+  reuse the existing visual-style visibility resolver with Inherit, Visible,
+  and Hidden controls. Builder and frontend consume the same resolved classes;
+  global propagation, local override, reset, and reload persistence were
+  verified in the focused browser pass.
+
+### Builder Core stabilization — Row layout editing
+
+- [x] Scope the dedicated row-toolbar layout popup to the selected row. It now
+  reuses the canonical row layout transformation used by the pencil inspector;
+  section-level layout editing remains section-scoped.
+- [x] Verify that changing a row layout preserves sibling rows with focused
+  browser coverage in `tests/row-layout-toolbar.spec.ts`.
+- [x] Remove obsolete section-level split/layout controls. Sections now expose
+  section/container capabilities only; row composition is edited from the row
+  toolbar or Row capability panel. Legacy layout fields remain readable for
+  backward compatibility.
+- [x] Make section insertion create an empty section; the section's Add Row
+  placeholder is the only entry point for choosing the first row layout.
+
+### Phase 5 — Effects and Animation capability
+
+- [x] First slice — canonical Section, Row, Hero, Grid, Heading, Text,
+  Button, Image, Panel, List, Accordion, and core element Advanced panels now
+  reuse the existing `AnimationControl` and shared animation document fields.
+- [x] Consolidate duplicated animation preset, class, and data-attribute
+  resolution into `lib/builderAnimation.ts`, reused by the dashboard preview
+  and storefront renderer.
+- [x] Continue consolidating existing effects and animation behavior only where
+  a genuine canonical implementation already exists; section scroll reveal
+  now uses the shared data-attribute observer and UIkit-compatible CSS path.
+- [x] Verify accessibility, reduced-motion behavior, and parity before adding
+  further motion features; the shared CSS/data-attribute path and the
+  ScrollReveal path now settle without motion when reduced motion is enabled.
+
+### Phase 6 — Integrated Builder Core review
+
+- [x] Run a focused cross-capability review against the constitution across
+  Heading, Text, Button, Image, Hero, Grid, and List.
+- [x] Confirm no duplicate panels, resolvers, document fields, or renderers
+  were introduced in the active canonical paths; legacy paths remain behind
+  the explicit allowlist.
+- [x] Reprioritize after the Core Builder capability families were validated;
+  the remaining Phase 3/4 items stay deferred until canonical global media and
+  visibility owners exist.
+
+### Builder Core Settings — Canonical completion
+
+- [x] Replace element-specific inspector assembly with the registry-driven
+  `ElementCapabilityComposer` and normalize canonical elements to Content,
+  Settings, and Advanced.
+- [x] Compose shared General Settings and Animation once for every canonical
+  element; preserve element panels as semantic-field owners only.
+- [x] Complete semantic typography roles for Heading, Text, Hero, Panel, and
+  Grid content. Global Style owns concrete Primary, Secondary, and Tertiary
+  font family/weight values; builder and frontend consume the same role classes.
+- [x] Consolidate standalone Button, Panel action, Hero action, and Grid action
+  variant/size editing through one shared UIkit Button presentation control.
+- [x] Retire unsupported Global Style navigation placeholders and the duplicate
+  Card elevation group so the editor exposes only canonical owners.
+- [x] Verify the shared inspector shell in the browser across Heading, Text,
+  Button, Image, Hero, Grid, Panel, Accordion, List, Icon, and Divider.
+- [x] Verify live Heading semantic/alignment rendering, Text variant mapping,
+  Button sizing, and reactive Global typography variables; restore temporary
+  verification values after each check.
+
+## Task execution contract
+
+Every implementation task must remain session-sized and record:
+
+- the selected capability or duplication;
+- the canonical implementation being reused;
+- affected consumers and expected files;
+- explicit exclusions;
+- focused success criteria and validation commands;
+- completion status and remaining roadmap work.
+
+Do not begin the next task while the current task has unresolved validation
+failures. Broad audits are periodic review milestones, not a requirement for
+every focused implementation task.
+
+## Status legend
+
+- `[ ]` planned or unresolved;
+- `[~]` in progress or awaiting focused validation;
+- `[x]` completed and validated;
+- `[!]` blocked by a documented decision or external dependency.

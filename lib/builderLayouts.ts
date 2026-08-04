@@ -138,7 +138,7 @@ export type BuilderLayoutBlock = {
   imageBorderRadius?: number;
   imageFit?: "contain" | "cover" | "fill";
   imageRatio?: "auto" | "natural" | "square" | "4:3" | "3:2" | "4:5" | "3:4" | "16:9" | "portrait";
-  imageShape?: "none" | "rounded" | "circle";
+  imageShape?: "none" | "rounded" | "circle" | "pill";
   imageShadow?: "none" | "small" | "medium" | "large" | "xlarge";
   imageWidth?: "auto" | "full" | "small" | "medium" | "large" | "xlarge";
   imageLoading?: "lazy" | "eager";
@@ -356,6 +356,11 @@ export type BuilderLayoutBlock = {
   galleryImageFit?: string;
   galleryHeight?: number;
   typography?: Record<string, unknown>;
+  headingTypographyRole?: "default" | "primary" | "secondary" | "tertiary";
+  textTypographyRole?: "default" | "primary" | "secondary" | "tertiary";
+  titleTypographyRole?: "default" | "primary" | "secondary" | "tertiary";
+  contentTypographyRole?: "default" | "primary" | "secondary" | "tertiary";
+  metaTypographyRole?: "default" | "primary" | "secondary" | "tertiary";
   visualStyle?: Record<string, unknown>;
   animation?: Record<string, unknown>;
   typewriterEnabled?: boolean;

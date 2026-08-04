@@ -2,9 +2,9 @@
 
 import type { InspectorTab, BuilderLayoutBlock, WordPressMediaItem } from "@/components/dashboard/builderTypes";
 import { UIKIT_IMAGE_CAPABILITY } from "@/lib/uikitCapabilities";
+import { BUILDER_LINK_TARGET_OPTIONS } from "@/lib/websiteBuilderLinks";
 import { BuilderImageUrlControl } from "./InspectorSharedControls";
 import { InspectorFieldRow, InspectorPillGroup, InspectorSelect, InspectorTextField } from "@/components/dashboard/inspector/InspectorControls";
-import GeneralSettingsPanel from "@/components/dashboard/inspector/panels/GeneralSettingsPanel";
 import type { BuilderShellSettings } from "@/lib/builderShell";
 
 type Props = {
@@ -52,7 +52,7 @@ export default function ImageCapabilityPanel({ block, tab, shellSettings, update
         <InspectorFieldRow label="Alt text"><InspectorTextField value={image.imageAlt ?? ""} onChange={(value) => updateSemantic({ imageAlt: value })} /></InspectorFieldRow>
         <InspectorFieldRow label="Caption"><InspectorTextField value={image.imageCaption ?? ""} onChange={(value) => updateSemantic({ imageCaption: value })} placeholder="Optional caption" /></InspectorFieldRow>
         <InspectorFieldRow label="Link URL"><InspectorTextField value={image.imageLinkUrl ?? ""} onChange={(value) => updateSemantic({ imageLinkUrl: value })} placeholder="Optional link" /></InspectorFieldRow>
-        <InspectorFieldRow label="Link target"><InspectorSelect value={(image.imageLinkTarget ?? "_self") as "_self" | "_blank"} options={[{ value: "_self", label: "Same tab" }, { value: "_blank", label: "New tab" }]} onChange={(value) => updateSemantic({ imageLinkTarget: value })} ariaLabel="Image link target" /></InspectorFieldRow>
+        <InspectorFieldRow label="Link target"><InspectorSelect value={(image.imageLinkTarget ?? "_self") as "_self" | "_blank"} options={BUILDER_LINK_TARGET_OPTIONS} onChange={(value) => updateSemantic({ imageLinkTarget: value })} ariaLabel="Image link target" /></InspectorFieldRow>
       </div>
     );
   }
@@ -60,7 +60,6 @@ export default function ImageCapabilityPanel({ block, tab, shellSettings, update
   if (tab === "style") {
     return (
       <div className="builder-inspector-stack" data-uikit-capability="image-style">
-        <GeneralSettingsPanel block={block} shellSettings={shellSettings} tab={tab} update={update} />
         <div className="builder-element-inspector-note">
           <strong>UIkit Image</strong>
           <span>Semantic presentation settings map to shared UIkit classes and attributes.</span>
@@ -84,9 +83,7 @@ export default function ImageCapabilityPanel({ block, tab, shellSettings, update
     );
   }
 
-  if (tab === "advanced") {
-    return <div className="builder-inspector-stack" data-uikit-capability="image-advanced"><div className="builder-element-inspector-note"><strong>Image advanced settings</strong><span>Visibility, animation, and custom classes remain in the shared Advanced tab when supported.</span></div></div>;
-  }
+  if (tab === "advanced") return null;
 
   return null;
 }

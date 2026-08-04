@@ -548,8 +548,6 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
           mediaFit: "cover",
           titleElement: "h3",
           titleStyle: "inherit",
-          actionStyle: "primary",
-          actionSize: "default",
           imageUrl: PREMIUM_IMAGE_PLACEHOLDER,
           imageAlt: "Warm architectural forms representing strategic planning",
         },
@@ -589,7 +587,6 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
       headingLevel: "h2",
       headingAlign: "left",
       headingSize: "medium",
-      typography: premiumContentTypography,
       elementPadding: "sm",
     };
   }
@@ -1112,7 +1109,6 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
     textVariant: "default",
     textAlign: "left",
     elementPadding: "sm",
-    typography: premiumContentTypography,
     visualStyle: {
       customClass: "builder-premium-starter",
     },
@@ -1374,25 +1370,27 @@ export function createWireframeSection(
   presetKey?: string,
 ): BuilderSection {
   const safeColumns = Math.min(Math.max(columns, 1), 6);
-  const safeRows = Math.min(Math.max(rows, 1), 4);
+  const safeRows = Math.min(Math.max(rows, 0), 4);
   const layout =
-    getBuilderRowLayoutPreset(presetKey)?.key ??
-    (safeRows === 1
-      ? safeColumns === 1
-        ? "whole"
-        : safeColumns === 2
-          ? "halves"
-          : safeColumns === 3
-            ? "thirds"
-            : safeColumns === 4
-              ? "quarters"
-              : safeColumns === 5
-                ? "fifths"
-                : "sixths"
-      : undefined);
+    safeRows === 0
+      ? undefined
+      : getBuilderRowLayoutPreset(presetKey)?.key ??
+        (safeRows === 1
+          ? safeColumns === 1
+            ? "whole"
+            : safeColumns === 2
+              ? "halves"
+              : safeColumns === 3
+                ? "thirds"
+                : safeColumns === 4
+                  ? "quarters"
+                  : safeColumns === 5
+                    ? "fifths"
+                    : "sixths"
+          : undefined);
   const preset = getBuilderRowLayoutPreset(layout);
   const rowLayout = preset?.key ?? layout ?? "whole";
-  const columnCount = preset?.ratios.length ?? safeColumns;
+  const columnCount = safeRows === 0 ? 0 : preset?.ratios.length ?? safeColumns;
   const layoutItems = Array.from({ length: safeRows }, (_, rowIndex) => {
     const rowId = `layout-row-${Date.now().toString(36)}-${rowIndex + 1}`;
     return Array.from({ length: columnCount }, (_, columnIndex) => ({
@@ -1408,8 +1406,8 @@ export function createWireframeSection(
     eyebrow: "",
     body: "",
     contentMode: BUILDER_STRUCTURAL_DESIGN.section.widthPreset,
-    layout: rowLayout,
-    layoutColumns: columnCount,
+    layout: safeRows > 0 ? rowLayout : undefined,
+    layoutColumns: safeRows > 0 ? columnCount : undefined,
     layoutRows: safeRows,
     layoutItems,
   };

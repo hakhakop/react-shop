@@ -27,6 +27,7 @@ import { resolveContentSections } from "@/lib/builderContentLanguages";
 import { Sparkles } from "lucide-react";
 import { getPublishedHeaderDocumentSettings } from "@/lib/publishedHeaderDocumentSettings";
 import { getUikitGlobalsCssVars } from "@/lib/uikitGlobals";
+import { builderGlobalVisibilityClassName } from "@/lib/builderVisualStyle";
 
 type WebsiteFrontendMode = "preview" | "domain";
 
@@ -167,7 +168,11 @@ export default async function WebsiteFrontend({
   const isPreview = mode === "preview";
 
   return (
-    <div data-scoped-preview-root={isPreview ? "" : undefined} data-domain-website-root={!isPreview ? "" : undefined}>
+    <div className={builderGlobalVisibilityClassName({
+      desktop: shellSettings.visibilityDesktop,
+      tablet: shellSettings.visibilityTablet,
+      mobile: shellSettings.visibilityMobile,
+    })} data-scoped-preview-root={isPreview ? "" : undefined} data-domain-website-root={!isPreview ? "" : undefined}>
       {isPreview && (
         <ScopedPreviewLinkRouter
           websiteId={websiteRouteSegment}

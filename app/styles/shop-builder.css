@@ -4898,3 +4898,17 @@ body.dark {
     padding-bottom: 6px;
   }
 }
+.webpages-typography-role-primary {
+  font-family: var(--webpages-font-primary, var(--uk-heading-font-family, inherit));
+  font-weight: var(--webpages-font-primary-weight, var(--uk-heading-font-weight, 700));
+}
+
+.webpages-typography-role-secondary {
+  font-family: var(--webpages-font-secondary, var(--uk-global-font-family, inherit));
+  font-weight: var(--webpages-font-secondary-weight, 400);
+}
+
+.webpages-typography-role-tertiary {
+  font-family: var(--webpages-font-tertiary, var(--uk-global-font-family, inherit));
+  font-weight: var(--webpages-font-tertiary-weight, 400);
+}

@@ -51,7 +51,23 @@ export type BuilderEffectsStyle = {
   overflow?: "visible" | "hidden" | "auto" | "scroll";
 };
 
+export type BuilderLayoutStyle = {
+  position?: "static" | "relative" | "absolute";
+  top?: string;
+  right?: string;
+  bottom?: string;
+  left?: string;
+  zIndex?: number;
+  textAlign?: "left" | "center" | "right";
+};
+
 export type BuilderVisibilityStyle = {
+  desktop?: boolean;
+  tablet?: boolean;
+  mobile?: boolean;
+};
+
+export type BuilderVisibilityDefaults = {
   desktop?: boolean;
   tablet?: boolean;
   mobile?: boolean;
@@ -108,6 +124,7 @@ export type BuilderVisualStyle = {
   background?: BuilderBackgroundStyle;
   border?: BuilderBorderStyle;
   effects?: BuilderEffectsStyle;
+  layout?: BuilderLayoutStyle;
   visibility?: BuilderVisibilityStyle;
   card?: BuilderCardPartStyle;
   customClass?: string;
@@ -340,6 +357,21 @@ export function effectsToCss(effects?: BuilderEffectsStyle): CSSProperties {
   return css;
 }
 
+export function layoutToCss(layout?: BuilderLayoutStyle): CSSProperties {
+  if (!layout) return {};
+
+  const positioned = layout.position && layout.position !== "static";
+  return {
+    ...(layout.position ? { position: layout.position } : {}),
+    ...(positioned && layout.top?.trim() ? { top: layout.top.trim() } : {}),
+    ...(positioned && layout.right?.trim() ? { right: layout.right.trim() } : {}),
+    ...(positioned && layout.bottom?.trim() ? { bottom: layout.bottom.trim() } : {}),
+    ...(positioned && layout.left?.trim() ? { left: layout.left.trim() } : {}),
+    ...(positioned && layout.zIndex !== undefined ? { zIndex: layout.zIndex } : {}),
+    ...(layout.textAlign ? { textAlign: layout.textAlign } : {}),
+  };
+}
+
 function cardStyleToCss(card?: BuilderCardPartStyle): CSSProperties {
   if (!card) return {};
   const css: CSSProperties & Record<string, string> = {};
@@ -407,14 +439,53 @@ export function visualStyleToCss(
     ...backgroundToCss(style.background),
     ...borderToCss(style.border),
     ...effectsToCss(style.effects),
+    ...layoutToCss(style.layout),
     ...cardStyleToCss(style.card),
   };
 }
 
-export function visualStyleClassName(style?: BuilderVisualStyle): string {
-  if (!style) return "";
+/**
+ * Returns the visibility classes for a document-owned visual style.
+ *
+ * An omitted device value is deliberately represented as an inherit class so
+ * the global visibility owner can decide the effective result. Explicit true
+ * values do not receive an inherit class, allowing them to override a hidden
+ * global default without changing the document schema.
+ */
+export function visualStyleVisibilityClassName(
+  style?: BuilderVisualStyle,
+): string {
+  const visibility = style?.visibility;
   const classes: string[] = [];
-  if (style.customClass?.trim()) {
+
+  for (const device of ["desktop", "tablet", "mobile"] as const) {
+    const value = visibility?.[device];
+    if (value === false) {
+      classes.push(`builder-hide-${device}`);
+    } else if (value === undefined) {
+      classes.push(`builder-visibility-inherit-${device}`);
+    }
+  }
+
+  return classes.join(" ");
+}
+
+/** Returns root classes for the canonical Global Visibility defaults. */
+export function builderGlobalVisibilityClassName(
+  defaults?: BuilderVisibilityDefaults,
+): string {
+  const classes: string[] = [];
+  for (const device of ["desktop", "tablet", "mobile"] as const) {
+    if (defaults?.[device] === false) {
+      classes.push(`builder-global-hide-${device}`);
+    }
+  }
+  return classes.join(" ");
+}
+
+export function visualStyleClassName(style?: BuilderVisualStyle): string {
+  const classes: string[] = [];
+  if (style?.customClass?.trim()) {
     classes.push(
       ...style.customClass
         .trim()
@@ -422,24 +493,16 @@ export function visualStyleClassName(style?: BuilderVisualStyle): string {
         .filter(Boolean),
     );
   }
-  if (style.card?.preset) {
+  if (style?.card?.preset) {
     classes.push(`builder-card-preset--${style.card.preset}`);
   }
-  if (style.card?.hoverPreset) {
+  if (style?.card?.hoverPreset) {
     classes.push(`builder-hover-preset--${style.card.hoverPreset}`);
   }
-  if (style.card?.imageOverlay && style.card.imageOverlay !== "none") {
+  if (style?.card?.imageOverlay && style.card.imageOverlay !== "none") {
     classes.push(`builder-image-overlay--${style.card.imageOverlay}`);
   }
-  if (style.visibility?.desktop === false) {
-    classes.push("builder-hide-desktop");
-  }
-  if (style.visibility?.tablet === false) {
-    classes.push("builder-hide-tablet");
-  }
-  if (style.visibility?.mobile === false) {
-    classes.push("builder-hide-mobile");
-  }
+  classes.push(visualStyleVisibilityClassName(style));
   return classes.join(" ");
 }
 

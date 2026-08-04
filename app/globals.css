@@ -1753,6 +1753,11 @@ a {
 }
 
 /* --- UIkit Headings --- */
+.shop-builder-main {
+  font-family: var(--uk-global-font-family, inherit);
+  font-size: var(--uk-base-font-size, 16px);
+  line-height: var(--uk-base-line-height, 1.5);
+}
 .shop-builder-main h1,
 .shop-builder-main h2,
 .shop-builder-main h3,
@@ -1761,7 +1766,15 @@ a {
 .shop-builder-main h6 {
   font-weight: normal;
   color: inherit;
-  font-family: inherit;
+  font-family: var(--uk-heading-font-family, inherit);
+}
+.shop-builder-main h1,
+.shop-builder-main h2,
+.shop-builder-main h3,
+.shop-builder-main h4,
+.shop-builder-main h5,
+.shop-builder-main h6 {
+  font-weight: var(--uk-heading-font-weight, 700);
 }
 .shop-builder-main h1 { font-size: 2.23125rem; line-height: 1.2; }
 .shop-builder-main h2 { font-size: 1.7rem; line-height: 1.3; }

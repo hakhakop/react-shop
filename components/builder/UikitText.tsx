@@ -1,6 +1,6 @@
 import type { CSSProperties } from "react";
 import type { TypographySettings, TypographyGroup } from "@/lib/builderTypography";
-import { resolveTypographyInput, typographyProps } from "@/lib/builderTypography";
+import { resolveTypographyInput, typographyProps, typographyRoleClass, type SemanticTypographyRole } from "@/lib/builderTypography";
 import { getUikitTextClass } from "@/lib/uikitTokens";
 
 type Props = {
@@ -10,6 +10,7 @@ type Props = {
   variant?: "default" | "lead" | "meta" | "small" | "large" | "muted";
   align?: "left" | "center" | "right";
   typography?: TypographySettings | TypographyGroup;
+  typographyRole?: SemanticTypographyRole;
 };
 
 export default function UikitText({
@@ -19,6 +20,7 @@ export default function UikitText({
   variant = "default",
   align = "left",
   typography,
+  typographyRole,
 }: Props) {
   const resolvedTypography = resolveTypographyInput(typography, "body") ?? {};
   const { fontSize: _fontSize, variant: _variant, textAlign: _textAlign, ...complementaryTypography } = resolvedTypography;
@@ -28,6 +30,7 @@ export default function UikitText({
     "shop-builder-column-block--text",
     getUikitTextClass(variant),
     `uk-text-${align}`,
+    typographyRoleClass(typographyRole),
     textTypography.className,
   ].filter(Boolean).join(" ");
   const style = textTypography.style as CSSProperties | undefined;

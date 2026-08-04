@@ -66,6 +66,7 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import { useTranslation } from "@/components/i18n/LanguageProvider";
+import { isLocale, localeLabels } from "@/lib/i18n";
 import {
   applyContentPatch,
   isUsingPrimaryFallback,
@@ -133,6 +134,7 @@ import {
   getUikitImageWrapperClass,
   getUikitImageStyle,
   getUikitImageAttributes,
+  resolveUikitImageSemantics,
   getUikitListClass,
   getUikitPanelMediaClass,
   getUikitPanelLayoutClass,
@@ -249,7 +251,7 @@ import {
 import type { BuilderVisualStyle } from "@/lib/builderVisualStyle";
 import YoothemeImportPanel from "@/components/dashboard/global-styles/YoothemeImportPanel";
 import CanonicalGlobalStylesPanel from "@/components/dashboard/global-styles/CanonicalGlobalStylesPanel";
-import { type TypographyArea } from "@/lib/builderTypography";
+import { typographyRoleClass, type TypographyArea } from "@/lib/builderTypography";
 import {
   resolveBuilderRowGap,
   resolveBuilderRowStyle,
@@ -260,8 +262,10 @@ import {
 import type { HeaderSettings } from "@/lib/themeSettings";
 import {
   hasBuilderVisualSpacing,
+  builderGlobalVisibilityClassName,
   resolveSpacingToken,
   visualStyleClassName,
+  visualStyleVisibilityClassName,
   visualStyleToCss,
 } from "@/lib/builderVisualStyle";
 import {
@@ -274,6 +278,11 @@ import {
   type BuilderSpacingContext,
   getDefaultSpacingToken,
 } from "@/lib/builderSpacing";
+import { builderLinkTargetProps } from "@/lib/websiteBuilderLinks";
+import {
+  builderAnimationClassName as previewAnimationClassName,
+  builderAnimationDataAttributes as previewAnimationAttrs,
+} from "@/lib/builderAnimation";
 import { normalizeBuilderLineBreaks } from "@/lib/builderText";
 import { builderGeometryCssVariables } from "@/lib/builderGeometry";
 import {
@@ -1857,7 +1866,7 @@ export default function DashboardBuilder({
   enabledContentLanguages = [primaryContentLanguage],
 }: DashboardBuilderProps) {
   const router = useRouter();
-  const { t } = useTranslation();
+  const { locale, setLocale, t } = useTranslation();
   const { theme: storefrontTheme } = useTheme();
   const [contentLanguage, setContentLanguage] = useState(primaryContentLanguage);
   const previewLanguageStorageKey = useMemo(
@@ -2111,7 +2120,6 @@ export default function DashboardBuilder({
   const [inspectorDesktopLayout, setInspectorDesktopLayout] = useState(false);
   const [inspectorResizing, setInspectorResizing] = useState(false);
   const [sectionSettingsOpen, setSectionSettingsOpen] = useState(false);
-  const [sectionStructureOpen, setSectionStructureOpen] = useState(false);
   const [globalStylesTab, setGlobalStylesTab] = useState<
     | "presets"
     | "siteDesign"
@@ -3909,7 +3917,6 @@ export default function DashboardBuilder({
     setOpenLayoutItemId(null);
     setInspectorTab("layout");
     setSectionSettingsOpen(true);
-    setSectionStructureOpen(false);
     revealCanvasTarget(sectionId);
   };
 
@@ -3935,7 +3942,6 @@ export default function DashboardBuilder({
     setSelectedLayoutColumnKey(columnKey);
     setSelectedLayoutBlockKey(blockKey);
     setOpenLayoutItemId(columnKey);
-    setSectionStructureOpen(false);
     const selectedBlock = selectedSection
       ? findLayoutBlock(selectedSection, blockKey, columnKey)
       : null;
@@ -3955,7 +3961,6 @@ export default function DashboardBuilder({
     setSelectedLayoutColumnKey(null);
     setSelectedLayoutBlockKey(null);
     setOpenLayoutItemId(null);
-    setSectionStructureOpen(false);
     setInspectorTab("layout");
     const section = builderState.sections.find((item) => item.id === sectionId);
     const row = section
@@ -4027,7 +4032,6 @@ export default function DashboardBuilder({
 
     setInspectorOpen(true);
     setSelectedId(target.sectionId);
-    setSectionStructureOpen(false);
 
     if (target.scope === "section") {
       setSelectedLayoutRowIndex(null);
@@ -4168,98 +4172,123 @@ export default function DashboardBuilder({
     return [];
   };
 
-  const reflowContentLayoutItems = (
-    items: NonNullable<BuilderSection["layoutItems"]>,
-    targetColumns: number,
+  const applyContentRowLayoutPreset = (
+    sectionId: string,
+    rowIndex: number,
+    presetKey: string,
   ) => {
-    const safeColumns = Math.min(Math.max(targetColumns, 1), 6);
-    const normalizedItems = items.map((item, index) => ({
-      ...item,
-      id: item.id ?? `layout-item-${index + 1}`,
-      blocks: [...getLayoutItemBlocks(item)],
-    }));
-    const nextItems = Array.from({ length: safeColumns }, (_, index) => {
-      const sourceItem = normalizedItems[index];
-      return (
-        sourceItem ?? {
-          id: `layout-item-${index + 1}`,
-          blocks: [],
-        }
-      );
-    });
-
-    if (normalizedItems.length > safeColumns) {
-      const overflowBlocks = normalizedItems
-        .slice(safeColumns)
-        .flatMap((item) => getLayoutItemBlocks(item));
-      if (overflowBlocks.length > 0) {
-        const lastIndex = safeColumns - 1;
-        nextItems[lastIndex] = {
-          ...nextItems[lastIndex],
-          blocks: [
-            ...getLayoutItemBlocks(nextItems[lastIndex]),
-            ...overflowBlocks,
-          ],
-        };
-      }
-    }
-
-    return nextItems;
-  };
-
-  const applyContentLayoutPreset = (sectionId: string, presetKey: string) => {
     const preset = getBuilderRowLayoutPreset(presetKey);
     if (!preset) return;
 
-    const nextColumns = preset.ratios.length;
     let nextSelectedColumnKey: string | null = null;
-    let nextSelectedBlockKey = selectedLayoutBlockKey;
 
     setBuilderState((current) => ({
       ...current,
       sections: current.sections.map((section) => {
-        if (section.id !== sectionId || !isLayoutContainerSection(section)) {
+        if (
+          section.id !== sectionId ||
+          !isLayoutContainerSection(section)
+        ) {
           return section;
         }
 
-        const layoutItems = reflowContentLayoutItems(
-          section.layoutItems ?? [],
-          nextColumns,
-        );
-        nextSelectedColumnKey = layoutItems[0]?.id ?? null;
+        const layoutItems = section.layoutItems ?? [];
+        const layoutRows = getPreviewLayoutRows(section, layoutItems);
+        const targetRow = layoutRows[rowIndex];
+        if (!targetRow) return section;
 
-        if (selectedLayoutBlockKey) {
-          const selectedBlockMatch = layoutItems.find((item, index) =>
-            getLayoutItemBlocks(item).some(
-              (block, blockIndex) =>
-                (block.id ??
-                  `${item.id ?? `layout-item-${index}`}-block-${blockIndex}`) ===
-                selectedLayoutBlockKey,
-            ),
+        const rowId =
+          targetRow.items.find((item) => item.rowId)?.rowId ??
+          `layout-row-${Date.now().toString(36)}`;
+        const normalizedItems = targetRow.items.map((item, index) => ({
+          ...item,
+          id: item.id ?? `${rowId}-column-${index + 1}`,
+          rowId,
+          blocks: [...getLayoutItemBlocks(item)],
+        }));
+        const nextRowItems: PreviewLayoutItem[] = preset.ratios.map(
+          (_, index) => {
+            const sourceItem = normalizedItems[index];
+            return (
+              sourceItem ?? {
+                id: `${rowId}-column-${index + 1}`,
+                rowId,
+                blocks: [],
+              }
+            );
+          },
+        );
+
+        if (section.id === "header-document" && preset.ratios.length > 1) {
+          const allHeaderBlocks = normalizedItems.flatMap((item) =>
+            getLayoutItemBlocks(item),
           );
-          if (selectedBlockMatch) {
-            nextSelectedColumnKey =
-              selectedBlockMatch.id ?? nextSelectedColumnKey ?? null;
-          } else {
-            nextSelectedBlockKey = null;
+          nextRowItems.forEach((item, index) => {
+            item.blocks = allHeaderBlocks.filter(
+              (_, blockIndex) =>
+                Math.min(
+                  preset.ratios.length - 1,
+                  Math.floor(
+                    (blockIndex * preset.ratios.length) /
+                      Math.max(1, allHeaderBlocks.length),
+                  ),
+                ) === index,
+            );
+          });
+        }
+
+        if (
+          section.id !== "header-document" &&
+          normalizedItems.length > preset.ratios.length
+        ) {
+          const overflowBlocks = normalizedItems
+            .slice(preset.ratios.length)
+            .flatMap((item) => getLayoutItemBlocks(item));
+          if (overflowBlocks.length > 0) {
+            const lastIndex = preset.ratios.length - 1;
+            nextRowItems[lastIndex] = {
+              ...nextRowItems[lastIndex],
+              blocks: [
+                ...getLayoutItemBlocks(nextRowItems[lastIndex]),
+                ...overflowBlocks,
+              ],
+            };
           }
         }
 
+        const nextRowItemsWithLayout = nextRowItems.map((item) => ({
+          ...item,
+          rowId,
+          rowLayout: preset.key,
+        }));
+        nextSelectedColumnKey = nextRowItemsWithLayout[0]?.id ?? null;
+
         return {
           ...section,
-          layout: preset.key,
-          layoutColumns: nextColumns,
-          layoutItems,
+          layoutItems: [
+            ...layoutItems.slice(0, targetRow.startIndex),
+            ...nextRowItemsWithLayout,
+            ...layoutItems.slice(targetRow.startIndex + targetRow.items.length),
+          ],
         };
       }),
     }));
 
-    if (nextSelectedColumnKey) {
-      setSelectedLayoutColumnKey(nextSelectedColumnKey);
-      setOpenLayoutItemId(nextSelectedColumnKey);
-    }
+    setSelectedId(sectionId);
+    setSelectedLayoutRowIndex(rowIndex);
+    setSelectedLayoutColumnKey(nextSelectedColumnKey);
+    setSelectedLayoutBlockKey(null);
+    setOpenLayoutItemId(nextSelectedColumnKey);
+    setInspectorTab("layout");
+    setPublishStatus("Row layout updated");
+  };
 
-    setSelectedLayoutBlockKey(nextSelectedBlockKey);
+  const applyContentLayoutPreset = (
+    sectionId: string,
+    presetKey: string,
+    rowIndex: number,
+  ) => {
+    applyContentRowLayoutPreset(sectionId, rowIndex, presetKey);
   };
 
   const applyHeaderPreset = (presetKey: string) => {
@@ -5856,95 +5885,11 @@ export default function DashboardBuilder({
 
   const applySelectedRowLayoutPreset = (presetKey: string) => {
     if (!selectedSection || selectedLayoutRowIndex === null) return;
-    const preset = getBuilderRowLayoutPreset(presetKey);
-    if (!preset) return;
-
-    let nextSelectedColumnKey: string | null = null;
-
-    setBuilderState((current) => ({
-      ...current,
-      sections: current.sections.map((section) => {
-        if (
-          section.id !== selectedSection.id ||
-          !isLayoutContainerSection(section)
-        ) {
-          return section;
-        }
-
-        const layoutItems = section.layoutItems ?? [];
-        const layoutRows = getPreviewLayoutRows(section, layoutItems);
-        const targetRow = layoutRows[selectedLayoutRowIndex];
-        if (!targetRow) return section;
-
-        const rowId =
-          targetRow.items.find((item) => item.rowId)?.rowId ??
-          `layout-row-${Date.now().toString(36)}`;
-        const normalizedItems = targetRow.items.map((item, index) => ({
-          ...item,
-          id: item.id ?? `${rowId}-column-${index + 1}`,
-          rowId,
-          blocks: [...getLayoutItemBlocks(item)],
-        }));
-        const nextRowItems: PreviewLayoutItem[] = preset.ratios.map(
-          (_, index) => {
-            const sourceItem = normalizedItems[index];
-            return (
-              sourceItem ?? {
-                id: `${rowId}-column-${index + 1}`,
-                rowId,
-                blocks: [],
-              }
-            );
-          },
-        );
-
-        if (section.id === "header-document" && preset.ratios.length > 1) {
-          const allHeaderBlocks = normalizedItems.flatMap((item) => getLayoutItemBlocks(item));
-          nextRowItems.forEach((item, index) => {
-            item.blocks = allHeaderBlocks.filter((_, blockIndex) =>
-              Math.min(preset.ratios.length - 1, Math.floor(blockIndex * preset.ratios.length / Math.max(1, allHeaderBlocks.length))) === index,
-            );
-          });
-        }
-
-        if (section.id !== "header-document" && normalizedItems.length > preset.ratios.length) {
-          const overflowBlocks = normalizedItems
-            .slice(preset.ratios.length)
-            .flatMap((item) => getLayoutItemBlocks(item));
-          if (overflowBlocks.length > 0) {
-            const lastIndex = preset.ratios.length - 1;
-            nextRowItems[lastIndex] = {
-              ...nextRowItems[lastIndex],
-              blocks: [
-                ...getLayoutItemBlocks(nextRowItems[lastIndex]),
-                ...overflowBlocks,
-              ],
-            };
-          }
-        }
-
-        const nextRowItemsWithLayout = nextRowItems.map((item) => ({
-          ...item,
-          rowId,
-          rowLayout: preset.key,
-        }));
-        nextSelectedColumnKey = nextRowItemsWithLayout[0]?.id ?? null;
-
-        return {
-          ...section,
-          layoutItems: [
-            ...layoutItems.slice(0, targetRow.startIndex),
-            ...nextRowItemsWithLayout,
-            ...layoutItems.slice(targetRow.startIndex + targetRow.items.length),
-          ],
-        };
-      }),
-    }));
-
-    setSelectedLayoutColumnKey(nextSelectedColumnKey);
-    setSelectedLayoutBlockKey(null);
-    setOpenLayoutItemId(nextSelectedColumnKey);
-    setPublishStatus("Row layout updated");
+    applyContentRowLayoutPreset(
+      selectedSection.id,
+      selectedLayoutRowIndex,
+      presetKey,
+    );
   };
 
   const updateSelectedRowStyle = (
@@ -7653,7 +7598,6 @@ export default function DashboardBuilder({
       sectionColorModeLabel={(sec) => sectionColorModeLabel(sec, layoutScheme)}
       sectionLabels={sectionLabels}
       sectionSettingsOpen={sectionSettingsOpen}
-      sectionStructureOpen={sectionStructureOpen}
       selectedLayoutColumnKey={selectedLayoutColumnKey}
       selectedLayoutRowIndex={selectedLayoutRowIndex}
       selectedLayoutBlock={selectedLayoutBlock}
@@ -7669,7 +7613,6 @@ export default function DashboardBuilder({
       addSelectedLayoutBlockGridItem={addSelectedLayoutBlockGridItem}
       addSelectedLayoutBlockButton={addSelectedLayoutBlockButton}
       addSelectedLayoutBlockSlide={addSelectedLayoutBlockSlide}
-      addSelectedLayoutItem={addSelectedLayoutItem}
       addSelectedSlide={addSelectedSlide}
       copyJson={copyJson}
       deleteSelected={deleteSelected}
@@ -7678,11 +7621,9 @@ export default function DashboardBuilder({
       deleteSelectedLayoutBlockButton={deleteSelectedLayoutBlockButton}
       deleteSelectedLayoutBlockGridItem={deleteSelectedLayoutBlockGridItem}
       deleteSelectedLayoutBlockSlide={deleteSelectedLayoutBlockSlide}
-      deleteSelectedLayoutItem={deleteSelectedLayoutItem}
       deleteSelectedSlide={deleteSelectedSlide}
       duplicateSelected={duplicateSelected}
       duplicateSelectedRow={duplicateSelectedRow}
-      applyLayoutPreset={applyContentLayoutPreset}
       onApplyHeaderPreset={applyHeaderPreset}
       applySelectedRowLayoutPreset={applySelectedRowLayoutPreset}
       onUpdateRowStyle={updateSelectedRowStyle}
@@ -7695,7 +7636,6 @@ export default function DashboardBuilder({
       setSpacingOverlayEnabled={setSpacingOverlayEnabled}
       setOpenSlideId={setOpenSlideId}
       setSectionSettingsOpen={setSectionSettingsOpen}
-      setSectionStructureOpen={setSectionStructureOpen}
       setSelectedLayoutBlockKey={setSelectedLayoutBlockKey}
       updateSelected={updateSelected}
       updateSelectedBadge={updateSelectedBadge}
@@ -7746,7 +7686,7 @@ export default function DashboardBuilder({
       onAddSection={() => {
         if (builderState.page === "header") return;
         const lastSectionId = builderState.sections.at(-1)?.id ?? "__empty-page__";
-        addWireframeNear(1, 1, lastSectionId, "below", "whole", "section", true);
+        addWireframeNear(1, 0, lastSectionId, "below", undefined, "section", true);
       }}
       onAddRow={builderState.page === "header" ? () => {
         const headerSection = builderState.sections.find((section) => section.id === "header-document");
@@ -9270,16 +9210,14 @@ export default function DashboardBuilder({
           <select
             aria-label="Language"
             data-testid="builder-language-selector"
-            value={contentLanguage}
+            value={locale}
             onChange={(event) => {
-              if (enabledContentLanguages.includes(event.target.value)) {
-                setContentLanguage(event.target.value);
-              }
+              if (isLocale(event.target.value)) void setLocale(event.target.value);
             }}
           >
-            {enabledContentLanguages.map((language) => (
+            {(["en", "hy", "ru"] as const).map((language) => (
               <option key={language} value={language}>
-                {language === "hy" ? "Հայերեն" : language === "en" ? "English" : "Русский"}
+                {localeLabels[language]}
               </option>
             ))}
           </select>
@@ -9374,7 +9312,11 @@ export default function DashboardBuilder({
 
   return (
     <div
-      className={`builder-dashboard ${inspectorOpen ? "" : "is-inspector-closed"}${
+      className={`builder-dashboard ${builderGlobalVisibilityClassName({
+        desktop: shellSettings.visibilityDesktop,
+        tablet: shellSettings.visibilityTablet,
+        mobile: shellSettings.visibilityMobile,
+      })} ${inspectorOpen ? "" : "is-inspector-closed"}${
         sidebarCollapsed ? " is-sidebar-collapsed" : ""
       }${inspectorOpen ? ` is-inspector-${effectiveInspectorMode}` : " is-inspector-collapsed"}${
         sidebarResizing ? " is-sidebar-resizing" : ""
@@ -10008,7 +9950,16 @@ export default function DashboardBuilder({
                 onMoveSectionBadge={moveSectionBadgeByKey}
                 onUploadGridItemImage={pickGridItemImage}
                 onUploadBlockImage={pickBlockImage}
-                onAddWireframe={addWireframeNear}
+                onAddSection={(targetSectionId, placement) =>
+                  addWireframeNear(
+                    1,
+                    0,
+                    targetSectionId,
+                    placement,
+                    undefined,
+                    "section",
+                  )
+                }
                 onAddRow={addRowNear}
                 onAddColumnAfter={addSelectedLayoutItem}
                 onStackColumnBelow={stackColumnBelow}
@@ -10303,7 +10254,7 @@ function PreviewCanvas({
   onMoveSectionBadge,
   onUploadGridItemImage,
   onUploadBlockImage,
-  onAddWireframe,
+  onAddSection,
   onAddRow,
   onAddColumnAfter,
   onStackColumnBelow,
@@ -10470,12 +10421,9 @@ function PreviewCanvas({
     blockKey: string,
     currentUrl?: string,
   ) => void;
-  onAddWireframe: (
-    columns: number,
-    rows: number,
+  onAddSection: (
     targetSectionId: string,
     placement: "above" | "below",
-    presetKey?: string,
   ) => void;
   onAddRow: (
     sectionId: string,
@@ -10574,7 +10522,11 @@ function PreviewCanvas({
     sectionId: string,
     field: "topSpacing" | "bottomSpacing" | "topMargin" | "bottomMargin",
   ) => void;
-  onApplyLayoutPreset: (sectionId: string, presetKey: string) => void;
+  onApplyLayoutPreset: (
+    sectionId: string,
+    presetKey: string,
+    rowIndex: number,
+  ) => void;
 }) {
   const [activeDragOver, setActiveDragOver] = useState<{
     type: "section" | "column" | "block";
@@ -10585,11 +10537,10 @@ function PreviewCanvas({
   } | null>(null);
   const [templateDragType, setTemplateDragType] =
     useState<BuilderTemplateDragType | null>(null);
-  const [insertTarget, setInsertTarget] = useState<{
-    sectionId: string | null;
-    placement: "above" | "below";
+  const [changeLayoutTarget, setChangeLayoutTarget] = useState<{
+    sectionId: string;
+    rowIndex: number;
   } | null>(null);
-  const [changeLayoutTargetSectionId, setChangeLayoutTargetSectionId] = useState<string | null>(null);
   const [editingTarget, setEditingTarget] =
     useState<BuilderInteractionTarget | null>(null);
   const selectedTarget = selectedBuilderTarget({
@@ -10640,87 +10591,13 @@ function PreviewCanvas({
     })
     .join("||");
 
-  const insertTargetSection =
-    sections.find((section) => section.id === insertTarget?.sectionId) ?? null;
-  const insertLayoutPicker = insertTarget ? (
-    <div
-      className="builder-layout-modal"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="builder-layout-picker-title"
-      onClick={() => setInsertTarget(null)}
-    >
-      <div
-        className="builder-layout-dialog"
-        onClick={(event) => event.stopPropagation()}
-      >
-        <div className="builder-layout-header">
-          <div>
-            <strong id="builder-layout-picker-title">Choose layout</strong>
-            <span>Select the column structure for this layout.</span>
-          </div>
-          <button
-            type="button"
-            className="builder-layout-close"
-            onClick={() => setInsertTarget(null)}
-            aria-label="Close row layout picker"
-          >
-            <X size={15} />
-          </button>
-        </div>
-
-        <div className="builder-layout-picker-body">
-          {uikitPresetGroups.map((group) => {
-            const groupPresets = group.keys
-              .map((key) => builderRowLayoutPresets.find((p) => p.key === key))
-              .filter(Boolean);
-
-            if (groupPresets.length === 0) return null;
-
-            return (
-              <div key={group.title} className="builder-layout-picker-group">
-                <div className="builder-layout-picker-group-title">
-                  {group.title}
-                </div>
-                <div className="builder-layout-picker-grid">
-                  {groupPresets.map((preset) => (
-                    <button
-                      key={preset!.key}
-                      type="button"
-                      className="builder-layout-picker-card"
-                      onClick={() => {
-                        onAddWireframe(
-                          preset!.ratios.length,
-                          1,
-                          insertTarget.sectionId ?? "__empty-page__",
-                          insertTarget.placement,
-                          preset!.key,
-                        );
-                        setInsertTarget(null);
-                      }}
-                    >
-                      <UikitPresetWireframeDiagram presetKey={preset!.key} />
-                      <span className="builder-layout-picker-card-copy">
-                        <strong>{preset!.label}</strong>
-                      </span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    </div>
-  ) : null;
-
-  const changeLayoutModal = changeLayoutTargetSectionId ? (
+  const changeLayoutModal = changeLayoutTarget ? (
     <div
       className="builder-layout-modal"
       role="dialog"
       aria-modal="true"
       aria-labelledby="builder-change-layout-picker-title"
-      onClick={() => setChangeLayoutTargetSectionId(null)}
+      onClick={() => setChangeLayoutTarget(null)}
     >
       <div
         className="builder-layout-dialog"
@@ -10734,7 +10611,7 @@ function PreviewCanvas({
           <button
             type="button"
             className="builder-layout-close"
-            onClick={() => setChangeLayoutTargetSectionId(null)}
+            onClick={() => setChangeLayoutTarget(null)}
             aria-label="Close layout picker"
           >
             <X size={15} />
@@ -10762,10 +10639,11 @@ function PreviewCanvas({
                       className="builder-layout-picker-card"
                       onClick={() => {
                         onApplyLayoutPreset(
-                          changeLayoutTargetSectionId,
+                          changeLayoutTarget.sectionId,
                           preset!.key,
+                          changeLayoutTarget.rowIndex,
                         );
-                        setChangeLayoutTargetSectionId(null);
+                        setChangeLayoutTarget(null);
                       }}
                     >
                       <UikitPresetWireframeDiagram presetKey={preset!.key} />
@@ -10940,7 +10818,7 @@ function PreviewCanvas({
           <button
             type="button"
             className="builder-preview-empty-add"
-            onClick={onOpenElementsPanel}
+            onClick={() => onAddSection("__empty-page__", "below")}
           >
             <Plus size={16} />
             Add section
@@ -11314,12 +11192,7 @@ function PreviewCanvas({
                       <button
                         type="button"
                         className="builder-preview-section-insert-trigger"
-                        onClick={() =>
-                          setInsertTarget({
-                            sectionId: section.id,
-                            placement: "above",
-                          })
-                        }
+                        onClick={() => onAddSection(section.id, "above")}
                         aria-label="Add section above"
                         title="Add section above"
                       >
@@ -11361,12 +11234,7 @@ function PreviewCanvas({
                       <button
                         type="button"
                         className="builder-preview-section-insert-trigger"
-                        onClick={() =>
-                          setInsertTarget({
-                            sectionId: section.id,
-                            placement: "below",
-                          })
-                        }
+                        onClick={() => onAddSection(section.id, "below")}
                         aria-label="Add section"
                         title="Add section"
                       >
@@ -11438,7 +11306,9 @@ function PreviewCanvas({
                       onDropElementTemplate={onDropElementTemplate}
                       onOpenSpacingSettings={onOpenSpacingSettings}
                       onOpenElementsPanel={onOpenElementsPanel}
-                      onChangeLayout={setChangeLayoutTargetSectionId}
+                      onChangeLayout={(sectionId, rowIndex) =>
+                        setChangeLayoutTarget({ sectionId, rowIndex })
+                      }
                       spacingOverlayEnabled={spacingOverlayEnabled}
                     />
                   </div>
@@ -11448,9 +11318,6 @@ function PreviewCanvas({
           </AnimatePresence>
         </div>
       </div>
-      {insertLayoutPicker
-        ? createPortal(insertLayoutPicker, document.body)
-        : null}
       {changeLayoutModal
         ? createPortal(changeLayoutModal, document.body)
         : null}
@@ -11742,93 +11609,6 @@ function getStorefrontPreviewClass(section: BuilderSection) {
   } shop-builder-section--align-${
     section.contentVerticalAlign ?? "top"
   } ${kindClass} ${previewAnimationClassName(section.animation)}`.trim();
-}
-
-function previewAnimationPreset(
-  animation?: BuilderSection["animation"] | BuilderLayoutBlock["animation"],
-) {
-  const preset = animation?.preset ?? "none";
-  return preset === "none" ? null : preset;
-}
-
-function previewAnimationClassName(
-  animation?: BuilderSection["animation"] | BuilderLayoutBlock["animation"],
-) {
-  const preset = previewAnimationPreset(animation);
-  return preset ? `shop-builder-animate--${preset}` : "";
-}
-
-function previewAnimationAttrs(
-  animation?: BuilderSection["animation"] | BuilderLayoutBlock["animation"],
-) {
-  const preset = previewAnimationPreset(animation);
-
-  if (!preset) {
-    return {
-      data: {},
-      style: undefined,
-    };
-  }
-
-  const delay =
-    typeof animation?.delayMs === "number" && Number.isFinite(animation.delayMs)
-      ? `${Math.max(0, animation.delayMs)}ms`
-      : undefined;
-  const progressSmoothing =
-    typeof animation?.progressSmoothingMs === "number" &&
-    Number.isFinite(animation.progressSmoothingMs)
-      ? `${Math.max(0, animation.progressSmoothingMs)}ms`
-      : undefined;
-  const scrubDistance =
-    typeof animation?.scrubDistanceVh === "number" &&
-    Number.isFinite(animation.scrubDistanceVh)
-      ? `${Math.max(40, animation.scrubDistanceVh)}vh`
-      : undefined;
-  const stepOffset =
-    typeof animation?.stepOffset === "number" &&
-    Number.isFinite(animation.stepOffset)
-      ? String(animation.stepOffset)
-      : undefined;
-  const duration =
-    typeof animation?.durationMs === "number" &&
-    Number.isFinite(animation.durationMs)
-      ? `${Math.max(200, animation.durationMs * 1000)}ms`
-      : undefined;
-  const easing =
-    animation?.easing === "ease-in-out"
-      ? "cubic-bezier(0.65, 0, 0.35, 1)"
-      : animation?.easing === "spring"
-        ? "cubic-bezier(0.34, 1.56, 0.64, 1)"
-        : undefined;
-  const style = {
-    ...(delay ? { "--builder-animate-delay": delay } : {}),
-    ...(duration ? { "--builder-animate-duration": duration } : {}),
-    ...(easing ? { "--builder-animate-easing": easing } : {}),
-    ...(progressSmoothing
-      ? { "--builder-progress-smoothing": progressSmoothing }
-      : {}),
-    ...(scrubDistance ? { "--builder-pin-distance": scrubDistance } : {}),
-  } as CSSProperties;
-
-  const playOnce = animation?.once ?? animation?.playOnce ?? true;
-  const triggerOffset =
-    typeof animation?.triggerOffset === "number" &&
-    Number.isFinite(animation.triggerOffset)
-      ? String(animation.triggerOffset)
-      : undefined;
-
-  return {
-    data: {
-      "data-builder-animate": preset,
-      "data-builder-animate-once": playOnce === false ? "false" : "true",
-      "data-builder-pause": animation?.pauseUntilComplete ? "true" : undefined,
-      "data-builder-step-offset": stepOffset,
-      "data-builder-trigger-offset": triggerOffset,
-      "data-builder-progress-direction":
-        animation?.progressDirection === "vertical" ? "vertical" : undefined,
-    },
-    style: Object.keys(style).length ? style : undefined,
-  };
 }
 
 function getPreviewLayoutBlocks(
@@ -13507,7 +13287,7 @@ function PreviewSection({
   ) => void;
   onOpenSpacingSettings: (target: SpacingInspectorTarget) => void;
   onOpenElementsPanel: () => void;
-  onChangeLayout: (sectionId: string) => void;
+  onChangeLayout: (sectionId: string, rowIndex: number) => void;
   spacingOverlayEnabled: boolean;
   nestingDepth?: number;
   nestedOwnerColumnKey?: string | null;
@@ -13594,6 +13374,32 @@ function PreviewSection({
       </div>
     </div>
   ) : null;
+
+  if (isLayoutContainerSection(section) && !section.layoutItems?.length) {
+    return (
+      <>
+        <div className="shop-builder-section-content builder-preview-empty-section">
+          <button
+            type="button"
+            className="builder-preview-drop-zone builder-preview-empty-section-action"
+            onClick={() =>
+              setRowInsertTarget({ rowIndex: -1, placement: "after" })
+            }
+            aria-label="Add row"
+          >
+            <span className="builder-structural-placeholder-mark">
+              <Plus size={14} />
+            </span>
+            <span className="builder-structural-placeholder-copy">
+              <strong>Empty section</strong>
+              <small>Add Row</small>
+            </span>
+          </button>
+        </div>
+        {rowLayoutPicker ? createPortal(rowLayoutPicker, document.body) : null}
+      </>
+    );
+  }
 
   if (section.kind === "hero" && !section.layoutItems?.length) {
     const isAntigravity = section.carouselSettings?.variant === "antigravity";
@@ -13972,25 +13778,17 @@ function PreviewSection({
             const rowLayoutLabel = rowLayoutPreset?.label
               ? `Layout · ${rowLayoutPreset.label}`
               : "Layout";
-            const isRowHoveredOrActive =
-              nestingDepth === 0 &&
-              hoveredTarget?.sectionId === section.id &&
-              (
-                (hoveredTarget.type === "row" && hoveredTarget.rowIndex === layoutRowIndex) ||
-                (hoveredTarget.type === "column" && rowMetaByColumnKey.get(hoveredTarget.columnKey)?.rowIndex === layoutRowIndex) ||
-                (hoveredTarget.type === "block" && rowMetaByColumnKey.get(hoveredTarget.columnKey)?.rowIndex === layoutRowIndex)
-              );
-
-            const isRowSelectedOrActive =
-              nestingDepth === 0 &&
-              selectedTarget?.sectionId === section.id &&
-              (
-                (selectedTarget.type === "row" && selectedTarget.rowIndex === layoutRowIndex) ||
-                (selectedTarget.type === "column" && rowMetaByColumnKey.get(selectedTarget.columnKey)?.rowIndex === layoutRowIndex) ||
-                (selectedTarget.type === "block" && rowMetaByColumnKey.get(selectedTarget.columnKey)?.rowIndex === layoutRowIndex)
-              );
-
-            const showRowToolbar = (isRowHoveredOrActive || isRowSelectedOrActive) && !editingTarget;
+            const hasActiveDescendant = [hoveredTarget, selectedTarget].some(
+              (target) =>
+                target?.sectionId === section.id &&
+                (target.type === "column" || target.type === "block") &&
+                rowMetaByColumnKey.get(target.columnKey)?.rowIndex ===
+                  layoutRowIndex,
+            );
+            const showRowToolbar =
+              rowChrome.showToolbar &&
+              !hasActiveDescendant &&
+              !editingTarget;
 
             const isEmptyRow = layoutRow.items.every(
               (item) =>
@@ -14090,6 +13888,21 @@ function PreviewSection({
                     ...rowStyle,
                   }}
                 >
+                  {nestingDepth === 0 && (
+                    <button
+                      type="button"
+                      className="builder-preview-row-hit-area"
+                      aria-label={`Select row ${layoutRowIndex + 1}`}
+                      title={`Select row ${layoutRowIndex + 1}`}
+                      onMouseEnter={() => onHoverTarget(rowTarget)}
+                      onFocus={() => onSelectRow(section.id, layoutRowIndex)}
+                      onClick={(event) => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        onSelectRow(section.id, layoutRowIndex);
+                      }}
+                    />
+                  )}
                   {rowChrome.showSpacing && (
                     <RowSpacingOverlay
                       item={rowItem}
@@ -14105,7 +13918,6 @@ function PreviewSection({
                     <div
                       className="builder-preview-row-toolbar"
                       onMouseEnter={() => onHoverTarget(rowTarget)}
-                      onMouseLeave={() => onHoverTarget(null)}
                     >
                       <BuilderContextToolbar
                         context="layout"
@@ -14113,7 +13925,9 @@ function PreviewSection({
                         canMoveUp={layoutRowIndex > 0}
                         canMoveDown={layoutRowIndex < layoutRows.length - 1}
                         canDelete={isEmptyRow}
-                        onChangeLayout={() => onChangeLayout(section.id)}
+                        onChangeLayout={() =>
+                          onChangeLayout(section.id, layoutRowIndex)
+                        }
                         onSettings={() => {
                           onSelectRow(section.id, layoutRowIndex);
                           onOpenInspector();
@@ -14203,7 +14017,7 @@ function PreviewSection({
                   data-builder-row-index={rowMeta?.rowIndex}
                   data-builder-column-key={columnKey}
                   data-builder-interaction-state={columnInteractionState}
-                  className={`${builderInteractionClassName(
+                  className={`${getUikitColumnClass({ horizontalAlign: typedItem.columnHorizontalAlign, verticalAlign: typedItem.columnVerticalAlign, flex: typedItem.columnFlex, responsiveWidth: typedItem.columnResponsiveWidth })} ${builderInteractionClassName(
                     columnTarget,
                     columnInteractionState,
                   )} shop-builder-content-layout-card builder-nested-layout-container`}
@@ -14215,7 +14029,20 @@ function PreviewSection({
                     "--builder-nested-row-count": typedItem.nestedLayout.rows.length,
                   } as CSSProperties}
                   onMouseEnter={() => onHoverTarget(columnTarget)}
-                  onMouseLeave={() => onHoverTarget(null)}
+                  onMouseLeave={(event) => {
+                    const relatedTarget =
+                      event.relatedTarget instanceof Element
+                        ? event.relatedTarget
+                        : null;
+                    const relatedOwner = relatedTarget?.closest<HTMLElement>(
+                      '[data-builder-object-type="column"]',
+                    );
+                    onHoverTarget(
+                      relatedOwner?.dataset.builderColumnEmpty === "true"
+                        ? rowTarget
+                        : builderTargetFromElement(relatedTarget),
+                    );
+                  }}
                   onClick={(event) => {
                     if (
                       event.target instanceof HTMLElement &&
@@ -14313,11 +14140,31 @@ function PreviewSection({
                   data-builder-section-id={section.id}
                   data-builder-row-index={rowMeta?.rowIndex}
                   data-builder-column-key={columnKey}
+                  data-builder-column-empty={blocks.length === 0 ? "true" : undefined}
                   data-builder-interaction-state={columnInteractionState}
-                  onMouseEnter={() =>
-                    onHoverTarget({ type: "column", sectionId: section.id, columnKey })
-                  }
-                  onMouseLeave={() => onHoverTarget(null)}
+                  onMouseEnter={() => {
+                    if (blocks.length > 0) {
+                      onHoverTarget({
+                        type: "column",
+                        sectionId: section.id,
+                        columnKey,
+                      });
+                    }
+                  }}
+                  onMouseLeave={(event) => {
+                    const relatedTarget =
+                      event.relatedTarget instanceof Element
+                        ? event.relatedTarget
+                        : null;
+                    const relatedOwner = relatedTarget?.closest<HTMLElement>(
+                      '[data-builder-object-type="column"]',
+                    );
+                    onHoverTarget(
+                      relatedOwner?.dataset.builderColumnEmpty === "true"
+                        ? rowTarget
+                        : builderTargetFromElement(relatedTarget),
+                    );
+                  }}
                   className={`${getUikitColumnWidthClass(layoutRow.layoutKey, index)} ${getUikitColumnClass({ horizontalAlign: typedItem.columnHorizontalAlign, verticalAlign: typedItem.columnVerticalAlign, flex: typedItem.columnFlex, responsiveWidth: typedItem.columnResponsiveWidth })} ${builderInteractionClassName(
                     columnTarget,
                     columnInteractionState,
@@ -14566,7 +14413,20 @@ function PreviewSection({
                             blockKey,
                           })
                         }
-                        onMouseLeave={() => onHoverTarget(null)}
+                        onMouseLeave={(event) => {
+                          const relatedTarget =
+                            event.relatedTarget instanceof Element
+                              ? event.relatedTarget
+                              : null;
+                          const relatedOwner = relatedTarget?.closest<HTMLElement>(
+                            '[data-builder-object-type="column"]',
+                          );
+                          onHoverTarget(
+                            relatedOwner?.dataset.builderColumnEmpty === "true"
+                              ? rowTarget
+                              : builderTargetFromElement(relatedTarget),
+                          );
+                        }}
                         className={`builder-preview-layout-block ${builderInteractionClassName(
                           blockTarget,
                           blockInteractionState,
@@ -14575,7 +14435,7 @@ function PreviewSection({
                         } ${legacySurfaceClass} ${
                           block.kind === "scrollPinnedDemo"
                             ? ""
-                            : `is-padding-${hasBuilderVisualSpacing(block.visualStyle?.padding) || !block.elementPadding || block.elementPadding === "inherit" ? "none" : block.elementPadding} is-align-${block.elementAlign ?? "left"} ${block.kind === "grid" ? "" : visualStyleClassName(block.visualStyle)} ${block.premiumCardStyle && block.premiumCardStyle !== "none" ? `shop-builder-card--${block.premiumCardStyle}` : ""}`
+                            : `is-padding-${hasBuilderVisualSpacing(block.visualStyle?.padding) || !block.elementPadding || block.elementPadding === "inherit" ? "none" : block.elementPadding} is-align-${block.elementAlign ?? "left"} ${block.kind === "grid" ? visualStyleVisibilityClassName(block.visualStyle) : visualStyleClassName(block.visualStyle)} ${block.premiumCardStyle && block.premiumCardStyle !== "none" ? `shop-builder-card--${block.premiumCardStyle}` : ""}`
                         } ${
                           selectedLayoutBlockKey === blockKey
                             ? "is-selected-block"
@@ -14843,16 +14703,7 @@ function PreviewSection({
                                     block.size,
                                   )}
                                   href={block.buttonUrl || "#"}
-                                  target={
-                                    block.buttonTarget === "_blank"
-                                      ? "_blank"
-                                      : undefined
-                                  }
-                                  rel={
-                                    block.buttonTarget === "_blank"
-                                      ? "noreferrer"
-                                      : undefined
-                                  }
+                                  {...builderLinkTargetProps(block.buttonTarget)}
                                 >
                                   {block.buttonLabel}
                                 </a>
@@ -14977,16 +14828,7 @@ function PreviewSection({
                                       (btn as any).size ?? block.size,
                                     )}
                                     href={btn.url || "#"}
-                                    target={
-                                      btn.target === "_blank"
-                                        ? "_blank"
-                                        : undefined
-                                    }
-                                    rel={
-                                      btn.target === "_blank"
-                                        ? "noreferrer"
-                                        : undefined
-                                    }
+                                    {...builderLinkTargetProps(btn.target)}
                                   >
                                     {btn.label || "Button"}
                                   </a>
@@ -15135,7 +14977,7 @@ function PreviewSection({
                                     ⠿
                                   </span>
                                   {resolveUikitIconName(item.iconName ?? block.listIcon) && <WebPagesIcon name={item.iconName ?? block.listIcon} size={item.iconSize ?? block.listIconSize ?? 16} />}
-                                  {item.url ? <a href={item.url} target={item.target === "_blank" ? "_blank" : undefined} rel={item.target === "_blank" ? "noreferrer" : undefined}><DashboardTypog as="span" typography={block.typography}>{item.text}</DashboardTypog></a> : <DashboardTypog as="span" typography={block.typography}>{item.text}</DashboardTypog>}
+                                  {item.url ? <a href={item.url} {...builderLinkTargetProps(item.target)}><DashboardTypog as="span" typography={block.typography}>{item.text}</DashboardTypog></a> : <DashboardTypog as="span" typography={block.typography}>{item.text}</DashboardTypog>}
                                 </li>
                               ))}
                             </ul>
@@ -15169,6 +15011,7 @@ function PreviewSection({
                             variant={block.textVariant}
                             align={block.textAlign}
                             typography={block.typography}
+                            typographyRole={block.textTypographyRole}
                           />
                         ) : block.kind === "heading" ? (
                           <ContentLayoutBlock
@@ -15201,7 +15044,7 @@ function PreviewSection({
                           </div>
                         ) : block.kind === "hero" ? (
                           <div
-                            className={`shop-builder-column-block shop-builder-column-block--hero ${block.heroContentAlign ? `shop-builder-hero--align-${block.heroContentAlign}` : ""} ${block.heroVerticalAlign ? `shop-builder-hero--valign-${block.heroVerticalAlign}` : ""} ${block.heroHeight ? `shop-builder-hero--height-${block.heroHeight}` : ""} ${block.heroMediaPlacement ? `shop-builder-hero--media-${block.heroMediaPlacement}` : ""} ${block.heroInverse ? "uk-light" : ""} ${block.carouselSettings?.variant === "antigravity" ? "shop-builder-hero--antigravity shop-builder-hero--antigravity-block" : ""} ${block.premiumCardStyle && block.premiumCardStyle !== "none" ? `shop-builder-card--${block.premiumCardStyle}` : ""}`}
+                            className={`shop-builder-column-block shop-builder-column-block--hero ${typographyRoleClass(block.contentTypographyRole)} ${block.heroContentAlign ? `shop-builder-hero--align-${block.heroContentAlign}` : ""} ${block.heroVerticalAlign ? `shop-builder-hero--valign-${block.heroVerticalAlign}` : ""} ${block.heroHeight ? `shop-builder-hero--height-${block.heroHeight}` : ""} ${block.heroMediaPlacement ? `shop-builder-hero--media-${block.heroMediaPlacement}` : ""} ${block.heroInverse ? "uk-light" : ""} ${block.carouselSettings?.variant === "antigravity" ? "shop-builder-hero--antigravity shop-builder-hero--antigravity-block" : ""} ${block.premiumCardStyle && block.premiumCardStyle !== "none" ? `shop-builder-card--${block.premiumCardStyle}` : ""}`}
                             style={{ textAlign: block.heroContentAlign, maxWidth: block.heroContentWidth === "full" ? "none" : block.heroContentWidth === "small" ? "42rem" : block.heroContentWidth === "medium" ? "56rem" : "72rem" }}
                           >
                             <div
@@ -15215,7 +15058,7 @@ function PreviewSection({
                               {block.eyebrow && (
                                 <InlineEditableText
                                   as="span"
-                                  className="shop-builder-eyebrow"
+                                  className={`shop-builder-eyebrow ${typographyRoleClass(block.metaTypographyRole)}`}
                                   typography={block.typography}
                                   value={block.eyebrow}
                                   onChange={(eyebrow) =>
@@ -15236,7 +15079,10 @@ function PreviewSection({
                                   "antigravity" ? (
                                   <DashboardTypog
                                     as={block.heroHeadingElement ?? "h2"}
-                                    className={
+                                    className={`${typographyRoleClass(block.titleTypographyRole)} ${getUikitHeadingClass(
+                                      block.heroHeadingElement ?? "h2",
+                                      block.heroHeadingStyle ?? "xlarge",
+                                    )} ${
                                       block.textGradientPreset &&
                                       block.textGradientPreset !== "none"
                                         ? `text-gradient--${block.textGradientPreset}`
@@ -15244,7 +15090,7 @@ function PreviewSection({
                                             "antigravity"
                                           ? "shop-builder-title--gradient"
                                           : ""
-                                    }
+                                    }`}
                                     typography={block.typography}
                                   >
                                     <TypewriterText
@@ -15294,7 +15140,7 @@ function PreviewSection({
                                 ) : (
                                   <InlineEditableText
                                     as={(block.heroHeadingElement ?? "h2") as any}
-                                    className={`${getUikitHeadingClass(block.heroHeadingElement ?? "h2", block.heroHeadingStyle ?? "xlarge")} ${
+                                    className={`${typographyRoleClass(block.titleTypographyRole)} ${getUikitHeadingClass(block.heroHeadingElement ?? "h2", block.heroHeadingStyle ?? "xlarge")} ${
                                       block.textGradientPreset &&
                                       block.textGradientPreset !== "none" &&
                                       block.textGradientPreset !== "custom"
@@ -15409,8 +15255,7 @@ function PreviewSection({
                                     area="button"
                                     className={`builder-hero-action ${getUikitButtonClass(block.buttonStyle ?? "primary", block.size ?? "default")}`}
                                     href={block.buttonUrl || "#"}
-                                    target={block.buttonTarget === "_blank" ? "_blank" : undefined}
-                                    rel={block.buttonTarget === "_blank" ? "noreferrer" : undefined}
+                                    {...builderLinkTargetProps(block.buttonTarget)}
                                   >
                                     {block.buttonLabel}
                                   </DashboardTypog>
@@ -15421,8 +15266,7 @@ function PreviewSection({
                                     area="button"
                                     className={`builder-hero-action ${getUikitButtonClass(block.secondaryButtonStyle ?? "secondary", block.secondaryButtonSize ?? "default")}`}
                                     href={block.secondaryButtonUrl || "#"}
-                                    target={block.secondaryButtonTarget === "_blank" ? "_blank" : undefined}
-                                    rel={block.secondaryButtonTarget === "_blank" ? "noreferrer" : undefined}
+                                    {...builderLinkTargetProps(block.secondaryButtonTarget)}
                                   >
                                     {block.secondaryButtonLabel}
                                   </DashboardTypog>
@@ -15668,7 +15512,7 @@ function PreviewSection({
                             const panelTitleClass = block.panelTitleStyle && block.panelTitleStyle !== "inherit" ? getUikitHeadingClass(block.panelTitleStyle, block.panelTitleStyle) : "";
 
                             return (
-                              <div data-builder-block-id={block.id} className={`shop-builder-column-block shop-builder-column-block--panel ${panelLayoutClass} ${getUikitCardClass(block.panelVariant ?? block.panelStyle ?? "default", { hover: block.panelHover ? "hover" : "none", padding: block.panelSize })}`} style={{ textAlign: block.panelTextAlign ?? "left" }}>
+                              <div data-builder-block-id={block.id} className={`shop-builder-column-block shop-builder-column-block--panel ${panelLayoutClass} ${typographyRoleClass(block.contentTypographyRole)} ${getUikitCardClass(block.panelVariant ?? block.panelStyle ?? "default", { hover: block.panelHover ? "hover" : "none", padding: block.panelSize })}`} style={{ textAlign: block.panelTextAlign ?? "left" }}>
                                 {block.panelShowMedia !== false && (
                                 <div
                                   className={`${panelMediaClass} shop-builder-panel-media${isPanelImagePlaceholder ? " is-empty" : ""}`}
@@ -15753,7 +15597,7 @@ function PreviewSection({
                                     <InlineEditableText
                                       as="span"
                                       area="eyebrow"
-                                      className="shop-builder-eyebrow shop-builder-panel-meta"
+                                      className={`shop-builder-eyebrow shop-builder-panel-meta ${typographyRoleClass(block.metaTypographyRole)}`}
                                       typography={block.typography}
                                       style={panelMetaStyle}
                                       value={block.eyebrow}
@@ -15771,7 +15615,7 @@ function PreviewSection({
                                     (block.typewriterEnabled ? (
                                       <DashboardTypog
                                         as={block.panelTitleElement ?? "h3"}
-                                        className={panelTitleClass}
+                                        className={`${panelTitleClass} ${typographyRoleClass(block.titleTypographyRole)}`}
                                         area="title"
                                         typography={undefined}
                                         style={panelTitleStyle}
@@ -15831,7 +15675,7 @@ function PreviewSection({
                                     ) : (
                                       <InlineEditableText
                                         as={block.panelTitleElement ?? "h3"}
-                                        className={panelTitleClass}
+                                        className={`${panelTitleClass} ${typographyRoleClass(block.titleTypographyRole)}`}
                                         area="title"
                                         typography={undefined}
                                         style={panelTitleStyle}
@@ -15965,14 +15809,7 @@ function PreviewSection({
                           })()
                         ) : block.kind === "image" ? (
                           (() => {
-                            const imageSemantics = {
-                              fit: block.imageFit,
-                              ratio: block.imageRatio,
-                              shape: block.imageShape ?? (block.imageBorderRadius ? "rounded" : "none"),
-                              shadow: block.imageShadow,
-                              alignment: block.imageAlignment,
-                              width: block.imageWidth,
-                            } as const;
+                            const imageSemantics = resolveUikitImageSemantics(block);
                             const imageStyle = getUikitImageStyle(imageSemantics);
                             const imageAttributes = getUikitImageAttributes(imageSemantics);
                             const imageClass = getUikitImageClass(imageSemantics);
@@ -16018,7 +15855,7 @@ function PreviewSection({
                                     {!isBlockImagePlaceholder ? (
                                       <>
                                         {block.imageLinkUrl ? (
-                                          <a href={block.imageLinkUrl} target={block.imageLinkTarget === "_blank" ? "_blank" : undefined} rel={block.imageLinkTarget === "_blank" ? "noreferrer" : undefined}>
+                                          <a href={block.imageLinkUrl} {...builderLinkTargetProps(block.imageLinkTarget)}>
                                             <Image className={imageClass} src={block.imageUrl!} alt={block.imageAlt ?? ""} width={1200} height={800} loading={block.imageLoading ?? "lazy"} {...imageAttributes} style={{ width: "100%", height: imageStyle.aspectRatio ? "100%" : "auto", objectFit: imageStyle.objectFit, ...(imageStyle.position ? { position: imageStyle.position, inset: imageStyle.inset } : {}) }} />
                                           </a>
                                         ) : (
@@ -16707,13 +16544,18 @@ function PreviewSection({
                                             const isItemImagePlaceholder =
                                               !item.imageUrl ||
                                               !item.imageUrl.trim();
+                                            const mediaStyle = getUikitPanelMediaStyle({
+                                              ratio: item.mediaRatio ?? block.imageRatio,
+                                              fit: (item.mediaFit ?? block.imageFit ?? "cover") === "contain" ? "contain" : "cover",
+                                              alignment: "center",
+                                            });
 
                                             return (
                                               <div
                                                 className={`${block.gridItemRenderer === "card" ? getUikitPanelMediaClass(item.mediaPlacement === "left" || item.mediaPlacement === "right" ? item.mediaPlacement : "top") : ""} shop-builder-grid-image ${
                                                   isItemImagePlaceholder ? "is-empty" : ""
                                                 }`}
-                                                style={{ aspectRatio: item.mediaRatio && item.mediaRatio !== "natural" ? ({ square: "1 / 1", "4:3": "4 / 3", "3:2": "3 / 2", "16:9": "16 / 9", portrait: "3 / 4" } as Record<string, string>)[item.mediaRatio] : undefined, overflow: "hidden" }}
+                                                style={{ aspectRatio: mediaStyle.aspectRatio, overflow: "hidden" }}
                                                 onClick={(event) => {
                                                   if (block.gridSource !== "products") {
                                                     event.stopPropagation();
@@ -16743,10 +16585,7 @@ function PreviewSection({
                                                         inset: 0,
                                                         width: "100%",
                                                         height: "100%",
-                                                        objectFit:
-                                                          item.mediaFit === "contain"
-                                                            ? "contain"
-                                                            : "cover",
+                                                        objectFit: mediaStyle.backgroundSize as React.CSSProperties["objectFit"],
                                                       }}
                                                     />
                                                     {block.gridSource !==
@@ -16821,7 +16660,7 @@ function PreviewSection({
                                               </div>
                                             );
                                           })()}
-                                          <div className={`${block.gridItemRenderer === "card" ? "uk-card-body " : ""}shop-builder-grid-content`}>
+                                          <div className={`${block.gridItemRenderer === "card" ? "uk-card-body " : ""}shop-builder-grid-content ${typographyRoleClass(block.contentTypographyRole)}`}>
                                             {block.gridSource !== "products" ? (
                                               <>
                                                 {item.iconName && <WebPagesIcon name={item.iconName} size={item.iconSize ?? 20} />}
@@ -16830,7 +16669,7 @@ function PreviewSection({
                                                   item.eyebrow && (
                                                     <InlineEditableText
                                                       as="span"
-                                                      className="shop-builder-eyebrow"
+                                                      className={`shop-builder-eyebrow ${typographyRoleClass(block.metaTypographyRole)}`}
                                                       typography={
                                                         itemTypography
                                                       }
@@ -16851,7 +16690,7 @@ function PreviewSection({
                                                 {item.title && (
                                                   <InlineEditableText
                                                     as={(item.titleElement ?? "h3") as any}
-                                                    className={`shop-builder-title ${item.titleStyle && item.titleStyle !== "inherit" ? getUikitHeadingClass(item.titleStyle, item.titleStyle) : ""}`}
+                                                    className={`shop-builder-title ${typographyRoleClass(block.titleTypographyRole)} ${item.titleStyle && item.titleStyle !== "inherit" ? getUikitHeadingClass(item.titleStyle, item.titleStyle) : ""}`}
                                                     typography={itemTypography}
                                                     style={gridTitleStyle}
                                                     value={item.title}
@@ -16872,7 +16711,7 @@ function PreviewSection({
                                                   item.meta && (
                                                     <InlineEditableText
                                                       as="span"
-                                                      className="shop-builder-grid-meta"
+                                                      className={`shop-builder-grid-meta ${typographyRoleClass(block.metaTypographyRole)}`}
                                                       typography={
                                                         itemTypography
                                                       }
@@ -16942,8 +16781,7 @@ function PreviewSection({
                                                       <a
                                                         className={`shop-builder-grid-action builder-grid-action ${getUikitButtonClass(item.actionStyle ?? item.buttonStyle ?? block.buttonStyle ?? "primary", item.actionSize ?? block.size ?? "default")}`}
                                                         href={item.buttonUrl || "#"}
-                                                        target={item.buttonTarget === "_blank" ? "_blank" : undefined}
-                                                        rel={item.buttonTarget === "_blank" ? "noreferrer" : undefined}
+                                                        {...builderLinkTargetProps(item.buttonTarget)}
                                                       >
                                                         {item.buttonLabel}
                                                       </a>
@@ -17003,8 +16841,7 @@ function PreviewSection({
                                                       <a
                                                         className={`shop-builder-grid-action builder-grid-action ${getUikitButtonClass(item.actionStyle ?? item.buttonStyle ?? block.buttonStyle ?? "primary", item.actionSize ?? block.size ?? "default")}`}
                                                         href={item.buttonUrl || "#"}
-                                                        target={item.buttonTarget === "_blank" ? "_blank" : undefined}
-                                                        rel={item.buttonTarget === "_blank" ? "noreferrer" : undefined}
+                                                        {...builderLinkTargetProps(item.buttonTarget)}
                                                       >
                                                         {item.buttonLabel}
                                                       </a>

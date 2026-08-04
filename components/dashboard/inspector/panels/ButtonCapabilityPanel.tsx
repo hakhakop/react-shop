@@ -2,9 +2,9 @@
 
 import type { InspectorTab } from "@/components/dashboard/builderTypes";
 import type { BuilderLayoutBlock } from "@/components/dashboard/builderTypes";
-import { UIKIT_BUTTON_CAPABILITY } from "@/lib/uikitCapabilities";
-import { InspectorFieldRow, InspectorPillGroup, InspectorSection, InspectorSelect, InspectorTextField } from "@/components/dashboard/inspector/InspectorControls";
-import GeneralSettingsPanel from "@/components/dashboard/inspector/panels/GeneralSettingsPanel";
+import { BUILDER_LINK_TARGET_OPTIONS } from "@/lib/websiteBuilderLinks";
+import { InspectorFieldRow, InspectorSelect, InspectorTextField } from "@/components/dashboard/inspector/InspectorControls";
+import ButtonPresentationFields from "@/components/dashboard/inspector/panels/ButtonPresentationFields";
 import type { BuilderShellSettings } from "@/lib/builderShell";
 
 type Props = {
@@ -45,9 +45,6 @@ function selectValue(value: string | undefined, fallback: string) {
   return value || fallback;
 }
 
-const targetOptions = [{ value: "_self", label: "Same tab" }, { value: "_blank", label: "New tab" }] as const;
-const named = <T extends string>(values: readonly T[]) => values.map((value) => ({ value, label: value.replace(/-/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase()) }));
-
 export default function ButtonCapabilityPanel({ block, tab, shellSettings, update }: Props) {
   const updateSemantic = (patch: Partial<BuilderLayoutBlock>) => {
     update({ ...legacyButtonFields, ...patch });
@@ -62,7 +59,7 @@ export default function ButtonCapabilityPanel({ block, tab, shellSettings, updat
         </div>
         <InspectorFieldRow label="Label"><InspectorTextField value={block.buttonLabel ?? ""} onChange={(value) => updateSemantic({ buttonLabel: value })} ariaLabel="Button label" /></InspectorFieldRow>
         <InspectorFieldRow label="URL / action"><InspectorTextField value={block.buttonUrl ?? ""} onChange={(value) => updateSemantic({ buttonUrl: value })} ariaLabel="Button URL or action" /></InspectorFieldRow>
-        <InspectorFieldRow label="Target"><InspectorSelect value={selectValue(block.buttonTarget, "_self") as "_self" | "_blank"} options={targetOptions} onChange={(value) => updateSemantic({ buttonTarget: value })} ariaLabel="Button target" /></InspectorFieldRow>
+        <InspectorFieldRow label="Target"><InspectorSelect value={selectValue(block.buttonTarget, "_self") as "_self" | "_blank"} options={BUILDER_LINK_TARGET_OPTIONS} onChange={(value) => updateSemantic({ buttonTarget: value })} ariaLabel="Button target" /></InspectorFieldRow>
       </div>
     );
   }
@@ -70,29 +67,21 @@ export default function ButtonCapabilityPanel({ block, tab, shellSettings, updat
   if (tab === "style") {
     return (
       <div className="builder-inspector-stack" data-uikit-capability="button-style">
-        <GeneralSettingsPanel block={block} shellSettings={shellSettings} tab={tab} update={update} />
         <div className="builder-element-inspector-note">
           <strong>UIkit Button</strong>
           <span>Semantic values map to UIkit classes in the builder and frontend.</span>
         </div>
-        <InspectorSection title="Button style" description="UIkit owns the semantic variant and size." className="inspector-section-flat">
-          <InspectorFieldRow label="Variant"><InspectorPillGroup value={selectValue(block.buttonStyle, "primary") as BuilderLayoutBlock["buttonStyle"]} options={named(UIKIT_BUTTON_CAPABILITY.properties.variant.values)} onChange={(value) => updateSemantic({ buttonStyle: value as BuilderLayoutBlock["buttonStyle"] })} ariaLabel="Button variant" /></InspectorFieldRow>
-          <InspectorFieldRow label="Size"><InspectorPillGroup value={selectValue(block.size, "default") as BuilderLayoutBlock["size"]} options={named(UIKIT_BUTTON_CAPABILITY.properties.size.values)} onChange={(value) => updateSemantic({ size: value })} ariaLabel="Button size" /></InspectorFieldRow>
-        </InspectorSection>
+        <ButtonPresentationFields
+          variant={selectValue(block.buttonStyle, "primary")}
+          size={selectValue(block.size, "default")}
+          onVariantChange={(value) => updateSemantic({ buttonStyle: value as BuilderLayoutBlock["buttonStyle"] })}
+          onSizeChange={(value) => updateSemantic({ size: value as BuilderLayoutBlock["size"] })}
+        />
       </div>
     );
   }
 
-  if (tab === "advanced") {
-    return (
-      <div className="builder-inspector-stack" data-uikit-capability="button-advanced">
-        <div className="builder-element-inspector-note">
-          <strong>Button advanced settings</strong>
-          <span>Visibility, animation, and custom classes remain in the shared Advanced tab.</span>
-        </div>
-      </div>
-    );
-  }
+  if (tab === "advanced") return null;
 
   return null;
 }

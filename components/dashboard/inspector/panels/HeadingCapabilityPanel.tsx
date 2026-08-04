@@ -2,10 +2,9 @@
 
 import type { BuilderLayoutBlock, InspectorTab } from "@/components/dashboard/builderTypes";
 import { UIKIT_HEADING_CAPABILITY } from "@/lib/uikitCapabilities";
-import { resolveTypographyInput, updateTypographyArea, type TypographySettings } from "@/lib/builderTypography";
 import { InspectorColorField, InspectorFieldRow, InspectorNumberUnit, InspectorPillGroup, InspectorSelect, InspectorSwitch, InspectorTextField, InspectorTextarea } from "@/components/dashboard/inspector/InspectorControls";
-import GeneralSettingsPanel from "@/components/dashboard/inspector/panels/GeneralSettingsPanel";
 import type { BuilderShellSettings } from "@/lib/builderShell";
+import TypographyRoleSettingsPanel from "@/components/dashboard/inspector/panels/TypographyRoleSettingsPanel";
 
 type Props = {
   block: BuilderLayoutBlock;
@@ -18,16 +17,6 @@ const gradientPresets = UIKIT_HEADING_CAPABILITY.properties.gradient.values;
 const labels = <T extends string>(values: readonly T[]) => values.map((value) => ({ value, label: value.replace(/-/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase()) }));
 
 export default function HeadingCapabilityPanel({ block, tab, shellSettings, update }: Props) {
-  const typography = resolveTypographyInput(block.typography, "title") ?? {};
-  const updateTypography = (patch: Partial<TypographySettings>) => {
-    update({
-      typography: updateTypographyArea(block.typography, "title", {
-        ...typography,
-        ...patch,
-      }),
-    });
-  };
-
   if (tab === "content") {
     return (
       <div className="builder-inspector-stack" data-uikit-capability="heading-content">
@@ -42,8 +31,8 @@ export default function HeadingCapabilityPanel({ block, tab, shellSettings, upda
     const gradient = block.textGradientPreset ?? "none";
     return (
       <div className="builder-inspector-stack" data-uikit-capability="heading-style">
-        <GeneralSettingsPanel block={block} shellSettings={shellSettings} tab={tab} update={update} />
-        <div className="builder-element-inspector-note"><strong>UIkit Heading</strong><span>Semantic visual presets map to UIkit heading classes in builder and frontend.</span></div>
+        <div className="builder-element-inspector-note"><strong>UIkit Heading</strong><span>Visual preset selects the UIkit heading style class. Semantic level controls the HTML heading element independently. Both paths are shared by builder and frontend.</span></div>
+        <TypographyRoleSettingsPanel block={block} fields={[{ field: "headingTypographyRole", label: "Font role" }]} update={update} />
         <InspectorFieldRow label="Visual preset"><InspectorSelect value={(block.headingSize ?? "medium") as BuilderLayoutBlock["headingSize"]} options={labels(UIKIT_HEADING_CAPABILITY.properties.visualPreset.values)} onChange={(value) => update({ headingSize: value })} ariaLabel="Heading visual preset" /></InspectorFieldRow>
         <InspectorFieldRow label="Alignment"><InspectorPillGroup value={(block.headingAlign ?? "left") as BuilderLayoutBlock["headingAlign"]} options={labels(UIKIT_HEADING_CAPABILITY.properties.alignment.values)} onChange={(value) => update({ headingAlign: value })} ariaLabel="Heading alignment" /></InspectorFieldRow>
         <InspectorFieldRow label="Gradient preset"><InspectorSelect value={gradient} options={labels(gradientPresets)} onChange={(value) => update({ textGradientPreset: value })} ariaLabel="Gradient preset" /></InspectorFieldRow>
@@ -62,19 +51,6 @@ export default function HeadingCapabilityPanel({ block, tab, shellSettings, upda
     );
   }
 
-  if (tab === "typography") {
-    return (
-      <div className="builder-inspector-stack" data-uikit-capability="heading-typography">
-        <div className="builder-element-inspector-note"><strong>Complementary typography</strong><span>These controls complement the UIkit visual preset; font size and typography variants are intentionally absent.</span></div>
-        <InspectorFieldRow label="Font family"><InspectorTextField value={typography.fontFamily ?? ""} placeholder="inherit" onChange={(value) => updateTypography({ fontFamily: value || undefined })} ariaLabel="Heading font family" /></InspectorFieldRow>
-        <div className="builder-two-column"><InspectorFieldRow label="Font weight"><InspectorSelect value={String(typography.fontWeight ?? "")} options={[{ value: "", label: "Inherit" }, ...[400, 500, 600, 700, 800].map((value) => ({ value: String(value), label: String(value) }))]} onChange={(value) => updateTypography({ fontWeight: value || undefined })} ariaLabel="Heading font weight" /></InspectorFieldRow><InspectorFieldRow label="Line height"><InspectorTextField value={typography.lineHeight ?? ""} placeholder="inherit" onChange={(value) => updateTypography({ lineHeight: value || undefined })} ariaLabel="Heading line height" /></InspectorFieldRow></div>
-        <div className="builder-two-column"><InspectorFieldRow label="Letter spacing"><InspectorTextField value={typography.letterSpacing ?? ""} placeholder="inherit" onChange={(value) => updateTypography({ letterSpacing: value || undefined })} ariaLabel="Heading letter spacing" /></InspectorFieldRow><InspectorFieldRow label="Text color"><InspectorColorField value={typography.color?.startsWith("#") ? typography.color : "#111827"} onChange={(value) => updateTypography({ color: value })} ariaLabel="Heading text color" /></InspectorFieldRow></div>
-        <div className="builder-two-column"><InspectorFieldRow label="Text transform"><InspectorSelect value={typography.textTransform ?? "none"} options={["none", "uppercase", "lowercase", "capitalize"].map((value) => ({ value, label: value }))} onChange={(value) => updateTypography({ textTransform: value as TypographySettings["textTransform"] })} ariaLabel="Heading text transform" /></InspectorFieldRow><InspectorFieldRow label="Text decoration"><InspectorSelect value={typography.textDecoration ?? "none"} options={["none", "underline", "line-through"].map((value) => ({ value, label: value }))} onChange={(value) => updateTypography({ textDecoration: value as TypographySettings["textDecoration"] })} ariaLabel="Heading text decoration" /></InspectorFieldRow></div>
-        <InspectorFieldRow label="Text shadow"><InspectorTextField value={typography.textShadow ?? ""} placeholder="none or CSS shadow" onChange={(value) => updateTypography({ textShadow: value || undefined })} ariaLabel="Heading text shadow" /></InspectorFieldRow>
-      </div>
-    );
-  }
-
-  if (tab === "advanced") return <div className="builder-inspector-stack" data-uikit-capability="heading-advanced"><div className="builder-element-inspector-note"><strong>Heading advanced settings</strong><span>Visibility, animation, and custom class behavior remain available through shared advanced document controls.</span></div></div>;
+  if (tab === "advanced") return null;
   return null;
 }

@@ -2,7 +2,9 @@
 
 import { useRef } from "react";
 import type { BuilderLayoutBlock, BuilderListItem, InspectorTab } from "@/components/dashboard/builderTypes";
+import type { BuilderShellSettings } from "@/lib/builderShell";
 import { UIKIT_LIST_CAPABILITY } from "@/lib/uikitCapabilities";
+import { BUILDER_LINK_TARGET_OPTIONS } from "@/lib/websiteBuilderLinks";
 import { InspectorFieldRow, InspectorPillGroup, InspectorSelect, InspectorTextField } from "@/components/dashboard/inspector/InspectorControls";
 import IconPicker from "@/components/dashboard/inspector/IconPicker";
 import RepeatableItemShell from "@/components/dashboard/inspector/RepeatableItemShell";
@@ -10,6 +12,7 @@ import RepeatableItemShell from "@/components/dashboard/inspector/RepeatableItem
 type Props = {
   block: BuilderLayoutBlock;
   tab: InspectorTab;
+  shellSettings: BuilderShellSettings;
   update: (patch: Partial<BuilderLayoutBlock>) => void;
 };
 
@@ -35,7 +38,7 @@ function canonicalItems(block: BuilderLayoutBlock): BuilderListItem[] {
     : (block.items ?? []).map((text, index) => ({ id: `${block.id ?? "list"}-item-${index + 1}`, text }));
 }
 
-export default function ListCapabilityPanel({ block, tab, update }: Props) {
+export default function ListCapabilityPanel({ block, tab, shellSettings, update }: Props) {
   const items = canonicalItems(block);
   const updateItems = (next: BuilderListItem[]) => update({ listItems: next });
   const copySequenceRef = useRef(0);
@@ -88,7 +91,7 @@ export default function ListCapabilityPanel({ block, tab, update }: Props) {
             renderItem={(item, index) => <>
               <InspectorFieldRow label="Text"><InspectorTextField value={item.text} onChange={(value) => updateItems(items.map((entry, itemIndex) => itemIndex === index ? { ...entry, text: value } : entry))} ariaLabel={`List item ${index + 1} text`} /></InspectorFieldRow>
               <InspectorFieldRow label="Link URL"><InspectorTextField value={item.url ?? ""} onChange={(value) => updateItems(items.map((entry, itemIndex) => itemIndex === index ? { ...entry, url: value || undefined } : entry))} ariaLabel={`List item ${index + 1} URL`} /></InspectorFieldRow>
-              <InspectorFieldRow label="Link target"><InspectorSelect value={item.target ?? "_self"} options={[{ value: "_self", label: "Same tab" }, { value: "_blank", label: "New tab" }]} onChange={(value) => updateItems(items.map((entry, itemIndex) => itemIndex === index ? { ...entry, target: value } : entry))} ariaLabel={`List item ${index + 1} target`} /></InspectorFieldRow>
+              <InspectorFieldRow label="Link target"><InspectorSelect value={item.target ?? "_self"} options={BUILDER_LINK_TARGET_OPTIONS} onChange={(value) => updateItems(items.map((entry, itemIndex) => itemIndex === index ? { ...entry, target: value } : entry))} ariaLabel={`List item ${index + 1} target`} /></InspectorFieldRow>
               <InspectorFieldRow label="Icon">
                 <IconPicker
                   value={item.iconName}
@@ -124,9 +127,7 @@ export default function ListCapabilityPanel({ block, tab, update }: Props) {
     return <div className="builder-inspector-stack" data-uikit-capability="list-behavior"><p className="builder-inspector-help">Links use the target selected on each list item. List presentation and markers remain UIkit-owned.</p></div>;
   }
 
-  if (tab === "advanced") {
-    return <div className="builder-inspector-stack" data-uikit-capability="list-advanced"><p className="builder-inspector-help">Visibility, animation, and custom class behavior remain in shared Advanced controls.</p></div>;
-  }
+  if (tab === "advanced") return null;
 
   return null;
 }

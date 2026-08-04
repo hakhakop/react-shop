@@ -101,7 +101,7 @@ export default function BorderEffectsControl({
 }: Props) {
   const b = border ?? {};
   const e = effects ?? {};
-  const vis = visibility ?? { desktop: true, tablet: true, mobile: true };
+  const vis = visibility ?? {};
 
   const [customFields, setCustomFields] = useState<Record<string, boolean>>({
     width: false,
@@ -758,21 +758,27 @@ export default function BorderEffectsControl({
       {showVisibility && (
         <div className="builder-style-subsection" style={{ display: "flex", flexDirection: "column", gap: "8px", marginTop: "14px" }}>
           <strong>Visibility</strong>
-          <div className="builder-style-visibility-row" style={{ display: "flex", gap: "14px", alignItems: "center" }}>
+          <div className="builder-style-visibility-row" style={{ display: "grid", gridTemplateColumns: "repeat(3, minmax(0, 1fr))", gap: "8px", alignItems: "center" }}>
             {(["desktop", "tablet", "mobile"] as const).map((device) => (
-              <label key={device} className="builder-check" style={{ display: "inline-flex", alignItems: "center", gap: "6px", cursor: "pointer", fontSize: "12px", textTransform: "capitalize", color: "var(--builder-ui-text)" }}>
-                <input
-                  type="checkbox"
-                  checked={vis[device] !== false}
-                  onChange={(event) =>
-                    onVisibilityChange?.({
-                      ...vis,
-                      [device]: event.target.checked,
-                    })
-                  }
-                  style={{ width: "14px", height: "14px", borderRadius: "3px", border: "1px solid var(--builder-ui-border)", cursor: "pointer" }}
-                />
+              <label key={device} className="builder-typography-field" style={{ display: "flex", flexDirection: "column", gap: "4px", fontSize: "12px", textTransform: "capitalize", color: "var(--builder-ui-text)" }}>
                 <span>{device}</span>
+                <select
+                  aria-label={`${device} visibility`}
+                  value={vis[device] === undefined ? "inherit" : vis[device] ? "visible" : "hidden"}
+                  onChange={(event) => {
+                    const next = { ...vis };
+                    if (event.target.value === "inherit") {
+                      delete next[device];
+                    } else {
+                      next[device] = event.target.value === "visible";
+                    }
+                    onVisibilityChange?.(next);
+                  }}
+                >
+                  <option value="inherit">Inherit (Global)</option>
+                  <option value="visible">Visible</option>
+                  <option value="hidden">Hidden</option>
+                </select>
               </label>
             ))}
           </div>

@@ -42,7 +42,7 @@ test("Hero exposes semantic content/actions and keeps builder/frontend parity", 
   await inspector.getByLabel("Primary action URL").fill("/primary-proof");
   await inspector.getByLabel("Secondary action label").fill("Secondary proof");
   await inspector.getByLabel("Secondary action URL").fill("/secondary-proof");
-  await inspector.getByRole("button", { name: "Styling", exact: true }).click();
+  await inspector.getByRole("button", { name: "Settings", exact: true }).click();
   await inspector.getByRole("radiogroup", { name: "Primary action variant" }).getByRole("radio", { name: "Secondary" }).click();
   await inspector.getByRole("radiogroup", { name: "Primary action size" }).getByRole("radio", { name: "Large" }).click();
   await inspector.getByLabel("Hero heading element").selectOption("h1");
@@ -50,16 +50,28 @@ test("Hero exposes semantic content/actions and keeps builder/frontend parity", 
   await expect(page.locator(".shop-builder-column-block--hero h1").filter({ hasText: "Proof heading" }).last()).toBeVisible();
   await expect(page.locator(".shop-builder-column-block--hero").last().getByText("Primary proof", { exact: true })).toBeVisible();
   await expect(page.locator(".shop-builder-column-block--hero").last().getByText("Secondary proof", { exact: true })).toBeVisible();
+  const heroAnimation = inspector.locator(".builder-style-animation");
+  await expect(heroAnimation).toBeVisible();
+  await heroAnimation.locator("select").first().selectOption("fade-up");
+  const builderHeroShell = page.locator(".builder-preview-layout-block.is-selected-block");
+  await expect(builderHeroShell).toHaveAttribute("data-builder-animate", "fade-up");
   const builderPrimary = page.locator(".shop-builder-column-block--hero").last().locator(".uk-button").first();
   await expect(builderPrimary).toHaveClass(/uk-button-secondary/);
   await expect(builderPrimary).toHaveClass(/uk-button-large/);
   await page.getByRole("button", { name: "Publish", exact: true }).click();
   await expect(page.locator(".builder-publish-celebration").getByText("Published successfully", { exact: true })).toBeVisible();
   const frontend = await page.context().newPage();
+  await frontend.emulateMedia({ reducedMotion: "reduce" });
   await frontend.goto("/app/websites/header-parity-site/preview?page=home");
   await expect(frontend.locator(".shop-builder-column-block--hero h1").filter({ hasText: "Proof heading" }).last()).toBeVisible();
   await expect(frontend.locator(".shop-builder-column-block--hero").last().getByText("Primary proof", { exact: true })).toBeVisible();
   await expect(frontend.locator(".shop-builder-column-block--hero").last().getByText("Secondary proof", { exact: true })).toBeVisible();
+  await expect(frontend.locator(".shop-builder-element-shell[data-builder-animate='fade-up'] .shop-builder-column-block--hero").last()).toBeVisible();
+  const reducedMotionHero = frontend.locator(".shop-builder-element-shell[data-builder-animate='fade-up']").last();
+  await expect.poll(() => reducedMotionHero.evaluate((element) => {
+    const style = getComputedStyle(element);
+    return { opacity: style.opacity, transform: style.transform };
+  })).toEqual({ opacity: "1", transform: "none" });
   await expect(frontend.locator(".shop-builder-column-block--hero").last().locator(".uk-button").first()).toHaveClass(/uk-button-secondary/);
   await expect(frontend.locator(".shop-builder-column-block--hero").last().locator(".uk-button").first()).toHaveClass(/uk-button-large/);
 });
@@ -72,20 +84,20 @@ test("Grid supports item CRUD, layout controls, and shared card semantics", asyn
   const before = await inspector.locator("[data-grid-item-id]").count();
   await inspector.getByRole("button", { name: /Add item/ }).click();
   await expect(inspector.locator("[data-grid-item-id]")).toHaveCount(before + 1);
-  await inspector.locator("[data-grid-item-id]").first().getByRole("button", { name: "Copy grid item 1", exact: true }).click();
+  await inspector.locator("[data-grid-item-id]").first().getByRole("button", { name: "Copy item 1", exact: true }).click();
   await expect(inspector.locator("[data-grid-item-id]")).toHaveCount(before + 2);
-  await inspector.locator("[data-grid-item-id]").nth(1).getByRole("button", { name: "Delete grid item 2", exact: true }).click();
+  await inspector.locator("[data-grid-item-id]").nth(1).getByRole("button", { name: "Delete item 2", exact: true }).click();
   await expect(inspector.locator("[data-grid-item-id]")).toHaveCount(before + 1);
-  await inspector.locator("[data-grid-item-id]").first().getByRole("button", { name: "Delete grid item 1", exact: true }).click();
+  await inspector.locator("[data-grid-item-id]").first().getByRole("button", { name: "Delete item 1", exact: true }).click();
   await expect(inspector.locator("[data-grid-item-id]")).toHaveCount(before);
   await inspector.getByRole("button", { name: /Add item/ }).click();
   await expect(inspector.locator("[data-grid-item-id]")).toHaveCount(before + 1);
-  await inspector.getByRole("button", { name: "Styling", exact: true }).click();
+  await inspector.getByRole("button", { name: "Settings", exact: true }).click();
   await inspector.getByLabel("Grid columns").selectOption("2");
   await inspector.getByLabel("Grid gutter").getByRole("radio").filter({ hasText: "Small" }).click();
   await inspector.getByLabel("Grid item renderer").getByRole("radio").filter({ hasText: "Card" }).click();
-  await inspector.getByRole("radiogroup", { name: "Grid button variant" }).getByRole("radio", { name: "Secondary" }).click();
-  await inspector.getByRole("radiogroup", { name: "Grid button size" }).getByRole("radio", { name: "Large" }).click();
+  await inspector.getByRole("radiogroup", { name: "Default action mapping variant" }).getByRole("radio", { name: "Secondary" }).click();
+  await inspector.getByRole("radiogroup", { name: "Default action mapping size" }).getByRole("radio", { name: "Large" }).click();
   const builderGrid = page.locator(".builder-preview-layout-block.is-selected-block .shop-builder-column-block--grid");
   await expect(builderGrid.locator(".uk-card").first()).toBeVisible();
   const builderGridActions = builderGrid.locator(".shop-builder-grid-action");
@@ -95,7 +107,7 @@ test("Grid supports item CRUD, layout controls, and shared card semantics", asyn
   await inspector.getByRole("button", { name: "Content", exact: true }).click();
   await inspector.getByRole("radiogroup", { name: "Grid source" }).getByRole("radio", { name: "Products" }).click();
   await expect.poll(() => builderGrid.locator(".shop-builder-grid-action").count()).toBeGreaterThan(0);
-  await inspector.getByRole("button", { name: "Styling", exact: true }).click();
+  await inspector.getByRole("button", { name: "Settings", exact: true }).click();
   const builderProductAction = builderGrid.locator(".shop-builder-grid-action").first();
   const readButtonMetrics = (button: typeof builderProductAction) => button.evaluate((element) => {
     const style = getComputedStyle(element);
@@ -107,7 +119,7 @@ test("Grid supports item CRUD, layout controls, and shared card semantics", asyn
   });
   const sizes = {} as Record<"small" | "default" | "large", Awaited<ReturnType<typeof readButtonMetrics>>>;
   for (const value of ["small", "default", "large"] as const) {
-    await inspector.getByRole("radiogroup", { name: "Grid button size" }).getByRole("radio", { name: value.replace(/\b\w/g, (letter) => letter.toUpperCase()) }).click();
+    await inspector.getByRole("radiogroup", { name: "Default action mapping size" }).getByRole("radio", { name: value.replace(/\b\w/g, (letter) => letter.toUpperCase()) }).click();
     sizes[value] = await readButtonMetrics(builderProductAction);
   }
   await expect(builderProductAction).toHaveClass(/uk-button-secondary/);

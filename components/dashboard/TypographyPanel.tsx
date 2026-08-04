@@ -1,6 +1,6 @@
 "use client";
 
-import { typographyProps, type TypographySettings } from "@/lib/builderTypography";
+import type { TypographySettings } from "@/lib/builderTypography";
 import {
   AlignLeft,
   AlignCenter,
@@ -16,6 +16,12 @@ type Props = {
   onOpenGlobalTypographySettings?: () => void;
   hideVariant?: boolean;
   hideFontSize?: boolean;
+  /** Canonical capability mode for elements with local → global inheritance. */
+  localValue?: TypographySettings;
+  inheritedValue?: TypographySettings;
+  onChangeLocal?: (patch: Partial<TypographySettings>) => void;
+  onResetProperty?: (property: keyof TypographySettings) => void;
+  hideAlignment?: boolean;
 };
 
 const SHADOW_PRESETS = [
@@ -48,11 +54,23 @@ export default function TypographyPanel({
   onOpenGlobalTypographySettings,
   hideVariant = false,
   hideFontSize = false,
+  localValue,
+  inheritedValue,
+  onChangeLocal,
+  onResetProperty,
+  hideAlignment = false,
 }: Props) {
-  const v = value || {};
+  const isCanonical = Boolean(onChangeLocal);
+  const local = localValue ?? value ?? {};
+  const inherited = inheritedValue ?? {};
+  const v = isCanonical ? { ...inherited, ...local } : local;
+  const isInherited = (property: keyof TypographySettings) =>
+    isCanonical && local[property] === undefined;
+  const resetProperty = (property: keyof TypographySettings) =>
+    onResetProperty?.(property);
 
   const [customFontFamilyActive, setCustomFontFamilyActive] = useState(
-    v.fontFamily ? !["Inter", "Outfit", "Playfair Display", "system-ui", "monospace"].includes(v.fontFamily) : false
+    v.fontFamily ? !["Manrope", "Inter", "Outfit", "Playfair Display", "system-ui", "monospace"].includes(v.fontFamily) : false
   );
 
   const [customFields, setCustomFields] = useState<Record<string, boolean>>({
@@ -66,6 +84,10 @@ export default function TypographyPanel({
     key: K,
     val: TypographySettings[K],
   ) {
+    if (isCanonical) {
+      onChangeLocal?.({ [key]: val });
+      return;
+    }
     onChange({ ...v, [key]: val });
   }
 
@@ -100,6 +122,11 @@ export default function TypographyPanel({
 
   const handleFontFamilyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const val = e.target.value;
+    if (val === "__inherit__") {
+      resetProperty("fontFamily");
+      setCustomFontFamilyActive(false);
+      return;
+    }
     if (val === "custom") {
       setCustomFontFamilyActive(true);
       set("fontFamily", "Inter");
@@ -160,12 +187,22 @@ export default function TypographyPanel({
       )}
 
       <div className="builder-typography-two-col-grid">
+        {isCanonical && (
+          <div className="builder-element-inspector-note" style={{ gridColumn: "1 / -1" }}>
+            <strong>Typography inheritance</strong>
+            <span>
+              Global Settings provide the effective value until this property is explicitly overridden.
+              {Object.keys(local).length > 0 ? " Use each property’s Inherit control to return it to inheritance." : ""}
+            </span>
+          </div>
+        )}
+
         {/* Font Family */}
         <div className="builder-typography-field">
           <span className="builder-style-side-label-wrapper">Font Family</span>
           <div style={{ display: "flex", flexDirection: "column", gap: "6px", width: "100%" }}>
             <select
-              value={customFontFamilyActive ? "custom" : v.fontFamily || "Inter"}
+              value={isInherited("fontFamily") ? "__inherit__" : customFontFamilyActive ? "custom" : v.fontFamily || "Inter"}
               onChange={handleFontFamilyChange}
               style={{
                 width: "100%",
@@ -179,6 +216,8 @@ export default function TypographyPanel({
                 fontSize: "12px",
               }}
             >
+              {isCanonical && <option value="__inherit__">Inherit · {inherited.fontFamily || "UIkit default"}</option>}
+              <option value="Manrope">Manrope</option>
               <option value="Inter">Inter</option>
               <option value="Outfit">Outfit</option>
               <option value="Playfair Display">Playfair Display</option>
@@ -211,8 +250,17 @@ export default function TypographyPanel({
         <div className="builder-typography-field">
           <span className="builder-style-side-label-wrapper">Font Weight</span>
           <div className="builder-style-chips-row">
+            {isCanonical && (
+              <button
+                type="button"
+                className={`builder-style-chip${isInherited("fontWeight") ? " is-active" : ""}`}
+                onClick={() => resetProperty("fontWeight")}
+              >
+                Inherit · {inherited.fontWeight || "default"}
+              </button>
+            )}
             {WEIGHTS.map((w) => {
-              const isSelected = String(v.fontWeight ?? "400") === w;
+              const isSelected = !isInherited("fontWeight") && String(v.fontWeight ?? "400") === w;
               return (
                 <button
                   key={w}
@@ -232,8 +280,17 @@ export default function TypographyPanel({
           <div className="builder-typography-field">
             <span className="builder-style-side-label-wrapper">Font Size</span>
             <div className="builder-style-chips-row">
+              {isCanonical && (
+                <button
+                  type="button"
+                  className={`builder-style-chip${isInherited("fontSize") ? " is-active" : ""}`}
+                  onClick={() => resetProperty("fontSize")}
+                >
+                  Inherit · {inherited.fontSize || "default"}
+                </button>
+              )}
               {FONT_SIZE_PRESETS.map((preset) => {
-                const isSelected = !showCustomSize && activeSizePreset === preset.value;
+                const isSelected = !isInherited("fontSize") && !showCustomSize && activeSizePreset === preset.value;
                 return (
                   <button
                     key={preset.value}
@@ -279,8 +336,17 @@ export default function TypographyPanel({
         <div className="builder-typography-field">
           <span className="builder-style-side-label-wrapper">Line Height</span>
           <div className="builder-style-chips-row">
+            {isCanonical && (
+              <button
+                type="button"
+                className={`builder-style-chip${isInherited("lineHeight") ? " is-active" : ""}`}
+                onClick={() => resetProperty("lineHeight")}
+              >
+                Inherit · {inherited.lineHeight || "default"}
+              </button>
+            )}
             {LINE_HEIGHT_PRESETS.map((lh) => {
-              const isSelected = !showCustomLH && activeLHPreset === lh;
+              const isSelected = !isInherited("lineHeight") && !showCustomLH && activeLHPreset === lh;
               return (
                 <button
                   key={lh}
@@ -325,8 +391,17 @@ export default function TypographyPanel({
         <div className="builder-typography-field">
           <span className="builder-style-side-label-wrapper">Letter Spacing</span>
           <div className="builder-style-chips-row">
+            {isCanonical && (
+              <button
+                type="button"
+                className={`builder-style-chip${isInherited("letterSpacing") ? " is-active" : ""}`}
+                onClick={() => resetProperty("letterSpacing")}
+              >
+                Inherit · {inherited.letterSpacing || "default"}
+              </button>
+            )}
             {LETTER_SPACING_PRESETS.map((ls) => {
-              const isSelected = !showCustomLS && activeLSPreset === ls;
+              const isSelected = !isInherited("letterSpacing") && !showCustomLS && activeLSPreset === ls;
               return (
                 <button
                   key={ls}
@@ -371,13 +446,22 @@ export default function TypographyPanel({
         <div className="builder-typography-field">
           <span className="builder-style-side-label-wrapper">Text Transform</span>
           <div className="builder-style-chips-row">
+            {isCanonical && (
+              <button
+                type="button"
+                className={`builder-style-chip${isInherited("textTransform") ? " is-active" : ""}`}
+                onClick={() => resetProperty("textTransform")}
+              >
+                Inherit · {inherited.textTransform || "none"}
+              </button>
+            )}
             {[
               { label: "TT", value: "uppercase", title: "Uppercase" },
               { label: "Tt", value: "capitalize", title: "Capitalize" },
               { label: "tt", value: "lowercase", title: "Lowercase" },
               { label: "None", value: "none", title: "None" },
             ].map((preset) => {
-              const isSelected = (v.textTransform || "none") === preset.value;
+              const isSelected = !isInherited("textTransform") && (v.textTransform || "none") === preset.value;
               return (
                 <button
                   key={preset.value}
@@ -394,7 +478,7 @@ export default function TypographyPanel({
         </div>
 
         {/* Text Alignment */}
-        <div className="builder-typography-field">
+        {!hideAlignment && <div className="builder-typography-field">
           <span className="builder-style-side-label-wrapper">Text Alignment</span>
           <div className="builder-style-chips-row">
             {[
@@ -403,7 +487,7 @@ export default function TypographyPanel({
               { value: "right", icon: <AlignRight size={13} />, title: "Align Right" },
               { value: "justify", icon: <AlignJustify size={13} />, title: "Align Justify" },
             ].map((preset) => {
-              const isSelected = (v.textAlign || "left") === preset.value;
+              const isSelected = !isInherited("textAlign") && (v.textAlign || "left") === preset.value;
               return (
                 <button
                   key={preset.value}
@@ -418,19 +502,28 @@ export default function TypographyPanel({
               );
             })}
           </div>
-        </div>
+        </div>}
 
         {/* Text Decoration */}
         <div className="builder-typography-field">
           <span className="builder-style-side-label-wrapper">Text Decoration</span>
           <div className="builder-style-chips-row">
+            {isCanonical && (
+              <button
+                type="button"
+                className={`builder-style-chip${isInherited("textDecoration") ? " is-active" : ""}`}
+                onClick={() => resetProperty("textDecoration")}
+              >
+                Inherit · {inherited.textDecoration || "none"}
+              </button>
+            )}
             {[
               { label: "None", value: "none" },
               { label: "Underline", value: "underline" },
               { label: "Overline", value: "overline" },
               { label: "Line Through", value: "line-through" },
             ].map((preset) => {
-              const isSelected = (v.textDecoration || "none") === preset.value;
+              const isSelected = !isInherited("textDecoration") && (v.textDecoration || "none") === preset.value;
               return (
                 <button
                   key={preset.value}
@@ -449,8 +542,17 @@ export default function TypographyPanel({
         <div className="builder-typography-field">
           <span className="builder-style-side-label-wrapper">Text Color</span>
           <div className="builder-style-color-presets-row" style={{ display: "flex", flexWrap: "wrap", gap: "6px", alignItems: "center", width: "100%" }}>
+            {isCanonical && (
+              <button
+                type="button"
+                className={`builder-style-chip${isInherited("color") ? " is-active" : ""}`}
+                onClick={() => resetProperty("color")}
+              >
+                Inherit · {inherited.color || "default"}
+              </button>
+            )}
             {["#ffffff", "#cccccc", "#888888", "#333333", "var(--builder-ui-accent)"].map((colorHex) => {
-              const isSelected = v.color === colorHex;
+              const isSelected = !isInherited("color") && v.color === colorHex;
               return (
                 <button
                   key={colorHex}
@@ -527,8 +629,17 @@ export default function TypographyPanel({
         <div className="builder-typography-field">
           <span className="builder-style-side-label-wrapper">Text Shadow</span>
           <div className="builder-style-chips-row">
+            {isCanonical && (
+              <button
+                type="button"
+                className={`builder-style-chip${isInherited("textShadow") ? " is-active" : ""}`}
+                onClick={() => resetProperty("textShadow")}
+              >
+                Inherit · {inherited.textShadow || "none"}
+              </button>
+            )}
             {SHADOW_PRESETS.map((shadow) => {
-              const isSelected = !showCustomShadow && activeShadowPreset === shadow.css;
+              const isSelected = !isInherited("textShadow") && !showCustomShadow && activeShadowPreset === shadow.css;
               return (
                 <button
                   key={shadow.value}

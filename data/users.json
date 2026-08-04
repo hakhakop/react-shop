@@ -6,8 +6,8 @@
     "name": "Hakob Jaghatspanyan",
     "role": "super_admin",
     "createdAt": "2026-06-29T19:14:12.875Z",
-    "updatedAt": "2026-08-02T02:11:24.955Z",
-    "language": "hy",
+    "updatedAt": "2026-08-03T19:24:09.332Z",
+    "language": "en",
     "subscription": {
       "packageId": "411e6d1b-3688-4cbb-ad61-533760969d57",
       "packageName": "🌱 Ստարտ",
@@ -225,6 +225,7 @@
     "name": "Header Parity Tester",
     "role": "user",
     "createdAt": "2026-07-22T19:07:02.187Z",
-    "updatedAt": "2026-07-22T19:07:02.187Z"
+    "updatedAt": "2026-08-03T19:22:03.936Z",
+    "language": "en"
   }
 ]

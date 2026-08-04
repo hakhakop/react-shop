@@ -1,15 +1,19 @@
 "use client";
 
-import type { BuilderSection, InspectorTab } from "@/components/dashboard/builderTypes";
+import type { BuilderSection, BuilderShellSettings, InspectorTab } from "@/components/dashboard/builderTypes";
 import { builderRowLayoutPresets } from "@/components/dashboard/builderLayoutPresets";
 import { UIKIT_ROW_CAPABILITY } from "@/lib/uikitCapabilities";
 import { normalizeLayoutToUikitPreset } from "@/lib/uikitLayoutEngine";
+import SpacingControl from "@/components/dashboard/style/SpacingControl";
+import type { BuilderSpacingSides } from "@/lib/builderVisualStyle";
 import { InspectorFieldRow, InspectorPillGroup, InspectorSelect, InspectorSwitch } from "@/components/dashboard/inspector/InspectorControls";
+import AnimationControl from "@/components/dashboard/style/AnimationControl";
 
 type RowItem = NonNullable<BuilderSection["layoutItems"]>[number];
 
 type Props = {
   row: RowItem;
+  shellSettings: BuilderShellSettings;
   layoutKey?: string | null;
   layoutSummary: string;
   tab: InspectorTab;
@@ -17,10 +21,9 @@ type Props = {
   applyLayoutPreset: (key: string) => void;
 };
 
-const spacingOptions = UIKIT_ROW_CAPABILITY.properties.spacing.values;
-
 export default function RowCapabilityPanel({
   row,
+  shellSettings,
   layoutKey,
   layoutSummary,
   tab,
@@ -52,6 +55,11 @@ export default function RowCapabilityPanel({
   }
 
   if (tab === "spacing") {
+    const spacingFields = [
+      { field: "rowTopSpacing" as const, label: "Top padding", side: "top" as const, inherited: shellSettings.rowPaddingTop },
+      { field: "rowBottomSpacing" as const, label: "Bottom padding", side: "bottom" as const, inherited: shellSettings.rowPaddingBottom },
+    ];
+
     return (
       <div className="builder-inspector-stack" data-uikit-capability="row-spacing">
         <div className="builder-element-inspector-note">
@@ -59,8 +67,17 @@ export default function RowCapabilityPanel({
           <span>Only semantic padding presets remain; row margins, arbitrary surfaces, and duplicate visual-style controls are not row capabilities.</span>
         </div>
         <div className="builder-two-column">
-          {(["rowTopSpacing", "rowBottomSpacing"] as const).map((field) => (
-            <InspectorFieldRow key={field} label={field === "rowTopSpacing" ? "Top padding" : "Bottom padding"}><InspectorSelect value={row[field] ?? "inherit"} options={[{ value: "inherit", label: "Inherit" }, ...labels(spacingOptions)]} onChange={(value) => update({ [field]: value } as Partial<RowItem>)} ariaLabel={field === "rowTopSpacing" ? "Top padding" : "Bottom padding"} /></InspectorFieldRow>
+          {spacingFields.map(({ field, label, side, inherited }) => (
+            <SpacingControl
+              key={field}
+              id={`row-spacing-${field}`}
+              label={label}
+              sides={[side]}
+              value={row[field] === undefined ? undefined : ({ [side]: row[field], linked: false } as BuilderSpacingSides)}
+              inheritedValue={{ [side]: inherited } as BuilderSpacingSides}
+              context="rowPadding"
+              onChange={(value) => update({ [field]: value[side] ?? "inherit" } as Partial<RowItem>)}
+            />
           ))}
         </div>
       </div>
@@ -72,8 +89,9 @@ export default function RowCapabilityPanel({
       <div className="builder-inspector-stack" data-uikit-capability="row-advanced">
         <div className="builder-element-inspector-note">
           <strong>Row advanced settings</strong>
-          <span>There are no additional retained UIkit row behavior controls. Visibility and custom class behavior remain available only through shared document-level mechanisms.</span>
+          <span>Animation uses the shared WebPages motion control and renderer contract.</span>
         </div>
+        <AnimationControl value={row.rowAnimation} onChange={(rowAnimation) => update({ rowAnimation })} />
       </div>
     );
   }

@@ -53,3 +53,29 @@ Accordion established the reference, and the List and Grid item inspectors now
 conform to the same Copy/Delete/Drag contract. New repeatable elements should
 adopt this contract from the beginning, while keeping their content fields and
 renderer semantics element-specific.
+
+## Canonical Element Inspector Composition
+
+Every canonical content element declares its capabilities in the shared
+inspector registry. `DashboardInspector` must not choose element panels or
+assemble shared controls with element-specific conditionals.
+
+The visible contract is always `Content`, `Settings`, and `Advanced`:
+
+- `Content` owns semantic document content and repeatable item data.
+- `Settings` composes shared General Settings with the element's declared
+  semantic UIkit presentation, media, link, and layout capabilities.
+- `Advanced` composes shared visibility/motion behavior and only genuinely
+  element-specific advanced behavior.
+
+Shared capability controls are single implementations. General settings and
+animation are injected by `ElementCapabilityComposer`; UIkit button variant
+and size are edited through `ButtonPresentationFields` wherever an action is
+rendered. Element panels provide only their semantic fields and document
+update callbacks.
+
+Concrete typography values remain Global Style tokens. Elements select only
+semantic typography roles (`Default`, `Primary`, `Secondary`, `Tertiary`) and
+UIkit visual presets. Undefined document fields mean inheritance; reset removes
+local ownership. Builder and frontend renderers consume the same role classes,
+UIkit mappings, and resolved values.

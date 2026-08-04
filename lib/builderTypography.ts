@@ -1,4 +1,6 @@
 import type { CSSProperties } from "react";
+import type { BuilderShellSettings } from "@/lib/builderShell";
+import { resolveAppearanceValue, resolveGlobalStyleToken } from "@/lib/globalStyleTokens";
 
 export type TypographyVariant = "heading" | "subheading" | "body" | "button";
 
@@ -24,6 +26,16 @@ export type TypographyGroup = {
 };
 
 export type TypographyArea = "title" | "body" | "button" | "eyebrow";
+export type SemanticTypographyRole = "default" | "primary" | "secondary" | "tertiary";
+
+export function typographyRoleClass(role?: SemanticTypographyRole) {
+  return role && role !== "default" ? `webpages-typography-role-${role}` : "";
+}
+
+export type TypographyResolutionOptions = {
+  shellSettings?: Partial<BuilderShellSettings>;
+  componentDefault?: TypographySettings;
+};
 
 function isClassLike(value?: string) {
   return typeof value === "string" && /^[a-z-]+[0-9a-z-]*$/.test(value);
@@ -50,6 +62,37 @@ export function isTypographyGroup(
 export function resolveTypographyInput(
   typ?: TypographySettings | TypographyGroup,
   area?: TypographyArea,
+  options?: TypographyResolutionOptions,
+): TypographySettings | undefined {
+  const local = resolveLocalTypographyInput(typ, area);
+  if (!options) return local;
+
+  const global = globalTypographyDefaults(area, options.shellSettings);
+  const componentDefault = options.componentDefault ?? {};
+  const keys = new Set<keyof TypographySettings>([
+    ...Object.keys(global) as (keyof TypographySettings)[],
+    ...Object.keys(componentDefault) as (keyof TypographySettings)[],
+    ...Object.keys(local ?? {}) as (keyof TypographySettings)[],
+  ]);
+  const resolved: TypographySettings = {};
+
+  keys.forEach((key) => {
+    const value = resolveAppearanceValue({
+      global: global[key],
+      componentDefault: componentDefault[key],
+      local: local?.[key],
+    }).value;
+    if (value !== undefined) {
+      resolved[key] = value as never;
+    }
+  });
+
+  return Object.keys(resolved).length > 0 ? resolved : undefined;
+}
+
+function resolveLocalTypographyInput(
+  typ?: TypographySettings | TypographyGroup,
+  area?: TypographyArea,
 ): TypographySettings | undefined {
   if (!typ) return undefined;
 
@@ -63,15 +106,15 @@ export function resolveTypographyInput(
         if (!specific.fontFamily) {
           const fallbackFont = group.body?.fontFamily || group.title?.fontFamily;
           if (fallbackFont) {
-            return { ...specific, fontFamily: fallbackFont };
+            return normalizeLocalTypographySettings({ ...specific, fontFamily: fallbackFont });
           }
         }
-        return specific;
+        return normalizeLocalTypographySettings(specific);
       }
       if (area === "button") {
         const fallbackFont = group.body?.fontFamily || group.title?.fontFamily;
         if (fallbackFont) {
-          return { fontFamily: fallbackFont };
+          return normalizeLocalTypographySettings({ fontFamily: fallbackFont });
         }
       }
       return undefined;
@@ -85,10 +128,56 @@ export function resolveTypographyInput(
     // flat text color from section/parent container typography (which could cause
     // contrast issues, like white text on a white button).
     const { color, ...rest } = flatSettings;
-    return rest;
+    return normalizeLocalTypographySettings(rest);
   }
 
-  return flatSettings;
+  return normalizeLocalTypographySettings(flatSettings);
+}
+
+function normalizeLocalTypographySettings(settings: TypographySettings): TypographySettings | undefined {
+  const normalized = { ...settings };
+  (Object.keys(normalized) as (keyof TypographySettings)[]).forEach((key) => {
+    const value = normalized[key];
+    if (typeof value === "string" && (!value.trim() || value.trim().toLowerCase() === "inherit")) {
+      delete normalized[key];
+    }
+  });
+  return Object.keys(normalized).length > 0 ? normalized : undefined;
+}
+
+function globalTypographyDefaults(
+  area: TypographyArea | undefined,
+  shellSettings?: Partial<BuilderShellSettings>,
+): TypographySettings {
+  const value = (key: string, fallback: string) =>
+    resolveGlobalStyleToken(key, shellSettings, undefined, fallback).value;
+
+  if (area === "title" || area === "eyebrow") {
+    return {
+      fontFamily: value("fontFamilyHeading", "inherit"),
+      fontWeight: value("headingFontWeight", "700"),
+      lineHeight: value("headingMediumLineHeight", value("baseLineHeight", "1.5")),
+      color: value("emphasisColor", value("textColor", "#111827")),
+    };
+  }
+
+  if (area === "button") {
+    return {
+      fontFamily: value("buttonFontFamily", "inherit"),
+      fontSize: value("buttonFontSize", value("baseFontSize", "16px")),
+      fontWeight: value("buttonFontWeight", "600"),
+      lineHeight: value("buttonLineHeight", value("baseLineHeight", "1.5")),
+      letterSpacing: value("buttonLetterSpacing", "0px"),
+    };
+  }
+
+  return {
+    fontFamily: value("fontFamilyBody", "system-ui, sans-serif"),
+    fontSize: value("baseFontSize", "16px"),
+    fontWeight: "400",
+    lineHeight: value("baseLineHeight", "1.5"),
+    color: value("textColor", "#111827"),
+  };
 }
 
 export function updateTypographyArea(
@@ -108,6 +197,26 @@ export function updateTypographyArea(
     eyebrow: inherited ? { ...inherited } : undefined,
     [area]: value,
   };
+}
+
+export function resetTypographyAreaProperty(
+  typ: TypographySettings | TypographyGroup | undefined,
+  area: TypographyArea,
+  property: keyof TypographySettings,
+): TypographySettings | TypographyGroup | undefined {
+  if (isTypographyGroup(typ)) {
+    const nextArea = { ...(typ[area] ?? {}) };
+    delete nextArea[property];
+    return {
+      ...typ,
+      [area]: Object.keys(nextArea).length > 0 ? nextArea : undefined,
+    };
+  }
+
+  if (!typ) return undefined;
+  const next = { ...(typ as TypographySettings) };
+  delete next[property];
+  return Object.keys(next).length > 0 ? next : undefined;
 }
 
 export function typographyProps(
@@ -317,4 +426,3 @@ export function getHeadingTypographyStyles(
 
   return style;
 }
-

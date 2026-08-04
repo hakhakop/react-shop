@@ -1,10 +1,12 @@
 "use client";
 
 import type { BuilderLayoutBlock, InspectorTab } from "@/components/dashboard/builderTypes";
+import type { BuilderShellSettings } from "@/lib/builderShell";
 import { InspectorFieldRow, InspectorPillGroup, InspectorSelect, InspectorSwitch, InspectorTextField, InspectorTextarea } from "@/components/dashboard/inspector/InspectorControls";
 import IconPicker from "@/components/dashboard/inspector/IconPicker";
 
 type Props = { block: BuilderLayoutBlock; tab: InspectorTab; update: (patch: Partial<BuilderLayoutBlock>) => void };
+type CoreProps = Props & { shellSettings: BuilderShellSettings };
 type CoreKind = "hero" | "grid" | "icon" | "badgeGrid" | "table" | "divider" | "alert" | "breadcrumbs" | "datePicker";
 
 const labels = <T extends string>(values: readonly T[]) => values.map((value) => ({ value, label: value.replace(/[-_]/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase()) }));
@@ -17,7 +19,7 @@ function TextContent({ block, update }: Pick<Props, "block" | "update">) {
   </>;
 }
 
-export default function CoreContentCapabilityPanel({ block, tab, update }: Props) {
+export default function CoreContentCapabilityPanel({ block, tab, shellSettings, update }: CoreProps) {
   const kind = block.kind as CoreKind;
   if (tab === "content") {
     return <div className="builder-inspector-stack" data-uikit-capability={`${kind}-content`}>
@@ -71,7 +73,7 @@ export default function CoreContentCapabilityPanel({ block, tab, update }: Props
         <InspectorFieldRow label="Show action"><InspectorSwitch checked={block.gridShowButton === true} onChange={(checked) => update({ gridShowButton: checked })} label="Show action" /></InspectorFieldRow>
       </>}
       {kind === "table" && <InspectorFieldRow label="Presentation"><InspectorPillGroup value={block.tableStyle ?? "plain"} options={labels(["plain", "striped", "bordered"] as const)} onChange={(value) => update({ tableStyle: value })} ariaLabel="Table presentation" /></InspectorFieldRow>}
-      {kind === "divider" && <InspectorPillGroup value={block.dividerStyle ?? "default"} options={labels(["default", "small", "icon", "vertical"] as const)} onChange={(value) => update({ dividerStyle: value })} ariaLabel="Divider style" />}
+      {kind === "divider" && <InspectorFieldRow label="Style"><InspectorPillGroup value={block.dividerStyle ?? "default"} options={labels(["default", "small", "icon", "vertical"] as const)} onChange={(value) => update({ dividerStyle: value })} ariaLabel="Divider style" /></InspectorFieldRow>}
       {kind === "alert" && <InspectorFieldRow label="Variant"><InspectorPillGroup value={block.alertStyle ?? "primary"} options={labels(["primary", "success", "warning", "danger"] as const)} onChange={(value) => update({ alertStyle: value })} ariaLabel="Alert variant" /></InspectorFieldRow>}
       {kind === "badgeGrid" && <InspectorFieldRow label="Show text"><InspectorSwitch checked={block.gridShowText !== false} onChange={(checked) => update({ gridShowText: checked })} label="Show text" /></InspectorFieldRow>}
     </div>;
@@ -80,7 +82,7 @@ export default function CoreContentCapabilityPanel({ block, tab, update }: Props
   if (tab === "behavior") {
     return <div className="builder-inspector-stack" data-uikit-capability={`${kind}-behavior`}><div className="builder-element-inspector-note"><strong>Behavior</strong><span>{kind === "datePicker" ? "The browser owns date selection and keyboard behavior." : kind === "breadcrumbs" ? "Navigation follows the active page hierarchy." : "No additional instance behavior is currently supported."}</span></div></div>;
   }
-  return <div className="builder-inspector-stack" data-uikit-capability={`${kind}-advanced`}><div className="builder-element-inspector-note"><strong>Advanced</strong><span>Visibility, animation, and custom class behavior remain available through shared document controls.</span></div></div>;
+  return null;
 }
 
 function TableEditor({ block, update }: Pick<Props, "block" | "update">) {

@@ -8,6 +8,19 @@ export type WebsiteBuilderPages = {
   publishedKeys: string[];
 };
 
+/** Canonical target choices shared by every builder-owned link inspector. */
+export const BUILDER_LINK_TARGET_OPTIONS = [
+  { value: "_self", label: "Same tab" },
+  { value: "_blank", label: "New tab" },
+] as const;
+
+/** Canonical target and security attributes shared by builder renderers. */
+export function builderLinkTargetProps(target: string | null | undefined) {
+  return target === "_blank"
+    ? { target: "_blank" as const, rel: "noreferrer" as const }
+    : {};
+}
+
 const builderPageKeys = new Set([
   "home",
   "shop",

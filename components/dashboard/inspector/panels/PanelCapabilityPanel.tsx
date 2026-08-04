@@ -1,13 +1,24 @@
 "use client";
 
-import type { InspectorTab, BuilderLayoutBlock } from "@/components/dashboard/builderTypes";
+import type { InspectorTab, BuilderLayoutBlock, WordPressMediaItem } from "@/components/dashboard/builderTypes";
+import type { BuilderShellSettings } from "@/lib/builderShell";
+import TypographyRoleSettingsPanel from "@/components/dashboard/inspector/panels/TypographyRoleSettingsPanel";
 import { UIKIT_PANEL_CAPABILITY } from "@/lib/uikitCapabilities";
+import { BUILDER_LINK_TARGET_OPTIONS } from "@/lib/websiteBuilderLinks";
+import { BuilderImageUrlControl } from "@/components/dashboard/inspector/panels/InspectorSharedControls";
+import ButtonPresentationFields from "@/components/dashboard/inspector/panels/ButtonPresentationFields";
 import { InspectorFieldRow, InspectorPillGroup, InspectorSelect, InspectorSwitch, InspectorTextField, InspectorTextarea } from "@/components/dashboard/inspector/InspectorControls";
 
 type Props = {
   block: BuilderLayoutBlock;
   tab: InspectorTab;
+  shellSettings: BuilderShellSettings;
   update: (patch: Partial<BuilderLayoutBlock>) => void;
+  openWordPressMediaPicker?: (options: {
+    title: string;
+    currentUrl?: string;
+    onSelect: (media: WordPressMediaItem) => void;
+  }) => void;
 };
 
 const legacyPanelFields = {
@@ -18,7 +29,6 @@ const legacyPanelFields = {
   elementBackgroundMode: undefined,
   elementBackground: undefined,
   elementPadding: undefined,
-  visualStyle: undefined,
   hoverPreset: undefined,
   cardStyle: undefined,
 } satisfies Partial<BuilderLayoutBlock>;
@@ -26,7 +36,7 @@ const legacyPanelFields = {
 const selectOptions = <T extends string>(values: readonly T[], labels?: Partial<Record<T, string>>) =>
   values.map((value) => ({ value, label: labels?.[value] ?? value.replace(/-/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase()) }));
 
-export default function PanelCapabilityPanel({ block, tab, update }: Props) {
+export default function PanelCapabilityPanel({ block, tab, shellSettings, update, openWordPressMediaPicker }: Props) {
   const updateSemantic = (patch: Partial<BuilderLayoutBlock>) => update({ ...legacyPanelFields, ...patch });
   const properties = UIKIT_PANEL_CAPABILITY.properties;
 
@@ -36,7 +46,20 @@ export default function PanelCapabilityPanel({ block, tab, update }: Props) {
         <section className="builder-inspector-section">
           <h3>Content</h3>
           <p className="builder-inspector-help">Content belongs to this Panel instance. Visual surface styling comes from Global Card styles.</p>
-          <InspectorFieldRow label="Image source"><InspectorTextField value={block.imageUrl ?? ""} onChange={(value) => updateSemantic({ imageUrl: value })} ariaLabel="Panel image source" /></InspectorFieldRow>
+          <InspectorFieldRow label="Image source">
+            <BuilderImageUrlControl
+              value={block.imageUrl ?? ""}
+              onChange={(event) => updateSemantic({ imageUrl: event.target.value })}
+              onChoose={() => openWordPressMediaPicker?.({
+                title: "Panel image",
+                currentUrl: block.imageUrl,
+                onSelect: (media) => updateSemantic({
+                  imageUrl: media.sourceUrl,
+                  imageAlt: block.imageAlt || media.altText || media.title || "",
+                }),
+              })}
+            />
+          </InspectorFieldRow>
           <InspectorFieldRow label="Alt text"><InspectorTextField value={block.imageAlt ?? ""} onChange={(value) => updateSemantic({ imageAlt: value })} ariaLabel="Panel image alt text" /></InspectorFieldRow>
           <InspectorFieldRow label="Eyebrow"><InspectorTextField value={block.eyebrow ?? ""} onChange={(value) => updateSemantic({ eyebrow: value })} ariaLabel="Panel eyebrow" /></InspectorFieldRow>
           <InspectorFieldRow label="Title"><InspectorTextField value={block.title ?? ""} onChange={(value) => updateSemantic({ title: value })} ariaLabel="Panel title" /></InspectorFieldRow>
@@ -47,7 +70,7 @@ export default function PanelCapabilityPanel({ block, tab, update }: Props) {
           <InspectorFieldRow label="Show action"><InspectorSwitch checked={block.panelActionVisible !== false} onChange={(checked) => updateSemantic({ panelActionVisible: checked })} label="Show action" /></InspectorFieldRow>
           <InspectorFieldRow label="Action label"><InspectorTextField value={block.buttonLabel ?? ""} onChange={(value) => updateSemantic({ buttonLabel: value })} ariaLabel="Action label" /></InspectorFieldRow>
           <InspectorFieldRow label="Action URL"><InspectorTextField value={block.buttonUrl ?? ""} onChange={(value) => updateSemantic({ buttonUrl: value })} ariaLabel="Action URL" /></InspectorFieldRow>
-          <InspectorFieldRow label="Action target"><InspectorSelect value={(block.buttonTarget ?? "_self") as "_self" | "_blank"} options={[{ value: "_self", label: "Same tab" }, { value: "_blank", label: "New tab" }]} onChange={(value) => updateSemantic({ buttonTarget: value })} ariaLabel="Action target" /></InspectorFieldRow>
+          <InspectorFieldRow label="Action target"><InspectorSelect value={(block.buttonTarget ?? "_self") as "_self" | "_blank"} options={BUILDER_LINK_TARGET_OPTIONS} onChange={(value) => updateSemantic({ buttonTarget: value })} ariaLabel="Action target" /></InspectorFieldRow>
         </section>
       </div>
     );
@@ -80,6 +103,7 @@ export default function PanelCapabilityPanel({ block, tab, update }: Props) {
   if (tab === "style") {
     return (
       <div className="builder-inspector-stack" data-uikit-capability="panel-style">
+        <TypographyRoleSettingsPanel block={block} fields={[{ field: "titleTypographyRole", label: "Title role" }, { field: "contentTypographyRole", label: "Content role" }, { field: "metaTypographyRole", label: "Meta role" }]} update={update} />
         <section className="builder-inspector-section">
           <h3>Styling</h3>
           <p className="builder-inspector-help">Global Card styles own colors, radius, borders, shadows, typography, and padding.</p>
@@ -87,13 +111,18 @@ export default function PanelCapabilityPanel({ block, tab, update }: Props) {
           <InspectorFieldRow label="Size"><InspectorPillGroup value={(block.panelSize ?? "default") as BuilderLayoutBlock["panelSize"]} options={selectOptions(properties.size.values)} onChange={(value) => updateSemantic({ panelSize: value })} ariaLabel="Panel size" /></InspectorFieldRow>
           <InspectorFieldRow label="Hover card"><InspectorSwitch checked={block.panelHover === true} onChange={(checked) => updateSemantic({ panelHover: checked })} label="Hover card" /></InspectorFieldRow>
         </section>
+        <ButtonPresentationFields
+          title="Action button"
+          variant={block.panelActionStyle ?? "primary"}
+          size={block.panelActionSize ?? "default"}
+          onVariantChange={(value) => updateSemantic({ panelActionStyle: value as BuilderLayoutBlock["panelActionStyle"] })}
+          onSizeChange={(value) => updateSemantic({ panelActionSize: value as BuilderLayoutBlock["panelActionSize"] })}
+        />
       </div>
     );
   }
 
-  if (tab === "advanced") {
-    return <div className="builder-inspector-stack" data-uikit-capability="panel-advanced"><p className="builder-inspector-help">Visibility, animation, and custom classes remain in the shared Advanced controls.</p></div>;
-  }
+  if (tab === "advanced") return null;
 
   return null;
 }

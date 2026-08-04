@@ -19,26 +19,32 @@ test("Column exposes semantic UIkit alignment and flex controls", async ({ page,
 
   const column = page.locator('.builder-preview-content-row [data-builder-object-type="column"]').first();
   await expect(column).toBeVisible();
-  await column.evaluate((element) => {
-    element.dispatchEvent(new MouseEvent("dblclick", { bubbles: true }));
-  });
+  await page.getByRole("treeitem", { name: /^Col 1 / }).first().click();
+  await page.getByRole("button", { name: "Open Inspector", exact: true }).first().click();
 
   const inspector = page.locator(".builder-floating-inspector");
   await expect(inspector).toBeVisible();
-  const horizontal = inspector.locator("label.builder-field", { hasText: "Horizontal alignment" }).locator("select");
-  const vertical = inspector.locator("label.builder-field", { hasText: "Vertical alignment" }).locator("select");
-  const flex = inspector.locator("label.builder-field", { hasText: "Flex behavior" }).locator("select");
-  const responsive = inspector.locator("label.builder-field", { hasText: "Responsive width" }).locator("select");
-  await expect(horizontal.locator("option")).toHaveText(["left", "center", "right"]);
-  await expect(vertical.locator("option")).toHaveText(["top", "center", "bottom"]);
-  await expect(flex.locator("option")).toHaveText(["none", "expand"]);
-  await expect(responsive.locator("option")).toHaveText(["inherit", "stack"]);
+  await expect(inspector).toContainText("Column 1 · Column");
+  const field = (label: string) => inspector.locator(".inspector-field-row").filter({ hasText: label });
+  const horizontal = field("Horizontal alignment").getByRole("radiogroup");
+  const vertical = field("Vertical alignment").getByRole("radiogroup");
+  const flex = field("Flex behavior").locator("select");
+  const responsive = field("Responsive width").locator("select");
+  await expect(horizontal.getByRole("radio")).toHaveText(["Left", "Center", "Right"]);
+  await expect(vertical.getByRole("radio")).toHaveText(["Top", "Center", "Bottom"]);
+  await expect(flex.locator("option")).toHaveText(["None", "Expand"]);
+  await expect(responsive.locator("option")).toHaveText(["Inherit", "Stack"]);
   await expect(inspector.getByText("Border Radius", { exact: true })).toHaveCount(0);
   await expect(inspector.getByText("Nested Rows", { exact: true })).toHaveCount(0);
   await expect(inspector.getByText("Typography", { exact: true })).toHaveCount(0);
 
-  await horizontal.selectOption("center");
-  await vertical.selectOption("bottom");
+  // Normalize the persisted fixture so this focused test is repeatable after a prior run.
+  await responsive.selectOption("inherit");
+  await expect(responsive).toHaveValue("inherit");
+  await expect(column).not.toHaveClass(/uk-width-1-1@s/);
+
+  await horizontal.getByRole("radio", { name: "Center" }).click();
+  await vertical.getByRole("radio", { name: "Bottom" }).click();
   await flex.selectOption("expand");
   await responsive.selectOption("stack");
   await expect(column).toHaveClass(/uk-flex-center/);
@@ -88,4 +94,40 @@ test("Column exposes semantic UIkit alignment and flex controls", async ({ page,
   await expect(frontendColumn).toHaveClass(/uk-flex-bottom/);
   await expect(frontendColumn).toHaveClass(/uk-flex-1/);
   await expect(frontendColumn).toHaveClass(/uk-width-1-1@s/);
+
+  // Reset removes the responsive local choice and returns the column to its component default.
+  await page.getByRole("button", { name: "Open Inspector", exact: true }).first().click();
+  await expect(inspector).toBeVisible();
+  await responsive.selectOption("inherit");
+  await expect(responsive).toHaveValue("inherit");
+  await expect(column).not.toHaveClass(/uk-width-1-1@s/);
+
+  await Promise.all([
+    page.waitForResponse((response) => response.request().method() === "POST" && response.url().includes("/api/builder-layouts")),
+    page.getByRole("button", { name: "Publish", exact: true }).click(),
+  ]);
+  await expect(page.locator(".builder-publish-celebration").getByText("Published successfully", { exact: true })).toBeVisible();
+
+  await page.reload();
+  await expect(page.locator(".builder-preview-shell").first()).toBeVisible();
+  await page.getByRole("treeitem", { name: /^Col 1 / }).first().click();
+  await page.getByRole("button", { name: "Open Inspector", exact: true }).first().click();
+  const reloadedInspector = page.locator(".builder-floating-inspector");
+  const reloadedResponsive = reloadedInspector
+    .locator(".inspector-field-row")
+    .filter({ hasText: "Responsive width" })
+    .locator("select");
+  const reloadedColumn = page.locator(
+    `[data-builder-object-type="column"][data-builder-column-key="${columnId}"]`,
+  ).first();
+  await expect(reloadedResponsive).toHaveValue("inherit");
+  await expect(reloadedColumn).not.toHaveClass(/uk-width-1-1@s/);
+
+  const resetFrontend = await context.newPage();
+  await resetFrontend.goto(previewUrl);
+  const resetFrontendColumn = resetFrontend.locator(
+    `[data-builder-object-type="column"][data-builder-column-key="${columnId}"]`,
+  ).first();
+  await expect(resetFrontendColumn).toBeVisible();
+  await expect(resetFrontendColumn).not.toHaveClass(/uk-width-1-1@s/);
 });

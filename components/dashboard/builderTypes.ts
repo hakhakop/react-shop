@@ -279,7 +279,7 @@ export type BuilderLayoutBlock = {
   imageAlignment?: "left" | "center" | "right";
   imageMaxWidth?: number;
   imageBorderRadius?: number;
-  imageShape?: "none" | "rounded" | "circle";
+  imageShape?: "none" | "rounded" | "circle" | "pill";
   imageShadow?: "none" | "small" | "medium" | "large" | "xlarge";
   imageWidth?: "auto" | "full" | "small" | "medium" | "large" | "xlarge";
   imageLoading?: "lazy" | "eager";
@@ -477,6 +477,11 @@ export type BuilderLayoutBlock = {
   galleryImageFit?: "contain" | "cover";
   galleryHeight?: number;
   typography?: TypographySettings | TypographyGroup;
+  headingTypographyRole?: "default" | "primary" | "secondary" | "tertiary";
+  textTypographyRole?: "default" | "primary" | "secondary" | "tertiary";
+  titleTypographyRole?: "default" | "primary" | "secondary" | "tertiary";
+  contentTypographyRole?: "default" | "primary" | "secondary" | "tertiary";
+  metaTypographyRole?: "default" | "primary" | "secondary" | "tertiary";
   visualStyle?: BuilderVisualStyle;
   animation?: BuilderAnimationSettings;
   typewriterEnabled?: boolean;

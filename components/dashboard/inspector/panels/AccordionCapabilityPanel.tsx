@@ -2,6 +2,7 @@
 
 import { useRef } from "react";
 import type { BuilderLayoutBlock, InspectorTab } from "@/components/dashboard/builderTypes";
+import type { BuilderShellSettings } from "@/lib/builderShell";
 import { UIKIT_ACCORDION_CAPABILITY } from "@/lib/uikitCapabilities";
 import { InspectorFieldRow, InspectorPillGroup, InspectorSelect, InspectorSwitch, InspectorTextField, InspectorTextarea } from "@/components/dashboard/inspector/InspectorControls";
 import RepeatableItemShell from "@/components/dashboard/inspector/RepeatableItemShell";
@@ -9,6 +10,7 @@ import RepeatableItemShell from "@/components/dashboard/inspector/RepeatableItem
 type Props = {
   block: BuilderLayoutBlock;
   tab: InspectorTab;
+  shellSettings: BuilderShellSettings;
   update: (patch: Partial<BuilderLayoutBlock>) => void;
 };
 
@@ -23,7 +25,7 @@ function remapOpenIndexes(openIndexes: number[], sourceIndex: number, targetInde
   }))].sort((a, b) => a - b);
 }
 
-export default function AccordionCapabilityPanel({ block, tab, update }: Props) {
+export default function AccordionCapabilityPanel({ block, tab, shellSettings, update }: Props) {
   const items = block.accordionItems ?? [];
   const labels = <T extends string>(values: readonly T[]) => values.map((value) => ({ value, label: value.replace(/-/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase()) }));
   const copySequenceRef = useRef(0);
@@ -131,5 +133,5 @@ export default function AccordionCapabilityPanel({ block, tab, update }: Props) 
     </div>;
   }
 
-  return <div className="builder-inspector-stack" data-uikit-capability="accordion-advanced"><div className="builder-element-inspector-note"><strong>Accordion advanced settings</strong><span>Visibility and custom class behavior remain in shared Advanced controls.</span></div></div>;
+  return null;
 }

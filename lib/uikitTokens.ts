@@ -533,17 +533,42 @@ export function getUikitAlertClass(status?: string): string {
 export type UikitImageSemantics = {
   fit?: "contain" | "cover" | "fill" | string;
   ratio?: "auto" | "natural" | "square" | "4:3" | "3:2" | "4:5" | "3:4" | "16:9" | "portrait" | string;
-  shape?: "none" | "rounded" | "circle" | string;
+  shape?: "none" | "rounded" | "circle" | "pill" | string;
   shadow?: "none" | "small" | "medium" | "large" | "xlarge" | string;
   alignment?: "left" | "center" | "right" | string;
   width?: "auto" | "full" | "small" | "medium" | "large" | "xlarge" | string;
 };
+
+export type UikitImageDocumentFields = {
+  imageFit?: UikitImageSemantics["fit"];
+  imageRatio?: UikitImageSemantics["ratio"];
+  imageShape?: UikitImageSemantics["shape"];
+  imageShadow?: UikitImageSemantics["shadow"];
+  imageAlignment?: UikitImageSemantics["alignment"];
+  imageWidth?: UikitImageSemantics["width"];
+  imageBorderRadius?: number | null;
+};
+
+/** Resolves stored Image fields into the shared UIkit Image semantic contract. */
+export function resolveUikitImageSemantics(
+  image: UikitImageDocumentFields,
+): UikitImageSemantics {
+  return {
+    fit: image.imageFit,
+    ratio: image.imageRatio,
+    shape: image.imageShape ?? (image.imageBorderRadius ? "rounded" : "none"),
+    shadow: image.imageShadow,
+    alignment: image.imageAlignment,
+    width: image.imageWidth,
+  };
+}
 
 /** Maps semantic Image settings to UIkit 3.25-compatible classes and attributes. */
 export function getUikitImageClass(image: UikitImageSemantics): string {
   const classes = ["uk-img"];
   if (image.shape === "rounded") classes.push("uk-border-rounded");
   if (image.shape === "circle") classes.push("uk-border-circle");
+  if (image.shape === "pill") classes.push("uk-border-pill");
   if (image.shadow && image.shadow !== "none") classes.push(`uk-box-shadow-${image.shadow}`);
   return classes.join(" ");
 }
@@ -553,6 +578,7 @@ export function getUikitImageWrapperClass(image: UikitImageSemantics): string {
   if (image.ratio && image.ratio !== "auto" && image.ratio !== "natural") classes.push("uk-cover-container");
   if (image.shape === "rounded") classes.push("uk-border-rounded");
   if (image.shape === "circle") classes.push("uk-border-circle");
+  if (image.shape === "pill") classes.push("uk-border-pill");
   if (image.shadow && image.shadow !== "none") classes.push(`uk-box-shadow-${image.shadow}`);
   if (image.alignment === "left" || image.alignment === "center" || image.alignment === "right") classes.push(`uk-align-${image.alignment}`);
   return classes.join(" ");

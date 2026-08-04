@@ -30,6 +30,7 @@ import {
   getWebsiteByDomainHost,
   getWebsiteRouteSegment,
 } from "../lib/websites";
+import { builderGlobalVisibilityClassName } from "../lib/builderVisualStyle";
 
 export const metadata: Metadata = {
   title: "Webpages Store",
@@ -273,7 +274,15 @@ export default async function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`body-root ${productImageNoPadding ? "shop-image-padding--none" : ""}`}
+        className={`body-root ${
+          !isDomainWebsiteRequest
+            ? builderGlobalVisibilityClassName({
+                desktop: shellSettings.visibilityDesktop,
+                tablet: shellSettings.visibilityTablet,
+                mobile: shellSettings.visibilityMobile,
+              })
+            : ""
+        } ${productImageNoPadding ? "shop-image-padding--none" : ""}`}
         data-storefront-preset={storefrontPreset}
         suppressHydrationWarning
       >

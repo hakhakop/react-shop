@@ -74,11 +74,11 @@ test("List uses semantic UIkit presentation, item links, and frontend parity", a
   await firstText.fill("Localized list item");
   await content.getByRole("button", { name: "Add item", exact: true }).click();
   const secondItem = content.locator('[data-list-item-id]').nth(1);
-  await secondItem.getByRole("button", { name: "Copy list item 2", exact: true }).click();
+  await secondItem.getByRole("button", { name: "Copy item 2", exact: true }).click();
   await expect(content.locator('[data-list-item-id]')).toHaveCount(before + 2);
-  await content.locator('[data-list-item-id]').nth(2).getByRole("button", { name: "Delete list item 3", exact: true }).click();
+  await content.locator('[data-list-item-id]').nth(2).getByRole("button", { name: "Delete item 3", exact: true }).click();
   await expect(content.locator('[data-list-item-id]')).toHaveCount(before + 1);
-  await secondItem.getByRole("button", { name: "Edit list item 2", exact: true }).click();
+  await secondItem.getByRole("button", { name: "Edit item 2", exact: true }).click();
   await secondItem.getByRole("button", { name: "Up", exact: true }).click();
   const listItemCards = content.locator('[data-list-item-id]');
   const secondItemSummary = await listItemCards.nth(1).locator(".builder-slide-toggle small").innerText();
@@ -86,7 +86,7 @@ test("List uses semantic UIkit presentation, item links, and frontend parity", a
   await expect(listItemCards.nth(0).locator(".builder-slide-toggle small")).toHaveText(secondItemSummary);
   const firstItemAfterDrag = content.locator('[data-list-item-id]').first();
   if (await firstItemAfterDrag.locator(".builder-nested-card-body").count() === 0) {
-    await firstItemAfterDrag.getByRole("button", { name: "Edit list item 1", exact: true }).click();
+    await firstItemAfterDrag.getByRole("button", { name: "Edit item 1", exact: true }).click();
   }
   await firstItemAfterDrag.getByLabel("List item 1 URL", { exact: true }).fill("/details");
 
@@ -131,6 +131,6 @@ test("List uses semantic UIkit presentation, item links, and frontend parity", a
   await expect(frontendList.getByText("Localized list item", { exact: true })).toBeVisible();
   await expect(frontendList.locator("a[href=\"/details\"]")).toBeVisible();
 
-  await page.getByTestId("builder-language-selector").selectOption("en");
+  await page.getByRole("combobox", { name: "Editing content:" }).selectOption("en");
   await expect(page.getByText("English localized list item", { exact: true })).toBeVisible();
 });

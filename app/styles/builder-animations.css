@@ -3,11 +3,6 @@
    Beautiful scroll-reveal entrance animations for sections/blocks
    ============================================================ */
 
-/* Disable default CSS fade-up animation when ScrollReveal is active */
-.shop-builder-section--scroll-reveal > .shop-builder-section-content {
-  animation: none !important;
-}
-
 /* --- Custom easing curves --- */
 :root {
   --bounce-ease: cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -240,6 +235,24 @@
     opacity: 1 !important;
     transform: none !important;
     filter: none !important;
+  }
+
+  /* The canonical data-attribute path must settle immediately as well. */
+  [data-builder-animate] {
+    animation: none !important;
+    opacity: 1 !important;
+    filter: none !important;
+    transition: none !important;
+    will-change: auto !important;
+  }
+
+  [data-builder-animate]:not(.shop-builder-section--full) {
+    transform: none !important;
+  }
+
+  /* Preserve the full-width section's centering while removing motion. */
+  .shop-builder-section--full[data-builder-animate] {
+    transform: translateX(-50%) !important;
   }
 }
 

@@ -22,7 +22,7 @@ export const UIKIT_IMAGE_CAPABILITY = {
   properties: {
     fit: { values: ["contain", "cover", "fill"] as const, owner: "uikit" },
     ratio: { values: ["natural", "square", "4:3", "3:2", "16:9", "portrait"] as const, owner: "uikit" },
-    shape: { values: ["none", "rounded", "circle"] as const, owner: "uikit" },
+    shape: { values: ["none", "rounded", "circle", "pill"] as const, owner: "uikit" },
     shadow: { values: ["none", "small", "medium", "large", "xlarge"] as const, owner: "uikit" },
     alignment: { values: ["left", "center", "right"] as const, owner: "uikit" },
     width: { values: ["auto", "full", "small", "medium", "large", "xlarge"] as const, owner: "uikit" },

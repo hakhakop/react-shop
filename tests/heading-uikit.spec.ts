@@ -64,9 +64,15 @@ test("Heading UIkit visual presets (small, medium, xlarge) visibly change comput
   await levelSelect.selectOption("h3");
   await expect(canvasHeadingContainer.locator("h3")).toBeVisible();
 
-  await inspector.getByRole("button", { name: "Styling", exact: true }).click();
+  await inspector.getByRole("button", { name: "Settings", exact: true }).click();
 
   const presetSelect = inspector.getByRole("combobox", { name: "Heading visual preset" });
+
+  await inspector
+    .getByRole("radiogroup", { name: "Heading alignment" })
+    .getByRole("radio", { name: "Center" })
+    .click();
+  await expect(canvasHeading).toHaveCSS("text-align", "center");
 
   // 1. Test "small" preset
   await presetSelect.selectOption("small");
@@ -91,13 +97,6 @@ test("Heading UIkit visual presets (small, medium, xlarge) visibly change comput
   expect(valSmall).toBeLessThan(valMedium);
   expect(valMedium).toBeLessThan(valXlarge);
 
-  await inspector.getByRole("button", { name: "Typography", exact: true }).click();
-  const weightSelect = inspector.locator(".builder-field", { hasText: "Font weight" }).locator("select");
-  await weightSelect.selectOption("800");
-  await expect(canvasHeading).toHaveCSS("font-weight", "800");
-  await expect(inspector.getByText("Font Size", { exact: true })).toHaveCount(0);
-  await expect(inspector.getByText("Clamp", { exact: true })).toHaveCount(0);
-  await inspector.getByRole("button", { name: "Styling", exact: true }).click();
   await inspector.locator(".builder-field", { hasText: "Gradient preset" }).locator("select").selectOption("indigo-purple");
   await expect(canvasHeading).toHaveClass(/text-gradient--indigo-purple/);
   const gradientBackground = await canvasHeading.evaluate((el) => getComputedStyle(el).backgroundImage);
@@ -114,7 +113,6 @@ test("Heading UIkit visual presets (small, medium, xlarge) visibly change comput
   await expect(frontendHeading).toBeVisible();
   await expect(frontendHeading).toHaveClass(/uk-heading-xlarge/);
   await expect(frontendHeading).toHaveClass(/text-gradient--indigo-purple/);
-  await expect(frontendHeading).toHaveCSS("font-weight", "800");
 
   const sizeXlargeFrontend = await frontendHeading.evaluate((el) => getComputedStyle(el).fontSize);
   expect(parseFloat(sizeXlargeFrontend)).toBeCloseTo(valXlarge, 0);

@@ -4,8 +4,6 @@ import {
   ArrowDown,
   ArrowUp,
   Copy,
-  GalleryHorizontal,
-  Layers3,
   PanelRightClose,
   Plus,
   Ruler,
@@ -13,10 +11,10 @@ import {
   Settings2,
   Trash2,
   X,
-  Sliders,
 } from "lucide-react";
 import RichTextEditor from "./RichTextEditor";
 import {
+  createElement,
   useEffect,
   useState,
   type ChangeEvent,
@@ -50,29 +48,22 @@ import {
 import TypographyPanel from "@/components/dashboard/TypographyPanel";
 import { headerPresets } from "./headerPresets";
 import StyleTabPanel from "@/components/dashboard/style/StyleTabPanel";
-import ButtonCapabilityPanel from "@/components/dashboard/inspector/panels/ButtonCapabilityPanel";
-import PanelCapabilityPanel from "@/components/dashboard/inspector/panels/PanelCapabilityPanel";
+import SpacingControl from "@/components/dashboard/style/SpacingControl";
 import SectionCapabilityPanel from "@/components/dashboard/inspector/panels/SectionCapabilityPanel";
 import RowCapabilityPanel from "@/components/dashboard/inspector/panels/RowCapabilityPanel";
 import ColumnCapabilityPanel from "@/components/dashboard/inspector/panels/ColumnCapabilityPanel";
-import HeadingCapabilityPanel from "@/components/dashboard/inspector/panels/HeadingCapabilityPanel";
-import AccordionCapabilityPanel from "@/components/dashboard/inspector/panels/AccordionCapabilityPanel";
-import TextCapabilityPanel from "@/components/dashboard/inspector/panels/TextCapabilityPanel";
-import ImageCapabilityPanel from "@/components/dashboard/inspector/panels/ImageCapabilityPanel";
-import ListCapabilityPanel from "@/components/dashboard/inspector/panels/ListCapabilityPanel";
-import CoreContentCapabilityPanel from "@/components/dashboard/inspector/panels/CoreContentCapabilityPanel";
-import { HeroCapabilityPanel, GridCapabilityPanel } from "@/components/dashboard/inspector/panels/HeroGridCapabilityPanel";
+import ElementCapabilityComposer from "@/components/dashboard/inspector/ElementCapabilityComposer";
+import { BuilderImageUrlControl } from "@/components/dashboard/inspector/panels/InspectorSharedControls";
+import { getInspectorElementCapabilityDeclaration } from "@/components/dashboard/inspector/inspectorRouting";
 import type { InspectorElementKind } from "@/lib/uikitCapabilities";
 import AnimationControl from "@/components/dashboard/style/AnimationControl";
 import {
   legacySpacingToSides,
+  type BuilderSpacingSides,
   type BuilderVisualStyle,
 } from "@/lib/builderVisualStyle";
 import {
   getSpacingOptionLabel,
-  type BuilderSpacingContext,
-  BUILDER_SPACING_SCALE,
-  TOKEN_LABELS,
   resolveBuilderSpacing,
 } from "@/lib/builderSpacing";
 import type { CategoryTreeItem } from "@/lib/categories";
@@ -110,111 +101,6 @@ import {
   getBuilderButtonPresetKey,
   hasLocalButtonStyles,
 } from "@/lib/builderButtons";
-import {
-  normalizeLayoutToUikitPreset,
-  UIKIT_LAYOUT_PRESETS,
-} from "@/lib/uikitLayoutEngine";
-
-const uikitPresetGroups = [
-  {
-    title: "Equal Widths",
-    keys: ["1-col", "2-col-equal", "3-col-equal", "4-col-equal", "5-col-equal", "6-col-equal"],
-  },
-  {
-    title: "Asymmetric Proportions",
-    keys: [
-      "thirds-2-1",
-      "thirds-1-2",
-      "quarters-3-1",
-      "quarters-1-3",
-      "quarters-2-1-1",
-      "quarters-1-1-2",
-      "quarters-1-2-1",
-      "fifths-2-3",
-      "fifths-3-2",
-      "fifths-1-4",
-      "fifths-4-1",
-      "fifths-3-1-1",
-      "fifths-1-1-3",
-      "fifths-1-3-1",
-      "fifths-2-1-1-1",
-      "fifths-1-1-1-2",
-      "sixths-1-5",
-      "sixths-5-1",
-    ],
-  },
-  {
-    title: "Fixed & Expanding",
-    keys: ["fixed-left", "fixed-right", "fixed-inner", "fixed-outer", "auto-expand"],
-  },
-];
-
-function UikitPresetWireframeDiagram({ presetKey }: { presetKey: string }) {
-  const normalizedKey = normalizeLayoutToUikitPreset(presetKey);
-  const preset = UIKIT_LAYOUT_PRESETS[normalizedKey];
-
-  return (
-    <div className="builder-preset-wireframe-container" aria-hidden="true">
-      {preset.columnClasses.map((cls, index) => {
-        let flexVal = "1";
-        let showArrow = false;
-
-        if (preset.key === "1-col") flexVal = "1";
-        else if (preset.key === "2-col-equal") flexVal = "1";
-        else if (preset.key === "3-col-equal") flexVal = "1";
-        else if (preset.key === "4-col-equal") flexVal = "1";
-        else if (preset.key === "5-col-equal") flexVal = "1";
-        else if (preset.key === "6-col-equal") flexVal = "1";
-        else if (preset.key === "thirds-2-1") flexVal = index === 0 ? "2" : "1";
-        else if (preset.key === "thirds-1-2") flexVal = index === 0 ? "1" : "2";
-        else if (preset.key === "quarters-3-1") flexVal = index === 0 ? "3" : "1";
-        else if (preset.key === "quarters-1-3") flexVal = index === 0 ? "1" : "3";
-        else if (preset.key === "quarters-2-1-1") flexVal = index === 0 ? "2" : "1";
-        else if (preset.key === "quarters-1-1-2") flexVal = index === 2 ? "2" : "1";
-        else if (preset.key === "quarters-1-2-1") flexVal = index === 1 ? "2" : "1";
-        else if (preset.key === "fifths-2-3") flexVal = index === 0 ? "2" : "3";
-        else if (preset.key === "fifths-3-2") flexVal = index === 0 ? "3" : "2";
-        else if (preset.key === "fifths-1-4") flexVal = index === 0 ? "1" : "4";
-        else if (preset.key === "fifths-4-1") flexVal = index === 0 ? "4" : "1";
-        else if (preset.key === "fifths-3-1-1") flexVal = index === 0 ? "3" : "1";
-        else if (preset.key === "fifths-1-1-3") flexVal = index === 2 ? "3" : "1";
-        else if (preset.key === "fifths-1-3-1") flexVal = index === 1 ? "3" : "1";
-        else if (preset.key === "fifths-2-1-1-1") flexVal = index === 0 ? "2" : "1";
-        else if (preset.key === "fifths-1-1-1-2") flexVal = index === 3 ? "2" : "1";
-        else if (preset.key === "sixths-1-5") flexVal = index === 0 ? "1" : "5";
-        else if (preset.key === "sixths-5-1") flexVal = index === 0 ? "5" : "1";
-        else if (preset.key === "fixed-left") {
-          flexVal = index === 0 ? "0 0 24%" : "1";
-          if (index === 1) showArrow = true;
-        } else if (preset.key === "fixed-right") {
-          flexVal = index === 0 ? "1" : "0 0 24%";
-          if (index === 0) showArrow = true;
-        } else if (preset.key === "fixed-inner") {
-          flexVal = index === 1 ? "0 0 24%" : "1";
-          if (index === 0 || index === 2) showArrow = true;
-        } else if (preset.key === "fixed-outer") {
-          flexVal = index === 1 ? "1" : "0 0 24%";
-          if (index === 1) showArrow = true;
-        } else if (preset.key === "auto-expand") {
-          flexVal = index === 0 ? "0 0 28%" : "1";
-          if (index === 1) showArrow = true;
-        }
-
-        return (
-          <div
-            key={`${preset.key}-${index}`}
-            className="builder-preset-wireframe-col"
-            style={{ flex: flexVal }}
-          >
-            {showArrow ? (
-              <span className="builder-preset-wireframe-arrow">← →</span>
-            ) : null}
-          </div>
-        );
-      })}
-    </div>
-  );
-}
 
 function resolveInspectorHeaderAlignment(
   section: BuilderSection,
@@ -460,348 +346,6 @@ const GRADIENT_PRESETS: Record<string, [string, string, string]> = {
   "gold-amber": ["#facc15", "#f59e0b", "#f97316"],
 };
 
-function SpacingControl({
-  id,
-  label,
-  value,
-  context,
-  inheritedValue,
-  allowInherit = true,
-  onChange,
-}: {
-  id: string;
-  label: string;
-  value: string | undefined;
-  context: BuilderSpacingContext;
-  inheritedValue?: string;
-  allowInherit?: boolean;
-  onChange: (newValue: any) => void;
-}) {
-  const presets = ["none", "xs", "sm", "md", "lg", "xl", "2xl", "3xl"] as const;
-
-  const isPresetToken = (val: string) => {
-    return (
-      val === "none" ||
-      val === "xs" ||
-      val === "sm" ||
-      val === "md" ||
-      val === "lg" ||
-      val === "xl" ||
-      val === "2xl" ||
-      val === "3xl" ||
-      val === "small" ||
-      val === "medium" ||
-      val === "large"
-    );
-  };
-
-  const isPreset = !value || value === "inherit" || isPresetToken(value);
-  const isCustom = !isPreset;
-
-  const numericMatch = value ? value.trim().match(/^(\d+)px$/i) : null;
-  const customNumericValue = numericMatch ? numericMatch[1] : "";
-
-  const handleCustomNumericChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const num = event.target.value.replace(/\D/g, "");
-    onChange(num ? `${num}px` : "0px");
-  };
-
-  let selectValue = "inherit";
-  if (isCustom) {
-    selectValue = "custom";
-  } else if (value) {
-    if (value === "small") selectValue = "sm";
-    else if (value === "medium") selectValue = "md";
-    else if (value === "large") selectValue = "lg";
-    else selectValue = value;
-  } else {
-    selectValue = allowInherit ? "inherit" : "sm";
-  }
-
-  const handleChipClick = (presetValue: string) => {
-    if (presetValue === "custom") {
-      const currentPx = resolveBuilderSpacing(
-        value ?? (allowInherit ? "inherit" : "sm"),
-        context,
-        inheritedValue,
-      ).px;
-      onChange(`${currentPx > 0 ? currentPx : 16}px`);
-    } else {
-      onChange(presetValue);
-    }
-  };
-
-  return (
-    <div className="builder-field spacing-control-wrapper" id={id}>
-      <span className="builder-style-side-label-wrapper">{label}</span>
-      <div className="spacing-control-row">
-        <div className="builder-style-chips-row">
-          {allowInherit && (
-            <button
-              type="button"
-              className={`builder-style-chip${selectValue === "inherit" ? " is-active" : ""}`}
-              onClick={() => handleChipClick("inherit")}
-              title={`Inherit global: ${resolveBuilderSpacing(undefined, context, inheritedValue).label}`}
-            >
-              Global
-            </button>
-          )}
-          {presets.map((preset) => {
-            const isSelected = selectValue === preset;
-            const px = BUILDER_SPACING_SCALE[preset];
-            const labelName = TOKEN_LABELS[preset];
-            const displayLabel = `${labelName === "None" ? "None" : labelName} ${px}px`;
-            return (
-              <button
-                key={preset}
-                type="button"
-                className={`builder-style-chip${isSelected ? " is-active" : ""}`}
-                onClick={() => handleChipClick(preset)}
-              >
-                {displayLabel}
-              </button>
-            );
-          })}
-          <button
-            type="button"
-            className={`builder-style-chip builder-style-chip--custom${selectValue === "custom" ? " is-active" : ""}`}
-            onClick={() => handleChipClick("custom")}
-          >
-            <Sliders size={11} style={{ marginRight: "4px" }} />
-            Custom
-          </button>
-          {isCustom && (
-            <div className="custom-spacing-input-wrapper">
-              <input
-                type="text"
-                pattern="[0-9]*"
-                inputMode="numeric"
-                value={customNumericValue}
-                onChange={handleCustomNumericChange}
-                placeholder="0"
-              />
-              <span className="custom-spacing-unit">px</span>
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function SectionSpacingControl({
-  label,
-  sides,
-  values,
-  inheritedValues,
-  context,
-  onChange,
-}: {
-  label: string;
-  sides: string[];
-  values: Record<string, string | undefined>;
-  inheritedValues: Record<string, string | undefined>;
-  context: BuilderSpacingContext;
-  onChange: (newValues: Record<string, string | undefined>) => void;
-}) {
-  const presets: { label: string; value: string }[] = [
-    { label: "Global", value: "inherit" },
-    { label: "None", value: "none" },
-    { label: "XS", value: "xs" },
-    { label: "S", value: "sm" },
-    { label: "M", value: "md" },
-    { label: "L", value: "lg" },
-    { label: "XL", value: "xl" },
-    { label: "2XL", value: "2xl" },
-    { label: "3XL", value: "3xl" },
-  ];
-
-  const isAllSidesEqual = () => {
-    if (sides.length <= 1) return true;
-    const firstVal = values[sides[0]];
-    return sides.every((side) => values[side] === firstVal);
-  };
-
-  const [linked, setLinked] = useState(() => isAllSidesEqual());
-
-  const valuesString = JSON.stringify(values);
-  useEffect(() => {
-    setLinked(isAllSidesEqual());
-  }, [valuesString]);
-
-  const setSideValue = (side: string, next: string) => {
-    if (linked && sides.length > 1) {
-      const updated: Record<string, string> = {};
-      sides.forEach((s) => {
-        updated[s] = next;
-      });
-      onChange(updated);
-    } else {
-      onChange({ [side]: next });
-    }
-  };
-
-  const renderSideControl = (side: string, sideLabel: string) => {
-    const val = values[side];
-    const inherited = inheritedValues[side];
-
-    const isPresetToken = (v?: string) => {
-      if (!v) return true;
-      if (v === "inherit") return true;
-      return presets.some(
-        (p) =>
-          p.value === v ||
-          (v === "small" && p.value === "sm") ||
-          (v === "medium" && p.value === "md") ||
-          (v === "large" && p.value === "lg"),
-      );
-    };
-
-    const isPreset = isPresetToken(val);
-    const isCustom = !isPreset;
-
-    const numericMatch = val ? val.trim().match(/^(\d+)px$/i) : null;
-    const customNumericValue = numericMatch ? numericMatch[1] : "";
-
-    const handleCustomNumericChange = (
-      event: ChangeEvent<HTMLInputElement>,
-    ) => {
-      const num = event.target.value.replace(/\D/g, "");
-      setSideValue(side, num ? `${num}px` : "0px");
-    };
-
-    let selectValue = "inherit";
-    if (isCustom) {
-      selectValue = "custom";
-    } else if (val) {
-      if (val === "small") selectValue = "sm";
-      else if (val === "medium") selectValue = "md";
-      else if (val === "large") selectValue = "lg";
-      else selectValue = val;
-    } else {
-      selectValue = "inherit";
-    }
-
-    const handleChipClick = (presetValue: string) => {
-      if (presetValue === "custom") {
-        const currentPx = resolveBuilderSpacing(
-          val ?? "inherit",
-          context,
-          inherited,
-        ).px;
-        setSideValue(side, `${currentPx > 0 ? currentPx : 32}px`);
-      } else {
-        setSideValue(side, presetValue);
-      }
-    };
-
-    return (
-      <div key={side} className="builder-style-side-control-chips-wrapper">
-        <span className="builder-style-side-label">{sideLabel}</span>
-        <div className="builder-style-chips-row">
-          {presets.map((preset) => {
-            const isSelected = selectValue === preset.value;
-            const px =
-              preset.value === "inherit"
-                ? null
-                : BUILDER_SPACING_SCALE[
-                    preset.value as keyof typeof BUILDER_SPACING_SCALE
-                  ];
-            const displayLabel =
-              preset.value === "inherit" ? "Global" : `${preset.label} ${px}px`;
-            return (
-              <button
-                key={preset.value}
-                type="button"
-                className={`builder-style-chip${isSelected ? " is-active" : ""}`}
-                onClick={() => handleChipClick(preset.value)}
-                title={
-                  preset.value === "inherit"
-                    ? `Inherit global: ${resolveBuilderSpacing(undefined, context, inherited).label}`
-                    : undefined
-                }
-              >
-                {displayLabel}
-              </button>
-            );
-          })}
-          <button
-            type="button"
-            className={`builder-style-chip builder-style-chip--custom${selectValue === "custom" ? " is-active" : ""}`}
-            onClick={() => handleChipClick("custom")}
-          >
-            <Sliders size={11} style={{ marginRight: "4px" }} />
-            Custom
-          </button>
-          {isCustom && (
-            <div className="custom-spacing-input-wrapper">
-              <input
-                type="text"
-                pattern="[0-9]*"
-                inputMode="numeric"
-                value={customNumericValue}
-                onChange={handleCustomNumericChange}
-                placeholder="0"
-              />
-              <span className="custom-spacing-unit">px</span>
-            </div>
-          )}
-        </div>
-      </div>
-    );
-  };
-
-  const showLinkCheckbox = sides.length > 1;
-
-  const getGlobalLabel = () => {
-    return sides
-      .map((side) => {
-        const sideChar = side.charAt(0).toUpperCase();
-        const raw = inheritedValues[side];
-        const resolved = resolveBuilderSpacing(undefined, context, raw).label;
-        return `${sideChar} ${resolved}`;
-      })
-      .join(" · ");
-  };
-
-  return (
-    <div className="builder-style-spacing">
-      <div className="builder-style-spacing-header">
-        <strong>{label}</strong>
-        {showLinkCheckbox && (
-          <label className="builder-check builder-style-link-toggle">
-            <input
-              type="checkbox"
-              checked={linked}
-              onChange={(event) => {
-                const nextLinked = event.target.checked;
-                setLinked(nextLinked);
-                if (nextLinked) {
-                  const firstVal = values[sides[0]] ?? "inherit";
-                  const updated: Record<string, string> = {};
-                  sides.forEach((s) => {
-                    updated[s] = firstVal;
-                  });
-                  onChange(updated);
-                }
-              }}
-            />
-            <span>Link sides</span>
-          </label>
-        )}
-      </div>
-      <small className="builder-style-spacing-source">
-        Global: {getGlobalLabel()}
-      </small>
-      <div className="builder-style-side-controls">
-        {linked && sides.length > 1
-          ? renderSideControl(sides[0], "ALL SIDES")
-          : sides.map((side) => renderSideControl(side, side.toUpperCase()))}
-      </div>
-    </div>
-  );
-}
-
 const getCustomGradientPatch = (
   block: any,
   presetField: "textGradientPreset" | "typewriterGradientPreset",
@@ -960,7 +504,6 @@ type DashboardInspectorProps = {
   sectionColorModeLabel: (section: BuilderSection) => string;
   sectionLabels: Record<SectionKind, string>;
   sectionSettingsOpen: boolean;
-  sectionStructureOpen: boolean;
   selectedLayoutColumnKey: string | null;
   selectedLayoutRowIndex: number | null;
   selectedLayoutBlock: BuilderLayoutBlock | null;
@@ -976,7 +519,6 @@ type DashboardInspectorProps = {
   addSelectedLayoutBlockButton: LooseHandler;
   addSelectedLayoutBlockGridItem: LooseHandler;
   addSelectedLayoutBlockSlide: LooseHandler;
-  addSelectedLayoutItem: LooseHandler;
   addSelectedSlide: LooseHandler;
   copyJson: LooseHandler;
   deleteSelected: LooseHandler;
@@ -985,11 +527,9 @@ type DashboardInspectorProps = {
   deleteSelectedLayoutBlockBadge: LooseHandler;
   deleteSelectedLayoutBlockGridItem: LooseHandler;
   deleteSelectedLayoutBlockSlide: LooseHandler;
-  deleteSelectedLayoutItem: LooseHandler;
   deleteSelectedSlide: LooseHandler;
   duplicateSelected: LooseHandler;
   duplicateSelectedRow?: LooseHandler;
-  applyLayoutPreset: (sectionId: string, presetKey: string) => void;
   applySelectedRowLayoutPreset?: (presetKey: string) => void;
   onApplyHeaderPreset?: (presetKey: string) => void;
   deleteSelectedRow?: LooseHandler;
@@ -1006,7 +546,6 @@ type DashboardInspectorProps = {
   setSpacingOverlayEnabled?: Dispatch<SetStateAction<boolean>>;
   setOpenSlideId: Dispatch<SetStateAction<string | null>>;
   setSectionSettingsOpen: Dispatch<SetStateAction<boolean>>;
-  setSectionStructureOpen: Dispatch<SetStateAction<boolean>>;
   setSelectedLayoutBlockKey: Dispatch<SetStateAction<string | null>>;
   setSelectedLayoutRowIndex?: Dispatch<SetStateAction<number | null>>;
   onUpdateRowLayout?: LooseHandler;
@@ -1031,47 +570,6 @@ type DashboardInspectorProps = {
 function isLayoutContainerSection(section: BuilderSection | null | undefined) {
   return (
     section?.kind === "contentLayout" || section?.kind === "scrollPinnedDemo"
-  );
-}
-
-const canonicalCapabilityBlockKinds = new Set<LayoutBlockKind>([
-  "button",
-  "panel",
-  "heading",
-  "text",
-  "list",
-  "accordion",
-  "image",
-  "hero",
-  "grid",
-  "icon",
-  "badgeGrid",
-  "table",
-  "divider",
-  "alert",
-  "breadcrumbs",
-  "datePicker",
-]);
-
-function BuilderImageUrlControl({
-  value,
-  placeholder = "https://... or /uploads/image.jpg",
-  onChange,
-  onChoose,
-}: {
-  value: string;
-  placeholder?: string;
-  onChange: (event: ChangeEvent<HTMLInputElement>) => void;
-  onChoose: () => void;
-}) {
-  return (
-    <div className="builder-media-url-row">
-      <input value={value} placeholder={placeholder} onChange={onChange} />
-      <button type="button" onClick={onChoose}>
-        <GalleryHorizontal size={14} />
-        Library
-      </button>
-    </div>
   );
 }
 
@@ -1498,7 +996,6 @@ function SectionAnchorControl({
 
 export default function DashboardInspector(props: DashboardInspectorProps) {
   const { t } = useTranslation();
-  const [isLayoutPickerOpen, setLayoutPickerOpen] = useState(false);
   const [categoryHideSearch, setCategoryHideSearch] = useState("");
   const [openNestedCardId, setOpenNestedCardId] = useState<string | null>(null);
   const [activeTypographyAreaState, setActiveTypographyAreaState] = useState<{
@@ -1530,7 +1027,6 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
     sectionColorModeLabel,
     sectionLabels,
     sectionSettingsOpen,
-    sectionStructureOpen,
     selectedLayoutBlock,
     selectedLayoutBlockKey,
     selectedLayoutColumnKey,
@@ -1545,7 +1041,6 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
     addSelectedLayoutBlockBadge,
     addSelectedLayoutBlockGridItem,
     addSelectedLayoutBlockSlide,
-    addSelectedLayoutItem,
     addSelectedSlide,
     copyJson,
     deleteSelected,
@@ -1553,11 +1048,9 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
     deleteSelectedLayoutBlockBadge,
     deleteSelectedLayoutBlockGridItem,
     deleteSelectedLayoutBlockSlide,
-    deleteSelectedLayoutItem,
     deleteSelectedSlide,
     duplicateSelected,
     duplicateSelectedRow = () => undefined,
-    applyLayoutPreset,
     applySelectedRowLayoutPreset = () => undefined,
     onApplyHeaderPreset,
     deleteSelectedRow = () => undefined,
@@ -1572,7 +1065,6 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
     setOpenSlideId,
     setSpacingOverlayEnabled = () => undefined,
     setSectionSettingsOpen,
-    setSectionStructureOpen,
     setSelectedLayoutBlockKey,
     updateSelected,
     updateSelectedBadge,
@@ -1640,71 +1132,32 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
   }
   blockTabs.push(["advanced", t("builder.inspector.advanced")]);
 
+  const selectedElementCapabilityDeclaration = selectedLayoutBlock
+    ? getInspectorElementCapabilityDeclaration(
+        selectedLayoutBlock.kind,
+        selectedSection?.id,
+      )
+    : undefined;
+  const inspectorTabLabel = (tab: InspectorTab) => {
+    if (tab === "content") return t("builder.inspector.content");
+    if (tab === "layout") return t("builder.inspector.layout");
+    if (tab === "spacing") return t("builder.inspector.spacing");
+    if (tab === "style") {
+      return selectedElementCapabilityDeclaration?.settingsLabel === "Settings"
+        ? "Settings"
+        : t("builder.inspector.styling");
+    }
+    if (tab === "typography") return t("builder.inspector.typography");
+    if (tab === "behavior") return "Behavior";
+    return t("builder.inspector.advanced");
+  };
   const canonicalBlockTabs: [InspectorTab, string][] =
-    selectedLayoutBlock?.kind === "button"
-      ? [
-          ["content", t("builder.inspector.content")],
-          ["style", t("builder.inspector.styling")],
-          ["advanced", t("builder.inspector.advanced")],
-        ]
-      : selectedLayoutBlock?.kind === "panel"
-        ? [
-            ["content", t("builder.inspector.content")],
-            ["layout", t("builder.inspector.layout")],
-            ["style", t("builder.inspector.styling")],
-            ["advanced", t("builder.inspector.advanced")],
-          ]
-      : selectedLayoutBlock?.kind === "heading"
-        ? [
-            ["content", t("builder.inspector.content")],
-            ["style", t("builder.inspector.styling")],
-            ["typography", t("builder.inspector.typography")],
-            ["advanced", t("builder.inspector.advanced")],
-          ]
-      : selectedLayoutBlock?.kind === "accordion"
-        ? [
-            ["content", t("builder.inspector.content")],
-            ["behavior", "Behavior"],
-            ["style", t("builder.inspector.styling")],
-            ["advanced", t("builder.inspector.advanced")],
-          ]
-      : selectedLayoutBlock?.kind === "image" && selectedSection?.id !== "header-document"
-        ? [
-            ["content", t("builder.inspector.content")],
-            ["style", t("builder.inspector.styling")],
-            ["behavior", "Behavior"],
-            ["advanced", t("builder.inspector.advanced")],
-          ]
-      : selectedLayoutBlock?.kind === "text"
-        ? [
-            ["content", t("builder.inspector.content")],
-            ["style", t("builder.inspector.styling")],
-            ["typography", t("builder.inspector.typography")],
-            ["advanced", t("builder.inspector.advanced")],
-          ]
-      : selectedLayoutBlock?.kind === "list"
-        ? [
-            ["content", t("builder.inspector.content")],
-            ["style", t("builder.inspector.styling")],
-            ["behavior", "Behavior"],
-            ["advanced", t("builder.inspector.advanced")],
-          ]
-      : selectedLayoutBlock && ["hero", "grid", "icon", "badgeGrid", "table", "divider", "alert", "breadcrumbs", "datePicker"].includes(selectedLayoutBlock.kind as string)
-        ? [
-            ["content", t("builder.inspector.content")],
-            ["style", t("builder.inspector.styling")],
-            ["behavior", "Behavior"],
-            ["advanced", t("builder.inspector.advanced")],
-          ]
+    selectedElementCapabilityDeclaration
+      ? selectedElementCapabilityDeclaration.capabilities.map((tab) => [
+          tab,
+          inspectorTabLabel(tab),
+        ])
       : blockTabs;
-
-  const usesGeneralSettings =
-    ["heading", "text", "button"].includes(selectedLayoutBlock?.kind ?? "") ||
-    (selectedLayoutBlock?.kind === "image" && selectedSection?.id !== "header-document");
-  if (usesGeneralSettings) {
-    const styleTabIndex = canonicalBlockTabs.findIndex(([tab]) => tab === "style");
-    if (styleTabIndex >= 0) canonicalBlockTabs[styleTabIndex] = ["style", "Settings"];
-  }
 
   const inspectorTabs: [InspectorTab, string][] = selectedLayoutBlock
     ? canonicalBlockTabs
@@ -1828,6 +1281,14 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
 
   useEffect(() => {
     if (selectedLayoutBlock) {
+      const declaration = getInspectorElementCapabilityDeclaration(
+        selectedLayoutBlock.kind,
+        selectedSection?.id,
+      );
+      if (declaration && !declaration.capabilities.includes(inspectorTab)) {
+        setInspectorTab(declaration.capabilities[0] ?? "content");
+        return;
+      }
       const supported = getSupportedTypographyAreas(
         selectedLayoutBlock.kind ?? "text",
         selectedSection?.id,
@@ -1852,7 +1313,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
     if (inspectorTab === "typography") {
       setInspectorTab("style");
     }
-  }, [inspectorTab, selectedLayoutBlock, selectedLayoutRow, isCanonicalColumnSelection, setInspectorTab]);
+  }, [inspectorTab, selectedLayoutBlock, selectedSection?.id, selectedLayoutRow, isCanonicalColumnSelection, setInspectorTab]);
 
   useEffect(() => {
     if (!spacingFocusRequest?.field) return;
@@ -2282,6 +1743,18 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
     }
   };
 
+  const selectedElementCapabilityPanel =
+    selectedLayoutBlock && selectedElementCapabilityDeclaration
+      ? createElement(ElementCapabilityComposer, {
+          declaration: selectedElementCapabilityDeclaration,
+          block: selectedLayoutBlock,
+          tab: inspectorTab,
+          shellSettings,
+          update: updateSelectedLayoutBlockByKey,
+          openWordPressMediaPicker,
+        })
+      : null;
+
   const inspectorTitle = selectedLayoutBlock
     ? isElementContentTab
       ? "Element Content"
@@ -2326,14 +1799,6 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
   // Normal sections use SectionCapabilityPanel; the historical generic content
   // controls are intentionally retired from the page-builder inspector.
   const showLegacySectionContentControls: boolean = false;
-  const currentRowLayoutPreset = getBuilderRowLayoutPreset(
-    layoutContainerSection?.layout ?? null,
-  );
-  const currentRowLayoutSummary = getBuilderRowLayoutSummary(
-    layoutContainerSection?.layout ?? null,
-    layoutContainerSection?.layoutColumns ?? null,
-  );
-
   return (
     <aside
       className={`builder-inspector builder-panel ${inspectorOpen ? "is-open" : ""}`}
@@ -2715,40 +2180,40 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                   <SpacingControl
                     id="spacing-row-rowTopSpacing"
                     label="Top Padding"
-                    value={selectedRowItem?.rowTopSpacing}
+                    sides={["top"]}
+                    value={selectedRowItem?.rowTopSpacing === undefined ? undefined : ({ top: selectedRowItem.rowTopSpacing, linked: false } as BuilderSpacingSides)}
                     context="rowPadding"
-                    inheritedValue={shellSettings.rowPaddingTop}
-                    onChange={(val) => onUpdateRowStyle({ rowTopSpacing: val })}
+                    inheritedValue={{ top: shellSettings.rowPaddingTop }}
+                    onChange={(value) => onUpdateRowStyle({ rowTopSpacing: value.top ?? "inherit" })}
                   />
                   <SpacingControl
                     id="spacing-row-rowBottomSpacing"
                     label="Bottom Padding"
-                    value={selectedRowItem?.rowBottomSpacing}
+                    sides={["bottom"]}
+                    value={selectedRowItem?.rowBottomSpacing === undefined ? undefined : ({ bottom: selectedRowItem.rowBottomSpacing, linked: false } as BuilderSpacingSides)}
                     context="rowPadding"
-                    inheritedValue={shellSettings.rowPaddingBottom}
-                    onChange={(val) =>
-                      onUpdateRowStyle({ rowBottomSpacing: val })
-                    }
+                    inheritedValue={{ bottom: shellSettings.rowPaddingBottom }}
+                    onChange={(value) => onUpdateRowStyle({ rowBottomSpacing: value.bottom ?? "inherit" })}
                   />
                 </div>
                 <div className="builder-two-column">
                   <SpacingControl
                     id="spacing-row-rowTopMargin"
                     label="Top Margin"
-                    value={selectedRowItem?.rowTopMargin}
+                    sides={["top"]}
+                    value={selectedRowItem?.rowTopMargin === undefined ? undefined : ({ top: selectedRowItem.rowTopMargin, linked: false } as BuilderSpacingSides)}
                     context="rowMargin"
-                    inheritedValue={shellSettings.rowMarginTop}
-                    onChange={(val) => onUpdateRowStyle({ rowTopMargin: val })}
+                    inheritedValue={{ top: shellSettings.rowMarginTop }}
+                    onChange={(value) => onUpdateRowStyle({ rowTopMargin: value.top ?? "inherit" })}
                   />
                   <SpacingControl
                     id="spacing-row-rowBottomMargin"
                     label="Bottom Margin"
-                    value={selectedRowItem?.rowBottomMargin}
+                    sides={["bottom"]}
+                    value={selectedRowItem?.rowBottomMargin === undefined ? undefined : ({ bottom: selectedRowItem.rowBottomMargin, linked: false } as BuilderSpacingSides)}
                     context="rowMargin"
-                    inheritedValue={shellSettings.rowMarginBottom}
-                    onChange={(val) =>
-                      onUpdateRowStyle({ rowBottomMargin: val })
-                    }
+                    inheritedValue={{ bottom: shellSettings.rowMarginBottom }}
+                    onChange={(value) => onUpdateRowStyle({ rowBottomMargin: value.bottom ?? "inherit" })}
                   />
                 </div>
                 <div className="builder-shell-note">
@@ -2903,6 +2368,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
           {isCanonicalSectionSelection && (
             <SectionCapabilityPanel
               section={selectedSection!}
+              shellSettings={shellSettings}
               tab={inspectorTab}
               update={updateSelected}
             />
@@ -2911,6 +2377,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
           {isCanonicalRowSelection && (
             <RowCapabilityPanel
               row={selectedRowItem!}
+              shellSettings={shellSettings}
               layoutKey={selectedLayoutRow?.layoutKey}
               layoutSummary={selectedRowLayoutSummary}
               tab={inspectorTab}
@@ -2927,49 +2394,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
             />
           )}
 
-          {selectedLayoutBlock?.kind === "accordion" && (
-            <AccordionCapabilityPanel
-              block={selectedLayoutBlock}
-              tab={inspectorTab}
-              update={updateSelectedLayoutBlockByKey}
-            />
-          )}
-
-          {selectedLayoutBlock?.kind === "image" && selectedSection.id !== "header-document" && (
-            <ImageCapabilityPanel
-              block={selectedLayoutBlock}
-              tab={inspectorTab}
-              shellSettings={shellSettings}
-              update={updateSelectedLayoutBlockByKey}
-              openWordPressMediaPicker={openWordPressMediaPicker}
-            />
-          )}
-
-          {selectedLayoutBlock?.kind === "button" && (
-            <ButtonCapabilityPanel block={selectedLayoutBlock} tab={inspectorTab} shellSettings={shellSettings} update={updateSelectedLayoutBlockByKey} />
-          )}
-          {selectedLayoutBlock?.kind === "panel" && (
-            <PanelCapabilityPanel block={selectedLayoutBlock} tab={inspectorTab} update={updateSelectedLayoutBlockByKey} />
-          )}
-          {selectedLayoutBlock?.kind === "heading" && (
-            <HeadingCapabilityPanel block={selectedLayoutBlock} tab={inspectorTab} shellSettings={shellSettings} update={updateSelectedLayoutBlockByKey} />
-          )}
-          {selectedLayoutBlock?.kind === "text" && (
-            <TextCapabilityPanel block={selectedLayoutBlock} tab={inspectorTab} shellSettings={shellSettings} update={updateSelectedLayoutBlockByKey} />
-          )}
-          {selectedLayoutBlock?.kind === "list" && (
-            <ListCapabilityPanel block={selectedLayoutBlock} tab={inspectorTab} update={updateSelectedLayoutBlockByKey} />
-          )}
-          {selectedLayoutBlock?.kind === "hero" && (
-            <HeroCapabilityPanel block={selectedLayoutBlock} tab={inspectorTab} update={updateSelectedLayoutBlockByKey} />
-          )}
-          {selectedLayoutBlock?.kind === "grid" && (
-            <GridCapabilityPanel block={selectedLayoutBlock} tab={inspectorTab} update={updateSelectedLayoutBlockByKey} />
-          )}
-          {selectedLayoutBlock && ["hero", "grid", "icon", "badgeGrid", "table", "divider", "alert", "breadcrumbs", "datePicker"].includes(selectedLayoutBlock.kind as string) && (
-            selectedLayoutBlock.kind !== "hero" && selectedLayoutBlock.kind !== "grid" &&
-            <CoreContentCapabilityPanel block={selectedLayoutBlock} tab={inspectorTab} update={updateSelectedLayoutBlockByKey} />
-          )}
+          {selectedElementCapabilityPanel}
 
           {!isCanonicalSectionSelection && !isCanonicalColumnSelection && (( !selectedLayoutBlock &&
             !selectedLayoutRow &&
@@ -3202,92 +2627,6 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                     />
                   </summary>
 
-                  {inspectorTab === "layout" &&
-                    !selectedLayoutBlock &&
-                    !selectedLayoutRow &&
-                    isLayoutContainerSection(selectedSection) && (
-                      <>
-                        <label className="builder-field">
-                          <span>Layout</span>
-                          <input
-                            value={currentRowLayoutPreset?.label ?? "Whole"}
-                            readOnly
-                          />
-                        </label>
-
-                        <button
-                          type="button"
-                          className="builder-inline-add"
-                          onClick={() => setLayoutPickerOpen(true)}
-                        >
-                          <Layers3 size={15} />
-                          Change Layout
-                        </button>
-
-                        <details
-                          className="builder-collapse builder-structure-summary"
-                          open={sectionStructureOpen}
-                          onToggle={(event) =>
-                            setSectionStructureOpen(
-                              (event.currentTarget as HTMLDetailsElement).open,
-                            )
-                          }
-                        >
-                          <summary>
-                            <span>Columns</span>
-                            <small>
-                              {selectedSection.layoutItems?.length ?? 0}
-                            </small>
-                          </summary>
-                          <div className="builder-structure-note">
-                            Select an element in the canvas to edit it. This
-                            area only manages the section grid itself.
-                          </div>
-                          <button
-                            type="button"
-                            className="builder-inline-add"
-                            onClick={addSelectedLayoutItem}
-                          >
-                            <Plus size={15} />
-                            Add column
-                          </button>
-                          <div className="builder-compact-column-list">
-                            {(selectedSection.layoutItems ?? []).map(
-                              (item, index) => {
-                                const itemKey =
-                                  item.id ?? `layout-item-${index}`;
-                                const blocks = getLayoutItemBlocks(item);
-                                return (
-                                  <div
-                                    key={itemKey}
-                                    className={`builder-compact-column-row ${
-                                      selectedLayoutColumnKey === itemKey
-                                        ? "is-selected"
-                                        : ""
-                                    }`}
-                                  >
-                                    <div>
-                                      <strong>Column {index + 1}</strong>
-                                      <span>{blocks.length} elements</span>
-                                    </div>
-                                    <button
-                                      type="button"
-                                      onClick={() =>
-                                        deleteSelectedLayoutItem(index)
-                                      }
-                                      title="Delete column"
-                                    >
-                                      <Trash2 size={14} />
-                                    </button>
-                                  </div>
-                                );
-                              },
-                            )}
-                          </div>
-                        </details>
-                      </>
-                    )}
-
                   {(isElementContentTab ||
                     isElementLayoutTab ||
                     isElementSpacingTab ||
@@ -3296,45 +2635,12 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                     isElementAdvancedTab ||
                     isElementBehaviorTab) &&
                     selectedLayoutBlock &&
-                    !canonicalCapabilityBlockKinds.has(selectedLayoutBlock.kind as LayoutBlockKind) &&
+                    !selectedElementCapabilityDeclaration &&
                     (isLayoutContainerSection(selectedSection) ||
                       selectedLayoutBlock.kind === "accordion" ||
                       selectedLayoutBlock.kind === "list") && (
                       <>
-                        {selectedLayoutBlock.kind === "button" ? (
-                          <ButtonCapabilityPanel
-                            block={selectedLayoutBlock}
-                            tab={inspectorTab}
-                            shellSettings={shellSettings}
-                            update={updateSelectedLayoutBlockByKey}
-                          />
-                        ) : selectedLayoutBlock.kind === "panel" ? (
-                          <PanelCapabilityPanel
-                            block={selectedLayoutBlock}
-                            tab={inspectorTab}
-                            update={updateSelectedLayoutBlockByKey}
-                          />
-                        ) : selectedLayoutBlock.kind === "heading" ? (
-                          <HeadingCapabilityPanel
-                            block={selectedLayoutBlock}
-                            tab={inspectorTab}
-                            shellSettings={shellSettings}
-                            update={updateSelectedLayoutBlockByKey}
-                          />
-                        ) : selectedLayoutBlock.kind === "text" ? (
-                          <TextCapabilityPanel
-                            block={selectedLayoutBlock}
-                            tab={inspectorTab}
-                            shellSettings={shellSettings}
-                            update={updateSelectedLayoutBlockByKey}
-                          />
-                        ) : selectedLayoutBlock.kind === "list" ? (
-                          <ListCapabilityPanel
-                            block={selectedLayoutBlock}
-                            tab={inspectorTab}
-                            update={updateSelectedLayoutBlockByKey}
-                          />
-                        ) : isElementSettingsTab ? (
+                        {isElementSettingsTab ? (
                           <div className="builder-element-styling-panel">
                             {selectedLayoutBlock.kind !== "image" && (
                               <div className="builder-element-inspector-note">
@@ -16711,14 +16017,15 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                     />
                   </summary>
 
-                  <SectionSpacingControl
+                  <SpacingControl
                     label="Padding"
                     sides={["top", "bottom"]}
-                    values={{
+                    value={{
                       top: selectedSection.topSpacing,
                       bottom: selectedSection.bottomSpacing,
+                      linked: selectedSection.topSpacing === selectedSection.bottomSpacing,
                     }}
-                    inheritedValues={{
+                    inheritedValue={{
                       top: shellSettings.sectionPaddingTop,
                       bottom: shellSettings.sectionPaddingBottom,
                     }}
@@ -16737,14 +16044,15 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                     }}
                   />
 
-                  <SectionSpacingControl
+                  <SpacingControl
                     label="Margin"
                     sides={["top", "bottom"]}
-                    values={{
+                    value={{
                       top: selectedSection.topMargin,
                       bottom: selectedSection.bottomMargin,
+                      linked: selectedSection.topMargin === selectedSection.bottomMargin,
                     }}
-                    inheritedValues={{
+                    inheritedValue={{
                       top: shellSettings.sectionMarginTop,
                       bottom: shellSettings.sectionMarginBottom,
                     }}
@@ -17407,78 +16715,6 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
           )}
         </>
       )}
-      {isLayoutPickerOpen && layoutContainerSection ? (
-        <div
-          className="builder-layout-modal"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="builder-layout-picker-title"
-          onClick={() => setLayoutPickerOpen(false)}
-        >
-          <div
-            className="builder-layout-dialog"
-            onClick={(event) => event.stopPropagation()}
-          >
-            <div className="builder-layout-header">
-              <div>
-                <strong id="builder-layout-picker-title">
-                  Choose layout
-                </strong>
-                <span>Select the column structure for this layout.</span>
-              </div>
-              <button
-                type="button"
-                className="builder-layout-close"
-                onClick={() => setLayoutPickerOpen(false)}
-                aria-label="Close layout picker"
-              >
-                <X size={15} />
-              </button>
-            </div>
-
-            <div className="builder-layout-picker-body">
-              {uikitPresetGroups.map((group) => {
-                const groupPresets = group.keys
-                  .map((key) => builderRowLayoutPresets.find((p) => p.key === key))
-                  .filter(Boolean);
-
-                if (groupPresets.length === 0) return null;
-
-                return (
-                  <div key={group.title} className="builder-layout-picker-group">
-                    <div className="builder-layout-picker-group-title">
-                      {group.title}
-                    </div>
-                    <div className="builder-layout-picker-grid">
-                      {groupPresets.map((preset) => {
-                        const isActive = currentRowLayoutPreset?.key === preset!.key;
-                        return (
-                          <button
-                            key={preset!.key}
-                            type="button"
-                            className={`builder-layout-picker-card ${
-                              isActive ? "is-active" : ""
-                            }`}
-                            onClick={() => {
-                              applyLayoutPreset(layoutContainerSection.id, preset!.key);
-                              setLayoutPickerOpen(false);
-                            }}
-                          >
-                            <UikitPresetWireframeDiagram presetKey={preset!.key} />
-                            <span className="builder-layout-picker-card-copy">
-                              <strong>{preset!.label}</strong>
-                            </span>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-      ) : null}
     </aside>
   );
 }

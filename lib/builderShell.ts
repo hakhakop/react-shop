@@ -106,8 +106,17 @@ export type BuilderShellSettings = {
   backgroundColor?: string;
   fontFamilyBody?: string;
   fontFamilyHeading?: string;
+  fontFamilyPrimary?: string;
+  fontWeightPrimary?: string;
+  fontFamilySecondary?: string;
+  fontWeightSecondary?: string;
+  fontFamilyTertiary?: string;
+  fontWeightTertiary?: string;
   baseFontSize?: string;
   baseLineHeight?: string;
+  visibilityDesktop?: boolean;
+  visibilityTablet?: boolean;
+  visibilityMobile?: boolean;
   headingFontWeight?: string;
   headingSmallFontSize?: string;
   headingMediumFontSize?: string;
@@ -394,8 +403,17 @@ export const defaultBuilderShellSettings: BuilderShellSettings = {
   backgroundColor: "#ffffff",
   fontFamilyBody: "system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
   fontFamilyHeading: "inherit",
+  fontFamilyPrimary: "inherit",
+  fontWeightPrimary: "700",
+  fontFamilySecondary: "inherit",
+  fontWeightSecondary: "400",
+  fontFamilyTertiary: "inherit",
+  fontWeightTertiary: "400",
   baseFontSize: "16px",
   baseLineHeight: "1.5",
+  visibilityDesktop: true,
+  visibilityTablet: true,
+  visibilityMobile: true,
   sectionPaddingSmall: "40px",
   sectionPaddingDefault: "70px",
   sectionPaddingMedium: "80px",
@@ -744,6 +762,18 @@ export function normalizeBuilderShellSettings(
       value?.elementMarginLeft,
       defaultBuilderShellSettings.elementMarginLeft
     ),
+    visibilityDesktop:
+      typeof value?.visibilityDesktop === "boolean"
+        ? value.visibilityDesktop
+        : defaultBuilderShellSettings.visibilityDesktop,
+    visibilityTablet:
+      typeof value?.visibilityTablet === "boolean"
+        ? value.visibilityTablet
+        : defaultBuilderShellSettings.visibilityTablet,
+    visibilityMobile:
+      typeof value?.visibilityMobile === "boolean"
+        ? value.visibilityMobile
+        : defaultBuilderShellSettings.visibilityMobile,
     menuPresentation: normalizeMenuPresentationMap(value?.menuPresentation),
     storefrontPreset: preset,
     primaryColor: typeof value?.primaryColor === "string" && value.primaryColor.trim().length > 0

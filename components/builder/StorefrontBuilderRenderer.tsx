@@ -26,8 +26,6 @@ import CarouselBlock, {
 import HomeGsapAnimations from "@/components/animations/HomeGsapAnimations";
 import ScrollPinnedDemo from "@/components/animations/ScrollPinnedDemo";
 import BuilderScrollAnimations from "@/components/builder/BuilderScrollAnimations";
-import ScrollReveal from "@/components/builder/ScrollReveal";
-import type { ScrollRevealConfig } from "@/components/builder/ScrollReveal";
 import PrincityGradientTracker from "@/components/builder/PrincityGradientTracker";
 import CategoryWithFilters from "@/components/CategoryWithFilters";
 import CategoryBar from "@/components/CategoryBar";
@@ -52,7 +50,7 @@ import type {
   BuilderPage,
   BuilderSection,
 } from "@/lib/builderLayouts";
-import { typographyProps, getHeadingTypographyStyles, type TypographyArea } from "@/lib/builderTypography";
+import { typographyProps, getHeadingTypographyStyles, typographyRoleClass, type TypographyArea } from "@/lib/builderTypography";
 import {
   resolveBuilderRowGap,
   resolveBuilderRowStyle,
@@ -86,6 +84,7 @@ import {
   getUikitImageWrapperClass,
   getUikitImageStyle,
   getUikitImageAttributes,
+  resolveUikitImageSemantics,
   getUikitListClass,
   getUikitPanelMediaClass,
   getUikitPanelLayoutClass,
@@ -96,6 +95,14 @@ import {
   resolveBuilderSpacing,
   type BuilderSpacingContext,
 } from "@/lib/builderSpacing";
+import { builderLinkTargetProps } from "@/lib/websiteBuilderLinks";
+import {
+  builderAnimationClassName as animationClassName,
+  builderAnimationDataAttributes as animationDataAttributes,
+  builderAnimationPreset as animationPreset,
+  type BuilderAnimationLike,
+  isBuilderStyleOnlyPreset,
+} from "@/lib/builderAnimation";
 import { builderButtonOverrideCssVars } from "@/lib/builderButtons";
 import { resolveUikitIconName } from "@/lib/uikitIconRegistry";
 import {
@@ -160,21 +167,6 @@ function gridSpacingClass(
   const key = (value || fallback).toString().trim().toLowerCase();
   return presets.includes(key) ? key : "custom";
 }
-
-type BuilderAnimation = {
-  preset?: string;
-  delayMs?: number;
-  durationMs?: number;
-  easing?: "ease-out" | "ease-in-out" | "spring";
-  triggerOffset?: number;
-  playOnce?: boolean;
-  progressSmoothingMs?: number;
-  scrubDistanceVh?: number;
-  stepOffset?: number;
-  once?: boolean;
-  pauseUntilComplete?: boolean;
-  progressDirection?: "horizontal" | "vertical";
-};
 
 const pageLabels: Partial<Record<BuilderPage, string>> = {
   home: "Home",
@@ -661,9 +653,6 @@ function sectionClassName(
   const visualClass = visualStyleClassName(
     section.visualStyle as BuilderVisualStyle | undefined,
   );
-  const srClass = isScrollRevealPreset(section.animation)
-    ? "shop-builder-section--scroll-reveal"
-    : "";
   const heightClass = `shop-builder-section--height-${section.sectionHeight ?? "auto"}`;
   const verticalAlignClass = `shop-builder-section--align-${section.contentVerticalAlign ?? "top"}`;
   const uikitSectionPad = getUikitSectionPaddingClass(
@@ -672,128 +661,7 @@ function sectionClassName(
   const uikitSectionStyle = getUikitSectionStyleClass(
     section.sectionVariant || section.colorScheme || (section.visualStyle as any)?.preset,
   );
-  return `${uikitSectionPad} ${uikitSectionStyle} shop-builder-section shop-builder-section--${mode} shop-builder-section--content-${contentMode} shop-builder-section--scheme-${scheme} ${heightClass} ${verticalAlignClass} ${visualClass} ${animationClassName(section.animation)} ${srClass} ${extra}`.trim();
-}
-
-const scrollRevealPresets = new Set([
-  "fade-up",
-  "fade-down",
-  "fade-in",
-  "slide-left",
-  "slide-right",
-  "scale-up",
-  "zoom-in",
-  "flip-up",
-  "blur-in",
-  "stagger",
-]);
-
-const styleOnlyPresets = new Set(["princity-gradient"]);
-
-function isScrollRevealPreset(
-  animation?: BuilderAnimation | Record<string, unknown>,
-) {
-  const preset =
-    animation && typeof animation.preset === "string"
-      ? animation.preset
-      : "none";
-  return scrollRevealPresets.has(preset);
-}
-
-function animationPreset(
-  animation?: BuilderAnimation | Record<string, unknown>,
-) {
-  const preset =
-    animation && typeof animation.preset === "string"
-      ? animation.preset
-      : "none";
-  return preset === "none" ? null : preset;
-}
-
-function animationClassName(
-  animation?: BuilderAnimation | Record<string, unknown>,
-) {
-  const preset = animationPreset(animation);
-  if (!preset) return "";
-  return `shop-builder-animate--${preset}`;
-}
-
-function animationDataAttributes(
-  animation?: BuilderAnimation | Record<string, unknown>,
-) {
-  const preset = animationPreset(animation);
-
-  if (!preset || styleOnlyPresets.has(preset)) {
-    return {
-      data: {},
-      style: undefined,
-    };
-  }
-
-  const delay =
-    typeof animation?.delayMs === "number" && Number.isFinite(animation.delayMs)
-      ? `${Math.max(0, animation.delayMs)}ms`
-      : undefined;
-  const progressSmoothing =
-    typeof animation?.progressSmoothingMs === "number" &&
-    Number.isFinite(animation.progressSmoothingMs)
-      ? `${Math.max(0, animation.progressSmoothingMs)}ms`
-      : undefined;
-  const scrubDistance =
-    typeof animation?.scrubDistanceVh === "number" &&
-    Number.isFinite(animation.scrubDistanceVh)
-      ? `${Math.max(40, animation.scrubDistanceVh)}vh`
-      : undefined;
-  const stepOffset =
-    typeof animation?.stepOffset === "number" &&
-    Number.isFinite(animation.stepOffset)
-      ? String(animation.stepOffset)
-      : undefined;
-  const duration =
-    typeof animation?.durationMs === "number" &&
-    Number.isFinite(animation.durationMs)
-      ? `${Math.max(200, animation.durationMs * 1000)}ms`
-      : undefined;
-  const easing =
-    animation?.easing === "ease-in-out"
-      ? "cubic-bezier(0.65, 0, 0.35, 1)"
-      : animation?.easing === "spring"
-        ? "cubic-bezier(0.34, 1.56, 0.64, 1)"
-        : undefined;
-  const style = {
-    ...(delay ? { "--builder-animate-delay": delay } : {}),
-    ...(duration ? { "--builder-animate-duration": duration } : {}),
-    ...(easing ? { "--builder-animate-easing": easing } : {}),
-    ...(progressSmoothing
-      ? { "--builder-progress-smoothing": progressSmoothing }
-      : {}),
-    ...(scrubDistance ? { "--builder-pin-distance": scrubDistance } : {}),
-  } as BuilderStyle;
-
-  const playOnce =
-    typeof animation?.once !== "undefined"
-      ? animation.once
-      : typeof animation?.playOnce !== "undefined"
-        ? animation.playOnce
-        : true;
-  const triggerOffset =
-    typeof animation?.triggerOffset === "number" &&
-    Number.isFinite(animation.triggerOffset)
-      ? String(animation.triggerOffset)
-      : undefined;
-
-  return {
-    data: {
-      "data-builder-animate": preset,
-      "data-builder-animate-once": playOnce === false ? "false" : "true",
-      "data-builder-pause": animation?.pauseUntilComplete ? "true" : undefined,
-      "data-builder-step-offset": stepOffset,
-      "data-builder-trigger-offset": triggerOffset,
-      "data-builder-progress-direction":
-        animation?.progressDirection === "vertical" ? "vertical" : undefined,
-    },
-    style: Object.keys(style).length ? style : undefined,
-  };
+  return `${uikitSectionPad} ${uikitSectionStyle} shop-builder-section shop-builder-section--${mode} shop-builder-section--content-${contentMode} shop-builder-section--scheme-${scheme} ${heightClass} ${verticalAlignClass} ${visualClass} ${animationClassName(section.animation)} ${extra}`.trim();
 }
 
 function SectionFrame({
@@ -983,8 +851,7 @@ function HeroSection({
             as="a"
             className={`shop-builder-cta ${isAntigravity ? "shop-builder-cta--antigravity" : ""}`}
             href={section.buttonUrl}
-            target={section.buttonTarget === "_blank" ? "_blank" : undefined}
-            rel={section.buttonTarget === "_blank" ? "noreferrer" : undefined}
+            {...builderLinkTargetProps(section.buttonTarget)}
             typography={section.typography}
           >
             {section.buttonLabel}
@@ -1547,7 +1414,7 @@ function GridCards({
             {block.gridShowEyebrow !== false && item.eyebrow && (
               <Typog
                 as="span"
-                className="shop-builder-eyebrow"
+                className={`shop-builder-eyebrow ${typographyRoleClass(block.metaTypographyRole)}`}
                 typography={item.typography ?? block.typography}
                 area="eyebrow"
               >
@@ -1557,7 +1424,7 @@ function GridCards({
             {item.title && (
               <Typog
                 as={Title}
-                className={`shop-builder-title ${titleClass}`.trim()}
+                className={`shop-builder-title ${titleClass} ${typographyRoleClass(block.titleTypographyRole)}`.trim()}
                 typography={item.typography ?? block.typography}
                 area="title"
                 style={gridTitleStyle}
@@ -1568,6 +1435,7 @@ function GridCards({
             {block.gridShowMeta !== false && item.meta && (
               <Typog
                 as="small"
+                className={typographyRoleClass(block.metaTypographyRole)}
                 area="body"
                 typography={item.typography ?? block.typography}
               >
@@ -1575,7 +1443,7 @@ function GridCards({
               </Typog>
             )}
             {block.gridShowText !== false && item.text && (
-              <Typog as="p" typography={item.typography ?? block.typography} area="body">
+              <Typog as="p" className={typographyRoleClass(block.contentTypographyRole)} typography={item.typography ?? block.typography} area="body">
                 {item.text}
               </Typog>
             )}
@@ -1597,8 +1465,7 @@ function GridCards({
                 <a
                   className={`shop-builder-grid-action ${getUikitButtonClass(item.actionStyle ?? item.buttonStyle ?? block.buttonStyle ?? "primary", item.actionSize ?? block.size ?? "default")}`}
                   href={item.buttonUrl}
-                  target={item.buttonTarget === "_blank" ? "_blank" : undefined}
-                  rel={item.buttonTarget === "_blank" ? "noreferrer" : undefined}
+                  {...builderLinkTargetProps(item.buttonTarget)}
                   >
                     {item.buttonLabel}
                   </a>
@@ -1985,6 +1852,7 @@ export function ContentLayoutBlock({
         variant={block.textVariant}
         align={block.textAlign}
         typography={block.typography}
+        typographyRole={block.textTypographyRole}
       />
     );
   }
@@ -2001,8 +1869,7 @@ export function ContentLayoutBlock({
             <a
               className={getUikitButtonClass(rawBlock.buttonStyle ?? "primary", rawBlock.size)}
               href={rawBlock.buttonUrl}
-              target={rawBlock.buttonTarget === "_blank" ? "_blank" : undefined}
-              rel={rawBlock.buttonTarget === "_blank" ? "noreferrer" : undefined}
+              {...builderLinkTargetProps(rawBlock.buttonTarget)}
             >
               {rawBlock.buttonLabel}
             </a>
@@ -2012,8 +1879,7 @@ export function ContentLayoutBlock({
               key={btn.id ?? btnIdx}
               className={getUikitButtonClass(btn.style ?? "primary", btn.size ?? rawBlock.size)}
               href={btn.url}
-              target={btn.target === "_blank" ? "_blank" : undefined}
-              rel={btn.target === "_blank" ? "noreferrer" : undefined}
+              {...builderLinkTargetProps(btn.target)}
             >
               {btn.label}
             </a>
@@ -2301,7 +2167,7 @@ export function ContentLayoutBlock({
               {resolveUikitIconName(item.iconName ?? block.listIcon) && (
                 <WebPagesIcon name={item.iconName ?? block.listIcon} size={item.iconSize ?? block.listIconSize ?? 16} />
               )}
-              {item.url ? <a href={item.url} target={item.target === "_blank" ? "_blank" : undefined} rel={item.target === "_blank" ? "noreferrer" : undefined}>{item.text}</a> : item.text}
+              {item.url ? <a href={item.url} {...builderLinkTargetProps(item.target)}>{item.text}</a> : item.text}
             </li>
           ))}
         </ul>
@@ -2343,6 +2209,7 @@ export function ContentLayoutBlock({
     const titleClassName = [
       uikitHeadingClass,
       alignClass,
+      typographyRoleClass(rawBlock.headingTypographyRole),
       isGradient && !isCustom ? `text-gradient--${rawBlock.textGradientPreset}` : "",
     ].filter(Boolean).join(" ");
 
@@ -2361,6 +2228,7 @@ export function ContentLayoutBlock({
     const combinedStyle = {
       ...compStyle,
       ...gradientStyle,
+      textAlign: rawBlock.headingAlign ?? "left",
     };
 
     return (
@@ -2485,6 +2353,7 @@ export function ContentLayoutBlock({
     const heroHeadingClass = [
       getUikitHeadingClass(block.heroHeadingElement ?? "h2", block.heroHeadingStyle ?? "xlarge"),
       titleClassName,
+      typographyRoleClass(block.titleTypographyRole),
       block.heroContentAlign ? `uk-text-${block.heroContentAlign}` : "",
     ].filter(Boolean).join(" ");
     const HeroHeading = (block.heroHeadingElement ?? "h2") as any;
@@ -2501,7 +2370,7 @@ export function ContentLayoutBlock({
 
     return (
       <div
-        className={`shop-builder-column-block shop-builder-column-block--hero ${block.heroContentAlign ? `shop-builder-hero--align-${block.heroContentAlign}` : ""} ${block.heroVerticalAlign ? `shop-builder-hero--valign-${block.heroVerticalAlign}` : ""} ${block.heroHeight ? `shop-builder-hero--height-${block.heroHeight}` : ""} ${block.heroMediaPlacement ? `shop-builder-hero--media-${block.heroMediaPlacement}` : ""} ${block.heroInverse ? "uk-light" : ""} ${isBlockAntigravity ? "shop-builder-hero--antigravity shop-builder-hero--antigravity-block" : ""} ${block.premiumCardStyle && block.premiumCardStyle !== "none" ? `shop-builder-card--${block.premiumCardStyle}` : ""}`}
+        className={`shop-builder-column-block shop-builder-column-block--hero ${typographyRoleClass(block.contentTypographyRole)} ${block.heroContentAlign ? `shop-builder-hero--align-${block.heroContentAlign}` : ""} ${block.heroVerticalAlign ? `shop-builder-hero--valign-${block.heroVerticalAlign}` : ""} ${block.heroHeight ? `shop-builder-hero--height-${block.heroHeight}` : ""} ${block.heroMediaPlacement ? `shop-builder-hero--media-${block.heroMediaPlacement}` : ""} ${block.heroInverse ? "uk-light" : ""} ${isBlockAntigravity ? "shop-builder-hero--antigravity shop-builder-hero--antigravity-block" : ""} ${block.premiumCardStyle && block.premiumCardStyle !== "none" ? `shop-builder-card--${block.premiumCardStyle}` : ""}`}
         style={{ textAlign: block.heroContentAlign, maxWidth: block.heroContentWidth === "full" ? "none" : block.heroContentWidth === "small" ? "42rem" : block.heroContentWidth === "medium" ? "56rem" : "72rem" }}
       >
         <div
@@ -2510,7 +2379,7 @@ export function ContentLayoutBlock({
           {block.eyebrow && (
             <Typog
               as="p"
-              className="shop-builder-eyebrow"
+              className={`shop-builder-eyebrow ${typographyRoleClass(block.metaTypographyRole)}`}
               area="eyebrow"
               typography={block.typography}
             >
@@ -2643,8 +2512,7 @@ export function ContentLayoutBlock({
                     key={button.key}
                     className={`shop-builder-hero-action ${getUikitButtonClass(button.style ?? "primary", button.size ?? "default")}`}
                     href={button.url}
-                    target={button.target === "_blank" ? "_blank" : undefined}
-                    rel={button.target === "_blank" ? "noreferrer" : undefined}
+                    {...builderLinkTargetProps(button.target)}
                   >
                     {button.label}
                   </a>
@@ -2751,6 +2619,7 @@ export function ContentLayoutBlock({
             as="a"
             className="shop-builder-cta"
             href={block.buttonUrl}
+            {...builderLinkTargetProps(block.buttonTarget)}
             typography={block.typography}
             area="button"
           >
@@ -2763,8 +2632,7 @@ export function ContentLayoutBlock({
             as="a"
             className={`shop-builder-cta shop-builder-cta--${btn.style ?? "primary"}`}
             href={btn.url}
-            target={btn.target === "_blank" ? "_blank" : undefined}
-            rel={btn.target === "_blank" ? "noreferrer" : undefined}
+            {...builderLinkTargetProps(btn.target)}
             typography={block.typography}
             area="button"
           >
@@ -2804,7 +2672,7 @@ export function ContentLayoutBlock({
     const panelTextAlign = block.panelTextAlign ?? "left";
 
     return (
-      <div data-builder-block-id={block.id} className={`shop-builder-column-block shop-builder-column-block--panel ${panelLayoutClass} ${getUikitCardClass(block.panelVariant ?? block.panelStyle ?? "default", { hover: block.panelHover ? "hover" : "none", padding: block.panelSize })}`} style={{ textAlign: panelTextAlign }}>
+      <div data-builder-block-id={block.id} className={`shop-builder-column-block shop-builder-column-block--panel ${panelLayoutClass} ${typographyRoleClass(block.contentTypographyRole)} ${getUikitCardClass(block.panelVariant ?? block.panelStyle ?? "default", { hover: block.panelHover ? "hover" : "none", padding: block.panelSize })}`} style={{ textAlign: panelTextAlign }}>
         {panelShowMedia && (
           <div
             className={`${panelMediaClass} shop-builder-panel-media${block.imageUrl ? "" : " is-empty"}`}
@@ -2826,7 +2694,7 @@ export function ContentLayoutBlock({
               as="span"
               area="eyebrow"
               typography={block.typography}
-              className="shop-builder-panel-meta"
+              className={`shop-builder-panel-meta ${typographyRoleClass(block.metaTypographyRole)}`}
               style={panelMetaStyle}
             >
               {block.eyebrow}
@@ -2835,7 +2703,7 @@ export function ContentLayoutBlock({
           {block.title && (
             <Typog
               as={block.panelTitleElement ?? "h3"}
-              className={panelTitleClass}
+              className={`${panelTitleClass} ${typographyRoleClass(block.titleTypographyRole)}`}
               area="title"
               typography={undefined}
               style={panelTitleStyle}
@@ -2922,8 +2790,7 @@ export function ContentLayoutBlock({
               area="button"
               className={`shop-builder-cta ${getUikitButtonClass(block.panelActionStyle ?? "primary", block.panelActionSize ?? "default")} shop-builder-panel-action--${block.panelActionAlign ?? "inherit"}`}
               href={block.buttonUrl}
-              target={block.buttonTarget === "_blank" ? "_blank" : undefined}
-              rel={block.buttonTarget === "_blank" ? "noreferrer" : undefined}
+              {...builderLinkTargetProps(block.buttonTarget)}
               typography={block.typography}
             >
               {block.buttonLabel}
@@ -2935,14 +2802,7 @@ export function ContentLayoutBlock({
   }
 
   if (block.kind === "image") {
-    const imageSemantics = {
-      fit: block.imageFit,
-      ratio: block.imageRatio,
-      shape: block.imageShape ?? (block.imageBorderRadius ? "rounded" : "none"),
-      shadow: block.imageShadow,
-      alignment: block.imageAlignment,
-      width: block.imageWidth,
-    } as const;
+    const imageSemantics = resolveUikitImageSemantics(block);
     const imageStyle = getUikitImageStyle(imageSemantics);
     const imageAttributes = getUikitImageAttributes(imageSemantics);
     const imageClass = getUikitImageClass(imageSemantics);
@@ -2990,7 +2850,7 @@ export function ContentLayoutBlock({
             }}
           >
             {block.imageLinkUrl ? (
-              <a href={block.imageLinkUrl} target={block.imageLinkTarget === "_blank" ? "_blank" : undefined} rel={block.imageLinkTarget === "_blank" ? "noreferrer" : undefined}>{image}</a>
+              <a href={block.imageLinkUrl} {...builderLinkTargetProps(block.imageLinkTarget)}>{image}</a>
             ) : image}
           </div>
           {block.imageCaption && <figcaption>{block.imageCaption}</figcaption>}
@@ -3085,6 +2945,7 @@ export function ContentLayoutBlock({
             area="button"
             className="shop-builder-cta"
             href={block.buttonUrl}
+            {...builderLinkTargetProps(block.buttonTarget)}
             typography={block.typography}
           >
             {block.buttonLabel}
@@ -3097,8 +2958,7 @@ export function ContentLayoutBlock({
             area="button"
             className={`shop-builder-cta shop-builder-cta--${btn.style ?? "primary"}`}
             href={btn.url}
-            target={btn.target === "_blank" ? "_blank" : undefined}
-            rel={btn.target === "_blank" ? "noreferrer" : undefined}
+            {...builderLinkTargetProps(btn.target)}
             typography={block.typography}
           >
             {btn.label}
@@ -3834,25 +3694,7 @@ function BuilderSectionRenderer({
     return null;
   }
 
-  if (isScrollRevealPreset(section.animation)) {
-    const anim = section.animation as BuilderAnimation;
-    return (
-      <ScrollReveal
-        config={{
-          preset: anim.preset as ScrollRevealConfig["preset"],
-          duration: anim.durationMs,
-          delay: anim.delayMs ? anim.delayMs / 1000 : undefined,
-          easing: anim.easing,
-          playOnce: anim.playOnce,
-          triggerOffset: anim.triggerOffset,
-        }}
-      >
-        {content}
-      </ScrollReveal>
-    );
-  }
-
-  if (styleOnlyPresets.has(animationPreset(section.animation) ?? "")) {
+  if (isBuilderStyleOnlyPreset(animationPreset(section.animation))) {
     return <PrincityGradientTracker>{content}</PrincityGradientTracker>;
   }
 

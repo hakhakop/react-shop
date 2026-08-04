@@ -52,6 +52,7 @@ type Props = {
   value?: BuilderSpacingSides;
   inheritedValue?: BuilderSpacingSides;
   context?: BuilderSpacingContext;
+  sides?: readonly SpacingSide[];
   onChange: (value: BuilderSpacingSides) => void;
 };
 
@@ -61,12 +62,15 @@ export default function SpacingControl({
   value,
   inheritedValue,
   context = "elementPadding",
+  sides,
   onChange,
 }: Props) {
+  const activeSides = sides?.length ? sides : SIDES;
   const v = value ?? { linked: true };
   const linked = v.linked !== false;
+  const linkedValue = v[activeSides[0]] ?? "inherit";
   const globalSides = inheritedValue
-    ? SIDES
+    ? activeSides
         .map((side) => {
           const raw = inheritedValue[side] ?? inheritedValue.top;
           return `${side.charAt(0).toUpperCase()} ${resolveBuilderSpacing(undefined, context, raw).label}`;
@@ -82,8 +86,8 @@ export default function SpacingControl({
     side: SpacingSide,
     next: string,
   ) {
-    if (linked) {
-      patch({ top: next, right: next, bottom: next, left: next });
+    if (linked && activeSides.length > 1) {
+      patch(Object.fromEntries(activeSides.map((activeSide) => [activeSide, next])) as Partial<BuilderSpacingSides>);
       return;
     }
     patch({ [side]: next });
@@ -94,7 +98,7 @@ export default function SpacingControl({
   }
 
   function selectValue(side: SpacingSide) {
-    const raw = linked ? v.top : v[side];
+    const raw = linked ? linkedValue : v[side];
     const normalized = normalizedPreset(raw ?? "inherit");
     return isPresetValue(normalized) ? normalized : "custom";
   }
@@ -105,7 +109,7 @@ export default function SpacingControl({
       return;
     }
 
-    const current = linked ? v.top : v[side];
+    const current = linked ? linkedValue : v[side];
     if (current && !isPresetValue(current)) return;
     const resolved = resolveBuilderSpacing(
       current ?? "inherit",
@@ -116,7 +120,7 @@ export default function SpacingControl({
   }
 
   function renderSideControl(side: SpacingSide, sideLabel: string) {
-    const raw = linked ? v.top : v[side];
+    const raw = linked ? linkedValue : v[side];
     const selectedValue = selectValue(side);
 
     return (
@@ -169,23 +173,27 @@ export default function SpacingControl({
     <div id={id} className="builder-style-spacing" tabIndex={id ? -1 : undefined}>
       <div className="builder-style-spacing-header">
         <strong>{label}</strong>
-        <label className="builder-check builder-style-link-toggle">
+        {activeSides.length > 1 && <label className="builder-check builder-style-link-toggle">
           <input
             type="checkbox"
             checked={linked}
             onChange={(event) => {
               const nextLinked = event.target.checked;
-              const top = v.top ?? "inherit";
+              const firstSide = activeSides[0];
+              const firstValue = v[firstSide] ?? "inherit";
               patch({
                 linked: nextLinked,
-                right: nextLinked ? top : (v.right ?? top),
-                bottom: nextLinked ? top : (v.bottom ?? top),
-                left: nextLinked ? top : (v.left ?? top),
+                ...Object.fromEntries(
+                  activeSides.map((side) => [
+                    side,
+                    nextLinked ? firstValue : (v[side] ?? firstValue),
+                  ]),
+                ),
               });
             }}
           />
           <span>Link sides</span>
-        </label>
+        </label>}
       </div>
       {globalSides ? (
         <small className="builder-style-spacing-source">
@@ -193,9 +201,9 @@ export default function SpacingControl({
         </small>
       ) : null}
       <div className="builder-style-side-controls">
-        {linked
+        {linked && activeSides.length > 1
           ? renderSideControl("top", "All sides")
-          : SIDES.map((side) => renderSideControl(side, side))}
+          : activeSides.map((side) => renderSideControl(side, side))}
       </div>
     </div>
   );
