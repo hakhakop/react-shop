@@ -1,7 +1,7 @@
 "use client";
 
-import React, { ChangeEvent } from "react";
-import { GalleryHorizontal, Sliders, Image as ImageIcon } from "lucide-react";
+import React, { ChangeEvent, ReactNode } from "react";
+import { GalleryHorizontal, Sliders, Image as ImageIcon, RotateCcw } from "lucide-react";
 import {
   resolveBuilderSpacing,
   BUILDER_SPACING_SCALE,
@@ -9,6 +9,167 @@ import {
   type BuilderSpacingContext,
 } from "@/lib/builderSpacing";
 import type { CategoryTreeItem } from "@/lib/categories";
+
+/**
+ * Visual pill/indicator showing whether a property is inheriting from Global Settings or locally overridden.
+ */
+export function InheritanceIndicator({
+  isOverridden,
+  inheritedValueText,
+}: {
+  isOverridden: boolean;
+  inheritedValueText?: string;
+}) {
+  return (
+    <span
+      className={`builder-inheritance-pill ${isOverridden ? "is-overridden" : "is-inherited"}`}
+      title={isOverridden ? "Locally overridden property" : `Inherit global: ${inheritedValueText || "Default"}`}
+    >
+      <span className="builder-inheritance-dot" />
+      <span className="builder-inheritance-text">
+        {isOverridden ? "Override" : inheritedValueText ? `Global (${inheritedValueText})` : "Inherit"}
+      </span>
+    </span>
+  );
+}
+
+/**
+ * One-click reset button to clear local property override and return to inheritance chain.
+ */
+export function OneClickReset({
+  onReset,
+  title = "Reset to global default",
+}: {
+  onReset: () => void;
+  title?: string;
+}) {
+  return (
+    <button
+      type="button"
+      className="builder-one-click-reset-btn"
+      onClick={(e) => {
+        e.stopPropagation();
+        onReset();
+      }}
+      title={title}
+      aria-label={title}
+    >
+      <RotateCcw size={11} />
+    </button>
+  );
+}
+
+/**
+ * YOOtheme-style Standardized 2-Column Inspector Row.
+ * Left: Label + Override/Inherit indicator + Reset button.
+ * Right: Control element.
+ */
+export function InspectorRow({
+  label,
+  description,
+  isOverridden = false,
+  inheritedValueText,
+  onReset,
+  children,
+  className = "",
+}: {
+  label: string;
+  description?: string;
+  isOverridden?: boolean;
+  inheritedValueText?: string;
+  onReset?: () => void;
+  children: ReactNode;
+  className?: string;
+}) {
+  return (
+    <div className={`builder-inspector-row ${isOverridden ? "has-override" : ""} ${className}`}>
+      <div className="builder-inspector-row-header">
+        <span className="builder-inspector-row-label">
+          {label}
+          {onReset && isOverridden && (
+            <OneClickReset onReset={onReset} title={`Reset ${label} to global default`} />
+          )}
+        </span>
+        <InheritanceIndicator isOverridden={isOverridden} inheritedValueText={inheritedValueText} />
+      </div>
+      {description && <div className="builder-inspector-row-desc">{description}</div>}
+      <div className="builder-inspector-row-control">{children}</div>
+    </div>
+  );
+}
+
+/**
+ * Compact YOOtheme-style Segmented Control button group.
+ */
+export function SegmentedControl<T extends string>({
+  value,
+  options,
+  onChange,
+  disabled = false,
+  className = "",
+}: {
+  value: T | undefined;
+  options: readonly { label: string; value: T; icon?: ReactNode }[];
+  onChange: (value: T) => void;
+  disabled?: boolean;
+  className?: string;
+}) {
+  return (
+    <div className={`builder-segmented-control ${disabled ? "is-disabled" : ""} ${className}`}>
+      {options.map((option) => {
+        const isSelected = value === option.value;
+        return (
+          <button
+            key={option.value}
+            type="button"
+            disabled={disabled}
+            className={`builder-segmented-control-item ${isSelected ? "is-selected" : ""}`}
+            onClick={() => onChange(option.value)}
+          >
+            {option.icon && <span className="builder-segmented-control-icon">{option.icon}</span>}
+            <span className="builder-segmented-control-label">{option.label}</span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+/**
+ * Standardized Inspector Token Select dropdown with clean UIkit semantics.
+ */
+export function InspectorTokenSelect<T extends string>({
+  value,
+  options,
+  onChange,
+  placeholder = "Inherit Global",
+  disabled = false,
+}: {
+  value: T | undefined;
+  options: readonly { label: string; value: T }[];
+  onChange: (value: T) => void;
+  placeholder?: string;
+  disabled?: boolean;
+}) {
+  return (
+    <div className="builder-inspector-token-select-wrap">
+      <select
+        value={value ?? ""}
+        disabled={disabled}
+        className="builder-inspector-token-select"
+        onChange={(e) => onChange(e.target.value as T)}
+      >
+        <option value="">{placeholder}</option>
+        {options.map((opt) => (
+          <option key={opt.value} value={opt.value}>
+            {opt.label}
+          </option>
+        ))}
+      </select>
+    </div>
+  );
+}
+
 
 // SpacingControl
 export function SpacingControl({
