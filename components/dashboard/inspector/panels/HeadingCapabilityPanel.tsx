@@ -2,9 +2,9 @@
 
 import type { BuilderLayoutBlock, InspectorTab } from "@/components/dashboard/builderTypes";
 import { UIKIT_HEADING_CAPABILITY } from "@/lib/uikitCapabilities";
-import { InspectorColorField, InspectorFieldRow, InspectorNumberUnit, InspectorPillGroup, InspectorSelect, InspectorSwitch, InspectorTextField, InspectorTextarea } from "@/components/dashboard/inspector/InspectorControls";
+import { InspectorColorField, InspectorFieldRow, InspectorNumberUnit, InspectorSelect, InspectorSwitch, InspectorTextarea, InspectorDivision, InspectorTextField } from "@/components/dashboard/inspector/InspectorControls";
 import type { BuilderShellSettings } from "@/lib/builderShell";
-import TypographyRoleSettingsPanel from "@/components/dashboard/inspector/panels/TypographyRoleSettingsPanel";
+import { TitleSettingsGroup } from "@/components/dashboard/inspector/panels/SharedSettingGroups";
 
 type Props = {
   block: BuilderLayoutBlock;
@@ -32,15 +32,36 @@ export default function HeadingCapabilityPanel({ block, tab, shellSettings, upda
     return (
       <div className="builder-inspector-stack" data-uikit-capability="heading-style">
         <div className="builder-element-inspector-note"><strong>UIkit Heading</strong><span>Visual preset selects the UIkit heading style class. Semantic level controls the HTML heading element independently. Both paths are shared by builder and frontend.</span></div>
-        <TypographyRoleSettingsPanel block={block} fields={[{ field: "headingTypographyRole", label: "Font role" }]} update={update} />
-        <InspectorFieldRow label="Visual preset"><InspectorSelect value={(block.headingSize ?? "medium") as BuilderLayoutBlock["headingSize"]} options={labels(UIKIT_HEADING_CAPABILITY.properties.visualPreset.values)} onChange={(value) => update({ headingSize: value })} ariaLabel="Heading visual preset" /></InspectorFieldRow>
-        <InspectorFieldRow label="Alignment"><InspectorPillGroup value={(block.headingAlign ?? "left") as BuilderLayoutBlock["headingAlign"]} options={labels(UIKIT_HEADING_CAPABILITY.properties.alignment.values)} onChange={(value) => update({ headingAlign: value })} ariaLabel="Heading alignment" /></InspectorFieldRow>
-        <InspectorFieldRow label="Gradient preset"><InspectorSelect value={gradient} options={labels(gradientPresets)} onChange={(value) => update({ textGradientPreset: value })} ariaLabel="Gradient preset" /></InspectorFieldRow>
-        {gradient === "custom" && <div className="builder-two-column">
-          <InspectorFieldRow label="Start color"><InspectorColorField value={block.textGradientCustomStart ?? "#ffffff"} onChange={(value) => update({ textGradientCustomStart: value })} ariaLabel="Gradient start color" /></InspectorFieldRow>
-          <InspectorFieldRow label="End color"><InspectorColorField value={block.textGradientCustomEnd ?? "#c084fc"} onChange={(value) => update({ textGradientCustomEnd: value })} ariaLabel="Gradient end color" /></InspectorFieldRow>
-          <InspectorFieldRow label="Angle"><InspectorNumberUnit value={block.textGradientCustomAngle ?? 135} unit="deg" units={["deg"]} onValueChange={(value) => update({ textGradientCustomAngle: Number(value) })} onUnitChange={() => undefined} ariaLabel="Gradient angle" /></InspectorFieldRow>
-        </div>}
+        <TitleSettingsGroup
+          block={block}
+          update={update}
+          keys={{
+            role: "headingTypographyRole",
+            size: "headingSize",
+            align: "headingAlign",
+            level: "headingLevel",
+          }}
+        />
+        <InspectorDivision title="GRADIENT">
+          <InspectorFieldRow
+            label="Gradient preset"
+            isOverridden={block.textGradientPreset !== undefined && block.textGradientPreset !== "none"}
+            inheritedValueText="None"
+            onReset={() => update({ textGradientPreset: undefined, textGradientCustomStart: undefined, textGradientCustomEnd: undefined, textGradientCustomAngle: undefined })}
+          >
+            <InspectorSelect
+              value={gradient}
+              options={labels(gradientPresets)}
+              onChange={(value) => update({ textGradientPreset: value })}
+              ariaLabel="Gradient preset"
+            />
+          </InspectorFieldRow>
+          {gradient === "custom" && <div className="builder-two-column">
+            <InspectorFieldRow label="Start color"><InspectorColorField value={block.textGradientCustomStart ?? "#ffffff"} onChange={(value) => update({ textGradientCustomStart: value })} ariaLabel="Gradient start color" /></InspectorFieldRow>
+            <InspectorFieldRow label="End color"><InspectorColorField value={block.textGradientCustomEnd ?? "#c084fc"} onChange={(value) => update({ textGradientCustomEnd: value })} ariaLabel="Gradient end color" /></InspectorFieldRow>
+            <InspectorFieldRow label="Angle"><InspectorNumberUnit value={block.textGradientCustomAngle ?? 135} unit="deg" units={["deg"]} onValueChange={(value) => update({ textGradientCustomAngle: Number(value) })} onUnitChange={() => undefined} ariaLabel="Gradient angle" /></InspectorFieldRow>
+          </div>}
+        </InspectorDivision>
         <InspectorFieldRow label="Typewriter"><InspectorSwitch checked={block.typewriterEnabled ?? false} onChange={(checked) => update({ typewriterEnabled: checked })} label="Enable typewriter" /></InspectorFieldRow>
         {block.typewriterEnabled && <>
           <InspectorFieldRow label="Typewriter phrases"><InspectorTextarea value={(block.typewriterPhrases ?? []).join("\n")} onChange={(value) => update({ typewriterPhrases: value.split("\n").map((entry) => entry.trim()).filter(Boolean) })} ariaLabel="Typewriter phrases" /></InspectorFieldRow>
@@ -50,6 +71,8 @@ export default function HeadingCapabilityPanel({ block, tab, shellSettings, upda
       </div>
     );
   }
+
+
 
   if (tab === "advanced") return null;
   return null;

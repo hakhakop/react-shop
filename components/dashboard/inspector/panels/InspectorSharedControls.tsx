@@ -1,7 +1,7 @@
 "use client";
 
-import React, { ChangeEvent, ReactNode } from "react";
-import { GalleryHorizontal, Sliders, Image as ImageIcon, RotateCcw } from "lucide-react";
+import React, { ChangeEvent, ReactNode, useState } from "react";
+import { GalleryHorizontal, Sliders, Image as ImageIcon, RotateCcw, ChevronDown, Check } from "lucide-react";
 import {
   resolveBuilderSpacing,
   BUILDER_SPACING_SCALE,
@@ -9,6 +9,7 @@ import {
   type BuilderSpacingContext,
 } from "@/lib/builderSpacing";
 import type { CategoryTreeItem } from "@/lib/categories";
+import { useInspector } from "@/components/dashboard/context/InspectorContext";
 
 /**
  * Visual pill/indicator showing whether a property is inheriting from Global Settings or locally overridden.
@@ -23,7 +24,7 @@ export function InheritanceIndicator({
   return (
     <span
       className={`builder-inheritance-pill ${isOverridden ? "is-overridden" : "is-inherited"}`}
-      title={isOverridden ? "Locally overridden property" : `Inherit global: ${inheritedValueText || "Default"}`}
+      title={isOverridden ? "Locally overridden property" : `Inheriting global: ${inheritedValueText || "Default"}`}
     >
       <span className="builder-inheritance-dot" />
       <span className="builder-inheritance-text">
@@ -60,6 +61,47 @@ export function OneClickReset({
 }
 
 /**
+ * YOOtheme-style Inspector Division Card grouping related rows with section title,
+ * optional description, and optional 1-click section reset.
+ */
+export function InspectorDivision({
+  title,
+  description,
+  onResetAll,
+  children,
+  className = "",
+}: {
+  title: string;
+  description?: string;
+  onResetAll?: () => void;
+  children: ReactNode;
+  className?: string;
+}) {
+  return (
+    <div className={`builder-inspector-division ${className}`}>
+      <div className="builder-inspector-division-header">
+        <div className="builder-inspector-division-title-group">
+          <span className="builder-inspector-division-title">{title}</span>
+          {description && <span className="builder-inspector-division-desc">{description}</span>}
+        </div>
+        {onResetAll && (
+          <button
+            type="button"
+            className="builder-inspector-division-reset-btn"
+            onClick={onResetAll}
+            title={`Reset all ${title} settings to global defaults`}
+          >
+            <RotateCcw size={10} />
+            <span>Reset Division</span>
+          </button>
+        )}
+      </div>
+      <div className="builder-inspector-division-content">{children}</div>
+    </div>
+  );
+}
+
+/**
  * YOOtheme-style Standardized 2-Column Inspector Row.
  * Left: Label + Override/Inherit indicator + Reset button.
  * Right: Control element.
@@ -71,6 +113,7 @@ export function InspectorRow({
   inheritedValueText,
   onReset,
   children,
+  layout = "auto",
   className = "",
 }: {
   label: string;
@@ -79,18 +122,21 @@ export function InspectorRow({
   inheritedValueText?: string;
   onReset?: () => void;
   children: ReactNode;
+  layout?: "auto" | "horizontal" | "vertical";
   className?: string;
 }) {
   return (
-    <div className={`builder-inspector-row ${isOverridden ? "has-override" : ""} ${className}`}>
+    <div className={`builder-inspector-row ${isOverridden ? "has-override" : ""} layout-${layout} ${className}`}>
       <div className="builder-inspector-row-header">
         <span className="builder-inspector-row-label">
-          {label}
+          <span>{label}</span>
           {onReset && isOverridden && (
-            <OneClickReset onReset={onReset} title={`Reset ${label} to global default`} />
+            <OneClickReset onReset={onReset} title={`Reset ${label} to global default (${inheritedValueText || "Global"})`} />
+          )}
+          {isOverridden && (
+            <InheritanceIndicator isOverridden={isOverridden} inheritedValueText={inheritedValueText} />
           )}
         </span>
-        <InheritanceIndicator isOverridden={isOverridden} inheritedValueText={inheritedValueText} />
       </div>
       {description && <div className="builder-inspector-row-desc">{description}</div>}
       <div className="builder-inspector-row-control">{children}</div>
@@ -109,7 +155,7 @@ export function SegmentedControl<T extends string>({
   className = "",
 }: {
   value: T | undefined;
-  options: readonly { label: string; value: T; icon?: ReactNode }[];
+  options: readonly { label: string; value: T; icon?: ReactNode; title?: string }[];
   onChange: (value: T) => void;
   disabled?: boolean;
   className?: string;
@@ -123,6 +169,7 @@ export function SegmentedControl<T extends string>({
             key={option.value}
             type="button"
             disabled={disabled}
+            title={option.title || option.label}
             className={`builder-segmented-control-item ${isSelected ? "is-selected" : ""}`}
             onClick={() => onChange(option.value)}
           >
@@ -136,7 +183,7 @@ export function SegmentedControl<T extends string>({
 }
 
 /**
- * Standardized Inspector Token Select dropdown with clean UIkit semantics.
+ * Standardized Inspector Token Select dropdown with clean UIkit semantics & custom chevron styling.
  */
 export function InspectorTokenSelect<T extends string>({
   value,
@@ -166,12 +213,16 @@ export function InspectorTokenSelect<T extends string>({
           </option>
         ))}
       </select>
+      <div className="builder-inspector-token-select-arrow" aria-hidden="true">
+        <ChevronDown size={12} />
+      </div>
     </div>
   );
 }
 
-
-// SpacingControl
+/**
+ * SpacingControl primitive with presets, inherit token, and custom input.
+ */
 export function SpacingControl({
   id,
   label,
@@ -190,7 +241,7 @@ export function SpacingControl({
   onChange: (newValue: string) => void;
 }) {
   const presets = ["none", "xs", "sm", "md", "lg", "xl", "2xl", "3xl"] as const;
-  
+
   const isPresetToken = (val: string) => {
     return (
       val === "none" ||
@@ -355,7 +406,7 @@ export function BuilderImageUrlControl({
           />
         ) : (
           <div className="builder-media-url-thumbnail-empty">
-            <ImageIcon size={16} />
+            <ImageIcon size={14} />
           </div>
         )}
         <input value={value} placeholder={placeholder} onChange={onChange} />
@@ -401,9 +452,6 @@ export function flattenCategoryTree(
 }
 
 // Category Visibility Control Component
-import { useState } from "react";
-import { useInspector } from "@/components/dashboard/context/InspectorContext";
-
 export function CategoryVisibilityControl({
   hiddenSlugs,
   onChange,
@@ -497,4 +545,3 @@ export function CategoryVisibilityControl({
     </div>
   );
 }
-

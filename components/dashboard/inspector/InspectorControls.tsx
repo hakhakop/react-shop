@@ -1,6 +1,7 @@
 "use client";
 
 import type { ChangeEvent, ReactNode } from "react";
+import { RotateCcw } from "lucide-react";
 
 export type InspectorOption<T extends string = string> = {
   value: T;
@@ -12,18 +13,63 @@ type FieldProps = {
   label?: string;
   help?: string;
   description?: string;
+  isOverridden?: boolean;
+  inheritedValueText?: string;
+  onReset?: () => void;
   children: ReactNode;
   className?: string;
 };
 
-export function InspectorFieldRow({ label, help, children, className = "" }: FieldProps) {
+export function InspectorFieldRow({
+  label,
+  help,
+  description,
+  isOverridden = false,
+  inheritedValueText,
+  onReset,
+  children,
+  className = ""
+}: FieldProps) {
   return (
-    <div className={`builder-field inspector-field-row ${className}`.trim()}>
-      {label && <div className="inspector-field-row-label"><span>{label}</span>{help && <InspectorHelpText>{help}</InspectorHelpText>}</div>}
-      <div className="inspector-field-row-control">{children}</div>
+    <div className={`builder-field inspector-field-row ${isOverridden ? "has-override" : ""} ${className}`.trim()}>
+      {label && (
+        <div className="inspector-field-row-label">
+          <div className="inspector-field-label-inline">
+            <span className="inspector-field-title-text">{label}</span>
+            {isOverridden && onReset && (
+              <button
+                type="button"
+                className="builder-one-click-reset-btn"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onReset();
+                }}
+                title={`Reset ${label} to default (${inheritedValueText || "Global"})`}
+                aria-label={`Reset ${label} to default`}
+              >
+                <RotateCcw size={11} />
+              </button>
+            )}
+            {isOverridden && !onReset && (
+              <span
+                className="builder-inheritance-dot-only"
+                title={inheritedValueText ? `Overridden (Global: ${inheritedValueText})` : "Overridden property"}
+              />
+            )}
+          </div>
+          {help && <InspectorHelpText>{help}</InspectorHelpText>}
+        </div>
+      )}
+      <div className="inspector-field-row-control">
+        <div style={{ display: "flex", flexDirection: "column", width: "100%", gap: "4px" }}>
+          {children}
+          {description && <div className="builder-inspector-row-desc">{description}</div>}
+        </div>
+      </div>
     </div>
   );
 }
+
 
 export function InspectorSection({ title, description, children, className = "" }: FieldProps & { title: string }) {
   return (
@@ -33,6 +79,17 @@ export function InspectorSection({ title, description, children, className = "" 
     </section>
   );
 }
+
+export function InspectorDivision({ title, children }: { title: string; children: ReactNode }) {
+  return (
+    <div className="builder-inspector-division">
+      <div className="builder-inspector-division-title">{title}</div>
+      <div className="builder-inspector-division-content">{children}</div>
+    </div>
+  );
+}
+
+
 
 export function InspectorHelpText({ children }: { children: ReactNode }) {
   return <small className="inspector-help-text">{children}</small>;

@@ -4,6 +4,7 @@
 import React from "react";
 import { useInspector } from "../../context/InspectorContext";
 import { InspectorChoiceGroup } from "./InspectorSharedControls";
+import { InspectorFieldRow } from "../InspectorControls";
 import type { BuilderLayoutBlock } from "@/components/dashboard/builderTypes";
 
 export default function ElementBackgroundPanel() {
@@ -25,8 +26,17 @@ export default function ElementBackgroundPanel() {
   return (
     <div className="builder-inspector-stack">
       <div className="builder-inspector-section">
-        <label className="builder-field">
-          <span>Background Mode</span>
+        <InspectorFieldRow
+          label="Background Mode"
+          isOverridden={block.elementBackgroundMode !== undefined}
+          inheritedValueText="Preset"
+          onReset={() =>
+            updateSelectedLayoutBlockByKey({
+              elementBackgroundMode: undefined,
+              elementBackground: undefined,
+            })
+          }
+        >
           <InspectorChoiceGroup
             value={block.elementBackgroundMode ?? "default"}
             options={[
@@ -40,10 +50,14 @@ export default function ElementBackgroundPanel() {
               })
             }
           />
-        </label>
+        </InspectorFieldRow>
         {block.elementBackgroundMode === "custom" && (
-          <label className="builder-field">
-            <span>Background Color</span>
+          <InspectorFieldRow
+            label="Background Color"
+            isOverridden={block.elementBackground !== undefined}
+            inheritedValueText="Default"
+            onReset={() => updateSelectedLayoutBlockByKey({ elementBackground: undefined })}
+          >
             <div className="builder-background-presets">
               {elementBackgroundPresets.map((preset) => (
                 <button
@@ -65,7 +79,7 @@ export default function ElementBackgroundPanel() {
                 </button>
               ))}
             </div>
-            <div className="builder-color-row">
+            <div className="builder-color-row" style={{ display: "flex", gap: "8px", marginTop: "8px" }}>
               <input
                 type="color"
                 value={block.elementBackground ?? "#ffffff"}
@@ -84,9 +98,10 @@ export default function ElementBackgroundPanel() {
                 }
               />
             </div>
-          </label>
+          </InspectorFieldRow>
         )}
       </div>
     </div>
   );
 }
+

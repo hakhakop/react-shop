@@ -3,6 +3,7 @@
 import React from "react";
 import { useInspector } from "../../context/InspectorContext";
 import { InspectorChoiceGroup } from "./InspectorSharedControls";
+import { InspectorFieldRow } from "../InspectorControls";
 import type { BuilderLayoutBlock } from "@/components/dashboard/builderTypes";
 
 export default function ElementAlignPanel() {
@@ -16,8 +17,12 @@ export default function ElementAlignPanel() {
     <div className="builder-inspector-stack">
       {block.kind !== "products" && block.kind !== "image" && (
         <div className="builder-inspector-section">
-          <label className="builder-field">
-            <span>Content Align</span>
+          <InspectorFieldRow
+            label="Content Align"
+            isOverridden={block.elementAlign !== undefined}
+            inheritedValueText="Left"
+            onReset={() => updateSelectedLayoutBlockByKey({ elementAlign: undefined })}
+          >
             <InspectorChoiceGroup
               value={block.elementAlign ?? "left"}
               options={[
@@ -31,12 +36,16 @@ export default function ElementAlignPanel() {
                 })
               }
             />
-          </label>
+          </InspectorFieldRow>
 
           {(block.kind === "button" || block.kind === "hero") && (
             <div className="builder-two-column">
-              <label className="builder-field">
-                <span>Buttons orientation</span>
+              <InspectorFieldRow
+                label="Buttons orientation"
+                isOverridden={block.buttonsLayout !== undefined}
+                inheritedValueText="Inline"
+                onReset={() => updateSelectedLayoutBlockByKey({ buttonsLayout: undefined })}
+              >
                 <InspectorChoiceGroup
                   value={block.buttonsLayout ?? "inline"}
                   options={[
@@ -47,9 +56,13 @@ export default function ElementAlignPanel() {
                     updateSelectedLayoutBlockByKey({ buttonsLayout: value as any })
                   }
                 />
-              </label>
-              <label className="builder-field">
-                <span>Button Gap</span>
+              </InspectorFieldRow>
+              <InspectorFieldRow
+                label="Button Gap"
+                isOverridden={block.buttonGap !== undefined}
+                inheritedValueText="Default"
+                onReset={() => updateSelectedLayoutBlockByKey({ buttonGap: undefined })}
+              >
                 <InspectorChoiceGroup
                   value={block.buttonGap ?? "0.75rem"}
                   options={[
@@ -63,11 +76,11 @@ export default function ElementAlignPanel() {
                   ]}
                   onChange={(value) =>
                     updateSelectedLayoutBlockByKey({
-                      buttonGap: value === "0.75rem" ? undefined : value,
+                      buttonGap: value,
                     })
                   }
                 />
-              </label>
+              </InspectorFieldRow>
             </div>
           )}
         </div>
@@ -75,8 +88,12 @@ export default function ElementAlignPanel() {
 
       {block.kind === "products" && (
         <div className="builder-inspector-section">
-          <label className="builder-field">
-            <span>Content Align</span>
+          <InspectorFieldRow
+            label="Content Align"
+            isOverridden={block.elementAlign !== undefined}
+            inheritedValueText="Left"
+            onReset={() => updateSelectedLayoutBlockByKey({ elementAlign: undefined })}
+          >
             <InspectorChoiceGroup
               value={block.elementAlign ?? "left"}
               options={[
@@ -90,9 +107,10 @@ export default function ElementAlignPanel() {
                 })
               }
             />
-          </label>
+          </InspectorFieldRow>
         </div>
       )}
     </div>
   );
 }
+

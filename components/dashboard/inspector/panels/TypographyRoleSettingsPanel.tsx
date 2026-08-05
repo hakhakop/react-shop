@@ -18,17 +18,23 @@ export default function TypographyRoleSettingsPanel({
   block,
   fields,
   update,
+  noSection = false,
 }: {
   block: BuilderLayoutBlock;
   fields: readonly { field: TypographyRoleField; label: string }[];
   update: (patch: Partial<BuilderLayoutBlock>) => void;
+  noSection?: boolean;
 }) {
-  return (
-    <section className="builder-inspector-section" data-uikit-capability="typography-role">
-      <h3>Typography</h3>
-      <p className="builder-inspector-help">Select semantic roles here. Concrete font values remain owned by Global Typography.</p>
+  const content = (
+    <>
       {fields.map(({ field, label }) => (
-        <InspectorFieldRow key={field} label={label}>
+        <InspectorFieldRow
+          key={field}
+          label={label}
+          isOverridden={block[field] !== undefined}
+          inheritedValueText="Inherit"
+          onReset={() => update({ [field]: undefined })}
+        >
           <InspectorSelect
             value={(block[field] ?? "inherit") as TypographyRole}
             options={OPTIONS}
@@ -37,6 +43,18 @@ export default function TypographyRoleSettingsPanel({
           />
         </InspectorFieldRow>
       ))}
+    </>
+  );
+
+  if (noSection) return content;
+
+  return (
+    <section className="builder-inspector-section" data-uikit-capability="typography-role">
+      <h3>Typography</h3>
+      <p className="builder-inspector-help">Select semantic roles here. Concrete font values remain owned by Global Typography.</p>
+      {content}
     </section>
   );
 }
+
+

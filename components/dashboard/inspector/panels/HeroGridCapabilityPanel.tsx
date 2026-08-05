@@ -12,6 +12,12 @@ import { BUILDER_LINK_TARGET_OPTIONS } from "@/lib/websiteBuilderLinks";
 import IconPicker from "@/components/dashboard/inspector/IconPicker";
 import RepeatableItemShell from "@/components/dashboard/inspector/RepeatableItemShell";
 import { BuilderImageUrlControl } from "@/components/dashboard/inspector/panels/InspectorSharedControls";
+import {
+  TitleSettingsGroup,
+  MetaSettingsGroup,
+  ContentSettingsGroup,
+  LinkSettingsGroup,
+} from "@/components/dashboard/inspector/panels/SharedSettingGroups";
 import TypographyRoleSettingsPanel from "@/components/dashboard/inspector/panels/TypographyRoleSettingsPanel";
 import ButtonPresentationFields from "@/components/dashboard/inspector/panels/ButtonPresentationFields";
 import {
@@ -22,6 +28,7 @@ import {
   InspectorSwitch,
   InspectorTextField,
   InspectorTextarea,
+  InspectorDivision,
 } from "@/components/dashboard/inspector/InspectorControls";
 
 type Props = {
@@ -891,17 +898,14 @@ export function GridCapabilityPanel({
         className="builder-inspector-stack"
         data-uikit-capability="grid-style"
       >
-        <TypographyRoleSettingsPanel
-          block={block}
-          fields={[
-            { field: "titleTypographyRole", label: "Item title role" },
-            { field: "contentTypographyRole", label: "Item content role" },
-            { field: "metaTypographyRole", label: "Item meta role" },
-          ]}
-          update={update}
-        />
-        <InspectorSection title="Grid layout">
-          <InspectorFieldRow label="Columns">
+        {/* GRID DIVISION */}
+        <InspectorDivision title="GRID">
+          <InspectorFieldRow
+            label="Columns"
+            isOverridden={block.columns !== undefined}
+            inheritedValueText="3"
+            onReset={() => update({ columns: undefined })}
+          >
             <InspectorSelect
               value={String(block.columns ?? 3)}
               options={[1, 2, 3, 4, 5, 6].map((value) => ({
@@ -912,7 +916,12 @@ export function GridCapabilityPanel({
               ariaLabel="Grid columns"
             />
           </InspectorFieldRow>
-          <InspectorFieldRow label="Gutter">
+          <InspectorFieldRow
+            label="Column Gap"
+            isOverridden={block.gridGap !== undefined}
+            inheritedValueText="Medium"
+            onReset={() => update({ gridGap: undefined })}
+          >
             <InspectorPillGroup
               value={block.gridGap ?? "medium"}
               options={opts([
@@ -926,7 +935,12 @@ export function GridCapabilityPanel({
               ariaLabel="Grid gutter"
             />
           </InspectorFieldRow>
-          <InspectorFieldRow label="Row gap">
+          <InspectorFieldRow
+            label="Row gap"
+            isOverridden={block.gridRowGap !== undefined}
+            inheritedValueText="Medium"
+            onReset={() => update({ gridRowGap: undefined })}
+          >
             <InspectorPillGroup
               value={block.gridRowGap ?? block.gridGap ?? "medium"}
               options={opts(["none", "small", "medium", "large"] as const)}
@@ -934,18 +948,12 @@ export function GridCapabilityPanel({
               ariaLabel="Grid row gap"
             />
           </InspectorFieldRow>
-          <InspectorFieldRow label="Rows">
-            <InspectorSelect
-              value={String(block.gridRows ?? 1)}
-              options={[1, 2, 3, 4, 5, 6].map((value) => ({
-                value: String(value),
-                label: String(value),
-              }))}
-              onChange={(value) => update({ gridRows: Number(value) })}
-              ariaLabel="Grid rows"
-            />
-          </InspectorFieldRow>
-          <InspectorFieldRow label="Stacking">
+          <InspectorFieldRow
+            label="Stacking"
+            isOverridden={block.gridStacking !== undefined}
+            inheritedValueText="Inherit"
+            onReset={() => update({ gridStacking: undefined })}
+          >
             <InspectorPillGroup
               value={block.gridStacking ?? "inherit"}
               options={opts(["inherit", "stack"] as const)}
@@ -953,9 +961,16 @@ export function GridCapabilityPanel({
               ariaLabel="Grid stacking"
             />
           </InspectorFieldRow>
-        </InspectorSection>
-        <InspectorSection title="Default card mapping">
-          <InspectorFieldRow label="Item renderer">
+        </InspectorDivision>
+
+        {/* PANEL DIVISION */}
+        <InspectorDivision title="PANEL">
+          <InspectorFieldRow
+            label="Item renderer"
+            isOverridden={block.gridItemRenderer !== undefined}
+            inheritedValueText="Plain"
+            onReset={() => update({ gridItemRenderer: undefined })}
+          >
             <InspectorPillGroup
               value={block.gridItemRenderer ?? "plain"}
               options={opts(["plain", "card"] as const)}
@@ -965,7 +980,12 @@ export function GridCapabilityPanel({
           </InspectorFieldRow>
           {block.gridItemRenderer === "card" && (
             <>
-              <InspectorFieldRow label="Card variant">
+              <InspectorFieldRow
+                label="Card variant"
+                isOverridden={block.gridCardVariant !== undefined}
+                inheritedValueText="Default"
+                onReset={() => update({ gridCardVariant: undefined })}
+              >
                 <InspectorPillGroup
                   value={block.gridCardVariant ?? "default"}
                   options={opts([
@@ -978,7 +998,12 @@ export function GridCapabilityPanel({
                   ariaLabel="Grid card variant"
                 />
               </InspectorFieldRow>
-              <InspectorFieldRow label="Card size">
+              <InspectorFieldRow
+                label="Card size"
+                isOverridden={block.gridCardSize !== undefined}
+                inheritedValueText="Default"
+                onReset={() => update({ gridCardSize: undefined })}
+              >
                 <InspectorPillGroup
                   value={block.gridCardSize ?? "default"}
                   options={opts(["small", "default", "large"] as const)}
@@ -986,7 +1011,12 @@ export function GridCapabilityPanel({
                   ariaLabel="Grid card size"
                 />
               </InspectorFieldRow>
-              <InspectorFieldRow label="Card hover">
+              <InspectorFieldRow
+                label="Card hover"
+                isOverridden={block.gridCardHover !== undefined}
+                inheritedValueText="Disabled"
+                onReset={() => update({ gridCardHover: undefined })}
+              >
                 <InspectorSwitch
                   checked={block.gridCardHover === true}
                   onChange={(checked) => update({ gridCardHover: checked })}
@@ -995,17 +1025,53 @@ export function GridCapabilityPanel({
               </InspectorFieldRow>
             </>
           )}
-        </InspectorSection>
-        <ButtonPresentationFields
-          title="Default action mapping"
-          description="Applies to every Grid action unless an item override is set."
-          variant={block.buttonStyle ?? "primary"}
-          size={block.size ?? "default"}
-          onVariantChange={(value) => update({ buttonStyle: value })}
-          onSizeChange={(value) => update({ size: value })}
+        </InspectorDivision>
+
+        {/* TITLE DIVISION */}
+        <TitleSettingsGroup
+          block={block}
+          update={update}
+          keys={{
+            role: "titleTypographyRole",
+            size: "gridTitleSize",
+            align: "gridTitleAlign",
+            level: "gridTitleLevel",
+          }}
+        />
+
+        {/* META DIVISION */}
+        <MetaSettingsGroup
+          block={block}
+          update={update}
+          keys={{
+            role: "metaTypographyRole",
+            align: "gridMetaAlign",
+            level: "gridMetaHtmlElement",
+          }}
+        />
+
+        {/* CONTENT DIVISION */}
+        <ContentSettingsGroup
+          block={block}
+          update={update}
+          keys={{
+            role: "contentTypographyRole",
+            align: "gridContentAlign",
+          }}
+        />
+
+        {/* LINK DIVISION */}
+        <LinkSettingsGroup
+          block={block}
+          update={update}
+          keys={{
+            style: "buttonStyle",
+            size: "size",
+          }}
         />
       </div>
     );
+
   if (tab === "behavior")
     return (
       <div

@@ -21,6 +21,12 @@ export default function ButtonPresentationFields({
   variant,
   size,
   allowInherit = false,
+  isVariantOverridden = false,
+  isSizeOverridden = false,
+  inheritedVariantText,
+  inheritedSizeText,
+  onVariantReset,
+  onSizeReset,
   onVariantChange,
   onSizeChange,
 }: {
@@ -29,12 +35,23 @@ export default function ButtonPresentationFields({
   variant: string;
   size: string;
   allowInherit?: boolean;
+  isVariantOverridden?: boolean;
+  isSizeOverridden?: boolean;
+  inheritedVariantText?: string;
+  inheritedSizeText?: string;
+  onVariantReset?: () => void;
+  onSizeReset?: () => void;
   onVariantChange: (value: string) => void;
   onSizeChange: (value: string) => void;
 }) {
   return (
     <InspectorSection title={title} description={description}>
-      <InspectorFieldRow label="Variant">
+      <InspectorFieldRow
+        label="Variant"
+        isOverridden={isVariantOverridden}
+        inheritedValueText={inheritedVariantText}
+        onReset={onVariantReset}
+      >
         <InspectorPillGroup
           value={variant}
           options={options(UIKIT_BUTTON_CAPABILITY.properties.variant.values, allowInherit)}
@@ -42,7 +59,12 @@ export default function ButtonPresentationFields({
           ariaLabel={`${title} variant`}
         />
       </InspectorFieldRow>
-      <InspectorFieldRow label="Size">
+      <InspectorFieldRow
+        label="Size"
+        isOverridden={isSizeOverridden}
+        inheritedValueText={inheritedSizeText}
+        onReset={onSizeReset}
+      >
         <InspectorPillGroup
           value={size}
           options={options(UIKIT_BUTTON_CAPABILITY.properties.size.values, allowInherit)}
@@ -53,3 +75,4 @@ export default function ButtonPresentationFields({
     </InspectorSection>
   );
 }
+

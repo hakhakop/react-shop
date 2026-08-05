@@ -74,9 +74,16 @@ export default function ButtonCapabilityPanel({ block, tab, shellSettings, updat
         <ButtonPresentationFields
           variant={selectValue(block.buttonStyle, "primary")}
           size={selectValue(block.size, "default")}
+          isVariantOverridden={block.buttonStyle !== undefined}
+          isSizeOverridden={block.size !== undefined}
+          inheritedVariantText="Primary"
+          inheritedSizeText="Default"
+          onVariantReset={() => updateSemantic({ buttonStyle: undefined })}
+          onSizeReset={() => updateSemantic({ size: undefined })}
           onVariantChange={(value) => updateSemantic({ buttonStyle: value as BuilderLayoutBlock["buttonStyle"] })}
           onSizeChange={(value) => updateSemantic({ size: value as BuilderLayoutBlock["size"] })}
         />
+
       </div>
     );
   }

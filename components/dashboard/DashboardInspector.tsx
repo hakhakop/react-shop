@@ -1881,22 +1881,45 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
             <div
               className="builder-inspector-breadcrumb-row"
               aria-label="Selection path"
+              style={{ display: "flex", alignItems: "center", gap: "4px", fontSize: "10px", color: "var(--builder-ui-muted)" }}
             >
-              <span>
+              <button
+                type="button"
+                className="builder-breadcrumb-link-btn"
+                style={{ background: "none", border: "none", padding: 0, color: "var(--builder-ui-accent)", cursor: "pointer", fontSize: "inherit", fontWeight: 500 }}
+                onClick={() => {
+                  setSelectedLayoutBlockKey(null);
+                  setInspectorTab("layout");
+                }}
+              >
                 {selectedSection.name ||
                   sectionLabels[selectedSection.kind] ||
                   selectedSection.title ||
                   "Section"}
-                {selectedLayoutRow &&
-                  ` > Row ${(selectedLayoutRowIndex ?? 0) + 1}`}
-                {selectedColumnIndex >= 0 &&
-                  ` > Col ${selectedColumnIndex + 1}`}
-                {selectedLayoutBlock && ` > ${selectedElementLabel}`}
-              </span>
+              </button>
+              {selectedLayoutRow && (
+                <>
+                  <span style={{ color: "var(--builder-ui-soft-muted)" }}>/</span>
+                  <span style={{ color: "var(--builder-ui-text)" }}>Row {(selectedLayoutRowIndex ?? 0) + 1}</span>
+                </>
+              )}
+              {selectedColumnIndex >= 0 && (
+                <>
+                  <span style={{ color: "var(--builder-ui-soft-muted)" }}>/</span>
+                  <span style={{ color: "var(--builder-ui-text)" }}>Col {selectedColumnIndex + 1}</span>
+                </>
+              )}
+              {selectedLayoutBlock && (
+                <>
+                  <span style={{ color: "var(--builder-ui-soft-muted)" }}>/</span>
+                  <strong style={{ color: "var(--builder-ui-text-strong)" }}>{selectedElementLabel}</strong>
+                </>
+              )}
               {contentFallbackActive ? (
-                <small className="builder-content-fallback-badge">{t("builder.contentLanguage.primaryFallback")}</small>
+                <small className="builder-content-fallback-badge" style={{ marginLeft: "auto" }}>{t("builder.contentLanguage.primaryFallback")}</small>
               ) : null}
             </div>
+
 
             {spacingOverlayEnabled && (
               <div

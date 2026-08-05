@@ -2,6 +2,7 @@
 
 import React from "react";
 import { useInspector } from "../../context/InspectorContext";
+import { InspectorFieldRow } from "../InspectorControls";
 
 export default function ElementBorderPanel() {
   const { selectedLayoutBlock, updateSelectedLayoutBlockByKey } = useInspector();
@@ -20,8 +21,12 @@ export default function ElementBorderPanel() {
           </small>
         </summary>
         <div className="builder-inspector-section">
-          <label className="builder-field">
-            <span>Card Border Radius</span>
+          <InspectorFieldRow
+            label="Card Border Radius"
+            isOverridden={block.borderRadius !== undefined}
+            inheritedValueText="Global Settings"
+            onReset={() => updateSelectedLayoutBlockByKey({ borderRadius: undefined })}
+          >
             <select
               value={
                 block.borderRadius === undefined
@@ -50,10 +55,9 @@ export default function ElementBorderPanel() {
               <option value="24">Extra Large (24px)</option>
               <option value="custom">Custom...</option>
             </select>
-          </label>
+          </InspectorFieldRow>
           {block.borderRadius !== undefined && ![0, 4, 8, 12, 16, 24].includes(block.borderRadius) && (
-            <label className="builder-field">
-              <span>Custom Radius (px)</span>
+            <InspectorFieldRow label="Custom Radius (px)">
               <input
                 type="number"
                 min={0}
@@ -64,10 +68,11 @@ export default function ElementBorderPanel() {
                   updateSelectedLayoutBlockByKey({ borderRadius: val });
                 }}
               />
-            </label>
+            </InspectorFieldRow>
           )}
         </div>
       </details>
     </div>
   );
 }
+
