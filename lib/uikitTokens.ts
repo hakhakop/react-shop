@@ -551,25 +551,27 @@ export type UikitImageDocumentFields = {
 
 /** Resolves stored Image fields into the shared UIkit Image semantic contract. */
 export function resolveUikitImageSemantics(
-  image: UikitImageDocumentFields,
-): UikitImageSemantics {
+  image: UikitImageDocumentFields & { imageBorder?: string; imageBoxShadow?: string; imageHoverTransition?: string },
+): UikitImageSemantics & { hoverTransition?: string } {
   return {
     fit: image.imageFit,
     ratio: image.imageRatio,
-    shape: image.imageShape ?? (image.imageBorderRadius ? "rounded" : "none"),
-    shadow: image.imageShadow,
+    shape: image.imageShape ?? (image.imageBorder === "rounded" || image.imageBorder === "circle" ? image.imageBorder : (image.imageBorderRadius ? "rounded" : "none")),
+    shadow: image.imageShadow ?? (image.imageBoxShadow && image.imageBoxShadow !== "none" ? image.imageBoxShadow : undefined),
     alignment: image.imageAlignment,
     width: image.imageWidth,
+    hoverTransition: image.imageHoverTransition,
   };
 }
 
 /** Maps semantic Image settings to UIkit 3.25-compatible classes and attributes. */
-export function getUikitImageClass(image: UikitImageSemantics): string {
+export function getUikitImageClass(image: UikitImageSemantics & { hoverTransition?: string }): string {
   const classes = ["uk-img"];
   if (image.shape === "rounded") classes.push("uk-border-rounded");
   if (image.shape === "circle") classes.push("uk-border-circle");
   if (image.shape === "pill") classes.push("uk-border-pill");
   if (image.shadow && image.shadow !== "none") classes.push(`uk-box-shadow-${image.shadow}`);
+  if (image.hoverTransition && image.hoverTransition !== "none") classes.push(`uk-transition-${image.hoverTransition}`, "uk-transition-opaque");
   return classes.join(" ");
 }
 

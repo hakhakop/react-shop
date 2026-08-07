@@ -10,7 +10,8 @@ import AccordionCapabilityPanel from "@/components/dashboard/inspector/panels/Ac
 import ButtonCapabilityPanel from "@/components/dashboard/inspector/panels/ButtonCapabilityPanel";
 import CoreContentCapabilityPanel from "@/components/dashboard/inspector/panels/CoreContentCapabilityPanel";
 import HeadingCapabilityPanel from "@/components/dashboard/inspector/panels/HeadingCapabilityPanel";
-import { GridCapabilityPanel, HeroCapabilityPanel } from "@/components/dashboard/inspector/panels/HeroGridCapabilityPanel";
+import GridCapabilityPanel from "@/components/dashboard/inspector/panels/GridCapabilityPanel";
+import { HeroCapabilityPanel } from "@/components/dashboard/inspector/panels/HeroGridCapabilityPanel";
 import ImageCapabilityPanel from "@/components/dashboard/inspector/panels/ImageCapabilityPanel";
 import ListCapabilityPanel from "@/components/dashboard/inspector/panels/ListCapabilityPanel";
 import PanelCapabilityPanel from "@/components/dashboard/inspector/panels/PanelCapabilityPanel";

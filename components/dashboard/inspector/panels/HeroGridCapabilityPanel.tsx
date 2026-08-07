@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import type {
   BuilderLayoutBlock,
   InspectorTab,
@@ -17,6 +17,9 @@ import {
   MetaSettingsGroup,
   ContentSettingsGroup,
   LinkSettingsGroup,
+  CardSettingsGroup,
+  MediaSettingsGroup,
+  ActionSettingsGroup,
 } from "@/components/dashboard/inspector/panels/SharedSettingGroups";
 import TypographyRoleSettingsPanel from "@/components/dashboard/inspector/panels/TypographyRoleSettingsPanel";
 import ButtonPresentationFields from "@/components/dashboard/inspector/panels/ButtonPresentationFields";
@@ -29,6 +32,9 @@ import {
   InspectorTextField,
   InspectorTextarea,
   InspectorDivision,
+  InspectorAlignmentControl,
+  InspectorMediaPlacementControl,
+  InspectorSegmentedControl,
 } from "@/components/dashboard/inspector/InspectorControls";
 
 type Props = {
@@ -223,9 +229,9 @@ export function HeroCapabilityPanel({
         />
         <InspectorSection title="Layout">
           <InspectorFieldRow label="Content alignment">
-            <InspectorPillGroup
+            <InspectorAlignmentControl
               value={block.heroContentAlign ?? block.elementAlign ?? "left"}
-              options={opts(["left", "center", "right"] as const)}
+              options={["left", "center", "right"] as const}
               onChange={(value) =>
                 update({ heroContentAlign: value, elementAlign: value })
               }
@@ -402,6 +408,7 @@ export function GridCapabilityPanel({
   openWordPressMediaPicker,
 }: Props) {
   const items = block.gridItems ?? [];
+  const [activeItemTabs, setActiveItemTabs] = useState<Record<string, "content" | "settings">>({});
   const copySequenceRef = useRef(0);
   const updateItems = (next: GridItem[]) => update({ gridItems: next });
   const reorderItems = (sourceIndex: number, targetIndex: number) => {
@@ -480,8 +487,7 @@ export function GridCapabilityPanel({
         data-uikit-capability="grid-content"
       >
         <InspectorSection
-          title="Grid content"
-          description="Manage the collection and each item’s content."
+          title="Content Source"
         >
           <InspectorFieldRow label="Source">
             <InspectorPillGroup
@@ -491,6 +497,403 @@ export function GridCapabilityPanel({
               ariaLabel="Grid source"
             />
           </InspectorFieldRow>
+        </InspectorSection>
+        <InspectorSection title="Items" description={`${items.length} items`}>
+          <RepeatableItemShell
+            items={items}
+            getItemKey={(item, index) => item.id ?? index}
+            itemLabel="Item"
+            itemDataAttribute="data-grid-item-id"
+            addPosition="before"
+            getItemSummary={(item) => item.title || "Untitled item"}
+            onAdd={() => {
+              const id = `grid-item-${Date.now().toString(36)}`;
+              updateItems([
+                ...items,
+                {
+                  id,
+                  title: `Grid item ${items.length + 1}`,
+                  text: "Edit this item.",
+                  buttonLabel: "Learn more",
+                  buttonUrl: "/",
+                },
+              ]);
+              return id;
+            }}
+            onCopy={copyItem}
+            onDelete={removeItem}
+            onReorder={reorderItems}
+            renderItem={(item, index) => {
+              const activeTab = item.id ? (activeItemTabs[item.id] ?? "content") : "content";
+              return (
+              <>
+                <InspectorFieldRow>
+                  <InspectorPillGroup
+                    value={activeTab}
+                    options={opts(["content", "settings"] as const)}
+                    onChange={(value) => {
+                      if (item.id) {
+                        setActiveItemTabs((prev) => ({
+                          ...prev,
+                          [item.id as string]: value as "content" | "settings",
+                        }));
+                      }
+                    }}
+                    ariaLabel={`Grid item ${index + 1} tab`}
+                  />
+                </InspectorFieldRow>
+
+                {activeTab === "content" && (
+                  <div style={{ display: "flex", flexDirection: "column", gap: "12px", marginTop: "12px" }}>
+                    <InspectorFieldRow label="Image">
+                      <BuilderImageUrlControl
+                        value={item.imageUrl ?? ""}
+                        onChange={(event) =>
+                          updateItems(
+                            items.map((entry, itemIndex) =>
+                              itemIndex === index
+                                ? { ...entry, imageUrl: event.target.value }
+                                : entry,
+                            ),
+                          )
+                        }
+                        onChoose={() =>
+                          openWordPressMediaPicker?.({
+                            title: `Grid item ${index + 1} image`,
+                            currentUrl: item.imageUrl,
+                            onSelect: (media) =>
+                              updateItems(
+                                items.map((entry, itemIndex) =>
+                                  itemIndex === index
+                                    ? {
+                                        ...entry,
+                                        imageUrl: media.sourceUrl,
+                                        imageAlt:
+                                          entry.imageAlt ||
+                                          media.altText ||
+                                          media.title ||
+                                          "",
+                                      }
+                                    : entry,
+                                ),
+                              ),
+                          })
+                        }
+                      />
+                    </InspectorFieldRow>
+                    <InspectorFieldRow label="Alt text">
+                      <InspectorTextField
+                        value={item.imageAlt ?? ""}
+                        onChange={(value) =>
+                          updateItems(
+                            items.map((entry, itemIndex) =>
+                              itemIndex === index
+                                ? { ...entry, imageAlt: value }
+                                : entry,
+                            ),
+                          )
+                        }
+                        ariaLabel={`Grid item ${index + 1} alt`}
+                      />
+                    </InspectorFieldRow>
+                    <InspectorFieldRow label="Eyebrow">
+                      <InspectorTextField
+                        value={item.eyebrow ?? ""}
+                        onChange={(value) =>
+                          updateItems(
+                            items.map((entry, itemIndex) =>
+                              itemIndex === index
+                                ? { ...entry, eyebrow: value }
+                                : entry,
+                            ),
+                          )
+                        }
+                        ariaLabel={`Grid item ${index + 1} eyebrow`}
+                      />
+                    </InspectorFieldRow>
+                    <InspectorFieldRow label="Title">
+                      <InspectorTextField
+                        value={item.title ?? ""}
+                        onChange={(value) =>
+                          updateItems(
+                            items.map((entry, itemIndex) =>
+                              itemIndex === index
+                                ? { ...entry, title: value }
+                                : entry,
+                            ),
+                          )
+                        }
+                        ariaLabel={`Grid item ${index + 1} title`}
+                      />
+                    </InspectorFieldRow>
+                    <InspectorFieldRow label="Meta">
+                      <InspectorTextField
+                        value={item.meta ?? ""}
+                        onChange={(value) =>
+                          updateItems(
+                            items.map((entry, itemIndex) =>
+                              itemIndex === index
+                                ? { ...entry, meta: value }
+                                : entry,
+                            ),
+                          )
+                        }
+                        ariaLabel={`Grid item ${index + 1} meta`}
+                      />
+                    </InspectorFieldRow>
+                    <InspectorFieldRow label="Body">
+                      <InspectorTextarea
+                        value={item.text ?? ""}
+                        onChange={(value) =>
+                          updateItems(
+                            items.map((entry, itemIndex) =>
+                              itemIndex === index
+                                ? { ...entry, text: value }
+                                : entry,
+                            ),
+                          )
+                        }
+                        ariaLabel={`Grid item ${index + 1} body`}
+                      />
+                    </InspectorFieldRow>
+                    <InspectorFieldRow label="Icon">
+                      <IconPicker
+                        value={item.iconName}
+                        onChange={(value) =>
+                          updateItems(
+                            items.map((entry, itemIndex) =>
+                              itemIndex === index
+                                ? { ...entry, iconName: value }
+                                : entry,
+                            ),
+                          )
+                        }
+                        onClear={() =>
+                          updateItems(
+                            items.map((entry, itemIndex) =>
+                              itemIndex === index
+                                ? { ...entry, iconName: undefined }
+                                : entry,
+                            ),
+                          )
+                        }
+                        ariaLabel={`Grid item ${index + 1} icon`}
+                      />
+                    </InspectorFieldRow>
+                    <InspectorFieldRow label="Action label">
+                      <InspectorTextField
+                        value={item.buttonLabel ?? ""}
+                        onChange={(value) =>
+                          updateItems(
+                            items.map((entry, itemIndex) =>
+                              itemIndex === index
+                                ? { ...entry, buttonLabel: value }
+                                : entry,
+                            ),
+                          )
+                        }
+                        ariaLabel={`Grid item ${index + 1} action label`}
+                      />
+                    </InspectorFieldRow>
+                  </div>
+                )}
+
+                {activeTab === "settings" && (
+                  <div style={{ display: "flex", flexDirection: "column", gap: "12px", marginTop: "12px" }}>
+                    <InspectorFieldRow label="Action URL">
+                      <InspectorTextField
+                        value={item.buttonUrl ?? ""}
+                        onChange={(value) =>
+                          updateItems(
+                            items.map((entry, itemIndex) =>
+                              itemIndex === index
+                                ? { ...entry, buttonUrl: value }
+                                : entry,
+                            ),
+                          )
+                        }
+                        ariaLabel={`Grid item ${index + 1} action URL`}
+                      />
+                    </InspectorFieldRow>
+                    <InspectorFieldRow label="Action target">
+                      <InspectorSelect
+                        value={item.buttonTarget ?? "_self"}
+                        options={BUILDER_LINK_TARGET_OPTIONS}
+                        onChange={(value) =>
+                          updateItems(
+                            items.map((entry, itemIndex) =>
+                              itemIndex === index
+                                ? { ...entry, buttonTarget: value }
+                                : entry,
+                            ),
+                          )
+                        }
+                        ariaLabel={`Grid item ${index + 1} action target`}
+                      />
+                    </InspectorFieldRow>
+                    <InspectorFieldRow label="Action style">
+                      <InspectorPillGroup
+                        value={
+                          item.actionStyle ??
+                          (item.buttonStyle === "link" ? "link" : "inherit")
+                        }
+                        options={
+                          item.buttonStyle === "link" && !item.actionStyle
+                            ? [
+                                { value: "inherit", label: "Inherit" },
+                                { value: "link", label: "Link" },
+                                ...opts(
+                                  UIKIT_BUTTON_CAPABILITY.properties.variant.values,
+                                ),
+                              ]
+                            : gridActionStyleOptions
+                        }
+                        onChange={(value) => updateItemActionStyle(index, value)}
+                        ariaLabel={`Grid item ${index + 1} action style`}
+                      />
+                    </InspectorFieldRow>
+                    <InspectorFieldRow label="Action size">
+                      <InspectorPillGroup
+                        value={item.actionSize ?? "inherit"}
+                        options={gridActionSizeOptions}
+                        onChange={(value) => updateItemActionSize(index, value)}
+                        ariaLabel={`Grid item ${index + 1} action size`}
+                      />
+                    </InspectorFieldRow>
+                    <InspectorFieldRow label="Icon size">
+                      <InspectorSelect
+                        value={String(item.iconSize ?? 20)}
+                        options={[12, 14, 16, 20, 24, 28, 32].map((value) => ({
+                          value: String(value),
+                          label: `${value}px`,
+                        }))}
+                        onChange={(value) =>
+                          updateItems(
+                            items.map((entry, itemIndex) =>
+                              itemIndex === index
+                                ? { ...entry, iconSize: Number(value) }
+                                : entry,
+                            ),
+                          )
+                        }
+                        ariaLabel={`Grid item ${index + 1} icon size`}
+                      />
+                    </InspectorFieldRow>
+                    <InspectorFieldRow label="Media placement">
+                      <InspectorMediaPlacementControl
+                        value={item.mediaPlacement ?? "top"}
+                        onChange={(value) =>
+                          updateItems(
+                            items.map((entry, itemIndex) =>
+                              itemIndex === index
+                                ? { ...entry, mediaPlacement: value }
+                                : entry,
+                            ),
+                          )
+                        }
+                        ariaLabel={`Grid item ${index + 1} media placement`}
+                      />
+                    </InspectorFieldRow>
+                    <InspectorFieldRow label="Media ratio">
+                      <InspectorSelect
+                        value={item.mediaRatio ?? "natural"}
+                        options={opts([
+                          "natural",
+                          "square",
+                          "4:3",
+                          "3:2",
+                          "16:9",
+                          "portrait",
+                        ] as const)}
+                        onChange={(value) =>
+                          updateItems(
+                            items.map((entry, itemIndex) =>
+                              itemIndex === index
+                                ? { ...entry, mediaRatio: value }
+                                : entry,
+                            ),
+                          )
+                        }
+                        ariaLabel={`Grid item ${index + 1} media ratio`}
+                      />
+                    </InspectorFieldRow>
+                    <InspectorFieldRow label="Media fit">
+                      <InspectorSegmentedControl
+                        value={item.mediaFit ?? "cover"}
+                        options={[
+                          { value: "cover", label: "Cover" },
+                          { value: "contain", label: "Contain" },
+                        ]}
+                        onChange={(value) =>
+                          updateItems(
+                            items.map((entry, itemIndex) =>
+                              itemIndex === index
+                                ? { ...entry, mediaFit: value as "cover" | "contain" }
+                                : entry,
+                            ),
+                          )
+                        }
+                        ariaLabel={`Grid item ${index + 1} media fit`}
+                      />
+                    </InspectorFieldRow>
+                    <InspectorFieldRow label="Text alignment">
+                      <InspectorAlignmentControl
+                        value={item.textAlign ?? "left"}
+                        onChange={(value) =>
+                          updateItems(
+                            items.map((entry, itemIndex) =>
+                              itemIndex === index
+                                ? { ...entry, textAlign: value }
+                                : entry,
+                            ),
+                          )
+                        }
+                        ariaLabel={`Grid item ${index + 1} text alignment`}
+                      />
+                    </InspectorFieldRow>
+                    <InspectorFieldRow label="Title element">
+                      <InspectorSelect
+                        value={item.titleElement ?? "h3"}
+                        options={opts(["h2", "h3", "h4", "div"] as const)}
+                        onChange={(value) =>
+                          updateItems(
+                            items.map((entry, itemIndex) =>
+                              itemIndex === index
+                                ? { ...entry, titleElement: value }
+                                : entry,
+                            ),
+                          )
+                        }
+                        ariaLabel={`Grid item ${index + 1} title element`}
+                      />
+                    </InspectorFieldRow>
+                    <InspectorFieldRow label="Title style">
+                      <InspectorSelect
+                        value={item.titleStyle ?? "inherit"}
+                        options={opts(["inherit", "h3", "h4", "h5"] as const)}
+                        onChange={(value) =>
+                          updateItems(
+                            items.map((entry, itemIndex) =>
+                              itemIndex === index
+                                ? { ...entry, titleStyle: value }
+                                : entry,
+                            ),
+                          )
+                        }
+                        ariaLabel={`Grid item ${index + 1} title style`}
+                      />
+                    </InspectorFieldRow>
+                  </div>
+                )}
+              </>
+              );
+            }}
+          />
+        </InspectorSection>
+        <InspectorSection
+          title="Field Visibility"
+          description="Control which fields are visible across all items."
+        >
           <InspectorFieldRow label="Show image">
             <InspectorSwitch
               checked={block.gridShowImage !== false}
@@ -526,369 +929,6 @@ export function GridCapabilityPanel({
               label="Show actions"
             />
           </InspectorFieldRow>
-        </InspectorSection>
-        <InspectorSection title="Items" description={`${items.length} items`}>
-          <RepeatableItemShell
-            items={items}
-            getItemKey={(item, index) => item.id ?? index}
-            itemLabel="Item"
-            itemDataAttribute="data-grid-item-id"
-            addPosition="before"
-            getItemSummary={(item) => item.title || "Untitled item"}
-            onAdd={() => {
-              const id = `grid-item-${Date.now().toString(36)}`;
-              updateItems([
-                ...items,
-                {
-                  id,
-                  title: `Grid item ${items.length + 1}`,
-                  text: "Edit this item.",
-                  buttonLabel: "Learn more",
-                  buttonUrl: "/",
-                },
-              ]);
-              return id;
-            }}
-            onCopy={copyItem}
-            onDelete={removeItem}
-            onReorder={reorderItems}
-            renderItem={(item, index) => (
-              <>
-                <InspectorFieldRow label="Image">
-                  <BuilderImageUrlControl
-                    value={item.imageUrl ?? ""}
-                    onChange={(event) =>
-                      updateItems(
-                        items.map((entry, itemIndex) =>
-                          itemIndex === index
-                            ? { ...entry, imageUrl: event.target.value }
-                            : entry,
-                        ),
-                      )
-                    }
-                    onChoose={() =>
-                      openWordPressMediaPicker?.({
-                        title: `Grid item ${index + 1} image`,
-                        currentUrl: item.imageUrl,
-                        onSelect: (media) =>
-                          updateItems(
-                            items.map((entry, itemIndex) =>
-                              itemIndex === index
-                                ? {
-                                    ...entry,
-                                    imageUrl: media.sourceUrl,
-                                    imageAlt:
-                                      entry.imageAlt ||
-                                      media.altText ||
-                                      media.title ||
-                                      "",
-                                  }
-                                : entry,
-                            ),
-                          ),
-                      })
-                    }
-                  />
-                </InspectorFieldRow>
-                <InspectorFieldRow label="Alt text">
-                  <InspectorTextField
-                    value={item.imageAlt ?? ""}
-                    onChange={(value) =>
-                      updateItems(
-                        items.map((entry, itemIndex) =>
-                          itemIndex === index
-                            ? { ...entry, imageAlt: value }
-                            : entry,
-                        ),
-                      )
-                    }
-                    ariaLabel={`Grid item ${index + 1} alt`}
-                  />
-                </InspectorFieldRow>
-                <InspectorFieldRow label="Eyebrow">
-                  <InspectorTextField
-                    value={item.eyebrow ?? ""}
-                    onChange={(value) =>
-                      updateItems(
-                        items.map((entry, itemIndex) =>
-                          itemIndex === index
-                            ? { ...entry, eyebrow: value }
-                            : entry,
-                        ),
-                      )
-                    }
-                    ariaLabel={`Grid item ${index + 1} eyebrow`}
-                  />
-                </InspectorFieldRow>
-                <InspectorFieldRow label="Title">
-                  <InspectorTextField
-                    value={item.title ?? ""}
-                    onChange={(value) =>
-                      updateItems(
-                        items.map((entry, itemIndex) =>
-                          itemIndex === index
-                            ? { ...entry, title: value }
-                            : entry,
-                        ),
-                      )
-                    }
-                    ariaLabel={`Grid item ${index + 1} title`}
-                  />
-                </InspectorFieldRow>
-                <InspectorFieldRow label="Meta">
-                  <InspectorTextField
-                    value={item.meta ?? ""}
-                    onChange={(value) =>
-                      updateItems(
-                        items.map((entry, itemIndex) =>
-                          itemIndex === index
-                            ? { ...entry, meta: value }
-                            : entry,
-                        ),
-                      )
-                    }
-                    ariaLabel={`Grid item ${index + 1} meta`}
-                  />
-                </InspectorFieldRow>
-                <InspectorFieldRow label="Body">
-                  <InspectorTextarea
-                    value={item.text ?? ""}
-                    onChange={(value) =>
-                      updateItems(
-                        items.map((entry, itemIndex) =>
-                          itemIndex === index
-                            ? { ...entry, text: value }
-                            : entry,
-                        ),
-                      )
-                    }
-                    ariaLabel={`Grid item ${index + 1} body`}
-                  />
-                </InspectorFieldRow>
-                <InspectorFieldRow label="Icon">
-                  <IconPicker
-                    value={item.iconName}
-                    onChange={(value) =>
-                      updateItems(
-                        items.map((entry, itemIndex) =>
-                          itemIndex === index
-                            ? { ...entry, iconName: value }
-                            : entry,
-                        ),
-                      )
-                    }
-                    onClear={() =>
-                      updateItems(
-                        items.map((entry, itemIndex) =>
-                          itemIndex === index
-                            ? { ...entry, iconName: undefined }
-                            : entry,
-                        ),
-                      )
-                    }
-                    ariaLabel={`Grid item ${index + 1} icon`}
-                  />
-                </InspectorFieldRow>
-                <InspectorFieldRow label="Icon size">
-                  <InspectorSelect
-                    value={String(item.iconSize ?? 20)}
-                    options={[12, 14, 16, 20, 24, 28, 32].map((value) => ({
-                      value: String(value),
-                      label: `${value}px`,
-                    }))}
-                    onChange={(value) =>
-                      updateItems(
-                        items.map((entry, itemIndex) =>
-                          itemIndex === index
-                            ? { ...entry, iconSize: Number(value) }
-                            : entry,
-                        ),
-                      )
-                    }
-                    ariaLabel={`Grid item ${index + 1} icon size`}
-                  />
-                </InspectorFieldRow>
-                <InspectorFieldRow label="Action label">
-                  <InspectorTextField
-                    value={item.buttonLabel ?? ""}
-                    onChange={(value) =>
-                      updateItems(
-                        items.map((entry, itemIndex) =>
-                          itemIndex === index
-                            ? { ...entry, buttonLabel: value }
-                            : entry,
-                        ),
-                      )
-                    }
-                    ariaLabel={`Grid item ${index + 1} action label`}
-                  />
-                </InspectorFieldRow>
-                <InspectorFieldRow label="Action URL">
-                  <InspectorTextField
-                    value={item.buttonUrl ?? ""}
-                    onChange={(value) =>
-                      updateItems(
-                        items.map((entry, itemIndex) =>
-                          itemIndex === index
-                            ? { ...entry, buttonUrl: value }
-                            : entry,
-                        ),
-                      )
-                    }
-                    ariaLabel={`Grid item ${index + 1} action URL`}
-                  />
-                </InspectorFieldRow>
-                <InspectorFieldRow label="Action target">
-                  <InspectorSelect
-                    value={item.buttonTarget ?? "_self"}
-                    options={BUILDER_LINK_TARGET_OPTIONS}
-                    onChange={(value) =>
-                      updateItems(
-                        items.map((entry, itemIndex) =>
-                          itemIndex === index
-                            ? { ...entry, buttonTarget: value }
-                            : entry,
-                        ),
-                      )
-                    }
-                    ariaLabel={`Grid item ${index + 1} action target`}
-                  />
-                </InspectorFieldRow>
-                <InspectorFieldRow label="Media placement">
-                  <InspectorPillGroup
-                    value={item.mediaPlacement ?? "top"}
-                    options={opts(["top", "left", "right"] as const)}
-                    onChange={(value) =>
-                      updateItems(
-                        items.map((entry, itemIndex) =>
-                          itemIndex === index
-                            ? { ...entry, mediaPlacement: value }
-                            : entry,
-                        ),
-                      )
-                    }
-                    ariaLabel={`Grid item ${index + 1} media placement`}
-                  />
-                </InspectorFieldRow>
-                <InspectorFieldRow label="Media ratio">
-                  <InspectorSelect
-                    value={item.mediaRatio ?? "natural"}
-                    options={opts([
-                      "natural",
-                      "square",
-                      "4:3",
-                      "3:2",
-                      "16:9",
-                      "portrait",
-                    ] as const)}
-                    onChange={(value) =>
-                      updateItems(
-                        items.map((entry, itemIndex) =>
-                          itemIndex === index
-                            ? { ...entry, mediaRatio: value }
-                            : entry,
-                        ),
-                      )
-                    }
-                    ariaLabel={`Grid item ${index + 1} media ratio`}
-                  />
-                </InspectorFieldRow>
-                <InspectorFieldRow label="Media fit">
-                  <InspectorPillGroup
-                    value={item.mediaFit ?? "cover"}
-                    options={opts(["cover", "contain"] as const)}
-                    onChange={(value) =>
-                      updateItems(
-                        items.map((entry, itemIndex) =>
-                          itemIndex === index
-                            ? { ...entry, mediaFit: value }
-                            : entry,
-                        ),
-                      )
-                    }
-                    ariaLabel={`Grid item ${index + 1} media fit`}
-                  />
-                </InspectorFieldRow>
-                <InspectorFieldRow label="Text alignment">
-                  <InspectorPillGroup
-                    value={item.textAlign ?? "left"}
-                    options={opts(["left", "center", "right"] as const)}
-                    onChange={(value) =>
-                      updateItems(
-                        items.map((entry, itemIndex) =>
-                          itemIndex === index
-                            ? { ...entry, textAlign: value }
-                            : entry,
-                        ),
-                      )
-                    }
-                    ariaLabel={`Grid item ${index + 1} text alignment`}
-                  />
-                </InspectorFieldRow>
-                <InspectorFieldRow label="Title element">
-                  <InspectorSelect
-                    value={item.titleElement ?? "h3"}
-                    options={opts(["h2", "h3", "h4", "div"] as const)}
-                    onChange={(value) =>
-                      updateItems(
-                        items.map((entry, itemIndex) =>
-                          itemIndex === index
-                            ? { ...entry, titleElement: value }
-                            : entry,
-                        ),
-                      )
-                    }
-                    ariaLabel={`Grid item ${index + 1} title element`}
-                  />
-                </InspectorFieldRow>
-                <InspectorFieldRow label="Title style">
-                  <InspectorSelect
-                    value={item.titleStyle ?? "inherit"}
-                    options={opts(["inherit", "h3", "h4", "h5"] as const)}
-                    onChange={(value) =>
-                      updateItems(
-                        items.map((entry, itemIndex) =>
-                          itemIndex === index
-                            ? { ...entry, titleStyle: value }
-                            : entry,
-                        ),
-                      )
-                    }
-                    ariaLabel={`Grid item ${index + 1} title style`}
-                  />
-                </InspectorFieldRow>
-                <InspectorFieldRow label="Action style">
-                  <InspectorPillGroup
-                    value={
-                      item.actionStyle ??
-                      (item.buttonStyle === "link" ? "link" : "inherit")
-                    }
-                    options={
-                      item.buttonStyle === "link" && !item.actionStyle
-                        ? [
-                            { value: "inherit", label: "Inherit" },
-                            { value: "link", label: "Link" },
-                            ...opts(
-                              UIKIT_BUTTON_CAPABILITY.properties.variant.values,
-                            ),
-                          ]
-                        : gridActionStyleOptions
-                    }
-                    onChange={(value) => updateItemActionStyle(index, value)}
-                    ariaLabel={`Grid item ${index + 1} action style`}
-                  />
-                </InspectorFieldRow>
-                <InspectorFieldRow label="Action size">
-                  <InspectorPillGroup
-                    value={item.actionSize ?? "inherit"}
-                    options={gridActionSizeOptions}
-                    onChange={(value) => updateItemActionSize(index, value)}
-                    ariaLabel={`Grid item ${index + 1} action size`}
-                  />
-                </InspectorFieldRow>
-              </>
-            )}
-          />
         </InspectorSection>
       </div>
     );
@@ -963,7 +1003,38 @@ export function GridCapabilityPanel({
           </InspectorFieldRow>
         </InspectorDivision>
 
-        {/* PANEL DIVISION */}
+        {/* MEDIA DIVISION */}
+        <MediaSettingsGroup
+          block={block}
+          update={(patch) => {
+            const mappedPatch = { ...patch };
+            if (patch.gridShowImage !== undefined) mappedPatch.heroShowMedia = patch.gridShowImage;
+            if (patch.imageRatio !== undefined) mappedPatch.heroMediaRatio = patch.imageRatio;
+            if (patch.imageFit !== undefined) mappedPatch.heroMediaFit = patch.imageFit;
+            
+            // Clear item-level overrides so global media settings apply to ALL items cleanly
+            if (block.gridItems && block.gridItems.length > 0) {
+              mappedPatch.gridItems = block.gridItems.map((item) => ({
+                ...item,
+                ...(patch.imageRatio !== undefined ? { mediaRatio: undefined } : {}),
+                ...(patch.imageFit !== undefined ? { mediaFit: undefined } : {}),
+                ...(patch.gridMediaPlacement !== undefined ? { mediaPlacement: undefined } : {}),
+              }));
+            }
+            update(mappedPatch);
+          }}
+          title="MEDIA"
+          keys={{
+            showMedia: "gridShowImage",
+            placement: "gridMediaPlacement",
+            ratio: "imageRatio",
+            fit: "imageFit",
+            width: "gridMediaWidth",
+            align: "gridMediaAlignment",
+          }}
+        />
+
+        {/* PANEL / CARD PRESENTATION DIVISION */}
         <InspectorDivision title="PANEL">
           <InspectorFieldRow
             label="Item renderer"
@@ -979,51 +1050,16 @@ export function GridCapabilityPanel({
             />
           </InspectorFieldRow>
           {block.gridItemRenderer === "card" && (
-            <>
-              <InspectorFieldRow
-                label="Card variant"
-                isOverridden={block.gridCardVariant !== undefined}
-                inheritedValueText="Default"
-                onReset={() => update({ gridCardVariant: undefined })}
-              >
-                <InspectorPillGroup
-                  value={block.gridCardVariant ?? "default"}
-                  options={opts([
-                    "default",
-                    "primary",
-                    "secondary",
-                    "blank",
-                  ] as const)}
-                  onChange={(value) => update({ gridCardVariant: value })}
-                  ariaLabel="Grid card variant"
-                />
-              </InspectorFieldRow>
-              <InspectorFieldRow
-                label="Card size"
-                isOverridden={block.gridCardSize !== undefined}
-                inheritedValueText="Default"
-                onReset={() => update({ gridCardSize: undefined })}
-              >
-                <InspectorPillGroup
-                  value={block.gridCardSize ?? "default"}
-                  options={opts(["small", "default", "large"] as const)}
-                  onChange={(value) => update({ gridCardSize: value })}
-                  ariaLabel="Grid card size"
-                />
-              </InspectorFieldRow>
-              <InspectorFieldRow
-                label="Card hover"
-                isOverridden={block.gridCardHover !== undefined}
-                inheritedValueText="Disabled"
-                onReset={() => update({ gridCardHover: undefined })}
-              >
-                <InspectorSwitch
-                  checked={block.gridCardHover === true}
-                  onChange={(checked) => update({ gridCardHover: checked })}
-                  label="Enable card hover"
-                />
-              </InspectorFieldRow>
-            </>
+            <CardSettingsGroup
+              block={block}
+              update={update}
+              title="CARD PRESENTATION"
+              keys={{
+                variant: "gridCardVariant",
+                size: "gridCardSize",
+                hover: "gridCardHover",
+              }}
+            />
           )}
         </InspectorDivision>
 
@@ -1060,11 +1096,15 @@ export function GridCapabilityPanel({
           }}
         />
 
-        {/* LINK DIVISION */}
-        <LinkSettingsGroup
+        {/* ACTION BUTTON DIVISION */}
+        <ActionSettingsGroup
           block={block}
           update={update}
+          title="ACTION BUTTON"
           keys={{
+            label: "buttonLabel",
+            url: "buttonUrl",
+            target: "buttonTarget",
             style: "buttonStyle",
             size: "size",
           }}

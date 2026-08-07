@@ -4,10 +4,11 @@ import { Search } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
 import type { BuilderShellSettings } from "@/lib/builderShell";
-import { GLOBAL_STYLE_GROUPS } from "@/lib/globalStyleTokens";
+import { GLOBAL_STYLE_GROUPS, GLOBAL_STYLE_TOKEN_DEFAULTS } from "@/lib/globalStyleTokens";
+import { YoothemeColorPicker, YoothemeFontPicker, YoothemeLessImportModal } from "@/components/dashboard/global-styles/YoothemeStyleControls";
 
 type Props = { shellSettings: BuilderShellSettings; updateShellSettings: (patch: Partial<BuilderShellSettings>) => void };
-type Screen = "root" | "global" | "button" | "card" | "heading" | "accordion" | "background" | "base" | "visibility";
+type Screen = "root" | "global" | "button" | "card" | "heading" | "accordion" | "background" | "base" | "visibility" | "section" | "container" | "grid" | "navbar";
 type Key = keyof BuilderShellSettings;
 
 const labels: Record<string, string> = {
@@ -22,17 +23,25 @@ const supported: { id: Screen; label: string; description: string; enabled?: boo
   { id: "base", label: "Base", description: "Base typography and global rhythm" },
   { id: "visibility", label: "Visibility", description: "Responsive visibility defaults" },
   { id: "button", label: "Button", description: "UIkit button colors, size, radius, and hover" },
-  { id: "card", label: "Card", description: "Card backgrounds, radius, and shadows" },
+  { id: "card", label: "Card", description: "Card backgrounds, radius, body, header, title, and shadows" },
   { id: "heading", label: "Heading", description: "Heading scales, family, and weight" },
   { id: "accordion", label: "Accordion", description: "Title, icon, spacing, and row presentation" },
+  { id: "section", label: "Section", description: "Section paddings, margins, and surface colors" },
+  { id: "container", label: "Container", description: "Max widths for small, default, large, and xlarge containers" },
+  { id: "grid", label: "Grid", description: "Gutter sizes, column gaps, and divider presentation" },
+  { id: "navbar", label: "Navbar", description: "Height, background, and navigation item typography" },
 ];
 
 const editorSections: Partial<Record<Screen, string[]>> = {
   global: ["Typography", "Primary", "Secondary", "Tertiary", "Colors", "Borders", "Spacing", "Controls", "Containers"],
   button: ["Shared geometry and typography", "Small size", "Large size", "Variant colors and borders", "Gradients", "Shadows"],
-  card: ["Geometry", "Padding", "Variants", "Hover states", "Content rhythm", "Elevation"],
+  card: ["Geometry", "Body", "Header", "Footer", "Title", "Badge", "Hover states", "Default variant", "Primary variant", "Secondary variant"],
   heading: ["Scale"],
   accordion: ["Title", "Icon and interaction", "Rows"],
+  section: ["Padding", "Margin", "Backgrounds"],
+  container: ["Max widths"],
+  grid: ["Gutters"],
+  navbar: ["Navigation bar"],
   background: ["Background"],
   base: ["Base", "Selection", "Inline emphasis"],
   visibility: ["Desktop", "Tablet", "Mobile"],
@@ -51,7 +60,7 @@ function Select({ label, value, options, onChange, disabled = false }: { label: 
 
 function Color({ label, value, onChange }: { label: string; value: unknown; onChange: (value: string) => void }) {
   const current = asString(value);
-  return <div className="builder-design-control builder-design-color"><span>{label}</span><div><input aria-label={`${label} swatch`} type="color" value={hex(current)} onChange={(event) => onChange(event.target.value)} /><input aria-label={label} type="text" value={current} onChange={(event) => onChange(event.target.value)} /></div></div>;
+  return <YoothemeColorPicker label={label} value={current} onChange={onChange} />;
 }
 
 function Gradient({ label, value, onChange }: { label: string; value: unknown; onChange: (value: string) => void }) {
@@ -84,6 +93,7 @@ export default function CanonicalGlobalStylesPanel({ shellSettings, updateShellS
   const [navQuery, setNavQuery] = useState("");
   const [draft, setDraft] = useState<BuilderShellSettings>(shellSettings);
   const [snapshot, setSnapshot] = useState<BuilderShellSettings>(shellSettings);
+  const [isLessModalOpen, setIsLessModalOpen] = useState(false);
   useEffect(() => {
     setDraft(shellSettings);
     if (screen === "root") setSnapshot(shellSettings);
@@ -95,7 +105,7 @@ export default function CanonicalGlobalStylesPanel({ shellSettings, updateShellS
   const cancel = () => { setDraft(snapshot); updateShellSettings(snapshot); setScreen("root"); };
   const save = () => { setSnapshot(draft); setScreen("root"); };
   const generalItems = supported.filter((item) => ["global", "background", "base", "visibility"].includes(item.id));
-  const componentItems = supported.filter((item) => ["button", "card", "heading", "accordion"].includes(item.id));
+  const componentItems = supported.filter((item) => ["button", "card", "heading", "accordion", "section", "container", "grid", "navbar"].includes(item.id));
   const matchesNav = (item: { label: string; description: string }) => {
     const query = navQuery.trim().toLowerCase();
     return !query || `${item.label} ${item.description}`.toLowerCase().includes(query);
@@ -116,6 +126,10 @@ export default function CanonicalGlobalStylesPanel({ shellSettings, updateShellS
           {screen === "base" && <><Group title="Base"><Length label="Base font size" value={draft.baseFontSize} onChange={(value) => set("baseFontSize", value)} /><Length label="Base line height" value={draft.baseLineHeight} onChange={(value) => set("baseLineHeight", value)} units={["", "px", "rem"]} /><Select label="Font weight" value={draft.headingFontWeight} options={["400", "500", "600", "700", "800"]} onChange={(value) => set("headingFontWeight", value)} /></Group><Group title="Selection"><Color label="Selection background" value={draft.selectionBackground} onChange={(value) => set("selectionBackground", value)} /><Color label="Selection text" value={draft.selectionColor} onChange={(value) => set("selectionColor", value)} /></Group><Group title="Inline emphasis"><Color label="Inserted background" value={draft.baseInsBackground} onChange={(value) => set("baseInsBackground", value)} /><Color label="Inserted text" value={draft.baseInsColor} onChange={(value) => set("baseInsColor", value)} /><Color label="Marked background" value={draft.baseMarkBackground} onChange={(value) => set("baseMarkBackground", value)} /><Color label="Marked text" value={draft.baseMarkColor} onChange={(value) => set("baseMarkColor", value)} /></Group></>}
           {screen === "visibility" && <VisibilityEditor draft={draft} setVisibility={setVisibility} />}
           {screen === "accordion" && <AccordionEditor draft={draft} set={set} />}
+          {screen === "section" && <SectionGlobalEditor draft={draft} set={set} />}
+          {screen === "container" && <ContainerGlobalEditor draft={draft} set={set} />}
+          {screen === "grid" && <GridGlobalEditor draft={draft} set={set} />}
+          {screen === "navbar" && <NavbarGlobalEditor draft={draft} set={set} />}
         </div>
       </div>
     </div>;
@@ -123,6 +137,36 @@ export default function CanonicalGlobalStylesPanel({ shellSettings, updateShellS
 
   return <div className="builder-global-design-root" data-testid="global-design-root">
     <div className="builder-design-root-heading"><div><small>DESIGN SYSTEM</small><span>STYLE</span></div><p>WebPages semantic design system</p></div>
+    
+    {/* YOOtheme Preset Selector */}
+    <div style={{ padding: "0 16px 12px 16px" }}>
+      <label style={{ fontSize: "11px", fontWeight: 600, color: "#94a3b8", textTransform: "uppercase", display: "block", marginBottom: "6px" }}>Theme Preset</label>
+      <select
+        value={draft.globalStylePresetName ?? "DevStack"}
+        onChange={(e) => {
+          const presetName = e.target.value;
+          let patch: Partial<BuilderShellSettings> = { globalStylePresetName: presetName };
+          if (presetName === "DevStack") {
+            patch = { ...patch, primaryColor: "#6f40f1", linkColor: "#6f40f1", fontFamilyBody: "Manrope" };
+          } else if (presetName === "Dark") {
+            patch = { ...patch, backgroundColor: "#0f172a", mutedBackgroundColor: "#1e293b", textColor: "#f8fafc", primaryColor: "#38bdf8", linkColor: "#38bdf8" };
+          } else if (presetName === "Soft") {
+            patch = { ...patch, backgroundColor: "#fdfbf7", mutedBackgroundColor: "#f4efe6", textColor: "#1e293b", primaryColor: "#e11d48", linkColor: "#e11d48", fontFamilyBody: "Georgia" };
+          } else if (presetName === "Default") {
+            patch = { ...patch, backgroundColor: "#ffffff", mutedBackgroundColor: "#f8fafc", textColor: "#111827", primaryColor: "#111111", linkColor: "#111111", fontFamilyBody: "Manrope" };
+          }
+          setDraft({ ...draft, ...patch });
+          updateShellSettings(patch);
+        }}
+        style={{ width: "100%", padding: "8px 12px", borderRadius: "8px", border: "1px solid #334155", fontSize: "13px", fontWeight: 600, backgroundColor: "#0f172a", color: "#f8fafc", outline: "none" }}
+      >
+        <option value="DevStack">DevStack (Modern Purple)</option>
+        <option value="Default">Default UIkit</option>
+        <option value="Dark">Dark Mode</option>
+        <option value="Soft">Soft Elegance</option>
+      </select>
+    </div>
+
     <div className="builder-design-inheritance-banner" data-token-inheritance="global-component-local"><strong>Canonical token source</strong><span>Global Style → Component Default → Current Element Override</span><small>Builder and published frontend consume the same generated UIkit variables.</small></div>
     <label className="builder-design-nav-search"><Search size={16} aria-hidden="true" /><input value={navQuery} onChange={(event) => setNavQuery(event.target.value)} placeholder="Search styles and components" aria-label="Search styles and components" /></label>
     <div className="builder-design-root-layout is-preview-off"><nav className="builder-design-nav">
@@ -130,16 +174,56 @@ export default function CanonicalGlobalStylesPanel({ shellSettings, updateShellS
       <div className="builder-design-nav-section"><h3>Token groups <small>{GLOBAL_STYLE_GROUPS.length}</small></h3>{GLOBAL_STYLE_GROUPS.map((group) => <div key={group.id} className="builder-design-token-group"><strong>{group.label}</strong><span>{group.items.join(" · ")}</span></div>)}</div>
       <div className="builder-design-nav-section"><h3>Components <small>{componentItems.filter(matchesNav).length}</small></h3>{componentItems.filter(matchesNav).map((item) => <NavItem key={item.id} item={item} onClick={open} />)}</div>
     </nav></div>
+
+    {/* YOOtheme Master Action Buttons */}
+    <div style={{ padding: "16px", display: "flex", flexDirection: "column", gap: "8px", borderTop: "1px solid rgba(255,255,255,0.08)", marginTop: "16px" }}>
+      <button
+        type="button"
+        onClick={() => {
+          updateShellSettings(draft);
+        }}
+        style={{ width: "100%", padding: "10px", borderRadius: "8px", border: "none", backgroundColor: "#6f40f1", color: "#ffffff", fontWeight: 700, fontSize: "12px", letterSpacing: "0.5px", textTransform: "uppercase", cursor: "pointer" }}
+      >
+        RECOMPILE STYLE
+      </button>
+      <button
+        type="button"
+        onClick={() => setIsLessModalOpen(true)}
+        style={{ width: "100%", padding: "8px", borderRadius: "8px", border: "1px solid #38bdf8", backgroundColor: "transparent", color: "#38bdf8", fontWeight: 600, fontSize: "11px", letterSpacing: "0.5px", textTransform: "uppercase", cursor: "pointer" }}
+      >
+        IMPORT YOOTHEME LESS
+      </button>
+      <button
+        type="button"
+        onClick={() => {
+          const resetPatch: Partial<BuilderShellSettings> = { ...GLOBAL_STYLE_TOKEN_DEFAULTS };
+          setDraft({ ...draft, ...resetPatch });
+          updateShellSettings(resetPatch);
+        }}
+        style={{ width: "100%", padding: "8px", borderRadius: "8px", border: "1px solid #334155", backgroundColor: "transparent", color: "#94a3b8", fontWeight: 600, fontSize: "11px", letterSpacing: "0.5px", textTransform: "uppercase", cursor: "pointer" }}
+      >
+        RESET TO DEFAULTS
+      </button>
+    </div>
+
+    <YoothemeLessImportModal
+      isOpen={isLessModalOpen}
+      onClose={() => setIsLessModalOpen(false)}
+      onImport={(importedPatch) => {
+        setDraft({ ...draft, ...importedPatch });
+        updateShellSettings(importedPatch);
+      }}
+    />
   </div>;
 }
 
 function NavItem({ item, onClick }: { item: { id: Screen; label: string; description: string; enabled?: boolean }; onClick: (screen: Screen) => void }) { return <button type="button" className={`builder-design-nav-item${item.enabled === false ? " is-disabled" : ""}`} disabled={item.enabled === false} onClick={() => onClick(item.id)}><strong>{item.label}</strong><span>{item.description}</span></button>; }
 
 function GlobalEditor({ draft, set }: { draft: BuilderShellSettings; set: (key: Key, value: string) => void }) { return <>
-  <Group title="Typography"><Select label="Base font family" value={draft.fontFamilyBody} options={["Manrope", "Inter", "system-ui", "Georgia"]} onChange={(value) => set("fontFamilyBody", value)} /><Length label="Base font size" value={draft.baseFontSize} onChange={(value) => set("baseFontSize", value)} /><Length label="Base line height" value={draft.baseLineHeight} onChange={(value) => set("baseLineHeight", value)} units={["", "px", "rem"]} />{([["smallTextFontSize", "Small"], ["headingMediumFontSize", "Medium"], ["headingLargeFontSize", "Large"], ["headingXLargeFontSize", "Xlarge"]] as [Key, string][]).map(([key, label]) => <Length key={key} label={`${label} size`} value={draft[key]} onChange={(value) => set(key, value)} />)}</Group>
-  <Group title="Primary"><Select label="Font family" value={draft.fontFamilyPrimary} options={["inherit", "Manrope", "Inter", "system-ui", "Georgia"]} onChange={(value) => set("fontFamilyPrimary", value)} /><Select label="Weight" value={draft.fontWeightPrimary} options={["400", "500", "600", "700", "800"]} onChange={(value) => set("fontWeightPrimary", value)} /></Group>
-  <Group title="Secondary"><Select label="Font family" value={draft.fontFamilySecondary} options={["inherit", "Manrope", "Inter", "system-ui", "Georgia"]} onChange={(value) => set("fontFamilySecondary", value)} /><Select label="Weight" value={draft.fontWeightSecondary} options={["400", "500", "600", "700", "800"]} onChange={(value) => set("fontWeightSecondary", value)} /></Group>
-  <Group title="Tertiary"><Select label="Font family" value={draft.fontFamilyTertiary} options={["inherit", "Manrope", "Inter", "system-ui", "Georgia"]} onChange={(value) => set("fontFamilyTertiary", value)} /><Select label="Weight" value={draft.fontWeightTertiary} options={["400", "500", "600", "700", "800"]} onChange={(value) => set("fontWeightTertiary", value)} /></Group>
+  <Group title="Typography"><YoothemeFontPicker label="Base font family" value={draft.fontFamilyBody ?? "Manrope"} onChange={(value) => set("fontFamilyBody", value)} /><Length label="Base font size" value={draft.baseFontSize} onChange={(value) => set("baseFontSize", value)} /><Length label="Base line height" value={draft.baseLineHeight} onChange={(value) => set("baseLineHeight", value)} units={["", "px", "rem"]} />{([["smallTextFontSize", "Small"], ["headingMediumFontSize", "Medium"], ["headingLargeFontSize", "Large"], ["headingXLargeFontSize", "Xlarge"]] as [Key, string][]).map(([key, label]) => <Length key={key} label={`${label} size`} value={draft[key]} onChange={(value) => set(key, value)} />)}</Group>
+  <Group title="Primary"><YoothemeFontPicker label="Font family" value={draft.fontFamilyPrimary ?? "inherit"} onChange={(value) => set("fontFamilyPrimary", value)} /><Select label="Weight" value={draft.fontWeightPrimary} options={["400", "500", "600", "700", "800"]} onChange={(value) => set("fontWeightPrimary", value)} /></Group>
+  <Group title="Secondary"><YoothemeFontPicker label="Font family" value={draft.fontFamilySecondary ?? "inherit"} onChange={(value) => set("fontFamilySecondary", value)} /><Select label="Weight" value={draft.fontWeightSecondary} options={["400", "500", "600", "700", "800"]} onChange={(value) => set("fontWeightSecondary", value)} /></Group>
+  <Group title="Tertiary"><YoothemeFontPicker label="Font family" value={draft.fontFamilyTertiary ?? "inherit"} onChange={(value) => set("fontFamilyTertiary", value)} /><Select label="Weight" value={draft.fontWeightTertiary} options={["400", "500", "600", "700", "800"]} onChange={(value) => set("fontWeightTertiary", value)} /></Group>
   <ColorGroup draft={draft} set={set} /><BorderGroup draft={draft} set={set} /><ShellSpacingGroup draft={draft} set={set} /><SpacingGroup draft={draft} set={set} /><ControlGroup draft={draft} set={set} /><ContainerGroup draft={draft} set={set} /></>; }
 
 function ColorGroup({ draft, set }: { draft: BuilderShellSettings; set: (key: Key, value: string) => void }) { return <Group title="Colors">{([["textColor", "Text"], ["emphasisColor", "Emphasis"], ["mutedTextColor", "Muted"], ["linkColor", "Link"], ["linkHoverColor", "Link hover"], ["primaryColor", "Primary background"], ["secondaryColor", "Secondary background"], ["successColor", "Success"], ["warningColor", "Warning"], ["dangerColor", "Danger"], ["backgroundColor", "Page background"], ["mutedBackgroundColor", "Muted background"]] as [Key, string][]).map(([key, label]) => <Color key={key} label={label} value={draft[key]} onChange={(value) => set(key, value)} />)}</Group>; }
@@ -198,4 +282,8 @@ function VisibilityEditor({ draft, setVisibility }: { draft: BuilderShellSetting
   return <Group title="Global defaults"><div className="builder-import-readonly"><strong>Inherited by sections and content elements</strong><span>Elements remain inherited until their local inspector explicitly selects Visible or Hidden.</span></div>{fields.map(([key, label]) => <label key={key} className="builder-design-control builder-design-checkbox"><span>{label}</span><input aria-label={`${label} visibility default`} type="checkbox" checked={draft[key] !== false} onChange={(event) => setVisibility(key, event.target.checked)} /><small>{draft[key] === false ? "Hidden" : "Visible"}</small></label>)}</Group>;
 }
 function AccordionEditor({ draft, set }: { draft: BuilderShellSettings; set: (key: Key, value: string) => void }) { return <><Group title="Title"><Length label="Font size" value={draft.accordionTitleFontSize} onChange={(value) => set("accordionTitleFontSize", value)} /><Select label="Weight" value={draft.accordionTitleFontWeight} options={["400", "500", "600", "700"]} onChange={(value) => set("accordionTitleFontWeight", value)} /><Length label="Letter spacing" value={draft.accordionTitleLetterSpacing} onChange={(value) => set("accordionTitleLetterSpacing", value)} /></Group><Group title="Icon and interaction"><Color label="Icon color" value={draft.accordionIconColor} onChange={(value) => set("accordionIconColor", value)} /><Color label="Hover color" value={draft.accordionTitleHoverColor} onChange={(value) => set("accordionTitleHoverColor", value)} /><Length label="Title vertical padding" value={draft.accordionTitlePaddingVertical} onChange={(value) => set("accordionTitlePaddingVertical", value)} /><Length label="Content top spacing" value={draft.accordionContentMarginTop} onChange={(value) => set("accordionContentMarginTop", value)} /></Group><Group title="Rows"><Length label="Border width" value={draft.accordionItemBorderWidth} onChange={(value) => set("accordionItemBorderWidth", value)} /><Color label="Border color" value={draft.accordionItemBorder} onChange={(value) => set("accordionItemBorder", value)} /><Shadow label="Row shadow" value={draft.accordionItemBoxShadow} onChange={(value) => set("accordionItemBoxShadow", value)} /></Group></>; }
+function SectionGlobalEditor({ draft, set }: { draft: BuilderShellSettings; set: (key: Key, value: string) => void }) { return <><Group title="Padding"><Length label="Small padding" value={draft.sectionPaddingSmall} onChange={(value) => set("sectionPaddingSmall", value)} /><Length label="Default padding" value={draft.sectionPaddingTop} onChange={(value) => set("sectionPaddingTop", value)} /><Length label="Large padding" value={draft.sectionPaddingLarge} onChange={(value) => set("sectionPaddingLarge", value)} /><Length label="Xlarge padding" value={draft.sectionPaddingXLarge} onChange={(value) => set("sectionPaddingXLarge", value)} /></Group><Group title="Backgrounds"><Color label="Default background" value={draft.backgroundColor} onChange={(value) => set("backgroundColor", value)} /><Color label="Muted background" value={draft.mutedBackgroundColor} onChange={(value) => set("mutedBackgroundColor", value)} /><Color label="Primary background" value={draft.primaryColor} onChange={(value) => set("primaryColor", value)} /><Color label="Secondary background" value={draft.secondaryColor} onChange={(value) => set("secondaryColor", value)} /></Group></>; }
+function ContainerGlobalEditor({ draft, set }: { draft: BuilderShellSettings; set: (key: Key, value: string) => void }) { return <Group title="Max widths"><Length label="Small container" value={draft.containerSmall} onChange={(value) => set("containerSmall", value)} /><Length label="Default container" value={draft.containerDefault} onChange={(value) => set("containerDefault", value)} /><Length label="Large container" value={draft.containerLarge} onChange={(value) => set("containerLarge", value)} /><Length label="Xlarge container" value={draft.containerXLarge} onChange={(value) => set("containerXLarge", value)} /><Length label="Page max width" value={draft.pageContainerMaxWidth} onChange={(value) => set("pageContainerMaxWidth", value)} /></Group>; }
+function GridGlobalEditor({ draft, set }: { draft: BuilderShellSettings; set: (key: Key, value: string) => void }) { return <Group title="Gutters"><Length label="Small gutter" value={draft.gridGutterSmall} onChange={(value) => set("gridGutterSmall", value)} /><Length label="Default gutter" value={draft.gridGutterDefault} onChange={(value) => set("gridGutterDefault", value)} /><Length label="Medium gutter" value={draft.gridGutterMedium} onChange={(value) => set("gridGutterMedium", value)} /><Length label="Large gutter" value={draft.gridGutterLarge} onChange={(value) => set("gridGutterLarge", value)} /></Group>; }
+function NavbarGlobalEditor({ draft, set }: { draft: BuilderShellSettings; set: (key: Key, value: string) => void }) { return <Group title="Navigation bar"><Color label="Link color" value={draft.linkColor} onChange={(value) => set("linkColor", value)} /><Color label="Link hover color" value={draft.linkHoverColor} onChange={(value) => set("linkHoverColor", value)} /><Color label="Primary background" value={draft.primaryColor} onChange={(value) => set("primaryColor", value)} /><Color label="Page background" value={draft.backgroundColor} onChange={(value) => set("backgroundColor", value)} /></Group>; }
 function UnsupportedEditor({ name }: { name: string }) { return <div className="builder-import-readonly builder-design-unsupported"><strong>{name} is not yet supported</strong><span>Imported values remain available in the Import LESS report only.</span></div>; }

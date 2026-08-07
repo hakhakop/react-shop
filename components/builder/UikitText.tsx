@@ -11,6 +11,9 @@ type Props = {
   align?: "left" | "center" | "right";
   typography?: TypographySettings | TypographyGroup;
   typographyRole?: SemanticTypographyRole;
+  margin?: string;
+  animation?: string;
+  visibility?: string;
 };
 
 export default function UikitText({
@@ -21,15 +24,25 @@ export default function UikitText({
   align = "left",
   typography,
   typographyRole,
+  margin,
+  animation,
+  visibility,
 }: Props) {
   const resolvedTypography = resolveTypographyInput(typography, "body") ?? {};
   const { fontSize: _fontSize, variant: _variant, textAlign: _textAlign, ...complementaryTypography } = resolvedTypography;
   const textTypography = typographyProps(complementaryTypography, "body");
+  const marginClass = margin && margin !== "none" && margin !== "default" ? `uk-margin-${margin}` : "";
+  const animationClass = animation && animation !== "none" ? `uk-animation-${animation}` : "";
+  const visibilityClass = visibility && visibility !== "always" ? `uk-${visibility}` : "";
+
   const className = [
     "shop-builder-column-block",
     "shop-builder-column-block--text",
     getUikitTextClass(variant),
     `uk-text-${align}`,
+    marginClass,
+    animationClass,
+    visibilityClass,
     typographyRoleClass(typographyRole),
     textTypography.className,
   ].filter(Boolean).join(" ");

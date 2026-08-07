@@ -10,6 +10,7 @@ import {
 } from "@/lib/builderSpacing";
 import type { CategoryTreeItem } from "@/lib/categories";
 import { useInspector } from "@/components/dashboard/context/InspectorContext";
+import { InspectorSegmentedControl } from "@/components/dashboard/inspector/InspectorControls";
 
 /**
  * Visual pill/indicator showing whether a property is inheriting from Global Settings or locally overridden.
@@ -352,7 +353,7 @@ export function SpacingControl({
   );
 }
 
-// Choice Group
+// Choice Group (Delegates to Canonical InspectorSegmentedControl)
 export function InspectorChoiceGroup<T extends string>({
   value,
   options,
@@ -363,18 +364,11 @@ export function InspectorChoiceGroup<T extends string>({
   onChange: (value: T) => void;
 }) {
   return (
-    <div className="builder-inspector-choice-group">
-      {options.map((option) => (
-        <button
-          key={option.value}
-          type="button"
-          className={option.value === value ? "is-active" : ""}
-          onClick={() => onChange(option.value)}
-        >
-          {option.label}
-        </button>
-      ))}
-    </div>
+    <InspectorSegmentedControl
+      value={value}
+      options={options}
+      onChange={onChange}
+    />
   );
 }
 

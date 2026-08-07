@@ -40,16 +40,14 @@ export default function RepeatableItemShell<T>({
     () => items.map((item, index) => getItemKey(item, index)),
     [getItemKey, items],
   );
-  const [openItemKey, setOpenItemKey] = useState<ItemKey | null>(
-    itemKeys[0] ?? null,
-  );
+  const [openItemKey, setOpenItemKey] = useState<ItemKey | null>(null);
   const [draggingIndex, setDraggingIndex] = useState<number | null>(null);
   const [dropTargetIndex, setDropTargetIndex] = useState<number | null>(null);
   const draggingIndexRef = useRef<number | null>(null);
 
   useEffect(() => {
     if (openItemKey === null || itemKeys.includes(openItemKey)) return;
-    setOpenItemKey(itemKeys[0] ?? null);
+    setOpenItemKey(null);
   }, [itemKeys, openItemKey]);
 
   const clearDragState = () => {

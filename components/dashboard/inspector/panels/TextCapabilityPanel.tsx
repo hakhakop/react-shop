@@ -3,7 +3,7 @@
 import type { BuilderLayoutBlock, InspectorTab } from "@/components/dashboard/builderTypes";
 import RichTextEditor from "@/components/dashboard/RichTextEditor";
 import { UIKIT_TEXT_CAPABILITY } from "@/lib/uikitCapabilities";
-import { InspectorFieldRow, InspectorPillGroup, InspectorSelect, InspectorDivision } from "@/components/dashboard/inspector/InspectorControls";
+import { InspectorFieldRow, InspectorPillGroup, InspectorSelect, InspectorDivision, InspectorAlignmentControl } from "@/components/dashboard/inspector/InspectorControls";
 import type { BuilderShellSettings } from "@/lib/builderShell";
 import TypographyRoleSettingsPanel from "@/components/dashboard/inspector/panels/TypographyRoleSettingsPanel";
 
@@ -52,9 +52,8 @@ export default function TextCapabilityPanel({ block, tab, shellSettings, update 
             inheritedValueText="Left"
             onReset={() => update({ textAlign: undefined })}
           >
-            <InspectorPillGroup
+            <InspectorAlignmentControl
               value={block.textAlign ?? "left"}
-              options={labels(properties.alignment.values)}
               onChange={(value) => update({ textAlign: value })}
               ariaLabel="Text alignment"
             />

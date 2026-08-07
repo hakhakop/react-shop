@@ -2,8 +2,7 @@
 
 import React from "react";
 import { useInspector } from "../../context/InspectorContext";
-import { InspectorChoiceGroup } from "./InspectorSharedControls";
-import { InspectorFieldRow } from "../InspectorControls";
+import { InspectorFieldRow, InspectorFlexAlignControl, InspectorSegmentedControl, InspectorSelect } from "../InspectorControls";
 import type { BuilderLayoutBlock } from "@/components/dashboard/builderTypes";
 
 export default function ElementAlignPanel() {
@@ -23,18 +22,15 @@ export default function ElementAlignPanel() {
             inheritedValueText="Left"
             onReset={() => updateSelectedLayoutBlockByKey({ elementAlign: undefined })}
           >
-            <InspectorChoiceGroup
+            <InspectorFlexAlignControl
               value={block.elementAlign ?? "left"}
-              options={[
-                { label: "Left", value: "left" },
-                { label: "Center", value: "center" },
-                { label: "Right", value: "right" },
-              ]}
+              options={["left", "center", "right"] as const}
               onChange={(value) =>
                 updateSelectedLayoutBlockByKey({
                   elementAlign: value as BuilderLayoutBlock["elementAlign"],
                 })
               }
+              ariaLabel="Content align"
             />
           </InspectorFieldRow>
 
@@ -46,7 +42,7 @@ export default function ElementAlignPanel() {
                 inheritedValueText="Inline"
                 onReset={() => updateSelectedLayoutBlockByKey({ buttonsLayout: undefined })}
               >
-                <InspectorChoiceGroup
+                <InspectorSegmentedControl
                   value={block.buttonsLayout ?? "inline"}
                   options={[
                     { label: "Inline", value: "inline" },
@@ -55,6 +51,7 @@ export default function ElementAlignPanel() {
                   onChange={(value) =>
                     updateSelectedLayoutBlockByKey({ buttonsLayout: value as any })
                   }
+                  ariaLabel="Buttons orientation"
                 />
               </InspectorFieldRow>
               <InspectorFieldRow
@@ -63,7 +60,7 @@ export default function ElementAlignPanel() {
                 inheritedValueText="Default"
                 onReset={() => updateSelectedLayoutBlockByKey({ buttonGap: undefined })}
               >
-                <InspectorChoiceGroup
+                <InspectorSelect
                   value={block.buttonGap ?? "0.75rem"}
                   options={[
                     { label: "Touching", value: "0.25rem" },
@@ -79,6 +76,7 @@ export default function ElementAlignPanel() {
                       buttonGap: value,
                     })
                   }
+                  ariaLabel="Button gap"
                 />
               </InspectorFieldRow>
             </div>
@@ -94,18 +92,15 @@ export default function ElementAlignPanel() {
             inheritedValueText="Left"
             onReset={() => updateSelectedLayoutBlockByKey({ elementAlign: undefined })}
           >
-            <InspectorChoiceGroup
+            <InspectorFlexAlignControl
               value={block.elementAlign ?? "left"}
-              options={[
-                { label: "Left", value: "left" },
-                { label: "Center", value: "center" },
-                { label: "Right", value: "right" },
-              ]}
+              options={["left", "center", "right"] as const}
               onChange={(value) =>
                 updateSelectedLayoutBlockByKey({
                   elementAlign: value as BuilderLayoutBlock["elementAlign"],
                 })
               }
+              ariaLabel="Content align"
             />
           </InspectorFieldRow>
         </div>

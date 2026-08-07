@@ -54,6 +54,7 @@ import RowCapabilityPanel from "@/components/dashboard/inspector/panels/RowCapab
 import ColumnCapabilityPanel from "@/components/dashboard/inspector/panels/ColumnCapabilityPanel";
 import ElementCapabilityComposer from "@/components/dashboard/inspector/ElementCapabilityComposer";
 import { BuilderImageUrlControl } from "@/components/dashboard/inspector/panels/InspectorSharedControls";
+import { InspectorAlignmentControl } from "@/components/dashboard/inspector/InspectorControls";
 import { getInspectorElementCapabilityDeclaration } from "@/components/dashboard/inspector/inspectorRouting";
 import type { InspectorElementKind } from "@/lib/uikitCapabilities";
 import AnimationControl from "@/components/dashboard/style/AnimationControl";
@@ -1763,9 +1764,11 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
         : isElementSpacingTab
           ? "Element Spacing"
           : isElementSettingsTab
-            ? selectedLayoutBlock.kind === "products"
-              ? "Element Styling"
-              : "Element Styling"
+            ? selectedElementCapabilityDeclaration?.settingsLabel === "Settings"
+              ? "Element Settings"
+              : selectedLayoutBlock.kind === "products"
+                ? "Element Styling"
+                : "Element Styling"
             : isElementTypographyTab
               ? "Element Typography"
               : "Element Advanced"
@@ -2419,7 +2422,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
 
           {selectedElementCapabilityPanel}
 
-          {!isCanonicalSectionSelection && !isCanonicalColumnSelection && (( !selectedLayoutBlock &&
+          {!isCanonicalSectionSelection && !isCanonicalColumnSelection && !selectedElementCapabilityDeclaration && (( !selectedLayoutBlock &&
             !selectedLayoutRow &&
             inspectorTab === "layout" &&
             selectedSection.id !== "header-document") ||
@@ -2579,15 +2582,17 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                       </label>
                     </details>
 
-                    <StyleTabPanel
-                      target={styleTarget}
-                      showSpacing={false}
-                      showBackground={false}
-                      showAppearance={false}
-                      showAdvanced={false}
-                      showTypography={false}
-                      onChange={updateStyleTarget}
-                    />
+                    {!selectedElementCapabilityDeclaration && (
+                      <StyleTabPanel
+                        target={styleTarget}
+                        showSpacing={false}
+                        showBackground={false}
+                        showAppearance={false}
+                        showAdvanced={false}
+                        showTypography={false}
+                        onChange={updateStyleTarget}
+                      />
+                    )}
                   </>
                 )}
 
@@ -2603,7 +2608,8 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                   isElementTypographyTab ||
                   isElementAdvancedTab) &&
                   isLayoutContainerSection(selectedSection) &&
-                  selectedLayoutBlock)) && (
+                  selectedLayoutBlock &&
+                  !selectedElementCapabilityDeclaration)) && (
                 <details
                   className={`builder-collapse ${
                     selectedLayoutBlock ? "builder-element-direct-collapse" : ""
@@ -2856,7 +2862,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                             </button>
                                           </div>
 
-                                          {isSelectedBlock && selectedLayoutBlock?.kind !== "heading" && selectedLayoutBlock?.kind !== "text" &&
+                                          {isSelectedBlock && !selectedElementCapabilityDeclaration && selectedLayoutBlock?.kind !== "heading" && selectedLayoutBlock?.kind !== "text" &&
                                             isElementTypographyTab && (
                                               <div className="builder-element-typography-panel">
                                                 {supportedAreas.length > 1 && (
@@ -5033,36 +5039,32 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                       <strong>Layout</strong>
                                                       <small>Shared Header element properties</small>
                                                     </div>
-                                                    <label className="builder-field">
-                                                      <span>Alignment</span>
-                                                      <select
-                                                        data-testid="header-element-alignment"
-                                                        value={resolveInspectorHeaderAlignment(
-                                                          selectedSection,
-                                                          item,
-                                                          block,
-                                                        )}
-                                                        onChange={(event) =>
-                                                          updateSelectedLayoutBlock(
-                                                            index,
-                                                            blockIndex,
-                                                            block.kind === "image"
-                                                              ? {
-                                                                  imageAlignment:
-                                                                    event.target.value as BuilderLayoutBlock["imageAlignment"],
-                                                                }
-                                                              : {
-                                                                  elementAlign:
-                                                                    event.target.value as BuilderLayoutBlock["elementAlign"],
-                                                                },
-                                                          )
-                                                        }
-                                                      >
-                                                        <option value="left">Left</option>
-                                                        <option value="center">Center</option>
-                                                        <option value="right">Right</option>
-                                                      </select>
-                                                    </label>
+                                                    <div className="builder-field">
+                                                       <span>Alignment</span>
+                                                       <InspectorAlignmentControl
+                                                         value={resolveInspectorHeaderAlignment(
+                                                           selectedSection,
+                                                           item,
+                                                           block,
+                                                         )}
+                                                         onChange={(value) =>
+                                                           updateSelectedLayoutBlock(
+                                                             index,
+                                                             blockIndex,
+                                                             block.kind === "image"
+                                                               ? {
+                                                                   imageAlignment:
+                                                                     value as BuilderLayoutBlock["imageAlignment"],
+                                                                 }
+                                                               : {
+                                                                   elementAlign:
+                                                                     value as BuilderLayoutBlock["elementAlign"],
+                                                                 },
+                                                           )
+                                                         }
+                                                         ariaLabel="Header element alignment"
+                                                       />
+                                                     </div>
                                                   </div>
                                                 )}
                                                 {selectedSection?.id === "header-document" && block.kind === "image" ? (
@@ -6127,45 +6129,32 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                                                                               </option>
                                                                             </select>
                                                                           </label>
-                                                                          <label className="builder-field">
-                                                                            <span>
-                                                                              Button
-                                                                              Alignment
-                                                                            </span>
-                                                                            <select
-                                                                              value={
-                                                                                gridItem.buttonAlign ??
-                                                                                "left"
-                                                                              }
-                                                                              onChange={(
-                                                                                event,
-                                                                              ) =>
-                                                                                updateSelectedLayoutBlockGridItem(
-                                                                                  index,
-                                                                                  blockIndex,
-                                                                                  gridItemIndex,
-                                                                                  {
-                                                                                    buttonAlign:
-                                                                                      event
-                                                                                        .target
-                                                                                        .value as NonNullable<
-                                                                                        typeof gridItem.buttonAlign
-                                                                                      >,
-                                                                                  },
-                                                                                )
-                                                                              }
-                                                                            >
-                                                                              <option value="left">
-                                                                                Left
-                                                                              </option>
-                                                                              <option value="center">
-                                                                                Center
-                                                                              </option>
-                                                                              <option value="right">
-                                                                                Right
-                                                                              </option>
-                                                                            </select>
-                                                                          </label>
+                                                                          <div className="builder-field">
+                                                                             <span>
+                                                                               Button
+                                                                               Alignment
+                                                                             </span>
+                                                                             <InspectorAlignmentControl
+                                                                               value={
+                                                                                 gridItem.buttonAlign ??
+                                                                                 "left"
+                                                                               }
+                                                                               onChange={(value) =>
+                                                                                 updateSelectedLayoutBlockGridItem(
+                                                                                   index,
+                                                                                   blockIndex,
+                                                                                   gridItemIndex,
+                                                                                   {
+                                                                                     buttonAlign:
+                                                                                       value as NonNullable<
+                                                                                         typeof gridItem.buttonAlign
+                                                                                       >,
+                                                                                   },
+                                                                                 )
+                                                                               }
+                                                                               ariaLabel="Grid item button alignment"
+                                                                             />
+                                                                           </div>
                                                                         </div>
                                                                       </div>
                                                                       <details
@@ -16596,15 +16585,17 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                   </div>
                 </details>
 
-                <StyleTabPanel
-                  target={styleTarget}
-                  showSpacing={false}
-                  showLayout={false}
-                  showAdvanced={false}
-                  showTypography={false}
-                  onChange={updateStyleTarget}
-                  onPickBackgroundImage={pickStyleBackgroundImage}
-                />
+                {!selectedElementCapabilityDeclaration && (
+                  <StyleTabPanel
+                    target={styleTarget}
+                    showSpacing={false}
+                    showLayout={false}
+                    showAdvanced={false}
+                    showTypography={false}
+                    onChange={updateStyleTarget}
+                    onPickBackgroundImage={pickStyleBackgroundImage}
+                  />
+                )}
               </div>
             )}
 

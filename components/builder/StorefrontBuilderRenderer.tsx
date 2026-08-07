@@ -5,6 +5,8 @@ import AntigravityTerminal from "@/components/builder/AntigravityTerminal";
 import AntigravityCanvas from "@/components/builder/AntigravityCanvas";
 import TypewriterText from "@/components/builder/TypewriterText";
 import BuilderLineBreakText from "@/components/builder/BuilderLineBreakText";
+import { RenderChecklist, Typog, blockLegacyGridMargin } from "@/components/builder/BuilderRenderHelpers";
+export { Typog } from "@/components/builder/BuilderRenderHelpers";
 import UikitAccordion from "@/components/builder/UikitAccordion";
 import UikitText from "@/components/builder/UikitText";
 import { WebPagesIcon } from "@/components/builder/WebPagesIcon";
@@ -1231,105 +1233,14 @@ async function ContentProductsBlock({
   );
 }
 
-function RenderChecklist({
-  items,
-  iconName = "check",
-  colorScheme = "default",
-  typography,
-  iconSize = 15,
-  renderWithUikit = false,
-}: {
-  items?: string[];
-  iconName?: string;
-  colorScheme?: string;
-  typography?: any;
-  iconSize?: number;
-  renderWithUikit?: boolean;
-}) {
-  if (!items || items.length === 0) return null;
-  const isGradientCycle = colorScheme === "gradient-cycle";
-  const legacyIcon = {
-    check: <Check size={iconSize} />,
-    circleCheck: <CircleCheck size={iconSize} />,
-    arrowRight: <ArrowRight size={iconSize} />,
-    star: <Star size={iconSize} />,
-    heart: <Heart size={iconSize} />,
-    sparkles: <Sparkles size={iconSize} />,
-    shield: <ShieldCheck size={iconSize} />,
-  }[iconName] ?? <Check size={iconSize} />;
-  return (
-    <ul
-      className={`shop-builder-column-block--list-items ${isGradientCycle ? "is-icon-gradient-cycle" : ""}`}
-      style={{
-        listStyle: "none",
-        padding: 0,
-        margin: "1rem 0",
-        display: "grid",
-        gap: "0.5rem",
-      }}
-    >
-      {items.map((item, index) => (
-        <li
-          key={`${item}-${index}`}
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "0.5rem",
-            fontSize: "0.95rem",
-          }}
-        >
-          {renderWithUikit && resolveUikitIconName(iconName) ? (
-            <WebPagesIcon name={iconName} size={iconSize} />
-          ) : (
-            legacyIcon
-          )}
-          <Typog as="span" typography={typography}>
-            {item}
-          </Typog>
-        </li>
-      ))}
-    </ul>
-  );
-}
+import { GridCardsClient } from "@/components/builder/GridCardsClient";
 
 function GridCards({
   block,
   items,
 }: {
   block: BuilderLayoutBlock;
-  items: Array<{
-    id: string;
-    imageUrl?: string;
-    imageAlt?: string;
-    eyebrow?: string;
-    title?: string;
-    meta?: string;
-    text?: string;
-    buttonLabel?: string;
-    buttonUrl?: string;
-    buttonStyle?: "primary" | "secondary" | "outline" | "ghost" | "link";
-    buttonTarget?: "_self" | "_blank";
-    buttonAlign?: "left" | "center" | "right";
-    renderer?: "plain" | "card";
-    cardVariant?: "default" | "primary" | "secondary" | "blank";
-    cardSize?: "small" | "default" | "large";
-    cardHover?: boolean;
-    mediaPlacement?: "top" | "left" | "right";
-    mediaRatio?: "natural" | "square" | "4:3" | "3:2" | "16:9" | "portrait";
-    mediaFit?: "cover" | "contain";
-    textAlign?: "left" | "center" | "right";
-    titleElement?: "h2" | "h3" | "h4" | "div";
-    titleStyle?: "inherit" | "h3" | "h4" | "h5";
-    actionStyle?: "default" | "primary" | "secondary" | "text";
-    actionSize?: "small" | "default" | "large";
-    typography?: BuilderLayoutBlock["typography"];
-    items?: string[];
-    listIcon?: string;
-    listIconColorScheme?: string;
-    listIconSize?: number;
-    iconName?: string;
-    iconSize?: number;
-  }>;
+  items: Array<any>;
 }) {
   const limit = Math.max(1, (block.columns ?? 3) * (block.gridRows ?? 1));
   const gridTitleStyle = {
@@ -1365,117 +1276,20 @@ function GridCards({
     contentPaddingClass === "custom"
       ? cssSpacingValue(block.gridContentPadding)
       : null;
+
   return (
-    <div
-      className={`shop-builder-grid shop-builder-grid--gap-${gridGapClass} shop-builder-grid--margin-${blockLegacyGridMargin(block)}`}
-      style={
-        {
-          "--shop-builder-grid-columns": block.columns ?? 3,
-          ...(gridGapCustom
-            ? { "--shop-builder-grid-gap": gridGapCustom }
-            : {}),
-        } as CSSProperties
-      }
-    >
-      {items.slice(0, limit).map((item) => (
-        (() => {
-        const isCard = block.gridItemRenderer === "card";
-        const cardVariant = block.gridCardVariant ?? "default";
-        const cardSize = item.cardSize ?? block.gridCardSize ?? "default";
-        const cardHover = item.cardHover ?? block.gridCardHover;
-        const Title = (item.titleElement ?? "h3") as any;
-        const titleClass = item.titleStyle && item.titleStyle !== "inherit" ? getUikitHeadingClass(item.titleStyle, item.titleStyle) : "";
-        const mediaStyle = getUikitPanelMediaStyle({ ratio: item.mediaRatio ?? block.imageRatio, fit: (item.mediaFit ?? block.imageFit ?? "cover") === "contain" ? "contain" : "cover", alignment: "center" });
-        return (
-        <article
-          key={item.id}
-          className={`${isCard ? getUikitCardClass(cardVariant, { padding: cardSize, hover: cardHover ? "hover" : "none" }) : ""} shop-builder-grid-card is-image-${imagePaddingClass} is-content-${contentPaddingClass} is-frame-${block.gridImageFrame ?? "none"}`}
-          style={
-            {
-              textAlign: item.textAlign ?? "left",
-              ...(imagePaddingCustom
-                ? { "--shop-builder-grid-image-padding": imagePaddingCustom }
-                : {}),
-              ...(contentPaddingCustom
-                ? {
-                    "--shop-builder-grid-content-padding": contentPaddingCustom,
-                  }
-                : {}),
-            } as CSSProperties
-          }
-        >
-          {block.gridShowImage !== false && item.imageUrl && (
-            <div className={`${isCard ? getUikitPanelMediaClass(item.mediaPlacement === "left" || item.mediaPlacement === "right" ? item.mediaPlacement : "top") : ""} shop-builder-grid-image ${item.mediaPlacement === "left" ? "shop-builder-grid-image--left" : item.mediaPlacement === "right" ? "shop-builder-grid-image--right" : ""}`} style={{ aspectRatio: mediaStyle.aspectRatio, overflow: "hidden" }}>
-              <img src={item.imageUrl} alt={item.imageAlt || item.title || ""} loading="lazy" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: mediaStyle.backgroundSize as CSSProperties["objectFit"] }} />
-            </div>
-          )}
-          <div className={`${isCard ? "uk-card-body " : ""}shop-builder-grid-content`}>
-            {item.iconName && <WebPagesIcon name={item.iconName} size={item.iconSize ?? 20} />}
-            {block.gridShowEyebrow !== false && item.eyebrow && (
-              <Typog
-                as="span"
-                className={`shop-builder-eyebrow ${typographyRoleClass(block.metaTypographyRole)}`}
-                typography={item.typography ?? block.typography}
-                area="eyebrow"
-              >
-                {item.eyebrow}
-              </Typog>
-            )}
-            {item.title && (
-              <Typog
-                as={Title}
-                className={`shop-builder-title ${titleClass} ${typographyRoleClass(block.titleTypographyRole)}`.trim()}
-                typography={item.typography ?? block.typography}
-                area="title"
-                style={gridTitleStyle}
-              >
-                <BuilderLineBreakText text={item.title} />
-              </Typog>
-            )}
-            {block.gridShowMeta !== false && item.meta && (
-              <Typog
-                as="small"
-                className={typographyRoleClass(block.metaTypographyRole)}
-                area="body"
-                typography={item.typography ?? block.typography}
-              >
-                {item.meta}
-              </Typog>
-            )}
-            {block.gridShowText !== false && item.text && (
-              <Typog as="p" className={typographyRoleClass(block.contentTypographyRole)} typography={item.typography ?? block.typography} area="body">
-                {item.text}
-              </Typog>
-            )}
-
-            <RenderChecklist
-              items={item.items}
-              iconName={item.listIcon}
-              colorScheme={item.listIconColorScheme}
-              typography={item.typography ?? block.typography}
-              iconSize={item.listIconSize}
-            />
-
-            {block.gridShowButton !== false &&
-              item.buttonLabel &&
-              item.buttonUrl && (
-                <div
-                  className={`shop-builder-grid-button shop-builder-grid-button--${item.buttonAlign ?? "left"}`}
-                >
-                <a
-                  className={`shop-builder-grid-action ${getUikitButtonClass(item.actionStyle ?? item.buttonStyle ?? block.buttonStyle ?? "primary", item.actionSize ?? block.size ?? "default")}`}
-                  href={item.buttonUrl}
-                  {...builderLinkTargetProps(item.buttonTarget)}
-                  >
-                    {item.buttonLabel}
-                  </a>
-                </div>
-              )}
-          </div>
-        </article>);
-        })()
-      ))}
-    </div>
+    <GridCardsClient
+      block={block}
+      items={items}
+      gridTitleStyle={gridTitleStyle}
+      gridGapClass={gridGapClass}
+      gridGapCustom={gridGapCustom}
+      imagePaddingClass={imagePaddingClass}
+      imagePaddingCustom={imagePaddingCustom}
+      contentPaddingClass={contentPaddingClass}
+      contentPaddingCustom={contentPaddingCustom}
+      limit={limit}
+    />
   );
 }
 
@@ -1853,16 +1667,24 @@ export function ContentLayoutBlock({
         align={block.textAlign}
         typography={block.typography}
         typographyRole={block.textTypographyRole}
+        margin={(block as any).margin}
+        animation={typeof block.animation === "string" ? block.animation : (block.animation as any)?.preset}
+        visibility={(block as any).visibility}
       />
     );
   }
 
   if (block.kind === "button") {
     const rawBlock = block as any;
+    const marginClass = rawBlock.margin && rawBlock.margin !== "none" && rawBlock.margin !== "default" ? `uk-margin-${rawBlock.margin}` : "";
+    const animationClass = rawBlock.animation && rawBlock.animation !== "none" ? `uk-animation-${rawBlock.animation}` : "";
+    const visibilityClass = rawBlock.visibility && rawBlock.visibility !== "always" ? `uk-${rawBlock.visibility}` : "";
+    const alignClass = rawBlock.buttonAlign === "center" ? "uk-flex-center" : rawBlock.buttonAlign === "right" ? "uk-flex-right" : "";
+
     return (
-      <div className="shop-builder-column-block shop-builder-column-block--button">
+      <div className={`shop-builder-column-block shop-builder-column-block--button ${marginClass} ${animationClass} ${visibilityClass}`.trim()}>
         <div
-          className={`uk-flex uk-flex-wrap ${rawBlock.buttonsLayout === "stacked" ? "uk-flex-column" : "uk-flex-middle"}`}
+          className={`uk-flex uk-flex-wrap ${alignClass} ${rawBlock.buttonsLayout === "stacked" ? "uk-flex-column" : "uk-flex-middle"}`.trim()}
           style={{ gap: rawBlock.buttonGap || "0.75rem" }}
         >
           {rawBlock.buttonLabel && rawBlock.buttonUrl && (
@@ -2201,13 +2023,22 @@ export function ContentLayoutBlock({
 
   if (block.kind === "heading") {
     const rawBlock = block as any;
-    const Tag = (rawBlock.headingLevel ?? "h2") as any;
-    const uikitHeadingClass = getUikitHeadingClass(rawBlock.headingLevel ?? "h2", rawBlock.headingSize);
+    const Tag = (rawBlock.headingLevel ?? rawBlock.headingElement ?? "h2") as any;
+    const styleVal = rawBlock.headingStyle ?? rawBlock.headingSize;
+    const uikitHeadingClass = styleVal && styleVal !== "none" && styleVal !== "inherit"
+      ? (styleVal.startsWith("heading-") || ["h1","h2","h3","h4","h5","h6"].includes(styleVal) ? `uk-${styleVal}` : getUikitHeadingClass(Tag, styleVal))
+      : getUikitHeadingClass(Tag, "default");
+    const decorationClass = rawBlock.titleDecoration ? `uk-heading-${rawBlock.titleDecoration}` : "";
     const alignClass = rawBlock.headingAlign ? `uk-text-${rawBlock.headingAlign}` : "";
+    const marginClass = rawBlock.margin && rawBlock.margin !== "none" && rawBlock.margin !== "default" ? `uk-margin-${rawBlock.margin}` : "";
+    const animationClass = rawBlock.animation && rawBlock.animation !== "none" ? `uk-animation-${rawBlock.animation}` : "";
+    const visibilityClass = rawBlock.visibility && rawBlock.visibility !== "always" ? `uk-${rawBlock.visibility}` : "";
     const isGradient = rawBlock.textGradientPreset && rawBlock.textGradientPreset !== "none";
     const isCustom = rawBlock.textGradientPreset === "custom";
     const titleClassName = [
+      "shop-builder-title",
       uikitHeadingClass,
+      decorationClass,
       alignClass,
       typographyRoleClass(rawBlock.headingTypographyRole),
       isGradient && !isCustom ? `text-gradient--${rawBlock.textGradientPreset}` : "",
@@ -2232,7 +2063,7 @@ export function ContentLayoutBlock({
     };
 
     return (
-      <div className="shop-builder-column-block shop-builder-column-block--heading">
+      <div className={`shop-builder-column-block shop-builder-column-block--heading ${marginClass} ${animationClass} ${visibilityClass}`.trim()}>
         <Tag className={titleClassName} style={Object.keys(combinedStyle).length > 0 ? combinedStyle : undefined}>
           {block.typewriterEnabled ? (
             <TypewriterText
@@ -3086,16 +2917,6 @@ function blockShellClassName(block: BuilderLayoutBlock) {
   } ${visualClass} ${animationClassName(block.animation)} ${premiumCardClass}`.trim();
 }
 
-function blockLegacyGridMargin(block: BuilderLayoutBlock) {
-  return hasBuilderVisualSpacing(
-    (block.visualStyle as BuilderVisualStyle | undefined)?.margin,
-  )
-    ? "none"
-    : block.gridMargin && block.gridMargin !== "inherit"
-      ? block.gridMargin
-      : "none";
-}
-
 const HAS_RICH_TEXT_HTML = /<[a-z][\s\S]*>/i;
 
 export function isRichPreviewText(value: string | null | undefined) {
@@ -3114,47 +2935,6 @@ export function buttonTypographyStyle(
   const buttonSafeStyle = { ...style };
   delete buttonSafeStyle.color;
   return buttonSafeStyle;
-}
-
-export function Typog({
-  as: As = "div",
-  area,
-  typography,
-  className,
-  children,
-  style,
-  ...props
-}: any) {
-  const resolvedArea = area ?? inferTypographyArea(String(As), className);
-  const tp = typographyProps(typography, resolvedArea);
-  const isHeading = /^h[1-6]$/i.test(String(As)) || resolvedArea === "title";
-  const uikitHeading = isHeading ? getUikitHeadingClass(As, typography?.preset) : "";
-  const uikitText = resolvedArea === "eyebrow" ? getUikitTextClass("meta") : resolvedArea === "lead" ? getUikitTextClass("lead") : "";
-  const isCta = String(className || "").includes("cta");
-  const uikitBtn = isCta ? getUikitButtonClass(props.buttonStyle || "primary", props.buttonSize) : "";
-  const combined = [className, tp.className, uikitHeading, uikitText, uikitBtn].filter(Boolean).join(" ");
-  const combinedStyle = buttonTypographyStyle(combined, {
-    ...style,
-    ...tp.style,
-  });
-  const isRich = isRichPreviewText(children);
-  if (isRich) {
-    const Tag = getRichTextSafeTag(String(As)) as any;
-    return (
-      <Tag
-        className={combined || undefined}
-        style={combinedStyle}
-        {...props}
-        dangerouslySetInnerHTML={{ __html: children }}
-      />
-    );
-  }
-  const Tag = As as any;
-  return (
-    <Tag className={combined || undefined} style={combinedStyle} {...props}>
-      {children}
-    </Tag>
-  );
 }
 
 export function BodyText({

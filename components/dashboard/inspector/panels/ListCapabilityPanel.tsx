@@ -5,9 +5,10 @@ import type { BuilderLayoutBlock, BuilderListItem, InspectorTab } from "@/compon
 import type { BuilderShellSettings } from "@/lib/builderShell";
 import { UIKIT_LIST_CAPABILITY } from "@/lib/uikitCapabilities";
 import { BUILDER_LINK_TARGET_OPTIONS } from "@/lib/websiteBuilderLinks";
-import { InspectorFieldRow, InspectorPillGroup, InspectorSelect, InspectorTextField } from "@/components/dashboard/inspector/InspectorControls";
+import { InspectorFieldRow, InspectorPillGroup, InspectorSelect, InspectorTextField, InspectorAlignmentControl } from "@/components/dashboard/inspector/InspectorControls";
 import IconPicker from "@/components/dashboard/inspector/IconPicker";
 import RepeatableItemShell from "@/components/dashboard/inspector/RepeatableItemShell";
+import { GeneralSettingsGroup } from "@/components/dashboard/inspector/panels/SharedSettingGroups";
 
 type Props = {
   block: BuilderLayoutBlock;
@@ -116,9 +117,10 @@ export default function ListCapabilityPanel({ block, tab, shellSettings, update 
           <h3>Style</h3>
           <InspectorFieldRow label="Presentation"><InspectorSelect value={block.listPresentation ?? "default"} options={properties.presentation.values.map((value) => ({ value, label: labels[value] }))} onChange={(value) => update({ listPresentation: value })} ariaLabel="List presentation" /></InspectorFieldRow>
           <InspectorFieldRow label="Marker"><InspectorPillGroup value={block.listMarker ?? "none"} options={properties.marker.values.map((value) => ({ value, label: labels[value] }))} onChange={(value) => update({ listMarker: value })} ariaLabel="List marker" /></InspectorFieldRow>
-          <InspectorFieldRow label="Alignment"><InspectorPillGroup value={block.listAlign ?? "left"} options={properties.alignment.values.map((value) => ({ value, label: labels[value] }))} onChange={(value) => update({ listAlign: value })} ariaLabel="List alignment" /></InspectorFieldRow>
+          <InspectorFieldRow label="Alignment"><InspectorAlignmentControl value={block.listAlign ?? "left"} onChange={(value) => update({ listAlign: value })} ariaLabel="List alignment" /></InspectorFieldRow>
           <InspectorFieldRow label="Spacing"><InspectorPillGroup value={block.listSpacing ?? "default"} options={properties.spacing.values.map((value) => ({ value, label: labels[value] }))} onChange={(value) => update({ listSpacing: value })} ariaLabel="List spacing" /></InspectorFieldRow>
         </section>
+        <GeneralSettingsGroup block={block} update={update} />
       </div>
     );
   }

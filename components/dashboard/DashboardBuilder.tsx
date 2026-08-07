@@ -1939,11 +1939,11 @@ export default function DashboardBuilder({
       : "My Websites";
   const shellSettingsLabel = isWebsiteScopedBuilder
     ? "Website Settings"
-    : "Root Website Settings";
-  const shellSettingsShortLabel = isWebsiteScopedBuilder ? "Website" : "Root";
+    : "Style Customizer";
+  const shellSettingsShortLabel = isWebsiteScopedBuilder ? "Website" : "Style";
   const shellSettingsStatusLabel = isWebsiteScopedBuilder
     ? "Website settings"
-    : "Root website settings";
+    : "Style customizer";
   const [builderState, setRawBuilderState] = useState<BuilderState>(defaultState);
   const setBuilderState = useCallback((value: BuilderState | ((current: BuilderState) => BuilderState)) => {
     setRawBuilderState((current) => {
@@ -15044,7 +15044,7 @@ function PreviewSection({
                           </div>
                         ) : block.kind === "hero" ? (
                           <div
-                            className={`shop-builder-column-block shop-builder-column-block--hero ${typographyRoleClass(block.contentTypographyRole)} ${block.heroContentAlign ? `shop-builder-hero--align-${block.heroContentAlign}` : ""} ${block.heroVerticalAlign ? `shop-builder-hero--valign-${block.heroVerticalAlign}` : ""} ${block.heroHeight ? `shop-builder-hero--height-${block.heroHeight}` : ""} ${block.heroMediaPlacement ? `shop-builder-hero--media-${block.heroMediaPlacement}` : ""} ${block.heroInverse ? "uk-light" : ""} ${block.carouselSettings?.variant === "antigravity" ? "shop-builder-hero--antigravity shop-builder-hero--antigravity-block" : ""} ${block.premiumCardStyle && block.premiumCardStyle !== "none" ? `shop-builder-card--${block.premiumCardStyle}` : ""}`}
+                            className={`shop-builder-column-block shop-builder-column-block--hero ${typographyRoleClass(block.contentTypographyRole)} ${block.heroContentAlign ? `shop-builder-hero--align-${block.heroContentAlign}` : ""} ${block.heroVerticalAlign ? `shop-builder-hero--valign-${block.heroVerticalAlign}` : ""} ${block.heroHeight ? `shop-builder-hero--height-${block.heroHeight}` : ""} ${block.heroMediaPlacement ? `shop-builder-hero--media-${block.heroMediaPlacement}` : ""} ${block.heroInverse ? "uk-light" : ""} ${block.carouselSettings?.variant === "antigravity" ? "shop-builder-hero--antigravity shop-builder-hero--antigravity-block" : ""} ${block.premiumCardStyle && block.premiumCardStyle !== "none" ? `shop-builder-card--${block.premiumCardStyle}` : ""} ${(block as any).margin && (block as any).margin !== "none" ? `uk-margin-${(block as any).margin}` : ""} ${block.animation && typeof block.animation === "string" && block.animation !== "none" ? `uk-animation-${block.animation}` : ""} ${(block as any).visibility && (block as any).visibility !== "always" ? `uk-${(block as any).visibility}` : ""}`.trim()}
                             style={{ textAlign: block.heroContentAlign, maxWidth: block.heroContentWidth === "full" ? "none" : block.heroContentWidth === "small" ? "42rem" : block.heroContentWidth === "medium" ? "56rem" : "72rem" }}
                           >
                             <div
@@ -15509,10 +15509,13 @@ function PreviewSection({
                             const panelMediaPresentation = getUikitPanelMediaStyle({ ratio: block.imageRatio, fit: block.panelMediaFit ?? "cover", alignment: block.panelMediaAlignment ?? "center" });
                             const panelMediaClass = getUikitPanelMediaClass(panelMediaPlacement);
                             const panelLayoutClass = getUikitPanelLayoutClass(panelMediaPlacement, block.panelMediaWidth ?? "medium");
-                            const panelTitleClass = block.panelTitleStyle && block.panelTitleStyle !== "inherit" ? getUikitHeadingClass(block.panelTitleStyle, block.panelTitleStyle) : "";
+                            const panelTitleClass = block.panelTitleStyle && block.panelTitleStyle !== "inherit" ? (block.panelTitleStyle.startsWith("heading-") || ["h1","h2","h3","h4","h5","h6"].includes(block.panelTitleStyle) ? `uk-${block.panelTitleStyle}` : getUikitHeadingClass(block.panelTitleStyle, block.panelTitleStyle)) : "";
+                            const panelMarginClass = ((block as any).margin && (block as any).margin !== "none" && (block as any).margin !== "default") ? `uk-margin-${(block as any).margin}` : "";
+                            const panelAnimationClass = (block.animation && typeof block.animation === "string" && block.animation !== "none") ? `uk-animation-${block.animation}` : "";
+                            const panelVisibilityClass = ((block as any).visibility && (block as any).visibility !== "always") ? `uk-${(block as any).visibility}` : "";
 
                             return (
-                              <div data-builder-block-id={block.id} className={`shop-builder-column-block shop-builder-column-block--panel ${panelLayoutClass} ${typographyRoleClass(block.contentTypographyRole)} ${getUikitCardClass(block.panelVariant ?? block.panelStyle ?? "default", { hover: block.panelHover ? "hover" : "none", padding: block.panelSize })}`} style={{ textAlign: block.panelTextAlign ?? "left" }}>
+                              <div data-builder-block-id={block.id} className={`shop-builder-column-block shop-builder-column-block--panel ${panelLayoutClass} ${panelMarginClass} ${panelAnimationClass} ${panelVisibilityClass} ${typographyRoleClass(block.contentTypographyRole)} ${getUikitCardClass(block.panelVariant ?? block.panelStyle ?? "default", { hover: block.panelHover ? "hover" : "none", padding: block.panelSize })}`.trim()} style={{ textAlign: block.panelTextAlign ?? "left" }}>
                                 {block.panelShowMedia !== false && (
                                 <div
                                   className={`${panelMediaClass} shop-builder-panel-media${isPanelImagePlaceholder ? " is-empty" : ""}`}
@@ -15615,7 +15618,7 @@ function PreviewSection({
                                     (block.typewriterEnabled ? (
                                       <DashboardTypog
                                         as={block.panelTitleElement ?? "h3"}
-                                        className={`${panelTitleClass} ${typographyRoleClass(block.titleTypographyRole)}`}
+                                        className={`shop-builder-title ${panelTitleClass} ${typographyRoleClass(block.titleTypographyRole)}`.trim()}
                                         area="title"
                                         typography={undefined}
                                         style={panelTitleStyle}
@@ -15675,7 +15678,7 @@ function PreviewSection({
                                     ) : (
                                       <InlineEditableText
                                         as={block.panelTitleElement ?? "h3"}
-                                        className={`${panelTitleClass} ${typographyRoleClass(block.titleTypographyRole)}`}
+                                        className={`shop-builder-title ${panelTitleClass} ${typographyRoleClass(block.titleTypographyRole)}`.trim()}
                                         area="title"
                                         typography={undefined}
                                         style={panelTitleStyle}
@@ -16284,6 +16287,7 @@ function PreviewSection({
                           </div>
                         ) : block.kind === "grid" ? (
                           (() => {
+                            const rawGridBlock = block as any;
                             const gridGapClass = gridSpacingClass(
                               block.gridGap,
                               ["none", "small", "medium", "large", "max"],
@@ -16294,9 +16298,9 @@ function PreviewSection({
                                 ? cssSpacingValue(block.gridGap)
                                 : null;
                             const imagePaddingClass = gridSpacingClass(
-                              block.gridImagePadding,
+                              rawGridBlock.alignImageWithoutPadding ? "frameless" : block.gridImagePadding,
                               ["frameless", "none", "small", "medium", "max"],
-                              "frameless",
+                              "none",
                             );
                             const imagePaddingCustom =
                               imagePaddingClass === "custom"
@@ -16311,24 +16315,31 @@ function PreviewSection({
                               contentPaddingClass === "custom"
                                 ? cssSpacingValue(block.gridContentPadding)
                                 : null;
+                             const gridColsCount = rawGridBlock.columnsDesktop ? (parseInt(rawGridBlock.columnsDesktop, 10) || (rawGridBlock.columnsDesktop.includes("column") ? parseInt(rawGridBlock.columnsDesktop, 10) : 3)) : (block.columns ?? 3);
+                             const colGapVal = rawGridBlock.columnGap ?? block.gridGap ?? "medium";
+                             const rowGapVal = rawGridBlock.rowGap ?? block.rowGap ?? block.gridGap ?? "medium";
+                             const generalMarginClass = (rawGridBlock.margin && rawGridBlock.margin !== "none" && rawGridBlock.margin !== "default") ? `uk-margin-${rawGridBlock.margin}` : "";
+                             const generalTextAlignmentClass = (rawGridBlock.textAlignment && rawGridBlock.textAlignment !== "none") ? `uk-text-${rawGridBlock.textAlignment}` : "";
+                             const generalAnimationClass = (rawGridBlock.animation && rawGridBlock.animation !== "none" && rawGridBlock.animation !== "inherit") ? `uk-animation-${rawGridBlock.animation}` : "";
+                             const generalVisibilityClass = (rawGridBlock.visibility && rawGridBlock.visibility !== "always") ? `uk-${rawGridBlock.visibility}` : "";
 
-                            return (
-                              <div className="shop-builder-column-block shop-builder-column-block--grid">
-                                <div
-                                  className={`shop-builder-grid shop-builder-grid--gap-${gridGapClass} shop-builder-grid--margin-${hasBuilderVisualSpacing(block.visualStyle?.margin) || !block.gridMargin || block.gridMargin === "inherit" ? "none" : block.gridMargin}`}
-                                  style={
-                                    {
-                                      "--shop-builder-grid-columns":
-                                        block.columns ?? 3,
-                                      ...(gridGapCustom
-                                        ? {
-                                            "--shop-builder-grid-gap":
-                                              gridGapCustom,
-                                          }
-                                        : {}),
-                                    } as CSSProperties
-                                  }
-                                >
+                             return (
+                               <div className="shop-builder-column-block shop-builder-column-block--grid">
+                                 <div
+                                   className={`shop-builder-grid shop-builder-grid--gap-${gridGapClass} ${generalMarginClass} ${generalTextAlignmentClass} ${generalAnimationClass} ${generalVisibilityClass} ${rawGridBlock.showDividers ? "uk-grid-divider" : ""} ${rawGridBlock.centerColumns ? "uk-flex-center" : ""}`.trim()}
+                                   style={
+                                     {
+                                       "--shop-builder-grid-columns": gridColsCount,
+                                       ...(gridGapCustom
+                                         ? {
+                                             "--shop-builder-grid-gap":
+                                               gridGapCustom,
+                                           }
+                                         : {}),
+                                       gap: `${colGapVal === "small" ? "15px" : colGapVal === "large" ? "40px" : colGapVal === "none" ? "0px" : "30px"} ${rowGapVal === "small" ? "15px" : rowGapVal === "large" ? "40px" : rowGapVal === "none" ? "0px" : "30px"}`,
+                                     } as CSSProperties
+                                   }
+                                 >
                                   {(block.gridSource === "products"
                                     ? previewProducts.map((product) => ({
                                         id: product.id,
@@ -16376,6 +16387,20 @@ function PreviewSection({
                                         margin:
                                           "var(--builder-card-title-margin, 0)",
                                       } as CSSProperties;
+                                      const panelStyle = rawGridBlock.panelStyle ?? block.gridCardVariant ?? rawGridBlock.cardVariant ?? "none";
+                                      const panelPadding = rawGridBlock.panelPadding ?? "none";
+                                      let panelClass = "";
+                                      if (panelStyle.startsWith("card-") || panelStyle === "default" || panelStyle === "primary" || panelStyle === "secondary") {
+                                        const variant = panelStyle.replace("card-", "");
+                                        const paddingCls = panelPadding === "small" ? "uk-card-small" : panelPadding === "large" ? "uk-card-large" : "";
+                                        panelClass = `uk-card uk-card-${variant || "default"} ${paddingCls} uk-card-body`.trim();
+                                      } else if (panelStyle.startsWith("tile-")) {
+                                        const variant = panelStyle.replace("tile-", "");
+                                        const paddingCls = panelPadding === "small" ? "uk-tile-small" : panelPadding === "large" ? "uk-tile-large" : "";
+                                        panelClass = `uk-tile uk-tile-${variant || "default"} ${paddingCls}`.trim();
+                                      } else if (block.gridItemRenderer === "card") {
+                                        panelClass = getUikitCardClass(block.gridCardVariant ?? "default", { padding: block.gridCardSize ?? "default", hover: block.gridCardHover ? "hover" : "none" });
+                                      }
 
                                       return (
                                         <article
@@ -16386,7 +16411,7 @@ function PreviewSection({
                                           draggable={
                                             block.gridSource !== "products"
                                           }
-                                          className={`${block.gridItemRenderer === "card" ? getUikitCardClass(block.gridCardVariant ?? "default", { padding: block.gridCardSize ?? "default", hover: block.gridCardHover ? "hover" : "none" }) : ""} shop-builder-grid-card is-image-${imagePaddingClass} is-content-${contentPaddingClass} is-frame-${
+                                          className={`${panelClass} ${getUikitPanelLayoutClass(item.mediaPlacement ?? block.gridMediaPlacement ?? "top", item.mediaWidth ?? block.gridMediaWidth ?? "medium")} shop-builder-grid-card is-image-${imagePaddingClass} is-content-${contentPaddingClass} is-frame-${
                                             block.gridImageFrame ?? "none"
                                           } ${
                                             draggingItem?.blockKey ===
@@ -16540,21 +16565,28 @@ function PreviewSection({
                                               </span>
                                             </>
                                           )}
-                                          {block.gridShowImage !== false && (() => {
+                                          {block.gridShowImage !== false && rawGridBlock.showImage !== false && (() => {
                                             const isItemImagePlaceholder =
                                               !item.imageUrl ||
                                               !item.imageUrl.trim();
+                                            const mediaPlacement = item.mediaPlacement ?? block.gridMediaPlacement ?? "top";
+                                            const isSideMedia = mediaPlacement === "left" || mediaPlacement === "right";
+                                            const mediaWidth = (item as any).mediaWidth ?? block.gridMediaWidth ?? "medium";
+                                            const mediaAlignment = (item as any).mediaAlignment ?? block.gridMediaAlignment ?? "center";
                                             const mediaStyle = getUikitPanelMediaStyle({
-                                              ratio: item.mediaRatio ?? block.imageRatio,
+                                              ratio: isSideMedia ? undefined : (item.mediaRatio ?? block.imageRatio),
                                               fit: (item.mediaFit ?? block.imageFit ?? "cover") === "contain" ? "contain" : "cover",
-                                              alignment: "center",
+                                              alignment: mediaAlignment,
                                             });
+                                            const isFrameless = rawGridBlock.alignImageWithoutPadding === true || block.gridImagePadding === "frameless";
+                                            const mediaClass = isFrameless ? getUikitPanelMediaClass(mediaPlacement === "left" || mediaPlacement === "right" ? mediaPlacement : "top") : "";
+                                            const imageMarginTopClass = (rawGridBlock.imageMarginTop && rawGridBlock.imageMarginTop !== "none" && rawGridBlock.imageMarginTop !== "default") ? `uk-margin-${rawGridBlock.imageMarginTop}` : "";
 
                                             return (
                                               <div
-                                                className={`${block.gridItemRenderer === "card" ? getUikitPanelMediaClass(item.mediaPlacement === "left" || item.mediaPlacement === "right" ? item.mediaPlacement : "top") : ""} shop-builder-grid-image ${
+                                                className={`${mediaClass} ${imageMarginTopClass} shop-builder-grid-image ${
                                                   isItemImagePlaceholder ? "is-empty" : ""
-                                                }`}
+                                                }`.trim()}
                                                 style={{ aspectRatio: mediaStyle.aspectRatio, overflow: "hidden" }}
                                                 onClick={(event) => {
                                                   if (block.gridSource !== "products") {
@@ -16580,6 +16612,7 @@ function PreviewSection({
                                                       }
                                                       width={420}
                                                       height={420}
+                                                      className={`${rawGridBlock.imageBorder && rawGridBlock.imageBorder !== "none" ? `uk-border-${rawGridBlock.imageBorder}` : ""} ${rawGridBlock.imageBoxShadow && rawGridBlock.imageBoxShadow !== "none" ? `uk-box-shadow-${rawGridBlock.imageBoxShadow}` : ""} ${rawGridBlock.imageHoverTransition && rawGridBlock.imageHoverTransition !== "none" ? `uk-transition-${rawGridBlock.imageHoverTransition} uk-transition-opaque` : ""}`.trim()}
                                                       style={{
                                                         position: "absolute",
                                                         inset: 0,
@@ -16660,61 +16693,42 @@ function PreviewSection({
                                               </div>
                                             );
                                           })()}
-                                          <div className={`${block.gridItemRenderer === "card" ? "uk-card-body " : ""}shop-builder-grid-content ${typographyRoleClass(block.contentTypographyRole)}`}>
+                                          <div className={`${panelStyle.startsWith("card-") || panelStyle === "default" || panelStyle === "primary" || panelStyle === "secondary" || block.gridItemRenderer === "card" ? `uk-card-body ${panelPadding === "small" ? "uk-card-small" : panelPadding === "large" ? "uk-card-large" : ""}` : ""} shop-builder-grid-content ${typographyRoleClass(block.contentTypographyRole)}`}>
                                             {block.gridSource !== "products" ? (
-                                              <>
-                                                {item.iconName && <WebPagesIcon name={item.iconName} size={item.iconSize ?? 20} />}
-                                                {block.gridShowEyebrow !==
-                                                  false &&
-                                                  item.eyebrow && (
+                                              (() => {
+                                                const TitleTag = (block.headingLevel ?? item.titleElement ?? "h3") as any;
+                                                const titleStyleVal = rawGridBlock.titleStyle ?? item.titleStyle;
+                                                const titleHeadingClass = (titleStyleVal && titleStyleVal !== "none")
+                                                  ? (titleStyleVal.startsWith("heading-") || ["h1","h2","h3","h4","h5","h6"].includes(titleStyleVal)
+                                                    ? `uk-${titleStyleVal}`
+                                                    : getUikitHeadingClass(titleStyleVal, titleStyleVal))
+                                                  : "";
+                                                const titleDecorationClass = (rawGridBlock.titleDecoration && rawGridBlock.titleDecoration !== "none")
+                                                  ? `uk-heading-${rawGridBlock.titleDecoration}`
+                                                  : "";
+                                                const titleMarginTopClass = (rawGridBlock.titleMarginTop && rawGridBlock.titleMarginTop !== "none" && rawGridBlock.titleMarginTop !== "default")
+                                                  ? `uk-margin-${rawGridBlock.titleMarginTop}`
+                                                  : "";
+
+                                                const metaStyleVal = rawGridBlock.metaStyle ?? "text-meta";
+                                                const metaStyleClass = (metaStyleVal && metaStyleVal !== "none") ? `uk-${metaStyleVal}` : "shop-builder-grid-meta";
+                                                const metaMarginTopClass = (rawGridBlock.metaMarginTop && rawGridBlock.metaMarginTop !== "none" && rawGridBlock.metaMarginTop !== "default")
+                                                  ? `uk-margin-${rawGridBlock.metaMarginTop}`
+                                                  : "";
+                                                const metaAlign = rawGridBlock.metaAlignment ?? "below-title";
+
+                                                const contentStyleVal = rawGridBlock.contentStyle;
+                                                const contentStyleClass = (contentStyleVal && contentStyleVal !== "none") ? `uk-${contentStyleVal}` : "shop-builder-body";
+                                                const contentMarginTopClass = (rawGridBlock.contentMarginTop && rawGridBlock.contentMarginTop !== "none" && rawGridBlock.contentMarginTop !== "default")
+                                                  ? `uk-margin-${rawGridBlock.contentMarginTop}`
+                                                  : "";
+
+                                                const renderMetaNode = () => (
+                                                  block.gridShowMeta !== false && rawGridBlock.showMeta !== false && item.meta ? (
                                                     <InlineEditableText
-                                                      as="span"
-                                                      className={`shop-builder-eyebrow ${typographyRoleClass(block.metaTypographyRole)}`}
-                                                      typography={
-                                                        itemTypography
-                                                      }
-                                                      value={item.eyebrow}
-                                                      onChange={(eyebrow) =>
-                                                        onUpdateGridItem(
-                                                          section.id,
-                                                          columnKey,
-                                                          blockKey,
-                                                          itemIndex,
-                                                          {
-                                                            eyebrow,
-                                                          },
-                                                        )
-                                                      }
-                                                    />
-                                                  )}
-                                                {item.title && (
-                                                  <InlineEditableText
-                                                    as={(item.titleElement ?? "h3") as any}
-                                                    className={`shop-builder-title ${typographyRoleClass(block.titleTypographyRole)} ${item.titleStyle && item.titleStyle !== "inherit" ? getUikitHeadingClass(item.titleStyle, item.titleStyle) : ""}`}
-                                                    typography={itemTypography}
-                                                    style={gridTitleStyle}
-                                                    value={item.title}
-                                                    onChange={(title) =>
-                                                      onUpdateGridItem(
-                                                        section.id,
-                                                        columnKey,
-                                                        blockKey,
-                                                        itemIndex,
-                                                        {
-                                                          title,
-                                                        },
-                                                      )
-                                                    }
-                                                  />
-                                                )}
-                                                {block.gridShowMeta !== false &&
-                                                  item.meta && (
-                                                    <InlineEditableText
-                                                      as="span"
-                                                      className={`shop-builder-grid-meta ${typographyRoleClass(block.metaTypographyRole)}`}
-                                                      typography={
-                                                        itemTypography
-                                                      }
+                                                      as="div"
+                                                      className={`shop-builder-grid-meta ${metaStyleClass} ${metaMarginTopClass} ${typographyRoleClass(block.metaTypographyRole)}`.trim()}
+                                                      typography={itemTypography}
                                                       value={item.meta}
                                                       onChange={(meta) =>
                                                         onUpdateGridItem(
@@ -16722,21 +16736,40 @@ function PreviewSection({
                                                           columnKey,
                                                           blockKey,
                                                           itemIndex,
-                                                          {
-                                                            meta,
-                                                          },
+                                                          { meta },
                                                         )
                                                       }
                                                     />
-                                                  )}
-                                                {block.gridShowText !== false &&
-                                                  item.text && (
+                                                  ) : null
+                                                );
+
+                                                const renderTitleNode = () => (
+                                                  rawGridBlock.showTitle !== false && item.title ? (
+                                                    <InlineEditableText
+                                                      as={TitleTag}
+                                                      className={`shop-builder-title ${titleHeadingClass} ${titleDecorationClass} ${titleMarginTopClass} ${typographyRoleClass(block.titleTypographyRole)}`.trim()}
+                                                      typography={itemTypography}
+                                                      style={gridTitleStyle}
+                                                      value={item.title}
+                                                      onChange={(title) =>
+                                                        onUpdateGridItem(
+                                                          section.id,
+                                                          columnKey,
+                                                          blockKey,
+                                                          itemIndex,
+                                                          { title },
+                                                        )
+                                                      }
+                                                    />
+                                                  ) : null
+                                                );
+
+                                                const renderContentNode = () => (
+                                                  block.gridShowText !== false && rawGridBlock.showContent !== false && item.text ? (
                                                     <InlineEditableText
                                                       as="p"
-                                                      className="shop-builder-body"
-                                                      typography={
-                                                        itemTypography
-                                                      }
+                                                      className={`${contentStyleClass} ${contentMarginTopClass} ${typographyRoleClass(block.contentTypographyRole)}`.trim()}
+                                                      typography={itemTypography}
                                                       value={item.text}
                                                       onChange={(text) =>
                                                         onUpdateGridItem(
@@ -16744,50 +16777,65 @@ function PreviewSection({
                                                           columnKey,
                                                           blockKey,
                                                           itemIndex,
-                                                          {
-                                                            text,
-                                                          },
+                                                          { text },
                                                         )
                                                       }
                                                     />
-                                                  )}
+                                                  ) : null
+                                                );
 
-                                                <RenderDashboardChecklist
-                                                  items={
-                                                    "items" in item
-                                                      ? item.items
-                                                      : undefined
-                                                  }
-                                                  iconName={
-                                                    "listIcon" in item
-                                                      ? item.listIcon
-                                                      : undefined
-                                                  }
-                                                  colorScheme={
-                                                    "listIconColorScheme" in
-                                                    item
-                                                      ? item.listIconColorScheme
-                                                      : undefined
-                                                  }
-                                                  typography={itemTypography}
-                                                />
+                                                return (
+                                                  <>
+                                                    {item.iconName && <WebPagesIcon name={item.iconName} size={item.iconSize ?? 20} />}
+                                                    {block.gridShowEyebrow !== false && item.eyebrow && (
+                                                      <InlineEditableText
+                                                        as="span"
+                                                        className={`shop-builder-eyebrow ${typographyRoleClass(block.metaTypographyRole)}`}
+                                                        typography={itemTypography}
+                                                        value={item.eyebrow}
+                                                        onChange={(eyebrow) =>
+                                                          onUpdateGridItem(
+                                                            section.id,
+                                                            columnKey,
+                                                            blockKey,
+                                                            itemIndex,
+                                                            { eyebrow },
+                                                          )
+                                                        }
+                                                      />
+                                                    )}
+                                                    {metaAlign === "above-title" && renderMetaNode()}
+                                                    {renderTitleNode()}
+                                                    {metaAlign === "below-title" && renderMetaNode()}
+                                                    {renderContentNode()}
+                                                    {metaAlign === "below-content" && renderMetaNode()}
 
-                                                {block.gridShowButton !==
-                                                  false &&
-                                                  item.buttonLabel && (
-                                                    <div
-                                                      className={`shop-builder-grid-button shop-builder-grid-button--${item.buttonAlign ?? "left"}`}
-                                                    >
-                                                      <a
-                                                        className={`shop-builder-grid-action builder-grid-action ${getUikitButtonClass(item.actionStyle ?? item.buttonStyle ?? block.buttonStyle ?? "primary", item.actionSize ?? block.size ?? "default")}`}
-                                                        href={item.buttonUrl || "#"}
-                                                        {...builderLinkTargetProps(item.buttonTarget)}
-                                                      >
-                                                        {item.buttonLabel}
-                                                      </a>
-                                                    </div>
-                                                  )}
-                                              </>
+                                                    <RenderDashboardChecklist
+                                                      items={"items" in item ? item.items : undefined}
+                                                      iconName={"listIcon" in item ? item.listIcon : undefined}
+                                                      colorScheme={"listIconColorScheme" in item ? item.listIconColorScheme : undefined}
+                                                      typography={itemTypography}
+                                                    />
+
+                                                    {block.gridShowButton !== false && rawGridBlock.showLink !== false && (item.buttonLabel || rawGridBlock.linkText) && (() => {
+                                                      const linkMarginTopClass = (rawGridBlock.linkMarginTop && rawGridBlock.linkMarginTop !== "none" && rawGridBlock.linkMarginTop !== "default") ? `uk-margin-${rawGridBlock.linkMarginTop}` : "";
+                                                      return (
+                                                        <div
+                                                          className={`shop-builder-grid-button shop-builder-grid-button--${item.buttonAlign ?? "left"} ${linkMarginTopClass}`.trim()}
+                                                        >
+                                                          <a
+                                                            className={`shop-builder-grid-action builder-grid-action ${rawGridBlock.linkStyle ? (rawGridBlock.linkStyle.startsWith("link-") ? `uk-${rawGridBlock.linkStyle}` : `uk-button uk-${rawGridBlock.linkStyle} ${rawGridBlock.linkButtonSize && rawGridBlock.linkButtonSize !== "default" ? `uk-button-${rawGridBlock.linkButtonSize}` : ""} ${rawGridBlock.linkFullWidth ? "uk-width-1-1" : ""}`) : getUikitButtonClass(item.actionStyle ?? item.buttonStyle ?? block.buttonStyle ?? "primary", item.actionSize ?? block.size ?? "default")}`.trim()}
+                                                            href={item.buttonUrl || "#"}
+                                                            {...builderLinkTargetProps(rawGridBlock.linkTarget || item.buttonTarget)}
+                                                          >
+                                                            {item.buttonLabel || rawGridBlock.linkText || "Read more"}
+                                                          </a>
+                                                        </div>
+                                                      );
+                                                    })()}
+                                                  </>
+                                                );
+                                              })()
                                             ) : (
                                               <>
                                                 {item.iconName && <WebPagesIcon name={item.iconName} size={item.iconSize ?? 20} />}

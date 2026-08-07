@@ -4,7 +4,8 @@ import type { InspectorTab, BuilderLayoutBlock, WordPressMediaItem } from "@/com
 import { UIKIT_IMAGE_CAPABILITY } from "@/lib/uikitCapabilities";
 import { BUILDER_LINK_TARGET_OPTIONS } from "@/lib/websiteBuilderLinks";
 import { BuilderImageUrlControl } from "./InspectorSharedControls";
-import { InspectorFieldRow, InspectorPillGroup, InspectorSelect, InspectorTextField } from "@/components/dashboard/inspector/InspectorControls";
+import { InspectorFieldRow, InspectorPillGroup, InspectorSelect, InspectorTextField, InspectorAlignmentControl } from "@/components/dashboard/inspector/InspectorControls";
+import { ImageSettingsGroup } from "@/components/dashboard/inspector/panels/SharedSettingGroups";
 import type { BuilderShellSettings } from "@/lib/builderShell";
 
 type Props = {
@@ -64,12 +65,7 @@ export default function ImageCapabilityPanel({ block, tab, shellSettings, update
           <strong>UIkit Image</strong>
           <span>Semantic presentation settings map to shared UIkit classes and attributes.</span>
         </div>
-        <InspectorFieldRow label="Fit"><InspectorPillGroup value={(image.imageFit ?? "cover") as BuilderLayoutBlock["imageFit"]} options={optionsFor(UIKIT_IMAGE_CAPABILITY.properties.fit.values)} onChange={(value) => updateSemantic({ imageFit: value })} ariaLabel="Image fit" /></InspectorFieldRow>
-        <InspectorFieldRow label="Aspect ratio"><InspectorSelect value={(image.imageRatio === "auto" ? "natural" : image.imageRatio ?? "natural") as BuilderLayoutBlock["imageRatio"]} options={optionsFor(UIKIT_IMAGE_CAPABILITY.properties.ratio.values)} onChange={(value) => updateSemantic({ imageRatio: value })} ariaLabel="Image aspect ratio" /></InspectorFieldRow>
-        <InspectorFieldRow label="Shape"><InspectorPillGroup value={(image.imageShape ?? (image.imageBorderRadius ? "rounded" : "none")) as BuilderLayoutBlock["imageShape"]} options={optionsFor(UIKIT_IMAGE_CAPABILITY.properties.shape.values)} onChange={(value) => updateSemantic({ imageShape: value })} ariaLabel="Image shape" /></InspectorFieldRow>
-        <InspectorFieldRow label="Shadow"><InspectorSelect value={(image.imageShadow ?? "none") as BuilderLayoutBlock["imageShadow"]} options={optionsFor(UIKIT_IMAGE_CAPABILITY.properties.shadow.values)} onChange={(value) => updateSemantic({ imageShadow: value })} ariaLabel="Image shadow" /></InspectorFieldRow>
-        <InspectorFieldRow label="Alignment"><InspectorPillGroup value={(image.imageAlignment ?? "center") as BuilderLayoutBlock["imageAlignment"]} options={optionsFor(UIKIT_IMAGE_CAPABILITY.properties.alignment.values)} onChange={(value) => updateSemantic({ imageAlignment: value })} ariaLabel="Image alignment" /></InspectorFieldRow>
-        <InspectorFieldRow label="Width"><InspectorSelect value={(image.imageWidth ?? "auto") as BuilderLayoutBlock["imageWidth"]} options={optionsFor(UIKIT_IMAGE_CAPABILITY.properties.width.values)} onChange={(value) => updateSemantic({ imageWidth: value })} ariaLabel="Image width" /></InspectorFieldRow>
+        <ImageSettingsGroup block={block} update={updateSemantic} />
       </div>
     );
   }

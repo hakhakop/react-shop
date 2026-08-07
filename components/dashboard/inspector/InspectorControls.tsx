@@ -1,11 +1,12 @@
 "use client";
 
 import type { ChangeEvent, ReactNode } from "react";
-import { RotateCcw } from "lucide-react";
+import { RotateCcw, AlignLeft, AlignCenter, AlignRight, AlignJustify, PanelTop, PanelLeft, PanelRight } from "lucide-react";
 
 export type InspectorOption<T extends string = string> = {
   value: T;
   label: string;
+  icon?: ReactNode;
   disabled?: boolean;
 };
 
@@ -111,11 +112,145 @@ export function InspectorSegmentedControl<T extends string = string>({ value, op
   onChange: (value: T) => void;
   ariaLabel?: string;
 }) {
-  return <div className="inspector-segmented" role="radiogroup" aria-label={ariaLabel}>{options.map((option) => <button key={option.value} type="button" role="radio" aria-checked={value === option.value} disabled={option.disabled} className={value === option.value ? "is-selected" : ""} onClick={() => onChange(option.value)}>{option.label}</button>)}</div>;
+  return (
+    <div className="inspector-segmented" role="radiogroup" aria-label={ariaLabel}>
+      {options.map((option) => (
+        <button
+          key={option.value}
+          type="button"
+          role="radio"
+          aria-checked={value === option.value}
+          disabled={option.disabled}
+          title={option.label}
+          className={value === option.value ? "is-selected" : ""}
+          onClick={() => onChange(option.value)}
+        >
+          {option.icon ? (
+            <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", gap: "4px" }}>
+              {option.icon}
+            </span>
+          ) : (
+            option.label
+          )}
+        </button>
+      ))}
+    </div>
+  );
 }
 
 export function InspectorPillGroup<T extends string = string>(props: { value: T | undefined; options: readonly InspectorOption<T>[]; onChange: (value: T) => void; ariaLabel?: string }) {
   return <div className="inspector-pill-group"><InspectorSegmentedControl {...props} /></div>;
+}
+
+export function InspectorAlignmentControl<T extends string = string>({
+  value,
+  onChange,
+  options = ["left", "center", "right"] as unknown as readonly T[],
+  ariaLabel = "Text alignment",
+}: {
+  value: T | undefined;
+  onChange: (value: T) => void;
+  options?: readonly T[];
+  ariaLabel?: string;
+}) {
+  const iconMap: Record<string, ReactNode> = {
+    left: <AlignLeft size={14} />,
+    center: <AlignCenter size={14} />,
+    right: <AlignRight size={14} />,
+    justify: <AlignJustify size={14} />,
+  };
+  const labelMap: Record<string, string> = {
+    left: "Align left",
+    center: "Align center",
+    right: "Align right",
+    justify: "Justify",
+  };
+  const formattedOptions: InspectorOption<T>[] = options.map((opt) => ({
+    value: opt,
+    label: labelMap[String(opt)] ?? String(opt),
+    icon: iconMap[String(opt)] ?? null,
+  }));
+
+  return (
+    <InspectorSegmentedControl
+      value={value}
+      options={formattedOptions}
+      onChange={onChange}
+      ariaLabel={ariaLabel}
+    />
+  );
+}
+
+export function InspectorMediaPlacementControl<T extends string = string>({
+  value,
+  onChange,
+  options = ["top", "left", "right"] as unknown as readonly T[],
+  ariaLabel = "Media placement",
+}: {
+  value: T | undefined;
+  onChange: (value: T) => void;
+  options?: readonly T[];
+  ariaLabel?: string;
+}) {
+  const iconMap: Record<string, ReactNode> = {
+    top: <PanelTop size={14} />,
+    left: <PanelLeft size={14} />,
+    right: <PanelRight size={14} />,
+  };
+  const labelMap: Record<string, string> = {
+    top: "Top",
+    left: "Left",
+    right: "Right",
+  };
+  const formattedOptions: InspectorOption<T>[] = options.map((opt) => ({
+    value: opt,
+    label: labelMap[String(opt)] ?? String(opt),
+    icon: iconMap[String(opt)] ?? null,
+  }));
+
+  return (
+    <InspectorSegmentedControl
+      value={value}
+      options={formattedOptions}
+      onChange={onChange}
+      ariaLabel={ariaLabel}
+    />
+  );
+}
+
+export function InspectorSemanticPositionControl<T extends string = string>({
+  value,
+  onChange,
+  options = ["start", "end"] as unknown as readonly T[],
+  ariaLabel = "Position",
+}: {
+  value: T | undefined;
+  onChange: (value: T) => void;
+  options?: readonly T[];
+  ariaLabel?: string;
+}) {
+  const iconMap: Record<string, ReactNode> = {
+    start: <AlignLeft size={14} />,
+    end: <AlignRight size={14} />,
+  };
+  const labelMap: Record<string, string> = {
+    start: "Start",
+    end: "End",
+  };
+  const formattedOptions: InspectorOption<T>[] = options.map((opt) => ({
+    value: opt,
+    label: labelMap[String(opt)] ?? String(opt),
+    icon: iconMap[String(opt)] ?? null,
+  }));
+
+  return (
+    <InspectorSegmentedControl
+      value={value}
+      options={formattedOptions}
+      onChange={onChange}
+      ariaLabel={ariaLabel}
+    />
+  );
 }
 
 export function InspectorSwitch({ checked, onChange, label, disabled = false }: { checked: boolean; onChange: (checked: boolean) => void; label?: string; disabled?: boolean }) {
@@ -134,6 +269,49 @@ export function InspectorNumberUnit({ value, unit, units = ["px", "%", "rem"], o
   return <div className="inspector-number-unit"><input className="inspector-control" type="number" aria-label={ariaLabel} value={value} onChange={(event) => onValueChange(event.target.value)} /><select className="inspector-control" aria-label={`${ariaLabel ?? "Value"} unit`} value={unit} onChange={(event) => onUnitChange(event.target.value)}>{units.map((entry) => <option key={entry} value={entry}>{entry}</option>)}</select></div>;
 }
 
+import { YoothemeColorPicker } from "@/components/dashboard/global-styles/YoothemeStyleControls";
+
 export function InspectorColorField({ value, onChange, ariaLabel }: { value: string; onChange: (value: string) => void; ariaLabel?: string }) {
-  return <div className="inspector-color-field"><input className="inspector-color-swatch" type="color" aria-label={`${ariaLabel ?? "Color"} picker`} value={value.startsWith("#") ? value.slice(0, 7) : "#808080"} onChange={(event) => onChange(event.target.value)} /><input className="inspector-control inspector-color-value" aria-label={ariaLabel} value={value} onChange={(event) => onChange(event.target.value)} /></div>;
+  return <YoothemeColorPicker label={ariaLabel || "Color"} value={value} onChange={onChange} />;
 }
+
+export function InspectorFlexAlignControl<T extends string = string>({
+  value,
+  onChange,
+  options = ["start", "center", "end", "between"] as unknown as readonly T[],
+  ariaLabel = "Container alignment",
+}: {
+  value: T | undefined;
+  onChange: (value: T) => void;
+  options?: readonly T[];
+  ariaLabel?: string;
+}) {
+  const iconMap: Record<string, ReactNode> = {
+    start: <AlignLeft size={14} />,
+    center: <AlignCenter size={14} />,
+    end: <AlignRight size={14} />,
+    between: <AlignJustify size={14} />,
+  };
+  const labelMap: Record<string, string> = {
+    start: "Start",
+    center: "Center",
+    end: "End",
+    between: "Space Between",
+  };
+  const formattedOptions: InspectorOption<T>[] = options.map((opt) => ({
+    value: opt,
+    label: labelMap[String(opt)] ?? String(opt),
+    icon: iconMap[String(opt)] ?? null,
+  }));
+
+  return (
+    <InspectorSegmentedControl
+      value={value}
+      options={formattedOptions}
+      onChange={onChange}
+      ariaLabel={ariaLabel}
+    />
+  );
+}
+
+export { BuilderImageUrlControl } from "@/components/dashboard/inspector/panels/InspectorSharedControls";

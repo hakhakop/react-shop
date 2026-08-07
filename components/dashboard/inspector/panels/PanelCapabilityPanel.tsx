@@ -7,7 +7,8 @@ import { UIKIT_PANEL_CAPABILITY } from "@/lib/uikitCapabilities";
 import { BUILDER_LINK_TARGET_OPTIONS } from "@/lib/websiteBuilderLinks";
 import { BuilderImageUrlControl } from "@/components/dashboard/inspector/panels/InspectorSharedControls";
 import ButtonPresentationFields from "@/components/dashboard/inspector/panels/ButtonPresentationFields";
-import { InspectorFieldRow, InspectorPillGroup, InspectorSelect, InspectorSwitch, InspectorTextField, InspectorTextarea } from "@/components/dashboard/inspector/InspectorControls";
+import { InspectorFieldRow, InspectorPillGroup, InspectorSelect, InspectorSwitch, InspectorTextField, InspectorTextarea, InspectorAlignmentControl, InspectorMediaPlacementControl } from "@/components/dashboard/inspector/InspectorControls";
+import { ImageSettingsGroup, CardSettingsGroup, MediaSettingsGroup, ActionSettingsGroup } from "@/components/dashboard/inspector/panels/SharedSettingGroups";
 
 type Props = {
   block: BuilderLayoutBlock;
@@ -79,18 +80,10 @@ export default function PanelCapabilityPanel({ block, tab, shellSettings, update
   if (tab === "layout") {
     return (
       <div className="builder-inspector-stack" data-uikit-capability="panel-layout">
-        <section className="builder-inspector-section" data-uikit-capability="panel-media">
-          <h3>Media</h3>
-          <InspectorFieldRow label="Show media"><InspectorSwitch checked={block.panelShowMedia !== false} onChange={(checked) => updateSemantic({ panelShowMedia: checked })} label="Show media" /></InspectorFieldRow>
-          <InspectorFieldRow label="Placement"><InspectorPillGroup value={(block.panelMediaPlacement ?? "top") as typeof properties.mediaPlacement.values[number]} options={selectOptions(properties.mediaPlacement.values, { top: "Top", left: "Left", right: "Right" })} onChange={(value) => updateSemantic({ panelMediaPlacement: value })} ariaLabel="Media placement" /></InspectorFieldRow>
-          <InspectorFieldRow label="Aspect ratio"><InspectorSelect value={(block.imageRatio ?? "natural") as BuilderLayoutBlock["imageRatio"]} options={selectOptions(properties.mediaRatio.values)} onChange={(value) => updateSemantic({ imageRatio: value })} ariaLabel="Media aspect ratio" /></InspectorFieldRow>
-          <InspectorFieldRow label="Fit"><InspectorPillGroup value={(block.panelMediaFit ?? "cover") as typeof properties.mediaFit.values[number]} options={selectOptions(properties.mediaFit.values, { cover: "Cover", contain: "Contain" })} onChange={(value) => updateSemantic({ panelMediaFit: value })} ariaLabel="Media fit" /></InspectorFieldRow>
-          <InspectorFieldRow label="Side media width"><InspectorSelect value={(block.panelMediaWidth ?? "medium") as typeof properties.mediaWidth.values[number]} options={selectOptions(properties.mediaWidth.values)} onChange={(value) => updateSemantic({ panelMediaWidth: value })} ariaLabel="Side media width" /></InspectorFieldRow>
-          <InspectorFieldRow label="Media alignment"><InspectorPillGroup value={(block.panelMediaAlignment ?? "center") as typeof properties.mediaAlignment.values[number]} options={selectOptions(properties.mediaAlignment.values)} onChange={(value) => updateSemantic({ panelMediaAlignment: value })} ariaLabel="Media alignment" /></InspectorFieldRow>
-        </section>
+        <MediaSettingsGroup block={block} update={updateSemantic} />
         <section className="builder-inspector-section" data-uikit-capability="panel-content-layout">
           <h3>Content layout</h3>
-          <InspectorFieldRow label="Text alignment"><InspectorPillGroup value={(block.panelTextAlign ?? "left") as typeof properties.textAlign.values[number]} options={selectOptions(properties.textAlign.values)} onChange={(value) => updateSemantic({ panelTextAlign: value })} ariaLabel="Text alignment" /></InspectorFieldRow>
+          <InspectorFieldRow label="Text alignment"><InspectorAlignmentControl value={(block.panelTextAlign ?? "left") as "left" | "center" | "right"} onChange={(value) => updateSemantic({ panelTextAlign: value })} ariaLabel="Text alignment" /></InspectorFieldRow>
           <InspectorFieldRow label="Vertical alignment"><InspectorSelect value={(block.panelVerticalAlign ?? "top") as typeof properties.verticalAlign.values[number]} options={selectOptions(properties.verticalAlign.values)} onChange={(value) => updateSemantic({ panelVerticalAlign: value })} ariaLabel="Vertical alignment" /></InspectorFieldRow>
           <InspectorFieldRow label="Title element"><InspectorSelect value={(block.panelTitleElement ?? "h3") as typeof properties.titleElement.values[number]} options={selectOptions(properties.titleElement.values)} onChange={(value) => updateSemantic({ panelTitleElement: value })} ariaLabel="Title element" /></InspectorFieldRow>
           <InspectorFieldRow label="Title visual style"><InspectorSelect value={(block.panelTitleStyle ?? "inherit") as typeof properties.titleStyle.values[number]} options={selectOptions(properties.titleStyle.values)} onChange={(value) => updateSemantic({ panelTitleStyle: value })} ariaLabel="Title visual style" /></InspectorFieldRow>
@@ -103,20 +96,30 @@ export default function PanelCapabilityPanel({ block, tab, shellSettings, update
   if (tab === "style") {
     return (
       <div className="builder-inspector-stack" data-uikit-capability="panel-style">
+        <CardSettingsGroup
+          block={block}
+          update={updateSemantic}
+          title="CARD PRESENTATION"
+          keys={{
+            variant: "panelVariant",
+            size: "panelSize",
+            hover: "panelHover",
+          }}
+        />
         <TypographyRoleSettingsPanel block={block} fields={[{ field: "titleTypographyRole", label: "Title role" }, { field: "contentTypographyRole", label: "Content role" }, { field: "metaTypographyRole", label: "Meta role" }]} update={update} />
-        <section className="builder-inspector-section">
-          <h3>Styling</h3>
-          <p className="builder-inspector-help">Global Card styles own colors, radius, borders, shadows, typography, and padding.</p>
-          <InspectorFieldRow label="Variant"><InspectorPillGroup value={(block.panelVariant ?? "default") as BuilderLayoutBlock["panelVariant"]} options={selectOptions(properties.variant.values)} onChange={(value) => updateSemantic({ panelVariant: value })} ariaLabel="Panel variant" /></InspectorFieldRow>
-          <InspectorFieldRow label="Size"><InspectorPillGroup value={(block.panelSize ?? "default") as BuilderLayoutBlock["panelSize"]} options={selectOptions(properties.size.values)} onChange={(value) => updateSemantic({ panelSize: value })} ariaLabel="Panel size" /></InspectorFieldRow>
-          <InspectorFieldRow label="Hover card"><InspectorSwitch checked={block.panelHover === true} onChange={(checked) => updateSemantic({ panelHover: checked })} label="Hover card" /></InspectorFieldRow>
-        </section>
-        <ButtonPresentationFields
-          title="Action button"
-          variant={block.panelActionStyle ?? "primary"}
-          size={block.panelActionSize ?? "default"}
-          onVariantChange={(value) => updateSemantic({ panelActionStyle: value as BuilderLayoutBlock["panelActionStyle"] })}
-          onSizeChange={(value) => updateSemantic({ panelActionSize: value as BuilderLayoutBlock["panelActionSize"] })}
+        <ActionSettingsGroup
+          block={block}
+          update={updateSemantic}
+          title="ACTION BUTTON"
+          showVisibilityToggle
+          keys={{
+            visible: "panelActionVisible",
+            label: "buttonLabel",
+            url: "buttonUrl",
+            target: "buttonTarget",
+            style: "panelActionStyle",
+            size: "panelActionSize",
+          }}
         />
       </div>
     );

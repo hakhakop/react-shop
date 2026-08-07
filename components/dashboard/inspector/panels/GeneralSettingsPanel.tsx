@@ -5,7 +5,7 @@ import type { BuilderShellSettings } from "@/lib/builderShell";
 import type { BuilderSpacingSides, BuilderVisualStyle } from "@/lib/builderVisualStyle";
 import { legacySpacingToSides } from "@/lib/builderVisualStyle";
 import AnimationControl from "@/components/dashboard/style/AnimationControl";
-import { InspectorFieldRow, InspectorSelect, InspectorTextField, InspectorDivision } from "@/components/dashboard/inspector/InspectorControls";
+import { InspectorFieldRow, InspectorSelect, InspectorTextField, InspectorDivision, InspectorAlignmentControl, InspectorFlexAlignControl } from "@/components/dashboard/inspector/InspectorControls";
 
 type Props = {
   block: BuilderLayoutBlock;
@@ -165,18 +165,11 @@ export default function GeneralSettingsPanel({ block, shellSettings, tab, update
           inheritedValueText="Left"
           onReset={() => update({ elementAlign: undefined })}
         >
-          <InspectorSelect
-            value={block.elementAlign ?? "inherit"}
-            options={[
-              { value: "inherit", label: "Inherit — Left" },
-              { value: "left", label: "Left" },
-              { value: "center", label: "Center" },
-              { value: "right", label: "Right" },
-            ]}
+          <InspectorFlexAlignControl
+            value={block.elementAlign ?? "left"}
+            options={["left", "center", "right"] as const}
             onChange={(elementAlign) => update({
-              elementAlign: elementAlign === "inherit"
-                ? undefined
-                : elementAlign as BuilderLayoutBlock["elementAlign"],
+              elementAlign: elementAlign as BuilderLayoutBlock["elementAlign"],
             })}
             ariaLabel="Block alignment"
           />
@@ -188,15 +181,10 @@ export default function GeneralSettingsPanel({ block, shellSettings, tab, update
           inheritedValueText="Component default"
           onReset={() => updateLayout({ textAlign: undefined })}
         >
-          <InspectorSelect
-            value={layout.textAlign ?? "inherit"}
-            options={[
-              { value: "inherit", label: "Inherit — Component default" },
-              { value: "left", label: "Left" },
-              { value: "center", label: "Center" },
-              { value: "right", label: "Right" },
-            ]}
-            onChange={(textAlign) => updateLayout({ textAlign: textAlign === "inherit" ? undefined : textAlign })}
+          <InspectorAlignmentControl
+            value={layout.textAlign ?? "left"}
+            options={["left", "center", "right"] as const}
+            onChange={(textAlign) => updateLayout({ textAlign })}
             ariaLabel="Text alignment"
           />
         </InspectorFieldRow>
