@@ -110,11 +110,27 @@ import StorefrontBuilderRenderer, {
   BodyText,
   ContentLayoutBlock,
   isRichPreviewText,
-  Typog as DashboardTypog,
 } from "@/components/builder/StorefrontBuilderRenderer";
+import { Typog as DashboardTypog } from "@/components/builder/BuilderRenderHelpers";
 import { WebPagesIcon } from "@/components/builder/WebPagesIcon";
 import { resolveUikitIconName, UIKIT_ICON_OPTIONS } from "@/lib/uikitIconRegistry";
 import UikitAccordion from "@/components/builder/UikitAccordion";
+import UikitAlert from "@/components/builder/UikitAlert";
+import UikitBadgeGrid from "@/components/builder/UikitBadgeGrid";
+import UikitBreadcrumbs from "@/components/builder/UikitBreadcrumbs";
+import UikitButton from "@/components/builder/UikitButton";
+import UikitDivider from "@/components/builder/UikitDivider";
+import UikitDatePicker from "@/components/builder/UikitDatePicker";
+import UikitGallery from "@/components/builder/UikitGallery";
+import UikitHeading from "@/components/builder/UikitHeading";
+import UikitIcon from "@/components/builder/UikitIcon";
+import UikitImage from "@/components/builder/UikitImage";
+import UikitList from "@/components/builder/UikitList";
+import UikitTable from "@/components/builder/UikitTable";
+import UikitSlider from "@/components/builder/UikitSlider";
+import UikitFluentForm from "@/components/builder/UikitFluentForm";
+import UikitProducts from "@/components/builder/UikitProducts";
+import UikitCategoryFilters from "@/components/builder/UikitCategoryFilters";
 import UikitText from "@/components/builder/UikitText";
 import {
   getUikitMarginClass,
@@ -2207,6 +2223,8 @@ export default function DashboardBuilder({
   const [mediaPickerOpen, setMediaPickerOpen] = useState(false);
   const [mediaPickerTitle, setMediaPickerTitle] = useState("WordPress Media");
   const [mediaPickerCurrentUrl, setMediaPickerCurrentUrl] = useState("");
+  const [mediaPickerMultiple, setMediaPickerMultiple] = useState(false);
+  const mediaSelectManyRef = useRef<((media: WordPressMediaItem[]) => void) | null>(null);
   const previewShellRef = useRef<HTMLDivElement>(null);
   const headerPreviewSlotRef = useRef<HTMLDivElement>(null);
   const headerPageContextRef = useRef<HTMLDivElement>(null);
@@ -5570,26 +5588,39 @@ export default function DashboardBuilder({
   const openWordPressMediaPicker = ({
     title,
     currentUrl,
+    multiple = false,
     onSelect,
+    onSelectMany,
   }: {
     title: string;
     currentUrl?: string;
+    multiple?: boolean;
     onSelect: (media: WordPressMediaItem) => void;
+    onSelectMany?: (media: WordPressMediaItem[]) => void;
   }) => {
     mediaSelectRef.current = onSelect;
+    mediaSelectManyRef.current = onSelectMany ?? null;
     setMediaPickerTitle(title);
     setMediaPickerCurrentUrl(currentUrl ?? "");
+    setMediaPickerMultiple(multiple);
     setMediaPickerOpen(true);
   };
 
   const closeWordPressMediaPicker = () => {
     setMediaPickerOpen(false);
     mediaSelectRef.current = null;
+    mediaSelectManyRef.current = null;
   };
 
   const selectWordPressMedia = (media: WordPressMediaItem) => {
     mediaSelectRef.current?.(media);
     setPublishStatus("WordPress media selected");
+    closeWordPressMediaPicker();
+  };
+
+  const selectManyWordPressMedia = (mediaItems: WordPressMediaItem[]) => {
+    mediaSelectManyRef.current?.(mediaItems);
+    setPublishStatus(`${mediaItems.length} WordPress media items selected`);
     closeWordPressMediaPicker();
   };
 
@@ -10189,8 +10220,10 @@ export default function DashboardBuilder({
           open={mediaPickerOpen}
           title={mediaPickerTitle}
           currentUrl={mediaPickerCurrentUrl}
+          multiple={mediaPickerMultiple}
           websiteId={websiteId}
           onSelect={selectWordPressMedia}
+          onSelectMany={selectManyWordPressMedia}
           onClose={closeWordPressMediaPicker}
         />
       </div>
@@ -14685,324 +14718,30 @@ function PreviewSection({
                             product={previewProduct}
                           />
                         ) : (block as any).kind === "button" ? (
-                          <div
-                            className={`shop-builder-column-block shop-builder-column-block--button ${block.premiumCardStyle && block.premiumCardStyle !== "none" ? `shop-builder-card--${block.premiumCardStyle}` : ""}`}
-                          >
-                            <div
-                              className={`shop-builder-buttons ${block.premiumButtonStyle && block.premiumButtonStyle !== "default" ? "" : `shop-builder-buttons--${block.buttonsLayout ?? "inline"}`}`}
-                              style={previewButtonsStyle(
-                                block.buttonsLayout,
-                                block.elementAlign,
-                                block.buttonGap,
-                              )}
-                            >
-                              {block.buttonLabel && (
-                                <a
-                                  className={getUikitButtonClass(
-                                    block.buttonStyle ?? "primary",
-                                    block.size,
-                                  )}
-                                  href={block.buttonUrl || "#"}
-                                  {...builderLinkTargetProps(block.buttonTarget)}
-                                >
-                                  {block.buttonLabel}
-                                </a>
-                              )}
-                              {(block.buttons ?? []).map((btn, btnIdx) => (
-                                <div
-                                  key={btn.id ?? btnIdx}
-                                  className={`builder-preview-button-item ${draggingItem?.kind === "button" && draggingItem?.fromIndex === btnIdx && draggingItem?.blockKey === blockKey ? "is-dragging" : ""} ${draggingItem?.kind === "button" && dropHoverIndex === btnIdx ? "is-drag-over" : ""}`}
-                                  draggable
-                                  onDragStart={(event) => {
-                                    event.stopPropagation();
-                                    event.dataTransfer.setData(
-                                      "text/plain",
-                                      `button:${blockKey}:${btnIdx}`,
-                                    );
-                                    event.dataTransfer.effectAllowed = "move";
-                                    setDraggingItem({
-                                      kind: "button",
-                                      blockKey,
-                                      fromIndex: btnIdx,
-                                    });
-                                  }}
-                                  onDragOver={(event) => {
-                                    if (
-                                      !draggingItem ||
-                                      draggingItem.kind !== "button" ||
-                                      draggingItem.blockKey !== blockKey
-                                    )
-                                      return;
-                                    if (draggingItem.fromIndex === btnIdx) {
-                                      setDropHoverIndex(null);
-                                      return;
-                                    }
-                                    event.preventDefault();
-                                    event.dataTransfer.dropEffect = "move";
-                                    if (dropHoverIndex !== btnIdx) {
-                                      setDropHoverIndex(btnIdx);
-                                    }
-                                  }}
-                                  onDragLeave={() => {
-                                    if (dropHoverIndex === btnIdx) {
-                                      setDropHoverIndex(null);
-                                    }
-                                  }}
-                                  onDrop={(event) => {
-                                    event.preventDefault();
-                                    event.stopPropagation();
-                                    setDropHoverIndex(null);
-                                    if (
-                                      !draggingItem ||
-                                      draggingItem.kind !== "button" ||
-                                      draggingItem.blockKey !== blockKey
-                                    )
-                                      return;
-                                    if (draggingItem.fromIndex === btnIdx) {
-                                      setDraggingItem(null);
-                                      return;
-                                    }
-                                    onMoveButton(
-                                      section.id,
-                                      columnKey,
-                                      blockKey,
-                                      draggingItem.fromIndex,
-                                      btnIdx,
-                                    );
-                                    setDraggingItem(null);
-                                  }}
-                                  onDragEnd={() => {
-                                    setDraggingItem(null);
-                                    setDropHoverIndex(null);
-                                  }}
-                                  style={{
-                                    position: "relative",
-                                    display: "inline-flex",
-                                    alignItems: "center",
-                                    gap: "4px",
-                                  }}
-                                >
-                                  <div className="builder-preview-button-tools">
-                                    <button
-                                      type="button"
-                                      onMouseDown={(e) => e.stopPropagation()}
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        onDuplicateButton(
-                                          section.id,
-                                          columnKey,
-                                          blockKey,
-                                          btnIdx,
-                                        );
-                                      }}
-                                      title="Duplicate button"
-                                    >
-                                      <Copy size={12} />
-                                    </button>
-                                    <button
-                                      type="button"
-                                      onMouseDown={(e) => e.stopPropagation()}
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        onDeleteButton(
-                                          section.id,
-                                          columnKey,
-                                          blockKey,
-                                          btnIdx,
-                                        );
-                                      }}
-                                      title="Delete button"
-                                    >
-                                      <Trash2 size={12} />
-                                    </button>
-                                  </div>
-                                  <span
-                                    className="builder-preview-button-drag-handle"
-                                    aria-hidden="true"
-                                  >
-                                    ⠿
-                                  </span>
-                                  <a
-                                    className={getUikitButtonClass(
-                                      btn.style ?? block.buttonStyle ?? "primary",
-                                      (btn as any).size ?? block.size,
-                                    )}
-                                    href={btn.url || "#"}
-                                    {...builderLinkTargetProps(btn.target)}
-                                  >
-                                    {btn.label || "Button"}
-                                  </a>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
+                          <UikitButton block={block} />
+                        ) : block.kind === "breadcrumbs" ? (
+                          <UikitBreadcrumbs block={block} />
                         ) : block.kind === "icon" ? (
-                          <div className="builder-preview-goodie builder-preview-goodie-icon">
-                            {getPreviewGoodieIcon(block)}
-                            {block.title && (
-                              <DashboardTypog
-                                as="strong"
-                                typography={block.typography}
-                              >
-                                {block.title}
-                              </DashboardTypog>
-                            )}
-                            {block.body && (
-                              <DashboardTypog
-                                as="p"
-                                typography={block.typography}
-                              >
-                                {block.body}
-                              </DashboardTypog>
-                            )}
-                          </div>
+                          <UikitIcon block={block} />
                         ) : block.kind === "list" ? (
-                          <div className="builder-preview-goodie builder-preview-goodie-list">
-                            {block.title && (
-                              <DashboardTypog
-                                as="strong"
-                                typography={block.typography}
-                              >
-                                {block.title}
-                              </DashboardTypog>
-                            )}
-                            <ul className={getUikitListClass({ presentation: block.listPresentation, marker: block.listMarker, align: block.listAlign, spacing: block.listSpacing })}>
-                              {(block.listItems ?? (block.items ?? []).map((text, index): BuilderListItem => ({ id: `${block.id ?? blockKey}-item-${index}`, text }))).map((item, index) => (
-                                <li
-                                  key={item.id}
-                                  className={`builder-preview-list-item webpages-list-item ${draggingItem?.kind === "list" && draggingItem?.fromIndex === index && draggingItem?.blockKey === blockKey ? "is-dragging" : ""} ${draggingItem?.kind === "list" && dropHoverIndex === index ? "is-drag-over" : ""}`}
-                                  draggable
-                                  onDragStart={(event) => {
-                                    event.stopPropagation();
-                                    event.dataTransfer.setData(
-                                      "text/plain",
-                                      `list:${blockKey}:${index}`,
-                                    );
-                                    event.dataTransfer.effectAllowed = "move";
-                                    setDraggingItem({
-                                      kind: "list",
-                                      blockKey,
-                                      fromIndex: index,
-                                    });
-                                  }}
-                                  onDragOver={(event) => {
-                                    if (
-                                      !draggingItem ||
-                                      draggingItem.kind !== "list" ||
-                                      draggingItem.blockKey !== blockKey
-                                    )
-                                      return;
-                                    if (draggingItem.fromIndex === index) {
-                                      setDropHoverIndex(null);
-                                      return;
-                                    }
-                                    event.preventDefault();
-                                    event.dataTransfer.dropEffect = "move";
-                                    if (dropHoverIndex !== index) {
-                                      setDropHoverIndex(index);
-                                    }
-                                  }}
-                                  onDragLeave={() => {
-                                    if (dropHoverIndex === index) {
-                                      setDropHoverIndex(null);
-                                    }
-                                  }}
-                                  onDrop={(event) => {
-                                    event.preventDefault();
-                                    event.stopPropagation();
-                                    setDropHoverIndex(null);
-                                    if (
-                                      !draggingItem ||
-                                      draggingItem.kind !== "list" ||
-                                      draggingItem.blockKey !== blockKey
-                                    )
-                                      return;
-                                    if (draggingItem.fromIndex === index) {
-                                      setDraggingItem(null);
-                                      return;
-                                    }
-                                    onMoveListItem(
-                                      section.id,
-                                      columnKey,
-                                      blockKey,
-                                      draggingItem.fromIndex,
-                                      index,
-                                    );
-                                    setDraggingItem(null);
-                                  }}
-                                  onDragEnd={() => {
-                                    setDraggingItem(null);
-                                    setDropHoverIndex(null);
-                                  }}
-                                  style={{ position: "relative" }}
-                                >
-                                  <div className="builder-preview-list-item-tools">
-                                    <button
-                                      type="button"
-                                      onMouseDown={(e) => e.stopPropagation()}
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        onDuplicateListItem(
-                                          section.id,
-                                          columnKey,
-                                          blockKey,
-                                          index,
-                                        );
-                                      }}
-                                      title="Duplicate list item"
-                                    >
-                                      <Copy size={12} />
-                                    </button>
-                                    <button
-                                      type="button"
-                                      onMouseDown={(e) => e.stopPropagation()}
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        onDeleteListItem(
-                                          section.id,
-                                          columnKey,
-                                          blockKey,
-                                          index,
-                                        );
-                                      }}
-                                      title="Delete list item"
-                                    >
-                                      <Trash2 size={12} />
-                                    </button>
-                                  </div>
-                                  <span
-                                    className="builder-preview-list-item-drag-handle"
-                                    aria-hidden="true"
-                                  >
-                                    ⠿
-                                  </span>
-                                  {resolveUikitIconName(item.iconName ?? block.listIcon) && <WebPagesIcon name={item.iconName ?? block.listIcon} size={item.iconSize ?? block.listIconSize ?? 16} />}
-                                  {item.url ? <a href={item.url} {...builderLinkTargetProps(item.target)}><DashboardTypog as="span" typography={block.typography}>{item.text}</DashboardTypog></a> : <DashboardTypog as="span" typography={block.typography}>{item.text}</DashboardTypog>}
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
+                          <UikitList block={block} />
                         ) : block.kind === "accordion" ? (
-                          <div className="shop-builder-column-block shop-builder-column-block--accordion">
-                            <UikitAccordion
-                              items={block.accordionItems ?? []}
-                              multiple={block.accordionMultiple}
-                              collapsible={block.accordionCollapsible}
-                              active={block.accordionOpenItems}
-                              style={block.accordionStyle}
-                              indicator={block.accordionIndicator}
-                              indicatorPosition={block.accordionIndicatorPosition}
-                              titleEmphasis={block.accordionTitleEmphasis}
-                              itemSpacing={block.accordionItemSpacing}
-                              contentSpacing={block.accordionContentSpacing}
-                              divider={block.accordionDivider}
-                              titleStyle={block.accordionTitleStyle}
-                              contentStyle={block.accordionContentStyle}
-                              legacyRowStyle={block.accordionRowStyle}
-                              legacySpacing={block.accordionSpacing}
-                              legacyOpenEmphasis={block.accordionOpenEmphasis}
-                            />
-                          </div>
+                          <UikitAccordion
+                            block={block}
+                            items={block.accordionItems ?? []}
+                            multiple={block.accordionMultiple}
+                            collapsible={block.accordionCollapsible}
+                            active={block.accordionOpenItems}
+                            style={block.accordionStyle}
+                            indicator={block.accordionIndicator}
+                            indicatorPosition={block.accordionIndicatorPosition}
+                            titleEmphasis={block.accordionTitleEmphasis}
+                            itemSpacing={block.accordionItemSpacing}
+                            contentSpacing={block.accordionContentSpacing}
+                            divider={block.accordionDivider}
+                            titleStyle={block.accordionTitleStyle}
+                            contentStyle={block.accordionContentStyle}
+                          />
                         ) : block.kind === "text" ? (
                           <UikitText
                             eyebrow={block.eyebrow}
@@ -15014,34 +14753,11 @@ function PreviewSection({
                             typographyRole={block.textTypographyRole}
                           />
                         ) : block.kind === "heading" ? (
-                          <ContentLayoutBlock
-                            block={block}
-                            breadcrumbItems={[]}
-                          />
+                          <UikitHeading block={block} isCanvas />
+                        ) : block.kind === "gallery" ? (
+                          <UikitGallery block={block} isCanvas />
                         ) : block.kind === "datePicker" ? (
-                          <div className="builder-preview-goodie builder-preview-goodie-date">
-                            <CalendarDays size={24} />
-                            {block.title && (
-                              <DashboardTypog
-                                as="strong"
-                                typography={block.typography}
-                              >
-                                {block.title}
-                              </DashboardTypog>
-                            )}
-                            {block.body && (
-                              <DashboardTypog
-                                as="p"
-                                typography={block.typography}
-                              >
-                                {block.body}
-                              </DashboardTypog>
-                            )}
-                            <label>
-                              <span>{block.dateLabel ?? "Preferred date"}</span>
-                              <input type="date" />
-                            </label>
-                          </div>
+                          <UikitDatePicker block={block} />
                         ) : block.kind === "hero" ? (
                           <div
                             className={`shop-builder-column-block shop-builder-column-block--hero ${typographyRoleClass(block.contentTypographyRole)} ${block.heroContentAlign ? `shop-builder-hero--align-${block.heroContentAlign}` : ""} ${block.heroVerticalAlign ? `shop-builder-hero--valign-${block.heroVerticalAlign}` : ""} ${block.heroHeight ? `shop-builder-hero--height-${block.heroHeight}` : ""} ${block.heroMediaPlacement ? `shop-builder-hero--media-${block.heroMediaPlacement}` : ""} ${block.heroInverse ? "uk-light" : ""} ${block.carouselSettings?.variant === "antigravity" ? "shop-builder-hero--antigravity shop-builder-hero--antigravity-block" : ""} ${block.premiumCardStyle && block.premiumCardStyle !== "none" ? `shop-builder-card--${block.premiumCardStyle}` : ""} ${(block as any).margin && (block as any).margin !== "none" ? `uk-margin-${(block as any).margin}` : ""} ${block.animation && typeof block.animation === "string" && block.animation !== "none" ? `uk-animation-${block.animation}` : ""} ${(block as any).visibility && (block as any).visibility !== "always" ? `uk-${(block as any).visibility}` : ""}`.trim()}
@@ -15279,186 +14995,6 @@ function PreviewSection({
                                 <AntigravityTerminal />
                               </div>
                             )}
-                          </div>
-                        ) : block.kind === "promoStrip" ? (
-                          <div className="shop-builder-column-block shop-builder-column-block--promo-strip">
-                            <div>
-                              {block.eyebrow && (
-                                <InlineEditableText
-                                  as="span"
-                                  className="shop-builder-eyebrow"
-                                  typography={block.typography}
-                                  value={block.eyebrow}
-                                  onChange={(eyebrow) =>
-                                    onUpdateBlock(
-                                      section.id,
-                                      columnKey,
-                                      blockKey,
-                                      { eyebrow },
-                                    )
-                                  }
-                                />
-                              )}
-                              {block.title &&
-                                (block.typewriterEnabled ? (
-                                  <DashboardTypog
-                                    as="h3"
-                                    typography={block.typography}
-                                  >
-                                    <TypewriterText
-                                      text={block.title}
-                                      phrases={block.typewriterPhrases}
-                                      speed={block.typewriterSpeed}
-                                      eraseSpeed={block.typewriterEraseSpeed}
-                                      delay={block.typewriterDelay}
-                                      loop={block.typewriterLoop}
-                                      useGradient={block.typewriterUseGradient}
-                                      gradientPreset={
-                                        block.textGradientPreset ??
-                                        block.typewriterGradientPreset
-                                      }
-                                      customStart={
-                                        block.textGradientCustomStart
-                                      }
-                                      customMiddle={
-                                        block.textGradientCustomMiddle
-                                      }
-                                      customEnd={block.textGradientCustomEnd}
-                                      customAngle={
-                                        block.textGradientCustomAngle
-                                      }
-                                      customStartOffset={
-                                        block.textGradientCustomStartOffset
-                                      }
-                                      customMiddleOffset={
-                                        block.textGradientCustomMiddleOffset
-                                      }
-                                      customEndOffset={
-                                        block.textGradientCustomEndOffset
-                                      }
-                                      typography={block.typography}
-                                      area="title"
-                                      preserveHeight={
-                                        block.typewriterPreserveHeight !== false
-                                      }
-                                      reservedLines={
-                                        block.typewriterReservedLines ?? 1
-                                      }
-                                      mobileReservedLines={
-                                        block.typewriterMobileReservedLines ?? 2
-                                      }
-                                    />
-                                  </DashboardTypog>
-                                ) : (
-                                  <InlineEditableText
-                                    as="h3"
-                                    typography={block.typography}
-                                    value={block.title}
-                                    onChange={(title) =>
-                                      onUpdateBlock(
-                                        section.id,
-                                        columnKey,
-                                        blockKey,
-                                        { title },
-                                      )
-                                    }
-                                  />
-                                ))}
-                              {block.body &&
-                                (block.typewriterEnabled && !block.title ? (
-                                  <DashboardTypog
-                                    as="p"
-                                    typography={block.typography}
-                                  >
-                                    <TypewriterText
-                                      text={block.body}
-                                      phrases={block.typewriterPhrases}
-                                      speed={block.typewriterSpeed}
-                                      eraseSpeed={block.typewriterEraseSpeed}
-                                      delay={block.typewriterDelay}
-                                      loop={block.typewriterLoop}
-                                      useGradient={block.typewriterUseGradient}
-                                      gradientPreset={
-                                        block.textGradientPreset ??
-                                        block.typewriterGradientPreset
-                                      }
-                                      customStart={
-                                        block.textGradientCustomStart
-                                      }
-                                      customMiddle={
-                                        block.textGradientCustomMiddle
-                                      }
-                                      customEnd={block.textGradientCustomEnd}
-                                      customAngle={
-                                        block.textGradientCustomAngle
-                                      }
-                                      customStartOffset={
-                                        block.textGradientCustomStartOffset
-                                      }
-                                      customMiddleOffset={
-                                        block.textGradientCustomMiddleOffset
-                                      }
-                                      customEndOffset={
-                                        block.textGradientCustomEndOffset
-                                      }
-                                      typography={block.typography}
-                                      area="body"
-                                      preserveHeight={
-                                        block.typewriterPreserveHeight !== false
-                                      }
-                                      reservedLines={
-                                        block.typewriterReservedLines ?? 1
-                                      }
-                                      mobileReservedLines={
-                                        block.typewriterMobileReservedLines ?? 2
-                                      }
-                                    />
-                                  </DashboardTypog>
-                                ) : (
-                                  <InlineEditableText
-                                    as="p"
-                                    typography={block.typography}
-                                    value={block.body}
-                                    onChange={(body) =>
-                                      onUpdateBlock(
-                                        section.id,
-                                        columnKey,
-                                        blockKey,
-                                        { body },
-                                      )
-                                    }
-                                  />
-                                ))}
-                            </div>
-                            <div
-                              className={`shop-builder-buttons shop-builder-buttons--${block.buttonsLayout ?? "inline"}`}
-                              style={previewButtonsStyle(
-                                block.buttonsLayout,
-                                block.elementAlign,
-                                block.buttonGap,
-                              )}
-                            >
-                              {block.buttonLabel && (
-                                <DashboardTypog
-                                  as="span"
-                                  className="builder-preview-cta"
-                                  typography={block.typography}
-                                >
-                                  {block.buttonLabel}
-                                </DashboardTypog>
-                              )}
-                              {(block.buttons ?? []).map((btn, btnIdx) => (
-                                <DashboardTypog
-                                  key={btn.id ?? btnIdx}
-                                  as="span"
-                                  className={`builder-preview-cta builder-preview-cta--${btn.style ?? "primary"}`}
-                                  style={{ display: "inline-flex" }}
-                                  typography={block.typography}
-                                >
-                                  {btn.label || "Button"}
-                                </DashboardTypog>
-                              ))}
-                            </div>
                           </div>
                         ) : block.kind === "panel" ? (
                           (() => {
@@ -15811,18 +15347,10 @@ function PreviewSection({
                             );
                           })()
                         ) : block.kind === "image" ? (
-                          (() => {
-                            const imageSemantics = resolveUikitImageSemantics(block);
-                            const imageStyle = getUikitImageStyle(imageSemantics);
-                            const imageAttributes = getUikitImageAttributes(imageSemantics);
-                            const imageClass = getUikitImageClass(imageSemantics);
-                            const figureClass = getUikitImageWrapperClass(imageSemantics);
-                            const isBlockImagePlaceholder =
-                              !block.imageUrl ||
-                              !block.imageUrl.trim();
-
-                            const handleImageClick = (event: React.MouseEvent) => {
-                              event.stopPropagation();
+                          <UikitImage
+                            block={block}
+                            isCanvas
+                            onUploadImage={() => {
                               if (onUploadBlockImage) {
                                 onUploadBlockImage(
                                   section.id,
@@ -15833,458 +15361,20 @@ function PreviewSection({
                               } else {
                                 onSelectBlock(section.id, columnKey, blockKey);
                               }
-                            };
-
-                            return (
-                              <div className="shop-builder-column-block shop-builder-column-block--image">
-                                <figure
-                                  className={`shop-builder-image-figure ${figureClass}`}
-                                  style={{
-                                    textAlign: block.imageAlignment ?? "center",
-                                    maxWidth: imageStyle.maxWidth ?? (block.imageMaxWidth ? `${block.imageMaxWidth}px` : undefined),
-                                    width: imageStyle.width,
-                                    marginInline: block.imageAlignment === "left" ? "0 auto" : block.imageAlignment === "right" ? "0 0 0 auto" : "auto",
-                                  }}
-                                >
-                                  <div
-                                    className={`shop-builder-image-media ${imageStyle.aspectRatio ? "uk-cover-container" : ""} ${isBlockImagePlaceholder ? "is-empty" : ""}`}
-                                    data-image-ratio={imageStyle.aspectRatio ? "true" : undefined}
-                                    style={{
-                                      aspectRatio: imageStyle.aspectRatio,
-                                      width: "100%",
-                                      position: imageStyle.aspectRatio ? "relative" : undefined,
-                                    }}
-                                  >
-                                    {!isBlockImagePlaceholder ? (
-                                      <>
-                                        {block.imageLinkUrl ? (
-                                          <a href={block.imageLinkUrl} {...builderLinkTargetProps(block.imageLinkTarget)}>
-                                            <Image className={imageClass} src={block.imageUrl!} alt={block.imageAlt ?? ""} width={1200} height={800} loading={block.imageLoading ?? "lazy"} {...imageAttributes} style={{ width: "100%", height: imageStyle.aspectRatio ? "100%" : "auto", objectFit: imageStyle.objectFit, ...(imageStyle.position ? { position: imageStyle.position, inset: imageStyle.inset } : {}) }} />
-                                          </a>
-                                        ) : (
-                                          <Image className={imageClass} src={block.imageUrl!} alt={block.imageAlt ?? ""} width={1200} height={800} loading={block.imageLoading ?? "lazy"} {...imageAttributes} style={{ width: "100%", height: imageStyle.aspectRatio ? "100%" : "auto", objectFit: imageStyle.objectFit, ...(imageStyle.position ? { position: imageStyle.position, inset: imageStyle.inset } : {}) }} />
-                                        )}
-                                        <button
-                                          type="button"
-                                          className="builder-preview-image-upload"
-                                          onClick={handleImageClick}
-                                        >
-                                          <ImageIcon size={13} />
-                                          <span>Change image</span>
-                                        </button>
-                                      </>
-                                    ) : (
-                                      <div
-                                        className="builder-media-placeholder-container"
-                                        style={{ minHeight: "180px" }}
-                                        onClick={handleImageClick}
-                                      >
-                                        <svg
-                                          className="builder-media-placeholder-bg"
-                                          viewBox="0 0 800 520"
-                                          preserveAspectRatio="none"
-                                          fill="none"
-                                          xmlns="http://www.w3.org/2000/svg"
-                                        >
-                                          <defs>
-                                            <linearGradient
-                                              id="bgGradImage"
-                                              x1="0"
-                                              y1="0"
-                                              x2="800"
-                                              y2="520"
-                                              gradientUnits="userSpaceOnUse"
-                                            >
-                                              <stop
-                                                offset="0%"
-                                                stopColor="#F2F4F8"
-                                              />
-                                              <stop
-                                                offset="100%"
-                                                stopColor="#EAEEF4"
-                                              />
-                                            </linearGradient>
-                                          </defs>
-                                          <rect
-                                            width="800"
-                                            height="520"
-                                            rx="16"
-                                            fill="url(#bgGradImage)"
-                                          />
-                                          <circle
-                                            cx="760"
-                                            cy="40"
-                                            r="230"
-                                            fill="#FFFFFF"
-                                            fillOpacity="0.5"
-                                          />
-                                          <circle
-                                            cx="40"
-                                            cy="480"
-                                            r="220"
-                                            fill="#FFFFFF"
-                                            fillOpacity="0.45"
-                                          />
-                                          <rect
-                                            x="24"
-                                            y="24"
-                                            width="752"
-                                            height="472"
-                                            rx="18"
-                                            fill="none"
-                                            stroke="#CBD5E1"
-                                            strokeWidth="2"
-                                            strokeDasharray="6 6"
-                                          />
-                                          <g fill="#BCC6D5">
-                                            <circle cx="56" cy="56" r="2.2" />
-                                            <circle cx="70" cy="56" r="2.2" />
-                                            <circle cx="84" cy="56" r="2.2" />
-                                            <circle cx="98" cy="56" r="2.2" />
-                                            <circle cx="112" cy="56" r="2.2" />
-                                            <circle cx="56" cy="70" r="2.2" />
-                                            <circle cx="70" cy="70" r="2.2" />
-                                            <circle cx="84" cy="70" r="2.2" />
-                                            <circle cx="98" cy="70" r="2.2" />
-                                            <circle cx="112" cy="70" r="2.2" />
-                                            <circle cx="56" cy="84" r="2.2" />
-                                            <circle cx="70" cy="84" r="2.2" />
-                                            <circle cx="84" cy="84" r="2.2" />
-                                            <circle cx="98" cy="84" r="2.2" />
-                                            <circle cx="112" cy="84" r="2.2" />
-                                          </g>
-                                          <g fill="#BCC6D5">
-                                            <circle cx="688" cy="436" r="2.2" />
-                                            <circle cx="702" cy="436" r="2.2" />
-                                            <circle cx="716" cy="436" r="2.2" />
-                                            <circle cx="730" cy="436" r="2.2" />
-                                            <circle cx="744" cy="436" r="2.2" />
-                                            <circle cx="688" cy="450" r="2.2" />
-                                            <circle cx="702" cy="450" r="2.2" />
-                                            <circle cx="716" cy="450" r="2.2" />
-                                            <circle cx="730" cy="450" r="2.2" />
-                                            <circle cx="744" cy="450" r="2.2" />
-                                            <circle cx="688" cy="464" r="2.2" />
-                                            <circle cx="702" cy="464" r="2.2" />
-                                            <circle cx="716" cy="464" r="2.2" />
-                                            <circle cx="730" cy="464" r="2.2" />
-                                            <circle cx="744" cy="464" r="2.2" />
-                                          </g>
-                                        </svg>
-                                        <div className="builder-media-placeholder-content">
-                                          <div className="builder-media-placeholder-icon-frame">
-                                            <svg
-                                              viewBox="0 0 120 90"
-                                              fill="none"
-                                              xmlns="http://www.w3.org/2000/svg"
-                                            >
-                                              <rect
-                                                width="120"
-                                                height="90"
-                                                rx="14"
-                                                fill="none"
-                                                stroke="#B8C3D2"
-                                                strokeWidth="4.5"
-                                              />
-                                              <circle
-                                                cx="90"
-                                                cy="30"
-                                                r="10"
-                                                fill="#B8C3D2"
-                                              />
-                                              <path
-                                                d="M 8 78 L 46 36 C 48.5 33.5 53.5 33.5 56 36 L 84 68 L 92 58 C 94.5 55.5 99.5 55.5 102 58 L 112 78 Z"
-                                                fill="#B8C3D2"
-                                              />
-                                            </svg>
-                                          </div>
-                                          <h4 className="builder-media-placeholder-title">
-                                            Select an image
-                                          </h4>
-                                          <p className="builder-media-placeholder-subtitle">
-                                            Drag and drop, upload, or choose from
-                                            your media library
-                                          </p>
-                                          <button
-                                            type="button"
-                                            className="builder-media-placeholder-btn"
-                                          >
-                                            <Upload size={14} />
-                                            <span>Choose Image</span>
-                                          </button>
-                                        </div>
-                                      </div>
-                                    )}
-                                  </div>
-                                  {block.imageCaption && (
-                                    <figcaption>
-                                      {block.imageCaption}
-                                    </figcaption>
-                                  )}
-                                </figure>
-                              </div>
-                            );
-                          })()
+                            }}
+                          />
                         ) : block.kind === "table" ? (
-                          <div className="shop-builder-column-block shop-builder-column-block--table">
-                            <div style={{ overflowX: "auto" }}>
-                              <table
-                                className={`builder-preview-table builder-preview-table--${block.tableStyle ?? "striped"}`}
-                                style={{
-                                  width: "100%",
-                                  borderCollapse: "collapse",
-                                  fontSize: "0.9em",
-                                }}
-                              >
-                                {(block.tableHeadings ?? []).length > 0 && (
-                                  <thead>
-                                    <tr>
-                                      {(block.tableHeadings ?? []).map(
-                                        (heading, hIdx) => (
-                                          <th key={hIdx}>{heading}</th>
-                                        ),
-                                      )}
-                                    </tr>
-                                  </thead>
-                                )}
-                                <tbody>
-                                  {(block.tableRows ?? []).map((row, rIdx) => (
-                                    <tr key={rIdx}>
-                                      {row.map((cell, cIdx) => (
-                                        <td key={cIdx}>{cell}</td>
-                                      ))}
-                                    </tr>
-                                  ))}
-                                </tbody>
-                              </table>
-                            </div>
-                          </div>
+                          <UikitTable block={block} />
                         ) : block.kind === "categoryFilters" ? (
-                          <div className="shop-builder-column-block shop-builder-column-block--category-filters">
-                            {previewCategoryTree.length > 0 ? (
-                              <CategoryBar
-                                categoryTree={previewCategoryTree}
-                                countsBySlug={previewCategoryCounts}
-                                hiddenCategorySlugs={block.hiddenCategorySlugs}
-                              />
-                            ) : (
-                              <div className="shop-builder-filter-pills">
-                                <span>Women</span>
-                                <span>Men</span>
-                                <span>Boots</span>
-                                <span>Accessories</span>
-                              </div>
-                            )}
-                          </div>
+                          <UikitCategoryFilters block={block} isCanvas />
                         ) : block.kind === "scrollPinnedDemo" ? (
                           <div className="shop-builder-column-block shop-builder-column-block--scroll-pinned">
                             <ScrollPinnedDemo block={block} isPreview={true} />
                           </div>
                         ) : block.kind === "slider" ? (
-                          <div className="shop-builder-column-block shop-builder-column-block--slider">
-                            {block.title && (
-                              <DashboardTypog
-                                as="h3"
-                                typography={block.typography}
-                              >
-                                {block.title}
-                              </DashboardTypog>
-                            )}
-                            {block.body && (
-                              <DashboardTypog
-                                as="p"
-                                typography={block.typography}
-                              >
-                                {block.body}
-                              </DashboardTypog>
-                            )}
-                            <CarouselBlock
-                              block={{
-                                __typename:
-                                  "PageBuilderLayoutPageBuilderCarouselLayoutLayout",
-                                fieldGroupName:
-                                  "ReactBuilderColumnSliderPreview",
-                              }}
-                              slides={(block.slides ?? []).map(
-                                (slide, slideIndex) => ({
-                                  id:
-                                    slide.id ??
-                                    `${blockKey}-slide-${slideIndex}`,
-                                  title: slide.title,
-                                  subtitle: slide.subtitle,
-                                  text: slide.text,
-                                  badge: slide.badge,
-                                  imageUrl: slide.imageUrl,
-                                  imageAlt: slide.imageAlt,
-                                  imagePadding: slide.imagePadding,
-                                  buttonLabel: slide.buttonLabel,
-                                  buttonUrl: slide.buttonUrl,
-                                }),
-                              )}
-                              settings={block.carouselSettings}
-                              className="builder-preview-carousel"
-                              onUploadSlideImage={(slideIndex, currentUrl) => {
-                                if (onUploadBlockImage) {
-                                  onUploadBlockImage(
-                                    section.id,
-                                    columnKey,
-                                    blockKey,
-                                    currentUrl,
-                                  );
-                                } else {
-                                  onSelectBlock(section.id, columnKey, blockKey);
-                                }
-                              }}
-                            />
-                          </div>
+                          <UikitSlider block={block} isCanvas />
                         ) : block.kind === "products" ? (
-                          <div className="shop-builder-column-block shop-builder-column-block--products">
-                            {block.title && (
-                              <DashboardTypog
-                                as="h3"
-                                typography={block.typography}
-                              >
-                                {block.title}
-                              </DashboardTypog>
-                            )}
-                            {previewProducts.length > 0 ? (
-                              (() => {
-                                const cardBorderRadiusStyle =
-                                  block.borderRadius !== undefined
-                                    ? {
-                                        "--builder-card-radius": `${block.borderRadius}px`,
-                                        "--product-card-radius": `${block.borderRadius}px`,
-                                      }
-                                    : {};
-
-                                const cardBackgroundStyle =
-                                  block.elementBackgroundMode === "custom" &&
-                                  block.elementBackground
-                                    ? {
-                                        "--builder-card-bg":
-                                          block.elementBackground,
-                                      }
-                                    : block.elementBackgroundMode ===
-                                        "transparent"
-                                      ? { "--builder-card-bg": "transparent" }
-                                      : {};
-
-                                const productStyleProps = {
-                                  ...cardBorderRadiusStyle,
-                                  ...cardBackgroundStyle,
-                                  ...visualStyleToCss(
-                                    block.visualStyle as
-                                      BuilderVisualStyle | undefined,
-                                  ),
-                                } as React.CSSProperties;
-                                const productVisualClass = visualStyleClassName(
-                                  block.visualStyle as
-                                    BuilderVisualStyle | undefined,
-                                );
-
-                                return block.layoutVariant === "carousel" ? (
-                                  <div
-                                    className={productVisualClass}
-                                    style={productStyleProps}
-                                  >
-                                    <ProductCarousel
-                                      products={previewProducts.slice(
-                                        0,
-                                        block.gridLimit ?? 8,
-                                      )}
-                                      preset={block.cardPreset ?? "standard"}
-                                      cardStyle={block.cardStyle}
-                                      cardTheme={block.panelStyle}
-                                      gridImageFrame={block.gridImageFrame}
-                                      imagePadding={block.imagePadding}
-                                      imageFit={block.imageFit}
-                                      imageRatio={block.imageRatio as "auto" | "square" | "4:5" | "3:4" | "16:9" | undefined}
-                                      borderRadius={block.borderRadius}
-                                      addToCartStyle={block.addToCartStyle}
-                                      addToCartSize={block.addToCartSize}
-                                      addToCartDisplay={block.addToCartDisplay}
-                                      addToCartVisibility={
-                                        block.addToCartVisibility
-                                      }
-                                      addToCartPosition={
-                                        block.addToCartPosition
-                                      }
-                                      typography={block.typography}
-                                      categoryTree={previewCategoryTree}
-                                    />
-                                  </div>
-                                ) : (
-                                  <div
-                                    className={`shop-builder-grid--margin-${
-                                      hasBuilderVisualSpacing(
-                                        block.visualStyle?.margin,
-                                      )
-                                        ? "none"
-                                        : block.gridMargin &&
-                                            block.gridMargin !== "inherit"
-                                          ? block.gridMargin
-                                          : "none"
-                                    } shop-card-preset--${block.panelStyle ?? "default"} ${productVisualClass}`}
-                                    style={productStyleProps}
-                                  >
-                                    <CategoryWithFilters
-                                      products={
-                                        (block.pagination?.enabled ?? false)
-                                          ? previewProducts
-                                          : previewProducts.slice(
-                                              0,
-                                              block.gridLimit ?? 4,
-                                            )
-                                      }
-                                      columns={block.columns}
-                                      filterPosition={block.filterPosition}
-                                      cardStyle={block.cardStyle}
-                                      cardPreset={block.cardPreset}
-                                      cardTheme={block.panelStyle}
-                                      pageSize={block.gridLimit}
-                                      gridGap={block.gridGap}
-                                      cardPadding={block.cardPadding}
-                                      imagePadding={block.imagePadding}
-                                      imageFit={block.imageFit}
-                                      imageRatio={block.imageRatio as "auto" | "square" | "4:5" | "3:4" | "16:9" | undefined}
-                                      imageFrame={block.gridImageFrame}
-                                      borderRadius={block.borderRadius}
-                                      addToCartStyle={block.addToCartStyle}
-                                      addToCartSize={block.addToCartSize}
-                                      addToCartPosition={
-                                        block.addToCartPosition
-                                      }
-                                      addToCartVisibility={
-                                        block.addToCartVisibility
-                                      }
-                                      addToCartDisplay={block.addToCartDisplay}
-                                      hiddenCategorySlugs={
-                                        block.hiddenCategorySlugs
-                                      }
-                                      categoryTree={previewCategoryTree}
-                                      typography={block.typography}
-                                      pagination={block.pagination}
-                                    />
-                                  </div>
-                                );
-                              })()
-                            ) : (
-                              <div
-                                className={`builder-preview-products shop-card-preset--${block.panelStyle ?? "default"}`}
-                              >
-                                {sampleProducts
-                                  .slice(0, block.gridLimit ?? 4)
-                                  .map((name) => (
-                                    <span
-                                      key={name}
-                                      className="product-card builder-preview-product-card"
-                                    >
-                                      {name}
-                                    </span>
-                                  ))}
-                              </div>
-                            )}
-                          </div>
+                          <UikitProducts block={block} isCanvas products={previewProducts} categoryTree={previewCategoryTree} />
                         ) : block.kind === "grid" ? (
                           (() => {
                             const rawGridBlock = block as any;
@@ -16382,8 +15472,6 @@ function PreviewSection({
                                           "var(--builder-card-title-size, inherit)",
                                         fontWeight:
                                           "var(--builder-card-title-weight, inherit)",
-                                        textAlign:
-                                          "var(--builder-card-title-align, inherit)" as CSSProperties["textAlign"],
                                         margin:
                                           "var(--builder-card-title-margin, 0)",
                                       } as CSSProperties;
@@ -16392,15 +15480,151 @@ function PreviewSection({
                                       let panelClass = "";
                                       if (panelStyle.startsWith("card-") || panelStyle === "default" || panelStyle === "primary" || panelStyle === "secondary") {
                                         const variant = panelStyle.replace("card-", "");
-                                        const paddingCls = panelPadding === "small" ? "uk-card-small" : panelPadding === "large" ? "uk-card-large" : "";
-                                        panelClass = `uk-card uk-card-${variant || "default"} ${paddingCls} uk-card-body`.trim();
+                                        panelClass = `uk-card uk-card-${variant || "default"}`.trim();
                                       } else if (panelStyle.startsWith("tile-")) {
                                         const variant = panelStyle.replace("tile-", "");
-                                        const paddingCls = panelPadding === "small" ? "uk-tile-small" : panelPadding === "large" ? "uk-tile-large" : "";
-                                        panelClass = `uk-tile uk-tile-${variant || "default"} ${paddingCls}`.trim();
-                                      } else if (block.gridItemRenderer === "card") {
-                                        panelClass = getUikitCardClass(block.gridCardVariant ?? "default", { padding: block.gridCardSize ?? "default", hover: block.gridCardHover ? "hover" : "none" });
+                                        panelClass = `uk-tile uk-tile-${variant || "default"}`.trim();
+                                      } else {
+                                        panelClass = "shop-builder-panel-plain";
                                       }
+
+                                      const bodyPaddingClass =
+                                        panelPadding === "small"
+                                          ? "shop-builder-panel-padding-small"
+                                          : panelPadding === "large"
+                                          ? "shop-builder-panel-padding-large"
+                                          : panelPadding === "default"
+                                          ? "shop-builder-panel-padding-default"
+                                          : "shop-builder-panel-padding-none";
+
+                                      const isFrameless = Boolean(rawGridBlock.alignImageWithoutPadding);
+
+                                      const renderGridImageNode = () => {
+                                        if (block.gridShowImage === false || rawGridBlock.showImage === false) return null;
+                                        const isItemImagePlaceholder = !item.imageUrl || !item.imageUrl.trim();
+                                        const mediaPlacement = item.mediaPlacement ?? block.gridMediaPlacement ?? "top";
+                                        const isSideMedia = mediaPlacement === "left" || mediaPlacement === "right";
+                                        const mediaWidth = (item as any).mediaWidth ?? block.gridMediaWidth ?? "medium";
+                                        const mediaAlignment = (item as any).mediaAlignment ?? block.gridMediaAlignment ?? "center";
+                                        const mediaStyle = getUikitPanelMediaStyle({
+                                          ratio: isSideMedia ? undefined : (item.mediaRatio ?? block.imageRatio),
+                                          fit: (item.mediaFit ?? block.imageFit ?? "cover") === "contain" ? "contain" : "cover",
+                                          alignment: mediaAlignment,
+                                        });
+                                        const mediaClass = isFrameless ? getUikitPanelMediaClass(mediaPlacement === "left" || mediaPlacement === "right" ? mediaPlacement : "top") : "";
+                                        const imageMarginTopClass = (rawGridBlock.imageMarginTop && rawGridBlock.imageMarginTop !== "none" && rawGridBlock.imageMarginTop !== "default") ? `uk-margin-${rawGridBlock.imageMarginTop}` : "";
+
+                                        return (
+                                          <div
+                                            className={`${mediaClass} ${imageMarginTopClass} shop-builder-grid-image ${
+                                              isItemImagePlaceholder ? "is-empty" : ""
+                                            }`.trim()}
+                                            style={{ aspectRatio: mediaStyle.aspectRatio, overflow: "hidden" }}
+                                            onClick={(event) => {
+                                              if (block.gridSource !== "products") {
+                                                event.stopPropagation();
+                                                onUploadGridItemImage(
+                                                  section.id,
+                                                  columnKey,
+                                                  blockKey,
+                                                  itemIndex,
+                                                  item.imageUrl,
+                                                );
+                                              }
+                                            }}
+                                          >
+                                            {!isItemImagePlaceholder ? (
+                                              <>
+                                                <Image
+                                                  src={item.imageUrl!}
+                                                  alt={
+                                                    item.imageAlt ||
+                                                    item.title ||
+                                                    ""
+                                                  }
+                                                  width={420}
+                                                  height={420}
+                                                  className={`${rawGridBlock.imageBorder && rawGridBlock.imageBorder !== "none" ? `uk-border-${rawGridBlock.imageBorder}` : ""} ${rawGridBlock.imageBoxShadow && rawGridBlock.imageBoxShadow !== "none" ? `uk-box-shadow-${rawGridBlock.imageBoxShadow}` : ""} ${rawGridBlock.imageHoverTransition && rawGridBlock.imageHoverTransition !== "none" ? `uk-transition-${rawGridBlock.imageHoverTransition} uk-transition-opaque` : ""}`.trim()}
+                                                  style={{
+                                                    position: "absolute",
+                                                    inset: 0,
+                                                    width: "100%",
+                                                    height: "100%",
+                                                    objectFit: mediaStyle.backgroundSize as React.CSSProperties["objectFit"],
+                                                  }}
+                                                />
+                                                {block.gridSource !==
+                                                  "products" && (
+                                                  <button
+                                                    type="button"
+                                                    className="builder-preview-image-upload"
+                                                    onClick={(event) => {
+                                                      event.stopPropagation();
+                                                      onUploadGridItemImage(
+                                                        section.id,
+                                                        columnKey,
+                                                        blockKey,
+                                                        itemIndex,
+                                                        item.imageUrl,
+                                                      );
+                                                    }}
+                                                  >
+                                                    <ImageIcon size={13} />
+                                                    <span>Change image</span>
+                                                  </button>
+                                                )}
+                                              </>
+                                            ) : block.gridSource !==
+                                              "products" ? (
+                                              <div className="builder-media-placeholder-container">
+                                                <svg
+                                                  className="builder-media-placeholder-bg"
+                                                  viewBox="0 0 800 520"
+                                                  preserveAspectRatio="none"
+                                                  fill="none"
+                                                  xmlns="http://www.w3.org/2000/svg"
+                                                >
+                                                  <defs>
+                                                    <linearGradient id="bgGradGrid" x1="0" y1="0" x2="800" y2="520" gradientUnits="userSpaceOnUse">
+                                                      <stop offset="0%" stopColor="#F2F4F8"/>
+                                                      <stop offset="100%" stopColor="#EAEEF4"/>
+                                                    </linearGradient>
+                                                  </defs>
+                                                  <rect width="800" height="520" rx="16" fill="url(#bgGradGrid)"/>
+                                                  <circle cx="760" cy="40" r="230" fill="#FFFFFF" fillOpacity="0.5"/>
+                                                  <circle cx="40" cy="480" r="220" fill="#FFFFFF" fillOpacity="0.45"/>
+                                                  <rect x="24" y="24" width="752" height="472" rx="18" fill="none" stroke="#CBD5E1" strokeWidth="2" strokeDasharray="6 6"/>
+                                                  <g fill="#BCC6D5">
+                                                    <circle cx="56" cy="56" r="2.2"/><circle cx="70" cy="56" r="2.2"/><circle cx="84" cy="56" r="2.2"/><circle cx="98" cy="56" r="2.2"/><circle cx="112" cy="56" r="2.2"/>
+                                                    <circle cx="56" cy="70" r="2.2"/><circle cx="70" cy="70" r="2.2"/><circle cx="84" cy="70" r="2.2"/><circle cx="98" cy="70" r="2.2"/><circle cx="112" cy="70" r="2.2"/>
+                                                    <circle cx="56" cy="84" r="2.2"/><circle cx="70" cy="84" r="2.2"/><circle cx="84" cy="84" r="2.2"/><circle cx="98" cy="84" r="2.2"/><circle cx="112" cy="84" r="2.2"/>
+                                                  </g>
+                                                  <g fill="#BCC6D5">
+                                                    <circle cx="688" cy="436" r="2.2"/><circle cx="702" cy="436" r="2.2"/><circle cx="716" cy="436" r="2.2"/><circle cx="730" cy="436" r="2.2"/><circle cx="744" cy="436" r="2.2"/>
+                                                    <circle cx="688" cy="450" r="2.2"/><circle cx="702" cy="450" r="2.2"/><circle cx="716" cy="450" r="2.2"/><circle cx="730" cy="450" r="2.2"/><circle cx="744" cy="450" r="2.2"/>
+                                                    <circle cx="688" cy="464" r="2.2"/><circle cx="702" cy="464" r="2.2"/><circle cx="716" cy="464" r="2.2"/><circle cx="730" cy="464" r="2.2"/><circle cx="744" cy="464" r="2.2"/>
+                                                  </g>
+                                                </svg>
+                                                <div className="builder-media-placeholder-content">
+                                                  <div className="builder-media-placeholder-icon-frame">
+                                                    <svg viewBox="0 0 120 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                      <rect width="120" height="90" rx="14" fill="none" stroke="#B8C3D2" strokeWidth="4.5"/>
+                                                      <circle cx="90" cy="30" r="10" fill="#B8C3D2"/>
+                                                      <path d="M 8 78 L 46 36 C 48.5 33.5 53.5 33.5 56 36 L 84 68 L 92 58 C 94.5 55.5 99.5 55.5 102 58 L 112 78 Z" fill="#B8C3D2"/>
+                                                    </svg>
+                                                  </div>
+                                                  <h4 className="builder-media-placeholder-title">Select an image</h4>
+                                                  <p className="builder-media-placeholder-subtitle">Drag and drop, upload, or choose from your media library</p>
+                                                  <button type="button" className="builder-media-placeholder-btn">
+                                                    <Upload size={14} />
+                                                    <span>Choose Image</span>
+                                                  </button>
+                                                </div>
+                                              </div>
+                                            ) : null}
+                                          </div>
+                                        );
+                                      };
 
                                       return (
                                         <article
@@ -16411,7 +15635,7 @@ function PreviewSection({
                                           draggable={
                                             block.gridSource !== "products"
                                           }
-                                          className={`${panelClass} ${getUikitPanelLayoutClass(item.mediaPlacement ?? block.gridMediaPlacement ?? "top", item.mediaWidth ?? block.gridMediaWidth ?? "medium")} shop-builder-grid-card is-image-${imagePaddingClass} is-content-${contentPaddingClass} is-frame-${
+                                          className={`${panelClass} ${getUikitPanelLayoutClass(item.mediaPlacement ?? block.gridMediaPlacement ?? "top", item.mediaWidth ?? block.gridMediaWidth ?? "medium")} shop-builder-grid-card ${isFrameless ? "is-image-frameless" : "is-image-none"} is-content-${contentPaddingClass} is-frame-${
                                             block.gridImageFrame ?? "none"
                                           } ${
                                             draggingItem?.blockKey ===
@@ -16565,135 +15789,13 @@ function PreviewSection({
                                               </span>
                                             </>
                                           )}
-                                          {block.gridShowImage !== false && rawGridBlock.showImage !== false && (() => {
-                                            const isItemImagePlaceholder =
-                                              !item.imageUrl ||
-                                              !item.imageUrl.trim();
-                                            const mediaPlacement = item.mediaPlacement ?? block.gridMediaPlacement ?? "top";
-                                            const isSideMedia = mediaPlacement === "left" || mediaPlacement === "right";
-                                            const mediaWidth = (item as any).mediaWidth ?? block.gridMediaWidth ?? "medium";
-                                            const mediaAlignment = (item as any).mediaAlignment ?? block.gridMediaAlignment ?? "center";
-                                            const mediaStyle = getUikitPanelMediaStyle({
-                                              ratio: isSideMedia ? undefined : (item.mediaRatio ?? block.imageRatio),
-                                              fit: (item.mediaFit ?? block.imageFit ?? "cover") === "contain" ? "contain" : "cover",
-                                              alignment: mediaAlignment,
-                                            });
-                                            const isFrameless = rawGridBlock.alignImageWithoutPadding === true || block.gridImagePadding === "frameless";
-                                            const mediaClass = isFrameless ? getUikitPanelMediaClass(mediaPlacement === "left" || mediaPlacement === "right" ? mediaPlacement : "top") : "";
-                                            const imageMarginTopClass = (rawGridBlock.imageMarginTop && rawGridBlock.imageMarginTop !== "none" && rawGridBlock.imageMarginTop !== "default") ? `uk-margin-${rawGridBlock.imageMarginTop}` : "";
 
-                                            return (
-                                              <div
-                                                className={`${mediaClass} ${imageMarginTopClass} shop-builder-grid-image ${
-                                                  isItemImagePlaceholder ? "is-empty" : ""
-                                                }`.trim()}
-                                                style={{ aspectRatio: mediaStyle.aspectRatio, overflow: "hidden" }}
-                                                onClick={(event) => {
-                                                  if (block.gridSource !== "products") {
-                                                    event.stopPropagation();
-                                                    onUploadGridItemImage(
-                                                      section.id,
-                                                      columnKey,
-                                                      blockKey,
-                                                      itemIndex,
-                                                      item.imageUrl,
-                                                    );
-                                                  }
-                                                }}
-                                              >
-                                                {!isItemImagePlaceholder ? (
-                                                  <>
-                                                    <Image
-                                                      src={item.imageUrl!}
-                                                      alt={
-                                                        item.imageAlt ||
-                                                        item.title ||
-                                                        ""
-                                                      }
-                                                      width={420}
-                                                      height={420}
-                                                      className={`${rawGridBlock.imageBorder && rawGridBlock.imageBorder !== "none" ? `uk-border-${rawGridBlock.imageBorder}` : ""} ${rawGridBlock.imageBoxShadow && rawGridBlock.imageBoxShadow !== "none" ? `uk-box-shadow-${rawGridBlock.imageBoxShadow}` : ""} ${rawGridBlock.imageHoverTransition && rawGridBlock.imageHoverTransition !== "none" ? `uk-transition-${rawGridBlock.imageHoverTransition} uk-transition-opaque` : ""}`.trim()}
-                                                      style={{
-                                                        position: "absolute",
-                                                        inset: 0,
-                                                        width: "100%",
-                                                        height: "100%",
-                                                        objectFit: mediaStyle.backgroundSize as React.CSSProperties["objectFit"],
-                                                      }}
-                                                    />
-                                                    {block.gridSource !==
-                                                      "products" && (
-                                                      <button
-                                                        type="button"
-                                                        className="builder-preview-image-upload"
-                                                        onClick={(event) => {
-                                                          event.stopPropagation();
-                                                          onUploadGridItemImage(
-                                                            section.id,
-                                                            columnKey,
-                                                            blockKey,
-                                                            itemIndex,
-                                                            item.imageUrl,
-                                                          );
-                                                        }}
-                                                      >
-                                                        <ImageIcon size={13} />
-                                                        <span>Change image</span>
-                                                      </button>
-                                                    )}
-                                                  </>
-                                                ) : block.gridSource !==
-                                                  "products" ? (
-                                                  <div className="builder-media-placeholder-container">
-                                                    <svg
-                                                      className="builder-media-placeholder-bg"
-                                                      viewBox="0 0 800 520"
-                                                      preserveAspectRatio="none"
-                                                      fill="none"
-                                                      xmlns="http://www.w3.org/2000/svg"
-                                                    >
-                                                      <defs>
-                                                        <linearGradient id="bgGradGrid" x1="0" y1="0" x2="800" y2="520" gradientUnits="userSpaceOnUse">
-                                                          <stop offset="0%" stopColor="#F2F4F8"/>
-                                                          <stop offset="100%" stopColor="#EAEEF4"/>
-                                                        </linearGradient>
-                                                      </defs>
-                                                      <rect width="800" height="520" rx="16" fill="url(#bgGradGrid)"/>
-                                                      <circle cx="760" cy="40" r="230" fill="#FFFFFF" fillOpacity="0.5"/>
-                                                      <circle cx="40" cy="480" r="220" fill="#FFFFFF" fillOpacity="0.45"/>
-                                                      <rect x="24" y="24" width="752" height="472" rx="18" fill="none" stroke="#CBD5E1" strokeWidth="2" strokeDasharray="6 6"/>
-                                                      <g fill="#BCC6D5">
-                                                        <circle cx="56" cy="56" r="2.2"/><circle cx="70" cy="56" r="2.2"/><circle cx="84" cy="56" r="2.2"/><circle cx="98" cy="56" r="2.2"/><circle cx="112" cy="56" r="2.2"/>
-                                                        <circle cx="56" cy="70" r="2.2"/><circle cx="70" cy="70" r="2.2"/><circle cx="84" cy="70" r="2.2"/><circle cx="98" cy="70" r="2.2"/><circle cx="112" cy="70" r="2.2"/>
-                                                        <circle cx="56" cy="84" r="2.2"/><circle cx="70" cy="84" r="2.2"/><circle cx="84" cy="84" r="2.2"/><circle cx="98" cy="84" r="2.2"/><circle cx="112" cy="84" r="2.2"/>
-                                                      </g>
-                                                      <g fill="#BCC6D5">
-                                                        <circle cx="688" cy="436" r="2.2"/><circle cx="702" cy="436" r="2.2"/><circle cx="716" cy="436" r="2.2"/><circle cx="730" cy="436" r="2.2"/><circle cx="744" cy="436" r="2.2"/>
-                                                        <circle cx="688" cy="450" r="2.2"/><circle cx="702" cy="450" r="2.2"/><circle cx="716" cy="450" r="2.2"/><circle cx="730" cy="450" r="2.2"/><circle cx="744" cy="450" r="2.2"/>
-                                                        <circle cx="688" cy="464" r="2.2"/><circle cx="702" cy="464" r="2.2"/><circle cx="716" cy="464" r="2.2"/><circle cx="730" cy="464" r="2.2"/><circle cx="744" cy="464" r="2.2"/>
-                                                      </g>
-                                                    </svg>
-                                                    <div className="builder-media-placeholder-content">
-                                                      <div className="builder-media-placeholder-icon-frame">
-                                                        <svg viewBox="0 0 120 90" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                          <rect width="120" height="90" rx="14" fill="none" stroke="#B8C3D2" strokeWidth="4.5"/>
-                                                          <circle cx="90" cy="30" r="10" fill="#B8C3D2"/>
-                                                          <path d="M 8 78 L 46 36 C 48.5 33.5 53.5 33.5 56 36 L 84 68 L 92 58 C 94.5 55.5 99.5 55.5 102 58 L 112 78 Z" fill="#B8C3D2"/>
-                                                        </svg>
-                                                      </div>
-                                                      <h4 className="builder-media-placeholder-title">Select an image</h4>
-                                                      <p className="builder-media-placeholder-subtitle">Drag and drop, upload, or choose from your media library</p>
-                                                      <button type="button" className="builder-media-placeholder-btn">
-                                                        <Upload size={14} />
-                                                        <span>Choose Image</span>
-                                                      </button>
-                                                    </div>
-                                                  </div>
-                                                ) : null}
-                                              </div>
-                                            );
-                                          })()}
-                                          <div className={`${panelStyle.startsWith("card-") || panelStyle === "default" || panelStyle === "primary" || panelStyle === "secondary" || block.gridItemRenderer === "card" ? `uk-card-body ${panelPadding === "small" ? "uk-card-small" : panelPadding === "large" ? "uk-card-large" : ""}` : ""} shop-builder-grid-content ${typographyRoleClass(block.contentTypographyRole)}`}>
+                                          {/* Flush edge-to-edge image rendered before inner padded content */}
+                                          {isFrameless && renderGridImageNode()}
+
+                                          <div className={`${bodyPaddingClass} shop-builder-grid-content ${typographyRoleClass(block.contentTypographyRole)}`.trim()}>
+                                            {/* Padded image rendered inside content */}
+                                            {!isFrameless && renderGridImageNode()}
                                             {block.gridSource !== "products" ? (
                                               (() => {
                                                 const TitleTag = (block.headingLevel ?? item.titleElement ?? "h3") as any;
@@ -16906,202 +16008,13 @@ function PreviewSection({
                             );
                           })()
                         ) : block.kind === "badgeGrid" ? (
-                          <div className="shop-builder-column-block shop-builder-column-block--badges">
-                            {block.title && (
-                              <DashboardTypog
-                                as="h3"
-                                typography={block.typography}
-                              >
-                                {block.title}
-                              </DashboardTypog>
-                            )}
-                            {block.body && (
-                              <DashboardTypog
-                                as="p"
-                                typography={block.typography}
-                              >
-                                {block.body}
-                              </DashboardTypog>
-                            )}
-                            <div
-                              className="shop-builder-column-badges"
-                              style={
-                                {
-                                  "--builder-column-badge-columns":
-                                    block.columns ?? 2,
-                                } as CSSProperties
-                              }
-                            >
-                              {(block.badges ?? []).map((badge, badgeIndex) => (
-                                <article
-                                  key={
-                                    badge.id ??
-                                    `${blockKey}-badge-${badgeIndex}`
-                                  }
-                                  className={`shop-builder-badge-card ${draggingItem?.kind === "badge" && draggingItem?.fromIndex === badgeIndex && draggingItem?.blockKey === blockKey ? "is-dragging" : ""} ${draggingItem?.kind === "badge" && dropHoverIndex === badgeIndex ? "is-drag-over" : ""}`}
-                                  draggable
-                                  onDragStart={(event) => {
-                                    event.stopPropagation();
-                                    event.dataTransfer.setData(
-                                      "text/plain",
-                                      `badge:${blockKey}:${badgeIndex}`,
-                                    );
-                                    event.dataTransfer.effectAllowed = "move";
-                                    setDraggingItem({
-                                      kind: "badge",
-                                      blockKey,
-                                      fromIndex: badgeIndex,
-                                    });
-                                  }}
-                                  onDragOver={(event) => {
-                                    if (
-                                      !draggingItem ||
-                                      draggingItem.kind !== "badge" ||
-                                      draggingItem.blockKey !== blockKey
-                                    )
-                                      return;
-                                    if (draggingItem.fromIndex === badgeIndex) {
-                                      setDropHoverIndex(null);
-                                      return;
-                                    }
-                                    event.preventDefault();
-                                    event.dataTransfer.dropEffect = "move";
-                                    if (dropHoverIndex !== badgeIndex) {
-                                      setDropHoverIndex(badgeIndex);
-                                    }
-                                  }}
-                                  onDragLeave={() => {
-                                    if (dropHoverIndex === badgeIndex) {
-                                      setDropHoverIndex(null);
-                                    }
-                                  }}
-                                  onDrop={(event) => {
-                                    event.preventDefault();
-                                    event.stopPropagation();
-                                    setDropHoverIndex(null);
-                                    if (
-                                      !draggingItem ||
-                                      draggingItem.kind !== "badge" ||
-                                      draggingItem.blockKey !== blockKey
-                                    )
-                                      return;
-                                    if (draggingItem.fromIndex === badgeIndex) {
-                                      setDraggingItem(null);
-                                      return;
-                                    }
-                                    onMoveBadge(
-                                      section.id,
-                                      columnKey,
-                                      blockKey,
-                                      draggingItem.fromIndex,
-                                      badgeIndex,
-                                    );
-                                    setDraggingItem(null);
-                                  }}
-                                  onDragEnd={() => {
-                                    setDraggingItem(null);
-                                    setDropHoverIndex(null);
-                                  }}
-                                >
-                                  <div className="builder-preview-badge-tools">
-                                    <button
-                                      type="button"
-                                      onMouseDown={(event) =>
-                                        event.stopPropagation()
-                                      }
-                                      onClick={(event) => {
-                                        event.stopPropagation();
-                                        onDuplicateBadge(
-                                          section.id,
-                                          columnKey,
-                                          blockKey,
-                                          badgeIndex,
-                                        );
-                                      }}
-                                      title="Duplicate badge"
-                                    >
-                                      <Copy size={12} />
-                                    </button>
-                                    <button
-                                      type="button"
-                                      onMouseDown={(event) =>
-                                        event.stopPropagation()
-                                      }
-                                      onClick={(event) => {
-                                        event.stopPropagation();
-                                        onDeleteBadge(
-                                          section.id,
-                                          columnKey,
-                                          blockKey,
-                                          badgeIndex,
-                                        );
-                                      }}
-                                      title="Delete badge"
-                                    >
-                                      <Trash2 size={12} />
-                                    </button>
-                                  </div>
-                                  <span
-                                    className="builder-preview-badge-drag-handle"
-                                    aria-hidden="true"
-                                  >
-                                    ::
-                                  </span>
-                                  {badge.label && (
-                                    <DashboardTypog
-                                      as="span"
-                                      typography={block.typography}
-                                    >
-                                      {badge.label}
-                                    </DashboardTypog>
-                                  )}
-                                  {badge.title && (
-                                    <DashboardTypog
-                                      as="strong"
-                                      typography={block.typography}
-                                    >
-                                      {badge.title}
-                                    </DashboardTypog>
-                                  )}
-                                  {badge.body && (
-                                    <DashboardTypog
-                                      as="p"
-                                      typography={block.typography}
-                                    >
-                                      {badge.body}
-                                    </DashboardTypog>
-                                  )}
-                                </article>
-                              ))}
-                            </div>
-                          </div>
+                          <UikitBadgeGrid block={block} />
                         ) : block.kind === "fluentForm" ? (
-                          <div className="shop-builder-column-block shop-builder-column-block--fluent-form builder-preview-fluent-form">
-                            <FluentFormClient
-                              formId={block.fluentFormId}
-                              title={block.title}
-                              previewMode
-                            />
-                          </div>
+                          <UikitFluentForm block={block} isCanvas />
                         ) : block.kind === "alert" ? (
-                          <div className="shop-builder-column-block shop-builder-column-block--alert">
-                            <div className={getUikitAlertClass(block.alertStyle)}>
-                              {block.title && (
-                                <h4 className="uk-margin-remove-top">
-                                  {block.title}
-                                </h4>
-                              )}
-                              {block.body && (
-                                <p className="uk-margin-remove-bottom">
-                                  {block.body}
-                                </p>
-                              )}
-                            </div>
-                          </div>
+                          <UikitAlert block={block} />
                         ) : block.kind === "divider" ? (
-                          <div className="shop-builder-column-block shop-builder-column-block--divider uk-margin">
-                            <hr className={getUikitDividerClass(block.dividerStyle)} />
-                          </div>
+                          <UikitDivider block={block} />
                         ) : (
                           <div className="shop-builder-column-block shop-builder-column-block--text">
                             {block.eyebrow && (
@@ -17168,9 +16081,6 @@ function PreviewSection({
 
                             {block.kind === "embed" && (
                               <span>{block.embedMode ?? "code"} block</span>
-                            )}
-                            {block.kind === "breadcrumbs" && (
-                              <span>Dynamic navigation path</span>
                             )}
                             <div
                               className={`shop-builder-buttons shop-builder-buttons--${block.buttonsLayout ?? "inline"}`}

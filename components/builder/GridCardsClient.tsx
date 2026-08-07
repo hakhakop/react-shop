@@ -100,18 +100,33 @@ export function GridCardsClient({
   const rawBlock = block as any;
   const [activeFilter, setActiveFilter] = useState<string>("all");
 
-  const colsCount = rawBlock.columnsDesktop ? (parseInt(rawBlock.columnsDesktop, 10) || (rawBlock.columnsDesktop.includes("column") ? parseInt(rawBlock.columnsDesktop, 10) : 3)) : (block.columns ?? 3);
-  const colGapValue = rawBlock.columnGap ?? block.gridGap ?? "medium";
-  const rowGapValue = rawBlock.rowGap ?? block.gridGap ?? "medium";
+  // Resolved Column Count across breakpoints & root columns
+  const rawCols = block.columns ?? (rawBlock.columnsDesktop && rawBlock.columnsDesktop !== "inherit" ? parseInt(rawBlock.columnsDesktop, 10) : undefined) ?? 3;
+  const colsCount = typeof rawCols === "number" && !isNaN(rawCols) ? rawCols : (parseInt(String(rawCols), 10) || 3);
+
+  // Resolved Gaps
+  const colGapValue = rawBlock.gridGap ?? rawBlock.columnGap ?? "medium";
+  const rowGapValue = rawBlock.gridRowGap ?? rawBlock.rowGap ?? colGapValue ?? "medium";
 
   const filterCategories = Array.from(new Set(items.map((it) => it.eyebrow || it.meta || "Default").filter(Boolean)));
   const filteredItems = activeFilter === "all" ? items : items.filter((it) => (it.eyebrow || it.meta || "Default") === activeFilter);
 
-  const canShowTitle = rawBlock.showTitle !== false && rawBlock.gridShowTitle !== false;
-  const canShowMeta = rawBlock.showMeta !== false && block.gridShowMeta !== false;
-  const canShowContent = rawBlock.showContent !== false && block.gridShowText !== false;
-  const canShowImage = rawBlock.showImage !== false && block.gridShowImage !== false;
-  const canShowLink = rawBlock.showLink !== false && block.gridShowButton !== false;
+  // Field Visibility
+  const canShowTitle = (rawBlock.gridShowTitle ?? rawBlock.showTitle ?? true) !== false;
+  const canShowMeta = (rawBlock.gridShowMeta ?? rawBlock.showMeta ?? true) !== false;
+  const canShowContent = (rawBlock.gridShowText ?? rawBlock.gridShowContent ?? rawBlock.showContent ?? true) !== false;
+  const canShowImage = (rawBlock.gridShowImage ?? rawBlock.showImage ?? true) !== false;
+  const canShowLink = (rawBlock.gridShowButton ?? rawBlock.showLink ?? true) !== false;
+
+  const parseGapPx = (val?: string) => {
+    if (val === "small") return "15px";
+    if (val === "medium" || val === "default") return "30px";
+    if (val === "large") return "40px";
+    if (val === "collapse" || val === "none") return "0px";
+    return "30px";
+  };
+
+  const gapCss = `${parseGapPx(colGapValue)} ${parseGapPx(rowGapValue)}`;
 
   return (
     <div className="shop-builder-grid-wrapper" data-uk-lightbox={rawBlock.enableLightbox ? "animation: slide" : undefined}>
@@ -133,17 +148,15 @@ export function GridCardsClient({
         style={
           {
             "--shop-builder-grid-columns": colsCount,
-            ...(gridGapCustom
-              ? { "--shop-builder-grid-gap": gridGapCustom }
-              : {}),
-            gap: `${colGapValue === "small" ? "15px" : colGapValue === "large" ? "40px" : colGapValue === "none" ? "0px" : "30px"} ${rowGapValue === "small" ? "15px" : rowGapValue === "large" ? "40px" : rowGapValue === "none" ? "0px" : "30px"}`,
+            gridTemplateColumns: `repeat(${colsCount}, minmax(0, 1fr))`,
+            gap: gapCss,
           } as CSSProperties
         }
       >
         {filteredItems.slice(0, limit).map((item) =>
           (() => {
-            const panelStyle = rawBlock.panelStyle ?? block.gridCardVariant ?? rawBlock.cardVariant ?? "none";
-            const panelPadding = rawBlock.panelPadding ?? "none";
+            const panelStyle = rawBlock.panelVariant ?? rawBlock.panelStyle ?? block.gridCardVariant ?? rawBlock.cardVariant ?? "none";
+            const panelPadding = rawBlock.panelSize ?? rawBlock.panelPadding ?? "none";
             let panelClass = "";
 
             if (
@@ -153,28 +166,45 @@ export function GridCardsClient({
               panelStyle === "secondary"
             ) {
               const variant = panelStyle.replace("card-", "");
-              const paddingCls = panelPadding === "small" ? "uk-card-small" : panelPadding === "large" ? "uk-card-large" : "";
-              panelClass = `uk-card uk-card-${variant || "default"} ${paddingCls}`.trim();
+              panelClass = `uk-card uk-card-${variant || "default"}`.trim();
             } else if (panelStyle.startsWith("tile-")) {
               const variant = panelStyle.replace("tile-", "");
-              const paddingCls = panelPadding === "small" ? "uk-tile-small" : panelPadding === "large" ? "uk-tile-large" : "";
-              panelClass = `uk-tile uk-tile-${variant || "default"} ${paddingCls}`.trim();
+              panelClass = `uk-tile uk-tile-${variant || "default"}`.trim();
+            } else {
+              panelClass = "shop-builder-panel-plain";
             }
+
+            const bodyPaddingClass =
+              panelPadding === "small"
+                ? "shop-builder-panel-padding-small"
+                : panelPadding === "large"
+                ? "shop-builder-panel-padding-large"
+                : panelPadding === "default"
+                ? "shop-builder-panel-padding-default"
+                : "shop-builder-panel-padding-none";
 
             const isCard = Boolean(panelClass);
             const cardHover = item.cardHover ?? block.gridCardHover;
 
             // Title styling & level
-            const TitleTag = (block.headingLevel ?? item.titleElement ?? "h3") as any;
-            const titleStyleVal = rawBlock.titleStyle ?? item.titleStyle;
-            const titleHeadingClass = getUikitTitleHeadingClass(titleStyleVal) || (item.titleStyle && item.titleStyle !== "inherit" ? getUikitHeadingClass(item.titleStyle, item.titleStyle) : "");
+            const TitleTag = (rawBlock.gridTitleLevel ?? item.titleElement ?? block.headingLevel ?? "h3") as any;
+            const titleStyleVal = rawBlock.gridTitleSize ?? rawBlock.titleStyle ?? item.titleStyle;
+            const titleHeadingClass = getUikitTitleHeadingClass(titleStyleVal) || (titleStyleVal && titleStyleVal !== "inherit" ? getUikitHeadingClass(titleStyleVal, titleStyleVal) : "");
             const titleDecorationClass = getUikitTitleDecorationClass(rawBlock.titleDecoration);
+            const titleColorVal = rawBlock.titleColor ?? rawBlock.gridTitleColor;
+            const titleColorClass = titleColorVal && titleColorVal !== "none" && titleColorVal !== "default"
+              ? (titleColorVal.startsWith("uk-text-") ? titleColorVal : `uk-text-${titleColorVal}`)
+              : "";
             const titleMarginTopClass = getUikitMarginClass(rawBlock.titleMarginTop);
 
             // Meta styling
             const metaStyleClass = getUikitTextStyleClass(rawBlock.metaStyle ?? "text-meta");
+            const metaColorVal = rawBlock.metaColor;
+            const metaColorClass = metaColorVal && metaColorVal !== "none" && metaColorVal !== "default"
+              ? (metaColorVal.startsWith("uk-text-") ? metaColorVal : `uk-text-${metaColorVal}`)
+              : "";
             const metaMarginTopClass = getUikitMarginClass(rawBlock.metaMarginTop);
-            const metaAlign = rawBlock.metaAlignment ?? "below-title";
+            const metaAlign = rawBlock.gridMetaAlign ?? rawBlock.metaAlignment ?? "below";
 
             // Content styling
             const contentStyleClass = getUikitTextStyleClass(rawBlock.contentStyle);
@@ -184,14 +214,16 @@ export function GridCardsClient({
             const imageBorderClass = getUikitImageBorderClass(rawBlock.imageBorder);
             const imageBoxShadowClass = getUikitImageBoxShadowClass(rawBlock.imageBoxShadow);
             const imageHoverTransitionClass = getUikitHoverTransitionClass(rawBlock.imageHoverTransition);
-            const imageMarginTopClass = getUikitMarginClass(rawBlock.imageMarginTop);
-            const imagePaddingClass = rawBlock.alignImageWithoutPadding ? "frameless" : "none";
+            const isFrameless = (rawBlock as any).alignImageWithoutPadding === true || imagePaddingClass === "frameless";
 
             // Link / Button styling
-            const buttonText = item.buttonLabel || rawBlock.linkText || "Read more";
-            const linkStyleClass = getUikitLinkStyleClass(rawBlock.linkStyle, rawBlock.linkButtonSize, rawBlock.linkFullWidth);
+            const buttonText = item.buttonLabel || rawBlock.buttonLabel || rawBlock.linkText || "Read more";
+            const btnVariant = rawBlock.buttonStyle ?? item.actionStyle ?? item.buttonStyle ?? block.buttonStyle ?? "primary";
+            const btnSize = rawBlock.size ?? item.actionSize ?? block.size ?? "default";
+            const isFullWidth = Boolean(rawBlock.fullWidthButton);
+            const linkStyleClass = getUikitLinkStyleClass(btnVariant, btnSize, isFullWidth);
             const linkMarginTopClass = getUikitMarginClass(rawBlock.linkMarginTop);
-            const linkTarget = rawBlock.linkTarget ?? item.buttonTarget ?? "_self";
+            const linkTarget = rawBlock.buttonTarget ?? rawBlock.linkTarget ?? item.buttonTarget ?? "_self";
 
             const mediaPlacement = item.mediaPlacement ?? (block as any).gridMediaPlacement ?? "top";
             const isSideMedia = mediaPlacement === "left" || mediaPlacement === "right";
@@ -209,7 +241,7 @@ export function GridCardsClient({
               canShowMeta && item.meta ? (
                 <Typog
                   as="div"
-                  className={`${metaStyleClass} ${metaMarginTopClass} ${typographyRoleClass(block.metaTypographyRole)}`.trim()}
+                  className={`${metaStyleClass} ${metaColorClass} ${metaMarginTopClass} ${typographyRoleClass(block.metaTypographyRole)}`.trim()}
                   area="body"
                   typography={item.typography ?? block.typography}
                 >
@@ -222,8 +254,8 @@ export function GridCardsClient({
               canShowTitle && item.title ? (
                 <Typog
                   as={TitleTag}
-                  className={`shop-builder-title ${titleHeadingClass} ${titleDecorationClass} ${titleMarginTopClass} ${typographyRoleClass(
-                    block.titleTypographyRole,
+                  className={`shop-builder-title ${titleHeadingClass} ${titleDecorationClass} ${titleColorClass} ${titleMarginTopClass} ${typographyRoleClass(
+                    rawBlock.titleTypographyRole ?? block.titleTypographyRole,
                   )}`.trim()}
                   typography={item.typography ?? block.typography}
                   area="title"
@@ -255,10 +287,52 @@ export function GridCardsClient({
               ) : null
             );
 
+            const renderImage = () => {
+              if (!canShowImage || !item.imageUrl) return null;
+              const placement = item.mediaPlacement ?? (block as any).gridMediaPlacement ?? "top";
+              const mediaClass = isFrameless ? (placement === "left" || placement === "right" ? `uk-card-media-${placement}` : "uk-card-media-top") : "";
+              const imageEl = (
+                <img
+                  src={item.imageUrl}
+                  alt={item.imageAlt || item.title || ""}
+                  loading={rawBlock.imageLoading ? "eager" : "lazy"}
+                  className={`${imageBorderClass} ${imageBoxShadowClass} ${imageHoverTransitionClass}`.trim()}
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: mediaStyle.backgroundSize as CSSProperties["objectFit"],
+                    borderRadius: isFrameless && isCard ? "4px 4px 0 0" : undefined,
+                  }}
+                />
+              );
+
+              return (
+                <div
+                  className={`${mediaClass} shop-builder-grid-image`}
+                  style={{
+                    aspectRatio: mediaStyle.aspectRatio,
+                    overflow: "hidden",
+                  }}
+                >
+                  {rawBlock.enableLightbox ? (
+                    <a href={item.imageUrl} data-caption={item.title || ""}>
+                      {imageEl}
+                    </a>
+                  ) : rawBlock.linkImage || rawBlock.linkPanel ? (
+                    <a href={itemUrl} {...builderLinkTargetProps(linkTarget)}>
+                      {imageEl}
+                    </a>
+                  ) : (
+                    imageEl
+                  )}
+                </div>
+              );
+            };
+
             return (
               <article
                 key={item.id}
-                className={`${panelClass} ${cardHover ? "uk-card-hover" : ""} ${panelLayoutClass} shop-builder-grid-card is-image-${imagePaddingClass} is-content-${contentPaddingClass} is-frame-${
+                className={`${panelClass} ${cardHover ? "uk-card-hover" : ""} ${panelLayoutClass} shop-builder-grid-card ${isFrameless ? "is-image-frameless" : "is-image-none"} is-content-${contentPaddingClass} is-frame-${
                   block.gridImageFrame ?? "none"
                 }`}
                 style={
@@ -269,49 +343,13 @@ export function GridCardsClient({
                   } as CSSProperties
                 }
               >
-                {canShowImage && item.imageUrl && (
-                  (() => {
-                    const placement = item.mediaPlacement ?? (block as any).gridMediaPlacement ?? "top";
-                    const isFrameless = rawBlock.alignImageWithoutPadding === true || block.gridImagePadding === "frameless";
-                    const mediaClass = isFrameless ? getUikitPanelMediaClass(placement === "left" || placement === "right" ? placement : "top") : "";
-                    const imageEl = (
-                      <img
-                        src={item.imageUrl}
-                        alt={item.imageAlt || item.title || ""}
-                        loading={rawBlock.imageLoading ? "eager" : "lazy"}
-                        className={`${imageBorderClass} ${imageBoxShadowClass} ${imageHoverTransitionClass}`.trim()}
-                        style={{
-                          position: "absolute",
-                          inset: 0,
-                          width: "100%",
-                          height: "100%",
-                          objectFit: mediaStyle.backgroundSize as CSSProperties["objectFit"],
-                        }}
-                      />
-                    );
+                {/* Frameless (Flush) image rendered outside card body */}
+                {isFrameless && renderImage()}
 
-                    return (
-                      <div
-                        className={`${mediaClass} shop-builder-grid-image`}
-                        style={{ aspectRatio: mediaStyle.aspectRatio, overflow: "hidden" }}
-                      >
-                        {rawBlock.enableLightbox ? (
-                          <a href={item.imageUrl} data-caption={item.title || ""}>
-                            {imageEl}
-                          </a>
-                        ) : rawBlock.linkImage || rawBlock.linkPanel ? (
-                          <a href={itemUrl} {...builderLinkTargetProps(linkTarget)}>
-                            {imageEl}
-                          </a>
-                        ) : (
-                          imageEl
-                        )}
-                      </div>
-                    );
-                  })()
-                )}
+                <div className={`${bodyPaddingClass} shop-builder-grid-content`.trim()}>
+                  {/* Padded image rendered inside card body */}
+                  {!isFrameless && renderImage()}
 
-                <div className={`${isCard ? `uk-card-body ${panelPadding === "small" ? "uk-card-small" : panelPadding === "large" ? "uk-card-large" : ""}` : ""} shop-builder-grid-content`}>
                   {item.iconName && <WebPagesIcon name={item.iconName} size={item.iconSize ?? 20} />}
                   {block.gridShowEyebrow !== false && item.eyebrow && (
                     <Typog

@@ -2,16 +2,37 @@
 
 import { useEffect, useRef } from "react";
 import UikitText from "@/components/builder/UikitText";
-import { getUikitAccordionClass, getUikitAccordionItemClass, getUikitHeadingClass } from "@/lib/uikitTokens";
+import {
+  getUikitAccordionClass,
+  getUikitAccordionItemClass,
+  getUikitHeadingClass,
+  getUikitTextClass,
+  getUikitButtonClass,
+  getUikitMarginClass,
+} from "@/lib/uikitTokens";
+import { typographyRoleClass } from "@/lib/builderTypography";
+import { builderLinkTargetProps } from "@/lib/websiteBuilderLinks";
 
 export type UikitAccordionItem = {
   id: string;
   title: string;
   content: string;
+  imageUrl?: string;
+  imageAlt?: string;
+  mediaPlacement?: "top" | "bottom" | "left" | "right";
+  mediaWidth?: "1-2" | "1-3" | "1-4" | "auto";
+  buttonUrl?: string;
+  buttonLabel?: string;
+  buttonStyle?: string;
+  buttonSize?: string;
+  buttonTarget?: string;
+  customId?: string;
+  customClass?: string;
 };
 
 type Props = {
-  items: UikitAccordionItem[];
+  block?: any;
+  items?: UikitAccordionItem[];
   multiple?: boolean;
   collapsible?: boolean;
   active?: number[];
@@ -22,19 +43,96 @@ type Props = {
   itemSpacing?: "inherit" | "small" | "default" | "large";
   contentSpacing?: "inherit" | "small" | "default" | "large";
   divider?: boolean;
-  titleStyle?: "inherit" | "h3" | "h4" | "h5";
-  contentStyle?: "inherit" | "default" | "lead" | "small" | "large" | "muted";
-  /** Legacy semantic fields retained for safe document migration. */
+  titleStyle?: "inherit" | "h3" | "h4" | "h5" | string;
+  contentStyle?: "inherit" | "default" | "lead" | "small" | "large" | "muted" | string;
   legacyRowStyle?: "plain" | "divided" | "striped";
   legacySpacing?: "compact" | "default" | "large";
   legacyOpenEmphasis?: "none" | "muted" | "primary";
 };
 
-export default function UikitAccordion({ items, multiple = false, collapsible = true, active = [], style: styleProp, indicator: indicatorProp, indicatorPosition = "end", titleEmphasis: titleEmphasisProp, itemSpacing: itemSpacingProp, contentSpacing = "inherit", divider = true, titleStyle = "inherit", contentStyle = "inherit", legacyRowStyle, legacySpacing, legacyOpenEmphasis }: Props) {
-  const style = styleProp === "boxed" ? "striped" : styleProp ?? (legacyRowStyle === "divided" ? "divided" : legacyRowStyle === "striped" ? "striped" : "default");
-  const indicator = indicatorProp ?? "default";
-  const titleEmphasis = titleEmphasisProp === "bold" ? "emphasis" : titleEmphasisProp ?? (legacyOpenEmphasis === "muted" ? "muted" : legacyOpenEmphasis === "primary" ? "emphasis" : "inherit");
-  const itemSpacing = itemSpacingProp ?? (legacySpacing === "compact" ? "small" : legacySpacing === "large" ? "large" : "inherit");
+export default function UikitAccordion({
+  block,
+  items: itemsProp,
+  multiple: multipleProp,
+  collapsible: collapsibleProp,
+  active: activeProp,
+  style: styleProp,
+  indicator: indicatorProp,
+  indicatorPosition: indicatorPositionProp,
+  titleEmphasis: titleEmphasisProp,
+  itemSpacing: itemSpacingProp,
+  contentSpacing: contentSpacingProp = "inherit",
+  divider: dividerProp = true,
+  titleStyle: titleStyleProp = "inherit",
+  contentStyle: contentStyleProp = "inherit",
+  legacyRowStyle,
+  legacySpacing,
+  legacyOpenEmphasis,
+}: Props) {
+  const rawBlock = (block ?? {}) as any;
+  const items: UikitAccordionItem[] = itemsProp ?? rawBlock.accordionItems ?? [];
+  const multiple = multipleProp ?? rawBlock.accordionMultiple ?? false;
+  const collapsible = collapsibleProp ?? rawBlock.accordionCollapsible ?? true;
+  const active = activeProp ?? rawBlock.accordionOpenItems ?? [];
+
+  const style =
+    styleProp === "boxed"
+      ? "striped"
+      : styleProp ??
+        rawBlock.accordionStyle ??
+        (legacyRowStyle === "divided" ? "divided" : legacyRowStyle === "striped" ? "striped" : "default");
+  const indicator = indicatorProp ?? rawBlock.accordionIndicator ?? "default";
+  const indicatorPosition = indicatorPositionProp ?? rawBlock.accordionIndicatorPosition ?? "end";
+  const titleEmphasis =
+    titleEmphasisProp === "bold"
+      ? "emphasis"
+      : titleEmphasisProp ??
+        rawBlock.accordionTitleEmphasis ??
+        (legacyOpenEmphasis === "muted" ? "muted" : legacyOpenEmphasis === "primary" ? "emphasis" : "inherit");
+  const itemSpacing =
+    itemSpacingProp ??
+    rawBlock.accordionItemSpacing ??
+    (legacySpacing === "compact" ? "small" : legacySpacing === "large" ? "large" : "inherit");
+  const contentSpacing = contentSpacingProp ?? rawBlock.accordionContentSpacing ?? "inherit";
+  const divider = dividerProp ?? rawBlock.accordionDivider ?? true;
+
+  // Title Settings
+  const TitleTag = (rawBlock.accordionTitleLevel ?? rawBlock.headingLevel ?? "h3") as any;
+  const titleStyleVal = rawBlock.accordionTitleSize ?? rawBlock.accordionTitleStyle ?? titleStyleProp;
+  const titleHeadingClass =
+    titleStyleVal && titleStyleVal !== "inherit" && titleStyleVal !== "none"
+      ? getUikitHeadingClass(titleStyleVal, titleStyleVal)
+      : "";
+  const titleFontFamilyClass = typographyRoleClass(
+    rawBlock.titleTypographyRole ?? rawBlock.accordionTitleFontFamily
+  );
+  const titleColorVal = rawBlock.accordionTitleColor ?? rawBlock.titleColor;
+  const titleColorClass =
+    titleColorVal && titleColorVal !== "none" && titleColorVal !== "default"
+      ? titleColorVal.startsWith("uk-text-")
+        ? titleColorVal
+        : `uk-text-${titleColorVal}`
+      : "";
+  const titleAlignVal = rawBlock.accordionTitleAlign ?? rawBlock.textAlign;
+  const titleAlignClass = titleAlignVal && titleAlignVal !== "none" ? `uk-text-${titleAlignVal}` : "";
+
+  // Content Settings
+  const contentStyleVal = rawBlock.accordionContentStyle ?? rawBlock.contentStyle ?? contentStyleProp;
+  const contentStyleClass = getUikitTextClass(contentStyleVal);
+  const contentMarginTopClass = getUikitMarginClass(rawBlock.accordionContentMarginTop);
+
+  // Field Visibility Flags
+  const canShowTitle = (rawBlock.accordionShowTitle ?? rawBlock.showTitle ?? true) !== false;
+  const canShowContent = (rawBlock.accordionShowContent ?? rawBlock.showContent ?? true) !== false;
+  const canShowImage = (rawBlock.accordionShowImage ?? rawBlock.showImage ?? true) !== false;
+  const canShowLink = (rawBlock.accordionShowLink ?? rawBlock.showLink ?? true) !== false;
+
+  // General Block Wrapper Classes
+  const generalMarginClass = getUikitMarginClass(rawBlock.margin);
+  const generalTextClass = rawBlock.textAlign && rawBlock.textAlign !== "none" ? `uk-text-${rawBlock.textAlign}` : "";
+  const generalAnimClass = rawBlock.animation && rawBlock.animation !== "none" ? `uk-animation-${rawBlock.animation}` : "";
+  const generalVisClass = rawBlock.visibility && rawBlock.visibility !== "always" ? `uk-${rawBlock.visibility}` : "";
+
   const rootRef = useRef<HTMLUListElement>(null);
 
   useEffect(() => {
@@ -43,49 +141,154 @@ export default function UikitAccordion({ items, multiple = false, collapsible = 
 
     Promise.all([import("uikit"), import("uikit/dist/js/uikit-icons")]).then(([module, iconsModule]) => {
       if (cancelled || !rootRef.current) return;
-     const UIkit = (module.default ?? module) as {
-       accordion: (element: HTMLElement, options: Record<string, unknown>) => { $destroy?: (remove?: boolean) => void };
-       icon?: (element: HTMLElement) => unknown;
-       use?: (plugin: unknown) => void;
-     };
-     const registerPlugin = UIkit.use;
-     registerPlugin?.(iconsModule.default ?? iconsModule);
-     instance = UIkit.accordion(rootRef.current, {
-       multiple,
-       collapsible,
-       active: active.length > 0 ? active : false,
-       animation: true,
-     });
+      const UIkit = (module.default ?? module) as {
+        accordion: (element: HTMLElement, options: Record<string, unknown>) => { $destroy?: (remove?: boolean) => void };
+        icon?: (element: HTMLElement) => unknown;
+        use?: (plugin: unknown) => void;
+      };
+      const registerPlugin = UIkit.use;
+      registerPlugin?.(iconsModule.default ?? iconsModule);
+      instance = UIkit.accordion(rootRef.current, {
+        multiple,
+        collapsible,
+        active: active.length > 0 ? active : false,
+        animation: true,
+      });
       rootRef.current.querySelectorAll<HTMLElement>("[uk-icon]").forEach((icon) => UIkit.icon?.(icon));
     });
 
     return () => {
       cancelled = true;
-      // Keep the React-owned root in place; UIkit should only release its listeners.
       instance?.$destroy?.();
     };
   }, [active, collapsible, multiple, items, indicator]);
 
   return (
-    <ul
-      ref={rootRef}
-      className={getUikitAccordionClass({ style, indicator, indicatorPosition, titleEmphasis, itemSpacing, contentSpacing, divider })}
-      uk-accordion=""
-     data-accordion-multiple={multiple ? "true" : "false"}
-     data-accordion-collapsible={collapsible ? "true" : "false"}
-   >
-      {items.map((item) => (
-        <li key={item.id} data-accordion-item-id={item.id} className={getUikitAccordionItemClass(style)}>
-          <a className="uk-accordion-title" href="#">
-            {indicator === "plus-minus" && <><span className="shop-builder-accordion-indicator shop-builder-accordion-indicator--plus" uk-icon="icon: plus" aria-hidden="true" /><span className="shop-builder-accordion-indicator shop-builder-accordion-indicator--minus" uk-icon="icon: minus" aria-hidden="true" /></>}
-            {(indicator === "default" || indicator === "chevron") && <span className="shop-builder-accordion-indicator" uk-icon="icon: chevron-down" aria-hidden="true" />}
-            <span className={`shop-builder-accordion-title-text ${titleStyle !== "inherit" ? getUikitHeadingClass(titleStyle, titleStyle) : ""}`}>{item.title}</span>
-          </a>
-          <div className="uk-accordion-content">
-            <UikitText content={item.content} variant={contentStyle === "inherit" ? "default" : contentStyle} />
-          </div>
-        </li>
-      ))}
-    </ul>
+    <div
+      id={rawBlock.customId || rawBlock.id}
+      className={`shop-builder-column-block shop-builder-column-block--accordion ${generalMarginClass} ${generalTextClass} ${generalAnimClass} ${generalVisClass} ${rawBlock.customClass ?? ""}`.trim()}
+    >
+      <ul
+        ref={rootRef}
+        className={getUikitAccordionClass({
+          style: style as any,
+          indicator: indicator as any,
+          indicatorPosition: indicatorPosition as any,
+          titleEmphasis: titleEmphasis as any,
+          itemSpacing: itemSpacing as any,
+          contentSpacing: contentSpacing as any,
+          divider,
+        })}
+        uk-accordion=""
+        data-accordion-multiple={multiple ? "true" : "false"}
+        data-accordion-collapsible={collapsible ? "true" : "false"}
+      >
+        {items.map((item, index) => {
+          const itemUrl = item.buttonUrl || rawBlock.accordionLinkUrl || "#";
+          const buttonText = item.buttonLabel || rawBlock.accordionLinkText || "Read more";
+          const btnVariant = item.buttonStyle || rawBlock.accordionButtonStyle || "primary";
+          const btnSize = item.buttonSize || rawBlock.accordionButtonSize || "default";
+          const linkTarget = item.buttonTarget || rawBlock.accordionLinkTarget || "_self";
+          const linkStyleClass = getUikitButtonClass(btnVariant, btnSize);
+          const mediaPlacement = item.mediaPlacement ?? rawBlock.accordionMediaPlacement ?? "top";
+
+          return (
+            <li
+              key={item.id || `accordion-item-${index}`}
+              id={item.customId}
+              data-accordion-item-id={item.id || index}
+              className={`${getUikitAccordionItemClass(style as any)} ${item.customClass ?? ""}`.trim()}
+            >
+              <a className="uk-accordion-title" href="#" onClick={(e) => e.preventDefault()}>
+                {indicator === "plus-minus" && (
+                  <>
+                    <span
+                      className="shop-builder-accordion-indicator shop-builder-accordion-indicator--plus"
+                      uk-icon="icon: plus"
+                      aria-hidden="true"
+                    />
+                    <span
+                      className="shop-builder-accordion-indicator shop-builder-accordion-indicator--minus"
+                      uk-icon="icon: minus"
+                      aria-hidden="true"
+                    />
+                  </>
+                )}
+                {(indicator === "default" || indicator === "chevron") && (
+                  <span
+                    className="shop-builder-accordion-indicator"
+                    uk-icon="icon: chevron-down"
+                    aria-hidden="true"
+                  />
+                )}
+                {canShowTitle && item.title && (
+                  <TitleTag
+                    className={`shop-builder-accordion-title-text ${titleHeadingClass} ${titleFontFamilyClass} ${titleColorClass} ${titleAlignClass}`.trim()}
+                  >
+                    {item.title}
+                  </TitleTag>
+                )}
+              </a>
+
+              <div className="uk-accordion-content">
+                {/* Media at Top */}
+                {canShowImage && item.imageUrl && mediaPlacement === "top" && (
+                  <div className="shop-builder-accordion-media uk-margin-bottom">
+                    <img
+                      src={item.imageUrl}
+                      alt={item.imageAlt || item.title || ""}
+                      style={{
+                        width: rawBlock.imageWidth || "100%",
+                        height: rawBlock.imageHeight || "auto",
+                        maxWidth: "100%",
+                        objectFit: "cover",
+                        borderRadius: "4px",
+                      }}
+                    />
+                  </div>
+                )}
+
+                {/* Main Content Text */}
+                {canShowContent && item.content && (
+                  <div className={`${contentStyleClass} ${contentMarginTopClass}`.trim()}>
+                    <UikitText content={item.content} variant={contentStyleVal === "inherit" ? "default" : contentStyleVal} />
+                  </div>
+                )}
+
+                {/* Media at Bottom */}
+                {canShowImage && item.imageUrl && mediaPlacement === "bottom" && (
+                  <div className="shop-builder-accordion-media uk-margin-top">
+                    <img
+                      src={item.imageUrl}
+                      alt={item.imageAlt || item.title || ""}
+                      style={{
+                        width: rawBlock.imageWidth || "100%",
+                        height: rawBlock.imageHeight || "auto",
+                        maxWidth: "100%",
+                        objectFit: "cover",
+                        borderRadius: "4px",
+                      }}
+                    />
+                  </div>
+                )}
+
+                {/* Link / Button */}
+                {canShowLink && (item.buttonUrl || item.buttonLabel) && (
+                  <div className="uk-margin-top">
+                    <a
+                      href={itemUrl}
+                      className={linkStyleClass}
+                      {...builderLinkTargetProps(linkTarget)}
+                    >
+                      {buttonText}
+                    </a>
+                  </div>
+                )}
+              </div>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
   );
 }

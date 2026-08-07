@@ -213,6 +213,17 @@ export function getUikitColumnClass(options?: {
   return classes.join(" ");
 }
 
+export function getUikitTableClass(style?: string, size?: string, hover?: boolean, striping?: boolean) {
+  const classes = ["uk-table"];
+  if (style === "divider") classes.push("uk-table-divider");
+  else if (style === "striped" || striping) classes.push("uk-table-striped");
+  if (size === "small") classes.push("uk-table-small");
+  else if (size === "large") classes.push("uk-table-large");
+  if (hover) classes.push("uk-table-hover");
+  classes.push("uk-table-middle");
+  return classes.join(" ");
+}
+
 /**
  * Maps column width proportion (e.g. span 6 out of 12) to UIkit responsive grid width.
  */

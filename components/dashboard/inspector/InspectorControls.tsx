@@ -84,7 +84,9 @@ export function InspectorSection({ title, description, children, className = "" 
 export function InspectorDivision({ title, children }: { title: string; children: ReactNode }) {
   return (
     <div className="builder-inspector-division">
-      <div className="builder-inspector-division-title">{title}</div>
+      <div className="builder-inspector-division-header">
+        <div className="builder-inspector-division-title">{title}</div>
+      </div>
       <div className="builder-inspector-division-content">{children}</div>
     </div>
   );

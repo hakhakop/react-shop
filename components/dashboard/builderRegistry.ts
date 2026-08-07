@@ -21,13 +21,13 @@ export const sectionLabels: Record<SectionKind, string> = {
 export const layoutBlockLabels: Record<LayoutBlockKind, string> = {
   hero: "Hero",
   button: "Button",
-  promoStrip: "Promo Strip",
   grid: "Grid",
   heading: "Heading",
   image: "Image",
   panel: "Panel",
   accordion: "Accordion",
   table: "Table",
+  gallery: "Gallery",
   text: "Text",
   slider: "Swiper / Carousel",
   scrollPinnedDemo: "Scroll Pinned Demo",
@@ -69,7 +69,6 @@ export const layoutBlockLabels: Record<LayoutBlockKind, string> = {
 export const baseLayoutBlockKinds: LayoutBlockKind[] = [
   "hero",
   "button",
-  "promoStrip",
   "grid",
   "heading",
   "image",
@@ -93,6 +92,7 @@ export const baseLayoutBlockKinds: LayoutBlockKind[] = [
   "divider",
   "accordion",
   "alert",
+  "gallery",
 ];
 
 export const productLayoutBlockKinds: LayoutBlockKind[] = [
@@ -111,13 +111,13 @@ export const productLayoutBlockKinds: LayoutBlockKind[] = [
 export const layoutBlockDescriptions: Record<LayoutBlockKind, string> = {
   hero: "Large intro with eyebrow, title, copy, and button.",
   button: "A standalone call-to-action button.",
-  promoStrip: "Compact announcement, offer, or callout.",
   grid: "Configurable static or dynamic card grid.",
   heading: "A standalone heading with level and alignment options.",
   image: "Simple image block with optional caption metadata.",
   panel: "Image, eyebrow, title, copy, and button in one content block.",
   accordion: "Accessible disclosure list with editable titles and content.",
   text: "Static copy, button, and small editorial content.",
+  gallery: "Interactive image gallery with lightbox, overlay, and filter navigation.",
   table: "Editable data table with headers and styled rows.",
   slider: "Swiper carousel with editable slides and images.",
   scrollPinnedDemo: "An elegant storytelling block with scroll pinning.",
@@ -180,7 +180,7 @@ export const layoutBlockGroups: {
   {
     id: "multiple-items",
     label: "Multiple Items",
-    kinds: ["accordion", "grid", "table", "slider", "badgeGrid", "categoryFilters"],
+    kinds: ["accordion", "grid", "gallery", "table", "slider", "badgeGrid", "categoryFilters"],
   },
   {
     id: "commerce",
@@ -215,7 +215,7 @@ export const layoutBlockGroups: {
   {
     id: "advanced",
     label: "Advanced",
-    kinds: ["promoStrip", "embed", "scrollPinnedDemo"],
+    kinds: ["embed", "scrollPinnedDemo"],
   },
 ];
 

@@ -1,4 +1,6 @@
-import { Suspense, memo } from "react";
+"use client";
+
+import { Suspense, memo, useEffect } from "react";
 import type { CSSProperties, ReactNode } from "react";
 import { builderGeometryCssVariables } from "@/lib/builderGeometry";
 import AntigravityTerminal from "@/components/builder/AntigravityTerminal";
@@ -6,8 +8,23 @@ import AntigravityCanvas from "@/components/builder/AntigravityCanvas";
 import TypewriterText from "@/components/builder/TypewriterText";
 import BuilderLineBreakText from "@/components/builder/BuilderLineBreakText";
 import { RenderChecklist, Typog, blockLegacyGridMargin } from "@/components/builder/BuilderRenderHelpers";
-export { Typog } from "@/components/builder/BuilderRenderHelpers";
 import UikitAccordion from "@/components/builder/UikitAccordion";
+import UikitAlert from "@/components/builder/UikitAlert";
+import UikitBadgeGrid from "@/components/builder/UikitBadgeGrid";
+import UikitBreadcrumbs from "@/components/builder/UikitBreadcrumbs";
+import UikitButton from "@/components/builder/UikitButton";
+import UikitDivider from "@/components/builder/UikitDivider";
+import UikitDatePicker from "@/components/builder/UikitDatePicker";
+import UikitGallery from "@/components/builder/UikitGallery";
+import UikitHeading from "@/components/builder/UikitHeading";
+import UikitIcon from "@/components/builder/UikitIcon";
+import UikitImage from "@/components/builder/UikitImage";
+import UikitList from "@/components/builder/UikitList";
+import UikitTable from "@/components/builder/UikitTable";
+import UikitSlider from "@/components/builder/UikitSlider";
+import UikitFluentForm from "@/components/builder/UikitFluentForm";
+import UikitProducts from "@/components/builder/UikitProducts";
+import UikitCategoryFilters from "@/components/builder/UikitCategoryFilters";
 import UikitText from "@/components/builder/UikitText";
 import { WebPagesIcon } from "@/components/builder/WebPagesIcon";
 import {
@@ -1258,11 +1275,14 @@ function GridCards({
   );
   const gridGapCustom =
     gridGapClass === "custom" ? cssSpacingValue(block.gridGap) : null;
-  const imagePaddingClass = gridSpacingClass(
-    block.gridImagePadding,
-    ["frameless", "none", "small", "medium", "max"],
-    "frameless",
-  );
+  const isAlignWithoutPadding = Boolean((block as any).alignImageWithoutPadding);
+  const imagePaddingClass = isAlignWithoutPadding
+    ? "frameless"
+    : gridSpacingClass(
+        block.gridImagePadding,
+        ["frameless", "none", "small", "medium", "max"],
+        "none",
+      );
   const imagePaddingCustom =
     imagePaddingClass === "custom"
       ? cssSpacingValue(block.gridImagePadding)
@@ -1634,26 +1654,22 @@ export function ContentLayoutBlock({
 }) {
   if (block.kind === "accordion") {
     return (
-      <div className="shop-builder-column-block shop-builder-column-block--accordion">
-        <UikitAccordion
-          items={block.accordionItems ?? []}
-          multiple={block.accordionMultiple}
-          collapsible={block.accordionCollapsible}
-          active={block.accordionOpenItems}
-          style={block.accordionStyle}
-          indicator={block.accordionIndicator}
-          indicatorPosition={block.accordionIndicatorPosition}
-          titleEmphasis={block.accordionTitleEmphasis}
-          itemSpacing={block.accordionItemSpacing}
-          contentSpacing={block.accordionContentSpacing}
-          divider={block.accordionDivider}
-          titleStyle={block.accordionTitleStyle}
-          contentStyle={block.accordionContentStyle}
-          legacyRowStyle={block.accordionRowStyle}
-          legacySpacing={block.accordionSpacing}
-          legacyOpenEmphasis={block.accordionOpenEmphasis}
-        />
-      </div>
+      <UikitAccordion
+        block={block}
+        items={block.accordionItems ?? []}
+        multiple={block.accordionMultiple}
+        collapsible={block.accordionCollapsible}
+        active={block.accordionOpenItems}
+        style={block.accordionStyle}
+        indicator={block.accordionIndicator}
+        indicatorPosition={block.accordionIndicatorPosition}
+        titleEmphasis={block.accordionTitleEmphasis}
+        itemSpacing={block.accordionItemSpacing}
+        contentSpacing={block.accordionContentSpacing}
+        divider={block.accordionDivider}
+        titleStyle={block.accordionTitleStyle}
+        contentStyle={block.accordionContentStyle}
+      />
     );
   }
 
@@ -1675,67 +1691,15 @@ export function ContentLayoutBlock({
   }
 
   if (block.kind === "button") {
-    const rawBlock = block as any;
-    const marginClass = rawBlock.margin && rawBlock.margin !== "none" && rawBlock.margin !== "default" ? `uk-margin-${rawBlock.margin}` : "";
-    const animationClass = rawBlock.animation && rawBlock.animation !== "none" ? `uk-animation-${rawBlock.animation}` : "";
-    const visibilityClass = rawBlock.visibility && rawBlock.visibility !== "always" ? `uk-${rawBlock.visibility}` : "";
-    const alignClass = rawBlock.buttonAlign === "center" ? "uk-flex-center" : rawBlock.buttonAlign === "right" ? "uk-flex-right" : "";
-
-    return (
-      <div className={`shop-builder-column-block shop-builder-column-block--button ${marginClass} ${animationClass} ${visibilityClass}`.trim()}>
-        <div
-          className={`uk-flex uk-flex-wrap ${alignClass} ${rawBlock.buttonsLayout === "stacked" ? "uk-flex-column" : "uk-flex-middle"}`.trim()}
-          style={{ gap: rawBlock.buttonGap || "0.75rem" }}
-        >
-          {rawBlock.buttonLabel && rawBlock.buttonUrl && (
-            <a
-              className={getUikitButtonClass(rawBlock.buttonStyle ?? "primary", rawBlock.size)}
-              href={rawBlock.buttonUrl}
-              {...builderLinkTargetProps(rawBlock.buttonTarget)}
-            >
-              {rawBlock.buttonLabel}
-            </a>
-          )}
-          {(rawBlock.buttons ?? []).map((btn: any, btnIdx: number) => (
-            <a
-              key={btn.id ?? btnIdx}
-              className={getUikitButtonClass(btn.style ?? "primary", btn.size ?? rawBlock.size)}
-              href={btn.url}
-              {...builderLinkTargetProps(btn.target)}
-            >
-              {btn.label}
-            </a>
-          ))}
-        </div>
-      </div>
-    );
+    return <UikitButton block={block} />;
   }
 
   if (block.kind === "breadcrumbs") {
-    return (
-      <div className="shop-builder-column-block shop-builder-column-block--breadcrumbs">
-        <Breadcrumbs items={breadcrumbItems} />
-      </div>
-    );
+    return <UikitBreadcrumbs block={block} items={breadcrumbItems} />;
   }
 
   if (block.kind === "categoryFilters") {
-    return (
-      <div className="shop-builder-column-block shop-builder-column-block--category-filters">
-        <Suspense
-          fallback={
-            <div className="shop-builder-column-empty">
-              Loading categories...
-            </div>
-          }
-        >
-          <CategoryFiltersBlock
-            hiddenCategorySlugs={block.hiddenCategorySlugs}
-            website={website}
-          />
-        </Suspense>
-      </div>
-    );
+    return <UikitCategoryFilters block={block as any} />;
   }
 
   if (product && block.id?.includes("product-media")) {
@@ -1777,42 +1741,7 @@ export function ContentLayoutBlock({
   }
 
   if (block.kind === "slider") {
-    const slides: CarouselSlide[] =
-      block.slides?.map((slide, index) => ({
-        id: slide.id ?? `${block.id}-slide-${index}`,
-        title: slide.title,
-        subtitle: slide.subtitle,
-        text: slide.text,
-        badge: slide.badge,
-        imageUrl: slide.imageUrl,
-        imageAlt: slide.imageAlt,
-        imagePadding: slide.imagePadding,
-        buttonLabel: slide.buttonLabel,
-        buttonUrl: slide.buttonUrl,
-      })) ?? [];
-
-    return (
-      <div className="shop-builder-column-block shop-builder-column-block--slider">
-        {block.title && (
-          <Typog as="h3" typography={block.typography}>
-            <BuilderLineBreakText text={block.title} />
-          </Typog>
-        )}
-        {block.body && (
-          <Typog as="p" typography={block.typography}>
-            {block.body}
-          </Typog>
-        )}
-        <CarouselBlock
-          block={{
-            __typename: "PageBuilderLayoutPageBuilderCarouselLayoutLayout",
-            fieldGroupName: "ReactBuilderColumnSlider",
-          }}
-          slides={slides}
-          settings={block.carouselSettings}
-        />
-      </div>
-    );
+    return <UikitSlider block={block as any} />;
   }
 
   if (block.kind === "scrollPinnedDemo") {
@@ -1851,98 +1780,15 @@ export function ContentLayoutBlock({
   }
 
   if (block.kind === "fluentForm") {
-    return (
-      <div className="shop-builder-column-block shop-builder-column-block--fluent-form">
-        <FluentFormClient formId={block.fluentFormId} title={block.title} />
-      </div>
-    );
+    return <UikitFluentForm block={block as any} />;
   }
 
   if (block.kind === "badgeGrid") {
-    const badges = block.badges?.length
-      ? block.badges
-      : [
-          {
-            id: "one",
-            label: "01",
-            title: "Fast setup",
-            body: "Reusable settings.",
-          },
-          {
-            id: "two",
-            label: "02",
-            title: "Clean blocks",
-            body: "Flat nested sections.",
-          },
-        ];
-
-    return (
-      <div className="shop-builder-column-block shop-builder-column-block--badges">
-        {block.title && (
-          <Typog as="h3" typography={block.typography}>
-            <BuilderLineBreakText text={block.title} />
-          </Typog>
-        )}
-        {block.body && (
-          <Typog as="p" typography={block.typography}>
-            {block.body}
-          </Typog>
-        )}
-        <div
-          className="shop-builder-column-badges"
-          style={
-            {
-              "--builder-column-badge-columns": block.columns ?? 2,
-            } as CSSProperties
-          }
-        >
-          {badges.map((badge, index) => (
-            <article key={badge.id ?? index}>
-              {badge.label && <span className={getUikitBadgeClass((badge as any).style ?? "primary")}>{badge.label}</span>}
-              {badge.title && (
-                <Typog as="strong" typography={block.typography}>
-                  <BuilderLineBreakText text={badge.title} />
-                </Typog>
-              )}
-              {badge.body && (
-                <Typog as="p" typography={block.typography}>
-                  {badge.body}
-                </Typog>
-              )}
-              {badge.items && badge.items.length > 0 && (
-                <RenderChecklist
-                  items={badge.items}
-                  iconName={badge.listIcon || "check"}
-                  colorScheme={badge.listIconColorScheme || "default"}
-                  typography={block.typography}
-                  iconSize={badge.listIconSize}
-                />
-              )}
-            </article>
-          ))}
-        </div>
-      </div>
-    );
+    return <UikitBadgeGrid block={block as any} />;
   }
 
   if (block.kind === "products") {
-    return (
-      <div className="shop-builder-column-block shop-builder-column-block--products">
-        {block.title && (
-          <Typog as="h3" typography={block.typography}>
-            <BuilderLineBreakText text={block.title} />
-          </Typog>
-        )}
-        <Suspense fallback={<ProductsSkeleton />}>
-          <ContentProductsBlock
-            block={block}
-            categoryTree={categoryTree}
-            activeCategorySlug={activeCategorySlug}
-            website={website}
-          />
-        </Suspense>
-      </div>
-    );
+    return <UikitProducts block={block as any} />;
   }
 
   if (block.kind === "grid") {
@@ -1956,169 +1802,31 @@ export function ContentLayoutBlock({
   }
 
   if (block.kind === "icon") {
-    return (
-      <div className="shop-builder-column-block shop-builder-column-block--icon">
-        <GoodieIcon iconName={block.iconName} size={block.iconSize ?? block.listIconSize ?? 28} />
-        {block.title && (
-          <Typog as="h3" typography={block.typography}>
-            <BuilderLineBreakText text={block.title} />
-          </Typog>
-        )}
-        {block.body && (
-          <Typog as="p" typography={block.typography}>
-            {block.body}
-          </Typog>
-        )}
-      </div>
-    );
+    return <UikitIcon block={block} />;
   }
 
   if (block.kind === "list") {
-    const listClass = getUikitListClass({ presentation: block.listPresentation, marker: block.listMarker, align: block.listAlign, spacing: block.listSpacing });
-    const listItems: BuilderListItem[] = block.listItems ?? (block.items ?? []).map((text, index) => ({ id: `${block.id ?? "list"}-item-${index}`, text }));
-    return (
-      <div className="shop-builder-column-block shop-builder-column-block--list">
-        {block.title && (
-          <Typog as="h3" typography={block.typography}>
-            <BuilderLineBreakText text={block.title} />
-          </Typog>
-        )}
-        <ul className={listClass}>
-          {listItems.map((item) => (
-            <li key={item.id} className="webpages-list-item">
-              {resolveUikitIconName(item.iconName ?? block.listIcon) && (
-                <WebPagesIcon name={item.iconName ?? block.listIcon} size={item.iconSize ?? block.listIconSize ?? 16} />
-              )}
-              {item.url ? <a href={item.url} {...builderLinkTargetProps(item.target)}>{item.text}</a> : item.text}
-            </li>
-          ))}
-        </ul>
-      </div>
-    );
+    return <UikitList block={block} />;
   }
 
   if (block.kind === "divider") {
-    const rawBlock = block as any;
-    const dividerClass = getUikitDividerClass(rawBlock.dividerStyle || rawBlock.preset);
-    return (
-      <div className="shop-builder-column-block shop-builder-column-block--divider uk-margin">
-        <hr className={dividerClass} />
-      </div>
-    );
+    return <UikitDivider block={block} />;
   }
 
   if (block.kind === "alert") {
-    const rawBlock = block as any;
-    const alertClass = getUikitAlertClass(rawBlock.status || rawBlock.alertStyle || rawBlock.preset);
-    return (
-      <div className="shop-builder-column-block shop-builder-column-block--alert">
-        <div className={alertClass}>
-          {rawBlock.title && <h4 className="uk-margin-remove-top">{rawBlock.title}</h4>}
-          {rawBlock.body && <p className="uk-margin-remove-bottom">{rawBlock.body}</p>}
-          {rawBlock.content && <p className="uk-margin-remove-bottom">{rawBlock.content}</p>}
-        </div>
-      </div>
-    );
+    return <UikitAlert block={block} />;
   }
 
   if (block.kind === "heading") {
-    const rawBlock = block as any;
-    const Tag = (rawBlock.headingLevel ?? rawBlock.headingElement ?? "h2") as any;
-    const styleVal = rawBlock.headingStyle ?? rawBlock.headingSize;
-    const uikitHeadingClass = styleVal && styleVal !== "none" && styleVal !== "inherit"
-      ? (styleVal.startsWith("heading-") || ["h1","h2","h3","h4","h5","h6"].includes(styleVal) ? `uk-${styleVal}` : getUikitHeadingClass(Tag, styleVal))
-      : getUikitHeadingClass(Tag, "default");
-    const decorationClass = rawBlock.titleDecoration ? `uk-heading-${rawBlock.titleDecoration}` : "";
-    const alignClass = rawBlock.headingAlign ? `uk-text-${rawBlock.headingAlign}` : "";
-    const marginClass = rawBlock.margin && rawBlock.margin !== "none" && rawBlock.margin !== "default" ? `uk-margin-${rawBlock.margin}` : "";
-    const animationClass = rawBlock.animation && rawBlock.animation !== "none" ? `uk-animation-${rawBlock.animation}` : "";
-    const visibilityClass = rawBlock.visibility && rawBlock.visibility !== "always" ? `uk-${rawBlock.visibility}` : "";
-    const isGradient = rawBlock.textGradientPreset && rawBlock.textGradientPreset !== "none";
-    const isCustom = rawBlock.textGradientPreset === "custom";
-    const titleClassName = [
-      "shop-builder-title",
-      uikitHeadingClass,
-      decorationClass,
-      alignClass,
-      typographyRoleClass(rawBlock.headingTypographyRole),
-      isGradient && !isCustom ? `text-gradient--${rawBlock.textGradientPreset}` : "",
-    ].filter(Boolean).join(" ");
+    return <UikitHeading block={block as any} />;
+  }
 
-    const compStyle = getHeadingTypographyStyles(rawBlock.typography, Boolean(isGradient));
-
-    const gradientStyle = isCustom
-      ? {
-          backgroundImage: `linear-gradient(${rawBlock.textGradientCustomAngle ?? 135}deg, ${rawBlock.textGradientCustomStart ?? "#ffffff"} ${rawBlock.textGradientCustomStartOffset ?? 0}%, ${rawBlock.textGradientCustomMiddle ?? "#60a5fa"} ${rawBlock.textGradientCustomMiddleOffset ?? 50}%, ${rawBlock.textGradientCustomEnd ?? "#c084fc"} ${rawBlock.textGradientCustomEndOffset ?? 100}%)`,
-          WebkitBackgroundClip: "text",
-          WebkitTextFillColor: "transparent",
-          backgroundClip: "text",
-          display: "inline-block",
-        }
-      : {};
-
-    const combinedStyle = {
-      ...compStyle,
-      ...gradientStyle,
-      textAlign: rawBlock.headingAlign ?? "left",
-    };
-
-    return (
-      <div className={`shop-builder-column-block shop-builder-column-block--heading ${marginClass} ${animationClass} ${visibilityClass}`.trim()}>
-        <Tag className={titleClassName} style={Object.keys(combinedStyle).length > 0 ? combinedStyle : undefined}>
-          {block.typewriterEnabled ? (
-            <TypewriterText
-              text={block.headingText ?? "Your Heading Text"}
-              phrases={block.typewriterPhrases}
-              speed={block.typewriterSpeed}
-              eraseSpeed={block.typewriterEraseSpeed}
-              delay={block.typewriterDelay}
-              loop={block.typewriterLoop}
-              useGradient={block.typewriterUseGradient}
-              gradientPreset={
-                block.textGradientPreset ?? block.typewriterGradientPreset
-              }
-              customStart={block.textGradientCustomStart}
-              customMiddle={block.textGradientCustomMiddle}
-              customEnd={block.textGradientCustomEnd}
-              customAngle={block.textGradientCustomAngle}
-              customStartOffset={block.textGradientCustomStartOffset}
-              customMiddleOffset={block.textGradientCustomMiddleOffset}
-              customEndOffset={block.textGradientCustomEndOffset}
-              area="title"
-              preserveHeight={block.typewriterPreserveHeight !== false}
-              reservedLines={block.typewriterReservedLines ?? 1}
-              mobileReservedLines={block.typewriterMobileReservedLines ?? 2}
-            />
-          ) : (
-            <BuilderLineBreakText
-              text={block.headingText ?? "Your Heading Text"}
-            />
-          )}
-        </Tag>
-      </div>
-    );
+  if (block.kind === "gallery") {
+    return <UikitGallery block={block as any} />;
   }
 
   if (block.kind === "datePicker") {
-    return (
-      <div className="shop-builder-column-block shop-builder-column-block--date-picker">
-        <CalendarDays size={24} />
-        {block.title && (
-          <Typog as="h3" typography={block.typography}>
-            <BuilderLineBreakText text={block.title} />
-          </Typog>
-        )}
-        {block.body && (
-          <Typog as="p" typography={block.typography}>
-            {block.body}
-          </Typog>
-        )}
-        <label>
-          <span>{block.dateLabel ?? "Preferred date"}</span>
-          <input type="date" />
-        </label>
-      </div>
-    );
+    return <UikitDatePicker block={block as any} />;
   }
 
   if (block.kind === "cartContent") {
@@ -2366,113 +2074,7 @@ export function ContentLayoutBlock({
     );
   }
 
-  if (block.kind === "promoStrip") {
-    return (
-      <div className="shop-builder-column-block shop-builder-column-block--promo-strip">
-        <div>
-          {block.eyebrow && (
-            <Typog
-              as="span"
-              className="uk-label uk-label-primary"
-              typography={block.typography}
-              area="eyebrow"
-            >
-              {block.eyebrow}
-            </Typog>
-          )}
-          {block.title && (
-            <Typog as="h3" typography={block.typography} area="title">
-              {block.typewriterEnabled ? (
-                <TypewriterText
-                  text={block.title}
-                  phrases={block.typewriterPhrases}
-                  speed={block.typewriterSpeed}
-                  eraseSpeed={block.typewriterEraseSpeed}
-                  delay={block.typewriterDelay}
-                  loop={block.typewriterLoop}
-                  useGradient={block.typewriterUseGradient}
-                  gradientPreset={
-                    block.textGradientPreset ?? block.typewriterGradientPreset
-                  }
-                  customStart={block.textGradientCustomStart}
-                  customMiddle={block.textGradientCustomMiddle}
-                  customEnd={block.textGradientCustomEnd}
-                  customAngle={block.textGradientCustomAngle}
-                  customStartOffset={block.textGradientCustomStartOffset}
-                  customMiddleOffset={block.textGradientCustomMiddleOffset}
-                  customEndOffset={block.textGradientCustomEndOffset}
-                  typography={block.typography}
-                  area="title"
-                  preserveHeight={block.typewriterPreserveHeight !== false}
-                  reservedLines={block.typewriterReservedLines ?? 1}
-                  mobileReservedLines={block.typewriterMobileReservedLines ?? 2}
-                />
-              ) : (
-                <BuilderLineBreakText text={block.title} />
-              )}
-            </Typog>
-          )}
-          {block.body && (
-            <Typog as="p" typography={block.typography} area="body">
-              {block.typewriterEnabled && !block.title ? (
-                <TypewriterText
-                  text={block.body}
-                  phrases={block.typewriterPhrases}
-                  speed={block.typewriterSpeed}
-                  eraseSpeed={block.typewriterEraseSpeed}
-                  delay={block.typewriterDelay}
-                  loop={block.typewriterLoop}
-                  useGradient={block.typewriterUseGradient}
-                  gradientPreset={
-                    block.textGradientPreset ?? block.typewriterGradientPreset
-                  }
-                  customStart={block.textGradientCustomStart}
-                  customMiddle={block.textGradientCustomMiddle}
-                  customEnd={block.textGradientCustomEnd}
-                  customAngle={block.textGradientCustomAngle}
-                  customStartOffset={block.textGradientCustomStartOffset}
-                  customMiddleOffset={block.textGradientCustomMiddleOffset}
-                  customEndOffset={block.textGradientCustomEndOffset}
-                  typography={block.typography}
-                  area="body"
-                  preserveHeight={block.typewriterPreserveHeight !== false}
-                  reservedLines={block.typewriterReservedLines ?? 1}
-                  mobileReservedLines={block.typewriterMobileReservedLines ?? 2}
-                />
-              ) : (
-                block.body
-              )}
-            </Typog>
-          )}
-        </div>
-        {block.buttonLabel && block.buttonUrl && (
-          <Typog
-            as="a"
-            className="shop-builder-cta"
-            href={block.buttonUrl}
-            {...builderLinkTargetProps(block.buttonTarget)}
-            typography={block.typography}
-            area="button"
-          >
-            {block.buttonLabel}
-          </Typog>
-        )}
-        {(block.buttons ?? []).map((btn, btnIdx) => (
-          <Typog
-            key={btn.id ?? btnIdx}
-            as="a"
-            className={`shop-builder-cta shop-builder-cta--${btn.style ?? "primary"}`}
-            href={btn.url}
-            {...builderLinkTargetProps(btn.target)}
-            typography={block.typography}
-            area="button"
-          >
-            {btn.label}
-          </Typog>
-        ))}
-      </div>
-    );
-  }
+
 
   if (block.kind === "panel") {
     const panelTitleStyle = {
@@ -2633,101 +2235,11 @@ export function ContentLayoutBlock({
   }
 
   if (block.kind === "image") {
-    const imageSemantics = resolveUikitImageSemantics(block);
-    const imageStyle = getUikitImageStyle(imageSemantics);
-    const imageAttributes = getUikitImageAttributes(imageSemantics);
-    const imageClass = getUikitImageClass(imageSemantics);
-    const figureClass = getUikitImageWrapperClass(imageSemantics);
-
-    if (!block.imageUrl) {
-      return null;
-    }
-
-    const image = (
-      <img
-        className={imageClass}
-        src={block.imageUrl}
-        alt={block.imageAlt ?? ""}
-        width={1200}
-        height={800}
-        loading={block.imageLoading ?? "lazy"}
-        {...imageAttributes}
-        style={{
-          width: "100%",
-          height: imageStyle.aspectRatio ? "100%" : "auto",
-          objectFit: imageStyle.objectFit,
-          ...(imageStyle.position ? { position: imageStyle.position, inset: imageStyle.inset } : {}),
-        }}
-      />
-    );
-
-    return (
-      <div className="shop-builder-column-block shop-builder-column-block--image">
-        <figure
-          className={`shop-builder-image-figure ${figureClass}`}
-          style={{
-            textAlign: block.imageAlignment ?? "center",
-            maxWidth: imageStyle.maxWidth ?? (block.imageMaxWidth ? `${block.imageMaxWidth}px` : undefined),
-            width: imageStyle.width,
-            marginInline: block.imageAlignment === "left" ? "0 auto" : block.imageAlignment === "right" ? "0 0 0 auto" : "auto",
-          }}
-        >
-          <div
-            className={`shop-builder-image-media ${imageStyle.aspectRatio ? "uk-cover-container" : ""}`}
-            data-image-ratio={imageStyle.aspectRatio ? "true" : undefined}
-            style={{
-              aspectRatio: imageStyle.aspectRatio,
-              width: "100%",
-            }}
-          >
-            {block.imageLinkUrl ? (
-              <a href={block.imageLinkUrl} {...builderLinkTargetProps(block.imageLinkTarget)}>{image}</a>
-            ) : image}
-          </div>
-          {block.imageCaption && <figcaption>{block.imageCaption}</figcaption>}
-        </figure>
-      </div>
-    );
+    return <UikitImage block={block} />;
   }
 
   if (block.kind === "table") {
-    const headLength = (block.tableHeadings ?? []).length;
-    return (
-      <div className="shop-builder-column-block shop-builder-column-block--table">
-        <div style={{ overflowX: "auto" }}>
-          <table
-            className={`builder-preview-table builder-preview-table--${block.tableStyle ?? "striped"}`}
-            style={{
-              width: "100%",
-              borderCollapse: "collapse",
-              fontSize: "0.9em",
-            }}
-          >
-            {headLength > 0 && (
-              <thead>
-                <tr>
-                  {(block.tableHeadings ?? []).map((heading, hIdx) => (
-                    <th key={hIdx}>{heading}</th>
-                  ))}
-                </tr>
-              </thead>
-            )}
-            <tbody>
-              {(block.tableRows ?? []).map((row, rIdx) => (
-                <tr key={rIdx}>
-                  {Array.from(
-                    { length: Math.max(headLength, row.length) },
-                    (_, cIdx) => (
-                      <td key={cIdx}>{row[cIdx] ?? ""}</td>
-                    ),
-                  )}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    );
+    return <UikitTable block={block} />;
   }
 
   return (
@@ -3527,25 +3039,20 @@ function StorefrontBuilderRendererBase({
   const pullUnderHeader = firstVisibleSection?.pullUnderHeader === true;
   const RootElement = rootElement;
 
+  useEffect(() => {
+    if (!isPageDocument) return;
+    const scheme = layout.design?.colorScheme ?? "auto";
+    if (scheme === "dark") {
+      document.documentElement.dataset.theme = "dark";
+      document.documentElement.classList.add("dark");
+    } else if (scheme === "light") {
+      document.documentElement.dataset.theme = "light";
+      document.documentElement.classList.remove("dark");
+    }
+  }, [isPageDocument, layout.design?.colorScheme]);
+
   return (
     <>
-      {isPageDocument ? <script
-        key={layout.design?.colorScheme ?? "auto"}
-        dangerouslySetInnerHTML={{
-          __html: `
-            (function() {
-              const scheme = ${JSON.stringify(layout.design?.colorScheme ?? "auto")};
-              if (scheme === "dark") {
-                document.documentElement.dataset.theme = "dark";
-                document.documentElement.classList.add("dark");
-              } else if (scheme === "light") {
-                document.documentElement.dataset.theme = "light";
-                document.documentElement.classList.remove("dark");
-              }
-            })();
-          `.trim(),
-        }}
-      /> : null}
       {isPageDocument ? <style
         data-builder-page-shell
         dangerouslySetInnerHTML={{ __html: builderPageShellCss(layout) }}

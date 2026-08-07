@@ -22,6 +22,11 @@ const sources = {
   registry: readFileSync(resolve(root, "components/dashboard/builderRegistry.ts"), "utf8"),
   types: readFileSync(resolve(root, "components/dashboard/builderTypes.ts"), "utf8"),
   defaults: readFileSync(resolve(root, "components/dashboard/builderDefaults.ts"), "utf8"),
+  uikitDivider: readFileSync(resolve(root, "components/builder/UikitDivider.tsx"), "utf8"),
+  uikitAlert: readFileSync(resolve(root, "components/builder/UikitAlert.tsx"), "utf8"),
+  uikitHeading: readFileSync(resolve(root, "components/builder/UikitHeading.tsx"), "utf8"),
+  uikitText: readFileSync(resolve(root, "components/builder/UikitText.tsx"), "utf8"),
+  headingCapabilityPanel: readFileSync(resolve(root, "components/dashboard/inspector/panels/HeadingCapabilityPanel.tsx"), "utf8"),
 };
 
 const require = createRequire(import.meta.url);
@@ -36,7 +41,14 @@ function loadTypeScriptModule(path, dependencies = {}) {
     fileName: path,
   }).outputText;
   const mod = { exports: {} };
-  const localRequire = (specifier) => dependencies[specifier] ?? require(specifier);
+  const localRequire = (specifier) => {
+    if (dependencies[specifier]) return dependencies[specifier];
+    if (specifier.startsWith("@/")) {
+      const targetPath = resolve(root, specifier.replace(/^@\//, "") + (specifier.endsWith(".ts") ? "" : ".ts"));
+      return loadTypeScriptModule(targetPath, dependencies);
+    }
+    return require(specifier);
+  };
   new Function("require", "module", "exports", output)(localRequire, mod, mod.exports);
   return mod.exports;
 }
@@ -61,7 +73,7 @@ const headerHeightRuntime = loadTypeScriptModule(
 const contracts = [
   { element: "all text-capable elements", field: "typography", inspector: ["TypographyPanel", "updateTypographyArea"], builder: ["typographyProps"], storefront: ["typographyProps"], shared: ["resolveTypographyInput"] },
   { element: "text", field: "title/body/button/eyebrow typography", inspector: ['kind === "text"', '"title", "body", "button", "eyebrow"'], builder: ["InlineEditableText", "block.typography"], storefront: ["Typog", "block.typography"], shared: ["updateTypographyArea"] },
-  { element: "heading", field: "headingAlign", inspector: ["headingAlign"], builder: ["block.headingAlign"], storefront: ["rawBlock.headingAlign"], shared: [] },
+  { element: "heading", field: "headingAlign", inspector: ["headingAlign"], builder: ["headingAlign"], storefront: ["headingAlign"], shared: [] },
   { element: "button-capable elements", field: "button typography and style", inspector: ["buttonStyle", "buttonPaddingY", "buttonPaddingX"], builder: ["blockButtonCssVars", "shop-builder-cta"], storefront: ["builderButtonOverrideCssVars", "shop-builder-cta"], shared: [] },
   { element: "all elements", field: "elementAlign", inspector: ["elementAlign"], builder: ["shop-builder-element-shell", "block.elementAlign"], storefront: ["shop-builder-element-shell", "block.elementAlign"], shared: [] },
   { element: "all elements", field: "spacing", inspector: ["visualStyle", "elementPadding"], builder: ["visualStyleToCss", "resolveBuilderSpacing"], storefront: ["visualStyleToCss", "resolveBuilderSpacing"], shared: ["resolveBuilderSpacing"] },
@@ -80,10 +92,12 @@ const report = [];
 
 for (const contract of contracts) {
   const checks = {
-    inspector: contract.inspector.every((token) => sources.inspector.includes(token)),
-    builder: contract.builder.every((token) => sources.builder.includes(token)),
+    inspector: contract.inspector.every((token) => `${sources.inspector}\n${sources.headingCapabilityPanel}`.includes(token)),
+    builder: contract.builder.every((token) =>
+      `${sources.builder}\n${sources.uikitHeading}\n${sources.uikitText}\n${sources.uikitDivider}\n${sources.uikitAlert}`.includes(token),
+    ),
     storefront: contract.storefront.every((token) =>
-      `${sources.storefront}\n${sources.headerView}\n${sources.headerDropdown}`.includes(token),
+      `${sources.storefront}\n${sources.headerView}\n${sources.headerDropdown}\n${sources.uikitHeading}\n${sources.uikitDivider}\n${sources.uikitAlert}`.includes(token),
     ),
     shared: contract.shared.every((token) =>
       `${sharedSource}\n${sources.headerComposition}\n${sources.headerHeight}`.includes(token),
@@ -286,37 +300,31 @@ const behavioralReport = [
     return "Both renderers call getUikitGridClass & getUikitColumnWidthClass with zero 12-column grid math";
   }),
   behavioralCase("uikit divider", "canonical UIkit divider element enforcement", () => {
-    assert(sources.inspector.includes('block.kind === "divider"'), "DashboardInspector.tsx has no divider branch");
-    assert(sources.inspector.includes("dividerStyle"), "DashboardInspector.tsx does not edit dividerStyle");
-    assert(sources.builder.includes('block.kind === "divider"'), "DashboardBuilder.tsx has no divider branch");
-    assert(sources.builder.includes("getUikitDividerClass"), "DashboardBuilder.tsx does not call getUikitDividerClass");
-    assert(sources.builder.includes("shop-builder-column-block--divider"), "DashboardBuilder.tsx does not render the divider wrapper class");
-    assert(sources.storefront.includes("getUikitDividerClass"), "StorefrontBuilderRenderer.tsx does not call getUikitDividerClass");
-    assert(sources.storefront.includes("shop-builder-column-block--divider"), "StorefrontBuilderRenderer.tsx does not render the divider wrapper class");
+    assert(sources.inspector.includes("dividerStyle") || sources.inspector.includes("DividerCapabilityPanel"), "DashboardInspector.tsx has no divider style capability");
+    assert(sources.builder.includes("UikitDivider"), "DashboardBuilder.tsx does not use UikitDivider");
+    assert(sources.uikitDivider.includes("getUikitDividerClass"), "UikitDivider.tsx does not call getUikitDividerClass");
+    assert(sources.uikitDivider.includes("shop-builder-column-block--divider"), "UikitDivider.tsx does not render the divider wrapper class");
+    assert(sources.storefront.includes("UikitDivider"), "StorefrontBuilderRenderer.tsx does not use UikitDivider");
     assert(sources.registry.includes("divider"), "divider not registered in builderRegistry");
     return "divider registered in palette, defaults, inspector, and both renderers via getUikitDividerClass";
   }),
   behavioralCase("uikit alert", "canonical UIkit alert element enforcement", () => {
-    assert(sources.inspector.includes('block.kind === "alert"'), "DashboardInspector.tsx has no alert branch");
-    assert(sources.inspector.includes("alertStyle"), "DashboardInspector.tsx does not edit alertStyle");
-    assert(sources.builder.includes('block.kind === "alert"'), "DashboardBuilder.tsx has no alert branch");
-    assert(sources.builder.includes("getUikitAlertClass"), "DashboardBuilder.tsx does not call getUikitAlertClass");
-    assert(sources.builder.includes("shop-builder-column-block--alert"), "DashboardBuilder.tsx does not render the alert wrapper class");
-    assert(sources.storefront.includes("getUikitAlertClass"), "StorefrontBuilderRenderer.tsx does not call getUikitAlertClass");
-    assert(sources.storefront.includes("shop-builder-column-block--alert"), "StorefrontBuilderRenderer.tsx does not render the alert wrapper class");
+    assert(sources.inspector.includes("alertStyle") || sources.inspector.includes("AlertCapabilityPanel"), "DashboardInspector.tsx has no alert branch");
+    assert(sources.builder.includes("UikitAlert"), "DashboardBuilder.tsx does not use UikitAlert");
+    assert(sources.uikitAlert.includes("getUikitAlertClass"), "UikitAlert.tsx does not call getUikitAlertClass");
+    assert(sources.uikitAlert.includes("shop-builder-column-block--alert"), "UikitAlert.tsx does not render the alert wrapper class");
+    assert(sources.storefront.includes("UikitAlert"), "StorefrontBuilderRenderer.tsx does not use UikitAlert");
     assert(sources.registry.includes("alert"), "alert not registered in builderRegistry");
     const invalidVariants = ['"error"', '"caution"', '"info"'].filter((v) => sources.inspector.includes(v));
     assert(invalidVariants.length === 0, `Alert inspector offers non-UIkit variants: ${invalidVariants.join(", ")}`);
     return "alert registered in palette, defaults, inspector, and both renderers via getUikitAlertClass; inspector exposes only primary/success/warning/danger";
   }),
   behavioralCase("uikit heading", "canonical UIkit heading element enforcement", () => {
-    assert(sources.inspector.includes('block.kind === "heading"'), "DashboardInspector.tsx has no heading branch");
-    assert(sources.inspector.includes("headingSize"), "DashboardInspector.tsx does not edit headingSize");
-    assert(sources.builder.includes('block.kind === "heading"'), "DashboardBuilder.tsx has no heading branch");
-    assert(sources.builder.includes("getUikitHeadingClass"), "DashboardBuilder.tsx does not call getUikitHeadingClass");
-    assert(sources.builder.includes("shop-builder-column-block--heading"), "DashboardBuilder.tsx does not render the heading wrapper class");
-    assert(sources.storefront.includes("getUikitHeadingClass"), "StorefrontBuilderRenderer.tsx does not call getUikitHeadingClass");
-    assert(sources.storefront.includes("shop-builder-column-block--heading"), "StorefrontBuilderRenderer.tsx does not render the heading wrapper class");
+    assert(sources.inspector.includes("headingSize") || sources.inspector.includes("HeadingCapabilityPanel"), "DashboardInspector.tsx has no heading branch");
+    assert(sources.builder.includes("UikitHeading"), "DashboardBuilder.tsx does not use UikitHeading");
+    assert(sources.uikitHeading.includes("getUikitHeadingClass"), "UikitHeading.tsx does not call getUikitHeadingClass");
+    assert(sources.uikitHeading.includes("shop-builder-column-block--heading"), "UikitHeading.tsx does not render the heading wrapper class");
+    assert(sources.storefront.includes("UikitHeading"), "StorefrontBuilderRenderer.tsx does not use UikitHeading");
     assert(sources.registry.includes("heading"), "heading not registered in builderRegistry");
     assert(sources.types.includes('headingSize?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "article-title" | "small" | "medium" | "large" | "xlarge"'), "BuilderLayoutBlock is missing the headingSize UIkit preset union");
     assert(sources.defaults.includes('headingSize: "medium"'), "createLayoutBlock heading defaults omit headingSize");

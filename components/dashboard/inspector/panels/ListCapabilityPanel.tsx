@@ -5,10 +5,18 @@ import type { BuilderLayoutBlock, BuilderListItem, InspectorTab } from "@/compon
 import type { BuilderShellSettings } from "@/lib/builderShell";
 import { UIKIT_LIST_CAPABILITY } from "@/lib/uikitCapabilities";
 import { BUILDER_LINK_TARGET_OPTIONS } from "@/lib/websiteBuilderLinks";
-import { InspectorFieldRow, InspectorPillGroup, InspectorSelect, InspectorTextField, InspectorAlignmentControl } from "@/components/dashboard/inspector/InspectorControls";
+import {
+  InspectorDivision,
+  InspectorFieldRow,
+  InspectorPillGroup,
+  InspectorSelect,
+  InspectorTextField,
+  InspectorTextarea,
+  InspectorAlignmentControl,
+} from "@/components/dashboard/inspector/InspectorControls";
 import IconPicker from "@/components/dashboard/inspector/IconPicker";
 import RepeatableItemShell from "@/components/dashboard/inspector/RepeatableItemShell";
-import { GeneralSettingsGroup } from "@/components/dashboard/inspector/panels/SharedSettingGroups";
+import GeneralSettingsPanel from "@/components/dashboard/inspector/panels/GeneralSettingsPanel";
 
 type Props = {
   block: BuilderLayoutBlock;
@@ -45,7 +53,14 @@ export default function ListCapabilityPanel({ block, tab, shellSettings, update 
   const copySequenceRef = useRef(0);
 
   const reorderItems = (sourceIndex: number, targetIndex: number) => {
-    if (sourceIndex < 0 || targetIndex < 0 || sourceIndex === targetIndex || sourceIndex >= items.length || targetIndex >= items.length) return;
+    if (
+      sourceIndex < 0 ||
+      targetIndex < 0 ||
+      sourceIndex === targetIndex ||
+      sourceIndex >= items.length ||
+      targetIndex >= items.length
+    )
+      return;
     const next = [...items];
     const [moved] = next.splice(sourceIndex, 1);
     next.splice(targetIndex, 0, moved);
@@ -69,12 +84,18 @@ export default function ListCapabilityPanel({ block, tab, shellSettings, update 
     return id;
   };
 
+  // CONTENT TAB
   if (tab === "content") {
     return (
       <div className="builder-inspector-stack" data-uikit-capability="list-content">
-        <section className="builder-inspector-section">
-          <h3>Content</h3>
-          <InspectorFieldRow label="Title"><InspectorTextField value={block.title ?? ""} onChange={(value) => update({ title: value })} ariaLabel="List title" /></InspectorFieldRow>
+        <InspectorDivision title="ITEMS">
+          <InspectorFieldRow label="Title">
+            <InspectorTextField
+              value={block.title ?? ""}
+              onChange={(value) => update({ title: value })}
+              ariaLabel="List title"
+            />
+          </InspectorFieldRow>
           <RepeatableItemShell
             items={items}
             getItemKey={(item) => item.id}
@@ -89,47 +110,182 @@ export default function ListCapabilityPanel({ block, tab, shellSettings, update 
             onCopy={copyItem}
             onDelete={removeItem}
             onReorder={reorderItems}
-            renderItem={(item, index) => <>
-              <InspectorFieldRow label="Text"><InspectorTextField value={item.text} onChange={(value) => updateItems(items.map((entry, itemIndex) => itemIndex === index ? { ...entry, text: value } : entry))} ariaLabel={`List item ${index + 1} text`} /></InspectorFieldRow>
-              <InspectorFieldRow label="Link URL"><InspectorTextField value={item.url ?? ""} onChange={(value) => updateItems(items.map((entry, itemIndex) => itemIndex === index ? { ...entry, url: value || undefined } : entry))} ariaLabel={`List item ${index + 1} URL`} /></InspectorFieldRow>
-              <InspectorFieldRow label="Link target"><InspectorSelect value={item.target ?? "_self"} options={BUILDER_LINK_TARGET_OPTIONS} onChange={(value) => updateItems(items.map((entry, itemIndex) => itemIndex === index ? { ...entry, target: value } : entry))} ariaLabel={`List item ${index + 1} target`} /></InspectorFieldRow>
-              <InspectorFieldRow label="Icon">
-                <IconPicker
-                  value={item.iconName}
-                  onChange={(value) => updateItems(items.map((entry, itemIndex) => itemIndex === index ? { ...entry, iconName: value } : entry))}
-                  onClear={() => updateItems(items.map((entry, itemIndex) => itemIndex === index ? { ...entry, iconName: undefined } : entry))}
-                  ariaLabel={`List item ${index + 1} icon`}
-                />
-              </InspectorFieldRow>
-              <InspectorFieldRow label="Icon size"><InspectorSelect value={String(item.iconSize ?? block.listIconSize ?? 16)} options={[12, 14, 16, 20, 24, 28].map((value) => ({ value: String(value), label: `${value}px` }))} onChange={(value) => updateItems(items.map((entry, itemIndex) => itemIndex === index ? { ...entry, iconSize: Number(value) } : entry))} ariaLabel={`List item ${index + 1} icon size`} /></InspectorFieldRow>
-            </>}
+            renderItem={(item, index) => (
+              <>
+                <InspectorFieldRow label="Text">
+                  <InspectorTextField
+                    value={item.text}
+                    onChange={(value) =>
+                      updateItems(
+                        items.map((entry, itemIndex) => (itemIndex === index ? { ...entry, text: value } : entry))
+                      )
+                    }
+                    ariaLabel={`List item ${index + 1} text`}
+                  />
+                </InspectorFieldRow>
+                <InspectorFieldRow label="Link URL">
+                  <InspectorTextField
+                    value={item.url ?? ""}
+                    onChange={(value) =>
+                      updateItems(
+                        items.map((entry, itemIndex) =>
+                          itemIndex === index ? { ...entry, url: value || undefined } : entry
+                        )
+                      )
+                    }
+                    ariaLabel={`List item ${index + 1} URL`}
+                  />
+                </InspectorFieldRow>
+                <InspectorFieldRow label="Link target">
+                  <InspectorSelect
+                    value={item.target ?? "_self"}
+                    options={BUILDER_LINK_TARGET_OPTIONS}
+                    onChange={(value) =>
+                      updateItems(
+                        items.map((entry, itemIndex) => (itemIndex === index ? { ...entry, target: value } : entry))
+                      )
+                    }
+                    ariaLabel={`List item ${index + 1} target`}
+                  />
+                </InspectorFieldRow>
+                <InspectorFieldRow label="Icon">
+                  <IconPicker
+                    value={item.iconName}
+                    onChange={(value) =>
+                      updateItems(
+                        items.map((entry, itemIndex) => (itemIndex === index ? { ...entry, iconName: value } : entry))
+                      )
+                    }
+                    onClear={() =>
+                      updateItems(
+                        items.map((entry, itemIndex) =>
+                          itemIndex === index ? { ...entry, iconName: undefined } : entry
+                        )
+                      )
+                    }
+                    ariaLabel={`List item ${index + 1} icon`}
+                  />
+                </InspectorFieldRow>
+                <InspectorFieldRow label="Icon size">
+                  <InspectorSelect
+                    value={String(item.iconSize ?? block.listIconSize ?? 16)}
+                    options={[12, 14, 16, 20, 24, 28].map((value) => ({ value: String(value), label: `${value}px` }))}
+                    onChange={(value) =>
+                      updateItems(
+                        items.map((entry, itemIndex) =>
+                          itemIndex === index ? { ...entry, iconSize: Number(value) } : entry
+                        )
+                      )
+                    }
+                    ariaLabel={`List item ${index + 1} icon size`}
+                  />
+                </InspectorFieldRow>
+              </>
+            )}
           />
-        </section>
+        </InspectorDivision>
       </div>
     );
   }
 
-  if (tab === "style") {
-    const properties = UIKIT_LIST_CAPABILITY.properties;
+  // ADVANCED TAB
+  if (tab === "advanced") {
     return (
-      <div className="builder-inspector-stack" data-uikit-capability="list-style">
-        <section className="builder-inspector-section">
-          <h3>Style</h3>
-          <InspectorFieldRow label="Presentation"><InspectorSelect value={block.listPresentation ?? "default"} options={properties.presentation.values.map((value) => ({ value, label: labels[value] }))} onChange={(value) => update({ listPresentation: value })} ariaLabel="List presentation" /></InspectorFieldRow>
-          <InspectorFieldRow label="Marker"><InspectorPillGroup value={block.listMarker ?? "none"} options={properties.marker.values.map((value) => ({ value, label: labels[value] }))} onChange={(value) => update({ listMarker: value })} ariaLabel="List marker" /></InspectorFieldRow>
-          <InspectorFieldRow label="Alignment"><InspectorAlignmentControl value={block.listAlign ?? "left"} onChange={(value) => update({ listAlign: value })} ariaLabel="List alignment" /></InspectorFieldRow>
-          <InspectorFieldRow label="Spacing"><InspectorPillGroup value={block.listSpacing ?? "default"} options={properties.spacing.values.map((value) => ({ value, label: labels[value] }))} onChange={(value) => update({ listSpacing: value })} ariaLabel="List spacing" /></InspectorFieldRow>
-        </section>
-        <GeneralSettingsGroup block={block} update={update} />
+      <div className="builder-inspector-stack" data-uikit-capability="list-advanced">
+        <InspectorDivision title="ADVANCED">
+          <InspectorFieldRow label="ID">
+            <InspectorTextField
+              value={(block as any).customId ?? block.id ?? ""}
+              onChange={(v) => update({ customId: v, id: v } as any)}
+              placeholder="e.g. features-list"
+              ariaLabel="Custom ID"
+            />
+          </InspectorFieldRow>
+          <InspectorFieldRow label="Class">
+            <InspectorTextField
+              value={(block as any).customClass ?? ""}
+              onChange={(v) => update({ customClass: v } as any)}
+              placeholder="e.g. my-custom-list"
+              ariaLabel="Custom Class"
+            />
+          </InspectorFieldRow>
+          <InspectorFieldRow label="Attributes">
+            <InspectorTextField
+              value={(block as any).customAttributes ?? ""}
+              onChange={(v) => update({ customAttributes: v } as any)}
+              placeholder='data-custom="value"'
+              ariaLabel="Custom Attributes"
+            />
+          </InspectorFieldRow>
+          <InspectorFieldRow label="Custom CSS">
+            <InspectorTextarea
+              value={(block as any).customCss ?? ""}
+              onChange={(v) => update({ customCss: v } as any)}
+              placeholder="/* CSS rules */"
+              ariaLabel="Custom CSS"
+            />
+          </InspectorFieldRow>
+        </InspectorDivision>
       </div>
     );
   }
 
-  if (tab === "behavior") {
-    return <div className="builder-inspector-stack" data-uikit-capability="list-behavior"><p className="builder-inspector-help">Links use the target selected on each list item. List presentation and markers remain UIkit-owned.</p></div>;
-  }
+  // SETTINGS TAB (Default)
+  const properties = UIKIT_LIST_CAPABILITY.properties;
+  return (
+    <div className="builder-inspector-stack" data-uikit-capability="list-style">
+      <InspectorDivision title="LIST">
+        <InspectorFieldRow label="Presentation">
+          <InspectorSelect
+            value={block.listPresentation ?? "default"}
+            options={properties.presentation.values.map((value) => ({ value, label: labels[value] }))}
+            onChange={(value) => update({ listPresentation: value })}
+            ariaLabel="List presentation"
+          />
+        </InspectorFieldRow>
+        <InspectorFieldRow label="Marker">
+          <InspectorPillGroup
+            value={block.listMarker ?? "none"}
+            options={properties.marker.values.map((value) => ({ value, label: labels[value] }))}
+            onChange={(value) => update({ listMarker: value })}
+            ariaLabel="List marker"
+          />
+        </InspectorFieldRow>
+        <InspectorFieldRow label="Alignment">
+          <InspectorAlignmentControl
+            value={block.listAlign ?? "left"}
+            onChange={(value) => update({ listAlign: value })}
+            ariaLabel="List alignment"
+          />
+        </InspectorFieldRow>
+        <InspectorFieldRow label="Spacing">
+          <InspectorPillGroup
+            value={block.listSpacing ?? "default"}
+            options={properties.spacing.values.map((value) => ({ value, label: labels[value] }))}
+            onChange={(value) => update({ listSpacing: value })}
+            ariaLabel="List spacing"
+          />
+        </InspectorFieldRow>
+      </InspectorDivision>
 
-  if (tab === "advanced") return null;
-
-  return null;
+      <InspectorDivision title="ICON">
+        <InspectorFieldRow label="Default Icon">
+          <IconPicker
+            value={block.listIcon}
+            onChange={(value) => update({ listIcon: value as any })}
+            onClear={() => update({ listIcon: undefined })}
+            ariaLabel="Default list icon"
+          />
+        </InspectorFieldRow>
+        <InspectorFieldRow label="Icon Size">
+          <InspectorSelect
+            value={String(block.listIconSize ?? 16)}
+            options={[12, 14, 16, 20, 24, 28].map((value) => ({ value: String(value), label: `${value}px` }))}
+            onChange={(value) => update({ listIconSize: Number(value) })}
+            ariaLabel="List icon size"
+          />
+        </InspectorFieldRow>
+      </InspectorDivision>
+    </div>
+  );
 }

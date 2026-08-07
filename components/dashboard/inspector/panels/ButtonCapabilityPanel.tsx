@@ -1,11 +1,15 @@
 "use client";
 
-import type { InspectorTab } from "@/components/dashboard/builderTypes";
-import type { BuilderLayoutBlock } from "@/components/dashboard/builderTypes";
-import { BUILDER_LINK_TARGET_OPTIONS } from "@/lib/websiteBuilderLinks";
-import { InspectorFieldRow, InspectorSelect, InspectorTextField } from "@/components/dashboard/inspector/InspectorControls";
-import ButtonPresentationFields from "@/components/dashboard/inspector/panels/ButtonPresentationFields";
+import type { InspectorTab, BuilderLayoutBlock } from "@/components/dashboard/builderTypes";
 import type { BuilderShellSettings } from "@/lib/builderShell";
+import { BUILDER_LINK_TARGET_OPTIONS } from "@/lib/websiteBuilderLinks";
+import {
+  InspectorDivision,
+  InspectorFieldRow,
+  InspectorSelect,
+  InspectorTextField,
+  InspectorTextarea,
+} from "@/components/dashboard/inspector/InspectorControls";
 
 type Props = {
   block: BuilderLayoutBlock;
@@ -14,74 +18,125 @@ type Props = {
   update: (patch: Partial<BuilderLayoutBlock>) => void;
 };
 
-const legacyButtonFields = {
-  buttonBg: undefined,
-  buttonTextColor: undefined,
-  buttonBorderRadius: undefined,
-  buttonBorderWidth: undefined,
-  buttonBorderColor: undefined,
-  buttonPaddingY: undefined,
-  buttonPaddingX: undefined,
-  buttonFontWeight: undefined,
-  buttonLetterSpacing: undefined,
-  buttonHoverBg: undefined,
-  buttonHoverTextColor: undefined,
-  buttonHoverBorderColor: undefined,
-  buttonHoverTransform: undefined,
-  buttonHoverBoxShadow: undefined,
-  buttonHoverEffect: undefined,
-  secondaryButtonLabel: undefined,
-  secondaryButtonUrl: undefined,
-  secondaryButtonTarget: undefined,
-  secondaryButtonStyle: undefined,
-  premiumButtonStyle: undefined,
-  premiumCardStyle: undefined,
-  buttonsLayout: undefined,
-  buttonGap: undefined,
-  elementAlign: undefined,
-} satisfies Partial<BuilderLayoutBlock>;
-
-function selectValue(value: string | undefined, fallback: string) {
-  return value || fallback;
-}
-
 export default function ButtonCapabilityPanel({ block, tab, shellSettings, update }: Props) {
-  const updateSemantic = (patch: Partial<BuilderLayoutBlock>) => {
-    update({ ...legacyButtonFields, ...patch });
-  };
-
+  // CONTENT TAB
   if (tab === "content") {
     return (
       <div className="builder-inspector-stack" data-uikit-capability="button-content">
-        <div className="builder-element-inspector-note">
-          <strong>WebPages action</strong>
-          <span>Content and navigation remain owned by WebPages.</span>
-        </div>
-        <InspectorFieldRow label="Label"><InspectorTextField value={block.buttonLabel ?? ""} onChange={(value) => updateSemantic({ buttonLabel: value })} ariaLabel="Button label" /></InspectorFieldRow>
-        <InspectorFieldRow label="URL / action"><InspectorTextField value={block.buttonUrl ?? ""} onChange={(value) => updateSemantic({ buttonUrl: value })} ariaLabel="Button URL or action" /></InspectorFieldRow>
-        <InspectorFieldRow label="Target"><InspectorSelect value={selectValue(block.buttonTarget, "_self") as "_self" | "_blank"} options={BUILDER_LINK_TARGET_OPTIONS} onChange={(value) => updateSemantic({ buttonTarget: value })} ariaLabel="Button target" /></InspectorFieldRow>
+        <InspectorDivision title="CONTENT">
+          <InspectorFieldRow label="Text">
+            <InspectorTextField
+              value={block.buttonLabel ?? ""}
+              onChange={(value) => update({ buttonLabel: value })}
+              ariaLabel="Button label"
+            />
+          </InspectorFieldRow>
+          <InspectorFieldRow label="Link URL">
+            <InspectorTextField
+              value={block.buttonUrl ?? ""}
+              onChange={(value) => update({ buttonUrl: value })}
+              ariaLabel="Button URL"
+            />
+          </InspectorFieldRow>
+          <InspectorFieldRow label="Link Target">
+            <InspectorSelect
+              value={block.buttonTarget ?? "_self"}
+              options={BUILDER_LINK_TARGET_OPTIONS}
+              onChange={(value) => update({ buttonTarget: value })}
+              ariaLabel="Button target"
+            />
+          </InspectorFieldRow>
+        </InspectorDivision>
       </div>
     );
   }
 
-  if (tab === "style") {
+  // ADVANCED TAB
+  if (tab === "advanced") {
     return (
-      <div className="builder-inspector-stack" data-uikit-capability="button-style">
-        <div className="builder-element-inspector-note">
-          <strong>UIkit Button</strong>
-          <span>Semantic values map to UIkit classes in the builder and frontend.</span>
-        </div>
-        <ButtonPresentationFields
-          variant={selectValue(block.buttonStyle, "primary")}
-          size={selectValue(block.size, "default")}
-          onVariantChange={(value) => updateSemantic({ buttonStyle: value as BuilderLayoutBlock["buttonStyle"] })}
-          onSizeChange={(value) => updateSemantic({ size: value as BuilderLayoutBlock["size"] })}
-        />
+      <div className="builder-inspector-stack" data-uikit-capability="button-advanced">
+        <InspectorDivision title="ADVANCED">
+          <InspectorFieldRow label="ID">
+            <InspectorTextField
+              value={(block as any).customId ?? block.id ?? ""}
+              onChange={(v) => update({ customId: v, id: v } as any)}
+              placeholder="e.g. cta-button"
+              ariaLabel="Custom ID"
+            />
+          </InspectorFieldRow>
+          <InspectorFieldRow label="Class">
+            <InspectorTextField
+              value={(block as any).customClass ?? ""}
+              onChange={(v) => update({ customClass: v } as any)}
+              placeholder="e.g. my-custom-button"
+              ariaLabel="Custom Class"
+            />
+          </InspectorFieldRow>
+          <InspectorFieldRow label="Attributes">
+            <InspectorTextField
+              value={(block as any).customAttributes ?? ""}
+              onChange={(v) => update({ customAttributes: v } as any)}
+              placeholder='data-custom="value"'
+              ariaLabel="Custom Attributes"
+            />
+          </InspectorFieldRow>
+          <InspectorFieldRow label="Custom CSS">
+            <InspectorTextarea
+              value={(block as any).customCss ?? ""}
+              onChange={(v) => update({ customCss: v } as any)}
+              placeholder="/* CSS rules */"
+              ariaLabel="Custom CSS"
+            />
+          </InspectorFieldRow>
+        </InspectorDivision>
       </div>
     );
   }
 
-  if (tab === "advanced") return null;
-
-  return null;
+  // SETTINGS TAB (Default)
+  return (
+    <div className="builder-inspector-stack" data-uikit-capability="button-style">
+      <InspectorDivision title="BUTTON">
+        <InspectorFieldRow label="Style">
+          <InspectorSelect
+            value={block.buttonStyle ?? "primary"}
+            options={[
+              { value: "default", label: "Button Default" },
+              { value: "primary", label: "Button Primary" },
+              { value: "secondary", label: "Button Secondary" },
+              { value: "danger", label: "Button Danger" },
+              { value: "link", label: "Link" },
+              { value: "text", label: "Text" },
+            ]}
+            onChange={(value) => update({ buttonStyle: value as any })}
+            ariaLabel="Button style"
+          />
+        </InspectorFieldRow>
+        <InspectorFieldRow label="Size">
+          <InspectorSelect
+            value={block.size ?? "default"}
+            options={[
+              { value: "default", label: "Default" },
+              { value: "small", label: "Small" },
+              { value: "large", label: "Large" },
+            ]}
+            onChange={(value) => update({ size: value as any })}
+            ariaLabel="Button size"
+          />
+        </InspectorFieldRow>
+        <InspectorFieldRow label="Alignment">
+          <InspectorSelect
+            value={(block as any).buttonAlign ?? block.textAlign ?? "left"}
+            options={[
+              { value: "left", label: "Left" },
+              { value: "center", label: "Center" },
+              { value: "right", label: "Right" },
+            ]}
+            onChange={(value) => update({ buttonAlign: value, textAlign: value } as any)}
+            ariaLabel="Button alignment"
+          />
+        </InspectorFieldRow>
+      </InspectorDivision>
+    </div>
+  );
 }

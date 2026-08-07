@@ -31,7 +31,7 @@
     },
     "sections": [
       {
-        "id": "contentLayout-msf1xx2i-xew90",
+        "id": "contentLayout-mshthfxl-ldpxt",
         "kind": "contentLayout",
         "title": "",
         "background": "#ffffff",
@@ -48,12 +48,196 @@
         "body": "",
         "layoutItems": [
           {
-            "id": "layout-row-msf1xzck-column-1",
-            "rowId": "layout-row-msf1xzck",
+            "id": "layout-row-mshthiqq-column-1",
+            "rowId": "layout-row-mshthiqq",
             "rowLayout": "1-col",
             "blocks": [
               {
-                "id": "grid-block-msf1y5kb-fpnuy",
+                "id": "accordion-block-mshthwna-irize",
+                "kind": "accordion",
+                "accordionItems": [
+                  {
+                    "id": "accordion-block-mshthwna-irize-item-1",
+                    "title": "What does this include?",
+                    "content": "Add the key details your visitors need to understand the offer."
+                  },
+                  {
+                    "id": "accordion-block-mshthwna-irize-item-2",
+                    "title": "How does it work?",
+                    "content": "Explain the next step in a concise, helpful answer."
+                  },
+                  {
+                    "id": "accordion-block-mshthwna-irize-item-3",
+                    "title": "Can I ask a question?",
+                    "content": "Give visitors a clear path to contact you or continue exploring."
+                  }
+                ],
+                "accordionMultiple": false,
+                "accordionCollapsible": true,
+                "accordionOpenItems": [
+                  0
+                ],
+                "accordionStyle": "minimal",
+                "accordionIndicator": "plus-minus",
+                "accordionIndicatorPosition": "start",
+                "accordionTitleEmphasis": "inherit",
+                "accordionItemSpacing": "default",
+                "accordionContentSpacing": "inherit",
+                "accordionDivider": true,
+                "accordionTitleStyle": "inherit",
+                "accordionContentStyle": "inherit"
+              }
+            ]
+          }
+        ],
+        "layoutRows": 1
+      },
+      {
+        "id": "contentLayout-msj2v46y-qrt78",
+        "kind": "contentLayout",
+        "title": "",
+        "background": "#ffffff",
+        "backgroundMode": "boxed",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "topSpacing": "inherit",
+        "bottomSpacing": "inherit",
+        "topMargin": "inherit",
+        "bottomMargin": "inherit",
+        "pullUnderHeader": false,
+        "visible": true,
+        "eyebrow": "",
+        "body": "",
+        "layoutItems": [
+          {
+            "id": "layout-row-msj2v5oi-column-1",
+            "rowId": "layout-row-msj2v5oi",
+            "rowLayout": "1-col",
+            "blocks": []
+          }
+        ],
+        "layoutRows": 1
+      },
+      {
+        "id": "contentLayout-msiztzp7-ysdtm",
+        "kind": "contentLayout",
+        "title": "",
+        "background": "#ffffff",
+        "backgroundMode": "boxed",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "topSpacing": "inherit",
+        "bottomSpacing": "inherit",
+        "topMargin": "inherit",
+        "bottomMargin": "inherit",
+        "pullUnderHeader": false,
+        "visible": true,
+        "eyebrow": "",
+        "body": "",
+        "layoutItems": [
+          {
+            "id": "layout-row-msizu157-column-1",
+            "rowId": "layout-row-msizu157",
+            "rowLayout": "1-col",
+            "blocks": [
+              {
+                "id": "products-block-msj2tqyy-mghex",
+                "kind": "products",
+                "title": "Objects chosen for everyday rituals",
+                "source": "all",
+                "layoutVariant": "grid",
+                "columns": 4,
+                "gridLimit": 8,
+                "filterPosition": "left",
+                "cardStyle": "soft",
+                "cardPreset": "editorial",
+                "panelStyle": "clean-shadow",
+                "elementPadding": "sm",
+                "typography": {
+                  "eyebrow": {
+                    "variant": "subheading",
+                    "fontSize": "12px",
+                    "fontWeight": "700",
+                    "lineHeight": "1.2",
+                    "letterSpacing": "0.12em",
+                    "textTransform": "uppercase"
+                  },
+                  "title": {
+                    "variant": "heading",
+                    "fontSize": "clamp(28px, 3vw, 46px)",
+                    "fontWeight": "720",
+                    "lineHeight": "1.06",
+                    "letterSpacing": "-0.025em"
+                  },
+                  "body": {
+                    "variant": "body",
+                    "fontSize": "16px",
+                    "fontWeight": "400",
+                    "lineHeight": "1.7"
+                  },
+                  "button": {
+                    "variant": "button",
+                    "fontSize": "14px",
+                    "fontWeight": "700",
+                    "lineHeight": "1",
+                    "letterSpacing": "0.01em"
+                  }
+                },
+                "visualStyle": {
+                  "customClass": "builder-premium-starter",
+                  "card": {
+                    "preset": "soft",
+                    "hoverPreset": "lift-soft",
+                    "imageRatio": "4:5",
+                    "imageFit": "cover",
+                    "imageRadius": "14px",
+                    "titleSize": "clamp(22px, 2vw, 30px)",
+                    "titleWeight": "720",
+                    "titleMargin": "0",
+                    "metaSize": "11px",
+                    "metaTransform": "uppercase",
+                    "metaSpacing": "0",
+                    "contentSize": "15px",
+                    "contentLineHeight": "1.65",
+                    "buttonMargin": "8px 0 0",
+                    "cardGap": "14px",
+                    "cardPadding": "clamp(20px, 2.4vw, 30px)"
+                  },
+                  "border": {
+                    "radius": "18px"
+                  }
+                },
+                "productMediaPlacement": "top"
+              }
+            ]
+          }
+        ],
+        "layoutRows": 1
+      },
+      {
+        "id": "contentLayout-msizbhm8-jzui3",
+        "kind": "contentLayout",
+        "title": "",
+        "background": "#ffffff",
+        "backgroundMode": "boxed",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "topSpacing": "inherit",
+        "bottomSpacing": "inherit",
+        "topMargin": "inherit",
+        "bottomMargin": "inherit",
+        "pullUnderHeader": false,
+        "visible": true,
+        "eyebrow": "",
+        "body": "",
+        "layoutItems": [
+          {
+            "id": "layout-row-msizcp0a-column-1",
+            "rowId": "layout-row-msizcp0a",
+            "rowLayout": "1-col",
+            "blocks": [
+              {
+                "id": "grid-block-msizktbh-b5hkn",
                 "kind": "grid",
                 "title": "Services designed around your goals",
                 "gridSource": "static",
@@ -77,24 +261,20 @@
                 "gridStacking": "inherit",
                 "gridItems": [
                   {
-                    "id": "grid-block-msf1y5kb-fpnuy-1",
+                    "id": "grid-block-msizktbh-b5hkn-1",
                     "eyebrow": "01",
                     "title": "Strategy with a practical point of view",
                     "meta": "Clarity before complexity",
                     "text": "Define the audience, message, and priorities that will make every design decision easier.",
                     "buttonLabel": "Explore Strategy",
                     "buttonUrl": "/",
-                    "renderer": "plain",
-                    "mediaPlacement": "top",
-                    "mediaRatio": "natural",
-                    "mediaFit": "cover",
                     "titleElement": "h3",
                     "titleStyle": "inherit",
                     "imageUrl": "/builder-image-placeholder.svg",
                     "imageAlt": "Warm architectural forms representing strategic planning"
                   },
                   {
-                    "id": "grid-block-msf1y5kb-fpnuy-2",
+                    "id": "grid-block-msizktbh-b5hkn-2",
                     "eyebrow": "02",
                     "title": "Design that feels distinctive and effortless",
                     "meta": "Made for real people",
@@ -105,7 +285,7 @@
                     "imageAlt": "Editorial composition representing interface design"
                   },
                   {
-                    "id": "grid-block-msf1y5kb-fpnuy-3",
+                    "id": "grid-block-msizktbh-b5hkn-3",
                     "eyebrow": "03",
                     "title": "A foundation designed to keep improving",
                     "meta": "Built beyond launch",
@@ -169,6 +349,134 @@
                   "border": {
                     "radius": "18px"
                   }
+                },
+                "panelVariant": "card-default",
+                "panelStyle": "card-default",
+                "panelSize": "default",
+                "panelPadding": "default",
+                "alignImageWithoutPadding": true
+              }
+            ]
+          }
+        ],
+        "layoutRows": 1
+      },
+      {
+        "id": "contentLayout-msiz1yck-iqpqn",
+        "kind": "contentLayout",
+        "title": "",
+        "background": "#ffffff",
+        "backgroundMode": "boxed",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "topSpacing": "inherit",
+        "bottomSpacing": "inherit",
+        "topMargin": "inherit",
+        "bottomMargin": "inherit",
+        "pullUnderHeader": false,
+        "visible": true,
+        "eyebrow": "",
+        "body": "",
+        "layoutItems": [
+          {
+            "id": "layout-row-msiz20kr-column-1",
+            "rowId": "layout-row-msiz20kr",
+            "rowLayout": "1-col",
+            "blocks": [
+              {
+                "id": "gallery-block-msiza4m4-0fxql",
+                "kind": "gallery",
+                "title": "Gallery Showcase",
+                "columns": 3,
+                "gridGap": "medium",
+                "enableLightbox": true,
+                "galleryItems": [
+                  {
+                    "id": "gallery-block-msiza4m4-0fxql-item-1",
+                    "imageUrl": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80",
+                    "title": "Creative Artwork",
+                    "meta": "Design & Art",
+                    "content": "Visual layout showcase"
+                  },
+                  {
+                    "id": "gallery-block-msiza4m4-0fxql-item-2",
+                    "imageUrl": "https://images.unsplash.com/photo-1541701494587-cb58502866ab?auto=format&fit=crop&w=800&q=80",
+                    "title": "Modern Abstract",
+                    "meta": "Abstract",
+                    "content": "Clean aesthetics"
+                  },
+                  {
+                    "id": "gallery-block-msiza4m4-0fxql-item-3",
+                    "imageUrl": "https://images.unsplash.com/photo-1550684848-fac1c5b4e853?auto=format&fit=crop&w=800&q=80",
+                    "title": "Photography",
+                    "meta": "Photo",
+                    "content": "High resolution media"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "layoutRows": 1
+      },
+      {
+        "id": "contentLayout-msizpqfn-tyxkx",
+        "kind": "contentLayout",
+        "title": "",
+        "background": "#ffffff",
+        "backgroundMode": "boxed",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "topSpacing": "inherit",
+        "bottomSpacing": "inherit",
+        "topMargin": "inherit",
+        "bottomMargin": "inherit",
+        "pullUnderHeader": false,
+        "visible": true,
+        "eyebrow": "",
+        "body": "",
+        "layoutItems": [
+          {
+            "id": "layout-row-msizprz4-column-1",
+            "rowId": "layout-row-msizprz4",
+            "rowLayout": "1-col",
+            "blocks": [
+              {
+                "id": "fluentForm-block-msizq37e-re8bl",
+                "kind": "fluentForm",
+                "title": "Let’s start a conversation",
+                "body": "Choose a Fluent Forms form to help visitors ask a question, request details, or book a consultation.",
+                "fluentFormId": "1",
+                "elementPadding": "sm",
+                "typography": {
+                  "eyebrow": {
+                    "variant": "subheading",
+                    "fontSize": "12px",
+                    "fontWeight": "700",
+                    "lineHeight": "1.2",
+                    "letterSpacing": "0.12em",
+                    "textTransform": "uppercase"
+                  },
+                  "title": {
+                    "variant": "heading",
+                    "fontSize": "clamp(28px, 3vw, 46px)",
+                    "fontWeight": "720",
+                    "lineHeight": "1.06",
+                    "letterSpacing": "-0.025em"
+                  },
+                  "body": {
+                    "variant": "body",
+                    "fontSize": "16px",
+                    "fontWeight": "400",
+                    "lineHeight": "1.7"
+                  },
+                  "button": {
+                    "variant": "button",
+                    "fontSize": "14px",
+                    "fontWeight": "700",
+                    "lineHeight": "1",
+                    "letterSpacing": "0.01em"
+                  }
                 }
               }
             ]
@@ -177,7 +485,7 @@
         "layoutRows": 1
       }
     ],
-    "updatedAt": "2026-08-04T19:29:48.108Z"
+    "updatedAt": "2026-08-07T15:10:56.613Z"
   },
   "shop": {
     "version": 1,

@@ -241,9 +241,12 @@ export function ImageSettingsGroup({
   keys = {
     width: "imageWidth",
     height: "imageHeight",
+    ratio: "imageRatio",
+    fit: "imageFit",
     loading: "imageLoading",
     shape: "imageShape",
     shadow: "imageShadow",
+    decoration: "imageBoxDecoration",
     align: "imageAlignment",
   },
 }: {
@@ -252,13 +255,23 @@ export function ImageSettingsGroup({
   keys?: {
     width: string;
     height: string;
+    ratio?: string;
+    fit?: string;
     loading: string;
     shape: string;
     shadow: string;
+    decoration?: string;
     align: string;
   };
 }) {
   const values = block as any;
+  const ratioKey = keys.ratio ?? "imageRatio";
+  const fitKey = keys.fit ?? "imageFit";
+  const shapeVal = values[keys.shape] ?? values.imageBorder ?? "none";
+  const shadowVal = values[keys.shadow] ?? values.imageBoxShadow ?? "none";
+  const decorationKey = keys.decoration ?? "imageBoxDecoration";
+  const decorationVal = values[decorationKey] ?? "none";
+
   return (
     <InspectorDivision title="IMAGE">
       <div className="builder-two-column" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
@@ -289,41 +302,110 @@ export function ImageSettingsGroup({
       </div>
 
       <InspectorFieldRow
+        label="Ratio"
+        isOverridden={values[ratioKey] !== undefined && values[ratioKey] !== "natural"}
+        inheritedValueText="Natural"
+        onReset={() => update({ [ratioKey]: undefined })}
+      >
+        <InspectorSelect
+          value={String(values[ratioKey] ?? "natural")}
+          options={[
+            { value: "natural", label: "Natural" },
+            { value: "square", label: "Square (1:1)" },
+            { value: "4:3", label: "4:3" },
+            { value: "3:2", label: "3:2" },
+            { value: "16:9", label: "16:9" },
+            { value: "portrait", label: "Portrait (3:4)" },
+          ]}
+          onChange={(value) => update({ [ratioKey]: value })}
+        />
+      </InspectorFieldRow>
+
+      <InspectorFieldRow
+        label="Fit"
+        isOverridden={values[fitKey] !== undefined}
+        inheritedValueText="Cover"
+        onReset={() => update({ [fitKey]: undefined })}
+      >
+        <InspectorSegmentedControl
+          value={String(values[fitKey] ?? "cover")}
+          options={[
+            { value: "cover", label: "Cover" },
+            { value: "contain", label: "Contain" },
+            { value: "fill", label: "Fill" },
+          ]}
+          onChange={(value) => update({ [fitKey]: value })}
+        />
+      </InspectorFieldRow>
+
+      <InspectorFieldRow
         label="Loading"
         isOverridden={values[keys.loading] !== undefined}
         inheritedValueText="Lazy"
         onReset={() => update({ [keys.loading]: undefined })}
       >
         <InspectorSelect
-          value={String(values[keys.loading] ?? "lazy")}
-          options={labels(UIKIT_IMAGE_CAPABILITY.properties.loading.values)}
+          value={typeof values[keys.loading] === "boolean" ? (values[keys.loading] ? "eager" : "lazy") : String(values[keys.loading] ?? "lazy")}
+          options={[
+            { value: "lazy", label: "Lazy (Default)" },
+            { value: "eager", label: "Eager (Immediate)" },
+          ]}
           onChange={(value) => update({ [keys.loading]: value })}
         />
       </InspectorFieldRow>
 
       <InspectorFieldRow
         label="Border"
-        isOverridden={values[keys.shape] !== undefined}
+        isOverridden={values[keys.shape] !== undefined || values.imageBorder !== undefined}
         inheritedValueText="None"
-        onReset={() => update({ [keys.shape]: undefined })}
+        onReset={() => update({ [keys.shape]: undefined, imageBorder: undefined })}
       >
         <InspectorSelect
-          value={String(values[keys.shape] ?? "none")}
-          options={labels(UIKIT_IMAGE_CAPABILITY.properties.shape.values)}
-          onChange={(value) => update({ [keys.shape]: value })}
+          value={String(shapeVal)}
+          options={[
+            { value: "none", label: "None" },
+            { value: "rounded", label: "Rounded" },
+            { value: "circle", label: "Circle" },
+            { value: "pill", label: "Pill" },
+          ]}
+          onChange={(value) => update({ [keys.shape]: value, imageBorder: value })}
         />
       </InspectorFieldRow>
 
       <InspectorFieldRow
         label="Box Shadow"
-        isOverridden={values[keys.shadow] !== undefined}
+        isOverridden={values[keys.shadow] !== undefined || values.imageBoxShadow !== undefined}
         inheritedValueText="None"
-        onReset={() => update({ [keys.shadow]: undefined })}
+        onReset={() => update({ [keys.shadow]: undefined, imageBoxShadow: undefined })}
       >
         <InspectorSelect
-          value={String(values[keys.shadow] ?? "none")}
-          options={labels(UIKIT_IMAGE_CAPABILITY.properties.shadow.values)}
-          onChange={(value) => update({ [keys.shadow]: value })}
+          value={String(shadowVal)}
+          options={[
+            { value: "none", label: "None" },
+            { value: "small", label: "Small" },
+            { value: "medium", label: "Medium" },
+            { value: "large", label: "Large" },
+            { value: "xlarge", label: "X-Large" },
+          ]}
+          onChange={(value) => update({ [keys.shadow]: value, imageBoxShadow: value })}
+        />
+      </InspectorFieldRow>
+
+      <InspectorFieldRow
+        label="Box Decoration"
+        isOverridden={values[decorationKey] !== undefined}
+        inheritedValueText="None"
+        onReset={() => update({ [decorationKey]: undefined })}
+      >
+        <InspectorSelect
+          value={String(decorationVal)}
+          options={[
+            { value: "none", label: "None" },
+            { value: "default", label: "Default" },
+            { value: "primary", label: "Primary" },
+            { value: "secondary", label: "Secondary" },
+          ]}
+          onChange={(value) => update({ [decorationKey]: value })}
         />
       </InspectorFieldRow>
 

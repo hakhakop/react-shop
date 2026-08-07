@@ -7,7 +7,7 @@ import IconPicker from "@/components/dashboard/inspector/IconPicker";
 
 type Props = { block: BuilderLayoutBlock; tab: InspectorTab; update: (patch: Partial<BuilderLayoutBlock>) => void };
 type CoreProps = Props & { shellSettings: BuilderShellSettings };
-type CoreKind = "hero" | "grid" | "icon" | "badgeGrid" | "table" | "divider" | "alert" | "breadcrumbs" | "datePicker";
+type CoreKind = "hero" | "icon" | "badgeGrid" | "table" | "divider" | "alert" | "breadcrumbs" | "datePicker";
 
 const labels = <T extends string>(values: readonly T[]) => values.map((value) => ({ value, label: value.replace(/[-_]/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase()) }));
 const option = <T extends string>(value: T, label: string) => [{ value, label }] as const;
@@ -52,11 +52,6 @@ export default function CoreContentCapabilityPanel({ block, tab, shellSettings, 
       {kind === "datePicker" && <InspectorFieldRow label="Field label"><InspectorTextField value={block.dateLabel ?? ""} onChange={(value) => update({ dateLabel: value })} ariaLabel="Date picker label" /></InspectorFieldRow>}
       {kind === "breadcrumbs" && <div className="builder-element-inspector-note"><strong>Dynamic breadcrumbs</strong><span>Breadcrumbs are resolved from the active page and current navigation context.</span></div>}
       {kind === "badgeGrid" && <div className="builder-element-inspector-note"><strong>Badge items</strong><span>Badge content is managed by the section data and remains localized with the document.</span></div>}
-      {kind === "grid" && <>
-        <InspectorFieldRow label="Source"><InspectorPillGroup value={block.gridSource ?? "static"} options={[{ value: "static", label: "Static" }, { value: "products", label: "Products" }]} onChange={(value) => update({ gridSource: value })} ariaLabel="Grid source" /></InspectorFieldRow>
-        <InspectorFieldRow label="Rows"><InspectorSelect value={String(block.gridRows ?? 3)} options={[1, 2, 3, 4, 5, 6].map((value) => ({ value: String(value), label: String(value) }))} onChange={(value) => update({ gridRows: Number(value) })} ariaLabel="Grid rows" /></InspectorFieldRow>
-        {block.gridSource === "products" && <InspectorFieldRow label="Item limit"><InspectorTextField value={String(block.gridLimit ?? 8)} onChange={(value) => update({ gridLimit: Number(value) || 0 })} ariaLabel="Grid item limit" /></InspectorFieldRow>}
-      </>}
       {kind === "table" && <TableEditor block={block} update={update} />}
       {kind === "divider" && <div className="builder-element-inspector-note"><strong>Divider content</strong><span>Divider content is structural; presentation is controlled in Styling.</span></div>}
     </div>;
@@ -66,12 +61,6 @@ export default function CoreContentCapabilityPanel({ block, tab, shellSettings, 
     return <div className="builder-inspector-stack" data-uikit-capability={`${kind}-style`}>
       <div className="builder-element-inspector-note"><strong>Semantic presentation</strong><span>Appearance tokens remain owned by UIkit and Global Styles.</span></div>
       {kind === "hero" && <InspectorFieldRow label="Variant"><InspectorSelect value={block.carouselSettings?.variant ?? "default"} options={[{ value: "default", label: "Default" }, { value: "antigravity", label: "Antigravity" }]} onChange={(value) => update({ carouselSettings: { ...(block.carouselSettings ?? {}), variant: value } })} ariaLabel="Hero variant" /></InspectorFieldRow>}
-      {kind === "grid" && <>
-        <InspectorFieldRow label="Item gap"><InspectorPillGroup value={block.gridGap ?? "medium"} options={labels(["none", "small", "medium", "large", "max"] as const)} onChange={(value) => update({ gridGap: value })} ariaLabel="Grid item gap" /></InspectorFieldRow>
-        <InspectorFieldRow label="Show image"><InspectorSwitch checked={block.gridShowImage !== false} onChange={(checked) => update({ gridShowImage: checked })} label="Show image" /></InspectorFieldRow>
-        <InspectorFieldRow label="Show text"><InspectorSwitch checked={block.gridShowText !== false} onChange={(checked) => update({ gridShowText: checked })} label="Show text" /></InspectorFieldRow>
-        <InspectorFieldRow label="Show action"><InspectorSwitch checked={block.gridShowButton === true} onChange={(checked) => update({ gridShowButton: checked })} label="Show action" /></InspectorFieldRow>
-      </>}
       {kind === "table" && <InspectorFieldRow label="Presentation"><InspectorPillGroup value={block.tableStyle ?? "plain"} options={labels(["plain", "striped", "bordered"] as const)} onChange={(value) => update({ tableStyle: value })} ariaLabel="Table presentation" /></InspectorFieldRow>}
       {kind === "divider" && <InspectorFieldRow label="Style"><InspectorPillGroup value={block.dividerStyle ?? "default"} options={labels(["default", "small", "icon", "vertical"] as const)} onChange={(value) => update({ dividerStyle: value })} ariaLabel="Divider style" /></InspectorFieldRow>}
       {kind === "alert" && <InspectorFieldRow label="Variant"><InspectorPillGroup value={block.alertStyle ?? "primary"} options={labels(["primary", "success", "warning", "danger"] as const)} onChange={(value) => update({ alertStyle: value })} ariaLabel="Alert variant" /></InspectorFieldRow>}

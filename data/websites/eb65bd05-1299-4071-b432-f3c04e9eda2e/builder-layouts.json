@@ -7114,6 +7114,142 @@
                           },
                           "buttonStyle": "secondary",
                           "size": "large"
+                        },
+                        {
+                          "id": "hero-block-msiglzqp-x6j88",
+                          "kind": "hero",
+                          "eyebrow": "Proof eyebrow",
+                          "title": "Proof heading",
+                          "body": "Proof body",
+                          "buttonLabel": "Primary proof",
+                          "buttonUrl": "/primary-proof",
+                          "buttonStyle": "secondary",
+                          "secondaryButtonLabel": "Secondary proof",
+                          "secondaryButtonUrl": "/secondary-proof",
+                          "secondaryButtonTarget": "_self",
+                          "secondaryButtonStyle": "secondary",
+                          "secondaryButtonSize": "default",
+                          "buttonsLayout": "inline",
+                          "buttonGap": "0.75rem",
+                          "elementAlign": "left",
+                          "elementPadding": "sm",
+                          "heroHeadingElement": "h1",
+                          "heroHeadingStyle": "large",
+                          "heroContentAlign": "left",
+                          "heroVerticalAlign": "center",
+                          "heroContentWidth": "large",
+                          "heroMediaPlacement": "none",
+                          "heroMediaFit": "cover",
+                          "heroMediaRatio": "natural",
+                          "heroHeight": "auto",
+                          "heroPrimaryActionVisible": true,
+                          "heroSecondaryActionVisible": true,
+                          "heroMediaLoading": "lazy",
+                          "typography": {
+                            "eyebrow": {
+                              "variant": "subheading",
+                              "fontSize": "12px",
+                              "fontWeight": "700",
+                              "lineHeight": "1.2",
+                              "letterSpacing": "0.12em",
+                              "textTransform": "uppercase"
+                            },
+                            "title": {
+                              "variant": "heading",
+                              "fontSize": "clamp(28px, 3vw, 46px)",
+                              "fontWeight": "720",
+                              "lineHeight": "1.06",
+                              "letterSpacing": "-0.025em"
+                            },
+                            "body": {
+                              "variant": "body",
+                              "fontSize": "16px",
+                              "fontWeight": "400",
+                              "lineHeight": "1.7"
+                            },
+                            "button": {
+                              "variant": "button",
+                              "fontSize": "14px",
+                              "fontWeight": "700",
+                              "lineHeight": "1",
+                              "letterSpacing": "0.01em"
+                            }
+                          },
+                          "carouselSettings": {
+                            "variant": "default"
+                          },
+                          "size": "large",
+                          "animation": {
+                            "preset": "fade-up"
+                          }
+                        },
+                        {
+                          "id": "hero-block-msigqw1n-ibrg2",
+                          "kind": "hero",
+                          "eyebrow": "Proof eyebrow",
+                          "title": "Proof heading",
+                          "body": "Proof body",
+                          "buttonLabel": "Primary proof",
+                          "buttonUrl": "/primary-proof",
+                          "buttonStyle": "secondary",
+                          "secondaryButtonLabel": "Secondary proof",
+                          "secondaryButtonUrl": "/secondary-proof",
+                          "secondaryButtonTarget": "_self",
+                          "secondaryButtonStyle": "secondary",
+                          "secondaryButtonSize": "default",
+                          "buttonsLayout": "inline",
+                          "buttonGap": "0.75rem",
+                          "elementAlign": "left",
+                          "elementPadding": "sm",
+                          "heroHeadingElement": "h1",
+                          "heroHeadingStyle": "large",
+                          "heroContentAlign": "left",
+                          "heroVerticalAlign": "center",
+                          "heroContentWidth": "large",
+                          "heroMediaPlacement": "none",
+                          "heroMediaFit": "cover",
+                          "heroMediaRatio": "natural",
+                          "heroHeight": "auto",
+                          "heroPrimaryActionVisible": true,
+                          "heroSecondaryActionVisible": true,
+                          "heroMediaLoading": "lazy",
+                          "typography": {
+                            "eyebrow": {
+                              "variant": "subheading",
+                              "fontSize": "12px",
+                              "fontWeight": "700",
+                              "lineHeight": "1.2",
+                              "letterSpacing": "0.12em",
+                              "textTransform": "uppercase"
+                            },
+                            "title": {
+                              "variant": "heading",
+                              "fontSize": "clamp(28px, 3vw, 46px)",
+                              "fontWeight": "720",
+                              "lineHeight": "1.06",
+                              "letterSpacing": "-0.025em"
+                            },
+                            "body": {
+                              "variant": "body",
+                              "fontSize": "16px",
+                              "fontWeight": "400",
+                              "lineHeight": "1.7"
+                            },
+                            "button": {
+                              "variant": "button",
+                              "fontSize": "14px",
+                              "fontWeight": "700",
+                              "lineHeight": "1",
+                              "letterSpacing": "0.01em"
+                            }
+                          },
+                          "carouselSettings": {
+                            "variant": "default"
+                          },
+                          "size": "large",
+                          "animation": {
+                            "preset": "fade-up"
+                          }
                         }
                       ]
                     }
@@ -8073,7 +8209,7 @@
         "visible": true
       }
     ],
-    "updatedAt": "2026-08-04T16:54:00.996Z"
+    "updatedAt": "2026-08-07T04:47:20.347Z"
   },
   "header": {
     "version": 1,

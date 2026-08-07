@@ -132,7 +132,6 @@ export type BuilderAnimationSettings = {
 export type LayoutBlockKind =
   | "hero"
   | "button"
-  | "promoStrip"
   | "grid"
   | "heading"
   | "hero"
@@ -175,7 +174,8 @@ export type LayoutBlockKind =
   | "accountContent"
   | "divider"
   | "accordion"
-  | "alert";
+  | "alert"
+  | "gallery";
   
 
 export type BuilderDesign = {

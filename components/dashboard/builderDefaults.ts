@@ -482,22 +482,6 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
     };
   }
 
-  if (kind === "promoStrip") {
-    return {
-      id,
-      kind,
-      eyebrow: "Now booking autumn projects",
-      title: "A sharper digital presence starts with one good conversation",
-      body: "Reserve a complimentary 30-minute planning session and leave with a clearer next step.",
-      buttonLabel: "Book a Session",
-      buttonUrl: "/",
-      buttonStyle: "primary",
-      elementPadding: "md",
-      typography: premiumContentTypography,
-      visualStyle: premiumCardVisualStyle(),
-    };
-  }
-
   if (kind === "button") {
     return {
       id,
@@ -952,6 +936,40 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
       elementPadding: "sm",
       typography: premiumContentTypography,
     };
+  }
+
+  if (kind === "gallery") {
+    return {
+      id,
+      kind,
+      title: "Gallery Showcase",
+      columns: 3,
+      gridGap: "medium",
+      enableLightbox: true,
+      galleryItems: [
+        {
+          id: `${id}-item-1`,
+          imageUrl: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80",
+          title: "Creative Artwork",
+          meta: "Design & Art",
+          content: "Visual layout showcase",
+        },
+        {
+          id: `${id}-item-2`,
+          imageUrl: "https://images.unsplash.com/photo-1541701494587-cb58502866ab?auto=format&fit=crop&w=800&q=80",
+          title: "Modern Abstract",
+          meta: "Abstract",
+          content: "Clean aesthetics",
+        },
+        {
+          id: `${id}-item-3`,
+          imageUrl: "https://images.unsplash.com/photo-1550684848-fac1c5b4e853?auto=format&fit=crop&w=800&q=80",
+          title: "Photography",
+          meta: "Photo",
+          content: "High resolution media",
+        },
+      ],
+    } as any;
   }
 
   if (kind === "badgeGrid") {

@@ -7,20 +7,32 @@ import type {
 } from "@/components/dashboard/builderTypes";
 import type { ComponentType } from "react";
 import AccordionCapabilityPanel from "@/components/dashboard/inspector/panels/AccordionCapabilityPanel";
+import AlertCapabilityPanel from "@/components/dashboard/inspector/panels/AlertCapabilityPanel";
+import BadgeGridCapabilityPanel from "@/components/dashboard/inspector/panels/BadgeGridCapabilityPanel";
+import BreadcrumbsCapabilityPanel from "@/components/dashboard/inspector/panels/BreadcrumbsCapabilityPanel";
 import ButtonCapabilityPanel from "@/components/dashboard/inspector/panels/ButtonCapabilityPanel";
 import CoreContentCapabilityPanel from "@/components/dashboard/inspector/panels/CoreContentCapabilityPanel";
+import DatePickerCapabilityPanel from "@/components/dashboard/inspector/panels/DatePickerCapabilityPanel";
+import DividerCapabilityPanel from "@/components/dashboard/inspector/panels/DividerCapabilityPanel";
 import HeadingCapabilityPanel from "@/components/dashboard/inspector/panels/HeadingCapabilityPanel";
+import IconCapabilityPanel from "@/components/dashboard/inspector/panels/IconCapabilityPanel";
 import GridCapabilityPanel from "@/components/dashboard/inspector/panels/GridCapabilityPanel";
 import { HeroCapabilityPanel } from "@/components/dashboard/inspector/panels/HeroGridCapabilityPanel";
 import ImageCapabilityPanel from "@/components/dashboard/inspector/panels/ImageCapabilityPanel";
 import ListCapabilityPanel from "@/components/dashboard/inspector/panels/ListCapabilityPanel";
 import PanelCapabilityPanel from "@/components/dashboard/inspector/panels/PanelCapabilityPanel";
+import TableCapabilityPanel from "@/components/dashboard/inspector/panels/TableCapabilityPanel";
+import GalleryCapabilityPanel from "@/components/dashboard/inspector/panels/GalleryCapabilityPanel";
+import SliderCapabilityPanel from "@/components/dashboard/inspector/panels/SliderCapabilityPanel";
+import FluentFormCapabilityPanel from "@/components/dashboard/inspector/panels/FluentFormCapabilityPanel";
+import ProductsCapabilityPanel from "@/components/dashboard/inspector/panels/ProductsCapabilityPanel";
+import CategoryFiltersCapabilityPanel from "@/components/dashboard/inspector/panels/CategoryFiltersCapabilityPanel";
 import TextCapabilityPanel from "@/components/dashboard/inspector/panels/TextCapabilityPanel";
 
 /** Normal page kinds with a dedicated capability-driven inspector path. */
 export const CANONICAL_INSPECTOR_KINDS = [
   "button", "panel", "heading", "text", "list", "accordion", "image",
-  "hero", "grid", "icon", "badgeGrid", "table", "divider", "alert", "breadcrumbs", "datePicker",
+  "hero", "grid", "gallery", "slider", "fluentForm", "products", "categoryFilters", "icon", "badgeGrid", "table", "divider", "alert", "breadcrumbs", "datePicker",
 ] as const satisfies readonly LayoutBlockKind[];
 
 /**
@@ -28,9 +40,8 @@ export const CANONICAL_INSPECTOR_KINDS = [
  * data-heavy editors are migrated; they are never silently treated as modern.
  */
 export const LEGACY_INSPECTOR_ALLOWLIST = [
-  "promoStrip", "slider", "scrollPinnedDemo",
-  "embed", "fluentForm", "menu",
-  "products", "categoryFilters",
+  "scrollPinnedDemo",
+  "embed", "menu",
   "cartContent", "checkoutContent", "accountContent",
 ] as const satisfies readonly LayoutBlockKind[];
 
@@ -50,7 +61,9 @@ export type InspectorPanelContext = {
   openWordPressMediaPicker: (options: {
     title: string;
     currentUrl?: string;
+    multiple?: boolean;
     onSelect: (media: WordPressMediaItem) => void;
+    onSelectMany?: (media: WordPressMediaItem[]) => void;
   }) => void;
 };
 
@@ -87,6 +100,7 @@ export const INSPECTOR_ELEMENT_CAPABILITIES: Partial<Record<LayoutBlockKind, Ins
   button: {
     capabilities: ["content", "style", "advanced"],
     composes: ["content", "component-presentation", "link", "general", "animation"],
+    settingsSources: ["style"],
     panel: ButtonCapabilityPanel,
     settingsLabel: "Settings",
   },
@@ -100,33 +114,35 @@ export const INSPECTOR_ELEMENT_CAPABILITIES: Partial<Record<LayoutBlockKind, Ins
   heading: {
     capabilities: ["content", "style", "advanced"],
     composes: ["content", "component-presentation", "general", "animation"],
+    settingsSources: ["style"],
     panel: HeadingCapabilityPanel,
     settingsLabel: "Settings",
   },
   text: {
     capabilities: ["content", "style", "advanced"],
     composes: ["content", "component-presentation", "general", "animation"],
+    settingsSources: ["style"],
     panel: TextCapabilityPanel,
     settingsLabel: "Settings",
   },
   list: {
     capabilities: ["content", "style", "advanced"],
     composes: ["content", "repeatable-items", "component-presentation", "link", "general", "animation"],
-    settingsSources: ["style", "behavior"],
+    settingsSources: ["style"],
     panel: ListCapabilityPanel,
     settingsLabel: "Settings",
   },
   accordion: {
     capabilities: ["content", "style", "advanced"],
     composes: ["content", "repeatable-items", "component-presentation", "general", "animation"],
-    settingsSources: ["behavior", "style"],
+    settingsSources: ["style"],
     panel: AccordionCapabilityPanel,
     settingsLabel: "Settings",
   },
   image: {
     capabilities: ["content", "style", "advanced"],
     composes: ["content", "media", "link", "component-presentation", "general", "animation"],
-    settingsSources: ["style", "behavior"],
+    settingsSources: ["style"],
     panel: ImageCapabilityPanel,
     settingsLabel: "Settings",
     available: normalImageAvailability,
@@ -141,57 +157,92 @@ export const INSPECTOR_ELEMENT_CAPABILITIES: Partial<Record<LayoutBlockKind, Ins
   grid: {
     capabilities: ["content", "style", "advanced"],
     composes: ["content", "repeatable-items", "component-presentation", "media", "link", "layout", "general", "animation"],
-    settingsSources: ["style", "behavior"],
+    settingsSources: ["style"],
     panel: GridCapabilityPanel,
+    settingsLabel: "Settings",
+  },
+  gallery: {
+    capabilities: ["content", "style", "advanced"],
+    composes: ["content", "repeatable-items", "component-presentation", "media", "link", "layout", "general", "animation"],
+    settingsSources: ["style"],
+    panel: GalleryCapabilityPanel,
+    settingsLabel: "Settings",
+  },
+  slider: {
+    capabilities: ["content", "style", "advanced"],
+    composes: ["content", "repeatable-items", "component-presentation", "media", "link", "general", "animation"],
+    settingsSources: ["style"],
+    panel: SliderCapabilityPanel,
+    settingsLabel: "Settings",
+  },
+  fluentForm: {
+    capabilities: ["content", "style", "advanced"],
+    composes: ["content", "component-presentation", "general", "animation"],
+    settingsSources: ["style"],
+    panel: FluentFormCapabilityPanel,
+    settingsLabel: "Settings",
+  },
+  products: {
+    capabilities: ["content", "style", "advanced"],
+    composes: ["content", "repeatable-items", "component-presentation", "media", "link", "general", "animation"],
+    settingsSources: ["style"],
+    panel: ProductsCapabilityPanel,
+    settingsLabel: "Settings",
+  },
+  categoryFilters: {
+    capabilities: ["content", "style", "advanced"],
+    composes: ["content", "component-presentation", "general", "animation"],
+    settingsSources: ["style"],
+    panel: CategoryFiltersCapabilityPanel,
     settingsLabel: "Settings",
   },
   icon: {
     capabilities: ["content", "style", "advanced"],
     composes: ["content", "component-presentation", "general", "animation"],
-    settingsSources: ["style", "behavior"],
-    panel: CoreContentCapabilityPanel,
+    settingsSources: ["style"],
+    panel: IconCapabilityPanel,
     settingsLabel: "Settings",
   },
   badgeGrid: {
     capabilities: ["content", "style", "advanced"],
-    composes: ["content", "component-presentation", "general", "animation"],
-    settingsSources: ["style", "behavior"],
-    panel: CoreContentCapabilityPanel,
+    composes: ["content", "repeatable-items", "component-presentation", "general", "animation"],
+    settingsSources: ["style"],
+    panel: BadgeGridCapabilityPanel,
     settingsLabel: "Settings",
   },
   table: {
     capabilities: ["content", "style", "advanced"],
     composes: ["content", "component-presentation", "general", "animation"],
-    settingsSources: ["style", "behavior"],
-    panel: CoreContentCapabilityPanel,
+    settingsSources: ["style"],
+    panel: TableCapabilityPanel,
     settingsLabel: "Settings",
   },
   divider: {
     capabilities: ["content", "style", "advanced"],
     composes: ["content", "component-presentation", "general", "animation"],
-    settingsSources: ["style", "behavior"],
-    panel: CoreContentCapabilityPanel,
+    settingsSources: ["style"],
+    panel: DividerCapabilityPanel,
     settingsLabel: "Settings",
   },
   alert: {
     capabilities: ["content", "style", "advanced"],
     composes: ["content", "component-presentation", "general", "animation"],
-    settingsSources: ["style", "behavior"],
-    panel: CoreContentCapabilityPanel,
+    settingsSources: ["style"],
+    panel: AlertCapabilityPanel,
     settingsLabel: "Settings",
   },
   breadcrumbs: {
     capabilities: ["content", "style", "advanced"],
     composes: ["content", "component-presentation", "general", "animation"],
-    settingsSources: ["style", "behavior"],
-    panel: CoreContentCapabilityPanel,
+    settingsSources: ["style"],
+    panel: BreadcrumbsCapabilityPanel,
     settingsLabel: "Settings",
   },
   datePicker: {
     capabilities: ["content", "style", "advanced"],
     composes: ["content", "component-presentation", "general", "animation"],
-    settingsSources: ["style", "behavior"],
-    panel: CoreContentCapabilityPanel,
+    settingsSources: ["style"],
+    panel: DatePickerCapabilityPanel,
     settingsLabel: "Settings",
   },
 };

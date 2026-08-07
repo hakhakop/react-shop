@@ -21,6 +21,8 @@ export type ProductNode = {
   image?: WPImage | null;
   galleryImages?: { nodes: WPImage[] } | null;
   price?: string | null;
+  featured?: boolean | null;
+  onSale?: boolean | null;
   productCategories?: {
     nodes: {
       name: string;
@@ -56,6 +58,7 @@ const PRODUCT_NODE_FIELDS = `
     altText
   }
   ... on Product {
+    featured
     productCategories {
       nodes {
         name
@@ -64,6 +67,7 @@ const PRODUCT_NODE_FIELDS = `
     }
   }
   ... on SimpleProduct {
+    onSale
     price(format: RAW)
     attributes {
       nodes {
@@ -74,6 +78,7 @@ const PRODUCT_NODE_FIELDS = `
     }
   }
   ... on VariableProduct {
+    onSale
     price(format: RAW)
     attributes {
       nodes {
@@ -264,36 +269,50 @@ export async function getProductsForGrid(options: {
   categoryId?: string;
   website?: SaaSWebsite | null;
 }): Promise<ProductNode[]> {
-  const { limit, source = "featured", categoryId } = options;
+  const { limit, source = "all", categoryId } = options;
   const endpoint = getWebsiteGraphQLEndpoint(options.website);
 
-  if (source === "category" && categoryId) {
-    const data = await graphqlFetch<GridProductsResponse>(
-      CATEGORY_ID_PRODUCTS_QUERY,
-      {
-        limit,
-        catId: [categoryId],
-      },
-      { endpoint },
-    );
-    return data.products?.nodes ?? [];
+  if ((source === "category" || (categoryId && categoryId !== "all")) && categoryId && categoryId !== "all") {
+    try {
+      const data = await graphqlFetch<GridProductsResponse>(
+        CATEGORY_ID_PRODUCTS_QUERY,
+        {
+          limit,
+          catId: [categoryId],
+        },
+        { endpoint },
+      );
+      if (data?.products?.nodes?.length) {
+        return data.products.nodes;
+      }
+    } catch (e) {}
   }
 
   if (source === "all") {
+    try {
+      const data = await graphqlFetch<GridProductsResponse>(
+        ALL_PRODUCTS_QUERY,
+        { limit },
+        { endpoint },
+      );
+      if (data?.products?.nodes?.length) {
+        return data.products.nodes;
+      }
+    } catch (e) {}
+  }
+
+  try {
     const data = await graphqlFetch<GridProductsResponse>(
-      ALL_PRODUCTS_QUERY,
+      FEATURED_PRODUCTS_QUERY,
       { limit },
       { endpoint },
     );
-    return data.products?.nodes ?? [];
-  }
+    if (data?.products?.nodes?.length) {
+      return data.products.nodes;
+    }
+  } catch (e) {}
 
-  const data = await graphqlFetch<GridProductsResponse>(
-    FEATURED_PRODUCTS_QUERY,
-    { limit },
-    { endpoint },
-  );
-  return data.products?.nodes ?? [];
+  return [];
 }
 
 type ProductData = {
