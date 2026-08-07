@@ -72,11 +72,14 @@ export type BuilderListItem = {
 };
 export type InspectorTab =
   | "content"
+  | "settings"
   | "layout"
   | "spacing"
   | "style"
+  | "appearance"
   | "typography"
   | "behavior"
+  | "effects"
   | "advanced";
 export type SidebarTab =
   | "builder"

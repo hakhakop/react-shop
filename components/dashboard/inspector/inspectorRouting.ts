@@ -133,7 +133,7 @@ export const INSPECTOR_ELEMENT_CAPABILITIES: Partial<Record<LayoutBlockKind, Ins
     settingsLabel: "Settings",
   },
   accordion: {
-    capabilities: ["content", "style", "advanced"],
+    capabilities: ["content", "settings", "appearance", "behavior", "effects", "advanced"],
     composes: ["content", "repeatable-items", "component-presentation", "general", "animation"],
     settingsSources: ["style"],
     panel: AccordionCapabilityPanel,

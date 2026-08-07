@@ -165,7 +165,7 @@
     "language": "hy",
     "status": "active",
     "createdAt": "2026-07-09T18:59:07.392Z",
-    "updatedAt": "2026-07-29T19:59:45.748Z",
+    "updatedAt": "2026-08-05T09:42:27.798Z",
     "cmsConnection": {
       "provider": "wordpress",
       "siteUrl": "https://sungoods.am",
@@ -184,7 +184,7 @@
     "enabledLanguages": [
       "hy"
     ],
-    "lastPublishedAt": "2026-07-29T14:22:53.387Z"
+    "lastPublishedAt": "2026-08-05T09:42:27.798Z"
   },
   {
     "id": "1fe31cd2-d036-4287-9fb6-8d1b996006d6",
@@ -450,8 +450,8 @@
     "status": "creating",
     "creationRequestId": "96747b45-74d9-43e4-993e-fc7970f987b7",
     "createdAt": "2026-07-22T19:07:37.955Z",
-    "updatedAt": "2026-08-04T13:39:58.925Z",
-    "lastPublishedAt": "2026-08-04T13:39:58.925Z"
+    "updatedAt": "2026-08-04T16:55:55.664Z",
+    "lastPublishedAt": "2026-08-04T16:55:55.664Z"
   },
   {
     "id": "afa2e947-4df5-4117-88e2-d678dbceff4b",

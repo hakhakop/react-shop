@@ -1141,8 +1141,10 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
     : undefined;
   const inspectorTabLabel = (tab: InspectorTab) => {
     if (tab === "content") return t("builder.inspector.content");
+    if (tab === "settings") return "Settings";
     if (tab === "layout") return t("builder.inspector.layout");
     if (tab === "spacing") return t("builder.inspector.spacing");
+    if (tab === "appearance") return "Appearance";
     if (tab === "style") {
       return selectedElementCapabilityDeclaration?.settingsLabel === "Settings"
         ? "Settings"
@@ -1150,6 +1152,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
     }
     if (tab === "typography") return t("builder.inspector.typography");
     if (tab === "behavior") return "Behavior";
+    if (tab === "effects") return "Effects";
     return t("builder.inspector.advanced");
   };
   const canonicalBlockTabs: [InspectorTab, string][] =
