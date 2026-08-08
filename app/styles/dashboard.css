@@ -2147,6 +2147,14 @@
   background: transparent;
 }
 
+/* Section settings must remain reachable from Structure/Layout even when the
+   row is not hovered; section content can cover the canvas toolbar. */
+.builder-wireframe-item--section .builder-wireframe-actions {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(0);
+}
+
 .builder-wireframe-item:hover .builder-wireframe-badge {
   opacity: 0;
   transform: scale(0.85);
@@ -15289,9 +15297,18 @@ body:has([data-scoped-builder-root])
 
 .builder-preview-canvas .builder-preview-section-tools,
 .builder-preview-canvas .builder-preview-row-toolbar,
-.builder-preview-canvas .builder-preview-block-tools {
-  z-index: 20 !important;
+.builder-preview-canvas .builder-preview-block-tools,
+.builder-preview-canvas .builder-preview-column-toolbar {
+  /* Editor chrome must stay above user content, including absolute-positioned
+     blocks and nested layout surfaces. The earlier z-index:9999 contract was
+     accidentally overridden here by z-index:20. */
+  z-index: 10000 !important;
 }
+
+.builder-preview-canvas .builder-preview-section-tools { z-index: 10010 !important; }
+.builder-preview-canvas .builder-preview-row-toolbar { z-index: 10020 !important; }
+.builder-preview-canvas .builder-preview-column-toolbar { z-index: 10030 !important; }
+.builder-preview-canvas .builder-preview-block-tools { z-index: 10040 !important; }
 
 /* Empty placeholders communicate availability through their content and
    surface only. The canonical interaction object owns the sole hover/selected

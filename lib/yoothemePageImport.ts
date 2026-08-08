@@ -657,7 +657,10 @@ const mapStaticElement = (
     }
     warnUnsupported(path, props, [
       "block_align", "grid_column_gap", "grid_default", "grid_medium", "grid_small",
-      "image_align", "link_style", "link_text", "meta_style", "panel_padding", "panel_style",
+      "grid_row_gap", "grid_divider", "grid_column_align", "grid_row_align",
+      "image_align", "image_width", "image_height", "image_loading", "image_border",
+      "image_box_shadow", "image_box_decoration", "image_transition", "link_image",
+      "link_style", "link_text", "meta_style", "panel_padding", "panel_style",
       "show_content", "show_image", "show_link", "show_meta", "show_title", "text_align",
       "title_element", "title_style",
       ...GENERAL_POSITION_KEYS,
@@ -677,7 +680,24 @@ const mapStaticElement = (
       gridMediaPlacement: props.image_align === "left" || props.image_align === "right" ? props.image_align : "top",
       gridItemAlign: sourceAlignment(props.text_align),
       gridGap: typeof props.grid_column_gap === "string" ? props.grid_column_gap : undefined,
+      gridRowGap: ["none", "small", "medium", "large"].includes(String(props.grid_row_gap))
+        ? (props.grid_row_gap as "none" | "small" | "medium" | "large")
+        : undefined,
+      showDividers: Boolean(props.grid_divider),
+      // YOOtheme's grid_column_align is its Vertical Alignment toggle.
+      centerRows: Boolean(props.grid_column_align),
+      columnsPhonePortrait: typeof props.grid_default === "string" ? props.grid_default : undefined,
+      columnsPhoneLandscape: typeof props.grid_small === "string" ? props.grid_small : undefined,
       columnsDesktop: typeof props.grid_medium === "string" ? props.grid_medium : undefined,
+      gridMediaWidth: props.image_grid_width === "1-3" ? "small" : props.image_grid_width === "1-2" ? "medium" : "large",
+      imageMaxWidth: sourceImageMaxWidth(props),
+      imageHeight: asString(props.image_height) as any,
+      imageLoading: props.image_loading === true ? "eager" : "lazy",
+      imageBorder: asString(props.image_border) ?? "none",
+      imageBoxShadow: asString(props.image_box_shadow) ?? "none",
+      imageBoxDecoration: asString(props.image_box_decoration) ?? "none",
+      imageHoverTransition: asString(props.image_transition) ?? "none",
+      linkImage: Boolean(props.link_image),
       textAlign: sourceAlignment(props.text_align),
     }, props);
   }
@@ -895,13 +915,34 @@ export const mapYoothemeStaticContent = (
       title: structureSection.title,
       background: structureSection.background,
       sectionVariant: sourceSectionVariant(sectionProps.style),
-      topSpacing: sourceSectionSpacing(sectionProps.padding),
-      bottomSpacing: sectionProps.padding_remove_bottom
-        ? "none"
-        : sourceSectionSpacing(sectionProps.padding),
+      preserveColor: Boolean(sectionProps.preserve_color),
+      overlap: Boolean(sectionProps.overlap),
+      textColor: sectionProps.text_color === "light" || sectionProps.text_color === "dark" ? sectionProps.text_color : "none",
+      contentMode: (typeof sectionProps.width === "string" ? sectionProps.width : "boxed") as any,
+      maxWidth: (typeof sectionProps.width === "string" ? sectionProps.width : "default") as any,
+      removeHorizontalPadding: Boolean(sectionProps.padding_remove_horizontal),
+      expandOneSide: sectionProps.expand === "left" || sectionProps.expand === "right" ? sectionProps.expand : "none",
+      sectionHeight: (typeof sectionProps.height === "string" ? sectionProps.height : "auto") as any,
+      heightOffset: sectionProps.height_offset as any,
+      subtractHeightAbove: Boolean(sectionProps.height_viewport),
+      contentVerticalAlign: sectionProps.vertical_align === "middle" || sectionProps.vertical_align === "center" ? "center" : sectionProps.vertical_align === "bottom" ? "bottom" : "top",
+      sectionPadding: (sourceSectionSpacing(sectionProps.padding) ?? "default") as any,
+      removeTopPadding: Boolean(sectionProps.padding_remove_top),
+      removeBottomPadding: Boolean(sectionProps.padding_remove_bottom),
+      topSpacing: sectionProps.padding_remove_top ? "none" : sourceSectionSpacing(sectionProps.padding),
+      bottomSpacing: sectionProps.padding_remove_bottom ? "none" : sourceSectionSpacing(sectionProps.padding),
+      htmlElement: (["div", "section", "header", "footer", "aside", "main"].includes(sectionProps.html_element as string) ? sectionProps.html_element : "div") as any,
+      stickyEffect: sectionProps.sticky === "cover" || sectionProps.sticky === "reveal" ? sectionProps.sticky : "none",
+      headerTransparent: sectionProps.header_transparent === "transparent" || sectionProps.header_transparent === "pull" || Boolean(sectionProps.header_transparent),
+      pullUnderHeader: sectionProps.header_transparent === "pull",
+      headerTextColor: sectionProps.header_transparent_color === "light" || sectionProps.header_transparent_color === "dark" ? sectionProps.header_transparent_color : "none",
+      animation: typeof sectionProps.animation === "string" && sectionProps.animation !== "none" ? (sectionProps.animation as any) : undefined,
+      animationDelay: sectionProps.animation_delay ? Number(sectionProps.animation_delay) : undefined,
+      sectionTitlePosition: typeof sectionProps.title_position === "string" ? sectionProps.title_position : undefined,
+      sectionTitleRotation: sectionProps.title_rotation === "left" || sectionProps.title_rotation === "right" ? sectionProps.title_rotation : "none",
+      sectionTitleBreakpoint: typeof sectionProps.title_breakpoint === "string" ? sectionProps.title_breakpoint : undefined,
       visible: true,
-      layout:
-        structureSection.layout ?? layoutItems[0]?.rowLayout,
+      layout: structureSection.layout ?? layoutItems[0]?.rowLayout,
       layoutColumns:
         structureSection.layoutColumns ||
         layoutItems.filter((item) => item.rowId === layoutItems[0]?.rowId).length,

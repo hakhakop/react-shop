@@ -4,8 +4,16 @@ import type { InspectorTab, BuilderLayoutBlock, WordPressMediaItem } from "@/com
 import type { BuilderShellSettings } from "@/lib/builderShell";
 import { UIKIT_PANEL_CAPABILITY } from "@/lib/uikitCapabilities";
 import { BuilderImageUrlControl } from "@/components/dashboard/inspector/panels/InspectorSharedControls";
-import { InspectorFieldRow, InspectorSelect, InspectorTextField, InspectorTextarea } from "@/components/dashboard/inspector/InspectorControls";
-import { ImageSettingsGroup, CardSettingsGroup, MediaSettingsGroup, ActionSettingsGroup, ContentSettingsGroup, MetaSettingsGroup, TitleSettingsGroup } from "@/components/dashboard/inspector/panels/SharedSettingGroups";
+import { InspectorFieldRow, InspectorTextField, InspectorTextarea } from "@/components/dashboard/inspector/InspectorControls";
+import {
+  ImageSettingsGroup,
+  CardSettingsGroup,
+  MediaSettingsGroup,
+  ActionSettingsGroup,
+  ContentSettingsGroup,
+  MetaSettingsGroup,
+  TitleSettingsGroup,
+} from "@/components/dashboard/inspector/panels/SharedSettingGroups";
 
 type Props = {
   block: BuilderLayoutBlock;
@@ -70,6 +78,30 @@ export default function PanelCapabilityPanel({ block, tab, shellSettings, update
   if (tab === "layout" || tab === "style") {
     return (
       <div className="builder-inspector-stack" data-uikit-capability="panel-settings">
+        <CardSettingsGroup
+          block={block}
+          update={updateSemantic}
+          title="PANEL"
+          showLink
+          keys={{ variant: "panelStyle", size: "panelSize", hover: "panelHover", link: "linkPanel" }}
+          surfaceOptions={[
+            { value: "none", label: "None" },
+            { value: "card-default", label: "Card Default" },
+            { value: "card-primary", label: "Card Primary" },
+            { value: "card-secondary", label: "Card Secondary" },
+            { value: "card-hover", label: "Card Hover" },
+            { value: "tile-default", label: "Tile Default" },
+            { value: "tile-primary", label: "Tile Primary" },
+            { value: "tile-secondary", label: "Tile Secondary" },
+          ]}
+          defaultSize="none"
+          sizeOptions={[
+            { value: "none", label: "None" },
+            { value: "small", label: "Small" },
+            { value: "default", label: "Default" },
+            { value: "large", label: "Large" },
+          ]}
+        />
         <MediaSettingsGroup block={block} update={updateSemantic} />
         <ImageSettingsGroup block={block} update={updateSemantic} />
         <TitleSettingsGroup
@@ -93,21 +125,6 @@ export default function PanelCapabilityPanel({ block, tab, shellSettings, update
           update={updateSemantic}
           showAlignment={false}
           keys={{ role: "contentTypographyRole", align: "panelTextAlign" }}
-        />
-        <section className="builder-inspector-section" data-uikit-capability="panel-content-layout">
-          <h3>Content layout</h3>
-          <InspectorFieldRow label="Vertical alignment"><InspectorSelect value={(block.panelVerticalAlign ?? "top") as typeof properties.verticalAlign.values[number]} options={selectOptions(properties.verticalAlign.values)} onChange={(value) => updateSemantic({ panelVerticalAlign: value })} ariaLabel="Vertical alignment" /></InspectorFieldRow>
-          <InspectorFieldRow label="Content width"><InspectorSelect value={(block.panelContentWidth ?? "auto") as typeof properties.contentWidth.values[number]} options={selectOptions(properties.contentWidth.values)} onChange={(value) => updateSemantic({ panelContentWidth: value })} ariaLabel="Content width" /></InspectorFieldRow>
-        </section>
-        <CardSettingsGroup
-          block={block}
-          update={updateSemantic}
-          title="CARD PRESENTATION"
-          keys={{
-            variant: "panelVariant",
-            size: "panelSize",
-            hover: "panelHover",
-          }}
         />
         <ActionSettingsGroup
           block={block}

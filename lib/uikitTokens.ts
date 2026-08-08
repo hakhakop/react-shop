@@ -250,20 +250,27 @@ export function getUikitWidthClass(colSpan?: number, totalCols: number = 12): st
 export function getUikitCardClass(
   preset?: string,
   options?: {
-    hover?: string;
+    hover?: boolean | string;
     padding?: string;
   }
 ): string {
   const classes: string[] = [];
 
-  const p = preset?.toLowerCase() || "default";
+  const rawP = (preset?.toLowerCase() || "default").trim();
+  const isTile = rawP.startsWith("tile-");
+  const isCardPrefix = rawP.startsWith("card-");
+  const p = isTile ? rawP.replace("tile-", "") : isCardPrefix ? rawP.replace("card-", "") : rawP;
 
   if (p === "none" || p === "flat" || p === "blank" || p === "panel") {
     classes.push("uk-panel");
+  } else if (isTile) {
+    classes.push("uk-tile", `uk-tile-${p || "default"}`);
   } else if (p === "secondary" || p === "dark") {
     classes.push("uk-card", "uk-card-secondary");
   } else if (p === "primary" || p === "accent") {
     classes.push("uk-card", "uk-card-primary");
+  } else if (p === "hover") {
+    classes.push("uk-card", "uk-card-default", "uk-card-hover");
   } else {
     // default, soft, elevated, outline, glass
     classes.push("uk-card", "uk-card-default");
@@ -272,14 +279,22 @@ export function getUikitCardClass(
   // Padding modifier
   const pad = options?.padding?.toLowerCase();
   if (pad === "small" || pad === "xs" || pad === "sm") {
-    classes.push("uk-card-small");
+    classes.push(isTile ? "uk-padding-small" : "uk-card-small");
   } else if (pad === "large" || pad === "lg" || pad === "xl") {
-    classes.push("uk-card-large");
+    classes.push(isTile ? "uk-padding-large" : "uk-card-large");
   }
 
   // Hover modifier
-  const hover = options?.hover?.toLowerCase();
-  if (hover && hover !== "none") {
+  const hover = options?.hover;
+  const isHoverActive =
+    hover === true ||
+    (typeof hover === "string" &&
+      hover.toLowerCase() !== "none" &&
+      hover.toLowerCase() !== "disabled" &&
+      hover.toLowerCase() !== "false" &&
+      hover.toLowerCase() !== "");
+
+  if (isHoverActive && !classes.includes("uk-card-hover")) {
     classes.push("uk-card-hover");
   }
 

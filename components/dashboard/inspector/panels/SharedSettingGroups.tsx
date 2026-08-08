@@ -429,6 +429,7 @@ export function ImageSettingsGroup({
   block,
   update,
   showFrameless = false,
+  showLinkImage = false,
   keys = {
     width: "imageWidth",
     height: "imageHeight",
@@ -445,6 +446,8 @@ export function ImageSettingsGroup({
   block: BuilderLayoutBlock;
   update: (patch: any) => void;
   showFrameless?: boolean;
+  /** Exposes the canonical `linkImage` behavior when the parent provides a link URL. */
+  showLinkImage?: boolean;
   keys?: {
     width: string;
     height: string;
@@ -548,6 +551,21 @@ export function ImageSettingsGroup({
           onChange={(value) => update({ [keys.loading]: value })}
         />
       </InspectorFieldRow>
+
+      {showLinkImage && (
+        <InspectorFieldRow
+          label="Link"
+          isOverridden={values.linkImage !== undefined}
+          inheritedValueText="Off"
+          onReset={() => update({ linkImage: undefined })}
+        >
+          <InspectorSwitch
+            checked={Boolean(values.linkImage)}
+            onChange={(checked) => update({ linkImage: checked })}
+            label="Link image"
+          />
+        </InspectorFieldRow>
+      )}
 
       <InspectorFieldRow
         label="Border"

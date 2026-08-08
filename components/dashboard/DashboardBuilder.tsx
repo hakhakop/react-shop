@@ -4028,15 +4028,23 @@ export default function DashboardBuilder({
     if (builderState.page !== "header") {
       const contextKey = builderState.page;
       setHeaderContextKey(contextKey);
-      switchBuilderTarget("header", { syncUrl: false });
+      const nextState = hydrateDocumentBuilderState(
+        loadDraftForKey("header", storageKeys),
+        shellSettings,
+      );
+      setBuilderState(nextState);
       router.replace(`${pathname}?page=header&context=${encodeURIComponent(contextKey)}`, { scroll: false });
     }
     setSelectedId("header-document");
+    setHeaderSelected(false);
     setSelectedLayoutRowIndex(null);
     setSelectedLayoutColumnKey(null);
     setSelectedLayoutBlockKey(null);
     setOpenLayoutItemId(null);
     setInspectorTab("layout");
+    setSectionSettingsOpen(true);
+    setSidebarCollapsed(false);
+    setSidebarTab("builder");
     openInspectorPanel();
   };
 
@@ -9505,7 +9513,7 @@ export default function DashboardBuilder({
             const target = event.target as HTMLElement;
             if (
               target.closest(
-                ".builder-preview-section, .builder-preview-layout-block, .builder-header-document-preview, button, input, select, textarea, [contenteditable='true'], [draggable='true']",
+                ".builder-preview-section, .builder-preview-layout-block, .builder-header-document-preview, .builder-preview-header-editable, button, input, select, textarea, [contenteditable='true'], [draggable='true']",
               )
             ) {
               return;
@@ -11057,10 +11065,16 @@ function PreviewCanvas({
                       hoveredTarget.sectionId === section.id
                         ? "is-hovered"
                         : ""
-                    } ${visualStyleClassName(section.visualStyle)} ${draggingSectionId === section.id ? "is-dragging" : ""} ${isDragOverAbove ? "is-drag-over-above" : ""} ${isDragOverBelow ? "is-drag-over-below" : ""}`}
-                    style={
-                      {
-                        background: section.background,
+                    }`}
+                    style={{
+                      background:
+                        section.sectionVariant && section.sectionVariant !== "default"
+                          ? undefined
+                          : section.background &&
+                              section.background !== "#ffffff" &&
+                              section.background !== "inherit"
+                            ? section.background
+                            : undefined,
                         "--builder-preview-padding-top": getPreviewSpacing(
                           section.topSpacing,
                         ),
@@ -11086,6 +11100,10 @@ function PreviewCanvas({
                           section.borderRadius !== undefined
                             ? `${section.borderRadius}px`
                             : undefined,
+                        "--shop-builder-section-height-offset":
+                          section.heightOffset === undefined
+                            ? undefined
+                            : `${section.heightOffset}${typeof section.heightOffset === "number" ? "px" : ""}`,
                         ...sectionSchemeStyle(section),
                         ...visualStyleToCss(
                           section.visualStyle as BuilderVisualStyle | undefined,
@@ -11699,9 +11717,17 @@ function getStorefrontPreviewClass(section: BuilderSection) {
   const uikitSectionStyle = getUikitSectionStyleClass(
     section.sectionVariant || section.colorScheme || (section.visualStyle as any)?.preset
   );
-  return `${uikitSectionPad} ${uikitSectionStyle} shop-builder-section shop-builder-section--${
+  const maxWidth = section.maxWidth ?? section.contentMode ?? "boxed";
+  const preserveColorClass = section.preserveColor ? "uk-preserve-color" : "";
+  const overlapClass = section.overlap ? "uk-section-overlap" : "";
+  const textColorClass = section.textColor === "light" ? "uk-light" : section.textColor === "dark" ? "uk-dark" : "";
+  const removeHorizontalPadClass = section.removeHorizontalPadding ? "uk-padding-remove-horizontal" : "";
+  const expandSideClass = section.expandOneSide && section.expandOneSide !== "none" ? `shop-builder-section--expand-${section.expandOneSide}` : "";
+  const titlePositionClass = section.sectionTitlePosition && section.sectionTitlePosition !== "none" ? `shop-builder-section--title-${section.sectionTitlePosition}` : "";
+  const titleRotationClass = section.sectionTitleRotation && section.sectionTitleRotation !== "none" ? `shop-builder-section--title-rotate-${section.sectionTitleRotation}` : "";
+  return `${uikitSectionPad} ${uikitSectionStyle} ${preserveColorClass} ${overlapClass} ${textColorClass} ${section.removeTopPadding ? "uk-padding-remove-top" : ""} ${section.removeBottomPadding ? "uk-padding-remove-bottom" : ""} ${removeHorizontalPadClass} ${expandSideClass} ${titlePositionClass} ${titleRotationClass} shop-builder-section shop-builder-section--${
     section.backgroundMode === "boxed" ? "boxed" : "full"
-  } shop-builder-section--content-${section.contentMode ?? "boxed"} shop-builder-section--height-${
+  } shop-builder-section--content-${maxWidth} shop-builder-section--height-${
     section.sectionHeight ?? "auto"
   } shop-builder-section--align-${
     section.contentVerticalAlign ?? "top"
@@ -15124,7 +15150,7 @@ function PreviewSection({
                             const panelVisibilityClass = ((block as any).visibility && (block as any).visibility !== "always") ? `uk-${(block as any).visibility}` : "";
 
                             return (
-                              <div data-builder-block-id={block.id} className={`shop-builder-column-block shop-builder-column-block--panel ${panelLayoutClass} ${panelMarginClass} ${panelAnimationClass} ${panelVisibilityClass} ${typographyRoleClass(block.contentTypographyRole)} ${getUikitCardClass(block.panelVariant ?? block.panelStyle ?? "default", { hover: block.panelHover ? "hover" : "none", padding: block.panelSize })}`.trim()} style={{ textAlign: block.panelTextAlign ?? "left" }}>
+                              <div data-builder-block-id={block.id} className={`shop-builder-column-block shop-builder-column-block--panel ${panelLayoutClass} ${panelMarginClass} ${panelAnimationClass} ${panelVisibilityClass} ${typographyRoleClass(block.contentTypographyRole)} ${getUikitCardClass(block.panelStyle ?? block.panelVariant ?? "default", { hover: block.panelHover, padding: block.panelSize })}`.trim()} style={{ textAlign: block.panelTextAlign ?? "left" }}>
                                 {block.panelShowMedia !== false && (
                                 <div
                                   className={`${panelMediaClass} ${panelImageClass} shop-builder-panel-media${isPanelImagePlaceholder ? " is-empty" : ""}`.trim()}
@@ -15533,11 +15559,16 @@ function PreviewSection({
                                   )
                                     .slice(
                                       0,
-                                      Math.max(
-                                        1,
-                                        (block.columns ?? 3) *
-                                          (block.gridRows ?? 1),
-                                      ),
+                                      block.gridSource === "products"
+                                        ? Math.max(
+                                            1,
+                                            (block.columns ?? 3) *
+                                              (block.gridRows ?? 1),
+                                          )
+                                        : typeof block.gridLimit === "number" &&
+                                          block.gridLimit > 0
+                                        ? block.gridLimit
+                                        : (block.gridItems ?? []).length,
                                     )
                                     .map((item: any, itemIndex) => {
                                       const itemTypography =
@@ -15592,13 +15623,27 @@ function PreviewSection({
                                         });
                                         const mediaClass = isFrameless ? getUikitPanelMediaClass(mediaPlacement === "left" || mediaPlacement === "right" ? mediaPlacement : "top") : "";
                                         const imageMarginTopClass = (rawGridBlock.imageMarginTop && rawGridBlock.imageMarginTop !== "none" && rawGridBlock.imageMarginTop !== "default") ? `uk-margin-${rawGridBlock.imageMarginTop}` : "";
+                                        const imageBorderClass = rawGridBlock.imageBorder && rawGridBlock.imageBorder !== "none" ? `uk-border-${rawGridBlock.imageBorder}` : "";
+                                        const imageBoxShadowClass = rawGridBlock.imageBoxShadow && rawGridBlock.imageBoxShadow !== "none" ? `uk-box-shadow-${rawGridBlock.imageBoxShadow}` : "";
+                                        const imageDecorationClass = rawGridBlock.imageBoxDecoration && rawGridBlock.imageBoxDecoration !== "none" ? `uk-background-${rawGridBlock.imageBoxDecoration}` : "";
+                                        const imageDimension = (value: unknown) => value === undefined || value === null || value === "" ? undefined : /^-?\d+(?:\.\d+)?$/.test(String(value)) ? `${value}px` : String(value);
+                                        const imageWidth = imageDimension(rawGridBlock.imageWidth);
+                                        const imageHeight = imageDimension(rawGridBlock.imageHeight);
+                                        const imageMaxWidth =
+                                          typeof rawGridBlock.imageMaxWidth === "number" && rawGridBlock.imageMaxWidth > 0
+                                            ? `${rawGridBlock.imageMaxWidth}px`
+                                            : undefined;
+                                        const hasCropFrame = !imageWidth && !imageHeight && mediaStyle.aspectRatio && mediaStyle.aspectRatio !== "auto";
 
                                         return (
                                           <div
-                                            className={`${mediaClass} ${imageMarginTopClass} shop-builder-grid-image ${
+                                            className={`${mediaClass} ${imageMarginTopClass} ${imageBorderClass} ${imageBoxShadowClass} ${imageDecorationClass} shop-builder-grid-image shop-builder-grid-image--align-${mediaAlignment} ${
                                               isItemImagePlaceholder ? "is-empty" : ""
                                             }`.trim()}
-                                            style={{ aspectRatio: mediaStyle.aspectRatio, overflow: "hidden" }}
+                                            style={{
+                                              maxWidth: imageMaxWidth,
+                                              aspectRatio: hasCropFrame ? mediaStyle.aspectRatio : "auto",
+                                            } as CSSProperties}
                                             onClick={(event) => {
                                               if (block.gridSource !== "products") {
                                                 event.stopPropagation();
@@ -15623,12 +15668,12 @@ function PreviewSection({
                                                   }
                                                   width={420}
                                                   height={420}
-                                                  className={`${rawGridBlock.imageBorder && rawGridBlock.imageBorder !== "none" ? `uk-border-${rawGridBlock.imageBorder}` : ""} ${rawGridBlock.imageBoxShadow && rawGridBlock.imageBoxShadow !== "none" ? `uk-box-shadow-${rawGridBlock.imageBoxShadow}` : ""} ${rawGridBlock.imageHoverTransition && rawGridBlock.imageHoverTransition !== "none" ? `uk-transition-${rawGridBlock.imageHoverTransition} uk-transition-opaque` : ""}`.trim()}
+                                                  className={`${rawGridBlock.imageHoverTransition && rawGridBlock.imageHoverTransition !== "none" ? `uk-transition-${rawGridBlock.imageHoverTransition} uk-transition-opaque` : ""}`.trim()}
                                                   style={{
-                                                    position: "absolute",
-                                                    inset: 0,
-                                                    width: "100%",
-                                                    height: "100%",
+                                                    position: "relative",
+                                                    width: imageWidth ?? "100%",
+                                                    height: imageHeight === "auto" ? "auto" : imageHeight ?? (hasCropFrame ? "100%" : "auto"),
+                                                    maxWidth: "100%",
                                                     objectFit: mediaStyle.backgroundSize as React.CSSProperties["objectFit"],
                                                   }}
                                                 />

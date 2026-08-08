@@ -107,6 +107,10 @@ export function GridCardsClient({
   // Resolved Gaps
   const colGapValue = rawBlock.gridGap ?? rawBlock.columnGap ?? "medium";
   const rowGapValue = rawBlock.gridRowGap ?? rawBlock.rowGap ?? colGapValue ?? "medium";
+  const gridColumns = (value: unknown, fallback: number) => {
+    const parsed = Number.parseInt(String(value), 10);
+    return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
+  };
 
   const filterCategories = Array.from(new Set(items.map((it) => it.eyebrow || it.meta || "Default").filter(Boolean)));
   const filteredItems = activeFilter === "all" ? items : items.filter((it) => (it.eyebrow || it.meta || "Default") === activeFilter);
@@ -126,7 +130,8 @@ export function GridCardsClient({
     return "30px";
   };
 
-  const gapCss = `${parseGapPx(colGapValue)} ${parseGapPx(rowGapValue)}`;
+  const columnGapCss = parseGapPx(colGapValue);
+  const rowGapCss = parseGapPx(rowGapValue);
 
   return (
     <div className="shop-builder-grid-wrapper" data-uk-lightbox={rawBlock.enableLightbox ? "animation: slide" : undefined}>
@@ -148,8 +153,14 @@ export function GridCardsClient({
         style={
           {
             "--shop-builder-grid-columns": colsCount,
-            gridTemplateColumns: `repeat(${colsCount}, minmax(0, 1fr))`,
-            gap: gapCss,
+            "--shop-builder-grid-columns-phone-landscape": gridColumns(rawBlock.columnsPhoneLandscape, colsCount),
+            "--shop-builder-grid-columns-tablet": gridColumns(rawBlock.columns, colsCount),
+            "--shop-builder-grid-columns-desktop": gridColumns(rawBlock.columnsDesktop, colsCount),
+            "--shop-builder-grid-columns-xlarge": gridColumns(rawBlock.columnsLargeScreens, colsCount),
+            columnGap: columnGapCss,
+            rowGap: rowGapCss,
+            alignItems: rawBlock.justifyColumns ? "end" : rawBlock.centerRows ? "center" : undefined,
+            justifyItems: rawBlock.centerColumns ? "center" : undefined,
           } as CSSProperties
         }
       >
@@ -219,6 +230,12 @@ export function GridCardsClient({
             const imageHoverTransitionClass = getUikitHoverTransitionClass(rawBlock.imageHoverTransition);
             const isFrameless = (rawBlock as any).alignImageWithoutPadding === true || imagePaddingClass === "frameless";
             const imageDimension = (value: unknown) => value === undefined || value === null || value === "" ? undefined : /^-?\d+(?:\.\d+)?$/.test(String(value)) ? `${value}px` : String(value);
+            const imageWidth = imageDimension(rawBlock.imageWidth);
+            const imageHeight = imageDimension(rawBlock.imageHeight);
+            const imageMaxWidth =
+              typeof rawBlock.imageMaxWidth === "number" && rawBlock.imageMaxWidth > 0
+                ? `${rawBlock.imageMaxWidth}px`
+                : undefined;
 
             // Link / Button styling
             const buttonText = rawBlock.buttonLabel ?? item.buttonLabel ?? rawBlock.linkText ?? "Read more";
@@ -238,6 +255,7 @@ export function GridCardsClient({
               fit: (item.mediaFit ?? block.imageFit ?? "cover") === "contain" ? "contain" : "cover",
               alignment: mediaAlignment,
             });
+            const hasCropFrame = !imageWidth && !imageHeight && mediaStyle.aspectRatio && mediaStyle.aspectRatio !== "auto";
             const panelLayoutClass = getUikitPanelLayoutClass(mediaPlacement, mediaWidth);
             const itemUrl = rawBlock.buttonUrl ?? item.buttonUrl ?? "#";
 
@@ -300,10 +318,11 @@ export function GridCardsClient({
                   src={item.imageUrl}
                   alt={item.imageAlt || item.title || ""}
                   loading={rawBlock.imageLoading === "eager" || rawBlock.imageLoading === true ? "eager" : "lazy"}
-                  className={`${imageBorderClass} ${imageBoxShadowClass} ${imageHoverTransitionClass}`.trim()}
+                  className={imageHoverTransitionClass}
                   style={{
-                    width: "100%",
-                    height: "100%",
+                    width: imageWidth ?? "100%",
+                    height: imageHeight === "auto" ? "auto" : imageHeight ?? (hasCropFrame ? "100%" : "auto"),
+                    maxWidth: "100%",
                     objectFit: mediaStyle.backgroundSize as CSSProperties["objectFit"],
                     borderRadius: isFrameless && isCard ? "4px 4px 0 0" : undefined,
                   }}
@@ -312,13 +331,11 @@ export function GridCardsClient({
 
               return (
                 <div
-                  className={`${mediaClass} ${imageDecorationClass} shop-builder-grid-image`.trim()}
+                  className={`${mediaClass} ${imageBorderClass} ${imageBoxShadowClass} ${imageDecorationClass} shop-builder-grid-image shop-builder-grid-image--align-${mediaAlignment}`.trim()}
                   style={{
-                    width: imageDimension(rawBlock.imageWidth) ?? "100%",
-                    aspectRatio: mediaStyle.aspectRatio,
-                    maxHeight: imageDimension(rawBlock.imageHeight),
-                    overflow: "hidden",
-                  }}
+                    maxWidth: imageMaxWidth,
+                    aspectRatio: hasCropFrame ? mediaStyle.aspectRatio : "auto",
+                  } as CSSProperties}
                 >
                   {rawBlock.enableLightbox ? (
                     <a href={item.imageUrl} data-caption={item.title || ""}>

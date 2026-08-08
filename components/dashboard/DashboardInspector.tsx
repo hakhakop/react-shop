@@ -1194,11 +1194,9 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
             ["advanced", t("builder.inspector.advanced")],
           ]
       : [
-          ["layout", t("builder.inspector.layout")],
-          ["spacing", t("builder.inspector.spacing")],
-          ["style", t("builder.inspector.styling")],
-          ["advanced", t("builder.inspector.advanced")],
-          ["content", t("builder.inspector.content")],
+          ["content", "Content"],
+          ["settings", "Settings"],
+          ["advanced", "Advanced"],
         ];
   const categoryFilterOptions = flattenCategoryTree(previewCategoryTree);
   const filteredCategoryFilterOptions = categoryFilterOptions.filter(
@@ -1330,8 +1328,8 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
       }
       return;
     }
-    if (inspectorTab === "typography") {
-      setInspectorTab("style");
+    if (inspectorTab !== "content" && inspectorTab !== "settings" && inspectorTab !== "advanced") {
+      setInspectorTab("settings");
     }
   }, [inspectorTab, selectedLayoutBlock, selectedSection?.id, selectedLayoutRow, isCanonicalColumnSelection, setInspectorTab]);
 
@@ -2035,8 +2033,7 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
 
           {selectedSection.id === "header-document" &&
             !selectedLayoutBlock &&
-            !selectedLayoutRow &&
-            inspectorTab === "layout" ? (
+            !selectedLayoutRow ? (
               <HeaderDocumentSettings
                 headerSettings={{
                   headerVisible: selectedSection.headerVisible ?? shellSettings.headerVisible ?? true,

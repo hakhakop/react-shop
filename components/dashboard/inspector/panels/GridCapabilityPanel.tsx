@@ -689,7 +689,7 @@ export default function GridCapabilityPanel({
           keys={{ role: "contentTypographyRole", align: "textAlignment", style: "contentStyle" }}
         />
 
-        <ImageSettingsGroup block={block} update={update} showFrameless />
+        <ImageSettingsGroup block={block} update={update} showFrameless showLinkImage />
 
         <ActionSettingsGroup
           block={block}

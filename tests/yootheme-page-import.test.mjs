@@ -212,6 +212,60 @@ test("YOOtheme asset paths can resolve against the configured WordPress site", (
   );
 });
 
+test("YOOtheme Grid image and responsive settings map to the canonical Grid contract", () => {
+  const mapping = mapYoothemeStaticContent({
+    type: "layout",
+    children: [{
+      type: "section",
+      children: [{
+        type: "row",
+        children: [{
+          type: "column",
+          children: [{
+            type: "grid",
+            props: {
+              grid_default: "1",
+              grid_small: "2",
+              grid_medium: "3",
+              grid_column_gap: "large",
+              grid_row_gap: "small",
+              grid_divider: true,
+              grid_column_align: true,
+              grid_row_align: true,
+              image_width: "68",
+              image_height: "auto",
+              image_loading: true,
+              image_border: "rounded",
+              image_box_shadow: "small",
+              image_box_decoration: "primary",
+              image_transition: "scale-up",
+              link_image: true,
+            },
+            children: [],
+          }],
+        }],
+      }],
+    }],
+  });
+
+  const grid = mapping.sections[0].layoutItems[0].blocks[0];
+  assert.equal(grid.columnsPhonePortrait, "1");
+  assert.equal(grid.columnsPhoneLandscape, "2");
+  assert.equal(grid.columnsDesktop, "3");
+  assert.equal(grid.gridGap, "large");
+  assert.equal(grid.gridRowGap, "small");
+  assert.equal(grid.showDividers, true);
+  assert.equal(grid.centerRows, true);
+  assert.equal(grid.gridMediaWidth, "large");
+  assert.equal(grid.imageMaxWidth, 68);
+  assert.equal(grid.imageLoading, "eager");
+  assert.equal(grid.imageBorder, "rounded");
+  assert.equal(grid.imageBoxShadow, "small");
+  assert.equal(grid.imageBoxDecoration, "primary");
+  assert.equal(grid.imageHoverTransition, "scale-up");
+  assert.equal(grid.linkImage, true);
+});
+
 test("unsupported nodes remain visible as recoverable import warnings", () => {
   const mapping = mapYoothemeStaticContent({
     type: "layout",

@@ -31,7 +31,8 @@ test("YOOtheme resolver honors layer precedence and evaluates supported color fu
   assert.equal(preset.shellSettings.buttonRadius, "500px");
   assert.match(String(preset.shellSettings.linkHoverColor), /^#/);
   assert.ok(preset.conflicts.some((row) => row.variable === "@global-primary-background"));
-  assert.ok(preset.unsupported.some((row) => row.variable === "@accordion-title-font-size"));
+  assert.equal(preset.shellSettings.accordionTitleFontSize, "18px");
+  assert.ok(preset.rows.some((row) => row.variable === "@accordion-title-font-size"));
 });
 
 test("unsupported expressions are reported and never guessed into semantic settings", () => {

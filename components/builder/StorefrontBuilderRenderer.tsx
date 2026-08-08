@@ -665,13 +665,10 @@ function sectionStyle(
 function sectionClassName(
   section: BuilderSection,
   layoutScheme: "light" | "dark" | "auto" = "light",
-  extra = "",
+  extra?: string,
 ) {
   const mode = section.backgroundMode === "boxed" ? "boxed" : "full";
-  const contentMode =
-    section.contentMode === "full" || section.contentMode === "narrow"
-      ? section.contentMode
-      : "boxed";
+  const maxWidth = section.maxWidth ?? section.contentMode ?? "boxed";
   const scheme = resolveSectionColorScheme(section, layoutScheme);
   const visualClass = visualStyleClassName(
     section.visualStyle as BuilderVisualStyle | undefined,
@@ -679,12 +676,33 @@ function sectionClassName(
   const heightClass = `shop-builder-section--height-${section.sectionHeight ?? "auto"}`;
   const verticalAlignClass = `shop-builder-section--align-${section.contentVerticalAlign ?? "top"}`;
   const uikitSectionPad = getUikitSectionPaddingClass(
-    (section as any).sectionPadding ?? (section as any).topSpacing ?? (section as any).sectionPaddingTop,
+    section.sectionPadding ?? section.topSpacing ?? (section as any).sectionPaddingTop,
   );
   const uikitSectionStyle = getUikitSectionStyleClass(
     section.sectionVariant || section.colorScheme || (section.visualStyle as any)?.preset,
   );
-  return `${uikitSectionPad} ${uikitSectionStyle} shop-builder-section shop-builder-section--${mode} shop-builder-section--content-${contentMode} shop-builder-section--scheme-${scheme} ${heightClass} ${verticalAlignClass} ${visualClass} ${animationClassName(section.animation)} ${extra}`.trim();
+  const preserveColorClass = section.preserveColor ? "uk-preserve-color" : "";
+  const overlapClass = section.overlap ? "uk-section-overlap" : "";
+  const textColorClass = section.textColor === "light" ? "uk-light" : section.textColor === "dark" ? "uk-dark" : "";
+  const removeTopPadClass = section.removeTopPadding ? "uk-padding-remove-top" : "";
+  const removeBottomPadClass = section.removeBottomPadding ? "uk-padding-remove-bottom" : "";
+  const removeHorizontalPadClass = section.removeHorizontalPadding
+    ? "uk-padding-remove-horizontal"
+    : "";
+  const expandSideClass =
+    section.expandOneSide && section.expandOneSide !== "none"
+      ? `shop-builder-section--expand-${section.expandOneSide}`
+      : "";
+  const titlePositionClass =
+    section.sectionTitlePosition && section.sectionTitlePosition !== "none"
+      ? `shop-builder-section--title-${section.sectionTitlePosition}`
+      : "";
+  const titleRotationClass =
+    section.sectionTitleRotation && section.sectionTitleRotation !== "none"
+      ? `shop-builder-section--title-rotate-${section.sectionTitleRotation}`
+      : "";
+
+  return `${uikitSectionPad} ${uikitSectionStyle} ${preserveColorClass} ${overlapClass} ${textColorClass} ${removeTopPadClass} ${removeBottomPadClass} ${removeHorizontalPadClass} ${expandSideClass} ${titlePositionClass} ${titleRotationClass} shop-builder-section shop-builder-section--${mode} shop-builder-section--content-${maxWidth} shop-builder-section--scheme-${scheme} ${heightClass} ${verticalAlignClass} ${visualClass} ${animationClassName(section.animation)} ${extra}`.trim();
 }
 
 function SectionFrame({
@@ -698,6 +716,7 @@ function SectionFrame({
   extra?: string;
   children: ReactNode;
 }) {
+  const ComponentTag = (section.htmlElement || "section") as any;
   const animationAttrs = animationDataAttributes(section.animation);
   const isAnimatedBg =
     section.backgroundEffect === "antigravity" ||
@@ -717,7 +736,7 @@ function SectionFrame({
       section.antigravityVisualMode === "full");
 
   return (
-    <section
+    <ComponentTag
       id={section.anchorId || section.id}
       data-builder-section-id={section.id}
       className={`${sectionClassName(section, layoutScheme, extra)} ${
@@ -730,8 +749,13 @@ function SectionFrame({
       style={{
         ...sectionStyle(section, layoutScheme),
         ...animationAttrs.style,
+        "--shop-builder-section-height-offset":
+          section.heightOffset === undefined ? undefined : `${section.heightOffset}${typeof section.heightOffset === "number" ? "px" : ""}`,
       }}
       data-gsap-section={section.kind === "hero" ? "hero" : section.kind}
+      data-section-title-breakpoint={section.sectionTitleBreakpoint}
+      data-subtract-height-above={section.subtractHeightAbove || undefined}
+      data-uk-sticky={section.stickyEffect && section.stickyEffect !== "none" ? `cls-active: uk-navbar-sticky; ${section.stickyEffect === "reveal" ? "show-on-up: true" : ""}` : undefined}
       {...animationAttrs.data}
     >
       {isAnimatedBg && (
@@ -780,7 +804,7 @@ function SectionFrame({
       >
         {children}
       </div>
-    </section>
+    </ComponentTag>
   );
 }
 
@@ -1263,7 +1287,12 @@ function GridCards({
   block: BuilderLayoutBlock;
   items: Array<any>;
 }) {
-  const limit = Math.max(1, (block.columns ?? 3) * (block.gridRows ?? 1));
+  const limit =
+    typeof block.gridLimit === "number" && block.gridLimit > 0
+      ? block.gridLimit
+      : block.gridSource === "products"
+        ? Math.max(1, (block.columns ?? 3) * (block.gridRows ?? 1))
+        : items.length || 999;
   const gridTitleStyle = {
     color: "var(--builder-card-title-color, inherit)",
     fontSize: "var(--builder-card-title-size, inherit)",
@@ -2131,7 +2160,7 @@ export function ContentLayoutBlock({
     const panelTextAlign = block.panelTextAlign ?? "left";
 
     return (
-      <div data-builder-block-id={block.id} className={`shop-builder-column-block shop-builder-column-block--panel ${panelLayoutClass} ${typographyRoleClass(block.contentTypographyRole)} ${getUikitCardClass(block.panelVariant ?? block.panelStyle ?? "default", { hover: block.panelHover ? "hover" : "none", padding: block.panelSize })}`} style={{ textAlign: panelTextAlign }}>
+      <div data-builder-block-id={block.id} className={`shop-builder-column-block shop-builder-column-block--panel ${panelLayoutClass} ${typographyRoleClass(block.contentTypographyRole)} ${getUikitCardClass(block.panelStyle ?? block.panelVariant ?? "default", { hover: block.panelHover, padding: block.panelSize })}`} style={{ textAlign: panelTextAlign }}>
         {panelShowMedia && (
           <div
             className={`${panelMediaClass} ${panelImageClass} shop-builder-panel-media${block.imageUrl ? "" : " is-empty"}`.trim()}

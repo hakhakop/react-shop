@@ -31,1608 +31,1123 @@
     },
     "sections": [
       {
-        "id": "contentLayout-msj8qr9v-n7bj8",
+        "id": "yootheme-section-1",
         "kind": "contentLayout",
-        "title": "",
-        "background": "#ffffff",
-        "backgroundMode": "boxed",
-        "contentMode": "boxed",
-        "colorScheme": "inherit",
-        "topSpacing": "inherit",
-        "bottomSpacing": "inherit",
-        "topMargin": "inherit",
-        "bottomMargin": "inherit",
-        "pullUnderHeader": false,
+        "title": "Hero",
+        "background": "transparent",
+        "sectionVariant": "default",
+        "topSpacing": "large",
+        "bottomSpacing": "none",
         "visible": true,
-        "eyebrow": "",
-        "body": "",
+        "layout": "1-col",
+        "layoutColumns": 1,
+        "layoutRows": 2,
         "layoutItems": [
           {
-            "id": "layout-row-msj8u2z1-column-1",
-            "rowId": "layout-row-msj8u2z1",
-            "rowLayout": "3-col-equal",
-            "blocks": [
-              {
-                "id": "panel-block-msj8u6js-97juc",
-                "kind": "panel",
-                "eyebrow": "A more considered approach",
-                "title": "Build a brand experience that feels unmistakably yours",
-                "body": "From the first headline to the smallest interaction, every detail works together to create clarity, confidence, and recognition.",
-                "buttonLabel": "Discover the Process",
-                "buttonUrl": "/",
-                "buttonStyle": "primary",
-                "imageUrl": "/builder-image-placeholder.svg",
-                "imageAlt": "Editorial placeholder for a featured brand story",
-                "imageRatio": "16:9",
-                "imagePadding": "frameless",
-                "imageFit": "cover",
-                "panelVariant": "default",
-                "panelHover": false,
-                "panelSize": "default",
-                "panelShowMedia": true,
-                "panelMediaPlacement": "top",
-                "panelMediaFit": "cover",
-                "panelMediaWidth": "medium",
-                "panelMediaAlignment": "center",
-                "panelTextAlign": "left",
-                "panelVerticalAlign": "top",
-                "panelTitleElement": "h3",
-                "panelTitleStyle": "inherit",
-                "panelContentWidth": "auto",
-                "panelActionVisible": true,
-                "panelActionStyle": "primary",
-                "panelActionSize": "default",
-                "panelActionAlign": "inherit"
-              }
-            ]
-          },
-          {
-            "id": "layout-row-msj8u2z1-column-2",
-            "rowId": "layout-row-msj8u2z1",
-            "blocks": [
-              {
-                "id": "image-block-msj8uqct-zcdxh",
-                "kind": "image",
-                "title": "",
-                "body": "",
-                "imageUrl": "/builder-image-placeholder.svg",
-                "imageAlt": "Modern editorial image placeholder",
-                "imageAlignment": "center",
-                "imageMaxWidth": 1200,
-                "imageFit": "cover",
-                "imageRatio": "16:9",
-                "imageShape": "rounded",
-                "imageShadow": "none",
-                "imageWidth": "auto",
-                "imageLoading": "lazy",
-                "imageLinkTarget": "_self",
-                "imageCaption": "",
-                "elementPadding": "xs"
-              },
-              {
-                "id": "image-block-msj8v6i9-44b6i",
-                "kind": "image",
-                "title": "",
-                "body": "",
-                "imageUrl": "/builder-image-placeholder.svg",
-                "imageAlt": "Modern editorial image placeholder",
-                "imageAlignment": "center",
-                "imageMaxWidth": 1200,
-                "imageFit": "cover",
-                "imageRatio": "16:9",
-                "imageShape": "rounded",
-                "imageShadow": "none",
-                "imageWidth": "auto",
-                "imageLoading": "lazy",
-                "imageLinkTarget": "_self",
-                "imageCaption": "",
-                "elementPadding": "xs"
-              },
-              {
-                "id": "icon-block-msjav24r-q93m1",
-                "kind": "icon",
-                "iconName": "android-robot",
-                "title": "Designed with care",
-                "body": "A focused experience that makes important information easier to notice and understand.",
-                "listIconSize": 28,
-                "elementPadding": "md",
-                "typography": {
-                  "eyebrow": {
-                    "variant": "subheading",
-                    "fontSize": "12px",
-                    "fontWeight": "700",
-                    "lineHeight": "1.2",
-                    "letterSpacing": "0.12em",
-                    "textTransform": "uppercase"
-                  },
-                  "title": {
-                    "variant": "heading",
-                    "fontSize": "clamp(28px, 3vw, 46px)",
-                    "fontWeight": "720",
-                    "lineHeight": "1.06",
-                    "letterSpacing": "-0.025em"
-                  },
-                  "body": {
-                    "variant": "body",
-                    "fontSize": "16px",
-                    "fontWeight": "400",
-                    "lineHeight": "1.7"
-                  },
-                  "button": {
-                    "variant": "button",
-                    "fontSize": "14px",
-                    "fontWeight": "700",
-                    "lineHeight": "1",
-                    "letterSpacing": "0.01em"
-                  }
-                },
-                "visualStyle": {
-                  "customClass": "builder-premium-starter",
-                  "card": {
-                    "preset": "soft",
-                    "hoverPreset": "lift-soft",
-                    "imageRatio": "4:5",
-                    "imageFit": "cover",
-                    "imageRadius": "14px",
-                    "titleSize": "clamp(22px, 2vw, 30px)",
-                    "titleWeight": "720",
-                    "titleMargin": "0",
-                    "metaSize": "11px",
-                    "metaTransform": "uppercase",
-                    "metaSpacing": "0",
-                    "contentSize": "15px",
-                    "contentLineHeight": "1.65",
-                    "buttonMargin": "8px 0 0",
-                    "cardGap": "14px",
-                    "cardPadding": "clamp(20px, 2.4vw, 30px)"
-                  },
-                  "border": {
-                    "radius": "18px"
-                  }
-                },
-                "icon": "android-robot"
-              },
-              {
-                "id": "button-block-msjekrby-fjg4y",
-                "kind": "button",
-                "buttonLabel": "Schedule a Consultation",
-                "buttonUrl": "/",
-                "buttonStyle": "default",
-                "size": "default",
-                "buttonAlign": "left",
-                "textAlign": "left"
-              }
-            ],
-            "rowLayout": "3-col-equal"
-          },
-          {
-            "id": "layout-row-msj8u2z1-column-3",
-            "rowId": "layout-row-msj8u2z1",
-            "blocks": [
-              {
-                "id": "list-block-msjacf9o-skijl",
-                "kind": "list",
-                "title": "What you can expect",
-                "items": [
-                  "A focused discovery session before design begins",
-                  "Clear recommendations grounded in your goals",
-                  "Responsive design considered at every stage",
-                  "A flexible system your team can confidently maintain"
-                ],
-                "listPresentation": "default",
-                "listMarker": "none",
-                "listAlign": "left",
-                "listSpacing": "default",
-                "elementPadding": "md",
-                "typography": {
-                  "eyebrow": {
-                    "variant": "subheading",
-                    "fontSize": "12px",
-                    "fontWeight": "700",
-                    "lineHeight": "1.2",
-                    "letterSpacing": "0.12em",
-                    "textTransform": "uppercase"
-                  },
-                  "title": {
-                    "variant": "heading",
-                    "fontSize": "clamp(28px, 3vw, 46px)",
-                    "fontWeight": "720",
-                    "lineHeight": "1.06",
-                    "letterSpacing": "-0.025em"
-                  },
-                  "body": {
-                    "variant": "body",
-                    "fontSize": "16px",
-                    "fontWeight": "400",
-                    "lineHeight": "1.7"
-                  },
-                  "button": {
-                    "variant": "button",
-                    "fontSize": "14px",
-                    "fontWeight": "700",
-                    "lineHeight": "1",
-                    "letterSpacing": "0.01em"
-                  }
-                },
-                "listItems": [
-                  {
-                    "id": "list-block-msjacf9o-skijl-item-1",
-                    "text": "A focused discovery session before design begins"
-                  },
-                  {
-                    "id": "list-block-msjacf9o-skijl-item-2",
-                    "text": "Clear recommendations grounded in your goals"
-                  },
-                  {
-                    "id": "list-block-msjacf9o-skijl-item-3",
-                    "text": "Responsive design considered at every stage"
-                  },
-                  {
-                    "id": "list-block-msjacf9o-skijl-item-4",
-                    "text": "A flexible system your team can confidently maintain"
-                  }
-                ]
-              },
-              {
-                "id": "text-block-msj8y517-9kezc",
-                "kind": "text",
-                "eyebrow": "",
-                "title": "Good work begins with a clear point of view",
-                "body": "<p>We help ambitious teams turn complex ideas into focused, useful experiences.</p><p>Every decision is shaped around what your audience needs to understand, feel, and do next.</p><blockquote>Clarity is not the absence of personality—it is what gives personality room to be understood.</blockquote>",
-                "buttonLabel": "",
-                "buttonUrl": "",
-                "textVariant": "default",
-                "textAlign": "left",
-                "elementPadding": "sm",
-                "visualStyle": {
-                  "customClass": "builder-premium-starter"
-                }
-              }
-            ],
-            "rowLayout": "3-col-equal"
-          }
-        ],
-        "layoutRows": 1,
-        "sectionVariant": "secondary",
-        "sectionHeight": "auto"
-      },
-      {
-        "id": "contentLayout-msjhxsql-xx9su",
-        "kind": "contentLayout",
-        "title": "",
-        "background": "#ffffff",
-        "backgroundMode": "boxed",
-        "contentMode": "boxed",
-        "colorScheme": "inherit",
-        "topSpacing": "inherit",
-        "bottomSpacing": "inherit",
-        "topMargin": "inherit",
-        "bottomMargin": "inherit",
-        "pullUnderHeader": false,
-        "visible": true,
-        "eyebrow": "",
-        "body": "",
-        "layoutItems": [
-          {
-            "id": "layout-row-msjhxvs0-column-1",
-            "rowId": "layout-row-msjhxvs0",
+            "id": "yootheme-section-1-row-1-column-1",
+            "rowId": "yootheme-section-1-row-1",
             "rowLayout": "1-col",
             "blocks": [
               {
-                "id": "panelSlider-block-msjhxxn9-6mfzo",
-                "kind": "panelSlider",
-                "title": "Choose the next step",
-                "body": "A focused collection of services, stories, or offers presented as sliding panels.",
-                "slides": [
-                  {
-                    "id": "panelSlider-block-msjhxxn9-6mfzo-panel-1",
-                    "title": "Build the right foundation",
-                    "meta": "Strategy",
-                    "text": "Align the essentials before expanding the experience.",
-                    "imageUrl": "/builder-image-placeholder.svg",
-                    "imageAlt": "Panel slider item 1",
-                    "imagePadding": "frameless",
-                    "imageFit": "cover",
-                    "imageRatio": "16:9",
-                    "panelStyle": "default",
-                    "panelSize": "default",
-                    "headingLevel": "h3",
-                    "metaStyle": "muted",
-                    "showAction": true,
-                    "buttonLabel": "Learn more",
-                    "buttonUrl": "#",
-                    "buttonStyle": "primary",
-                    "buttonSize": "default"
-                  },
-                  {
-                    "id": "panelSlider-block-msjhxxn9-6mfzo-panel-2",
-                    "title": "Shape a clear system",
-                    "meta": "Design",
-                    "text": "Use reusable components to keep every part of the page coherent.",
-                    "imageUrl": "/builder-image-placeholder.svg",
-                    "imageAlt": "Panel slider item 2",
-                    "imagePadding": "frameless",
-                    "imageFit": "cover",
-                    "imageRatio": "16:9",
-                    "panelStyle": "default",
-                    "panelSize": "default",
-                    "headingLevel": "h3",
-                    "metaStyle": "muted",
-                    "showAction": true,
-                    "buttonLabel": "Explore design",
-                    "buttonUrl": "#",
-                    "buttonStyle": "primary",
-                    "buttonSize": "default"
-                  },
-                  {
-                    "id": "panelSlider-block-msjhxxn9-6mfzo-panel-3",
-                    "title": "Launch with confidence",
-                    "meta": "Delivery",
-                    "text": "Make each interaction responsive, consistent, and ready to evolve.",
-                    "imageUrl": "/builder-image-placeholder.svg",
-                    "imageAlt": "Panel slider item 3",
-                    "imagePadding": "frameless",
-                    "imageFit": "cover",
-                    "imageRatio": "16:9",
-                    "panelStyle": "default",
-                    "panelSize": "default",
-                    "headingLevel": "h3",
-                    "metaStyle": "muted",
-                    "showAction": true,
-                    "buttonLabel": "See the process",
-                    "buttonUrl": "#",
-                    "buttonStyle": "primary",
-                    "buttonSize": "default"
-                  },
-                  {
-                    "id": "1786140836357",
-                    "title": "Panel 4",
-                    "meta": "",
-                    "text": "Panel item content.",
-                    "showAction": true,
-                    "buttonLabel": "Learn more",
-                    "buttonUrl": "#"
-                  }
-                ],
-                "carouselSettings": {
-                  "variant": "panel",
-                  "slideMode": "panel",
-                  "effect": "slide",
-                  "loop": true,
-                  "autoplay": false,
-                  "autoplayDelayMs": 5000,
-                  "pauseOnHover": true,
-                  "spaceBetween": 24,
-                  "cardsPerView": 3,
-                  "showArrows": true,
-                  "showDots": true,
-                  "arrowStyle": "solid-dark",
-                  "arrowPosition": "outer",
-                  "paginationStyle": "progress",
-                  "paginationPosition": "bottom"
-                },
-                "elementPadding": "sm"
-              }
-            ]
-          }
-        ],
-        "layoutRows": 1
-      },
-      {
-        "id": "contentLayout-msjg825r-xsnad",
-        "kind": "contentLayout",
-        "title": "",
-        "background": "#ffffff",
-        "backgroundMode": "boxed",
-        "contentMode": "boxed",
-        "colorScheme": "inherit",
-        "topSpacing": "inherit",
-        "bottomSpacing": "inherit",
-        "topMargin": "inherit",
-        "bottomMargin": "inherit",
-        "pullUnderHeader": false,
-        "visible": true,
-        "eyebrow": "",
-        "body": "",
-        "layoutItems": [
-          {
-            "id": "layout-row-msjg85lp-column-1",
-            "rowId": "layout-row-msjg85lp",
-            "rowLayout": "1-col",
-            "blocks": [
-              {
-                "id": "panelSlider-block-msjgtj45-5h252",
-                "kind": "panelSlider",
-                "title": "Choose the next step",
-                "body": "A focused collection of services, stories, or offers presented as sliding panels.",
-                "slides": [
-                  {
-                    "id": "panelSlider-block-msjgtj45-5h252-panel-1",
-                    "title": "Build the right foundation",
-                    "meta": "Strategy",
-                    "text": "Align the essentials before expanding the experience.",
-                    "imageUrl": "/builder-image-placeholder.svg",
-                    "imageAlt": "Panel slider item 1",
-                    "imagePadding": "frameless",
-                    "imageFit": "cover",
-                    "imageRatio": "16:9",
-                    "panelStyle": "default",
-                    "panelSize": "default",
-                    "headingLevel": "h3",
-                    "metaStyle": "muted",
-                    "showAction": true,
-                    "buttonLabel": "Learn more",
-                    "buttonUrl": "#",
-                    "buttonStyle": "primary",
-                    "buttonSize": "default"
-                  },
-                  {
-                    "id": "panelSlider-block-msjgtj45-5h252-panel-2",
-                    "title": "Shape a clear system",
-                    "meta": "Design",
-                    "text": "Use reusable components to keep every part of the page coherent.",
-                    "imageUrl": "/builder-image-placeholder.svg",
-                    "imageAlt": "Panel slider item 2",
-                    "imagePadding": "frameless",
-                    "imageFit": "cover",
-                    "imageRatio": "16:9",
-                    "panelStyle": "default",
-                    "panelSize": "default",
-                    "headingLevel": "h3",
-                    "metaStyle": "muted",
-                    "showAction": true,
-                    "buttonLabel": "Explore design",
-                    "buttonUrl": "#",
-                    "buttonStyle": "primary",
-                    "buttonSize": "default"
-                  },
-                  {
-                    "id": "panelSlider-block-msjgtj45-5h252-panel-3",
-                    "title": "Launch with confidence",
-                    "meta": "Delivery",
-                    "text": "Make each interaction responsive, consistent, and ready to evolve.",
-                    "imageUrl": "/builder-image-placeholder.svg",
-                    "imageAlt": "Panel slider item 3",
-                    "imagePadding": "frameless",
-                    "imageFit": "cover",
-                    "imageRatio": "16:9",
-                    "panelStyle": "default",
-                    "panelSize": "default",
-                    "headingLevel": "h3",
-                    "metaStyle": "muted",
-                    "showAction": true,
-                    "buttonLabel": "See the process",
-                    "buttonUrl": "#",
-                    "buttonStyle": "primary",
-                    "buttonSize": "default"
-                  },
-                  {
-                    "id": "1786138648076",
-                    "title": "Panel 4",
-                    "meta": "",
-                    "text": "Panel item content.",
-                    "showAction": true,
-                    "buttonLabel": "Learn more",
-                    "buttonUrl": "#"
-                  },
-                  {
-                    "id": "1786138649592",
-                    "title": "Panel 5",
-                    "meta": "",
-                    "text": "Panel item content.",
-                    "showAction": true,
-                    "buttonLabel": "Learn more",
-                    "buttonUrl": "#"
-                  }
-                ],
-                "carouselSettings": {
-                  "variant": "panel",
-                  "slideMode": "panel",
-                  "effect": "slide",
-                  "loop": true,
-                  "autoplay": true,
-                  "autoplayDelayMs": 5000,
-                  "pauseOnHover": true,
-                  "spaceBetween": 24,
-                  "cardsPerView": 3,
-                  "showArrows": true,
-                  "showDots": true,
-                  "arrowStyle": "chevron",
-                  "arrowPosition": "bottom-right",
-                  "paginationStyle": "minimal-dots",
-                  "paginationPosition": "bottom"
-                },
-                "elementPadding": "sm"
-              }
-            ]
-          }
-        ],
-        "layoutRows": 1
-      },
-      {
-        "id": "contentLayout-msjgbyp1-4qig2",
-        "kind": "contentLayout",
-        "title": "",
-        "background": "#ffffff",
-        "backgroundMode": "boxed",
-        "contentMode": "boxed",
-        "colorScheme": "inherit",
-        "topSpacing": "inherit",
-        "bottomSpacing": "inherit",
-        "topMargin": "inherit",
-        "bottomMargin": "inherit",
-        "pullUnderHeader": false,
-        "visible": true,
-        "eyebrow": "",
-        "body": "",
-        "layoutItems": [],
-        "layoutRows": 0
-      },
-      {
-        "id": "contentLayout-msje5i8z-gg5on",
-        "kind": "contentLayout",
-        "title": "",
-        "background": "#ffffff",
-        "backgroundMode": "boxed",
-        "contentMode": "boxed",
-        "colorScheme": "inherit",
-        "topSpacing": "inherit",
-        "bottomSpacing": "inherit",
-        "topMargin": "inherit",
-        "bottomMargin": "inherit",
-        "pullUnderHeader": false,
-        "visible": true,
-        "eyebrow": "",
-        "body": "",
-        "layoutItems": [
-          {
-            "id": "layout-row-msje5kwk-column-1",
-            "rowId": "layout-row-msje5kwk",
-            "rowLayout": "1-col",
-            "blocks": [
-              {
-                "id": "hero-block-msje5ttn-bntxe",
-                "kind": "hero",
-                "eyebrow": "A CONSIDERED DIGITAL PRESENCE",
-                "title": "Turn a clear idea into a website people remember",
-                "body": "Bring your story, services, and next steps together in a polished experience designed to earn attention and build trust.",
-                "buttonLabel": "Start a Project",
-                "buttonUrl": "/",
-                "buttonStyle": "primary",
-                "secondaryButtonLabel": "See Our Work",
-                "secondaryButtonUrl": "/",
-                "secondaryButtonTarget": "_self",
-                "secondaryButtonStyle": "secondary",
-                "secondaryButtonSize": "default",
-                "buttonsLayout": "inline",
-                "buttonGap": "0.75rem",
-                "elementAlign": "left",
-                "elementPadding": "sm",
-                "heroHeadingElement": "h1",
-                "heroHeadingStyle": "article-title",
-                "heroContentAlign": "center",
-                "heroVerticalAlign": "center",
-                "heroContentWidth": "large",
-                "heroMediaPlacement": "none",
-                "heroMediaFit": "cover",
-                "heroMediaRatio": "natural",
-                "heroHeight": "auto",
-                "heroPrimaryActionVisible": true,
-                "heroSecondaryActionVisible": true,
-                "heroMediaLoading": "lazy",
-                "typography": {
-                  "eyebrow": {
-                    "variant": "subheading",
-                    "fontSize": "12px",
-                    "fontWeight": "700",
-                    "lineHeight": "1.2",
-                    "letterSpacing": "0.12em",
-                    "textTransform": "uppercase"
-                  },
-                  "title": {
-                    "variant": "heading",
-                    "fontSize": "clamp(28px, 3vw, 46px)",
-                    "fontWeight": "720",
-                    "lineHeight": "1.06",
-                    "letterSpacing": "-0.025em"
-                  },
-                  "body": {
-                    "variant": "body",
-                    "fontSize": "16px",
-                    "fontWeight": "400",
-                    "lineHeight": "1.7"
-                  },
-                  "button": {
-                    "variant": "button",
-                    "fontSize": "14px",
-                    "fontWeight": "700",
-                    "lineHeight": "1",
-                    "letterSpacing": "0.01em"
-                  }
-                },
-                "carouselSettings": {
-                  "variant": "default"
-                },
+                "id": "yootheme-heading-0-0-0-0",
+                "kind": "heading",
+                "headingText": "Build Anything on<br class=\"uk-visible@s\"> DevStack",
+                "title": "Build Anything on<br class=\"uk-visible@s\"> DevStack",
+                "headingLevel": "h1",
+                "headingSize": "medium",
+                "headingAlign": "center",
+                "elementAlign": "center",
                 "visualStyle": {
                   "layout": {
-                    "textAlign": "center"
+                    "position": "relative",
+                    "zIndex": 3
                   }
-                },
-                "headingAlign": "center",
+                }
+              },
+              {
+                "id": "yootheme-text-0-0-0-1",
+                "kind": "text",
+                "body": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut.",
+                "textVariant": "lead",
                 "textAlign": "center",
-                "titleTypographyRole": "primary"
+                "elementAlign": "center",
+                "visualStyle": {
+                  "layout": {
+                    "position": "relative",
+                    "zIndex": 3
+                  }
+                }
+              },
+              {
+                "id": "yootheme-button-0-0-0-2",
+                "kind": "button",
+                "buttons": [
+                  {
+                    "id": "yootheme-button-0-0-0-2-0",
+                    "label": "Sign up for Free",
+                    "url": "?page_id=21",
+                    "target": "_self",
+                    "style": "primary"
+                  },
+                  {
+                    "id": "yootheme-button-0-0-0-2-1",
+                    "label": "Learn More",
+                    "url": "?page_id=20",
+                    "target": "_self",
+                    "style": "outline"
+                  }
+                ],
+                "size": "large",
+                "textAlign": "center",
+                "visualStyle": {
+                  "layout": {
+                    "position": "relative",
+                    "zIndex": 3
+                  }
+                }
+              },
+              {
+                "id": "yootheme-image-0-0-0-3",
+                "kind": "image",
+                "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/background-square-01.png",
+                "imageAlt": "",
+                "imageMaxWidth": 600,
+                "imageWidth": "auto",
+                "imageLoading": "eager",
+                "imageShape": "none",
+                "visualStyle": {
+                  "layout": {
+                    "position": "absolute",
+                    "top": "22vh",
+                    "left": "-20vw",
+                    "zIndex": 0
+                  }
+                }
+              },
+              {
+                "id": "yootheme-image-0-0-0-4",
+                "kind": "image",
+                "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/background-square-02.png",
+                "imageAlt": "",
+                "imageMaxWidth": 1100,
+                "imageWidth": "auto",
+                "imageLoading": "eager",
+                "imageShape": "none",
+                "visualStyle": {
+                  "layout": {
+                    "position": "absolute",
+                    "top": "-30vh",
+                    "left": "-47vw",
+                    "zIndex": 0
+                  }
+                }
+              },
+              {
+                "id": "yootheme-image-0-0-0-5",
+                "kind": "image",
+                "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/background-square-03.png",
+                "imageAlt": "",
+                "imageMaxWidth": 700,
+                "imageWidth": "auto",
+                "imageLoading": "eager",
+                "imageShape": "none",
+                "visualStyle": {
+                  "layout": {
+                    "position": "absolute",
+                    "top": "15vh",
+                    "left": "39vw",
+                    "zIndex": 0
+                  }
+                }
+              },
+              {
+                "id": "yootheme-image-0-0-0-6",
+                "kind": "image",
+                "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/background-square-04.png",
+                "imageAlt": "",
+                "imageMaxWidth": 950,
+                "imageWidth": "auto",
+                "imageLoading": "eager",
+                "imageShape": "none",
+                "visualStyle": {
+                  "layout": {
+                    "position": "absolute",
+                    "top": "-27vh",
+                    "left": "54vw",
+                    "zIndex": 0
+                  }
+                }
+              },
+              {
+                "id": "yootheme-image-0-0-0-7",
+                "kind": "image",
+                "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/background-square-05.png",
+                "imageAlt": "",
+                "imageMaxWidth": 600,
+                "imageWidth": "auto",
+                "imageLoading": "eager",
+                "imageShape": "none",
+                "visualStyle": {
+                  "layout": {
+                    "position": "absolute",
+                    "top": "-550",
+                    "left": "35vw",
+                    "zIndex": 0
+                  }
+                }
               }
             ]
-          }
-        ],
-        "layoutRows": 1
-      },
-      {
-        "id": "contentLayout-msjem56u-nf6c2",
-        "kind": "contentLayout",
-        "title": "",
-        "background": "#ffffff",
-        "backgroundMode": "boxed",
-        "contentMode": "boxed",
-        "colorScheme": "inherit",
-        "topSpacing": "inherit",
-        "bottomSpacing": "inherit",
-        "topMargin": "inherit",
-        "bottomMargin": "inherit",
-        "pullUnderHeader": false,
-        "visible": true,
-        "eyebrow": "",
-        "body": "",
-        "layoutItems": [
+          },
           {
-            "id": "layout-row-msjem7an-column-1",
-            "rowId": "layout-row-msjem7an",
+            "id": "yootheme-section-1-row-2-column-1",
+            "rowId": "yootheme-section-1-row-2",
             "rowLayout": "1-col",
             "blocks": [
               {
-                "id": "heading-block-msjem98z-9lvd7",
+                "id": "yootheme-image-0-1-0-0",
+                "kind": "image",
+                "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/home-hero.jpg",
+                "imageAlt": "",
+                "imageMaxWidth": 750,
+                "imageWidth": "auto",
+                "imageLoading": "eager",
+                "imageLinkUrl": "wp-content/uploads/yootheme/home-hero-video.mp4",
+                "imageLinkTarget": "_self",
+                "imageShape": "rounded",
+                "imageAlignment": "center",
+                "visualStyle": {
+                  "layout": {
+                    "position": "relative",
+                    "zIndex": 1
+                  }
+                }
+              },
+              {
+                "id": "yootheme-image-0-1-0-1",
+                "kind": "image",
+                "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/icon-play.svg",
+                "imageAlt": "",
+                "imageMaxWidth": 100,
+                "imageWidth": "auto",
+                "imageLoading": "eager",
+                "imageShape": "none",
+                "imageAlignment": "center",
+                "visualStyle": {
+                  "layout": {
+                    "position": "absolute",
+                    "top": "50%",
+                    "zIndex": 2
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "yootheme-section-2",
+        "kind": "contentLayout",
+        "title": "Clients",
+        "background": "transparent",
+        "sectionVariant": "default",
+        "topSpacing": "large",
+        "bottomSpacing": "none",
+        "visible": true,
+        "layout": "1-col",
+        "layoutColumns": 1,
+        "layoutRows": 1,
+        "layoutItems": [
+          {
+            "id": "yootheme-section-2-row-1-column-1",
+            "rowId": "yootheme-section-2-row-1",
+            "rowLayout": "1-col",
+            "blocks": [
+              {
+                "id": "yootheme-heading-1-0-0-0",
                 "kind": "heading",
-                "headingText": "Thoughtful work creates momentum that lasts",
+                "headingText": "DevStack Is Trusted by Professionals Around the World",
+                "title": "DevStack Is Trusted by Professionals Around the World",
                 "headingLevel": "h2",
-                "headingAlign": "left",
-                "headingSize": "medium",
-                "elementPadding": "sm"
-              }
-            ]
-          }
-        ],
-        "layoutRows": 1
-      },
-      {
-        "id": "contentLayout-msjetcbi-wuk80",
-        "kind": "contentLayout",
-        "title": "",
-        "background": "#ffffff",
-        "backgroundMode": "boxed",
-        "contentMode": "boxed",
-        "colorScheme": "inherit",
-        "topSpacing": "inherit",
-        "bottomSpacing": "inherit",
-        "topMargin": "inherit",
-        "bottomMargin": "inherit",
-        "pullUnderHeader": false,
-        "visible": true,
-        "eyebrow": "",
-        "body": "",
-        "layoutItems": [
-          {
-            "id": "layout-row-msjetfy2-column-1",
-            "rowId": "layout-row-msjetfy2",
-            "rowLayout": "1-col",
-            "blocks": [
+                "headingAlign": "center"
+              },
               {
-                "id": "gallery-block-msjetrcr-gffkm",
-                "kind": "gallery",
-                "title": "Gallery Showcase",
-                "columns": 5,
-                "gridGap": "medium",
-                "enableLightbox": true,
-                "galleryItems": [
-                  {
-                    "id": "gallery-block-msjetrcr-gffkm-item-1",
-                    "imageUrl": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80",
-                    "title": "Creative Artwork",
-                    "meta": "Design & Art",
-                    "content": "Visual layout showcase"
-                  },
-                  {
-                    "id": "gallery-block-msjetrcr-gffkm-item-2",
-                    "imageUrl": "https://images.unsplash.com/photo-1541701494587-cb58502866ab?auto=format&fit=crop&w=800&q=80",
-                    "title": "Modern Abstract",
-                    "meta": "Abstract",
-                    "content": "Clean aesthetics"
-                  },
-                  {
-                    "id": "gallery-block-msjetrcr-gffkm-item-3",
-                    "imageUrl": "https://images.unsplash.com/photo-1550684848-fac1c5b4e853?auto=format&fit=crop&w=800&q=80",
-                    "title": "Photography",
-                    "meta": "Photo",
-                    "content": "High resolution media"
-                  },
-                  {
-                    "id": "1786135280235",
-                    "imageUrl": "https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=800&q=80",
-                    "title": "Item 4"
-                  },
-                  {
-                    "id": "1786135283041",
-                    "imageUrl": "https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=800&q=80",
-                    "title": "Item 5"
-                  }
-                ],
-                "imageRatio": "3:2",
-                "headingSize": "h5"
-              }
-            ]
-          }
-        ],
-        "layoutRows": 1
-      },
-      {
-        "id": "contentLayout-msjafxc2-4vlx5",
-        "kind": "contentLayout",
-        "title": "",
-        "background": "#ffffff",
-        "backgroundMode": "boxed",
-        "contentMode": "boxed",
-        "colorScheme": "inherit",
-        "topSpacing": "inherit",
-        "bottomSpacing": "inherit",
-        "topMargin": "inherit",
-        "bottomMargin": "inherit",
-        "pullUnderHeader": false,
-        "visible": true,
-        "eyebrow": "",
-        "body": "",
-        "layoutItems": [
-          {
-            "id": "layout-row-msjaj42m-column-1",
-            "rowId": "layout-row-msjaj42m",
-            "rowLayout": "1-col",
-            "blocks": [
-              {
-                "id": "list-block-msjajeff-prfhz",
-                "kind": "list",
-                "title": "What you can expect",
-                "items": [
-                  "A focused discovery session before design begins",
-                  "Clear recommendations grounded in your goals",
-                  "Responsive design considered at every stage",
-                  "A flexible system your team can confidently maintain"
-                ],
-                "listPresentation": "striped",
-                "listMarker": "none",
-                "listAlign": "left",
-                "listSpacing": "large",
-                "elementPadding": "md",
-                "typography": {
-                  "eyebrow": {
-                    "variant": "subheading",
-                    "fontSize": "12px",
-                    "fontWeight": "700",
-                    "lineHeight": "1.2",
-                    "letterSpacing": "0.12em",
-                    "textTransform": "uppercase"
-                  },
-                  "title": {
-                    "variant": "heading",
-                    "fontSize": "clamp(28px, 3vw, 46px)",
-                    "fontWeight": "720",
-                    "lineHeight": "1.06",
-                    "letterSpacing": "-0.025em"
-                  },
-                  "body": {
-                    "variant": "body",
-                    "fontSize": "16px",
-                    "fontWeight": "400",
-                    "lineHeight": "1.7"
-                  },
-                  "button": {
-                    "variant": "button",
-                    "fontSize": "14px",
-                    "fontWeight": "700",
-                    "lineHeight": "1",
-                    "letterSpacing": "0.01em"
-                  }
-                },
-                "listItems": [
-                  {
-                    "id": "list-block-msjajeff-prfhz-item-1",
-                    "text": "A focused discovery session before design begins"
-                  },
-                  {
-                    "id": "list-block-msjajeff-prfhz-item-2",
-                    "text": "Clear recommendations grounded in your goals"
-                  },
-                  {
-                    "id": "list-block-msjajeff-prfhz-item-3",
-                    "text": "Responsive design considered at every stage"
-                  },
-                  {
-                    "id": "list-block-msjajeff-prfhz-item-4",
-                    "text": "A flexible system your team can confidently maintain"
-                  }
-                ],
-                "contentTypographyRole": "default",
-                "contentStyle": "text-large"
-              }
-            ]
-          }
-        ],
-        "layoutRows": 1
-      },
-      {
-        "id": "contentLayout-msjevaps-nxnma",
-        "kind": "contentLayout",
-        "title": "",
-        "background": "#ffffff",
-        "backgroundMode": "boxed",
-        "contentMode": "boxed",
-        "colorScheme": "inherit",
-        "topSpacing": "inherit",
-        "bottomSpacing": "inherit",
-        "topMargin": "inherit",
-        "bottomMargin": "inherit",
-        "pullUnderHeader": false,
-        "visible": true,
-        "eyebrow": "",
-        "body": "",
-        "layoutItems": [
-          {
-            "id": "layout-row-msjevcvv-column-1",
-            "rowId": "layout-row-msjevcvv",
-            "rowLayout": "1-col",
-            "blocks": [
-              {
-                "id": "badgeGrid-block-msjevf7g-7ty6f",
-                "kind": "badgeGrid",
-                "title": "Built around the essentials",
-                "body": "Highlight the qualities that make your offer clear, dependable, and easy to choose.",
-                "columns": 3,
-                "badges": [
-                  {
-                    "id": "badgeGrid-block-msjevf7g-7ty6f-badge-1",
-                    "label": "12+",
-                    "title": "Years of focused experience",
-                    "body": "Senior thinking applied from the first conversation through launch."
-                  },
-                  {
-                    "id": "badgeGrid-block-msjevf7g-7ty6f-badge-2",
-                    "label": "38",
-                    "title": "Brands moved forward",
-                    "body": "Distinctive digital foundations shaped around real business goals."
-                  },
-                  {
-                    "id": "badgeGrid-block-msjevf7g-7ty6f-badge-3",
-                    "label": "94%",
-                    "title": "Work from recommendations",
-                    "body": "Long-term relationships built through clarity, care, and dependable delivery."
-                  }
-                ],
-                "elementPadding": "sm",
-                "typography": {
-                  "eyebrow": {
-                    "variant": "subheading",
-                    "fontSize": "12px",
-                    "fontWeight": "700",
-                    "lineHeight": "1.2",
-                    "letterSpacing": "0.12em",
-                    "textTransform": "uppercase"
-                  },
-                  "title": {
-                    "variant": "heading",
-                    "fontSize": "clamp(28px, 3vw, 46px)",
-                    "fontWeight": "720",
-                    "lineHeight": "1.06",
-                    "letterSpacing": "-0.025em"
-                  },
-                  "body": {
-                    "variant": "body",
-                    "fontSize": "16px",
-                    "fontWeight": "400",
-                    "lineHeight": "1.7"
-                  },
-                  "button": {
-                    "variant": "button",
-                    "fontSize": "14px",
-                    "fontWeight": "700",
-                    "lineHeight": "1",
-                    "letterSpacing": "0.01em"
-                  }
-                },
-                "visualStyle": {
-                  "customClass": "builder-premium-starter",
-                  "card": {
-                    "preset": "soft",
-                    "hoverPreset": "lift-soft",
-                    "imageRatio": "4:5",
-                    "imageFit": "cover",
-                    "imageRadius": "14px",
-                    "titleSize": "clamp(22px, 2vw, 30px)",
-                    "titleWeight": "720",
-                    "titleMargin": "0",
-                    "metaSize": "11px",
-                    "metaTransform": "uppercase",
-                    "metaSpacing": "0",
-                    "contentSize": "15px",
-                    "contentLineHeight": "1.65",
-                    "buttonMargin": "8px 0 0",
-                    "cardGap": "14px",
-                    "cardPadding": "clamp(20px, 2.4vw, 30px)"
-                  },
-                  "border": {
-                    "radius": "18px"
-                  }
-                }
-              }
-            ]
-          }
-        ],
-        "layoutRows": 1
-      },
-      {
-        "id": "contentLayout-msjezol5-lpg2g",
-        "kind": "contentLayout",
-        "title": "",
-        "background": "#ffffff",
-        "backgroundMode": "boxed",
-        "contentMode": "boxed",
-        "colorScheme": "inherit",
-        "topSpacing": "inherit",
-        "bottomSpacing": "inherit",
-        "topMargin": "inherit",
-        "bottomMargin": "inherit",
-        "pullUnderHeader": false,
-        "visible": true,
-        "eyebrow": "",
-        "body": "",
-        "layoutItems": [
-          {
-            "id": "layout-row-msjezue2-column-1",
-            "rowId": "layout-row-msjezue2",
-            "rowLayout": "1-col",
-            "blocks": [
-              {
-                "id": "table-block-msjezw8v-tzr0l",
-                "kind": "table",
-                "title": "Choose the partnership that fits your next chapter",
-                "body": "Every engagement begins with the same care; choose the level of collaboration your goals require.",
-                "tableHeadings": [
-                  "What’s included",
-                  "Essential",
-                  "Signature",
-                  "Partnership"
-                ],
-                "tableRows": [
-                  [
-                    "Discovery workshop",
-                    "90 minutes",
-                    "Half day",
-                    "Full day"
-                  ],
-                  [
-                    "Design directions",
-                    "1 direction",
-                    "2 directions",
-                    "3 directions"
-                  ],
-                  [
-                    "Launch support",
-                    "7 days",
-                    "30 days",
-                    "90 days"
-                  ],
-                  [
-                    "Ongoing guidance",
-                    "By request",
-                    "Monthly",
-                    "Dedicated"
-                  ]
-                ],
-                "tableStyle": "striped",
-                "elementPadding": "sm",
-                "typography": {
-                  "eyebrow": {
-                    "variant": "subheading",
-                    "fontSize": "12px",
-                    "fontWeight": "700",
-                    "lineHeight": "1.2",
-                    "letterSpacing": "0.12em",
-                    "textTransform": "uppercase"
-                  },
-                  "title": {
-                    "variant": "heading",
-                    "fontSize": "clamp(28px, 3vw, 46px)",
-                    "fontWeight": "720",
-                    "lineHeight": "1.06",
-                    "letterSpacing": "-0.025em"
-                  },
-                  "body": {
-                    "variant": "body",
-                    "fontSize": "16px",
-                    "fontWeight": "400",
-                    "lineHeight": "1.7"
-                  },
-                  "button": {
-                    "variant": "button",
-                    "fontSize": "14px",
-                    "fontWeight": "700",
-                    "lineHeight": "1",
-                    "letterSpacing": "0.01em"
-                  }
-                }
-              }
-            ]
-          }
-        ],
-        "layoutRows": 1
-      },
-      {
-        "id": "contentLayout-msj8vem5-bawpk",
-        "kind": "contentLayout",
-        "title": "",
-        "background": "#ffffff",
-        "backgroundMode": "boxed",
-        "contentMode": "boxed",
-        "colorScheme": "inherit",
-        "topSpacing": "inherit",
-        "bottomSpacing": "inherit",
-        "topMargin": "inherit",
-        "bottomMargin": "inherit",
-        "pullUnderHeader": false,
-        "visible": true,
-        "eyebrow": "",
-        "body": "",
-        "layoutItems": [
-          {
-            "id": "layout-row-msj8vjjn-column-1",
-            "rowId": "layout-row-msj8vjjn",
-            "rowLayout": "1-col",
-            "blocks": [
-              {
-                "id": "divider-block-msj8vn92-kdzmy",
-                "kind": "divider",
-                "dividerStyle": "small",
-                "preset": "small"
-              }
-            ]
-          }
-        ],
-        "layoutRows": 1
-      },
-      {
-        "id": "contentLayout-mshthfxl-ldpxt",
-        "kind": "contentLayout",
-        "title": "",
-        "background": "#ffffff",
-        "backgroundMode": "boxed",
-        "contentMode": "boxed",
-        "colorScheme": "inherit",
-        "topSpacing": "inherit",
-        "bottomSpacing": "inherit",
-        "topMargin": "inherit",
-        "bottomMargin": "inherit",
-        "pullUnderHeader": false,
-        "visible": true,
-        "eyebrow": "",
-        "body": "",
-        "layoutItems": [
-          {
-            "id": "layout-row-mshthiqq-column-1",
-            "rowId": "layout-row-mshthiqq",
-            "rowLayout": "1-col",
-            "blocks": [
-              {
-                "id": "accordion-block-msj9lb8y-7a04t",
-                "kind": "accordion",
-                "accordionItems": [
-                  {
-                    "id": "accordion-block-msj9lb8y-7a04t-item-1",
-                    "title": "What does this include?",
-                    "content": "Add the key details your visitors need to understand the offer."
-                  },
-                  {
-                    "id": "accordion-block-msj9lb8y-7a04t-item-2",
-                    "title": "How does it work?",
-                    "content": "Explain the next step in a concise, helpful answer."
-                  },
-                  {
-                    "id": "accordion-block-msj9lb8y-7a04t-item-3",
-                    "title": "Can I ask a question?",
-                    "content": "Give visitors a clear path to contact you or continue exploring."
-                  }
-                ],
-                "accordionMultiple": false,
-                "accordionCollapsible": true,
-                "accordionOpenItems": [
-                  0
-                ],
-                "accordionStyle": "striped",
-                "accordionIndicator": "plus-minus",
-                "accordionIndicatorPosition": "start",
-                "accordionTitleEmphasis": "inherit",
-                "accordionItemSpacing": "inherit",
-                "accordionContentSpacing": "inherit",
-                "accordionDivider": true,
-                "accordionTitleStyle": "inherit",
-                "accordionContentStyle": "large",
-                "titleTypographyRole": "default",
-                "animation": {
-                  "preset": "none"
-                }
-              }
-            ]
-          }
-        ],
-        "layoutRows": 1
-      },
-      {
-        "id": "contentLayout-msj2v46y-qrt78",
-        "kind": "contentLayout",
-        "title": "",
-        "background": "#ffffff",
-        "backgroundMode": "boxed",
-        "contentMode": "boxed",
-        "colorScheme": "inherit",
-        "topSpacing": "inherit",
-        "bottomSpacing": "inherit",
-        "topMargin": "inherit",
-        "bottomMargin": "inherit",
-        "pullUnderHeader": false,
-        "visible": true,
-        "eyebrow": "",
-        "body": "",
-        "layoutItems": [
-          {
-            "id": "layout-row-msj2v5oi-column-1",
-            "rowId": "layout-row-msj2v5oi",
-            "rowLayout": "1-col",
-            "blocks": []
-          }
-        ],
-        "layoutRows": 1
-      },
-      {
-        "id": "contentLayout-msiztzp7-ysdtm",
-        "kind": "contentLayout",
-        "title": "",
-        "background": "#ffffff",
-        "backgroundMode": "boxed",
-        "contentMode": "boxed",
-        "colorScheme": "inherit",
-        "topSpacing": "inherit",
-        "bottomSpacing": "inherit",
-        "topMargin": "inherit",
-        "bottomMargin": "inherit",
-        "pullUnderHeader": false,
-        "visible": true,
-        "eyebrow": "",
-        "body": "",
-        "layoutItems": [
-          {
-            "id": "layout-row-msizu157-column-1",
-            "rowId": "layout-row-msizu157",
-            "rowLayout": "1-col",
-            "blocks": [
-              {
-                "id": "products-block-msj2tqyy-mghex",
-                "kind": "products",
-                "title": "Objects chosen for everyday rituals",
-                "source": "all",
-                "layoutVariant": "grid",
-                "columns": 3,
-                "gridLimit": 0,
-                "filterPosition": "left",
-                "cardStyle": "soft",
-                "cardPreset": "editorial",
-                "panelStyle": "clean-shadow",
-                "elementPadding": "sm",
-                "typography": {
-                  "eyebrow": {
-                    "variant": "subheading",
-                    "fontSize": "12px",
-                    "fontWeight": "700",
-                    "lineHeight": "1.2",
-                    "letterSpacing": "0.12em",
-                    "textTransform": "uppercase"
-                  },
-                  "title": {
-                    "variant": "heading",
-                    "fontSize": "clamp(28px, 3vw, 46px)",
-                    "fontWeight": "720",
-                    "lineHeight": "1.06",
-                    "letterSpacing": "-0.025em"
-                  },
-                  "body": {
-                    "variant": "body",
-                    "fontSize": "16px",
-                    "fontWeight": "400",
-                    "lineHeight": "1.7"
-                  },
-                  "button": {
-                    "variant": "button",
-                    "fontSize": "14px",
-                    "fontWeight": "700",
-                    "lineHeight": "1",
-                    "letterSpacing": "0.01em"
-                  }
-                },
-                "visualStyle": {
-                  "customClass": "builder-premium-starter",
-                  "card": {
-                    "preset": "soft",
-                    "hoverPreset": "lift-soft",
-                    "imageRatio": "4:5",
-                    "imageFit": "cover",
-                    "imageRadius": "14px",
-                    "titleSize": "clamp(22px, 2vw, 30px)",
-                    "titleWeight": "720",
-                    "titleMargin": "0",
-                    "metaSize": "11px",
-                    "metaTransform": "uppercase",
-                    "metaSpacing": "0",
-                    "contentSize": "15px",
-                    "contentLineHeight": "1.65",
-                    "buttonMargin": "8px 0 0",
-                    "cardGap": "14px",
-                    "cardPadding": "clamp(20px, 2.4vw, 30px)"
-                  },
-                  "border": {
-                    "radius": "18px"
-                  }
-                },
-                "productMediaPlacement": "top",
-                "productsLimit": 0,
-                "limit": 0,
-                "paginationEnabled": true,
-                "pagination": {
-                  "enabled": true
-                },
-                "pageSize": 12,
-                "productCategory": "all",
-                "category": "all",
-                "categoryId": "all",
-                "showCategoryPills": true,
-                "showFrontendSort": true,
-                "imageFit": "cover",
-                "imageRatio": "3:2",
-                "productMediaWidth": "medium",
-                "productMediaAlign": "center",
-                "gridColumns": 3,
-                "panelSize": "large",
-                "panelVariant": "default",
-                "panelHover": false,
-                "cartButtonSize": "default",
-                "cartButtonStyle": "default",
-                "showAttributeFilters": true,
-                "attributeFilterPresentation": "top"
-              }
-            ]
-          }
-        ],
-        "layoutRows": 1
-      },
-      {
-        "id": "contentLayout-msizbhm8-jzui3",
-        "kind": "contentLayout",
-        "title": "",
-        "background": "#ffffff",
-        "backgroundMode": "boxed",
-        "contentMode": "boxed",
-        "colorScheme": "inherit",
-        "topSpacing": "inherit",
-        "bottomSpacing": "inherit",
-        "topMargin": "inherit",
-        "bottomMargin": "inherit",
-        "pullUnderHeader": false,
-        "visible": true,
-        "eyebrow": "",
-        "body": "",
-        "layoutItems": [
-          {
-            "id": "layout-row-msizcp0a-column-1",
-            "rowId": "layout-row-msizcp0a",
-            "rowLayout": "1-col",
-            "blocks": [
-              {
-                "id": "grid-block-msj5dacu-k1p3j",
+                "id": "yootheme-grid-1-0-0-1",
                 "kind": "grid",
-                "title": "Services designed around your goals",
                 "gridSource": "static",
-                "gridRows": 1,
-                "gridMargin": "inherit",
-                "gridImagePadding": "frameless",
-                "gridContentPadding": "medium",
-                "gridImageFrame": "none",
+                "gridItems": [
+                  {
+                    "id": "yootheme-grid-item-1-0-0-1-0",
+                    "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/home-clients-01.svg",
+                    "imageAlt": "",
+                    "title": "",
+                    "meta": "",
+                    "text": "",
+                    "buttonLabel": "Read more",
+                    "buttonTarget": "_self",
+                    "renderer": "plain",
+                    "cardVariant": "default",
+                    "mediaPlacement": "top",
+                    "mediaFit": "cover",
+                    "textAlign": "center",
+                    "titleElement": "h3"
+                  },
+                  {
+                    "id": "yootheme-grid-item-1-0-0-1-1",
+                    "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/home-clients-02.svg",
+                    "imageAlt": "",
+                    "title": "",
+                    "meta": "",
+                    "text": "",
+                    "buttonLabel": "Read more",
+                    "buttonTarget": "_self",
+                    "renderer": "plain",
+                    "cardVariant": "default",
+                    "mediaPlacement": "top",
+                    "mediaFit": "cover",
+                    "textAlign": "center",
+                    "titleElement": "h3"
+                  },
+                  {
+                    "id": "yootheme-grid-item-1-0-0-1-2",
+                    "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/home-clients-03.svg",
+                    "imageAlt": "",
+                    "title": "",
+                    "meta": "",
+                    "text": "",
+                    "buttonLabel": "Read more",
+                    "buttonTarget": "_self",
+                    "renderer": "plain",
+                    "cardVariant": "default",
+                    "mediaPlacement": "top",
+                    "mediaFit": "cover",
+                    "textAlign": "center",
+                    "titleElement": "h3"
+                  },
+                  {
+                    "id": "yootheme-grid-item-1-0-0-1-3",
+                    "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/home-clients-04.svg",
+                    "imageAlt": "",
+                    "title": "",
+                    "meta": "",
+                    "text": "",
+                    "buttonLabel": "Read more",
+                    "buttonTarget": "_self",
+                    "renderer": "plain",
+                    "cardVariant": "default",
+                    "mediaPlacement": "top",
+                    "mediaFit": "cover",
+                    "textAlign": "center",
+                    "titleElement": "h3"
+                  },
+                  {
+                    "id": "yootheme-grid-item-1-0-0-1-4",
+                    "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/home-clients-05.svg",
+                    "imageAlt": "",
+                    "title": "",
+                    "meta": "",
+                    "text": "",
+                    "buttonLabel": "Read more",
+                    "buttonTarget": "_self",
+                    "renderer": "plain",
+                    "cardVariant": "default",
+                    "mediaPlacement": "top",
+                    "mediaFit": "cover",
+                    "textAlign": "center",
+                    "titleElement": "h3"
+                  },
+                  {
+                    "id": "yootheme-grid-item-1-0-0-1-5",
+                    "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/home-clients-06.svg",
+                    "imageAlt": "",
+                    "title": "",
+                    "meta": "",
+                    "text": "",
+                    "buttonLabel": "Read more",
+                    "buttonTarget": "_self",
+                    "renderer": "plain",
+                    "cardVariant": "default",
+                    "mediaPlacement": "top",
+                    "mediaFit": "cover",
+                    "textAlign": "center",
+                    "titleElement": "h3"
+                  }
+                ],
                 "gridShowImage": true,
-                "gridShowEyebrow": true,
                 "gridShowMeta": true,
                 "gridShowText": true,
                 "gridShowButton": true,
                 "gridItemRenderer": "plain",
                 "gridCardVariant": "default",
                 "gridCardSize": "default",
-                "gridCardHover": false,
-                "gridStacking": "inherit",
+                "gridMediaPlacement": "top",
+                "gridItemAlign": "center",
+                "gridGap": "large",
+                "columnsDesktop": "",
+                "textAlign": "center"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "yootheme-section-3",
+        "kind": "contentLayout",
+        "title": "How It Works",
+        "background": "transparent",
+        "sectionVariant": "default",
+        "topSpacing": "large",
+        "bottomSpacing": "none",
+        "visible": true,
+        "layout": "1-col",
+        "layoutColumns": 1,
+        "layoutRows": 2,
+        "layoutItems": [
+          {
+            "id": "yootheme-section-3-row-1-column-1",
+            "rowId": "yootheme-section-3-row-1",
+            "rowLayout": "1-col",
+            "blocks": [
+              {
+                "id": "yootheme-heading-2-0-0-0",
+                "kind": "heading",
+                "headingText": "How does it work?",
+                "title": "How does it work?",
+                "headingLevel": "h2",
+                "headingSize": "h1",
+                "headingAlign": "center",
+                "elementAlign": "center"
+              },
+              {
+                "id": "yootheme-text-2-0-0-1",
+                "kind": "text",
+                "body": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut.",
+                "textVariant": "lead",
+                "textAlign": "center",
+                "elementAlign": "center"
+              }
+            ]
+          },
+          {
+            "id": "yootheme-section-3-row-2-column-1",
+            "rowId": "yootheme-section-3-row-2",
+            "rowLayout": "3-col-equal",
+            "blocks": [
+              {
+                "id": "yootheme-image-2-1-0-0",
+                "kind": "image",
+                "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/home-feature-integrate-floating-icon.svg",
+                "imageAlt": "",
+                "imageWidth": "auto",
+                "imageLoading": "lazy",
+                "imageShape": "none",
+                "imageAlignment": "center",
+                "visualStyle": {
+                  "layout": {
+                    "position": "absolute",
+                    "top": "200",
+                    "right": "6%",
+                    "zIndex": 1
+                  }
+                }
+              },
+              {
+                "id": "yootheme-panel-2-1-0-1",
+                "kind": "panel",
+                "title": "Integrate",
+                "body": "Lorem ipsum dolo nonumy eirmod tempor<br class=\"uk-visible@m\"> invidunt ut labore et magna aliquyam.",
+                "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/home-feature-integrate.svg",
+                "imageAlt": "Integrate",
+                "buttonLabel": "Learn More",
+                "buttonUrl": "#",
+                "buttonStyle": "ghost",
+                "panelVariant": "default",
+                "panelStyle": "default",
+                "panelShowMedia": true,
+                "panelMediaPlacement": "top",
+                "panelMediaWidth": "medium",
+                "panelTextAlign": "center",
+                "panelTitleElement": "h3"
+              }
+            ]
+          },
+          {
+            "id": "yootheme-section-3-row-2-column-2",
+            "rowId": "yootheme-section-3-row-2",
+            "rowLayout": "3-col-equal",
+            "blocks": [
+              {
+                "id": "yootheme-image-2-1-1-0",
+                "kind": "image",
+                "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/home-feature-automate-floating-icon.svg",
+                "imageAlt": "",
+                "imageWidth": "auto",
+                "imageLoading": "lazy",
+                "imageShape": "none",
+                "visualStyle": {
+                  "layout": {
+                    "position": "absolute",
+                    "top": "200",
+                    "right": "6%",
+                    "zIndex": 1
+                  }
+                }
+              },
+              {
+                "id": "yootheme-panel-2-1-1-1",
+                "kind": "panel",
+                "title": "Automate",
+                "body": "Lorem ipsum dolo nonumy eirmod tempor<br class=\"uk-visible@m\"> invidunt ut labore et magna aliquyam.",
+                "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/home-feature-automate.svg",
+                "imageAlt": "Automate",
+                "buttonLabel": "Learn More",
+                "buttonUrl": "#",
+                "buttonStyle": "ghost",
+                "panelVariant": "default",
+                "panelStyle": "default",
+                "panelShowMedia": true,
+                "panelMediaPlacement": "top",
+                "panelMediaWidth": "medium",
+                "panelTextAlign": "center",
+                "panelTitleElement": "h3"
+              }
+            ]
+          },
+          {
+            "id": "yootheme-section-3-row-2-column-3",
+            "rowId": "yootheme-section-3-row-2",
+            "rowLayout": "3-col-equal",
+            "blocks": [
+              {
+                "id": "yootheme-image-2-1-2-0",
+                "kind": "image",
+                "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/home-feature-innovate-floating-icon.svg",
+                "imageAlt": "",
+                "imageWidth": "auto",
+                "imageLoading": "lazy",
+                "imageShape": "none",
+                "visualStyle": {
+                  "layout": {
+                    "position": "absolute",
+                    "top": "200",
+                    "right": "6%",
+                    "zIndex": 1
+                  }
+                }
+              },
+              {
+                "id": "yootheme-panel-2-1-2-1",
+                "kind": "panel",
+                "title": "Innovate",
+                "body": "Lorem ipsum dolo nonumy eirmod tempor<br class=\"uk-visible@s\"> invidunt ut labore et magna aliquyam.",
+                "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/home-feature-innovate.svg",
+                "imageAlt": "Innovate",
+                "buttonLabel": "Learn More",
+                "buttonUrl": "#",
+                "buttonStyle": "ghost",
+                "panelVariant": "default",
+                "panelStyle": "default",
+                "panelShowMedia": true,
+                "panelMediaPlacement": "top",
+                "panelMediaWidth": "medium",
+                "panelTextAlign": "center",
+                "panelTitleElement": "h3"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "yootheme-section-4",
+        "kind": "contentLayout",
+        "title": "Feature Grid",
+        "background": "transparent",
+        "sectionVariant": "default",
+        "topSpacing": "large",
+        "bottomSpacing": "none",
+        "visible": true,
+        "layout": "1-col",
+        "layoutColumns": 1,
+        "layoutRows": 2,
+        "layoutItems": [
+          {
+            "id": "yootheme-section-4-row-1-column-1",
+            "rowId": "yootheme-section-4-row-1",
+            "rowLayout": "1-col",
+            "blocks": [
+              {
+                "id": "yootheme-heading-3-0-0-0",
+                "kind": "heading",
+                "headingText": "The Best Tools from the Leading<br class=\"uk-visible@m\"> DevOps Platform",
+                "title": "The Best Tools from the Leading<br class=\"uk-visible@m\"> DevOps Platform",
+                "headingLevel": "h2",
+                "headingSize": "h1",
+                "headingAlign": "center",
+                "elementAlign": "center",
+                "visualStyle": {
+                  "layout": {
+                    "position": "relative",
+                    "zIndex": 1
+                  }
+                }
+              },
+              {
+                "id": "yootheme-text-3-0-0-1",
+                "kind": "text",
+                "body": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor.",
+                "textVariant": "lead",
+                "textAlign": "center",
+                "elementAlign": "center",
+                "visualStyle": {
+                  "layout": {
+                    "position": "relative",
+                    "zIndex": 1
+                  }
+                }
+              },
+              {
+                "id": "yootheme-grid-3-0-0-2",
+                "kind": "grid",
+                "gridSource": "static",
                 "gridItems": [
                   {
-                    "id": "grid-block-msj5dacu-k1p3j-1",
-                    "eyebrow": "01",
-                    "title": "Strategy with a practical point of view",
-                    "meta": "Clarity before complexity",
-                    "text": "Define the audience, message, and priorities that will make every design decision easier.",
-                    "buttonLabel": "Explore Strategy",
-                    "buttonUrl": "/",
+                    "id": "yootheme-grid-item-3-0-0-2-0",
+                    "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/icon-deployment.svg",
+                    "imageAlt": "Easy Deployments",
+                    "title": "Easy Deployments",
+                    "meta": "",
+                    "text": "",
+                    "buttonLabel": "Learn More",
+                    "buttonUrl": "?page_id=19#deployment",
+                    "buttonTarget": "_self",
+                    "renderer": "card",
+                    "cardVariant": "default",
+                    "mediaPlacement": "top",
+                    "mediaFit": "cover",
+                    "textAlign": "center",
                     "titleElement": "h3",
-                    "titleStyle": "inherit",
-                    "imageUrl": "/builder-image-placeholder.svg",
-                    "imageAlt": "Warm architectural forms representing strategic planning"
+                    "titleStyle": "h5"
                   },
                   {
-                    "id": "grid-block-msj5dacu-k1p3j-2",
-                    "eyebrow": "02",
-                    "title": "Design that feels distinctive and effortless",
-                    "meta": "Made for real people",
-                    "text": "Shape a responsive experience with a strong visual rhythm and thoughtful interactions.",
-                    "buttonLabel": "View Selected Work",
-                    "buttonUrl": "/",
-                    "imageUrl": "/builder-image-placeholder.svg",
-                    "imageAlt": "Editorial composition representing interface design"
+                    "id": "yootheme-grid-item-3-0-0-2-1",
+                    "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/icon-automation.svg",
+                    "imageAlt": "Scalable Automation",
+                    "title": "Scalable Automation",
+                    "meta": "",
+                    "text": "",
+                    "buttonLabel": "Learn More",
+                    "buttonUrl": "?page_id=19#automation",
+                    "buttonTarget": "_self",
+                    "renderer": "card",
+                    "cardVariant": "default",
+                    "mediaPlacement": "top",
+                    "mediaFit": "cover",
+                    "textAlign": "center",
+                    "titleElement": "h3",
+                    "titleStyle": "h5"
                   },
                   {
-                    "id": "grid-block-msj5dacu-k1p3j-3",
-                    "eyebrow": "03",
-                    "title": "A foundation designed to keep improving",
-                    "meta": "Built beyond launch",
-                    "text": "Measure what matters, refine the journey, and evolve the site as the business grows.",
-                    "buttonLabel": "Discuss Your Goals",
-                    "buttonUrl": "/",
-                    "imageUrl": "/builder-image-placeholder.svg",
-                    "imageAlt": "Abstract rising forms representing sustainable growth"
+                    "id": "yootheme-grid-item-3-0-0-2-2",
+                    "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/icon-ci-cd.svg",
+                    "imageAlt": "Continuous Integration",
+                    "title": "Continuous Integration",
+                    "meta": "",
+                    "text": "",
+                    "buttonLabel": "Learn More",
+                    "buttonUrl": "?page_id=19#ci-cd",
+                    "buttonTarget": "_self",
+                    "renderer": "card",
+                    "cardVariant": "default",
+                    "mediaPlacement": "top",
+                    "mediaFit": "cover",
+                    "textAlign": "center",
+                    "titleElement": "h3",
+                    "titleStyle": "h5"
+                  },
+                  {
+                    "id": "yootheme-grid-item-3-0-0-2-3",
+                    "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/icon-infrastructure.svg",
+                    "imageAlt": "Infrastructure",
+                    "title": "Infrastructure",
+                    "meta": "",
+                    "text": "",
+                    "buttonLabel": "Learn More",
+                    "buttonUrl": "?page_id=19#infrastructure",
+                    "buttonTarget": "_self",
+                    "renderer": "card",
+                    "cardVariant": "default",
+                    "mediaPlacement": "top",
+                    "mediaFit": "cover",
+                    "textAlign": "center",
+                    "titleElement": "h3",
+                    "titleStyle": "h5"
+                  },
+                  {
+                    "id": "yootheme-grid-item-3-0-0-2-4",
+                    "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/icon-security.svg",
+                    "imageAlt": "End-to-End Security",
+                    "title": "End-to-End Security",
+                    "meta": "",
+                    "text": "",
+                    "buttonLabel": "Learn More",
+                    "buttonUrl": "?page_id=19#security",
+                    "buttonTarget": "_self",
+                    "renderer": "card",
+                    "cardVariant": "default",
+                    "mediaPlacement": "top",
+                    "mediaFit": "cover",
+                    "textAlign": "center",
+                    "titleElement": "h3",
+                    "titleStyle": "h5"
+                  },
+                  {
+                    "id": "yootheme-grid-item-3-0-0-2-5",
+                    "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/icon-integrations.svg",
+                    "imageAlt": "Seamless Integrations",
+                    "title": "Seamless Integrations",
+                    "meta": "",
+                    "text": "",
+                    "buttonLabel": "Learn More",
+                    "buttonUrl": "?page_id=19#integrations",
+                    "buttonTarget": "_self",
+                    "renderer": "card",
+                    "cardVariant": "default",
+                    "mediaPlacement": "top",
+                    "mediaFit": "cover",
+                    "textAlign": "center",
+                    "titleElement": "h3",
+                    "titleStyle": "h5"
+                  },
+                  {
+                    "id": "yootheme-grid-item-3-0-0-2-6",
+                    "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/icon-automated-testing.svg",
+                    "imageAlt": "Automated Testing",
+                    "title": "Automated Testing",
+                    "meta": "",
+                    "text": "",
+                    "buttonLabel": "Learn More",
+                    "buttonUrl": "?page_id=19#features",
+                    "buttonTarget": "_self",
+                    "renderer": "card",
+                    "cardVariant": "default",
+                    "mediaPlacement": "top",
+                    "mediaFit": "cover",
+                    "textAlign": "center",
+                    "titleElement": "h3",
+                    "titleStyle": "h5"
+                  },
+                  {
+                    "id": "yootheme-grid-item-3-0-0-2-7",
+                    "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/icon-cloud-storage.svg",
+                    "imageAlt": "Cloud Storage",
+                    "title": "Cloud Storage",
+                    "meta": "",
+                    "text": "",
+                    "buttonLabel": "Learn More",
+                    "buttonUrl": "?page_id=19#features",
+                    "buttonTarget": "_self",
+                    "renderer": "card",
+                    "cardVariant": "default",
+                    "mediaPlacement": "top",
+                    "mediaFit": "cover",
+                    "textAlign": "center",
+                    "titleElement": "h3",
+                    "titleStyle": "h5"
                   }
                 ],
-                "typography": {
-                  "eyebrow": {
-                    "variant": "subheading",
-                    "fontSize": "12px",
-                    "fontWeight": "700",
-                    "lineHeight": "1.2",
-                    "letterSpacing": "0.12em",
-                    "textTransform": "uppercase"
-                  },
-                  "title": {
-                    "variant": "heading",
-                    "fontSize": "clamp(28px, 3vw, 46px)",
-                    "fontWeight": "720",
-                    "lineHeight": "1.06",
-                    "letterSpacing": "-0.025em"
-                  },
-                  "body": {
-                    "variant": "body",
-                    "fontSize": "16px",
-                    "fontWeight": "400",
-                    "lineHeight": "1.7"
-                  },
-                  "button": {
-                    "variant": "button",
-                    "fontSize": "14px",
-                    "fontWeight": "700",
-                    "lineHeight": "1",
-                    "letterSpacing": "0.01em"
-                  }
-                },
+                "gridShowImage": true,
+                "gridShowMeta": true,
+                "gridShowText": true,
+                "gridShowButton": true,
+                "gridItemRenderer": "card",
+                "gridCardVariant": "default",
+                "gridCardSize": "default",
+                "gridMediaPlacement": "top",
+                "gridItemAlign": "center",
+                "columnsDesktop": "4",
+                "textAlign": "center",
                 "visualStyle": {
-                  "customClass": "builder-premium-starter",
-                  "card": {
-                    "preset": "soft",
-                    "hoverPreset": "lift-soft",
-                    "imageRatio": "16:9",
-                    "imageFit": "cover",
-                    "imageRadius": "14px",
-                    "titleSize": "clamp(22px, 2vw, 30px)",
-                    "titleWeight": "720",
-                    "titleMargin": "0",
-                    "metaSize": "11px",
-                    "metaTransform": "uppercase",
-                    "metaSpacing": "0",
-                    "contentSize": "15px",
-                    "contentLineHeight": "1.65",
-                    "buttonMargin": "8px 0 0",
-                    "cardGap": "14px",
-                    "cardPadding": "clamp(20px, 2.4vw, 30px)"
-                  },
-                  "border": {
-                    "radius": "18px"
+                  "layout": {
+                    "position": "relative",
+                    "zIndex": 1
                   }
-                },
-                "panelSize": "small",
-                "panelStyle": "card-default",
-                "alignImageWithoutPadding": true,
-                "imageFit": "cover",
-                "imageRatio": "natural"
+                }
               }
             ]
-          }
-        ],
-        "layoutRows": 1
-      },
-      {
-        "id": "contentLayout-msiz1yck-iqpqn",
-        "kind": "contentLayout",
-        "title": "",
-        "background": "#ffffff",
-        "backgroundMode": "boxed",
-        "contentMode": "boxed",
-        "colorScheme": "inherit",
-        "topSpacing": "inherit",
-        "bottomSpacing": "inherit",
-        "topMargin": "inherit",
-        "bottomMargin": "inherit",
-        "pullUnderHeader": false,
-        "visible": true,
-        "eyebrow": "",
-        "body": "",
-        "layoutItems": [
+          },
           {
-            "id": "layout-row-msiz20kr-column-1",
-            "rowId": "layout-row-msiz20kr",
+            "id": "yootheme-section-4-row-2-column-1",
+            "rowId": "yootheme-section-4-row-2",
             "rowLayout": "1-col",
             "blocks": [
               {
-                "id": "gallery-block-msiza4m4-0fxql",
-                "kind": "gallery",
-                "title": "Gallery Showcase",
-                "columns": 3,
-                "gridGap": "medium",
-                "enableLightbox": true,
-                "galleryItems": [
-                  {
-                    "id": "gallery-block-msiza4m4-0fxql-item-1",
-                    "imageUrl": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80",
-                    "title": "Creative Artwork",
-                    "meta": "Design & Art",
-                    "content": "Visual layout showcase"
-                  },
-                  {
-                    "id": "gallery-block-msiza4m4-0fxql-item-2",
-                    "imageUrl": "https://images.unsplash.com/photo-1541701494587-cb58502866ab?auto=format&fit=crop&w=800&q=80",
-                    "title": "Modern Abstract",
-                    "meta": "Abstract",
-                    "content": "Clean aesthetics"
-                  },
-                  {
-                    "id": "gallery-block-msiza4m4-0fxql-item-3",
-                    "imageUrl": "https://images.unsplash.com/photo-1550684848-fac1c5b4e853?auto=format&fit=crop&w=800&q=80",
-                    "title": "Photography",
-                    "meta": "Photo",
-                    "content": "High resolution media"
+                "id": "yootheme-image-3-1-0-0",
+                "kind": "image",
+                "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/background-square-05.png",
+                "imageAlt": "",
+                "imageMaxWidth": 1000,
+                "imageWidth": "auto",
+                "imageLoading": "lazy",
+                "imageShape": "none",
+                "visualStyle": {
+                  "layout": {
+                    "position": "absolute",
+                    "bottom": "-300",
+                    "left": "-50vw",
+                    "zIndex": 0
                   }
-                ],
-                "imageFit": "fill",
-                "contentTypographyRole": "primary"
-              }
-            ]
-          }
-        ],
-        "layoutRows": 1
-      },
-      {
-        "id": "contentLayout-msjfd1b6-eh046",
-        "kind": "contentLayout",
-        "title": "",
-        "background": "#ffffff",
-        "backgroundMode": "boxed",
-        "contentMode": "boxed",
-        "colorScheme": "inherit",
-        "topSpacing": "inherit",
-        "bottomSpacing": "inherit",
-        "topMargin": "inherit",
-        "bottomMargin": "inherit",
-        "pullUnderHeader": false,
-        "visible": true,
-        "eyebrow": "",
-        "body": "",
-        "layoutItems": [
-          {
-            "id": "layout-row-msjfd88y-column-1",
-            "rowId": "layout-row-msjfd88y",
-            "rowLayout": "1-col",
-            "blocks": []
-          }
-        ],
-        "layoutRows": 1
-      },
-      {
-        "id": "contentLayout-msjfd5eb-1ucah",
-        "kind": "contentLayout",
-        "title": "",
-        "background": "#ffffff",
-        "backgroundMode": "boxed",
-        "contentMode": "boxed",
-        "colorScheme": "inherit",
-        "topSpacing": "inherit",
-        "bottomSpacing": "inherit",
-        "topMargin": "inherit",
-        "bottomMargin": "inherit",
-        "pullUnderHeader": false,
-        "visible": true,
-        "eyebrow": "",
-        "body": "",
-        "layoutItems": [],
-        "layoutRows": 0
-      },
-      {
-        "id": "contentLayout-msizpqfn-tyxkx",
-        "kind": "contentLayout",
-        "title": "",
-        "background": "#ffffff",
-        "backgroundMode": "boxed",
-        "contentMode": "boxed",
-        "colorScheme": "inherit",
-        "topSpacing": "inherit",
-        "bottomSpacing": "inherit",
-        "topMargin": "inherit",
-        "bottomMargin": "inherit",
-        "pullUnderHeader": false,
-        "visible": true,
-        "eyebrow": "",
-        "body": "",
-        "layoutItems": [
-          {
-            "id": "layout-row-msizprz4-column-1",
-            "rowId": "layout-row-msizprz4",
-            "rowLayout": "1-col",
-            "blocks": [
+                }
+              },
               {
-                "id": "fluentForm-block-msizq37e-re8bl",
-                "kind": "fluentForm",
-                "title": "Let’s start a conversation",
-                "body": "Choose a Fluent Forms form to help visitors ask a question, request details, or book a consultation.",
-                "fluentFormId": "1",
-                "elementPadding": "sm",
-                "typography": {
-                  "eyebrow": {
-                    "variant": "subheading",
-                    "fontSize": "12px",
-                    "fontWeight": "700",
-                    "lineHeight": "1.2",
-                    "letterSpacing": "0.12em",
-                    "textTransform": "uppercase"
-                  },
-                  "title": {
-                    "variant": "heading",
-                    "fontSize": "clamp(28px, 3vw, 46px)",
-                    "fontWeight": "720",
-                    "lineHeight": "1.06",
-                    "letterSpacing": "-0.025em"
-                  },
-                  "body": {
-                    "variant": "body",
-                    "fontSize": "16px",
-                    "fontWeight": "400",
-                    "lineHeight": "1.7"
-                  },
-                  "button": {
-                    "variant": "button",
-                    "fontSize": "14px",
-                    "fontWeight": "700",
-                    "lineHeight": "1",
-                    "letterSpacing": "0.01em"
+                "id": "yootheme-image-3-1-0-1",
+                "kind": "image",
+                "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/background-square-03.png",
+                "imageAlt": "",
+                "imageMaxWidth": 600,
+                "imageWidth": "auto",
+                "imageLoading": "lazy",
+                "imageShape": "none",
+                "imageAlignment": "right",
+                "visualStyle": {
+                  "layout": {
+                    "position": "absolute",
+                    "top": "-700",
+                    "right": "-29vw",
+                    "zIndex": 0
                   }
                 }
               }
             ]
           }
-        ],
-        "layoutRows": 1
+        ]
+      },
+      {
+        "id": "yootheme-section-5",
+        "kind": "contentLayout",
+        "title": "Testimonials",
+        "background": "transparent",
+        "sectionVariant": "default",
+        "topSpacing": "xlarge",
+        "bottomSpacing": "none",
+        "visible": true,
+        "layout": "2-col-equal",
+        "layoutColumns": 2,
+        "layoutRows": 2,
+        "layoutItems": [
+          {
+            "id": "yootheme-section-5-row-1-column-1",
+            "rowId": "yootheme-section-5-row-1",
+            "rowLayout": "2-col-equal",
+            "blocks": [
+              {
+                "id": "yootheme-heading-4-0-0-0",
+                "kind": "heading",
+                "headingText": "Reach Your Digital Goals With a Solution <br class=\"uk-visible@s\"> Trusted by Many Industry Experts",
+                "title": "Reach Your Digital Goals With a Solution <br class=\"uk-visible@s\"> Trusted by Many Industry Experts",
+                "headingLevel": "h2",
+                "headingAlign": "left",
+                "elementAlign": "center"
+              }
+            ]
+          },
+          {
+            "id": "yootheme-section-5-row-1-column-2",
+            "rowId": "yootheme-section-5-row-1",
+            "rowLayout": "2-col-equal",
+            "blocks": [
+              {
+                "id": "yootheme-button-4-0-1-0",
+                "kind": "button",
+                "buttons": [
+                  {
+                    "id": "yootheme-button-4-0-1-0-0",
+                    "label": "View All",
+                    "url": "?post_type=post",
+                    "target": "_self",
+                    "style": "primary"
+                  }
+                ],
+                "textAlign": "right"
+              }
+            ]
+          },
+          {
+            "id": "yootheme-section-5-row-2-column-1",
+            "rowId": "yootheme-section-5-row-2",
+            "rowLayout": "1-col",
+            "blocks": [
+              {
+                "id": "yootheme-panel-slider-4-1-0-0",
+                "kind": "panelSlider",
+                "slides": [
+                  {
+                    "id": "yootheme-panel-slide-4-1-0-0-0",
+                    "title": "",
+                    "meta": "",
+                    "text": "",
+                    "imageUrl": "",
+                    "imageAlt": "",
+                    "headingLevel": "h3",
+                    "metaStyle": "muted",
+                    "showAction": false,
+                    "buttonLabel": "Read more",
+                    "buttonUrl": "#",
+                    "buttonTarget": "_self",
+                    "buttonStyle": "outline"
+                  }
+                ],
+                "carouselSettings": {
+                  "variant": "panel",
+                  "slideMode": "panel",
+                  "loop": true,
+                  "autoplay": false,
+                  "pauseOnHover": true,
+                  "align": "center",
+                  "spaceBetween": 15,
+                  "showArrows": true,
+                  "showDots": false,
+                  "arrowPosition": "default",
+                  "paginationPosition": "bottom-center",
+                  "effect": "slide"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "yootheme-section-6",
+        "kind": "contentLayout",
+        "title": "Call to Action",
+        "background": "transparent",
+        "sectionVariant": "default",
+        "topSpacing": "large",
+        "bottomSpacing": "large",
+        "visible": true,
+        "layout": "1-col",
+        "layoutColumns": 1,
+        "layoutRows": 3,
+        "layoutItems": [
+          {
+            "id": "yootheme-section-6-row-1-column-1",
+            "rowId": "yootheme-section-6-row-1",
+            "rowLayout": "1-col",
+            "blocks": [
+              {
+                "id": "yootheme-heading-5-0-0-0",
+                "kind": "heading",
+                "headingText": "Reinvent Your Business With<br class=\"uk-visible@s\"> DevStack Solutions",
+                "title": "Reinvent Your Business With<br class=\"uk-visible@s\"> DevStack Solutions",
+                "headingLevel": "h2",
+                "headingSize": "h1",
+                "headingAlign": "center"
+              }
+            ]
+          },
+          {
+            "id": "yootheme-section-6-row-2-column-1",
+            "rowId": "yootheme-section-6-row-2",
+            "rowLayout": "1-col",
+            "blocks": [
+              {
+                "id": "yootheme-grid-5-1-0-0",
+                "kind": "grid",
+                "gridSource": "static",
+                "gridItems": [
+                  {
+                    "id": "yootheme-grid-item-5-1-0-0-0",
+                    "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/home-cta-01.svg",
+                    "imageAlt": "Ship Faster with<br class=\"uk-visible@s\"> the Leading DevOps Platform",
+                    "title": "Ship Faster with<br class=\"uk-visible@s\"> the Leading DevOps Platform",
+                    "meta": "",
+                    "text": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr dolore magna aliquyam erat, sed diam voluptua.",
+                    "buttonLabel": "View Features",
+                    "buttonUrl": "?page_id=19",
+                    "buttonTarget": "_self",
+                    "renderer": "card",
+                    "cardVariant": "default",
+                    "mediaPlacement": "top",
+                    "mediaFit": "cover",
+                    "titleElement": "h3",
+                    "titleStyle": "h2"
+                  },
+                  {
+                    "id": "yootheme-grid-item-5-1-0-0-1",
+                    "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/home-cta-02.svg",
+                    "imageAlt": "Endless Benefits with DevStack Enterprise",
+                    "title": "Endless Benefits with DevStack Enterprise",
+                    "meta": "",
+                    "text": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr dolore magna aliquyam erat, sed diam voluptua.",
+                    "buttonLabel": "View Enterprise",
+                    "buttonUrl": "?page_id=2",
+                    "buttonTarget": "_self",
+                    "renderer": "plain",
+                    "cardVariant": "primary",
+                    "mediaPlacement": "top",
+                    "mediaFit": "cover",
+                    "titleElement": "h3",
+                    "titleStyle": "h2"
+                  }
+                ],
+                "gridShowImage": true,
+                "gridShowMeta": true,
+                "gridShowText": true,
+                "gridShowButton": true,
+                "gridItemRenderer": "card",
+                "gridCardVariant": "default",
+                "gridCardSize": "large",
+                "gridMediaPlacement": "top",
+                "columnsDesktop": "2",
+                "visualStyle": {
+                  "layout": {
+                    "position": "relative",
+                    "zIndex": 1
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "id": "yootheme-section-6-row-3-column-1",
+            "rowId": "yootheme-section-6-row-3",
+            "rowLayout": "1-col",
+            "blocks": [
+              {
+                "id": "yootheme-image-5-2-0-0",
+                "kind": "image",
+                "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/background-square-02.png",
+                "imageAlt": "",
+                "imageMaxWidth": 800,
+                "imageWidth": "auto",
+                "imageLoading": "lazy",
+                "imageShape": "none",
+                "visualStyle": {
+                  "layout": {
+                    "position": "absolute",
+                    "bottom": "-25vh",
+                    "left": "-40vw",
+                    "zIndex": 0
+                  }
+                }
+              },
+              {
+                "id": "yootheme-image-5-2-0-1",
+                "kind": "image",
+                "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/background-square-05.png",
+                "imageAlt": "",
+                "imageMaxWidth": 1000,
+                "imageWidth": "auto",
+                "imageLoading": "lazy",
+                "imageShape": "none",
+                "imageAlignment": "right",
+                "visualStyle": {
+                  "layout": {
+                    "position": "absolute",
+                    "right": "-53vw",
+                    "bottom": "0vh",
+                    "zIndex": 0
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "yootheme-section-7",
+        "kind": "contentLayout",
+        "title": "Latest Posts",
+        "background": "transparent",
+        "sectionVariant": "muted",
+        "topSpacing": "large",
+        "bottomSpacing": "large",
+        "visible": true,
+        "layout": "1-col",
+        "layoutColumns": 1,
+        "layoutRows": 1,
+        "layoutItems": [
+          {
+            "id": "yootheme-section-7-row-1-column-1",
+            "rowId": "yootheme-section-7-row-1",
+            "rowLayout": "1-col",
+            "blocks": [
+              {
+                "id": "yootheme-heading-6-0-0-0",
+                "kind": "heading",
+                "headingText": "Latest News",
+                "title": "Latest News",
+                "headingLevel": "h2",
+                "headingSize": "h1",
+                "headingAlign": "center"
+              },
+              {
+                "id": "yootheme-text-6-0-0-1",
+                "kind": "text",
+                "body": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut.",
+                "textVariant": "lead",
+                "textAlign": "center",
+                "elementAlign": "center"
+              },
+              {
+                "id": "yootheme-button-6-0-0-2",
+                "kind": "button",
+                "buttons": [
+                  {
+                    "id": "yootheme-button-6-0-0-2-0",
+                    "label": "Visit Our Blog",
+                    "url": "?post_type=post",
+                    "target": "_self",
+                    "style": "ghost"
+                  }
+                ],
+                "textAlign": "center"
+              },
+              {
+                "id": "yootheme-grid-6-0-0-3",
+                "kind": "grid",
+                "gridSource": "static",
+                "gridItems": [
+                  {
+                    "id": "yootheme-grid-item-6-0-0-3-0",
+                    "imageUrl": "",
+                    "imageAlt": "",
+                    "title": "",
+                    "meta": "",
+                    "text": "",
+                    "buttonLabel": "Read more",
+                    "buttonTarget": "_self",
+                    "renderer": "card",
+                    "cardVariant": "default",
+                    "mediaPlacement": "top",
+                    "mediaFit": "cover",
+                    "textAlign": "center",
+                    "titleElement": "h3",
+                    "titleStyle": "h4"
+                  }
+                ],
+                "gridShowImage": true,
+                "gridShowMeta": true,
+                "gridShowText": true,
+                "gridShowButton": true,
+                "gridItemRenderer": "card",
+                "gridCardVariant": "default",
+                "gridCardSize": "default",
+                "gridMediaPlacement": "top",
+                "gridItemAlign": "center",
+                "columnsDesktop": "3",
+                "textAlign": "center",
+                "visualStyle": {
+                  "layout": {
+                    "position": "relative",
+                    "zIndex": 1
+                  }
+                }
+              }
+            ]
+          }
+        ]
       }
     ],
-    "updatedAt": "2026-08-07T22:15:23.700Z"
+    "updatedAt": "2026-08-08T12:52:27.768Z"
   },
   "shop": {
     "version": 1,

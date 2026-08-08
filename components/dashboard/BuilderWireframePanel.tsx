@@ -23,6 +23,7 @@ import {
   List,
   Sparkles,
   Plus,
+  Settings2,
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type {
@@ -502,6 +503,18 @@ export default function BuilderWireframePanel({
                     <span className="builder-wireframe-meta">
                       <span className="builder-wireframe-badge builder-wireframe-badge--section">{isHeaderDocument ? "HDR" : "SEC"}</span>
                       {!isHeaderDocument ? <div className="builder-wireframe-actions">
+                        <button
+                          type="button"
+                          className="builder-wireframe-action-btn builder-wireframe-action-btn--settings"
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            onSelectSection(section.id);
+                          }}
+                          title="Open section settings"
+                          aria-label="Open section settings"
+                        >
+                          <Settings2 size={10} />
+                        </button>
                         {onMoveSection && (
                           <button
                             type="button"

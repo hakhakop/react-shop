@@ -58,7 +58,8 @@ export type SectionKind =
   | "badgeGrid"
   | "contentLayout"
   | "embed"
-  | "scrollPinnedDemo";
+  | "scrollPinnedDemo"
+  | (string & {});
 export type PreviewDevice = "desktop" | "tablet" | "mobile";
 export type GlobalSectionSpacing = "none" | "xs" | "sm" | "md" | "lg" | "xl" | "2xl" | "3xl" | "small" | "medium" | "large" | string;
 export type SectionSpacing = "inherit" | GlobalSectionSpacing;
@@ -91,10 +92,10 @@ export type SidebarTab =
   | "templates"
   | "settings";
 export type SlideImagePadding = "frameless" | "small" | "medium" | "max";
-export type SectionBackgroundMode = "full" | "boxed";
-export type SectionContentMode = "full" | "boxed" | "narrow";
-export type SectionHeight = "auto" | "viewport" | "viewport-80";
-export type SectionContentVerticalAlign = "top" | "center" | "bottom";
+export type SectionBackgroundMode = "full" | "boxed" | string;
+export type SectionContentMode = "none" | "small" | "default" | "medium" | "large" | "xlarge" | "expand" | "full" | "boxed" | "narrow" | string;
+export type SectionHeight = "none" | "auto" | "viewport" | "viewport-20" | "viewport-percent" | "viewport-80";
+export type SectionContentVerticalAlign = "top" | "middle" | "center" | "bottom";
 export type BuilderColorScheme = "auto" | "light" | "dark";
 export type SectionColorScheme = "inherit" | "light" | "dark";
 export type EmbedMode = "iframe" | "code";
@@ -179,7 +180,8 @@ export type LayoutBlockKind =
   | "divider"
   | "accordion"
   | "alert"
-  | "gallery";
+  | "gallery"
+  | (string & {});
   
 
 export type BuilderDesign = {
@@ -612,10 +614,28 @@ export type BuilderSection = {
   antigravityVisualMode?: "full" | "transparent-grid" | "no-grid" | "lines-only";
   antigravityInteractionScope?: "section" | "global" | "none";
   contentMode?: SectionContentMode;
+  maxWidth?: SectionContentMode;
+  removeHorizontalPadding?: boolean;
+  expandOneSide?: "none" | "left" | "right";
   sectionHeight?: SectionHeight;
+  heightOffset?: number | string;
+  subtractHeightAbove?: boolean;
   contentVerticalAlign?: SectionContentVerticalAlign;
-  sectionVariant?: "default" | "muted" | "primary" | "secondary";
+  sectionVariant?: "default" | "muted" | "primary" | "secondary" | "image" | "video";
+  preserveColor?: boolean;
+  overlap?: boolean;
+  textColor?: "none" | "light" | "dark";
+  sectionPadding?: "none" | "xsmall" | "small" | "default" | "medium" | "large" | "xlarge";
+  removeTopPadding?: boolean;
+  removeBottomPadding?: boolean;
+  htmlElement?: "div" | "section" | "header" | "footer" | "aside" | "main";
+  stickyEffect?: "none" | "cover" | "reveal";
   pullUnderHeader?: boolean;
+  headerTextColor?: "none" | "light" | "dark";
+  animationDelay?: number | string;
+  sectionTitlePosition?: string;
+  sectionTitleRotation?: "left" | "right" | "none";
+  sectionTitleBreakpoint?: string;
   colorScheme?: SectionColorScheme;
   layout?: string;
   topSpacing?: SectionSpacing;

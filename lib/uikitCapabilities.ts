@@ -49,6 +49,33 @@ export const UIKIT_ACCORDION_CAPABILITY = {
   },
 } as const;
 
+export const UIKIT_SECTION_CAPABILITY = {
+  properties: {
+    style: { values: ["default", "muted", "primary", "secondary", "image", "video"] as const, owner: "uikit" },
+    preserveColor: { values: ["enabled", "disabled"] as const, owner: "uikit" },
+    overlap: { values: ["enabled", "disabled"] as const, owner: "uikit" },
+    textColor: { values: ["none", "light", "dark"] as const, owner: "uikit" },
+    maxWidth: { values: ["none", "small", "default", "medium", "large", "xlarge", "expand"] as const, owner: "uikit" },
+    removeHorizontalPadding: { values: ["enabled", "disabled"] as const, owner: "uikit" },
+    expandOneSide: { values: ["none", "left", "right"] as const, owner: "uikit" },
+    height: { values: ["none", "viewport", "viewport-20", "viewport-percent"] as const, owner: "uikit" },
+    subtractHeightAbove: { values: ["enabled", "disabled"] as const, owner: "uikit" },
+    verticalAlign: { values: ["top", "middle", "bottom"] as const, owner: "uikit" },
+    padding: { values: ["none", "xsmall", "small", "default", "medium", "large", "xlarge"] as const, owner: "uikit" },
+    removeTopPadding: { values: ["enabled", "disabled"] as const, owner: "uikit" },
+    removeBottomPadding: { values: ["enabled", "disabled"] as const, owner: "uikit" },
+    htmlElement: { values: ["div", "section", "header", "footer", "aside", "main"] as const, owner: "webpages" },
+    stickyEffect: { values: ["none", "cover", "reveal"] as const, owner: "uikit" },
+    headerTransparent: { values: ["enabled", "disabled"] as const, owner: "webpages" },
+    headerTextColor: { values: ["none", "light", "dark"] as const, owner: "webpages" },
+    animation: { values: ["none", "fade", "scale-up", "scale-down", "slide-top-small", "slide-top-medium", "slide-bottom-medium"] as const, owner: "uikit" },
+    animationDelay: { values: ["number"] as const, owner: "uikit" },
+    titlePosition: { values: ["none", "left-top", "right-top", "left-center", "right-center"] as const, owner: "uikit" },
+    titleRotation: { values: ["none", "left", "right"] as const, owner: "uikit" },
+    titleBreakpoint: { values: ["xlarge", "large", "medium", "small"] as const, owner: "uikit" },
+  },
+} as const;
+
 export const UIKIT_ROW_CAPABILITY = {
   properties: {
     layout: { values: ["1-col", "2-col-equal", "3-col-equal", "4-col-equal", "5-col-equal", "6-col-equal", "thirds-2-1", "thirds-1-2", "quarters-3-1", "quarters-1-3", "quarters-2-1-1", "quarters-1-1-2", "quarters-1-2-1", "auto-expand"] as const, owner: "uikit" },
