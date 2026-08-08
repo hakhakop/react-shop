@@ -451,12 +451,15 @@ export function getUikitHeadingClass(
  */
 export function getUikitTextClass(variant?: string): string {
   if (!variant) return "";
-  const v = variant.toLowerCase();
+  const v = variant.toLowerCase().replace(/^uk-text-/, "").replace(/^text-/, "");
+  if (v === "bold") return "uk-text-bold";
   if (v === "lead") return "uk-text-lead";
   if (v === "meta") return "uk-text-meta";
   if (v === "muted") return "uk-text-muted";
   if (v === "small" || v === "sm") return "uk-text-small";
   if (v === "large" || v === "lg") return "uk-text-large";
+  if (v === "heading-small") return "uk-heading-small";
+  if (/^heading-h[1-6]$/.test(v)) return `uk-${v.slice("heading-".length)}`;
   return "";
 }
 

@@ -16,13 +16,12 @@ import {
   TitleSettingsGroup,
   MetaSettingsGroup,
   ContentSettingsGroup,
+  ImageSettingsGroup,
   LinkSettingsGroup,
   CardSettingsGroup,
   MediaSettingsGroup,
   ActionSettingsGroup,
 } from "@/components/dashboard/inspector/panels/SharedSettingGroups";
-import TypographyRoleSettingsPanel from "@/components/dashboard/inspector/panels/TypographyRoleSettingsPanel";
-import ButtonPresentationFields from "@/components/dashboard/inspector/panels/ButtonPresentationFields";
 import {
   InspectorFieldRow,
   InspectorPillGroup,
@@ -61,79 +60,6 @@ const gridActionSizeOptions = [
   { value: "inherit", label: "Inherit" },
   ...opts(UIKIT_BUTTON_CAPABILITY.properties.size.values),
 ];
-
-function ActionFields({
-  label,
-  prefix,
-  block,
-  update,
-}: {
-  label: string;
-  prefix: "primary" | "secondary";
-  block: BuilderLayoutBlock;
-  update: Props["update"];
-}) {
-  const labelKey =
-    prefix === "primary" ? "buttonLabel" : "secondaryButtonLabel";
-  const urlKey = prefix === "primary" ? "buttonUrl" : "secondaryButtonUrl";
-  const targetKey =
-    prefix === "primary" ? "buttonTarget" : "secondaryButtonTarget";
-  const styleKey =
-    prefix === "primary" ? "buttonStyle" : "secondaryButtonStyle";
-  const sizeKey = prefix === "primary" ? "size" : "secondaryButtonSize";
-  const values = block as any;
-  return (
-    <InspectorSection title={label}>
-      <InspectorFieldRow label="Label">
-        <InspectorTextField
-          value={String(values[labelKey] ?? "")}
-          onChange={(value) => update({ [labelKey]: value })}
-          ariaLabel={`${label} label`}
-        />
-      </InspectorFieldRow>
-      <InspectorFieldRow label="URL">
-        <InspectorTextField
-          value={String(values[urlKey] ?? "")}
-          onChange={(value) => update({ [urlKey]: value })}
-          ariaLabel={`${label} URL`}
-        />
-      </InspectorFieldRow>
-      <InspectorFieldRow label="Target">
-        <InspectorSelect
-          value={String(values[targetKey] ?? "_self")}
-          options={BUILDER_LINK_TARGET_OPTIONS}
-          onChange={(value) => update({ [targetKey]: value })}
-          ariaLabel={`${label} target`}
-        />
-      </InspectorFieldRow>
-    </InspectorSection>
-  );
-}
-
-function ActionPresentationFields({
-  label,
-  prefix,
-  block,
-  update,
-}: {
-  label: string;
-  prefix: "primary" | "secondary";
-  block: BuilderLayoutBlock;
-  update: Props["update"];
-}) {
-  const values = block as any;
-  const styleKey =
-    prefix === "primary" ? "buttonStyle" : "secondaryButtonStyle";
-  const sizeKey = prefix === "primary" ? "size" : "secondaryButtonSize";
-  return <ButtonPresentationFields
-    title={label}
-    variant={String(values[styleKey] ?? (prefix === "primary" ? "primary" : "secondary"))}
-    size={String(values[sizeKey] ?? "default")}
-    onVariantChange={(value) => update({ [styleKey]: value })}
-    onSizeChange={(value) => update({ [sizeKey]: value })}
-  />;
-}
-
 export function HeroCapabilityPanel({
   block,
   tab,
@@ -198,17 +124,35 @@ export function HeroCapabilityPanel({
             />
           </InspectorFieldRow>
         </InspectorSection>
-        <ActionFields
-          label="Primary action"
-          prefix="primary"
+        <ActionSettingsGroup
+          title="PRIMARY ACTION"
+          showVisibilityToggle
+          showPresentation={false}
           block={block}
           update={update}
+          keys={{
+            visible: "heroPrimaryActionVisible",
+            label: "buttonLabel",
+            url: "buttonUrl",
+            target: "buttonTarget",
+            style: "buttonStyle",
+            size: "size",
+          }}
         />
-        <ActionFields
-          label="Secondary action"
-          prefix="secondary"
+        <ActionSettingsGroup
+          title="SECONDARY ACTION"
+          showVisibilityToggle
+          showPresentation={false}
           block={block}
           update={update}
+          keys={{
+            visible: "heroSecondaryActionVisible",
+            label: "secondaryButtonLabel",
+            url: "secondaryButtonUrl",
+            target: "secondaryButtonTarget",
+            style: "secondaryButtonStyle",
+            size: "secondaryButtonSize",
+          }}
         />
       </div>
     );
@@ -218,26 +162,32 @@ export function HeroCapabilityPanel({
         className="builder-inspector-stack"
         data-uikit-capability="hero-style"
       >
-        <TypographyRoleSettingsPanel
+        <TitleSettingsGroup
           block={block}
-          fields={[
-            { field: "titleTypographyRole", label: "Heading role" },
-            { field: "contentTypographyRole", label: "Content role" },
-            { field: "metaTypographyRole", label: "Eyebrow role" },
-          ]}
           update={update}
+          defaultSize="xlarge"
+          defaultLevel="h2"
+          keys={{
+            role: "titleTypographyRole",
+            size: "heroHeadingStyle",
+            align: "heroContentAlign",
+            level: "heroHeadingElement",
+          }}
+        />
+        <MetaSettingsGroup
+          block={block}
+          update={update}
+          showAlignment={false}
+          showHtmlElement={false}
+          showStyle
+        />
+        <ContentSettingsGroup
+          block={block}
+          update={update}
+          showAlignment={false}
+          showStyle
         />
         <InspectorSection title="Layout">
-          <InspectorFieldRow label="Content alignment">
-            <InspectorAlignmentControl
-              value={block.heroContentAlign ?? block.elementAlign ?? "left"}
-              options={["left", "center", "right"] as const}
-              onChange={(value) =>
-                update({ heroContentAlign: value, elementAlign: value })
-              }
-              ariaLabel="Hero content alignment"
-            />
-          </InspectorFieldRow>
           <InspectorFieldRow label="Vertical alignment">
             <InspectorPillGroup
               value={block.heroVerticalAlign ?? "center"}
@@ -300,48 +250,18 @@ export function HeroCapabilityPanel({
             />
           </InspectorFieldRow>
         </InspectorSection>
-        <InspectorSection title="Presentation">
-          <InspectorFieldRow label="Heading element">
-            <InspectorSelect
-              value={block.heroHeadingElement ?? "h2"}
-              options={opts(["h1", "h2", "h3", "h4", "h5", "h6"] as const)}
-              onChange={(value) => update({ heroHeadingElement: value })}
-              ariaLabel="Hero heading element"
-            />
-          </InspectorFieldRow>
-          <InspectorFieldRow label="Heading style">
-            <InspectorSelect
-              value={block.heroHeadingStyle ?? "xlarge"}
-              options={opts([
-                "inherit",
-                "h1",
-                "h2",
-                "h3",
-                "article-title",
-                "small",
-                "medium",
-                "large",
-                "xlarge",
-              ] as const)}
-              onChange={(value) => update({ heroHeadingStyle: value })}
-              ariaLabel="Hero heading style"
-            />
-          </InspectorFieldRow>
-        </InspectorSection>
-        <InspectorSection title="Actions">
-          <ActionPresentationFields
-            label="Primary action"
-            prefix="primary"
-            block={block}
-            update={update}
-          />
-          <ActionPresentationFields
-            label="Secondary action"
-            prefix="secondary"
-            block={block}
-            update={update}
-          />
-        </InspectorSection>
+        <ActionSettingsGroup
+          title="PRIMARY ACTION"
+          block={block}
+          update={update}
+          keys={{ style: "buttonStyle", size: "size" }}
+        />
+        <ActionSettingsGroup
+          title="SECONDARY ACTION"
+          block={block}
+          update={update}
+          keys={{ style: "secondaryButtonStyle", size: "secondaryButtonSize" }}
+        />
       </div>
     );
   if (tab === "behavior")
@@ -1009,28 +929,30 @@ export function GridCapabilityPanel({
           update={(patch) => {
             const mappedPatch = { ...patch };
             if (patch.gridShowImage !== undefined) mappedPatch.heroShowMedia = patch.gridShowImage;
-            if (patch.imageRatio !== undefined) mappedPatch.heroMediaRatio = patch.imageRatio;
-            if (patch.imageFit !== undefined) mappedPatch.heroMediaFit = patch.imageFit;
-            
-            // Clear item-level overrides so global media settings apply to ALL items cleanly
-            if (block.gridItems && block.gridItems.length > 0) {
-              mappedPatch.gridItems = block.gridItems.map((item) => ({
-                ...item,
-                ...(patch.imageRatio !== undefined ? { mediaRatio: undefined } : {}),
-                ...(patch.imageFit !== undefined ? { mediaFit: undefined } : {}),
-                ...(patch.gridMediaPlacement !== undefined ? { mediaPlacement: undefined } : {}),
-              }));
-            }
             update(mappedPatch);
           }}
           title="MEDIA"
           keys={{
             showMedia: "gridShowImage",
             placement: "gridMediaPlacement",
-            ratio: "imageRatio",
-            fit: "imageFit",
             width: "gridMediaWidth",
-            align: "gridMediaAlignment",
+          }}
+        />
+
+        <ImageSettingsGroup
+          block={block}
+          update={(patch) => {
+            const mappedPatch = { ...patch } as Record<string, unknown>;
+            if (patch.imageRatio !== undefined) mappedPatch.heroMediaRatio = patch.imageRatio;
+            if (patch.imageFit !== undefined) mappedPatch.heroMediaFit = patch.imageFit;
+            if (block.gridItems && block.gridItems.length > 0 && (patch.imageRatio !== undefined || patch.imageFit !== undefined)) {
+              mappedPatch.gridItems = block.gridItems.map((item) => ({
+                ...item,
+                ...(patch.imageRatio !== undefined ? { mediaRatio: undefined } : {}),
+                ...(patch.imageFit !== undefined ? { mediaFit: undefined } : {}),
+              }));
+            }
+            update(mappedPatch as Partial<BuilderLayoutBlock>);
           }}
         />
 

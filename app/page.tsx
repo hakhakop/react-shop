@@ -50,6 +50,7 @@ export default async function HomePage() {
         layout={localizedLayout}
         page="home"
         headerOverlay={headerDocumentSettings.overlay}
+        shellSettings={shellSettings}
       />
     );
   }

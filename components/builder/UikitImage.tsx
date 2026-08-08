@@ -1,6 +1,8 @@
 "use client";
 
 import type { BuilderLayoutBlock } from "@/components/dashboard/builderTypes";
+import type { BuilderShellSettings } from "@/lib/builderShell";
+import { resolveAppearanceValue } from "@/lib/globalStyleTokens";
 import {
   resolveUikitImageSemantics,
   getUikitImageStyle,
@@ -16,11 +18,45 @@ type Props = {
   block: any;
   isCanvas?: boolean;
   onUploadImage?: () => void;
+  shellSettings?: Partial<BuilderShellSettings>;
 };
 
-export default function UikitImage({ block, isCanvas, onUploadImage }: Props) {
+export default function UikitImage({ block, isCanvas, onUploadImage, shellSettings }: Props) {
   const rawBlock = (block ?? {}) as any;
-  const imageSemantics = resolveUikitImageSemantics(rawBlock);
+  const resolveString = (
+    local: unknown,
+    global: string | undefined,
+    componentDefault: string,
+  ) =>
+    resolveAppearanceValue({
+      local: typeof local === "string" ? local : undefined,
+      global,
+      componentDefault,
+    }).value;
+  const localImageShape =
+    typeof rawBlock.imageShape === "string"
+      ? rawBlock.imageShape
+      : ["rounded", "circle", "pill"].includes(rawBlock.imageBorder)
+        ? rawBlock.imageBorder
+        : undefined;
+  const resolvedImageBlock = {
+    ...rawBlock,
+    imageRatio: resolveString(rawBlock.imageRatio, shellSettings?.imageDefaultRatio, "natural"),
+    imageFit: resolveString(rawBlock.imageFit, shellSettings?.imageDefaultFit, "cover"),
+    imageShape: resolveString(localImageShape, shellSettings?.imageDefaultBorder, "none"),
+    imageShadow: resolveString(rawBlock.imageShadow, shellSettings?.imageDefaultShadow, "none"),
+    imageAlignment: resolveString(rawBlock.imageAlignment, shellSettings?.imageDefaultAlignment, "center"),
+    imageLoading: resolveString(rawBlock.imageLoading, shellSettings?.imageDefaultLoading, "lazy"),
+  };
+  const imageSemantics = resolveUikitImageSemantics(resolvedImageBlock);
+  const imageAlignment =
+    imageSemantics.alignment === "left" ||
+    imageSemantics.alignment === "right" ||
+    imageSemantics.alignment === "center"
+      ? imageSemantics.alignment
+      : "center";
+  const imageLoading =
+    resolvedImageBlock.imageLoading === "eager" ? "eager" : "lazy";
   const imageStyle = getUikitImageStyle(imageSemantics);
   const imageAttributes = getUikitImageAttributes(imageSemantics);
   const imageClass = getUikitImageClass(imageSemantics);
@@ -44,13 +80,13 @@ export default function UikitImage({ block, isCanvas, onUploadImage }: Props) {
       <figure
         className={`shop-builder-image-figure ${figureClass}`}
         style={{
-          textAlign: rawBlock.imageAlignment ?? "center",
+          textAlign: imageAlignment,
           maxWidth: imageStyle.maxWidth ?? (rawBlock.imageMaxWidth ? `${rawBlock.imageMaxWidth}px` : undefined),
           width: imageStyle.width,
           marginInline:
-            rawBlock.imageAlignment === "left"
+            imageAlignment === "left"
               ? "0 auto"
-              : rawBlock.imageAlignment === "right"
+              : imageAlignment === "right"
               ? "0 0 0 auto"
               : "auto",
         }}
@@ -76,7 +112,7 @@ export default function UikitImage({ block, isCanvas, onUploadImage }: Props) {
                     alt={rawBlock.imageAlt ?? ""}
                     width={1200}
                     height={800}
-                    loading={rawBlock.imageLoading ?? "lazy"}
+                    loading={imageLoading}
                     {...imageAttributes}
                     style={{
                       width: "100%",
@@ -95,7 +131,7 @@ export default function UikitImage({ block, isCanvas, onUploadImage }: Props) {
                   alt={rawBlock.imageAlt ?? ""}
                   width={1200}
                   height={800}
-                  loading={rawBlock.imageLoading ?? "lazy"}
+                  loading={imageLoading}
                   {...imageAttributes}
                   style={{
                     width: "100%",

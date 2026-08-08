@@ -32,6 +32,7 @@ export default async function CartPage() {
         pageLabel="Cart"
         pageContent={pageContent}
         headerOverlay={headerDocumentSettings.overlay}
+        shellSettings={shellSettings}
       />
     );
   }

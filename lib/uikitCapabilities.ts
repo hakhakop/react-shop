@@ -43,8 +43,8 @@ export const UIKIT_ACCORDION_CAPABILITY = {
     itemSpacing: { values: ["inherit", "small", "default", "large"] as const, owner: "uikit" },
     contentSpacing: { values: ["inherit", "small", "default", "large"] as const, owner: "uikit" },
     divider: { values: ["enabled", "disabled"] as const, owner: "uikit" },
-    titleStyle: { values: ["inherit", "h3", "h4", "h5"] as const, owner: "uikit" },
-    contentStyle: { values: ["inherit", "default", "lead", "small", "large", "muted"] as const, owner: "uikit" },
+    titleStyle: { values: ["inherit", "h1", "h2", "h3", "h4", "h5", "h6", "article-title", "small", "medium", "large", "xlarge"] as const, owner: "uikit" },
+    contentStyle: { values: ["inherit", "none", "text-bold", "text-lead", "text-meta", "text-small", "text-large", "text-muted", "heading-small", "heading-h1", "heading-h2", "heading-h3", "heading-h4", "heading-h5", "heading-h6"] as const, owner: "uikit" },
     animation: { values: ["enabled"] as const, owner: "uikit" },
   },
 } as const;

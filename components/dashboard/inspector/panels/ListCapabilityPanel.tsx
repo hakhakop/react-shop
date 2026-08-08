@@ -16,7 +16,7 @@ import {
 } from "@/components/dashboard/inspector/InspectorControls";
 import IconPicker from "@/components/dashboard/inspector/IconPicker";
 import RepeatableItemShell from "@/components/dashboard/inspector/RepeatableItemShell";
-import GeneralSettingsPanel from "@/components/dashboard/inspector/panels/GeneralSettingsPanel";
+import { ContentSettingsGroup } from "@/components/dashboard/inspector/panels/SharedSettingGroups";
 
 type Props = {
   block: BuilderLayoutBlock;
@@ -47,7 +47,7 @@ function canonicalItems(block: BuilderLayoutBlock): BuilderListItem[] {
     : (block.items ?? []).map((text, index) => ({ id: `${block.id ?? "list"}-item-${index + 1}`, text }));
 }
 
-export default function ListCapabilityPanel({ block, tab, shellSettings, update }: Props) {
+export default function ListCapabilityPanel({ block, tab, update }: Props) {
   const items = canonicalItems(block);
   const updateItems = (next: BuilderListItem[]) => update({ listItems: next });
   const copySequenceRef = useRef(0);
@@ -233,7 +233,14 @@ export default function ListCapabilityPanel({ block, tab, shellSettings, update 
   // SETTINGS TAB (Default)
   const properties = UIKIT_LIST_CAPABILITY.properties;
   return (
-    <div className="builder-inspector-stack" data-uikit-capability="list-style">
+    <div className="builder-inspector-stack" data-uikit-capability="list-settings">
+      <ContentSettingsGroup
+        block={block}
+        update={update}
+        showAlignment={false}
+        showStyle
+      />
+
       <InspectorDivision title="LIST">
         <InspectorFieldRow label="Presentation">
           <InspectorSelect

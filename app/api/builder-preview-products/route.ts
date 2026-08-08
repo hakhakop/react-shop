@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 export async function GET(request: NextRequest) {
   const limit = Math.min(
     Math.max(Number(request.nextUrl.searchParams.get("limit") ?? 24) || 24, 1),
-    200
+    500
   );
   const source = request.nextUrl.searchParams.get("source");
   const categoryId = request.nextUrl.searchParams.get("categoryId") ?? undefined;

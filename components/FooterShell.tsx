@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import StorefrontBuilderRenderer from "@/components/builder/StorefrontBuilderRenderer";
 import { resolveContentSections } from "@/lib/builderContentLanguages";
+import { getBuilderShellSettings } from "@/lib/builderShell";
 import { getOrCreateFooterBuilderLayout } from "@/lib/footerBuilderDocument";
 import type { SaaSWebsite } from "@/lib/websites";
 
@@ -13,9 +14,11 @@ export default async function FooterShell({
   website,
   activeContentLanguage,
 }: FooterShellProps) {
-  const layout = await getOrCreateFooterBuilderLayout(
-    website ? { websiteId: website.id } : {},
-  );
+  const scope = website ? { websiteId: website.id } : {};
+  const [layout, shellSettings] = await Promise.all([
+    getOrCreateFooterBuilderLayout(scope),
+    getBuilderShellSettings(scope),
+  ]);
   const cookieStore = await cookies();
   const languageCookie = cookieStore.get(
     `website_content_language_${website?.id ?? "root"}`,
@@ -40,6 +43,7 @@ export default async function FooterShell({
       page="footer"
       pageLabel="Footer"
       website={website}
+      shellSettings={shellSettings}
       rootElement="footer"
     />
   );

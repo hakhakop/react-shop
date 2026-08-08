@@ -30,6 +30,7 @@ export const layoutBlockLabels: Record<LayoutBlockKind, string> = {
   gallery: "Gallery",
   text: "Text",
   slider: "Swiper / Carousel",
+  panelSlider: "Panel Slider",
   scrollPinnedDemo: "Scroll Pinned Demo",
   embed: "HTML",
   fluentForm: "Fluent Form",
@@ -76,6 +77,7 @@ export const baseLayoutBlockKinds: LayoutBlockKind[] = [
   "table",
   "text",
   "slider",
+  "panelSlider",
   "scrollPinnedDemo",
   "fluentForm",
   "embed",
@@ -120,6 +122,7 @@ export const layoutBlockDescriptions: Record<LayoutBlockKind, string> = {
   gallery: "Interactive image gallery with lightbox, overlay, and filter navigation.",
   table: "Editable data table with headers and styled rows.",
   slider: "Swiper carousel with editable slides and images.",
+  panelSlider: "Panel cards with shared Grid settings, shown in a responsive Swiper slider.",
   scrollPinnedDemo: "An elegant storytelling block with scroll pinning.",
   embed: "Forms, chat widgets, maps, or trusted HTML.",
   fluentForm: "Render a Fluent Forms form from WordPress by form ID.",
@@ -180,7 +183,7 @@ export const layoutBlockGroups: {
   {
     id: "multiple-items",
     label: "Multiple Items",
-    kinds: ["accordion", "grid", "gallery", "table", "slider", "badgeGrid", "categoryFilters"],
+    kinds: ["accordion", "grid", "gallery", "table", "slider", "panelSlider", "badgeGrid", "categoryFilters"],
   },
   {
     id: "commerce",

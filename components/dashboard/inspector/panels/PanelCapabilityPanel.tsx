@@ -2,13 +2,10 @@
 
 import type { InspectorTab, BuilderLayoutBlock, WordPressMediaItem } from "@/components/dashboard/builderTypes";
 import type { BuilderShellSettings } from "@/lib/builderShell";
-import TypographyRoleSettingsPanel from "@/components/dashboard/inspector/panels/TypographyRoleSettingsPanel";
 import { UIKIT_PANEL_CAPABILITY } from "@/lib/uikitCapabilities";
-import { BUILDER_LINK_TARGET_OPTIONS } from "@/lib/websiteBuilderLinks";
 import { BuilderImageUrlControl } from "@/components/dashboard/inspector/panels/InspectorSharedControls";
-import ButtonPresentationFields from "@/components/dashboard/inspector/panels/ButtonPresentationFields";
-import { InspectorFieldRow, InspectorPillGroup, InspectorSelect, InspectorSwitch, InspectorTextField, InspectorTextarea, InspectorAlignmentControl, InspectorMediaPlacementControl } from "@/components/dashboard/inspector/InspectorControls";
-import { ImageSettingsGroup, CardSettingsGroup, MediaSettingsGroup, ActionSettingsGroup } from "@/components/dashboard/inspector/panels/SharedSettingGroups";
+import { InspectorFieldRow, InspectorSelect, InspectorTextField, InspectorTextarea } from "@/components/dashboard/inspector/InspectorControls";
+import { ImageSettingsGroup, CardSettingsGroup, MediaSettingsGroup, ActionSettingsGroup, ContentSettingsGroup, MetaSettingsGroup, TitleSettingsGroup } from "@/components/dashboard/inspector/panels/SharedSettingGroups";
 
 type Props = {
   block: BuilderLayoutBlock;
@@ -66,36 +63,42 @@ export default function PanelCapabilityPanel({ block, tab, shellSettings, update
           <InspectorFieldRow label="Title"><InspectorTextField value={block.title ?? ""} onChange={(value) => updateSemantic({ title: value })} ariaLabel="Panel title" /></InspectorFieldRow>
           <InspectorFieldRow label="Body"><InspectorTextarea value={block.body ?? ""} onChange={(value) => updateSemantic({ body: value })} ariaLabel="Panel body" /></InspectorFieldRow>
         </section>
-        <section className="builder-inspector-section" data-uikit-capability="panel-action">
-          <h3>Action</h3>
-          <InspectorFieldRow label="Show action"><InspectorSwitch checked={block.panelActionVisible !== false} onChange={(checked) => updateSemantic({ panelActionVisible: checked })} label="Show action" /></InspectorFieldRow>
-          <InspectorFieldRow label="Action label"><InspectorTextField value={block.buttonLabel ?? ""} onChange={(value) => updateSemantic({ buttonLabel: value })} ariaLabel="Action label" /></InspectorFieldRow>
-          <InspectorFieldRow label="Action URL"><InspectorTextField value={block.buttonUrl ?? ""} onChange={(value) => updateSemantic({ buttonUrl: value })} ariaLabel="Action URL" /></InspectorFieldRow>
-          <InspectorFieldRow label="Action target"><InspectorSelect value={(block.buttonTarget ?? "_self") as "_self" | "_blank"} options={BUILDER_LINK_TARGET_OPTIONS} onChange={(value) => updateSemantic({ buttonTarget: value })} ariaLabel="Action target" /></InspectorFieldRow>
-        </section>
       </div>
     );
   }
 
-  if (tab === "layout") {
+  if (tab === "layout" || tab === "style") {
     return (
-      <div className="builder-inspector-stack" data-uikit-capability="panel-layout">
+      <div className="builder-inspector-stack" data-uikit-capability="panel-settings">
         <MediaSettingsGroup block={block} update={updateSemantic} />
+        <ImageSettingsGroup block={block} update={updateSemantic} />
+        <TitleSettingsGroup
+          block={block}
+          update={updateSemantic}
+          showDecoration={false}
+          keys={{ role: "titleTypographyRole", size: "panelTitleStyle", align: "panelTextAlign", level: "panelTitleElement" }}
+          defaultSize="inherit"
+          defaultLevel="h3"
+          visualPresetOptions={selectOptions(properties.titleStyle.values, { inherit: "Inherit", h3: "Heading H3", h4: "Heading H4", h5: "Heading H5" })}
+        />
+        <MetaSettingsGroup
+          block={block}
+          update={updateSemantic}
+          showAlignment={false}
+          showHtmlElement={false}
+          keys={{ role: "metaTypographyRole", align: "panelTextAlign", level: "panelMetaHtmlElement" }}
+        />
+        <ContentSettingsGroup
+          block={block}
+          update={updateSemantic}
+          showAlignment={false}
+          keys={{ role: "contentTypographyRole", align: "panelTextAlign" }}
+        />
         <section className="builder-inspector-section" data-uikit-capability="panel-content-layout">
           <h3>Content layout</h3>
-          <InspectorFieldRow label="Text alignment"><InspectorAlignmentControl value={(block.panelTextAlign ?? "left") as "left" | "center" | "right"} onChange={(value) => updateSemantic({ panelTextAlign: value })} ariaLabel="Text alignment" /></InspectorFieldRow>
           <InspectorFieldRow label="Vertical alignment"><InspectorSelect value={(block.panelVerticalAlign ?? "top") as typeof properties.verticalAlign.values[number]} options={selectOptions(properties.verticalAlign.values)} onChange={(value) => updateSemantic({ panelVerticalAlign: value })} ariaLabel="Vertical alignment" /></InspectorFieldRow>
-          <InspectorFieldRow label="Title element"><InspectorSelect value={(block.panelTitleElement ?? "h3") as typeof properties.titleElement.values[number]} options={selectOptions(properties.titleElement.values)} onChange={(value) => updateSemantic({ panelTitleElement: value })} ariaLabel="Title element" /></InspectorFieldRow>
-          <InspectorFieldRow label="Title visual style"><InspectorSelect value={(block.panelTitleStyle ?? "inherit") as typeof properties.titleStyle.values[number]} options={selectOptions(properties.titleStyle.values)} onChange={(value) => updateSemantic({ panelTitleStyle: value })} ariaLabel="Title visual style" /></InspectorFieldRow>
           <InspectorFieldRow label="Content width"><InspectorSelect value={(block.panelContentWidth ?? "auto") as typeof properties.contentWidth.values[number]} options={selectOptions(properties.contentWidth.values)} onChange={(value) => updateSemantic({ panelContentWidth: value })} ariaLabel="Content width" /></InspectorFieldRow>
         </section>
-      </div>
-    );
-  }
-
-  if (tab === "style") {
-    return (
-      <div className="builder-inspector-stack" data-uikit-capability="panel-style">
         <CardSettingsGroup
           block={block}
           update={updateSemantic}
@@ -106,7 +109,6 @@ export default function PanelCapabilityPanel({ block, tab, shellSettings, update
             hover: "panelHover",
           }}
         />
-        <TypographyRoleSettingsPanel block={block} fields={[{ field: "titleTypographyRole", label: "Title role" }, { field: "contentTypographyRole", label: "Content role" }, { field: "metaTypographyRole", label: "Meta role" }]} update={update} />
         <ActionSettingsGroup
           block={block}
           update={updateSemantic}

@@ -191,6 +191,99 @@ Do not begin the next task while the current task has unresolved validation
 failures. Broad audits are periodic review milestones, not a requirement for
 every focused implementation task.
 
+## YOOtheme compatibility roadmap
+
+This roadmap defines the next bounded milestone after the Builder Core work. It
+uses the supplied DevStack theme and `Home.json` export as compatibility
+references only. UIkit and the existing WebPages document, capability, resolver,
+and renderer paths remain canonical; proprietary theme code and assets are not
+copied.
+
+### Phase 0 — Source boundary and compatibility contract
+
+- [x] Audit the supplied theme package and `Home.json` export.
+- [x] Define the source-to-WebPages boundary: source data may be analyzed and
+  mapped, but imported documents must use the existing WebPages schema.
+- [x] Inventory the source node types and identify unsupported or dynamic
+  boundaries without inventing replacement element systems.
+
+### Phase 1 — Import contract and structural mapping
+
+- [x] Add a pure source analyzer that reports source node counts and maps
+  supported source element types to the existing WebPages vocabulary.
+- [x] Map source layout, section, row, and column structure to canonical
+  WebPages layout primitives without writing documents yet.
+- [x] Add focused fixture coverage for the supplied `Home.json` shape,
+  including unsupported-node reporting and deterministic mapping.
+
+### Phase 2 — Core static element import
+
+- [x] Import headings, text, buttons, and images through existing document
+  fields and canonical builder/frontend renderers.
+- [x] Preserve source ordering, hierarchy, links, alt text, and supported
+  semantic roles.
+- [x] Verify imported builder and frontend output against the source structure.
+
+### Phase 3 — Shared consumers
+
+- [x] Map Grid and Grid items onto the existing shared Card, Media, Title,
+  Meta, Content, Action, and General capability paths.
+- [x] Map Panel and Panel Slider onto the same shared consumer capabilities;
+  keep slider behavior in the existing UIkit/Swiper path.
+- [x] Preserve unsupported options as explicit import warnings rather than
+  silently creating parallel behavior.
+
+### Phase 4 — Global style translation
+
+- [x] Map source section variants and spacing presets only where existing
+  WebPages section fields already own them.
+- [x] Translate only source values that have an existing WebPages Global
+  Settings owner or UIkit token mapping.
+- [x] Keep concrete appearance values global and semantic element choices local,
+  following the existing inheritance contract.
+- [x] Report source values with no canonical owner; do not create settings
+  solely to achieve superficial visual similarity.
+
+Phase 4 currently has no separate source Global Settings payload in
+`Home.json`; the boundary analyzer therefore maps recognized semantic values
+to existing WebPages/UIkit owners and reports concrete font/color values for a
+future source export that contains global settings. No new settings are
+created by this phase.
+
+### Phase 5 — Assets and dynamic boundaries
+
+- [x] Normalize supported source-relative asset paths against the configured
+  public WordPress site URL while preserving external and data URLs.
+- [x] Reuse the existing media-picker and asset/document paths for supported
+  source assets: imported URLs remain in canonical image fields and can be
+  replaced through the existing media picker.
+- [x] Define safe boundaries for dynamic data, forms, commerce, and external
+  integrations; do not pretend static import supports them.
+- [x] Verify missing assets and unsupported nodes remain recoverable and
+  visible to the user through the import warning list.
+
+Phase 5 boundary note: static import does not copy remote media into WebPages
+storage. Supported source URLs are preserved in existing document fields; the
+existing media picker remains the canonical replacement/editing path. Dynamic,
+commerce, form, and unsupported source nodes remain warnings and are not
+silently converted into static content.
+
+### Phase 6 — Import experience and parity hardening
+
+- [x] Add the import entry point only after the pure mapping and fixture
+  contracts are stable.
+- [x] Provide a previewable import result, warnings, and a reversible save
+  boundary using the existing builder workflow.
+- [ ] Run focused builder/frontend parity checks and a periodic broad audit
+  before calling the compatibility milestone complete.
+
+### Compatibility milestone completion rule
+
+The milestone is complete only when a supported `Home.json` subset can be
+deterministically mapped into canonical WebPages documents, rendered through
+the existing builder/frontend paths, and accompanied by explicit warnings for
+everything outside the supported contract.
+
 ## Status legend
 
 - `[ ]` planned or unresolved;

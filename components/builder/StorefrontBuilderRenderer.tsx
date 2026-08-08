@@ -61,6 +61,8 @@ import { getProductCategories, type ProductCategory } from "@/lib/navigation";
 import { getProductsForGrid, type ProductNode } from "@/lib/products";
 import { safeDecodeURI } from "@/lib/safeDecodeURI";
 import type { SaaSWebsite } from "@/lib/websites";
+import type { BuilderShellSettings } from "@/lib/builderShell";
+import { resolveAppearanceValue } from "@/lib/globalStyleTokens";
 import type {
   BuilderLayout,
   BuilderLayoutBlock,
@@ -140,6 +142,8 @@ export type StorefrontBuilderRendererProps = {
   product?: StorefrontBuilderProduct;
   pageContent?: ReactNode;
   website?: SaaSWebsite | null;
+  /** Canonical Global Styles values, resolved by shared element renderers. */
+  shellSettings?: Partial<BuilderShellSettings>;
   /** When true, the header overlays page content (shellSettings.headerOverlay).
    *  Sets data-overlap-header on the page root so HeaderFrame auto-detects
    *  the first section's background for text-mode adaptation. */
@@ -1640,6 +1644,7 @@ export function ContentLayoutBlock({
   categoryTree,
   activeCategorySlug,
   website,
+  shellSettings,
   parentScheme = "light",
 }: {
   block: BuilderLayoutBlock;
@@ -1650,6 +1655,7 @@ export function ContentLayoutBlock({
   categoryTree?: CategoryTreeItem[];
   activeCategorySlug?: string | null;
   website?: SaaSWebsite | null;
+  shellSettings?: Partial<BuilderShellSettings>;
   parentScheme?: "light" | "dark";
 }) {
   if (block.kind === "accordion") {
@@ -1740,8 +1746,12 @@ export function ContentLayoutBlock({
     );
   }
 
+  if (block.kind === "panelSlider") {
+    return <UikitSlider block={block as any} panelMode shellSettings={shellSettings} />;
+  }
+
   if (block.kind === "slider") {
-    return <UikitSlider block={block as any} />;
+    return <UikitSlider block={block as any} shellSettings={shellSettings} />;
   }
 
   if (block.kind === "scrollPinnedDemo") {
@@ -1895,6 +1905,15 @@ export function ContentLayoutBlock({
       typographyRoleClass(block.titleTypographyRole),
       block.heroContentAlign ? `uk-text-${block.heroContentAlign}` : "",
     ].filter(Boolean).join(" ");
+    const heroMetaClass = [
+      "shop-builder-eyebrow",
+      typographyRoleClass(block.metaTypographyRole),
+      getUikitTextClass((block as any).metaStyle),
+    ].filter(Boolean).join(" ");
+    const heroContentClass = [
+      typographyRoleClass(block.contentTypographyRole),
+      getUikitTextClass((block as any).contentStyle),
+    ].filter(Boolean).join(" ");
     const HeroHeading = (block.heroHeadingElement ?? "h2") as any;
     const customStyle = isCustom
       ? {
@@ -1918,7 +1937,7 @@ export function ContentLayoutBlock({
           {block.eyebrow && (
             <Typog
               as="p"
-              className={`shop-builder-eyebrow ${typographyRoleClass(block.metaTypographyRole)}`}
+              className={heroMetaClass}
               area="eyebrow"
               typography={block.typography}
             >
@@ -1989,7 +2008,7 @@ export function ContentLayoutBlock({
             </Typog>
           )}
           {block.body && (
-            <Typog as="p" typography={block.typography}>
+            <Typog as="p" className={heroContentClass} typography={block.typography}>
               {block.typewriterEnabled && !block.title ? (
                 <TypewriterText
                   text={block.body}
@@ -2097,9 +2116,16 @@ export function ContentLayoutBlock({
       maxWidth: "var(--builder-card-content-max-width, none)",
     } as CSSProperties;
     const panelMediaPlacement = block.panelMediaPlacement ?? "top";
-    const panelMediaPresentation = getUikitPanelMediaStyle({ ratio: block.imageRatio, fit: block.panelMediaFit ?? "cover", alignment: block.panelMediaAlignment ?? "center" });
+    const panelMediaPresentation = getUikitPanelMediaStyle({ ratio: block.imageRatio, fit: (block.imageFit ?? block.panelMediaFit) === "contain" ? "contain" : "cover", alignment: block.imageAlignment ?? block.panelMediaAlignment ?? "center" });
     const panelMediaClass = getUikitPanelMediaClass(panelMediaPlacement);
     const panelLayoutClass = getUikitPanelLayoutClass(panelMediaPlacement, block.panelMediaWidth ?? "medium");
+    const panelImageDimension = (value: unknown) => value === undefined || value === null || value === "" ? undefined : /^-?\d+(?:\.\d+)?$/.test(String(value)) ? `${value}px` : String(value);
+    const panelImageShape = (block as any).imageShape ?? (block as any).imageBorder ?? "none";
+    const panelImageRadius = panelImageShape === "circle" ? "50%" : panelImageShape === "pill" ? "9999px" : panelImageShape === "rounded" ? "6px" : undefined;
+    const panelImageClass = [
+      (block as any).imageShadow && (block as any).imageShadow !== "none" ? `uk-box-shadow-${(block as any).imageShadow}` : "",
+      (block as any).imageBoxDecoration && (block as any).imageBoxDecoration !== "none" ? `uk-background-${(block as any).imageBoxDecoration}` : "",
+    ].filter(Boolean).join(" ");
     const panelTitleClass = block.panelTitleStyle && block.panelTitleStyle !== "inherit" ? getUikitHeadingClass(block.panelTitleStyle, block.panelTitleStyle) : "";
     const panelShowMedia = block.panelShowMedia !== false;
     const panelTextAlign = block.panelTextAlign ?? "left";
@@ -2108,7 +2134,7 @@ export function ContentLayoutBlock({
       <div data-builder-block-id={block.id} className={`shop-builder-column-block shop-builder-column-block--panel ${panelLayoutClass} ${typographyRoleClass(block.contentTypographyRole)} ${getUikitCardClass(block.panelVariant ?? block.panelStyle ?? "default", { hover: block.panelHover ? "hover" : "none", padding: block.panelSize })}`} style={{ textAlign: panelTextAlign }}>
         {panelShowMedia && (
           <div
-            className={`${panelMediaClass} shop-builder-panel-media${block.imageUrl ? "" : " is-empty"}`}
+            className={`${panelMediaClass} ${panelImageClass} shop-builder-panel-media${block.imageUrl ? "" : " is-empty"}`.trim()}
             role="img"
             aria-label={block.imageAlt || block.title || "Panel image"}
             style={{
@@ -2117,6 +2143,9 @@ export function ContentLayoutBlock({
               overflow: "hidden",
               backgroundSize: panelMediaPresentation.backgroundSize,
               backgroundPosition: panelMediaPresentation.backgroundPosition,
+              width: panelImageDimension((block as any).imageWidth) ?? "100%",
+              maxHeight: panelImageDimension((block as any).imageHeight),
+              borderRadius: panelImageRadius,
               ...(block.imageUrl ? { backgroundImage: `url(${block.imageUrl})` } : {}),
             }}
           />
@@ -2235,7 +2264,7 @@ export function ContentLayoutBlock({
   }
 
   if (block.kind === "image") {
-    return <UikitImage block={block} />;
+    return <UikitImage block={block} shellSettings={shellSettings} />;
   }
 
   if (block.kind === "table") {
@@ -2518,6 +2547,7 @@ function ContentLayoutSection({
   categoryTree,
   activeCategorySlug,
   website,
+  shellSettings,
   layoutScheme = "light",
 }: {
   section: BuilderSection;
@@ -2528,6 +2558,7 @@ function ContentLayoutSection({
   categoryTree?: CategoryTreeItem[];
   activeCategorySlug?: string | null;
   website?: SaaSWebsite | null;
+  shellSettings?: Partial<BuilderShellSettings>;
   layoutScheme?: "light" | "dark" | "auto";
 }) {
   const items = section.layoutItems?.length
@@ -2720,6 +2751,7 @@ function ContentLayoutSection({
                           categoryTree={categoryTree}
                           activeCategorySlug={activeCategorySlug}
                           website={website}
+                          shellSettings={shellSettings}
                           parentScheme={rowColorScheme}
                         />
                       );
@@ -2747,6 +2779,7 @@ function ContentLayoutSection({
                           categoryTree={categoryTree}
                           activeCategorySlug={activeCategorySlug}
                           website={website}
+                          shellSettings={shellSettings}
                           parentScheme={rowColorScheme}
                         />
                       </div>
@@ -2813,11 +2846,24 @@ function ContentLayoutSection({
 
 function SliderSection({
   section,
+  shellSettings,
   layoutScheme = "light",
 }: {
   section: BuilderSection;
+  shellSettings?: Partial<BuilderShellSettings>;
   layoutScheme?: "light" | "dark" | "auto";
 }) {
+  const resolveString = (
+    local: unknown,
+    global: string | undefined,
+    componentDefault: string,
+  ) =>
+    resolveAppearanceValue({
+      local: typeof local === "string" ? local : undefined,
+      global,
+      componentDefault,
+    }).value;
+  const carouselSettings = section.carouselSettings ?? {};
   const slides: CarouselSlide[] =
     section.slides?.map((slide, index) => ({
       id: slide.id ?? `${section.id}-slide-${index}`,
@@ -2828,6 +2874,12 @@ function SliderSection({
       imageUrl: slide.imageUrl,
       imageAlt: slide.imageAlt,
       imagePadding: slide.imagePadding,
+      imageRatio: resolveString((slide as any).imageRatio, shellSettings?.imageDefaultRatio, "natural"),
+      imageFit: resolveString((slide as any).imageFit, shellSettings?.imageDefaultFit, "cover"),
+      imageShape: resolveString((slide as any).imageShape, shellSettings?.imageDefaultBorder, "none"),
+      imageShadow: resolveString((slide as any).imageShadow, shellSettings?.imageDefaultShadow, "none"),
+      imageAlignment: resolveString((slide as any).imageAlignment, shellSettings?.imageDefaultAlignment, "center"),
+      imageLoading: resolveString((slide as any).imageLoading, shellSettings?.imageDefaultLoading, "lazy"),
       buttonLabel: slide.buttonLabel,
       buttonUrl: slide.buttonUrl,
     })) ?? [];
@@ -2848,7 +2900,13 @@ function SliderSection({
           fieldGroupName: "ReactBuilderSlider",
         }}
         slides={slides}
-        settings={section.carouselSettings}
+        settings={{
+          ...carouselSettings,
+          arrowStyle: resolveString(carouselSettings.arrowStyle, shellSettings?.sliderArrowStyle, "chevron"),
+          arrowPosition: resolveString(carouselSettings.arrowPosition, shellSettings?.sliderArrowPosition, "overlay"),
+          paginationStyle: resolveString(carouselSettings.paginationStyle, shellSettings?.sliderDotnavStyle, "minimal-dots"),
+          paginationPosition: resolveString(carouselSettings.paginationPosition, shellSettings?.sliderDotnavPosition, "bottom"),
+        }}
       />
     </SectionFrame>
   );
@@ -2895,6 +2953,7 @@ function BuilderSectionRenderer({
   page,
   pageContent,
   website,
+  shellSettings,
   layoutScheme = "light",
 }: {
   section: BuilderSection;
@@ -2906,6 +2965,7 @@ function BuilderSectionRenderer({
   page: BuilderLayoutKey;
   pageContent?: ReactNode;
   website?: SaaSWebsite | null;
+  shellSettings?: Partial<BuilderShellSettings>;
   layoutScheme?: "light" | "dark" | "auto";
 }) {
   if (!section.visible) return null;
@@ -2969,11 +3029,12 @@ function BuilderSectionRenderer({
         categoryTree={categoryTree}
         activeCategorySlug={activeCategorySlug}
         website={website}
+        shellSettings={shellSettings}
         layoutScheme={layoutScheme}
       />
     );
   } else if (section.kind === "slider") {
-    content = <SliderSection section={section} layoutScheme={layoutScheme} />;
+    content = <SliderSection section={section} shellSettings={shellSettings} layoutScheme={layoutScheme} />;
   } else if (section.kind === "embed") {
     content = <EmbedSection section={section} layoutScheme={layoutScheme} />;
   } else if (section.kind === "scrollPinnedDemo") {
@@ -3004,6 +3065,7 @@ function StorefrontBuilderRendererBase({
   product,
   pageContent,
   website,
+  shellSettings,
   headerOverlay = false,
   rootElement = "main",
 }: StorefrontBuilderRendererProps) {
@@ -3084,6 +3146,7 @@ function StorefrontBuilderRendererBase({
               page={page}
               pageContent={pageContent}
               website={website}
+              shellSettings={shellSettings}
               layoutScheme={layoutScheme}
             />
           ))}

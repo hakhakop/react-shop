@@ -8,6 +8,7 @@ import { renderDomainWebsiteFrontend } from "@/components/website/DomainWebsiteF
 import ProductAdminMarker from "@/components/ProductAdminMarker";
 import { ProductRecentlyViewedTracker } from "@/components/RecentlyViewedProvider";
 import { getPublishedBuilderLayout } from "@/lib/builderLayouts";
+import { getBuilderShellSettings } from "@/lib/builderShell";
 import { getCurrentWebsiteFromHeaders } from "@/lib/currentWebsite";
 import { getProductBySlug } from "@/lib/products";
 
@@ -153,7 +154,10 @@ const priceFormatted =
     );
   }
 
-  const templateLayout = await getPublishedBuilderLayout("product-single");
+  const [templateLayout, shellSettings] = await Promise.all([
+    getPublishedBuilderLayout("product-single"),
+    getBuilderShellSettings(),
+  ]);
 
   if (templateLayout) {
     return (
@@ -176,6 +180,7 @@ const priceFormatted =
             { label: p.name },
           ]}
           product={rendererProduct}
+          shellSettings={shellSettings}
         />
       </>
     );

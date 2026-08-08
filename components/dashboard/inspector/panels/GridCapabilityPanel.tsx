@@ -7,12 +7,18 @@ import type {
   WordPressMediaItem,
 } from "@/components/dashboard/builderTypes";
 import type { BuilderShellSettings } from "@/lib/builderShell";
-import { UIKIT_BUTTON_CAPABILITY } from "@/lib/uikitCapabilities";
 import { BUILDER_LINK_TARGET_OPTIONS } from "@/lib/websiteBuilderLinks";
 import IconPicker from "@/components/dashboard/inspector/IconPicker";
 import RepeatableItemShell from "@/components/dashboard/inspector/RepeatableItemShell";
 import { BuilderImageUrlControl } from "@/components/dashboard/inspector/panels/InspectorSharedControls";
-import { ImageSettingsGroup } from "@/components/dashboard/inspector/panels/SharedSettingGroups";
+import {
+  ActionSettingsGroup,
+  CardSettingsGroup,
+  ContentSettingsGroup,
+  ImageSettingsGroup,
+  MetaSettingsGroup,
+  TitleSettingsGroup,
+} from "@/components/dashboard/inspector/panels/SharedSettingGroups";
 import {
   InspectorFieldRow,
   InspectorPillGroup,
@@ -22,8 +28,6 @@ import {
   InspectorTextField,
   InspectorTextarea,
   InspectorDivision,
-  InspectorAlignmentControl,
-  InspectorSegmentedControl,
 } from "@/components/dashboard/inspector/InspectorControls";
 
 type Props = {
@@ -58,25 +62,6 @@ const gapOptions = [
   { value: "medium", label: "Medium" },
   { value: "large", label: "Large" },
   { value: "collapse", label: "Collapse" },
-];
-
-const colorOptions = [
-  { value: "none", label: "None" },
-  { value: "muted", label: "Muted" },
-  { value: "emphasis", label: "Emphasis" },
-  { value: "primary", label: "Primary" },
-  { value: "secondary", label: "Secondary" },
-  { value: "success", label: "Success" },
-  { value: "warning", label: "Warning" },
-  { value: "danger", label: "Danger" },
-];
-
-const fontFamilyOptions = [
-  { value: "none", label: "None" },
-  { value: "default", label: "Default" },
-  { value: "primary", label: "Primary" },
-  { value: "secondary", label: "Secondary" },
-  { value: "tertiary", label: "Tertiary" },
 ];
 
 type GridItem = NonNullable<BuilderLayoutBlock["gridItems"]>[number];
@@ -651,395 +636,68 @@ export default function GridCapabilityPanel({
           </InspectorFieldRow>
         </InspectorDivision>
 
-        {/* PANEL SECTION */}
-        <InspectorDivision title="PANEL">
-          <InspectorFieldRow
-            label="Style"
-            isOverridden={block.panelVariant !== undefined && (block.panelVariant as any) !== "none"}
-            inheritedValueText="None"
-            onReset={() => update({ panelVariant: undefined, panelStyle: undefined })}
-          >
-            <InspectorSelect
-              value={block.panelVariant ?? (block as any).panelStyle ?? "none"}
-              options={[
-                { value: "none", label: "None" },
-                { value: "card-default", label: "Card Default" },
-                { value: "card-primary", label: "Card Primary" },
-                { value: "card-secondary", label: "Card Secondary" },
-                { value: "card-hover", label: "Card Hover" },
-                { value: "tile-default", label: "Tile Default" },
-                { value: "tile-primary", label: "Tile Primary" },
-                { value: "tile-secondary", label: "Tile Secondary" },
-              ]}
-              onChange={(v) => update({ panelVariant: v, panelStyle: v })}
-              ariaLabel="Panel Style"
-            />
-          </InspectorFieldRow>
-          <InspectorFieldRow
-            label="Link"
-            isOverridden={Boolean((block as any).linkPanel) || Boolean((block as any).addHoverStyle)}
-            inheritedValueText="Off"
-            onReset={() => update({ linkPanel: false, addHoverStyle: false } as any)}
-          >
-            <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-              <label className="builder-inspector-checkbox-row">
-                <input
-                  type="checkbox"
-                  checked={Boolean((block as any).linkPanel)}
-                  onChange={(e) => update({ linkPanel: e.target.checked } as any)}
-                />
-                <span>Link panel</span>
-              </label>
-              <label className="builder-inspector-checkbox-row">
-                <input
-                  type="checkbox"
-                  checked={Boolean((block as any).addHoverStyle)}
-                  onChange={(e) => update({ addHoverStyle: e.target.checked } as any)}
-                />
-                <span>Add hover style</span>
-              </label>
-            </div>
-          </InspectorFieldRow>
-          <InspectorFieldRow
-            label="Padding"
-            isOverridden={block.panelSize !== undefined && (block.panelSize as any) !== "none"}
-            inheritedValueText="None"
-            onReset={() => update({ panelSize: undefined, panelPadding: undefined } as any)}
-          >
-            <InspectorSelect
-              value={block.panelSize ?? (block as any).panelPadding ?? "none"}
-              options={[
-                { value: "none", label: "None" },
-                { value: "small", label: "Small" },
-                { value: "default", label: "Default" },
-                { value: "large", label: "Large" },
-              ]}
-              onChange={(v) => update({ panelSize: v, panelPadding: v } as any)}
-              ariaLabel="Panel Padding"
-            />
-          </InspectorFieldRow>
-          <InspectorFieldRow
-            label="Image"
-            isOverridden={Boolean((block as any).alignImageWithoutPadding)}
-            inheritedValueText="Off"
-            onReset={() => update({ alignImageWithoutPadding: false } as any)}
-          >
-            <label className="builder-inspector-checkbox-row">
-              <input
-                type="checkbox"
-                checked={Boolean((block as any).alignImageWithoutPadding)}
-                onChange={(e) => update({ alignImageWithoutPadding: e.target.checked } as any)}
-              />
-              <span>Align image without padding</span>
-            </label>
-          </InspectorFieldRow>
-          <InspectorFieldRow
-            label="Max Width"
-            isOverridden={(block as any).panelMaxWidth !== undefined && (block as any).panelMaxWidth !== "none"}
-            inheritedValueText="None"
-            onReset={() => update({ panelMaxWidth: undefined } as any)}
-          >
-            <InspectorSelect
-              value={(block as any).panelMaxWidth ?? "none"}
-              options={[
-                { value: "none", label: "None" },
-                { value: "small", label: "Small" },
-                { value: "medium", label: "Medium" },
-                { value: "large", label: "Large" },
-                { value: "xlarge", label: "X-Large" },
-                { value: "2xlarge", label: "2X-Large" },
-              ]}
-              onChange={(v) => update({ panelMaxWidth: v } as any)}
-              ariaLabel="Panel Max Width"
-            />
-          </InspectorFieldRow>
-        </InspectorDivision>
+        <CardSettingsGroup
+          block={block}
+          update={update}
+          title="PANEL"
+          showLink
+          keys={{ variant: "panelStyle", size: "panelSize", hover: "panelHover", link: "linkPanel" }}
+          surfaceOptions={[
+            { value: "none", label: "None" },
+            { value: "card-default", label: "Card Default" },
+            { value: "card-primary", label: "Card Primary" },
+            { value: "card-secondary", label: "Card Secondary" },
+            { value: "card-hover", label: "Card Hover" },
+            { value: "tile-default", label: "Tile Default" },
+            { value: "tile-primary", label: "Tile Primary" },
+            { value: "tile-secondary", label: "Tile Secondary" },
+          ]}
+          defaultSize="none"
+          sizeOptions={[
+            { value: "none", label: "None" },
+            { value: "small", label: "Small" },
+            { value: "default", label: "Default" },
+            { value: "large", label: "Large" },
+          ]}
+        />
 
-        {/* TITLE SECTION */}
-        <InspectorDivision title="TITLE">
-          <InspectorFieldRow
-            label="Style"
-            isOverridden={(block as any).gridTitleSize !== undefined && (block as any).gridTitleSize !== "none"}
-            inheritedValueText="None"
-            onReset={() => update({ gridTitleSize: undefined })}
-          >
-            <InspectorSelect
-              value={(block as any).gridTitleSize ?? "none"}
-              options={[
-                { value: "none", label: "None" },
-                { value: "h1", label: "Heading 1" },
-                { value: "h2", label: "Heading 2" },
-                { value: "h3", label: "Heading 3" },
-                { value: "h4", label: "Heading 4" },
-                { value: "small", label: "Heading Small" },
-                { value: "medium", label: "Heading Medium" },
-                { value: "large", label: "Heading Large" },
-              ]}
-              onChange={(v) => update({ gridTitleSize: v })}
-              ariaLabel="Title Style"
-            />
-          </InspectorFieldRow>
-          <InspectorFieldRow
-            label="Decoration"
-            isOverridden={(block as any).titleDecoration !== undefined && (block as any).titleDecoration !== "none"}
-            inheritedValueText="None"
-            onReset={() => update({ titleDecoration: undefined } as any)}
-          >
-            <InspectorSelect
-              value={(block as any).titleDecoration ?? "none"}
-              options={[
-                { value: "none", label: "None" },
-                { value: "divider", label: "Divider" },
-                { value: "bullet", label: "Bullet" },
-                { value: "line", label: "Line" },
-              ]}
-              onChange={(v) => update({ titleDecoration: v } as any)}
-              ariaLabel="Title Decoration"
-            />
-          </InspectorFieldRow>
-          <InspectorFieldRow
-            label="Font Family"
-            isOverridden={block.titleTypographyRole !== undefined && (block.titleTypographyRole as any) !== "none"}
-            inheritedValueText="None"
-            onReset={() => update({ titleTypographyRole: undefined })}
-          >
-            <InspectorSelect
-              value={block.titleTypographyRole ?? "none"}
-              options={fontFamilyOptions}
-              onChange={(v) => update({ titleTypographyRole: v as any })}
-              ariaLabel="Title Font Family"
-            />
-          </InspectorFieldRow>
-          <InspectorFieldRow
-            label="Color"
-            isOverridden={(block as any).titleColor !== undefined && (block as any).titleColor !== "none"}
-            inheritedValueText="None"
-            onReset={() => update({ titleColor: undefined } as any)}
-          >
-            <InspectorSelect
-              value={(block as any).titleColor ?? "none"}
-              options={colorOptions}
-              onChange={(v) => update({ titleColor: v } as any)}
-              ariaLabel="Title Color"
-            />
-          </InspectorFieldRow>
-          <InspectorFieldRow
-            label="HTML Element"
-            isOverridden={(block as any).gridTitleLevel !== undefined && (block as any).gridTitleLevel !== "h3"}
-            inheritedValueText="h3"
-            onReset={() => update({ gridTitleLevel: undefined })}
-          >
-            <InspectorSelect
-              value={(block as any).gridTitleLevel ?? "h3"}
-              options={[
-                { value: "h1", label: "h1" },
-                { value: "h2", label: "h2" },
-                { value: "h3", label: "h3" },
-                { value: "h4", label: "h4" },
-                { value: "h5", label: "h5" },
-                { value: "h6", label: "h6" },
-                { value: "div", label: "div" },
-              ]}
-              onChange={(v) => update({ gridTitleLevel: v })}
-              ariaLabel="Title HTML Element"
-            />
-          </InspectorFieldRow>
-        </InspectorDivision>
+        <TitleSettingsGroup
+          block={block}
+          update={update}
+          showAlignment={false}
+          showDecoration
+          showColor
+          defaultSize="none"
+          keys={{ role: "titleTypographyRole", size: "gridTitleSize", align: "textAlignment", level: "gridTitleLevel", decoration: "titleDecoration", color: "titleColor" }}
+        />
 
-        {/* META SECTION */}
-        <InspectorDivision title="META">
-          <InspectorFieldRow
-            label="Style"
-            isOverridden={(block as any).metaStyle !== undefined && (block as any).metaStyle !== "text-meta"}
-            inheritedValueText="Text Meta"
-            onReset={() => update({ metaStyle: undefined } as any)}
-          >
-            <InspectorSelect
-              value={(block as any).metaStyle ?? "text-meta"}
-              options={[
-                { value: "text-meta", label: "Text Meta" },
-                { value: "text-lead", label: "Text Lead" },
-                { value: "heading-small", label: "Heading Small" },
-              ]}
-              onChange={(v) => update({ metaStyle: v } as any)}
-              ariaLabel="Meta Style"
-            />
-          </InspectorFieldRow>
-          <InspectorFieldRow
-            label="Color"
-            isOverridden={(block as any).metaColor !== undefined && (block as any).metaColor !== "none"}
-            inheritedValueText="None"
-            onReset={() => update({ metaColor: undefined } as any)}
-          >
-            <InspectorSelect
-              value={(block as any).metaColor ?? "none"}
-              options={colorOptions}
-              onChange={(v) => update({ metaColor: v } as any)}
-              ariaLabel="Meta Color"
-            />
-          </InspectorFieldRow>
-          <InspectorFieldRow
-            label="Position"
-            isOverridden={(block as any).gridMetaAlign !== undefined && (block as any).gridMetaAlign !== "below"}
-            inheritedValueText="Below Title"
-            onReset={() => update({ gridMetaAlign: undefined } as any)}
-          >
-            <InspectorSelect
-              value={(block as any).gridMetaAlign ?? "below"}
-              options={[
-                { value: "below", label: "Below Title" },
-                { value: "above", label: "Above Title" },
-                { value: "content", label: "Below Content" },
-              ]}
-              onChange={(v) => update({ gridMetaAlign: v as any })}
-              ariaLabel="Meta Position"
-            />
-          </InspectorFieldRow>
-          <InspectorFieldRow
-            label="HTML Element"
-            isOverridden={(block as any).gridMetaHtmlElement !== undefined && (block as any).gridMetaHtmlElement !== "div"}
-            inheritedValueText="div"
-            onReset={() => update({ gridMetaHtmlElement: undefined })}
-          >
-            <InspectorSelect
-              value={(block as any).gridMetaHtmlElement ?? "div"}
-              options={[
-                { value: "div", label: "div" },
-                { value: "span", label: "span" },
-                { value: "p", label: "p" },
-              ]}
-              onChange={(v) => update({ gridMetaHtmlElement: v })}
-              ariaLabel="Meta HTML Element"
-            />
-          </InspectorFieldRow>
-        </InspectorDivision>
+        <MetaSettingsGroup
+          block={block}
+          update={update}
+          showAlignment={false}
+          showStyle
+          showColor
+          showPosition
+          keys={{ role: "metaTypographyRole", align: "textAlignment", level: "gridMetaHtmlElement", style: "metaStyle", color: "metaColor", position: "gridMetaAlign" }}
+        />
 
-        {/* CONTENT SECTION */}
-        <InspectorDivision title="CONTENT">
-          <InspectorFieldRow
-            label="Style"
-            isOverridden={(block as any).contentStyle !== undefined && (block as any).contentStyle !== "none"}
-            inheritedValueText="None"
-            onReset={() => update({ contentStyle: undefined } as any)}
-          >
-            <InspectorSelect
-              value={(block as any).contentStyle ?? "none"}
-              options={[
-                { value: "none", label: "None" },
-                { value: "text-lead", label: "Text Lead" },
-                { value: "text-meta", label: "Text Meta" },
-                { value: "text-small", label: "Text Small" },
-                { value: "text-large", label: "Text Large" },
-              ]}
-              onChange={(v) => update({ contentStyle: v } as any)}
-              ariaLabel="Content Style"
-            />
-          </InspectorFieldRow>
-          <InspectorFieldRow
-            label="Columns"
-            isOverridden={(block as any).contentColumns !== undefined && (block as any).contentColumns !== "none"}
-            inheritedValueText="None"
-            onReset={() => update({ contentColumns: undefined } as any)}
-          >
-            <InspectorSelect
-              value={String((block as any).contentColumns ?? "none")}
-              options={[
-                { value: "none", label: "None" },
-                { value: "1-2", label: "1-2 Columns" },
-                { value: "1-3", label: "1-3 Columns" },
-                { value: "1-4", label: "1-4 Columns" },
-              ]}
-              onChange={(v) => update({ contentColumns: v } as any)}
-              ariaLabel="Content Columns"
-            />
-          </InspectorFieldRow>
-        </InspectorDivision>
+        <ContentSettingsGroup
+          block={block}
+          update={update}
+          showAlignment={false}
+          showStyle
+          keys={{ role: "contentTypographyRole", align: "textAlignment", style: "contentStyle" }}
+        />
 
-        {/* IMAGE SECTION */}
-        <ImageSettingsGroup block={block} update={update} />
+        <ImageSettingsGroup block={block} update={update} showFrameless />
 
-        {/* LINK SECTION */}
-        <InspectorDivision title="LINK">
-          <InspectorFieldRow
-            label="Target"
-            isOverridden={(block as any).buttonTarget === "_blank"}
-            inheritedValueText="Same window"
-            onReset={() => update({ buttonTarget: "_self" })}
-          >
-            <label className="builder-inspector-checkbox-row">
-              <input
-                type="checkbox"
-                checked={(block as any).buttonTarget === "_blank"}
-                onChange={(e) => update({ buttonTarget: e.target.checked ? "_blank" : "_self" })}
-              />
-              <span>Open in a new window</span>
-            </label>
-          </InspectorFieldRow>
-          <InspectorFieldRow
-            label="Text"
-            isOverridden={block.buttonLabel !== undefined && block.buttonLabel !== "Read more"}
-            inheritedValueText="Read more"
-            onReset={() => update({ buttonLabel: undefined })}
-          >
-            <InspectorTextField
-              value={block.buttonLabel ?? "Read more"}
-              onChange={(v) => update({ buttonLabel: v })}
-              ariaLabel="Link Text"
-            />
-          </InspectorFieldRow>
-          <InspectorFieldRow
-            label="Style"
-            isOverridden={block.buttonStyle !== undefined && block.buttonStyle !== "primary"}
-            inheritedValueText="Primary"
-            onReset={() => update({ buttonStyle: undefined })}
-          >
-            <InspectorSelect
-              value={block.buttonStyle ?? "primary"}
-              options={[
-                { value: "default", label: "Button Default" },
-                { value: "primary", label: "Button Primary" },
-                { value: "secondary", label: "Button Secondary" },
-                { value: "danger", label: "Button Danger" },
-                { value: "link", label: "Link" },
-                { value: "text", label: "Link Text" },
-              ]}
-              onChange={(v) => update({ buttonStyle: v })}
-              ariaLabel="Link Style"
-            />
-          </InspectorFieldRow>
-          <InspectorFieldRow
-            label="Button Size"
-            isOverridden={block.size !== undefined && block.size !== "default"}
-            inheritedValueText="Default"
-            onReset={() => update({ size: undefined })}
-          >
-            <InspectorSelect
-              value={block.size ?? "default"}
-              options={[
-                { value: "default", label: "Default" },
-                { value: "small", label: "Small" },
-                { value: "large", label: "Large" },
-              ]}
-              onChange={(v) => update({ size: v })}
-              ariaLabel="Button Size"
-            />
-          </InspectorFieldRow>
-          <InspectorFieldRow
-            label="Full width"
-            isOverridden={Boolean((block as any).fullWidthButton)}
-            inheritedValueText="Off"
-            onReset={() => update({ fullWidthButton: false } as any)}
-          >
-            <label className="builder-inspector-checkbox-row">
-              <input
-                type="checkbox"
-                checked={Boolean((block as any).fullWidthButton)}
-                onChange={(e) => update({ fullWidthButton: e.target.checked } as any)}
-              />
-              <span>Full width button</span>
-            </label>
-          </InspectorFieldRow>
-        </InspectorDivision>
+        <ActionSettingsGroup
+          block={block}
+          update={update}
+          title="DEFAULT ACTION"
+          showFullWidth
+          keys={{ label: "buttonLabel", url: "buttonUrl", target: "buttonTarget", style: "buttonStyle", size: "size", width: "fullWidthButton" }}
+        />
       </div>
     );
   }

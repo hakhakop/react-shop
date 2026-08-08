@@ -143,6 +143,7 @@ export type LayoutBlockKind =
   | "table"
   | "text"
   | "slider"
+  | "panelSlider"
   | "embed"
   | "fluentForm"
   | "badgeGrid"
@@ -401,8 +402,8 @@ export type BuilderLayoutBlock = {
   accordionItemSpacing?: "inherit" | "small" | "default" | "large";
   accordionContentSpacing?: "inherit" | "small" | "default" | "large";
   accordionDivider?: boolean;
-  accordionTitleStyle?: "inherit" | "h3" | "h4" | "h5";
-  accordionContentStyle?: "inherit" | "default" | "lead" | "small" | "large" | "muted";
+  accordionTitleStyle?: "inherit" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "article-title" | "small" | "medium" | "large" | "xlarge";
+  accordionContentStyle?: "inherit" | "none" | "text-bold" | "text-lead" | "text-meta" | "text-small" | "text-large" | "text-muted" | "heading-small" | "heading-h1" | "heading-h2" | "heading-h3" | "heading-h4" | "heading-h5" | "heading-h6" | "default" | "lead" | "meta" | "small" | "large" | "muted";
   /** @deprecated Read-only migration fallback for older Accordion documents. */
   accordionRowStyle?: "plain" | "divided" | "striped";
   /** @deprecated Read-only migration fallback for older Accordion documents. */
@@ -739,14 +740,50 @@ export type BuilderSection = {
     contentTranslations?: BuilderContentTranslations;
     id?: string;
     title?: string;
+    meta?: string;
     subtitle?: string;
     text?: string;
     badge?: string;
     imageUrl?: string;
     imageAlt?: string;
     imagePadding?: SlideImagePadding;
+    imageFit?: string;
+    imageRatio?: string;
+    imageShape?: string;
+    imageShadow?: string;
+    imageAlignment?: string;
+    imageWidth?: string;
+    imageHeight?: string | number;
+    imageBorder?: string;
+    imageBoxShadow?: string;
+    iconName?: string;
+    iconSize?: number;
+    panelStyle?: string;
+    panelSize?: string;
+    panelHover?: boolean;
+    linkPanel?: boolean;
+    headingLevel?: string;
+    headingSize?: string;
+    titleTypographyRole?: string;
+    headingAlign?: string;
+    titleDecoration?: string;
+    titleColor?: string;
+    metaTypographyRole?: string;
+    metaAlign?: string;
+    metaHtmlElement?: string;
+    metaStyle?: string;
+    metaColor?: string;
+    gridMetaAlign?: string;
+    contentTypographyRole?: string;
+    contentAlign?: string;
+    contentStyle?: string;
+    showAction?: boolean;
+    fullWidthButton?: boolean;
     buttonLabel?: string;
     buttonUrl?: string;
+    buttonTarget?: string;
+    buttonStyle?: string;
+    buttonSize?: string;
     typography?: TypographySettings;
     items?: string[];
     listIcon?: "check" | "circleCheck" | "arrowRight" | "star" | "heart" | "sparkles" | "shield";

@@ -6680,6 +6680,92 @@ body:has([data-scoped-preview-root]) [data-scoped-preview-root] .site-header {
   min-width: 0;
 }
 
+/* Shared Products sidebar controls. These inherit the active preview theme
+   rather than introducing a separate light/dark product design. */
+.builder-products-filter-sidebar {
+  width: min(100%, 224px);
+  flex: 0 0 224px;
+  background: var(--builder-surface, var(--surface-muted, #f7f7f4));
+  color: var(--builder-text, var(--text-main, #111111));
+}
+
+.builder-products-filter-heading {
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.builder-products-filter-facets {
+  display: grid;
+  gap: 14px;
+}
+
+.builder-products-filter-facet-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 7px;
+  color: var(--builder-muted, var(--text-muted, #666666));
+  font-size: 12px;
+}
+
+.builder-products-filter-facet-header span:last-child {
+  opacity: 0.7;
+}
+
+.builder-products-filter-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.builder-products-filter-option {
+  min-height: 28px;
+  padding: 0 9px;
+  border-radius: 5px;
+  font-size: 11px;
+  line-height: 26px;
+}
+
+.builder-products-filter-expand,
+.builder-products-filter-clear {
+  margin-top: 7px;
+  font-size: 12px;
+}
+
+.builder-product-card-attributes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin: 0 0 10px;
+}
+
+.builder-product-card-attribute-control {
+  position: relative;
+}
+
+.builder-product-card-attribute-trigger {
+  cursor: pointer;
+}
+
+.builder-product-card-attribute-popover {
+  position: absolute;
+  z-index: 5;
+  left: 0;
+  bottom: calc(100% + 7px);
+  width: max-content;
+  max-width: min(280px, 90vw);
+  padding: 7px 9px;
+  border-radius: 5px;
+  background: var(--builder-surface, #24241f);
+  color: var(--builder-text, #f7f7f1);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+
 .builder-preview-product-grid {
   margin-top: 22px;
   display: grid;
@@ -15327,6 +15413,60 @@ body:has([data-scoped-builder-root])
   transition-timing-function: linear !important;
 }
 
+/* Panel Slider: Swiper owns motion only; slide appearance comes from the
+   same UIkit Panel/Card and semantic content contract as Grid. */
+.shop-builder-panel-slider-card {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  overflow: hidden;
+}
+
+.shop-builder-panel-slider-media {
+  position: relative;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--global-muted-background, #f5f5f5) 85%, transparent);
+}
+
+.shop-builder-panel-slider-media-link,
+.shop-builder-panel-slider-media img {
+  display: block;
+  height: 100%;
+}
+
+.shop-builder-panel-slider-media-link {
+  width: 100%;
+}
+
+.shop-builder-panel-slider-placeholder {
+  display: flex;
+  min-height: 180px;
+  width: 100%;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border: 0;
+  background: color-mix(in srgb, var(--global-muted-background, #f5f5f5) 85%, transparent);
+  color: inherit;
+}
+
+.shop-builder-panel-slider-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.shop-builder-panel-slider-icon {
+  align-self: flex-start;
+}
+
+.shop-builder-panel-slider-action {
+  align-self: flex-start;
+  margin-top: auto;
+}
+
 /* Hero Slide Card (Mode A) */
 .shop-builder-hero-slide-card {
   position: relative;
@@ -17103,12 +17243,98 @@ body:has([data-scoped-builder-root])
 
 .webpages-icon-picker {
   min-width: 0;
-  display: grid;
-  gap: 12px;
-  padding: 12px;
+}
+
+.webpages-icon-picker__trigger-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.webpages-icon-picker__trigger {
+  min-width: 0;
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 10px 12px;
   border: 1px solid var(--builder-ui-border, #d7dce5);
-  border-radius: 10px;
+  border-radius: 8px;
+  background: var(--builder-ui-input, #fff);
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.webpages-icon-picker__trigger:hover,
+.webpages-icon-picker__trigger:focus-visible {
+  border-color: var(--builder-ui-accent, #3b82f6);
+  outline: none;
+}
+
+.webpages-icon-picker__trigger > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.webpages-icon-picker__backdrop {
+  position: fixed;
+  z-index: 10000;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgb(15 23 42 / 42%);
+}
+
+.webpages-icon-picker__dialog {
+  width: min(920px, calc(100vw - 48px));
+  max-height: min(760px, calc(100vh - 48px));
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr);
+  gap: 14px;
+  overflow: hidden;
+  padding: 18px;
+  border: 1px solid var(--builder-ui-border, #d7dce5);
+  border-radius: 14px;
   background: var(--builder-ui-surface, #fff);
+  color: var(--builder-ui-text, inherit);
+  box-shadow: 0 24px 64px rgb(15 23 42 / 35%);
+}
+
+.webpages-icon-picker__dialog-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.webpages-icon-picker__dialog-header > div {
+  display: grid;
+  gap: 3px;
+}
+
+.webpages-icon-picker__dialog-header strong {
+  font-size: 16px;
+}
+
+.webpages-icon-picker__dialog-header span {
+  color: var(--builder-ui-soft-muted, #64748b);
+  font-size: 12px;
+}
+
+.webpages-icon-picker__close {
+  display: inline-grid;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  padding: 0;
+  border: 1px solid var(--builder-ui-border, #d7dce5);
+  border-radius: 8px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
 }
 
 .webpages-icon-picker__toolbar {
@@ -17141,12 +17367,10 @@ body:has([data-scoped-builder-root])
 }
 
 .webpages-icon-picker__clear {
-  grid-column: 2;
-  grid-row: 2;
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  justify-self: end;
+  flex: none;
   padding: 7px 10px;
   border: 1px solid var(--builder-ui-border, #d7dce5);
   border-radius: 7px;
@@ -17160,7 +17384,6 @@ body:has([data-scoped-builder-root])
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(56px, 1fr));
   gap: 8px;
-  max-height: min(520px, 58vh);
   overflow-y: auto;
   padding: 3px;
   scrollbar-gutter: stable;
@@ -17205,6 +17428,19 @@ body:has([data-scoped-builder-root])
   font-size: 10px;
 }
 
+.shop-builder-column-block--list .webpages-list-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.webpages-list-item__icon {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  color: currentColor;
+}
+
 .webpages-icon-picker__empty {
   grid-column: 1 / -1;
   margin: 16px 4px;
@@ -17226,6 +17462,16 @@ body:has([data-scoped-builder-root])
 }
 
 @media (max-width: 540px) {
+  .webpages-icon-picker__backdrop {
+    padding: 12px;
+  }
+
+  .webpages-icon-picker__dialog {
+    width: calc(100vw - 24px);
+    max-height: calc(100vh - 24px);
+    padding: 14px;
+  }
+
   .webpages-icon-picker__toolbar {
     grid-template-columns: minmax(0, 1fr) auto;
   }
@@ -17240,13 +17486,11 @@ body:has([data-scoped-builder-root])
   }
 
   .webpages-icon-picker__clear {
-    grid-column: 2;
-    grid-row: 1 / span 2;
+    align-self: stretch;
   }
 
   .webpages-icon-picker__grid {
     grid-template-columns: repeat(auto-fill, minmax(54px, 1fr));
-    max-height: min(460px, 56vh);
   }
 }
 
@@ -17259,15 +17503,15 @@ h5.shop-builder-title { font-size: 1.1rem; line-height: 1.4; font-weight: 600; }
 h6.shop-builder-title { font-size: 0.95rem; line-height: 1.4; font-weight: 600; }
 
 /* UIkit Title Style Overrides (ALWAYS Override HTML Element Tag Defaults) */
-.shop-builder-title.uk-h1, .uk-h1 { font-size: 2.5rem !important; line-height: 1.2 !important; font-weight: 700 !important; }
-.shop-builder-title.uk-h2, .uk-h2 { font-size: 2rem !important; line-height: 1.3 !important; font-weight: 600 !important; }
-.shop-builder-title.uk-h3, .uk-h3 { font-size: 1.5rem !important; line-height: 1.4 !important; font-weight: 600 !important; }
-.shop-builder-title.uk-h4, .uk-h4 { font-size: 1.25rem !important; line-height: 1.4 !important; font-weight: 600 !important; }
-.shop-builder-title.uk-h5, .uk-h5 { font-size: 1.1rem !important; line-height: 1.4 !important; font-weight: 600 !important; }
-.shop-builder-title.uk-h6, .uk-h6 { font-size: 0.95rem !important; line-height: 1.4 !important; font-weight: 600 !important; }
+.shop-builder-title.uk-h1 { font-size: 2.5rem !important; line-height: 1.2 !important; font-weight: 700 !important; }
+.shop-builder-title.uk-h2 { font-size: 2rem !important; line-height: 1.3 !important; font-weight: 600 !important; }
+.shop-builder-title.uk-h3 { font-size: 1.5rem !important; line-height: 1.4 !important; font-weight: 600 !important; }
+.shop-builder-title.uk-h4 { font-size: 1.25rem !important; line-height: 1.4 !important; font-weight: 600 !important; }
+.shop-builder-title.uk-h5 { font-size: 1.1rem !important; line-height: 1.4 !important; font-weight: 600 !important; }
+.shop-builder-title.uk-h6 { font-size: 0.95rem !important; line-height: 1.4 !important; font-weight: 600 !important; }
 
-.shop-builder-title.uk-heading-primary, .uk-heading-primary { font-size: 3.25rem !important; line-height: 1.1 !important; font-weight: 800 !important; letter-spacing: -0.02em !important; }
-.shop-builder-title.uk-heading-hero, .uk-heading-hero { font-size: 4.5rem !important; line-height: 1.05 !important; font-weight: 900 !important; letter-spacing: -0.03em !important; }
+.shop-builder-title.uk-heading-primary { font-size: 3.25rem !important; line-height: 1.1 !important; font-weight: 800 !important; letter-spacing: -0.02em !important; }
+.shop-builder-title.uk-heading-hero { font-size: 4.5rem !important; line-height: 1.05 !important; font-weight: 900 !important; letter-spacing: -0.03em !important; }
 
 /* UIkit Title Decorations */
 .uk-heading-divider { border-bottom: 2px solid #e2e8f0 !important; padding-bottom: 8px !important; width: 100%; }

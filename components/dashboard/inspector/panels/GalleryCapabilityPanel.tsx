@@ -480,10 +480,10 @@ export default function GalleryCapabilityPanel({
         <TitleSettingsGroup block={block} update={update} />
 
         {/* SHARED META SETTINGS GROUP */}
-        <MetaSettingsGroup block={block} update={update} />
+        <MetaSettingsGroup block={block} update={update} showStyle />
 
         {/* SHARED CONTENT SETTINGS GROUP */}
-        <ContentSettingsGroup block={block} update={update} />
+        <ContentSettingsGroup block={block} update={update} showStyle />
 
         {/* SHARED LINK SETTINGS GROUP */}
         <LinkSettingsGroup block={block} update={update} />

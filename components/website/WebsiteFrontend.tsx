@@ -201,6 +201,7 @@ export default async function WebsiteFrontend({
           website={website}
           headerOverlay={headerDocumentSettings.overlay}
           {...rendererProps}
+          shellSettings={shellSettings}
         />
       ) : (
         fallbackContent

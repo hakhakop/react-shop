@@ -7,7 +7,7 @@ type Props = {
   eyebrow?: string;
   title?: string;
   content?: string;
-  variant?: "default" | "lead" | "meta" | "small" | "large" | "muted";
+  variant?: string;
   align?: "left" | "center" | "right";
   typography?: TypographySettings | TypographyGroup;
   typographyRole?: SemanticTypographyRole;

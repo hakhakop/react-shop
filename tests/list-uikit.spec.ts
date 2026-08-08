@@ -59,7 +59,7 @@ test("List uses semantic UIkit presentation, item links, and frontend parity", a
   await card.click();
 
   const selected = page.locator(".builder-preview-layout-block.is-selected-block").last();
-  const list = selected.locator(".builder-preview-goodie-list");
+  const list = selected.locator(".shop-builder-column-block--list");
   await expect(list.locator("ul.uk-list")).toBeVisible();
   const blockId = await selected.getAttribute("data-builder-block-key");
   if (!blockId) throw new Error("List block id missing");
@@ -70,7 +70,9 @@ test("List uses semantic UIkit presentation, item links, and frontend parity", a
   const content = inspector.locator('[data-uikit-capability="list-content"]');
   await expect(content.getByText("Icon type", { exact: true })).toHaveCount(0);
   const before = await content.locator('[data-list-item-id]').count();
-  const firstText = content.locator('[data-list-item-id]').first().locator("input").first();
+  const firstItem = content.locator('[data-list-item-id]').first();
+  await firstItem.getByRole("button", { name: "Edit item 1", exact: true }).click();
+  const firstText = firstItem.locator("input").first();
   await firstText.fill("Localized list item");
   await content.getByRole("button", { name: "Add item", exact: true }).click();
   const secondItem = content.locator('[data-list-item-id]').nth(1);
@@ -90,15 +92,17 @@ test("List uses semantic UIkit presentation, item links, and frontend parity", a
   }
   await firstItemAfterDrag.getByLabel("List item 1 URL", { exact: true }).fill("/details");
 
-  await inspector.getByRole("button", { name: "Styling", exact: true }).click();
-  const style = inspector.locator('[data-uikit-capability="list-style"]');
+  await inspector.getByRole("button", { name: "Settings", exact: true }).click();
+  const style = inspector.locator('[data-uikit-capability="list-settings"]');
   await style.getByLabel("List presentation", { exact: true }).selectOption("divider");
   await style.getByRole("radiogroup", { name: "List marker" }).getByRole("radio", { name: "Disc" }).click();
   await style.getByRole("radiogroup", { name: "List spacing" }).getByRole("radio", { name: "Large" }).click();
+  await style.getByLabel("Content style", { exact: true }).selectOption("text-bold");
   await expect(list.locator("ul.uk-list")).toHaveClass(/uk-list-divider/);
   await expect(list.locator("ul.uk-list")).toHaveClass(/uk-list-large/);
   await expect(list.locator("ul.uk-list")).toHaveClass(/uk-list-disc/);
   await expect(list.locator("li").first()).toHaveCSS("list-style-type", "disc");
+  await expect(list.locator("li").first().locator("a, span").last()).toHaveClass(/uk-text-bold/);
   await expect.poll(async () => list.locator("li").nth(1).evaluate((element) => getComputedStyle(element).borderTopWidth)).not.toBe("0px");
 
   const stored = await page.evaluate((id) => {
@@ -113,7 +117,7 @@ test("List uses semantic UIkit presentation, item links, and frontend parity", a
     for (const value of Object.values(localStorage)) { try { const found = walk(JSON.parse(value)); if (found) return found; } catch {} }
     return null;
   }, blockId);
-  expect(stored).toMatchObject({ kind: "list", listPresentation: "divider", listMarker: "disc", listSpacing: "large" });
+  expect(stored).toMatchObject({ kind: "list", listPresentation: "divider", listMarker: "disc", listSpacing: "large", contentStyle: "text-bold" });
   expect(JSON.stringify(stored)).not.toMatch(/uk-/);
   expect(stored?.listItems).toEqual(expect.arrayContaining([expect.objectContaining({ text: "Localized list item" }), expect.objectContaining({ url: "/details" })]));
 
@@ -128,6 +132,7 @@ test("List uses semantic UIkit presentation, item links, and frontend parity", a
   await expect(frontendList.locator("ul.uk-list")).toHaveClass(/uk-list-divider/);
   await expect(frontendList.locator("ul.uk-list")).toHaveClass(/uk-list-large/);
   await expect(frontendList.locator("ul.uk-list")).toHaveClass(/uk-list-disc/);
+  await expect(frontendList.locator("li").first().locator("a, span").last()).toHaveClass(/uk-text-bold/);
   await expect(frontendList.getByText("Localized list item", { exact: true })).toBeVisible();
   await expect(frontendList.locator("a[href=\"/details\"]")).toBeVisible();
 

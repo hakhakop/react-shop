@@ -4,6 +4,8 @@ import { Search } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
 import type { BuilderShellSettings } from "@/lib/builderShell";
+import { YOOTHEME_DEVSTACK_PRESETS } from "@/lib/yoothemeLessImporter";
+import { resolveBundledYoothemeDevstackPreset } from "@/lib/yoothemeDevstackPresets";
 import { GLOBAL_STYLE_GROUPS, GLOBAL_STYLE_TOKEN_DEFAULTS } from "@/lib/globalStyleTokens";
 import { YoothemeColorPicker, YoothemeFontPicker, YoothemeLessImportModal } from "@/components/dashboard/global-styles/YoothemeStyleControls";
 
@@ -15,6 +17,10 @@ const labels: Record<string, string> = {
   small: "Small", default: "Default", medium: "Medium", large: "Large", xlarge: "Xlarge",
   none: "None", xs: "XS", sm: "Small", md: "Medium", lg: "Large", xl: "XL", "2xl": "2XL", "3xl": "3XL",
   primary: "Primary", secondary: "Secondary", text: "Text", muted: "Muted", danger: "Danger", visible: "Visible", hidden: "Hidden",
+  natural: "Natural", square: "Square", portrait: "Portrait", cover: "Cover", contain: "Contain", fill: "Fill", lazy: "Lazy", eager: "Eager",
+  rounded: "Rounded", circle: "Circle", pill: "Pill", left: "Left", center: "Center", right: "Right",
+  chevron: "Chevron", "glass-circle": "Glass circle", "solid-dark": "Solid dark", "minimal-light": "Minimal light", overlay: "Overlay", outer: "Outside", bottom: "Bottom", top: "Top", "bottom-right": "Bottom right", "bottom-left": "Bottom left", "top-right": "Top right", "top-left": "Top left",
+  "simple-dots": "Simple dots", "minimal-dots": "Minimal dots", "expanding-pills": "Expanding pills", fraction: "Fraction", progress: "Progress",
 };
 
 const supported: { id: Screen; label: string; description: string; enabled?: boolean }[] = [
@@ -23,7 +29,7 @@ const supported: { id: Screen; label: string; description: string; enabled?: boo
   { id: "base", label: "Base", description: "Base typography and global rhythm" },
   { id: "visibility", label: "Visibility", description: "Responsive visibility defaults" },
   { id: "button", label: "Button", description: "UIkit button colors, size, radius, and hover" },
-  { id: "card", label: "Card", description: "Card backgrounds, radius, body, header, title, and shadows" },
+  { id: "card", label: "Card", description: "UIkit card surfaces, variants, padding, and content rhythm" },
   { id: "heading", label: "Heading", description: "Heading scales, family, and weight" },
   { id: "accordion", label: "Accordion", description: "Title, icon, spacing, and row presentation" },
   { id: "section", label: "Section", description: "Section paddings, margins, and surface colors" },
@@ -35,7 +41,7 @@ const supported: { id: Screen; label: string; description: string; enabled?: boo
 const editorSections: Partial<Record<Screen, string[]>> = {
   global: ["Typography", "Primary", "Secondary", "Tertiary", "Colors", "Borders", "Spacing", "Controls", "Containers"],
   button: ["Shared geometry and typography", "Small size", "Large size", "Variant colors and borders", "Gradients", "Shadows"],
-  card: ["Geometry", "Body", "Header", "Footer", "Title", "Badge", "Hover states", "Default variant", "Primary variant", "Secondary variant"],
+  card: ["Geometry", "Padding", "Variants", "Hover states", "Content rhythm"],
   heading: ["Scale"],
   accordion: ["Title", "Icon and interaction", "Rows"],
   section: ["Padding", "Margin", "Backgrounds"],
@@ -92,6 +98,16 @@ export default function CanonicalGlobalStylesPanel({ shellSettings, updateShellS
   const [screen, setScreen] = useState<Screen>("root");
   const [navQuery, setNavQuery] = useState("");
   const [draft, setDraft] = useState<BuilderShellSettings>(shellSettings);
+  const legacyPresetAliases: Record<string, string> = {
+    DevStack: "DevStack Light Blue",
+    Default: "DevStack Light Blue",
+    Dark: "DevStack Dark Purple",
+    Soft: "DevStack Light Orange",
+  };
+  const rawPresetName = legacyPresetAliases[draft.globalStylePresetName ?? ""] ?? draft.globalStylePresetName;
+  const selectedPresetName = YOOTHEME_DEVSTACK_PRESETS.some((preset) => preset.name === rawPresetName)
+    ? rawPresetName!
+    : YOOTHEME_DEVSTACK_PRESETS[0]?.name ?? "";
   const [snapshot, setSnapshot] = useState<BuilderShellSettings>(shellSettings);
   const [isLessModalOpen, setIsLessModalOpen] = useState(false);
   useEffect(() => {
@@ -101,6 +117,17 @@ export default function CanonicalGlobalStylesPanel({ shellSettings, updateShellS
 
   const open = (next: Screen) => { setDraft({ ...shellSettings }); setSnapshot({ ...shellSettings }); setScreen(next); };
   const set = (key: Key, value: string) => { const next = { ...draft, [key]: value }; setDraft(next); updateShellSettings({ [key]: value }); };
+  const applyDevstackPreset = (presetName: string) => {
+    const preset = YOOTHEME_DEVSTACK_PRESETS.find((item) => item.name === presetName);
+    if (!preset) return;
+    const resolved = resolveBundledYoothemeDevstackPreset(preset.id);
+    const patch: Partial<BuilderShellSettings> = {
+      ...resolved.shellSettings,
+      globalStylePresetName: preset.name,
+    };
+    setDraft({ ...draft, ...patch });
+    updateShellSettings(patch);
+  };
   const setVisibility = (key: "visibilityDesktop" | "visibilityTablet" | "visibilityMobile", value: boolean) => { const next = { ...draft, [key]: value }; setDraft(next); updateShellSettings({ [key]: value }); };
   const cancel = () => { setDraft(snapshot); updateShellSettings(snapshot); setScreen("root"); };
   const save = () => { setSnapshot(draft); setScreen("root"); };
@@ -138,32 +165,15 @@ export default function CanonicalGlobalStylesPanel({ shellSettings, updateShellS
   return <div className="builder-global-design-root" data-testid="global-design-root">
     <div className="builder-design-root-heading"><div><small>DESIGN SYSTEM</small><span>STYLE</span></div><p>WebPages semantic design system</p></div>
     
-    {/* YOOtheme Preset Selector */}
+    {/* Canonical YOOtheme/DevStack preset selector */}
     <div style={{ padding: "0 16px 12px 16px" }}>
       <label style={{ fontSize: "11px", fontWeight: 600, color: "#94a3b8", textTransform: "uppercase", display: "block", marginBottom: "6px" }}>Theme Preset</label>
       <select
-        value={draft.globalStylePresetName ?? "DevStack"}
-        onChange={(e) => {
-          const presetName = e.target.value;
-          let patch: Partial<BuilderShellSettings> = { globalStylePresetName: presetName };
-          if (presetName === "DevStack") {
-            patch = { ...patch, primaryColor: "#6f40f1", linkColor: "#6f40f1", fontFamilyBody: "Manrope" };
-          } else if (presetName === "Dark") {
-            patch = { ...patch, backgroundColor: "#0f172a", mutedBackgroundColor: "#1e293b", textColor: "#f8fafc", primaryColor: "#38bdf8", linkColor: "#38bdf8" };
-          } else if (presetName === "Soft") {
-            patch = { ...patch, backgroundColor: "#fdfbf7", mutedBackgroundColor: "#f4efe6", textColor: "#1e293b", primaryColor: "#e11d48", linkColor: "#e11d48", fontFamilyBody: "Georgia" };
-          } else if (presetName === "Default") {
-            patch = { ...patch, backgroundColor: "#ffffff", mutedBackgroundColor: "#f8fafc", textColor: "#111827", primaryColor: "#111111", linkColor: "#111111", fontFamilyBody: "Manrope" };
-          }
-          setDraft({ ...draft, ...patch });
-          updateShellSettings(patch);
-        }}
+        value={selectedPresetName}
+        onChange={(e) => applyDevstackPreset(e.target.value)}
         style={{ width: "100%", padding: "8px 12px", borderRadius: "8px", border: "1px solid #334155", fontSize: "13px", fontWeight: 600, backgroundColor: "#0f172a", color: "#f8fafc", outline: "none" }}
       >
-        <option value="DevStack">DevStack (Modern Purple)</option>
-        <option value="Default">Default UIkit</option>
-        <option value="Dark">Dark Mode</option>
-        <option value="Soft">Soft Elegance</option>
+        {YOOTHEME_DEVSTACK_PRESETS.map((preset) => <option key={preset.id} value={preset.name}>{preset.name}</option>)}
       </select>
     </div>
 

@@ -30,6 +30,11 @@ import {
   type ProductImageRatio,
 } from "@/lib/productCardImage";
 import { useProductCategoryFilter } from "./ProductCategoryFilterProvider";
+import {
+  getProductAttributeFacets,
+  productMatchesAttributeSelection,
+  type ProductAttributeFacet as AttributeFacet,
+} from "@/lib/productAttributeFilters";
 import { safeDecodeURI } from "@/lib/safeDecodeURI";
 import { typographyProps as resolveTypographyProps } from "@/lib/builderTypography";
 
@@ -181,45 +186,6 @@ function getCartButtonStyle({
     fontWeight: style === "inherit" ? "var(--button-font-weight, 800)" : 800,
     letterSpacing: style === "inherit" ? "var(--button-letter-spacing, 0.06em)" : "0.06em",
     boxShadow: colorStyle.boxShadow ?? "none",
-  };
-}
-
-type AttributeOption = {
-  key: string; // normalized key (e.g. "yellow")
-  label: string; // display label (e.g. "Yellow")
-};
-
-type AttributeFacet = {
-  key: string; // attr key (e.g. "pa_color")
-  label: string;
-  options: AttributeOption[];
-};
-
-function normalizeAttributeNode(
-  attr: any,
-): { attrKey: string; label: string; values: string[] } | null {
-  if (!attr) return null;
-
-  const rawName = safeDecodeURI((attr.name ?? attr.label ?? "").toString().trim());
-  if (!rawName) return null;
-
-  const attrKey = rawName.toLowerCase();
-  const values: string[] = [];
-
-  if (Array.isArray(attr.options) && attr.options.length > 0) {
-    for (const opt of attr.options) {
-      if (!opt) continue;
-      const v = safeDecodeURI(String(opt).trim());
-      if (v) values.push(v);
-    }
-  }
-
-  if (values.length === 0) return null;
-
-  return {
-    attrKey,
-    label: safeDecodeURI(attr.label || rawName),
-    values,
   };
 }
 
@@ -452,42 +418,10 @@ export default function CategoryWithFilters({
         ? { ...productSpaceVars, "--archive-columns": 1 }
         : productSpaceVars;
 
-  const attributeFacets: AttributeFacet[] = useMemo(() => {
-    const map: Record<string, { label: string; optionSet: Set<string> }> = {};
-
-    for (const p of products) {
-      const rawAttrs = p.attributes?.nodes ?? [];
-      for (const raw of rawAttrs) {
-        const normalized = normalizeAttributeNode(raw);
-        if (!normalized) continue;
-        const { attrKey, label, values } = normalized;
-
-        if (!map[attrKey]) {
-          map[attrKey] = {
-            label,
-            optionSet: new Set<string>(),
-          };
-        }
-
-        for (const v of values) {
-          map[attrKey].optionSet.add(v);
-        }
-      }
-    }
-
-    return Object.entries(map)
-      .map(([attrKey, { label, optionSet }]) => ({
-        key: attrKey,
-        label,
-        options: Array.from(optionSet)
-          .sort((a, b) => a.localeCompare(b))
-          .map((v) => ({
-            key: v.toLowerCase(),
-            label: v,
-          })),
-      }))
-      .sort((a, b) => a.label.localeCompare(b.label));
-  }, [products]);
+  const attributeFacets: AttributeFacet[] = useMemo(
+    () => getProductAttributeFacets(products),
+    [products],
+  );
 
   const categoryOptions = useMemo(() => {
     const hiddenSlugs = new Set(hiddenCategorySlugs ?? []);
@@ -733,42 +667,9 @@ export default function CategoryWithFilters({
 
     // attribute filters
     if (hasAttributeFilters) {
-      items = items.filter((p) => {
-        const rawAttrs = p.attributes?.nodes ?? [];
-        const productAttrMap: Record<string, Set<string>> = {};
-
-        for (const raw of rawAttrs) {
-          const normalized = normalizeAttributeNode(raw);
-          if (!normalized) continue;
-          const { attrKey, values } = normalized;
-
-          if (!productAttrMap[attrKey]) {
-            productAttrMap[attrKey] = new Set<string>();
-          }
-
-          for (const v of values) {
-            productAttrMap[attrKey].add(v.toLowerCase());
-          }
-        }
-
-        for (const [attrKey, selectedOptions] of Object.entries(
-          selectedAttributes,
-        )) {
-          if (selectedOptions.length === 0) continue;
-
-          const productValues = productAttrMap[attrKey];
-          if (!productValues || productValues.size === 0) {
-            return false;
-          }
-
-          const match = selectedOptions.some((optKey) =>
-            productValues.has(optKey),
-          );
-          if (!match) return false;
-        }
-
-        return true;
-      });
+      items = items.filter((product) =>
+        productMatchesAttributeSelection(product, selectedAttributes),
+      );
     }
 
     if (selectedCategories.length > 0) {

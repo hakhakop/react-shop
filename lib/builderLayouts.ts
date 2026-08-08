@@ -281,8 +281,8 @@ export type BuilderLayoutBlock = {
   accordionItemSpacing?: "inherit" | "small" | "default" | "large";
   accordionContentSpacing?: "inherit" | "small" | "default" | "large";
   accordionDivider?: boolean;
-  accordionTitleStyle?: "inherit" | "h3" | "h4" | "h5";
-  accordionContentStyle?: "inherit" | "default" | "lead" | "small" | "large" | "muted";
+  accordionTitleStyle?: "inherit" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "article-title" | "small" | "medium" | "large" | "xlarge";
+  accordionContentStyle?: "inherit" | "none" | "text-bold" | "text-lead" | "text-meta" | "text-small" | "text-large" | "text-muted" | "heading-small" | "heading-h1" | "heading-h2" | "heading-h3" | "heading-h4" | "heading-h5" | "heading-h6" | "default" | "lead" | "meta" | "small" | "large" | "muted";
   /** @deprecated Read-only migration fallback for older Accordion documents. */
   accordionRowStyle?: "plain" | "divided" | "striped";
   /** @deprecated Read-only migration fallback for older Accordion documents. */

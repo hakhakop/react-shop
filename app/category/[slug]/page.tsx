@@ -9,6 +9,7 @@ import CategoryWithFilters from "../../../components/CategoryWithFilters";
 import StorefrontBuilderRenderer from "@/components/builder/StorefrontBuilderRenderer";
 import { renderDomainWebsiteFrontend } from "@/components/website/DomainWebsiteFrontend";
 import { getPublishedBuilderLayout } from "@/lib/builderLayouts";
+import { getBuilderShellSettings } from "@/lib/builderShell";
 import { getCurrentWebsiteFromHeaders } from "@/lib/currentWebsite";
 
 export default async function CategoryPage({
@@ -91,9 +92,10 @@ export default async function CategoryPage({
 
   if (domainWebsiteDefaultPage) return domainWebsiteDefaultPage;
 
-  const [specificTemplateLayout, defaultTemplateLayout] = await Promise.all([
+  const [specificTemplateLayout, defaultTemplateLayout, shellSettings] = await Promise.all([
     getPublishedBuilderLayout("product-category-specific"),
     getPublishedBuilderLayout("product-category"),
+    getBuilderShellSettings(),
   ]);
   const specificTemplateMatches = specificTemplateLayout?.sections.some(
     (section) => section.source === "category" && section.categoryId === slug
@@ -116,6 +118,7 @@ export default async function CategoryPage({
         products={products}
         categoryTree={categoryTree}
         activeCategorySlug={slug}
+        shellSettings={shellSettings}
       />
     );
   }

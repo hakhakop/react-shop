@@ -2,6 +2,7 @@ import StorefrontBuilderRenderer from "@/components/builder/StorefrontBuilderRen
 import CheckoutPageClient from "@/components/CheckoutPageClient";
 import { renderDomainWebsiteFrontend } from "@/components/website/DomainWebsiteFrontend";
 import { getPublishedBuilderLayout } from "@/lib/builderLayouts";
+import { getBuilderShellSettings } from "@/lib/builderShell";
 import { getCurrentWebsiteFromHeaders } from "@/lib/currentWebsite";
 import { getWooCommerceConnection } from "@/lib/woocommerce";
 
@@ -27,7 +28,10 @@ export default async function CheckoutPage() {
 
   if (domainWebsitePage) return domainWebsitePage;
 
-  const layout = await getPublishedBuilderLayout("page:checkout");
+  const [layout, shellSettings] = await Promise.all([
+    getPublishedBuilderLayout("page:checkout"),
+    getBuilderShellSettings(),
+  ]);
 
   if (layout) {
     return (
@@ -36,6 +40,7 @@ export default async function CheckoutPage() {
         page="page:checkout"
         pageLabel="Checkout"
         pageContent={pageContent}
+        shellSettings={shellSettings}
       />
     );
   }

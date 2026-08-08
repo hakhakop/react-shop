@@ -6,6 +6,7 @@ import { getUikitHeadingClass } from "@/lib/uikitTokens";
 import { typographyRoleClass } from "@/lib/builderTypography";
 import { builderLinkTargetProps } from "@/lib/websiteBuilderLinks";
 import TypewriterText from "@/components/builder/TypewriterText";
+import { isRichText, sanitizeHtml } from "@/lib/safeHtml";
 
 type Props = {
   block: BuilderLayoutBlock;
@@ -26,7 +27,7 @@ export default function UikitHeading({ block }: Props) {
   const decorationClass = rawBlock.titleDecoration ? `uk-heading-${rawBlock.titleDecoration}` : "";
 
   // Alignment
-  const textAlignVal = rawBlock.headingAlign ?? rawBlock.textAlign ?? rawBlock.layout?.textAlign;
+  const textAlignVal = rawBlock.layout?.textAlign ?? rawBlock.textAlign ?? rawBlock.headingAlign;
   const alignClass = textAlignVal ? `uk-text-${textAlignVal}` : "";
 
   // Color
@@ -62,7 +63,7 @@ export default function UikitHeading({ block }: Props) {
         ? `uk-width-${maxWidthVal}@${maxWidthBpVal}`
         : `uk-width-${maxWidthVal}`
       : "";
-  const blockAlignVal = rawBlock.elementAlign ?? rawBlock.blockAlign ?? rawBlock.headingAlign ?? rawBlock.layout?.blockAlign;
+  const blockAlignVal = rawBlock.elementAlign ?? rawBlock.blockAlign ?? rawBlock.layout?.blockAlign;
   const blockAlignClass =
     blockAlignVal && blockAlignVal !== "none"
       ? blockAlignVal === "center"
@@ -86,6 +87,10 @@ export default function UikitHeading({ block }: Props) {
   const linkTarget = rawBlock.buttonTarget ?? rawBlock.imageLinkTarget ?? "_self";
 
   const headingContent = rawBlock.headingText ?? rawBlock.title ?? "Build Anything on DevStack";
+  const normalizedHeadingContent = headingContent.replace(/<\/br\s*>/gi, "<br>");
+  const headingHtml = isRichText(normalizedHeadingContent)
+    ? sanitizeHtml(normalizedHeadingContent, { FORBID_ATTR: ["style"] })
+    : undefined;
 
   const titleClassName = [
     "shop-builder-title",
@@ -110,15 +115,20 @@ export default function UikitHeading({ block }: Props) {
 
   const contentNode = rawBlock.typewriterEnabled ? (
     <TypewriterText text={headingContent} phrases={rawBlock.typewriterPhrases ?? [headingContent]} speed={rawBlock.typewriterSpeed} loop={rawBlock.typewriterLoop !== false} />
-  ) : (
+  ) : headingHtml !== undefined ? null : (
     headingContent
   );
 
   const innerNode = linkUrl ? (
-    <a href={linkUrl} {...builderLinkTargetProps(linkTarget)} className="uk-link-reset">
-      {contentNode}
+    <a
+      href={linkUrl}
+      {...builderLinkTargetProps(linkTarget)}
+      className="uk-link-reset"
+      {...(headingHtml !== undefined ? { dangerouslySetInnerHTML: { __html: headingHtml } } : {})}
+    >
+      {headingHtml === undefined ? contentNode : null}
     </a>
-  ) : (
+  ) : headingHtml !== undefined ? null : (
     contentNode
   );
 
@@ -127,9 +137,13 @@ export default function UikitHeading({ block }: Props) {
       id={rawBlock.customId || rawBlock.id}
       className={`shop-builder-column-block shop-builder-column-block--heading ${marginClass} ${removeTopClass} ${removeBottomClass} ${maxWidthClass} ${blockAlignClass} ${animationClass} ${visibilityClass} ${rawBlock.customClass ?? ""}`.trim()}
     >
-      <Tag className={titleClassName} style={customGradientStyle}>
-        {innerNode}
-      </Tag>
+      {headingHtml !== undefined && !linkUrl ? (
+        <Tag className={titleClassName} style={customGradientStyle} dangerouslySetInnerHTML={{ __html: headingHtml }} />
+      ) : (
+        <Tag className={titleClassName} style={customGradientStyle}>
+          {innerNode}
+        </Tag>
+      )}
     </div>
   );
 }

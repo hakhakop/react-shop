@@ -202,7 +202,7 @@ test("Builder Preview and frontend use the shared Header document resolver", () 
   assert.match(frontend, /getPublishedHeaderDocumentSettings\(/);
   assert.match(composition, /documentTransparent: section\?\.headerTransparent/);
   assert.match(composition, /documentOverlay: section\?\.headerOverlay/);
-  assert.match(inspector, /onHeaderDocumentChange=\{\(patch\) => \{\s*updateSelected\(patch\);\s*\}\}/);
+  assert.match(inspector, /onHeaderDocumentChange=\{updateSelected\}/);
   assert.doesNotMatch(inspector, /onHeaderDocumentChange[\s\S]{0,180}updateShellSettings/);
   assert.doesNotMatch(frame, /overlapHeader \? "site-header--no-background"/);
   assert.doesNotMatch(

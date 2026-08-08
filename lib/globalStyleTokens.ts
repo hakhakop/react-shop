@@ -76,6 +76,16 @@ export const GLOBAL_STYLE_TOKEN_DEFAULTS = {
   cardPaddingSmall: "15px",
   cardPaddingDefault: "30px",
   cardPaddingLarge: "40px",
+  imageDefaultRatio: "natural",
+  imageDefaultFit: "cover",
+  imageDefaultLoading: "lazy",
+  imageDefaultBorder: "none",
+  imageDefaultShadow: "none",
+  imageDefaultAlignment: "center",
+  sliderArrowStyle: "chevron",
+  sliderArrowPosition: "overlay",
+  sliderDotnavStyle: "minimal-dots",
+  sliderDotnavPosition: "bottom",
   buttonPrimaryBackground: "#111111",
   buttonPrimaryText: "#ffffff",
   buttonDefaultBackground: "#ffffff",
@@ -145,8 +155,8 @@ export function resolveAppearanceValue<T>(options: {
 }
 
 export const GLOBAL_STYLE_GROUPS = [
-  { id: "appearance", label: "Appearance", items: ["Colors", "Typography", "Links", "Buttons", "Cards", "Forms", "Icons"] },
+  { id: "appearance", label: "Appearance", items: ["Colors", "Typography", "Links", "Buttons", "Panels", "Forms", "Icons"] },
   { id: "layout", label: "Layout", items: ["Containers", "Sections", "Grid", "Spacing"] },
-  { id: "media", label: "Media", items: ["Images", "Video"] },
+  { id: "media", label: "Media", items: ["Images", "Video", "Slider navigation"] },
   { id: "effects", label: "Effects", items: ["Radius", "Borders", "Shadows", "Transitions"] },
 ] as const;

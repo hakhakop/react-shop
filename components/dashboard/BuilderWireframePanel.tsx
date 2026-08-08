@@ -182,6 +182,7 @@ function getBlockIcon(kind: string) {
     case "products":
       return <LayoutGrid size={13} className="builder-wireframe-icon builder-wireframe-icon--grid" />;
     case "slider":
+    case "panelSlider":
       return <Sliders size={13} className="builder-wireframe-icon builder-wireframe-icon--slider" />;
     case "embed":
       return <Code size={13} className="builder-wireframe-icon builder-wireframe-icon--embed" />;

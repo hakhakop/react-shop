@@ -8,14 +8,19 @@ import {
   InspectorDivision,
   InspectorFieldRow,
   InspectorPillGroup,
-  InspectorSection,
   InspectorSelect,
   InspectorSwitch,
   InspectorTextField,
   InspectorTextarea,
-  InspectorSemanticPositionControl,
 } from "@/components/dashboard/inspector/InspectorControls";
 import RepeatableItemShell from "@/components/dashboard/inspector/RepeatableItemShell";
+import {
+  ActionSettingsGroup,
+  CONTENT_STYLE_OPTIONS,
+  ContentSettingsGroup,
+  ImageSettingsGroup,
+  TitleSettingsGroup,
+} from "@/components/dashboard/inspector/panels/SharedSettingGroups";
 
 type Props = {
   block: BuilderLayoutBlock;
@@ -56,22 +61,6 @@ export default function AccordionCapabilityPanel({ block, tab, shellSettings, up
       label: value.replace(/-/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase()),
     }));
   const copySequenceRef = useRef(0);
-
-  const fontFamilyOptions = [
-    { value: "inherit", label: "Inherit" },
-    { value: "default", label: "Default" },
-    { value: "primary", label: "Primary" },
-    { value: "secondary", label: "Secondary" },
-    { value: "tertiary", label: "Tertiary" },
-  ];
-
-  const colorOptions = [
-    { value: "none", label: "None" },
-    { value: "muted", label: "Muted" },
-    { value: "emphasis", label: "Emphasis" },
-    { value: "primary", label: "Primary" },
-    { value: "secondary", label: "Secondary" },
-  ];
 
   const updateItems = (next: AccordionItem[]) => update({ accordionItems: next });
   const updateItem = (index: number, patch: Partial<AccordionItem>) =>
@@ -363,9 +352,19 @@ export default function AccordionCapabilityPanel({ block, tab, shellSettings, up
             options={[
               { value: "default", label: "Default" },
               { value: "divided", label: "Divided" },
+              { value: "striped", label: "Striped" },
+              { value: "minimal", label: "Minimal" },
             ]}
             onChange={(v) => update({ accordionStyle: v as any })}
             ariaLabel="Accordion Style"
+          />
+        </InspectorFieldRow>
+        <InspectorFieldRow label="Title emphasis">
+          <InspectorSelect
+            value={block.accordionTitleEmphasis ?? "inherit"}
+            options={labels(UIKIT_ACCORDION_CAPABILITY.properties.titleEmphasis.values)}
+            onChange={(value) => update({ accordionTitleEmphasis: value as any })}
+            ariaLabel="Accordion title emphasis"
           />
         </InspectorFieldRow>
         <InspectorFieldRow label="Item Margin">
@@ -379,6 +378,21 @@ export default function AccordionCapabilityPanel({ block, tab, shellSettings, up
             ]}
             onChange={(v) => update({ accordionItemSpacing: v as any })}
             ariaLabel="Item Margin"
+          />
+        </InspectorFieldRow>
+        <InspectorFieldRow label="Content spacing">
+          <InspectorSelect
+            value={block.accordionContentSpacing ?? "inherit"}
+            options={labels(UIKIT_ACCORDION_CAPABILITY.properties.contentSpacing.values)}
+            onChange={(value) => update({ accordionContentSpacing: value as any })}
+            ariaLabel="Accordion content spacing"
+          />
+        </InspectorFieldRow>
+        <InspectorFieldRow label="Dividers">
+          <InspectorSwitch
+            checked={block.accordionDivider !== false}
+            onChange={(checked) => update({ accordionDivider: checked })}
+            label="Show dividers"
           />
         </InspectorFieldRow>
         <InspectorFieldRow>
@@ -450,72 +464,14 @@ export default function AccordionCapabilityPanel({ block, tab, shellSettings, up
         )}
       </InspectorDivision>
 
-      {/* TITLE SECTION */}
-      <InspectorDivision title="TITLE">
-        <InspectorFieldRow label="Style">
-          <InspectorSelect
-            value={(block as any).accordionTitleSize ?? (block as any).accordionTitleStyle ?? "none"}
-            options={[
-              { value: "none", label: "None" },
-              { value: "h1", label: "Heading 1" },
-              { value: "h2", label: "Heading 2" },
-              { value: "h3", label: "Heading 3" },
-              { value: "h4", label: "Heading 4" },
-              { value: "small", label: "Heading Small" },
-              { value: "medium", label: "Heading Medium" },
-              { value: "large", label: "Heading Large" },
-              { value: "xlarge", label: "Heading X-Large" },
-              { value: "2xlarge", label: "Heading 2X-Large" },
-            ]}
-            onChange={(v) => update({ accordionTitleSize: v, accordionTitleStyle: v } as any)}
-            ariaLabel="Title Style"
-          />
-        </InspectorFieldRow>
-        <InspectorFieldRow label="Font Family">
-          <InspectorSelect
-            value={block.titleTypographyRole ?? (block as any).accordionTitleFontFamily ?? "inherit"}
-            options={fontFamilyOptions}
-            onChange={(v) => update({ titleTypographyRole: v as any, accordionTitleFontFamily: v } as any)}
-            ariaLabel="Title Font Family"
-          />
-        </InspectorFieldRow>
-        <InspectorFieldRow label="Color">
-          <InspectorSelect
-            value={(block as any).accordionTitleColor ?? "none"}
-            options={colorOptions}
-            onChange={(v) => update({ accordionTitleColor: v } as any)}
-            ariaLabel="Title Color"
-          />
-        </InspectorFieldRow>
-        <InspectorFieldRow label="HTML Element">
-          <InspectorSelect
-            value={(block as any).accordionTitleLevel ?? "h3"}
-            options={[
-              { value: "h1", label: "h1" },
-              { value: "h2", label: "h2" },
-              { value: "h3", label: "h3" },
-              { value: "h4", label: "h4" },
-              { value: "h5", label: "h5" },
-              { value: "h6", label: "h6" },
-              { value: "div", label: "div" },
-            ]}
-            onChange={(v) => update({ accordionTitleLevel: v } as any)}
-            ariaLabel="Title HTML Element"
-          />
-        </InspectorFieldRow>
-        <InspectorFieldRow label="Align">
-          <InspectorSelect
-            value={(block as any).accordionTitleAlign ?? "left"}
-            options={[
-              { value: "left", label: "Left" },
-              { value: "center", label: "Center" },
-              { value: "right", label: "Right" },
-            ]}
-            onChange={(v) => update({ accordionTitleAlign: v } as any)}
-            ariaLabel="Title Align"
-          />
-        </InspectorFieldRow>
-      </InspectorDivision>
+      <TitleSettingsGroup
+        block={block}
+        update={update}
+        showColor
+        defaultSize="inherit"
+        defaultLevel="h3"
+        keys={{ role: "titleTypographyRole", size: "accordionTitleStyle", align: "accordionTitleAlign", level: "accordionTitleLevel", color: "accordionTitleColor" }}
+      />
 
       {/* INDICATOR SECTION */}
       <InspectorDivision title="INDICATOR">
@@ -544,22 +500,20 @@ export default function AccordionCapabilityPanel({ block, tab, shellSettings, up
         </InspectorFieldRow>
       </InspectorDivision>
 
-      {/* CONTENT SECTION */}
-      <InspectorDivision title="CONTENT">
-        <InspectorFieldRow label="Style">
-          <InspectorSelect
-            value={block.accordionContentStyle ?? "none"}
-            options={[
-              { value: "none", label: "None" },
-              { value: "text-lead", label: "Text Lead" },
-              { value: "text-meta", label: "Text Meta" },
-              { value: "text-small", label: "Text Small" },
-              { value: "text-large", label: "Text Large" },
-            ]}
-            onChange={(v) => update({ accordionContentStyle: v as any })}
-            ariaLabel="Content Style"
-          />
-        </InspectorFieldRow>
+      <ContentSettingsGroup
+        block={block}
+        update={update}
+        showRole={false}
+        showAlignment={false}
+        showStyle
+        defaultStyle="inherit"
+        styleOptions={[
+          { value: "inherit", label: "Inherit" },
+          ...CONTENT_STYLE_OPTIONS,
+        ]}
+        keys={{ role: "contentTypographyRole", align: "accordionContentAlign", style: "accordionContentStyle" }}
+      />
+      <InspectorDivision title="ACCORDION CONTENT">
         <InspectorFieldRow label="Margin Top">
           <InspectorSelect
             value={(block as any).accordionContentMarginTop ?? "default"}
@@ -575,25 +529,9 @@ export default function AccordionCapabilityPanel({ block, tab, shellSettings, up
         </InspectorFieldRow>
       </InspectorDivision>
 
-      {/* IMAGE / MEDIA SECTION */}
-      <InspectorDivision title="IMAGE">
-        <InspectorFieldRow label="Width/Height">
-          <div style={{ display: "flex", gap: "8px", width: "100%" }}>
-            <InspectorTextField
-              value={(block as any).imageWidth ?? "auto"}
-              onChange={(v) => update({ imageWidth: v } as any)}
-              placeholder="auto"
-              ariaLabel="Image Width"
-            />
-            <InspectorTextField
-              value={(block as any).imageHeight ?? "auto"}
-              onChange={(v) => update({ imageHeight: v } as any)}
-              placeholder="auto"
-              ariaLabel="Image Height"
-            />
-          </div>
-        </InspectorFieldRow>
-        <InspectorFieldRow label="Alignment">
+      <ImageSettingsGroup block={block} update={update} />
+      <InspectorDivision title="MEDIA LAYOUT">
+        <InspectorFieldRow label="Placement">
           <InspectorSelect
             value={(block as any).accordionMediaPlacement ?? "top"}
             options={[
@@ -603,7 +541,7 @@ export default function AccordionCapabilityPanel({ block, tab, shellSettings, up
               { value: "right", label: "Right" },
             ]}
             onChange={(v) => update({ accordionMediaPlacement: v } as any)}
-            ariaLabel="Media Alignment"
+            ariaLabel="Media placement"
           />
         </InspectorFieldRow>
         <InspectorFieldRow label="Grid Width">
@@ -634,54 +572,13 @@ export default function AccordionCapabilityPanel({ block, tab, shellSettings, up
         </InspectorFieldRow>
       </InspectorDivision>
 
-      {/* LINK SECTION */}
-      <InspectorDivision title="LINK">
-        <InspectorFieldRow label="Target">
-          <label className="builder-inspector-checkbox-row">
-            <input
-              type="checkbox"
-              checked={(block as any).accordionLinkTarget === "_blank"}
-              onChange={(e) => update({ accordionLinkTarget: e.target.checked ? "_blank" : "_self" } as any)}
-            />
-            <span>Open in new tab</span>
-          </label>
-        </InspectorFieldRow>
-        <InspectorFieldRow label="Text">
-          <InspectorTextField
-            value={(block as any).accordionLinkText ?? "Read more"}
-            onChange={(v) => update({ accordionLinkText: v } as any)}
-            placeholder="Read more"
-            ariaLabel="Link Text"
-          />
-        </InspectorFieldRow>
-        <InspectorFieldRow label="Style">
-          <InspectorSelect
-            value={(block as any).accordionButtonStyle ?? "primary"}
-            options={[
-              { value: "default", label: "Button Default" },
-              { value: "primary", label: "Button Primary" },
-              { value: "secondary", label: "Button Secondary" },
-              { value: "danger", label: "Button Danger" },
-              { value: "link", label: "Link" },
-              { value: "text", label: "Text" },
-            ]}
-            onChange={(v) => update({ accordionButtonStyle: v } as any)}
-            ariaLabel="Button Style"
-          />
-        </InspectorFieldRow>
-        <InspectorFieldRow label="Size">
-          <InspectorSelect
-            value={(block as any).accordionButtonSize ?? "default"}
-            options={[
-              { value: "default", label: "Default" },
-              { value: "small", label: "Small" },
-              { value: "large", label: "Large" },
-            ]}
-            onChange={(v) => update({ accordionButtonSize: v } as any)}
-            ariaLabel="Button Size"
-          />
-        </InspectorFieldRow>
-      </InspectorDivision>
+      <ActionSettingsGroup
+        block={block}
+        update={update}
+        title="ACTION"
+        showVisibilityToggle
+        keys={{ visible: "accordionShowLink", label: "accordionLinkText", url: "accordionLinkUrl", target: "accordionLinkTarget", style: "accordionButtonStyle", size: "accordionButtonSize" }}
+      />
     </div>
   );
 }

@@ -9,7 +9,6 @@ import {
   InspectorSelect,
   InspectorTextField,
   InspectorTextarea,
-  InspectorAlignmentControl,
 } from "@/components/dashboard/inspector/InspectorControls";
 import IconPicker from "@/components/dashboard/inspector/IconPicker";
 
@@ -32,7 +31,7 @@ export default function IconCapabilityPanel({ block, tab, shellSettings, update 
             <IconPicker
               value={rawBlock.iconName ?? rawBlock.icon}
               onChange={(value) => update({ iconName: value, icon: value } as any)}
-              onClear={() => update({ iconName: undefined, icon: undefined } as any)}
+              onClear={() => update({ iconName: "", icon: "" } as any)}
               ariaLabel="Select icon"
             />
           </InspectorFieldRow>
@@ -131,13 +130,6 @@ export default function IconCapabilityPanel({ block, tab, shellSettings, update 
             }))}
             onChange={(v) => update({ iconSize: Number(v) } as any)}
             ariaLabel="Icon Size"
-          />
-        </InspectorFieldRow>
-        <InspectorFieldRow label="Alignment">
-          <InspectorAlignmentControl
-            value={rawBlock.textAlign ?? "left"}
-            onChange={(v) => update({ textAlign: v } as any)}
-            ariaLabel="Icon Alignment"
           />
         </InspectorFieldRow>
       </InspectorDivision>

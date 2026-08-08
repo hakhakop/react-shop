@@ -15,6 +15,20 @@ import {
 } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { ImageIcon, Upload } from "lucide-react";
+import {
+  getUikitButtonClass,
+  getUikitCardClass,
+  getUikitHeadingClass,
+  getUikitImageClass,
+  getUikitImageStyle,
+  getUikitImageWrapperClass,
+  getUikitPanelMediaStyle,
+  getUikitTextClass,
+  resolveUikitImageSemantics,
+} from "@/lib/uikitTokens";
+import { typographyRoleClass, type SemanticTypographyRole } from "@/lib/builderTypography";
+import { builderLinkTargetProps } from "@/lib/websiteBuilderLinks";
+import { WebPagesIcon } from "@/components/builder/WebPagesIcon";
 
 // Swiper core & module styles
 import "swiper/css";
@@ -32,14 +46,51 @@ export type CarouselSlide = {
   imageUrl?: string | null;
   imageAlt?: string | null;
   title?: string | null;
+  meta?: string | null;
   subtitle?: string | null;
   text?: string | null;
   buttonLabel?: string | null;
   buttonUrl?: string | null;
+  buttonTarget?: string | null;
   badge?: string | null;
   price?: string | null;
   rating?: number | string | null;
   imagePadding?: "frameless" | "small" | "medium" | "max" | string | null;
+  panelStyle?: string | null;
+  panelSize?: string | null;
+  panelHover?: boolean | null;
+  linkPanel?: boolean | null;
+  headingLevel?: string | null;
+  headingSize?: string | null;
+  titleTypographyRole?: string | null;
+  headingAlign?: string | null;
+  titleDecoration?: string | null;
+  titleColor?: string | null;
+  metaTypographyRole?: string | null;
+  metaAlign?: string | null;
+  metaHtmlElement?: string | null;
+  metaStyle?: string | null;
+  metaColor?: string | null;
+  gridMetaAlign?: string | null;
+  contentTypographyRole?: string | null;
+  contentAlign?: string | null;
+  contentStyle?: string | null;
+  imageFit?: string | null;
+  imageRatio?: string | null;
+  imageShape?: string | null;
+  imageShadow?: string | null;
+  imageAlignment?: string | null;
+  imageLoading?: "lazy" | "eager" | string | null;
+  imageWidth?: string | null;
+  imageHeight?: string | number | null;
+  imageBorder?: string | null;
+  imageBoxShadow?: string | null;
+  iconName?: string | null;
+  iconSize?: number | null;
+  showAction?: boolean | null;
+  fullWidthButton?: boolean | null;
+  buttonStyle?: string | null;
+  buttonSize?: string | null;
 };
 
 export type CarouselSettings = {
@@ -75,7 +126,38 @@ export type CarouselSettings = {
   overlayColor?: "dark" | "light" | "glass-dark" | "glass-light" | "brand" | string | null;
   overlayTextColor?: "auto" | "light" | "dark" | "brand" | string | null;
   kenBurns?: boolean | "true" | "false" | 1 | 0 | null;
+  headingLevel?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | string | null;
+  headingSize?: string | null;
+  titleTypographyRole?: string | null;
+  metaTypographyRole?: string | null;
+  metaStyle?: string | null;
+  contentTypographyRole?: string | null;
+  contentStyle?: string | null;
+  buttonStyle?: string | null;
+  buttonSize?: string | null;
+  linkTarget?: string | null;
+  panelStyle?: string | null;
+  panelSize?: string | null;
+  panelHover?: boolean | null;
+  linkPanel?: boolean | null;
+  imageWidth?: string | null;
+  imageHeight?: string | number | null;
+  imageRatio?: string | null;
+  imageFit?: string | null;
+  imageShape?: string | null;
+  imageShadow?: string | null;
+  imageLoading?: string | null;
+  imageAlignment?: string | null;
+  imageBoxDecoration?: string | null;
+  alignImageWithoutPadding?: boolean | null;
 };
+
+function resolveImageLoading(
+  value: CarouselSlide["imageLoading"] | undefined,
+  fallback: "lazy" | "eager",
+): "lazy" | "eager" {
+  return value === "eager" || value === "lazy" ? value : fallback;
+}
 
 type CarouselBlockProps = {
   block?: any;
@@ -88,6 +170,16 @@ type CarouselBlockProps = {
 function isPlaceholderSvgUrl(url?: string | null): boolean {
   if (!url || !url.trim()) return true;
   return url.includes("builder-image-placeholder.svg");
+}
+
+function toCssDimension(value?: string | number | null): string | undefined {
+  if (value === undefined || value === null || value === "" || value === "auto") return undefined;
+  return typeof value === "number" ? `${value}px` : value;
+}
+
+function getUikitTextColorClass(value?: string | null): string {
+  if (!value || value === "none" || value === "default" || value === "inherit") return "";
+  return value.startsWith("uk-text-") ? value : `uk-text-${value}`;
 }
 
 export default function CarouselBlock({
@@ -212,6 +304,16 @@ export default function CarouselBlock({
     paginationStyle !== "hidden" && booleanSetting(settings?.showDots, true);
 
   const explicitSlideMode = settings?.slideMode ?? "auto";
+  const headingLevel = settings?.headingLevel ?? undefined;
+  const headingSize = settings?.headingSize ?? undefined;
+  const titleRole = settings?.titleTypographyRole as SemanticTypographyRole | undefined;
+  const metaRole = settings?.metaTypographyRole as SemanticTypographyRole | undefined;
+  const contentRole = settings?.contentTypographyRole as SemanticTypographyRole | undefined;
+  const SlideTitle = (headingLevel ?? "h3") as React.ElementType;
+  const titleClass = getUikitHeadingClass(headingLevel ?? "h3", headingSize);
+  const metaClass = getUikitTextClass(settings?.metaStyle ?? undefined);
+  const contentClass = getUikitTextClass(settings?.contentStyle ?? undefined);
+  const buttonClass = getUikitButtonClass(settings?.buttonStyle ?? undefined, settings?.buttonSize ?? undefined);
 
   // Unique React key — includes every Swiper structural prop so it remounts cleanly
   // when variant, nav visibility, pagination type, or effects change
@@ -355,7 +457,9 @@ export default function CarouselBlock({
 
           // Decide effective slide mode
           const effectiveMode =
-            explicitSlideMode === "image-only"
+            explicitSlideMode === "panel"
+              ? "panel"
+              : explicitSlideMode === "image-only"
               ? "image-only"
               : explicitSlideMode === "hero"
               ? "hero"
@@ -370,6 +474,174 @@ export default function CarouselBlock({
               : isHeroOrFadeMode
               ? "hero"
               : "card";
+
+          if (effectiveMode === "panel") {
+            const panelClass = getUikitCardClass(slide.panelStyle ?? "default", {
+              hover: slide.panelHover ? "hover" : "none",
+              padding: slide.panelSize ?? "default",
+            });
+            const itemImage = resolveUikitImageSemantics({
+              imageFit: slide.imageFit ?? undefined,
+              imageRatio: slide.imageRatio ?? undefined,
+              imageShape: slide.imageShape ?? undefined,
+              imageShadow: slide.imageShadow ?? undefined,
+              imageAlignment: slide.imageAlignment ?? undefined,
+              imageWidth: slide.imageWidth ?? undefined,
+              imageBorder: slide.imageBorder ?? undefined,
+              imageBoxShadow: slide.imageBoxShadow ?? undefined,
+            });
+            const itemImageStyle = getUikitImageStyle(itemImage);
+            const itemMediaStyle = getUikitPanelMediaStyle({
+              ratio: itemImage.ratio,
+              fit: itemImage.fit === "contain" ? "contain" : "cover",
+              alignment:
+                itemImage.alignment === "left" || itemImage.alignment === "center" || itemImage.alignment === "right"
+                  ? itemImage.alignment
+                  : undefined,
+            });
+            const ItemTitle = (slide.headingLevel ?? headingLevel ?? "h3") as React.ElementType;
+            const itemTitleClass = getUikitHeadingClass(
+              slide.headingLevel ?? headingLevel ?? "h3",
+              slide.headingSize ?? headingSize,
+            );
+            const itemTitleRole = (slide.titleTypographyRole ?? titleRole) as SemanticTypographyRole | undefined;
+            const itemMetaRole = (slide.metaTypographyRole ?? metaRole) as SemanticTypographyRole | undefined;
+            const itemContentRole = (slide.contentTypographyRole ?? contentRole) as SemanticTypographyRole | undefined;
+            const itemMetaClass = getUikitTextClass(slide.metaStyle ?? settings?.metaStyle ?? undefined);
+            const itemContentClass = getUikitTextClass(slide.contentStyle ?? settings?.contentStyle ?? undefined);
+            const itemButtonClass = getUikitButtonClass(
+              slide.buttonStyle ?? settings?.buttonStyle ?? undefined,
+              slide.buttonSize ?? settings?.buttonSize ?? undefined,
+            );
+            const itemMeta = slide.meta ?? slide.subtitle;
+            const metaPosition = slide.gridMetaAlign ?? "below-title";
+            const textAlign = slide.contentAlign ?? slide.headingAlign ?? "left";
+            const titleColorClass = getUikitTextColorClass(slide.titleColor);
+            const metaColorClass = getUikitTextColorClass(slide.metaColor);
+            const titleDecorationClass =
+              slide.titleDecoration && slide.titleDecoration !== "none"
+                ? `uk-heading-${slide.titleDecoration}`
+                : "";
+            const panelLinkProps = builderLinkTargetProps(slide.buttonTarget || settings?.linkTarget);
+            const panelLinkUrl = slide.buttonUrl || "#";
+            const hasAction = slide.showAction !== false && Boolean(slide.buttonLabel);
+            const mediaStyle: React.CSSProperties = {
+              aspectRatio: itemMediaStyle.aspectRatio ?? itemImageStyle.aspectRatio,
+              height: toCssDimension(slide.imageHeight),
+              maxWidth: itemImageStyle.maxWidth,
+              width: itemImageStyle.width ?? "100%",
+            };
+            const MetaElement = (slide.metaHtmlElement ?? "div") as React.ElementType;
+
+            const renderMeta = () =>
+              itemMeta ? (
+                <MetaElement
+                  className={`${itemMetaClass} ${typographyRoleClass(itemMetaRole)} ${metaColorClass}`.trim()}
+                >
+                  {itemMeta}
+                </MetaElement>
+              ) : null;
+
+            const renderTitle = () =>
+              slide.title ? (
+                <ItemTitle
+                  className={`${itemTitleClass} ${typographyRoleClass(itemTitleRole)} ${titleColorClass} ${titleDecorationClass}`.trim()}
+                >
+                  {slide.linkPanel ? (
+                    <a href={panelLinkUrl} {...panelLinkProps}>{slide.title}</a>
+                  ) : (
+                    slide.title
+                  )}
+                </ItemTitle>
+              ) : null;
+
+            return (
+              <SwiperSlide key={slide.id || idx}>
+                <article className={`shop-builder-panel-slider-card ${panelClass}`.trim()}>
+                  {hasRealImage ? (
+                    <div
+                      className={`shop-builder-panel-slider-media ${getUikitImageWrapperClass(itemImage)}`.trim()}
+                      style={mediaStyle}
+                    >
+                      {slide.linkPanel ? (
+                        <a href={panelLinkUrl} {...panelLinkProps} className="shop-builder-panel-slider-media-link">
+                          <img
+                            src={slide.imageUrl!}
+                            alt={slide.imageAlt ?? slide.title ?? ""}
+                            className={getUikitImageClass(itemImage)}
+                            style={{
+                              position: itemImageStyle.position,
+                              inset: itemImageStyle.inset,
+                              width: "100%",
+                              height: "100%",
+                              objectFit: itemImageStyle.objectFit,
+                              objectPosition: itemMediaStyle.backgroundPosition,
+                            }}
+                            loading={resolveImageLoading(slide.imageLoading, idx === 0 ? "eager" : "lazy")}
+                          />
+                        </a>
+                      ) : (
+                        <img
+                          src={slide.imageUrl!}
+                          alt={slide.imageAlt ?? slide.title ?? ""}
+                          className={getUikitImageClass(itemImage)}
+                          style={{
+                            position: itemImageStyle.position,
+                            inset: itemImageStyle.inset,
+                            width: "100%",
+                            height: "100%",
+                            objectFit: itemImageStyle.objectFit,
+                            objectPosition: itemMediaStyle.backgroundPosition,
+                          }}
+                          loading={resolveImageLoading(slide.imageLoading, idx === 0 ? "eager" : "lazy")}
+                        />
+                      )}
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      className="shop-builder-panel-slider-placeholder"
+                      onClick={() => onUploadSlideImage?.(idx, slide.imageUrl ?? undefined)}
+                    >
+                      <ImageIcon className="w-8 h-8" />
+                      <span>{onUploadSlideImage ? "Select image" : "No image"}</span>
+                    </button>
+                  )}
+
+                  <div
+                    className="uk-card-body shop-builder-panel-slider-body"
+                    style={{ textAlign: textAlign as React.CSSProperties["textAlign"] }}
+                  >
+                    {slide.iconName && (
+                      <WebPagesIcon
+                        name={slide.iconName}
+                        size={slide.iconSize ?? 24}
+                        className="shop-builder-panel-slider-icon"
+                      />
+                    )}
+                    {metaPosition === "above-title" && renderMeta()}
+                    {renderTitle()}
+                    {metaPosition !== "above-title" && metaPosition !== "below-content" && renderMeta()}
+                    {slide.text && (
+                      <div className={`${itemContentClass} ${typographyRoleClass(itemContentRole)}`.trim()}>
+                        {slide.text}
+                      </div>
+                    )}
+                    {metaPosition === "below-content" && renderMeta()}
+                    {hasAction && (
+                      <a
+                        href={panelLinkUrl}
+                        className={`${itemButtonClass} shop-builder-panel-slider-action ${slide.fullWidthButton ? "uk-width-1-1" : ""}`.trim()}
+                        {...panelLinkProps}
+                      >
+                        {slide.buttonLabel}
+                      </a>
+                    )}
+                  </div>
+                </article>
+              </SwiperSlide>
+            );
+          }
 
           if (effectiveMode === "image-only") {
             // MODE 1: Pure Image Showcase (Swiper Official Demo Style)
@@ -408,7 +680,11 @@ export default function CarouselBlock({
                       {(slide.title || slide.badge) && (
                         <div className="absolute bottom-4 left-4 z-10 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-black/60 backdrop-blur-md text-white text-xs font-semibold">
                           {slide.badge && <span className="opacity-75">{slide.badge}</span>}
-                          {slide.title && <span>{slide.title}</span>}
+                          {slide.title && (
+                            <SlideTitle className={`${titleClass} ${typographyRoleClass(titleRole)}`.trim()}>
+                              {slide.title}
+                            </SlideTitle>
+                          )}
                         </div>
                       )}
                     </div>
@@ -541,14 +817,19 @@ export default function CarouselBlock({
                       </span>
                     )}
                     {slide.title && (
-                      <h3 className={`text-xl md:text-2xl ${textColors.title}`}>
+                      <SlideTitle className={`${titleClass} ${typographyRoleClass(titleRole)} ${textColors.title}`.trim()}>
                         {slide.title}
-                      </h3>
+                      </SlideTitle>
                     )}
-                    {(slide.subtitle || slide.text) && (
-                      <p className={`text-xs md:text-sm line-clamp-3 ${textColors.text}`}>
-                        {slide.subtitle || slide.text}
-                      </p>
+                    {slide.subtitle && (
+                      <div className={`${metaClass} ${typographyRoleClass(metaRole)} ${textColors.text}`.trim()}>
+                        {slide.subtitle}
+                      </div>
+                    )}
+                    {slide.text && (
+                      <div className={`${contentClass} ${typographyRoleClass(contentRole)} text-xs md:text-sm line-clamp-3 ${textColors.text}`.trim()}>
+                        {slide.text}
+                      </div>
                     )}
                     {slide.price && (
                       <div className={`text-lg ${textColors.price}`}>
@@ -558,7 +839,8 @@ export default function CarouselBlock({
                     {slide.buttonLabel && slide.buttonUrl && (
                       <a
                         href={slide.buttonUrl}
-                        className={textColors.btn}
+                        className={buttonClass}
+                        {...builderLinkTargetProps(slide.buttonTarget || settings?.linkTarget)}
                       >
                         <span>{slide.buttonLabel}</span>
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -618,15 +900,21 @@ export default function CarouselBlock({
                     )}
 
                     {slide.title && (
-                      <h3 className="shop-builder-swiper-title">
+                      <SlideTitle className={`${titleClass} ${typographyRoleClass(titleRole)} shop-builder-swiper-title`.trim()}>
                         {slide.title}
-                      </h3>
+                      </SlideTitle>
                     )}
 
-                    {(slide.subtitle || slide.text) && (
-                      <p className="shop-builder-swiper-text">
-                        {slide.subtitle || slide.text}
-                      </p>
+                    {slide.subtitle && (
+                      <div className={`${metaClass} ${typographyRoleClass(metaRole)} shop-builder-swiper-text`.trim()}>
+                        {slide.subtitle}
+                      </div>
+                    )}
+
+                    {slide.text && (
+                      <div className={`${contentClass} ${typographyRoleClass(contentRole)} shop-builder-swiper-text`.trim()}>
+                        {slide.text}
+                      </div>
                     )}
 
                     {slide.price && (
@@ -636,7 +924,8 @@ export default function CarouselBlock({
                     {slide.buttonLabel && slide.buttonUrl && (
                       <a
                         href={slide.buttonUrl}
-                        className="shop-builder-swiper-btn"
+                        className={buttonClass}
+                        {...builderLinkTargetProps(slide.buttonTarget || settings?.linkTarget)}
                       >
                         <span>{slide.buttonLabel}</span>
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -683,18 +972,29 @@ export default function CarouselBlock({
                     <span className="shop-builder-slide-badge">{slide.badge}</span>
                   )}
                   {slide.title && (
-                    <h3 className="shop-builder-slide-title">{slide.title}</h3>
+                    <SlideTitle className={`${titleClass} ${typographyRoleClass(titleRole)} shop-builder-slide-title`.trim()}>
+                      {slide.title}
+                    </SlideTitle>
                   )}
-                  {(slide.subtitle || slide.text) && (
-                    <p className="shop-builder-slide-text">
-                      {slide.subtitle || slide.text}
-                    </p>
+                  {slide.subtitle && (
+                    <div className={`${metaClass} ${typographyRoleClass(metaRole)} shop-builder-slide-text`.trim()}>
+                      {slide.subtitle}
+                    </div>
+                  )}
+                  {slide.text && (
+                    <div className={`${contentClass} ${typographyRoleClass(contentRole)} shop-builder-slide-text`.trim()}>
+                      {slide.text}
+                    </div>
                   )}
                   {slide.price && (
                     <div className="shop-builder-slide-price">{slide.price}</div>
                   )}
                   {slide.buttonLabel && slide.buttonUrl && (
-                    <a href={slide.buttonUrl} className="shop-builder-slide-btn">
+                    <a
+                      href={slide.buttonUrl}
+                      className={buttonClass}
+                      {...builderLinkTargetProps(slide.buttonTarget || settings?.linkTarget)}
+                    >
                       <span>{slide.buttonLabel}</span>
                     </a>
                   )}

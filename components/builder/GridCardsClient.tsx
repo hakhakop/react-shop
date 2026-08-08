@@ -12,6 +12,7 @@ import {
   getUikitPanelLayoutClass,
   getUikitPanelMediaClass,
   getUikitPanelMediaStyle,
+  getUikitTextClass,
 } from "@/lib/uikitTokens";
 import { typographyRoleClass } from "@/lib/builderTypography";
 import { builderLinkTargetProps } from "@/lib/websiteBuilderLinks";
@@ -22,8 +23,7 @@ function getUikitMarginClass(val?: string) {
 }
 
 function getUikitTextStyleClass(val?: string) {
-  if (!val || val === "none") return "";
-  return `uk-${val}`;
+  return getUikitTextClass(val);
 }
 
 function getUikitTitleHeadingClass(val?: string) {
@@ -155,7 +155,7 @@ export function GridCardsClient({
       >
         {filteredItems.slice(0, limit).map((item) =>
           (() => {
-            const panelStyle = rawBlock.panelVariant ?? rawBlock.panelStyle ?? block.gridCardVariant ?? rawBlock.cardVariant ?? "none";
+            const panelStyle = rawBlock.panelStyle ?? rawBlock.panelVariant ?? block.gridCardVariant ?? rawBlock.cardVariant ?? "none";
             const panelPadding = rawBlock.panelSize ?? rawBlock.panelPadding ?? "none";
             let panelClass = "";
 
@@ -184,7 +184,7 @@ export function GridCardsClient({
                 : "shop-builder-panel-padding-none";
 
             const isCard = Boolean(panelClass);
-            const cardHover = item.cardHover ?? block.gridCardHover;
+            const cardHover = item.cardHover ?? rawBlock.panelHover ?? block.gridCardHover;
 
             // Title styling & level
             const TitleTag = (rawBlock.gridTitleLevel ?? item.titleElement ?? block.headingLevel ?? "h3") as any;
@@ -204,7 +204,9 @@ export function GridCardsClient({
               ? (metaColorVal.startsWith("uk-text-") ? metaColorVal : `uk-text-${metaColorVal}`)
               : "";
             const metaMarginTopClass = getUikitMarginClass(rawBlock.metaMarginTop);
-            const metaAlign = rawBlock.gridMetaAlign ?? rawBlock.metaAlignment ?? "below";
+            const rawMetaAlign = rawBlock.gridMetaAlign ?? rawBlock.metaAlignment ?? "below-title";
+            const metaAlign = rawMetaAlign === "above" ? "above-title" : rawMetaAlign === "below" ? "below-title" : rawMetaAlign === "content" ? "below-content" : rawMetaAlign;
+            const MetaTag = (rawBlock.gridMetaHtmlElement ?? "div") as any;
 
             // Content styling
             const contentStyleClass = getUikitTextStyleClass(rawBlock.contentStyle);
@@ -213,11 +215,13 @@ export function GridCardsClient({
             // Image styling
             const imageBorderClass = getUikitImageBorderClass(rawBlock.imageBorder);
             const imageBoxShadowClass = getUikitImageBoxShadowClass(rawBlock.imageBoxShadow);
+            const imageDecorationClass = rawBlock.imageBoxDecoration && rawBlock.imageBoxDecoration !== "none" ? `uk-background-${rawBlock.imageBoxDecoration}` : "";
             const imageHoverTransitionClass = getUikitHoverTransitionClass(rawBlock.imageHoverTransition);
             const isFrameless = (rawBlock as any).alignImageWithoutPadding === true || imagePaddingClass === "frameless";
+            const imageDimension = (value: unknown) => value === undefined || value === null || value === "" ? undefined : /^-?\d+(?:\.\d+)?$/.test(String(value)) ? `${value}px` : String(value);
 
             // Link / Button styling
-            const buttonText = item.buttonLabel || rawBlock.buttonLabel || rawBlock.linkText || "Read more";
+            const buttonText = rawBlock.buttonLabel ?? item.buttonLabel ?? rawBlock.linkText ?? "Read more";
             const btnVariant = rawBlock.buttonStyle ?? item.actionStyle ?? item.buttonStyle ?? block.buttonStyle ?? "primary";
             const btnSize = rawBlock.size ?? item.actionSize ?? block.size ?? "default";
             const isFullWidth = Boolean(rawBlock.fullWidthButton);
@@ -228,19 +232,19 @@ export function GridCardsClient({
             const mediaPlacement = item.mediaPlacement ?? (block as any).gridMediaPlacement ?? "top";
             const isSideMedia = mediaPlacement === "left" || mediaPlacement === "right";
             const mediaWidth = (item as any).mediaWidth ?? (block as any).gridMediaWidth ?? "medium";
-            const mediaAlignment = (item as any).mediaAlignment ?? (block as any).gridMediaAlignment ?? "center";
+            const mediaAlignment = (item as any).mediaAlignment ?? (block as any).imageAlignment ?? (block as any).gridMediaAlignment ?? "center";
             const mediaStyle = getUikitPanelMediaStyle({
               ratio: isSideMedia ? undefined : (item.mediaRatio ?? block.imageRatio),
               fit: (item.mediaFit ?? block.imageFit ?? "cover") === "contain" ? "contain" : "cover",
               alignment: mediaAlignment,
             });
             const panelLayoutClass = getUikitPanelLayoutClass(mediaPlacement, mediaWidth);
-            const itemUrl = item.buttonUrl || "#";
+            const itemUrl = rawBlock.buttonUrl ?? item.buttonUrl ?? "#";
 
             const renderMeta = () => (
               canShowMeta && item.meta ? (
                 <Typog
-                  as="div"
+                  as={MetaTag}
                   className={`${metaStyleClass} ${metaColorClass} ${metaMarginTopClass} ${typographyRoleClass(block.metaTypographyRole)}`.trim()}
                   area="body"
                   typography={item.typography ?? block.typography}
@@ -295,7 +299,7 @@ export function GridCardsClient({
                 <img
                   src={item.imageUrl}
                   alt={item.imageAlt || item.title || ""}
-                  loading={rawBlock.imageLoading ? "eager" : "lazy"}
+                  loading={rawBlock.imageLoading === "eager" || rawBlock.imageLoading === true ? "eager" : "lazy"}
                   className={`${imageBorderClass} ${imageBoxShadowClass} ${imageHoverTransitionClass}`.trim()}
                   style={{
                     width: "100%",
@@ -308,9 +312,11 @@ export function GridCardsClient({
 
               return (
                 <div
-                  className={`${mediaClass} shop-builder-grid-image`}
+                  className={`${mediaClass} ${imageDecorationClass} shop-builder-grid-image`.trim()}
                   style={{
+                    width: imageDimension(rawBlock.imageWidth) ?? "100%",
                     aspectRatio: mediaStyle.aspectRatio,
+                    maxHeight: imageDimension(rawBlock.imageHeight),
                     overflow: "hidden",
                   }}
                 >
@@ -376,7 +382,7 @@ export function GridCardsClient({
                     iconSize={item.listIconSize}
                   />
 
-                  {canShowLink && (buttonText || item.buttonLabel) && (
+                  {canShowLink && buttonText && (
                     <div
                       className={`shop-builder-grid-button ${linkMarginTopClass} shop-builder-grid-button--${
                         item.buttonAlign ?? "left"
@@ -384,8 +390,8 @@ export function GridCardsClient({
                     >
                       <a
                         className={`shop-builder-grid-action ${linkStyleClass} ${getUikitButtonClass(
-                          item.actionStyle ?? item.buttonStyle ?? block.buttonStyle ?? "primary",
-                          item.actionSize ?? block.size ?? "default",
+                          rawBlock.buttonStyle ?? item.actionStyle ?? item.buttonStyle ?? block.buttonStyle ?? "primary",
+                          rawBlock.size ?? item.actionSize ?? block.size ?? "default",
                         )}`.trim()}
                         href={itemUrl}
                         {...builderLinkTargetProps(linkTarget)}

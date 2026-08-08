@@ -33,19 +33,21 @@ test("Panel inspector exposes semantic instance controls and keeps builder/front
   const inspector = page.locator(".builder-floating-inspector");
   await inspector.getByRole("button", { name: "Content", exact: true }).click();
   await expect(inspector.locator('[data-uikit-capability="panel-content"]')).toBeVisible();
-  await expect(inspector.getByText("Styling", { exact: true })).toBeVisible();
+  await expect(inspector.getByText("Settings", { exact: true })).toBeVisible();
   await expect(inspector.getByText("Card Presets", { exact: true })).toHaveCount(0);
   await expect(inspector.getByText("Clear legacy Panel fields", { exact: true })).toHaveCount(0);
 
-  await inspector.getByRole("button", { name: "Layout", exact: true }).click();
-  const layout = inspector.locator('[data-uikit-capability="panel-layout"]');
-  await expect(layout.locator('[data-uikit-capability="panel-media"]')).toBeVisible();
+  await inspector.getByRole("button", { name: "Settings", exact: true }).click();
+  const layout = inspector.locator('[data-uikit-capability="panel-settings"]').first();
+  await expect(layout.locator(".builder-inspector-division", { hasText: /^MEDIA/ })).toBeVisible();
   await layout.getByRole("radiogroup", { name: "Media placement" }).getByRole("radio", { name: "Left" }).click();
-  await layout.getByLabel("Media aspect ratio", { exact: true }).selectOption("square");
-  await layout.getByRole("radiogroup", { name: "Media fit" }).getByRole("radio", { name: "Contain" }).click();
+  const imageSettings = layout.locator(".builder-inspector-division", { hasText: /^IMAGE/ });
+  await imageSettings.locator(".inspector-field-row").filter({ hasText: /^Ratio/ }).locator("select").selectOption("square");
+  await imageSettings.getByRole("radiogroup").getByRole("radio", { name: "Contain" }).click();
   await layout.getByLabel("Side media width", { exact: true }).selectOption("large");
-  await layout.getByRole("radiogroup", { name: "Text alignment" }).getByRole("radio", { name: "Center" }).click();
-  await layout.getByLabel("Title element", { exact: true }).selectOption("h2");
+  const titleSettings = layout.locator(".builder-inspector-division", { hasText: /^TITLE/ });
+  await titleSettings.getByRole("radiogroup", { name: "Text alignment" }).getByRole("radio", { name: "Align center" }).click();
+  await titleSettings.locator(".inspector-field-row").filter({ hasText: /^HTML Element/ }).locator("select").selectOption("h2");
   await layout.getByLabel("Content width", { exact: true }).selectOption("medium");
 
   const panel = selectedBlock.locator(".shop-builder-column-block--panel");
@@ -54,10 +56,9 @@ test("Panel inspector exposes semantic instance controls and keeps builder/front
   await expect(panel.locator(".uk-card-media-left")).toBeVisible();
   await expect(panel.locator("h2")).toBeVisible();
 
-  await inspector.getByRole("button", { name: "Styling", exact: true }).click();
-  await inspector.getByRole("radiogroup", { name: "Panel variant" }).getByRole("radio", { name: "Secondary" }).click();
-  await inspector.getByRole("radiogroup", { name: "Panel size" }).getByRole("radio", { name: "Large" }).click();
-  await inspector.locator("label.inspector-switch", { hasText: "Hover card" }).click();
+  await layout.getByRole("radiogroup", { name: "Card variant" }).getByRole("radio", { name: "Secondary" }).click();
+  await layout.getByRole("radiogroup", { name: "Card size" }).getByRole("radio", { name: "Large" }).click();
+  await layout.locator(".builder-inspector-division", { hasText: /^CARD PRESENTATION/ }).getByRole("switch", { name: "Enable hover effect" }).check({ force: true });
 
   const stored = await page.evaluate((id) => {
     const found: Record<string, unknown>[] = [];
@@ -71,7 +72,7 @@ test("Panel inspector exposes semantic instance controls and keeps builder/front
     Object.values(localStorage).forEach((value) => { try { walk(JSON.parse(value)); } catch {} });
     return found[0] ?? null;
   }, blockId);
-  expect(stored).toMatchObject({ panelMediaPlacement: "left", imageRatio: "square", panelMediaFit: "contain", panelMediaWidth: "large", panelTextAlign: "center", panelTitleElement: "h2", panelVariant: "secondary", panelSize: "large", panelHover: true });
+  expect(stored).toMatchObject({ panelMediaPlacement: "left", imageRatio: "square", imageFit: "contain", panelMediaWidth: "large", panelTextAlign: "center", panelTitleElement: "h2", panelVariant: "secondary", panelSize: "large", panelHover: true });
   expect(JSON.stringify(stored)).not.toMatch(/uk-/);
 
   await Promise.all([

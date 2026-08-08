@@ -14,6 +14,7 @@ import {
 } from "@/components/dashboard/inspector/InspectorControls";
 import type { BuilderShellSettings } from "@/lib/builderShell";
 import { Link, Image as ImageIcon } from "lucide-react";
+import { TitleSettingsGroup } from "@/components/dashboard/inspector/panels/SharedSettingGroups";
 
 type Props = {
   block: BuilderLayoutBlock;
@@ -127,11 +128,10 @@ export default function HeadingCapabilityPanel({
   if (tab === "style") {
     const headingStyleOptions = [
       { value: "none", label: "None" },
-      { value: "heading-small", label: "Heading Small" },
-      { value: "heading-medium", label: "Heading Medium" },
-      { value: "heading-large", label: "Heading Large" },
-      { value: "heading-xlarge", label: "Heading X-Large" },
-      { value: "heading-2xlarge", label: "Heading 2X-Large" },
+      { value: "small", label: "Heading Small" },
+      { value: "medium", label: "Heading Medium" },
+      { value: "large", label: "Heading Large" },
+      { value: "xlarge", label: "Heading X-Large" },
       { value: "hero", label: "Hero" },
       { value: "h1", label: "H1" },
       { value: "h2", label: "H2" },
@@ -141,103 +141,29 @@ export default function HeadingCapabilityPanel({
       { value: "h6", label: "H6" },
     ];
 
-    const decorationOptions = [
-      { value: "none", label: "None" },
-      { value: "divider", label: "Divider" },
-      { value: "bullet", label: "Bullet" },
-      { value: "line", label: "Line" },
-    ];
-
-    const fontFamilyOptions = [
-      { value: "none", label: "None" },
-      { value: "default", label: "Default" },
-      { value: "primary", label: "Primary" },
-      { value: "secondary", label: "Secondary" },
-      { value: "tertiary", label: "Tertiary" },
-    ];
-
-    const colorOptions = [
-      { value: "none", label: "None" },
-      { value: "muted", label: "Muted" },
-      { value: "emphasis", label: "Emphasis" },
-      { value: "primary", label: "Primary" },
-      { value: "secondary", label: "Secondary" },
-      { value: "success", label: "Success" },
-      { value: "warning", label: "Warning" },
-      { value: "danger", label: "Danger" },
-    ];
-
-    const htmlElementOptions = [
-      { value: "h1", label: "h1" },
-      { value: "h2", label: "h2" },
-      { value: "h3", label: "h3" },
-      { value: "h4", label: "h4" },
-      { value: "h5", label: "h5" },
-      { value: "h6", label: "h6" },
-      { value: "div", label: "div" },
-    ];
-
     const gradient = block.textGradientPreset ?? "none";
 
     return (
       <div className="builder-inspector-stack" data-uikit-capability="heading-style">
-        <InspectorDivision title="TITLE">
-          <InspectorFieldRow
-            label="Style"
-            isOverridden={block.headingSize !== undefined && (block.headingSize as any) !== "heading-medium"}
-            inheritedValueText="Heading Medium"
-            onReset={() => update({ headingSize: undefined })}
-          >
-            <InspectorSelect
-              value={block.headingSize ?? "heading-medium"}
-              options={headingStyleOptions}
-              onChange={(value) => update({ headingSize: value as any })}
-              ariaLabel="Heading Style"
-            />
-          </InspectorFieldRow>
+        <TitleSettingsGroup
+          block={block}
+          update={update}
+          showDecoration
+          showColor
+          defaultSize="medium"
+          visualPresetOptions={headingStyleOptions}
+          styleAriaLabel="Heading style"
+          keys={{
+            role: "headingTypographyRole",
+            size: "headingSize",
+            align: "headingAlign",
+            level: "headingLevel",
+            decoration: "titleDecoration",
+            color: "headingColor",
+          }}
+        />
 
-          <InspectorFieldRow
-            label="Decoration"
-            isOverridden={(block as any).titleDecoration !== undefined && (block as any).titleDecoration !== "none"}
-            inheritedValueText="None"
-            onReset={() => update({ titleDecoration: undefined } as any)}
-          >
-            <InspectorSelect
-              value={(block as any).titleDecoration ?? "none"}
-              options={decorationOptions}
-              onChange={(value) => update({ titleDecoration: value } as any)}
-              ariaLabel="Title Decoration"
-            />
-          </InspectorFieldRow>
-
-          <InspectorFieldRow
-            label="Font Family"
-            isOverridden={block.headingTypographyRole !== undefined && (block.headingTypographyRole as any) !== "none"}
-            inheritedValueText="None"
-            onReset={() => update({ headingTypographyRole: undefined })}
-          >
-            <InspectorSelect
-              value={block.headingTypographyRole ?? "none"}
-              options={fontFamilyOptions}
-              onChange={(value) => update({ headingTypographyRole: value as any })}
-              ariaLabel="Font Family"
-            />
-          </InspectorFieldRow>
-
-          <InspectorFieldRow
-            label="Color"
-            isOverridden={(block as any).headingColor !== undefined && (block as any).headingColor !== "none"}
-            inheritedValueText="None"
-            onReset={() => update({ headingColor: undefined } as any)}
-          >
-            <InspectorSelect
-              value={(block as any).headingColor ?? "none"}
-              options={colorOptions}
-              onChange={(value) => update({ headingColor: value } as any)}
-              ariaLabel="Heading Color"
-            />
-          </InspectorFieldRow>
-
+        <InspectorDivision title="INTERACTION">
           <InspectorFieldRow
             label="Hover Effect"
             isOverridden={Boolean((block as any).showHoverEffect)}
@@ -252,20 +178,6 @@ export default function HeadingCapabilityPanel({
               />
               <span>Show hover effect if linked.</span>
             </label>
-          </InspectorFieldRow>
-
-          <InspectorFieldRow
-            label="HTML Element"
-            isOverridden={block.headingLevel !== undefined && block.headingLevel !== "h2"}
-            inheritedValueText="H2"
-            onReset={() => update({ headingLevel: undefined })}
-          >
-            <InspectorSelect
-              value={block.headingLevel ?? "h2"}
-              options={htmlElementOptions}
-              onChange={(value) => update({ headingLevel: value as any })}
-              ariaLabel="HTML Element"
-            />
           </InspectorFieldRow>
         </InspectorDivision>
 

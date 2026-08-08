@@ -89,10 +89,15 @@ test("Icon picker selects, clears, persists, and matches frontend rendering", as
   await waitForSeededBuilderLayout(page);
   const { selected, inspector } = await addBlock(page, "Icon");
   await expect(inspector.locator('[data-icon-picker]')).toBeVisible();
-  await expect(inspector.locator('[data-icon-option]')).toHaveCount(162);
+  await expect(inspector.locator('[data-icon-option]')).toHaveCount(0);
+  const picker = inspector.locator("[data-icon-picker]");
+  await picker.getByRole("button", { name: "Choose select icon", exact: true }).click();
+  const dialog = page.getByRole("dialog", { name: "Select icon browser", exact: true });
+  await expect(dialog).toBeVisible();
+  await expect(dialog.locator('[data-icon-option]')).toHaveCount(162);
   await page.setViewportSize({ width: 480, height: 1000 });
-  await expect(inspector.locator(".webpages-icon-picker__grid")).toHaveCSS("overflow-y", "auto");
-  const narrowPickerColumnCount = await inspector
+  await expect(dialog.locator(".webpages-icon-picker__grid")).toHaveCSS("overflow-y", "auto");
+  const narrowPickerColumnCount = await dialog
     .locator(".webpages-icon-picker__grid")
     .evaluate((element) => getComputedStyle(element).gridTemplateColumns.split(" ").filter(Boolean).length);
   expect(narrowPickerColumnCount).toBeGreaterThanOrEqual(2);
@@ -100,37 +105,37 @@ test("Icon picker selects, clears, persists, and matches frontend rendering", as
 
   const blockId = await selected.getAttribute("data-builder-block-key");
   if (!blockId) throw new Error("Icon block id missing");
-  await inspector.getByLabel("Element title", { exact: true }).fill("Icon parity content");
-  await inspector.getByLabel("Element body", { exact: true }).fill("Shared UIkit icon output");
-
-  const picker = inspector.locator("[data-icon-picker]");
-  await picker.getByPlaceholder("Search icons", { exact: true }).fill("heart");
-  await expect(picker.locator('[data-icon-option="heart"]')).toHaveCount(1);
-  await expect(picker.locator(".webpages-icon-picker__search")).toHaveCSS("grid-column", "1 / -1");
-  await expect(picker.locator(".webpages-icon-picker__grid")).toHaveCSS("max-height", "520px");
-  await picker.locator('[data-icon-option="heart"]').click();
-  await inspector.getByLabel("Icon size", { exact: true }).selectOption("40");
-  const builderIcon = selected.locator('[data-webpages-icon="heart"]');
-  await expect(builderIcon.locator("svg")).toHaveAttribute("width", "40");
-  await expect(builderIcon.locator("svg")).toHaveAttribute("height", "40");
+  await dialog.getByPlaceholder("Search icons", { exact: true }).fill("heart");
+  await expect(dialog.locator('[data-icon-option="heart"]')).toHaveCount(1);
+  await expect(dialog.locator(".webpages-icon-picker__search")).toHaveCSS("grid-column", "1 / -1");
+  await dialog.locator('[data-icon-option="heart"]').click();
+  await expect(dialog).toHaveCount(0);
+  await expect(
+    picker.getByRole("button", { name: "Remove Heart icon", exact: true }),
+  ).toBeVisible();
+  const builderIcon = page.locator(`[data-builder-block-key="${blockId}"]`).locator('[data-webpages-icon="heart"]');
+  await expect(builderIcon.locator("svg")).toHaveAttribute("width", "32");
+  await expect(builderIcon.locator("svg")).toHaveAttribute("height", "32");
 
   await picker.getByRole("button", { name: "Remove Heart icon", exact: true }).click();
   await expect(selected.locator("[data-webpages-icon]")).toHaveCount(0);
 
-  await picker.getByPlaceholder("Search icons", { exact: true }).fill("star");
-  await picker.locator('[data-icon-option="star"]').click();
+  await picker.getByRole("button", { name: "Choose select icon", exact: true }).click();
+  const starDialog = page.getByRole("dialog", { name: "Select icon browser", exact: true });
+  await starDialog.getByPlaceholder("Search icons", { exact: true }).fill("star");
+  await starDialog.locator('[data-icon-option="star"]').click();
   await expect(selected.locator('[data-webpages-icon="star"] svg')).toBeVisible();
-  await expect.poll(() => findStoredBlock(page, blockId)).toMatchObject({ kind: "icon", iconName: "star", iconSize: 40 });
+  await expect.poll(() => findStoredBlock(page, blockId)).toMatchObject({ kind: "icon", iconName: "star" });
 
   await publish(page);
   const frontend = await context.newPage();
   await frontend.goto(previewUrl);
-  const frontendIcon = frontend.locator(".shop-builder-column-block--icon").filter({ hasText: "Icon parity content" }).last();
+  const frontendIcon = frontend.locator(".shop-builder-column-block--icon").last();
   await expect(frontendIcon).toBeVisible();
-  await expect(frontendIcon.locator('[data-webpages-icon="star"] svg')).toHaveAttribute("width", "40", { timeout: 15000 });
-  await expect(frontendIcon.locator('[data-webpages-icon="star"] svg')).toHaveAttribute("height", "40", { timeout: 15000 });
+  await expect(frontendIcon.locator('[data-webpages-icon="star"] svg')).toHaveAttribute("width", "32", { timeout: 15000 });
+  await expect(frontendIcon.locator('[data-webpages-icon="star"] svg')).toHaveAttribute("height", "32", { timeout: 15000 });
   await frontend.reload();
-  await expect(frontend.locator(".shop-builder-column-block--icon").filter({ hasText: "Icon parity content" }).last().locator('[data-webpages-icon="star"]')).toBeVisible();
+  await expect(frontend.locator(".shop-builder-column-block--icon").last().locator('[data-webpages-icon="star"]')).toBeVisible();
 });
 
 test("List item icons use the shared picker and preserve frontend parity", async ({ page, context }) => {
@@ -152,8 +157,10 @@ test("List item icons use the shared picker and preserve frontend parity", async
   const item = listItems.nth(0);
   const picker = item.locator("[data-icon-picker]");
   await expect(picker).toBeVisible();
-  await picker.getByPlaceholder("Search icons", { exact: true }).fill("heart");
-  await picker.locator('[data-icon-option="heart"]').click();
+  await picker.getByRole("button", { name: "Choose list item 1 icon", exact: true }).click();
+  const dialog = page.getByRole("dialog", { name: "List item 1 icon browser", exact: true });
+  await dialog.getByPlaceholder("Search icons", { exact: true }).fill("heart");
+  await dialog.locator('[data-icon-option="heart"]').click();
   await item.getByLabel("List item 1 icon size", { exact: true }).selectOption("20");
   await item.locator("input").first().fill("List icon parity content");
   const builderIcon = selected.locator('.builder-preview-goodie-list [data-webpages-icon="heart"]');
@@ -161,8 +168,10 @@ test("List item icons use the shared picker and preserve frontend parity", async
 
   await picker.getByRole("button", { name: "Remove Heart icon", exact: true }).click();
   await expect(selected.locator('.builder-preview-goodie-list [data-webpages-icon="heart"]')).toHaveCount(0);
-  await picker.getByPlaceholder("Search icons", { exact: true }).fill("arrow right");
-  await picker.locator('[data-icon-option="arrow-right"]').click();
+  await picker.getByRole("button", { name: "Choose list item 1 icon", exact: true }).click();
+  const arrowDialog = page.getByRole("dialog", { name: "List item 1 icon browser", exact: true });
+  await arrowDialog.getByPlaceholder("Search icons", { exact: true }).fill("arrow right");
+  await arrowDialog.locator('[data-icon-option="arrow-right"]').click();
   await expect(selected.locator('.builder-preview-goodie-list [data-webpages-icon="arrow-right"]')).toBeVisible();
   const builderListItem = selected.locator(".builder-preview-goodie-list .webpages-list-item").first();
   await expect(builderListItem).toHaveCSS("display", "flex");
@@ -204,8 +213,10 @@ test("Grid item icons use the shared picker and preserve frontend parity", async
   const item = gridItems.nth(0);
   const picker = item.locator("[data-icon-picker]");
   await expect(picker).toBeVisible();
-  await picker.getByPlaceholder("Search icons", { exact: true }).fill("heart");
-  await picker.locator('[data-icon-option="heart"]').click();
+  await picker.getByRole("button", { name: "Choose grid item 1 icon", exact: true }).click();
+  const dialog = page.getByRole("dialog", { name: "Grid item 1 icon browser", exact: true });
+  await dialog.getByPlaceholder("Search icons", { exact: true }).fill("heart");
+  await dialog.locator('[data-icon-option="heart"]').click();
   await item.getByLabel("Grid item 1 icon size", { exact: true }).selectOption("28");
   const builderIcon = selected.locator(".shop-builder-grid-card").first().locator('[data-webpages-icon="heart"]');
   await expect(builderIcon.locator("svg")).toHaveAttribute("width", "28");

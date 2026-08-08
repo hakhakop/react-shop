@@ -1,5 +1,273 @@
 [
   {
+    "id": "panel-slider-msji4s07-g500",
+    "title": "Panel Slider",
+    "templateType": "element",
+    "description": "Element template saved from Home",
+    "sourcePage": "home",
+    "sections": [
+      {
+        "id": "contentLayout-msji4rzs-l3xfi",
+        "kind": "contentLayout",
+        "title": "Panel Slider",
+        "background": "#ffffff",
+        "backgroundMode": "boxed",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "topSpacing": "inherit",
+        "bottomSpacing": "inherit",
+        "topMargin": "inherit",
+        "bottomMargin": "inherit",
+        "pullUnderHeader": false,
+        "visible": true,
+        "eyebrow": "",
+        "body": "",
+        "layout": "1-col",
+        "layoutColumns": 1,
+        "layoutItems": [
+          {
+            "id": "layout-item-msji4rzs-template-element",
+            "rowId": "layout-row-msji4rzs-1",
+            "rowLayout": "1-col",
+            "blocks": [
+              {
+                "id": "panelSlider-block-msji4rzs-6ycni",
+                "kind": "panelSlider",
+                "title": "Choose the next step",
+                "body": "A focused collection of services, stories, or offers presented as sliding panels.",
+                "slides": [
+                  {
+                    "id": "panelSlider-block-msjhxxn9-6mfzo-panel-1",
+                    "title": "Build the right foundation",
+                    "meta": "Strategy",
+                    "text": "Align the essentials before expanding the experience.",
+                    "imageUrl": "/builder-image-placeholder.svg",
+                    "imageAlt": "Panel slider item 1",
+                    "imagePadding": "frameless",
+                    "imageFit": "cover",
+                    "imageRatio": "16:9",
+                    "panelStyle": "default",
+                    "panelSize": "default",
+                    "headingLevel": "h3",
+                    "metaStyle": "muted",
+                    "showAction": true,
+                    "buttonLabel": "Learn more",
+                    "buttonUrl": "#",
+                    "buttonStyle": "primary",
+                    "buttonSize": "default"
+                  },
+                  {
+                    "id": "panelSlider-block-msjhxxn9-6mfzo-panel-2",
+                    "title": "Shape a clear system",
+                    "meta": "Design",
+                    "text": "Use reusable components to keep every part of the page coherent.",
+                    "imageUrl": "/builder-image-placeholder.svg",
+                    "imageAlt": "Panel slider item 2",
+                    "imagePadding": "frameless",
+                    "imageFit": "cover",
+                    "imageRatio": "16:9",
+                    "panelStyle": "default",
+                    "panelSize": "default",
+                    "headingLevel": "h3",
+                    "metaStyle": "muted",
+                    "showAction": true,
+                    "buttonLabel": "Explore design",
+                    "buttonUrl": "#",
+                    "buttonStyle": "primary",
+                    "buttonSize": "default"
+                  },
+                  {
+                    "id": "panelSlider-block-msjhxxn9-6mfzo-panel-3",
+                    "title": "Launch with confidence",
+                    "meta": "Delivery",
+                    "text": "Make each interaction responsive, consistent, and ready to evolve.",
+                    "imageUrl": "/builder-image-placeholder.svg",
+                    "imageAlt": "Panel slider item 3",
+                    "imagePadding": "frameless",
+                    "imageFit": "cover",
+                    "imageRatio": "16:9",
+                    "panelStyle": "default",
+                    "panelSize": "default",
+                    "headingLevel": "h3",
+                    "metaStyle": "muted",
+                    "showAction": true,
+                    "buttonLabel": "See the process",
+                    "buttonUrl": "#",
+                    "buttonStyle": "primary",
+                    "buttonSize": "default"
+                  }
+                ],
+                "carouselSettings": {
+                  "variant": "panel",
+                  "slideMode": "panel",
+                  "effect": "slide",
+                  "loop": true,
+                  "autoplay": false,
+                  "autoplayDelayMs": 5000,
+                  "pauseOnHover": true,
+                  "spaceBetween": 24,
+                  "cardsPerView": 3,
+                  "showArrows": true,
+                  "showDots": true,
+                  "arrowStyle": "glass-circle",
+                  "arrowPosition": "bottom-right",
+                  "paginationStyle": "minimal-dots",
+                  "paginationPosition": "bottom"
+                },
+                "elementPadding": "sm"
+              }
+            ]
+          }
+        ],
+        "layoutRows": 1
+      }
+    ],
+    "updatedAt": "2026-08-07T22:13:48.871Z"
+  },
+  {
+    "id": "panel-slider-msji2e8a-j6d4",
+    "title": "Panel Slider",
+    "templateType": "element",
+    "description": "Element template saved from Home",
+    "sourcePage": "home",
+    "sections": [
+      {
+        "id": "contentLayout-msji2e7r-54o9g",
+        "kind": "contentLayout",
+        "title": "Panel Slider",
+        "background": "#ffffff",
+        "backgroundMode": "boxed",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "topSpacing": "inherit",
+        "bottomSpacing": "inherit",
+        "topMargin": "inherit",
+        "bottomMargin": "inherit",
+        "pullUnderHeader": false,
+        "visible": true,
+        "eyebrow": "",
+        "body": "",
+        "layout": "1-col",
+        "layoutColumns": 1,
+        "layoutItems": [
+          {
+            "id": "layout-item-msji2e7r-template-element",
+            "rowId": "layout-row-msji2e7r-1",
+            "rowLayout": "1-col",
+            "blocks": [
+              {
+                "id": "panelSlider-block-msji2e7r-9bohw",
+                "kind": "panelSlider",
+                "title": "Choose the next step",
+                "body": "A focused collection of services, stories, or offers presented as sliding panels.",
+                "slides": [
+                  {
+                    "id": "panelSlider-block-msjgtj45-5h252-panel-1",
+                    "title": "Build the right foundation",
+                    "meta": "Strategy",
+                    "text": "Align the essentials before expanding the experience.",
+                    "imageUrl": "/builder-image-placeholder.svg",
+                    "imageAlt": "Panel slider item 1",
+                    "imagePadding": "frameless",
+                    "imageFit": "cover",
+                    "imageRatio": "16:9",
+                    "panelStyle": "default",
+                    "panelSize": "default",
+                    "headingLevel": "h3",
+                    "metaStyle": "muted",
+                    "showAction": true,
+                    "buttonLabel": "Learn more",
+                    "buttonUrl": "#",
+                    "buttonStyle": "primary",
+                    "buttonSize": "default"
+                  },
+                  {
+                    "id": "panelSlider-block-msjgtj45-5h252-panel-2",
+                    "title": "Shape a clear system",
+                    "meta": "Design",
+                    "text": "Use reusable components to keep every part of the page coherent.",
+                    "imageUrl": "/builder-image-placeholder.svg",
+                    "imageAlt": "Panel slider item 2",
+                    "imagePadding": "frameless",
+                    "imageFit": "cover",
+                    "imageRatio": "16:9",
+                    "panelStyle": "default",
+                    "panelSize": "default",
+                    "headingLevel": "h3",
+                    "metaStyle": "muted",
+                    "showAction": true,
+                    "buttonLabel": "Explore design",
+                    "buttonUrl": "#",
+                    "buttonStyle": "primary",
+                    "buttonSize": "default"
+                  },
+                  {
+                    "id": "panelSlider-block-msjgtj45-5h252-panel-3",
+                    "title": "Launch with confidence",
+                    "meta": "Delivery",
+                    "text": "Make each interaction responsive, consistent, and ready to evolve.",
+                    "imageUrl": "/builder-image-placeholder.svg",
+                    "imageAlt": "Panel slider item 3",
+                    "imagePadding": "frameless",
+                    "imageFit": "cover",
+                    "imageRatio": "16:9",
+                    "panelStyle": "default",
+                    "panelSize": "default",
+                    "headingLevel": "h3",
+                    "metaStyle": "muted",
+                    "showAction": true,
+                    "buttonLabel": "See the process",
+                    "buttonUrl": "#",
+                    "buttonStyle": "primary",
+                    "buttonSize": "default"
+                  },
+                  {
+                    "id": "1786138648076",
+                    "title": "Panel 4",
+                    "meta": "",
+                    "text": "Panel item content.",
+                    "showAction": true,
+                    "buttonLabel": "Learn more",
+                    "buttonUrl": "#"
+                  },
+                  {
+                    "id": "1786138649592",
+                    "title": "Panel 5",
+                    "meta": "",
+                    "text": "Panel item content.",
+                    "showAction": true,
+                    "buttonLabel": "Learn more",
+                    "buttonUrl": "#"
+                  }
+                ],
+                "carouselSettings": {
+                  "variant": "panel",
+                  "slideMode": "panel",
+                  "effect": "slide",
+                  "loop": true,
+                  "autoplay": true,
+                  "autoplayDelayMs": 5000,
+                  "pauseOnHover": true,
+                  "spaceBetween": 24,
+                  "cardsPerView": 3,
+                  "showArrows": true,
+                  "showDots": true,
+                  "arrowStyle": "chevron",
+                  "arrowPosition": "bottom-right",
+                  "paginationStyle": "minimal-dots",
+                  "paginationPosition": "bottom"
+                },
+                "elementPadding": "sm"
+              }
+            ]
+          }
+        ],
+        "layoutRows": 1
+      }
+    ],
+    "updatedAt": "2026-08-07T22:11:57.706Z"
+  },
+  {
     "id": "row-1-ms7kywi0-i6k6",
     "title": "Row 1",
     "templateType": "row",

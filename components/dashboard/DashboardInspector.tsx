@@ -710,28 +710,44 @@ function HeaderHeightControl({
   );
 }
 
+type HeaderDocumentSettingsValues = Pick<
+  BuilderSection,
+  | "headerVisible"
+  | "headerTransparent"
+  | "headerOverlay"
+  | "headerHeight"
+  | "headerCustomHeight"
+  | "headerBehavior"
+  | "headerWidthMode"
+  | "headerBackgroundMode"
+  | "headerTextMode"
+  | "headerZIndex"
+  | "headerTopToolbarVisible"
+  | "headerTopToolbarText"
+  | "headerTopToolbarPhone"
+  | "headerTopToolbarMeta"
+>;
+
+type HeaderDocumentPatch = Partial<HeaderDocumentSettingsValues>;
+
 function HeaderDocumentSettings({
-  settings,
-  onChange,
+  headerSettings,
   headerVisible,
   headerTransparent,
   headerOverlay,
   headerHeight,
   headerCustomHeight,
   onHeaderDocumentChange,
-  onHeaderHeightChange,
   onApplyHeaderPreset,
   headerPresetKey,
 }: {
-  settings: BuilderShellSettings;
-  onChange: (patch: Partial<BuilderShellSettings>) => void;
+  headerSettings: HeaderDocumentSettingsValues;
   headerVisible: boolean;
   headerTransparent: boolean;
   headerOverlay: boolean;
   headerHeight?: string;
   headerCustomHeight?: number;
-  onHeaderDocumentChange: (patch: Partial<Pick<BuilderSection, "headerVisible" | "headerTransparent" | "headerOverlay">>) => void;
-  onHeaderHeightChange: (patch: Partial<Pick<BuilderSection, "headerHeight" | "headerCustomHeight">>) => void;
+  onHeaderDocumentChange: (patch: HeaderDocumentPatch) => void;
   onApplyHeaderPreset?: (presetKey: string) => void;
   headerPresetKey?: string;
 }) {
@@ -803,8 +819,8 @@ function HeaderDocumentSettings({
         <label className="builder-field">
           <span>Header Behavior</span>
           <select
-            value={settings.headerBehavior ?? "sticky"}
-            onChange={(event) => onChange({ headerBehavior: event.target.value as BuilderShellSettings["headerBehavior"] })}
+            value={headerSettings.headerBehavior ?? "sticky"}
+            onChange={(event) => onHeaderDocumentChange({ headerBehavior: event.target.value as BuilderSection["headerBehavior"] })}
           >
             <option value="static">Static</option>
             <option value="sticky">Sticky</option>
@@ -816,8 +832,8 @@ function HeaderDocumentSettings({
           <label className="builder-field">
             <span>Background mode</span>
             <select
-              value={settings.headerBackgroundMode ?? "default"}
-              onChange={(event) => onChange({ headerBackgroundMode: event.target.value as BuilderShellSettings["headerBackgroundMode"] })}
+              value={headerSettings.headerBackgroundMode ?? "default"}
+              onChange={(event) => onHeaderDocumentChange({ headerBackgroundMode: event.target.value as BuilderSection["headerBackgroundMode"] })}
             >
               <option value="default">Default</option>
               <option value="glass">Glass</option>
@@ -828,8 +844,8 @@ function HeaderDocumentSettings({
           <label className="builder-field">
             <span>Text mode</span>
             <select
-              value={settings.headerTextMode ?? "auto"}
-              onChange={(event) => onChange({ headerTextMode: event.target.value as BuilderShellSettings["headerTextMode"] })}
+              value={headerSettings.headerTextMode ?? "auto"}
+              onChange={(event) => onHeaderDocumentChange({ headerTextMode: event.target.value as BuilderSection["headerTextMode"] })}
             >
               <option value="auto">Auto contrast</option>
               <option value="light">Light</option>
@@ -858,20 +874,20 @@ function HeaderDocumentSettings({
         <div className="builder-two-column">
           <label className="builder-field">
             <span>Header width</span>
-            <select value={settings.headerWidthMode ?? "boxed"} onChange={(event) => onChange({ headerWidthMode: event.target.value as BuilderShellSettings["headerWidthMode"] })}>
+            <select value={headerSettings.headerWidthMode ?? "boxed"} onChange={(event) => onHeaderDocumentChange({ headerWidthMode: event.target.value as BuilderSection["headerWidthMode"] })}>
               <option value="boxed">Boxed</option>
               <option value="full">Full width</option>
             </select>
           </label>
           <label className="builder-field">
             <span>Z-index</span>
-            <input type="number" min={0} max={999} value={settings.headerZIndex ?? 40} onChange={(event) => onChange({ headerZIndex: Number(event.target.value) })} />
+            <input type="number" min={0} max={999} value={headerSettings.headerZIndex ?? 40} onChange={(event) => onHeaderDocumentChange({ headerZIndex: Number(event.target.value) })} />
           </label>
         </div>
         <HeaderHeightControl
           height={headerHeight}
           customHeight={headerCustomHeight}
-          onChange={onHeaderHeightChange}
+          onChange={onHeaderDocumentChange}
         />
       </details>
 
@@ -880,25 +896,25 @@ function HeaderDocumentSettings({
           <InspectorGroupSummary
             title="Top Toolbar"
             description="Header-wide announcement and support metadata."
-            meta={settings.topToolbarVisible ? "visible" : "hidden"}
+            meta={headerSettings.headerTopToolbarVisible ? "visible" : "hidden"}
           />
         </summary>
         <label className="builder-check">
-          <input type="checkbox" checked={settings.topToolbarVisible} onChange={(event) => onChange({ topToolbarVisible: event.target.checked })} />
+          <input type="checkbox" checked={headerSettings.headerTopToolbarVisible ?? true} onChange={(event) => onHeaderDocumentChange({ headerTopToolbarVisible: event.target.checked })} />
           <span>Show top toolbar</span>
         </label>
         <label className="builder-field">
           <span>Toolbar text</span>
-          <input value={settings.topToolbarText} onChange={(event) => onChange({ topToolbarText: event.target.value })} />
+          <input value={headerSettings.headerTopToolbarText ?? ""} onChange={(event) => onHeaderDocumentChange({ headerTopToolbarText: event.target.value })} />
         </label>
         <div className="builder-two-column">
           <label className="builder-field">
             <span>Phone / support</span>
-            <input value={settings.topToolbarPhone} onChange={(event) => onChange({ topToolbarPhone: event.target.value })} />
+            <input value={headerSettings.headerTopToolbarPhone ?? ""} onChange={(event) => onHeaderDocumentChange({ headerTopToolbarPhone: event.target.value })} />
           </label>
           <label className="builder-field">
             <span>Right meta</span>
-            <input value={settings.topToolbarMeta} onChange={(event) => onChange({ topToolbarMeta: event.target.value })} />
+            <input value={headerSettings.headerTopToolbarMeta ?? ""} onChange={(event) => onHeaderDocumentChange({ headerTopToolbarMeta: event.target.value })} />
           </label>
         </div>
       </details>
@@ -2022,40 +2038,28 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
             !selectedLayoutRow &&
             inspectorTab === "layout" ? (
               <HeaderDocumentSettings
-                settings={{
-                  ...shellSettings,
+                headerSettings={{
+                  headerVisible: selectedSection.headerVisible ?? shellSettings.headerVisible ?? true,
+                  headerTransparent: selectedSection.headerTransparent ?? shellSettings.headerTransparent ?? false,
+                  headerOverlay: selectedSection.headerOverlay ?? shellSettings.headerOverlay ?? false,
+                  headerHeight: selectedSection.headerHeight ?? shellSettings.headerHeight,
+                  headerCustomHeight: selectedSection.headerCustomHeight ?? shellSettings.headerCustomHeight,
                   headerBehavior: selectedSection.headerBehavior ?? shellSettings.headerBehavior,
                   headerWidthMode: selectedSection.headerWidthMode ?? shellSettings.headerWidthMode,
                   headerBackgroundMode: selectedSection.headerBackgroundMode ?? shellSettings.headerBackgroundMode,
                   headerTextMode: selectedSection.headerTextMode ?? shellSettings.headerTextMode,
                   headerZIndex: selectedSection.headerZIndex ?? shellSettings.headerZIndex,
-                  topToolbarVisible: selectedSection.headerTopToolbarVisible ?? shellSettings.topToolbarVisible,
-                  topToolbarText: selectedSection.headerTopToolbarText ?? shellSettings.topToolbarText,
-                  topToolbarPhone: selectedSection.headerTopToolbarPhone ?? shellSettings.topToolbarPhone,
-                  topToolbarMeta: selectedSection.headerTopToolbarMeta ?? shellSettings.topToolbarMeta,
+                  headerTopToolbarVisible: selectedSection.headerTopToolbarVisible ?? shellSettings.topToolbarVisible,
+                  headerTopToolbarText: selectedSection.headerTopToolbarText ?? shellSettings.topToolbarText,
+                  headerTopToolbarPhone: selectedSection.headerTopToolbarPhone ?? shellSettings.topToolbarPhone,
+                  headerTopToolbarMeta: selectedSection.headerTopToolbarMeta ?? shellSettings.topToolbarMeta,
                 }}
-                onChange={(patch) => updateSelected({
-                  ...(patch.headerBehavior !== undefined ? { headerBehavior: patch.headerBehavior } : {}),
-                  ...(patch.headerWidthMode !== undefined ? { headerWidthMode: patch.headerWidthMode } : {}),
-                  ...(patch.headerBackgroundMode !== undefined ? { headerBackgroundMode: patch.headerBackgroundMode } : {}),
-                  ...(patch.headerTextMode !== undefined ? { headerTextMode: patch.headerTextMode } : {}),
-                  ...(patch.headerZIndex !== undefined ? { headerZIndex: patch.headerZIndex } : {}),
-                  ...(patch.topToolbarVisible !== undefined ? { headerTopToolbarVisible: patch.topToolbarVisible } : {}),
-                  ...(patch.topToolbarText !== undefined ? { headerTopToolbarText: patch.topToolbarText } : {}),
-                  ...(patch.topToolbarPhone !== undefined ? { headerTopToolbarPhone: patch.topToolbarPhone } : {}),
-                  ...(patch.topToolbarMeta !== undefined ? { headerTopToolbarMeta: patch.topToolbarMeta } : {}),
-                })}
                 headerVisible={selectedSection.headerVisible ?? shellSettings.headerVisible ?? true}
                 headerTransparent={selectedSection.headerTransparent ?? shellSettings.headerTransparent ?? false}
                 headerOverlay={selectedSection.headerOverlay ?? shellSettings.headerOverlay ?? false}
                 headerHeight={selectedSection.headerHeight ?? shellSettings.headerHeight}
                 headerCustomHeight={selectedSection.headerCustomHeight ?? shellSettings.headerCustomHeight}
-                onHeaderDocumentChange={(patch) => {
-                  updateSelected(patch);
-                }}
-                onHeaderHeightChange={(patch) => {
-                  updateSelected(patch);
-                }}
+                onHeaderDocumentChange={updateSelected}
                 onApplyHeaderPreset={onApplyHeaderPreset}
                 headerPresetKey={selectedSection.headerPresetKey}
               />

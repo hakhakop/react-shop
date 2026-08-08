@@ -23,6 +23,7 @@ export default async function ClientPage() {
         layout={layout}
         page="client"
         headerOverlay={headerDocumentSettings.overlay}
+        shellSettings={shellSettings}
       />
     );
   }

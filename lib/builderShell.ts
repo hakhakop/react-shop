@@ -272,6 +272,18 @@ export type BuilderShellSettings = {
   cardPaddingSmall?: string;
   cardPaddingDefault?: string;
   cardPaddingLarge?: string;
+  /** Global defaults consumed by the canonical Image capability. */
+  imageDefaultRatio?: string;
+  imageDefaultFit?: string;
+  imageDefaultLoading?: string;
+  imageDefaultBorder?: string;
+  imageDefaultShadow?: string;
+  imageDefaultAlignment?: string;
+  /** Global defaults consumed by the canonical Slider navigation capability. */
+  sliderArrowStyle?: string;
+  sliderArrowPosition?: string;
+  sliderDotnavStyle?: string;
+  sliderDotnavPosition?: string;
   headingSmallFontSizeResponsive?: string;
   headingMediumFontSizeResponsive?: string;
   headingMediumLineHeight?: string;
@@ -455,6 +467,16 @@ export const defaultBuilderShellSettings: BuilderShellSettings = {
   cardPaddingSmall: "15px",
   cardPaddingDefault: "30px",
   cardPaddingLarge: "40px",
+  imageDefaultRatio: "natural",
+  imageDefaultFit: "cover",
+  imageDefaultLoading: "lazy",
+  imageDefaultBorder: "none",
+  imageDefaultShadow: "none",
+  imageDefaultAlignment: "center",
+  sliderArrowStyle: "chevron",
+  sliderArrowPosition: "overlay",
+  sliderDotnavStyle: "minimal-dots",
+  sliderDotnavPosition: "bottom",
   buttonPrimaryBackground: "#111111",
   buttonPrimaryText: "#ffffff",
   buttonSecondaryBackground: "#e5e7eb",

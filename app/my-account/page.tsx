@@ -2,6 +2,7 @@ import StorefrontBuilderRenderer from "@/components/builder/StorefrontBuilderRen
 import MyAccountPageContent from "@/components/MyAccountPageContent";
 import { renderDomainWebsiteFrontend } from "@/components/website/DomainWebsiteFrontend";
 import { getPublishedBuilderLayout } from "@/lib/builderLayouts";
+import { getBuilderShellSettings } from "@/lib/builderShell";
 import { getCurrentWebsiteFromHeaders } from "@/lib/currentWebsite";
 import { getWooCommerceConnection } from "@/lib/woocommerce";
 
@@ -19,7 +20,10 @@ export default async function MyAccountPage() {
 
   if (domainWebsitePage) return domainWebsitePage;
 
-  const layout = await getPublishedBuilderLayout("page:my-account");
+  const [layout, shellSettings] = await Promise.all([
+    getPublishedBuilderLayout("page:my-account"),
+    getBuilderShellSettings(),
+  ]);
 
   if (layout) {
     return (
@@ -28,6 +32,7 @@ export default async function MyAccountPage() {
         page="page:my-account"
         pageLabel="My account"
         pageContent={content}
+        shellSettings={shellSettings}
       />
     );
   }

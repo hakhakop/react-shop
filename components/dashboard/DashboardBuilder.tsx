@@ -313,6 +313,7 @@ import {
   getBuilderImageAspectRatio,
   getBuilderImageObjectFit,
 } from "@/lib/builderImages";
+import { mapYoothemeStaticContent } from "@/lib/yoothemePageImport";
 import { AnimatePresence, motion } from "framer-motion";
 
 const BUILDER_TEMPLATE_DND_TYPE = "application/x-builder-template";
@@ -1465,9 +1466,9 @@ function normalizeBuilderState(
               panelSize,
               panelShowMedia: block.panelShowMedia ?? true,
               panelMediaPlacement: block.panelMediaPlacement === "left" || block.panelMediaPlacement === "right" ? block.panelMediaPlacement : "top",
-              panelMediaFit: block.panelMediaFit === "contain" ? "contain" : "cover",
+              panelMediaFit: (block.imageFit ?? block.panelMediaFit) === "contain" ? "contain" : "cover",
               panelMediaWidth: block.panelMediaWidth === "small" || block.panelMediaWidth === "large" ? block.panelMediaWidth : "medium",
-              panelMediaAlignment: block.panelMediaAlignment === "left" || block.panelMediaAlignment === "right" ? block.panelMediaAlignment : "center",
+              panelMediaAlignment: (block.imageAlignment ?? block.panelMediaAlignment) === "left" || (block.imageAlignment ?? block.panelMediaAlignment) === "right" ? (block.imageAlignment ?? block.panelMediaAlignment) : "center",
               panelTextAlign: block.panelTextAlign === "center" || block.panelTextAlign === "right" ? block.panelTextAlign : "left",
               panelVerticalAlign: block.panelVerticalAlign === "center" || block.panelVerticalAlign === "bottom" ? block.panelVerticalAlign : "top",
               panelTitleElement: block.panelTitleElement === "h2" || block.panelTitleElement === "h4" || block.panelTitleElement === "div" ? block.panelTitleElement : "h3",
@@ -2213,6 +2214,12 @@ export default function DashboardBuilder({
   const [templateStatus, setTemplateStatus] = useState(
     "Templates save to React",
   );
+  const [yoothemeImportWarnings, setYoothemeImportWarnings] = useState<string[]>([]);
+  const [yoothemeImportPreview, setYoothemeImportPreview] = useState<{
+    fileName: string;
+    sections: BuilderSection[];
+    warnings: string[];
+  } | null>(null);
   const [previewProducts, setPreviewProducts] = useState<ProductNode[]>([]);
   const [previewCategoryTree, setPreviewCategoryTree] = useState<
     CategoryTreeItem[]
@@ -7381,6 +7388,56 @@ export default function DashboardBuilder({
     }
   };
 
+  const importYoothemePage = async (file: File) => {
+    setTemplateStatus("Preparing YOOtheme import preview...");
+    setYoothemeImportWarnings([]);
+    setYoothemeImportPreview(null);
+
+    try {
+      const parsed = JSON.parse(await file.text()) as unknown;
+      const mapping = mapYoothemeStaticContent(parsed);
+
+      if (!mapping.sections.length) {
+        setTemplateStatus("YOOtheme import failed: no supported sections");
+        return;
+      }
+
+      setYoothemeImportPreview({
+        fileName: file.name,
+        sections: mapping.sections,
+        warnings: mapping.warnings,
+      });
+      setTemplateStatus("YOOtheme import preview ready");
+    } catch {
+      setTemplateStatus("YOOtheme import failed: invalid JSON");
+    }
+  };
+
+  const cancelYoothemeImport = () => {
+    setYoothemeImportPreview(null);
+    setTemplateStatus("YOOtheme import cancelled");
+  };
+
+  const applyYoothemeImport = () => {
+    if (!yoothemeImportPreview) return;
+
+    setBuilderState((current) => ({
+      ...current,
+      sections: yoothemeImportPreview.sections,
+    }));
+    setYoothemeImportWarnings(yoothemeImportPreview.warnings);
+    setSelectedId(yoothemeImportPreview.sections[0]?.id ?? "");
+    setSelectedLayoutColumnKey(null);
+    setSelectedLayoutBlockKey(null);
+    setOpenLayoutItemId(null);
+    setTemplateStatus(
+      yoothemeImportPreview.warnings.length
+        ? `YOOtheme page imported with ${yoothemeImportPreview.warnings.length} compatibility warning${yoothemeImportPreview.warnings.length === 1 ? "" : "s"}`
+        : "YOOtheme page imported",
+    );
+    setYoothemeImportPreview(null);
+  };
+
   const deleteSavedTemplate = async (id: string) => {
     setTemplateStatus("Deleting template...");
     const response = await fetch(
@@ -9385,6 +9442,8 @@ export default function DashboardBuilder({
         templateDescriptions={templateDescriptions}
         templateLabels={templateLabels}
         templateStatus={templateStatus}
+        yoothemeImportWarnings={yoothemeImportWarnings}
+        yoothemeImportPreview={yoothemeImportPreview}
         topActionsSlot={sidebarTopActions}
         utilityControlsSlot={sidebarUtilityControls}
         onAddElementFromLibrary={addElementFromLibrary}
@@ -9397,6 +9456,9 @@ export default function DashboardBuilder({
         onApplySavedTemplate={applySavedTemplate}
         onExportSavedTemplate={exportSavedTemplate}
         onImportSavedTemplate={importSavedTemplate}
+        onImportYoothemePage={importYoothemePage}
+        onApplyYoothemeImport={applyYoothemeImport}
+        onCancelYoothemeImport={cancelYoothemeImport}
         onRenameSavedTemplate={renameSavedTemplate}
         onSetNewPageTitle={setNewPageTitle}
         onSetSidebarTab={setSidebarTab}
@@ -9893,6 +9955,7 @@ export default function DashboardBuilder({
                   layout={footerPageContextLayout}
                   page={footerPageContextState.page}
                   pageLabel={getLayoutLabel(footerPageContextState.page, customPages)}
+                  shellSettings={shellSettings}
                 />
               </div>
             ) : null}
@@ -10025,6 +10088,7 @@ export default function DashboardBuilder({
                   page="footer"
                   pageLabel="Footer"
                   rootElement="footer"
+                  shellSettings={shellSettings}
                 />
                 <button
                   type="button"
@@ -14774,7 +14838,7 @@ function PreviewSection({
                               {block.eyebrow && (
                                 <InlineEditableText
                                   as="span"
-                                  className={`shop-builder-eyebrow ${typographyRoleClass(block.metaTypographyRole)}`}
+                                  className={`shop-builder-eyebrow ${typographyRoleClass(block.metaTypographyRole)} ${getUikitTextClass((block as any).metaStyle)}`}
                                   typography={block.typography}
                                   value={block.eyebrow}
                                   onChange={(eyebrow) =>
@@ -14894,6 +14958,7 @@ function PreviewSection({
                                 (block.typewriterEnabled && !block.title ? (
                                   <DashboardTypog
                                     as="p"
+                                    className={`${typographyRoleClass(block.contentTypographyRole)} ${getUikitTextClass((block as any).contentStyle)}`}
                                     typography={block.typography}
                                   >
                                     <TypewriterText
@@ -14943,6 +15008,7 @@ function PreviewSection({
                                 ) : (
                                   <InlineEditableText
                                     as="p"
+                                    className={`${typographyRoleClass(block.contentTypographyRole)} ${getUikitTextClass((block as any).contentStyle)}`}
                                     typography={block.typography}
                                     value={block.body}
                                     onChange={(body) =>
@@ -14965,7 +15031,7 @@ function PreviewSection({
                                   block.buttonGap,
                                 )}
                               >
-                                {block.buttonLabel && (
+                                {block.heroPrimaryActionVisible !== false && block.buttonLabel && (
                                   <DashboardTypog
                                     as="a"
                                     area="button"
@@ -15042,9 +15108,16 @@ function PreviewSection({
                             } as React.CSSProperties;
 
                             const panelMediaPlacement = block.panelMediaPlacement ?? "top";
-                            const panelMediaPresentation = getUikitPanelMediaStyle({ ratio: block.imageRatio, fit: block.panelMediaFit ?? "cover", alignment: block.panelMediaAlignment ?? "center" });
+                            const panelMediaPresentation = getUikitPanelMediaStyle({ ratio: block.imageRatio, fit: (block.imageFit ?? block.panelMediaFit) === "contain" ? "contain" : "cover", alignment: block.imageAlignment ?? block.panelMediaAlignment ?? "center" });
                             const panelMediaClass = getUikitPanelMediaClass(panelMediaPlacement);
                             const panelLayoutClass = getUikitPanelLayoutClass(panelMediaPlacement, block.panelMediaWidth ?? "medium");
+                            const panelImageDimension = (value: unknown) => value === undefined || value === null || value === "" ? undefined : /^-?\d+(?:\.\d+)?$/.test(String(value)) ? `${value}px` : String(value);
+                            const panelImageShape = (block as any).imageShape ?? (block as any).imageBorder ?? "none";
+                            const panelImageRadius = panelImageShape === "circle" ? "50%" : panelImageShape === "pill" ? "9999px" : panelImageShape === "rounded" ? "6px" : undefined;
+                            const panelImageClass = [
+                              (block as any).imageShadow && (block as any).imageShadow !== "none" ? `uk-box-shadow-${(block as any).imageShadow}` : "",
+                              (block as any).imageBoxDecoration && (block as any).imageBoxDecoration !== "none" ? `uk-background-${(block as any).imageBoxDecoration}` : "",
+                            ].filter(Boolean).join(" ");
                             const panelTitleClass = block.panelTitleStyle && block.panelTitleStyle !== "inherit" ? (block.panelTitleStyle.startsWith("heading-") || ["h1","h2","h3","h4","h5","h6"].includes(block.panelTitleStyle) ? `uk-${block.panelTitleStyle}` : getUikitHeadingClass(block.panelTitleStyle, block.panelTitleStyle)) : "";
                             const panelMarginClass = ((block as any).margin && (block as any).margin !== "none" && (block as any).margin !== "default") ? `uk-margin-${(block as any).margin}` : "";
                             const panelAnimationClass = (block.animation && typeof block.animation === "string" && block.animation !== "none") ? `uk-animation-${block.animation}` : "";
@@ -15054,7 +15127,7 @@ function PreviewSection({
                               <div data-builder-block-id={block.id} className={`shop-builder-column-block shop-builder-column-block--panel ${panelLayoutClass} ${panelMarginClass} ${panelAnimationClass} ${panelVisibilityClass} ${typographyRoleClass(block.contentTypographyRole)} ${getUikitCardClass(block.panelVariant ?? block.panelStyle ?? "default", { hover: block.panelHover ? "hover" : "none", padding: block.panelSize })}`.trim()} style={{ textAlign: block.panelTextAlign ?? "left" }}>
                                 {block.panelShowMedia !== false && (
                                 <div
-                                  className={`${panelMediaClass} shop-builder-panel-media${isPanelImagePlaceholder ? " is-empty" : ""}`}
+                                  className={`${panelMediaClass} ${panelImageClass} shop-builder-panel-media${isPanelImagePlaceholder ? " is-empty" : ""}`.trim()}
                                   style={{
                                     aspectRatio: panelMediaPresentation.aspectRatio,
                                     position: "relative",
@@ -15062,6 +15135,9 @@ function PreviewSection({
                                     cursor: "pointer",
                                     backgroundSize: panelMediaPresentation.backgroundSize,
                                     backgroundPosition: panelMediaPresentation.backgroundPosition,
+                                    width: panelImageDimension((block as any).imageWidth) ?? "100%",
+                                    maxHeight: panelImageDimension((block as any).imageHeight),
+                                    borderRadius: panelImageRadius,
                                     ...(!isPanelImagePlaceholder
                                       ? { backgroundImage: `url(${block.imageUrl})` }
                                       : {}),
@@ -15350,6 +15426,7 @@ function PreviewSection({
                           <UikitImage
                             block={block}
                             isCanvas
+                            shellSettings={shellSettings}
                             onUploadImage={() => {
                               if (onUploadBlockImage) {
                                 onUploadBlockImage(
@@ -15371,8 +15448,10 @@ function PreviewSection({
                           <div className="shop-builder-column-block shop-builder-column-block--scroll-pinned">
                             <ScrollPinnedDemo block={block} isPreview={true} />
                           </div>
+                        ) : block.kind === "panelSlider" ? (
+                          <UikitSlider block={block} isCanvas panelMode shellSettings={shellSettings} />
                         ) : block.kind === "slider" ? (
-                          <UikitSlider block={block} isCanvas />
+                          <UikitSlider block={block} isCanvas shellSettings={shellSettings} />
                         ) : block.kind === "products" ? (
                           <UikitProducts block={block} isCanvas products={previewProducts} categoryTree={previewCategoryTree} />
                         ) : block.kind === "grid" ? (
@@ -15476,7 +15555,7 @@ function PreviewSection({
                                           "var(--builder-card-title-margin, 0)",
                                       } as CSSProperties;
                                       const panelStyle = rawGridBlock.panelStyle ?? block.gridCardVariant ?? rawGridBlock.cardVariant ?? "none";
-                                      const panelPadding = rawGridBlock.panelPadding ?? "none";
+                                      const panelPadding = rawGridBlock.panelSize ?? rawGridBlock.panelPadding ?? "none";
                                       let panelClass = "";
                                       if (panelStyle.startsWith("card-") || panelStyle === "default" || panelStyle === "primary" || panelStyle === "secondary") {
                                         const variant = panelStyle.replace("card-", "");
@@ -15635,7 +15714,7 @@ function PreviewSection({
                                           draggable={
                                             block.gridSource !== "products"
                                           }
-                                          className={`${panelClass} ${getUikitPanelLayoutClass(item.mediaPlacement ?? block.gridMediaPlacement ?? "top", item.mediaWidth ?? block.gridMediaWidth ?? "medium")} shop-builder-grid-card ${isFrameless ? "is-image-frameless" : "is-image-none"} is-content-${contentPaddingClass} is-frame-${
+                                          className={`${panelClass} ${(item as any).cardHover ?? rawGridBlock.panelHover ?? block.gridCardHover ? "uk-card-hover" : ""} ${getUikitPanelLayoutClass(item.mediaPlacement ?? block.gridMediaPlacement ?? "top", item.mediaWidth ?? block.gridMediaWidth ?? "medium")} shop-builder-grid-card ${isFrameless ? "is-image-frameless" : "is-image-none"} is-content-${contentPaddingClass} is-frame-${
                                             block.gridImageFrame ?? "none"
                                           } ${
                                             draggingItem?.blockKey ===
@@ -15798,8 +15877,8 @@ function PreviewSection({
                                             {!isFrameless && renderGridImageNode()}
                                             {block.gridSource !== "products" ? (
                                               (() => {
-                                                const TitleTag = (block.headingLevel ?? item.titleElement ?? "h3") as any;
-                                                const titleStyleVal = rawGridBlock.titleStyle ?? item.titleStyle;
+                                                const TitleTag = (rawGridBlock.gridTitleLevel ?? item.titleElement ?? block.headingLevel ?? "h3") as any;
+                                                const titleStyleVal = rawGridBlock.gridTitleSize ?? rawGridBlock.titleStyle ?? item.titleStyle;
                                                 const titleHeadingClass = (titleStyleVal && titleStyleVal !== "none")
                                                   ? (titleStyleVal.startsWith("heading-") || ["h1","h2","h3","h4","h5","h6"].includes(titleStyleVal)
                                                     ? `uk-${titleStyleVal}`
@@ -15807,6 +15886,10 @@ function PreviewSection({
                                                   : "";
                                                 const titleDecorationClass = (rawGridBlock.titleDecoration && rawGridBlock.titleDecoration !== "none")
                                                   ? `uk-heading-${rawGridBlock.titleDecoration}`
+                                                  : "";
+                                                const titleColorVal = rawGridBlock.titleColor ?? rawGridBlock.gridTitleColor;
+                                                const titleColorClass = titleColorVal && titleColorVal !== "none" && titleColorVal !== "default"
+                                                  ? (titleColorVal.startsWith("uk-text-") ? titleColorVal : `uk-text-${titleColorVal}`)
                                                   : "";
                                                 const titleMarginTopClass = (rawGridBlock.titleMarginTop && rawGridBlock.titleMarginTop !== "none" && rawGridBlock.titleMarginTop !== "default")
                                                   ? `uk-margin-${rawGridBlock.titleMarginTop}`
@@ -15817,10 +15900,12 @@ function PreviewSection({
                                                 const metaMarginTopClass = (rawGridBlock.metaMarginTop && rawGridBlock.metaMarginTop !== "none" && rawGridBlock.metaMarginTop !== "default")
                                                   ? `uk-margin-${rawGridBlock.metaMarginTop}`
                                                   : "";
-                                                const metaAlign = rawGridBlock.metaAlignment ?? "below-title";
+                                                const rawMetaAlign = rawGridBlock.gridMetaAlign ?? rawGridBlock.metaAlignment ?? "below-title";
+                                                const metaAlign = rawMetaAlign === "above" ? "above-title" : rawMetaAlign === "below" ? "below-title" : rawMetaAlign === "content" ? "below-content" : rawMetaAlign;
+                                                const MetaTag = (rawGridBlock.gridMetaHtmlElement ?? "div") as any;
 
                                                 const contentStyleVal = rawGridBlock.contentStyle;
-                                                const contentStyleClass = (contentStyleVal && contentStyleVal !== "none") ? `uk-${contentStyleVal}` : "shop-builder-body";
+                                                const contentStyleClass = getUikitTextClass(contentStyleVal) || "shop-builder-body";
                                                 const contentMarginTopClass = (rawGridBlock.contentMarginTop && rawGridBlock.contentMarginTop !== "none" && rawGridBlock.contentMarginTop !== "default")
                                                   ? `uk-margin-${rawGridBlock.contentMarginTop}`
                                                   : "";
@@ -15828,7 +15913,7 @@ function PreviewSection({
                                                 const renderMetaNode = () => (
                                                   block.gridShowMeta !== false && rawGridBlock.showMeta !== false && item.meta ? (
                                                     <InlineEditableText
-                                                      as="div"
+                                                      as={MetaTag}
                                                       className={`shop-builder-grid-meta ${metaStyleClass} ${metaMarginTopClass} ${typographyRoleClass(block.metaTypographyRole)}`.trim()}
                                                       typography={itemTypography}
                                                       value={item.meta}
@@ -15849,7 +15934,7 @@ function PreviewSection({
                                                   rawGridBlock.showTitle !== false && item.title ? (
                                                     <InlineEditableText
                                                       as={TitleTag}
-                                                      className={`shop-builder-title ${titleHeadingClass} ${titleDecorationClass} ${titleMarginTopClass} ${typographyRoleClass(block.titleTypographyRole)}`.trim()}
+                                                      className={`shop-builder-title ${titleHeadingClass} ${titleDecorationClass} ${titleColorClass} ${titleMarginTopClass} ${typographyRoleClass(block.titleTypographyRole)}`.trim()}
                                                       typography={itemTypography}
                                                       style={gridTitleStyle}
                                                       value={item.title}
@@ -15919,18 +16004,18 @@ function PreviewSection({
                                                       typography={itemTypography}
                                                     />
 
-                                                    {block.gridShowButton !== false && rawGridBlock.showLink !== false && (item.buttonLabel || rawGridBlock.linkText) && (() => {
+                                                    {block.gridShowButton !== false && rawGridBlock.showLink !== false && (rawGridBlock.buttonLabel ?? item.buttonLabel ?? rawGridBlock.linkText) && (() => {
                                                       const linkMarginTopClass = (rawGridBlock.linkMarginTop && rawGridBlock.linkMarginTop !== "none" && rawGridBlock.linkMarginTop !== "default") ? `uk-margin-${rawGridBlock.linkMarginTop}` : "";
                                                       return (
                                                         <div
                                                           className={`shop-builder-grid-button shop-builder-grid-button--${item.buttonAlign ?? "left"} ${linkMarginTopClass}`.trim()}
                                                         >
                                                           <a
-                                                            className={`shop-builder-grid-action builder-grid-action ${rawGridBlock.linkStyle ? (rawGridBlock.linkStyle.startsWith("link-") ? `uk-${rawGridBlock.linkStyle}` : `uk-button uk-${rawGridBlock.linkStyle} ${rawGridBlock.linkButtonSize && rawGridBlock.linkButtonSize !== "default" ? `uk-button-${rawGridBlock.linkButtonSize}` : ""} ${rawGridBlock.linkFullWidth ? "uk-width-1-1" : ""}`) : getUikitButtonClass(item.actionStyle ?? item.buttonStyle ?? block.buttonStyle ?? "primary", item.actionSize ?? block.size ?? "default")}`.trim()}
-                                                            href={item.buttonUrl || "#"}
-                                                            {...builderLinkTargetProps(rawGridBlock.linkTarget || item.buttonTarget)}
+                                                            className={`shop-builder-grid-action builder-grid-action ${rawGridBlock.buttonStyle ? getUikitButtonClass(rawGridBlock.buttonStyle, rawGridBlock.size ?? "default") : rawGridBlock.linkStyle ? (rawGridBlock.linkStyle.startsWith("link-") ? `uk-${rawGridBlock.linkStyle}` : `uk-button uk-${rawGridBlock.linkStyle} ${rawGridBlock.linkButtonSize && rawGridBlock.linkButtonSize !== "default" ? `uk-button-${rawGridBlock.linkButtonSize}` : ""} ${rawGridBlock.linkFullWidth ? "uk-width-1-1" : ""}`) : getUikitButtonClass(item.actionStyle ?? item.buttonStyle ?? block.buttonStyle ?? "primary", item.actionSize ?? block.size ?? "default")} ${rawGridBlock.fullWidthButton ? "uk-width-1-1" : ""}`.trim()}
+                                                            href={rawGridBlock.buttonUrl ?? item.buttonUrl ?? "#"}
+                                                            {...builderLinkTargetProps(rawGridBlock.buttonTarget ?? rawGridBlock.linkTarget ?? item.buttonTarget)}
                                                           >
-                                                            {item.buttonLabel || rawGridBlock.linkText || "Read more"}
+                                                            {rawGridBlock.buttonLabel ?? item.buttonLabel ?? rawGridBlock.linkText ?? "Read more"}
                                                           </a>
                                                         </div>
                                                       );

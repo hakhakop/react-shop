@@ -230,38 +230,70 @@ export async function getCategoryProductsBySlug(
 type GridProductsResponse = {
   products: {
     nodes: ProductNode[];
+    pageInfo?: {
+      hasNextPage: boolean;
+      endCursor?: string | null;
+    };
   };
 };
 
 const FEATURED_PRODUCTS_QUERY = `
-  query FeaturedProducts($limit: Int!) {
-    products(first: $limit, where: { featured: true, supportedTypesOnly: true }) {
+  query FeaturedProducts($limit: Int!, $after: String) {
+    products(first: $limit, after: $after, where: { featured: true }) {
       nodes {
         ${PRODUCT_NODE_FIELDS}
       }
+      pageInfo { hasNextPage endCursor }
     }
   }
 `;
 
 const CATEGORY_ID_PRODUCTS_QUERY = `
-  query ProductsByCategoryId($limit: Int!, $catId: [String]) {
-    products(first: $limit, where: { categoryIn: $catId, supportedTypesOnly: true }) {
+  query ProductsByCategoryId($limit: Int!, $after: String, $catId: [String]) {
+    products(first: $limit, after: $after, where: { categoryIn: $catId }) {
       nodes {
         ${PRODUCT_NODE_FIELDS}
       }
+      pageInfo { hasNextPage endCursor }
     }
   }
 `;
 
 const ALL_PRODUCTS_QUERY = `
-  query AllProducts($limit: Int!) {
-    products(first: $limit, where: { supportedTypesOnly: true }) {
+  query AllProducts($limit: Int!, $after: String) {
+    products(first: $limit, after: $after) {
       nodes {
         ${PRODUCT_NODE_FIELDS}
       }
+      pageInfo { hasNextPage endCursor }
     }
   }
 `;
+
+async function getPagedProducts(
+  query: string,
+  variables: Record<string, unknown>,
+  limit: number,
+  endpoint: string | null,
+): Promise<ProductNode[]> {
+  const products: ProductNode[] = [];
+  let after: string | null = null;
+
+  while (products.length < limit) {
+    const data: GridProductsResponse = await graphqlFetch<GridProductsResponse>(
+      query,
+      { ...variables, limit: Math.min(limit - products.length, 100), after },
+      { endpoint },
+    );
+    const page: GridProductsResponse["products"] | undefined = data?.products;
+    if (!page?.nodes?.length) break;
+    products.push(...page.nodes);
+    if (!page.pageInfo?.hasNextPage || !page.pageInfo.endCursor) break;
+    after = page.pageInfo.endCursor;
+  }
+
+  return products.slice(0, limit);
+}
 
 export async function getProductsForGrid(options: {
   limit: number;
@@ -274,41 +306,31 @@ export async function getProductsForGrid(options: {
 
   if ((source === "category" || (categoryId && categoryId !== "all")) && categoryId && categoryId !== "all") {
     try {
-      const data = await graphqlFetch<GridProductsResponse>(
+      const products = await getPagedProducts(
         CATEGORY_ID_PRODUCTS_QUERY,
-        {
-          limit,
-          catId: [categoryId],
-        },
-        { endpoint },
+        { catId: [categoryId] },
+        limit,
+        endpoint,
       );
-      if (data?.products?.nodes?.length) {
-        return data.products.nodes;
+      if (products.length) {
+        return products;
       }
     } catch (e) {}
   }
 
   if (source === "all") {
     try {
-      const data = await graphqlFetch<GridProductsResponse>(
-        ALL_PRODUCTS_QUERY,
-        { limit },
-        { endpoint },
-      );
-      if (data?.products?.nodes?.length) {
-        return data.products.nodes;
+      const products = await getPagedProducts(ALL_PRODUCTS_QUERY, {}, limit, endpoint);
+      if (products.length) {
+        return products;
       }
     } catch (e) {}
   }
 
   try {
-    const data = await graphqlFetch<GridProductsResponse>(
-      FEATURED_PRODUCTS_QUERY,
-      { limit },
-      { endpoint },
-    );
-    if (data?.products?.nodes?.length) {
-      return data.products.nodes;
+    const products = await getPagedProducts(FEATURED_PRODUCTS_QUERY, {}, limit, endpoint);
+    if (products.length) {
+      return products;
     }
   } catch (e) {}
 

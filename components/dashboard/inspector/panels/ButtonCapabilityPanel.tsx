@@ -2,14 +2,14 @@
 
 import type { InspectorTab, BuilderLayoutBlock } from "@/components/dashboard/builderTypes";
 import type { BuilderShellSettings } from "@/lib/builderShell";
-import { BUILDER_LINK_TARGET_OPTIONS } from "@/lib/websiteBuilderLinks";
 import {
   InspectorDivision,
+  InspectorAlignmentControl,
   InspectorFieldRow,
-  InspectorSelect,
   InspectorTextField,
   InspectorTextarea,
 } from "@/components/dashboard/inspector/InspectorControls";
+import { ActionSettingsGroup } from "@/components/dashboard/inspector/panels/SharedSettingGroups";
 
 type Props = {
   block: BuilderLayoutBlock;
@@ -23,30 +23,12 @@ export default function ButtonCapabilityPanel({ block, tab, shellSettings, updat
   if (tab === "content") {
     return (
       <div className="builder-inspector-stack" data-uikit-capability="button-content">
-        <InspectorDivision title="CONTENT">
-          <InspectorFieldRow label="Text">
-            <InspectorTextField
-              value={block.buttonLabel ?? ""}
-              onChange={(value) => update({ buttonLabel: value })}
-              ariaLabel="Button label"
-            />
-          </InspectorFieldRow>
-          <InspectorFieldRow label="Link URL">
-            <InspectorTextField
-              value={block.buttonUrl ?? ""}
-              onChange={(value) => update({ buttonUrl: value })}
-              ariaLabel="Button URL"
-            />
-          </InspectorFieldRow>
-          <InspectorFieldRow label="Link Target">
-            <InspectorSelect
-              value={block.buttonTarget ?? "_self"}
-              options={BUILDER_LINK_TARGET_OPTIONS}
-              onChange={(value) => update({ buttonTarget: value })}
-              ariaLabel="Button target"
-            />
-          </InspectorFieldRow>
-        </InspectorDivision>
+        <ActionSettingsGroup
+          block={block}
+          update={update}
+          title="BUTTON"
+          showPresentation={false}
+        />
       </div>
     );
   }
@@ -96,42 +78,16 @@ export default function ButtonCapabilityPanel({ block, tab, shellSettings, updat
   // SETTINGS TAB (Default)
   return (
     <div className="builder-inspector-stack" data-uikit-capability="button-style">
-      <InspectorDivision title="BUTTON">
-        <InspectorFieldRow label="Style">
-          <InspectorSelect
-            value={block.buttonStyle ?? "primary"}
-            options={[
-              { value: "default", label: "Button Default" },
-              { value: "primary", label: "Button Primary" },
-              { value: "secondary", label: "Button Secondary" },
-              { value: "danger", label: "Button Danger" },
-              { value: "link", label: "Link" },
-              { value: "text", label: "Text" },
-            ]}
-            onChange={(value) => update({ buttonStyle: value as any })}
-            ariaLabel="Button style"
-          />
-        </InspectorFieldRow>
-        <InspectorFieldRow label="Size">
-          <InspectorSelect
-            value={block.size ?? "default"}
-            options={[
-              { value: "default", label: "Default" },
-              { value: "small", label: "Small" },
-              { value: "large", label: "Large" },
-            ]}
-            onChange={(value) => update({ size: value as any })}
-            ariaLabel="Button size"
-          />
-        </InspectorFieldRow>
+      <ActionSettingsGroup
+        block={block}
+        update={update}
+        title="BUTTON"
+        keys={{ style: "buttonStyle", size: "size" }}
+      />
+      <InspectorDivision title="LAYOUT">
         <InspectorFieldRow label="Alignment">
-          <InspectorSelect
+          <InspectorAlignmentControl
             value={(block as any).buttonAlign ?? block.textAlign ?? "left"}
-            options={[
-              { value: "left", label: "Left" },
-              { value: "center", label: "Center" },
-              { value: "right", label: "Right" },
-            ]}
             onChange={(value) => update({ buttonAlign: value, textAlign: value } as any)}
             ariaLabel="Button alignment"
           />

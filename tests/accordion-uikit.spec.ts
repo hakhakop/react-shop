@@ -93,7 +93,7 @@ test("Accordion uses semantic items and UIkit behavior in builder and frontend",
   const accordion = page.locator(".shop-builder-column-block--accordion").filter({ hasText: "Delivery timeline" }).last();
   await expect.poll(() => accordion.count(), { timeout: 30_000 }).toBeGreaterThan(0);
   await expect(accordion).toBeVisible();
-  const selected = page.locator(`[data-builder-block-key="${fixtureId}"]`);
+  const selected = page.locator(`[data-builder-block-key="${fixtureId}"]`).last();
   await selected.dispatchEvent("mousedown");
   await selected.dispatchEvent("click");
   await expect(selected).toHaveClass(/is-selected-block/);
@@ -112,19 +112,19 @@ test("Accordion uses semantic items and UIkit behavior in builder and frontend",
   const contentPanel = inspector.locator('[data-uikit-capability="accordion-content"]');
   const itemCards = contentPanel.locator("[data-accordion-item-id]");
   await expect(itemCards).toHaveCount(3);
-  await expect(itemCards.nth(0).locator(".builder-nested-card-body")).toBeVisible();
+  await expect(itemCards.nth(0).locator(".builder-nested-card-body")).toHaveCount(0);
   await expect(itemCards.nth(1).locator(".builder-nested-card-body")).toHaveCount(0);
-  await itemCards.nth(1).getByRole("button", { name: "Edit accordion item 2", exact: true }).click();
+  await itemCards.nth(1).getByRole("button", { name: "Edit item 2", exact: true }).click();
   await expect(itemCards.nth(0).locator(".builder-nested-card-body")).toHaveCount(0);
   await expect(itemCards.nth(1).locator(".builder-nested-card-body")).toBeVisible();
-  await itemCards.nth(1).getByRole("button", { name: "Edit accordion item 2", exact: true }).click();
+  await itemCards.nth(1).getByRole("button", { name: "Edit item 2", exact: true }).click();
   await expect(itemCards.nth(0).locator(".builder-nested-card-body")).toHaveCount(0);
   await expect(itemCards.nth(1).locator(".builder-nested-card-body")).toHaveCount(0);
-  await itemCards.nth(0).getByRole("button", { name: "Edit accordion item 1", exact: true }).click();
-  await itemCards.nth(0).getByRole("button", { name: "Copy accordion item 1", exact: true }).click();
+  await itemCards.nth(0).getByRole("button", { name: "Edit item 1", exact: true }).click();
+  await itemCards.nth(0).getByRole("button", { name: "Copy item 1", exact: true }).click();
   await expect(contentPanel.locator("[data-accordion-item-id]")).toHaveCount(4);
   await expect(contentPanel.locator("[data-accordion-item-id]").nth(1).locator(".builder-slide-toggle small")).toHaveText("Delivery timeline Copy");
-  await contentPanel.locator("[data-accordion-item-id]").nth(1).getByRole("button", { name: "Delete accordion item 2", exact: true }).click();
+  await contentPanel.locator("[data-accordion-item-id]").nth(1).getByRole("button", { name: "Delete item 2", exact: true }).click();
   await expect(contentPanel.locator("[data-accordion-item-id]")).toHaveCount(3);
   const secondItemSummary = await itemCards.nth(1).locator(".builder-slide-toggle small").innerText();
   await itemCards.nth(1).locator(".builder-nested-card-drag-handle").dragTo(itemCards.nth(0).locator(".builder-nested-card-header"));
@@ -133,34 +133,36 @@ test("Accordion uses semantic items and UIkit behavior in builder and frontend",
   await itemCards.nth(0).locator(".builder-nested-card-drag-handle").dragTo(itemCards.nth(1).locator(".builder-nested-card-header"));
   await expect(itemCards.nth(0).locator(".builder-slide-toggle small")).toHaveText("Delivery timeline");
   if (await itemCards.nth(0).locator(".builder-nested-card-body").count() === 0) {
-    await itemCards.nth(0).getByRole("button", { name: "Edit accordion item 1", exact: true }).click();
+    await itemCards.nth(0).getByRole("button", { name: "Edit item 1", exact: true }).click();
   }
   await inspector.getByRole("button", { name: "Content", exact: true }).click();
   const firstTitle = inspector.getByLabel("Accordion item 1 title", { exact: true });
   await firstTitle.fill("What is the delivery timeline?");
   await inspector.getByLabel("Accordion item 1 content", { exact: true }).fill("Most projects begin within two weeks.");
-  await inspector.getByRole("button", { name: "Behavior", exact: true }).click();
-  const allowMultiple = inspector.getByLabel("Allow multiple open", { exact: true });
+  await inspector.getByRole("button", { name: "Settings", exact: true }).click();
+  const stylePanel = inspector.locator('[data-uikit-capability="accordion-settings"]');
+  const allowMultiple = stylePanel
+    .locator("label.builder-inspector-checkbox-row")
+    .filter({ hasText: "Allow multiple open items" })
+    .locator("input");
   if (!(await allowMultiple.isChecked())) {
     await allowMultiple.locator("xpath=..").click({ force: true });
     await expect(allowMultiple).toBeChecked();
   }
   await inspector.getByLabel("Initially open", { exact: true }).selectOption("first");
-  await inspector.getByRole("button", { name: "Styling", exact: true }).click();
-  const stylePanel = inspector.locator('[data-uikit-capability="accordion-style"]');
-  await stylePanel.getByRole("radiogroup", { name: "Style" }).getByRole("radio", { name: "Striped" }).click();
-  await stylePanel.getByRole("radiogroup", { name: "Indicator" }).getByRole("radio", { name: "Plus Minus" }).click();
-  await stylePanel.getByRole("radiogroup", { name: "Indicator position" }).getByRole("radio", { name: "Start" }).click();
+  await stylePanel.getByLabel("Accordion Style", { exact: true }).selectOption("striped");
+  await stylePanel.getByLabel("Indicator Style", { exact: true }).selectOption("plus-minus");
+  await stylePanel.getByLabel("Indicator Position", { exact: true }).selectOption("start");
   await stylePanel.getByLabel("Accordion title emphasis", { exact: true }).selectOption("emphasis");
-  await stylePanel.getByRole("radiogroup", { name: "Accordion item spacing" }).getByRole("radio", { name: "Large" }).click();
-  await stylePanel.getByRole("radiogroup", { name: "Accordion content spacing" }).getByRole("radio", { name: "Small" }).click();
+  await stylePanel.getByLabel("Item Margin", { exact: true }).selectOption("large");
+  await stylePanel.getByLabel("Accordion content spacing", { exact: true }).selectOption("small");
   const showDividers = stylePanel.getByLabel("Show dividers", { exact: true });
   if (await showDividers.isChecked()) {
     await showDividers.locator("xpath=..").click({ force: true });
     await expect(showDividers).not.toBeChecked();
   }
-  await stylePanel.getByLabel("Accordion title style", { exact: true }).selectOption("h4");
-  await stylePanel.getByLabel("Accordion content style", { exact: true }).selectOption("lead");
+  await stylePanel.getByLabel("Title style", { exact: true }).selectOption("h4");
+  await stylePanel.getByLabel("Content style", { exact: true }).selectOption("text-lead");
   await expect(selectedAccordion.locator("ul")).toHaveClass(/uk-list-striped/);
   await expect(selectedAccordion.locator("ul")).toHaveClass(/shop-builder-accordion--style-striped/);
   await expect(selectedAccordion.locator("ul")).toHaveClass(/shop-builder-accordion--indicator-plus-minus/);
@@ -175,8 +177,6 @@ test("Accordion uses semantic items and UIkit behavior in builder and frontend",
   await expect(selectedAccordion.locator(".uk-accordion-indicator, .shop-builder-accordion-indicator")).toHaveCount(6);
   await expect(selectedAccordion.locator(".uk-accordion-title").first()).toHaveCSS("display", "flex");
   await expect(selectedAccordion.locator(".uk-accordion-title").first()).toHaveCSS("text-align", "left");
-  await inspector.getByRole("button", { name: "Behavior", exact: true }).click();
-
   const titles = selectedAccordion.locator(".uk-accordion-title");
   await expect(selectedAccordion.locator("li").nth(0)).toHaveClass(/uk-open/);
   await titles.nth(0).click();
@@ -200,7 +200,7 @@ test("Accordion uses semantic items and UIkit behavior in builder and frontend",
     for (const value of Object.values(localStorage)) { try { const found = walk(JSON.parse(value)); if (found) return found; } catch {} }
     return null;
   }, blockId);
-  expect(stored).toMatchObject({ kind: "accordion", accordionMultiple: true, accordionCollapsible: true, accordionOpenItems: [0], accordionStyle: "striped", accordionIndicator: "plus-minus", accordionIndicatorPosition: "start", accordionTitleEmphasis: "emphasis", accordionItemSpacing: "large", accordionContentSpacing: "small", accordionDivider: false, accordionTitleStyle: "h4", accordionContentStyle: "lead" });
+  expect(stored).toMatchObject({ kind: "accordion", accordionMultiple: true, accordionCollapsible: true, accordionOpenItems: [0], accordionStyle: "striped", accordionIndicator: "plus-minus", accordionIndicatorPosition: "start", accordionTitleEmphasis: "emphasis", accordionItemSpacing: "large", accordionContentSpacing: "small", accordionDivider: false, accordionTitleStyle: "h4", accordionContentStyle: "text-lead" });
   expect((stored?.accordionItems as Array<Record<string, unknown>>)[0]).toMatchObject({ title: "What is the delivery timeline?", content: "Most projects begin within two weeks." });
   expect(JSON.stringify(stored)).not.toMatch(/uk-/);
 
@@ -210,6 +210,7 @@ test("Accordion uses semantic items and UIkit behavior in builder and frontend",
   const frontendAccordion = frontend.locator(".shop-builder-column-block--accordion").last();
   await expect(frontendAccordion).toBeVisible();
   await expect(frontendAccordion.locator(".uk-accordion-title").first()).toContainText("What is the delivery timeline?");
+  await expect(frontendAccordion.locator(".uk-accordion-content").first().locator(".uk-text-lead")).toBeVisible();
   await expect(frontendAccordion.locator("ul")).toHaveClass(/uk-list-striped/);
   const builderStripedBackground = await selectedAccordion.locator("li").first().evaluate((node) => getComputedStyle(node).backgroundColor);
   const frontendStripedBackground = await frontendAccordion.locator("li").first().evaluate((node) => getComputedStyle(node).backgroundColor);

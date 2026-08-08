@@ -1,13 +1,25 @@
 "use client";
 
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import { Plus, ImagePlus } from "lucide-react";
 import type { BuilderLayoutBlock, InspectorTab } from "@/components/dashboard/builderTypes";
 import type { BuilderShellSettings } from "@/lib/builderShell";
+import IconPicker from "@/components/dashboard/inspector/IconPicker";
 import RepeatableItemShell from "@/components/dashboard/inspector/RepeatableItemShell";
+import {
+  ActionSettingsGroup,
+  CardSettingsGroup,
+  ContentSettingsGroup,
+  ImageSettingsGroup,
+  LinkSettingsGroup,
+  MetaSettingsGroup,
+  TitleSettingsGroup,
+} from "@/components/dashboard/inspector/panels/SharedSettingGroups";
+import { BuilderImageUrlControl } from "@/components/dashboard/inspector/panels/InspectorSharedControls";
 import {
   InspectorDivision,
   InspectorFieldRow,
+  InspectorPillGroup,
   InspectorSelect,
   InspectorSwitch,
   InspectorTextField,
@@ -28,6 +40,24 @@ type Props = {
   }) => void;
 };
 
+// Older Panel Slider documents stored the component defaults on every initial
+// item. New items inherit them from carouselSettings. Keep those legacy copies
+// from masking a later shared-setting change, while leaving real item overrides
+// untouched.
+const LEGACY_PANEL_SLIDER_ITEM_DEFAULTS: Record<string, unknown> = {
+  panelStyle: "default",
+  panelSize: "default",
+  panelHover: false,
+  linkPanel: false,
+  imageRatio: "16:9",
+  imageFit: "cover",
+  imageShape: "none",
+  imageShadow: "none",
+  imageLoading: "lazy",
+  imageAlignment: "center",
+  alignImageWithoutPadding: false,
+};
+
 export default function SliderCapabilityPanel({
   block,
   tab,
@@ -38,16 +68,68 @@ export default function SliderCapabilityPanel({
   const rawBlock = (block ?? {}) as any;
   const slides: any[] = rawBlock.slides ?? [];
   const carouselSettings = rawBlock.carouselSettings ?? {};
+  const isPanelSlider = rawBlock.kind === "panelSlider";
+  const itemLabel = isPanelSlider ? "Panel" : "Slide";
+  const panelSliderItemDefaults = isPanelSlider
+    ? {
+        imagePadding: "frameless",
+        imageFit: "cover",
+        imageRatio: "16:9",
+        panelStyle: "default",
+        panelSize: "default",
+        headingLevel: "h3",
+        meta: "Meta",
+        metaStyle: "muted",
+        showAction: true,
+        buttonStyle: "primary",
+        buttonSize: "default",
+      }
+    : {};
+  const inheritedArrowStyle = isPanelSlider ? "chevron" : (shellSettings.sliderArrowStyle ?? "chevron");
+  const inheritedArrowPosition = isPanelSlider ? "overlay" : (shellSettings.sliderArrowPosition ?? "overlay");
+  const inheritedDotnavStyle = isPanelSlider ? "minimal-dots" : (shellSettings.sliderDotnavStyle ?? "minimal-dots");
+  const inheritedDotnavPosition = isPanelSlider ? "bottom" : (shellSettings.sliderDotnavPosition ?? "bottom");
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [activeItemTabs, setActiveItemTabs] = useState<Record<string, "content" | "settings">>({});
 
   const updateCarousel = (patch: any) => {
+    const nextCarouselSettings = {
+      ...carouselSettings,
+      ...patch,
+    };
+
+    if (!isPanelSlider || slides.length === 0) {
+      update({ carouselSettings: nextCarouselSettings } as any);
+      return;
+    }
+
+    const sharedKeys = Object.keys(LEGACY_PANEL_SLIDER_ITEM_DEFAULTS).filter((key) =>
+      Object.prototype.hasOwnProperty.call(patch, key),
+    );
+
+    if (sharedKeys.length === 0) {
+      update({ carouselSettings: nextCarouselSettings } as any);
+      return;
+    }
+
+    const migratedSlides = slides.map((slide) => {
+      const nextSlide = { ...slide };
+      sharedKeys.forEach((key) => {
+        const previousEffectiveValue = carouselSettings[key] ??
+          LEGACY_PANEL_SLIDER_ITEM_DEFAULTS[key];
+        if (nextSlide[key] === previousEffectiveValue || nextSlide[key] === LEGACY_PANEL_SLIDER_ITEM_DEFAULTS[key]) {
+          delete nextSlide[key];
+        }
+      });
+      return nextSlide;
+    });
+
     update({
-      carouselSettings: {
-        ...carouselSettings,
-        ...patch,
-      },
+      carouselSettings: nextCarouselSettings,
+      slides: migratedSlides,
     } as any);
   };
+  const sharedSettingsBlock = { ...carouselSettings } as BuilderLayoutBlock;
 
   const handleAddMediaFiles = (files: FileList | null) => {
     if (!files || files.length === 0) return;
@@ -56,11 +138,11 @@ export default function SliderCapabilityPanel({
       const url = URL.createObjectURL(file);
       newSlides.push({
         id: String(Date.now() + index),
+        ...panelSliderItemDefaults,
         imageUrl: url,
         title: file.name.replace(/\.[^/.]+$/, "").replace(/[-_]/g, " "),
-        subtitle: "",
+        ...(isPanelSlider ? { showAction: true, buttonLabel: "Learn more" } : { subtitle: "" }),
         text: "",
-        buttonLabel: "",
         buttonUrl: "#",
       });
     });
@@ -72,13 +154,13 @@ export default function SliderCapabilityPanel({
   // --------------------------------------------------------------------------
   if (tab === "content") {
     return (
-      <div className="builder-inspector-stack" data-uikit-capability="slider-content">
+      <div className="builder-inspector-stack" data-uikit-capability={isPanelSlider ? "panel-slider-content" : "slider-content"}>
         <InspectorDivision title="HEADING & INTRO">
           <InspectorFieldRow label="Block Title">
             <InspectorTextField
               value={rawBlock.title ?? ""}
               onChange={(value: string) => update({ title: value })}
-              placeholder="Slider title..."
+              placeholder={isPanelSlider ? "Panel slider title..." : "Slider title..."}
             />
           </InspectorFieldRow>
 
@@ -86,12 +168,12 @@ export default function SliderCapabilityPanel({
             <InspectorTextarea
               value={rawBlock.body ?? ""}
               onChange={(value: string) => update({ body: value })}
-              placeholder="Slider intro text..."
+              placeholder={isPanelSlider ? "Panel slider intro text..." : "Slider intro text..."}
             />
           </InspectorFieldRow>
         </InspectorDivision>
 
-        <InspectorDivision title="SLIDES">
+        <InspectorDivision title={isPanelSlider ? "PANEL SLIDES" : "SLIDES"}>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", marginBottom: "12px" }}>
             <button
               type="button"
@@ -116,10 +198,11 @@ export default function SliderCapabilityPanel({
                     ...slides,
                     {
                       id: String(Date.now()),
-                      title: `Slide ${slides.length + 1}`,
-                      subtitle: "Subtitle",
-                      text: "Slide description copy...",
-                      buttonLabel: "Learn More",
+                      ...panelSliderItemDefaults,
+                      title: `${itemLabel} ${slides.length + 1}`,
+                      ...(isPanelSlider
+                        ? { text: "Panel item content.", showAction: true, buttonLabel: "Learn more" }
+                        : { subtitle: "Subtitle", text: "Slide description copy...", buttonLabel: "Learn More" }),
                       buttonUrl: "#",
                       imageUrl: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1200&q=80",
                     },
@@ -128,7 +211,7 @@ export default function SliderCapabilityPanel({
               }
             >
               <Plus size={14} />
-              <span>ADD SLIDE</span>
+              <span>ADD ITEM</span>
             </button>
 
             <button
@@ -152,7 +235,7 @@ export default function SliderCapabilityPanel({
               onClick={() => {
                 if (openWordPressMediaPicker) {
                   openWordPressMediaPicker({
-                    title: "Select Slide Media (Select Multiple)",
+                    title: `Select ${isPanelSlider ? "Panel Slider" : "Slider"} Media (Select Multiple)`,
                     multiple: true,
                     onSelect: (media: any) => {
                       update({
@@ -160,9 +243,10 @@ export default function SliderCapabilityPanel({
                           ...slides,
                           {
                             id: String(Date.now()),
+                            ...panelSliderItemDefaults,
                             imageUrl: media.sourceUrl,
-                            title: media.title || media.altText || "Slide Image",
-                            subtitle: "",
+                            title: media.title || media.altText || `${itemLabel} image`,
+                            ...(isPanelSlider ? { showAction: true, buttonLabel: "Learn more" } : { subtitle: "" }),
                             text: "",
                           },
                         ],
@@ -171,9 +255,10 @@ export default function SliderCapabilityPanel({
                     onSelectMany: (mediaItems: any[]) => {
                       const newSlides = mediaItems.map((media, idx) => ({
                         id: String(Date.now() + idx),
+                        ...panelSliderItemDefaults,
                         imageUrl: media.sourceUrl,
-                        title: media.title || media.altText || `Slide ${slides.length + idx + 1}`,
-                        subtitle: "",
+                        title: media.title || media.altText || `${itemLabel} ${slides.length + idx + 1}`,
+                        ...(isPanelSlider ? { showAction: true, buttonLabel: "Learn more" } : { subtitle: "" }),
                         text: "",
                       }));
                       update({ slides: [...slides, ...newSlides] } as any);
@@ -200,19 +285,20 @@ export default function SliderCapabilityPanel({
           <RepeatableItemShell
             items={slides}
             getItemKey={(slide: any, index: number) => slide.id || `slide-${index}`}
-            getItemSummary={(slide: any, index: number) => slide.title || `Slide ${index + 1}`}
-            itemLabel="Slide"
-            addLabel="Add slide"
+            getItemSummary={(slide: any, index: number) => slide.title || `${itemLabel} ${index + 1}`}
+            itemLabel={itemLabel}
+            addLabel={`Add ${itemLabel.toLowerCase()}`}
             onAdd={() =>
               update({
                 slides: [
                   ...slides,
                   {
                     id: String(Date.now()),
-                    title: `Slide ${slides.length + 1}`,
-                    subtitle: "Subtitle",
-                    text: "Slide description copy...",
-                    buttonLabel: "Learn More",
+                    ...panelSliderItemDefaults,
+                    title: `${itemLabel} ${slides.length + 1}`,
+                    ...(isPanelSlider
+                      ? { text: "Panel item content.", showAction: true, buttonLabel: "Learn more" }
+                      : { subtitle: "Subtitle", text: "Slide description copy...", buttonLabel: "Learn More" }),
                     buttonUrl: "#",
                   },
                 ],
@@ -243,78 +329,144 @@ export default function SliderCapabilityPanel({
                 update({ slides: updated } as any);
               };
 
+              const itemKey = String(slide.id ?? index);
+              const activeTab = activeItemTabs[itemKey] ?? "content";
+              const updateItemTab = (value: string) =>
+                setActiveItemTabs((current) => ({
+                  ...current,
+                  [itemKey]: value as "content" | "settings",
+                }));
+
               return (
                 <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-                  <InspectorFieldRow label="Title">
-                    <InspectorTextField
-                      value={slide.title ?? ""}
-                      onChange={(value: string) => updateSlide({ title: value })}
-                      placeholder="Slide title..."
-                    />
-                  </InspectorFieldRow>
+                  <InspectorPillGroup
+                    value={activeTab}
+                    options={[
+                      { value: "content", label: "Content" },
+                      { value: "settings", label: "Settings" },
+                    ]}
+                    onChange={updateItemTab}
+                    ariaLabel={`${itemLabel} ${index + 1} tab`}
+                  />
 
-                  <InspectorFieldRow label="Subtitle / Badge">
-                    <InspectorTextField
-                      value={slide.subtitle ?? ""}
-                      onChange={(value: string) => updateSlide({ subtitle: value })}
-                      placeholder="Subtitle..."
-                    />
-                  </InspectorFieldRow>
+                  {activeTab === "content" ? (
+                    <>
+                      <InspectorFieldRow label="Title">
+                        <InspectorTextField
+                          value={slide.title ?? ""}
+                          onChange={(value: string) => updateSlide({ title: value })}
+                          placeholder={`${itemLabel} title...`}
+                          ariaLabel={`${itemLabel} ${index + 1} title`}
+                        />
+                      </InspectorFieldRow>
 
-                  <InspectorFieldRow label="Description Copy">
-                    <InspectorTextarea
-                      value={slide.text ?? ""}
-                      onChange={(value: string) => updateSlide({ text: value })}
-                      placeholder="Slide copy..."
-                    />
-                  </InspectorFieldRow>
+                      <InspectorFieldRow label="Meta">
+                        <InspectorTextField
+                          value={slide.meta ?? slide.subtitle ?? ""}
+                          onChange={(value: string) => updateSlide({ meta: value })}
+                          placeholder="Meta text..."
+                          ariaLabel={`${itemLabel} ${index + 1} meta`}
+                        />
+                      </InspectorFieldRow>
 
-                  <InspectorFieldRow label="Image URL">
-                    <div style={{ display: "flex", gap: "6px" }}>
-                      <InspectorTextField
-                        value={slide.imageUrl ?? ""}
-                        onChange={(value: string) => updateSlide({ imageUrl: value })}
-                        placeholder="https://..."
-                      />
-                      {openWordPressMediaPicker && (
-                        <button
-                          type="button"
-                          className="builder-btn builder-btn-secondary"
-                          style={{ padding: "0 8px", fontSize: "11px", whiteSpace: "nowrap" }}
-                          onClick={() =>
-                            openWordPressMediaPicker({
-                              title: "Select Slide Image",
+                      <InspectorFieldRow label="Content">
+                        <InspectorTextarea
+                          value={slide.text ?? ""}
+                          onChange={(value: string) => updateSlide({ text: value })}
+                          placeholder={`${itemLabel} content...`}
+                          ariaLabel={`${itemLabel} ${index + 1} content`}
+                        />
+                      </InspectorFieldRow>
+
+                      <InspectorFieldRow label="Image">
+                        <BuilderImageUrlControl
+                          value={slide.imageUrl ?? ""}
+                          onChange={(event) => updateSlide({ imageUrl: event.target.value })}
+                          onChoose={() =>
+                            openWordPressMediaPicker?.({
+                              title: `${itemLabel} ${index + 1} image`,
                               currentUrl: slide.imageUrl,
-                              onSelect: (media: any) => updateSlide({ imageUrl: media.sourceUrl }),
+                              onSelect: (media: any) =>
+                                updateSlide({
+                                  imageUrl: media.sourceUrl,
+                                  imageAlt: media.altText || media.title || "",
+                                }),
                             })
                           }
-                        >
-                          Pick
-                        </button>
-                      )}
-                    </div>
-                  </InspectorFieldRow>
+                        />
+                      </InspectorFieldRow>
 
-                  <InspectorFieldRow label="Button Label">
-                    <InspectorTextField
-                      value={slide.buttonLabel ?? ""}
-                      onChange={(value: string) => updateSlide({ buttonLabel: value })}
-                      placeholder="Button text..."
-                    />
-                  </InspectorFieldRow>
+                      <InspectorFieldRow label="Icon">
+                        <IconPicker
+                          value={slide.iconName}
+                          onChange={(iconName) => updateSlide({ iconName })}
+                          onClear={() => updateSlide({ iconName: undefined })}
+                          ariaLabel={`${itemLabel} ${index + 1} icon`}
+                        />
+                      </InspectorFieldRow>
 
-                  <InspectorFieldRow label="Button Link URL">
-                    <InspectorTextField
-                      value={slide.buttonUrl ?? ""}
-                      onChange={(value: string) => updateSlide({ buttonUrl: value })}
-                      placeholder="/"
-                    />
-                  </InspectorFieldRow>
+                      <InspectorFieldRow label="Link URL">
+                        <InspectorTextField
+                          value={slide.buttonUrl ?? ""}
+                          onChange={(value: string) => updateSlide({ buttonUrl: value })}
+                          placeholder="https://..."
+                          ariaLabel={`${itemLabel} ${index + 1} link URL`}
+                        />
+                      </InspectorFieldRow>
+                    </>
+                  ) : (
+                    <>
+                      <CardSettingsGroup
+                        block={slide as BuilderLayoutBlock}
+                        update={updateSlide}
+                        title="PANEL"
+                        showLink
+                        keys={{ variant: "panelStyle", size: "panelSize", hover: "panelHover", link: "linkPanel" }}
+                      />
+                      <TitleSettingsGroup
+                        block={slide as BuilderLayoutBlock}
+                        update={updateSlide}
+                        showDecoration
+                        showColor
+                        defaultSize="none"
+                      />
+                      <MetaSettingsGroup
+                        block={slide as BuilderLayoutBlock}
+                        update={updateSlide}
+                        showStyle
+                        showColor
+                        showPosition
+                      />
+                      <ContentSettingsGroup
+                        block={slide as BuilderLayoutBlock}
+                        update={updateSlide}
+                        showStyle
+                      />
+                      <ImageSettingsGroup block={slide as BuilderLayoutBlock} update={updateSlide} showFrameless />
+                      <ActionSettingsGroup
+                        block={slide as BuilderLayoutBlock}
+                        update={updateSlide}
+                        title="LINK"
+                        showVisibilityToggle
+                        showFullWidth
+                        keys={{
+                          visible: "showAction",
+                          label: "buttonLabel",
+                          url: "buttonUrl",
+                          target: "buttonTarget",
+                          style: "buttonStyle",
+                          size: "buttonSize",
+                          width: "fullWidthButton",
+                        }}
+                      />
+                    </>
+                  )}
                 </div>
               );
             }}
           />
         </InspectorDivision>
+
       </div>
     );
   }
@@ -324,9 +476,48 @@ export default function SliderCapabilityPanel({
   // --------------------------------------------------------------------------
   if (tab === "style") {
     return (
-      <div className="builder-inspector-stack" data-uikit-capability="slider-settings">
-        <InspectorDivision title="SLIDER & CAROUSEL">
-          <InspectorFieldRow label="Variant / Layout">
+      <div className="builder-inspector-stack" data-uikit-capability={isPanelSlider ? "panel-slider-settings" : "slider-settings"}>
+        <InspectorDivision title={isPanelSlider ? "SLIDE BEHAVIOR" : "SLIDER & CAROUSEL"}>
+          {isPanelSlider ? (
+            <>
+              <InspectorFieldRow label="Cards at desktop">
+                <InspectorSelect
+                  value={String(carouselSettings.cardsPerView ?? 3)}
+                  onChange={(value: string) => updateCarousel({ cardsPerView: Number(value) })}
+                  options={[
+                    { value: "1", label: "1 card" },
+                    { value: "2", label: "2 cards" },
+                    { value: "3", label: "3 cards" },
+                    { value: "4", label: "4 cards" },
+                  ]}
+                />
+              </InspectorFieldRow>
+
+              <InspectorFieldRow label="Slide effect">
+                <InspectorSelect
+                  value={carouselSettings.effect ?? "slide"}
+                  onChange={(value: string) => updateCarousel({ effect: value })}
+                  options={[
+                    { value: "slide", label: "Slide" },
+                    { value: "fade", label: "Fade" },
+                  ]}
+                />
+              </InspectorFieldRow>
+
+              <InspectorFieldRow label="Gap">
+                <InspectorSelect
+                  value={String(carouselSettings.spaceBetween ?? 24)}
+                  onChange={(value: string) => updateCarousel({ spaceBetween: Number(value) })}
+                  options={[
+                    { value: "12", label: "Small" },
+                    { value: "24", label: "Default" },
+                    { value: "32", label: "Large" },
+                  ]}
+                />
+              </InspectorFieldRow>
+            </>
+          ) : (
+            <InspectorFieldRow label="Variant / Layout">
             <InspectorSelect
               value={carouselSettings.variant ?? "default"}
               onChange={(value: string) => updateCarousel({ variant: value })}
@@ -337,7 +528,8 @@ export default function SliderCapabilityPanel({
                 { value: "antigravity", label: "Terminal / Antigravity" },
               ]}
             />
-          </InspectorFieldRow>
+            </InspectorFieldRow>
+          )}
 
           <InspectorFieldRow label="Autoplay">
             <InspectorSwitch
@@ -357,20 +549,118 @@ export default function SliderCapabilityPanel({
 
           <InspectorFieldRow label="Navigation Arrows">
             <InspectorSwitch
-              checked={carouselSettings.showNavigation !== false}
-              onChange={(checked: boolean) => updateCarousel({ showNavigation: checked })}
+              checked={carouselSettings.showArrows ?? (carouselSettings.showNavigation !== false)}
+              onChange={(checked: boolean) => updateCarousel({ showArrows: checked })}
               label="Show prev/next arrows"
             />
           </InspectorFieldRow>
 
           <InspectorFieldRow label="Pagination Dots">
             <InspectorSwitch
-              checked={carouselSettings.showPagination !== false}
-              onChange={(checked: boolean) => updateCarousel({ showPagination: checked })}
+              checked={carouselSettings.showDots ?? (carouselSettings.showPagination !== false)}
+              onChange={(checked: boolean) => updateCarousel({ showDots: checked })}
               label="Show pagination dots"
             />
           </InspectorFieldRow>
         </InspectorDivision>
+
+        <InspectorDivision title="NAVIGATION PRESENTATION">
+          <InspectorFieldRow
+            label="Arrow style"
+            isOverridden={carouselSettings.arrowStyle !== undefined}
+            inheritedValueText={inheritedArrowStyle}
+            onReset={() => updateCarousel({ arrowStyle: undefined })}
+          >
+            <InspectorSelect
+              value={carouselSettings.arrowStyle ?? inheritedArrowStyle}
+              onChange={(value: string) => updateCarousel({ arrowStyle: value })}
+              options={[
+                { value: "chevron", label: "Chevron" },
+                { value: "glass-circle", label: "Glass circle" },
+                { value: "solid-dark", label: "Solid dark" },
+                { value: "minimal-light", label: "Minimal light" },
+                { value: "outer", label: "Outside" },
+                { value: "hidden", label: "Hidden" },
+              ]}
+            />
+          </InspectorFieldRow>
+
+          <InspectorFieldRow
+            label="Arrow position"
+            isOverridden={carouselSettings.arrowPosition !== undefined}
+            inheritedValueText={inheritedArrowPosition}
+            onReset={() => updateCarousel({ arrowPosition: undefined })}
+          >
+            <InspectorSelect
+              value={carouselSettings.arrowPosition ?? inheritedArrowPosition}
+              onChange={(value: string) => updateCarousel({ arrowPosition: value })}
+              options={[
+                { value: "overlay", label: "Overlay" },
+                { value: "outer", label: "Outside" },
+                { value: "bottom", label: "Bottom" },
+                { value: "bottom-right", label: "Bottom right" },
+                { value: "bottom-left", label: "Bottom left" },
+                { value: "top-right", label: "Top right" },
+                { value: "top-left", label: "Top left" },
+              ]}
+            />
+          </InspectorFieldRow>
+
+          <InspectorFieldRow
+            label="Dot navigation style"
+            isOverridden={carouselSettings.paginationStyle !== undefined}
+            inheritedValueText={inheritedDotnavStyle}
+            onReset={() => updateCarousel({ paginationStyle: undefined })}
+          >
+            <InspectorSelect
+              value={carouselSettings.paginationStyle ?? inheritedDotnavStyle}
+              onChange={(value: string) => updateCarousel({ paginationStyle: value })}
+              options={[
+                { value: "simple-dots", label: "Simple dots" },
+                { value: "minimal-dots", label: "Minimal dots" },
+                { value: "expanding-pills", label: "Expanding pills" },
+                { value: "fraction", label: "Fraction" },
+                { value: "progress", label: "Progress" },
+                { value: "hidden", label: "Hidden" },
+              ]}
+            />
+          </InspectorFieldRow>
+
+          <InspectorFieldRow
+            label="Dot navigation position"
+            isOverridden={carouselSettings.paginationPosition !== undefined}
+            inheritedValueText={inheritedDotnavPosition}
+            onReset={() => updateCarousel({ paginationPosition: undefined })}
+          >
+            <InspectorSelect
+              value={carouselSettings.paginationPosition ?? inheritedDotnavPosition}
+              onChange={(value: string) => updateCarousel({ paginationPosition: value })}
+              options={[
+                { value: "bottom", label: "Bottom" },
+                { value: "top", label: "Top" },
+                { value: "overlay", label: "Overlay" },
+              ]}
+            />
+          </InspectorFieldRow>
+        </InspectorDivision>
+
+        {isPanelSlider && (
+          <>
+            <CardSettingsGroup
+              block={sharedSettingsBlock}
+              update={updateCarousel}
+              title="PANEL"
+              showLink
+              keys={{ variant: "panelStyle", size: "panelSize", hover: "panelHover", link: "linkPanel" }}
+            />
+            <ImageSettingsGroup block={sharedSettingsBlock} update={updateCarousel} showFrameless />
+          </>
+        )}
+
+        <TitleSettingsGroup block={block} update={update} />
+        <MetaSettingsGroup block={block} update={update} showStyle />
+        <ContentSettingsGroup block={block} update={update} showStyle />
+        {!isPanelSlider && <LinkSettingsGroup block={block} update={update} />}
       </div>
     );
   }

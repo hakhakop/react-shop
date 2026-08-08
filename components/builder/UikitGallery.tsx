@@ -3,7 +3,16 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import type { BuilderLayoutBlock } from "@/components/dashboard/builderTypes";
-import { getUikitImageClass, resolveUikitImageSemantics } from "@/lib/uikitTokens";
+import {
+  getUikitButtonClass,
+  getUikitHeadingClass,
+  getUikitImageAttributes,
+  getUikitImageClass,
+  getUikitImageStyle,
+  getUikitImageWrapperClass,
+  getUikitTextClass,
+  resolveUikitImageSemantics,
+} from "@/lib/uikitTokens";
 import { typographyRoleClass } from "@/lib/builderTypography";
 import { builderLinkTargetProps } from "@/lib/websiteBuilderLinks";
 
@@ -68,6 +77,7 @@ export default function UikitGallery({ block }: Props) {
   const showTitle = rawBlock.gridShowTitle !== false;
   const showMeta = rawBlock.gridShowMeta !== false;
   const showContent = rawBlock.gridShowText !== false;
+  const showLink = rawBlock.gridShowButton !== false;
 
   // React Lightbox Modal state
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
@@ -108,6 +118,24 @@ export default function UikitGallery({ block }: Props) {
     .join(" ");
 
   const columnWidthClass = `uk-width-1-${columns}@m uk-width-1-2@s`;
+  const imageSemantics = resolveUikitImageSemantics(rawBlock);
+  const imageStyle = getUikitImageStyle(imageSemantics);
+  const imageAttributes = getUikitImageAttributes(imageSemantics);
+  const imageClass = getUikitImageClass(imageSemantics);
+  const imageWrapperClass = getUikitImageWrapperClass(imageSemantics);
+  const imageDecorationClass = rawBlock.imageBoxDecoration && rawBlock.imageBoxDecoration !== "none"
+    ? `uk-background-${rawBlock.imageBoxDecoration}`
+    : "";
+  const imageHeight = rawBlock.imageHeight
+    ? /^-?\d+(?:\.\d+)?$/.test(String(rawBlock.imageHeight))
+      ? `${rawBlock.imageHeight}px`
+      : String(rawBlock.imageHeight)
+    : undefined;
+  const TitleTag = (rawBlock.headingLevel ?? "h2") as React.ElementType;
+  const titleClass = getUikitHeadingClass(rawBlock.headingLevel ?? "h2", rawBlock.headingSize);
+  const metaClass = getUikitTextClass(rawBlock.metaStyle ?? "text-meta");
+  const contentClass = getUikitTextClass(rawBlock.contentStyle);
+  const buttonClass = getUikitButtonClass(rawBlock.buttonStyle ?? "primary", rawBlock.size ?? "default");
 
   return (
     <div
@@ -116,9 +144,14 @@ export default function UikitGallery({ block }: Props) {
     >
       <div className={gridClass} data-uk-grid={rawBlock.masonry && rawBlock.masonry !== "none" ? `masonry: ${rawBlock.masonry}` : ""}>
         {items.map((item: any, index: number) => {
-          const imageSemantics = resolveUikitImageSemantics(rawBlock);
-          const imageClass = getUikitImageClass(imageSemantics);
-
+          const titleAlign = rawBlock.headingAlign ?? rawBlock.alignment ?? "left";
+          const metaAlign = rawBlock.metaAlign ?? titleAlign;
+          const contentAlign = rawBlock.contentAlign ?? titleAlign;
+          const itemUrl = item.linkUrl || "#";
+          const actionLabel = item.buttonLabel || rawBlock.buttonLabel || rawBlock.linkText || "Read more";
+          const hasAction = Boolean(
+            item.buttonLabel || rawBlock.buttonLabel || rawBlock.linkText || rawBlock.buttonStyle || rawBlock.size || (itemUrl && itemUrl !== "#"),
+          );
           return (
             <div key={item.id} className={columnWidthClass}>
               <div
@@ -128,11 +161,26 @@ export default function UikitGallery({ block }: Props) {
                   boxShadow: "0 10px 30px rgba(0,0,0,0.08)",
                   position: "relative",
                   overflow: "hidden",
+                  width: imageStyle.width,
+                  maxWidth: imageStyle.maxWidth,
+                  marginInline:
+                    imageSemantics.alignment === "left"
+                      ? "0 auto"
+                      : imageSemantics.alignment === "right"
+                      ? "0 0 0 auto"
+                      : "auto",
                 }}
               >
                 <div
-                  className="uk-inline-clip uk-transition-toggle"
-                  style={{ width: "100%", display: "block", cursor: isLightbox ? "pointer" : "default" }}
+                  className={`uk-inline-clip uk-transition-toggle ${imageWrapperClass} ${imageDecorationClass}`.trim()}
+                  style={{
+                    width: "100%",
+                    display: "block",
+                    cursor: isLightbox ? "pointer" : "default",
+                    aspectRatio: imageStyle.aspectRatio,
+                    height: imageStyle.aspectRatio ? undefined : imageHeight,
+                    position: imageStyle.aspectRatio ? "relative" : undefined,
+                  }}
                   onClick={(e) => {
                     if (isLightbox) {
                       e.preventDefault();
@@ -146,12 +194,13 @@ export default function UikitGallery({ block }: Props) {
                     alt={item.title}
                     className={`${imageClass} uk-transition-scale-up uk-transition-opaque`}
                     loading={rawBlock.imageLoading ?? "lazy"}
+                    {...imageAttributes}
                     style={{
                       width: "100%",
-                      height: "260px",
-                      objectFit: "cover",
+                      height: imageStyle.aspectRatio ? "100%" : imageHeight ?? "260px",
+                      objectFit: imageStyle.objectFit,
                       display: "block",
-                      borderRadius: overlayMode === "caption" ? "12px 12px 0 0" : "12px",
+                      ...(imageStyle.position ? { position: imageStyle.position, inset: imageStyle.inset } : {}),
                     }}
                     onError={(e) => {
                       // Fallback to high res gradient placeholder if network image fails
@@ -173,31 +222,53 @@ export default function UikitGallery({ block }: Props) {
                         padding: "20px",
                         color: "#ffffff",
                         borderRadius: "12px",
-                        textAlign: rawBlock.alignment || "left",
+                        textAlign: titleAlign,
                       }}
                     >
                       {showMeta && item.meta && (
                         <div
-                          className={`uk-text-meta ${typographyRoleClass(rawBlock.metaTypographyRole)}`}
-                          style={{ color: "rgba(255, 255, 255, 0.75)", fontSize: "0.825rem", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "4px" }}
+                          className={`${metaClass} ${typographyRoleClass(rawBlock.metaTypographyRole)}`.trim()}
+                          style={{
+                            color: "rgba(255, 255, 255, 0.75)",
+                            ...(rawBlock.metaStyle ? {} : { fontSize: "0.825rem", textTransform: "uppercase", letterSpacing: "0.05em" }),
+                            marginBottom: "4px",
+                            textAlign: metaAlign,
+                          }}
                         >
                           {item.meta}
                         </div>
                       )}
                       {showTitle && item.title && (
-                        <div
-                          className={`uk-text-bold ${typographyRoleClass(rawBlock.titleTypographyRole)}`}
-                          style={{ color: "#ffffff", fontSize: "1.15rem", fontWeight: 700, lineHeight: "1.3" }}
+                        <TitleTag
+                          className={`${titleClass} ${typographyRoleClass(rawBlock.titleTypographyRole)}`.trim()}
+                          style={{ color: "#ffffff", lineHeight: "1.3", textAlign: titleAlign }}
                         >
                           {item.title}
-                        </div>
+                        </TitleTag>
                       )}
                       {showContent && item.content && (
                         <div
-                          className={`uk-margin-small-top ${typographyRoleClass(rawBlock.contentTypographyRole)}`}
-                          style={{ color: "rgba(255, 255, 255, 0.9)", fontSize: "0.9rem", marginTop: "6px" }}
+                          className={`uk-margin-small-top ${contentClass} ${typographyRoleClass(rawBlock.contentTypographyRole)}`.trim()}
+                          style={{
+                            color: "rgba(255, 255, 255, 0.9)",
+                            ...(rawBlock.contentStyle ? {} : { fontSize: "0.9rem" }),
+                            marginTop: "6px",
+                            textAlign: contentAlign,
+                          }}
                         >
                           {item.content}
+                        </div>
+                      )}
+                      {showLink && hasAction && (
+                        <div className="uk-margin-small-top" style={{ textAlign: contentAlign }}>
+                          <a
+                            href={itemUrl}
+                            className={buttonClass}
+                            {...builderLinkTargetProps(item.linkTarget || rawBlock.linkTarget)}
+                            onClick={(event) => event.stopPropagation()}
+                          >
+                            {actionLabel}
+                          </a>
                         </div>
                       )}
                     </div>
@@ -206,20 +277,43 @@ export default function UikitGallery({ block }: Props) {
 
                 {/* OVERLAY CAPTION MODE */}
                 {overlayMode === "caption" && (
-                  <div style={{ padding: "16px", background: "#ffffff", textAlign: rawBlock.alignment || "left" }}>
+                  <div style={{ padding: "16px", background: "#ffffff", textAlign: titleAlign }}>
                     {showMeta && item.meta && (
-                      <div className={`uk-text-meta ${typographyRoleClass(rawBlock.metaTypographyRole)}`} style={{ fontSize: "0.8rem", color: "#666", marginBottom: "4px" }}>
+                      <div
+                        className={`${metaClass} ${typographyRoleClass(rawBlock.metaTypographyRole)}`.trim()}
+                        style={{
+                          ...(rawBlock.metaStyle ? {} : { fontSize: "0.8rem" }),
+                          color: "#666",
+                          marginBottom: "4px",
+                          textAlign: metaAlign,
+                        }}
+                      >
                         {item.meta}
                       </div>
                     )}
                     {showTitle && item.title && (
-                      <div className={`uk-text-bold ${typographyRoleClass(rawBlock.titleTypographyRole)}`} style={{ fontSize: "1.05rem", fontWeight: 600, color: "#111" }}>
+                      <TitleTag className={`${titleClass} ${typographyRoleClass(rawBlock.titleTypographyRole)}`.trim()} style={{ color: "#111", textAlign: titleAlign }}>
                         {item.title}
-                      </div>
+                      </TitleTag>
                     )}
                     {showContent && item.content && (
-                      <div className={`uk-margin-small-top ${typographyRoleClass(rawBlock.contentTypographyRole)}`} style={{ fontSize: "0.875rem", color: "#444", marginTop: "4px" }}>
+                      <div
+                        className={`uk-margin-small-top ${contentClass} ${typographyRoleClass(rawBlock.contentTypographyRole)}`.trim()}
+                        style={{
+                          ...(rawBlock.contentStyle ? {} : { fontSize: "0.875rem" }),
+                          color: "#444",
+                          marginTop: "4px",
+                          textAlign: contentAlign,
+                        }}
+                      >
                         {item.content}
+                      </div>
+                    )}
+                    {showLink && hasAction && (
+                      <div className="uk-margin-small-top" style={{ textAlign: contentAlign }}>
+                        <a href={itemUrl} className={buttonClass} {...builderLinkTargetProps(item.linkTarget || rawBlock.linkTarget)}>
+                          {actionLabel}
+                        </a>
                       </div>
                     )}
                   </div>

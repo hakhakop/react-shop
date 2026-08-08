@@ -34,6 +34,7 @@ import type {
   BuilderCustomPage,
   BuilderLayoutKey,
   BuilderSavedTemplate,
+  BuilderSection,
   BuilderState,
   BuilderTargetType,
   BuilderTemplate,
@@ -101,6 +102,12 @@ type DashboardSidebarProps = {
   templateDescriptions: Record<BuilderTemplate, string>;
   templateLabels: Record<BuilderTemplate, string>;
   templateStatus: string;
+  yoothemeImportWarnings?: string[];
+  yoothemeImportPreview?: {
+    fileName: string;
+    sections: BuilderSection[];
+    warnings: string[];
+  } | null;
   onUpdateShellSettings: (patch: Partial<BuilderShellSettings>) => void;
   onSaveMenuItems?: (newItems: BuilderShellSettings["menuItems"]) => void | Promise<void>;
   topActionsSlot?: ReactNode;
@@ -121,6 +128,9 @@ type DashboardSidebarProps = {
     file: File,
     templateType: NonNullable<BuilderSavedTemplate["templateType"]>,
   ) => void | Promise<void>;
+  onImportYoothemePage?: (file: File) => void | Promise<void>;
+  onApplyYoothemeImport?: () => void;
+  onCancelYoothemeImport?: () => void;
   onRenameSavedTemplate?: (template: BuilderSavedTemplate, title: string) => void;
   onSetNewPageTitle: Dispatch<SetStateAction<string>>;
   onSetSidebarTab: Dispatch<SetStateAction<SidebarTab>>;
@@ -151,6 +161,8 @@ export default function DashboardSidebar({
   templateDescriptions,
   templateLabels,
   templateStatus,
+  yoothemeImportWarnings = [],
+  yoothemeImportPreview = null,
   topActionsSlot,
   utilityControlsSlot,
   onAddElementFromLibrary,
@@ -163,6 +175,9 @@ export default function DashboardSidebar({
   onApplySavedTemplate = () => undefined,
   onExportSavedTemplate = () => undefined,
   onImportSavedTemplate = () => undefined,
+  onImportYoothemePage = () => undefined,
+  onApplyYoothemeImport = () => undefined,
+  onCancelYoothemeImport = () => undefined,
   onRenameSavedTemplate = () => undefined,
   onSetNewPageTitle,
   onSetSidebarTab,
@@ -439,6 +454,127 @@ export default function DashboardSidebar({
             <span>Choose another category or start with Blank.</span>
           </div>
         )}
+      </div>
+    </div>
+  ) : null;
+
+  const yoothemeImportPreviewModal = yoothemeImportPreview ? (
+    <div
+      className="builder-layout-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="yootheme-import-preview-title"
+      onMouseDown={(event) => {
+        if (event.target === event.currentTarget) onCancelYoothemeImport();
+      }}
+    >
+      <div className="builder-layout-dialog" style={{ maxWidth: "640px" }}>
+        <div className="builder-layout-header">
+          <div>
+            <strong id="yootheme-import-preview-title">Preview YOOtheme import</strong>
+            <span>Review the mapped page before replacing the current builder page.</span>
+          </div>
+          <button
+            type="button"
+            className="builder-icon-button builder-layout-close"
+            onClick={onCancelYoothemeImport}
+            aria-label="Cancel YOOtheme import"
+          >
+            <X size={16} />
+          </button>
+        </div>
+        <div className="builder-template-note" style={{ margin: "16px 0" }}>
+          <strong>{yoothemeImportPreview.fileName}</strong>
+          <span>
+            {yoothemeImportPreview.sections.length} section{yoothemeImportPreview.sections.length === 1 ? "" : "s"} mapped
+            {yoothemeImportPreview.warnings.length
+              ? ` with ${yoothemeImportPreview.warnings.length} compatibility warning${yoothemeImportPreview.warnings.length === 1 ? "" : "s"}`
+              : " with no compatibility warnings"}.
+          </span>
+        </div>
+        <div
+          aria-label="Mapped page preview"
+          style={{
+            display: "grid",
+            gap: "10px",
+            maxHeight: "min(52vh, 520px)",
+            overflowY: "auto",
+            padding: "2px 4px 4px 0",
+          }}
+        >
+          {yoothemeImportPreview.sections.map((section, sectionIndex) => (
+            <article
+              key={section.id}
+              style={{
+                border: "1px solid var(--builder-border, #d9dce5)",
+                borderRadius: "10px",
+                padding: "12px",
+                background: "var(--builder-surface-muted, #f7f8fb)",
+              }}
+            >
+              <div style={{ display: "flex", justifyContent: "space-between", gap: "12px", marginBottom: "8px" }}>
+                <strong>{section.title || `Section ${sectionIndex + 1}`}</strong>
+                <span style={{ opacity: 0.7, whiteSpace: "nowrap" }}>
+                  {section.layoutRows || section.layoutItems?.length || 0} row{(section.layoutRows || section.layoutItems?.length || 0) === 1 ? "" : "s"}
+                </span>
+              </div>
+              <div style={{ display: "grid", gap: "6px" }}>
+                {(section.layoutItems ?? []).map((item, itemIndex) => (
+                  <div
+                    key={item.id}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "8px",
+                      flexWrap: "wrap",
+                      fontSize: "12px",
+                    }}
+                  >
+                    <span style={{ opacity: 0.65 }}>
+                      Column {itemIndex + 1} · {item.rowLayout}
+                    </span>
+                    {(item.blocks ?? []).length > 0 ? (
+                      (item.blocks ?? []).map((block, blockIndex) => (
+                        <span
+                          key={block.id ?? `${item.id}-${blockIndex}`}
+                          style={{
+                            borderRadius: "999px",
+                            padding: "3px 8px",
+                            background: "var(--builder-accent-soft, #e9e7ff)",
+                            color: "var(--builder-accent, #5548e8)",
+                            fontWeight: 600,
+                          }}
+                        >
+                          {block.kind ?? "element"}
+                        </span>
+                      ))
+                    ) : (
+                      <span style={{ opacity: 0.55 }}>empty</span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </article>
+          ))}
+        </div>
+        {yoothemeImportPreview.warnings.length > 0 && (
+          <details open className="builder-template-note" style={{ marginBottom: "16px" }}>
+            <summary>Compatibility warnings</summary>
+            <ul style={{ margin: "8px 0 0", paddingLeft: "18px" }}>
+              {yoothemeImportPreview.warnings.map((warning, index) => (
+                <li key={`${index}-${warning}`}>{warning}</li>
+              ))}
+            </ul>
+          </details>
+        )}
+        <div className="builder-layout-actions">
+          <button type="button" className="builder-secondary-button" onClick={onCancelYoothemeImport}>
+            Cancel
+          </button>
+          <button type="button" className="builder-primary-button" onClick={onApplyYoothemeImport}>
+            Apply import
+          </button>
+        </div>
       </div>
     </div>
   ) : null;
@@ -925,6 +1061,18 @@ export default function DashboardSidebar({
                     </span>
                   </button>
                   <small>{templateStatus}</small>
+                  {yoothemeImportWarnings.length > 0 && (
+                    <details className="builder-template-note" style={{ marginTop: "8px" }}>
+                      <summary>
+                        {yoothemeImportWarnings.length} YOOtheme compatibility warning{yoothemeImportWarnings.length === 1 ? "" : "s"}
+                      </summary>
+                      <ul style={{ margin: "8px 0 0", paddingLeft: "18px" }}>
+                        {yoothemeImportWarnings.map((warning, index) => (
+                          <li key={`${index}-${warning}`}>{warning}</li>
+                        ))}
+                      </ul>
+                    </details>
+                  )}
                 </div>
               ) : null}
               {filteredTemplates.length > 0 ? (
@@ -1058,6 +1206,23 @@ export default function DashboardSidebar({
                   }}
                 />
               </label>
+              {templateLibraryTab === "page" && (
+                <label className="builder-template-import-control">
+                  <Upload size={14} />
+                  <span>Import YOOtheme Page JSON</span>
+                  <input
+                    key={`yootheme-${templateImportKey}`}
+                    type="file"
+                    accept=".json,application/json"
+                    onChange={async (event) => {
+                      const file = event.currentTarget.files?.[0];
+                      if (!file) return;
+                      await onImportYoothemePage(file);
+                      setTemplateImportKey((key) => key + 1);
+                    }}
+                  />
+                </label>
+              )}
             </div>
           </motion.div>
           )}
@@ -1079,6 +1244,7 @@ export default function DashboardSidebar({
     {pageTemplateLibraryModal && typeof document !== "undefined"
       ? createPortal(pageTemplateLibraryModal, document.body)
       : null}
+    {yoothemeImportPreviewModal}
     </>
   );
 }

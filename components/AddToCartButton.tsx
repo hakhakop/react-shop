@@ -59,7 +59,10 @@ export default function AddToCartButton({
 
   return (
     <button
-      className={className ? `btn btn-primary ${className}` : "btn btn-primary"}
+      // A caller that supplies a visual class owns the button appearance.
+      // This lets UIkit-rendered product cards use the same canonical button
+      // classes as the rest of the builder instead of mixing in legacy styles.
+      className={className || "btn btn-primary"}
       style={style}
       type="button"
       onClick={handleClick}

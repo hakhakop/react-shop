@@ -199,7 +199,7 @@ body.dark {
 
 .shop-builder-title {
   margin: 0;
-  max-width: 840px;
+  max-width: none;
   color: var(--builder-heading-color, var(--builder-section-text, var(--builder-text, #111111)));
   font-family: var(--builder-heading-font-family, inherit);
   font-size: var(--builder-heading-size, clamp(42px, 8vw, 126px));
@@ -667,6 +667,14 @@ body.dark {
 .builder-preview-goodie-list > .uk-list > .webpages-list-item > .webpages-icon,
 .shop-builder-column-block--list > .uk-list > .webpages-list-item > .webpages-icon {
   flex: 0 0 auto;
+  color: inherit;
+}
+
+.builder-preview-goodie-list > .uk-list > .webpages-list-item > .webpages-list-item__icon,
+.shop-builder-column-block--list > .uk-list > .webpages-list-item > .webpages-list-item__icon {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
   color: inherit;
 }
 
@@ -4993,15 +5001,15 @@ h5.shop-builder-title { font-size: 1.1rem; line-height: 1.4; font-weight: 600; }
 h6.shop-builder-title { font-size: 0.95rem; line-height: 1.4; font-weight: 600; }
 
 /* UIkit Title Style Overrides (ALWAYS Override HTML Element Tag Defaults) */
-.shop-builder-title.uk-h1, .uk-h1 { font-size: 2.5rem !important; line-height: 1.2 !important; font-weight: 700 !important; }
-.shop-builder-title.uk-h2, .uk-h2 { font-size: 2rem !important; line-height: 1.3 !important; font-weight: 600 !important; }
-.shop-builder-title.uk-h3, .uk-h3 { font-size: 1.5rem !important; line-height: 1.4 !important; font-weight: 600 !important; }
-.shop-builder-title.uk-h4, .uk-h4 { font-size: 1.25rem !important; line-height: 1.4 !important; font-weight: 600 !important; }
-.shop-builder-title.uk-h5, .uk-h5 { font-size: 1.1rem !important; line-height: 1.4 !important; font-weight: 600 !important; }
-.shop-builder-title.uk-h6, .uk-h6 { font-size: 0.95rem !important; line-height: 1.4 !important; font-weight: 600 !important; }
+.shop-builder-title.uk-h1 { font-size: 2.5rem !important; line-height: 1.2 !important; font-weight: 700 !important; }
+.shop-builder-title.uk-h2 { font-size: 2rem !important; line-height: 1.3 !important; font-weight: 600 !important; }
+.shop-builder-title.uk-h3 { font-size: 1.5rem !important; line-height: 1.4 !important; font-weight: 600 !important; }
+.shop-builder-title.uk-h4 { font-size: 1.25rem !important; line-height: 1.4 !important; font-weight: 600 !important; }
+.shop-builder-title.uk-h5 { font-size: 1.1rem !important; line-height: 1.4 !important; font-weight: 600 !important; }
+.shop-builder-title.uk-h6 { font-size: 0.95rem !important; line-height: 1.4 !important; font-weight: 600 !important; }
 
-.shop-builder-title.uk-heading-primary, .uk-heading-primary { font-size: 3.25rem !important; line-height: 1.1 !important; font-weight: 800 !important; letter-spacing: -0.02em !important; }
-.shop-builder-title.uk-heading-hero, .uk-heading-hero { font-size: 4.5rem !important; line-height: 1.05 !important; font-weight: 900 !important; letter-spacing: -0.03em !important; }
+.shop-builder-title.uk-heading-primary { font-size: 3.25rem !important; line-height: 1.1 !important; font-weight: 800 !important; letter-spacing: -0.02em !important; }
+.shop-builder-title.uk-heading-hero { font-size: 4.5rem !important; line-height: 1.05 !important; font-weight: 900 !important; letter-spacing: -0.03em !important; }
 
 /* UIkit Title Decorations */
 .uk-heading-divider { border-bottom: 2px solid #e2e8f0 !important; padding-bottom: 8px !important; width: 100%; }

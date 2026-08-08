@@ -5,6 +5,7 @@ import type { BuilderShellSettings } from "@/lib/builderShell";
 import type { BuilderVisualStyle } from "@/lib/builderVisualStyle";
 import {
   InspectorFieldRow,
+  InspectorAlignmentControl,
   InspectorSelect,
   InspectorTextField,
   InspectorDivision,
@@ -55,6 +56,12 @@ export default function GeneralSettingsPanel({ block, shellSettings, tab, update
     { value: "right", label: "Right" },
     { value: "justify", label: "Justify" },
   ];
+  const defaultTextAlignment = (block as any).type === "icon" ? "left" : "center";
+  const effectiveTextAlignment =
+    layout.textAlign ??
+    (block as any).textAlign ??
+    (block as any).headingAlign ??
+    defaultTextAlignment;
 
   return (
     <section className="builder-general-settings-panel" data-uikit-capability="general-settings">
@@ -255,9 +262,9 @@ export default function GeneralSettingsPanel({ block, shellSettings, tab, update
 
           {/* Text Alignment */}
           <InspectorFieldRow label="Text Alignment">
-            <InspectorSelect
-              value={layout.textAlign ?? (block as any).headingAlign ?? "center"}
-              options={textAlignmentOptions}
+            <InspectorAlignmentControl
+              value={String(effectiveTextAlignment)}
+              options={textAlignmentOptions.map((option) => option.value)}
               onChange={(textAlign) => {
                 updateLayout({ textAlign: textAlign as any });
                 update({ headingAlign: textAlign, textAlign } as any);
@@ -358,4 +365,3 @@ export default function GeneralSettingsPanel({ block, shellSettings, tab, update
     </section>
   );
 }
-

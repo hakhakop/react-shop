@@ -7,6 +7,7 @@ import RecentlyViewedStrip from "@/components/RecentlyViewedStrip";
 import StorefrontBuilderRenderer from "@/components/builder/StorefrontBuilderRenderer";
 import { renderDomainWebsiteFrontend } from "@/components/website/DomainWebsiteFrontend";
 import { getPublishedBuilderLayout } from "@/lib/builderLayouts";
+import { getBuilderShellSettings } from "@/lib/builderShell";
 import { getCurrentWebsiteFromHeaders } from "@/lib/currentWebsite";
 import type { SaaSWebsite } from "@/lib/websites";
 
@@ -85,10 +86,19 @@ export default async function ShopPage() {
 
   if (domainWebsitePage) return domainWebsitePage;
 
-  const layout = await getPublishedBuilderLayout("shop");
+  const [layout, shellSettings] = await Promise.all([
+    getPublishedBuilderLayout("shop"),
+    getBuilderShellSettings(),
+  ]);
 
   if (layout?.sections?.some((section) => section.visible)) {
-    return <StorefrontBuilderRenderer layout={layout} page="shop" />;
+    return (
+      <StorefrontBuilderRenderer
+        layout={layout}
+        page="shop"
+        shellSettings={shellSettings}
+      />
+    );
   }
 
   return <DefaultShopPage website={website} />;

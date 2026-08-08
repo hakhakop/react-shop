@@ -7250,6 +7250,124 @@
                           "animation": {
                             "preset": "fade-up"
                           }
+                        },
+                        {
+                          "id": "panel-block-msj943q6-egnvx",
+                          "kind": "panel",
+                          "eyebrow": "A more considered approach",
+                          "title": "Build a brand experience that feels unmistakably yours",
+                          "body": "From the first headline to the smallest interaction, every detail works together to create clarity, confidence, and recognition.",
+                          "buttonLabel": "Discover the Process",
+                          "buttonUrl": "/",
+                          "buttonStyle": "primary",
+                          "imageUrl": "/builder-image-placeholder.svg",
+                          "imageAlt": "Editorial placeholder for a featured brand story",
+                          "imageRatio": "square",
+                          "imagePadding": "frameless",
+                          "imageFit": "contain",
+                          "panelVariant": "secondary",
+                          "panelHover": true,
+                          "panelSize": "large",
+                          "panelShowMedia": true,
+                          "panelMediaPlacement": "left",
+                          "panelMediaFit": "cover",
+                          "panelMediaWidth": "large",
+                          "panelMediaAlignment": "center",
+                          "panelTextAlign": "center",
+                          "panelVerticalAlign": "top",
+                          "panelTitleElement": "h2",
+                          "panelTitleStyle": "inherit",
+                          "panelContentWidth": "medium",
+                          "panelActionVisible": true,
+                          "panelActionStyle": "primary",
+                          "panelActionSize": "default",
+                          "panelActionAlign": "inherit"
+                        },
+                        {
+                          "id": "accordion-direct-fixture",
+                          "kind": "accordion",
+                          "accordionItems": [
+                            {
+                              "id": "accordion-direct-fixture-1",
+                              "title": "Delivery timeline",
+                              "content": "Most projects begin within two weeks."
+                            },
+                            {
+                              "id": "accordion-direct-fixture-2",
+                              "title": "How does it work?",
+                              "content": "We guide the next step clearly."
+                            },
+                            {
+                              "id": "accordion-direct-fixture-3",
+                              "title": "Can I ask a question?",
+                              "content": "Contact the team for help."
+                            }
+                          ],
+                          "accordionMultiple": false,
+                          "accordionCollapsible": true,
+                          "accordionOpenItems": [
+                            0
+                          ]
+                        },
+                        {
+                          "id": "accordion-direct-fixture",
+                          "kind": "accordion",
+                          "accordionItems": [
+                            {
+                              "id": "accordion-direct-fixture-1",
+                              "title": "Delivery timeline",
+                              "content": "Most projects begin within two weeks."
+                            },
+                            {
+                              "id": "accordion-direct-fixture-2",
+                              "title": "How does it work?",
+                              "content": "We guide the next step clearly."
+                            },
+                            {
+                              "id": "accordion-direct-fixture-3",
+                              "title": "Can I ask a question?",
+                              "content": "Contact the team for help."
+                            }
+                          ],
+                          "accordionMultiple": false,
+                          "accordionCollapsible": true,
+                          "accordionOpenItems": [
+                            0
+                          ]
+                        },
+                        {
+                          "id": "accordion-direct-fixture",
+                          "kind": "accordion",
+                          "accordionItems": [
+                            {
+                              "id": "accordion-direct-fixture-1",
+                              "title": "Delivery timeline",
+                              "content": "Most projects begin within two weeks."
+                            },
+                            {
+                              "id": "accordion-direct-fixture-2",
+                              "title": "How does it work?",
+                              "content": "We guide the next step clearly."
+                            },
+                            {
+                              "id": "accordion-direct-fixture-3",
+                              "title": "Can I ask a question?",
+                              "content": "Contact the team for help."
+                            }
+                          ],
+                          "accordionMultiple": false,
+                          "accordionCollapsible": true,
+                          "accordionOpenItems": [
+                            0
+                          ]
+                        },
+                        {
+                          "id": "button-block-msjenxz0-nhivx",
+                          "kind": "button",
+                          "buttonLabel": "Schedule a Consultation",
+                          "buttonUrl": "/",
+                          "buttonStyle": "secondary",
+                          "size": "large"
                         }
                       ]
                     }
@@ -8209,7 +8327,7 @@
         "visible": true
       }
     ],
-    "updatedAt": "2026-08-07T04:47:20.347Z"
+    "updatedAt": "2026-08-07T20:36:52.242Z"
   },
   "header": {
     "version": 1,

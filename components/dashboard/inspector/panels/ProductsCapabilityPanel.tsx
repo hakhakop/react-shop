@@ -12,6 +12,7 @@ import {
   InspectorTextField,
 } from "@/components/dashboard/inspector/InspectorControls";
 import {
+  ImageSettingsGroup,
   MediaSettingsGroup,
   CardSettingsGroup,
   TitleSettingsGroup,
@@ -260,6 +261,38 @@ export default function ProductsCapabilityPanel({
 
         <InspectorDivision title="FRONTEND CONTROLS">
           <InspectorFieldRow
+            label="Attribute filters"
+            isOverridden={rawBlock.showAttributeFilters !== undefined}
+            inheritedValueText="Off"
+            onReset={() => update({ showAttributeFilters: undefined } as any)}
+          >
+            <InspectorSwitch
+              checked={rawBlock.showAttributeFilters === true}
+              onChange={(checked: boolean) => update({ showAttributeFilters: checked } as any)}
+              label="Show product attribute filters"
+            />
+          </InspectorFieldRow>
+
+          {rawBlock.showAttributeFilters === true && (
+            <InspectorFieldRow
+              label="Filter presentation"
+              isOverridden={rawBlock.attributeFilterPresentation !== undefined}
+              inheritedValueText="Top"
+              onReset={() => update({ attributeFilterPresentation: undefined } as any)}
+            >
+              <InspectorPillGroup
+                value={rawBlock.attributeFilterPresentation ?? "top"}
+                options={[
+                  { value: "top", label: "Top" },
+                  { value: "sidebar", label: "Sidebar" },
+                ]}
+                onChange={(value: string) => update({ attributeFilterPresentation: value } as any)}
+                ariaLabel="Attribute filter presentation"
+              />
+            </InspectorFieldRow>
+          )}
+
+          <InspectorFieldRow
             label="Category pills"
             isOverridden={rawBlock.showCategoryPills !== undefined}
             inheritedValueText="Off"
@@ -356,20 +389,20 @@ export default function ProductsCapabilityPanel({
           </InspectorFieldRow>
         </InspectorDivision>
 
-        {/* MEDIA — identical keys pattern to Grid MediaSettingsGroup */}
+        {/* Media layout is structural. Image appearance is composed below from
+            the same ImageSettingsGroup used by Grid. */}
         <MediaSettingsGroup
           block={block}
           update={update}
-          title="MEDIA"
+          title="MEDIA LAYOUT"
           keys={{
             showMedia: "productShowMedia",
             placement: "productMediaPlacement",
-            ratio: "imageRatio",
-            fit: "imageFit",
             width: "productMediaWidth",
-            align: "productMediaAlign",
           }}
         />
+
+        <ImageSettingsGroup block={block} update={update} />
 
         {/* PANEL — identical structure to Grid PANEL division:
             InspectorDivision title="PANEL" wrapping CardSettingsGroup title="CARD PRESENTATION"

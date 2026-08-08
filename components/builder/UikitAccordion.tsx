@@ -9,6 +9,11 @@ import {
   getUikitTextClass,
   getUikitButtonClass,
   getUikitMarginClass,
+  getUikitImageAttributes,
+  getUikitImageClass,
+  getUikitImageStyle,
+  getUikitImageWrapperClass,
+  resolveUikitImageSemantics,
 } from "@/lib/uikitTokens";
 import { typographyRoleClass } from "@/lib/builderTypography";
 import { builderLinkTargetProps } from "@/lib/websiteBuilderLinks";
@@ -118,8 +123,18 @@ export default function UikitAccordion({
 
   // Content Settings
   const contentStyleVal = rawBlock.accordionContentStyle ?? rawBlock.contentStyle ?? contentStyleProp;
-  const contentStyleClass = getUikitTextClass(contentStyleVal);
   const contentMarginTopClass = getUikitMarginClass(rawBlock.accordionContentMarginTop);
+  const imageSemantics = resolveUikitImageSemantics(rawBlock);
+  const imageStyle = getUikitImageStyle(imageSemantics);
+  const imageClass = getUikitImageClass(imageSemantics);
+  const imageWrapperClass = getUikitImageWrapperClass(imageSemantics);
+  const imageDecorationClass = rawBlock.imageBoxDecoration && rawBlock.imageBoxDecoration !== "none" ? `uk-background-${rawBlock.imageBoxDecoration}` : "";
+  const cssLength = (value: unknown, fallback: string) => {
+    const stringValue = String(value ?? "").trim();
+    if (!stringValue || stringValue === "auto") return fallback;
+    return /^\d+$/.test(stringValue) ? `${stringValue}px` : stringValue;
+  };
+  const mediaWidth = (value: unknown) => ({ "1-2": "50%", "1-3": "33.333%", "1-4": "25%" } as Record<string, string>)[String(value)] ?? "100%";
 
   // Field Visibility Flags
   const canShowTitle = (rawBlock.accordionShowTitle ?? rawBlock.showTitle ?? true) !== false;
@@ -191,6 +206,49 @@ export default function UikitAccordion({
           const linkTarget = item.buttonTarget || rawBlock.accordionLinkTarget || "_self";
           const linkStyleClass = getUikitButtonClass(btnVariant, btnSize);
           const mediaPlacement = item.mediaPlacement ?? rawBlock.accordionMediaPlacement ?? "top";
+          const sideMedia = mediaPlacement === "left" || mediaPlacement === "right";
+          const renderMedia = () => (
+            <div
+              className={`shop-builder-accordion-media ${imageWrapperClass} ${imageDecorationClass}`.trim()}
+              style={{
+                width: sideMedia ? mediaWidth(item.mediaWidth ?? rawBlock.accordionMediaWidth) : cssLength(rawBlock.imageWidth, imageStyle.width ?? "100%"),
+                maxWidth: sideMedia ? mediaWidth(item.mediaWidth ?? rawBlock.accordionMediaWidth) : imageStyle.maxWidth ?? "100%",
+                aspectRatio: imageStyle.aspectRatio,
+                position: imageStyle.aspectRatio ? "relative" : undefined,
+                flex: sideMedia ? `0 0 ${mediaWidth(item.mediaWidth ?? rawBlock.accordionMediaWidth)}` : undefined,
+              }}
+            >
+              <img
+                src={item.imageUrl}
+                alt={item.imageAlt || item.title || ""}
+                className={imageClass}
+                loading={rawBlock.imageLoading === "eager" ? "eager" : "lazy"}
+                {...getUikitImageAttributes(imageSemantics)}
+                style={{
+                  width: "100%",
+                  height: imageStyle.aspectRatio ? "100%" : cssLength(rawBlock.imageHeight, "auto"),
+                  maxWidth: "100%",
+                  objectFit: imageStyle.objectFit,
+                  position: imageStyle.position,
+                  inset: imageStyle.inset,
+                }}
+              />
+            </div>
+          );
+          const renderContent = () => (
+            <>
+              {canShowContent && item.content && (
+                <div className={contentMarginTopClass}>
+                  <UikitText content={item.content} variant={contentStyleVal === "inherit" ? "default" : contentStyleVal} />
+                </div>
+              )}
+              {canShowLink && (item.buttonUrl || item.buttonLabel || rawBlock.accordionLinkUrl || rawBlock.accordionLinkText) && (
+                <div className="uk-margin-top">
+                  <a href={itemUrl} className={linkStyleClass} {...builderLinkTargetProps(linkTarget)}>{buttonText}</a>
+                </div>
+              )}
+            </>
+          );
 
           return (
             <li
@@ -231,58 +289,18 @@ export default function UikitAccordion({
               </a>
 
               <div className="uk-accordion-content">
-                {/* Media at Top */}
                 {canShowImage && item.imageUrl && mediaPlacement === "top" && (
-                  <div className="shop-builder-accordion-media uk-margin-bottom">
-                    <img
-                      src={item.imageUrl}
-                      alt={item.imageAlt || item.title || ""}
-                      style={{
-                        width: rawBlock.imageWidth || "100%",
-                        height: rawBlock.imageHeight || "auto",
-                        maxWidth: "100%",
-                        objectFit: "cover",
-                        borderRadius: "4px",
-                      }}
-                    />
-                  </div>
+                  <div className="uk-margin-bottom">{renderMedia()}</div>
                 )}
-
-                {/* Main Content Text */}
-                {canShowContent && item.content && (
-                  <div className={`${contentStyleClass} ${contentMarginTopClass}`.trim()}>
-                    <UikitText content={item.content} variant={contentStyleVal === "inherit" ? "default" : contentStyleVal} />
+                {sideMedia ? (
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--uk-margin-small)", alignItems: "flex-start" }}>
+                    {mediaPlacement === "left" && canShowImage && item.imageUrl && renderMedia()}
+                    <div style={{ flex: "1 1 12rem", minWidth: 0 }}>{renderContent()}</div>
+                    {mediaPlacement === "right" && canShowImage && item.imageUrl && renderMedia()}
                   </div>
-                )}
-
-                {/* Media at Bottom */}
+                ) : renderContent()}
                 {canShowImage && item.imageUrl && mediaPlacement === "bottom" && (
-                  <div className="shop-builder-accordion-media uk-margin-top">
-                    <img
-                      src={item.imageUrl}
-                      alt={item.imageAlt || item.title || ""}
-                      style={{
-                        width: rawBlock.imageWidth || "100%",
-                        height: rawBlock.imageHeight || "auto",
-                        maxWidth: "100%",
-                        objectFit: "cover",
-                        borderRadius: "4px",
-                      }}
-                    />
-                  </div>
-                )}
-
-                {/* Link / Button */}
-                {canShowLink && (item.buttonUrl || item.buttonLabel) && (
-                  <div className="uk-margin-top">
-                    <a
-                      href={itemUrl}
-                      className={linkStyleClass}
-                      {...builderLinkTargetProps(linkTarget)}
-                    >
-                      {buttonText}
-                    </a>
-                  </div>
+                  <div className="uk-margin-top">{renderMedia()}</div>
                 )}
               </div>
             </li>

@@ -62,6 +62,7 @@ export const elementIconRegistry: Record<LayoutBlockKind, keyof typeof elementIc
   gallery: "image",
   text: "text",
   slider: "slider",
+  panelSlider: "slider",
   scrollPinnedDemo: "scrollPinnedDemo",
   embed: "embed",
   fluentForm: "fluentForm",

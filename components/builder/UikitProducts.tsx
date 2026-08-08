@@ -2,11 +2,24 @@
 
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import Link from "next/link";
+import AddToCartButton from "@/components/AddToCartButton";
 import BuilderLineBreakText from "@/components/builder/BuilderLineBreakText";
 import { Typog } from "@/components/builder/BuilderRenderHelpers";
 import { productMatchesCategorySelection } from "@/lib/productCategoryFilter";
+import {
+  getProductAttributeFacets,
+  normalizeProductAttribute,
+  productMatchesAttributeSelection,
+  type SelectedProductAttributes,
+} from "@/lib/productAttributeFilters";
 import { typographyRoleClass } from "@/lib/builderTypography";
-import { getUikitButtonClass, getUikitCardClass, getUikitHeadingClass } from "@/lib/uikitTokens";
+import {
+  getUikitButtonClass,
+  getUikitCardClass,
+  getUikitHeadingClass,
+  getUikitPanelMediaClass,
+  getUikitPanelMediaStyle,
+} from "@/lib/uikitTokens";
 import type { CategoryTreeItem } from "@/lib/categories";
 
 type Props = {
@@ -27,6 +40,40 @@ const MOCK_PRODUCTS = [
   { id: "8", slug: "slim-fit-chino-pants", name: "Slim Fit Chino Pants", price: "$65.00", priceAmount: 65, category: "clothing", categoryName: "Clothing", badge: "", featured: false, onSale: false, image: "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=600&q=80", date: "2026-07-05", productCategories: { nodes: [{ slug: "clothing", name: "Clothing" }] } },
 ];
 
+function resolveProductPrice(rawPrice: unknown, fallbackAmount: unknown) {
+  const raw = String(rawPrice ?? fallbackAmount ?? "").trim();
+  if (!raw) return { label: "$99.00", amount: 99 };
+
+  // Variable products from this WooGraphQL source can return one price per
+  // variation as a comma-separated string. Collapse repeated values and show
+  // a compact range only when there are genuinely different prices.
+  const values = raw
+    .split(",")
+    .map((value) => value.trim())
+    .filter(Boolean)
+    .filter((value, index, all) => all.indexOf(value) === index);
+  const label = values.length <= 1
+    ? (values[0] ?? raw)
+    : `${values[0]} – ${values[values.length - 1]}`;
+  const amount = Number.parseFloat((values[0] ?? raw).replace(/[^0-9.]/g, ""));
+
+  return {
+    label,
+    amount: Number.isFinite(amount) ? amount : 99,
+  };
+}
+
+function getCardAttributeSummary(product: { attributes?: { nodes?: readonly unknown[] | null } | null }) {
+  const attributes = (product.attributes?.nodes ?? [])
+    .map(normalizeProductAttribute)
+    .filter((attribute): attribute is NonNullable<typeof attribute> => attribute !== null);
+  const tooltip = attributes
+    .map((attribute) => `${attribute.label}: ${attribute.values.join(", ")}`)
+    .join(" · ");
+
+  return { attributes, tooltip };
+}
+
 function normalizeProduct(p: any, idx: number) {
   // productCategories: WooCommerce standard shape
   const catNodes: { slug: string; name: string }[] =
@@ -40,16 +87,15 @@ function normalizeProduct(p: any, idx: number) {
   // featured / onSale - read from real fields or fallback to badge
   const featured = Boolean(p.featured);
   const onSale = Boolean(p.onSale);
+  const resolvedPrice = resolveProductPrice(p.price, p.priceAmount);
 
   return {
     ...p,
     id: String(p.id || p.databaseId || idx),
     slug: String(p.slug || p.databaseId || p.id || `product-${idx + 1}`),
     name: p.name || p.title || "WooCommerce Product",
-    price: p.price ? String(p.price) : p.priceAmount ? `$${p.priceAmount}` : "$99.00",
-    priceAmount: typeof p.priceAmount === "number"
-      ? p.priceAmount
-      : parseFloat(String(p.price || "0").replace(/[^0-9.]/g, "")) || 99,
+    price: resolvedPrice.label,
+    priceAmount: typeof p.priceAmount === "number" ? p.priceAmount : resolvedPrice.amount,
     category: catSlug,
     categoryName: catName,
     badge: onSale ? "Sale" : featured ? "Featured" : p.badge ?? "",
@@ -58,6 +104,12 @@ function normalizeProduct(p: any, idx: number) {
     image: p.imageUrl || p.image?.sourceUrl || MOCK_PRODUCTS[idx % MOCK_PRODUCTS.length].image,
     date: p.date || "2026-08-01",
     productCategories: p.productCategories || { nodes: catNodes.length ? catNodes : [{ slug: catSlug, name: catName }] },
+    attributes: p.attributes ?? {
+      nodes: [
+        { name: "Color", options: idx % 2 === 0 ? ["Black", "White"] : ["Tan", "Blue"] },
+        { name: "Size", options: idx % 3 === 0 ? ["Small", "Medium"] : ["Medium", "Large"] },
+      ],
+    },
   };
 }
 
@@ -73,11 +125,16 @@ export default function UikitProducts({ block, isCanvas, products: passedProduct
   // pageSize === 0 means "show all" (no limit)
   const pageSize = rawPageSize > 0 ? rawPageSize : 0;
   const paginationStyle = rawBlock.paginationStyle ?? "numbers";
+  const attributeFilterPresentation = rawBlock.attributeFilterPresentation === "sidebar" ? "sidebar" : "top";
 
   // Local state
   const [fetchedProducts, setFetchedProducts] = useState<any[]>([]);
   const [activeCategoryPill, setActiveCategoryPill] = useState<string>("all");
   const [sortOption, setSortOption] = useState<string>(blockSortOrder);
+  const [selectedAttributes, setSelectedAttributes] = useState<SelectedProductAttributes>({});
+  const [openAttributeFacet, setOpenAttributeFacet] = useState<string | null>(null);
+  const [openProductAttribute, setOpenProductAttribute] = useState<string | null>(null);
+  const [expandedSidebarFacets, setExpandedSidebarFacets] = useState<Record<string, boolean>>({});
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [loadMoreCount, setLoadMoreCount] = useState<number>(pageSize);
 
@@ -94,7 +151,7 @@ export default function UikitProducts({ block, isCanvas, products: passedProduct
   useEffect(() => {
     setCurrentPage(1);
     setLoadMoreCount(pageSize);
-  }, [selectedCategory, activeCategoryPill, sortOption, source, pageSize]);
+  }, [selectedCategory, activeCategoryPill, sortOption, source, pageSize, selectedAttributes]);
 
   // Fetch products — always re-fetch when category or source changes.
   // When passedProducts (canvas preview pool) are available AND no specific
@@ -103,18 +160,22 @@ export default function UikitProducts({ block, isCanvas, products: passedProduct
   useEffect(() => {
     const needsCategoryFetch = selectedCategory && selectedCategory !== "all";
     const needsSourceFetch = source === "featured" || source === "sale";
+    // The builder preview pool is intentionally small. Attribute facets must
+    // instead use the full product result so a facet is never omitted merely
+    // because its first product falls outside that preview slice.
+    const needsAttributeFacetFetch = rawBlock.showAttributeFilters === true;
 
     // Use passedProducts pool only when showing all / no category filter
-    if (passedProducts && passedProducts.length > 0 && !needsCategoryFetch && !needsSourceFetch) {
+    if (passedProducts && passedProducts.length > 0 && !needsCategoryFetch && !needsSourceFetch && !needsAttributeFacetFetch) {
       setFetchedProducts(passedProducts);
       return;
     }
 
     let isMounted = true;
-    // Fetch ALL products (limit=200) so client-side filtering has the full set
+    // Fetch the full catalogue so client-side filtering and its facets are complete.
     const catQuery = needsCategoryFetch ? `&categoryId=${encodeURIComponent(selectedCategory)}` : "";
     const srcQuery = needsSourceFetch ? `&source=${encodeURIComponent(source)}` : "";
-    fetch(`/api/builder-preview-products?limit=200${catQuery}${srcQuery}`)
+    fetch(`/api/builder-preview-products?limit=500${catQuery}${srcQuery}`)
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
         if (!isMounted) return;
@@ -135,7 +196,7 @@ export default function UikitProducts({ block, isCanvas, products: passedProduct
     return () => {
       isMounted = false;
     };
-  }, [passedProducts, selectedCategory, source]);
+  }, [passedProducts, selectedCategory, source, rawBlock.showAttributeFilters]);
 
   // Normalize all fetched or mock products
   const normalizedProducts = useMemo(() => {
@@ -184,6 +245,12 @@ export default function UikitProducts({ block, isCanvas, products: passedProduct
       });
     }
 
+    if (rawBlock.showAttributeFilters && Object.keys(selectedAttributes).length > 0) {
+      result = result.filter((product) =>
+        productMatchesAttributeSelection(product, selectedAttributes),
+      );
+    }
+
     // Sort
     result.sort((a, b) => {
       if (sortOption === "price-asc") return a.priceAmount - b.priceAmount;
@@ -198,7 +265,7 @@ export default function UikitProducts({ block, isCanvas, products: passedProduct
     });
 
     return result;
-  }, [normalizedProducts, source, selectedCategory, activeCategoryPill, sortOption, categoryTree]);
+  }, [normalizedProducts, source, selectedCategory, activeCategoryPill, sortOption, categoryTree, rawBlock.showAttributeFilters, selectedAttributes]);
 
   // Build unique category list from fetched products (for frontend pills)
   const categoriesList = useMemo(() => {
@@ -206,14 +273,87 @@ export default function UikitProducts({ block, isCanvas, products: passedProduct
     normalizedProducts.forEach((p) => {
       const nodes: { slug: string; name: string }[] = p.productCategories?.nodes || [];
       nodes.forEach((c) => {
-        if (c.slug) map.set(c.slug, c.name || c.slug);
+        const name = c.name || c.slug;
+        const key = name.trim().toLocaleLowerCase();
+        if (c.slug && key && !map.has(key)) map.set(key, name);
       });
-      if (!map.has(p.category) && p.category) {
-        map.set(p.category, p.categoryName || p.category);
+      if (p.category) {
+        const name = p.categoryName || p.category;
+        const key = name.trim().toLocaleLowerCase();
+        if (key && !map.has(key)) map.set(key, name);
       }
     });
     return Array.from(map.entries()).map(([slug, name]) => ({ slug, name }));
   }, [normalizedProducts]);
+
+  const attributeFacets = useMemo(
+    () => getProductAttributeFacets(normalizedProducts),
+    [normalizedProducts],
+  );
+  const hasSelectedAttributes = Object.values(selectedAttributes).some(
+    (options) => options.length > 0,
+  );
+
+  const toggleAttributeOption = (attributeKey: string, optionKey: string) => {
+    setSelectedAttributes((current) => {
+      const selected = current[attributeKey] ?? [];
+      const next = selected.includes(optionKey)
+        ? selected.filter((key) => key !== optionKey)
+        : [...selected, optionKey];
+      if (next.length === 0) {
+        const { [attributeKey]: _removed, ...remaining } = current;
+        return remaining;
+      }
+      return { ...current, [attributeKey]: next };
+    });
+  };
+
+  const attributeFilterControls = rawBlock.showAttributeFilters && attributeFacets.length > 0 && (
+    <>
+      {attributeFacets.map((facet) => {
+        const selected = selectedAttributes[facet.key] ?? [];
+        const isOpen = openAttributeFacet === facet.key;
+        return (
+          <div key={facet.key} style={{ position: "relative", display: "inline-flex", flexWrap: "wrap", gap: "4px" }}>
+            <button
+              type="button"
+              className={`uk-button uk-button-${selected.length > 0 ? "primary" : "default"} uk-button-small`}
+              aria-expanded={isOpen}
+              onClick={() => setOpenAttributeFacet((current) => current === facet.key ? null : facet.key)}
+            >
+              {facet.label}{selected.length > 0 ? ` (${selected.length})` : ""}
+            </button>
+            {isOpen && (
+              <div
+                className="uk-card uk-card-default uk-card-body uk-box-shadow-medium"
+                style={{ position: "absolute", zIndex: 20, top: "calc(100% + 6px)", left: 0, minWidth: "170px", padding: "10px", display: "flex", gap: "6px", flexWrap: "wrap" }}
+              >
+                {facet.options.map((option) => {
+                  const isSelected = selected.includes(option.key);
+                  return (
+                    <button
+                      key={option.key}
+                      type="button"
+                      className={`uk-button uk-button-${isSelected ? "primary" : "default"} uk-button-small`}
+                      aria-pressed={isSelected}
+                      onClick={() => toggleAttributeOption(facet.key, option.key)}
+                    >
+                      {option.label}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        );
+      })}
+      {hasSelectedAttributes && (
+        <button type="button" className="uk-button uk-button-text uk-button-small" onClick={() => setSelectedAttributes({})}>
+          Clear filters
+        </button>
+      )}
+    </>
+  );
 
   // Pagination
   // pageSize=0 means no limit — show all products
@@ -260,29 +400,33 @@ export default function UikitProducts({ block, isCanvas, products: passedProduct
     hover: panelHover ? "hover" : "none",
   });
 
-  // Contract MediaSettingsGroup keys: productShowMedia, productMediaPlacement,
-  // productMediaWidth, productMediaAlign, imageRatio, and imageFit.
+  // Product cards own only structural media layout. Image appearance is shared
+  // with Grid through ImageSettingsGroup and its canonical image* fields.
   const showMedia = rawBlock.productShowMedia !== false;
   const mediaPlacement = rawBlock.productMediaPlacement ?? "top";
   const mediaWidth = rawBlock.productMediaWidth ?? "medium";
-  const mediaAlign = rawBlock.productMediaAlign ?? "center";
+  const mediaAlign = rawBlock.imageAlignment ?? rawBlock.productMediaAlign ?? "center";
   const isSideMedia = mediaPlacement === "left" || mediaPlacement === "right";
   const mediaWidthValue = mediaWidth === "small" ? "35%" : mediaWidth === "large" ? "50%" : "42%";
-  const mediaObjectPosition = mediaAlign === "left" ? "left center" : mediaAlign === "right" ? "right center" : "center center";
-
-  // Contract MediaSettingsGroup keys: imageRatio, imageFit, imageShape (via ImageSettingsGroup)
-  const ratio = rawBlock.imageRatio ?? "16:9";
-  const aspectRatioValue =
-    ratio === "1:1" || ratio === "square" ? "1 / 1"
-    : ratio === "portrait" || ratio === "3:4" ? "3 / 4"
-    : ratio === "16:9" ? "16 / 9"
-    : ratio === "4:3" ? "4 / 3"
-    : ratio === "3:2" ? "3 / 2"
-    : "auto";
+  const mediaStyle = getUikitPanelMediaStyle({
+    ratio: rawBlock.imageRatio ?? "natural",
+    fit: rawBlock.imageFit === "contain" ? "contain" : "cover",
+    alignment: mediaAlign,
+  });
   const imageFit = rawBlock.imageFit ?? "cover";
-  const imageMaxHeight = rawBlock.imageHeight ? `${rawBlock.imageHeight}px` : "220px";
+  const imageDimension = (value: unknown, fallback?: string) => {
+    if (value === undefined || value === null || value === "") return fallback;
+    const stringValue = String(value);
+    return /^-?\\d+(?:\\.\\d+)?$/.test(stringValue) ? `${stringValue}px` : stringValue;
+  };
+  const imageWidth = imageDimension(rawBlock.imageWidth);
+  // Ratio owns the media box until an author explicitly supplies a height.
+  // A product-only 220px cap previously hid ratio changes that Grid displayed.
+  const imageHeight = imageDimension(rawBlock.imageHeight);
   const imageShape = rawBlock.imageShape ?? rawBlock.imageBorder ?? "rounded";
   const imageBorderRadius = imageShape === "circle" ? "50%" : imageShape === "pill" ? "9999px" : imageShape === "none" || imageShape === "sharp" ? "0px" : "6px";
+  const imageShadowClass = rawBlock.imageShadow && rawBlock.imageShadow !== "none" ? `uk-box-shadow-${rawBlock.imageShadow}` : "";
+  const imageDecorationClass = rawBlock.imageBoxDecoration && rawBlock.imageBoxDecoration !== "none" ? `uk-background-${rawBlock.imageBoxDecoration}` : "";
   const imageLoading = rawBlock.imageLoading ?? rawBlock.productMediaLoading ?? "lazy";
 
   // Contract TitleSettingsGroup keys: titleTypographyRole, productTitleSize,
@@ -330,7 +474,7 @@ export default function UikitProducts({ block, isCanvas, products: passedProduct
       )}
 
       {/* Frontend Controls Bar */}
-      {(rawBlock.showCategoryPills || rawBlock.showFrontendSort) && (
+      {(rawBlock.showCategoryPills || rawBlock.showFrontendSort || (rawBlock.showAttributeFilters && attributeFilterPresentation === "top" && attributeFacets.length > 0)) && (
         <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: "12px", marginBottom: "16px" }}>
           {/* Category Filter Pills */}
           {rawBlock.showCategoryPills && (
@@ -400,6 +544,12 @@ export default function UikitProducts({ block, isCanvas, products: passedProduct
               </select>
             </div>
           )}
+
+          {rawBlock.showAttributeFilters && attributeFilterPresentation === "top" && attributeFacets.length > 0 && (
+            <div aria-label="Product attribute filters" style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap", width: "100%" }}>
+              {attributeFilterControls}
+            </div>
+          )}
         </div>
       )}
 
@@ -415,7 +565,44 @@ export default function UikitProducts({ block, isCanvas, products: passedProduct
         </div>
       ) : (
         <>
-          {/* Products Grid */}
+          <div style={{ display: attributeFilterPresentation === "sidebar" && rawBlock.showAttributeFilters && attributeFacets.length > 0 ? "flex" : undefined, gap: "24px", alignItems: "flex-start", flexWrap: "wrap" }}>
+            {rawBlock.showAttributeFilters && attributeFilterPresentation === "sidebar" && attributeFacets.length > 0 && (
+              <aside className="uk-card uk-card-default uk-card-body builder-products-filter-sidebar" aria-label="Product attribute filters">
+                <div className="builder-products-filter-heading">Filter products</div>
+                <div className="builder-products-filter-facets">
+                  {attributeFacets.map((facet) => {
+                    const isExpanded = expandedSidebarFacets[facet.key] === true;
+                    const visibleOptions = isExpanded ? facet.options : facet.options.slice(0, 8);
+                    return (
+                    <section key={facet.key} className="builder-products-filter-facet">
+                      <div className="builder-products-filter-facet-header">
+                        <span>{facet.label}</span>
+                        <span>{facet.options.length}</span>
+                      </div>
+                      <div className="builder-products-filter-options">
+                        {visibleOptions.map((option) => {
+                          const selected = (selectedAttributes[facet.key] ?? []).includes(option.key);
+                          return <button key={option.key} type="button" className={`uk-button uk-button-${selected ? "primary" : "default"} uk-button-small builder-products-filter-option`} aria-pressed={selected} onClick={() => toggleAttributeOption(facet.key, option.key)}>{option.label}</button>;
+                        })}
+                      </div>
+                      {facet.options.length > 8 && (
+                        <button
+                          type="button"
+                          className="uk-button uk-button-text uk-button-small builder-products-filter-expand"
+                          onClick={() => setExpandedSidebarFacets((current) => ({ ...current, [facet.key]: !isExpanded }))}
+                        >
+                          {isExpanded ? "Show less" : `Show all (${facet.options.length})`}
+                        </button>
+                      )}
+                    </section>
+                  )})}
+                  {hasSelectedAttributes && <button type="button" className="uk-button uk-button-text uk-button-small builder-products-filter-clear" onClick={() => setSelectedAttributes({})}>Clear filters</button>}
+                </div>
+              </aside>
+            )}
+
+            {/* Products Grid */}
+            <div style={{ flex: "1 1 0", minWidth: "min(100%, 280px)" }}>
           <div className={`uk-grid ${gridGapClass}`} data-uk-grid>
             {visibleProducts.map((product) => (
               <div key={product.id} className={`${columnWidthClass} uk-width-1-2@s`}>
@@ -439,12 +626,12 @@ export default function UikitProducts({ block, isCanvas, products: passedProduct
                       }}
                     >
                       <div
-                        className="uk-card-media-top"
+                        className={`${getUikitPanelMediaClass(mediaPlacement)} ${imageDecorationClass}`.trim()}
                         style={{
                           position: "relative",
-                          width: "100%",
-                          aspectRatio: aspectRatioValue,
-                          maxHeight: imageMaxHeight,
+                          width: imageWidth ?? "100%",
+                          aspectRatio: mediaStyle.aspectRatio,
+                          maxHeight: imageHeight,
                           overflow: "hidden",
                           alignSelf: mediaAlign === "center" ? "center" : "stretch",
                         }}
@@ -453,11 +640,12 @@ export default function UikitProducts({ block, isCanvas, products: passedProduct
                           src={product.image}
                           alt={product.name}
                           loading={imageLoading}
+                          className={imageShadowClass || undefined}
                           style={{
                             width: "100%",
                             height: "100%",
                             objectFit: imageFit as any,
-                            objectPosition: mediaObjectPosition,
+                            objectPosition: mediaStyle.backgroundPosition,
                             borderRadius: imageBorderRadius,
                             display: "block",
                           }}
@@ -487,9 +675,8 @@ export default function UikitProducts({ block, isCanvas, products: passedProduct
 
                   {/* Product Info */}
                   <div
-                    className={contentClassName || undefined}
+                    className={`uk-card-body ${contentClassName}`.trim()}
                     style={{
-                      padding: panelSize === "small" ? "8px 10px 10px" : panelSize === "large" ? "18px 20px 20px" : "12px 14px 14px",
                       flex: isSideMedia && showMedia ? "1 1 auto" : undefined,
                       minWidth: isSideMedia && showMedia ? 0 : undefined,
                       textAlign: contentAlignStyle,
@@ -504,7 +691,7 @@ export default function UikitProducts({ block, isCanvas, products: passedProduct
                           metaLevel,
                           {
                             className: metaClassName || undefined,
-                            style: { color: "#999", textTransform: "uppercase", letterSpacing: "0.6px", display: "block", textAlign: metaAlignStyle },
+                            style: { textTransform: "uppercase", letterSpacing: "0.6px", display: "block", textAlign: metaAlignStyle },
                           },
                           product.categoryName,
                         )
@@ -515,20 +702,59 @@ export default function UikitProducts({ block, isCanvas, products: passedProduct
                         product.name
                       )}
                     </Link>
+                    {(() => {
+                      const { attributes, tooltip } = getCardAttributeSummary(product);
+                      return attributes.length > 0 ? (
+                        <div
+                          className="builder-product-card-attributes"
+                          aria-label={tooltip}
+                        >
+                          {attributes.map((attribute) => {
+                            const attributeId = `${product.id}:${attribute.attrKey}`;
+                            const isOpen = openProductAttribute === attributeId;
+                            return (
+                              <div key={attribute.attrKey} className="builder-product-card-attribute-control">
+                                <button
+                                  type="button"
+                                  className="uk-button uk-button-default uk-button-small builder-product-card-attribute-trigger"
+                                  aria-expanded={isOpen}
+                                  onClick={() => setOpenProductAttribute((current) => current === attributeId ? null : attributeId)}
+                                >
+                                  {attribute.label}
+                                </button>
+                                {isOpen && (
+                                  <div className="builder-product-card-attribute-popover" role="status">
+                                    {attribute.values.join(", ")}
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      ) : null;
+                    })()}
                     <div style={{ display: "flex", alignItems: "center", justifyContent: contentAlignStyle === "center" ? "center" : contentAlignStyle === "right" ? "flex-end" : "space-between", gap: "8px", flexWrap: "wrap" }}>
-                      <strong className={contentClassName || undefined} style={{ fontSize: "15px", color: "#1e87f0", fontWeight: 700 }}>
+                      <strong className={`uk-text-primary ${contentClassName}`.trim()} style={{ fontSize: "15px", fontWeight: 700 }}>
                         {product.price}
                       </strong>
                       {showCartButton && (
-                        <button type="button" className={cartButtonClass}>
-                          Add to Cart
-                        </button>
+                        <AddToCartButton
+                          id={product.id}
+                          productId={product.databaseId ?? product.id}
+                          slug={product.slug}
+                          name={product.name}
+                          priceNumber={product.priceAmount}
+                          imageUrl={product.image}
+                          className={cartButtonClass}
+                        />
                       )}
                     </div>
                   </div>
                 </div>
               </div>
             ))}
+          </div>
+            </div>
           </div>
 
           {/* Pagination Controls */}

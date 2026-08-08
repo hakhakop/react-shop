@@ -32,7 +32,7 @@ import TextCapabilityPanel from "@/components/dashboard/inspector/panels/TextCap
 /** Normal page kinds with a dedicated capability-driven inspector path. */
 export const CANONICAL_INSPECTOR_KINDS = [
   "button", "panel", "heading", "text", "list", "accordion", "image",
-  "hero", "grid", "gallery", "slider", "fluentForm", "products", "categoryFilters", "icon", "badgeGrid", "table", "divider", "alert", "breadcrumbs", "datePicker",
+  "hero", "grid", "gallery", "slider", "panelSlider", "fluentForm", "products", "categoryFilters", "icon", "badgeGrid", "table", "divider", "alert", "breadcrumbs", "datePicker",
 ] as const satisfies readonly LayoutBlockKind[];
 
 /**
@@ -133,7 +133,7 @@ export const INSPECTOR_ELEMENT_CAPABILITIES: Partial<Record<LayoutBlockKind, Ins
     settingsLabel: "Settings",
   },
   accordion: {
-    capabilities: ["content", "settings", "appearance", "behavior", "effects", "advanced"],
+    capabilities: ["content", "style", "advanced"],
     composes: ["content", "repeatable-items", "component-presentation", "general", "animation"],
     settingsSources: ["style"],
     panel: AccordionCapabilityPanel,
@@ -169,6 +169,13 @@ export const INSPECTOR_ELEMENT_CAPABILITIES: Partial<Record<LayoutBlockKind, Ins
     settingsLabel: "Settings",
   },
   slider: {
+    capabilities: ["content", "style", "advanced"],
+    composes: ["content", "repeatable-items", "component-presentation", "media", "link", "general", "animation"],
+    settingsSources: ["style"],
+    panel: SliderCapabilityPanel,
+    settingsLabel: "Settings",
+  },
+  panelSlider: {
     capabilities: ["content", "style", "advanced"],
     composes: ["content", "repeatable-items", "component-presentation", "media", "link", "general", "animation"],
     settingsSources: ["style"],

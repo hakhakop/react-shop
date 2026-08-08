@@ -19,9 +19,31 @@ export type YoothemeImportRow = {
   note?: string;
 };
 
+export type YoothemeDevstackPresetId =
+  | "devstack-dark-purple"
+  | "devstack-dark-red"
+  | "devstack-light-blue"
+  | "devstack-light-green"
+  | "devstack-light-orange";
+
+export type YoothemeDevstackPresetDefinition = {
+  id: YoothemeDevstackPresetId;
+  name: string;
+  description: string;
+  styleFile: string;
+};
+
+export const YOOTHEME_DEVSTACK_PRESETS: readonly YoothemeDevstackPresetDefinition[] = [
+  { id: "devstack-dark-purple", name: "DevStack Dark Purple", description: "DevStack dark purple semantic style preset.", styleFile: "master-devstack/styles/dark-purple.less" },
+  { id: "devstack-dark-red", name: "DevStack Dark Red", description: "DevStack dark red semantic style preset.", styleFile: "master-devstack/styles/dark-red.less" },
+  { id: "devstack-light-blue", name: "DevStack Light Blue", description: "DevStack light blue semantic style preset.", styleFile: "master-devstack/styles/light-blue.less" },
+  { id: "devstack-light-green", name: "DevStack Light Green", description: "DevStack light green semantic style preset.", styleFile: "master-devstack/styles/light-green.less" },
+  { id: "devstack-light-orange", name: "DevStack Light Orange", description: "DevStack light orange semantic style preset.", styleFile: "master-devstack/styles/light-orange.less" },
+];
+
 export type YoothemeSemanticPreset = {
-  id: "devstack-light-blue";
-  name: "DevStack Light Blue";
+  id: YoothemeDevstackPresetId;
+  name: string;
   description: string;
   shellSettings: Partial<BuilderShellSettings>;
   design: Partial<BuilderDesign>;
@@ -439,7 +461,8 @@ function setNested(target: Record<string, unknown>, path: string, value: string)
   target[key] = value;
 }
 
-export function resolveYoothemeLess(sources: YoothemeLessSource[]): YoothemeSemanticPreset {
+export function resolveYoothemeLess(sources: YoothemeLessSource[], presetId: YoothemeDevstackPresetId = "devstack-light-blue"): YoothemeSemanticPreset {
+  const presetDefinition = YOOTHEME_DEVSTACK_PRESETS.find((preset) => preset.id === presetId) ?? YOOTHEME_DEVSTACK_PRESETS[2];
   const ordered = [...sources].sort((a, b) => a.precedence - b.precedence);
   const { latest, all } = getLatestDeclarations(ordered);
   const rawValues = new Map([...latest.entries()].map(([name, declaration]) => [name, declaration.rawValue]));
@@ -488,9 +511,9 @@ export function resolveYoothemeLess(sources: YoothemeLessSource[]): YoothemeSema
 
   const design: Partial<BuilderDesign> = {};
   return {
-    id: "devstack-light-blue",
-    name: "DevStack Light Blue",
-    description: "Imported semantic Global Styles from the DevStack Light Blue YOOtheme LESS layers.",
+    id: presetDefinition.id,
+    name: presetDefinition.name,
+    description: `Imported semantic Global Styles from the ${presetDefinition.name} YOOtheme LESS layers.`,
     shellSettings: shellSettings as Partial<BuilderShellSettings>,
     design,
     rows,
@@ -500,6 +523,7 @@ export function resolveYoothemeLess(sources: YoothemeLessSource[]): YoothemeSema
   };
 }
 
-export function getYoothemeImportSourceOrder() {
-  return ["master-devstack/_import.less", "master-devstack/styles/light-blue.less", "theme.less", "style.less"] as const;
+export function getYoothemeImportSourceOrder(presetId: YoothemeDevstackPresetId = "devstack-light-blue") {
+  const presetDefinition = YOOTHEME_DEVSTACK_PRESETS.find((preset) => preset.id === presetId) ?? YOOTHEME_DEVSTACK_PRESETS[2];
+  return ["master-devstack/_import.less", presetDefinition.styleFile, "theme.less", "style.less"] as const;
 }

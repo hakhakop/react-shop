@@ -1,10 +1,11 @@
 "use client";
 
 import type { BuilderLayoutBlock, BuilderListItem } from "@/components/dashboard/builderTypes";
-import { getUikitListClass } from "@/lib/uikitTokens";
+import { getUikitListClass, getUikitTextClass } from "@/lib/uikitTokens";
 import { builderLinkTargetProps } from "@/lib/websiteBuilderLinks";
 import { WebPagesIcon } from "@/components/builder/WebPagesIcon";
 import { resolveUikitIconName } from "@/lib/uikitIconRegistry";
+import { typographyRoleClass } from "@/lib/builderTypography";
 
 type Props = {
   block: any;
@@ -20,8 +21,9 @@ export default function UikitList({ block }: Props) {
   });
 
   const listItems: BuilderListItem[] =
-    rawBlock.listItems ??
-    (rawBlock.items ?? []).map((text: string, index: number) => ({
+    rawBlock.listItems?.length
+      ? rawBlock.listItems
+      : (rawBlock.items ?? []).map((text: string, index: number) => ({
       id: `${rawBlock.id ?? "list"}-item-${index}`,
       text,
     }));
@@ -30,6 +32,9 @@ export default function UikitList({ block }: Props) {
   const textAlignClass = rawBlock.textAlign && rawBlock.textAlign !== "none" ? `uk-text-${rawBlock.textAlign}` : "";
   const animationClass = rawBlock.animation && rawBlock.animation !== "none" ? `uk-animation-${rawBlock.animation}` : "";
   const visibilityClass = rawBlock.visibility && rawBlock.visibility !== "always" ? `uk-${rawBlock.visibility}` : "";
+  const contentStyleClass = getUikitTextClass(rawBlock.contentStyle);
+  const contentRoleClass = typographyRoleClass(rawBlock.contentTypographyRole);
+  const itemTextClass = `${contentStyleClass} ${contentRoleClass}`.trim();
 
   return (
     <div
@@ -51,16 +56,16 @@ export default function UikitList({ block }: Props) {
           return (
             <li key={item.id} className="webpages-list-item">
               {resolvedIcon && (
-                <span className="uk-margin-small-right" style={{ display: "inline-flex", alignItems: "center" }}>
-                  <WebPagesIcon name={iconName as any} size={iconSize} />
+                <span className="webpages-list-item__icon">
+                  <WebPagesIcon name={resolvedIcon} size={iconSize} />
                 </span>
               )}
               {item.url ? (
-                <a href={item.url} {...builderLinkTargetProps(target)}>
+                <a className={itemTextClass} href={item.url} {...builderLinkTargetProps(target)}>
                   {item.text}
                 </a>
               ) : (
-                <span>{item.text}</span>
+                <span className={itemTextClass}>{item.text}</span>
               )}
             </li>
           );

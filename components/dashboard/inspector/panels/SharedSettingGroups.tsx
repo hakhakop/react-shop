@@ -30,78 +30,154 @@ const roleOptions = [
   { value: "tertiary", label: "Tertiary" },
 ];
 
+/** Canonical semantic text-style vocabulary shared by content-capable elements. */
+export const CONTENT_STYLE_OPTIONS = [
+  { value: "none", label: "None" },
+  { value: "text-bold", label: "Text Bold" },
+  { value: "text-lead", label: "Text Lead" },
+  { value: "text-meta", label: "Text Meta" },
+  { value: "text-small", label: "Text Small" },
+  { value: "text-large", label: "Text Large" },
+  { value: "text-muted", label: "Text Muted" },
+  { value: "heading-small", label: "Heading Small" },
+  { value: "heading-h1", label: "Heading H1" },
+  { value: "heading-h2", label: "Heading H2" },
+  { value: "heading-h3", label: "Heading H3" },
+  { value: "heading-h4", label: "Heading H4" },
+  { value: "heading-h5", label: "Heading H5" },
+  { value: "heading-h6", label: "Heading H6" },
+] as const;
+
 /**
  * Reusable Title Settings Group.
- * Displays Font role, Visual preset, Alignment, and HTML Element.
+ * Displays Style, Decoration, Font Family, and HTML Element.
  */
 export function TitleSettingsGroup({
   block,
   update,
+  showFontRole = true,
+  showDecoration = false,
+  showColor = false,
+  defaultSize = "medium",
+  defaultLevel = "h2",
+  visualPresetOptions,
+  styleAriaLabel = "Title style",
   keys = {
     role: "titleTypographyRole",
     size: "headingSize",
     align: "headingAlign",
     level: "headingLevel",
+    decoration: "titleDecoration",
+    color: "titleColor",
   },
 }: {
   block: BuilderLayoutBlock;
   update: (patch: any) => void;
+  showFontRole?: boolean;
+  /** @deprecated Alignment is owned by the shared General settings panel. */
+  showAlignment?: boolean;
+  showDecoration?: boolean;
+  showColor?: boolean;
+  defaultSize?: string;
+  defaultLevel?: string;
+  visualPresetOptions?: Array<{ value: string; label: string }>;
+  styleAriaLabel?: string;
   keys?: {
     role: string;
     size: string;
     align: string;
     level: string;
+    decoration?: string;
+    color?: string;
   };
 }) {
   const values = block as any;
+  const decorationKey = keys.decoration ?? "titleDecoration";
+  const colorKey = keys.color ?? "titleColor";
   return (
     <InspectorDivision title="TITLE">
       <InspectorFieldRow
-        label="Font role"
-        isOverridden={values[keys.role] !== undefined && values[keys.role] !== "inherit"}
-        inheritedValueText="Inherit"
-        onReset={() => update({ [keys.role]: undefined })}
-      >
-        <InspectorSelect
-          value={String(values[keys.role] ?? "inherit")}
-          options={roleOptions}
-          onChange={(value) => update({ [keys.role]: value === "inherit" ? undefined : value })}
-        />
-      </InspectorFieldRow>
-
-      <InspectorFieldRow
-        label="Visual preset"
+        label="Style"
         isOverridden={values[keys.size] !== undefined}
-        inheritedValueText="Medium"
+        inheritedValueText={defaultSize === "none" ? "None" : defaultSize === "inherit" ? "Inherit" : "Medium"}
         onReset={() => update({ [keys.size]: undefined })}
       >
         <InspectorSelect
-          value={String(values[keys.size] ?? "medium")}
-          options={labels(UIKIT_HEADING_CAPABILITY.properties.visualPreset.values)}
+          value={String(values[keys.size] ?? defaultSize)}
+          options={visualPresetOptions ?? labels(UIKIT_HEADING_CAPABILITY.properties.visualPreset.values)}
           onChange={(value) => update({ [keys.size]: value })}
+          ariaLabel={styleAriaLabel}
         />
       </InspectorFieldRow>
 
-      <InspectorFieldRow
-        label="Alignment"
-        isOverridden={values[keys.align] !== undefined}
-        inheritedValueText="Left"
-        onReset={() => update({ [keys.align]: undefined })}
-      >
-        <InspectorAlignmentControl
-          value={String(values[keys.align] ?? "left")}
-          onChange={(value) => update({ [keys.align]: value })}
-        />
-      </InspectorFieldRow>
+      {showDecoration && (
+        <InspectorFieldRow
+          label="Decoration"
+          isOverridden={values[decorationKey] !== undefined}
+          inheritedValueText="None"
+          onReset={() => update({ [decorationKey]: undefined })}
+        >
+          <InspectorSelect
+            value={String(values[decorationKey] ?? "none")}
+            options={[
+              { value: "none", label: "None" },
+              { value: "divider", label: "Divider" },
+              { value: "bullet", label: "Bullet" },
+              { value: "line", label: "Line" },
+            ]}
+            onChange={(value) => update({ [decorationKey]: value })}
+          />
+        </InspectorFieldRow>
+      )}
+
+      {showFontRole && (
+        <InspectorFieldRow
+          label="Font Family"
+          isOverridden={values[keys.role] !== undefined && values[keys.role] !== "inherit"}
+          inheritedValueText="Inherit"
+          onReset={() => update({ [keys.role]: undefined })}
+        >
+          <InspectorSelect
+            value={String(values[keys.role] ?? "inherit")}
+            options={roleOptions}
+            onChange={(value) => update({ [keys.role]: value === "inherit" ? undefined : value })}
+            ariaLabel="Title font family"
+          />
+        </InspectorFieldRow>
+      )}
+
+      {showColor && (
+        <InspectorFieldRow
+          label="Color"
+          isOverridden={values[colorKey] !== undefined}
+          inheritedValueText="None"
+          onReset={() => update({ [colorKey]: undefined })}
+        >
+          <InspectorSelect
+            value={String(values[colorKey] ?? "none")}
+            options={[
+              { value: "none", label: "None" },
+              { value: "muted", label: "Muted" },
+              { value: "emphasis", label: "Emphasis" },
+              { value: "primary", label: "Primary" },
+              { value: "secondary", label: "Secondary" },
+              { value: "success", label: "Success" },
+              { value: "warning", label: "Warning" },
+              { value: "danger", label: "Danger" },
+            ]}
+            onChange={(value) => update({ [colorKey]: value })}
+          />
+        </InspectorFieldRow>
+      )}
 
       <InspectorFieldRow
         label="HTML Element"
         isOverridden={values[keys.level] !== undefined}
-        inheritedValueText="H2"
+        inheritedValueText={defaultLevel.toUpperCase()}
         onReset={() => update({ [keys.level]: undefined })}
       >
         <InspectorSelect
-          value={String(values[keys.level] ?? "h2")}
+          value={String(values[keys.level] ?? defaultLevel)}
           options={UIKIT_HEADING_CAPABILITY.properties.level.values.map((v) => ({
             value: v,
             label: v.toUpperCase(),
@@ -120,21 +196,40 @@ export function TitleSettingsGroup({
 export function MetaSettingsGroup({
   block,
   update,
+  showAlignment = true,
+  showStyle = false,
+  showColor = false,
+  showPosition = false,
+  showHtmlElement = true,
   keys = {
     role: "metaTypographyRole",
     align: "metaAlign",
     level: "metaHtmlElement",
+    style: "metaStyle",
+    color: "metaColor",
+    position: "gridMetaAlign",
   },
 }: {
   block: BuilderLayoutBlock;
   update: (patch: any) => void;
+  showAlignment?: boolean;
+  showStyle?: boolean;
+  showColor?: boolean;
+  showPosition?: boolean;
+  showHtmlElement?: boolean;
   keys?: {
     role: string;
     align: string;
     level: string;
+    style?: string;
+    color?: string;
+    position?: string;
   };
 }) {
   const values = block as any;
+  const styleKey = keys.style ?? "metaStyle";
+  const colorKey = keys.color ?? "metaColor";
+  const positionKey = keys.position ?? "gridMetaAlign";
   return (
     <InspectorDivision title="META">
       <InspectorFieldRow
@@ -150,7 +245,69 @@ export function MetaSettingsGroup({
         />
       </InspectorFieldRow>
 
-      <InspectorFieldRow
+      {showStyle && (
+        <InspectorFieldRow
+          label="Style"
+          isOverridden={values[styleKey] !== undefined}
+          inheritedValueText="Text meta"
+          onReset={() => update({ [styleKey]: undefined })}
+        >
+          <InspectorSelect
+            value={String(values[styleKey] ?? "text-meta")}
+            options={[
+              { value: "text-meta", label: "Text Meta" },
+              { value: "text-lead", label: "Text Lead" },
+              { value: "heading-small", label: "Heading Small" },
+            ]}
+            onChange={(value) => update({ [styleKey]: value })}
+          />
+        </InspectorFieldRow>
+      )}
+
+      {showColor && (
+        <InspectorFieldRow
+          label="Color"
+          isOverridden={values[colorKey] !== undefined}
+          inheritedValueText="None"
+          onReset={() => update({ [colorKey]: undefined })}
+        >
+          <InspectorSelect
+            value={String(values[colorKey] ?? "none")}
+            options={[
+              { value: "none", label: "None" },
+              { value: "muted", label: "Muted" },
+              { value: "emphasis", label: "Emphasis" },
+              { value: "primary", label: "Primary" },
+              { value: "secondary", label: "Secondary" },
+              { value: "success", label: "Success" },
+              { value: "warning", label: "Warning" },
+              { value: "danger", label: "Danger" },
+            ]}
+            onChange={(value) => update({ [colorKey]: value })}
+          />
+        </InspectorFieldRow>
+      )}
+
+      {showPosition && (
+        <InspectorFieldRow
+          label="Position"
+          isOverridden={values[positionKey] !== undefined}
+          inheritedValueText="Below title"
+          onReset={() => update({ [positionKey]: undefined })}
+        >
+          <InspectorSelect
+            value={String(values[positionKey] ?? "below-title")}
+            options={[
+              { value: "above-title", label: "Above Title" },
+              { value: "below-title", label: "Below Title" },
+              { value: "below-content", label: "Below Content" },
+            ]}
+            onChange={(value) => update({ [positionKey]: value })}
+          />
+        </InspectorFieldRow>
+      )}
+
+      {showAlignment && <InspectorFieldRow
         label="Alignment"
         isOverridden={values[keys.align] !== undefined}
         inheritedValueText="Left"
@@ -160,23 +317,26 @@ export function MetaSettingsGroup({
           value={String(values[keys.align] ?? "left")}
           onChange={(value) => update({ [keys.align]: value })}
         />
-      </InspectorFieldRow>
+      </InspectorFieldRow>}
 
-      <InspectorFieldRow
-        label="HTML Element"
-        isOverridden={values[keys.level] !== undefined}
-        inheritedValueText="Div"
-        onReset={() => update({ [keys.level]: undefined })}
-      >
-        <InspectorSelect
-          value={String(values[keys.level] ?? "div")}
-          options={["div", "span", "p"].map((v) => ({
-            value: v,
-            label: v.toUpperCase(),
-          }))}
-          onChange={(value) => update({ [keys.level]: value })}
-        />
-      </InspectorFieldRow>
+      {showHtmlElement && (
+        <InspectorFieldRow
+          label="HTML Element"
+          isOverridden={values[keys.level] !== undefined}
+          inheritedValueText="Div"
+          onReset={() => update({ [keys.level]: undefined })}
+        >
+          <InspectorSelect
+            value={String(values[keys.level] ?? "div")}
+            options={["div", "span", "p"].map((v) => ({
+              value: v,
+              label: v.toUpperCase(),
+            }))}
+            onChange={(value) => update({ [keys.level]: value })}
+            ariaLabel="Title HTML element"
+          />
+        </InspectorFieldRow>
+      )}
     </InspectorDivision>
   );
 }
@@ -188,22 +348,35 @@ export function MetaSettingsGroup({
 export function ContentSettingsGroup({
   block,
   update,
+  showAlignment = true,
+  showStyle = false,
+  showRole = true,
+  defaultStyle = "none",
+  styleOptions,
   keys = {
     role: "contentTypographyRole",
     align: "contentAlign",
+    style: "contentStyle",
   },
 }: {
   block: BuilderLayoutBlock;
   update: (patch: any) => void;
+  showAlignment?: boolean;
+  showStyle?: boolean;
+  showRole?: boolean;
+  defaultStyle?: string;
+  styleOptions?: Array<{ value: string; label: string }>;
   keys?: {
     role: string;
     align: string;
+    style?: string;
   };
 }) {
   const values = block as any;
+  const styleKey = keys.style ?? "contentStyle";
   return (
     <InspectorDivision title="CONTENT">
-      <InspectorFieldRow
+      {showRole && <InspectorFieldRow
         label="Font role"
         isOverridden={values[keys.role] !== undefined && values[keys.role] !== "inherit"}
         inheritedValueText="Inherit"
@@ -213,10 +386,27 @@ export function ContentSettingsGroup({
           value={String(values[keys.role] ?? "inherit")}
           options={roleOptions}
           onChange={(value) => update({ [keys.role]: value === "inherit" ? undefined : value })}
+          ariaLabel="Content font role"
         />
-      </InspectorFieldRow>
+      </InspectorFieldRow>}
 
-      <InspectorFieldRow
+      {showStyle && (
+        <InspectorFieldRow
+          label="Style"
+          isOverridden={values[styleKey] !== undefined}
+          inheritedValueText="None"
+          onReset={() => update({ [styleKey]: undefined })}
+        >
+          <InspectorSelect
+          value={String(values[styleKey] ?? defaultStyle)}
+          options={styleOptions ?? CONTENT_STYLE_OPTIONS}
+          onChange={(value) => update({ [styleKey]: value === "inherit" ? undefined : value })}
+          ariaLabel="Content style"
+          />
+        </InspectorFieldRow>
+      )}
+
+      {showAlignment && <InspectorFieldRow
         label="Alignment"
         isOverridden={values[keys.align] !== undefined}
         inheritedValueText="Left"
@@ -226,7 +416,7 @@ export function ContentSettingsGroup({
           value={String(values[keys.align] ?? "left")}
           onChange={(value) => update({ [keys.align]: value })}
         />
-      </InspectorFieldRow>
+      </InspectorFieldRow>}
     </InspectorDivision>
   );
 }
@@ -238,6 +428,7 @@ export function ContentSettingsGroup({
 export function ImageSettingsGroup({
   block,
   update,
+  showFrameless = false,
   keys = {
     width: "imageWidth",
     height: "imageHeight",
@@ -248,10 +439,12 @@ export function ImageSettingsGroup({
     shadow: "imageShadow",
     decoration: "imageBoxDecoration",
     align: "imageAlignment",
+    frameless: "alignImageWithoutPadding",
   },
 }: {
   block: BuilderLayoutBlock;
   update: (patch: any) => void;
+  showFrameless?: boolean;
   keys?: {
     width: string;
     height: string;
@@ -262,6 +455,7 @@ export function ImageSettingsGroup({
     shadow: string;
     decoration?: string;
     align: string;
+    frameless?: string;
   };
 }) {
   const values = block as any;
@@ -270,6 +464,7 @@ export function ImageSettingsGroup({
   const shapeVal = values[keys.shape] ?? values.imageBorder ?? "none";
   const shadowVal = values[keys.shadow] ?? values.imageBoxShadow ?? "none";
   const decorationKey = keys.decoration ?? "imageBoxDecoration";
+  const framelessKey = keys.frameless ?? "alignImageWithoutPadding";
   const decorationVal = values[decorationKey] ?? "none";
 
   return (
@@ -420,6 +615,21 @@ export function ImageSettingsGroup({
           onChange={(value) => update({ [keys.align]: value })}
         />
       </InspectorFieldRow>
+
+      {showFrameless && (
+        <InspectorFieldRow
+          label="Image"
+          isOverridden={values[framelessKey] !== undefined}
+          inheritedValueText="Off"
+          onReset={() => update({ [framelessKey]: undefined })}
+        >
+          <InspectorSwitch
+            checked={Boolean(values[framelessKey])}
+            onChange={(checked) => update({ [framelessKey]: checked })}
+            label="Align image without padding"
+          />
+        </InspectorFieldRow>
+      )}
     </InspectorDivision>
   );
 }
@@ -485,6 +695,8 @@ export function ActionSettingsGroup({
   update,
   title = "ACTION BUTTON",
   showVisibilityToggle = false,
+  showFullWidth = false,
+  showPresentation = true,
   keys = {
     visible: "panelActionVisible",
     label: "buttonLabel",
@@ -492,12 +704,16 @@ export function ActionSettingsGroup({
     target: "buttonTarget",
     style: "buttonStyle",
     size: "size",
+    width: "fullWidthButton",
   },
 }: {
   block: BuilderLayoutBlock;
   update: (patch: any) => void;
   title?: string;
   showVisibilityToggle?: boolean;
+  showFullWidth?: boolean;
+  /** Content tabs use the same action contract without repeating style controls. */
+  showPresentation?: boolean;
   keys?: {
     visible?: string;
     label?: string;
@@ -505,6 +721,7 @@ export function ActionSettingsGroup({
     target?: string;
     style?: string;
     size?: string;
+    width?: string;
   };
 }) {
   const values = block as any;
@@ -514,6 +731,7 @@ export function ActionSettingsGroup({
   const urlKey = keys.url;
   const targetKey = keys.target;
   const visibleKey = keys.visible;
+  const widthKey = keys.width;
 
   return (
     <InspectorDivision title={title}>
@@ -578,33 +796,50 @@ export function ActionSettingsGroup({
         </InspectorFieldRow>
       )}
 
-      <InspectorFieldRow
-        label="Style"
-        isOverridden={values[styleKey] !== undefined}
-        inheritedValueText="Primary"
-        onReset={() => update({ [styleKey]: undefined })}
-      >
-        <InspectorPillGroup
-          value={String(values[styleKey] ?? "primary")}
-          options={labels(UIKIT_BUTTON_CAPABILITY.properties.variant.values)}
-          onChange={(value) => update({ [styleKey]: value })}
-          ariaLabel="Button style"
-        />
-      </InspectorFieldRow>
+      {showPresentation && <>
+        <InspectorFieldRow
+          label="Style"
+          isOverridden={values[styleKey] !== undefined}
+          inheritedValueText="Primary"
+          onReset={() => update({ [styleKey]: undefined })}
+        >
+          <InspectorPillGroup
+            value={String(values[styleKey] ?? "primary")}
+            options={labels(UIKIT_BUTTON_CAPABILITY.properties.variant.values)}
+            onChange={(value) => update({ [styleKey]: value })}
+            ariaLabel="Button variant"
+          />
+        </InspectorFieldRow>
 
-      <InspectorFieldRow
-        label="Button size"
-        isOverridden={values[sizeKey] !== undefined}
-        inheritedValueText="Default"
-        onReset={() => update({ [sizeKey]: undefined })}
-      >
-        <InspectorPillGroup
-          value={String(values[sizeKey] ?? "default")}
-          options={labels(UIKIT_BUTTON_CAPABILITY.properties.size.values)}
-          onChange={(value) => update({ [sizeKey]: value })}
-          ariaLabel="Button size"
-        />
-      </InspectorFieldRow>
+        <InspectorFieldRow
+          label="Button size"
+          isOverridden={values[sizeKey] !== undefined}
+          inheritedValueText="Default"
+          onReset={() => update({ [sizeKey]: undefined })}
+        >
+          <InspectorPillGroup
+            value={String(values[sizeKey] ?? "default")}
+            options={labels(UIKIT_BUTTON_CAPABILITY.properties.size.values)}
+            onChange={(value) => update({ [sizeKey]: value })}
+            ariaLabel="Button size"
+          />
+        </InspectorFieldRow>
+      </>}
+
+      {showFullWidth && widthKey && (
+        <InspectorFieldRow
+          label="Full width"
+          isOverridden={values[widthKey] !== undefined}
+          inheritedValueText="Off"
+          onReset={() => update({ [widthKey]: undefined })}
+        >
+          <InspectorSwitch
+            checked={Boolean(values[widthKey])}
+            onChange={(checked) => update({ [widthKey]: checked })}
+            label="Full width button"
+          />
+        </InspectorFieldRow>
+      )}
     </InspectorDivision>
   );
 }
@@ -617,50 +852,70 @@ export function CardSettingsGroup({
   block,
   update,
   title = "CARD / PANEL",
+  surfaceOptions,
+  sizeOptions,
+  defaultSize = "default",
+  showLink = false,
   keys = {
     variant: "panelVariant",
     size: "panelSize",
     hover: "panelHover",
+    link: "linkPanel",
   },
 }: {
   block: BuilderLayoutBlock;
   update: (patch: any) => void;
   title?: string;
+  surfaceOptions?: Array<{ value: string; label: string }>;
+  sizeOptions?: Array<{ value: string; label: string }>;
+  defaultSize?: string;
+  showLink?: boolean;
   keys?: {
     variant: string;
     size: string;
     hover: string;
+    link?: string;
   };
 }) {
   const values = block as any;
+  const linkKey = keys.link ?? "linkPanel";
   const variantValues = ["default", "primary", "secondary", "blank"] as const;
   const sizeValues = ["small", "default", "large"] as const;
 
   return (
     <InspectorDivision title={title}>
       <InspectorFieldRow
-        label="Variant"
+        label={surfaceOptions ? "Style" : "Variant"}
         isOverridden={values[keys.variant] !== undefined}
-        inheritedValueText="Default"
+        inheritedValueText={surfaceOptions ? "None" : "Default"}
         onReset={() => update({ [keys.variant]: undefined })}
       >
-        <InspectorPillGroup
-          value={String(values[keys.variant] ?? "default")}
-          options={labels(variantValues)}
-          onChange={(value) => update({ [keys.variant]: value })}
-          ariaLabel="Card variant"
-        />
+        {surfaceOptions ? (
+          <InspectorSelect
+            value={String(values[keys.variant] ?? "none")}
+            options={surfaceOptions}
+            onChange={(value) => update({ [keys.variant]: value })}
+            ariaLabel="Panel style"
+          />
+        ) : (
+          <InspectorPillGroup
+            value={String(values[keys.variant] ?? "default")}
+            options={labels(variantValues)}
+            onChange={(value) => update({ [keys.variant]: value })}
+            ariaLabel="Card variant"
+          />
+        )}
       </InspectorFieldRow>
 
       <InspectorFieldRow
         label="Size"
         isOverridden={values[keys.size] !== undefined}
-        inheritedValueText="Default"
+        inheritedValueText={defaultSize === "none" ? "None" : "Default"}
         onReset={() => update({ [keys.size]: undefined })}
       >
         <InspectorPillGroup
-          value={String(values[keys.size] ?? "default")}
-          options={labels(sizeValues)}
+          value={String(values[keys.size] ?? defaultSize)}
+          options={sizeOptions ?? labels(sizeValues)}
           onChange={(value) => update({ [keys.size]: value })}
           ariaLabel="Card size"
         />
@@ -678,14 +933,29 @@ export function CardSettingsGroup({
           label="Enable hover effect"
         />
       </InspectorFieldRow>
+
+      {showLink && (
+        <InspectorFieldRow
+          label="Link"
+          isOverridden={values[linkKey] !== undefined}
+          inheritedValueText="Off"
+          onReset={() => update({ [linkKey]: undefined })}
+        >
+          <InspectorSwitch
+            checked={Boolean(values[linkKey])}
+            onChange={(checked) => update({ [linkKey]: checked })}
+            label="Link entire panel"
+          />
+        </InspectorFieldRow>
+      )}
     </InspectorDivision>
   );
 }
 
 /**
- * Canonical Media Settings Group.
- * Displays Show media, Placement, Aspect ratio, Fit, Side media width, and Media alignment.
- * Used by Standalone Panel and Grid Element and any media-container elements.
+ * Canonical Media Layout Settings Group.
+ * Owns only structural media placement. Image appearance belongs exclusively
+ * to ImageSettingsGroup, regardless of the element rendering the image.
  */
 export function MediaSettingsGroup({
   block,
@@ -694,10 +964,7 @@ export function MediaSettingsGroup({
   keys = {
     showMedia: "panelShowMedia",
     placement: "panelMediaPlacement",
-    ratio: "imageRatio",
-    fit: "panelMediaFit",
     width: "panelMediaWidth",
-    align: "panelMediaAlignment",
   },
 }: {
   block: BuilderLayoutBlock;
@@ -706,21 +973,10 @@ export function MediaSettingsGroup({
   keys?: {
     showMedia: string;
     placement: string;
-    ratio: string;
-    fit: string;
     width: string;
-    align: string;
   };
 }) {
   const values = block as any;
-  const ratioOptions = [
-    { value: "natural", label: "Natural" },
-    { value: "square", label: "Square (1:1)" },
-    { value: "4:3", label: "4:3" },
-    { value: "3:2", label: "3:2" },
-    { value: "16:9", label: "16:9" },
-    { value: "portrait", label: "Portrait (3:4)" },
-  ];
   const widthOptions = [
     { value: "small", label: "Small" },
     { value: "medium", label: "Medium" },
@@ -756,37 +1012,6 @@ export function MediaSettingsGroup({
       </InspectorFieldRow>
 
       <InspectorFieldRow
-        label="Aspect ratio"
-        isOverridden={values[keys.ratio] !== undefined}
-        inheritedValueText="16:9"
-        onReset={() => update({ [keys.ratio]: undefined })}
-      >
-        <InspectorSelect
-          value={String(values[keys.ratio] ?? "16:9")}
-          options={ratioOptions}
-          onChange={(val) => update({ [keys.ratio]: val })}
-          ariaLabel="Media aspect ratio"
-        />
-      </InspectorFieldRow>
-
-      <InspectorFieldRow
-        label="Fit"
-        isOverridden={values[keys.fit] !== undefined}
-        inheritedValueText="Cover"
-        onReset={() => update({ [keys.fit]: undefined })}
-      >
-        <InspectorSegmentedControl
-          value={String(values[keys.fit] ?? "cover")}
-          options={[
-            { value: "cover", label: "Cover" },
-            { value: "contain", label: "Contain" },
-          ]}
-          onChange={(val) => update({ [keys.fit]: val })}
-          ariaLabel="Media fit"
-        />
-      </InspectorFieldRow>
-
-      <InspectorFieldRow
         label="Side media width"
         isOverridden={values[keys.width] !== undefined}
         inheritedValueText="Medium"
@@ -800,18 +1025,6 @@ export function MediaSettingsGroup({
         />
       </InspectorFieldRow>
 
-      <InspectorFieldRow
-        label="Media alignment"
-        isOverridden={values[keys.align] !== undefined}
-        inheritedValueText="Center"
-        onReset={() => update({ [keys.align]: undefined })}
-      >
-        <InspectorAlignmentControl
-          value={String(values[keys.align] ?? "center")}
-          onChange={(val) => update({ [keys.align]: val })}
-          ariaLabel="Media alignment"
-        />
-      </InspectorFieldRow>
     </InspectorDivision>
   );
 }

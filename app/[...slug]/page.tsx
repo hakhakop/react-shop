@@ -102,6 +102,7 @@ export default async function WPPage({
               { label: builderPage.title, href: `/${builderPage.slug}` },
             ]}
             headerOverlay={headerDocumentSettings.overlay}
+            shellSettings={shellSettings}
           />
         );
       }

@@ -34,7 +34,7 @@ export default function CoreContentCapabilityPanel({ block, tab, shellSettings, 
           <IconPicker
             value={block.iconName}
             onChange={(value) => update({ iconName: value })}
-            onClear={() => update({ iconName: undefined })}
+            onClear={() => update({ iconName: "" })}
             ariaLabel="Icon"
           />
         </InspectorFieldRow>
