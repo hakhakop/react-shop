@@ -3,7 +3,8 @@
 import { Search } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
-import type { BuilderShellSettings } from "@/lib/builderShell";
+import { createPortal } from "react-dom";
+import type { BuilderCustomGlobalStylePreset, BuilderShellSettings } from "@/lib/builderShell";
 import { YOOTHEME_DEVSTACK_PRESETS } from "@/lib/yoothemeLessImporter";
 import { resolveBundledYoothemeDevstackPreset } from "@/lib/yoothemeDevstackPresets";
 import { GLOBAL_STYLE_GROUPS, GLOBAL_STYLE_TOKEN_DEFAULTS } from "@/lib/globalStyleTokens";
@@ -104,12 +105,11 @@ export default function CanonicalGlobalStylesPanel({ shellSettings, updateShellS
     Dark: "DevStack Dark Purple",
     Soft: "DevStack Light Orange",
   };
-  const rawPresetName = legacyPresetAliases[draft.globalStylePresetName ?? ""] ?? draft.globalStylePresetName;
-  const selectedPresetName = YOOTHEME_DEVSTACK_PRESETS.some((preset) => preset.name === rawPresetName)
-    ? rawPresetName!
-    : YOOTHEME_DEVSTACK_PRESETS[0]?.name ?? "";
   const [snapshot, setSnapshot] = useState<BuilderShellSettings>(shellSettings);
   const [isLessModalOpen, setIsLessModalOpen] = useState(false);
+  const [isPresetModalOpen, setIsPresetModalOpen] = useState(false);
+  const [isSavePresetOpen, setIsSavePresetOpen] = useState(false);
+  const [customPresetName, setCustomPresetName] = useState("");
   useEffect(() => {
     setDraft(shellSettings);
     if (screen === "root") setSnapshot(shellSettings);
@@ -127,6 +127,35 @@ export default function CanonicalGlobalStylesPanel({ shellSettings, updateShellS
     };
     setDraft({ ...draft, ...patch });
     updateShellSettings(patch);
+  };
+  const applyCustomPreset = (preset: BuilderCustomGlobalStylePreset) => {
+    const patch: Partial<BuilderShellSettings> = { ...preset.shellSettings as Partial<BuilderShellSettings>, globalStylePresetName: preset.name };
+    setDraft((current) => ({ ...current, ...patch }));
+    updateShellSettings(patch);
+    setIsPresetModalOpen(false);
+  };
+  const saveCurrentPreset = () => {
+    const name = customPresetName.trim();
+    if (!name) return;
+    const { customGlobalStylePresets: _presets, globalStylePresetBackup: _backup, ...currentStyle } = draft;
+    const savedPreset: BuilderCustomGlobalStylePreset = {
+      id: `yootheme-less-${Date.now()}`,
+      name,
+      shellSettings: currentStyle as Record<string, unknown>,
+      source: "yootheme-less",
+      createdAt: new Date().toISOString(),
+    };
+    const existing = shellSettings.customGlobalStylePresets ?? [];
+    const customGlobalStylePresets = [...existing.filter((entry) => entry.name.toLocaleLowerCase() !== name.toLocaleLowerCase()), savedPreset];
+    setDraft((current) => ({ ...current, customGlobalStylePresets }));
+    updateShellSettings({ customGlobalStylePresets });
+    setCustomPresetName("");
+    setIsSavePresetOpen(false);
+  };
+  const deleteCustomPreset = (id: string) => {
+    const customGlobalStylePresets = (shellSettings.customGlobalStylePresets ?? []).filter((preset) => preset.id !== id);
+    setDraft((current) => ({ ...current, customGlobalStylePresets }));
+    updateShellSettings({ customGlobalStylePresets });
   };
   const setVisibility = (key: "visibilityDesktop" | "visibilityTablet" | "visibilityMobile", value: boolean) => { const next = { ...draft, [key]: value }; setDraft(next); updateShellSettings({ [key]: value }); };
   const cancel = () => { setDraft(snapshot); updateShellSettings(snapshot); setScreen("root"); };
@@ -149,7 +178,7 @@ export default function CanonicalGlobalStylesPanel({ shellSettings, updateShellS
           {screen === "button" && <ButtonGlobalEditor draft={draft} set={set} />}
           {screen === "card" && <CardEditor draft={draft} set={set} />}
           {screen === "heading" && <HeadingEditor draft={draft} set={set} />}
-          {screen === "background" && <Group title="Background"><Color label="Page background" value={draft.backgroundColor} onChange={(value) => set("backgroundColor", value)} /><Color label="Muted background" value={draft.mutedBackgroundColor} onChange={(value) => set("mutedBackgroundColor", value)} /></Group>}
+          {screen === "background" && <SemanticBackgroundEditor draft={draft} set={set} />}
           {screen === "base" && <><Group title="Base"><Length label="Base font size" value={draft.baseFontSize} onChange={(value) => set("baseFontSize", value)} /><Length label="Base line height" value={draft.baseLineHeight} onChange={(value) => set("baseLineHeight", value)} units={["", "px", "rem"]} /><Select label="Font weight" value={draft.headingFontWeight} options={["400", "500", "600", "700", "800"]} onChange={(value) => set("headingFontWeight", value)} /></Group><Group title="Selection"><Color label="Selection background" value={draft.selectionBackground} onChange={(value) => set("selectionBackground", value)} /><Color label="Selection text" value={draft.selectionColor} onChange={(value) => set("selectionColor", value)} /></Group><Group title="Inline emphasis"><Color label="Inserted background" value={draft.baseInsBackground} onChange={(value) => set("baseInsBackground", value)} /><Color label="Inserted text" value={draft.baseInsColor} onChange={(value) => set("baseInsColor", value)} /><Color label="Marked background" value={draft.baseMarkBackground} onChange={(value) => set("baseMarkBackground", value)} /><Color label="Marked text" value={draft.baseMarkColor} onChange={(value) => set("baseMarkColor", value)} /></Group></>}
           {screen === "visibility" && <VisibilityEditor draft={draft} setVisibility={setVisibility} />}
           {screen === "accordion" && <AccordionEditor draft={draft} set={set} />}
@@ -165,16 +194,9 @@ export default function CanonicalGlobalStylesPanel({ shellSettings, updateShellS
   return <div className="builder-global-design-root" data-testid="global-design-root">
     <div className="builder-design-root-heading"><div><small>DESIGN SYSTEM</small><span>STYLE</span></div><p>WebPages semantic design system</p></div>
     
-    {/* Canonical YOOtheme/DevStack preset selector */}
     <div style={{ padding: "0 16px 12px 16px" }}>
       <label style={{ fontSize: "11px", fontWeight: 600, color: "#94a3b8", textTransform: "uppercase", display: "block", marginBottom: "6px" }}>Theme Preset</label>
-      <select
-        value={selectedPresetName}
-        onChange={(e) => applyDevstackPreset(e.target.value)}
-        style={{ width: "100%", padding: "8px 12px", borderRadius: "8px", border: "1px solid #334155", fontSize: "13px", fontWeight: 600, backgroundColor: "#0f172a", color: "#f8fafc", outline: "none" }}
-      >
-        {YOOTHEME_DEVSTACK_PRESETS.map((preset) => <option key={preset.id} value={preset.name}>{preset.name}</option>)}
-      </select>
+      <button type="button" onClick={() => setIsPresetModalOpen(true)} style={{ width: "100%", padding: "10px 12px", borderRadius: "8px", border: "1px solid #334155", fontSize: "13px", fontWeight: 600, backgroundColor: "#0f172a", color: "#f8fafc", textAlign: "left", cursor: "pointer" }}>{legacyPresetAliases[draft.globalStylePresetName ?? ""] ?? draft.globalStylePresetName ?? "Choose theme preset"}</button>
     </div>
 
     <div className="builder-design-inheritance-banner" data-token-inheritance="global-component-local"><strong>Canonical token source</strong><span>Global Style → Component Default → Current Element Override</span><small>Builder and published frontend consume the same generated UIkit variables.</small></div>
@@ -203,6 +225,7 @@ export default function CanonicalGlobalStylesPanel({ shellSettings, updateShellS
       >
         IMPORT YOOTHEME LESS
       </button>
+      <button type="button" onClick={() => setIsSavePresetOpen(true)} style={{ width: "100%", padding: "8px", borderRadius: "8px", border: "1px solid #a78bfa", backgroundColor: "transparent", color: "#c4b5fd", fontWeight: 600, fontSize: "11px", letterSpacing: "0.5px", textTransform: "uppercase", cursor: "pointer" }}>SAVE CURRENT AS PRESET</button>
       <button
         type="button"
         onClick={() => {
@@ -220,12 +243,28 @@ export default function CanonicalGlobalStylesPanel({ shellSettings, updateShellS
       isOpen={isLessModalOpen}
       onClose={() => setIsLessModalOpen(false)}
       onImport={(importedPatch) => {
-        setDraft({ ...draft, ...importedPatch });
+        setDraft((current) => ({ ...current, ...importedPatch }));
         updateShellSettings(importedPatch);
       }}
     />
+    <ThemePresetModal isOpen={isPresetModalOpen} onClose={() => setIsPresetModalOpen(false)} builtIns={YOOTHEME_DEVSTACK_PRESETS.map((preset) => ({ name: preset.name, colors: presetColors(preset.id) }))} customPresets={shellSettings.customGlobalStylePresets ?? []} onApplyBuiltIn={(name) => { applyDevstackPreset(name); setIsPresetModalOpen(false); }} onApplyCustom={applyCustomPreset} onDeleteCustom={deleteCustomPreset} />
+    <SavePresetModal isOpen={isSavePresetOpen} name={customPresetName} onNameChange={setCustomPresetName} onClose={() => setIsSavePresetOpen(false)} onSave={saveCurrentPreset} />
   </div>;
 }
+
+function presetColors(id: string) {
+  const settings = resolveBundledYoothemeDevstackPreset(id as Parameters<typeof resolveBundledYoothemeDevstackPreset>[0]).shellSettings;
+  return [settings.backgroundColor, settings.primaryColor, settings.textColor].filter((color): color is string => typeof color === "string" && color.length > 0);
+}
+
+function ThemePresetModal({ isOpen, onClose, builtIns, customPresets, onApplyBuiltIn, onApplyCustom, onDeleteCustom }: { isOpen: boolean; onClose: () => void; builtIns: { name: string; colors: string[] }[]; customPresets: BuilderCustomGlobalStylePreset[]; onApplyBuiltIn: (name: string) => void; onApplyCustom: (preset: BuilderCustomGlobalStylePreset) => void; onDeleteCustom: (id: string) => void }) {
+  if (!isOpen) return null;
+  return createPortal(<div style={{ position: "fixed", inset: 0, zIndex: 999999, background: "rgba(2,6,23,.76)", padding: "24px", overflowY: "auto" }}><div style={{ width: "min(860px, 100%)", margin: "40px auto", padding: "20px", borderRadius: "14px", background: "#0f172a", color: "#f8fafc", border: "1px solid #334155" }}><div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "18px" }}><div><strong>Theme presets</strong><p style={{ margin: "4px 0 0", color: "#94a3b8", fontSize: "12px" }}>Choose a built-in YOOtheme mapping or a saved custom preset.</p></div><button type="button" onClick={onClose} style={{ border: 0, background: "transparent", color: "#cbd5e1", cursor: "pointer" }}>Close</button></div><PresetCards title="YOOtheme presets" entries={builtIns} onApply={(name) => onApplyBuiltIn(name)} />{customPresets.length > 0 ? <PresetCards title="Custom presets" entries={customPresets.map((preset) => ({ name: preset.name, colors: [preset.shellSettings.backgroundColor, preset.shellSettings.primaryColor, preset.shellSettings.textColor].filter((color): color is string => typeof color === "string") }))} onApply={(name) => { const preset = customPresets.find((entry) => entry.name === name); if (preset) onApplyCustom(preset); }} onDelete={(name) => { const preset = customPresets.find((entry) => entry.name === name); if (preset) onDeleteCustom(preset.id); }} /> : null}</div></div>, document.body);
+}
+
+function PresetCards({ title, entries, onApply, onDelete }: { title: string; entries: { name: string; colors: string[] }[]; onApply: (name: string) => void; onDelete?: (name: string) => void }) { return <section style={{ marginTop: "18px" }}><h3 style={{ fontSize: "12px", textTransform: "uppercase", letterSpacing: ".08em", color: "#94a3b8" }}>{title}</h3><div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))", gap: "12px" }}>{entries.map((entry) => <div key={entry.name} style={{ border: "1px solid #334155", borderRadius: "10px", overflow: "hidden", background: "#172033" }}><button type="button" onClick={() => onApply(entry.name)} style={{ display: "block", width: "100%", border: 0, padding: "0", background: "transparent", color: "inherit", textAlign: "left", cursor: "pointer" }}><div style={{ display: "flex", height: "82px" }}>{(entry.colors.length ? entry.colors : ["#334155"]).map((color, index) => <span key={`${color}-${index}`} style={{ flex: 1, background: color }} />)}</div><strong style={{ display: "block", padding: "10px 10px 4px", fontSize: "13px" }}>{entry.name}</strong><span style={{ display: "block", padding: "0 10px 10px", color: "#94a3b8", fontSize: "11px" }}>Apply preset</span></button>{onDelete ? <button type="button" onClick={() => onDelete(entry.name)} style={{ width: "calc(100% - 20px)", margin: "0 10px 10px", border: "1px solid #7f1d1d", borderRadius: "6px", background: "transparent", color: "#fca5a5", padding: "6px", fontSize: "11px", cursor: "pointer" }}>Delete</button> : null}</div>)}</div></section>; }
+
+function SavePresetModal({ isOpen, name, onNameChange, onClose, onSave }: { isOpen: boolean; name: string; onNameChange: (name: string) => void; onClose: () => void; onSave: () => void }) { if (!isOpen) return null; return createPortal(<div style={{ position: "fixed", inset: 0, zIndex: 1000000, background: "rgba(2,6,23,.76)", display: "grid", placeItems: "center", padding: "24px" }}><div style={{ width: "min(420px, 100%)", padding: "20px", borderRadius: "14px", background: "#0f172a", color: "#f8fafc", border: "1px solid #334155" }}><strong>Save current theme preset</strong><p style={{ margin: "6px 0 14px", color: "#94a3b8", fontSize: "12px" }}>This saves the current Global Styles values, including the imported LESS mapping.</p><input autoFocus value={name} onChange={(event) => onNameChange(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter") onSave(); }} placeholder="Preset name" style={{ boxSizing: "border-box", width: "100%", padding: "10px", borderRadius: "8px", border: "1px solid #334155", background: "#020617", color: "#f8fafc" }} /><div style={{ display: "flex", justifyContent: "flex-end", gap: "8px", marginTop: "16px" }}><button type="button" onClick={onClose}>Cancel</button><button type="button" disabled={!name.trim()} onClick={onSave}>Save preset</button></div></div></div>, document.body); }
 
 function NavItem({ item, onClick }: { item: { id: Screen; label: string; description: string; enabled?: boolean }; onClick: (screen: Screen) => void }) { return <button type="button" className={`builder-design-nav-item${item.enabled === false ? " is-disabled" : ""}`} disabled={item.enabled === false} onClick={() => onClick(item.id)}><strong>{item.label}</strong><span>{item.description}</span></button>; }
 
@@ -236,7 +275,7 @@ function GlobalEditor({ draft, set }: { draft: BuilderShellSettings; set: (key: 
   <Group title="Tertiary"><YoothemeFontPicker label="Font family" value={draft.fontFamilyTertiary ?? "inherit"} onChange={(value) => set("fontFamilyTertiary", value)} /><Select label="Weight" value={draft.fontWeightTertiary} options={["400", "500", "600", "700", "800"]} onChange={(value) => set("fontWeightTertiary", value)} /></Group>
   <ColorGroup draft={draft} set={set} /><BorderGroup draft={draft} set={set} /><ShellSpacingGroup draft={draft} set={set} /><SpacingGroup draft={draft} set={set} /><ControlGroup draft={draft} set={set} /><ContainerGroup draft={draft} set={set} /></>; }
 
-function ColorGroup({ draft, set }: { draft: BuilderShellSettings; set: (key: Key, value: string) => void }) { return <Group title="Colors">{([["textColor", "Text"], ["emphasisColor", "Emphasis"], ["mutedTextColor", "Muted"], ["linkColor", "Link"], ["linkHoverColor", "Link hover"], ["primaryColor", "Primary background"], ["secondaryColor", "Secondary background"], ["successColor", "Success"], ["warningColor", "Warning"], ["dangerColor", "Danger"], ["backgroundColor", "Page background"], ["mutedBackgroundColor", "Muted background"]] as [Key, string][]).map(([key, label]) => <Color key={key} label={label} value={draft[key]} onChange={(value) => set(key, value)} />)}</Group>; }
+function ColorGroup({ draft, set }: { draft: BuilderShellSettings; set: (key: Key, value: string) => void }) { return <Group title="Colors">{([["textColor", "Text"], ["emphasisColor", "Emphasis"], ["mutedTextColor", "Muted text"], ["linkColor", "Link"], ["linkHoverColor", "Link hover"], ["successColor", "Success"], ["warningColor", "Warning"], ["dangerColor", "Danger"]] as [Key, string][]).map(([key, label]) => <Color key={key} label={label} value={draft[key]} onChange={(value) => set(key, value)} />)}</Group>; }
 function BorderGroup({ draft, set }: { draft: BuilderShellSettings; set: (key: Key, value: string) => void }) { return <Group title="Borders"><Color label="Color" value={draft.borderColor} onChange={(value) => set("borderColor", value)} /><Length label="Radius" value={draft.borderRadius} onChange={(value) => set("borderRadius", value)} /><Length label="Width" value={draft.borderWidth} onChange={(value) => set("borderWidth", value)} /></Group>; }
 function ShellSpacingGroup({ draft, set }: { draft: BuilderShellSettings; set: (key: Key, value: string) => void }) {
   const fields: [Key, string][] = [
@@ -292,7 +331,8 @@ function VisibilityEditor({ draft, setVisibility }: { draft: BuilderShellSetting
   return <Group title="Global defaults"><div className="builder-import-readonly"><strong>Inherited by sections and content elements</strong><span>Elements remain inherited until their local inspector explicitly selects Visible or Hidden.</span></div>{fields.map(([key, label]) => <label key={key} className="builder-design-control builder-design-checkbox"><span>{label}</span><input aria-label={`${label} visibility default`} type="checkbox" checked={draft[key] !== false} onChange={(event) => setVisibility(key, event.target.checked)} /><small>{draft[key] === false ? "Hidden" : "Visible"}</small></label>)}</Group>;
 }
 function AccordionEditor({ draft, set }: { draft: BuilderShellSettings; set: (key: Key, value: string) => void }) { return <><Group title="Title"><Length label="Font size" value={draft.accordionTitleFontSize} onChange={(value) => set("accordionTitleFontSize", value)} /><Select label="Weight" value={draft.accordionTitleFontWeight} options={["400", "500", "600", "700"]} onChange={(value) => set("accordionTitleFontWeight", value)} /><Length label="Letter spacing" value={draft.accordionTitleLetterSpacing} onChange={(value) => set("accordionTitleLetterSpacing", value)} /></Group><Group title="Icon and interaction"><Color label="Icon color" value={draft.accordionIconColor} onChange={(value) => set("accordionIconColor", value)} /><Color label="Hover color" value={draft.accordionTitleHoverColor} onChange={(value) => set("accordionTitleHoverColor", value)} /><Length label="Title vertical padding" value={draft.accordionTitlePaddingVertical} onChange={(value) => set("accordionTitlePaddingVertical", value)} /><Length label="Content top spacing" value={draft.accordionContentMarginTop} onChange={(value) => set("accordionContentMarginTop", value)} /></Group><Group title="Rows"><Length label="Border width" value={draft.accordionItemBorderWidth} onChange={(value) => set("accordionItemBorderWidth", value)} /><Color label="Border color" value={draft.accordionItemBorder} onChange={(value) => set("accordionItemBorder", value)} /><Shadow label="Row shadow" value={draft.accordionItemBoxShadow} onChange={(value) => set("accordionItemBoxShadow", value)} /></Group></>; }
-function SectionGlobalEditor({ draft, set }: { draft: BuilderShellSettings; set: (key: Key, value: string) => void }) { return <><Group title="Padding"><Length label="Small padding" value={draft.sectionPaddingSmall} onChange={(value) => set("sectionPaddingSmall", value)} /><Length label="Default padding" value={draft.sectionPaddingTop} onChange={(value) => set("sectionPaddingTop", value)} /><Length label="Large padding" value={draft.sectionPaddingLarge} onChange={(value) => set("sectionPaddingLarge", value)} /><Length label="Xlarge padding" value={draft.sectionPaddingXLarge} onChange={(value) => set("sectionPaddingXLarge", value)} /></Group><Group title="Backgrounds"><Color label="Default background" value={draft.backgroundColor} onChange={(value) => set("backgroundColor", value)} /><Color label="Muted background" value={draft.mutedBackgroundColor} onChange={(value) => set("mutedBackgroundColor", value)} /><Color label="Primary background" value={draft.primaryColor} onChange={(value) => set("primaryColor", value)} /><Color label="Secondary background" value={draft.secondaryColor} onChange={(value) => set("secondaryColor", value)} /></Group></>; }
+function SemanticBackgroundEditor({ draft, set }: { draft: BuilderShellSettings; set: (key: Key, value: string) => void }) { return <Group title="Background"><Color label="Default background" value={draft.backgroundDefault} onChange={(value) => set("backgroundDefault", value)} /><Color label="Muted background" value={draft.backgroundMuted} onChange={(value) => set("backgroundMuted", value)} /><Color label="Primary background" value={draft.backgroundPrimary} onChange={(value) => set("backgroundPrimary", value)} /><Color label="Secondary background" value={draft.backgroundSecondary} onChange={(value) => set("backgroundSecondary", value)} /></Group>; }
+function SectionGlobalEditor({ draft, set }: { draft: BuilderShellSettings; set: (key: Key, value: string) => void }) { return <><Group title="Padding"><Length label="Small padding" value={draft.sectionPaddingSmall} onChange={(value) => set("sectionPaddingSmall", value)} /><Length label="Default padding" value={draft.sectionPaddingTop} onChange={(value) => set("sectionPaddingTop", value)} /><Length label="Large padding" value={draft.sectionPaddingLarge} onChange={(value) => set("sectionPaddingLarge", value)} /><Length label="Xlarge padding" value={draft.sectionPaddingXLarge} onChange={(value) => set("sectionPaddingXLarge", value)} /></Group><SemanticBackgroundEditor draft={draft} set={set} /></>; }
 function ContainerGlobalEditor({ draft, set }: { draft: BuilderShellSettings; set: (key: Key, value: string) => void }) { return <Group title="Max widths"><Length label="Small container" value={draft.containerSmall} onChange={(value) => set("containerSmall", value)} /><Length label="Default container" value={draft.containerDefault} onChange={(value) => set("containerDefault", value)} /><Length label="Large container" value={draft.containerLarge} onChange={(value) => set("containerLarge", value)} /><Length label="Xlarge container" value={draft.containerXLarge} onChange={(value) => set("containerXLarge", value)} /><Length label="Page max width" value={draft.pageContainerMaxWidth} onChange={(value) => set("pageContainerMaxWidth", value)} /></Group>; }
 function GridGlobalEditor({ draft, set }: { draft: BuilderShellSettings; set: (key: Key, value: string) => void }) { return <Group title="Gutters"><Length label="Small gutter" value={draft.gridGutterSmall} onChange={(value) => set("gridGutterSmall", value)} /><Length label="Default gutter" value={draft.gridGutterDefault} onChange={(value) => set("gridGutterDefault", value)} /><Length label="Medium gutter" value={draft.gridGutterMedium} onChange={(value) => set("gridGutterMedium", value)} /><Length label="Large gutter" value={draft.gridGutterLarge} onChange={(value) => set("gridGutterLarge", value)} /></Group>; }
 function NavbarGlobalEditor({ draft, set }: { draft: BuilderShellSettings; set: (key: Key, value: string) => void }) { return <Group title="Navigation bar"><Color label="Link color" value={draft.linkColor} onChange={(value) => set("linkColor", value)} /><Color label="Link hover color" value={draft.linkHoverColor} onChange={(value) => set("linkHoverColor", value)} /><Color label="Primary background" value={draft.primaryColor} onChange={(value) => set("primaryColor", value)} /><Color label="Page background" value={draft.backgroundColor} onChange={(value) => set("backgroundColor", value)} /></Group>; }

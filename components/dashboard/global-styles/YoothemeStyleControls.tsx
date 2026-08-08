@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import { Search, ChevronDown, Check, Upload, X } from "lucide-react";
 import type { BuilderShellSettings } from "@/lib/builderShell";
 import { GLOBAL_STYLE_TOKEN_DEFAULTS } from "@/lib/globalStyleTokens";
+import { resolveYoothemeLess } from "@/lib/yoothemeLessImporter";
 
 // Helper to convert hex to HSL
 function hexToHsl(hexStr: string): { h: number; s: number; l: number } {
@@ -508,30 +509,41 @@ export function YoothemeLessImportModal({
   onImport: (patch: Partial<BuilderShellSettings>) => void;
 }) {
   const [lessText, setLessText] = useState("");
+  const [sourceName, setSourceName] = useState("pasted.less");
+  const [error, setError] = useState("");
+  const [mounted, setMounted] = useState(false);
 
-  if (!isOpen) return null;
+  useEffect(() => {
+    setMounted(true);
+    return () => setMounted(false);
+  }, []);
+
+  if (!isOpen || !mounted) return null;
 
   const handleParse = () => {
-    const patch: Record<string, string> = {};
-    const lines = lessText.split("\n");
-    for (const line of lines) {
-      const match = line.match(/^\s*@([a-z0-9-]+)\s*:\s*([^;]+);/i);
-      if (match) {
-        const varName = match[1].toLowerCase();
-        const varVal = match[2].trim();
-        if (varName.includes("primary-color") || varName === "global-color") patch.primaryColor = varVal;
-        if (varName.includes("text-color") || varName === "global-text-color") patch.textColor = varVal;
-        if (varName.includes("background") || varName === "global-background") patch.backgroundColor = varVal;
-        if (varName.includes("font-family") || varName === "global-font-family") patch.fontFamilyBody = varVal;
-        if (varName.includes("card-background")) patch.cardBackground = varVal;
-        if (varName.includes("button-primary-background")) patch.buttonPrimaryBackground = varVal;
-      }
+    if (!lessText.trim()) {
+      setError("Paste or upload a LESS file before importing.");
+      return;
     }
-    onImport(patch);
+    const resolved = resolveYoothemeLess([
+      { name: sourceName, content: lessText, precedence: 1 },
+    ]);
+    if (!Object.keys(resolved.shellSettings).length) {
+      setError("No supported YOOtheme variables were found in this LESS source.");
+      return;
+    }
+    onImport(resolved.shellSettings);
     onClose();
   };
 
-  return (
+  const handleFile = async (file?: File) => {
+    if (!file) return;
+    setError("");
+    setSourceName(file.name);
+    setLessText(await file.text());
+  };
+
+  return createPortal(
     <div style={{ position: "fixed", inset: 0, zIndex: 999999, backgroundColor: "rgba(0,0,0,0.7)", display: "flex", alignItems: "center", justifyContent: "center", padding: "16px" }}>
       <div style={{ width: "100%", maxWidth: "500px", backgroundColor: "#1e293b", borderRadius: "12px", padding: "20px", boxShadow: "0 20px 40px rgba(0,0,0,0.6)", border: "1px solid rgba(255,255,255,0.1)", color: "#f8fafc" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "12px" }}>
@@ -539,8 +551,18 @@ export function YoothemeLessImportModal({
           <button type="button" onClick={onClose} style={{ background: "none", border: "none", color: "#94a3b8", cursor: "pointer" }}><X size={18} /></button>
         </div>
         <p style={{ fontSize: "12px", color: "#94a3b8", marginBottom: "12px" }}>
-          Paste your YOOtheme LESS theme variables below (e.g. <code>@global-color: #6F40F1; @global-font-family: Inter;</code>).
+          Upload a YOOtheme <code>.less</code> file or paste its variables below. The same semantic Global Styles resolver used by Import LESS will map supported values.
         </p>
+        <label style={{ display: "inline-flex", alignItems: "center", gap: "8px", padding: "8px 10px", border: "1px solid #334155", borderRadius: "7px", color: "#cbd5e1", cursor: "pointer", fontSize: "12px", fontWeight: 600, marginBottom: "12px" }}>
+          <Upload size={14} /> Upload LESS file
+          <input
+            type="file"
+            accept=".less,text/plain"
+            style={{ display: "none" }}
+            onChange={(event) => void handleFile(event.target.files?.[0])}
+          />
+        </label>
+        {sourceName !== "pasted.less" && <p style={{ fontSize: "11px", color: "#94a3b8", margin: "-4px 0 10px" }}>Loaded {sourceName}</p>}
         <textarea
           value={lessText}
           onChange={(e) => setLessText(e.target.value)}
@@ -548,11 +570,12 @@ export function YoothemeLessImportModal({
           rows={8}
           style={{ width: "100%", padding: "10px", borderRadius: "8px", backgroundColor: "#0f172a", border: "1px solid #334155", color: "#f8fafc", fontFamily: "monospace", fontSize: "12px", outline: "none", resize: "vertical" }}
         />
+        {error && <p role="alert" style={{ color: "#fda4af", fontSize: "12px", margin: "10px 0 0" }}>{error}</p>}
         <div style={{ display: "flex", justifyContent: "flex-end", gap: "8px", marginTop: "16px" }}>
           <button type="button" onClick={onClose} style={{ padding: "8px 14px", borderRadius: "6px", border: "1px solid #334155", backgroundColor: "transparent", color: "#cbd5e1", fontSize: "12px", fontWeight: 600, cursor: "pointer" }}>Cancel</button>
           <button type="button" onClick={handleParse} style={{ padding: "8px 16px", borderRadius: "6px", border: "none", backgroundColor: "#6f40f1", color: "#ffffff", fontSize: "12px", fontWeight: 700, cursor: "pointer" }}>Import Style Tokens</button>
         </div>
       </div>
     </div>
-  );
+  , document.body);
 }

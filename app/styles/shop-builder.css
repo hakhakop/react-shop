@@ -243,7 +243,7 @@ body.dark {
   margin: 0;
   max-width: none;
   color: var(--builder-heading-color, var(--builder-section-text, var(--builder-text, #111111)));
-  font-family: var(--builder-heading-font-family, inherit);
+  font-family: var(--builder-heading-font-family, var(--webpages-font-primary, var(--uk-heading-font-family, var(--uk-global-font-family, system-ui, sans-serif))));
   font-size: var(--builder-heading-size, clamp(42px, 8vw, 126px));
   font-weight: var(--builder-heading-weight, 760);
   line-height: var(--builder-heading-line-height, 0.92);
@@ -4992,17 +4992,17 @@ body.dark {
   }
 }
 .webpages-typography-role-primary {
-  font-family: var(--webpages-font-primary, var(--uk-heading-font-family, inherit)) !important;
+  font-family: var(--webpages-font-primary, var(--uk-heading-font-family, inherit));
   font-weight: var(--webpages-font-primary-weight, var(--uk-heading-font-weight, 700));
 }
 
 .webpages-typography-role-secondary {
-  font-family: var(--webpages-font-secondary, var(--uk-global-font-family, inherit)) !important;
+  font-family: var(--webpages-font-secondary, var(--uk-global-font-family, inherit));
   font-weight: var(--webpages-font-secondary-weight, 400);
 }
 
 .webpages-typography-role-tertiary {
-  font-family: var(--webpages-font-tertiary, var(--uk-global-font-family, inherit)) !important;
+  font-family: var(--webpages-font-tertiary, var(--uk-global-font-family, inherit));
   font-weight: var(--webpages-font-tertiary-weight, 400);
 }
 

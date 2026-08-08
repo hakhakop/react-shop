@@ -85,7 +85,8 @@
                     "position": "relative",
                     "zIndex": 3
                   }
-                }
+                },
+                "headingTypographyRole": "primary"
               },
               {
                 "id": "yootheme-text-0-0-0-1",
@@ -136,7 +137,6 @@
                 "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/background-square-01.png",
                 "imageAlt": "",
                 "imageMaxWidth": 600,
-                "imageWidth": "auto",
                 "imageLoading": "eager",
                 "imageShape": "none",
                 "visualStyle": {
@@ -146,7 +146,8 @@
                     "left": "-20vw",
                     "zIndex": 0
                   }
-                }
+                },
+                "imageRatio": "square"
               },
               {
                 "id": "yootheme-image-0-0-0-4",
@@ -172,7 +173,6 @@
                 "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/background-square-03.png",
                 "imageAlt": "",
                 "imageMaxWidth": 700,
-                "imageWidth": "auto",
                 "imageLoading": "eager",
                 "imageShape": "none",
                 "visualStyle": {
@@ -208,7 +208,6 @@
                 "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/background-square-05.png",
                 "imageAlt": "",
                 "imageMaxWidth": 600,
-                "imageWidth": "auto",
                 "imageLoading": "eager",
                 "imageShape": "none",
                 "visualStyle": {
@@ -218,7 +217,9 @@
                     "left": "35vw",
                     "zIndex": 0
                   }
-                }
+                },
+                "imageRatio": "natural",
+                "imageFit": "contain"
               }
             ]
           },
@@ -266,19 +267,20 @@
               }
             ]
           }
-        ]
+        ],
+        "backgroundRole": "default"
       },
       {
         "id": "yootheme-section-2",
         "kind": "contentLayout",
         "title": "Clients",
         "background": "transparent",
-        "sectionVariant": "muted",
+        "sectionVariant": "default",
         "preserveColor": false,
         "overlap": false,
         "textColor": "none",
-        "contentMode": "medium",
-        "maxWidth": "medium",
+        "contentMode": "small",
+        "maxWidth": "small",
         "removeHorizontalPadding": false,
         "expandOneSide": "none",
         "sectionHeight": "auto",
@@ -420,7 +422,7 @@
                 "gridShowImage": true,
                 "gridShowMeta": true,
                 "gridShowText": true,
-                "gridShowButton": false,
+                "gridShowButton": true,
                 "gridItemRenderer": "plain",
                 "gridCardVariant": "default",
                 "gridCardSize": "default",
@@ -430,18 +432,16 @@
                 "showDividers": false,
                 "centerRows": true,
                 "columnsPhonePortrait": "auto",
-                "columnsDesktop": "6",
+                "columnsDesktop": "",
                 "gridMediaWidth": "medium",
+                "imageHeight": null,
+                "imageLoading": "lazy",
                 "imageBorder": "none",
+                "imageBoxShadow": "none",
+                "imageBoxDecoration": "none",
                 "imageHoverTransition": "none",
                 "linkImage": false,
-                "textAlign": "center",
-                "imageRatio": "natural",
-                "imageShape": "none",
-                "panelStyle": "none",
-                "imageWidth": "160px",
-                "imageHeight": "30px",
-                "fullWidthButton": false
+                "textAlign": "center"
               }
             ]
           }
@@ -903,7 +903,7 @@
                 "columnsPhoneLandscape": "2",
                 "columnsDesktop": "4",
                 "gridMediaWidth": "medium",
-                "imageWidth": "68",
+                "imageMaxWidth": 68,
                 "imageHeight": null,
                 "imageLoading": "lazy",
                 "imageBorder": "none",
@@ -1184,7 +1184,7 @@
                 "gridShowImage": true,
                 "gridShowMeta": true,
                 "gridShowText": true,
-                "gridShowButton": false,
+                "gridShowButton": true,
                 "gridItemRenderer": "card",
                 "gridCardVariant": "default",
                 "gridCardSize": "large",
@@ -1194,7 +1194,6 @@
                 "columnsPhonePortrait": "1",
                 "columnsDesktop": "2",
                 "gridMediaWidth": "medium",
-                "imageWidth": null,
                 "imageHeight": null,
                 "imageLoading": "lazy",
                 "imageBorder": "none",
@@ -1207,9 +1206,7 @@
                     "position": "relative",
                     "zIndex": 1
                   }
-                },
-                "imageFit": "fill",
-                "imageRatio": "square"
+                }
               }
             ]
           },
@@ -1370,7 +1367,7 @@
                 "columnsPhoneLandscape": "2",
                 "columnsDesktop": "3",
                 "gridMediaWidth": "medium",
-                "imageWidth": "610",
+                "imageMaxWidth": 610,
                 "imageHeight": null,
                 "imageLoading": "lazy",
                 "imageBorder": "none",
@@ -1391,7 +1388,7 @@
         ]
       }
     ],
-    "updatedAt": "2026-08-08T16:19:42.153Z"
+    "updatedAt": "2026-08-08T18:43:49.889Z"
   },
   "shop": {
     "version": 1,

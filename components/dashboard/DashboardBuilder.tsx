@@ -135,7 +135,6 @@ import UikitText from "@/components/builder/UikitText";
 import {
   getUikitMarginClass,
   getUikitSectionPaddingClass,
-  getUikitSectionStyleClass,
   getUikitContainerClass,
   getUikitGridClass,
   getUikitWidthClass,
@@ -156,12 +155,14 @@ import {
   getUikitPanelLayoutClass,
   getUikitPanelMediaStyle,
 } from "@/lib/uikitTokens";
+import { resolveSectionBackground, sectionBackgroundClass } from "@/lib/semanticBackgrounds";
 import {
   getUikitColumnWidthClass,
   normalizeLayoutToUikitPreset,
   UIKIT_LAYOUT_PRESETS,
 } from "@/lib/uikitLayoutEngine";
 import { getUikitGlobalsCssVars } from "@/lib/uikitGlobals";
+import WebPagesFontLoader from "@/components/builder/WebPagesFontLoader";
 import CategoryBar from "@/components/CategoryBar";
 import CategoryWithFilters from "@/components/CategoryWithFilters";
 import ProductCategoryFilterProvider from "@/components/ProductCategoryFilterProvider";
@@ -852,10 +853,7 @@ function resolveDesignColors(
 }
 
 function sectionSchemeStyle(section: BuilderSection) {
-  const colorScheme =
-    section.colorScheme === "dark" || section.colorScheme === "light"
-      ? section.colorScheme
-      : readableSchemeForColor(section.background);
+  const colorScheme = resolveSectionColorScheme(section);
 
   if (colorScheme === "dark") {
     return {
@@ -898,7 +896,9 @@ function resolveSectionColorScheme(
     return section.colorScheme;
   }
 
-  const readable = readableSchemeForColor(section.background);
+  const resolvedBackground = resolveSectionBackground(section);
+  if (!resolvedBackground.override) return resolvedBackground.role === "primary" || resolvedBackground.role === "secondary" ? "dark" : "light";
+  const readable = readableSchemeForColor(resolvedBackground.override);
   return readable === "inherit" ? layoutScheme : readable;
 }
 
@@ -2219,6 +2219,7 @@ export default function DashboardBuilder({
     fileName: string;
     sections: BuilderSection[];
     warnings: string[];
+    globalStylePatch: Partial<BuilderShellSettings>;
   } | null>(null);
   const [previewProducts, setPreviewProducts] = useState<ProductNode[]>([]);
   const [previewCategoryTree, setPreviewCategoryTree] = useState<
@@ -7414,6 +7415,7 @@ export default function DashboardBuilder({
         fileName: file.name,
         sections: mapping.sections,
         warnings: mapping.warnings,
+        globalStylePatch: mapping.globalStylePatch,
       });
       setTemplateStatus("YOOtheme import preview ready");
     } catch {
@@ -7433,6 +7435,9 @@ export default function DashboardBuilder({
       ...current,
       sections: yoothemeImportPreview.sections,
     }));
+    if (Object.keys(yoothemeImportPreview.globalStylePatch).length) {
+      updateShellSettings(yoothemeImportPreview.globalStylePatch);
+    }
     setYoothemeImportWarnings(yoothemeImportPreview.warnings);
     setSelectedId(yoothemeImportPreview.sections[0]?.id ?? "");
     setSelectedLayoutColumnKey(null);
@@ -9431,6 +9436,7 @@ export default function DashboardBuilder({
         } as CSSProperties
       }
     >
+      <WebPagesFontLoader settings={shellSettings} />
       <DashboardSidebar
         availableLayoutBlockKinds={availableLayoutBlockKinds}
         builderState={builderState}
@@ -11067,14 +11073,7 @@ function PreviewCanvas({
                         : ""
                     }`}
                     style={{
-                      background:
-                        section.sectionVariant && section.sectionVariant !== "default"
-                          ? undefined
-                          : section.background &&
-                              section.background !== "#ffffff" &&
-                              section.background !== "inherit"
-                            ? section.background
-                            : undefined,
+                      background: resolveSectionBackground(section).override,
                         "--builder-preview-padding-top": getPreviewSpacing(
                           section.topSpacing,
                         ),
@@ -11714,9 +11713,7 @@ function getStorefrontPreviewClass(section: BuilderSection) {
   const uikitSectionPad = getUikitSectionPaddingClass(
     (section as any).sectionPadding ?? (section as any).topSpacing ?? (section as any).sectionPaddingTop
   );
-  const uikitSectionStyle = getUikitSectionStyleClass(
-    section.sectionVariant || section.colorScheme || (section.visualStyle as any)?.preset
-  );
+  const uikitSectionStyle = sectionBackgroundClass(resolveSectionBackground(section).role);
   const maxWidth = section.maxWidth ?? section.contentMode ?? "boxed";
   const preserveColorClass = section.preserveColor ? "uk-preserve-color" : "";
   const overlapClass = section.overlap ? "uk-section-overlap" : "";

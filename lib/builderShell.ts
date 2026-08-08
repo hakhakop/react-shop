@@ -47,6 +47,16 @@ export type ReactMenuItem = {
   parentId?: string | null;
 };
 
+/** A named, semantic Global Styles snapshot created from a YOOtheme import. */
+export type BuilderCustomGlobalStylePreset = {
+  id: string;
+  name: string;
+  shellSettings: Record<string, unknown>;
+  design?: Record<string, unknown>;
+  source: "yootheme-less";
+  createdAt: string;
+};
+
 export type BuilderShellSettings = {
   headerVisible: boolean;
   topToolbarVisible: boolean;
@@ -103,6 +113,12 @@ export type BuilderShellSettings = {
   warningColor?: string;
   dangerColor?: string;
   textColor?: string;
+  /** Canonical YOOtheme semantic section backgrounds. */
+  backgroundDefault?: string;
+  backgroundMuted?: string;
+  backgroundPrimary?: string;
+  backgroundSecondary?: string;
+  /** Legacy aliases retained only for document migration. */
   backgroundColor?: string;
   fontFamilyBody?: string;
   fontFamilyHeading?: string;
@@ -297,6 +313,7 @@ export type BuilderShellSettings = {
   baseMarkColor?: string;
   globalStylePresetName?: string;
   globalStylePresetBackup?: { design?: Record<string, unknown>; shellSettings?: Record<string, unknown> };
+  customGlobalStylePresets?: BuilderCustomGlobalStylePreset[];
   sectionPaddingSmall?: string;
   sectionPaddingDefault?: string;
   sectionPaddingMedium?: string;
@@ -412,6 +429,10 @@ export const defaultBuilderShellSettings: BuilderShellSettings = {
   warningColor: "#d97706",
   dangerColor: "#dc2626",
   textColor: "#111827",
+  backgroundDefault: "#ffffff",
+  backgroundMuted: "#f8fafc",
+  backgroundPrimary: "#111111",
+  backgroundSecondary: "#64748b",
   backgroundColor: "#ffffff",
   fontFamilyBody: "system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
   fontFamilyHeading: "inherit",
@@ -658,6 +679,10 @@ export function normalizeBuilderShellSettings(
   return {
     ...defaultBuilderShellSettings,
     ...(value ?? {}),
+    backgroundDefault: normalizeOptionalString(value?.backgroundDefault) ?? normalizeOptionalString(value?.backgroundColor) ?? defaultBuilderShellSettings.backgroundDefault,
+    backgroundMuted: normalizeOptionalString(value?.backgroundMuted) ?? normalizeOptionalString(value?.mutedBackgroundColor) ?? defaultBuilderShellSettings.backgroundMuted,
+    backgroundPrimary: normalizeOptionalString(value?.backgroundPrimary) ?? normalizeOptionalString(value?.primaryColor) ?? defaultBuilderShellSettings.backgroundPrimary,
+    backgroundSecondary: normalizeOptionalString(value?.backgroundSecondary) ?? normalizeOptionalString(value?.secondaryColor) ?? defaultBuilderShellSettings.backgroundSecondary,
     headerVisible:
       typeof value?.headerVisible === "boolean"
         ? value.headerVisible

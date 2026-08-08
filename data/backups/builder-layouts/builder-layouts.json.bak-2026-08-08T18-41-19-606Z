@@ -35,6 +35,32 @@
         "kind": "contentLayout",
         "title": "Hero",
         "background": "transparent",
+        "sectionVariant": "default",
+        "preserveColor": false,
+        "overlap": false,
+        "textColor": "none",
+        "contentMode": "small",
+        "maxWidth": "small",
+        "removeHorizontalPadding": false,
+        "expandOneSide": "none",
+        "sectionHeight": "auto",
+        "subtractHeightAbove": false,
+        "contentVerticalAlign": "top",
+        "sectionPadding": "large",
+        "removeTopPadding": false,
+        "removeBottomPadding": true,
+        "topSpacing": "large",
+        "bottomSpacing": "none",
+        "htmlElement": "div",
+        "stickyEffect": "none",
+        "headerTransparent": true,
+        "pullUnderHeader": false,
+        "headerTextColor": "none",
+        "animation": "slide-bottom-medium",
+        "animationDelay": 100,
+        "sectionTitlePosition": "top-left",
+        "sectionTitleRotation": "left",
+        "sectionTitleBreakpoint": "xl",
         "visible": true,
         "layout": "1-col",
         "layoutColumns": 1,
@@ -53,7 +79,13 @@
                 "headingLevel": "h1",
                 "headingSize": "medium",
                 "headingAlign": "center",
-                "elementAlign": "center"
+                "elementAlign": "center",
+                "visualStyle": {
+                  "layout": {
+                    "position": "relative",
+                    "zIndex": 3
+                  }
+                }
               },
               {
                 "id": "yootheme-text-0-0-0-1",
@@ -61,7 +93,13 @@
                 "body": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut.",
                 "textVariant": "lead",
                 "textAlign": "center",
-                "elementAlign": "center"
+                "elementAlign": "center",
+                "visualStyle": {
+                  "layout": {
+                    "position": "relative",
+                    "zIndex": 3
+                  }
+                }
               },
               {
                 "id": "yootheme-button-0-0-0-2",
@@ -84,57 +122,103 @@
                 ],
                 "size": "large",
                 "textAlign": "center",
+                "visualStyle": {
+                  "layout": {
+                    "position": "relative",
+                    "zIndex": 3
+                  }
+                },
                 "buttonStyle": "default"
               },
               {
                 "id": "yootheme-image-0-0-0-3",
                 "kind": "image",
-                "imageUrl": "/wp-content/uploads/yootheme/background-square-01.png",
+                "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/background-square-01.png",
                 "imageAlt": "",
                 "imageMaxWidth": 600,
                 "imageWidth": "auto",
                 "imageLoading": "eager",
-                "imageShape": "none"
+                "imageShape": "none",
+                "visualStyle": {
+                  "layout": {
+                    "position": "absolute",
+                    "top": "22vh",
+                    "left": "-20vw",
+                    "zIndex": 0
+                  }
+                }
               },
               {
                 "id": "yootheme-image-0-0-0-4",
                 "kind": "image",
-                "imageUrl": "/wp-content/uploads/yootheme/background-square-02.png",
+                "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/background-square-02.png",
                 "imageAlt": "",
                 "imageMaxWidth": 1100,
                 "imageWidth": "auto",
                 "imageLoading": "eager",
-                "imageShape": "none"
+                "imageShape": "none",
+                "visualStyle": {
+                  "layout": {
+                    "position": "absolute",
+                    "top": "-30vh",
+                    "left": "-47vw",
+                    "zIndex": 0
+                  }
+                }
               },
               {
                 "id": "yootheme-image-0-0-0-5",
                 "kind": "image",
-                "imageUrl": "/wp-content/uploads/yootheme/background-square-03.png",
+                "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/background-square-03.png",
                 "imageAlt": "",
                 "imageMaxWidth": 700,
                 "imageWidth": "auto",
                 "imageLoading": "eager",
-                "imageShape": "none"
+                "imageShape": "none",
+                "visualStyle": {
+                  "layout": {
+                    "position": "absolute",
+                    "top": "15vh",
+                    "left": "39vw",
+                    "zIndex": 0
+                  }
+                }
               },
               {
                 "id": "yootheme-image-0-0-0-6",
                 "kind": "image",
-                "imageUrl": "/wp-content/uploads/yootheme/background-square-04.png",
+                "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/background-square-04.png",
                 "imageAlt": "",
                 "imageMaxWidth": 950,
                 "imageWidth": "auto",
                 "imageLoading": "eager",
-                "imageShape": "none"
+                "imageShape": "none",
+                "visualStyle": {
+                  "layout": {
+                    "position": "absolute",
+                    "top": "-27vh",
+                    "left": "54vw",
+                    "zIndex": 0
+                  }
+                }
               },
               {
                 "id": "yootheme-image-0-0-0-7",
                 "kind": "image",
-                "imageUrl": "/wp-content/uploads/yootheme/background-square-05.png",
+                "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/background-square-05.png",
                 "imageAlt": "",
                 "imageMaxWidth": 600,
                 "imageWidth": "auto",
                 "imageLoading": "eager",
-                "imageShape": "none"
+                "imageShape": "none",
+                "visualStyle": {
+                  "layout": {
+                    "position": "absolute",
+                    "top": "-550",
+                    "left": "35vw",
+                    "zIndex": 0
+                  }
+                }
               }
             ]
           },
@@ -146,7 +230,7 @@
               {
                 "id": "yootheme-image-0-1-0-0",
                 "kind": "image",
-                "imageUrl": "/wp-content/uploads/yootheme/home-hero.jpg",
+                "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/home-hero.jpg",
                 "imageAlt": "",
                 "imageMaxWidth": 750,
                 "imageWidth": "auto",
@@ -154,27 +238,66 @@
                 "imageLinkUrl": "wp-content/uploads/yootheme/home-hero-video.mp4",
                 "imageLinkTarget": "_self",
                 "imageShape": "rounded",
-                "imageAlignment": "center"
+                "imageAlignment": "center",
+                "visualStyle": {
+                  "layout": {
+                    "position": "relative",
+                    "zIndex": 1
+                  }
+                }
               },
               {
                 "id": "yootheme-image-0-1-0-1",
                 "kind": "image",
-                "imageUrl": "/wp-content/uploads/yootheme/icon-play.svg",
+                "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/icon-play.svg",
                 "imageAlt": "",
+                "imageMaxWidth": 100,
                 "imageWidth": "auto",
                 "imageLoading": "eager",
                 "imageShape": "none",
-                "imageAlignment": "center"
+                "imageAlignment": "center",
+                "visualStyle": {
+                  "layout": {
+                    "position": "absolute",
+                    "top": "50%",
+                    "zIndex": 2
+                  }
+                }
               }
             ]
           }
-        ]
+        ],
+        "backgroundRole": "default"
       },
       {
         "id": "yootheme-section-2",
         "kind": "contentLayout",
         "title": "Clients",
         "background": "transparent",
+        "sectionVariant": "default",
+        "preserveColor": false,
+        "overlap": false,
+        "textColor": "none",
+        "contentMode": "small",
+        "maxWidth": "small",
+        "removeHorizontalPadding": false,
+        "expandOneSide": "none",
+        "sectionHeight": "auto",
+        "subtractHeightAbove": false,
+        "contentVerticalAlign": "top",
+        "sectionPadding": "large",
+        "removeTopPadding": false,
+        "removeBottomPadding": true,
+        "topSpacing": "large",
+        "bottomSpacing": "none",
+        "htmlElement": "div",
+        "stickyEffect": "none",
+        "headerTransparent": false,
+        "pullUnderHeader": false,
+        "headerTextColor": "none",
+        "sectionTitlePosition": "top-left",
+        "sectionTitleRotation": "left",
+        "sectionTitleBreakpoint": "xl",
         "visible": true,
         "layout": "1-col",
         "layoutColumns": 1,
@@ -192,6 +315,132 @@
                 "title": "DevStack Is Trusted by Professionals Around the World",
                 "headingLevel": "h2",
                 "headingAlign": "center"
+              },
+              {
+                "id": "yootheme-grid-1-0-0-1",
+                "kind": "grid",
+                "gridSource": "static",
+                "gridItems": [
+                  {
+                    "id": "yootheme-grid-item-1-0-0-1-0",
+                    "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/home-clients-01.svg",
+                    "imageAlt": "",
+                    "title": "",
+                    "meta": "",
+                    "text": "",
+                    "buttonLabel": "Read more",
+                    "buttonTarget": "_self",
+                    "renderer": "plain",
+                    "cardVariant": "default",
+                    "mediaPlacement": "top",
+                    "mediaFit": "cover",
+                    "textAlign": "center",
+                    "titleElement": "h3"
+                  },
+                  {
+                    "id": "yootheme-grid-item-1-0-0-1-1",
+                    "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/home-clients-02.svg",
+                    "imageAlt": "",
+                    "title": "",
+                    "meta": "",
+                    "text": "",
+                    "buttonLabel": "Read more",
+                    "buttonTarget": "_self",
+                    "renderer": "plain",
+                    "cardVariant": "default",
+                    "mediaPlacement": "top",
+                    "mediaFit": "cover",
+                    "textAlign": "center",
+                    "titleElement": "h3"
+                  },
+                  {
+                    "id": "yootheme-grid-item-1-0-0-1-2",
+                    "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/home-clients-03.svg",
+                    "imageAlt": "",
+                    "title": "",
+                    "meta": "",
+                    "text": "",
+                    "buttonLabel": "Read more",
+                    "buttonTarget": "_self",
+                    "renderer": "plain",
+                    "cardVariant": "default",
+                    "mediaPlacement": "top",
+                    "mediaFit": "cover",
+                    "textAlign": "center",
+                    "titleElement": "h3"
+                  },
+                  {
+                    "id": "yootheme-grid-item-1-0-0-1-3",
+                    "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/home-clients-04.svg",
+                    "imageAlt": "",
+                    "title": "",
+                    "meta": "",
+                    "text": "",
+                    "buttonLabel": "Read more",
+                    "buttonTarget": "_self",
+                    "renderer": "plain",
+                    "cardVariant": "default",
+                    "mediaPlacement": "top",
+                    "mediaFit": "cover",
+                    "textAlign": "center",
+                    "titleElement": "h3"
+                  },
+                  {
+                    "id": "yootheme-grid-item-1-0-0-1-4",
+                    "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/home-clients-05.svg",
+                    "imageAlt": "",
+                    "title": "",
+                    "meta": "",
+                    "text": "",
+                    "buttonLabel": "Read more",
+                    "buttonTarget": "_self",
+                    "renderer": "plain",
+                    "cardVariant": "default",
+                    "mediaPlacement": "top",
+                    "mediaFit": "cover",
+                    "textAlign": "center",
+                    "titleElement": "h3"
+                  },
+                  {
+                    "id": "yootheme-grid-item-1-0-0-1-5",
+                    "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/home-clients-06.svg",
+                    "imageAlt": "",
+                    "title": "",
+                    "meta": "",
+                    "text": "",
+                    "buttonLabel": "Read more",
+                    "buttonTarget": "_self",
+                    "renderer": "plain",
+                    "cardVariant": "default",
+                    "mediaPlacement": "top",
+                    "mediaFit": "cover",
+                    "textAlign": "center",
+                    "titleElement": "h3"
+                  }
+                ],
+                "gridShowImage": true,
+                "gridShowMeta": true,
+                "gridShowText": true,
+                "gridShowButton": true,
+                "gridItemRenderer": "plain",
+                "gridCardVariant": "default",
+                "gridCardSize": "default",
+                "gridMediaPlacement": "top",
+                "gridItemAlign": "center",
+                "gridGap": "large",
+                "showDividers": false,
+                "centerRows": true,
+                "columnsPhonePortrait": "auto",
+                "columnsDesktop": "",
+                "gridMediaWidth": "medium",
+                "imageHeight": null,
+                "imageLoading": "lazy",
+                "imageBorder": "none",
+                "imageBoxShadow": "none",
+                "imageBoxDecoration": "none",
+                "imageHoverTransition": "none",
+                "linkImage": false,
+                "textAlign": "center"
               }
             ]
           }
@@ -202,6 +451,32 @@
         "kind": "contentLayout",
         "title": "How It Works",
         "background": "transparent",
+        "sectionVariant": "default",
+        "preserveColor": false,
+        "overlap": false,
+        "textColor": "none",
+        "contentMode": "default",
+        "maxWidth": "default",
+        "removeHorizontalPadding": false,
+        "expandOneSide": "none",
+        "sectionHeight": "auto",
+        "subtractHeightAbove": false,
+        "contentVerticalAlign": "top",
+        "sectionPadding": "large",
+        "removeTopPadding": false,
+        "removeBottomPadding": true,
+        "topSpacing": "large",
+        "bottomSpacing": "none",
+        "htmlElement": "div",
+        "stickyEffect": "none",
+        "headerTransparent": false,
+        "pullUnderHeader": false,
+        "headerTextColor": "none",
+        "animation": "fade",
+        "animationDelay": 100,
+        "sectionTitlePosition": "top-left",
+        "sectionTitleRotation": "left",
+        "sectionTitleBreakpoint": "xl",
         "visible": true,
         "layout": "1-col",
         "layoutColumns": 1,
@@ -240,12 +515,48 @@
               {
                 "id": "yootheme-image-2-1-0-0",
                 "kind": "image",
-                "imageUrl": "https://cms.webpages.am/wp-content/uploads/2026/07/pasted-image-3.png",
-                "imageAlt": "pasted-image-3",
+                "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/home-feature-integrate-floating-icon.svg",
+                "imageAlt": "",
                 "imageWidth": "auto",
                 "imageLoading": "lazy",
                 "imageShape": "none",
-                "imageAlignment": "center"
+                "imageAlignment": "center",
+                "visualStyle": {
+                  "layout": {
+                    "position": "absolute",
+                    "top": "200",
+                    "right": "6%",
+                    "zIndex": 1
+                  }
+                }
+              },
+              {
+                "id": "yootheme-panel-2-1-0-1",
+                "kind": "panel",
+                "title": "Integrate",
+                "body": "Lorem ipsum dolo nonumy eirmod tempor<br class=\"uk-visible@m\"> invidunt ut labore et magna aliquyam.",
+                "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/home-feature-integrate.svg",
+                "imageAlt": "Integrate",
+                "buttonLabel": "Learn More",
+                "buttonUrl": "#",
+                "buttonStyle": "ghost",
+                "panelVariant": "default",
+                "panelShowMedia": true,
+                "panelMediaPlacement": "top",
+                "panelMediaWidth": "medium",
+                "panelTextAlign": "center",
+                "panelTitleElement": "h3",
+                "panelHover": true,
+                "panelSize": "default",
+                "panelMediaFit": "cover",
+                "panelMediaAlignment": "center",
+                "panelVerticalAlign": "top",
+                "panelTitleStyle": "inherit",
+                "panelContentWidth": "auto",
+                "panelActionVisible": true,
+                "panelActionStyle": "primary",
+                "panelActionSize": "default",
+                "panelActionAlign": "inherit"
               }
             ]
           },
@@ -257,11 +568,47 @@
               {
                 "id": "yootheme-image-2-1-1-0",
                 "kind": "image",
-                "imageUrl": "/wp-content/uploads/yootheme/home-feature-automate-floating-icon.svg",
+                "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/home-feature-automate-floating-icon.svg",
                 "imageAlt": "",
                 "imageWidth": "auto",
                 "imageLoading": "lazy",
-                "imageShape": "none"
+                "imageShape": "none",
+                "visualStyle": {
+                  "layout": {
+                    "position": "absolute",
+                    "top": "200",
+                    "right": "6%",
+                    "zIndex": 1
+                  }
+                }
+              },
+              {
+                "id": "yootheme-panel-2-1-1-1",
+                "kind": "panel",
+                "title": "Automate",
+                "body": "Lorem ipsum dolo nonumy eirmod tempor<br class=\"uk-visible@m\"> invidunt ut labore et magna aliquyam.",
+                "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/home-feature-automate.svg",
+                "imageAlt": "Automate",
+                "buttonLabel": "Learn More",
+                "buttonUrl": "#",
+                "buttonStyle": "ghost",
+                "panelVariant": "default",
+                "panelShowMedia": true,
+                "panelMediaPlacement": "top",
+                "panelMediaWidth": "medium",
+                "panelTextAlign": "center",
+                "panelTitleElement": "h3",
+                "panelHover": true,
+                "panelSize": "default",
+                "panelMediaFit": "cover",
+                "panelMediaAlignment": "center",
+                "panelVerticalAlign": "top",
+                "panelTitleStyle": "inherit",
+                "panelContentWidth": "auto",
+                "panelActionVisible": true,
+                "panelActionStyle": "primary",
+                "panelActionSize": "default",
+                "panelActionAlign": "inherit"
               }
             ]
           },
@@ -273,11 +620,47 @@
               {
                 "id": "yootheme-image-2-1-2-0",
                 "kind": "image",
-                "imageUrl": "/wp-content/uploads/yootheme/home-feature-innovate-floating-icon.svg",
+                "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/home-feature-innovate-floating-icon.svg",
                 "imageAlt": "",
                 "imageWidth": "auto",
                 "imageLoading": "lazy",
-                "imageShape": "none"
+                "imageShape": "none",
+                "visualStyle": {
+                  "layout": {
+                    "position": "absolute",
+                    "top": "200",
+                    "right": "6%",
+                    "zIndex": 1
+                  }
+                }
+              },
+              {
+                "id": "yootheme-panel-2-1-2-1",
+                "kind": "panel",
+                "title": "Innovate",
+                "body": "Lorem ipsum dolo nonumy eirmod tempor<br class=\"uk-visible@s\"> invidunt ut labore et magna aliquyam.",
+                "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/home-feature-innovate.svg",
+                "imageAlt": "Innovate",
+                "buttonLabel": "Learn More",
+                "buttonUrl": "#",
+                "buttonStyle": "ghost",
+                "panelVariant": "default",
+                "panelShowMedia": true,
+                "panelMediaPlacement": "top",
+                "panelMediaWidth": "medium",
+                "panelTextAlign": "center",
+                "panelTitleElement": "h3",
+                "panelHover": true,
+                "panelSize": "default",
+                "panelMediaFit": "cover",
+                "panelMediaAlignment": "center",
+                "panelVerticalAlign": "top",
+                "panelTitleStyle": "inherit",
+                "panelContentWidth": "auto",
+                "panelActionVisible": true,
+                "panelActionStyle": "primary",
+                "panelActionSize": "default",
+                "panelActionAlign": "inherit"
               }
             ]
           }
@@ -288,6 +671,32 @@
         "kind": "contentLayout",
         "title": "Feature Grid",
         "background": "transparent",
+        "sectionVariant": "default",
+        "preserveColor": false,
+        "overlap": false,
+        "textColor": "none",
+        "contentMode": "default",
+        "maxWidth": "default",
+        "removeHorizontalPadding": false,
+        "expandOneSide": "none",
+        "sectionHeight": "auto",
+        "subtractHeightAbove": false,
+        "contentVerticalAlign": "top",
+        "sectionPadding": "large",
+        "removeTopPadding": false,
+        "removeBottomPadding": true,
+        "topSpacing": "large",
+        "bottomSpacing": "none",
+        "htmlElement": "div",
+        "stickyEffect": "none",
+        "headerTransparent": false,
+        "pullUnderHeader": false,
+        "headerTextColor": "none",
+        "animation": "fade",
+        "animationDelay": 100,
+        "sectionTitlePosition": "top-left",
+        "sectionTitleRotation": "left",
+        "sectionTitleBreakpoint": "xl",
         "visible": true,
         "layout": "1-col",
         "layoutColumns": 1,
@@ -306,7 +715,13 @@
                 "headingLevel": "h2",
                 "headingSize": "h1",
                 "headingAlign": "center",
-                "elementAlign": "center"
+                "elementAlign": "center",
+                "visualStyle": {
+                  "layout": {
+                    "position": "relative",
+                    "zIndex": 1
+                  }
+                }
               },
               {
                 "id": "yootheme-text-3-0-0-1",
@@ -314,7 +729,194 @@
                 "body": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor.",
                 "textVariant": "lead",
                 "textAlign": "center",
-                "elementAlign": "center"
+                "elementAlign": "center",
+                "visualStyle": {
+                  "layout": {
+                    "position": "relative",
+                    "zIndex": 1
+                  }
+                }
+              },
+              {
+                "id": "yootheme-grid-3-0-0-2",
+                "kind": "grid",
+                "gridSource": "static",
+                "gridItems": [
+                  {
+                    "id": "yootheme-grid-item-3-0-0-2-0",
+                    "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/icon-deployment.svg",
+                    "imageAlt": "Easy Deployments",
+                    "title": "Easy Deployments",
+                    "meta": "",
+                    "text": "",
+                    "buttonLabel": "Learn More",
+                    "buttonUrl": "?page_id=19#deployment",
+                    "buttonTarget": "_self",
+                    "renderer": "card",
+                    "cardVariant": "default",
+                    "mediaPlacement": "top",
+                    "mediaFit": "cover",
+                    "textAlign": "center",
+                    "titleElement": "h3",
+                    "titleStyle": "h5"
+                  },
+                  {
+                    "id": "yootheme-grid-item-3-0-0-2-1",
+                    "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/icon-automation.svg",
+                    "imageAlt": "Scalable Automation",
+                    "title": "Scalable Automation",
+                    "meta": "",
+                    "text": "",
+                    "buttonLabel": "Learn More",
+                    "buttonUrl": "?page_id=19#automation",
+                    "buttonTarget": "_self",
+                    "renderer": "card",
+                    "cardVariant": "default",
+                    "mediaPlacement": "top",
+                    "mediaFit": "cover",
+                    "textAlign": "center",
+                    "titleElement": "h3",
+                    "titleStyle": "h5"
+                  },
+                  {
+                    "id": "yootheme-grid-item-3-0-0-2-2",
+                    "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/icon-ci-cd.svg",
+                    "imageAlt": "Continuous Integration",
+                    "title": "Continuous Integration",
+                    "meta": "",
+                    "text": "",
+                    "buttonLabel": "Learn More",
+                    "buttonUrl": "?page_id=19#ci-cd",
+                    "buttonTarget": "_self",
+                    "renderer": "card",
+                    "cardVariant": "default",
+                    "mediaPlacement": "top",
+                    "mediaFit": "cover",
+                    "textAlign": "center",
+                    "titleElement": "h3",
+                    "titleStyle": "h5"
+                  },
+                  {
+                    "id": "yootheme-grid-item-3-0-0-2-3",
+                    "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/icon-infrastructure.svg",
+                    "imageAlt": "Infrastructure",
+                    "title": "Infrastructure",
+                    "meta": "",
+                    "text": "",
+                    "buttonLabel": "Learn More",
+                    "buttonUrl": "?page_id=19#infrastructure",
+                    "buttonTarget": "_self",
+                    "renderer": "card",
+                    "cardVariant": "default",
+                    "mediaPlacement": "top",
+                    "mediaFit": "cover",
+                    "textAlign": "center",
+                    "titleElement": "h3",
+                    "titleStyle": "h5"
+                  },
+                  {
+                    "id": "yootheme-grid-item-3-0-0-2-4",
+                    "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/icon-security.svg",
+                    "imageAlt": "End-to-End Security",
+                    "title": "End-to-End Security",
+                    "meta": "",
+                    "text": "",
+                    "buttonLabel": "Learn More",
+                    "buttonUrl": "?page_id=19#security",
+                    "buttonTarget": "_self",
+                    "renderer": "card",
+                    "cardVariant": "default",
+                    "mediaPlacement": "top",
+                    "mediaFit": "cover",
+                    "textAlign": "center",
+                    "titleElement": "h3",
+                    "titleStyle": "h5"
+                  },
+                  {
+                    "id": "yootheme-grid-item-3-0-0-2-5",
+                    "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/icon-integrations.svg",
+                    "imageAlt": "Seamless Integrations",
+                    "title": "Seamless Integrations",
+                    "meta": "",
+                    "text": "",
+                    "buttonLabel": "Learn More",
+                    "buttonUrl": "?page_id=19#integrations",
+                    "buttonTarget": "_self",
+                    "renderer": "card",
+                    "cardVariant": "default",
+                    "mediaPlacement": "top",
+                    "mediaFit": "cover",
+                    "textAlign": "center",
+                    "titleElement": "h3",
+                    "titleStyle": "h5"
+                  },
+                  {
+                    "id": "yootheme-grid-item-3-0-0-2-6",
+                    "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/icon-automated-testing.svg",
+                    "imageAlt": "Automated Testing",
+                    "title": "Automated Testing",
+                    "meta": "",
+                    "text": "",
+                    "buttonLabel": "Learn More",
+                    "buttonUrl": "?page_id=19#features",
+                    "buttonTarget": "_self",
+                    "renderer": "card",
+                    "cardVariant": "default",
+                    "mediaPlacement": "top",
+                    "mediaFit": "cover",
+                    "textAlign": "center",
+                    "titleElement": "h3",
+                    "titleStyle": "h5"
+                  },
+                  {
+                    "id": "yootheme-grid-item-3-0-0-2-7",
+                    "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/icon-cloud-storage.svg",
+                    "imageAlt": "Cloud Storage",
+                    "title": "Cloud Storage",
+                    "meta": "",
+                    "text": "",
+                    "buttonLabel": "Learn More",
+                    "buttonUrl": "?page_id=19#features",
+                    "buttonTarget": "_self",
+                    "renderer": "card",
+                    "cardVariant": "default",
+                    "mediaPlacement": "top",
+                    "mediaFit": "cover",
+                    "textAlign": "center",
+                    "titleElement": "h3",
+                    "titleStyle": "h5"
+                  }
+                ],
+                "gridShowImage": true,
+                "gridShowMeta": true,
+                "gridShowText": true,
+                "gridShowButton": true,
+                "gridItemRenderer": "card",
+                "gridCardVariant": "default",
+                "gridCardSize": "default",
+                "gridMediaPlacement": "top",
+                "gridItemAlign": "center",
+                "showDividers": false,
+                "centerRows": false,
+                "columnsPhonePortrait": "1",
+                "columnsPhoneLandscape": "2",
+                "columnsDesktop": "4",
+                "gridMediaWidth": "medium",
+                "imageMaxWidth": 68,
+                "imageHeight": null,
+                "imageLoading": "lazy",
+                "imageBorder": "none",
+                "imageBoxShadow": "none",
+                "imageBoxDecoration": "none",
+                "imageHoverTransition": "none",
+                "linkImage": false,
+                "textAlign": "center",
+                "visualStyle": {
+                  "layout": {
+                    "position": "relative",
+                    "zIndex": 1
+                  }
+                }
               }
             ]
           },
@@ -326,23 +928,39 @@
               {
                 "id": "yootheme-image-3-1-0-0",
                 "kind": "image",
-                "imageUrl": "/wp-content/uploads/yootheme/background-square-05.png",
+                "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/background-square-05.png",
                 "imageAlt": "",
                 "imageMaxWidth": 1000,
                 "imageWidth": "auto",
                 "imageLoading": "lazy",
-                "imageShape": "none"
+                "imageShape": "none",
+                "visualStyle": {
+                  "layout": {
+                    "position": "absolute",
+                    "bottom": "-300",
+                    "left": "-50vw",
+                    "zIndex": 0
+                  }
+                }
               },
               {
                 "id": "yootheme-image-3-1-0-1",
                 "kind": "image",
-                "imageUrl": "/wp-content/uploads/yootheme/background-square-03.png",
+                "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/background-square-03.png",
                 "imageAlt": "",
                 "imageMaxWidth": 600,
                 "imageWidth": "auto",
                 "imageLoading": "lazy",
                 "imageShape": "none",
-                "imageAlignment": "right"
+                "imageAlignment": "right",
+                "visualStyle": {
+                  "layout": {
+                    "position": "absolute",
+                    "top": "-700",
+                    "right": "-29vw",
+                    "zIndex": 0
+                  }
+                }
               }
             ]
           }
@@ -353,6 +971,30 @@
         "kind": "contentLayout",
         "title": "Testimonials",
         "background": "transparent",
+        "sectionVariant": "default",
+        "preserveColor": false,
+        "overlap": false,
+        "textColor": "none",
+        "contentMode": "",
+        "maxWidth": "",
+        "removeHorizontalPadding": false,
+        "expandOneSide": "none",
+        "sectionHeight": "auto",
+        "subtractHeightAbove": false,
+        "contentVerticalAlign": "top",
+        "sectionPadding": "xlarge",
+        "removeTopPadding": false,
+        "removeBottomPadding": true,
+        "topSpacing": "xlarge",
+        "bottomSpacing": "none",
+        "htmlElement": "div",
+        "stickyEffect": "none",
+        "headerTransparent": false,
+        "pullUnderHeader": false,
+        "headerTextColor": "none",
+        "sectionTitlePosition": "top-left",
+        "sectionTitleRotation": "left",
+        "sectionTitleBreakpoint": "xl",
         "visible": true,
         "layout": "2-col-equal",
         "layoutColumns": 2,
@@ -401,7 +1043,43 @@
             "id": "yootheme-section-5-row-2-column-1",
             "rowId": "yootheme-section-5-row-2",
             "rowLayout": "1-col",
-            "blocks": []
+            "blocks": [
+              {
+                "id": "yootheme-panel-slider-4-1-0-0",
+                "kind": "panelSlider",
+                "slides": [
+                  {
+                    "id": "yootheme-panel-slide-4-1-0-0-0",
+                    "title": "",
+                    "meta": "",
+                    "text": "",
+                    "imageUrl": "",
+                    "imageAlt": "",
+                    "headingLevel": "h3",
+                    "metaStyle": "muted",
+                    "showAction": false,
+                    "buttonLabel": "Read more",
+                    "buttonUrl": "#",
+                    "buttonTarget": "_self",
+                    "buttonStyle": "outline"
+                  }
+                ],
+                "carouselSettings": {
+                  "variant": "panel",
+                  "slideMode": "panel",
+                  "loop": true,
+                  "autoplay": false,
+                  "pauseOnHover": true,
+                  "align": "center",
+                  "spaceBetween": 15,
+                  "showArrows": true,
+                  "showDots": false,
+                  "arrowPosition": "default",
+                  "paginationPosition": "bottom-center",
+                  "effect": "slide"
+                }
+              }
+            ]
           }
         ]
       },
@@ -410,6 +1088,32 @@
         "kind": "contentLayout",
         "title": "Call to Action",
         "background": "transparent",
+        "sectionVariant": "default",
+        "preserveColor": false,
+        "overlap": false,
+        "textColor": "none",
+        "contentMode": "small",
+        "maxWidth": "small",
+        "removeHorizontalPadding": false,
+        "expandOneSide": "none",
+        "sectionHeight": "auto",
+        "subtractHeightAbove": false,
+        "contentVerticalAlign": "top",
+        "sectionPadding": "large",
+        "removeTopPadding": false,
+        "removeBottomPadding": false,
+        "topSpacing": "large",
+        "bottomSpacing": "large",
+        "htmlElement": "div",
+        "stickyEffect": "none",
+        "headerTransparent": false,
+        "pullUnderHeader": false,
+        "headerTextColor": "none",
+        "animation": "fade",
+        "animationDelay": 100,
+        "sectionTitlePosition": "top-left",
+        "sectionTitleRotation": "left",
+        "sectionTitleBreakpoint": "xl",
         "visible": true,
         "layout": "1-col",
         "layoutColumns": 1,
@@ -435,7 +1139,75 @@
             "id": "yootheme-section-6-row-2-column-1",
             "rowId": "yootheme-section-6-row-2",
             "rowLayout": "1-col",
-            "blocks": []
+            "blocks": [
+              {
+                "id": "yootheme-grid-5-1-0-0",
+                "kind": "grid",
+                "gridSource": "static",
+                "gridItems": [
+                  {
+                    "id": "yootheme-grid-item-5-1-0-0-0",
+                    "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/home-cta-01.svg",
+                    "imageAlt": "Ship Faster with<br class=\"uk-visible@s\"> the Leading DevOps Platform",
+                    "title": "Ship Faster with<br class=\"uk-visible@s\"> the Leading DevOps Platform",
+                    "meta": "",
+                    "text": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr dolore magna aliquyam erat, sed diam voluptua.",
+                    "buttonLabel": "View Features",
+                    "buttonUrl": "?page_id=19",
+                    "buttonTarget": "_self",
+                    "renderer": "card",
+                    "cardVariant": "default",
+                    "mediaPlacement": "top",
+                    "mediaFit": "cover",
+                    "titleElement": "h3",
+                    "titleStyle": "h2"
+                  },
+                  {
+                    "id": "yootheme-grid-item-5-1-0-0-1",
+                    "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/home-cta-02.svg",
+                    "imageAlt": "Endless Benefits with DevStack Enterprise",
+                    "title": "Endless Benefits with DevStack Enterprise",
+                    "meta": "",
+                    "text": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr dolore magna aliquyam erat, sed diam voluptua.",
+                    "buttonLabel": "View Enterprise",
+                    "buttonUrl": "?page_id=2",
+                    "buttonTarget": "_self",
+                    "renderer": "plain",
+                    "cardVariant": "primary",
+                    "mediaPlacement": "top",
+                    "mediaFit": "cover",
+                    "titleElement": "h3",
+                    "titleStyle": "h2"
+                  }
+                ],
+                "gridShowImage": true,
+                "gridShowMeta": true,
+                "gridShowText": true,
+                "gridShowButton": true,
+                "gridItemRenderer": "card",
+                "gridCardVariant": "default",
+                "gridCardSize": "large",
+                "gridMediaPlacement": "top",
+                "showDividers": false,
+                "centerRows": false,
+                "columnsPhonePortrait": "1",
+                "columnsDesktop": "2",
+                "gridMediaWidth": "medium",
+                "imageHeight": null,
+                "imageLoading": "lazy",
+                "imageBorder": "none",
+                "imageBoxShadow": "none",
+                "imageBoxDecoration": "none",
+                "imageHoverTransition": "none",
+                "linkImage": false,
+                "visualStyle": {
+                  "layout": {
+                    "position": "relative",
+                    "zIndex": 1
+                  }
+                }
+              }
+            ]
           },
           {
             "id": "yootheme-section-6-row-3-column-1",
@@ -445,23 +1217,39 @@
               {
                 "id": "yootheme-image-5-2-0-0",
                 "kind": "image",
-                "imageUrl": "/wp-content/uploads/yootheme/background-square-02.png",
+                "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/background-square-02.png",
                 "imageAlt": "",
                 "imageMaxWidth": 800,
                 "imageWidth": "auto",
                 "imageLoading": "lazy",
-                "imageShape": "none"
+                "imageShape": "none",
+                "visualStyle": {
+                  "layout": {
+                    "position": "absolute",
+                    "bottom": "-25vh",
+                    "left": "-40vw",
+                    "zIndex": 0
+                  }
+                }
               },
               {
                 "id": "yootheme-image-5-2-0-1",
                 "kind": "image",
-                "imageUrl": "/wp-content/uploads/yootheme/background-square-05.png",
+                "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/background-square-05.png",
                 "imageAlt": "",
                 "imageMaxWidth": 1000,
                 "imageWidth": "auto",
                 "imageLoading": "lazy",
                 "imageShape": "none",
-                "imageAlignment": "right"
+                "imageAlignment": "right",
+                "visualStyle": {
+                  "layout": {
+                    "position": "absolute",
+                    "right": "-53vw",
+                    "bottom": "0vh",
+                    "zIndex": 0
+                  }
+                }
               }
             ]
           }
@@ -472,6 +1260,31 @@
         "kind": "contentLayout",
         "title": "Latest Posts",
         "background": "transparent",
+        "sectionVariant": "muted",
+        "preserveColor": false,
+        "overlap": false,
+        "textColor": "none",
+        "contentMode": "default",
+        "maxWidth": "default",
+        "removeHorizontalPadding": false,
+        "expandOneSide": "none",
+        "sectionHeight": "auto",
+        "subtractHeightAbove": false,
+        "contentVerticalAlign": "top",
+        "sectionPadding": "large",
+        "removeTopPadding": false,
+        "removeBottomPadding": false,
+        "topSpacing": "large",
+        "bottomSpacing": "large",
+        "htmlElement": "div",
+        "stickyEffect": "none",
+        "headerTransparent": false,
+        "pullUnderHeader": false,
+        "headerTextColor": "none",
+        "animation": "fade",
+        "sectionTitlePosition": "top-left",
+        "sectionTitleRotation": "left",
+        "sectionTitleBreakpoint": "xl",
         "visible": true,
         "layout": "1-col",
         "layoutColumns": 1,
@@ -514,13 +1327,67 @@
                 "textAlign": "center",
                 "buttonStyle": "default",
                 "size": "default"
+              },
+              {
+                "id": "yootheme-grid-6-0-0-3",
+                "kind": "grid",
+                "gridSource": "static",
+                "gridItems": [
+                  {
+                    "id": "yootheme-grid-item-6-0-0-3-0",
+                    "imageUrl": "",
+                    "imageAlt": "",
+                    "title": "",
+                    "meta": "",
+                    "text": "",
+                    "buttonLabel": "Read more",
+                    "buttonTarget": "_self",
+                    "renderer": "card",
+                    "cardVariant": "default",
+                    "mediaPlacement": "top",
+                    "mediaFit": "cover",
+                    "textAlign": "center",
+                    "titleElement": "h3",
+                    "titleStyle": "h4"
+                  }
+                ],
+                "gridShowImage": true,
+                "gridShowMeta": true,
+                "gridShowText": true,
+                "gridShowButton": true,
+                "gridItemRenderer": "card",
+                "gridCardVariant": "default",
+                "gridCardSize": "default",
+                "gridMediaPlacement": "top",
+                "gridItemAlign": "center",
+                "showDividers": false,
+                "centerRows": false,
+                "columnsPhonePortrait": "1",
+                "columnsPhoneLandscape": "2",
+                "columnsDesktop": "3",
+                "gridMediaWidth": "medium",
+                "imageMaxWidth": 610,
+                "imageHeight": null,
+                "imageLoading": "lazy",
+                "imageBorder": "none",
+                "imageBoxShadow": "none",
+                "imageBoxDecoration": "none",
+                "imageHoverTransition": "none",
+                "linkImage": false,
+                "textAlign": "center",
+                "visualStyle": {
+                  "layout": {
+                    "position": "relative",
+                    "zIndex": 1
+                  }
+                }
               }
             ]
           }
         ]
       }
     ],
-    "updatedAt": "2026-08-08T07:27:14.534Z"
+    "updatedAt": "2026-08-08T18:09:27.615Z"
   },
   "shop": {
     "version": 1,
@@ -2662,6 +3529,12 @@
                 "kind": "headerWishlist",
                 "headerUtilityAction": "wishlist",
                 "headerUtilityVariant": "muted"
+              },
+              {
+                "id": "header-utility-account",
+                "kind": "headerAccount",
+                "headerUtilityAction": "account",
+                "headerUtilityVariant": "muted"
               }
             ]
           }
@@ -2670,7 +3543,7 @@
         "headerArchitectureVersion": 2,
         "headerVisible": true,
         "headerTransparent": false,
-        "headerOverlay": false,
+        "headerOverlay": true,
         "headerLayout": "princity",
         "headerBehavior": "pill-on-scroll",
         "headerWidthMode": "boxed",
@@ -2682,10 +3555,13 @@
         "headerTopToolbarPhone": "+374 xx xx xx",
         "headerTopToolbarMeta": "AMD ֏",
         "headerHeight": "compact",
-        "headerCustomHeight": 40
+        "headerCustomHeight": 40,
+        "animation": {
+          "preset": "none"
+        }
       }
     ],
-    "updatedAt": "2026-08-03T05:01:24.875Z"
+    "updatedAt": "2026-08-08T14:52:50.082Z"
   },
   "footer": {
     "version": 1,

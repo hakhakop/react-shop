@@ -2,6 +2,7 @@ import type {
   BuilderLayoutBlock,
   BuilderSection,
 } from "@/components/dashboard/builderTypes";
+import type { BuilderShellSettings } from "@/lib/builderShell";
 import type { BuilderVisualStyle } from "@/lib/builderVisualStyle";
 
 /**
@@ -65,6 +66,7 @@ export type YoothemeStructuralMapping = {
 export type YoothemeStaticImportMapping = {
   sections: BuilderSection[];
   warnings: string[];
+  globalStylePatch: Partial<BuilderShellSettings>;
 };
 
 export type YoothemeGlobalStyleBoundary = {
@@ -267,6 +269,25 @@ const sourceSectionVariant = (
   value === "muted" || value === "primary" || value === "secondary"
     ? value
     : "default";
+
+const sourceGlobalBackgroundPatch = (root: YoothemeSourceNode): Partial<BuilderShellSettings> => {
+  const rootRecord = root as Record<string, unknown>;
+  const candidates = [sourceProps(root), rootRecord.global, rootRecord.settings, rootRecord.global_styles]
+    .filter((value): value is Record<string, unknown> => Boolean(value) && typeof value === "object");
+  const read = (...keys: string[]) => {
+    for (const candidate of candidates) for (const key of keys) {
+      const value = candidate[key];
+      if (typeof value === "string" && value.trim()) return value.trim();
+    }
+    return undefined;
+  };
+  return {
+    ...(read("global_background", "global-background", "background") ? { backgroundDefault: read("global_background", "global-background", "background") } : {}),
+    ...(read("global_muted_background", "global-muted-background", "muted_background") ? { backgroundMuted: read("global_muted_background", "global-muted-background", "muted_background") } : {}),
+    ...(read("global_primary_background", "global-primary-background", "primary_background") ? { backgroundPrimary: read("global_primary_background", "global-primary-background", "primary_background") } : {}),
+    ...(read("global_secondary_background", "global-secondary-background", "secondary_background") ? { backgroundSecondary: read("global_secondary_background", "global-secondary-background", "secondary_background") } : {}),
+  };
+};
 
 const sourceSectionSpacing = (
   value: unknown,
@@ -863,7 +884,7 @@ export const mapYoothemeStaticContent = (
   const warnings = [...structure.warnings];
 
   if (!root || root.type !== "layout") {
-    return { sections: [], warnings };
+    return { sections: [], warnings, globalStylePatch: {} };
   }
 
   const sections: BuilderSection[] = [];
@@ -915,6 +936,10 @@ export const mapYoothemeStaticContent = (
       title: structureSection.title,
       background: structureSection.background,
       sectionVariant: sourceSectionVariant(sectionProps.style),
+      backgroundRole: (() => {
+        const style = sourceSectionVariant(sectionProps.style);
+        return style === "default" || style === "muted" || style === "primary" || style === "secondary" ? style : undefined;
+      })(),
       preserveColor: Boolean(sectionProps.preserve_color),
       overlap: Boolean(sectionProps.overlap),
       textColor: sectionProps.text_color === "light" || sectionProps.text_color === "dark" ? sectionProps.text_color : "none",
@@ -951,7 +976,7 @@ export const mapYoothemeStaticContent = (
     });
   });
 
-  return { sections, warnings };
+  return { sections, warnings, globalStylePatch: sourceGlobalBackgroundPatch(root) };
 };
 
 export const analyzeYoothemeLayout = (

@@ -3,7 +3,7 @@
 import React from "react";
 import type { BuilderLayoutBlock } from "@/components/dashboard/builderTypes";
 import { getUikitHeadingClass } from "@/lib/uikitTokens";
-import { typographyRoleClass } from "@/lib/builderTypography";
+import { typographyProps, typographyRoleClass } from "@/lib/builderTypography";
 import { builderLinkTargetProps } from "@/lib/websiteBuilderLinks";
 import TypewriterText from "@/components/builder/TypewriterText";
 import { isRichText, sanitizeHtml } from "@/lib/safeHtml";
@@ -42,6 +42,10 @@ export default function UikitHeading({ block }: Props) {
   // Typography Role
   const typographyRole = rawBlock.headingTypographyRole ?? rawBlock.titleTypographyRole;
   const roleClass = typographyRoleClass(typographyRole);
+  // Local typography is intentionally resolved here, in the shared Heading
+  // renderer used by the canvas and published frontend. Global/component
+  // values continue to come from the root UIkit variables when absent.
+  const localTypography = typographyProps(rawBlock.typography, "title");
 
   // Margin
   const marginModeVal = rawBlock.marginMode ?? rawBlock.margin ?? rawBlock.layout?.marginMode;
@@ -97,6 +101,7 @@ export default function UikitHeading({ block }: Props) {
     uikitHeadingClass,
     decorationClass,
     roleClass,
+    localTypography.className,
     alignClass,
     colorClass,
     isGradient ? `uikit-text-gradient uikit-text-gradient--${rawBlock.textGradientPreset}` : "",
@@ -105,13 +110,14 @@ export default function UikitHeading({ block }: Props) {
     .filter(Boolean)
     .join(" ");
 
-  const customGradientStyle = isCustomGradient
-    ? {
+  const customGradientStyle = {
+    ...(localTypography.style ?? {}),
+    ...(isCustomGradient ? {
         backgroundImage: `linear-gradient(${rawBlock.textGradientCustomAngle ?? 135}deg, ${rawBlock.textGradientCustomStart ?? "#ffffff"}, ${rawBlock.textGradientCustomEnd ?? "#c084fc"})`,
         WebkitBackgroundClip: "text",
         WebkitTextFillColor: "transparent",
-      }
-    : undefined;
+      } : {}),
+  };
 
   const contentNode = rawBlock.typewriterEnabled ? (
     <TypewriterText text={headingContent} phrases={rawBlock.typewriterPhrases ?? [headingContent]} speed={rawBlock.typewriterSpeed} loop={rawBlock.typewriterLoop !== false} />

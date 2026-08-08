@@ -1,6 +1,7 @@
 import HeaderShell from "@/components/HeaderShell";
 import FooterShell from "@/components/FooterShell";
 import ScopedPreviewLinkRouter from "@/components/builder/ScopedPreviewLinkRouter";
+import WebPagesFontLoader from "@/components/builder/WebPagesFontLoader";
 import StorefrontBuilderRenderer, {
   type StorefrontBuilderRendererProps,
 } from "@/components/builder/StorefrontBuilderRenderer";
@@ -173,6 +174,7 @@ export default async function WebsiteFrontend({
       tablet: shellSettings.visibilityTablet,
       mobile: shellSettings.visibilityMobile,
     })} data-scoped-preview-root={isPreview ? "" : undefined} data-domain-website-root={!isPreview ? "" : undefined}>
+      <WebPagesFontLoader settings={shellSettings} />
       {isPreview && (
         <ScopedPreviewLinkRouter
           websiteId={websiteRouteSegment}

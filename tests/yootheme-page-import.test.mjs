@@ -90,9 +90,11 @@ test("Home.json static content maps to existing WebPages block fields", async ()
   assert.equal(mapping.sections.length, 7);
   assert.equal(mapping.sections[0].visible, true);
   assert.equal(mapping.sections[0].sectionVariant, "default");
+  assert.equal(mapping.sections[0].backgroundRole, "default");
   assert.equal(mapping.sections[0].topSpacing, "large");
   assert.equal(mapping.sections[0].bottomSpacing, "none");
   assert.equal(mapping.sections[6].sectionVariant, "muted");
+  assert.equal(mapping.sections[6].backgroundRole, "muted");
   assert.deepEqual(
     firstColumn.blocks.slice(0, 3).map((block) => block.kind),
     ["heading", "text", "button"],
@@ -196,6 +198,27 @@ test("Home.json global-style boundary maps existing semantics and reports concre
     concrete.unmapped.map(({ sourceKey, sourceValue }) => [sourceKey, sourceValue]),
     [["font_family", "Manrope"], ["color", "#111111"]],
   );
+});
+
+test("YOOtheme page global background payload maps to the canonical four roles", () => {
+  const mapping = mapYoothemeStaticContent({
+    type: "layout",
+    global: {
+      global_background: "#ffffff",
+      global_muted_background: "#eff2f8",
+      global_primary_background: "#643cf4",
+      global_secondary_background: "#17104e",
+    },
+    children: [{ type: "section", props: { style: "primary" }, children: [] }],
+  });
+
+  assert.deepEqual(mapping.globalStylePatch, {
+    backgroundDefault: "#ffffff",
+    backgroundMuted: "#eff2f8",
+    backgroundPrimary: "#643cf4",
+    backgroundSecondary: "#17104e",
+  });
+  assert.equal(mapping.sections[0].backgroundRole, "primary");
 });
 
 test("YOOtheme asset paths can resolve against the configured WordPress site", () => {

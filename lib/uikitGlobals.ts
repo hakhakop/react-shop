@@ -7,6 +7,7 @@
 
 import type { BuilderShellSettings } from "@/lib/builderShell";
 import { resolveGlobalStyleToken } from "@/lib/globalStyleTokens";
+import { fontFamilyStack } from "@/lib/webFonts";
 
 export type UikitGlobalsConfig = {
   // Spacing Scale
@@ -67,6 +68,12 @@ export function getUikitGlobalsCssVars(
     resolveGlobalStyleToken(key, shellSettings, design, fallback).value;
   const globalRadius = value("borderRadius", design?.radius || "8px");
   const cardRadius = value("cardBorderRadius", shellSettings?.productCardRadius || globalRadius);
+  const inheritedFamily = (family: string, fallback: string) => family.trim().toLowerCase() === "inherit" ? fallback : family;
+  const bodyFamily = value("fontFamilyBody", "system-ui");
+  const headingFamily = inheritedFamily(value("fontFamilyHeading", "inherit"), bodyFamily);
+  const primaryFamily = inheritedFamily(value("fontFamilyPrimary", "inherit"), headingFamily);
+  const secondaryFamily = inheritedFamily(value("fontFamilySecondary", "inherit"), bodyFamily);
+  const tertiaryFamily = inheritedFamily(value("fontFamilyTertiary", "inherit"), bodyFamily);
 
   const vars: Record<string, string> = {
     // Spacing scale
@@ -108,13 +115,23 @@ export function getUikitGlobalsCssVars(
     "--uk-global-text-color": value("textColor", "#111827"),
     "--uk-global-muted-text-color": value("mutedTextColor", "#6b7280"),
     "--uk-global-background-color": value("backgroundColor", "#ffffff"),
-    "--uk-global-font-family": value("fontFamilyBody", "system-ui, sans-serif"),
-    "--uk-heading-font-family": value("fontFamilyHeading", "inherit"),
-    "--webpages-font-primary": value("fontFamilyPrimary", value("fontFamilyHeading", "inherit")),
+    // Canonical YOOtheme section background roles. The legacy field names stay
+    // readable for existing saved documents, but sections resolve these roles.
+    "--webpages-background-default": value("backgroundDefault", value("backgroundColor", "#ffffff")),
+    "--webpages-background-muted": value("backgroundMuted", value("mutedBackgroundColor", "#f8fafc")),
+    "--webpages-background-primary": value("backgroundPrimary", primary),
+    "--webpages-background-secondary": value("backgroundSecondary", value("secondaryColor", "#64748b")),
+    "--uikit-section-default-bg": value("backgroundDefault", value("backgroundColor", "#ffffff")),
+    "--uikit-section-muted-bg": value("backgroundMuted", value("mutedBackgroundColor", "#f8fafc")),
+    "--uikit-section-primary-bg": value("backgroundPrimary", primary),
+    "--uikit-section-secondary-bg": value("backgroundSecondary", value("secondaryColor", "#64748b")),
+    "--uk-global-font-family": fontFamilyStack(bodyFamily, "system-ui, sans-serif"),
+    "--uk-heading-font-family": fontFamilyStack(headingFamily, "system-ui, sans-serif"),
+    "--webpages-font-primary": fontFamilyStack(primaryFamily, "system-ui, sans-serif"),
     "--webpages-font-primary-weight": value("fontWeightPrimary", value("headingFontWeight", "700")),
-    "--webpages-font-secondary": value("fontFamilySecondary", value("fontFamilyBody", "inherit")),
+    "--webpages-font-secondary": fontFamilyStack(secondaryFamily, "system-ui, sans-serif"),
     "--webpages-font-secondary-weight": value("fontWeightSecondary", "400"),
-    "--webpages-font-tertiary": value("fontFamilyTertiary", value("fontFamilyBody", "inherit")),
+    "--webpages-font-tertiary": fontFamilyStack(tertiaryFamily, "system-ui, sans-serif"),
     "--webpages-font-tertiary-weight": value("fontWeightTertiary", "400"),
     "--uk-base-font-size": value("baseFontSize", "16px"),
     "--uk-base-line-height": value("baseLineHeight", "1.5"),

@@ -123,7 +123,13 @@ export default function TypographyPanel({
   const handleFontFamilyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const val = e.target.value;
     if (val === "__inherit__") {
-      resetProperty("fontFamily");
+      if (isCanonical) {
+        resetProperty("fontFamily");
+      } else {
+        // Legacy callers still use value/onChange. Clear only the local
+        // property so the shared renderer resumes the global/component value.
+        onChange({ ...v, fontFamily: undefined });
+      }
       setCustomFontFamilyActive(false);
       return;
     }
@@ -216,7 +222,7 @@ export default function TypographyPanel({
                 fontSize: "12px",
               }}
             >
-              {isCanonical && <option value="__inherit__">Inherit · {inherited.fontFamily || "UIkit default"}</option>}
+              <option value="__inherit__">Inherit · {isCanonical ? inherited.fontFamily || "UIkit default" : "Global / component default"}</option>
               <option value="Manrope">Manrope</option>
               <option value="Inter">Inter</option>
               <option value="Outfit">Outfit</option>

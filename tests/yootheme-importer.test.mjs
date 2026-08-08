@@ -8,6 +8,8 @@ const layers = [
     @global-font-family: Manrope;
     @global-primary-background: #6F40F1;
     @global-background: #F7F8FC;
+    @global-muted-background: #EEF1F8;
+    @global-secondary-background: #17104E;
     @global-small-box-shadow: 0 1px 2px rgba(0,0,0,.1);
     @button-border-radius: 500px;
     @global-primary-font-weight: 600;
@@ -25,7 +27,10 @@ const layers = [
 
 test("YOOtheme resolver honors layer precedence and evaluates supported color functions", () => {
   const preset = resolveYoothemeLess(layers);
-  assert.equal(preset.shellSettings.primaryColor, "#1991EE");
+  assert.equal(preset.shellSettings.backgroundPrimary, "#1991EE");
+  assert.equal(preset.shellSettings.backgroundDefault, "#F7F8FC");
+  assert.equal(preset.shellSettings.backgroundMuted, "#EEF1F8");
+  assert.equal(preset.shellSettings.backgroundSecondary, "#17104E");
   assert.equal(preset.shellSettings.fontFamilyBody, "Manrope");
   assert.equal(preset.shellSettings.pageContainerMaxWidth, "1500px");
   assert.equal(preset.shellSettings.buttonRadius, "500px");
@@ -39,7 +44,7 @@ test("unsupported expressions are reported and never guessed into semantic setti
   const preset = resolveYoothemeLess([
     { name: "base.less", precedence: 1, content: "@global-primary-background: var(--brand); @navbar-gap: 10px;" },
   ]);
-  assert.equal(preset.shellSettings.primaryColor, undefined);
+  assert.equal(preset.shellSettings.backgroundPrimary, undefined);
   assert.ok(preset.unsupported.some((row) => row.variable === "@global-primary-background"));
   assert.doesNotMatch(JSON.stringify(preset), /uk-[a-z-]+/);
 });

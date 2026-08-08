@@ -63,6 +63,7 @@ import { safeDecodeURI } from "@/lib/safeDecodeURI";
 import type { SaaSWebsite } from "@/lib/websites";
 import type { BuilderShellSettings } from "@/lib/builderShell";
 import { resolveAppearanceValue } from "@/lib/globalStyleTokens";
+import { resolveSectionBackground, sectionBackgroundClass } from "@/lib/semanticBackgrounds";
 import type {
   BuilderLayout,
   BuilderLayoutBlock,
@@ -89,7 +90,6 @@ import {
 import {
   getUikitMarginClass,
   getUikitSectionPaddingClass,
-  getUikitSectionStyleClass,
   getUikitContainerClass,
   getUikitGridClass,
   getUikitWidthClass,
@@ -372,13 +372,12 @@ function resolveSectionColorScheme(
     return section.colorScheme;
   }
 
-  const bg = section.background?.trim().toLowerCase();
-  if (!bg || bg === "transparent" || bg === "initial" || bg === "inherit") {
-    return layoutScheme;
-  }
+  const resolvedBackground = resolveSectionBackground(section);
+  if (!resolvedBackground.override) return resolvedBackground.role === "primary" || resolvedBackground.role === "secondary" ? "dark" : "light";
+  const bg = resolvedBackground.override.trim().toLowerCase();
 
   return resolveColorSchemeForBackground(
-    section.background,
+    resolvedBackground.override,
     layoutScheme === "auto" ? "light" : layoutScheme,
   );
 }
@@ -630,9 +629,10 @@ function sectionStyle(
         : ({} satisfies BuilderStyle);
 
   const visual = section.visualStyle as BuilderVisualStyle | undefined;
-  const contextVars = getContextVars(colorScheme, section.background);
+  const resolvedBackground = resolveSectionBackground(section);
+  const contextVars = getContextVars(colorScheme, resolvedBackground.override);
   const styleObj: BuilderStyle = {
-    background: section.background,
+    background: resolvedBackground.override,
     "--builder-section-padding-top": getSpacingValue(
       section.topSpacing,
       "sectionPadding",
@@ -678,9 +678,7 @@ function sectionClassName(
   const uikitSectionPad = getUikitSectionPaddingClass(
     section.sectionPadding ?? section.topSpacing ?? (section as any).sectionPaddingTop,
   );
-  const uikitSectionStyle = getUikitSectionStyleClass(
-    section.sectionVariant || section.colorScheme || (section.visualStyle as any)?.preset,
-  );
+  const uikitSectionStyle = sectionBackgroundClass(resolveSectionBackground(section).role);
   const preserveColorClass = section.preserveColor ? "uk-preserve-color" : "";
   const overlapClass = section.overlap ? "uk-section-overlap" : "";
   const textColorClass = section.textColor === "light" ? "uk-light" : section.textColor === "dark" ? "uk-dark" : "";

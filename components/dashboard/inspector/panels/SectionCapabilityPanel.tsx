@@ -11,6 +11,7 @@ import {
 } from "@/components/dashboard/inspector/InspectorControls";
 import AnimationControl from "@/components/dashboard/style/AnimationControl";
 import BorderEffectsControl from "@/components/dashboard/style/BorderEffectsControl";
+import { resolveSectionBackground } from "@/lib/semanticBackgrounds";
 
 type Props = {
   section: BuilderSection;
@@ -20,6 +21,7 @@ type Props = {
 };
 
 export default function SectionCapabilityPanel({ section, shellSettings, tab, update }: Props) {
+  const resolvedBackground = resolveSectionBackground(section);
   // 1. CONTENT TAB
   if (tab === "content") {
     return (
@@ -56,21 +58,21 @@ export default function SectionCapabilityPanel({ section, shellSettings, tab, up
           </InspectorFieldRow>
         </InspectorSection>
 
-        <InspectorSection title="Background Media">
-          <InspectorFieldRow label="Background Color">
+        <InspectorSection title="Background override">
+          <InspectorFieldRow label="Local color override" description="Optional. Without this override, the section resolves its selected Global Styles background role.">
             <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
               <input
                 type="color"
-                value={section.background || "#ffffff"}
-                onChange={(e) => update({ background: e.target.value })}
+                value={resolvedBackground.override || "#ffffff"}
+                onChange={(e) => update({ backgroundOverride: e.target.value })}
                 style={{ width: "36px", height: "32px", border: "none", cursor: "pointer" }}
               />
               <input
                 type="text"
                 className="builder-input"
-                value={section.background || ""}
-                onChange={(e) => update({ background: e.target.value })}
-                placeholder="#ffffff"
+                value={section.backgroundOverride ?? resolvedBackground.override ?? ""}
+                onChange={(e) => update({ backgroundOverride: e.target.value || undefined })}
+                placeholder="Uses Global Styles role"
                 style={{ flex: 1 }}
               />
             </div>
@@ -118,21 +120,19 @@ export default function SectionCapabilityPanel({ section, shellSettings, tab, up
       <InspectorSection title="Section Settings">
         {/* STYLE */}
         <InspectorFieldRow
-          label="Style"
-          description="Preserve the text color, for example when using cards. Section overlap is not supported by all styles and may have no visual effect."
+          label="Background role"
+          description="Resolves from Global Styles. Local color overrides are optional and live in Content."
         >
           <InspectorSelect
-            value={section.sectionVariant ?? "default"}
+            value={resolvedBackground.role}
             options={[
               { value: "default", label: "Default" },
               { value: "muted", label: "Muted" },
               { value: "primary", label: "Primary" },
               { value: "secondary", label: "Secondary" },
-              { value: "image", label: "Image" },
-              { value: "video", label: "Video" },
             ]}
-            onChange={(value) => update({ sectionVariant: value as any })}
-            ariaLabel="Style"
+            onChange={(value) => update({ backgroundRole: value as any, sectionVariant: value as any })}
+            ariaLabel="Background role"
           />
           <div style={{ marginTop: "8px", display: "flex", flexDirection: "column", gap: "6px" }}>
             <InspectorSwitch

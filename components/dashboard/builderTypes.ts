@@ -600,6 +600,10 @@ export type BuilderSection = {
   listIconColorScheme?: "default" | "gradient-cycle";
   listIconSize?: number;
   background: string;
+  /** Global Styles semantic background ownership. */
+  backgroundRole?: "default" | "muted" | "primary" | "secondary";
+  /** Explicit local color override; legacy `background` remains a migration fallback. */
+  backgroundOverride?: string;
   backgroundMode?: SectionBackgroundMode;
   backgroundEffect?: string;
   antigravitySpeed?: number;
