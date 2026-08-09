@@ -126,6 +126,34 @@ body.dark {
   margin: 0 auto;
 }
 
+/* Canonical UIkit container gutters, shared by Builder and storefront. */
+.shop-builder-section-content.uk-container {
+  box-sizing: border-box;
+  max-width: var(--uk-container-default-max-width, 1200px);
+  padding-left: var(--uk-container-padding-horizontal, 15px);
+  padding-right: var(--uk-container-padding-horizontal, 15px);
+}
+
+.shop-builder-section-content.uk-container-xsmall { max-width: var(--uk-container-xsmall-max-width, 750px); }
+.shop-builder-section-content.uk-container-small { max-width: var(--uk-container-small-max-width, 900px); }
+.shop-builder-section-content.uk-container-large { max-width: var(--uk-container-large-max-width, 1400px); }
+.shop-builder-section-content.uk-container-xlarge { max-width: var(--uk-container-xlarge-max-width, 1600px); }
+.shop-builder-section-content.uk-container-expand { max-width: none; }
+
+@media (min-width: 640px) {
+  .shop-builder-section-content.uk-container {
+    padding-left: var(--uk-container-padding-horizontal-s, 30px);
+    padding-right: var(--uk-container-padding-horizontal-s, 30px);
+  }
+}
+
+@media (min-width: 960px) {
+  .shop-builder-section-content.uk-container {
+    padding-left: var(--uk-container-padding-horizontal-m, 40px);
+    padding-right: var(--uk-container-padding-horizontal-m, 40px);
+  }
+}
+
 .shop-builder-section--height-viewport,
 .shop-builder-section--height-viewport-80,
 .shop-builder-section--height-viewport-20,
@@ -193,12 +221,74 @@ body.dark {
   max-width: none;
 }
 
-.shop-builder-section--content-small .shop-builder-section-content { max-width: 900px; }
-.shop-builder-section--content-medium .shop-builder-section-content { max-width: 1200px; }
-.shop-builder-section--content-large .shop-builder-section-content { max-width: 1440px; }
-.shop-builder-section--content-xlarge .shop-builder-section-content { max-width: 1640px; }
+.shop-builder-section--content-xsmall .shop-builder-section-content { max-width: var(--uk-container-xsmall-max-width, 750px); }
+.shop-builder-section--content-small .shop-builder-section-content { max-width: var(--uk-container-small-max-width, 900px); }
+.shop-builder-section--content-medium .shop-builder-section-content { max-width: var(--uk-container-default-max-width, 1200px); }
+.shop-builder-section--content-large .shop-builder-section-content { max-width: var(--uk-container-large-max-width, 1400px); }
+.shop-builder-section--content-xlarge .shop-builder-section-content { max-width: var(--uk-container-xlarge-max-width, 1600px); }
 .shop-builder-section--content-none .shop-builder-section-content,
 .shop-builder-section--content-expand .shop-builder-section-content { max-width: none; }
+
+/* Shared YOOtheme General responsive semantics for every element wrapper. */
+@media (min-width: 640px) {
+  .builder-general-maxwidth-small-from-small { max-width: var(--uk-container-small-max-width, 960px); }
+  .builder-general-maxwidth-medium-from-small { max-width: var(--uk-container-default-max-width, 1200px); }
+  .builder-general-maxwidth-large-from-small { max-width: var(--uk-container-large-max-width, 1400px); }
+  .builder-general-maxwidth-xlarge-from-small { max-width: var(--uk-container-xlarge-max-width, 1600px); }
+  .builder-general-maxwidth-2xlarge-from-small { max-width: var(--uk-container-2xlarge-max-width, 1800px); }
+  .builder-general-blockalign-center-from-small { margin-left: auto; margin-right: auto; }
+  .builder-general-blockalign-right-from-small { margin-left: auto; margin-right: 0; }
+  .builder-general-blockalign-left-from-small { margin-left: 0; margin-right: auto; }
+  .builder-general-textalign-left-from-small { text-align: left; }
+  .builder-general-textalign-center-from-small { text-align: center; }
+  .builder-general-textalign-right-from-small { text-align: right; }
+  .builder-general-textalign-justify-from-small { text-align: justify; }
+}
+
+@media (min-width: 960px) {
+  .builder-general-maxwidth-small-from-medium { max-width: var(--uk-container-small-max-width, 960px); }
+  .builder-general-maxwidth-medium-from-medium { max-width: var(--uk-container-default-max-width, 1200px); }
+  .builder-general-maxwidth-large-from-medium { max-width: var(--uk-container-large-max-width, 1400px); }
+  .builder-general-maxwidth-xlarge-from-medium { max-width: var(--uk-container-xlarge-max-width, 1600px); }
+  .builder-general-maxwidth-2xlarge-from-medium { max-width: var(--uk-container-2xlarge-max-width, 1800px); }
+  .builder-general-blockalign-center-from-medium { margin-left: auto; margin-right: auto; }
+  .builder-general-blockalign-right-from-medium { margin-left: auto; margin-right: 0; }
+  .builder-general-blockalign-left-from-medium { margin-left: 0; margin-right: auto; }
+  .builder-general-textalign-left-from-medium { text-align: left; }
+  .builder-general-textalign-center-from-medium { text-align: center; }
+  .builder-general-textalign-right-from-medium { text-align: right; }
+  .builder-general-textalign-justify-from-medium { text-align: justify; }
+}
+
+@media (min-width: 1200px) {
+  .builder-general-maxwidth-small-from-large { max-width: var(--uk-container-small-max-width, 960px); }
+  .builder-general-maxwidth-medium-from-large { max-width: var(--uk-container-default-max-width, 1200px); }
+  .builder-general-maxwidth-large-from-large { max-width: var(--uk-container-large-max-width, 1400px); }
+  .builder-general-maxwidth-xlarge-from-large { max-width: var(--uk-container-xlarge-max-width, 1600px); }
+  .builder-general-maxwidth-2xlarge-from-large { max-width: var(--uk-container-2xlarge-max-width, 1800px); }
+  .builder-general-blockalign-center-from-large { margin-left: auto; margin-right: auto; }
+  .builder-general-blockalign-right-from-large { margin-left: auto; margin-right: 0; }
+  .builder-general-blockalign-left-from-large { margin-left: 0; margin-right: auto; }
+  .builder-general-textalign-left-from-large { text-align: left; }
+  .builder-general-textalign-center-from-large { text-align: center; }
+  .builder-general-textalign-right-from-large { text-align: right; }
+  .builder-general-textalign-justify-from-large { text-align: justify; }
+}
+
+@media (min-width: 1600px) {
+  .builder-general-maxwidth-small-from-xlarge { max-width: var(--uk-container-small-max-width, 960px); }
+  .builder-general-maxwidth-medium-from-xlarge { max-width: var(--uk-container-default-max-width, 1200px); }
+  .builder-general-maxwidth-large-from-xlarge { max-width: var(--uk-container-large-max-width, 1400px); }
+  .builder-general-maxwidth-xlarge-from-xlarge { max-width: var(--uk-container-xlarge-max-width, 1600px); }
+  .builder-general-maxwidth-2xlarge-from-xlarge { max-width: var(--uk-container-2xlarge-max-width, 1800px); }
+  .builder-general-blockalign-center-from-xlarge { margin-left: auto; margin-right: auto; }
+  .builder-general-blockalign-right-from-xlarge { margin-left: auto; margin-right: 0; }
+  .builder-general-blockalign-left-from-xlarge { margin-left: 0; margin-right: auto; }
+  .builder-general-textalign-left-from-xlarge { text-align: left; }
+  .builder-general-textalign-center-from-xlarge { text-align: center; }
+  .builder-general-textalign-right-from-xlarge { text-align: right; }
+  .builder-general-textalign-justify-from-xlarge { text-align: justify; }
+}
 
 .shop-builder-section--expand-left .shop-builder-section-content { margin-left: 0; margin-right: auto; }
 .shop-builder-section--expand-right .shop-builder-section-content { margin-left: auto; margin-right: 0; }
@@ -243,7 +333,8 @@ body.dark {
   margin: 0;
   max-width: none;
   color: var(--builder-heading-color, var(--builder-section-text, var(--builder-text, #111111)));
-  font-family: var(--builder-heading-font-family, var(--webpages-font-primary, var(--uk-heading-font-family, var(--uk-global-font-family, system-ui, sans-serif))));
+  /* Inherit means Heading Global → legacy component default, never Primary. */
+  font-family: var(--builder-heading-font-family, var(--uk-heading-font-family, var(--uk-global-font-family, system-ui, sans-serif)));
   font-size: var(--builder-heading-size, clamp(42px, 8vw, 126px));
   font-weight: var(--builder-heading-weight, 760);
   line-height: var(--builder-heading-line-height, 0.92);
@@ -449,6 +540,69 @@ body.dark {
 
 .shop-builder-promo .shop-builder-title {
   color: inherit;
+}
+
+/* Dedicated Section titles follow the shared YOOtheme position/rotation contract. */
+.shop-builder-promo .shop-builder-section-heading {
+  display: flex;
+  flex-direction: column;
+}
+
+.shop-builder-section--title-left-top .shop-builder-section-heading,
+.shop-builder-section--title-right-top .shop-builder-section-heading {
+  align-self: flex-start;
+}
+
+.shop-builder-section--title-left-center .shop-builder-section-heading,
+.shop-builder-section--title-right-center .shop-builder-section-heading {
+  align-self: center;
+}
+
+.shop-builder-section--title-left-top .shop-builder-section-heading,
+.shop-builder-section--title-left-center .shop-builder-section-heading {
+  text-align: left;
+}
+
+.shop-builder-section--title-right-top .shop-builder-section-heading,
+.shop-builder-section--title-right-center .shop-builder-section-heading {
+  text-align: right;
+}
+
+.shop-builder-section--title-rotate-left .shop-builder-section-heading,
+.shop-builder-section--title-rotate-right .shop-builder-section-heading {
+  writing-mode: vertical-rl;
+}
+
+.shop-builder-section--title-rotate-left .shop-builder-section-heading {
+  transform: rotate(180deg);
+}
+
+@media (max-width: 639px) {
+  .shop-builder-section[data-section-title-breakpoint="small"] .shop-builder-section-heading {
+    writing-mode: horizontal-tb;
+    transform: none;
+  }
+}
+
+@media (max-width: 959px) {
+  .shop-builder-section[data-section-title-breakpoint="medium"] .shop-builder-section-heading {
+    writing-mode: horizontal-tb;
+    transform: none;
+  }
+}
+
+@media (max-width: 1199px) {
+  .shop-builder-section[data-section-title-breakpoint="large"] .shop-builder-section-heading {
+    writing-mode: horizontal-tb;
+    transform: none;
+  }
+}
+
+@media (max-width: 1599px) {
+  .shop-builder-section[data-section-title-breakpoint="xlarge"] .shop-builder-section-heading {
+    writing-mode: horizontal-tb;
+    transform: none;
+  }
 }
 
 .shop-builder-promo .shop-builder-body {

@@ -1794,6 +1794,7 @@ a {
 .shop-builder-main .uk-heading-large { font-size: var(--uk-heading-large-font-size, 3.4rem); line-height: var(--uk-base-line-height, 1.1); }
 .shop-builder-main .uk-heading-xlarge { font-size: var(--uk-heading-xlarge-font-size, 4rem); line-height: var(--uk-base-line-height, 1); }
 .shop-builder-main .uk-heading-2xlarge { font-size: var(--uk-heading-xlarge-font-size, 6rem); line-height: var(--uk-base-line-height, 1); }
+.shop-builder-main .uk-heading-3xlarge { font-size: calc(var(--uk-heading-xlarge-font-size, 4rem) * 1.25); line-height: var(--uk-base-line-height, 1); }
 
 @media (min-width: 960px) {
   .shop-builder-main .uk-heading-small { font-size: var(--uk-heading-small-font-size-responsive, 3.25rem); }
@@ -1801,6 +1802,7 @@ a {
   .shop-builder-main .uk-heading-large { font-size: 4rem; }
   .shop-builder-main .uk-heading-xlarge { font-size: 6rem; }
   .shop-builder-main .uk-heading-2xlarge { font-size: 8rem; }
+  .shop-builder-main .uk-heading-3xlarge { font-size: 10rem; }
 }
 
 /* --- UIkit Text utilities --- */
@@ -1808,6 +1810,56 @@ a {
   font-size: 1.5rem;
   line-height: 1.5;
   color: #333;
+}
+
+/* Canonical UIkit Text element columns and drop-cap semantics. */
+.shop-builder-main .uk-dropcap::first-letter {
+  float: left;
+  margin: 0.08em 0.12em 0 0;
+  font-size: 3.5em;
+  line-height: 0.8;
+  font-weight: var(--uk-heading-font-weight, 700);
+}
+
+.shop-builder-main .uk-column-divider {
+  column-rule: 1px solid var(--uk-global-border-color, #e5e7eb);
+  column-gap: var(--uk-grid-gutter-medium, 30px);
+}
+
+@media (min-width: 0) {
+  .shop-builder-main .uk-column-1-2 { columns: 2; }
+  .shop-builder-main .uk-column-1-3 { columns: 3; }
+  .shop-builder-main .uk-column-1-4 { columns: 4; }
+  .shop-builder-main .uk-column-1-5 { columns: 5; }
+  .shop-builder-main .uk-column-1-6 { columns: 6; }
+}
+@media (min-width: 640px) {
+  .shop-builder-main .uk-column-1-2\@s { columns: 2; }
+  .shop-builder-main .uk-column-1-3\@s { columns: 3; }
+  .shop-builder-main .uk-column-1-4\@s { columns: 4; }
+  .shop-builder-main .uk-column-1-5\@s { columns: 5; }
+  .shop-builder-main .uk-column-1-6\@s { columns: 6; }
+}
+@media (min-width: 960px) {
+  .shop-builder-main .uk-column-1-2\@m { columns: 2; }
+  .shop-builder-main .uk-column-1-3\@m { columns: 3; }
+  .shop-builder-main .uk-column-1-4\@m { columns: 4; }
+  .shop-builder-main .uk-column-1-5\@m { columns: 5; }
+  .shop-builder-main .uk-column-1-6\@m { columns: 6; }
+}
+@media (min-width: 1200px) {
+  .shop-builder-main .uk-column-1-2\@l { columns: 2; }
+  .shop-builder-main .uk-column-1-3\@l { columns: 3; }
+  .shop-builder-main .uk-column-1-4\@l { columns: 4; }
+  .shop-builder-main .uk-column-1-5\@l { columns: 5; }
+  .shop-builder-main .uk-column-1-6\@l { columns: 6; }
+}
+@media (min-width: 1600px) {
+  .shop-builder-main .uk-column-1-2\@xl { columns: 2; }
+  .shop-builder-main .uk-column-1-3\@xl { columns: 3; }
+  .shop-builder-main .uk-column-1-4\@xl { columns: 4; }
+  .shop-builder-main .uk-column-1-5\@xl { columns: 5; }
+  .shop-builder-main .uk-column-1-6\@xl { columns: 6; }
 }
 .shop-builder-main .uk-text-meta {
   font-size: 12px;

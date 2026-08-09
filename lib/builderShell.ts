@@ -346,9 +346,13 @@ export type BuilderShellSettings = {
   gridGutterMedium?: string;
   gridGutterLarge?: string;
   containerSmall?: string;
+  containerXSmall?: string;
   containerDefault?: string;
   containerLarge?: string;
   containerXLarge?: string;
+  containerPaddingHorizontal?: string;
+  containerPaddingHorizontalSmall?: string;
+  containerPaddingHorizontalMedium?: string;
   containerExpand?: boolean;
   cardBackground?: string;
   cardBorderRadius?: string;
@@ -500,9 +504,13 @@ export const defaultBuilderShellSettings: BuilderShellSettings = {
   gridGutterDefault: "30px",
   gridGutterLarge: "40px",
   containerSmall: "900px",
+  containerXSmall: "750px",
   containerDefault: "1200px",
   containerLarge: "1400px",
   containerXLarge: "1600px",
+  containerPaddingHorizontal: "15px",
+  containerPaddingHorizontalSmall: "30px",
+  containerPaddingHorizontalMedium: "40px",
   containerExpand: false,
   cardBackground: "#ffffff",
   cardPrimaryBackground: "#1991ee",

@@ -130,6 +130,7 @@ import {
   getBuilderImageAspectRatio,
   getBuilderImageObjectFit,
 } from "@/lib/builderImages";
+import { normalizeSectionTitleBreakpoint, normalizeSectionTitlePosition } from "@/lib/sectionSemantics";
 
 export type StorefrontBuilderRendererProps = {
   layout: BuilderLayout;
@@ -662,7 +663,7 @@ function sectionStyle(
   return styleObj as BuilderStyle;
 }
 
-function sectionClassName(
+export function getBuilderSectionClassName(
   section: BuilderSection,
   layoutScheme: "light" | "dark" | "auto" = "light",
   extra?: string,
@@ -691,9 +692,10 @@ function sectionClassName(
     section.expandOneSide && section.expandOneSide !== "none"
       ? `shop-builder-section--expand-${section.expandOneSide}`
       : "";
+  const titlePosition = normalizeSectionTitlePosition(section.sectionTitlePosition);
   const titlePositionClass =
-    section.sectionTitlePosition && section.sectionTitlePosition !== "none"
-      ? `shop-builder-section--title-${section.sectionTitlePosition}`
+    titlePosition !== "none"
+      ? `shop-builder-section--title-${titlePosition}`
       : "";
   const titleRotationClass =
     section.sectionTitleRotation && section.sectionTitleRotation !== "none"
@@ -737,7 +739,7 @@ function SectionFrame({
     <ComponentTag
       id={section.anchorId || section.id}
       data-builder-section-id={section.id}
-      className={`${sectionClassName(section, layoutScheme, extra)} ${
+      className={`${getBuilderSectionClassName(section, layoutScheme, extra)} ${
         isFullTheme
           ? "shop-builder-section--effect-antigravity"
           : isAnimatedBg
@@ -751,7 +753,8 @@ function SectionFrame({
           section.heightOffset === undefined ? undefined : `${section.heightOffset}${typeof section.heightOffset === "number" ? "px" : ""}`,
       }}
       data-gsap-section={section.kind === "hero" ? "hero" : section.kind}
-      data-section-title-breakpoint={section.sectionTitleBreakpoint}
+      data-builder-html-element={section.htmlElement || "section"}
+      data-section-title-breakpoint={normalizeSectionTitleBreakpoint(section.sectionTitleBreakpoint)}
       data-subtract-height-above={section.subtractHeightAbove || undefined}
       data-uk-sticky={section.stickyEffect && section.stickyEffect !== "none" ? `cls-active: uk-navbar-sticky; ${section.stickyEffect === "reveal" ? "show-on-up: true" : ""}` : undefined}
       {...animationAttrs.data}
@@ -946,8 +949,8 @@ function PromoSection({
         section.promoVariant ?? "default"
       }`}
     >
-      <div>
-        <h2 className="shop-builder-title">{section.title}</h2>
+      <div className="shop-builder-section-heading">
+        <h2 className="shop-builder-title" data-builder-section-title>{section.title}</h2>
         <BodyText className="shop-builder-body">{section.body}</BodyText>
       </div>
       {section.ctaLabel && section.ctaUrl && (
@@ -1714,8 +1717,14 @@ export function ContentLayoutBlock({
         content={block.body}
         variant={block.textVariant}
         align={block.textAlign}
-        typography={block.typography}
-        typographyRole={block.textTypographyRole}
+          typography={block.typography}
+          typographyRole={block.textTypographyRole}
+          textColor={block.textColor}
+          dropcap={block.textDropcap}
+          columns={block.textColumns}
+          columnDivider={block.textColumnDivider}
+          columnBreakpoint={block.textColumnBreakpoint}
+          htmlElement={block.textHtmlElement}
         margin={(block as any).margin}
         animation={typeof block.animation === "string" ? block.animation : (block.animation as any)?.preset}
         visibility={(block as any).visibility}
@@ -2791,6 +2800,7 @@ function ContentLayoutSection({
                     return (
                       <div
                         key={block.id ?? blockIndex}
+                        data-builder-block-id={block.id}
                         className={blockShellClassName(block)}
                         style={{
                           ...blockSurfaceStyle(block, rowColorScheme),
@@ -3129,6 +3139,7 @@ function StorefrontBuilderRendererBase({
     (section) => section.visible,
   );
   const pullUnderHeader = firstVisibleSection?.pullUnderHeader === true;
+  const transparentSectionHeader = firstVisibleSection?.headerTransparent === true;
   const RootElement = rootElement;
 
   useEffect(() => {
@@ -3159,7 +3170,7 @@ function StorefrontBuilderRendererBase({
         }
         data-builder-page-root
         data-gsap-home={isHomePage ? true : undefined}
-        data-overlap-header={isPageDocument && (pullUnderHeader || headerOverlay) ? "true" : undefined}
+        data-overlap-header={isPageDocument && (pullUnderHeader || transparentSectionHeader || headerOverlay) ? "true" : undefined}
       >
         <BuilderScrollAnimations />
         {isHomePage && <HomeGsapAnimations />}

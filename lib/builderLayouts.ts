@@ -271,7 +271,7 @@ export type BuilderLayoutBlock = {
   listAlign?: "left" | "center" | "right";
   listSpacing?: "compact" | "default" | "large";
   headingText?: string;
-  headingLevel?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
+  headingLevel?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "div";
   accordionItems?: { id: string; title: string; content: string }[];
   accordionMultiple?: boolean;
   accordionCollapsible?: boolean;
@@ -293,6 +293,12 @@ export type BuilderLayoutBlock = {
   accordionOpenEmphasis?: "none" | "muted" | "primary";
   headingAlign?: "left" | "center" | "right";
   textVariant?: "default" | "lead" | "meta" | "small" | "large" | "muted";
+  textColor?: "none" | "muted" | "emphasis" | "primary" | "secondary" | "success" | "warning" | "danger";
+  textDropcap?: boolean;
+  textColumns?: "none" | "1-2" | "1-3" | "1-4" | "1-5" | "1-6";
+  textColumnDivider?: boolean;
+  textColumnBreakpoint?: "always" | "small" | "medium" | "large" | "xlarge";
+  textHtmlElement?: "div" | "address" | "aside" | "footer";
   textAlign?: "left" | "center" | "right";
   dateLabel?: string;
   tableHeadings?: string[];

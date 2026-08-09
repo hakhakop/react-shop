@@ -41,6 +41,10 @@
         "maxWidth": "small",
         "sectionPadding": "large",
         "removeBottomPadding": true,
+        "sectionTitlePosition": "top-left",
+        "sectionTitleRotation": "left",
+        "sectionTitleBreakpoint": "xl",
+        "headerTransparent": true,
         "preserveColor": false,
         "overlap": false,
         "textColor": "none",
@@ -50,14 +54,10 @@
         "contentVerticalAlign": "top",
         "htmlElement": "div",
         "stickyEffect": "none",
-        "headerTransparent": true,
         "pullUnderHeader": false,
         "headerTextColor": "none",
         "animation": "slide-bottom-medium",
         "animationDelay": 100,
-        "sectionTitlePosition": "top-left",
-        "sectionTitleRotation": "left",
-        "sectionTitleBreakpoint": "xl",
         "visible": true,
         "layout": "1-col",
         "layoutColumns": 1,
@@ -77,11 +77,15 @@
                 "headingSize": "medium",
                 "headingAlign": "center",
                 "elementAlign": "center",
+                "textAlign": "center",
                 "visualStyle": {
                   "layout": {
                     "position": "relative",
-                    "zIndex": 3
+                    "zIndex": 3,
+                    "blockAlign": "center",
+                    "textAlign": "center"
                   },
+                  "effects": {},
                   "card": {}
                 }
               },
@@ -92,10 +96,21 @@
                 "textVariant": "lead",
                 "textAlign": "center",
                 "elementAlign": "center",
+                "maxWidth": "xlarge",
+                "headingAlign": "center",
+                "margin": "default",
+                "marginMode": "default",
                 "visualStyle": {
                   "layout": {
                     "position": "relative",
-                    "zIndex": 3
+                    "zIndex": 3,
+                    "marginMode": "default",
+                    "maxWidth": "xlarge",
+                    "blockAlign": "center",
+                    "textAlign": "center"
+                  },
+                  "effects": {
+                    "maxWidth": "xlarge"
                   },
                   "card": {}
                 }
@@ -121,11 +136,17 @@
                 ],
                 "size": "large",
                 "textAlign": "center",
+                "headingAlign": "center",
+                "margin": "medium",
+                "marginMode": "medium",
                 "visualStyle": {
                   "layout": {
                     "position": "relative",
-                    "zIndex": 3
+                    "zIndex": 3,
+                    "marginMode": "medium",
+                    "textAlign": "center"
                   },
+                  "effects": {},
                   "card": {}
                 }
               },
@@ -138,13 +159,20 @@
                 "imageWidth": "auto",
                 "imageLoading": "eager",
                 "imageShape": "none",
+                "margin": "default",
+                "marginMode": "default",
+                "visibility": "xl",
+                "visibilityMode": "xl",
                 "visualStyle": {
                   "layout": {
                     "position": "absolute",
                     "top": "22vh",
                     "left": "-20vw",
-                    "zIndex": 0
+                    "zIndex": 0,
+                    "marginMode": "default",
+                    "visibilityMode": "xl"
                   },
+                  "effects": {},
                   "card": {}
                 }
               },
@@ -157,13 +185,20 @@
                 "imageWidth": "auto",
                 "imageLoading": "eager",
                 "imageShape": "none",
+                "margin": "default",
+                "marginMode": "default",
+                "visibility": "m",
+                "visibilityMode": "m",
                 "visualStyle": {
                   "layout": {
                     "position": "absolute",
                     "top": "-30vh",
                     "left": "-47vw",
-                    "zIndex": 0
+                    "zIndex": 0,
+                    "marginMode": "default",
+                    "visibilityMode": "m"
                   },
+                  "effects": {},
                   "card": {}
                 }
               },
@@ -176,13 +211,20 @@
                 "imageWidth": "auto",
                 "imageLoading": "eager",
                 "imageShape": "none",
+                "margin": "default",
+                "marginMode": "default",
+                "visibility": "xl",
+                "visibilityMode": "xl",
                 "visualStyle": {
                   "layout": {
                     "position": "absolute",
                     "top": "15vh",
                     "left": "39vw",
-                    "zIndex": 0
+                    "zIndex": 0,
+                    "marginMode": "default",
+                    "visibilityMode": "xl"
                   },
+                  "effects": {},
                   "card": {}
                 }
               },
@@ -195,13 +237,20 @@
                 "imageWidth": "auto",
                 "imageLoading": "eager",
                 "imageShape": "none",
+                "margin": "default",
+                "marginMode": "default",
+                "visibility": "m",
+                "visibilityMode": "m",
                 "visualStyle": {
                   "layout": {
                     "position": "absolute",
                     "top": "-27vh",
                     "left": "54vw",
-                    "zIndex": 0
+                    "zIndex": 0,
+                    "marginMode": "default",
+                    "visibilityMode": "m"
                   },
+                  "effects": {},
                   "card": {}
                 }
               },
@@ -214,13 +263,20 @@
                 "imageWidth": "auto",
                 "imageLoading": "eager",
                 "imageShape": "none",
+                "margin": "default",
+                "marginMode": "default",
+                "visibility": "s",
+                "visibilityMode": "s",
                 "visualStyle": {
                   "layout": {
                     "position": "absolute",
                     "top": "-550",
                     "left": "35vw",
-                    "zIndex": 0
+                    "zIndex": 0,
+                    "marginMode": "default",
+                    "visibilityMode": "s"
                   },
+                  "effects": {},
                   "card": {}
                 }
               }
@@ -243,11 +299,18 @@
                 "imageLinkTarget": "_self",
                 "imageShape": "rounded",
                 "imageAlignment": "center",
+                "textAlign": "center",
+                "headingAlign": "center",
+                "margin": "none",
+                "marginMode": "none",
                 "visualStyle": {
                   "layout": {
                     "position": "relative",
-                    "zIndex": 1
+                    "zIndex": 1,
+                    "marginMode": "none",
+                    "textAlign": "center"
                   },
+                  "effects": {},
                   "card": {}
                 }
               },
@@ -261,12 +324,19 @@
                 "imageLoading": "eager",
                 "imageShape": "none",
                 "imageAlignment": "center",
+                "textAlign": "center",
+                "headingAlign": "center",
+                "margin": "none",
+                "marginMode": "none",
                 "visualStyle": {
                   "layout": {
                     "position": "absolute",
                     "top": "50%",
-                    "zIndex": 2
+                    "zIndex": 2,
+                    "marginMode": "none",
+                    "textAlign": "center"
                   },
+                  "effects": {},
                   "card": {}
                 }
               }
@@ -285,6 +355,9 @@
         "maxWidth": "small",
         "sectionPadding": "large",
         "removeBottomPadding": true,
+        "sectionTitlePosition": "top-left",
+        "sectionTitleRotation": "left",
+        "sectionTitleBreakpoint": "xl",
         "preserveColor": false,
         "overlap": false,
         "textColor": "none",
@@ -297,9 +370,6 @@
         "headerTransparent": false,
         "pullUnderHeader": false,
         "headerTextColor": "none",
-        "sectionTitlePosition": "top-left",
-        "sectionTitleRotation": "left",
-        "sectionTitleBreakpoint": "xl",
         "visible": true,
         "layout": "1-col",
         "layoutColumns": 1,
@@ -316,7 +386,15 @@
                 "headingText": "DevStack Is Trusted by Professionals Around the World",
                 "title": "DevStack Is Trusted by Professionals Around the World",
                 "headingLevel": "h2",
-                "headingAlign": "center"
+                "headingAlign": "center",
+                "textAlign": "center",
+                "visualStyle": {
+                  "layout": {
+                    "textAlign": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
               },
               {
                 "id": "yootheme-grid-1-0-0-1",
@@ -450,10 +528,20 @@
                   "card": {
                     "titleMargin": "0",
                     "buttonMargin": "0"
-                  }
+                  },
+                  "layout": {
+                    "marginMode": "default",
+                    "blockAlign": "center",
+                    "textAlign": "center"
+                  },
+                  "effects": {}
                 },
                 "gridMetaAlign": "below-title",
-                "gridMetaHtmlElement": "div"
+                "gridMetaHtmlElement": "div",
+                "elementAlign": "center",
+                "headingAlign": "center",
+                "margin": "default",
+                "marginMode": "default"
               }
             ]
           }
@@ -470,6 +558,9 @@
         "maxWidth": "default",
         "sectionPadding": "large",
         "removeBottomPadding": true,
+        "sectionTitlePosition": "top-left",
+        "sectionTitleRotation": "left",
+        "sectionTitleBreakpoint": "xl",
         "preserveColor": false,
         "overlap": false,
         "textColor": "none",
@@ -484,9 +575,6 @@
         "headerTextColor": "none",
         "animation": "fade",
         "animationDelay": 100,
-        "sectionTitlePosition": "top-left",
-        "sectionTitleRotation": "left",
-        "sectionTitleBreakpoint": "xl",
         "visible": true,
         "layout": "1-col",
         "layoutColumns": 1,
@@ -505,7 +593,23 @@
                 "headingLevel": "h2",
                 "headingSize": "h1",
                 "headingAlign": "center",
-                "elementAlign": "center"
+                "elementAlign": "center",
+                "maxWidth": "2xlarge",
+                "textAlign": "center",
+                "animation": {
+                  "preset": "none"
+                },
+                "visualStyle": {
+                  "layout": {
+                    "maxWidth": "2xlarge",
+                    "blockAlign": "center",
+                    "textAlign": "center"
+                  },
+                  "effects": {
+                    "maxWidth": "2xlarge"
+                  },
+                  "card": {}
+                }
               },
               {
                 "id": "yootheme-text-2-0-0-1",
@@ -513,7 +617,23 @@
                 "body": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut.",
                 "textVariant": "lead",
                 "textAlign": "center",
-                "elementAlign": "center"
+                "elementAlign": "center",
+                "maxWidth": "xlarge",
+                "headingAlign": "center",
+                "animation": {
+                  "preset": "none"
+                },
+                "visualStyle": {
+                  "layout": {
+                    "maxWidth": "xlarge",
+                    "blockAlign": "center",
+                    "textAlign": "center"
+                  },
+                  "effects": {
+                    "maxWidth": "xlarge"
+                  },
+                  "card": {}
+                }
               }
             ]
           },
@@ -530,13 +650,23 @@
                 "imageWidth": "auto",
                 "imageShape": "none",
                 "imageAlignment": "center",
+                "textAlign": "center",
+                "headingAlign": "center",
+                "margin": "default",
+                "marginMode": "default",
+                "animation": {
+                  "preset": "parallax"
+                },
                 "visualStyle": {
                   "layout": {
                     "position": "absolute",
                     "top": "200",
                     "right": "6%",
-                    "zIndex": 1
+                    "zIndex": 1,
+                    "marginMode": "default",
+                    "textAlign": "center"
                   },
+                  "effects": {},
                   "card": {}
                 }
               },
@@ -564,10 +694,19 @@
                   "card": {
                     "titleMargin": "var(--uk-global-margin-medium)",
                     "buttonMargin": "var(--uk-global-margin-medium)"
-                  }
+                  },
+                  "layout": {
+                    "marginMode": "medium",
+                    "textAlign": "center"
+                  },
+                  "effects": {}
                 },
                 "gridMetaAlign": "below-title",
-                "gridMetaHtmlElement": "div"
+                "gridMetaHtmlElement": "div",
+                "textAlign": "center",
+                "headingAlign": "center",
+                "margin": "medium",
+                "marginMode": "medium"
               }
             ]
           },
@@ -583,13 +722,20 @@
                 "imageAlt": "",
                 "imageWidth": "auto",
                 "imageShape": "none",
+                "margin": "default",
+                "marginMode": "default",
+                "animation": {
+                  "preset": "parallax"
+                },
                 "visualStyle": {
                   "layout": {
                     "position": "absolute",
                     "top": "200",
                     "right": "6%",
-                    "zIndex": 1
+                    "zIndex": 1,
+                    "marginMode": "default"
                   },
+                  "effects": {},
                   "card": {}
                 }
               },
@@ -618,10 +764,19 @@
                   "card": {
                     "titleMargin": "var(--uk-global-margin-medium)",
                     "buttonMargin": "var(--uk-global-margin-medium)"
-                  }
+                  },
+                  "layout": {
+                    "marginMode": "medium",
+                    "textAlign": "center"
+                  },
+                  "effects": {}
                 },
                 "gridMetaAlign": "below-title",
-                "gridMetaHtmlElement": "div"
+                "gridMetaHtmlElement": "div",
+                "textAlign": "center",
+                "headingAlign": "center",
+                "margin": "medium",
+                "marginMode": "medium"
               }
             ]
           },
@@ -637,13 +792,20 @@
                 "imageAlt": "",
                 "imageWidth": "auto",
                 "imageShape": "none",
+                "margin": "default",
+                "marginMode": "default",
+                "animation": {
+                  "preset": "parallax"
+                },
                 "visualStyle": {
                   "layout": {
                     "position": "absolute",
                     "top": "200",
                     "right": "6%",
-                    "zIndex": 1
+                    "zIndex": 1,
+                    "marginMode": "default"
                   },
+                  "effects": {},
                   "card": {}
                 }
               },
@@ -672,10 +834,19 @@
                   "card": {
                     "titleMargin": "var(--uk-global-margin-medium)",
                     "buttonMargin": "var(--uk-global-margin-medium)"
-                  }
+                  },
+                  "layout": {
+                    "marginMode": "medium",
+                    "textAlign": "center"
+                  },
+                  "effects": {}
                 },
                 "gridMetaAlign": "below-title",
-                "gridMetaHtmlElement": "div"
+                "gridMetaHtmlElement": "div",
+                "textAlign": "center",
+                "headingAlign": "center",
+                "margin": "medium",
+                "marginMode": "medium"
               }
             ]
           }
@@ -692,6 +863,9 @@
         "maxWidth": "default",
         "sectionPadding": "large",
         "removeBottomPadding": true,
+        "sectionTitlePosition": "top-left",
+        "sectionTitleRotation": "left",
+        "sectionTitleBreakpoint": "xl",
         "preserveColor": false,
         "overlap": false,
         "textColor": "none",
@@ -706,9 +880,6 @@
         "headerTextColor": "none",
         "animation": "fade",
         "animationDelay": 100,
-        "sectionTitlePosition": "top-left",
-        "sectionTitleRotation": "left",
-        "sectionTitleBreakpoint": "xl",
         "visible": true,
         "layout": "1-col",
         "layoutColumns": 1,
@@ -728,11 +899,18 @@
                 "headingSize": "h1",
                 "headingAlign": "center",
                 "elementAlign": "center",
+                "textAlign": "center",
+                "animation": {
+                  "preset": "none"
+                },
                 "visualStyle": {
                   "layout": {
                     "position": "relative",
-                    "zIndex": 1
+                    "zIndex": 1,
+                    "blockAlign": "center",
+                    "textAlign": "center"
                   },
+                  "effects": {},
                   "card": {}
                 }
               },
@@ -743,10 +921,26 @@
                 "textVariant": "lead",
                 "textAlign": "center",
                 "elementAlign": "center",
+                "maxWidth": "xlarge",
+                "headingAlign": "center",
+                "margin": "default",
+                "marginMode": "default",
+                "removeBottomMargin": true,
+                "animation": {
+                  "preset": "none"
+                },
                 "visualStyle": {
                   "layout": {
                     "position": "relative",
-                    "zIndex": 1
+                    "zIndex": 1,
+                    "marginMode": "default",
+                    "removeBottomMargin": true,
+                    "maxWidth": "xlarge",
+                    "blockAlign": "center",
+                    "textAlign": "center"
+                  },
+                  "effects": {
+                    "maxWidth": "xlarge"
                   },
                   "card": {}
                 }
@@ -935,11 +1129,20 @@
                   },
                   "layout": {
                     "position": "relative",
-                    "zIndex": 1
-                  }
+                    "zIndex": 1,
+                    "marginMode": "large",
+                    "textAlign": "center"
+                  },
+                  "effects": {}
                 },
                 "gridMetaAlign": "below-title",
-                "gridMetaHtmlElement": "div"
+                "gridMetaHtmlElement": "div",
+                "headingAlign": "center",
+                "margin": "large",
+                "marginMode": "large",
+                "animation": {
+                  "preset": "fade"
+                }
               }
             ]
           },
@@ -956,13 +1159,20 @@
                 "imageMaxWidth": 1000,
                 "imageWidth": "auto",
                 "imageShape": "none",
+                "margin": "default",
+                "marginMode": "default",
+                "visibility": "xl",
+                "visibilityMode": "xl",
                 "visualStyle": {
                   "layout": {
                     "position": "absolute",
                     "bottom": "-300",
                     "left": "-50vw",
-                    "zIndex": 0
+                    "zIndex": 0,
+                    "marginMode": "default",
+                    "visibilityMode": "xl"
                   },
+                  "effects": {},
                   "card": {}
                 }
               },
@@ -975,13 +1185,23 @@
                 "imageWidth": "auto",
                 "imageShape": "none",
                 "imageAlignment": "right",
+                "textAlign": "right",
+                "headingAlign": "right",
+                "margin": "default",
+                "marginMode": "default",
+                "visibility": "xl",
+                "visibilityMode": "xl",
                 "visualStyle": {
                   "layout": {
                     "position": "absolute",
                     "top": "-700",
                     "right": "-29vw",
-                    "zIndex": 0
+                    "zIndex": 0,
+                    "marginMode": "default",
+                    "textAlign": "right",
+                    "visibilityMode": "xl"
                   },
+                  "effects": {},
                   "card": {}
                 }
               }
@@ -998,6 +1218,9 @@
         "sectionVariant": "default",
         "sectionPadding": "xlarge",
         "removeBottomPadding": true,
+        "sectionTitlePosition": "top-left",
+        "sectionTitleRotation": "left",
+        "sectionTitleBreakpoint": "xl",
         "preserveColor": false,
         "overlap": false,
         "textColor": "none",
@@ -1012,9 +1235,6 @@
         "headerTransparent": false,
         "pullUnderHeader": false,
         "headerTextColor": "none",
-        "sectionTitlePosition": "top-left",
-        "sectionTitleRotation": "left",
-        "sectionTitleBreakpoint": "xl",
         "visible": true,
         "layout": "2-col-equal",
         "layoutColumns": 2,
@@ -1032,7 +1252,18 @@
                 "title": "Reach Your Digital Goals With a Solution <br class=\"uk-visible@s\"> Trusted by Many Industry Experts",
                 "headingLevel": "h2",
                 "headingAlign": "left",
-                "elementAlign": "center"
+                "elementAlign": "center",
+                "textAlign": "left",
+                "visualStyle": {
+                  "layout": {
+                    "blockAlign": "center",
+                    "textAlign": "left",
+                    "textAlignBreakpoint": "medium",
+                    "textAlignFallback": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
               }
             ]
           },
@@ -1053,7 +1284,20 @@
                     "style": "primary"
                   }
                 ],
-                "textAlign": "right"
+                "textAlign": "right",
+                "headingAlign": "right",
+                "margin": "default",
+                "marginMode": "default",
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "default",
+                    "textAlign": "right",
+                    "textAlignBreakpoint": "medium",
+                    "textAlignFallback": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
               }
             ]
           },
@@ -1096,6 +1340,20 @@
                   "arrowPosition": "default",
                   "paginationPosition": "bottom-center",
                   "effect": "slide"
+                },
+                "textAlign": "center",
+                "headingAlign": "center",
+                "margin": "large",
+                "marginMode": "large",
+                "removeBottomMargin": true,
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "large",
+                    "removeBottomMargin": true,
+                    "textAlign": "center"
+                  },
+                  "effects": {},
+                  "card": {}
                 }
               }
             ]
@@ -1112,6 +1370,9 @@
         "contentMode": "small",
         "maxWidth": "small",
         "sectionPadding": "large",
+        "sectionTitlePosition": "top-left",
+        "sectionTitleRotation": "left",
+        "sectionTitleBreakpoint": "xl",
         "preserveColor": false,
         "overlap": false,
         "textColor": "none",
@@ -1126,9 +1387,6 @@
         "headerTextColor": "none",
         "animation": "fade",
         "animationDelay": 100,
-        "sectionTitlePosition": "top-left",
-        "sectionTitleRotation": "left",
-        "sectionTitleBreakpoint": "xl",
         "visible": true,
         "layout": "1-col",
         "layoutColumns": 1,
@@ -1146,7 +1404,18 @@
                 "title": "Reinvent Your Business With<br class=\"uk-visible@s\"> DevStack Solutions",
                 "headingLevel": "h2",
                 "headingSize": "h1",
-                "headingAlign": "center"
+                "headingAlign": "center",
+                "textAlign": "center",
+                "animation": {
+                  "preset": "none"
+                },
+                "visualStyle": {
+                  "layout": {
+                    "textAlign": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
               }
             ]
           },
@@ -1225,11 +1494,15 @@
                   },
                   "layout": {
                     "position": "relative",
-                    "zIndex": 1
-                  }
+                    "zIndex": 1,
+                    "marginMode": "default"
+                  },
+                  "effects": {}
                 },
                 "gridMetaAlign": "below-title",
-                "gridMetaHtmlElement": "div"
+                "gridMetaHtmlElement": "div",
+                "margin": "default",
+                "marginMode": "default"
               }
             ]
           },
@@ -1246,13 +1519,20 @@
                 "imageMaxWidth": 800,
                 "imageWidth": "auto",
                 "imageShape": "none",
+                "margin": "default",
+                "marginMode": "default",
+                "visibility": "xl",
+                "visibilityMode": "xl",
                 "visualStyle": {
                   "layout": {
                     "position": "absolute",
                     "bottom": "-25vh",
                     "left": "-40vw",
-                    "zIndex": 0
+                    "zIndex": 0,
+                    "marginMode": "default",
+                    "visibilityMode": "xl"
                   },
+                  "effects": {},
                   "card": {}
                 }
               },
@@ -1265,13 +1545,23 @@
                 "imageWidth": "auto",
                 "imageShape": "none",
                 "imageAlignment": "right",
+                "textAlign": "right",
+                "headingAlign": "right",
+                "margin": "default",
+                "marginMode": "default",
+                "visibility": "xl",
+                "visibilityMode": "xl",
                 "visualStyle": {
                   "layout": {
                     "position": "absolute",
                     "right": "-53vw",
                     "bottom": "0vh",
-                    "zIndex": 0
+                    "zIndex": 0,
+                    "marginMode": "default",
+                    "textAlign": "right",
+                    "visibilityMode": "xl"
                   },
+                  "effects": {},
                   "card": {}
                 }
               }
@@ -1289,6 +1579,9 @@
         "contentMode": "default",
         "maxWidth": "default",
         "sectionPadding": "large",
+        "sectionTitlePosition": "top-left",
+        "sectionTitleRotation": "left",
+        "sectionTitleBreakpoint": "xl",
         "preserveColor": false,
         "overlap": false,
         "textColor": "none",
@@ -1302,9 +1595,6 @@
         "pullUnderHeader": false,
         "headerTextColor": "none",
         "animation": "fade",
-        "sectionTitlePosition": "top-left",
-        "sectionTitleRotation": "left",
-        "sectionTitleBreakpoint": "xl",
         "visible": true,
         "layout": "1-col",
         "layoutColumns": 1,
@@ -1322,7 +1612,18 @@
                 "title": "Latest News",
                 "headingLevel": "h2",
                 "headingSize": "h1",
-                "headingAlign": "center"
+                "headingAlign": "center",
+                "textAlign": "center",
+                "animation": {
+                  "preset": "none"
+                },
+                "visualStyle": {
+                  "layout": {
+                    "textAlign": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
               },
               {
                 "id": "yootheme-text-6-0-0-1",
@@ -1330,7 +1631,26 @@
                 "body": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut.",
                 "textVariant": "lead",
                 "textAlign": "center",
-                "elementAlign": "center"
+                "elementAlign": "center",
+                "maxWidth": "xlarge",
+                "headingAlign": "center",
+                "margin": "default",
+                "marginMode": "default",
+                "animation": {
+                  "preset": "none"
+                },
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "default",
+                    "maxWidth": "xlarge",
+                    "blockAlign": "center",
+                    "textAlign": "center"
+                  },
+                  "effects": {
+                    "maxWidth": "xlarge"
+                  },
+                  "card": {}
+                }
               },
               {
                 "id": "yootheme-button-6-0-0-2",
@@ -1344,7 +1664,21 @@
                     "style": "ghost"
                   }
                 ],
-                "textAlign": "center"
+                "textAlign": "center",
+                "headingAlign": "center",
+                "margin": "default",
+                "marginMode": "default",
+                "animation": {
+                  "preset": "none"
+                },
+                "visualStyle": {
+                  "layout": {
+                    "marginMode": "default",
+                    "textAlign": "center"
+                  },
+                  "effects": {},
+                  "card": {}
+                }
               },
               {
                 "id": "yootheme-grid-6-0-0-3",
@@ -1404,18 +1738,26 @@
                   },
                   "layout": {
                     "position": "relative",
-                    "zIndex": 1
-                  }
+                    "zIndex": 1,
+                    "marginMode": "large",
+                    "removeBottomMargin": true,
+                    "textAlign": "center"
+                  },
+                  "effects": {}
                 },
                 "gridMetaAlign": "above-title",
-                "gridMetaHtmlElement": "div"
+                "gridMetaHtmlElement": "div",
+                "headingAlign": "center",
+                "margin": "large",
+                "marginMode": "large",
+                "removeBottomMargin": true
               }
             ]
           }
         ]
       }
     ],
-    "updatedAt": "2026-08-09T08:05:59.484Z"
+    "updatedAt": "2026-08-09T10:31:32.511Z"
   },
   "header": {
     "version": 1,

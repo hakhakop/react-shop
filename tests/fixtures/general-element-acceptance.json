@@ -1,0 +1,103 @@
+{
+  "type": "layout",
+  "children": [
+    {
+      "type": "section",
+      "name": "General acceptance",
+      "children": [
+        {
+          "type": "row",
+          "children": [
+            {
+              "type": "column",
+              "children": [
+                {
+                  "type": "headline",
+                  "props": {
+                    "content": "General heading",
+                    "position": "relative",
+                    "position_left": "12px",
+                    "position_top": "8px",
+                    "position_z_index": "10",
+                    "margin": "medium",
+                    "margin_remove_bottom": true,
+                    "maxwidth": "small",
+                    "maxwidth_breakpoint": "s",
+                    "block_align": "center",
+                    "block_align_breakpoint": "s",
+                    "text_align": "right",
+                    "text_align_breakpoint": "s",
+                    "visibility": "s",
+                    "animation": "fade"
+                  }
+                },
+                {
+                  "type": "image",
+                  "props": {
+                    "image": "wp-content/uploads/yootheme/background-square-01.png",
+                    "position": "relative",
+                    "position_left": "12px",
+                    "position_top": "8px",
+                    "position_z_index": "10",
+                    "margin": "medium",
+                    "margin_remove_bottom": true,
+                    "maxwidth": "small",
+                    "maxwidth_breakpoint": "s",
+                    "block_align": "center",
+                    "block_align_breakpoint": "s",
+                    "text_align": "right",
+                    "text_align_breakpoint": "s",
+                    "visibility": "s",
+                    "animation": "fade"
+                  }
+                },
+                {
+                  "type": "panel",
+                  "props": {
+                    "title": "General panel",
+                    "content": "General panel content",
+                    "position": "relative",
+                    "position_left": "12px",
+                    "position_top": "8px",
+                    "position_z_index": "10",
+                    "margin": "medium",
+                    "margin_remove_bottom": true,
+                    "maxwidth": "small",
+                    "maxwidth_breakpoint": "s",
+                    "block_align": "center",
+                    "block_align_breakpoint": "s",
+                    "text_align": "right",
+                    "text_align_breakpoint": "s",
+                    "visibility": "s",
+                    "animation": "fade"
+                  }
+                },
+                {
+                  "type": "grid",
+                  "props": {
+                    "show_image": false,
+                    "position": "relative",
+                    "position_left": "12px",
+                    "position_top": "8px",
+                    "position_z_index": "10",
+                    "margin": "medium",
+                    "margin_remove_bottom": true,
+                    "maxwidth": "small",
+                    "maxwidth_breakpoint": "s",
+                    "block_align": "center",
+                    "block_align_breakpoint": "s",
+                    "text_align": "right",
+                    "text_align_breakpoint": "s",
+                    "visibility": "s",
+                    "animation": "fade"
+                  },
+                  "children": []
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

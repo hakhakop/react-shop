@@ -131,6 +131,9 @@ export function getUikitContainerClass(preset?: string): string {
   if (!preset) return "uk-container";
 
   const p = preset.toLowerCase();
+  if (p === "xsmall" || p === "xs") {
+    return "uk-container uk-container-xsmall";
+  }
   if (p === "small" || p === "narrow" || p === "sm") {
     return "uk-container uk-container-small";
   }
@@ -403,7 +406,15 @@ export function getUikitHeadingClass(
   const classes = ["uk-margin-remove-top"];
 
   const s = sizePreset?.toLowerCase();
-  if (s === "xlarge" || s === "hero" || s === "display" || s === "2xl" || s === "3xl") {
+  if (s === "3xlarge" || s === "3xl") {
+    classes.push("uk-heading-3xlarge");
+    return classes.join(" ");
+  }
+  if (s === "2xlarge" || s === "2xl") {
+    classes.push("uk-heading-2xlarge");
+    return classes.join(" ");
+  }
+  if (s === "xlarge" || s === "hero" || s === "display") {
     classes.push("uk-heading-xlarge");
     return classes.join(" ");
   }
@@ -450,6 +461,7 @@ export function getUikitHeadingClass(
 
   // Level-based fallback
   const l = String(level).toLowerCase();
+  if (l === "div") return classes.join(" ");
   if (l === "h1" || l === "1") classes.push("uk-article-title");
   else if (l === "h2" || l === "2") classes.push("uk-h2");
   else if (l === "h3" || l === "3") classes.push("uk-h3");

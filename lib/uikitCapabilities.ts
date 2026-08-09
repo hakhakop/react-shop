@@ -7,7 +7,7 @@ export const UIKIT_CAPABILITIES = {
   section: { variants: ["default", "muted", "primary", "secondary"], sizes: [], spacing: ["none", "small", "medium", "large"], alignment: ["left", "center", "right"], responsive: ["stack", "matchHeight"], typography: [], appearance: ["background", "container", "radius"], behavior: [] },
   row: { variants: [], sizes: [], spacing: ["none", "small", "medium", "large"], alignment: ["top", "center", "bottom", "between", "around"], responsive: ["matchHeight"], typography: [], appearance: ["gutter"], behavior: [] },
   column: { variants: [], sizes: ["full", "half", "third", "quarter"], spacing: [], alignment: ["left", "center", "right"], responsive: ["stack"], typography: [], appearance: [], behavior: [] },
-  heading: { variants: [], sizes: ["small", "medium", "large", "xlarge", "h1", "h2", "h3", "h4", "h5", "h6"], spacing: [], alignment: ["left", "center", "right"], responsive: [], typography: ["fontFamily", "color", "textAlign"], appearance: [], behavior: [] },
+  heading: { variants: [], sizes: ["small", "medium", "large", "xlarge", "2xlarge", "3xlarge", "h1", "h2", "h3", "h4", "h5", "h6"], spacing: [], alignment: ["left", "center", "right"], responsive: [], typography: ["fontFamily", "color", "textAlign"], appearance: [], behavior: [] },
   text: { variants: ["default", "lead", "meta", "small", "large", "muted"], sizes: [], spacing: [], alignment: ["left", "center", "right"], responsive: [], typography: ["fontFamily", "fontWeight", "lineHeight", "letterSpacing", "textTransform", "textDecoration", "color"], appearance: [], behavior: [] },
   button: { variants: ["default", "primary", "secondary", "text"], sizes: ["small", "default", "large"], spacing: [], alignment: [], responsive: [], typography: [], appearance: [], behavior: ["url", "target"] },
   card: { variants: ["default", "primary", "secondary", "blank"], sizes: ["small", "default", "large"], spacing: [], alignment: [], responsive: [], typography: [], appearance: [], behavior: ["hover"] },
@@ -98,8 +98,8 @@ export const UIKIT_COLUMN_CAPABILITY = {
 
 export const UIKIT_HEADING_CAPABILITY = {
   properties: {
-    level: { values: ["h1", "h2", "h3", "h4", "h5", "h6"] as const, owner: "webpages" },
-    visualPreset: { values: ["h1", "h2", "h3", "h4", "h5", "h6", "article-title", "small", "medium", "large", "xlarge"] as const, owner: "uikit" },
+    level: { values: ["h1", "h2", "h3", "h4", "h5", "h6", "div"] as const, owner: "webpages" },
+    visualPreset: { values: ["h1", "h2", "h3", "h4", "h5", "h6", "article-title", "small", "medium", "large", "xlarge", "2xlarge", "3xlarge"] as const, owner: "uikit" },
     alignment: { values: ["left", "center", "right"] as const, owner: "uikit" },
     typography: { values: ["fontFamily", "fontWeight", "lineHeight", "letterSpacing", "textTransform", "textDecoration", "textShadow", "color"] as const, owner: "webpages" },
     gradient: { values: ["none", "indigo-purple", "cyan-blue", "emerald-teal", "sunset-orange", "indigo-purple-cyan", "sunset-pink", "gold-amber", "custom"] as const, owner: "webpages" },

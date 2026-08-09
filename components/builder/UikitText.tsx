@@ -9,6 +9,12 @@ type Props = {
   content?: string;
   variant?: string;
   align?: "left" | "center" | "right";
+  textColor?: "none" | "muted" | "emphasis" | "primary" | "secondary" | "success" | "warning" | "danger";
+  dropcap?: boolean;
+  columns?: "none" | "1-2" | "1-3" | "1-4" | "1-5" | "1-6";
+  columnDivider?: boolean;
+  columnBreakpoint?: "always" | "small" | "medium" | "large" | "xlarge";
+  htmlElement?: "div" | "address" | "aside" | "footer";
   typography?: TypographySettings | TypographyGroup;
   typographyRole?: SemanticTypographyRole;
   margin?: string;
@@ -22,6 +28,12 @@ export default function UikitText({
   content,
   variant = "default",
   align = "left",
+  textColor = "none",
+  dropcap = false,
+  columns = "none",
+  columnDivider = false,
+  columnBreakpoint = "always",
+  htmlElement = "div",
   typography,
   typographyRole,
   margin,
@@ -34,6 +46,10 @@ export default function UikitText({
   const marginClass = margin && margin !== "none" && margin !== "default" ? `uk-margin-${margin}` : "";
   const animationClass = animation && animation !== "none" ? `uk-animation-${animation}` : "";
   const visibilityClass = visibility && visibility !== "always" ? `uk-${visibility}` : "";
+  const colorClass = textColor !== "none" ? `uk-text-${textColor}` : "";
+  const breakpointSuffix = ({ small: "@s", medium: "@m", large: "@l", xlarge: "@xl" } as const)[columnBreakpoint as "small" | "medium" | "large" | "xlarge"] ?? "";
+  const columnClass = columns !== "none" ? `uk-column-${columns}${breakpointSuffix}` : "";
+  const ContentTag = htmlElement as "div" | "address" | "aside" | "footer";
 
   const className = [
     "shop-builder-column-block",
@@ -45,6 +61,7 @@ export default function UikitText({
     visibilityClass,
     typographyRoleClass(typographyRole),
     textTypography.className,
+    colorClass,
   ].filter(Boolean).join(" ");
   const style = textTypography.style as CSSProperties | undefined;
 
@@ -58,8 +75,8 @@ export default function UikitText({
       {eyebrow ? <div className="uk-text-meta">{eyebrow}</div> : null}
       {title ? <div className="shop-builder-text-title">{title}</div> : null}
       {content ? (
-        <div
-          className="shop-builder-text-content"
+        <ContentTag
+          className={`shop-builder-text-content ${columnClass} ${columnDivider && columns !== "none" ? "uk-column-divider" : ""} ${dropcap ? "uk-dropcap" : ""}`.trim()}
           dangerouslySetInnerHTML={{ __html: content }}
         />
       ) : null}

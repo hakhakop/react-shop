@@ -2,6 +2,7 @@ import type { BuilderLayoutBlock, BuilderSection } from "@/components/dashboard/
 import type { BuilderShellSettings } from "@/lib/builderShell";
 import type { TypographySettings } from "@/lib/builderTypography";
 import type { BuilderVisualStyle } from "@/lib/builderVisualStyle";
+import { normalizeSectionTitlePosition } from "@/lib/sectionSemantics";
 
 /**
  * The single compatibility boundary for supported YOOtheme semantics.
@@ -82,12 +83,19 @@ export function normalizeYoothemeSection(props: Record<string, unknown>): Partia
   const style = string(props.style);
   const role = style === "default" || style === "muted" || style === "primary" || style === "secondary" ? style : undefined;
   const width = string(props.width);
-  const contentMode = width === "none" || width === "small" || width === "default" || width === "large" || width === "xlarge" || width === "expand" ? width : width === "full" ? "full" : undefined;
+  const contentMode = width === "none" || width === "xsmall" || width === "small" || width === "default" || width === "large" || width === "xlarge" || width === "expand" ? width : width === "full" ? "full" : undefined;
   const height = string(props.height);
   const sectionHeight = height === "viewport" && bool(props.height_offset_top) ? "viewport-percent" : height === "viewport" ? "viewport" : height === "viewport-20" ? "viewport-20" : height === "viewport-percent" ? "viewport-percent" : height === "none" || height === "auto" ? "auto" : undefined;
   const padding = string(props.padding);
   const sectionPadding = padding === "none" || padding === "xsmall" || padding === "small" || padding === "default" || padding === "medium" || padding === "large" || padding === "xlarge" ? padding : padding === "x-small" ? "xsmall" : undefined;
   const vertical = string(props.vertical_align);
+  const titlePosition = string(props.title_position);
+  const titleRotation = string(props.title_rotation);
+  const titleBreakpoint = string(props.title_breakpoint);
+  const sticky = string(props.sticky ?? props.sticky_effect);
+  const htmlElement = string(props.html_element);
+  const textColor = string(props.text_color);
+  const headerTextColor = string(props.header_text_color);
   return {
     ...(role ? { backgroundRole: role, sectionVariant: role } : {}),
     ...(contentMode ? { contentMode, maxWidth: contentMode } : {}),
@@ -99,6 +107,15 @@ export function normalizeYoothemeSection(props: Record<string, unknown>): Partia
     ...(bool(props.padding_remove_top) ? { removeTopPadding: true } : {}),
     ...(bool(props.padding_remove_bottom) ? { removeBottomPadding: true } : {}),
     ...(bool(props.padding_remove_horizontal) ? { removeHorizontalPadding: true } : {}),
+    ...(titlePosition ? { sectionTitlePosition: normalizeSectionTitlePosition(titlePosition) } : {}),
+    ...(titleRotation === "none" || titleRotation === "left" || titleRotation === "right" ? { sectionTitleRotation: titleRotation } : {}),
+    ...(titleBreakpoint ? { sectionTitleBreakpoint: titleBreakpoint } : {}),
+    ...(sticky === "none" || sticky === "cover" || sticky === "reveal" ? { stickyEffect: sticky } : {}),
+    ...(bool(props.header_transparent) ? { headerTransparent: true } : {}),
+    ...(bool(props.pull_under_header) ? { pullUnderHeader: true } : {}),
+    ...(headerTextColor === "none" || headerTextColor === "light" || headerTextColor === "dark" ? { headerTextColor } : {}),
+    ...(textColor === "none" || textColor === "light" || textColor === "dark" ? { textColor } : {}),
+    ...(htmlElement === "div" || htmlElement === "section" || htmlElement === "header" || htmlElement === "footer" || htmlElement === "aside" || htmlElement === "main" ? { htmlElement } : {}),
   };
 }
 
@@ -132,6 +149,33 @@ export function normalizeYoothemeTypography(props: Record<string, unknown>): { t
     ...(transform === "none" || transform === "uppercase" || transform === "lowercase" || transform === "capitalize" ? { textTransform: transform } : {}),
   };
   return Object.keys(typography).length ? { typography } : {};
+}
+
+/** YOOtheme Heading uses semantic font-family roles, not literal font names. */
+export function normalizeYoothemeTypographyRole(
+  value: unknown,
+): "default" | "primary" | "secondary" | "tertiary" | undefined {
+  return value === "default" || value === "primary" || value === "secondary" || value === "tertiary"
+    ? value
+    : undefined;
+}
+
+/** Canonical Text element presentation. These values are intentionally separate
+ * from raw typography overrides: YOOtheme Text owns semantic styles/colors and
+ * responsive columns, while absent fields continue to inherit Globals. */
+export function normalizeYoothemeTextPresentation(props: Record<string, unknown>) {
+  const textColor = string(props.text_color);
+  const columns = string(props.column);
+  const breakpoint = string(props.column_breakpoint);
+  const htmlElement = string(props.html_element);
+  return {
+    ...(textColor === "muted" || textColor === "emphasis" || textColor === "primary" || textColor === "secondary" || textColor === "success" || textColor === "warning" || textColor === "danger" ? { textColor: textColor as "muted" | "emphasis" | "primary" | "secondary" | "success" | "warning" | "danger" } : {}),
+    ...(props.dropcap === true || props.dropcap === "1" ? { textDropcap: true } : {}),
+    ...(columns === "1-2" || columns === "1-3" || columns === "1-4" || columns === "1-5" || columns === "1-6" ? { textColumns: columns as "1-2" | "1-3" | "1-4" | "1-5" | "1-6" } : {}),
+    ...(props.column_divider === true || props.column_divider === "1" ? { textColumnDivider: true } : {}),
+    ...(breakpoint === "s" ? { textColumnBreakpoint: "small" as const } : breakpoint === "m" ? { textColumnBreakpoint: "medium" as const } : breakpoint === "l" ? { textColumnBreakpoint: "large" as const } : breakpoint === "xl" ? { textColumnBreakpoint: "xlarge" as const } : {}),
+    ...(htmlElement === "address" || htmlElement === "aside" || htmlElement === "footer" ? { textHtmlElement: htmlElement as "address" | "aside" | "footer" } : {}),
+  };
 }
 
 const yoothemeSpacingValue = (value: unknown): string | undefined => {

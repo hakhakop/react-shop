@@ -59,6 +59,18 @@ export type BuilderLayoutStyle = {
   left?: string;
   zIndex?: number;
   textAlign?: "left" | "center" | "right";
+  textAlignBreakpoint?: "small" | "medium" | "large" | "xlarge";
+  textAlignFallback?: "left" | "center" | "right" | "justify" | "none";
+  blockAlign?: "left" | "center" | "right" | "none";
+  blockAlignBreakpoint?: "small" | "medium" | "large" | "xlarge";
+  blockAlignFallback?: "left" | "center" | "right" | "none";
+  maxWidth?: string;
+  maxWidthBreakpoint?: "small" | "medium" | "large" | "xlarge";
+  marginMode?: string;
+  removeTopMargin?: boolean;
+  removeBottomMargin?: boolean;
+  blendWithPage?: boolean;
+  visibilityMode?: string;
 };
 
 export type BuilderVisibilityStyle = {
@@ -361,6 +373,21 @@ export function layoutToCss(layout?: BuilderLayoutStyle): CSSProperties {
   if (!layout) return {};
 
   const positioned = layout.position && layout.position !== "static";
+  const maxWidth = layout.maxWidth?.trim();
+  const maxWidthValue = maxWidth && !layout.maxWidthBreakpoint
+    ? ({
+        small: "var(--uk-container-small-max-width, 960px)",
+        medium: "var(--uk-container-default-max-width, 1200px)",
+        large: "var(--uk-container-large-max-width, 1400px)",
+        xlarge: "var(--uk-container-xlarge-max-width, 1600px)",
+        "2xlarge": "var(--uk-container-2xlarge-max-width, 1800px)",
+      }[maxWidth] ?? maxWidth)
+    : undefined;
+  const marginMode = layout.marginMode?.trim();
+  const marginValue = marginMode === "none" || marginMode === "remove-vertical"
+    ? "0"
+    : resolveSpacingToken(marginMode, "elementMargin");
+
   return {
     ...(layout.position ? { position: layout.position } : {}),
     ...(positioned && layout.top?.trim() ? { top: layout.top.trim() } : {}),
@@ -369,7 +396,40 @@ export function layoutToCss(layout?: BuilderLayoutStyle): CSSProperties {
     ...(positioned && layout.left?.trim() ? { left: layout.left.trim() } : {}),
     ...(positioned && layout.zIndex !== undefined ? { zIndex: layout.zIndex } : {}),
     ...(layout.textAlign ? { textAlign: layout.textAlign } : {}),
+    ...(maxWidthValue ? { maxWidth: maxWidthValue } : {}),
+    ...(layout.blockAlign === "center" ? { marginLeft: "auto", marginRight: "auto" } : {}),
+    ...(layout.blockAlign === "right" ? { marginLeft: "auto" } : {}),
+    ...(layout.blockAlign === "left" ? { marginRight: "auto" } : {}),
+    ...(marginValue ? { marginTop: marginValue, marginBottom: marginValue } : {}),
+    ...(layout.removeTopMargin ? { marginTop: 0 } : {}),
+    ...(layout.removeBottomMargin ? { marginBottom: 0 } : {}),
+    ...(layout.blendWithPage ? { mixBlendMode: "multiply" } : {}),
   };
+}
+
+export function builderGeneralVisibilityClassName(value?: string): string {
+  if (!value || value === "always") return "";
+  const normalized = value === "s" ? "visible-s" : value === "m" ? "visible-m" : value === "l" ? "visible-l" : value === "xl" ? "visible-xl" : value;
+  const visibilityMap: Record<string, string> = {
+    "visible-s": "uk-visible@s",
+    "visible-m": "uk-visible@m",
+    "visible-l": "uk-visible@l",
+    "visible-xl": "uk-visible@xl",
+    "hidden-s": "uk-hidden@s",
+    "hidden-m": "uk-hidden@m",
+    "hidden-l": "uk-hidden@l",
+    "hidden-xl": "uk-hidden@xl",
+  };
+  return visibilityMap[normalized] ?? "";
+}
+
+export function builderGeneralResponsiveClassName(layout?: BuilderLayoutStyle): string {
+  if (!layout) return "";
+  const classes: string[] = [];
+  if (layout.maxWidth && layout.maxWidthBreakpoint) classes.push(`builder-general-maxwidth-${layout.maxWidth}-from-${layout.maxWidthBreakpoint}`);
+  if (layout.blockAlign && layout.blockAlign !== "none" && layout.blockAlignBreakpoint) classes.push(`builder-general-blockalign-${layout.blockAlign}-from-${layout.blockAlignBreakpoint}`);
+  if (layout.textAlign && layout.textAlignBreakpoint) classes.push(`builder-general-textalign-${layout.textAlign}-from-${layout.textAlignBreakpoint}`);
+  return classes.join(" ");
 }
 
 function cardStyleToCss(card?: BuilderCardPartStyle): CSSProperties {
@@ -503,6 +563,8 @@ export function visualStyleClassName(style?: BuilderVisualStyle): string {
     classes.push(`builder-image-overlay--${style.card.imageOverlay}`);
   }
   classes.push(visualStyleVisibilityClassName(style));
+  classes.push(builderGeneralVisibilityClassName(style?.layout?.visibilityMode));
+  classes.push(builderGeneralResponsiveClassName(style?.layout));
   return classes.join(" ");
 }
 

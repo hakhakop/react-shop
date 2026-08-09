@@ -12,6 +12,7 @@ import {
 import AnimationControl from "@/components/dashboard/style/AnimationControl";
 import BorderEffectsControl from "@/components/dashboard/style/BorderEffectsControl";
 import { resolveSectionBackground } from "@/lib/semanticBackgrounds";
+import { normalizeSectionTitleBreakpoint, normalizeSectionTitlePosition } from "@/lib/sectionSemantics";
 
 type Props = {
   section: BuilderSection;
@@ -174,6 +175,7 @@ export default function SectionCapabilityPanel({ section, shellSettings, tab, up
             value={section.maxWidth ?? section.contentMode ?? "default"}
             options={[
               { value: "none", label: "None" },
+              { value: "xsmall", label: "X-Small" },
               { value: "small", label: "Small" },
               { value: "default", label: "Default" },
               { value: "medium", label: "Medium" },
@@ -416,7 +418,7 @@ export default function SectionCapabilityPanel({ section, shellSettings, tab, up
         <InspectorDivision title="Title">
           <InspectorFieldRow label="Position">
             <InspectorSelect
-              value={section.sectionTitlePosition ?? "none"}
+              value={normalizeSectionTitlePosition(section.sectionTitlePosition)}
               options={[
                 { value: "none", label: "None" },
                 { value: "left-top", label: "Left Top" },
@@ -444,7 +446,7 @@ export default function SectionCapabilityPanel({ section, shellSettings, tab, up
 
           <InspectorFieldRow label="Breakpoint">
             <InspectorSelect
-              value={section.sectionTitleBreakpoint ?? "xlarge"}
+              value={normalizeSectionTitleBreakpoint(section.sectionTitleBreakpoint)}
               options={[
                 { value: "xlarge", label: "X-Large (Large Screens)" },
                 { value: "large", label: "Large" },

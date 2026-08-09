@@ -109,11 +109,13 @@ import BuilderScrollAnimations from "@/components/builder/BuilderScrollAnimation
 import StorefrontBuilderRenderer, {
   BodyText,
   ContentLayoutBlock,
+  getBuilderSectionClassName,
   isRichPreviewText,
 } from "@/components/builder/StorefrontBuilderRenderer";
 import { Typog as DashboardTypog } from "@/components/builder/BuilderRenderHelpers";
 import { WebPagesIcon } from "@/components/builder/WebPagesIcon";
 import { resolveUikitIconName, UIKIT_ICON_OPTIONS } from "@/lib/uikitIconRegistry";
+import { normalizeSectionTitleBreakpoint } from "@/lib/sectionSemantics";
 import UikitAccordion from "@/components/builder/UikitAccordion";
 import UikitAlert from "@/components/builder/UikitAlert";
 import UikitBadgeGrid from "@/components/builder/UikitBadgeGrid";
@@ -282,7 +284,6 @@ import {
   builderGlobalVisibilityClassName,
   resolveSpacingToken,
   visualStyleClassName,
-  visualStyleVisibilityClassName,
   visualStyleToCss,
 } from "@/lib/builderVisualStyle";
 import {
@@ -1427,7 +1428,6 @@ function normalizeBuilderState(
               elementBackgroundMode,
               elementBackground,
               elementPadding,
-              visualStyle,
               hoverPreset,
               cardStyle,
               ...semanticPanel
@@ -1437,7 +1437,6 @@ function normalizeBuilderState(
             void borderRadius;
             void elementBackgroundMode;
             void elementBackground;
-            void visualStyle;
             void cardStyle;
             const rawVariant = String(
               block.panelVariant ?? panelStyle ?? "default",
@@ -10947,7 +10946,7 @@ function PreviewCanvas({
         data-builder-page={page}
         data-gsap-home={page === "home" ? true : undefined}
         data-overlap-header={
-          (visibleSections[0]?.pullUnderHeader || headerOverlay) ? "true" : undefined
+          (visibleSections[0]?.pullUnderHeader || visibleSections[0]?.headerTransparent || headerOverlay) ? "true" : undefined
         }
       >
         <BuilderScrollAnimations key={animationSignature} />
@@ -11054,13 +11053,11 @@ function PreviewCanvas({
                     className={`builder-preview-section ${builderInteractionClassName(
                       sectionTarget,
                       sectionInteractionState,
-                    )} ${getStorefrontPreviewClass(
+                    )} ${getBuilderSectionClassName(
                       section,
-                    )} builder-preview-${section.kind} builder-preview-section--${
-                      section.backgroundMode === "boxed" ? "boxed" : "full"
-                    } builder-preview-section--content-${
-                      section.contentMode ?? "boxed"
-                    } builder-preview-section--scheme-${resolveSectionColorScheme(section, layoutScheme)} ${
+                      layoutScheme,
+                      `${getStorefrontPreviewClass(section)} builder-preview-${section.kind}`,
+                    )} ${
                       isFullTheme
                         ? "shop-builder-section--effect-antigravity"
                         : isAnimatedBg
@@ -11111,6 +11108,9 @@ function PreviewCanvas({
                       } as CSSProperties
                     }
                     {...animationAttrs.data}
+                    data-section-title-breakpoint={normalizeSectionTitleBreakpoint(section.sectionTitleBreakpoint)}
+                    data-builder-html-element={section.htmlElement || "section"}
+                    data-uk-sticky={section.stickyEffect && section.stickyEffect !== "none" ? `cls-active: uk-navbar-sticky; ${section.stickyEffect === "reveal" ? "show-on-up: true" : ""}` : undefined}
                     onClick={() => onSelect(section.id)}
                     onDoubleClick={(event) => {
                       event.stopPropagation();
@@ -11710,25 +11710,7 @@ function getStorefrontPreviewClass(section: BuilderSection) {
                       ? "shop-builder-embed"
                       : "";
 
-  const uikitSectionPad = getUikitSectionPaddingClass(
-    (section as any).sectionPadding ?? (section as any).topSpacing ?? (section as any).sectionPaddingTop
-  );
-  const uikitSectionStyle = sectionBackgroundClass(resolveSectionBackground(section).role);
-  const maxWidth = section.maxWidth ?? section.contentMode ?? "boxed";
-  const preserveColorClass = section.preserveColor ? "uk-preserve-color" : "";
-  const overlapClass = section.overlap ? "uk-section-overlap" : "";
-  const textColorClass = section.textColor === "light" ? "uk-light" : section.textColor === "dark" ? "uk-dark" : "";
-  const removeHorizontalPadClass = section.removeHorizontalPadding ? "uk-padding-remove-horizontal" : "";
-  const expandSideClass = section.expandOneSide && section.expandOneSide !== "none" ? `shop-builder-section--expand-${section.expandOneSide}` : "";
-  const titlePositionClass = section.sectionTitlePosition && section.sectionTitlePosition !== "none" ? `shop-builder-section--title-${section.sectionTitlePosition}` : "";
-  const titleRotationClass = section.sectionTitleRotation && section.sectionTitleRotation !== "none" ? `shop-builder-section--title-rotate-${section.sectionTitleRotation}` : "";
-  return `${uikitSectionPad} ${uikitSectionStyle} ${preserveColorClass} ${overlapClass} ${textColorClass} ${section.removeTopPadding ? "uk-padding-remove-top" : ""} ${section.removeBottomPadding ? "uk-padding-remove-bottom" : ""} ${removeHorizontalPadClass} ${expandSideClass} ${titlePositionClass} ${titleRotationClass} shop-builder-section shop-builder-section--${
-    section.backgroundMode === "boxed" ? "boxed" : "full"
-  } shop-builder-section--content-${maxWidth} shop-builder-section--height-${
-    section.sectionHeight ?? "auto"
-  } shop-builder-section--align-${
-    section.contentVerticalAlign ?? "top"
-  } ${kindClass} ${previewAnimationClassName(section.animation)}`.trim();
+  return kindClass;
 }
 
 function getPreviewLayoutBlocks(
@@ -14555,7 +14537,7 @@ function PreviewSection({
                         } ${legacySurfaceClass} ${
                           block.kind === "scrollPinnedDemo"
                             ? ""
-                            : `is-padding-${hasBuilderVisualSpacing(block.visualStyle?.padding) || !block.elementPadding || block.elementPadding === "inherit" ? "none" : block.elementPadding} is-align-${block.elementAlign ?? "left"} ${block.kind === "grid" ? visualStyleVisibilityClassName(block.visualStyle) : visualStyleClassName(block.visualStyle)} ${block.premiumCardStyle && block.premiumCardStyle !== "none" ? `shop-builder-card--${block.premiumCardStyle}` : ""}`
+                            : `is-padding-${hasBuilderVisualSpacing(block.visualStyle?.padding) || !block.elementPadding || block.elementPadding === "inherit" ? "none" : block.elementPadding} is-align-${block.elementAlign ?? "left"} ${visualStyleClassName(block.visualStyle)} ${block.premiumCardStyle && block.premiumCardStyle !== "none" ? `shop-builder-card--${block.premiumCardStyle}` : ""}`
                         } ${
                           selectedLayoutBlockKey === blockKey
                             ? "is-selected-block"
@@ -14838,6 +14820,12 @@ function PreviewSection({
                             align={block.textAlign}
                             typography={block.typography}
                             typographyRole={block.textTypographyRole}
+                            textColor={block.textColor}
+                            dropcap={block.textDropcap}
+                            columns={block.textColumns}
+                            columnDivider={block.textColumnDivider}
+                            columnBreakpoint={block.textColumnBreakpoint}
+                            htmlElement={block.textHtmlElement}
                           />
                         ) : block.kind === "heading" ? (
                           <UikitHeading block={block} isCanvas />
@@ -16408,12 +16396,12 @@ function PreviewSection({
         section.promoVariant ?? "default"
       }`}
     >
-      <div>
+      <div className="shop-builder-section-heading">
         <p className="shop-builder-eyebrow">
           <Grid3X3 size={18} />
           Promo
         </p>
-        <h2 className="shop-builder-title">{section.title}</h2>
+        <h2 className="shop-builder-title" data-builder-section-title>{section.title}</h2>
         {section.body && (
           <BodyText className="shop-builder-body">{section.body}</BodyText>
         )}

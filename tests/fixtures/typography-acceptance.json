@@ -1,0 +1,44 @@
+{
+  "type": "layout",
+  "children": [
+    {
+      "type": "section",
+      "name": "Typography acceptance",
+      "children": [
+        {
+          "type": "row",
+          "children": [
+            {
+              "type": "column",
+              "children": [
+                {
+                  "type": "headline",
+                  "props": {
+                    "content": "Canonical typography heading",
+                    "title_style": "heading-3xlarge",
+                    "title_font_family": "primary",
+                    "title_color": "secondary",
+                    "title_element": "div"
+                  }
+                },
+                {
+                  "type": "text",
+                  "props": {
+                    "content": "Typography acceptance text proves semantic text style, color, columns, semantic element and drop cap rendering.",
+                    "text_style": "lead",
+                    "text_color": "primary",
+                    "dropcap": true,
+                    "column": "1-2",
+                    "column_divider": true,
+                    "column_breakpoint": "s",
+                    "html_element": "aside"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

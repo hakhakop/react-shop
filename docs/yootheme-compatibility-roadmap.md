@@ -98,45 +98,108 @@ background and Manrope family from the same canonical variables.
 - **Explicit unsupported:** theme-only WordPress, WooCommerce, and plugin options without a WebPages owner.
 - **Acceptance:** met for the supported scope: imported DevStack globals populate visible controls; Builder and storefront preview resolve the same background/font variables; semantic groups are editable and persisted; unsupported breakpoint imports remain explicit warnings and do not create dead state.
 
-### 2. Section / Container — PARTIAL
+### 2. Section / Container — COMPLETE
+
+**Phase 2 progress (2026-08-09):** live YOOtheme inspection confirmed the
+Section screen order (section padding, semantic background states, responsive
+padding tiers) and the Container screen order (default max width, horizontal
+padding, responsive horizontal padding, xsmall/small/large/xlarge max widths).
+WebPages now exposes the missing Container horizontal padding tokens and the
+xsmall container tier through the existing Global Styles → Container editor.
+LESS values `container-padding-horizontal`, `-s`, `-m`, and
+`container-xsmall-max-width` normalize into `BuilderShellSettings`, generate
+shared UIkit variables, and render through the same container CSS in Builder
+and storefront. The duplicated Builder-only Section class calculation now
+uses the existing frontend `getBuilderSectionClassName` helper, so height,
+alignment, padding-removal, semantic background, title, overlap, and visual
+classes have one path. Live Builder verification changed Small max width from
+900px to 777px and observed the canvas max width change to 777px before
+restoring the imported value.
+
+Section JSON normalization now also recognizes the existing canonical fields
+for title position/rotation/breakpoint, sticky cover/reveal, transparent
+header/pull-under-header, header text color, section text color, and HTML
+element. These values are not stored as source-only compatibility props; they
+flow into `BuilderSection` and the shared Section class/render path.
+The Builder preview no longer appends a second Section class implementation;
+live Builder and storefront inspection now show the same canonical title-position
+and rotation classes, the same normalized `xlarge` title breakpoint, the same
+HTML-element marker, and the same imported `data-overlap-header="true"` state
+for the transparent Hero. Builder interaction checks also changed Height to
+Viewport (the shared `height-viewport` class and sticky positioning appeared),
+changed Sticky Effect to Cover (the shared `data-uk-sticky` contract appeared),
+and toggled Overlap (the shared `uk-section-overlap` class appeared and was
+removed on reset). All temporary edits were restored to the fixture defaults;
+the storefront uses the same SectionFrame class/attribute path.
+
+The dedicated `tests/fixtures/section-acceptance.json` fixture now covers the
+capabilities the imported Home page cannot exercise. The Playwright acceptance
+test installs it through the normal layout API, verifies a real storefront
+`<section>` tag, checks the dedicated title's left-top/left-rotation state,
+switches to right-center/right-rotation, verifies the small breakpoint resets
+rotation below the breakpoint, and compares Builder/frontend output before
+restoring the original layout. Phase 3 remains untouched.
 
 - **YOOtheme semantics:** section style/background role, width/expand, horizontal padding removal, vertical padding, height/viewport offset, vertical alignment, overlap, preserve color, HTML element, sticky, transparent header, title position/rotation/breakpoint.
 - **Existing owners:** `BuilderSection`, semantic background resolver, section inspector, UIkit section/container classes.
-- **Missing capability:** complete normalized height/header/sticky/title behavior and full container-width semantics; no raw YOOtheme enum casts.
+- **Missing capability:** none within the supported Section / Container contract; no raw YOOtheme enum casts.
 - **Inspector/UI:** Section Layout, Section Style, and Advanced must expose normalized width, padding, height, alignment, header, and title controls in YOOtheme-compatible order.
 - **Import mapping:** `section/element.json` fields normalize once into `BuilderSection`; padding presets continue to inherit Global Styles tokens.
 - **Builder/frontend:** share `SectionFrame` / section-class calculation or a single equivalent helper.
 - **Inheritance:** background roles and padding scales derive from globals unless an explicit local override exists.
 - **Explicit unsupported:** scroll effects or sticky variants without a shared WebPages behavior contract.
-- **Acceptance:** import every Section variant in fixture layouts, change global background/padding/containers, and verify affected sections update in both surfaces.
+- **Acceptance:** met for the supported contract, including the dedicated Section fixture and Builder/frontend parity checks; unsupported scroll effects remain explicit.
 
-### 3. General Element Settings — PARTIAL
+### 3. General Element Settings — COMPLETE
 
 - **YOOtheme semantics:** margin/removal, max width, visibility, block/text alignment, animation, custom CSS/classes/IDs, absolute positioning, offsets, z-index, origin/breakpoint behavior.
 - **Existing owners:** `BuilderVisualStyle`, general inspector panels, `visualStyleToCss`.
-- **Missing capability:** responsive visibility/position normalization, transform origin, general margin presets consistently used by every block renderer, and a safe policy for source CSS.
+- **Completed capability:** responsive visibility normalization, responsive max-width/block/text alignment classes, semantic margin presets/removal, shared positioning/offset/z-index/blend output, and consistent wrapper consumption across Heading, Image, Panel, and Grid.
+- **Remaining explicit gap:** transform-origin/advanced transform behavior and arbitrary source selector CSS remain outside the supported contract.
 - **Inspector/UI:** one General/Advanced group reused by every supported block; controls unavailable to a block must be absent rather than inert.
 - **Import mapping:** normalize common General source props before element-specific mapping.
-- **Builder/frontend:** every block wrapper must apply the same visual-style output.
+- **Builder/frontend:** every supported block wrapper applies the same `visualStyleClassName`/`visualStyleToCss` output. Panel normalization now preserves `visualStyle`; Grid no longer bypasses the shared General class path. Storefront shells expose the canonical block id for fixture verification.
 - **Inheritance:** global spacing tokens feed local semantic spacing presets; source CSS is unsupported unless an explicit safe custom-style product feature is adopted.
-- **Explicit unsupported:** arbitrary YOOtheme selector CSS and unsupported animation/parallax engines.
-- **Acceptance:** import a positioned image/panel/grid, edit offsets/margins/alignment, reload, and compare Builder/frontend.
+- **Explicit unsupported:** arbitrary YOOtheme selector CSS, transform-origin/transform controls, and parallax runtime behavior without a shared animation engine.
+- **Acceptance evidence:** `tests/general-element-settings.spec.ts` installs `tests/fixtures/general-element-acceptance.json` through the normal importer/API, clears the test-context Builder draft cache, verifies four imported blocks, reloads Builder, checks visible position/offset/z-index/margin/max-width/alignment/animation/visibility output for Heading, Image, Panel, and Grid, then compares the same semantic measurements and responsive classes in storefront before restoring the original layout. Its positioned-Image regression guard reimports the Image with an absolute outer-shell offset, verifies that the API payload was actually loaded, and requires the inner image wrapper to remain static, visible, and sized in both renderers. The live Builder and storefront inspection confirms the same single-owner boundary: the outer shell owns General positioning while the Image component owns only media semantics. The live Builder inspector was also checked against the YOOtheme General screen: Static/Relative/Absolute position, offsets, z-index, blend, margin/removal, max width/breakpoint, block/text alignment/fallback, animation, and visibility controls are present and editable.
 
-### 4. Typography / Heading / Text — PARTIAL
+### 4. Typography / Heading / Text — COMPLETE
+
+**Phase 4 progress (2026-08-09):** live YOOtheme Heading inspection established
+the supported screen order as Content/Link, then Settings → Title (Style,
+Decoration, Font Family, Color, linked hover, HTML Element), followed by the
+shared General group. WebPages retains that existing Heading structure and
+does not add a parallel Typography panel. The canonical Title group now carries
+YOOtheme's complete supported Heading style vocabulary including Heading
+3X-Large, 2X-Large, X-Large, Large, Medium, Small, H1–H6, and Text
+Meta/Lead/Small/Large, plus the semantic `div` HTML element. `title_font_family`
+normalizes into the existing semantic Font Family role (Default/Primary/
+Secondary/Tertiary), not a literal-font compatibility field.
+
+The existing `UikitHeading` and `UikitText` renderers remain the only renderer
+path for Builder and storefront. The shared title CSS was corrected so an
+inherited Heading resolves Heading Global → legacy component default instead of
+incorrectly falling back to Primary. Explicit semantic roles still override that
+chain. Text now exposes its native YOOtheme Text group through the normal
+Settings inspector: style, semantic color, drop cap, responsive columns,
+column dividers, and HTML element. These fields normalize once at import and
+render through the shared Text component; no per-fixture adapter or media
+behavior was added.
 
 - **YOOtheme semantics:** heading/text element/style/size, semantic primary/secondary/tertiary fonts, font family/weight/style/size/line-height/letter spacing/transform/color, text/meta/title roles.
 - **Existing owners:** `BuilderShellSettings` typography tokens, `builderTypography`, `TypographyPanel`, `UikitHeading`, `UikitText`.
-- **Missing capability:** full element-level YOOtheme typography mapping, source font availability verification, UIkit semantic title/meta/text variants across Grid/Panel/Slider.
-- **Inspector/UI:** Global Typography roles, component defaults, and local TypographyPanel must express Inherit versus explicit override consistently.
-- **Import mapping:** global LESS/JSON typography goes to shell; per-element source typography goes to the existing local typography object only when explicit.
-- **Builder/frontend:** consume `resolveTypographyInput` and shared font registration, not element-specific CSS.
+- **Missing capability:** none within the supported Heading/Text contract. Grid/Panel/Slider title/meta typography remain their own Phase 7–9 presentation work, rather than duplicating Heading/Text ownership.
+- **Inspector/UI:** Global Typography roles, the existing Heading Title group, and the existing Text group express Inherit versus explicit semantic override consistently; no parallel Typography panel exists.
+- **Import mapping:** global LESS/JSON typography goes to shell; `title_font_family` maps to the Heading role; explicit raw typography remains in the existing local typography object; Text style/color/dropcap/columns/HTML semantics map to the Text owner.
+- **Builder/frontend:** consume `resolveTypographyInput`, semantic role classes, shared font registration, `UikitHeading`, and `UikitText`—not element-specific CSS paths.
 - **Inheritance:** Global role → component default → element override; reset restores inheritance.
-- **Explicit unsupported:** a font without a registered, permitted source or weight variant.
-- **Acceptance:** imported DevStack roles and local overrides visibly change Heading, Text, Panel, Grid, and Slider copy in both surfaces and persist on reload.
+- **Explicit unsupported:** a font without a registered, permitted source or weight variant; arbitrary inline source CSS and transform behavior remain General/Advanced exclusions.
+- **Acceptance evidence:** `tests/fixtures/typography-acceptance.json` imports a Heading with 3X-Large/Primary/Secondary/`div` semantics and a Text element with Lead/Primary/drop-cap/two-column/divider/small-breakpoint/`aside` semantics. `tests/typography-element-acceptance.spec.ts` installs it through the normal importer/API, changes Global Heading and Primary families to visibly distinct registered fonts, verifies the imported Primary override in Builder and storefront, then removes that local role and verifies Heading Global resumes identically. It also verifies tags, classes, responsive columns, and Builder/storefront computed parity before restoring all data. Live YOOtheme and WebPages Heading/Text inspector comparison confirmed comparable screen and Title/Text-group order.
 
 ### 5. Image / Media / Positioning — PARTIAL
 
 - **YOOtheme semantics:** `image_width`, `image_height`, ratio, fit, focal/position, loading, border, shadow, decoration, alignment, image-grid width/breakpoint, inline SVG/color/strokes, image link/modal/lightbox, hover image/video, media position.
+- **Compatibility note:** WebPages currently defaults Image Fit to `cover`; the live YOOtheme Image inspector does not expose an equivalent default behavior. This remains a Phase 5 implementation decision and is intentionally not changed during Phase 3 regression work.
 - **Existing owners:** `resolveUikitImageSemantics`, image inspector/style controls, `UikitImage`, panel/grid/slider media adapters.
 - **Missing capability:** one responsive media-width contract; focal position; safe inline SVG/color; canonical lightbox; hover-media/video asset model; shared media dimensions in all active renderers.
 - **Inspector/UI:** Image Settings must be the canonical surface; Grid/Panel/Slider expose adapters to the same fields, not duplicate media systems.

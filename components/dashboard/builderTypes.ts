@@ -93,7 +93,7 @@ export type SidebarTab =
   | "settings";
 export type SlideImagePadding = "frameless" | "small" | "medium" | "max";
 export type SectionBackgroundMode = "full" | "boxed" | string;
-export type SectionContentMode = "none" | "small" | "default" | "medium" | "large" | "xlarge" | "expand" | "full" | "boxed" | "narrow" | string;
+export type SectionContentMode = "none" | "xsmall" | "small" | "default" | "medium" | "large" | "xlarge" | "expand" | "full" | "boxed" | "narrow" | string;
 export type SectionHeight = "none" | "auto" | "viewport" | "viewport-20" | "viewport-percent" | "viewport-80";
 export type SectionContentVerticalAlign = "top" | "middle" | "center" | "bottom";
 export type BuilderColorScheme = "auto" | "light" | "dark";
@@ -388,11 +388,18 @@ export type BuilderLayoutBlock = {
   listAlign?: "left" | "center" | "right";
   listSpacing?: "compact" | "default" | "large";
   headingText?: string;
-  headingLevel?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
+  headingLevel?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "div";
   headingAlign?: "left" | "center" | "right";
-  headingSize?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "article-title" | "small" | "medium" | "large" | "xlarge";
+  headingSize?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "article-title" | "small" | "medium" | "large" | "xlarge" | "2xlarge" | "3xlarge";
   textVariant?: "default" | "lead" | "meta" | "small" | "large" | "muted";
   textAlign?: "left" | "center" | "right";
+  /** Canonical YOOtheme Text element presentation fields. */
+  textColor?: "none" | "muted" | "emphasis" | "primary" | "secondary" | "success" | "warning" | "danger";
+  textDropcap?: boolean;
+  textColumns?: "none" | "1-2" | "1-3" | "1-4" | "1-5" | "1-6";
+  textColumnDivider?: boolean;
+  textColumnBreakpoint?: "always" | "small" | "medium" | "large" | "xlarge";
+  textHtmlElement?: "div" | "address" | "aside" | "footer";
   accordionItems?: { id: string; title: string; content: string }[];
   accordionMultiple?: boolean;
   accordionCollapsible?: boolean;

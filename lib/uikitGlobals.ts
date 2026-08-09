@@ -93,10 +93,14 @@ export function getUikitGlobalsCssVars(
 
     // Container max-widths
     "--uk-container-small-max-width": value("containerSmall", "900px"),
+    "--uk-container-xsmall-max-width": value("containerXSmall", "750px"),
     "--uk-container-default-max-width": value("containerDefault", "1200px"),
     "--uk-container-large-max-width": value("containerLarge", "1400px"),
     "--uk-container-xlarge-max-width": value("containerXLarge", "1600px"),
     "--uk-container-expand-max-width": value("containerExpand", "none"),
+    "--uk-container-padding-horizontal": value("containerPaddingHorizontal", "15px"),
+    "--uk-container-padding-horizontal-s": value("containerPaddingHorizontalSmall", "30px"),
+    "--uk-container-padding-horizontal-m": value("containerPaddingHorizontalMedium", "40px"),
     "--uk-page-container-max-width": value("pageContainerMaxWidth", value("containerXLarge", "1600px")),
 
     // Grid gutters

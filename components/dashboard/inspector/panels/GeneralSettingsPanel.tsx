@@ -71,13 +71,11 @@ export default function GeneralSettingsPanel({ block, shellSettings, tab, update
           {/* Position */}
           <InspectorFieldRow label="Position">
             <InspectorSelect
-              value={layout.position ?? "relative"}
+              value={layout.position ?? "static"}
               options={[
+                { value: "static", label: "Static" },
                 { value: "relative", label: "Relative" },
                 { value: "absolute", label: "Absolute" },
-                { value: "fixed", label: "Fixed" },
-                { value: "sticky", label: "Sticky" },
-                { value: "static", label: "Static" },
               ]}
               onChange={(position) => updateLayout({ position: position as any })}
               ariaLabel="Position"

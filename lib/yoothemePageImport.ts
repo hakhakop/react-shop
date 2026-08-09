@@ -10,6 +10,8 @@ import {
   normalizeYoothemeSection,
   normalizeYoothemeTemplateGlobals,
   normalizeYoothemeTypography,
+  normalizeYoothemeTypographyRole,
+  normalizeYoothemeTextPresentation,
 } from "@/lib/yoothemeImportContract";
 
 /**
@@ -199,6 +201,45 @@ const sourcePosition = (
   return undefined;
 };
 
+const sourceBreakpoint = (
+  value: unknown,
+): "small" | "medium" | "large" | "xlarge" | undefined => {
+  const normalized = String(value ?? "").toLowerCase();
+  return normalized === "s" || normalized === "small"
+    ? "small"
+    : normalized === "m" || normalized === "medium"
+      ? "medium"
+      : normalized === "l" || normalized === "large"
+        ? "large"
+        : normalized === "xl" || normalized === "xlarge"
+          ? "xlarge"
+          : undefined;
+};
+
+const sourceMargin = (value: unknown): string | undefined => {
+  const normalized = String(value ?? "").toLowerCase();
+  if (!normalized) return undefined;
+  if (normalized === "remove-vertical" || normalized === "none") return "none";
+  if (normalized === "xsmall") return "small";
+  if (["small", "default", "medium", "large", "xlarge"].includes(normalized)) return normalized;
+  return undefined;
+};
+
+const sourceVisibility = (value: unknown): string | undefined => {
+  const normalized = String(value ?? "").toLowerCase();
+  return ["s", "m", "l", "xl", "visible-s", "visible-m", "visible-l", "visible-xl", "hidden-s", "hidden-m", "hidden-l", "hidden-xl"].includes(normalized)
+    ? normalized
+    : undefined;
+};
+
+const sourceAnimation = (value: unknown): string | undefined => {
+  const normalized = String(value ?? "").toLowerCase();
+  if (!normalized || normalized === "none" || normalized === "parallax") return normalized || undefined;
+  return ["fade", "scale-up", "scale-down", "slide-top-small", "slide-bottom-small", "slide-left-small", "slide-right-small", "slide-top-medium", "slide-bottom-medium", "slide-left-medium", "slide-right-medium", "slide-top", "slide-bottom", "slide-left", "slide-right"].includes(normalized)
+    ? normalized
+    : undefined;
+};
+
 const sourceZIndex = (value: unknown): number | undefined => {
   if (typeof value === "number" && Number.isFinite(value)) return value;
   if (typeof value !== "string" || value.trim() === "") return undefined;
@@ -221,8 +262,20 @@ const sourceGeneralVisualStyle = (
   const bottom = asString(props.position_bottom);
   const left = asString(props.position_left);
   const zIndex = sourceZIndex(props.position_z_index);
+  const marginMode = sourceMargin(props.margin);
+  const maxWidth = asString(props.maxwidth);
+  const maxWidthBreakpoint = sourceBreakpoint(props.maxwidth_breakpoint);
+  const blockAlign = sourceAlignment(props.block_align);
+  const blockAlignBreakpoint = sourceBreakpoint(props.block_align_breakpoint);
+  const blockAlignFallback = sourceAlignment(props.block_align_fallback) ?? (props.block_align_fallback === "" ? "left" : undefined);
+  const textAlign = sourceAlignment(props.text_align) ?? (props.text_align === "justify" ? "justify" : undefined);
+  const textAlignBreakpoint = sourceBreakpoint(props.text_align_breakpoint);
+  const textAlignFallback = sourceAlignment(props.text_align_fallback) ?? (props.text_align_fallback === "justify" ? "justify" : undefined);
+  const visibilityMode = sourceVisibility(props.visibility);
+  const animation = sourceAnimation(props.animation);
+  const blendWithPage = props.blend === true || props.blend === "true";
 
-  if (!position && !top && !right && !bottom && !left && zIndex === undefined) {
+  if (!position && !top && !right && !bottom && !left && zIndex === undefined && !marginMode && !maxWidth && !blockAlign && !textAlign && !visibilityMode && !animation && !blendWithPage && !props.margin_remove_top && !props.margin_remove_bottom) {
     return undefined;
   }
 
@@ -234,7 +287,21 @@ const sourceGeneralVisualStyle = (
       ...(bottom ? { bottom } : {}),
       ...(left ? { left } : {}),
       ...(zIndex !== undefined ? { zIndex } : {}),
+      ...(marginMode ? { marginMode } : {}),
+      ...(props.margin_remove_top ? { removeTopMargin: true } : {}),
+      ...(props.margin_remove_bottom ? { removeBottomMargin: true } : {}),
+      ...(maxWidth ? { maxWidth } : {}),
+      ...(maxWidthBreakpoint ? { maxWidthBreakpoint } : {}),
+      ...(blockAlign ? { blockAlign } : {}),
+      ...(blockAlignBreakpoint ? { blockAlignBreakpoint } : {}),
+      ...(blockAlignFallback ? { blockAlignFallback } : {}),
+      ...(textAlign ? { textAlign: textAlign as any } : {}),
+      ...(textAlignBreakpoint ? { textAlignBreakpoint } : {}),
+      ...(textAlignFallback ? { textAlignFallback: textAlignFallback as any } : {}),
+      ...(blendWithPage ? { blendWithPage: true } : {}),
+      ...(visibilityMode ? { visibilityMode } : {}),
     },
+    ...(maxWidth ? { effects: { maxWidth } } : {}),
   };
 };
 
@@ -243,7 +310,20 @@ const withSourceGeneralVisualStyle = <T extends BuilderLayoutBlock>(
   props: Record<string, unknown>,
 ): T => {
   const visualStyle = sourceGeneralVisualStyle(props);
-  return visualStyle ? { ...block, visualStyle: { ...(block.visualStyle ?? {}), ...visualStyle, card: { ...(block.visualStyle?.card ?? {}), ...(visualStyle.card ?? {}) } } } : block;
+  if (!visualStyle) return block;
+  const layout = visualStyle.layout ?? {};
+  const direct: Record<string, unknown> = {
+    ...(layout.maxWidth ? { maxWidth: layout.maxWidth } : {}),
+    ...(layout.maxWidthBreakpoint ? { maxWidthBreakpoint: layout.maxWidthBreakpoint } : {}),
+    ...(layout.blockAlign && layout.blockAlign !== "none" ? { elementAlign: layout.blockAlign } : {}),
+    ...(layout.textAlign ? { textAlign: layout.textAlign as any, headingAlign: layout.textAlign as any } : {}),
+    ...(layout.marginMode ? { margin: layout.marginMode, marginMode: layout.marginMode } : {}),
+    ...(layout.removeTopMargin ? { removeTopMargin: true } : {}),
+    ...(layout.removeBottomMargin ? { removeBottomMargin: true } : {}),
+    ...(layout.visibilityMode ? { visibility: layout.visibilityMode, visibilityMode: layout.visibilityMode } : {}),
+    ...(sourceAnimation(props.animation) ? { animation: { preset: sourceAnimation(props.animation) as any } } : {}),
+  };
+  return { ...block, ...direct, visualStyle: { ...(block.visualStyle ?? {}), ...visualStyle, layout: { ...(block.visualStyle?.layout ?? {}), ...(visualStyle.layout ?? {}) }, effects: { ...(block.visualStyle?.effects ?? {}), ...(visualStyle.effects ?? {}) }, card: { ...(block.visualStyle?.card ?? {}), ...(visualStyle.card ?? {}) } } } as T;
 };
 
 const GENERAL_POSITION_KEYS = [
@@ -409,7 +489,7 @@ export const analyzeYoothemeGlobalStyleBoundary = (
 const sourceHeadingLevel = (
   value: unknown,
 ): BuilderLayoutBlock["headingLevel"] | undefined =>
-  typeof value === "string" && /^h[1-6]$/.test(value)
+  typeof value === "string" && (/^h[1-6]$/.test(value) || value === "div")
     ? (value as BuilderLayoutBlock["headingLevel"])
     : undefined;
 
@@ -417,13 +497,15 @@ const sourceHeadingSize = (
   value: unknown,
 ): BuilderLayoutBlock["headingSize"] | undefined => {
   if (typeof value !== "string") return undefined;
-  if (["h1", "h2", "h3", "h4", "h5", "h6", "small", "medium", "large", "xlarge"].includes(value)) {
+  if (["h1", "h2", "h3", "h4", "h5", "h6", "small", "medium", "large", "xlarge", "2xlarge", "3xlarge"].includes(value)) {
     return value as BuilderLayoutBlock["headingSize"];
   }
   if (value === "heading-small") return "small";
   if (value === "heading-medium") return "medium";
   if (value === "heading-large") return "large";
   if (value === "heading-xlarge") return "xlarge";
+  if (value === "heading-2xlarge") return "2xlarge";
+  if (value === "heading-3xlarge") return "3xlarge";
   return undefined;
 };
 
@@ -596,6 +678,9 @@ const mapStaticElement = (
       headingSize: sourceHeadingSize(props.title_style),
       headingAlign: sourceAlignment(props.text_align),
       elementAlign: sourceAlignment(props.block_align),
+      ...(normalizeYoothemeTypographyRole(props.title_font_family)
+        ? { headingTypographyRole: normalizeYoothemeTypographyRole(props.title_font_family) }
+        : {}),
       ...normalizeYoothemeTypography(props),
     }, props);
   }
@@ -608,6 +693,7 @@ const mapStaticElement = (
       textVariant: sourceTextVariant(props.text_style) ?? "default",
       textAlign: sourceAlignment(props.text_align),
       elementAlign: sourceAlignment(props.block_align),
+      ...normalizeYoothemeTextPresentation(props),
       ...normalizeYoothemeTypography(props),
     }, props);
   }

@@ -128,10 +128,12 @@ export default function HeadingCapabilityPanel({
   if (tab === "style") {
     const headingStyleOptions = [
       { value: "none", label: "None" },
-      { value: "small", label: "Heading Small" },
-      { value: "medium", label: "Heading Medium" },
-      { value: "large", label: "Heading Large" },
+      { value: "3xlarge", label: "Heading 3X-Large" },
+      { value: "2xlarge", label: "Heading 2X-Large" },
       { value: "xlarge", label: "Heading X-Large" },
+      { value: "large", label: "Heading Large" },
+      { value: "medium", label: "Heading Medium" },
+      { value: "small", label: "Heading Small" },
       { value: "hero", label: "Hero" },
       { value: "h1", label: "H1" },
       { value: "h2", label: "H2" },
@@ -139,6 +141,10 @@ export default function HeadingCapabilityPanel({
       { value: "h4", label: "H4" },
       { value: "h5", label: "H5" },
       { value: "h6", label: "H6" },
+      { value: "text-meta", label: "Text Meta" },
+      { value: "text-lead", label: "Text Lead" },
+      { value: "text-small", label: "Text Small" },
+      { value: "text-large", label: "Text Large" },
     ];
 
     const gradient = block.textGradientPreset ?? "none";

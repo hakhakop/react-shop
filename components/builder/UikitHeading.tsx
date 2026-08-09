@@ -2,7 +2,7 @@
 
 import React from "react";
 import type { BuilderLayoutBlock } from "@/components/dashboard/builderTypes";
-import { getUikitHeadingClass } from "@/lib/uikitTokens";
+import { getUikitHeadingClass, getUikitTextClass } from "@/lib/uikitTokens";
 import { typographyProps, typographyRoleClass } from "@/lib/builderTypography";
 import { builderLinkTargetProps } from "@/lib/websiteBuilderLinks";
 import TypewriterText from "@/components/builder/TypewriterText";
@@ -19,7 +19,9 @@ export default function UikitHeading({ block }: Props) {
   const styleVal = rawBlock.headingStyle ?? rawBlock.headingSize;
   const uikitHeadingClass =
     styleVal && styleVal !== "none" && styleVal !== "inherit"
-      ? styleVal.startsWith("heading-") || ["h1", "h2", "h3", "h4", "h5", "h6"].includes(styleVal)
+      ? styleVal.startsWith("text-")
+        ? getUikitTextClass(styleVal)
+        : styleVal.startsWith("heading-") || ["h1", "h2", "h3", "h4", "h5", "h6"].includes(styleVal)
         ? `uk-${styleVal}`
         : getUikitHeadingClass(Tag, styleVal)
       : getUikitHeadingClass(Tag, "default");

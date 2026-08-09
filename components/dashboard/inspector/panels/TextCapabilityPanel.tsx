@@ -3,7 +3,7 @@
 import type { BuilderLayoutBlock, InspectorTab } from "@/components/dashboard/builderTypes";
 import RichTextEditor from "@/components/dashboard/RichTextEditor";
 import { UIKIT_TEXT_CAPABILITY } from "@/lib/uikitCapabilities";
-import { InspectorFieldRow, InspectorPillGroup, InspectorSelect, InspectorDivision, InspectorAlignmentControl } from "@/components/dashboard/inspector/InspectorControls";
+import { InspectorFieldRow, InspectorPillGroup, InspectorSelect, InspectorDivision, InspectorAlignmentControl, InspectorSwitch } from "@/components/dashboard/inspector/InspectorControls";
 import type { BuilderShellSettings } from "@/lib/builderShell";
 import TypographyRoleSettingsPanel from "@/components/dashboard/inspector/panels/TypographyRoleSettingsPanel";
 
@@ -47,6 +47,19 @@ export default function TextCapabilityPanel({ block, tab, shellSettings, update 
             />
           </InspectorFieldRow>
           <InspectorFieldRow
+            label="Color"
+            isOverridden={block.textColor !== undefined}
+            inheritedValueText="None"
+            onReset={() => update({ textColor: undefined })}
+          >
+            <InspectorSelect
+              value={block.textColor ?? "none"}
+              options={labels(["none", "muted", "emphasis", "primary", "secondary", "success", "warning", "danger"] as const)}
+              onChange={(value) => update({ textColor: value === "none" ? undefined : value as any })}
+              ariaLabel="Text color"
+            />
+          </InspectorFieldRow>
+          <InspectorFieldRow
             label="Alignment"
             isOverridden={block.textAlign !== undefined}
             inheritedValueText="Left"
@@ -57,6 +70,25 @@ export default function TextCapabilityPanel({ block, tab, shellSettings, update 
               onChange={(value) => update({ textAlign: value })}
               ariaLabel="Text alignment"
             />
+          </InspectorFieldRow>
+        </InspectorDivision>
+        <InspectorDivision title="TEXT">
+          <InspectorFieldRow label="Drop Cap" isOverridden={block.textDropcap !== undefined} inheritedValueText="Off" onReset={() => update({ textDropcap: undefined })}>
+            <InspectorSwitch checked={Boolean(block.textDropcap)} onChange={(checked) => update({ textDropcap: checked || undefined })} label="Enable drop cap" />
+          </InspectorFieldRow>
+          <InspectorFieldRow label="Columns" isOverridden={block.textColumns !== undefined} inheritedValueText="None" onReset={() => update({ textColumns: undefined, textColumnDivider: undefined, textColumnBreakpoint: undefined })}>
+            <InspectorSelect value={block.textColumns ?? "none"} options={labels(["none", "1-2", "1-3", "1-4", "1-5", "1-6"] as const)} onChange={(value) => update({ textColumns: value === "none" ? undefined : value as any })} ariaLabel="Text columns" />
+          </InspectorFieldRow>
+          {(block.textColumns ?? "none") !== "none" && <>
+            <InspectorFieldRow label="Dividers" isOverridden={block.textColumnDivider !== undefined} inheritedValueText="Off" onReset={() => update({ textColumnDivider: undefined })}>
+              <InspectorSwitch checked={Boolean(block.textColumnDivider)} onChange={(checked) => update({ textColumnDivider: checked || undefined })} label="Show dividers" />
+            </InspectorFieldRow>
+            <InspectorFieldRow label="Columns Breakpoint" isOverridden={block.textColumnBreakpoint !== undefined} inheritedValueText="Medium" onReset={() => update({ textColumnBreakpoint: undefined })}>
+              <InspectorSelect value={block.textColumnBreakpoint ?? "medium"} options={labels(["always", "small", "medium", "large", "xlarge"] as const)} onChange={(value) => update({ textColumnBreakpoint: value as any })} ariaLabel="Text columns breakpoint" />
+            </InspectorFieldRow>
+          </>}
+          <InspectorFieldRow label="HTML Element" isOverridden={block.textHtmlElement !== undefined} inheritedValueText="Div" onReset={() => update({ textHtmlElement: undefined })}>
+            <InspectorSelect value={block.textHtmlElement ?? "div"} options={labels(["div", "address", "aside", "footer"] as const)} onChange={(value) => update({ textHtmlElement: value === "div" ? undefined : value as any })} ariaLabel="Text HTML element" />
           </InspectorFieldRow>
         </InspectorDivision>
       </div>
