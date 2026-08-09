@@ -745,6 +745,7 @@ export function ActionSettingsGroup({
   title = "ACTION BUTTON",
   showVisibilityToggle = false,
   showFullWidth = false,
+  showMargin = false,
   showPresentation = true,
   keys = {
     visible: "panelActionVisible",
@@ -761,6 +762,7 @@ export function ActionSettingsGroup({
   title?: string;
   showVisibilityToggle?: boolean;
   showFullWidth?: boolean;
+  showMargin?: boolean;
   /** Content tabs use the same action contract without repeating style controls. */
   showPresentation?: boolean;
   keys?: {
@@ -771,6 +773,7 @@ export function ActionSettingsGroup({
     style?: string;
     size?: string;
     width?: string;
+    margin?: string;
   };
 }) {
   const values = block as any;
@@ -781,6 +784,7 @@ export function ActionSettingsGroup({
   const targetKey = keys.target;
   const visibleKey = keys.visible;
   const widthKey = keys.width;
+  const marginKey = keys.margin;
 
   return (
     <InspectorDivision title={title}>
@@ -886,6 +890,23 @@ export function ActionSettingsGroup({
             checked={Boolean(values[widthKey])}
             onChange={(checked) => update({ [widthKey]: checked })}
             label="Full width button"
+          />
+        </InspectorFieldRow>
+      )}
+
+      {showMargin && marginKey && (
+        <InspectorFieldRow label="Link margin">
+          <InspectorSelect
+            value={String(values[marginKey] ?? "none")}
+            options={[
+              { value: "none", label: "None" },
+              { value: "small", label: "Small" },
+              { value: "medium", label: "Medium" },
+              { value: "large", label: "Large" },
+              { value: "xlarge", label: "X-Large" },
+            ]}
+            onChange={(value) => update({ [marginKey]: value === "none" ? undefined : value })}
+            ariaLabel="Link margin"
           />
         </InspectorFieldRow>
       )}

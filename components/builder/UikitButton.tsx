@@ -23,7 +23,12 @@ export default function UikitButton({ block }: Props) {
       : "uk-flex-left";
 
   const isStacked = rawBlock.buttonsLayout === "stacked";
-  const buttonsList = rawBlock.buttons ?? [];
+  const isFullWidth = Boolean(rawBlock.fullWidthButton);
+  // `buttons` is the canonical multi-action owner. Legacy singular action
+  // fields are rendered only when that collection is absent, never alongside
+  // it, so the inspector and the rendered content have one source of truth.
+  const hasCanonicalItems = Array.isArray(rawBlock.buttons);
+  const buttonsList = hasCanonicalItems ? rawBlock.buttons : [];
 
   return (
     <div
@@ -31,12 +36,12 @@ export default function UikitButton({ block }: Props) {
       className={`shop-builder-column-block shop-builder-column-block--button ${marginClass} ${textAlignClass} ${animationClass} ${visibilityClass} ${rawBlock.customClass ?? ""}`.trim()}
     >
       <div
-        className={`uk-flex uk-flex-wrap ${alignFlexClass} ${isStacked ? "uk-flex-column" : "uk-flex-middle"}`.trim()}
+        className={`uk-flex uk-flex-wrap ${alignFlexClass} ${isStacked ? "uk-flex-column" : "uk-flex-middle"} ${isFullWidth ? "uk-child-width-1-1" : ""}`.trim()}
         style={{ gap: rawBlock.buttonGap || "0.75rem" }}
       >
-        {rawBlock.buttonLabel && (
+        {!hasCanonicalItems && rawBlock.buttonLabel && (
           <a
-            className={getUikitButtonClass(rawBlock.buttonStyle ?? "primary", rawBlock.size)}
+            className={`${getUikitButtonClass(rawBlock.buttonStyle ?? "primary", rawBlock.size)} ${isFullWidth ? "uk-width-1-1" : ""}`.trim()}
             href={rawBlock.buttonUrl || "#"}
             {...builderLinkTargetProps(rawBlock.buttonTarget)}
           >
@@ -46,7 +51,7 @@ export default function UikitButton({ block }: Props) {
         {buttonsList.map((btn: any, btnIdx: number) => (
           <a
             key={btn.id ?? btnIdx}
-            className={getUikitButtonClass(btn.style ?? rawBlock.buttonStyle ?? "primary", btn.size ?? rawBlock.size)}
+            className={`${getUikitButtonClass(btn.style ?? rawBlock.buttonStyle ?? "primary", btn.size ?? rawBlock.size)} ${isFullWidth ? "uk-width-1-1" : ""}`.trim()}
             href={btn.url || "#"}
             {...builderLinkTargetProps(btn.target)}
           >

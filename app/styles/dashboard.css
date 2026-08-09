@@ -7370,7 +7370,10 @@ body[data-storefront-preset="princity"]
 }
 
 .builder-preview-content-layout-grid article {
-  position: relative;
+  /* Selection chrome is rendered by row/column frames. A relative column
+     turns into an accidental containing block for a General-positioned
+     element, so it must not own layout positioning. */
+  position: static;
   min-width: 0;
   padding: 0;
   border-radius: 0;
@@ -14082,14 +14085,17 @@ article.is-selected-column > .builder-preview-box-spacing,
 }
 
 .builder-preview-content-row.builder-interaction-row {
-  position: relative;
-  z-index: 1;
+  /* General-positioned element shells are anchored by the section content,
+     exactly as they are on the storefront. Editor interaction chrome must
+     not replace that reference box. */
+  position: static;
+  z-index: auto;
 }
 
 /* Editor-only row geometry. The frame has the exact website dimensions;
    pseudo-elements extend hit testing without contributing to layout. */
 .builder-preview-canvas .builder-interaction-row-frame {
-  position: relative;
+  position: static;
   min-width: 0;
   outline: none;
 }
@@ -15246,7 +15252,7 @@ body:has([data-scoped-builder-root])
 
 /* Ensure row layout uses a clean 12-column CSS grid with 20px horizontal gap between columns */
 .builder-preview-canvas .builder-preview-content-row {
-  position: relative !important;
+  position: static !important;
   display: grid !important;
   grid-template-columns: repeat(12, minmax(0, 1fr)) !important;
   column-gap: 20px !important;
@@ -17714,16 +17720,3 @@ h6.shop-builder-title { font-size: 0.95rem; line-height: 1.4; font-weight: 600; 
 
 .uk-transition-scale-down { transition: transform 300ms ease-in-out !important; }
 .uk-transition-scale-down:hover, .shop-builder-grid-image:hover .uk-transition-scale-down { transform: scale(0.94) !important; }
-
-/* UIkit Button Styles & Sizes */
-.uk-button-primary { background-color: #1e87f0 !important; color: #ffffff !important; border: 1px solid transparent !important; }
-.uk-button-secondary { background-color: #222222 !important; color: #ffffff !important; border: 1px solid transparent !important; }
-.uk-button-danger { background-color: #f0506e !important; color: #ffffff !important; border: 1px solid transparent !important; }
-.uk-button-default { background-color: transparent !important; color: #333333 !important; border: 1px solid #e5e5e5 !important; }
-.uk-link-muted { color: #64748b !important; text-decoration: none !important; }
-.uk-link-muted:hover { color: #1e293b !important; text-decoration: underline !important; }
-.uk-link-text { color: inherit !important; text-decoration: none !important; }
-.uk-link-text:hover { opacity: 0.75 !important; }
-
-.uk-button-small { padding: 0 15px !important; height: 32px !important; line-height: 30px !important; font-size: 0.85rem !important; }
-.uk-button-large { padding: 0 35px !important; height: 48px !important; line-height: 46px !important; font-size: 1.1rem !important; }

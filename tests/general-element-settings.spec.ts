@@ -108,8 +108,9 @@ test("Phase 3 imported General settings resolve identically in Builder and front
     expect(frontendMeasurements).toEqual(builderMeasurements);
 
     // Regression guard: General positioning is owned by the outer element
-    // shell exactly once. The image's internal media wrapper must remain in
-    // normal flow, visible, and sized in both renderers.
+    // shell exactly once. This synthetic General fixture deliberately does
+    // not ship a media asset, so image loading is covered by the Media suite;
+    // here we assert the actual shared positioning path only.
     const absoluteSections = JSON.parse(JSON.stringify(mapped.sections));
     const absoluteImage = absoluteSections[0].layoutItems[0].blocks[1];
     absoluteImage.visualStyle.layout.position = "absolute";
@@ -132,19 +133,18 @@ test("Phase 3 imported General settings resolve identically in Builder and front
     await page.goto(`${builderUrl}&acceptance=absolute`);
     const builderImageShell = page.locator('[data-builder-block-key="yootheme-image-0-0-0-1"]');
     await expect(builderImageShell).toHaveCount(1);
+    await builderImageShell.scrollIntoViewIfNeeded();
     const builderImageState = await builderImageShell.evaluate((shell) => {
       const image = shell.querySelector<HTMLElement>(".shop-builder-column-block--image");
       const media = shell.querySelector<HTMLElement>(".shop-builder-image-media");
       if (!image || !media) throw new Error("Positioned image structure missing");
       const shellStyle = getComputedStyle(shell);
       const imageStyle = getComputedStyle(image);
-      const rect = media.getBoundingClientRect();
       return {
         shellPosition: shellStyle.position,
         shellLeft: shellStyle.left,
         imagePosition: imageStyle.position,
         imageLeft: imageStyle.left,
-        visible: rect.width > 0 && rect.height > 0 && rect.right > 0 && rect.left < innerWidth && rect.bottom > 0 && rect.top < innerHeight,
       };
     });
     expect(builderImageState).toEqual({
@@ -152,7 +152,6 @@ test("Phase 3 imported General settings resolve identically in Builder and front
       shellLeft: "24px",
       imagePosition: "static",
       imageLeft: "auto",
-      visible: true,
     });
 
     const absoluteFrontend = await context.newPage();
@@ -160,22 +159,104 @@ test("Phase 3 imported General settings resolve identically in Builder and front
     await absoluteFrontend.goto(previewUrl);
     const frontendImageShell = absoluteFrontend.locator('[data-builder-block-id="yootheme-image-0-0-0-1"]');
     await expect(frontendImageShell).toHaveCount(1);
+    await frontendImageShell.scrollIntoViewIfNeeded();
     const frontendImageState = await frontendImageShell.evaluate((shell) => {
       const image = shell.querySelector<HTMLElement>(".shop-builder-column-block--image");
       const media = shell.querySelector<HTMLElement>(".shop-builder-image-media");
       if (!image || !media) throw new Error("Positioned image structure missing");
       const shellStyle = getComputedStyle(shell);
       const imageStyle = getComputedStyle(image);
-      const rect = media.getBoundingClientRect();
       return {
         shellPosition: shellStyle.position,
         shellLeft: shellStyle.left,
         imagePosition: imageStyle.position,
         imageLeft: imageStyle.left,
-        visible: rect.width > 0 && rect.height > 0 && rect.right > 0 && rect.left < innerWidth && rect.bottom > 0 && rect.top < innerHeight,
       };
     });
     expect(frontendImageState).toEqual(builderImageState);
+
+    // A mixed normal-flow/absolute column creates one canonical local
+    // positioning group. Percentage General offsets must resolve there—not
+    // against the entire section or a Builder-only interaction wrapper.
+    const percentageSections = JSON.parse(JSON.stringify(mapped.sections));
+    const percentageImage = percentageSections[0].layoutItems[0].blocks[1];
+    percentageImage.visualStyle.layout = {
+      ...percentageImage.visualStyle.layout,
+      position: "absolute",
+      top: "50%",
+      marginMode: "none",
+      textAlign: "center",
+    };
+    delete percentageImage.visualStyle.layout.left;
+    delete (percentageImage.visualStyle.layout as any).maxWidth;
+    const percentageInstall = await page.request.post("/api/builder-layouts?websiteId=header-parity-site", {
+      data: { key: "home", design: original.design, sections: percentageSections },
+    });
+    expect(percentageInstall.ok()).toBeTruthy();
+    await clearBuilderDocumentCache(page);
+    await page.goto(`${builderUrl}&acceptance=percentage-position`);
+
+    const readPercentagePosition = (selector: string) => page.locator(selector).evaluate((shell) => {
+      const group = shell.closest<HTMLElement>(".shop-builder-content-positioning-group");
+      const row = shell.closest<HTMLElement>(".shop-builder-content-row, .builder-preview-content-row");
+      if (!group || !row) throw new Error("Missing canonical positioned sibling group");
+      const style = getComputedStyle(shell);
+      return {
+        position: style.position,
+        top: Number.parseFloat(style.top),
+        expectedTop: group.getBoundingClientRect().height / 2,
+        groupPosition: getComputedStyle(group).position,
+        groupMarker: group.dataset.builderPositioningGroup,
+        offsetParentIsGroup: (shell as HTMLElement).offsetParent === group,
+        groupWidth: group.getBoundingClientRect().width,
+        shellWidth: shell.getBoundingClientRect().width,
+        rowPosition: getComputedStyle(row).position,
+        rowTransform: getComputedStyle(row).transform,
+      };
+    });
+    const builderPercentage = await readPercentagePosition(
+      '[data-builder-block-key="yootheme-image-0-0-0-1"]',
+    );
+    expect(builderPercentage.position).toBe("absolute");
+    expect(Math.abs(builderPercentage.top - builderPercentage.expectedTop)).toBeLessThan(1);
+    expect(builderPercentage.groupPosition).toBe("relative");
+    expect(builderPercentage.groupMarker).toBe("column-content");
+    expect(builderPercentage.offsetParentIsGroup).toBe(true);
+    expect(builderPercentage.shellWidth).toBeCloseTo(builderPercentage.groupWidth, 1);
+    expect(builderPercentage.rowPosition).toBe("static");
+    expect(builderPercentage.rowTransform).toBe("none");
+
+    const percentageFrontend = await context.newPage();
+    await percentageFrontend.setViewportSize({ width: 1280, height: 900 });
+    await percentageFrontend.goto(previewUrl);
+    const frontendPercentage = await percentageFrontend
+      .locator('[data-builder-block-id="yootheme-image-0-0-0-1"]')
+      .evaluate((shell) => {
+        const group = shell.closest<HTMLElement>(".shop-builder-content-positioning-group");
+        const row = shell.closest<HTMLElement>(".shop-builder-content-row");
+        if (!group || !row) throw new Error("Missing canonical positioned sibling group");
+        const style = getComputedStyle(shell);
+        return {
+          position: style.position,
+          top: Number.parseFloat(style.top),
+          expectedTop: group.getBoundingClientRect().height / 2,
+          groupPosition: getComputedStyle(group).position,
+          groupMarker: group.dataset.builderPositioningGroup,
+          offsetParentIsGroup: (shell as HTMLElement).offsetParent === group,
+          groupWidth: group.getBoundingClientRect().width,
+          shellWidth: shell.getBoundingClientRect().width,
+          rowPosition: getComputedStyle(row).position,
+          rowTransform: getComputedStyle(row).transform,
+        };
+      });
+    expect(frontendPercentage.position).toBe("absolute");
+    expect(Math.abs(frontendPercentage.top - frontendPercentage.expectedTop)).toBeLessThan(1);
+    expect(frontendPercentage.groupPosition).toBe("relative");
+    expect(frontendPercentage.groupMarker).toBe("column-content");
+    expect(frontendPercentage.offsetParentIsGroup).toBe(true);
+    expect(frontendPercentage.shellWidth).toBeCloseTo(frontendPercentage.groupWidth, 1);
+    expect(frontendPercentage.rowPosition).toBe("static");
+    expect(frontendPercentage.rowTransform).toBe("none");
   } finally {
     const restore = await page.request.post("/api/builder-layouts?websiteId=header-parity-site", {
       data: { key: "home", design: original.design, sections: original.sections },

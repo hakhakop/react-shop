@@ -131,6 +131,8 @@ export default function PanelCapabilityPanel({ block, tab, shellSettings, update
           update={updateSemantic}
           title="ACTION BUTTON"
           showVisibilityToggle
+          showFullWidth
+          showMargin
           keys={{
             visible: "panelActionVisible",
             label: "buttonLabel",
@@ -138,6 +140,8 @@ export default function PanelCapabilityPanel({ block, tab, shellSettings, update
             target: "buttonTarget",
             style: "panelActionStyle",
             size: "panelActionSize",
+            width: "fullWidthButton",
+            margin: "linkMarginTop",
           }}
         />
       </div>

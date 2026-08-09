@@ -492,12 +492,25 @@ function setNested(target: Record<string, unknown>, path: string, value: string)
   target[key] = value;
 }
 
+function controlTextLineHeight(height: unknown, borderWidth: unknown, fallback: string) {
+  const heightMatch = typeof height === "string" && /^(-?(?:\d+\.?\d*|\.\d+))px$/.exec(height.trim());
+  const borderMatch = typeof borderWidth === "string" && /^(-?(?:\d+\.?\d*|\.\d+))px$/.exec(borderWidth.trim());
+  if (!heightMatch || !borderMatch) return fallback;
+  return `${Math.max(0, Number(heightMatch[1]) - Number(borderMatch[1]) * 2)}px`;
+}
+
 export function resolveYoothemeLess(sources: YoothemeLessSource[], presetId: YoothemeDevstackPresetId = "devstack-light-blue"): YoothemeSemanticPreset {
   const presetDefinition = YOOTHEME_DEVSTACK_PRESETS.find((preset) => preset.id === presetId) ?? YOOTHEME_DEVSTACK_PRESETS[2];
   const ordered = [...sources].sort((a, b) => a.precedence - b.precedence);
   const { latest, all } = getLatestDeclarations(ordered);
   const rawValues = new Map([...latest.entries()].map(([name, declaration]) => [name, declaration.rawValue]));
-  const shellSettings: Record<string, unknown> = {};
+  // These are UIkit's semantic button defaults, not WebPages defaults. They
+  // must be written on every YOOtheme style import so an earlier WebPages
+  // global (for example uppercase labels) cannot remain active merely because
+  // the LESS layer relies on UIkit's default rather than redeclaring it.
+  const shellSettings: Record<string, unknown> = {
+    buttonTextTransform: "none",
+  };
   const rows: YoothemeImportRow[] = [];
   const unsupported: YoothemeImportRow[] = [];
   const conflicts: YoothemeImportRow[] = [];
@@ -544,6 +557,31 @@ export function resolveYoothemeLess(sources: YoothemeLessSource[], presetId: Yoo
       rows.push(row);
       if (previous.length > 1) conflicts.push(row);
     }
+  }
+
+  // UIkit derives button text line-height from the control height and border.
+  // Persist that semantic default on every YOOtheme import when the source has
+  // not expressly overridden it, so historical WebPages component defaults
+  // cannot win over the imported global control contract.
+  const buttonBorderWidth = shellSettings.buttonBorderWidth ?? "2px";
+  if (!latest.has("button-line-height")) {
+    shellSettings.buttonLineHeight = controlTextLineHeight(
+      shellSettings.controlHeightDefault ?? shellSettings.buttonHeight ?? "48px",
+      buttonBorderWidth,
+      "44px",
+    );
+  }
+  if (!latest.has("button-large-line-height")) {
+    shellSettings.buttonLargeLineHeight = controlTextLineHeight(
+      shellSettings.controlHeightLarge ?? "56px",
+      buttonBorderWidth,
+      "52px",
+    );
+  }
+  if (!latest.has("button-large-padding-horizontal")) {
+    shellSettings.buttonLargePaddingX = shellSettings.gridGutterMedium
+      ?? shellSettings.gridGutterDefault
+      ?? "40px";
   }
 
   const reportOnlyPatterns = [

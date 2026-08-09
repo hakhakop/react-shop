@@ -1138,7 +1138,10 @@ body {
 }
 
 /* Soft page fade-in on route change */
-main {
+/* Builder pages have their own opt-in Section animation contract. Applying a
+   route-level transform here changes the containing block of General-positioned
+   elements while hydration settles. */
+main:not(.shop-builder-main):not(:has(.shop-builder-main)) {
   animation: pageFadeIn 0.35s ease-out;
 }
 
@@ -1494,7 +1497,7 @@ a {
   font-weight: var(--uk-button-font-weight, 600);
   font-size: var(--uk-button-font-size, 14px);
   line-height: var(--uk-button-line-height, 1.5);
-  text-transform: var(--uk-button-text-transform, uppercase);
+  text-transform: var(--uk-button-text-transform, none);
   letter-spacing: var(--uk-button-letter-spacing, 0);
   text-align: center;
   text-decoration: none;

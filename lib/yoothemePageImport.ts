@@ -547,11 +547,14 @@ const sourceTextVariant = (
 
 const sourceButtonStyle = (
   value: unknown,
-): NonNullable<BuilderLayoutBlock["buttons"]>[number]["style"] => {
+): "primary" | "secondary" | "default" | "text" => {
   if (value === "primary") return "primary";
-  if (value === "text" || value === "link") return "ghost";
   if (value === "secondary") return "secondary";
-  return "outline";
+  // `link` is a YOOtheme presentation alias for the canonical UIkit Text
+  // button. Do not store either semantic in the historic ghost/outline set.
+  if (value === "text" || value === "link") return "text";
+  if (value === "default") return "default";
+  return "default";
 };
 
 const sourceButtonSize = (
@@ -600,7 +603,7 @@ const sourceGridButtonStyle = (
 ): NonNullable<NonNullable<BuilderLayoutBlock["gridItems"]>[number]["buttonStyle"]> | undefined => {
   if (value === undefined || value === null || value === "") return undefined;
   const style = sourceButtonStyle(value);
-  return style === "light" ? "link" : style;
+  return style as NonNullable<NonNullable<BuilderLayoutBlock["gridItems"]>[number]["buttonStyle"]>;
 };
 
 const sourceGridItem = (
@@ -732,6 +735,9 @@ const mapStaticElement = (
       .filter((child) => child.type === "button_item")
       .map((child, index) => {
         const itemProps = sourceProps(child);
+        if (itemProps.link_target === "modal") {
+          warnings.push(`${path}.${index}.link_target: INTENTIONALLY UNSUPPORTED for Compatibility Fixture #1 — Button dialog/offcanvas links have no canonical WebPages interaction; the ordinary link URL is retained without modal behavior.`);
+        }
         return {
           id: sourcePathId(`${path}.${index}`, "button"),
           label: asString(itemProps.content) ?? `Button ${index + 1}`,
@@ -749,6 +755,7 @@ const mapStaticElement = (
       kind: "button",
       buttons: items,
       size: sourceButtonSize(props.button_size),
+      fullWidthButton: props.fullwidth === true || props.fullwidth === "true",
       textAlign: sourceAlignment(props.text_align),
       elementAlign: sourceAlignment(props.block_align),
     }, props);
@@ -797,7 +804,7 @@ const mapStaticElement = (
       "grid_row_gap", "grid_divider", "grid_column_align", "grid_row_align",
       "image_align", "image_width", "image_height", "image_position", "image_fit", "image_ratio", "image_loading", "image_border",
       "image_box_shadow", "image_box_decoration", "image_transition", "link_image", "image_grid_width",
-      "link_style", "link_text", "meta_style", "panel_padding", "panel_style",
+      "link_style", "link_text", "link_target", "link_size", "link_fullwidth", "link_margin", "meta_style", "panel_padding", "panel_style",
       "show_content", "show_image", "show_link", "show_meta", "show_title", "text_align",
       "title_element", "title_style", "title_align", "meta_align", "meta_element",
       "title_margin", "link_margin", "margin", "margin_remove_bottom",
@@ -835,6 +842,12 @@ const mapStaticElement = (
       imageBoxDecoration: asString(props.image_box_decoration) ?? "none",
       imageHoverTransition: asString(props.image_transition) ?? "none",
       linkImage: Boolean(props.link_image),
+      buttonLabel: asString(props.link_text) ?? undefined,
+      buttonStyle: props.link_style ? sourceButtonStyle(props.link_style) : undefined,
+      buttonTarget: props.link_target === "blank" ? "_blank" : "_self",
+      size: sourceButtonSize(props.link_size),
+      fullWidthButton: props.link_fullwidth === true || props.link_fullwidth === "true",
+      linkMarginTop: sourceMargin(props.link_margin),
       textAlign: sourceAlignment(props.text_align),
       ...normalizeYoothemeGridPanelPresentation(props),
     }, props);
@@ -845,7 +858,7 @@ const mapStaticElement = (
       warnings.push(`${path}: panel image asset could not be resolved and was left empty.`);
     }
     warnUnsupported(path, props, [
-      "content", "image", "image_width", "image_height", "image_fit", "image_ratio", "image_position", "image_loading", "link", "link_style", "link_text", "meta_style",
+      "content", "image", "image_width", "image_height", "image_fit", "image_ratio", "image_position", "image_loading", "link", "link_style", "link_text", "link_target", "link_size", "link_fullwidth", "link_margin", "meta_style",
       "text_align", "title", "title_element", "panel_style", "image_align", "image_grid_width",
       "title_align", "meta_align", "meta_element", "title_margin", "link_margin", "margin", "margin_remove_bottom",
       ...GENERAL_POSITION_KEYS,
@@ -863,6 +876,12 @@ const mapStaticElement = (
       buttonLabel: asString(props.link_text) ?? undefined,
       buttonUrl: asString(props.link) ?? undefined,
       buttonStyle: props.link_style ? sourceButtonStyle(props.link_style) : undefined,
+      panelActionStyle: props.link_style ? sourceButtonStyle(props.link_style) : undefined,
+      buttonTarget: props.link_target === "blank" ? "_blank" : "_self",
+      size: sourceButtonSize(props.link_size),
+      panelActionSize: sourceButtonSize(props.link_size),
+      fullWidthButton: props.link_fullwidth === true || props.link_fullwidth === "true",
+      linkMarginTop: sourceMargin(props.link_margin),
       panelVariant: sourceCardVariant(props.panel_style),
       panelStyle: sourcePanelStyle(props.panel_style) ?? "default",
       panelShowMedia: Boolean(props.image),

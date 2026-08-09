@@ -70,22 +70,6 @@ body.dark {
   --builder-section-button-text: #09090b;
 }
 
-.shop-builder-main .shop-builder-section-content {
-  animation: shopBuilderFadeUp 0.72s ease both;
-}
-
-.shop-builder-main .shop-builder-section:nth-of-type(2) .shop-builder-section-content {
-  animation-delay: 0.04s;
-}
-
-.shop-builder-main .shop-builder-section:nth-of-type(3) .shop-builder-section-content {
-  animation-delay: 0.08s;
-}
-
-.shop-builder-main .shop-builder-section:nth-of-type(4) .shop-builder-section-content {
-  animation-delay: 0.12s;
-}
-
 .shop-builder-main[data-gsap-home] .shop-builder-section-content {
   animation: none;
 }
@@ -3220,18 +3204,6 @@ body.dark {
   border-color: rgba(255, 255, 255, 0.16);
 }
 
-@keyframes shopBuilderFadeUp {
-  from {
-    opacity: 0;
-    transform: translateY(18px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
 [data-builder-animate] {
   --builder-animate-delay: 0ms;
   --builder-animate-duration: 760ms;
@@ -5246,19 +5218,6 @@ h6.shop-builder-title { font-size: 0.95rem; line-height: 1.4; font-weight: 600; 
 
 .uk-transition-scale-down { transition: transform 300ms ease-in-out !important; }
 .uk-transition-scale-down:hover, .shop-builder-grid-image:hover .uk-transition-scale-down { transform: scale(0.94) !important; }
-
-/* UIkit Button Styles & Sizes */
-.uk-button-primary { background-color: #1e87f0 !important; color: #ffffff !important; border: 1px solid transparent !important; }
-.uk-button-secondary { background-color: #222222 !important; color: #ffffff !important; border: 1px solid transparent !important; }
-.uk-button-danger { background-color: #f0506e !important; color: #ffffff !important; border: 1px solid transparent !important; }
-.uk-button-default { background-color: transparent !important; color: #333333 !important; border: 1px solid #e5e5e5 !important; }
-.uk-link-muted { color: #64748b !important; text-decoration: none !important; }
-.uk-link-muted:hover { color: #1e293b !important; text-decoration: underline !important; }
-.uk-link-text { color: inherit !important; text-decoration: none !important; }
-.uk-link-text:hover { opacity: 0.75 !important; }
-
-.uk-button-small { padding: 0 15px !important; height: 32px !important; line-height: 30px !important; font-size: 0.85rem !important; }
-.uk-button-large { padding: 0 35px !important; height: 48px !important; line-height: 46px !important; font-size: 1.1rem !important; }
 
 /* UIkit Canonical Section Variants & Modifiers */
 .uk-section-default {

@@ -3958,7 +3958,7 @@
         "headerArchitectureVersion": 2,
         "headerVisible": true,
         "headerTransparent": false,
-        "headerOverlay": false,
+        "headerOverlay": true,
         "headerLayout": "princity",
         "headerBehavior": "pill-on-scroll",
         "headerWidthMode": "boxed",
@@ -3976,7 +3976,7 @@
         }
       }
     ],
-    "updatedAt": "2026-08-09T13:23:40.018Z"
+    "updatedAt": "2026-08-08T14:52:50.082Z"
   },
   "footer": {
     "version": 1,

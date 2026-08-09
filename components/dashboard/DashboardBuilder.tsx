@@ -128,6 +128,10 @@ import UikitHeading from "@/components/builder/UikitHeading";
 import UikitIcon from "@/components/builder/UikitIcon";
 import UikitImage from "@/components/builder/UikitImage";
 import { ElementAdvancedStyle } from "@/components/builder/ElementAdvancedStyle";
+import {
+  ContentPositioningGroup,
+  getContentPositioningGroupChildStyle,
+} from "@/components/builder/ContentPositioningGroup";
 import UikitList from "@/components/builder/UikitList";
 import UikitTable from "@/components/builder/UikitTable";
 import UikitSlider from "@/components/builder/UikitSlider";
@@ -159,6 +163,7 @@ import {
   getUikitPanelMediaStyle,
 } from "@/lib/uikitTokens";
 import { elementAdvancedScope, parseSafeElementAttributes, resolveElementAdvanced } from "@/lib/elementAdvanced";
+import { getGeneralElementShellStyle } from "@/lib/builderElementShell";
 import { resolveSectionBackground, sectionBackgroundClass } from "@/lib/semanticBackgrounds";
 import {
   getUikitColumnWidthClass,
@@ -12791,39 +12796,6 @@ function dashboardElementPaddingMeasurement(
   return resolveBuilderSpacing(value, "elementPadding");
 }
 
-function dashboardElementBoxStyle(block: BuilderLayoutBlock): CSSProperties {
-  const visual = block.visualStyle as BuilderVisualStyle | undefined;
-  const style: CSSProperties = {};
-
-  if (!hasBuilderVisualSpacing(visual?.padding)) {
-    if (
-      block.elementPadding &&
-      block.elementPadding !== "inherit"
-    ) {
-      const padding = resolveBuilderSpacing(
-        block.elementPadding,
-        "elementPadding",
-      ).css;
-      style.padding = padding;
-    } else {
-      style.paddingTop = "var(--builder-global-element-padding-top, 0px)";
-      style.paddingRight = "var(--builder-global-element-padding-right, 0px)";
-      style.paddingBottom =
-        "var(--builder-global-element-padding-bottom, 0px)";
-      style.paddingLeft = "var(--builder-global-element-padding-left, 0px)";
-    }
-  }
-
-  if (
-    !hasBuilderVisualSpacing(visual?.margin) &&
-    (!block.gridMargin || block.gridMargin === "inherit")
-  ) {
-    style.margin = 0;
-  }
-
-  return style;
-}
-
 function visualSpacingSideValue(
   sides: BuilderVisualStyle["padding"] | BuilderVisualStyle["margin"],
   side: "top" | "right" | "bottom" | "left",
@@ -14461,7 +14433,8 @@ function PreviewSection({
                     </div>
                   )}
 
-                  {blocks.map((block, blockIndex) => {
+                  <ContentPositioningGroup blocks={blocks}>
+                    {blocks.map((block, blockIndex) => {
                     const blockKey =
                       block.id ?? `${columnKey}-block-${blockIndex}`;
                     const blockAnimationAttrs = previewAnimationAttrs(
@@ -14586,11 +14559,8 @@ function PreviewSection({
                                 ? `${block.borderRadius}px`
                                 : undefined,
                             ...blockButtonCssVars(block),
-                            ...dashboardElementBoxStyle(block),
-                            ...visualStyleToCss(
-                              block.visualStyle as
-                                BuilderVisualStyle | undefined,
-                            ),
+                            ...getGeneralElementShellStyle(block),
+                            ...getContentPositioningGroupChildStyle(block, blocks),
                             ...blockAnimationAttrs.style,
                           } as CSSProperties
                         }
@@ -15428,7 +15398,7 @@ function PreviewSection({
                                       <DashboardTypog
                                         as="span"
                                         area="button"
-                                        className={`builder-preview-cta ${getUikitButtonClass(block.panelActionStyle ?? "primary", block.panelActionSize ?? "default")} shop-builder-panel-action--${block.panelActionAlign ?? "inherit"}`}
+                                        className={`builder-preview-cta ${getUikitMarginClass((block as any).linkMarginTop)} ${getUikitButtonClass(block.panelActionStyle ?? block.buttonStyle ?? "primary", block.panelActionSize ?? block.size ?? "default")} ${block.fullWidthButton ? "uk-width-1-1" : ""} shop-builder-panel-action--${block.panelActionAlign ?? "inherit"}`}
                                         typography={block.typography}
                                       >
                                         {block.buttonLabel}
@@ -16241,7 +16211,8 @@ function PreviewSection({
                         )}
                       </div>
                     );
-                  })}
+                    })}
+                  </ContentPositioningGroup>
                 </article>
               </Fragment>
             );

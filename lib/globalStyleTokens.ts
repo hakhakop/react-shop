@@ -126,7 +126,9 @@ export const GLOBAL_STYLE_TOKEN_DEFAULTS = {
   buttonRadius: "8px",
   buttonBorderWidth: "0px",
   buttonFontSize: "15px",
-  buttonLineHeight: "48px",
+  // UIkit's 48px default control includes its 2px top/bottom border.
+  // The button text line box is therefore 44px.
+  buttonLineHeight: "44px",
   buttonFontFamily: "inherit",
   buttonFontStyle: "normal",
   buttonFontWeight: "600",

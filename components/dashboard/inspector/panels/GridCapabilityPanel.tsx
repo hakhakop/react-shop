@@ -696,7 +696,8 @@ export default function GridCapabilityPanel({
           update={update}
           title="DEFAULT ACTION"
           showFullWidth
-          keys={{ label: "buttonLabel", url: "buttonUrl", target: "buttonTarget", style: "buttonStyle", size: "size", width: "fullWidthButton" }}
+          showMargin
+          keys={{ label: "buttonLabel", url: "buttonUrl", target: "buttonTarget", style: "buttonStyle", size: "size", width: "fullWidthButton", margin: "linkMarginTop" }}
         />
       </div>
     );

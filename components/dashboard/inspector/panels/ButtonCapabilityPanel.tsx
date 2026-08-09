@@ -6,10 +6,15 @@ import {
   InspectorDivision,
   InspectorAlignmentControl,
   InspectorFieldRow,
+  InspectorPillGroup,
+  InspectorSelect,
   InspectorTextField,
   InspectorTextarea,
 } from "@/components/dashboard/inspector/InspectorControls";
 import { ActionSettingsGroup } from "@/components/dashboard/inspector/panels/SharedSettingGroups";
+import RepeatableItemShell from "@/components/dashboard/inspector/RepeatableItemShell";
+import { UIKIT_BUTTON_CAPABILITY } from "@/lib/uikitCapabilities";
+import { BUILDER_LINK_TARGET_OPTIONS } from "@/lib/websiteBuilderLinks";
 
 type Props = {
   block: BuilderLayoutBlock;
@@ -18,17 +23,78 @@ type Props = {
   update: (patch: Partial<BuilderLayoutBlock>) => void;
 };
 
+type ButtonItem = NonNullable<BuilderLayoutBlock["buttons"]>[number];
+
+const buttonStyleOptions = UIKIT_BUTTON_CAPABILITY.properties.variant.values.map((value) => ({
+  value,
+  label: value.replace(/\b\w/g, (letter) => letter.toUpperCase()),
+}));
+
+function ButtonItemsEditor({ block, update }: Pick<Props, "block" | "update">) {
+  const items = (block.buttons ?? []) as ButtonItem[];
+  const updateItems = (next: ButtonItem[]) => update({ buttons: next } as Partial<BuilderLayoutBlock>);
+  const updateItem = (index: number, patch: Partial<ButtonItem>) =>
+    updateItems(items.map((item, itemIndex) => itemIndex === index ? { ...item, ...patch } : item));
+  const reorder = (sourceIndex: number, targetIndex: number) => {
+    if (sourceIndex < 0 || targetIndex < 0 || sourceIndex === targetIndex) return;
+    const next = [...items];
+    const [moved] = next.splice(sourceIndex, 1);
+    next.splice(targetIndex, 0, moved);
+    updateItems(next);
+  };
+  const copy = (index: number) => {
+    const source = items[index];
+    if (!source) return;
+    const id = `${block.id ?? "button"}-item-${Date.now().toString(36)}`;
+    const next = [...items];
+    next.splice(index + 1, 0, { ...source, id, label: source.label ? `${source.label} Copy` : "Button" });
+    updateItems(next);
+    return id;
+  };
+
+  return (
+    <InspectorDivision title="ITEMS">
+      <RepeatableItemShell
+        items={items}
+        getItemKey={(item, index) => item.id ?? `${block.id ?? "button"}-item-${index}`}
+        itemLabel="Item"
+        itemDataAttribute="data-button-item-id"
+        addLabel="Add Item"
+        getItemSummary={(item) => item.label || "Untitled item"}
+        onAdd={() => {
+          const id = `${block.id ?? "button"}-item-${Date.now().toString(36)}`;
+          updateItems([...items, { id, label: "Button", url: "#", target: "_self", style: "default" }]);
+          return id;
+        }}
+        onCopy={copy}
+        onDelete={(index) => updateItems(items.filter((_, itemIndex) => itemIndex !== index))}
+        onReorder={reorder}
+        renderItem={(item, index) => <>
+          <InspectorFieldRow label="Label">
+            <InspectorTextField value={item.label ?? ""} onChange={(label) => updateItem(index, { label })} ariaLabel={`Button item ${index + 1} label`} />
+          </InspectorFieldRow>
+          <InspectorFieldRow label="Link URL">
+            <InspectorTextField value={item.url ?? ""} onChange={(url) => updateItem(index, { url: url || undefined })} ariaLabel={`Button item ${index + 1} URL`} />
+          </InspectorFieldRow>
+          <InspectorFieldRow label="Link target">
+            <InspectorSelect value={item.target ?? "_self"} options={BUILDER_LINK_TARGET_OPTIONS} onChange={(target) => updateItem(index, { target })} ariaLabel={`Button item ${index + 1} target`} />
+          </InspectorFieldRow>
+          <InspectorFieldRow label="Style">
+            <InspectorPillGroup value={item.style ?? "primary"} options={buttonStyleOptions} onChange={(style) => updateItem(index, { style })} ariaLabel={`Button item ${index + 1} style`} />
+          </InspectorFieldRow>
+        </>}
+      />
+    </InspectorDivision>
+  );
+}
+
 export default function ButtonCapabilityPanel({ block, tab, shellSettings, update }: Props) {
   // CONTENT TAB
   if (tab === "content") {
+    const hasCanonicalItems = Array.isArray(block.buttons);
     return (
       <div className="builder-inspector-stack" data-uikit-capability="button-content">
-        <ActionSettingsGroup
-          block={block}
-          update={update}
-          title="BUTTON"
-          showPresentation={false}
-        />
+        {hasCanonicalItems ? <ButtonItemsEditor block={block} update={update} /> : <ActionSettingsGroup block={block} update={update} title="BUTTON" showPresentation={false} />}
       </div>
     );
   }
@@ -83,6 +149,7 @@ export default function ButtonCapabilityPanel({ block, tab, shellSettings, updat
         update={update}
         title="BUTTON"
         keys={{ style: "buttonStyle", size: "size" }}
+        showFullWidth
       />
       <InspectorDivision title="LAYOUT">
         <InspectorFieldRow label="Alignment">

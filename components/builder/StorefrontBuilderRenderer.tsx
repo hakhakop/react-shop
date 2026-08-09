@@ -20,6 +20,10 @@ import UikitHeading from "@/components/builder/UikitHeading";
 import UikitIcon from "@/components/builder/UikitIcon";
 import UikitImage from "@/components/builder/UikitImage";
 import { ElementAdvancedStyle } from "@/components/builder/ElementAdvancedStyle";
+import {
+  ContentPositioningGroup,
+  getContentPositioningGroupChildStyle,
+} from "@/components/builder/ContentPositioningGroup";
 import UikitList from "@/components/builder/UikitList";
 import UikitTable from "@/components/builder/UikitTable";
 import UikitSlider from "@/components/builder/UikitSlider";
@@ -43,7 +47,6 @@ import Breadcrumbs from "@/components/Breadcrumbs";
 import CarouselBlock, {
   type CarouselSlide,
 } from "@/components/blocks/CarouselBlock";
-import HomeGsapAnimations from "@/components/animations/HomeGsapAnimations";
 import ScrollPinnedDemo from "@/components/animations/ScrollPinnedDemo";
 import BuilderScrollAnimations from "@/components/builder/BuilderScrollAnimations";
 import PrincityGradientTracker from "@/components/builder/PrincityGradientTracker";
@@ -133,6 +136,7 @@ import {
   getBuilderImageObjectFit,
 } from "@/lib/builderImages";
 import { normalizeSectionTitleBreakpoint, normalizeSectionTitlePosition } from "@/lib/sectionSemantics";
+import { getGeneralElementShellStyle } from "@/lib/builderElementShell";
 
 export type StorefrontBuilderRendererProps = {
   layout: BuilderLayout;
@@ -2289,7 +2293,7 @@ export function ContentLayoutBlock({
             <Typog
               as="a"
               area="button"
-              className={`shop-builder-cta ${getUikitButtonClass(block.panelActionStyle ?? "primary", block.panelActionSize ?? "default")} shop-builder-panel-action--${block.panelActionAlign ?? "inherit"}`}
+              className={`shop-builder-cta ${getUikitMarginClass((block as any).linkMarginTop)} ${getUikitButtonClass(block.panelActionStyle ?? block.buttonStyle ?? "primary", block.panelActionSize ?? block.size ?? "default")} ${block.fullWidthButton ? "uk-width-1-1" : ""} shop-builder-panel-action--${block.panelActionAlign ?? "inherit"}`}
               href={block.buttonUrl}
               {...builderLinkTargetProps(block.buttonTarget)}
               typography={block.typography}
@@ -2443,33 +2447,9 @@ function blockSurfaceStyle(
     legacy["--builder-radius"] = `${block.borderRadius}px`;
     legacy["--builder-card-radius"] = `${block.borderRadius}px`;
   }
-  if (!hasBuilderVisualSpacing(visual?.padding)) {
-    if (
-      block.elementPadding &&
-      block.elementPadding !== "inherit"
-    ) {
-      legacy.padding = resolveBuilderSpacing(
-        block.elementPadding,
-        "elementPadding",
-      ).css;
-    } else {
-      legacy.paddingTop = "var(--builder-global-element-padding-top, 0px)";
-      legacy.paddingRight = "var(--builder-global-element-padding-right, 0px)";
-      legacy.paddingBottom =
-        "var(--builder-global-element-padding-bottom, 0px)";
-      legacy.paddingLeft = "var(--builder-global-element-padding-left, 0px)";
-    }
-  }
-  if (
-    !hasBuilderVisualSpacing(visual?.margin) &&
-    (!block.gridMargin || block.gridMargin === "inherit")
-  ) {
-    legacy.margin = 0;
-  }
-
   Object.assign(legacy, builderButtonOverrideCssVars(block));
 
-  return { ...contextVars, ...legacy, ...visualCss };
+  return { ...contextVars, ...legacy, ...getGeneralElementShellStyle(block) };
 }
 
 function blockShellClassName(block: BuilderLayoutBlock) {
@@ -2808,6 +2788,7 @@ function ContentLayoutSection({
                         className={blockShellClassName(block)}
                         style={{
                           ...blockSurfaceStyle(block, rowColorScheme),
+                          ...getContentPositioningGroupChildStyle(block, columnBlocks),
                           ...blockAnimationAttrs.style,
                         }}
                         {...blockAnimationAttrs.data}
@@ -2867,14 +2848,18 @@ function ContentLayoutSection({
                                 key={nestedColumn.id}
                                 className="builder-nested-column"
                               >
-                                {renderColumnBlocks(nestedColumn.blocks)}
+                                <ContentPositioningGroup blocks={nestedColumn.blocks}>
+                                  {renderColumnBlocks(nestedColumn.blocks)}
+                                </ContentPositioningGroup>
                               </div>
                             ))}
                           </div>
                         ))}
                       </div>
                     ) : (
-                      renderColumnBlocks(blocks)
+                      <ContentPositioningGroup blocks={blocks}>
+                        {renderColumnBlocks(blocks)}
+                      </ContentPositioningGroup>
                     )}
                   </article>
                 );
@@ -3179,7 +3164,6 @@ function StorefrontBuilderRendererBase({
         data-overlap-header={isPageDocument && (pullUnderHeader || transparentSectionHeader || headerOverlay) ? "true" : undefined}
       >
         <BuilderScrollAnimations />
-        {isHomePage && <HomeGsapAnimations />}
         <div className="shop-builder-inner">
           {layout.sections.map((section) => (
             <BuilderSectionRenderer

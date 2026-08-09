@@ -253,7 +253,7 @@ export type BuilderLayoutBlock = {
   buttonLabel?: string;
   buttonUrl?: string;
   buttonTarget?: "_self" | "_blank";
-  buttonStyle?: "primary" | "secondary" | "outline" | "ghost" | "light";
+  buttonStyle?: "primary" | "secondary" | "default" | "text" | "outline" | "ghost" | "light";
   size?: "small" | "default" | "large";
   secondaryButtonLabel?: string;
   secondaryButtonUrl?: string;
@@ -262,13 +262,15 @@ export type BuilderLayoutBlock = {
   secondaryButtonSize?: "small" | "default" | "large";
   buttonsLayout?: "inline" | "stacked";
   buttonGap?: string;
+  fullWidthButton?: boolean;
+  linkMarginTop?: string;
   buttons?: {
     contentTranslations?: BuilderContentTranslations;
     id?: string;
     label?: string;
     url?: string;
     target?: "_self" | "_blank";
-    style?: "primary" | "secondary" | "outline" | "ghost" | "light";
+    style?: "primary" | "secondary" | "default" | "text" | "outline" | "ghost" | "light";
   }[];
   buttonBg?: string;
   buttonTextColor?: string;
@@ -496,7 +498,7 @@ export type BuilderLayoutBlock = {
     text?: string;
     buttonLabel?: string;
     buttonUrl?: string;
-    buttonStyle?: "primary" | "secondary" | "outline" | "ghost" | "link";
+    buttonStyle?: "primary" | "secondary" | "default" | "text" | "outline" | "ghost" | "link";
     buttonAlign?: "left" | "center" | "right";
     buttonTarget?: "_self" | "_blank";
     renderer?: "plain" | "card";

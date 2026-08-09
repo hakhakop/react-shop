@@ -54,10 +54,8 @@ function getUikitHoverTransitionClass(val?: string) {
 }
 
 function getUikitLinkStyleClass(val?: string, size?: string, fullWidth?: boolean) {
-  if (!val || val === "button-default") return `uk-button uk-button-default ${size && size !== "default" ? `uk-button-${size}` : ""} ${fullWidth ? "uk-width-1-1" : ""}`;
-  if (val.startsWith("button-")) return `uk-button uk-${val} ${size && size !== "default" ? `uk-button-${size}` : ""} ${fullWidth ? "uk-width-1-1" : ""}`;
-  if (val.startsWith("link-")) return `uk-${val}`;
-  return `uk-button uk-button-default`;
+  const normalized = val?.replace(/^button-/, "").replace(/^link-/, "text") || "default";
+  return `${getUikitButtonClass(normalized, size)} ${fullWidth ? "uk-width-1-1" : ""}`.trim();
 }
 
 function getUikitGeneralClass(rawBlock: any) {
@@ -409,10 +407,7 @@ export function GridCardsClient({
                       }`}
                     >
                       <a
-                        className={`shop-builder-grid-action ${linkStyleClass} ${getUikitButtonClass(
-                          rawBlock.buttonStyle ?? item.actionStyle ?? item.buttonStyle ?? block.buttonStyle ?? "primary",
-                          rawBlock.size ?? item.actionSize ?? block.size ?? "default",
-                        )}`.trim()}
+                        className={`shop-builder-grid-action ${linkStyleClass}`.trim()}
                         href={itemUrl}
                         {...builderLinkTargetProps(linkTarget)}
                       >

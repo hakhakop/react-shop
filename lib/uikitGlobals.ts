@@ -74,6 +74,15 @@ export function getUikitGlobalsCssVars(
   const primaryFamily = inheritedFamily(value("fontFamilyPrimary", "inherit"), headingFamily);
   const secondaryFamily = inheritedFamily(value("fontFamilySecondary", "inherit"), bodyFamily);
   const tertiaryFamily = inheritedFamily(value("fontFamilyTertiary", "inherit"), bodyFamily);
+  const buttonBorderWidth = value("buttonBorderWidth", value("borderWidth", "1px"));
+  const controlLineHeight = (height: string, fallback: string) => {
+    const heightMatch = /^(-?(?:\d+\.?\d*|\.\d+))px$/.exec(height.trim());
+    const borderMatch = /^(-?(?:\d+\.?\d*|\.\d+))px$/.exec(buttonBorderWidth.trim());
+    if (!heightMatch || !borderMatch) return fallback;
+    return `${Math.max(0, Number(heightMatch[1]) - Number(borderMatch[1]) * 2)}px`;
+  };
+  const buttonControlHeight = value("controlHeightDefault", value("buttonHeight", "48px"));
+  const buttonLargeControlHeight = value("controlHeightLarge", "56px");
 
   const vars: Record<string, string> = {
     // Spacing scale
@@ -187,7 +196,7 @@ export function getUikitGlobalsCssVars(
     "--uk-global-border-radius": typeof globalRadius === "number" ? `${globalRadius}px` : globalRadius,
     "--uk-card-border-radius": typeof cardRadius === "number" ? `${cardRadius}px` : cardRadius,
     "--uk-button-border-radius": value("buttonRadius", cardRadius),
-    "--uk-button-border-width": value("buttonBorderWidth", value("borderWidth", "1px")),
+    "--uk-button-border-width": buttonBorderWidth,
     "--uk-card-border-width": value("cardBorderWidth", value("borderWidth", "1px")),
     "--uk-card-border-color": value("cardBorderColor", "#e5e7eb"),
     "--uk-card-default-border": value("cardDefaultBorder", value("cardBorderColor", "#e5e7eb")),
@@ -233,8 +242,8 @@ export function getUikitGlobalsCssVars(
     "--uk-button-font-family": value("buttonFontFamily", "inherit"),
     "--uk-button-font-style": value("buttonFontStyle", "normal"),
     "--uk-button-font-weight": value("buttonFontWeight", "600"),
-    "--uk-button-line-height": value("buttonLineHeight", value("buttonHeight", "48px")),
-    "--uk-button-text-transform": value("buttonTextTransform", "uppercase"),
+    "--uk-button-line-height": value("buttonLineHeight", controlLineHeight(buttonControlHeight, "44px")),
+    "--uk-button-text-transform": value("buttonTextTransform", "none"),
     "--uk-button-border-mode": value("buttonBorderMode", "solid"),
     "--uk-button-background-size": value("buttonBackgroundSize", "200%"),
     "--uk-button-background-position": value("buttonBackgroundPosition", "100%"),
@@ -244,7 +253,7 @@ export function getUikitGlobalsCssVars(
     "--uk-button-small-padding-x": value("buttonSmallPaddingX", "20px"),
     "--uk-button-small-radius": value("buttonSmallRadius", value("buttonRadius", cardRadius)),
     "--uk-button-large-font-size": value("buttonLargeFontSize", value("baseFontSize", "16px")),
-    "--uk-button-large-line-height": value("buttonLargeLineHeight", value("controlHeightLarge", "56px")),
+    "--uk-button-large-line-height": value("buttonLargeLineHeight", controlLineHeight(buttonLargeControlHeight, "52px")),
     "--uk-button-large-padding-x": value("buttonLargePaddingX", value("gridGutterMedium", value("buttonPaddingX", "40px"))),
     "--uk-button-large-radius": value("buttonLargeRadius", value("buttonRadius", cardRadius)),
     "--uk-button-letter-spacing": value("buttonLetterSpacing", "0px"),

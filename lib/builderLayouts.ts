@@ -103,6 +103,8 @@ export type BuilderLayoutBlock = {
   buttonTarget?: string;
   buttonStyle?: string;
   size?: "small" | "default" | "large";
+  fullWidthButton?: boolean;
+  linkMarginTop?: string;
   secondaryButtonLabel?: string;
   secondaryButtonUrl?: string;
   secondaryButtonTarget?: string;
@@ -338,7 +340,7 @@ export type BuilderLayoutBlock = {
     text?: string;
     buttonLabel?: string;
     buttonUrl?: string;
-    buttonStyle?: "primary" | "secondary" | "outline" | "ghost" | "link";
+    buttonStyle?: "primary" | "secondary" | "default" | "text" | "outline" | "ghost" | "link";
     buttonTarget?: "_self" | "_blank";
     buttonAlign?: "left" | "center" | "right";
     renderer?: "plain" | "card";

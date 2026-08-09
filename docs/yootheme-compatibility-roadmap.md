@@ -210,6 +210,21 @@ behavior was added.
 
 ### 6. Button / Links — PARTIAL
 
+**Phase 6 progress (2026-08-09):** Button, Panel action, and Grid action now
+normalize YOOtheme Default, Primary, Secondary, Text/Link styles into the
+canonical UIkit variant vocabulary instead of the obsolete outline/ghost
+aliases. The same import contract retains link target, size, full-width, and
+link-margin values for Panel and Grid actions; the existing shared Action UI
+exposes those values in their normal element inspectors. `UikitButton`, Panel
+action rendering, and Grid action rendering consume those canonical values in
+Builder and storefront. Button dialog/offcanvas remains explicitly unsupported
+and produces a durable warning. Focused coverage in
+`tests/button-links-acceptance.test.mjs` protects the importer and variant
+resolver contract. Live Builder/storefront inspection verified the imported
+hero Primary and Default buttons render the same UIkit variant and size in
+both surfaces. Full Panel/Grid interaction editing and fresh-import visual
+verification remain required before this phase can be marked complete.
+
 - **YOOtheme semantics:** button/link style, size, state colors/borders/shadows/gradients, typography, target, full width, margins, panel/image/title links, modal/dialog links.
 - **Existing owners:** button shell tokens, `UikitButton` classes, button inspector/style controls, `builderLinkTargetProps`.
 - **Missing capability:** semantic default/text/link variants, link spacing and title/panel linking shared across consumers, dialog policy.
