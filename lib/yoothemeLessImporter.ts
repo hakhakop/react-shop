@@ -1,5 +1,6 @@
 import type { BuilderDesign } from "@/components/dashboard/builderTypes";
 import type { BuilderShellSettings } from "@/lib/builderShell";
+import { resolveYoothemeLessCapability } from "@/lib/yoothemeImportContract";
 
 export type YoothemeLessSource = {
   name: string;
@@ -370,8 +371,8 @@ const destinationMap: Record<string, { destination: string; domain: string }> = 
   "button-border-radius": { destination: "shellSettings.buttonRadius", domain: "Buttons" },
   "button-primary-hover-background": { destination: "shellSettings.buttonHoverBg", domain: "Buttons" },
   "button-primary-hover-color": { destination: "shellSettings.buttonPrimaryHoverText", domain: "Buttons" },
-  "button-primary-hover-box-shadow": { destination: "shellSettings.buttonHoverShadow", domain: "Buttons" },
-  "button-primary-hover-gradient": { destination: "shellSettings.buttonHoverGradient", domain: "Buttons" },
+  "button-primary-hover-box-shadow": { destination: "shellSettings.buttonPrimaryHoverShadow", domain: "Buttons" },
+  "button-primary-hover-gradient": { destination: "shellSettings.buttonPrimaryHoverGradient", domain: "Buttons" },
   "button-font-size": { destination: "shellSettings.buttonFontSize", domain: "Buttons" },
   "button-large-font-size": { destination: "shellSettings.buttonLargeFontSize", domain: "Buttons" },
   "button-font-family": { destination: "shellSettings.buttonFontFamily", domain: "Buttons" },
@@ -498,18 +499,35 @@ export function resolveYoothemeLess(sources: YoothemeLessSource[], presetId: Yoo
   const conflicts: YoothemeImportRow[] = [];
 
   for (const [variable, declaration] of latest.entries()) {
-    const mapping = destinationMap[variable];
+    const legacyMapping = destinationMap[variable];
+    const capability = resolveYoothemeLessCapability(variable, legacyMapping?.destination, legacyMapping?.domain);
+    const mapping = capability && legacyMapping ? { ...legacyMapping, destination: capability.owner } : legacyMapping;
     if (!mapping) continue;
     const resolved = resolveExpression(declaration.rawValue, rawValues);
     const previous = all.get(variable) ?? [];
+    if (!capability) continue;
+    if (capability.status === "unsupported") {
+      unsupported.push({
+        source: declaration.source.name,
+        variable: `@${variable}`,
+        rawValue: declaration.rawValue,
+        resolvedValue: resolved.value,
+        destination: mapping.destination,
+        status: "unsupported",
+        note: `INTENTIONALLY UNSUPPORTED for Compatibility Fixture #1 — ${capability.ui} exposes the value, but runtime breakpoint reconfiguration has no shared renderer.`,
+      });
+      continue;
+    }
     const row: YoothemeImportRow = {
       source: declaration.source.name,
       variable: `@${variable}`,
       rawValue: declaration.rawValue,
       resolvedValue: resolved.value,
       destination: mapping.destination,
-      status: previous.length > 1 ? "conflict" : resolved.value ? "mapped" : "unsupported",
-      note: previous.length > 1 ? `Resolved by precedence; ${previous.length - 1} earlier assignment(s) overridden.` : undefined,
+      status: previous.length > 1 ? "conflict" : resolved.value && capability.status === "mapped-rendered" ? "mapped" : "unsupported",
+      note: previous.length > 1
+        ? `Resolved by precedence; ${previous.length - 1} earlier assignment(s) overridden.`
+        : `${capability.status === "mapped-rendered" ? "Mapped and rendered" : "INTENTIONALLY UNSUPPORTED for Compatibility Fixture #1 — runtime behavior is not yet configurable"} · ${capability.ui}`,
     };
     if (!resolved.value) {
       row.note = resolved.reason;

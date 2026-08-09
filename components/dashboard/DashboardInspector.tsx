@@ -2520,6 +2520,12 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                           <option value="full">Full</option>
                           <option value="boxed">Boxed</option>
                           <option value="narrow">Narrow</option>
+                          <option value="none">None</option>
+                          <option value="small">Small</option>
+                          <option value="default">Default</option>
+                          <option value="large">Large</option>
+                          <option value="xlarge">Xlarge</option>
+                          <option value="expand">Expand</option>
                         </select>
                       </label>
 
@@ -2565,6 +2571,27 @@ export default function DashboardInspector(props: DashboardInspectorProps) {
                           </small>
                         </label>
                       </div>
+
+                      <label className="builder-field">
+                        <span>Section Padding</span>
+                        <select
+                          value={selectedSection.sectionPadding ?? "default"}
+                          onChange={(event) =>
+                            updateSelected({
+                              sectionPadding: event.target.value as BuilderSection["sectionPadding"],
+                            })
+                          }
+                        >
+                          <option value="none">None</option>
+                          <option value="xsmall">Xsmall</option>
+                          <option value="small">Small</option>
+                          <option value="default">Default</option>
+                          <option value="medium">Medium</option>
+                          <option value="large">Large</option>
+                          <option value="xlarge">Xlarge</option>
+                        </select>
+                        <small>Uses the matching Global Styles › Section padding token.</small>
+                      </label>
 
                       <label className="builder-check">
                         <input

@@ -4,6 +4,13 @@ import type {
 } from "@/components/dashboard/builderTypes";
 import type { BuilderShellSettings } from "@/lib/builderShell";
 import type { BuilderVisualStyle } from "@/lib/builderVisualStyle";
+import {
+  normalizeYoothemeMedia,
+  normalizeYoothemeGridPanelPresentation,
+  normalizeYoothemeSection,
+  normalizeYoothemeTemplateGlobals,
+  normalizeYoothemeTypography,
+} from "@/lib/yoothemeImportContract";
 
 /**
  * Pure compatibility analysis and static-content mapping for YOOtheme layout exports.
@@ -75,7 +82,7 @@ export type YoothemeGlobalStyleBoundary = {
     path: string;
     sourceKey: string;
     sourceValue: string;
-    owner: "WebPages Global Styles" | "UIkit token";
+    owner: "WebPages Global Styles" | "WebPages Element override" | "UIkit token";
   }>;
   unmapped: Array<{
     path: string;
@@ -236,7 +243,7 @@ const withSourceGeneralVisualStyle = <T extends BuilderLayoutBlock>(
   props: Record<string, unknown>,
 ): T => {
   const visualStyle = sourceGeneralVisualStyle(props);
-  return visualStyle ? { ...block, visualStyle } : block;
+  return visualStyle ? { ...block, visualStyle: { ...(block.visualStyle ?? {}), ...visualStyle, card: { ...(block.visualStyle?.card ?? {}), ...(visualStyle.card ?? {}) } } } : block;
 };
 
 const GENERAL_POSITION_KEYS = [
@@ -270,24 +277,8 @@ const sourceSectionVariant = (
     ? value
     : "default";
 
-const sourceGlobalBackgroundPatch = (root: YoothemeSourceNode): Partial<BuilderShellSettings> => {
-  const rootRecord = root as Record<string, unknown>;
-  const candidates = [sourceProps(root), rootRecord.global, rootRecord.settings, rootRecord.global_styles]
-    .filter((value): value is Record<string, unknown> => Boolean(value) && typeof value === "object");
-  const read = (...keys: string[]) => {
-    for (const candidate of candidates) for (const key of keys) {
-      const value = candidate[key];
-      if (typeof value === "string" && value.trim()) return value.trim();
-    }
-    return undefined;
-  };
-  return {
-    ...(read("global_background", "global-background", "background") ? { backgroundDefault: read("global_background", "global-background", "background") } : {}),
-    ...(read("global_muted_background", "global-muted-background", "muted_background") ? { backgroundMuted: read("global_muted_background", "global-muted-background", "muted_background") } : {}),
-    ...(read("global_primary_background", "global-primary-background", "primary_background") ? { backgroundPrimary: read("global_primary_background", "global-primary-background", "primary_background") } : {}),
-    ...(read("global_secondary_background", "global-secondary-background", "secondary_background") ? { backgroundSecondary: read("global_secondary_background", "global-secondary-background", "secondary_background") } : {}),
-  };
-};
+const sourceGlobalBackgroundPatch = (root: YoothemeSourceNode): Partial<BuilderShellSettings> =>
+  normalizeYoothemeTemplateGlobals(root as Record<string, unknown>);
 
 const sourceSectionSpacing = (
   value: unknown,
@@ -306,7 +297,7 @@ const reportGlobalStyleValue = (
   path: string,
   sourceKey: string,
   value: unknown,
-  owner: "WebPages Global Styles" | "UIkit token",
+  owner: "WebPages Global Styles" | "WebPages Element override" | "UIkit token",
 ) => {
   const sourceValue = asString(value);
   if (!sourceValue) return;
@@ -401,15 +392,10 @@ export const analyzeYoothemeGlobalStyleBoundary = (
       }
     });
 
-    ["font_family", "font_size", "font_weight", "letter_spacing", "color"].forEach(
+    ["font_family", "font_size", "font_weight", "letter_spacing", "line_height", "color", "text_transform"].forEach(
       (sourceKey) => {
-        reportUnmappedStyleValue(
-          boundary,
-          path,
-          sourceKey,
-          props[sourceKey],
-          "Concrete source appearance requires an existing Global Settings owner before import.",
-        );
+        if (props[sourceKey] === undefined) return;
+        reportGlobalStyleValue(boundary, path, sourceKey, props[sourceKey], "WebPages Element override");
       },
     );
 
@@ -472,6 +458,9 @@ const sourcePanelStyle = (
 ): BuilderLayoutBlock["panelStyle"] | undefined => {
   if (typeof value !== "string") return undefined;
   const normalized = value.replace(/^(?:card|tile)-/, "");
+  // Card variants are owned by `panelVariant`/`gridCardVariant`; `panelStyle`
+  // selects the existing panel renderer. Do not reject valid YOOtheme cards.
+  if (normalized === "primary" || normalized === "blank") return "default";
   return [
     "default",
     "princity",
@@ -545,8 +534,10 @@ const sourceGridItem = (
 const sourceSliderItem = (
   node: YoothemeSourceNode,
   path: string,
+  parentProps: Record<string, unknown> = {},
 ): NonNullable<BuilderSection["slides"]>[number] => {
-  const props = sourceProps(node);
+  const props = { ...parentProps, ...sourceProps(node) };
+  const media = normalizeYoothemeMedia(props);
   return {
     id: sourcePathId(path, "panel-slide"),
     title: asString(props.title) ?? "",
@@ -554,6 +545,12 @@ const sourceSliderItem = (
     text: asString(props.content) ?? "",
     imageUrl: resolveYoothemeAssetUrl(props.image),
     imageAlt: asString(props.image_alt) ?? asString(props.title) ?? "",
+    imageWidth: asString(props.image_width) ?? undefined,
+    imageHeight: asString(props.image_height) ?? undefined,
+    imageFit: media.imageFit,
+    imageRatio: media.imageRatio,
+    imageAlignment: media.imageAlignment,
+    imageLoading: media.imageLoading,
     headingLevel: sourceHeadingLevel(props.title_element) ?? "h3",
     metaStyle: sourceTextVariant(props.meta_style) ?? "muted",
     showAction: Boolean(props.link),
@@ -571,9 +568,9 @@ const warnUnsupported = (
   warnings: string[],
 ) => {
   const unsupported = Object.keys(props).filter((key) => !supported.includes(key));
-  if (unsupported.length > 0) {
-    warnings.push(`${path}: source options not represented by the canonical WebPages consumer: ${unsupported.join(", ")}.`);
-  }
+  unsupported.forEach((key) => {
+    warnings.push(`${path}.${key}: INTENTIONALLY UNSUPPORTED for Compatibility Fixture #1 — no canonical WebPages owner or shared renderer exists.`);
+  });
 };
 
 const mapStaticElement = (
@@ -588,7 +585,7 @@ const mapStaticElement = (
   if (type === "headline") {
     const level = sourceHeadingLevel(props.title_element);
     if (props.title_element && !level) {
-      warnings.push(`${path}: semantic level '${String(props.title_element)}' has no direct WebPages heading equivalent.`);
+      warnings.push(`${path}.title_element: INTENTIONALLY UNSUPPORTED for Compatibility Fixture #1 — semantic level '${String(props.title_element)}' has no canonical WebPages heading control.`);
     }
     return withSourceGeneralVisualStyle({
       id: sourcePathId(path, "heading"),
@@ -599,6 +596,7 @@ const mapStaticElement = (
       headingSize: sourceHeadingSize(props.title_style),
       headingAlign: sourceAlignment(props.text_align),
       elementAlign: sourceAlignment(props.block_align),
+      ...normalizeYoothemeTypography(props),
     }, props);
   }
 
@@ -610,6 +608,7 @@ const mapStaticElement = (
       textVariant: sourceTextVariant(props.text_style) ?? "default",
       textAlign: sourceAlignment(props.text_align),
       elementAlign: sourceAlignment(props.block_align),
+      ...normalizeYoothemeTypography(props),
     }, props);
   }
 
@@ -649,22 +648,23 @@ const mapStaticElement = (
       warnings.push(`${path}: image link target '${String(props.link_target)}' was normalized to the current window.`);
     }
     if (props.link_target === "modal") {
-      warnings.push(`${path}: modal image links are not supported by the current image field and were imported as normal links.`);
+      warnings.push(`${path}.link_target: INTENTIONALLY UNSUPPORTED for Compatibility Fixture #1 — image modal links have no canonical WebPages image control; the ordinary link URL is retained without modal behavior.`);
     }
+    const media = normalizeYoothemeMedia(props);
     return withSourceGeneralVisualStyle({
       id: sourcePathId(path, "image"),
       kind: "image",
       imageUrl: resolveYoothemeAssetUrl(props.image),
-      imageAlt: asString(props.alt) ?? "",
+      imageAlt: asString(props.image_alt) ?? asString(props.alt) ?? "",
       imageMaxWidth: sourceImageMaxWidth(props),
       imageWidth: "auto",
-      imageLoading: props.image_loading === true ? "eager" : "lazy",
+      ...media,
       imageLinkUrl: asString(props.link) ?? undefined,
       imageLinkTarget: props.link ? linkTarget : undefined,
       imageShape: props.image_border === "rounded" || props.image_border === "circle" || props.image_border === "pill"
         ? props.image_border
         : "none",
-      imageAlignment: sourceAlignment(props.text_align),
+      imageAlignment: sourceAlignment(props.text_align) ?? media.imageAlignment,
     }, props);
   }
 
@@ -683,7 +683,8 @@ const mapStaticElement = (
       "image_box_shadow", "image_box_decoration", "image_transition", "link_image",
       "link_style", "link_text", "meta_style", "panel_padding", "panel_style",
       "show_content", "show_image", "show_link", "show_meta", "show_title", "text_align",
-      "title_element", "title_style",
+      "title_element", "title_style", "title_align", "meta_align", "meta_element",
+      "title_margin", "link_margin", "margin", "margin_remove_bottom",
       ...GENERAL_POSITION_KEYS,
     ], warnings);
     return withSourceGeneralVisualStyle({
@@ -720,6 +721,7 @@ const mapStaticElement = (
       imageHoverTransition: asString(props.image_transition) ?? "none",
       linkImage: Boolean(props.link_image),
       textAlign: sourceAlignment(props.text_align),
+      ...normalizeYoothemeGridPanelPresentation(props),
     }, props);
   }
 
@@ -728,8 +730,9 @@ const mapStaticElement = (
       warnings.push(`${path}: panel image asset could not be resolved and was left empty.`);
     }
     warnUnsupported(path, props, [
-      "content", "image", "image_width", "link", "link_style", "link_text", "meta_style",
+      "content", "image", "image_width", "image_height", "image_fit", "image_ratio", "image_position", "image_loading", "link", "link_style", "link_text", "meta_style",
       "text_align", "title", "title_element", "panel_style", "image_align", "image_grid_width",
+      "title_align", "meta_align", "meta_element", "title_margin", "link_margin", "margin", "margin_remove_bottom",
       ...GENERAL_POSITION_KEYS,
     ], warnings);
     return withSourceGeneralVisualStyle({
@@ -739,6 +742,9 @@ const mapStaticElement = (
       body: asString(props.content) ?? "",
       imageUrl: resolveYoothemeAssetUrl(props.image),
       imageAlt: asString(props.title) ?? "",
+      imageMaxWidth: sourceImageMaxWidth(props),
+      imageHeight: asString(props.image_height) ?? undefined,
+      ...normalizeYoothemeMedia(props),
       buttonLabel: asString(props.link_text) ?? undefined,
       buttonUrl: asString(props.link) ?? undefined,
       buttonStyle: props.link_style ? sourceButtonStyle(props.link_style) : undefined,
@@ -749,15 +755,16 @@ const mapStaticElement = (
       panelMediaWidth: props.image_grid_width === "1-2" ? "medium" : "large",
       panelTextAlign: sourceAlignment(props.text_align),
       panelTitleElement: sourceHeadingLevel(props.title_element) as "h2" | "h3" | "h4" | "div" | undefined,
+      ...normalizeYoothemeGridPanelPresentation(props),
     }, props);
   }
 
   if (type === "overlay-slider") {
     const slides = sourceChildren(node)
       .filter((child) => child.type === "overlay-slider_item")
-      .map((child, index) => sourceSliderItem(child, `${path}.${index}`));
+      .map((child, index) => sourceSliderItem(child, `${path}.${index}`, props));
     warnUnsupported(path, props, [
-      "link_style", "link_text", "meta_style", "nav", "nav_align", "nav_position", "show_content",
+      "image_width", "image_height", "image_fit", "image_ratio", "image_position", "image_loading", "link_style", "link_text", "meta_style", "nav", "nav_align", "nav_position", "show_content",
       "show_link", "show_meta", "show_title", "slidenav", "slider_autoplay_pause", "slider_center",
       "slider_divider", "slider_gap", "text_align", "title_element", "margin", "visibility",
       ...GENERAL_POSITION_KEYS,
@@ -929,33 +936,30 @@ export const mapYoothemeStaticContent = (
     }
 
     const sectionProps = sourceProps(sectionNode);
+    const normalizedSection = normalizeYoothemeSection(sectionProps);
 
     sections.push({
       id: structureSection.id,
       kind: "contentLayout",
       title: structureSection.title,
       background: structureSection.background,
-      sectionVariant: sourceSectionVariant(sectionProps.style),
-      backgroundRole: (() => {
-        const style = sourceSectionVariant(sectionProps.style);
-        return style === "default" || style === "muted" || style === "primary" || style === "secondary" ? style : undefined;
-      })(),
+      ...normalizedSection,
       preserveColor: Boolean(sectionProps.preserve_color),
       overlap: Boolean(sectionProps.overlap),
       textColor: sectionProps.text_color === "light" || sectionProps.text_color === "dark" ? sectionProps.text_color : "none",
-      contentMode: (typeof sectionProps.width === "string" ? sectionProps.width : "boxed") as any,
-      maxWidth: (typeof sectionProps.width === "string" ? sectionProps.width : "default") as any,
-      removeHorizontalPadding: Boolean(sectionProps.padding_remove_horizontal),
+      contentMode: normalizedSection.contentMode ?? "boxed",
+      maxWidth: normalizedSection.maxWidth ?? "default",
+      removeHorizontalPadding: normalizedSection.removeHorizontalPadding ?? Boolean(sectionProps.padding_remove_horizontal),
       expandOneSide: sectionProps.expand === "left" || sectionProps.expand === "right" ? sectionProps.expand : "none",
-      sectionHeight: (typeof sectionProps.height === "string" ? sectionProps.height : "auto") as any,
-      heightOffset: sectionProps.height_offset as any,
-      subtractHeightAbove: Boolean(sectionProps.height_viewport),
-      contentVerticalAlign: sectionProps.vertical_align === "middle" || sectionProps.vertical_align === "center" ? "center" : sectionProps.vertical_align === "bottom" ? "bottom" : "top",
-      sectionPadding: (sourceSectionSpacing(sectionProps.padding) ?? "default") as any,
-      removeTopPadding: Boolean(sectionProps.padding_remove_top),
-      removeBottomPadding: Boolean(sectionProps.padding_remove_bottom),
-      topSpacing: sectionProps.padding_remove_top ? "none" : sourceSectionSpacing(sectionProps.padding),
-      bottomSpacing: sectionProps.padding_remove_bottom ? "none" : sourceSectionSpacing(sectionProps.padding),
+      sectionHeight: normalizedSection.sectionHeight ?? "auto",
+      heightOffset: normalizedSection.heightOffset,
+      subtractHeightAbove: normalizedSection.subtractHeightAbove,
+      contentVerticalAlign: normalizedSection.contentVerticalAlign ?? "top",
+      sectionPadding: normalizedSection.sectionPadding ?? "default",
+      removeTopPadding: normalizedSection.removeTopPadding,
+      removeBottomPadding: normalizedSection.removeBottomPadding,
+      // Do not copy global section padding into legacy local spacing fields:
+      // imported sections must keep inheriting the canonical Global Style token.
       htmlElement: (["div", "section", "header", "footer", "aside", "main"].includes(sectionProps.html_element as string) ? sectionProps.html_element : "div") as any,
       stickyEffect: sectionProps.sticky === "cover" || sectionProps.sticky === "reveal" ? sectionProps.sticky : "none",
       headerTransparent: sectionProps.header_transparent === "transparent" || sectionProps.header_transparent === "pull" || Boolean(sectionProps.header_transparent),

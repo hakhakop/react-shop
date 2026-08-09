@@ -178,10 +178,3 @@ export function resolveAppearanceValue<T>(options: {
   if (options.global !== undefined) return { value: options.global, source: "global" };
   return { value: options.componentDefault, source: "component-default" };
 }
-
-export const GLOBAL_STYLE_GROUPS = [
-  { id: "appearance", label: "Appearance", items: ["Colors", "Typography", "Links", "Buttons", "Panels", "Forms", "Icons"] },
-  { id: "layout", label: "Layout", items: ["Containers", "Sections", "Grid", "Spacing"] },
-  { id: "media", label: "Media", items: ["Images", "Video", "Slider navigation"] },
-  { id: "effects", label: "Effects", items: ["Radius", "Borders", "Shadows", "Transitions"] },
-] as const;

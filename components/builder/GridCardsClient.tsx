@@ -98,6 +98,7 @@ export function GridCardsClient({
   limit: number;
 }) {
   const rawBlock = block as any;
+  const sharedCard = rawBlock.visualStyle?.card ?? {};
   const [activeFilter, setActiveFilter] = useState<string>("all");
 
   // Resolved Column Count across breakpoints & root columns
@@ -202,7 +203,7 @@ export function GridCardsClient({
             const titleStyleVal = rawBlock.gridTitleSize ?? rawBlock.titleStyle ?? item.titleStyle;
             const titleHeadingClass = getUikitTitleHeadingClass(titleStyleVal) || (titleStyleVal && titleStyleVal !== "inherit" ? getUikitHeadingClass(titleStyleVal, titleStyleVal) : "");
             const titleDecorationClass = getUikitTitleDecorationClass(rawBlock.titleDecoration);
-            const titleColorVal = rawBlock.titleColor ?? rawBlock.gridTitleColor;
+            const titleColorVal = rawBlock.titleColor ?? rawBlock.gridTitleColor ?? sharedCard.titleColor;
             const titleColorClass = titleColorVal && titleColorVal !== "none" && titleColorVal !== "default"
               ? (titleColorVal.startsWith("uk-text-") ? titleColorVal : `uk-text-${titleColorVal}`)
               : "";
@@ -281,7 +282,7 @@ export function GridCardsClient({
                   )}`.trim()}
                   typography={item.typography ?? block.typography}
                   area="title"
-                  style={gridTitleStyle}
+                  style={{ ...gridTitleStyle, textAlign: sharedCard.titleAlign ?? gridTitleStyle.textAlign, margin: sharedCard.titleMargin ?? gridTitleStyle.margin }}
                 >
                   {rawBlock.linkTitle || rawBlock.linkPanel ? (
                     <a href={itemUrl} {...builderLinkTargetProps(linkTarget)}>

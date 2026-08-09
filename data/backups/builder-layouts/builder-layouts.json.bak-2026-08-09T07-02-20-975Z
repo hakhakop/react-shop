@@ -114,7 +114,7 @@
                     "label": "Learn More",
                     "url": "?page_id=20",
                     "target": "_self",
-                    "style": "default"
+                    "style": "outline"
                   }
                 ],
                 "size": "large",
@@ -124,8 +124,7 @@
                     "position": "relative",
                     "zIndex": 3
                   }
-                },
-                "buttonStyle": "default"
+                }
               },
               {
                 "id": "yootheme-image-0-0-0-3",
@@ -530,22 +529,12 @@
                 "buttonUrl": "#",
                 "buttonStyle": "ghost",
                 "panelVariant": "default",
+                "panelStyle": "default",
                 "panelShowMedia": true,
                 "panelMediaPlacement": "top",
                 "panelMediaWidth": "medium",
                 "panelTextAlign": "center",
-                "panelTitleElement": "h3",
-                "panelHover": true,
-                "panelSize": "default",
-                "panelMediaFit": "cover",
-                "panelMediaAlignment": "center",
-                "panelVerticalAlign": "top",
-                "panelTitleStyle": "inherit",
-                "panelContentWidth": "auto",
-                "panelActionVisible": true,
-                "panelActionStyle": "primary",
-                "panelActionSize": "default",
-                "panelActionAlign": "inherit"
+                "panelTitleElement": "h3"
               }
             ]
           },
@@ -581,22 +570,12 @@
                 "buttonUrl": "#",
                 "buttonStyle": "ghost",
                 "panelVariant": "default",
+                "panelStyle": "default",
                 "panelShowMedia": true,
                 "panelMediaPlacement": "top",
                 "panelMediaWidth": "medium",
                 "panelTextAlign": "center",
-                "panelTitleElement": "h3",
-                "panelHover": true,
-                "panelSize": "default",
-                "panelMediaFit": "cover",
-                "panelMediaAlignment": "center",
-                "panelVerticalAlign": "top",
-                "panelTitleStyle": "inherit",
-                "panelContentWidth": "auto",
-                "panelActionVisible": true,
-                "panelActionStyle": "primary",
-                "panelActionSize": "default",
-                "panelActionAlign": "inherit"
+                "panelTitleElement": "h3"
               }
             ]
           },
@@ -632,22 +611,12 @@
                 "buttonUrl": "#",
                 "buttonStyle": "ghost",
                 "panelVariant": "default",
+                "panelStyle": "default",
                 "panelShowMedia": true,
                 "panelMediaPlacement": "top",
                 "panelMediaWidth": "medium",
                 "panelTextAlign": "center",
-                "panelTitleElement": "h3",
-                "panelHover": true,
-                "panelSize": "default",
-                "panelMediaFit": "cover",
-                "panelMediaAlignment": "center",
-                "panelVerticalAlign": "top",
-                "panelTitleStyle": "inherit",
-                "panelContentWidth": "auto",
-                "panelActionVisible": true,
-                "panelActionStyle": "primary",
-                "panelActionSize": "default",
-                "panelActionAlign": "inherit"
+                "panelTitleElement": "h3"
               }
             ]
           }
@@ -1012,9 +981,7 @@
                     "style": "primary"
                   }
                 ],
-                "textAlign": "right",
-                "buttonStyle": "default",
-                "size": "default"
+                "textAlign": "right"
               }
             ]
           },
@@ -1147,7 +1114,7 @@
                     "buttonLabel": "View Enterprise",
                     "buttonUrl": "?page_id=2",
                     "buttonTarget": "_self",
-                    "renderer": "card",
+                    "renderer": "plain",
                     "cardVariant": "primary",
                     "mediaPlacement": "top",
                     "mediaFit": "cover",
@@ -1290,12 +1257,10 @@
                     "label": "Visit Our Blog",
                     "url": "?post_type=post",
                     "target": "_self",
-                    "style": "default"
+                    "style": "ghost"
                   }
                 ],
-                "textAlign": "center",
-                "buttonStyle": "default",
-                "size": "default"
+                "textAlign": "center"
               },
               {
                 "id": "yootheme-grid-6-0-0-3",
@@ -1356,7 +1321,7 @@
         ]
       }
     ],
-    "updatedAt": "2026-08-09T07:02:20.972Z"
+    "updatedAt": "2026-08-09T06:46:21.288Z"
   },
   "shop": {
     "version": 1,

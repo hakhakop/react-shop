@@ -11,6 +11,7 @@ import {
   getUikitImageWrapperClass,
 } from "@/lib/uikitTokens";
 import { builderLinkTargetProps } from "@/lib/websiteBuilderLinks";
+import { visualStyleToCss } from "@/lib/builderVisualStyle";
 import { Image as ImageIcon, Upload } from "lucide-react";
 import Image from "next/image";
 
@@ -76,6 +77,7 @@ export default function UikitImage({ block, isCanvas, onUploadImage, shellSettin
     <div
       id={rawBlock.customId || rawBlock.id}
       className={`shop-builder-column-block shop-builder-column-block--image ${marginClass} ${textAlignClass} ${animationClass} ${visibilityClass} ${rawBlock.customClass ?? ""}`.trim()}
+      style={visualStyleToCss(rawBlock.visualStyle)}
     >
       <figure
         className={`shop-builder-image-figure ${figureClass}`}

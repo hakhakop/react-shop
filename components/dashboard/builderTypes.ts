@@ -778,6 +778,7 @@ export type BuilderSection = {
     imageAlignment?: string;
     imageWidth?: string;
     imageHeight?: string | number;
+    imageLoading?: "lazy" | "eager";
     imageBorder?: string;
     imageBoxShadow?: string;
     iconName?: string;

@@ -131,9 +131,9 @@ export function YoothemeColorPicker({ label, value, onChange }: ColorPickerProps
   }, [isOpen]);
 
   return (
-    <div className="builder-design-control builder-design-color-yootheme" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "6px 0" }}>
-      <span style={{ fontSize: "13px", color: "#e2e8f0", fontWeight: 500 }}>{label}</span>
-      <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+    <div className="builder-design-control builder-design-color-yootheme">
+      <span>{label}</span>
+      <div className="builder-design-color-yootheme-control">
         <button
           ref={swatchRef}
           type="button"
@@ -348,25 +348,12 @@ export function YoothemeFontPicker({ label, value, onChange }: FontPickerProps) 
   const currentValueDisplay = value || "Inherit";
 
   return (
-    <div className="builder-design-control builder-design-font-yootheme" style={{ position: "relative" }}>
-      <span style={{ fontSize: "13px", color: "#e2e8f0", fontWeight: 500 }}>{label}</span>
+    <div className="builder-design-control builder-design-font-yootheme">
+      <span>{label}</span>
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          width: "100%",
-          padding: "6px 10px",
-          fontSize: "13px",
-          border: "1px solid #334155",
-          borderRadius: "6px",
-          backgroundColor: "#0f172a",
-          cursor: "pointer",
-          color: "#f8fafc",
-          marginTop: "4px",
-        }}
+        className="builder-design-font-yootheme-trigger"
       >
         <span style={{ fontFamily: currentValueDisplay === "Inherit" ? "inherit" : currentValueDisplay }}>
           {currentValueDisplay}
@@ -377,40 +364,17 @@ export function YoothemeFontPicker({ label, value, onChange }: FontPickerProps) 
       {isOpen && (
         <div
           ref={dropdownRef}
-          style={{
-            position: "absolute",
-            top: "100%",
-            left: 0,
-            right: 0,
-            zIndex: 9999,
-            marginTop: "4px",
-            maxHeight: "240px",
-            backgroundColor: "#1e293b",
-            borderRadius: "8px",
-            boxShadow: "0 10px 25px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.1)",
-            overflowY: "auto",
-            padding: "8px",
-            color: "#f8fafc",
-          }}
+          className="builder-design-font-yootheme-menu"
         >
           {/* Search Box */}
           <div style={{ position: "relative", marginBottom: "8px" }}>
             <Search size={14} style={{ position: "absolute", left: "8px", top: "50%", transform: "translateY(-50%)", color: "#94a3b8" }} />
             <input
+              className="builder-design-font-yootheme-search"
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search font..."
-              style={{
-                width: "100%",
-                padding: "6px 8px 6px 28px",
-                fontSize: "12px",
-                border: "1px solid #334155",
-                borderRadius: "6px",
-                backgroundColor: "#0f172a",
-                color: "#f8fafc",
-                outline: "none",
-              }}
               autoFocus
             />
           </div>
@@ -429,22 +393,8 @@ export function YoothemeFontPicker({ label, value, onChange }: FontPickerProps) 
                     onChange(font === "Inherit" ? "inherit" : font);
                     setIsOpen(false);
                   }}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    width: "100%",
-                    padding: "6px 8px",
-                    fontSize: "13px",
-                    textAlign: "left",
-                    border: "none",
-                    background: "none",
-                    borderRadius: "4px",
-                    cursor: "pointer",
-                    fontFamily: font === "Inherit" ? "inherit" : font,
-                    color: font === currentValueDisplay ? "#38bdf8" : "#e2e8f0",
-                    fontWeight: font === currentValueDisplay ? 600 : 400,
-                  }}
+                  className={`builder-design-font-yootheme-option${font === currentValueDisplay ? " is-selected" : ""}`}
+                  style={{ fontFamily: font === "Inherit" ? "inherit" : font }}
                 >
                   <span>{font}</span>
                   {font === currentValueDisplay && <Check size={14} />}
@@ -467,22 +417,8 @@ export function YoothemeFontPicker({ label, value, onChange }: FontPickerProps) 
                     onChange(font);
                     setIsOpen(false);
                   }}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    width: "100%",
-                    padding: "6px 8px",
-                    fontSize: "13px",
-                    textAlign: "left",
-                    border: "none",
-                    background: "none",
-                    borderRadius: "4px",
-                    cursor: "pointer",
-                    fontFamily: font,
-                    color: font === currentValueDisplay ? "#38bdf8" : "#e2e8f0",
-                    fontWeight: font === currentValueDisplay ? 600 : 400,
-                  }}
+                  className={`builder-design-font-yootheme-option${font === currentValueDisplay ? " is-selected" : ""}`}
+                  style={{ fontFamily: font }}
                 >
                   <span>{font}</span>
                   {font === currentValueDisplay && <Check size={14} />}

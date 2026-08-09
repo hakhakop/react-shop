@@ -114,7 +114,7 @@ export function getUikitGlobalsCssVars(
     "--uk-global-danger-color": value("dangerColor", "#dc2626"),
     "--uk-global-text-color": value("textColor", "#111827"),
     "--uk-global-muted-text-color": value("mutedTextColor", "#6b7280"),
-    "--uk-global-background-color": value("backgroundColor", "#ffffff"),
+    "--uk-global-background-color": value("backgroundDefault", value("backgroundColor", "#ffffff")),
     // Canonical YOOtheme section background roles. The legacy field names stay
     // readable for existing saved documents, but sections resolve these roles.
     "--webpages-background-default": value("backgroundDefault", value("backgroundColor", "#ffffff")),
@@ -165,7 +165,7 @@ export function getUikitGlobalsCssVars(
     "--uk-global-inverse-color": value("inverseColor", "#fff"),
     "--uk-global-link-color": value("linkColor", primary),
     "--uk-global-link-hover-color": value("linkHoverColor", accent),
-    "--uk-global-muted-background": value("mutedBackgroundColor", "#f8fafc"),
+    "--uk-global-muted-background": value("backgroundMuted", value("mutedBackgroundColor", "#f8fafc")),
     "--uk-base-selection-background": value("selectionBackground", primary),
     "--uk-base-selection-color": value("selectionColor", "#fff"),
     "--uk-base-ins-background": value("baseInsBackground", "transparent"),
@@ -183,6 +183,7 @@ export function getUikitGlobalsCssVars(
     "--uk-global-border-radius": typeof globalRadius === "number" ? `${globalRadius}px` : globalRadius,
     "--uk-card-border-radius": typeof cardRadius === "number" ? `${cardRadius}px` : cardRadius,
     "--uk-button-border-radius": value("buttonRadius", cardRadius),
+    "--uk-button-border-width": value("buttonBorderWidth", value("borderWidth", "1px")),
     "--uk-card-border-width": value("cardBorderWidth", value("borderWidth", "1px")),
     "--uk-card-border-color": value("cardBorderColor", "#e5e7eb"),
     "--uk-card-default-border": value("cardDefaultBorder", value("cardBorderColor", "#e5e7eb")),

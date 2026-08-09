@@ -176,7 +176,7 @@ test("Home.json static content maps to existing WebPages block fields", async ()
   assert.equal(panelSlider.slides.length, 1);
 
   assert.ok(mapping.warnings.some((warning) => warning.includes("modal image links")));
-  assert.ok(mapping.warnings.some((warning) => warning.includes("source options not represented")));
+  assert.ok(mapping.warnings.some((warning) => warning.includes("INTENTIONALLY UNSUPPORTED for Compatibility Fixture #1")));
 });
 
 test("Home.json global-style boundary maps existing semantics and reports concrete values", async () => {

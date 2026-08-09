@@ -15159,6 +15159,7 @@ function PreviewSection({
                                     backgroundSize: panelMediaPresentation.backgroundSize,
                                     backgroundPosition: panelMediaPresentation.backgroundPosition,
                                     width: panelImageDimension((block as any).imageWidth) ?? "100%",
+                                    maxWidth: typeof (block as any).imageMaxWidth === "number" ? `${(block as any).imageMaxWidth}px` : undefined,
                                     maxHeight: panelImageDimension((block as any).imageHeight),
                                     borderRadius: panelImageRadius,
                                     ...(!isPanelImagePlaceholder

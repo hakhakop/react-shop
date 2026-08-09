@@ -37,7 +37,7 @@
 .builder-dashboard:not(.is-sidebar-resizing) {
   transition: grid-template-columns 220ms cubic-bezier(0.16, 1, 0.3, 1) !important;
   background: var(--builder-dashboard-bg, var(--builder-ui-bg));
-  color: rgba(255, 255, 255, 0.86);
+  color: var(--builder-ui-text);
   font-size: 13px;
   line-height: 1.4;
   backdrop-filter: blur(12px);
@@ -12725,6 +12725,7 @@ article.is-selected-column > .builder-preview-box-spacing,
 
 /* Light Theme overrides */
 .builder-dashboard[data-theme="light"] {
+  color-scheme: light;
   --builder-ui-bg: #f3f2ed;
   --builder-ui-panel: rgba(255, 255, 255, 0.94);
   --builder-ui-panel-solid: #ffffff;
@@ -12747,6 +12748,44 @@ article.is-selected-column > .builder-preview-box-spacing,
   --builder-ui-note-muted: #5e5875;
   --builder-ui-nested-border: rgba(31, 31, 27, 0.09);
   --builder-ui-nested-bg: rgba(0, 0, 0, 0.02);
+}
+
+.builder-dashboard[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+/* Shared Global Styles / inspector control states. These rely only on the
+   dashboard token system so every editor screen remains legible in either
+   dashboard theme. */
+.builder-dashboard .builder-design-control input::placeholder,
+.builder-dashboard .builder-design-control textarea::placeholder,
+.builder-dashboard .builder-design-nav-search input::placeholder {
+  color: var(--builder-ui-soft-muted);
+  opacity: 1;
+}
+
+.builder-dashboard .builder-design-control input:focus-visible,
+.builder-dashboard .builder-design-control select:focus-visible,
+.builder-dashboard .builder-design-control textarea:focus-visible,
+.builder-dashboard .builder-design-nav-item:focus-visible,
+.builder-dashboard .builder-design-editor-header button:focus-visible {
+  outline: 2px solid var(--builder-ui-accent);
+  outline-offset: 2px;
+  border-color: var(--builder-ui-accent);
+}
+
+.builder-dashboard .builder-design-control input:disabled,
+.builder-dashboard .builder-design-control select:disabled,
+.builder-dashboard .builder-design-editor-header button:disabled {
+  color: var(--builder-ui-soft-muted);
+  background: var(--builder-ui-surface-strong);
+  border-color: var(--builder-ui-border);
+  opacity: .72;
+}
+
+.builder-dashboard .builder-design-control select option {
+  background: var(--builder-ui-panel-solid);
+  color: var(--builder-ui-text);
 }
 
 .builder-dashboard[data-theme="light"] .builder-sidebar-left-nav {
@@ -17242,6 +17281,121 @@ body:has([data-scoped-builder-root])
 .builder-design-button-matrix-cell { display: grid; gap: 8px; align-items: center; }
 .builder-design-button-matrix-cell > span { font-size: 11px; color: #64748b; text-transform: capitalize; }
 @media (max-width: 900px) { .builder-design-button-matrix-grid { grid-template-columns: repeat(2, minmax(140px, 1fr)); } }
+
+/* Global Styles use the same label/control rows as YOOtheme's Style panels.
+   These primitives deliberately apply to every canonical Global Styles editor. */
+.builder-global-design-editor .builder-design-grid {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 12px;
+}
+
+.builder-global-design-editor .builder-design-control {
+  grid-template-columns: minmax(150px, .88fr) minmax(0, 1.12fr);
+  align-items: center;
+  gap: 16px;
+  color: var(--builder-ui-text);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.builder-global-design-editor .builder-design-control > span {
+  color: var(--builder-ui-text);
+}
+
+.builder-global-design-editor .builder-design-control > input,
+.builder-global-design-editor .builder-design-control > select,
+.builder-global-design-editor .builder-design-control > div {
+  grid-column: 2;
+}
+
+.builder-global-design-editor .builder-design-color-yootheme,
+.builder-global-design-editor .builder-design-font-yootheme {
+  position: relative;
+}
+
+.builder-global-design-editor .builder-design-color-yootheme-control {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+}
+
+.builder-global-design-editor .builder-design-font-yootheme-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  min-height: 36px;
+  padding: 6px 10px;
+  border: 1px solid var(--builder-ui-border);
+  border-radius: 7px;
+  background: var(--builder-ui-surface);
+  color: var(--builder-ui-text);
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.builder-global-design-editor .builder-design-font-yootheme-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  z-index: 9999;
+  max-height: 240px;
+  overflow-y: auto;
+  padding: 8px;
+  border: 1px solid var(--builder-ui-border);
+  border-radius: 8px;
+  background: var(--builder-ui-panel-solid);
+  box-shadow: 0 10px 25px rgba(15, 23, 42, .16);
+  color: var(--builder-ui-text);
+}
+
+.builder-global-design-editor .builder-design-font-yootheme-search {
+  width: 100%;
+  min-height: 32px;
+  padding: 6px 8px 6px 28px;
+  border: 1px solid var(--builder-ui-border);
+  border-radius: 6px;
+  background: var(--builder-ui-surface);
+  color: var(--builder-ui-text);
+  outline: none;
+}
+
+.builder-global-design-editor .builder-design-font-yootheme-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 6px 8px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--builder-ui-text);
+  cursor: pointer;
+  font-size: 13px;
+  text-align: left;
+}
+
+.builder-global-design-editor .builder-design-font-yootheme-option:hover,
+.builder-global-design-editor .builder-design-font-yootheme-option.is-selected {
+  background: var(--builder-ui-surface-strong);
+  color: var(--builder-ui-accent);
+  font-weight: 600;
+}
+
+@media (max-width: 560px) {
+  .builder-global-design-editor .builder-design-control {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+
+  .builder-global-design-editor .builder-design-control > input,
+  .builder-global-design-editor .builder-design-control > select,
+  .builder-global-design-editor .builder-design-control > div {
+    grid-column: 1;
+  }
+}
 
 /* WebPages Icon System v1 */
 .webpages-icon {
