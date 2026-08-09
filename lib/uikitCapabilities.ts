@@ -20,7 +20,7 @@ export const UIKIT_CAPABILITIES = {
 
 export const UIKIT_IMAGE_CAPABILITY = {
   properties: {
-    fit: { values: ["contain", "cover", "fill"] as const, owner: "uikit" },
+    fit: { values: ["natural", "contain", "cover", "fill"] as const, owner: "uikit" },
     ratio: { values: ["natural", "square", "4:3", "3:2", "16:9", "portrait"] as const, owner: "uikit" },
     shape: { values: ["none", "rounded", "circle", "pill"] as const, owner: "uikit" },
     shadow: { values: ["none", "small", "medium", "large", "xlarge"] as const, owner: "uikit" },

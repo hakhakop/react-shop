@@ -253,8 +253,9 @@ export function GridCardsClient({
             const mediaAlignment = (item as any).mediaAlignment ?? (block as any).imageAlignment ?? (block as any).gridMediaAlignment ?? "center";
             const mediaStyle = getUikitPanelMediaStyle({
               ratio: isSideMedia ? undefined : (item.mediaRatio ?? block.imageRatio),
-              fit: (item.mediaFit ?? block.imageFit ?? "cover") === "contain" ? "contain" : "cover",
+              fit: item.mediaFit ?? block.imageFit,
               alignment: mediaAlignment,
+              position: (item as any).imagePosition ?? (block as any).imagePosition,
             });
             const hasCropFrame = !imageWidth && !imageHeight && mediaStyle.aspectRatio && mediaStyle.aspectRatio !== "auto";
             const panelLayoutClass = getUikitPanelLayoutClass(mediaPlacement, mediaWidth);
@@ -324,7 +325,8 @@ export function GridCardsClient({
                     width: imageWidth ?? "100%",
                     height: imageHeight === "auto" ? "auto" : imageHeight ?? (hasCropFrame ? "100%" : "auto"),
                     maxWidth: "100%",
-                    objectFit: mediaStyle.backgroundSize as CSSProperties["objectFit"],
+                    objectFit: mediaStyle.objectFit,
+                    objectPosition: mediaStyle.backgroundPosition,
                     borderRadius: isFrameless && isCard ? "4px 4px 0 0" : undefined,
                   }}
                 />

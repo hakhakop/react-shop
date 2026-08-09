@@ -132,7 +132,7 @@
                     "label": "Learn More",
                     "url": "?page_id=20",
                     "target": "_self",
-                    "style": "default"
+                    "style": "outline"
                   }
                 ],
                 "size": "large",
@@ -149,8 +149,7 @@
                   },
                   "effects": {},
                   "card": {}
-                },
-                "buttonStyle": "default"
+                }
               },
               {
                 "id": "yootheme-image-0-0-0-3",
@@ -161,7 +160,6 @@
                 "imageWidth": "600",
                 "imageLoading": "eager",
                 "imageShape": "none",
-                "imageAlignment": "left",
                 "margin": "default",
                 "marginMode": "default",
                 "visibility": "xl",
@@ -188,7 +186,6 @@
                 "imageWidth": "1100",
                 "imageLoading": "eager",
                 "imageShape": "none",
-                "imageAlignment": "left",
                 "margin": "default",
                 "marginMode": "default",
                 "visibility": "m",
@@ -215,7 +212,6 @@
                 "imageWidth": "700",
                 "imageLoading": "eager",
                 "imageShape": "none",
-                "imageAlignment": "left",
                 "margin": "default",
                 "marginMode": "default",
                 "visibility": "xl",
@@ -242,7 +238,6 @@
                 "imageWidth": "950",
                 "imageLoading": "eager",
                 "imageShape": "none",
-                "imageAlignment": "left",
                 "margin": "default",
                 "marginMode": "default",
                 "visibility": "m",
@@ -269,7 +264,6 @@
                 "imageWidth": "600",
                 "imageLoading": "eager",
                 "imageShape": "none",
-                "imageAlignment": "left",
                 "margin": "default",
                 "marginMode": "default",
                 "visibility": "s",
@@ -343,10 +337,7 @@
                     "textAlign": "center"
                   },
                   "effects": {},
-                  "card": {},
-                  "customClass": "uk-disabled",
-                  "customAttributes": "data-yootheme-play=\"true\"\naria-label=\"Play video\"\nonclick=alert(1)",
-                  "customCss": ".el-image {\n  border-radius: 50%;\n  box-shadow: 0 0 0 0 #4C6CD8;\n  transform: scale(1);\n  animation: pulse 2s infinite;\n  margin-top: -42px;\n}\n\n@keyframes pulse {\n  0% {\n    transform: scale(0.95);\n    box-shadow: 0 0 0 0 rgba(76,108,216, 0.8);\n  }\n\n  70% {\n    transform: scale(1);\n    box-shadow: 0 0 0 10px rgba(76,108,216, 0);\n  }\n\n  100% {\n    transform: scale(0.95);\n    box-shadow: 0 0 0 0 rgba(76,108,216, 0);\n  }\n}"
+                  "card": {}
                 }
               }
             ]
@@ -688,6 +679,7 @@
                 "buttonUrl": "#",
                 "buttonStyle": "ghost",
                 "panelVariant": "default",
+                "panelStyle": "default",
                 "panelShowMedia": true,
                 "panelMediaPlacement": "top",
                 "panelMediaWidth": "medium",
@@ -712,17 +704,7 @@
                 "textAlign": "center",
                 "headingAlign": "center",
                 "margin": "medium",
-                "marginMode": "medium",
-                "panelHover": true,
-                "panelSize": "default",
-                "panelMediaAlignment": "center",
-                "panelVerticalAlign": "top",
-                "panelTitleStyle": "inherit",
-                "panelContentWidth": "auto",
-                "panelActionVisible": true,
-                "panelActionStyle": "primary",
-                "panelActionSize": "default",
-                "panelActionAlign": "inherit"
+                "marginMode": "medium"
               }
             ]
           },
@@ -737,7 +719,6 @@
                 "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/home-feature-automate-floating-icon.svg",
                 "imageAlt": "",
                 "imageShape": "none",
-                "imageAlignment": "right",
                 "margin": "default",
                 "marginMode": "default",
                 "animation": {
@@ -768,6 +749,7 @@
                 "buttonUrl": "#",
                 "buttonStyle": "ghost",
                 "panelVariant": "default",
+                "panelStyle": "default",
                 "panelShowMedia": true,
                 "panelMediaPlacement": "top",
                 "panelMediaWidth": "medium",
@@ -792,17 +774,7 @@
                 "textAlign": "center",
                 "headingAlign": "center",
                 "margin": "medium",
-                "marginMode": "medium",
-                "panelHover": true,
-                "panelSize": "default",
-                "panelMediaAlignment": "center",
-                "panelVerticalAlign": "top",
-                "panelTitleStyle": "inherit",
-                "panelContentWidth": "auto",
-                "panelActionVisible": true,
-                "panelActionStyle": "primary",
-                "panelActionSize": "default",
-                "panelActionAlign": "inherit"
+                "marginMode": "medium"
               }
             ]
           },
@@ -817,7 +789,6 @@
                 "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/home-feature-innovate-floating-icon.svg",
                 "imageAlt": "",
                 "imageShape": "none",
-                "imageAlignment": "right",
                 "margin": "default",
                 "marginMode": "default",
                 "animation": {
@@ -848,6 +819,7 @@
                 "buttonUrl": "#",
                 "buttonStyle": "ghost",
                 "panelVariant": "default",
+                "panelStyle": "default",
                 "panelShowMedia": true,
                 "panelMediaPlacement": "top",
                 "panelMediaWidth": "medium",
@@ -872,17 +844,7 @@
                 "textAlign": "center",
                 "headingAlign": "center",
                 "margin": "medium",
-                "marginMode": "medium",
-                "panelHover": true,
-                "panelSize": "default",
-                "panelMediaAlignment": "center",
-                "panelVerticalAlign": "top",
-                "panelTitleStyle": "inherit",
-                "panelContentWidth": "auto",
-                "panelActionVisible": true,
-                "panelActionStyle": "primary",
-                "panelActionSize": "default",
-                "panelActionAlign": "inherit"
+                "marginMode": "medium"
               }
             ]
           }
@@ -1195,7 +1157,6 @@
                 "imageMaxWidth": 1000,
                 "imageWidth": "1000",
                 "imageShape": "none",
-                "imageAlignment": "left",
                 "margin": "default",
                 "marginMode": "default",
                 "visibility": "xl",
@@ -1334,9 +1295,7 @@
                   },
                   "effects": {},
                   "card": {}
-                },
-                "buttonStyle": "default",
-                "size": "default"
+                }
               }
             ]
           },
@@ -1556,7 +1515,6 @@
                 "imageMaxWidth": 800,
                 "imageWidth": "800",
                 "imageShape": "none",
-                "imageAlignment": "left",
                 "margin": "default",
                 "marginMode": "default",
                 "visibility": "xl",
@@ -1700,7 +1658,7 @@
                     "label": "Visit Our Blog",
                     "url": "?post_type=post",
                     "target": "_self",
-                    "style": "default"
+                    "style": "ghost"
                   }
                 ],
                 "textAlign": "center",
@@ -1717,9 +1675,7 @@
                   },
                   "effects": {},
                   "card": {}
-                },
-                "buttonStyle": "default",
-                "size": "default"
+                }
               },
               {
                 "id": "yootheme-grid-6-0-0-3",
@@ -1797,7 +1753,7 @@
         ]
       }
     ],
-    "updatedAt": "2026-08-09T12:10:17.321Z"
+    "updatedAt": "2026-08-09T10:50:45.109Z"
   },
   "shop": {
     "version": 1,

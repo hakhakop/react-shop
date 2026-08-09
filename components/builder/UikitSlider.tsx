@@ -82,7 +82,7 @@ export default function UikitSlider({ block, panelMode = false, shellSettings }:
         imageWidth: rawCarouselSettings.imageWidth,
         imageHeight: rawCarouselSettings.imageHeight,
         imageRatio: rawCarouselSettings.imageRatio ?? "natural",
-        imageFit: rawCarouselSettings.imageFit ?? "cover",
+        imageFit: rawCarouselSettings.imageFit ?? "natural",
         imageShape: rawCarouselSettings.imageShape ?? "none",
         imageShadow: rawCarouselSettings.imageShadow ?? "none",
         imageLoading: rawCarouselSettings.imageLoading ?? "lazy",
@@ -119,7 +119,7 @@ export default function UikitSlider({ block, panelMode = false, shellSettings }:
           : resolveString(slide.imageRatio, shellSettings?.imageDefaultRatio, "natural"),
         imageFit: panelMode
           ? slide.imageFit ?? panelShared?.imageFit
-          : resolveString(slide.imageFit, shellSettings?.imageDefaultFit, "cover"),
+          : resolveString(slide.imageFit, shellSettings?.imageDefaultFit, "natural"),
         imageShape: panelMode
           ? slide.imageShape ?? panelShared?.imageShape
           : resolveString(

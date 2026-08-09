@@ -140,6 +140,10 @@ export type BuilderVisualStyle = {
   visibility?: BuilderVisibilityStyle;
   card?: BuilderCardPartStyle;
   customClass?: string;
+  /** Canonical element-level Advanced attributes, one name/value pair per line. */
+  customAttributes?: string;
+  /** Canonical element-level CSS, scoped by the shared element shell. */
+  customCss?: string;
 };
 
 export function hasBuilderVisualSpacing(sides?: BuilderSpacingSides) {

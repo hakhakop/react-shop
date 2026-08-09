@@ -192,6 +192,26 @@ const sourcePathId = (path: string, kind: string): string =>
 const sourceAlignment = (value: unknown): "left" | "center" | "right" | undefined =>
   value === "left" || value === "center" || value === "right" ? value : undefined;
 
+/**
+ * An absolutely positioned YOOtheme image is offset as an image-sized box.
+ * WebPages keeps Position/Offsets on the Phase 3 shell, so its media child
+ * must use the corresponding edge as its anchor when no explicit alignment
+ * was authored. This avoids centering a 600px decoration inside a full-width
+ * positioned shell.
+ */
+const sourceImageAlignment = (
+  props: Record<string, unknown>,
+  fallback?: unknown,
+): "left" | "center" | "right" | undefined => {
+  const explicit = sourceAlignment(props.text_align);
+  if (explicit) return explicit;
+  if (sourcePosition(props.position) === "absolute") {
+    if (asString(props.position_right) !== null) return "right";
+    if (asString(props.position_left) !== null) return "left";
+  }
+  return sourceAlignment(fallback);
+};
+
 const sourcePosition = (
   value: unknown,
 ): NonNullable<NonNullable<BuilderVisualStyle>["layout"]>["position"] => {
@@ -274,8 +294,11 @@ const sourceGeneralVisualStyle = (
   const visibilityMode = sourceVisibility(props.visibility);
   const animation = sourceAnimation(props.animation);
   const blendWithPage = props.blend === true || props.blend === "true";
+  const customClass = asString(props.class);
+  const customAttributes = asString(props.attributes) ?? asString(props.attrs);
+  const customCss = asString(props.css);
 
-  if (!position && !top && !right && !bottom && !left && zIndex === undefined && !marginMode && !maxWidth && !blockAlign && !textAlign && !visibilityMode && !animation && !blendWithPage && !props.margin_remove_top && !props.margin_remove_bottom) {
+  if (!position && !top && !right && !bottom && !left && zIndex === undefined && !marginMode && !maxWidth && !blockAlign && !textAlign && !visibilityMode && !animation && !blendWithPage && !customClass && !customAttributes && !customCss && !props.margin_remove_top && !props.margin_remove_bottom) {
     return undefined;
   }
 
@@ -302,6 +325,9 @@ const sourceGeneralVisualStyle = (
       ...(visibilityMode ? { visibilityMode } : {}),
     },
     ...(maxWidth ? { effects: { maxWidth } } : {}),
+    ...(customClass ? { customClass } : {}),
+    ...(customAttributes ? { customAttributes } : {}),
+    ...(customCss ? { customCss } : {}),
   };
 };
 
@@ -584,6 +610,7 @@ const sourceGridItem = (
   warnings: string[],
 ): NonNullable<BuilderLayoutBlock["gridItems"]>[number] => {
   const props = sourceProps(node);
+  const media = normalizeYoothemeMedia({ ...parentProps, ...props });
   const panelStyle = sourcePanelStyle(props.panel_style ?? parentProps.panel_style);
   if (Object.prototype.hasOwnProperty.call(props, "image") && !resolveYoothemeAssetUrl(props.image)) {
     warnings.push(`${path}: image asset could not be resolved and was left empty.`);
@@ -606,7 +633,8 @@ const sourceGridItem = (
     renderer: panelStyle ? "card" : "plain",
     cardVariant: sourceCardVariant(props.panel_style ?? parentProps.panel_style),
     mediaPlacement: props.image_align === "left" || props.image_align === "right" ? props.image_align : "top",
-    mediaFit: props.image_fit === "contain" ? "contain" : "cover",
+    mediaFit: media.imageFit ?? "natural",
+    imagePosition: media.imagePosition,
     textAlign: sourceAlignment(props.text_align ?? parentProps.text_align),
     titleElement: sourceHeadingLevel(props.title_element ?? parentProps.title_element) as "h2" | "h3" | "h4" | "div" | undefined,
     titleStyle: sourceHeadingSize(props.title_style ?? parentProps.title_style) as "inherit" | "h3" | "h4" | "h5" | undefined,
@@ -632,6 +660,7 @@ const sourceSliderItem = (
     imageFit: media.imageFit,
     imageRatio: media.imageRatio,
     imageAlignment: media.imageAlignment,
+    imagePosition: media.imagePosition,
     imageLoading: media.imageLoading,
     headingLevel: sourceHeadingLevel(props.title_element) ?? "h3",
     metaStyle: sourceTextVariant(props.meta_style) ?? "muted",
@@ -742,15 +771,16 @@ const mapStaticElement = (
       kind: "image",
       imageUrl: resolveYoothemeAssetUrl(props.image),
       imageAlt: asString(props.image_alt) ?? asString(props.alt) ?? "",
+      // Retained only as a read-compatible alias for documents that predate
+      // canonical imageWidth. The resolver prefers imageWidth.
       imageMaxWidth: sourceImageMaxWidth(props),
-      imageWidth: "auto",
       ...media,
       imageLinkUrl: asString(props.link) ?? undefined,
       imageLinkTarget: props.link ? linkTarget : undefined,
       imageShape: props.image_border === "rounded" || props.image_border === "circle" || props.image_border === "pill"
         ? props.image_border
         : "none",
-      imageAlignment: sourceAlignment(props.text_align) ?? media.imageAlignment,
+      imageAlignment: sourceImageAlignment(props, media.imageAlignment),
     }, props);
   }
 
@@ -765,8 +795,8 @@ const mapStaticElement = (
     warnUnsupported(path, props, [
       "block_align", "grid_column_gap", "grid_default", "grid_medium", "grid_small",
       "grid_row_gap", "grid_divider", "grid_column_align", "grid_row_align",
-      "image_align", "image_width", "image_height", "image_loading", "image_border",
-      "image_box_shadow", "image_box_decoration", "image_transition", "link_image",
+      "image_align", "image_width", "image_height", "image_position", "image_fit", "image_ratio", "image_loading", "image_border",
+      "image_box_shadow", "image_box_decoration", "image_transition", "link_image", "image_grid_width",
       "link_style", "link_text", "meta_style", "panel_padding", "panel_style",
       "show_content", "show_image", "show_link", "show_meta", "show_title", "text_align",
       "title_element", "title_style", "title_align", "meta_align", "meta_element",
@@ -798,9 +828,8 @@ const mapStaticElement = (
       columnsPhoneLandscape: typeof props.grid_small === "string" ? props.grid_small : undefined,
       columnsDesktop: typeof props.grid_medium === "string" ? props.grid_medium : undefined,
       gridMediaWidth: props.image_grid_width === "1-3" ? "small" : props.image_grid_width === "1-2" ? "medium" : "large",
+      ...normalizeYoothemeMedia(props),
       imageMaxWidth: sourceImageMaxWidth(props),
-      imageHeight: asString(props.image_height) as any,
-      imageLoading: props.image_loading === true ? "eager" : "lazy",
       imageBorder: asString(props.image_border) ?? "none",
       imageBoxShadow: asString(props.image_box_shadow) ?? "none",
       imageBoxDecoration: asString(props.image_box_decoration) ?? "none",

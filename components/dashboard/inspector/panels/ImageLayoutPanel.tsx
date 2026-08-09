@@ -19,7 +19,7 @@ export default function ImageLayoutPanel() {
           <InspectorGroupSummary
             title="Image Styling"
             description="Control the selected image crop, fit, and corner shape."
-            meta={`${block.imageRatio ?? "auto"} · ${block.imageFit ?? "cover"}`}
+            meta={`${block.imageRatio ?? "auto"} · ${block.imageFit ?? "natural"}`}
           />
         </summary>
         <div className="builder-inspector-section">
@@ -44,8 +44,9 @@ export default function ImageLayoutPanel() {
             <label className="builder-field">
               <span>Image Fit</span>
               <InspectorChoiceGroup
-                value={block.imageFit ?? "cover"}
+                value={block.imageFit ?? "natural"}
                 options={[
+                  { label: "Natural", value: "natural" },
                   { label: "Cover", value: "cover" },
                   { label: "Contain", value: "contain" },
                   { label: "Fill", value: "fill" },

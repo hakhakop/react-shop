@@ -127,6 +127,7 @@ import UikitGallery from "@/components/builder/UikitGallery";
 import UikitHeading from "@/components/builder/UikitHeading";
 import UikitIcon from "@/components/builder/UikitIcon";
 import UikitImage from "@/components/builder/UikitImage";
+import { ElementAdvancedStyle } from "@/components/builder/ElementAdvancedStyle";
 import UikitList from "@/components/builder/UikitList";
 import UikitTable from "@/components/builder/UikitTable";
 import UikitSlider from "@/components/builder/UikitSlider";
@@ -157,6 +158,7 @@ import {
   getUikitPanelLayoutClass,
   getUikitPanelMediaStyle,
 } from "@/lib/uikitTokens";
+import { elementAdvancedScope, parseSafeElementAttributes, resolveElementAdvanced } from "@/lib/elementAdvanced";
 import { resolveSectionBackground, sectionBackgroundClass } from "@/lib/semanticBackgrounds";
 import {
   getUikitColumnWidthClass,
@@ -1465,7 +1467,7 @@ function normalizeBuilderState(
               panelSize,
               panelShowMedia: block.panelShowMedia ?? true,
               panelMediaPlacement: block.panelMediaPlacement === "left" || block.panelMediaPlacement === "right" ? block.panelMediaPlacement : "top",
-              panelMediaFit: (block.imageFit ?? block.panelMediaFit) === "contain" ? "contain" : "cover",
+              panelMediaFit: block.imageFit ?? block.panelMediaFit,
               panelMediaWidth: block.panelMediaWidth === "small" || block.panelMediaWidth === "large" ? block.panelMediaWidth : "medium",
               panelMediaAlignment: (block.imageAlignment ?? block.panelMediaAlignment) === "left" || (block.imageAlignment ?? block.panelMediaAlignment) === "right" ? (block.imageAlignment ?? block.panelMediaAlignment) : "center",
               panelTextAlign: block.panelTextAlign === "center" || block.panelTextAlign === "right" ? block.panelTextAlign : "left",
@@ -14505,6 +14507,7 @@ function PreviewSection({
                         data-builder-section-id={section.id}
                         data-builder-column-key={columnKey}
                         data-builder-block-key={blockKey}
+                        data-builder-element-scope={elementAdvancedScope(block)}
                         data-builder-interaction-state={blockInteractionState}
                         draggable
                         onMouseEnter={() =>
@@ -14592,6 +14595,7 @@ function PreviewSection({
                           } as CSSProperties
                         }
                         {...blockAnimationAttrs.data}
+                        {...parseSafeElementAttributes(resolveElementAdvanced(block).customAttributes)}
                         onMouseDown={(event) => {
                           event.stopPropagation();
                           onSelectBlock(section.id, columnKey, blockKey);
@@ -14744,6 +14748,7 @@ function PreviewSection({
                           onBlockDragEnd();
                         }}
                       >
+                        <ElementAdvancedStyle block={block} />
                         {blockChrome.showSpacing && (
                           <BoxSpacingOverlay
                             kind="element"
@@ -15119,7 +15124,7 @@ function PreviewSection({
                             } as React.CSSProperties;
 
                             const panelMediaPlacement = block.panelMediaPlacement ?? "top";
-                            const panelMediaPresentation = getUikitPanelMediaStyle({ ratio: block.imageRatio, fit: (block.imageFit ?? block.panelMediaFit) === "contain" ? "contain" : "cover", alignment: block.imageAlignment ?? block.panelMediaAlignment ?? "center" });
+                            const panelMediaPresentation = getUikitPanelMediaStyle({ ratio: block.imageRatio, fit: block.imageFit ?? block.panelMediaFit, alignment: block.imageAlignment ?? block.panelMediaAlignment ?? "center", position: (block as any).imagePosition });
                             const panelMediaClass = getUikitPanelMediaClass(panelMediaPlacement);
                             const panelLayoutClass = getUikitPanelLayoutClass(panelMediaPlacement, block.panelMediaWidth ?? "medium");
                             const panelImageDimension = (value: unknown) => value === undefined || value === null || value === "" ? undefined : /^-?\d+(?:\.\d+)?$/.test(String(value)) ? `${value}px` : String(value);
@@ -15148,7 +15153,7 @@ function PreviewSection({
                                     backgroundPosition: panelMediaPresentation.backgroundPosition,
                                     width: panelImageDimension((block as any).imageWidth) ?? "100%",
                                     maxWidth: typeof (block as any).imageMaxWidth === "number" ? `${(block as any).imageMaxWidth}px` : undefined,
-                                    maxHeight: panelImageDimension((block as any).imageHeight),
+                                    height: panelImageDimension((block as any).imageHeight),
                                     borderRadius: panelImageRadius,
                                     ...(!isPanelImagePlaceholder
                                       ? { backgroundImage: `url(${block.imageUrl})` }
@@ -15604,8 +15609,9 @@ function PreviewSection({
                                         const mediaAlignment = (item as any).mediaAlignment ?? block.gridMediaAlignment ?? "center";
                                         const mediaStyle = getUikitPanelMediaStyle({
                                           ratio: isSideMedia ? undefined : (item.mediaRatio ?? block.imageRatio),
-                                          fit: (item.mediaFit ?? block.imageFit ?? "cover") === "contain" ? "contain" : "cover",
+                                          fit: item.mediaFit ?? block.imageFit,
                                           alignment: mediaAlignment,
+                                          position: (item as any).imagePosition ?? (block as any).imagePosition,
                                         });
                                         const mediaClass = isFrameless ? getUikitPanelMediaClass(mediaPlacement === "left" || mediaPlacement === "right" ? mediaPlacement : "top") : "";
                                         const imageMarginTopClass = (rawGridBlock.imageMarginTop && rawGridBlock.imageMarginTop !== "none" && rawGridBlock.imageMarginTop !== "default") ? `uk-margin-${rawGridBlock.imageMarginTop}` : "";
@@ -15654,13 +15660,15 @@ function PreviewSection({
                                                   }
                                                   width={420}
                                                   height={420}
+                                                  loading={rawGridBlock.imageLoading === "eager" || rawGridBlock.imageLoading === true ? "eager" : "lazy"}
                                                   className={`${rawGridBlock.imageHoverTransition && rawGridBlock.imageHoverTransition !== "none" ? `uk-transition-${rawGridBlock.imageHoverTransition} uk-transition-opaque` : ""}`.trim()}
                                                   style={{
                                                     position: "relative",
                                                     width: imageWidth ?? "100%",
                                                     height: imageHeight === "auto" ? "auto" : imageHeight ?? (hasCropFrame ? "100%" : "auto"),
                                                     maxWidth: "100%",
-                                                    objectFit: mediaStyle.backgroundSize as React.CSSProperties["objectFit"],
+                                                    objectFit: mediaStyle.objectFit,
+                                                    objectPosition: mediaStyle.backgroundPosition,
                                                   }}
                                                 />
                                                 {block.gridSource !==

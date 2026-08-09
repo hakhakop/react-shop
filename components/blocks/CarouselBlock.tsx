@@ -80,6 +80,7 @@ export type CarouselSlide = {
   imageShape?: string | null;
   imageShadow?: string | null;
   imageAlignment?: string | null;
+  imagePosition?: string | null;
   imageLoading?: "lazy" | "eager" | string | null;
   imageWidth?: string | null;
   imageHeight?: string | number | null;
@@ -486,6 +487,7 @@ export default function CarouselBlock({
               imageShape: slide.imageShape ?? undefined,
               imageShadow: slide.imageShadow ?? undefined,
               imageAlignment: slide.imageAlignment ?? undefined,
+              imagePosition: slide.imagePosition ?? undefined,
               imageWidth: slide.imageWidth ?? undefined,
               imageBorder: slide.imageBorder ?? undefined,
               imageBoxShadow: slide.imageBoxShadow ?? undefined,
@@ -493,11 +495,14 @@ export default function CarouselBlock({
             const itemImageStyle = getUikitImageStyle(itemImage);
             const itemMediaStyle = getUikitPanelMediaStyle({
               ratio: itemImage.ratio,
-              fit: itemImage.fit === "contain" ? "contain" : "cover",
+              fit: itemImage.fit === "cover" || itemImage.fit === "contain" || itemImage.fit === "fill"
+                ? itemImage.fit
+                : "natural",
               alignment:
                 itemImage.alignment === "left" || itemImage.alignment === "center" || itemImage.alignment === "right"
                   ? itemImage.alignment
                   : undefined,
+              position: itemImage.position,
             });
             const ItemTitle = (slide.headingLevel ?? headingLevel ?? "h3") as React.ElementType;
             const itemTitleClass = getUikitHeadingClass(

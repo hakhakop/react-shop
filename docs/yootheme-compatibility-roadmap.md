@@ -196,18 +196,17 @@ behavior was added.
 - **Explicit unsupported:** a font without a registered, permitted source or weight variant; arbitrary inline source CSS and transform behavior remain General/Advanced exclusions.
 - **Acceptance evidence:** `tests/fixtures/typography-acceptance.json` imports a Heading with 3X-Large/Primary/Secondary/`div` semantics and a Text element with Lead/Primary/drop-cap/two-column/divider/small-breakpoint/`aside` semantics. `tests/typography-element-acceptance.spec.ts` installs it through the normal importer/API, changes Global Heading and Primary families to visibly distinct registered fonts, verifies the imported Primary override in Builder and storefront, then removes that local role and verifies Heading Global resumes identically. It also verifies tags, classes, responsive columns, and Builder/storefront computed parity before restoring all data. Live YOOtheme and WebPages Heading/Text inspector comparison confirmed comparable screen and Title/Text-group order.
 
-### 5. Image / Media / Positioning — PARTIAL
+### 5. Image / Media / Positioning — PARTIAL (reopened for hero composition acceptance)
 
 - **YOOtheme semantics:** `image_width`, `image_height`, ratio, fit, focal/position, loading, border, shadow, decoration, alignment, image-grid width/breakpoint, inline SVG/color/strokes, image link/modal/lightbox, hover image/video, media position.
-- **Compatibility note:** WebPages currently defaults Image Fit to `cover`; the live YOOtheme Image inspector does not expose an equivalent default behavior. This remains a Phase 5 implementation decision and is intentionally not changed during Phase 3 regression work.
-- **Existing owners:** `resolveUikitImageSemantics`, image inspector/style controls, `UikitImage`, panel/grid/slider media adapters.
-- **Missing capability:** one responsive media-width contract; focal position; safe inline SVG/color; canonical lightbox; hover-media/video asset model; shared media dimensions in all active renderers.
-- **Inspector/UI:** Image Settings must be the canonical surface; Grid/Panel/Slider expose adapters to the same fields, not duplicate media systems.
-- **Import mapping:** map supported dimensions/fit/ratio/alignment/loading/link into shared media fields; element adapters only translate storage shape.
-- **Builder/frontend:** standalone image, GridCards, Panel, and Carousel must resolve the same media semantics and dimensions.
+- **Compatibility resolution:** the implicit historic `cover` default is migrated once to canonical `natural`; an explicit modern Cover setting is preserved. Natural uses the browser’s non-cropping baseline, so an imported image is not silently framed or cropped.
+- **Canonical owner:** `resolveUikitImageSemantics` / `getUikitImageStyle`, with `ImageSettingsGroup` as the one inspector surface. `UikitImage`, `GridCardsClient`, Panel, and Carousel consume that contract through narrow adapters; General element positioning remains Phase 3 ownership.
+- **Inspector/UI:** Image Settings provides Width, Height, Ratio, Fit (Natural / Cover / Contain / Fill), Focal Point, Loading, Border, Box Shadow, Decoration, Link, and Alignment. The legacy Image Layout surface uses the same Natural default.
+- **Import mapping:** `image_width`, `image_height`, `image_fit`, `image_ratio`, `image_position`, `image_align`, and `image_loading` normalize into `image*` fields. Grid width normalizes to the existing `gridMediaWidth` adapter; legacy `imageMaxWidth` remains read-compatible only.
+- **Builder/frontend:** standalone Image, Grid, Panel, and Panel Slider use shared dimension, focal, loading, and natural-fit semantics. Their active Builder and storefront paths were verified together.
 - **Inheritance:** global media defaults apply where the element has no explicit override.
-- **Explicit unsupported:** inline SVG manipulation, hover video, and modal/lightbox until a shared asset/interaction contract exists.
-- **Acceptance:** import fixture media, change width/fit/ratio/alignment in the canonical inspector, and observe matching layout changes in all relevant consumers and frontend.
+- **Explicit unsupported:** inline SVG manipulation/color/stroke animation; hover image/video asset switching; modal/lightbox links; and responsive `image_grid_breakpoint`. They stay importer warnings because WebPages has no safe shared asset/interaction or responsive-media-width owner yet.
+- **Reopened acceptance:** the previous fixture only proved stored dimensions/non-cropping behavior. It did not prove imported DevStack hero composition: media-sized absolute anchors, main-image aspect presentation, play-control placement, and decorative image scale/placement must be compared visually in the live YOOtheme and WebPages fixture. Standalone Image Settings must also follow the live YOOtheme Content/Settings separation: Width/Height are Content controls; Focal Point, Loading, Border, Shadow, and Decoration remain Settings; WebPages-only framing controls must not appear as fake YOOtheme Settings controls.
 
 ### 6. Button / Links — PARTIAL
 

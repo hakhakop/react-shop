@@ -19,6 +19,7 @@ import UikitGallery from "@/components/builder/UikitGallery";
 import UikitHeading from "@/components/builder/UikitHeading";
 import UikitIcon from "@/components/builder/UikitIcon";
 import UikitImage from "@/components/builder/UikitImage";
+import { ElementAdvancedStyle } from "@/components/builder/ElementAdvancedStyle";
 import UikitList from "@/components/builder/UikitList";
 import UikitTable from "@/components/builder/UikitTable";
 import UikitSlider from "@/components/builder/UikitSlider";
@@ -111,6 +112,7 @@ import {
   getUikitPanelLayoutClass,
   getUikitPanelMediaStyle,
 } from "@/lib/uikitTokens";
+import { elementAdvancedScope, parseSafeElementAttributes, resolveElementAdvanced } from "@/lib/elementAdvanced";
 import { getUikitColumnWidthClass } from "@/lib/uikitLayoutEngine";
 import {
   resolveBuilderSpacing,
@@ -2152,7 +2154,7 @@ export function ContentLayoutBlock({
       maxWidth: "var(--builder-card-content-max-width, none)",
     } as CSSProperties;
     const panelMediaPlacement = block.panelMediaPlacement ?? "top";
-    const panelMediaPresentation = getUikitPanelMediaStyle({ ratio: block.imageRatio, fit: (block.imageFit ?? block.panelMediaFit) === "contain" ? "contain" : "cover", alignment: block.imageAlignment ?? block.panelMediaAlignment ?? "center" });
+    const panelMediaPresentation = getUikitPanelMediaStyle({ ratio: block.imageRatio, fit: block.imageFit ?? block.panelMediaFit, alignment: block.imageAlignment ?? block.panelMediaAlignment ?? "center", position: (block as any).imagePosition });
     const panelMediaClass = getUikitPanelMediaClass(panelMediaPlacement);
     const panelLayoutClass = getUikitPanelLayoutClass(panelMediaPlacement, block.panelMediaWidth ?? "medium");
     const panelImageDimension = (value: unknown) => value === undefined || value === null || value === "" ? undefined : /^-?\d+(?:\.\d+)?$/.test(String(value)) ? `${value}px` : String(value);
@@ -2181,7 +2183,7 @@ export function ContentLayoutBlock({
               backgroundPosition: panelMediaPresentation.backgroundPosition,
               width: panelImageDimension((block as any).imageWidth) ?? "100%",
               maxWidth: typeof (block as any).imageMaxWidth === "number" ? `${(block as any).imageMaxWidth}px` : undefined,
-              maxHeight: panelImageDimension((block as any).imageHeight),
+              height: panelImageDimension((block as any).imageHeight),
               borderRadius: panelImageRadius,
               ...(block.imageUrl ? { backgroundImage: `url(${block.imageUrl})` } : {}),
             }}
@@ -2482,6 +2484,7 @@ function blockShellClassName(block: BuilderLayoutBlock) {
   const legacySurfaceClass = ["panel", "grid", "hero"].includes(block.kind ?? "")
     ? ""
     : `shop-card-preset--${block.panelStyle ?? "default"}`;
+  const advancedClass = resolveElementAdvanced(block).customClass ?? "";
   return `${uikitMarginClass} shop-builder-element-shell ${legacySurfaceClass} is-padding-${
     hasBuilderVisualSpacing(
       (block.visualStyle as BuilderVisualStyle | undefined)?.padding,
@@ -2492,7 +2495,7 @@ function blockShellClassName(block: BuilderLayoutBlock) {
         : "none"
   } is-align-${
     block.elementAlign ?? "left"
-  } ${visualClass} ${animationClassName(block.animation)} ${premiumCardClass}`.trim();
+  } ${visualClass} ${advancedClass} ${animationClassName(block.animation)} ${premiumCardClass}`.trim();
 }
 
 const HAS_RICH_TEXT_HTML = /<[a-z][\s\S]*>/i;
@@ -2801,13 +2804,16 @@ function ContentLayoutSection({
                       <div
                         key={block.id ?? blockIndex}
                         data-builder-block-id={block.id}
+                        data-builder-element-scope={elementAdvancedScope(block)}
                         className={blockShellClassName(block)}
                         style={{
                           ...blockSurfaceStyle(block, rowColorScheme),
                           ...blockAnimationAttrs.style,
                         }}
                         {...blockAnimationAttrs.data}
+                        {...parseSafeElementAttributes(resolveElementAdvanced(block).customAttributes)}
                       >
+                        <ElementAdvancedStyle block={block} />
                         <ContentLayoutBlock
                           block={block}
                           product={product}

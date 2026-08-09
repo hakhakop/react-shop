@@ -1,0 +1,89 @@
+{
+  "type": "layout",
+  "children": [
+    {
+      "type": "section",
+      "name": "Media acceptance",
+      "children": [
+        {
+          "type": "row",
+          "children": [
+            {
+              "type": "column",
+              "children": [
+                {
+                  "type": "image",
+                  "props": {
+                    "image": "/wp-content/uploads/yootheme/home-hero.jpg",
+                    "image_alt": "Standalone canonical media",
+                    "image_width": "360",
+                    "image_height": "180",
+                    "image_position": "bottom-right",
+                    "image_loading": true
+                  }
+                },
+                {
+                  "type": "image",
+                  "props": {
+                    "image": "/uploads/builder/0-02-05-8001443a8fbe13329b3510ac8579d1617c3ea156-mp47gwbq.jpg",
+                    "image_alt": "Width-only intrinsic media",
+                    "image_width": "750",
+                    "image_loading": "eager"
+                  }
+                },
+                {
+                  "type": "grid",
+                  "props": {
+                    "image_width": "320",
+                    "image_height": "160",
+                    "image_position": "top-left",
+                    "image_loading": "eager",
+                    "image_grid_width": "1-2"
+                  },
+                  "children": [
+                    {
+                      "type": "grid_item",
+                      "props": {
+                        "title": "Grid canonical media",
+                        "image": "/wp-content/uploads/yootheme/home-hero.jpg"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "type": "panel",
+                  "props": {
+                    "title": "Panel canonical media",
+                    "content": "Panel media uses the same natural-fit default.",
+                    "image": "/wp-content/uploads/yootheme/home-hero.jpg",
+                    "image_width": "300",
+                    "image_height": "150",
+                    "image_position": "bottom-left",
+                    "image_loading": "eager"
+                  }
+                },
+                {
+                  "type": "overlay-slider",
+                  "props": {},
+                  "children": [
+                    {
+                      "type": "overlay-slider_item",
+                      "props": {
+                        "title": "Slider canonical media",
+                        "image": "/wp-content/uploads/yootheme/home-hero.jpg",
+                        "image_width": "280",
+                        "image_height": "140",
+                        "image_position": "top-right",
+                        "image_loading": "eager"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

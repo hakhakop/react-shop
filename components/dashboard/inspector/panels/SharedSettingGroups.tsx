@@ -430,6 +430,8 @@ export function ImageSettingsGroup({
   update,
   showFrameless = false,
   showLinkImage = false,
+  showDimensions = true,
+  showFrameControls = true,
   keys = {
     width: "imageWidth",
     height: "imageHeight",
@@ -448,6 +450,10 @@ export function ImageSettingsGroup({
   showFrameless?: boolean;
   /** Exposes the canonical `linkImage` behavior when the parent provides a link URL. */
   showLinkImage?: boolean;
+  /** Image Content owns source dimensions in the standalone YOOtheme UI. */
+  showDimensions?: boolean;
+  /** Ratio/Fit are WebPages framing behavior, not YOOtheme Image Settings. */
+  showFrameControls?: boolean;
   keys?: {
     width: string;
     height: string;
@@ -472,7 +478,7 @@ export function ImageSettingsGroup({
 
   return (
     <InspectorDivision title="IMAGE">
-      <div className="builder-two-column" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
+      {showDimensions && <div className="builder-two-column" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
         <InspectorFieldRow
           label="Width"
           isOverridden={values[keys.width] !== undefined}
@@ -497,9 +503,9 @@ export function ImageSettingsGroup({
             onChange={(val) => update({ [keys.height]: val || undefined })}
           />
         </InspectorFieldRow>
-      </div>
+      </div>}
 
-      <InspectorFieldRow
+      {showFrameControls && <InspectorFieldRow
         label="Ratio"
         isOverridden={values[ratioKey] !== undefined && values[ratioKey] !== "natural"}
         inheritedValueText="Natural"
@@ -517,22 +523,47 @@ export function ImageSettingsGroup({
           ]}
           onChange={(value) => update({ [ratioKey]: value })}
         />
-      </InspectorFieldRow>
+      </InspectorFieldRow>}
 
-      <InspectorFieldRow
+      {showFrameControls && <InspectorFieldRow
         label="Fit"
         isOverridden={values[fitKey] !== undefined}
-        inheritedValueText="Cover"
+        inheritedValueText="Natural"
         onReset={() => update({ [fitKey]: undefined })}
       >
         <InspectorSegmentedControl
-          value={String(values[fitKey] ?? "cover")}
+          value={String(values[fitKey] ?? "natural")}
           options={[
+            { value: "natural", label: "Natural" },
             { value: "cover", label: "Cover" },
             { value: "contain", label: "Contain" },
             { value: "fill", label: "Fill" },
           ]}
           onChange={(value) => update({ [fitKey]: value })}
+        />
+      </InspectorFieldRow>}
+
+      <InspectorFieldRow
+        label="Focal Point"
+        isOverridden={values.imagePosition !== undefined}
+        inheritedValueText="Center Center"
+        onReset={() => update({ imagePosition: undefined })}
+      >
+        <InspectorSelect
+          value={String(values.imagePosition ?? "center")}
+          options={[
+            { value: "top-left", label: "Top Left" },
+            { value: "top-center", label: "Top Center" },
+            { value: "top-right", label: "Top Right" },
+            { value: "center-left", label: "Center Left" },
+            { value: "center", label: "Center Center" },
+            { value: "center-right", label: "Center Right" },
+            { value: "bottom-left", label: "Bottom Left" },
+            { value: "bottom-center", label: "Bottom Center" },
+            { value: "bottom-right", label: "Bottom Right" },
+          ]}
+          onChange={(value) => update({ imagePosition: value === "center" ? undefined : value })}
+          ariaLabel="Image focal point"
         />
       </InspectorFieldRow>
 

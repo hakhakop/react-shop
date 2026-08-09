@@ -53,6 +53,24 @@ export default function ImageCapabilityPanel({ block, tab, shellSettings, update
               ariaLabel="Image Alt Text"
             />
           </InspectorFieldRow>
+          <div className="builder-two-column" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
+            <InspectorFieldRow label="Width">
+              <InspectorTextField
+                value={String(image.imageWidth ?? "")}
+                placeholder="auto"
+                onChange={(value) => update({ imageWidth: value || undefined })}
+                ariaLabel="Image width"
+              />
+            </InspectorFieldRow>
+            <InspectorFieldRow label="Height">
+              <InspectorTextField
+                value={String(image.imageHeight ?? "")}
+                placeholder="auto"
+                onChange={(value) => update({ imageHeight: value || undefined })}
+                ariaLabel="Image height"
+              />
+            </InspectorFieldRow>
+          </div>
           <InspectorFieldRow label="Caption">
             <InspectorTextField
               value={image.imageCaption ?? ""}
@@ -130,7 +148,7 @@ export default function ImageCapabilityPanel({ block, tab, shellSettings, update
   // SETTINGS TAB (Default)
   return (
     <div className="builder-inspector-stack" data-uikit-capability="image-style">
-      <ImageSettingsGroup block={block} update={update} />
+      <ImageSettingsGroup block={block} update={update} showDimensions={false} showFrameControls={false} />
     </div>
   );
 }

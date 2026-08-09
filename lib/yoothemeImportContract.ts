@@ -119,20 +119,21 @@ export function normalizeYoothemeSection(props: Record<string, unknown>): Partia
   };
 }
 
-export function normalizeYoothemeMedia(props: Record<string, unknown>): Partial<Pick<BuilderLayoutBlock, "imageFit" | "imageRatio" | "imageAlignment" | "imageLoading">> {
+export function normalizeYoothemeMedia(props: Record<string, unknown>): Partial<Pick<BuilderLayoutBlock, "imageFit" | "imageRatio" | "imageAlignment" | "imagePosition" | "imageLoading" | "imageWidth" | "imageHeight">> {
   const width = string(props.image_width);
   const height = string(props.image_height);
   const ratio = string(props.image_ratio);
   const fit = string(props.image_fit);
   const position = string(props.image_position);
+  const alignment = string(props.image_align);
   return {
+    ...(width ? { imageWidth: width } : {}),
+    ...(height ? { imageHeight: height } : {}),
     ...(fit === "contain" || fit === "cover" || fit === "fill" ? { imageFit: fit } : {}),
     ...(ratio === "auto" || ratio === "square" || ratio === "4:5" || ratio === "3:4" || ratio === "16:9" ? { imageRatio: ratio } : {}),
-    ...(position === "left" || position === "center" || position === "right" ? { imageAlignment: position } : {}),
+    ...(alignment === "left" || alignment === "center" || alignment === "right" ? { imageAlignment: alignment } : {}),
+    ...(position === "top-left" || position === "top-center" || position === "top-right" || position === "center-left" || position === "center" || position === "center-right" || position === "bottom-left" || position === "bottom-center" || position === "bottom-right" ? { imagePosition: position } : {}),
     ...(props.image_loading === true || props.image_loading === "eager" ? { imageLoading: "eager" } : props.image_loading === false || props.image_loading === "lazy" ? { imageLoading: "lazy" } : {}),
-    // Height and width are owned by the image/grid-specific fields. A generic
-    // block does not own a second, incompatible image-height representation.
-    ...(width || height ? {} : {}),
   };
 }
 

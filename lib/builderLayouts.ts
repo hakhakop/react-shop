@@ -142,7 +142,9 @@ export type BuilderLayoutBlock = {
   imageRatio?: "auto" | "natural" | "square" | "4:3" | "3:2" | "4:5" | "3:4" | "16:9" | "portrait";
   imageShape?: "none" | "rounded" | "circle" | "pill";
   imageShadow?: "none" | "small" | "medium" | "large" | "xlarge";
-  imageWidth?: "auto" | "full" | "small" | "medium" | "large" | "xlarge";
+  imagePosition?: "top-left" | "top-center" | "top-right" | "center-left" | "center" | "center-right" | "bottom-left" | "bottom-center" | "bottom-right";
+  imageWidth?: "auto" | "full" | "small" | "medium" | "large" | "xlarge" | (string & {});
+  imageHeight?: string | number;
   imageLoading?: "lazy" | "eager";
   imageLinkUrl?: string;
   imageLinkTarget?: "_self" | "_blank";
@@ -158,7 +160,7 @@ export type BuilderLayoutBlock = {
   panelSize?: "small" | "default" | "large";
   panelShowMedia?: boolean;
   panelMediaPlacement?: "top" | "left" | "right";
-  panelMediaFit?: "cover" | "contain";
+  panelMediaFit?: "natural" | "cover" | "contain" | "fill";
   panelMediaWidth?: "small" | "medium" | "large";
   panelMediaAlignment?: "left" | "center" | "right";
   panelTextAlign?: "left" | "center" | "right";
@@ -345,7 +347,8 @@ export type BuilderLayoutBlock = {
     cardHover?: boolean;
     mediaPlacement?: "top" | "left" | "right";
     mediaRatio?: "natural" | "square" | "4:3" | "3:2" | "16:9" | "portrait";
-    mediaFit?: "cover" | "contain";
+    mediaFit?: "natural" | "cover" | "contain" | "fill";
+    imagePosition?: "top-left" | "top-center" | "top-right" | "center-left" | "center" | "center-right" | "bottom-left" | "bottom-center" | "bottom-right";
     textAlign?: "left" | "center" | "right";
     titleElement?: "h2" | "h3" | "h4" | "div";
     titleStyle?: "inherit" | "h3" | "h4" | "h5";

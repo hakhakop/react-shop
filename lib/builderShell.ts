@@ -312,6 +312,8 @@ export type BuilderShellSettings = {
   /** Global defaults consumed by the canonical Image capability. */
   imageDefaultRatio?: string;
   imageDefaultFit?: string;
+  /** Version 3 distinguishes the historic implicit-cover default from an explicit choice. */
+  imageMediaDefaultsVersion?: 2 | 3;
   imageDefaultLoading?: string;
   imageDefaultBorder?: string;
   imageDefaultShadow?: string;
@@ -542,7 +544,10 @@ export const defaultBuilderShellSettings: BuilderShellSettings = {
   cardPaddingDefault: "30px",
   cardPaddingLarge: "40px",
   imageDefaultRatio: "natural",
-  imageDefaultFit: "cover",
+  // YOOtheme Image has no default crop mode. Preserve natural media until an
+  // element explicitly opts into a crop/object-fit behavior.
+  imageDefaultFit: "natural",
+  imageMediaDefaultsVersion: 3,
   imageDefaultLoading: "lazy",
   imageDefaultBorder: "none",
   imageDefaultShadow: "none",
@@ -732,6 +737,16 @@ export function normalizeBuilderShellSettings(
   return {
     ...defaultBuilderShellSettings,
     ...(value ?? {}),
+    // Version 2 was written while Cover was the implicit product default, so
+    // `cover` there is indistinguishable from an author choice. Treat that
+    // historical ambiguity as Natural for YOOtheme-compatible media. Version
+    // 3 is written after this migration and preserves an explicit Cover.
+    imageDefaultFit: value?.imageMediaDefaultsVersion === 3
+      ? normalizeOptionalString(value?.imageDefaultFit) ?? defaultBuilderShellSettings.imageDefaultFit
+      : value?.imageDefaultFit === "cover"
+        ? "natural"
+        : normalizeOptionalString(value?.imageDefaultFit) ?? defaultBuilderShellSettings.imageDefaultFit,
+    imageMediaDefaultsVersion: 3,
     backgroundDefault: normalizeOptionalString(value?.backgroundDefault) ?? normalizeOptionalString(value?.backgroundColor) ?? defaultBuilderShellSettings.backgroundDefault,
     backgroundMuted: normalizeOptionalString(value?.backgroundMuted) ?? normalizeOptionalString(value?.mutedBackgroundColor) ?? defaultBuilderShellSettings.backgroundMuted,
     backgroundPrimary: normalizeOptionalString(value?.backgroundPrimary) ?? normalizeOptionalString(value?.primaryColor) ?? defaultBuilderShellSettings.backgroundPrimary,

@@ -323,9 +323,10 @@ export function getUikitPanelLayoutClass(
 
 export function getUikitPanelMediaStyle(options: {
   ratio?: string;
-  fit?: "cover" | "contain";
+  fit?: "cover" | "contain" | "fill" | "natural";
   alignment?: "left" | "center" | "right";
-}): { aspectRatio?: string; backgroundSize: string; backgroundPosition: string } {
+  position?: string;
+}): { aspectRatio?: string; backgroundSize?: "cover" | "contain" | "fill"; backgroundPosition: string; objectFit?: "cover" | "contain" | "fill" } {
   const ratioMap: Record<string, string> = {
     square: "1 / 1",
     "4:3": "4 / 3",
@@ -333,10 +334,17 @@ export function getUikitPanelMediaStyle(options: {
     "16:9": "16 / 9",
     portrait: "3 / 4",
   };
+  const focal = options.position && options.position !== "center"
+    ? options.position.replace(/-/g, " ")
+    : undefined;
+  const fit = options.fit === "cover" || options.fit === "contain" || options.fit === "fill"
+    ? options.fit
+    : undefined;
   return {
     aspectRatio: ratioMap[options.ratio ?? ""] || undefined,
-    backgroundSize: options.fit === "contain" ? "contain" : "cover",
-    backgroundPosition: options.alignment === "left" ? "left center" : options.alignment === "right" ? "right center" : "center",
+    backgroundSize: fit,
+    objectFit: fit,
+    backgroundPosition: focal ?? (options.alignment === "left" ? "left center" : options.alignment === "right" ? "right center" : "center"),
   };
 }
 
@@ -578,15 +586,19 @@ export type UikitImageSemantics = {
   shadow?: "none" | "small" | "medium" | "large" | "xlarge" | string;
   alignment?: "left" | "center" | "right" | string;
   width?: "auto" | "full" | "small" | "medium" | "large" | "xlarge" | string;
+  height?: string | number | null;
+  position?: string;
 };
 
 export type UikitImageDocumentFields = {
-  imageFit?: UikitImageSemantics["fit"];
+  imageFit?: UikitImageSemantics["fit"] | "natural";
   imageRatio?: UikitImageSemantics["ratio"];
   imageShape?: UikitImageSemantics["shape"];
   imageShadow?: UikitImageSemantics["shadow"];
   imageAlignment?: UikitImageSemantics["alignment"];
   imageWidth?: UikitImageSemantics["width"];
+  imageHeight?: string | number | null;
+  imagePosition?: string;
   imageBorderRadius?: number | null;
 };
 
@@ -601,6 +613,8 @@ export function resolveUikitImageSemantics(
     shadow: image.imageShadow ?? (image.imageBoxShadow && image.imageBoxShadow !== "none" ? image.imageBoxShadow : undefined),
     alignment: image.imageAlignment,
     width: image.imageWidth,
+    height: image.imageHeight,
+    position: image.imagePosition,
     hoverTransition: image.imageHoverTransition,
   };
 }
@@ -631,7 +645,9 @@ export function getUikitImageStyle(image: UikitImageSemantics): {
   aspectRatio?: string;
   maxWidth?: string;
   width?: string;
-  objectFit: "contain" | "cover" | "fill";
+  height?: string;
+  objectFit?: "contain" | "cover" | "fill";
+  objectPosition?: string;
   position?: "absolute";
   inset?: 0;
 } {
@@ -650,13 +666,25 @@ export function getUikitImageStyle(image: UikitImageSemantics): {
     large: "960px",
     xlarge: "1280px",
   };
+  const cssDimension = (value: unknown) => {
+    if (typeof value === "number") return `${value}px`;
+    if (typeof value !== "string" || !value.trim() || value === "auto") return undefined;
+    return /^-?\d+(?:\.\d+)?$/.test(value.trim()) ? `${value.trim()}px` : value.trim();
+  };
   const ratio = ratioMap[image.ratio ?? ""];
   const contained = Boolean(ratio);
+  const width = image.width === "full" ? "100%" : widthMap[image.width ?? ""] ?? cssDimension(image.width);
+  const focal = image.position && image.position !== "center" ? image.position.replace(/-/g, " ") : undefined;
   return {
     aspectRatio: ratio,
-    maxWidth: image.width && image.width !== "auto" && image.width !== "full" ? widthMap[image.width] : undefined,
-    width: image.width === "full" ? "100%" : undefined,
-    objectFit: image.fit === "contain" || image.fit === "fill" ? image.fit : "cover",
+    maxWidth: image.width && image.width !== "auto" && image.width !== "full" && widthMap[image.width] ? widthMap[image.width] : undefined,
+    width,
+    height: cssDimension(image.height),
+    // Natural is the YOOtheme default: no crop mode is implied. `fill` is the
+    // browser's non-cropping baseline and prevents legacy CSS fallbacks from
+    // reintroducing `cover` when an image has an explicit frame.
+    objectFit: image.fit === "contain" || image.fit === "fill" || image.fit === "cover" ? image.fit : "fill",
+    objectPosition: focal,
     ...(contained ? { position: "absolute", inset: 0 as const } : {}),
   };
 }

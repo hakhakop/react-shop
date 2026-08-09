@@ -41,10 +41,6 @@
         "maxWidth": "small",
         "sectionPadding": "large",
         "removeBottomPadding": true,
-        "sectionTitlePosition": "top-left",
-        "sectionTitleRotation": "left",
-        "sectionTitleBreakpoint": "xl",
-        "headerTransparent": true,
         "preserveColor": false,
         "overlap": false,
         "textColor": "none",
@@ -54,10 +50,14 @@
         "contentVerticalAlign": "top",
         "htmlElement": "div",
         "stickyEffect": "none",
+        "headerTransparent": true,
         "pullUnderHeader": false,
         "headerTextColor": "none",
         "animation": "slide-bottom-medium",
         "animationDelay": 100,
+        "sectionTitlePosition": "top-left",
+        "sectionTitleRotation": "left",
+        "sectionTitleBreakpoint": "xl",
         "visible": true,
         "layout": "1-col",
         "layoutColumns": 1,
@@ -77,16 +77,11 @@
                 "headingSize": "medium",
                 "headingAlign": "center",
                 "elementAlign": "center",
-                "textAlign": "center",
                 "visualStyle": {
                   "layout": {
                     "position": "relative",
-                    "zIndex": 3,
-                    "blockAlign": "center",
-                    "textAlign": "center"
-                  },
-                  "effects": {},
-                  "card": {}
+                    "zIndex": 3
+                  }
                 }
               },
               {
@@ -96,24 +91,11 @@
                 "textVariant": "lead",
                 "textAlign": "center",
                 "elementAlign": "center",
-                "textColumnBreakpoint": "medium",
-                "maxWidth": "xlarge",
-                "headingAlign": "center",
-                "margin": "default",
-                "marginMode": "default",
                 "visualStyle": {
                   "layout": {
                     "position": "relative",
-                    "zIndex": 3,
-                    "marginMode": "default",
-                    "maxWidth": "xlarge",
-                    "blockAlign": "center",
-                    "textAlign": "center"
-                  },
-                  "effects": {
-                    "maxWidth": "xlarge"
-                  },
-                  "card": {}
+                    "zIndex": 3
+                  }
                 }
               },
               {
@@ -137,18 +119,11 @@
                 ],
                 "size": "large",
                 "textAlign": "center",
-                "headingAlign": "center",
-                "margin": "medium",
-                "marginMode": "medium",
                 "visualStyle": {
                   "layout": {
                     "position": "relative",
-                    "zIndex": 3,
-                    "marginMode": "medium",
-                    "textAlign": "center"
-                  },
-                  "effects": {},
-                  "card": {}
+                    "zIndex": 3
+                  }
                 },
                 "buttonStyle": "default"
               },
@@ -158,25 +133,16 @@
                 "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/background-square-01.png",
                 "imageAlt": "",
                 "imageMaxWidth": 600,
-                "imageWidth": "600",
+                "imageWidth": "auto",
                 "imageLoading": "eager",
                 "imageShape": "none",
-                "imageAlignment": "left",
-                "margin": "default",
-                "marginMode": "default",
-                "visibility": "xl",
-                "visibilityMode": "xl",
                 "visualStyle": {
                   "layout": {
                     "position": "absolute",
                     "top": "22vh",
                     "left": "-20vw",
-                    "zIndex": 0,
-                    "marginMode": "default",
-                    "visibilityMode": "xl"
-                  },
-                  "effects": {},
-                  "card": {}
+                    "zIndex": 0
+                  }
                 }
               },
               {
@@ -185,25 +151,16 @@
                 "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/background-square-02.png",
                 "imageAlt": "",
                 "imageMaxWidth": 1100,
-                "imageWidth": "1100",
+                "imageWidth": "auto",
                 "imageLoading": "eager",
                 "imageShape": "none",
-                "imageAlignment": "left",
-                "margin": "default",
-                "marginMode": "default",
-                "visibility": "m",
-                "visibilityMode": "m",
                 "visualStyle": {
                   "layout": {
                     "position": "absolute",
                     "top": "-30vh",
                     "left": "-47vw",
-                    "zIndex": 0,
-                    "marginMode": "default",
-                    "visibilityMode": "m"
-                  },
-                  "effects": {},
-                  "card": {}
+                    "zIndex": 0
+                  }
                 }
               },
               {
@@ -212,25 +169,16 @@
                 "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/background-square-03.png",
                 "imageAlt": "",
                 "imageMaxWidth": 700,
-                "imageWidth": "700",
+                "imageWidth": "auto",
                 "imageLoading": "eager",
                 "imageShape": "none",
-                "imageAlignment": "left",
-                "margin": "default",
-                "marginMode": "default",
-                "visibility": "xl",
-                "visibilityMode": "xl",
                 "visualStyle": {
                   "layout": {
                     "position": "absolute",
                     "top": "15vh",
                     "left": "39vw",
-                    "zIndex": 0,
-                    "marginMode": "default",
-                    "visibilityMode": "xl"
-                  },
-                  "effects": {},
-                  "card": {}
+                    "zIndex": 0
+                  }
                 }
               },
               {
@@ -239,25 +187,16 @@
                 "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/background-square-04.png",
                 "imageAlt": "",
                 "imageMaxWidth": 950,
-                "imageWidth": "950",
+                "imageWidth": "auto",
                 "imageLoading": "eager",
                 "imageShape": "none",
-                "imageAlignment": "left",
-                "margin": "default",
-                "marginMode": "default",
-                "visibility": "m",
-                "visibilityMode": "m",
                 "visualStyle": {
                   "layout": {
                     "position": "absolute",
                     "top": "-27vh",
                     "left": "54vw",
-                    "zIndex": 0,
-                    "marginMode": "default",
-                    "visibilityMode": "m"
-                  },
-                  "effects": {},
-                  "card": {}
+                    "zIndex": 0
+                  }
                 }
               },
               {
@@ -266,25 +205,16 @@
                 "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/background-square-05.png",
                 "imageAlt": "",
                 "imageMaxWidth": 600,
-                "imageWidth": "600",
+                "imageWidth": "auto",
                 "imageLoading": "eager",
                 "imageShape": "none",
-                "imageAlignment": "left",
-                "margin": "default",
-                "marginMode": "default",
-                "visibility": "s",
-                "visibilityMode": "s",
                 "visualStyle": {
                   "layout": {
                     "position": "absolute",
                     "top": "-550",
                     "left": "35vw",
-                    "zIndex": 0,
-                    "marginMode": "default",
-                    "visibilityMode": "s"
-                  },
-                  "effects": {},
-                  "card": {}
+                    "zIndex": 0
+                  }
                 }
               }
             ]
@@ -300,25 +230,17 @@
                 "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/home-hero.jpg",
                 "imageAlt": "",
                 "imageMaxWidth": 750,
-                "imageWidth": "750",
+                "imageWidth": "auto",
                 "imageLoading": "eager",
                 "imageLinkUrl": "wp-content/uploads/yootheme/home-hero-video.mp4",
                 "imageLinkTarget": "_self",
                 "imageShape": "rounded",
                 "imageAlignment": "center",
-                "textAlign": "center",
-                "headingAlign": "center",
-                "margin": "none",
-                "marginMode": "none",
                 "visualStyle": {
                   "layout": {
                     "position": "relative",
-                    "zIndex": 1,
-                    "marginMode": "none",
-                    "textAlign": "center"
-                  },
-                  "effects": {},
-                  "card": {}
+                    "zIndex": 1
+                  }
                 }
               },
               {
@@ -327,26 +249,16 @@
                 "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/icon-play.svg",
                 "imageAlt": "",
                 "imageMaxWidth": 100,
+                "imageWidth": "auto",
                 "imageLoading": "eager",
                 "imageShape": "none",
                 "imageAlignment": "center",
-                "textAlign": "center",
-                "headingAlign": "center",
-                "margin": "none",
-                "marginMode": "none",
                 "visualStyle": {
                   "layout": {
                     "position": "absolute",
                     "top": "50%",
-                    "zIndex": 2,
-                    "marginMode": "none",
-                    "textAlign": "center"
-                  },
-                  "effects": {},
-                  "card": {},
-                  "customClass": "uk-disabled",
-                  "customAttributes": "data-yootheme-play=\"true\"\naria-label=\"Play video\"\nonclick=alert(1)",
-                  "customCss": ".el-image {\n  border-radius: 50%;\n  box-shadow: 0 0 0 0 #4C6CD8;\n  transform: scale(1);\n  animation: pulse 2s infinite;\n  margin-top: -42px;\n}\n\n@keyframes pulse {\n  0% {\n    transform: scale(0.95);\n    box-shadow: 0 0 0 0 rgba(76,108,216, 0.8);\n  }\n\n  70% {\n    transform: scale(1);\n    box-shadow: 0 0 0 10px rgba(76,108,216, 0);\n  }\n\n  100% {\n    transform: scale(0.95);\n    box-shadow: 0 0 0 0 rgba(76,108,216, 0);\n  }\n}"
+                    "zIndex": 2
+                  }
                 }
               }
             ]
@@ -364,9 +276,6 @@
         "maxWidth": "small",
         "sectionPadding": "large",
         "removeBottomPadding": true,
-        "sectionTitlePosition": "top-left",
-        "sectionTitleRotation": "left",
-        "sectionTitleBreakpoint": "xl",
         "preserveColor": false,
         "overlap": false,
         "textColor": "none",
@@ -379,6 +288,9 @@
         "headerTransparent": false,
         "pullUnderHeader": false,
         "headerTextColor": "none",
+        "sectionTitlePosition": "top-left",
+        "sectionTitleRotation": "left",
+        "sectionTitleBreakpoint": "xl",
         "visible": true,
         "layout": "1-col",
         "layoutColumns": 1,
@@ -394,16 +306,8 @@
                 "kind": "heading",
                 "headingText": "DevStack Is Trusted by Professionals Around the World",
                 "title": "DevStack Is Trusted by Professionals Around the World",
-                "headingLevel": "div",
-                "headingAlign": "center",
-                "textAlign": "center",
-                "visualStyle": {
-                  "layout": {
-                    "textAlign": "center"
-                  },
-                  "effects": {},
-                  "card": {}
-                }
+                "headingLevel": "h2",
+                "headingAlign": "center"
               },
               {
                 "id": "yootheme-grid-1-0-0-1",
@@ -422,7 +326,7 @@
                     "renderer": "plain",
                     "cardVariant": "default",
                     "mediaPlacement": "top",
-                    "mediaFit": "natural",
+                    "mediaFit": "cover",
                     "textAlign": "center",
                     "titleElement": "h3"
                   },
@@ -438,7 +342,7 @@
                     "renderer": "plain",
                     "cardVariant": "default",
                     "mediaPlacement": "top",
-                    "mediaFit": "natural",
+                    "mediaFit": "cover",
                     "textAlign": "center",
                     "titleElement": "h3"
                   },
@@ -454,7 +358,7 @@
                     "renderer": "plain",
                     "cardVariant": "default",
                     "mediaPlacement": "top",
-                    "mediaFit": "natural",
+                    "mediaFit": "cover",
                     "textAlign": "center",
                     "titleElement": "h3"
                   },
@@ -470,7 +374,7 @@
                     "renderer": "plain",
                     "cardVariant": "default",
                     "mediaPlacement": "top",
-                    "mediaFit": "natural",
+                    "mediaFit": "cover",
                     "textAlign": "center",
                     "titleElement": "h3"
                   },
@@ -486,7 +390,7 @@
                     "renderer": "plain",
                     "cardVariant": "default",
                     "mediaPlacement": "top",
-                    "mediaFit": "natural",
+                    "mediaFit": "cover",
                     "textAlign": "center",
                     "titleElement": "h3"
                   },
@@ -502,7 +406,7 @@
                     "renderer": "plain",
                     "cardVariant": "default",
                     "mediaPlacement": "top",
-                    "mediaFit": "natural",
+                    "mediaFit": "cover",
                     "textAlign": "center",
                     "titleElement": "h3"
                   }
@@ -522,33 +426,14 @@
                 "columnsPhonePortrait": "auto",
                 "columnsDesktop": "",
                 "gridMediaWidth": "medium",
+                "imageHeight": null,
+                "imageLoading": "lazy",
                 "imageBorder": "none",
                 "imageBoxShadow": "none",
                 "imageBoxDecoration": "none",
                 "imageHoverTransition": "none",
                 "linkImage": false,
-                "textAlign": "center",
-                "visualStyle": {
-                  "margin": {
-                    "top": "var(--uk-global-margin)"
-                  },
-                  "card": {
-                    "titleMargin": "0",
-                    "buttonMargin": "0"
-                  },
-                  "layout": {
-                    "marginMode": "default",
-                    "blockAlign": "center",
-                    "textAlign": "center"
-                  },
-                  "effects": {}
-                },
-                "gridMetaAlign": "below-title",
-                "gridMetaHtmlElement": "div",
-                "elementAlign": "center",
-                "headingAlign": "center",
-                "margin": "default",
-                "marginMode": "default"
+                "textAlign": "center"
               }
             ]
           }
@@ -565,9 +450,6 @@
         "maxWidth": "default",
         "sectionPadding": "large",
         "removeBottomPadding": true,
-        "sectionTitlePosition": "top-left",
-        "sectionTitleRotation": "left",
-        "sectionTitleBreakpoint": "xl",
         "preserveColor": false,
         "overlap": false,
         "textColor": "none",
@@ -582,6 +464,9 @@
         "headerTextColor": "none",
         "animation": "fade",
         "animationDelay": 100,
+        "sectionTitlePosition": "top-left",
+        "sectionTitleRotation": "left",
+        "sectionTitleBreakpoint": "xl",
         "visible": true,
         "layout": "1-col",
         "layoutColumns": 1,
@@ -600,23 +485,7 @@
                 "headingLevel": "h2",
                 "headingSize": "h1",
                 "headingAlign": "center",
-                "elementAlign": "center",
-                "maxWidth": "2xlarge",
-                "textAlign": "center",
-                "animation": {
-                  "preset": "none"
-                },
-                "visualStyle": {
-                  "layout": {
-                    "maxWidth": "2xlarge",
-                    "blockAlign": "center",
-                    "textAlign": "center"
-                  },
-                  "effects": {
-                    "maxWidth": "2xlarge"
-                  },
-                  "card": {}
-                }
+                "elementAlign": "center"
               },
               {
                 "id": "yootheme-text-2-0-0-1",
@@ -624,24 +493,7 @@
                 "body": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut.",
                 "textVariant": "lead",
                 "textAlign": "center",
-                "elementAlign": "center",
-                "textColumnBreakpoint": "medium",
-                "maxWidth": "xlarge",
-                "headingAlign": "center",
-                "animation": {
-                  "preset": "none"
-                },
-                "visualStyle": {
-                  "layout": {
-                    "maxWidth": "xlarge",
-                    "blockAlign": "center",
-                    "textAlign": "center"
-                  },
-                  "effects": {
-                    "maxWidth": "xlarge"
-                  },
-                  "card": {}
-                }
+                "elementAlign": "center"
               }
             ]
           },
@@ -655,26 +507,16 @@
                 "kind": "image",
                 "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/home-feature-integrate-floating-icon.svg",
                 "imageAlt": "",
+                "imageWidth": "auto",
                 "imageShape": "none",
                 "imageAlignment": "center",
-                "textAlign": "center",
-                "headingAlign": "center",
-                "margin": "default",
-                "marginMode": "default",
-                "animation": {
-                  "preset": "parallax"
-                },
                 "visualStyle": {
                   "layout": {
                     "position": "absolute",
                     "top": "200",
                     "right": "6%",
-                    "zIndex": 1,
-                    "marginMode": "default",
-                    "textAlign": "center"
-                  },
-                  "effects": {},
-                  "card": {}
+                    "zIndex": 1
+                  }
                 }
               },
               {
@@ -693,28 +535,9 @@
                 "panelMediaWidth": "medium",
                 "panelTextAlign": "center",
                 "panelTitleElement": "h3",
-                "visualStyle": {
-                  "margin": {
-                    "top": "var(--uk-global-margin-medium)"
-                  },
-                  "card": {
-                    "titleMargin": "var(--uk-global-margin-medium)",
-                    "buttonMargin": "var(--uk-global-margin-medium)"
-                  },
-                  "layout": {
-                    "marginMode": "medium",
-                    "textAlign": "center"
-                  },
-                  "effects": {}
-                },
-                "gridMetaAlign": "below-title",
-                "gridMetaHtmlElement": "div",
-                "textAlign": "center",
-                "headingAlign": "center",
-                "margin": "medium",
-                "marginMode": "medium",
                 "panelHover": true,
                 "panelSize": "default",
+                "panelMediaFit": "cover",
                 "panelMediaAlignment": "center",
                 "panelVerticalAlign": "top",
                 "panelTitleStyle": "inherit",
@@ -736,23 +559,15 @@
                 "kind": "image",
                 "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/home-feature-automate-floating-icon.svg",
                 "imageAlt": "",
+                "imageWidth": "auto",
                 "imageShape": "none",
-                "imageAlignment": "right",
-                "margin": "default",
-                "marginMode": "default",
-                "animation": {
-                  "preset": "parallax"
-                },
                 "visualStyle": {
                   "layout": {
                     "position": "absolute",
                     "top": "200",
                     "right": "6%",
-                    "zIndex": 1,
-                    "marginMode": "default"
-                  },
-                  "effects": {},
-                  "card": {}
+                    "zIndex": 1
+                  }
                 }
               },
               {
@@ -762,8 +577,6 @@
                 "body": "Lorem ipsum dolo nonumy eirmod tempor<br class=\"uk-visible@m\"> invidunt ut labore et magna aliquyam.",
                 "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/home-feature-automate.svg",
                 "imageAlt": "Automate",
-                "imageMaxWidth": 280,
-                "imageWidth": "280",
                 "buttonLabel": "Learn More",
                 "buttonUrl": "#",
                 "buttonStyle": "ghost",
@@ -773,28 +586,9 @@
                 "panelMediaWidth": "medium",
                 "panelTextAlign": "center",
                 "panelTitleElement": "h3",
-                "visualStyle": {
-                  "margin": {
-                    "top": "var(--uk-global-margin-medium)"
-                  },
-                  "card": {
-                    "titleMargin": "var(--uk-global-margin-medium)",
-                    "buttonMargin": "var(--uk-global-margin-medium)"
-                  },
-                  "layout": {
-                    "marginMode": "medium",
-                    "textAlign": "center"
-                  },
-                  "effects": {}
-                },
-                "gridMetaAlign": "below-title",
-                "gridMetaHtmlElement": "div",
-                "textAlign": "center",
-                "headingAlign": "center",
-                "margin": "medium",
-                "marginMode": "medium",
                 "panelHover": true,
                 "panelSize": "default",
+                "panelMediaFit": "cover",
                 "panelMediaAlignment": "center",
                 "panelVerticalAlign": "top",
                 "panelTitleStyle": "inherit",
@@ -816,23 +610,15 @@
                 "kind": "image",
                 "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/home-feature-innovate-floating-icon.svg",
                 "imageAlt": "",
+                "imageWidth": "auto",
                 "imageShape": "none",
-                "imageAlignment": "right",
-                "margin": "default",
-                "marginMode": "default",
-                "animation": {
-                  "preset": "parallax"
-                },
                 "visualStyle": {
                   "layout": {
                     "position": "absolute",
                     "top": "200",
                     "right": "6%",
-                    "zIndex": 1,
-                    "marginMode": "default"
-                  },
-                  "effects": {},
-                  "card": {}
+                    "zIndex": 1
+                  }
                 }
               },
               {
@@ -842,8 +628,6 @@
                 "body": "Lorem ipsum dolo nonumy eirmod tempor<br class=\"uk-visible@s\"> invidunt ut labore et magna aliquyam.",
                 "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/home-feature-innovate.svg",
                 "imageAlt": "Innovate",
-                "imageMaxWidth": 280,
-                "imageWidth": "280",
                 "buttonLabel": "Learn More",
                 "buttonUrl": "#",
                 "buttonStyle": "ghost",
@@ -853,28 +637,9 @@
                 "panelMediaWidth": "medium",
                 "panelTextAlign": "center",
                 "panelTitleElement": "h3",
-                "visualStyle": {
-                  "margin": {
-                    "top": "var(--uk-global-margin-medium)"
-                  },
-                  "card": {
-                    "titleMargin": "var(--uk-global-margin-medium)",
-                    "buttonMargin": "var(--uk-global-margin-medium)"
-                  },
-                  "layout": {
-                    "marginMode": "medium",
-                    "textAlign": "center"
-                  },
-                  "effects": {}
-                },
-                "gridMetaAlign": "below-title",
-                "gridMetaHtmlElement": "div",
-                "textAlign": "center",
-                "headingAlign": "center",
-                "margin": "medium",
-                "marginMode": "medium",
                 "panelHover": true,
                 "panelSize": "default",
+                "panelMediaFit": "cover",
                 "panelMediaAlignment": "center",
                 "panelVerticalAlign": "top",
                 "panelTitleStyle": "inherit",
@@ -899,9 +664,6 @@
         "maxWidth": "default",
         "sectionPadding": "large",
         "removeBottomPadding": true,
-        "sectionTitlePosition": "top-left",
-        "sectionTitleRotation": "left",
-        "sectionTitleBreakpoint": "xl",
         "preserveColor": false,
         "overlap": false,
         "textColor": "none",
@@ -916,6 +678,9 @@
         "headerTextColor": "none",
         "animation": "fade",
         "animationDelay": 100,
+        "sectionTitlePosition": "top-left",
+        "sectionTitleRotation": "left",
+        "sectionTitleBreakpoint": "xl",
         "visible": true,
         "layout": "1-col",
         "layoutColumns": 1,
@@ -935,19 +700,11 @@
                 "headingSize": "h1",
                 "headingAlign": "center",
                 "elementAlign": "center",
-                "textAlign": "center",
-                "animation": {
-                  "preset": "none"
-                },
                 "visualStyle": {
                   "layout": {
                     "position": "relative",
-                    "zIndex": 1,
-                    "blockAlign": "center",
-                    "textAlign": "center"
-                  },
-                  "effects": {},
-                  "card": {}
+                    "zIndex": 1
+                  }
                 }
               },
               {
@@ -957,29 +714,11 @@
                 "textVariant": "lead",
                 "textAlign": "center",
                 "elementAlign": "center",
-                "textColumnBreakpoint": "medium",
-                "maxWidth": "xlarge",
-                "headingAlign": "center",
-                "margin": "default",
-                "marginMode": "default",
-                "removeBottomMargin": true,
-                "animation": {
-                  "preset": "none"
-                },
                 "visualStyle": {
                   "layout": {
                     "position": "relative",
-                    "zIndex": 1,
-                    "marginMode": "default",
-                    "removeBottomMargin": true,
-                    "maxWidth": "xlarge",
-                    "blockAlign": "center",
-                    "textAlign": "center"
-                  },
-                  "effects": {
-                    "maxWidth": "xlarge"
-                  },
-                  "card": {}
+                    "zIndex": 1
+                  }
                 }
               },
               {
@@ -1000,7 +739,7 @@
                     "renderer": "card",
                     "cardVariant": "default",
                     "mediaPlacement": "top",
-                    "mediaFit": "natural",
+                    "mediaFit": "cover",
                     "textAlign": "center",
                     "titleElement": "h3",
                     "titleStyle": "h5"
@@ -1018,7 +757,7 @@
                     "renderer": "card",
                     "cardVariant": "default",
                     "mediaPlacement": "top",
-                    "mediaFit": "natural",
+                    "mediaFit": "cover",
                     "textAlign": "center",
                     "titleElement": "h3",
                     "titleStyle": "h5"
@@ -1036,7 +775,7 @@
                     "renderer": "card",
                     "cardVariant": "default",
                     "mediaPlacement": "top",
-                    "mediaFit": "natural",
+                    "mediaFit": "cover",
                     "textAlign": "center",
                     "titleElement": "h3",
                     "titleStyle": "h5"
@@ -1054,7 +793,7 @@
                     "renderer": "card",
                     "cardVariant": "default",
                     "mediaPlacement": "top",
-                    "mediaFit": "natural",
+                    "mediaFit": "cover",
                     "textAlign": "center",
                     "titleElement": "h3",
                     "titleStyle": "h5"
@@ -1072,7 +811,7 @@
                     "renderer": "card",
                     "cardVariant": "default",
                     "mediaPlacement": "top",
-                    "mediaFit": "natural",
+                    "mediaFit": "cover",
                     "textAlign": "center",
                     "titleElement": "h3",
                     "titleStyle": "h5"
@@ -1090,7 +829,7 @@
                     "renderer": "card",
                     "cardVariant": "default",
                     "mediaPlacement": "top",
-                    "mediaFit": "natural",
+                    "mediaFit": "cover",
                     "textAlign": "center",
                     "titleElement": "h3",
                     "titleStyle": "h5"
@@ -1108,7 +847,7 @@
                     "renderer": "card",
                     "cardVariant": "default",
                     "mediaPlacement": "top",
-                    "mediaFit": "natural",
+                    "mediaFit": "cover",
                     "textAlign": "center",
                     "titleElement": "h3",
                     "titleStyle": "h5"
@@ -1126,7 +865,7 @@
                     "renderer": "card",
                     "cardVariant": "default",
                     "mediaPlacement": "top",
-                    "mediaFit": "natural",
+                    "mediaFit": "cover",
                     "textAlign": "center",
                     "titleElement": "h3",
                     "titleStyle": "h5"
@@ -1147,8 +886,9 @@
                 "columnsPhoneLandscape": "2",
                 "columnsDesktop": "4",
                 "gridMediaWidth": "medium",
-                "imageWidth": "68",
                 "imageMaxWidth": 68,
+                "imageHeight": null,
+                "imageLoading": "lazy",
                 "imageBorder": "none",
                 "imageBoxShadow": "none",
                 "imageBoxDecoration": "none",
@@ -1156,28 +896,10 @@
                 "linkImage": false,
                 "textAlign": "center",
                 "visualStyle": {
-                  "margin": {
-                    "top": "var(--uk-global-margin-large)"
-                  },
-                  "card": {
-                    "titleMargin": "0",
-                    "buttonMargin": "0"
-                  },
                   "layout": {
                     "position": "relative",
-                    "zIndex": 1,
-                    "marginMode": "large",
-                    "textAlign": "center"
-                  },
-                  "effects": {}
-                },
-                "gridMetaAlign": "below-title",
-                "gridMetaHtmlElement": "div",
-                "headingAlign": "center",
-                "margin": "large",
-                "marginMode": "large",
-                "animation": {
-                  "preset": "fade"
+                    "zIndex": 1
+                  }
                 }
               }
             ]
@@ -1193,24 +915,15 @@
                 "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/background-square-05.png",
                 "imageAlt": "",
                 "imageMaxWidth": 1000,
-                "imageWidth": "1000",
+                "imageWidth": "auto",
                 "imageShape": "none",
-                "imageAlignment": "left",
-                "margin": "default",
-                "marginMode": "default",
-                "visibility": "xl",
-                "visibilityMode": "xl",
                 "visualStyle": {
                   "layout": {
                     "position": "absolute",
                     "bottom": "-300",
                     "left": "-50vw",
-                    "zIndex": 0,
-                    "marginMode": "default",
-                    "visibilityMode": "xl"
-                  },
-                  "effects": {},
-                  "card": {}
+                    "zIndex": 0
+                  }
                 }
               },
               {
@@ -1219,27 +932,16 @@
                 "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/background-square-03.png",
                 "imageAlt": "",
                 "imageMaxWidth": 600,
-                "imageWidth": "600",
+                "imageWidth": "auto",
                 "imageShape": "none",
                 "imageAlignment": "right",
-                "textAlign": "right",
-                "headingAlign": "right",
-                "margin": "default",
-                "marginMode": "default",
-                "visibility": "xl",
-                "visibilityMode": "xl",
                 "visualStyle": {
                   "layout": {
                     "position": "absolute",
                     "top": "-700",
                     "right": "-29vw",
-                    "zIndex": 0,
-                    "marginMode": "default",
-                    "textAlign": "right",
-                    "visibilityMode": "xl"
-                  },
-                  "effects": {},
-                  "card": {}
+                    "zIndex": 0
+                  }
                 }
               }
             ]
@@ -1255,9 +957,6 @@
         "sectionVariant": "default",
         "sectionPadding": "xlarge",
         "removeBottomPadding": true,
-        "sectionTitlePosition": "top-left",
-        "sectionTitleRotation": "left",
-        "sectionTitleBreakpoint": "xl",
         "preserveColor": false,
         "overlap": false,
         "textColor": "none",
@@ -1272,6 +971,9 @@
         "headerTransparent": false,
         "pullUnderHeader": false,
         "headerTextColor": "none",
+        "sectionTitlePosition": "top-left",
+        "sectionTitleRotation": "left",
+        "sectionTitleBreakpoint": "xl",
         "visible": true,
         "layout": "2-col-equal",
         "layoutColumns": 2,
@@ -1289,18 +991,7 @@
                 "title": "Reach Your Digital Goals With a Solution <br class=\"uk-visible@s\"> Trusted by Many Industry Experts",
                 "headingLevel": "h2",
                 "headingAlign": "left",
-                "elementAlign": "center",
-                "textAlign": "left",
-                "visualStyle": {
-                  "layout": {
-                    "blockAlign": "center",
-                    "textAlign": "left",
-                    "textAlignBreakpoint": "medium",
-                    "textAlignFallback": "center"
-                  },
-                  "effects": {},
-                  "card": {}
-                }
+                "elementAlign": "center"
               }
             ]
           },
@@ -1322,19 +1013,6 @@
                   }
                 ],
                 "textAlign": "right",
-                "headingAlign": "right",
-                "margin": "default",
-                "marginMode": "default",
-                "visualStyle": {
-                  "layout": {
-                    "marginMode": "default",
-                    "textAlign": "right",
-                    "textAlignBreakpoint": "medium",
-                    "textAlignFallback": "center"
-                  },
-                  "effects": {},
-                  "card": {}
-                },
                 "buttonStyle": "default",
                 "size": "default"
               }
@@ -1356,11 +1034,10 @@
                     "text": "",
                     "imageUrl": "",
                     "imageAlt": "",
-                    "imageWidth": "800",
                     "headingLevel": "h3",
                     "metaStyle": "muted",
                     "showAction": false,
-                    "buttonLabel": "Read Story",
+                    "buttonLabel": "Read more",
                     "buttonUrl": "#",
                     "buttonTarget": "_self",
                     "buttonStyle": "outline"
@@ -1379,20 +1056,6 @@
                   "arrowPosition": "default",
                   "paginationPosition": "bottom-center",
                   "effect": "slide"
-                },
-                "textAlign": "center",
-                "headingAlign": "center",
-                "margin": "large",
-                "marginMode": "large",
-                "removeBottomMargin": true,
-                "visualStyle": {
-                  "layout": {
-                    "marginMode": "large",
-                    "removeBottomMargin": true,
-                    "textAlign": "center"
-                  },
-                  "effects": {},
-                  "card": {}
                 }
               }
             ]
@@ -1409,9 +1072,6 @@
         "contentMode": "small",
         "maxWidth": "small",
         "sectionPadding": "large",
-        "sectionTitlePosition": "top-left",
-        "sectionTitleRotation": "left",
-        "sectionTitleBreakpoint": "xl",
         "preserveColor": false,
         "overlap": false,
         "textColor": "none",
@@ -1426,6 +1086,9 @@
         "headerTextColor": "none",
         "animation": "fade",
         "animationDelay": 100,
+        "sectionTitlePosition": "top-left",
+        "sectionTitleRotation": "left",
+        "sectionTitleBreakpoint": "xl",
         "visible": true,
         "layout": "1-col",
         "layoutColumns": 1,
@@ -1443,18 +1106,7 @@
                 "title": "Reinvent Your Business With<br class=\"uk-visible@s\"> DevStack Solutions",
                 "headingLevel": "h2",
                 "headingSize": "h1",
-                "headingAlign": "center",
-                "textAlign": "center",
-                "animation": {
-                  "preset": "none"
-                },
-                "visualStyle": {
-                  "layout": {
-                    "textAlign": "center"
-                  },
-                  "effects": {},
-                  "card": {}
-                }
+                "headingAlign": "center"
               }
             ]
           },
@@ -1481,7 +1133,7 @@
                     "renderer": "card",
                     "cardVariant": "default",
                     "mediaPlacement": "top",
-                    "mediaFit": "natural",
+                    "mediaFit": "cover",
                     "titleElement": "h3",
                     "titleStyle": "h2"
                   },
@@ -1498,7 +1150,7 @@
                     "renderer": "card",
                     "cardVariant": "primary",
                     "mediaPlacement": "top",
-                    "mediaFit": "natural",
+                    "mediaFit": "cover",
                     "titleElement": "h3",
                     "titleStyle": "h2"
                   }
@@ -1516,30 +1168,19 @@
                 "columnsPhonePortrait": "1",
                 "columnsDesktop": "2",
                 "gridMediaWidth": "medium",
+                "imageHeight": null,
+                "imageLoading": "lazy",
                 "imageBorder": "none",
                 "imageBoxShadow": "none",
                 "imageBoxDecoration": "none",
                 "imageHoverTransition": "none",
                 "linkImage": false,
                 "visualStyle": {
-                  "margin": {
-                    "top": "var(--uk-global-margin)"
-                  },
-                  "card": {
-                    "titleMargin": "0",
-                    "buttonMargin": "var(--uk-global-margin-medium)"
-                  },
                   "layout": {
                     "position": "relative",
-                    "zIndex": 1,
-                    "marginMode": "default"
-                  },
-                  "effects": {}
-                },
-                "gridMetaAlign": "below-title",
-                "gridMetaHtmlElement": "div",
-                "margin": "default",
-                "marginMode": "default"
+                    "zIndex": 1
+                  }
+                }
               }
             ]
           },
@@ -1554,24 +1195,15 @@
                 "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/background-square-02.png",
                 "imageAlt": "",
                 "imageMaxWidth": 800,
-                "imageWidth": "800",
+                "imageWidth": "auto",
                 "imageShape": "none",
-                "imageAlignment": "left",
-                "margin": "default",
-                "marginMode": "default",
-                "visibility": "xl",
-                "visibilityMode": "xl",
                 "visualStyle": {
                   "layout": {
                     "position": "absolute",
                     "bottom": "-25vh",
                     "left": "-40vw",
-                    "zIndex": 0,
-                    "marginMode": "default",
-                    "visibilityMode": "xl"
-                  },
-                  "effects": {},
-                  "card": {}
+                    "zIndex": 0
+                  }
                 }
               },
               {
@@ -1580,27 +1212,16 @@
                 "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/background-square-05.png",
                 "imageAlt": "",
                 "imageMaxWidth": 1000,
-                "imageWidth": "1000",
+                "imageWidth": "auto",
                 "imageShape": "none",
                 "imageAlignment": "right",
-                "textAlign": "right",
-                "headingAlign": "right",
-                "margin": "default",
-                "marginMode": "default",
-                "visibility": "xl",
-                "visibilityMode": "xl",
                 "visualStyle": {
                   "layout": {
                     "position": "absolute",
                     "right": "-53vw",
                     "bottom": "0vh",
-                    "zIndex": 0,
-                    "marginMode": "default",
-                    "textAlign": "right",
-                    "visibilityMode": "xl"
-                  },
-                  "effects": {},
-                  "card": {}
+                    "zIndex": 0
+                  }
                 }
               }
             ]
@@ -1617,9 +1238,6 @@
         "contentMode": "default",
         "maxWidth": "default",
         "sectionPadding": "large",
-        "sectionTitlePosition": "top-left",
-        "sectionTitleRotation": "left",
-        "sectionTitleBreakpoint": "xl",
         "preserveColor": false,
         "overlap": false,
         "textColor": "none",
@@ -1633,6 +1251,9 @@
         "pullUnderHeader": false,
         "headerTextColor": "none",
         "animation": "fade",
+        "sectionTitlePosition": "top-left",
+        "sectionTitleRotation": "left",
+        "sectionTitleBreakpoint": "xl",
         "visible": true,
         "layout": "1-col",
         "layoutColumns": 1,
@@ -1650,18 +1271,7 @@
                 "title": "Latest News",
                 "headingLevel": "h2",
                 "headingSize": "h1",
-                "headingAlign": "center",
-                "textAlign": "center",
-                "animation": {
-                  "preset": "none"
-                },
-                "visualStyle": {
-                  "layout": {
-                    "textAlign": "center"
-                  },
-                  "effects": {},
-                  "card": {}
-                }
+                "headingAlign": "center"
               },
               {
                 "id": "yootheme-text-6-0-0-1",
@@ -1669,27 +1279,7 @@
                 "body": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut.",
                 "textVariant": "lead",
                 "textAlign": "center",
-                "elementAlign": "center",
-                "textColumnBreakpoint": "medium",
-                "maxWidth": "xlarge",
-                "headingAlign": "center",
-                "margin": "default",
-                "marginMode": "default",
-                "animation": {
-                  "preset": "none"
-                },
-                "visualStyle": {
-                  "layout": {
-                    "marginMode": "default",
-                    "maxWidth": "xlarge",
-                    "blockAlign": "center",
-                    "textAlign": "center"
-                  },
-                  "effects": {
-                    "maxWidth": "xlarge"
-                  },
-                  "card": {}
-                }
+                "elementAlign": "center"
               },
               {
                 "id": "yootheme-button-6-0-0-2",
@@ -1704,20 +1294,6 @@
                   }
                 ],
                 "textAlign": "center",
-                "headingAlign": "center",
-                "margin": "default",
-                "marginMode": "default",
-                "animation": {
-                  "preset": "none"
-                },
-                "visualStyle": {
-                  "layout": {
-                    "marginMode": "default",
-                    "textAlign": "center"
-                  },
-                  "effects": {},
-                  "card": {}
-                },
                 "buttonStyle": "default",
                 "size": "default"
               },
@@ -1738,7 +1314,7 @@
                     "renderer": "card",
                     "cardVariant": "default",
                     "mediaPlacement": "top",
-                    "mediaFit": "natural",
+                    "mediaFit": "cover",
                     "textAlign": "center",
                     "titleElement": "h3",
                     "titleStyle": "h4"
@@ -1759,8 +1335,9 @@
                 "columnsPhoneLandscape": "2",
                 "columnsDesktop": "3",
                 "gridMediaWidth": "medium",
-                "imageWidth": "610",
                 "imageMaxWidth": 610,
+                "imageHeight": null,
+                "imageLoading": "lazy",
                 "imageBorder": "none",
                 "imageBoxShadow": "none",
                 "imageBoxDecoration": "none",
@@ -1768,36 +1345,18 @@
                 "linkImage": false,
                 "textAlign": "center",
                 "visualStyle": {
-                  "margin": {
-                    "top": "var(--uk-global-margin-large)",
-                    "bottom": "0"
-                  },
-                  "card": {
-                    "titleMargin": "0",
-                    "buttonMargin": "0"
-                  },
                   "layout": {
                     "position": "relative",
-                    "zIndex": 1,
-                    "marginMode": "large",
-                    "removeBottomMargin": true,
-                    "textAlign": "center"
-                  },
-                  "effects": {}
-                },
-                "gridMetaAlign": "above-title",
-                "gridMetaHtmlElement": "div",
-                "headingAlign": "center",
-                "margin": "large",
-                "marginMode": "large",
-                "removeBottomMargin": true
+                    "zIndex": 1
+                  }
+                }
               }
             ]
           }
         ]
       }
     ],
-    "updatedAt": "2026-08-09T12:10:17.321Z"
+    "updatedAt": "2026-08-09T07:02:20.972Z"
   },
   "shop": {
     "version": 1,

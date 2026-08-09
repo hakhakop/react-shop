@@ -137,6 +137,9 @@ test("Home.json static content maps to existing WebPages block fields", async ()
     top: "50%",
     zIndex: 2,
   });
+  assert.equal(playOverlay.visualStyle?.customClass, "uk-disabled");
+  assert.match(playOverlay.visualStyle?.customCss ?? "", /\.el-image/);
+  assert.match(playOverlay.visualStyle?.customCss ?? "", /@keyframes pulse/);
 
   const positionedBackground = mapping.sections[0].layoutItems[0].blocks[3];
   assert.equal(positionedBackground.kind, "image");

@@ -410,10 +410,11 @@ export default function UikitProducts({ block, isCanvas, products: passedProduct
   const mediaWidthValue = mediaWidth === "small" ? "35%" : mediaWidth === "large" ? "50%" : "42%";
   const mediaStyle = getUikitPanelMediaStyle({
     ratio: rawBlock.imageRatio ?? "natural",
-    fit: rawBlock.imageFit === "contain" ? "contain" : "cover",
+    fit: rawBlock.imageFit,
     alignment: mediaAlign,
+    position: rawBlock.imagePosition,
   });
-  const imageFit = rawBlock.imageFit ?? "cover";
+  const imageFit = rawBlock.imageFit ?? "natural";
   const imageDimension = (value: unknown, fallback?: string) => {
     if (value === undefined || value === null || value === "") return fallback;
     const stringValue = String(value);

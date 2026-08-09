@@ -3,6 +3,7 @@
 import { createElement, Fragment } from "react";
 import type { InspectorPanelContext, InspectorElementCapabilityDeclaration } from "@/components/dashboard/inspector/inspectorRouting";
 import GeneralSettingsPanel from "@/components/dashboard/inspector/panels/GeneralSettingsPanel";
+import ElementAdvancedPanel from "@/components/dashboard/inspector/panels/ElementAdvancedPanel";
 
 type Props = InspectorPanelContext & {
   declaration: InspectorElementCapabilityDeclaration;
@@ -40,7 +41,7 @@ export default function ElementCapabilityComposer({ declaration, ...context }: P
   if (context.tab === "advanced") {
     return (
       <div className="builder-inspector-stack" data-inspector-composition="advanced">
-        {createElement(panel, context)}
+        <ElementAdvancedPanel block={context.block} update={context.update} />
       </div>
     );
   }

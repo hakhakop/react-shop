@@ -96,7 +96,10 @@ export const GLOBAL_STYLE_TOKEN_DEFAULTS = {
   cardPaddingDefault: "30px",
   cardPaddingLarge: "40px",
   imageDefaultRatio: "natural",
-  imageDefaultFit: "cover",
+  // Matches the canonical BuilderShell default. YOOtheme does not imply a
+  // crop mode for a bare Image, so dashboard hydration must not reintroduce
+  // the historic Cover default before normalized shell settings arrive.
+  imageDefaultFit: "natural",
   imageDefaultLoading: "lazy",
   imageDefaultBorder: "none",
   imageDefaultShadow: "none",

@@ -39,13 +39,33 @@ export default function UikitImage({ block, isCanvas, onUploadImage, shellSettin
       : ["rounded", "circle", "pill"].includes(rawBlock.imageBorder)
         ? rawBlock.imageBorder
         : undefined;
+  const layout = rawBlock.visualStyle?.layout ?? {};
+  const positionedMediaAnchor =
+    layout.position === "absolute"
+      ? layout.right !== undefined
+        ? "right"
+        : layout.left !== undefined
+          ? "left"
+          : undefined
+      : undefined;
+  // Pre-Phase-5 imports wrote numeric YOOtheme image_width only to the
+  // legacy max-width alias and stored `auto` here. Promote that value at the
+  // canonical media boundary so the media composition box, not just its img,
+  // retains the source width and can overflow a positioned column.
+  const canonicalImageWidth =
+    rawBlock.imageWidth && rawBlock.imageWidth !== "auto"
+      ? rawBlock.imageWidth
+      : typeof rawBlock.imageMaxWidth === "number" && rawBlock.imageMaxWidth > 0
+        ? String(rawBlock.imageMaxWidth)
+        : rawBlock.imageWidth;
   const resolvedImageBlock = {
     ...rawBlock,
     imageRatio: resolveString(rawBlock.imageRatio, shellSettings?.imageDefaultRatio, "natural"),
-    imageFit: resolveString(rawBlock.imageFit, shellSettings?.imageDefaultFit, "cover"),
+    imageFit: resolveString(rawBlock.imageFit, shellSettings?.imageDefaultFit, "natural"),
     imageShape: resolveString(localImageShape, shellSettings?.imageDefaultBorder, "none"),
     imageShadow: resolveString(rawBlock.imageShadow, shellSettings?.imageDefaultShadow, "none"),
-    imageAlignment: resolveString(rawBlock.imageAlignment, shellSettings?.imageDefaultAlignment, "center"),
+    imageWidth: canonicalImageWidth,
+    imageAlignment: resolveString(rawBlock.imageAlignment ?? positionedMediaAnchor, shellSettings?.imageDefaultAlignment, "center"),
     imageLoading: resolveString(rawBlock.imageLoading, shellSettings?.imageDefaultLoading, "lazy"),
   };
   const imageSemantics = resolveUikitImageSemantics(resolvedImageBlock);
@@ -59,9 +79,18 @@ export default function UikitImage({ block, isCanvas, onUploadImage, shellSettin
     resolvedImageBlock.imageLoading === "eager" ? "eager" : "lazy";
   const imageStyle = getUikitImageStyle(imageSemantics);
   const imageAttributes = getUikitImageAttributes(imageSemantics);
-  const imageClass = getUikitImageClass(imageSemantics);
+  const imageClass = `${getUikitImageClass(imageSemantics)} el-image`.trim();
   const figureClass = getUikitImageWrapperClass(imageSemantics);
   const isPlaceholder = !rawBlock.imageUrl || !rawBlock.imageUrl.trim();
+  // Framed media deliberately clips cover/ratio content. An explicit element
+  // Advanced stylesheet may intentionally move `.el-image` outside that frame
+  // (as the YOOtheme play control does), so only that opted-in case may paint
+  // beyond the media box.
+  const hasAdvancedCss = Boolean(rawBlock.visualStyle?.customCss ?? rawBlock.customCss);
+  // A width-only YOOtheme image has no authored frame. Rendering it through
+  // Next Image's fixed 1200×800 placeholder dimensions creates a synthetic
+  // 3:2 ratio before the real asset can define its natural geometry.
+  const usesIntrinsicGeometry = !imageStyle.aspectRatio && !imageStyle.height;
 
   const marginClass = rawBlock.margin && rawBlock.margin !== "none" ? `uk-margin-${rawBlock.margin}` : "";
   const textAlignClass = rawBlock.textAlign && rawBlock.textAlign !== "none" ? `uk-text-${rawBlock.textAlign}` : "";
@@ -83,6 +112,7 @@ export default function UikitImage({ block, isCanvas, onUploadImage, shellSettin
           textAlign: imageAlignment,
           maxWidth: imageStyle.maxWidth ?? (rawBlock.imageMaxWidth ? `${rawBlock.imageMaxWidth}px` : undefined),
           width: imageStyle.width,
+          height: imageStyle.height,
           marginInline:
             imageAlignment === "left"
               ? "0 auto"
@@ -92,7 +122,7 @@ export default function UikitImage({ block, isCanvas, onUploadImage, shellSettin
         }}
       >
         <div
-          className={`shop-builder-image-media ${imageStyle.aspectRatio ? "uk-cover-container" : ""} ${
+          className={`shop-builder-image-media ${hasAdvancedCss ? "has-advanced-css" : ""} ${imageStyle.aspectRatio ? "uk-cover-container" : ""} ${
             isPlaceholder ? "is-empty" : ""
           }`}
           data-image-ratio={imageStyle.aspectRatio ? "true" : undefined}
@@ -106,42 +136,18 @@ export default function UikitImage({ block, isCanvas, onUploadImage, shellSettin
             <>
               {rawBlock.imageLinkUrl ? (
                 <a href={rawBlock.imageLinkUrl} {...builderLinkTargetProps(rawBlock.imageLinkTarget)}>
-                  <Image
-                    className={imageClass}
-                    src={rawBlock.imageUrl!}
-                    alt={rawBlock.imageAlt ?? ""}
-                    width={1200}
-                    height={800}
-                    loading={imageLoading}
-                    {...imageAttributes}
-                    style={{
-                      width: "100%",
-                      height: imageStyle.aspectRatio ? "100%" : "auto",
-                      objectFit: imageStyle.objectFit as any,
-                      ...(imageStyle.position
-                        ? { position: imageStyle.position as any, inset: imageStyle.inset }
-                        : {}),
-                    }}
-                  />
+                  {usesIntrinsicGeometry ? (
+                    <img className={imageClass} src={rawBlock.imageUrl!} alt={rawBlock.imageAlt ?? ""} loading={imageLoading} {...imageAttributes} style={{ width: "100%", height: "auto", objectFit: imageStyle.objectFit as any, objectPosition: imageStyle.objectPosition }} />
+                  ) : (
+                    <Image className={imageClass} src={rawBlock.imageUrl!} alt={rawBlock.imageAlt ?? ""} width={1200} height={800} loading={imageLoading} {...imageAttributes} style={{ width: "100%", height: imageStyle.aspectRatio ? "100%" : "auto", objectFit: imageStyle.objectFit as any, objectPosition: imageStyle.objectPosition, ...(imageStyle.position ? { position: imageStyle.position as any, inset: imageStyle.inset } : {}) }} />
+                  )}
                 </a>
               ) : (
-                <Image
-                  className={imageClass}
-                  src={rawBlock.imageUrl!}
-                  alt={rawBlock.imageAlt ?? ""}
-                  width={1200}
-                  height={800}
-                  loading={imageLoading}
-                  {...imageAttributes}
-                  style={{
-                    width: "100%",
-                    height: imageStyle.aspectRatio ? "100%" : "auto",
-                    objectFit: imageStyle.objectFit as any,
-                    ...(imageStyle.position
-                      ? { position: imageStyle.position as any, inset: imageStyle.inset }
-                      : {}),
-                  }}
-                />
+                usesIntrinsicGeometry ? (
+                  <img className={imageClass} src={rawBlock.imageUrl!} alt={rawBlock.imageAlt ?? ""} loading={imageLoading} {...imageAttributes} style={{ width: "100%", height: "auto", objectFit: imageStyle.objectFit as any, objectPosition: imageStyle.objectPosition }} />
+                ) : (
+                  <Image className={imageClass} src={rawBlock.imageUrl!} alt={rawBlock.imageAlt ?? ""} width={1200} height={800} loading={imageLoading} {...imageAttributes} style={{ width: "100%", height: imageStyle.aspectRatio ? "100%" : "auto", objectFit: imageStyle.objectFit as any, objectPosition: imageStyle.objectPosition, ...(imageStyle.position ? { position: imageStyle.position as any, inset: imageStyle.inset } : {}) }} />
+                )
               )}
               {isCanvas && (
                 <button
