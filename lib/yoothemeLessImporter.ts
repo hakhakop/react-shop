@@ -280,12 +280,28 @@ const destinationMap: Record<string, { destination: string; domain: string }> = 
   "global-font-family": { destination: "shellSettings.fontFamilyBody", domain: "Typography" },
   "global-font-size": { destination: "shellSettings.baseFontSize", domain: "Typography" },
   "global-line-height": { destination: "shellSettings.baseLineHeight", domain: "Typography" },
-  "global-primary-font-weight": { destination: "shellSettings.headingFontWeight", domain: "Typography" },
-  "global-2xlarge-font-size": { destination: "shellSettings.headingXLargeFontSize", domain: "Typography" },
-  "global-xlarge-font-size": { destination: "shellSettings.headingLargeFontSize", domain: "Typography" },
-  "global-large-font-size": { destination: "shellSettings.headingMediumFontSize", domain: "Typography" },
-  "global-small-font-size": { destination: "shellSettings.smallTextFontSize", domain: "Typography" },
+  "global-small-font-size": { destination: "shellSettings.fontSizeSmall", domain: "Typography" },
+  "global-medium-font-size": { destination: "shellSettings.fontSizeMedium", domain: "Typography" },
+  "global-large-font-size": { destination: "shellSettings.fontSizeLarge", domain: "Typography" },
+  "global-xlarge-font-size": { destination: "shellSettings.fontSizeXLarge", domain: "Typography" },
+  "global-2xlarge-font-size": { destination: "shellSettings.fontSize2XLarge", domain: "Typography" },
+  "global-primary-font-family": { destination: "shellSettings.fontFamilyPrimary", domain: "Typography" },
+  "global-primary-font-style": { destination: "shellSettings.fontStylePrimary", domain: "Typography" },
+  "global-primary-font-weight": { destination: "shellSettings.fontWeightPrimary", domain: "Typography" },
+  "global-primary-letter-spacing": { destination: "shellSettings.letterSpacingPrimary", domain: "Typography" },
+  "global-primary-text-transform": { destination: "shellSettings.textTransformPrimary", domain: "Typography" },
+  "global-secondary-font-family": { destination: "shellSettings.fontFamilySecondary", domain: "Typography" },
+  "global-secondary-font-style": { destination: "shellSettings.fontStyleSecondary", domain: "Typography" },
+  "global-secondary-font-weight": { destination: "shellSettings.fontWeightSecondary", domain: "Typography" },
+  "global-secondary-letter-spacing": { destination: "shellSettings.letterSpacingSecondary", domain: "Typography" },
+  "global-secondary-text-transform": { destination: "shellSettings.textTransformSecondary", domain: "Typography" },
+  "global-tertiary-font-family": { destination: "shellSettings.fontFamilyTertiary", domain: "Typography" },
+  "global-tertiary-font-style": { destination: "shellSettings.fontStyleTertiary", domain: "Typography" },
+  "global-tertiary-font-weight": { destination: "shellSettings.fontWeightTertiary", domain: "Typography" },
+  "global-tertiary-letter-spacing": { destination: "shellSettings.letterSpacingTertiary", domain: "Typography" },
+  "global-tertiary-text-transform": { destination: "shellSettings.textTransformTertiary", domain: "Typography" },
   "global-color": { destination: "shellSettings.textColor", domain: "Colors" },
+  "global-inverse-color": { destination: "shellSettings.inverseColor", domain: "Colors" },
   "global-emphasis-color": { destination: "shellSettings.emphasisColor", domain: "Colors" },
   "global-muted-color": { destination: "shellSettings.mutedTextColor", domain: "Colors" },
   "global-link-color": { destination: "shellSettings.linkColor", domain: "Colors" },
@@ -314,8 +330,18 @@ const destinationMap: Record<string, { destination: string; domain: string }> = 
   "global-medium-gutter": { destination: "shellSettings.gridGutterMedium", domain: "Spacing" },
   "global-large-gutter": { destination: "shellSettings.gridGutterLarge", domain: "Spacing" },
   "global-control-small-height": { destination: "shellSettings.controlHeightSmall", domain: "Buttons" },
-  "global-control-height": { destination: "shellSettings.buttonHeight", domain: "Buttons" },
+  "global-control-height": { destination: "shellSettings.controlHeightDefault", domain: "Controls" },
   "global-control-large-height": { destination: "shellSettings.controlHeightLarge", domain: "Buttons" },
+  "global-z-index": { destination: "shellSettings.globalZIndex", domain: "Layout" },
+  "breakpoint-small": { destination: "shellSettings.breakpointSmall", domain: "Layout" },
+  "breakpoint-medium": { destination: "shellSettings.breakpointMedium", domain: "Layout" },
+  "breakpoint-large": { destination: "shellSettings.breakpointLarge", domain: "Layout" },
+  "breakpoint-xlarge": { destination: "shellSettings.breakpointXLarge", domain: "Layout" },
+  "section-xsmall-padding-vertical": { destination: "shellSettings.sectionPaddingXSmall", domain: "Sections" },
+  "section-small-padding-vertical": { destination: "shellSettings.sectionPaddingSmall", domain: "Sections" },
+  "section-padding-vertical": { destination: "shellSettings.sectionPaddingDefault", domain: "Sections" },
+  "section-large-padding-vertical": { destination: "shellSettings.sectionPaddingLarge", domain: "Sections" },
+  "section-xlarge-padding-vertical": { destination: "shellSettings.sectionPaddingXLarge", domain: "Sections" },
   "container-small-max-width": { destination: "shellSettings.containerSmall", domain: "Containers and page" },
   "container-max-width": { destination: "shellSettings.containerDefault", domain: "Containers and page" },
   "container-large-max-width": { destination: "shellSettings.containerLarge", domain: "Containers and page" },
@@ -490,6 +516,9 @@ export function resolveYoothemeLess(sources: YoothemeLessSource[], presetId: Yoo
       unsupported.push(row);
     } else {
       setNested(shellSettings, mapping.destination, resolved.value);
+      // `buttonHeight` is a legacy component alias. Keep it synchronized on
+      // import while `controlHeightDefault` remains the canonical global owner.
+      if (variable === "global-control-height") shellSettings.buttonHeight = resolved.value;
       rows.push(row);
       if (previous.length > 1) conflicts.push(row);
     }

@@ -22,7 +22,7 @@
       "headingWeight": "760",
       "headingLineHeight": "0.92",
       "cardBg": "#efefe9",
-      "cardRadius": "8px",
+      "cardRadius": "24px",
       "cardBorder": "transparent",
       "cardShadow": "0 12px 30px rgba(17,17,17,0.06)",
       "cardShadowHover": "0 18px 42px rgba(17,17,17,0.1)",
@@ -36,6 +36,7 @@
         "title": "Hero",
         "background": "transparent",
         "sectionVariant": "default",
+        "backgroundRole": "default",
         "preserveColor": false,
         "overlap": false,
         "textColor": "none",
@@ -85,8 +86,7 @@
                     "position": "relative",
                     "zIndex": 3
                   }
-                },
-                "headingTypographyRole": "primary"
+                }
               },
               {
                 "id": "yootheme-text-0-0-0-1",
@@ -118,7 +118,7 @@
                     "label": "Learn More",
                     "url": "?page_id=20",
                     "target": "_self",
-                    "style": "default"
+                    "style": "outline"
                   }
                 ],
                 "size": "large",
@@ -128,8 +128,7 @@
                     "position": "relative",
                     "zIndex": 3
                   }
-                },
-                "buttonStyle": "default"
+                }
               },
               {
                 "id": "yootheme-image-0-0-0-3",
@@ -137,6 +136,7 @@
                 "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/background-square-01.png",
                 "imageAlt": "",
                 "imageMaxWidth": 600,
+                "imageWidth": "auto",
                 "imageLoading": "eager",
                 "imageShape": "none",
                 "visualStyle": {
@@ -146,8 +146,7 @@
                     "left": "-20vw",
                     "zIndex": 0
                   }
-                },
-                "imageRatio": "square"
+                }
               },
               {
                 "id": "yootheme-image-0-0-0-4",
@@ -173,6 +172,7 @@
                 "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/background-square-03.png",
                 "imageAlt": "",
                 "imageMaxWidth": 700,
+                "imageWidth": "auto",
                 "imageLoading": "eager",
                 "imageShape": "none",
                 "visualStyle": {
@@ -208,6 +208,7 @@
                 "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/background-square-05.png",
                 "imageAlt": "",
                 "imageMaxWidth": 600,
+                "imageWidth": "auto",
                 "imageLoading": "eager",
                 "imageShape": "none",
                 "visualStyle": {
@@ -217,9 +218,7 @@
                     "left": "35vw",
                     "zIndex": 0
                   }
-                },
-                "imageRatio": "natural",
-                "imageFit": "contain"
+                }
               }
             ]
           },
@@ -267,8 +266,7 @@
               }
             ]
           }
-        ],
-        "backgroundRole": "default"
+        ]
       },
       {
         "id": "yootheme-section-2",
@@ -276,6 +274,7 @@
         "title": "Clients",
         "background": "transparent",
         "sectionVariant": "default",
+        "backgroundRole": "default",
         "preserveColor": false,
         "overlap": false,
         "textColor": "none",
@@ -453,6 +452,7 @@
         "title": "How It Works",
         "background": "transparent",
         "sectionVariant": "default",
+        "backgroundRole": "default",
         "preserveColor": false,
         "overlap": false,
         "textColor": "none",
@@ -542,22 +542,12 @@
                 "buttonUrl": "#",
                 "buttonStyle": "ghost",
                 "panelVariant": "default",
+                "panelStyle": "default",
                 "panelShowMedia": true,
                 "panelMediaPlacement": "top",
                 "panelMediaWidth": "medium",
                 "panelTextAlign": "center",
-                "panelTitleElement": "h3",
-                "panelHover": true,
-                "panelSize": "default",
-                "panelMediaFit": "cover",
-                "panelMediaAlignment": "center",
-                "panelVerticalAlign": "top",
-                "panelTitleStyle": "inherit",
-                "panelContentWidth": "auto",
-                "panelActionVisible": true,
-                "panelActionStyle": "primary",
-                "panelActionSize": "default",
-                "panelActionAlign": "inherit"
+                "panelTitleElement": "h3"
               }
             ]
           },
@@ -594,22 +584,12 @@
                 "buttonUrl": "#",
                 "buttonStyle": "ghost",
                 "panelVariant": "default",
+                "panelStyle": "default",
                 "panelShowMedia": true,
                 "panelMediaPlacement": "top",
                 "panelMediaWidth": "medium",
                 "panelTextAlign": "center",
-                "panelTitleElement": "h3",
-                "panelHover": true,
-                "panelSize": "default",
-                "panelMediaFit": "cover",
-                "panelMediaAlignment": "center",
-                "panelVerticalAlign": "top",
-                "panelTitleStyle": "inherit",
-                "panelContentWidth": "auto",
-                "panelActionVisible": true,
-                "panelActionStyle": "primary",
-                "panelActionSize": "default",
-                "panelActionAlign": "inherit"
+                "panelTitleElement": "h3"
               }
             ]
           },
@@ -646,22 +626,12 @@
                 "buttonUrl": "#",
                 "buttonStyle": "ghost",
                 "panelVariant": "default",
+                "panelStyle": "default",
                 "panelShowMedia": true,
                 "panelMediaPlacement": "top",
                 "panelMediaWidth": "medium",
                 "panelTextAlign": "center",
-                "panelTitleElement": "h3",
-                "panelHover": true,
-                "panelSize": "default",
-                "panelMediaFit": "cover",
-                "panelMediaAlignment": "center",
-                "panelVerticalAlign": "top",
-                "panelTitleStyle": "inherit",
-                "panelContentWidth": "auto",
-                "panelActionVisible": true,
-                "panelActionStyle": "primary",
-                "panelActionSize": "default",
-                "panelActionAlign": "inherit"
+                "panelTitleElement": "h3"
               }
             ]
           }
@@ -673,6 +643,7 @@
         "title": "Feature Grid",
         "background": "transparent",
         "sectionVariant": "default",
+        "backgroundRole": "default",
         "preserveColor": false,
         "overlap": false,
         "textColor": "none",
@@ -973,6 +944,7 @@
         "title": "Testimonials",
         "background": "transparent",
         "sectionVariant": "default",
+        "backgroundRole": "default",
         "preserveColor": false,
         "overlap": false,
         "textColor": "none",
@@ -1034,9 +1006,7 @@
                     "style": "primary"
                   }
                 ],
-                "textAlign": "right",
-                "buttonStyle": "default",
-                "size": "default"
+                "textAlign": "right"
               }
             ]
           },
@@ -1090,6 +1060,7 @@
         "title": "Call to Action",
         "background": "transparent",
         "sectionVariant": "default",
+        "backgroundRole": "default",
         "preserveColor": false,
         "overlap": false,
         "textColor": "none",
@@ -1262,6 +1233,7 @@
         "title": "Latest Posts",
         "background": "transparent",
         "sectionVariant": "muted",
+        "backgroundRole": "muted",
         "preserveColor": false,
         "overlap": false,
         "textColor": "none",
@@ -1322,12 +1294,10 @@
                     "label": "Visit Our Blog",
                     "url": "?post_type=post",
                     "target": "_self",
-                    "style": "default"
+                    "style": "ghost"
                   }
                 ],
-                "textAlign": "center",
-                "buttonStyle": "default",
-                "size": "default"
+                "textAlign": "center"
               },
               {
                 "id": "yootheme-grid-6-0-0-3",
@@ -1388,7 +1358,7 @@
         ]
       }
     ],
-    "updatedAt": "2026-08-08T18:43:49.889Z"
+    "updatedAt": "2026-08-08T18:59:41.493Z"
   },
   "shop": {
     "version": 1,

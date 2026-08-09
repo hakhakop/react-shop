@@ -123,13 +123,27 @@ export type BuilderShellSettings = {
   fontFamilyBody?: string;
   fontFamilyHeading?: string;
   fontFamilyPrimary?: string;
+  fontStylePrimary?: string;
   fontWeightPrimary?: string;
+  letterSpacingPrimary?: string;
+  textTransformPrimary?: string;
   fontFamilySecondary?: string;
+  fontStyleSecondary?: string;
   fontWeightSecondary?: string;
+  letterSpacingSecondary?: string;
+  textTransformSecondary?: string;
   fontFamilyTertiary?: string;
+  fontStyleTertiary?: string;
   fontWeightTertiary?: string;
+  letterSpacingTertiary?: string;
+  textTransformTertiary?: string;
   baseFontSize?: string;
   baseLineHeight?: string;
+  fontSizeSmall?: string;
+  fontSizeMedium?: string;
+  fontSizeLarge?: string;
+  fontSizeXLarge?: string;
+  fontSize2XLarge?: string;
   visibilityDesktop?: boolean;
   visibilityTablet?: boolean;
   visibilityMobile?: boolean;
@@ -141,6 +155,7 @@ export type BuilderShellSettings = {
   smallTextFontSize?: string;
   largeTextFontSize?: string;
   emphasisColor?: string;
+  inverseColor?: string;
   mutedTextColor?: string;
   linkColor?: string;
   linkHoverColor?: string;
@@ -158,7 +173,13 @@ export type BuilderShellSettings = {
   marginLarge?: string;
   marginXLarge?: string;
   controlHeightSmall?: string;
+  controlHeightDefault?: string;
   controlHeightLarge?: string;
+  globalZIndex?: string;
+  breakpointSmall?: string;
+  breakpointMedium?: string;
+  breakpointLarge?: string;
+  breakpointXLarge?: string;
   pageContainerMaxWidth?: string;
   cardPrimaryBackground?: string;
   cardSecondaryBackground?: string;
@@ -314,6 +335,7 @@ export type BuilderShellSettings = {
   globalStylePresetName?: string;
   globalStylePresetBackup?: { design?: Record<string, unknown>; shellSettings?: Record<string, unknown> };
   customGlobalStylePresets?: BuilderCustomGlobalStylePreset[];
+  sectionPaddingXSmall?: string;
   sectionPaddingSmall?: string;
   sectionPaddingDefault?: string;
   sectionPaddingMedium?: string;
@@ -437,13 +459,34 @@ export const defaultBuilderShellSettings: BuilderShellSettings = {
   fontFamilyBody: "system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
   fontFamilyHeading: "inherit",
   fontFamilyPrimary: "inherit",
+  fontStylePrimary: "inherit",
   fontWeightPrimary: "700",
+  letterSpacingPrimary: "inherit",
+  textTransformPrimary: "inherit",
   fontFamilySecondary: "inherit",
+  fontStyleSecondary: "inherit",
   fontWeightSecondary: "400",
+  letterSpacingSecondary: "inherit",
+  textTransformSecondary: "inherit",
   fontFamilyTertiary: "inherit",
+  fontStyleTertiary: "inherit",
   fontWeightTertiary: "400",
+  letterSpacingTertiary: "inherit",
+  textTransformTertiary: "inherit",
   baseFontSize: "16px",
   baseLineHeight: "1.5",
+  fontSizeSmall: "14px",
+  fontSizeMedium: "20px",
+  fontSizeLarge: "24px",
+  fontSizeXLarge: "34px",
+  fontSize2XLarge: "44px",
+  inverseColor: "#ffffff",
+  controlHeightDefault: "48px",
+  globalZIndex: "1000",
+  breakpointSmall: "640px",
+  breakpointMedium: "960px",
+  breakpointLarge: "1200px",
+  breakpointXLarge: "1600px",
   visibilityDesktop: true,
   visibilityTablet: true,
   visibilityMobile: true,
@@ -451,6 +494,8 @@ export const defaultBuilderShellSettings: BuilderShellSettings = {
   sectionPaddingDefault: "70px",
   sectionPaddingMedium: "80px",
   sectionPaddingLarge: "100px",
+  sectionPaddingXSmall: "20px",
+  sectionPaddingXLarge: "140px",
   gridGutterSmall: "15px",
   gridGutterDefault: "30px",
   gridGutterLarge: "40px",
