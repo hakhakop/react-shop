@@ -208,32 +208,45 @@ behavior was added.
 - **Explicit unsupported:** inline SVG manipulation/color/stroke animation; hover image/video asset switching; modal/lightbox links; and responsive `image_grid_breakpoint`. They stay importer warnings because WebPages has no safe shared asset/interaction or responsive-media-width owner yet.
 - **Reopened acceptance:** the previous fixture only proved stored dimensions/non-cropping behavior. It did not prove imported DevStack hero composition: media-sized absolute anchors, main-image aspect presentation, play-control placement, and decorative image scale/placement must be compared visually in the live YOOtheme and WebPages fixture. Standalone Image Settings must also follow the live YOOtheme Content/Settings separation: Width/Height are Content controls; Focal Point, Loading, Border, Shadow, and Decoration remain Settings; WebPages-only framing controls must not appear as fake YOOtheme Settings controls.
 
-### 6. Button / Links — PARTIAL
+### 6. Button / Links — COMPLETE
 
-**Phase 6 progress (2026-08-09):** Button, Panel action, and Grid action now
-normalize YOOtheme Default, Primary, Secondary, Text/Link styles into the
-canonical UIkit variant vocabulary instead of the obsolete outline/ghost
-aliases. The same import contract retains link target, size, full-width, and
-link-margin values for Panel and Grid actions; the existing shared Action UI
-exposes those values in their normal element inspectors. `UikitButton`, Panel
-action rendering, and Grid action rendering consume those canonical values in
-Builder and storefront. Button dialog/offcanvas remains explicitly unsupported
-and produces a durable warning. Focused coverage in
-`tests/button-links-acceptance.test.mjs` protects the importer and variant
-resolver contract. Live Builder/storefront inspection verified the imported
-hero Primary and Default buttons render the same UIkit variant and size in
-both surfaces. Full Panel/Grid interaction editing and fresh-import visual
-verification remain required before this phase can be marked complete.
+**Verified completion (2026-08-09):** Button, Panel action, and Grid action
+normalize YOOtheme Default, Primary, Secondary, and Text/Link styles into one
+canonical UIkit variant vocabulary. `UikitButton` owns multi-action
+`buttons[]`; the Button Content inspector exposes that exact collection with
+add, remove, reorder, per-item label, URL, target, and style controls. Legacy
+singular button fields remain read-compatible only when `buttons[]` is absent.
+
+Panel uses its existing shared Action group and Grid now uses
+`resolveCanonicalGridAction`, so imported `link_style`, `link_target`,
+`link_size`, `link_fullwidth`, and `link_margin` converge on the same
+canonical action fields consumed in both Builder and storefront. A shared
+typography wrapper no longer appends a legacy Primary class to an already
+resolved UIkit variant, and the Builder Panel action no longer receives the
+legacy preview CTA typography that overrode the Global Button large-size
+tokens. Global Button CSS variables remain the sole visual owner for family,
+weight, transform, variant, size, radius, padding, line height, and shadow.
+
+Focused fresh-import coverage in
+`tests/button-links-acceptance.spec.ts` imports a Button Items collection,
+Panel action, and Grid action through the production importer; publishes an
+Item edit; then proves Builder/storefront class and computed-token parity.
+It verifies Primary/Text Large and Secondary Large/Default Small variants,
+full-width, `_blank`/`noreferrer`, and Panel/Grid link margins. The test
+passes together with `npx tsc --noEmit`. The currently open Builder tab has
+an explicitly unsaved local draft and was deliberately not overwritten during
+this verification; the isolated fresh import is the authoritative persisted
+comparison.
 
 - **YOOtheme semantics:** button/link style, size, state colors/borders/shadows/gradients, typography, target, full width, margins, panel/image/title links, modal/dialog links.
 - **Existing owners:** button shell tokens, `UikitButton` classes, button inspector/style controls, `builderLinkTargetProps`.
-- **Missing capability:** semantic default/text/link variants, link spacing and title/panel linking shared across consumers, dialog policy.
+- **Missing capability:** modal/dialog/offcanvas navigation policy only.
 - **Inspector/UI:** existing Button and Link controls show variant, size, target, width, and explicit link behavior.
 - **Import mapping:** `button_style`, `link_style`, `link_text`, `link_target`, size/margins normalize to canonical button/link fields.
-- **Builder/frontend:** all button/link renderers consume shared token classes and target helper.
+- **Builder/frontend:** `UikitButton`, Panel action, and Grid action consume the same UIkit token classes and target helper; the Builder uses the same action resolver as storefront.
 - **Inheritance:** global button tokens → component variant → local explicit fields.
 - **Explicit unsupported:** YOOtheme dialog/offcanvas links until WebPages has one canonical modal/navigation interaction.
-- **Acceptance:** imported variants/states and links work in Builder/frontend; changing Global Button styles updates every inheriting button.
+- **Acceptance:** met for supported Button, Panel action, and Grid action semantics: fresh import, normal inspector editing/persistence, Global token resolution, Builder/storefront class and computed-style parity, targets, full width, and link spacing. Dialog/offcanvas links remain intentionally unsupported.
 
 ### 7. Panel / Card — PARTIAL
 

@@ -164,6 +164,7 @@ import {
 } from "@/lib/uikitTokens";
 import { elementAdvancedScope, parseSafeElementAttributes, resolveElementAdvanced } from "@/lib/elementAdvanced";
 import { getGeneralElementShellStyle } from "@/lib/builderElementShell";
+import { resolveCanonicalGridAction } from "@/lib/builderActions";
 import { resolveSectionBackground, sectionBackgroundClass } from "@/lib/semanticBackgrounds";
 import {
   getUikitColumnWidthClass,
@@ -15398,7 +15399,7 @@ function PreviewSection({
                                       <DashboardTypog
                                         as="span"
                                         area="button"
-                                        className={`builder-preview-cta ${getUikitMarginClass((block as any).linkMarginTop)} ${getUikitButtonClass(block.panelActionStyle ?? block.buttonStyle ?? "primary", block.panelActionSize ?? block.size ?? "default")} ${block.fullWidthButton ? "uk-width-1-1" : ""} shop-builder-panel-action--${block.panelActionAlign ?? "inherit"}`}
+                                        className={`${getUikitMarginClass((block as any).linkMarginTop)} ${getUikitButtonClass(block.panelActionStyle ?? block.buttonStyle ?? "primary", block.panelActionSize ?? block.size ?? "default")} ${block.fullWidthButton ? "uk-width-1-1" : ""} shop-builder-panel-action--${block.panelActionAlign ?? "inherit"}`}
                                         typography={block.typography}
                                       >
                                         {block.buttonLabel}
@@ -16013,18 +16014,19 @@ function PreviewSection({
                                                       typography={itemTypography}
                                                     />
 
-                                                    {block.gridShowButton !== false && rawGridBlock.showLink !== false && (rawGridBlock.buttonLabel ?? item.buttonLabel ?? rawGridBlock.linkText) && (() => {
-                                                      const linkMarginTopClass = (rawGridBlock.linkMarginTop && rawGridBlock.linkMarginTop !== "none" && rawGridBlock.linkMarginTop !== "default") ? `uk-margin-${rawGridBlock.linkMarginTop}` : "";
+                                                    {block.gridShowButton !== false && rawGridBlock.showLink !== false && (() => {
+                                                      const action = resolveCanonicalGridAction(block, item);
+                                                      const linkMarginTopClass = getUikitMarginClass(action.margin);
                                                       return (
                                                         <div
                                                           className={`shop-builder-grid-button shop-builder-grid-button--${item.buttonAlign ?? "left"} ${linkMarginTopClass}`.trim()}
                                                         >
                                                           <a
-                                                            className={`shop-builder-grid-action builder-grid-action ${rawGridBlock.buttonStyle ? getUikitButtonClass(rawGridBlock.buttonStyle, rawGridBlock.size ?? "default") : rawGridBlock.linkStyle ? (rawGridBlock.linkStyle.startsWith("link-") ? `uk-${rawGridBlock.linkStyle}` : `uk-button uk-${rawGridBlock.linkStyle} ${rawGridBlock.linkButtonSize && rawGridBlock.linkButtonSize !== "default" ? `uk-button-${rawGridBlock.linkButtonSize}` : ""} ${rawGridBlock.linkFullWidth ? "uk-width-1-1" : ""}`) : getUikitButtonClass(item.actionStyle ?? item.buttonStyle ?? block.buttonStyle ?? "primary", item.actionSize ?? block.size ?? "default")} ${rawGridBlock.fullWidthButton ? "uk-width-1-1" : ""}`.trim()}
-                                                            href={rawGridBlock.buttonUrl ?? item.buttonUrl ?? "#"}
-                                                            {...builderLinkTargetProps(rawGridBlock.buttonTarget ?? rawGridBlock.linkTarget ?? item.buttonTarget)}
+                                                            className={`shop-builder-grid-action builder-grid-action ${getUikitButtonClass(action.style, action.size)} ${action.fullWidth ? "uk-width-1-1" : ""}`.trim()}
+                                                            href={action.url}
+                                                            {...builderLinkTargetProps(action.target)}
                                                           >
-                                                            {rawGridBlock.buttonLabel ?? item.buttonLabel ?? rawGridBlock.linkText ?? "Read more"}
+                                                            {action.label}
                                                           </a>
                                                         </div>
                                                       );
@@ -16078,19 +16080,22 @@ function PreviewSection({
                                                   )}
                                                 {block.gridShowButton !==
                                                   false &&
-                                                  item.buttonLabel && (
+                                                  item.buttonLabel && (() => {
+                                                    const action = resolveCanonicalGridAction(block, item);
+                                                    return (
                                                     <div
-                                                      className={`shop-builder-grid-button shop-builder-grid-button--${item.buttonAlign ?? "left"}`}
+                                                      className={`shop-builder-grid-button shop-builder-grid-button--${item.buttonAlign ?? "left"} ${getUikitMarginClass(action.margin)}`.trim()}
                                                     >
                                                       <a
-                                                        className={`shop-builder-grid-action builder-grid-action ${getUikitButtonClass(item.actionStyle ?? item.buttonStyle ?? block.buttonStyle ?? "primary", item.actionSize ?? block.size ?? "default")}`}
-                                                        href={item.buttonUrl || "#"}
-                                                        {...builderLinkTargetProps(item.buttonTarget)}
+                                                        className={`shop-builder-grid-action builder-grid-action ${getUikitButtonClass(action.style, action.size)} ${action.fullWidth ? "uk-width-1-1" : ""}`.trim()}
+                                                        href={action.url}
+                                                        {...builderLinkTargetProps(action.target)}
                                                       >
-                                                        {item.buttonLabel}
+                                                        {action.label}
                                                       </a>
                                                     </div>
-                                                  )}
+                                                    );
+                                                  })()}
                                               </>
                                             )}
                                           </div>

@@ -16,6 +16,7 @@ import {
 } from "@/lib/uikitTokens";
 import { typographyRoleClass } from "@/lib/builderTypography";
 import { builderLinkTargetProps } from "@/lib/websiteBuilderLinks";
+import { resolveCanonicalGridAction } from "@/lib/builderActions";
 
 function getUikitMarginClass(val?: string) {
   if (!val || val === "default" || val === "none") return "";
@@ -237,13 +238,11 @@ export function GridCardsClient({
                 : undefined;
 
             // Link / Button styling
-            const buttonText = rawBlock.buttonLabel ?? item.buttonLabel ?? rawBlock.linkText ?? "Read more";
-            const btnVariant = rawBlock.buttonStyle ?? item.actionStyle ?? item.buttonStyle ?? block.buttonStyle ?? "primary";
-            const btnSize = rawBlock.size ?? item.actionSize ?? block.size ?? "default";
-            const isFullWidth = Boolean(rawBlock.fullWidthButton);
-            const linkStyleClass = getUikitLinkStyleClass(btnVariant, btnSize, isFullWidth);
-            const linkMarginTopClass = getUikitMarginClass(rawBlock.linkMarginTop);
-            const linkTarget = rawBlock.buttonTarget ?? rawBlock.linkTarget ?? item.buttonTarget ?? "_self";
+            const action = resolveCanonicalGridAction(block, item);
+            const buttonText = action.label;
+            const linkStyleClass = getUikitLinkStyleClass(action.style, action.size, action.fullWidth);
+            const linkMarginTopClass = getUikitMarginClass(action.margin);
+            const linkTarget = action.target;
 
             const mediaPlacement = item.mediaPlacement ?? (block as any).gridMediaPlacement ?? "top";
             const isSideMedia = mediaPlacement === "left" || mediaPlacement === "right";
@@ -257,7 +256,7 @@ export function GridCardsClient({
             });
             const hasCropFrame = !imageWidth && !imageHeight && mediaStyle.aspectRatio && mediaStyle.aspectRatio !== "auto";
             const panelLayoutClass = getUikitPanelLayoutClass(mediaPlacement, mediaWidth);
-            const itemUrl = rawBlock.buttonUrl ?? item.buttonUrl ?? "#";
+            const itemUrl = action.url;
 
             const renderMeta = () => (
               canShowMeta && item.meta ? (

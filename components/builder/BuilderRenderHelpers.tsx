@@ -66,7 +66,11 @@ export function Typog({
   const uikitHeading = isHeading ? getUikitHeadingClass(As, typography?.preset) : "";
   const uikitText = resolvedArea === "eyebrow" ? getUikitTextClass("meta") : resolvedArea === "lead" ? getUikitTextClass("lead") : "";
   const isCta = String(className || "").includes("cta");
-  const uikitButton = isCta ? getUikitButtonClass(props.buttonStyle || "primary", props.buttonSize) : "";
+  // Renderers that already selected a semantic UIkit button variant must not
+  // receive this legacy Primary fallback as a second, competing class.
+  const uikitButton = isCta && !String(className || "").includes("uk-button")
+    ? getUikitButtonClass(props.buttonStyle || "primary", props.buttonSize)
+    : "";
   const combined = [className, tp.className, uikitHeading, uikitText, uikitButton].filter(Boolean).join(" ");
   const combinedStyle = buttonTypographyStyle(combined, {
     ...style,
