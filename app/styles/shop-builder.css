@@ -927,6 +927,83 @@ body.dark {
 .shop-builder-panel-action--center { align-self: center; }
 .shop-builder-panel-action--right { align-self: flex-end; }
 
+/* Canonical Panel/Card presentation states shared by Builder and storefront. */
+.shop-builder-column-block--panel {
+  position: relative;
+}
+
+.shop-builder-panel-link-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: inherit;
+}
+
+.shop-builder-panel--linked > :not(.shop-builder-panel-link-overlay) {
+  position: relative;
+  z-index: 0;
+}
+
+.shop-builder-panel--media-padded > .shop-builder-panel-media {
+  /* This is the canonical Panel padding state. It must also override the
+     older generic card-media rule while a Builder preview is mounted. */
+  margin: var(--uk-card-padding, 30px) !important;
+  width: calc(100% - (var(--uk-card-padding, 30px) * 2)) !important;
+  border-radius: var(--uk-card-border-radius, var(--builder-card-radius, var(--builder-radius, 8px)));
+}
+.shop-builder-panel--media-padded.uk-card-small > .shop-builder-panel-media {
+  margin: var(--uk-card-padding-small, 15px) !important;
+  width: calc(100% - (var(--uk-card-padding-small, 15px) * 2)) !important;
+}
+.shop-builder-panel--media-padded.uk-card-large > .shop-builder-panel-media {
+  margin: var(--uk-card-padding-large, 40px) !important;
+  width: calc(100% - (var(--uk-card-padding-large, 40px) * 2)) !important;
+}
+
+.shop-builder-column-block--panel.shop-builder-panel--media-padded.shop-builder-panel--media-left,
+.shop-builder-column-block--panel.shop-builder-panel--media-padded.shop-builder-panel--media-right {
+  gap: var(--uk-card-padding, 30px);
+}
+.shop-builder-column-block--panel.shop-builder-panel--media-padded.uk-card-small.shop-builder-panel--media-left,
+.shop-builder-column-block--panel.shop-builder-panel--media-padded.uk-card-small.shop-builder-panel--media-right {
+  gap: var(--uk-card-padding-small, 15px);
+}
+.shop-builder-column-block--panel.shop-builder-panel--media-padded.uk-card-large.shop-builder-panel--media-left,
+.shop-builder-column-block--panel.shop-builder-panel--media-padded.uk-card-large.shop-builder-panel--media-right {
+  gap: var(--uk-card-padding-large, 40px);
+}
+.shop-builder-column-block--panel.shop-builder-panel--media-padded.shop-builder-panel--media-left > .shop-builder-panel-media,
+.shop-builder-column-block--panel.shop-builder-panel--media-padded.shop-builder-panel--media-right > .shop-builder-panel-media {
+  margin: 0;
+  width: 100% !important;
+}
+
+.shop-builder-panel--height-expand {
+  min-height: 100%;
+}
+.shop-builder-panel--height-expand.shop-builder-panel--media-top {
+  display: flex;
+  flex-direction: column;
+}
+.shop-builder-panel--height-expand .uk-card-body {
+  min-height: 0;
+}
+.shop-builder-panel--expand-content .uk-card-body {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+}
+.shop-builder-panel--expand-content .shop-builder-panel-action {
+  margin-top: auto;
+}
+.shop-builder-panel--expand-image.shop-builder-panel--media-top > .shop-builder-panel-media {
+  flex: 1 1 auto;
+}
+.shop-builder-panel--expand-both.shop-builder-panel--media-top > .shop-builder-panel-media,
+.shop-builder-panel--expand-both .uk-card-body {
+  flex: 1 1 auto;
+}
+
 @media (max-width: 679px) {
   .shop-builder-column-block--panel.shop-builder-panel--media-left,
   .shop-builder-column-block--panel.shop-builder-panel--media-right,
@@ -2255,6 +2332,17 @@ body.dark {
 .shop-builder-column-block--panel > div:last-child {
   display: grid;
   gap: var(--builder-card-gap, 10px);
+}
+
+/* The legacy panel body stack is useful for ordinary cards, but expansion is
+   a semantic Panel state and needs a flex column so its content can consume
+   the available height. Keep this after the legacy stack rule so Builder and
+   storefront resolve the same presentation. */
+.shop-builder-column-block--panel.shop-builder-panel--expand-content > .uk-card-body,
+.shop-builder-column-block--panel.shop-builder-panel--expand-both > .uk-card-body {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
 }
 
 .shop-builder-column-block--panel h3,

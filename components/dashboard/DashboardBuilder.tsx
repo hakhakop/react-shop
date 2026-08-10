@@ -165,6 +165,7 @@ import {
 import { elementAdvancedScope, parseSafeElementAttributes, resolveElementAdvanced } from "@/lib/elementAdvanced";
 import { getGeneralElementShellStyle } from "@/lib/builderElementShell";
 import { resolveCanonicalGridAction } from "@/lib/builderActions";
+import { resolvePanelPresentation } from "@/lib/panelPresentation";
 import { resolveSectionBackground, sectionBackgroundClass } from "@/lib/semanticBackgrounds";
 import {
   getUikitColumnWidthClass,
@@ -324,6 +325,7 @@ import {
   getBuilderImageObjectFit,
 } from "@/lib/builderImages";
 import { mapYoothemeStaticContent } from "@/lib/yoothemePageImport";
+import { invalidateImportedBuilderDraft } from "@/lib/builderDraftInvalidation";
 import { AnimatePresence, motion } from "framer-motion";
 
 const BUILDER_TEMPLATE_DND_TYPE = "application/x-builder-template";
@@ -1453,13 +1455,19 @@ function normalizeBuilderState(
               rawVariant === "primary" ||
               rawVariant === "secondary" ||
               rawVariant === "blank" ||
+              rawVariant === "tile-default" ||
+              rawVariant === "tile-muted" ||
+              rawVariant === "tile-primary" ||
+              rawVariant === "tile-secondary" ||
               rawVariant === "panel"
                 ? rawVariant === "panel"
                   ? "blank"
                   : rawVariant
                 : "default";
             const panelSize =
-              block.panelSize === "small" || elementPadding === "sm"
+              block.panelSize === "none"
+                ? "none"
+                : block.panelSize === "small" || elementPadding === "sm"
                 ? "small"
                 : block.panelSize === "large" ||
                     elementPadding === "lg" ||
@@ -1485,6 +1493,11 @@ function normalizeBuilderState(
               panelActionStyle: block.panelActionStyle === "default" || block.panelActionStyle === "secondary" || block.panelActionStyle === "text" ? block.panelActionStyle : "primary",
               panelActionSize: block.panelActionSize === "small" || block.panelActionSize === "large" ? block.panelActionSize : "default",
               panelActionAlign: block.panelActionAlign === "left" || block.panelActionAlign === "center" || block.panelActionAlign === "right" ? block.panelActionAlign : "inherit",
+              panelImageNoPadding: block.panelImageNoPadding,
+              panelHeightExpand: block.panelHeightExpand === true,
+              panelExpand: block.panelExpand === "image" || block.panelExpand === "content" || block.panelExpand === "both" ? block.panelExpand : "none",
+              panelMetaPosition: block.panelMetaPosition === "above-title" || block.panelMetaPosition === "above-content" || block.panelMetaPosition === "below-content" ? block.panelMetaPosition : "below-title",
+              linkPanel: block.linkPanel === true,
             } as BuilderLayoutBlock;
           }
           if (block.kind === "list") {
@@ -2004,6 +2017,13 @@ export default function DashboardBuilder({
   const builderStateRef = useRef(builderState);
   builderStateRef.current = builderState;
   const restoredDraftKeysRef = useRef(new Set<BuilderLayoutKey>());
+  // A YOOtheme import replaces a persisted document. Its old local draft must
+  // not win on the next Builder load after the imported document is published.
+  const pendingYoothemeDraftInvalidationRef = useRef<BuilderLayoutKey | null>(null);
+  const skipImportedDraftPersistenceRef = useRef<{
+    page: BuilderLayoutKey;
+    signature: string;
+  } | null>(null);
   const [headerDocumentPreviewState, setHeaderDocumentPreviewState] = useState<BuilderState | null>(null);
   const [footerDocumentPreviewState, setFooterDocumentPreviewState] = useState<BuilderState | null>(null);
   const [presetToApply, setPresetToApply] = useState<{ presetKey: string; name: string } | null>(null);
@@ -3085,6 +3105,25 @@ export default function DashboardBuilder({
 
   useEffect(() => {
     if (!draftReady) return;
+    // A published document is already the authoritative fallback. Persisting
+    // it again as a draft makes a subsequent fresh import vulnerable to an
+    // old browser draft winning during hydration.
+    if (
+      committedBuilderStateSignature.length > 0 &&
+      builderStateSignature === committedBuilderStateSignature
+    ) {
+      return;
+    }
+    const pendingSkip = skipImportedDraftPersistenceRef.current;
+    if (pendingSkip) {
+      skipImportedDraftPersistenceRef.current = null;
+      if (
+        pendingSkip.page === builderState.page &&
+        pendingSkip.signature === JSON.stringify(builderState)
+      ) {
+        return;
+      }
+    }
     window.localStorage.setItem(storageKeys.state, JSON.stringify(builderState));
     let drafts: Partial<Record<BuilderLayoutKey, BuilderState>> = {};
     try {
@@ -3099,7 +3138,13 @@ export default function DashboardBuilder({
     }
     drafts[builderState.page] = builderState;
     window.localStorage.setItem(storageKeys.drafts, JSON.stringify(drafts));
-  }, [builderState, draftReady, storageKeys]);
+  }, [
+    builderState,
+    builderStateSignature,
+    committedBuilderStateSignature,
+    draftReady,
+    storageKeys,
+  ]);
 
   useEffect(() => {
     if (builderState.page === "header") {
@@ -6359,6 +6404,28 @@ export default function DashboardBuilder({
       layoutSuccess = false;
     } else {
       setCommittedBuilderStateSignature(JSON.stringify(builderState));
+      if (pendingYoothemeDraftInvalidationRef.current === builderState.page) {
+        try {
+          invalidateImportedBuilderDraft(window.localStorage, {
+            draftsKey: storageKeys.drafts,
+            stateKey: storageKeys.state,
+            pageKey: builderState.page,
+            importedState: builderState,
+          });
+          restoredDraftKeysRef.current.delete(builderState.page);
+          // The import's setState effect can still be queued when Publish is
+          // clicked. Skip precisely that already-persisted state once, rather
+          // than allowing it to recreate the invalidated draft.
+          skipImportedDraftPersistenceRef.current = {
+            page: builderState.page,
+            signature: JSON.stringify(builderState),
+          };
+          pendingYoothemeDraftInvalidationRef.current = null;
+        } catch {
+          // Persistence succeeded. A storage failure must not turn a successful
+          // document publish into a failed import.
+        }
+      }
       setPublishedKeys((current) => {
         if (current.includes(builderState.page)) return current;
         return [...current, builderState.page];
@@ -7438,6 +7505,7 @@ export default function DashboardBuilder({
   const applyYoothemeImport = () => {
     if (!yoothemeImportPreview) return;
 
+    pendingYoothemeDraftInvalidationRef.current = builderState.page;
     setBuilderState((current) => ({
       ...current,
       sections: yoothemeImportPreview.sections,
@@ -15109,9 +15177,31 @@ function PreviewSection({
                             const panelMarginClass = ((block as any).margin && (block as any).margin !== "none" && (block as any).margin !== "default") ? `uk-margin-${(block as any).margin}` : "";
                             const panelAnimationClass = (block.animation && typeof block.animation === "string" && block.animation !== "none") ? `uk-animation-${block.animation}` : "";
                             const panelVisibilityClass = ((block as any).visibility && (block as any).visibility !== "always") ? `uk-${(block as any).visibility}` : "";
+                            const panelPresentation = resolvePanelPresentation(block as Record<string, unknown>);
+                            const panelMeta = block.eyebrow ? (
+                              <InlineEditableText
+                                as="span"
+                                area="eyebrow"
+                                className={`shop-builder-eyebrow shop-builder-panel-meta ${typographyRoleClass(block.metaTypographyRole)}`}
+                                typography={block.typography}
+                                style={panelMetaStyle}
+                                value={block.eyebrow}
+                                onChange={(eyebrow) =>
+                                  onUpdateBlock(section.id, columnKey, blockKey, { eyebrow })
+                                }
+                              />
+                            ) : null;
 
                             return (
-                              <div data-builder-block-id={block.id} className={`shop-builder-column-block shop-builder-column-block--panel ${panelLayoutClass} ${panelMarginClass} ${panelAnimationClass} ${panelVisibilityClass} ${typographyRoleClass(block.contentTypographyRole)} ${getUikitCardClass(block.panelStyle ?? block.panelVariant ?? "default", { hover: block.panelHover, padding: block.panelSize })}`.trim()} style={{ textAlign: block.panelTextAlign ?? "left" }}>
+                              <div data-builder-block-id={block.id} className={`shop-builder-column-block shop-builder-column-block--panel ${panelLayoutClass} ${panelMarginClass} ${panelAnimationClass} ${panelVisibilityClass} ${typographyRoleClass(block.contentTypographyRole)} ${panelPresentation.className}`.trim()} style={{ textAlign: block.panelTextAlign ?? "left" }}>
+                                {panelPresentation.linked && (
+                                  <a
+                                    className="shop-builder-panel-link-overlay"
+                                    href={panelPresentation.linkHref}
+                                    {...builderLinkTargetProps(block.buttonTarget)}
+                                    aria-label={block.title || block.buttonLabel || "Open panel"}
+                                  />
+                                )}
                                 {block.panelShowMedia !== false && (
                                 <div
                                   className={`${panelMediaClass} ${panelImageClass} shop-builder-panel-media${isPanelImagePlaceholder ? " is-empty" : ""}`.trim()}
@@ -15196,24 +15286,7 @@ function PreviewSection({
                                 </div>
                                 )}
                                 <div className={`uk-card-body shop-builder-panel-content-width-${block.panelContentWidth ?? "auto"}`} style={{ textAlign: block.panelTextAlign ?? "left", alignSelf: block.panelVerticalAlign === "center" ? "center" : block.panelVerticalAlign === "bottom" ? "end" : "start" }}>
-                                  {block.eyebrow && (
-                                    <InlineEditableText
-                                      as="span"
-                                      area="eyebrow"
-                                      className={`shop-builder-eyebrow shop-builder-panel-meta ${typographyRoleClass(block.metaTypographyRole)}`}
-                                      typography={block.typography}
-                                      style={panelMetaStyle}
-                                      value={block.eyebrow}
-                                      onChange={(eyebrow) =>
-                                        onUpdateBlock(
-                                          section.id,
-                                          columnKey,
-                                          blockKey,
-                                          { eyebrow },
-                                        )
-                                      }
-                                    />
-                                  )}
+                                  {panelPresentation.metaPosition === "above-title" && panelMeta}
                                   {block.title &&
                                     (block.typewriterEnabled ? (
                                       <DashboardTypog
@@ -15293,6 +15366,7 @@ function PreviewSection({
                                         }
                                       />
                                     ))}
+                                  {(panelPresentation.metaPosition === "below-title" || panelPresentation.metaPosition === "above-content") && panelMeta}
                                   {block.body &&
                                     (block.typewriterEnabled && !block.title ? (
                                       <DashboardTypog
@@ -15370,6 +15444,7 @@ function PreviewSection({
                                         }
                                       />
                                     ))}
+                                  {panelPresentation.metaPosition === "below-content" && panelMeta}
 
                                   <RenderDashboardChecklist
                                     items={block.items}
@@ -15395,7 +15470,7 @@ function PreviewSection({
                                       })`,
                                     }}
                                   >
-                                    {block.panelActionVisible !== false && block.buttonLabel && (
+                                    {!panelPresentation.linked && block.panelActionVisible !== false && block.buttonLabel && (
                                       <DashboardTypog
                                         as="span"
                                         area="button"

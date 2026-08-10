@@ -307,9 +307,14 @@ export type BuilderLayoutBlock = {
   elementPadding?: "none" | "xs" | "sm" | "md" | "lg" | "xl" | "2xl" | "3xl" | "small" | "medium" | "large" | string;
   elementAlign?: "left" | "center" | "right";
   panelStyle?: BuilderPanelStyle;
-  panelVariant?: "default" | "primary" | "secondary" | "blank";
+  panelVariant?: "default" | "primary" | "secondary" | "blank" | "tile-default" | "tile-muted" | "tile-primary" | "tile-secondary";
   panelHover?: boolean;
-  panelSize?: "small" | "default" | "large";
+  panelSize?: "none" | "small" | "default" | "large";
+  panelImageNoPadding?: boolean;
+  panelHeightExpand?: boolean;
+  panelExpand?: "none" | "image" | "content" | "both";
+  panelMetaPosition?: "above-title" | "below-title" | "above-content" | "below-content";
+  linkPanel?: boolean;
   panelShowMedia?: boolean;
   panelMediaPlacement?: "top" | "left" | "right";
   panelMediaFit?: "natural" | "cover" | "contain" | "fill";

@@ -248,17 +248,16 @@ comparison.
 - **Explicit unsupported:** YOOtheme dialog/offcanvas links until WebPages has one canonical modal/navigation interaction.
 - **Acceptance:** met for supported Button, Panel action, and Grid action semantics: fresh import, normal inspector editing/persistence, Global token resolution, Builder/storefront class and computed-style parity, targets, full width, and link spacing. Dialog/offcanvas links remain intentionally unsupported.
 
-### 7. Panel / Card — PARTIAL
+### 7. Panel / Card — COMPLETE
 
-- **YOOtheme semantics:** panel/card/tile variants, padding, hover, links, media placement/width, title/meta/content layout, expand and image-padding behavior.
-- **Existing owners:** panel block fields, `BuilderVisualStyle.card`, UIkit card variables/classes, panel renderer.
-- **Missing capability:** a complete shared presentation contract for title/meta/content order, spacing, linking, responsive media, and panel expansion.
-- **Inspector/UI:** Panel Style/Media/Typography groups reuse card presentation controls and expose only valid variants.
-- **Import mapping:** `panel_style`, `panel_padding`, media and text semantics map through the shared presentation/media contract.
-- **Builder/frontend:** panel renderer uses the same card/media helper and CSS variables in both surfaces.
-- **Inheritance:** global Card tokens → panel/card variant → local presentation override.
-- **Explicit unsupported:** tiles or panel modes without a canonical WebPages presentation equivalent.
-- **Acceptance:** import `card-default`, `card-primary`, `card-secondary`, padding, media, and text semantics; edit values and verify parity.
+- **YOOtheme semantics:** panel/card/tile variants, padding, hover, whole-panel links, media placement/width, title/meta/content order, image-without-padding, and height/expansion behavior.
+- **Canonical owners:** `panelVariant`, `panelSize`, `panelHover`, `linkPanel`, `panelImageNoPadding`, `panelHeightExpand`, `panelExpand`, and `panelMetaPosition` on the existing Panel block. `resolvePanelPresentation` is the sole presentation resolver, used by both `DashboardBuilder` and `StorefrontBuilderRenderer`; existing Global Card variables remain the surface, text, border-radius, and shadow owner.
+- **Inspector/UI:** the Panel Settings screen now follows the live YOOtheme order: **Panel** (Style, Link, Hover, Padding, Image without padding, Height, Expand Content), **Title**, **Meta**, **Content**, **Image**, the clearly separated WebPages-only structural **Image Layout**, then **Link**. Card Hover is represented as the canonical default-card + hover state rather than a parallel surface token. Width/ratio/fit are retained internally for canonical media resolution but are not presented as false YOOtheme Panel Image controls.
+- **Import mapping:** `panel_style` (including Card Hover and tile variants), `panel_padding`, `panel_link`, `panel_link_hover`, `panel_image_no_padding`, `height_expand`, `panel_expand`, `meta`, and `meta_align` normalize into those owners. Legacy `panelStyle` remains a compatibility read alias and cannot mask an imported Primary/Secondary canonical variant.
+- **Builder/frontend:** both render through `resolvePanelPresentation`; the same UIkit classes govern Card/Tile variant, padding, hover, whole-panel link overlay, media padding, meta position, and expansion. Linked panels suppress the separate action exactly as YOOtheme makes the panel link the primary action.
+- **Inheritance:** Global Card tokens → canonical Panel variant/padding/hover → explicit local Panel state. No Panel-specific global color/shadow system was added.
+- **Explicit unsupported:** responsive `image_grid_breakpoint`, hover image/video, modal/lightbox interaction, and YOOtheme text/link sub-controls for which no canonical WebPages consumer exists remain absent and reported by the importer; they are not stored as Panel-only compatibility state.
+- **Acceptance:** met. `tests/panel-card-acceptance.spec.ts` fresh-imports a Card Primary Panel and proves canonical persistence, padded media, 40px Card Large body padding, height/content expansion, below-content meta order, whole-panel `_blank` link, hover class, action suppression, inspector values, and Builder/storefront parity. It also verifies Card Default/Primary/Secondary/Hover and Tile Muted normalize into the shared resolver. Type-check passes. In the live DevStack Builder/storefront, the existing imported Integrate/Automate/Innovate Panels resolve matching `uk-card-default`, flush media (`-30px` horizontal/top margins), and 30px body padding; the live inspector was compared directly with the YOOtheme Panel screen.
 
 ### 8. Grid — PARTIAL
 

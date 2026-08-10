@@ -72,9 +72,33 @@
     "updatedAt": "2026-07-31T06:56:59.554Z"
   },
   {
-    "key": "page:devstack-pricing",
-    "title": "Devstack Pricing",
-    "slug": "devstack-pricing",
-    "updatedAt": "2026-08-09T16:49:22.522Z"
+    "key": "page:ne2",
+    "title": "ne2",
+    "slug": "ne2",
+    "updatedAt": "2026-07-31T07:46:25.884Z"
+  },
+  {
+    "key": "page:new3",
+    "title": "new3",
+    "slug": "new3",
+    "updatedAt": "2026-07-31T16:05:08.471Z"
+  },
+  {
+    "key": "page:new3-2",
+    "title": "new3",
+    "slug": "new3-2",
+    "updatedAt": "2026-07-31T16:05:11.501Z"
+  },
+  {
+    "key": "page:new3-3",
+    "title": "new3",
+    "slug": "new3-3",
+    "updatedAt": "2026-07-31T16:05:12.774Z"
+  },
+  {
+    "key": "page:new3-4",
+    "title": "new3",
+    "slug": "new3-4",
+    "updatedAt": "2026-07-31T16:05:12.971Z"
   }
 ]

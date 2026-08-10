@@ -122,6 +122,7 @@ import {
   type BuilderSpacingContext,
 } from "@/lib/builderSpacing";
 import { builderLinkTargetProps } from "@/lib/websiteBuilderLinks";
+import { resolvePanelPresentation } from "@/lib/panelPresentation";
 import {
   builderAnimationClassName as animationClassName,
   builderAnimationDataAttributes as animationDataAttributes,
@@ -2171,9 +2172,29 @@ export function ContentLayoutBlock({
     const panelTitleClass = block.panelTitleStyle && block.panelTitleStyle !== "inherit" ? getUikitHeadingClass(block.panelTitleStyle, block.panelTitleStyle) : "";
     const panelShowMedia = block.panelShowMedia !== false;
     const panelTextAlign = block.panelTextAlign ?? "left";
+    const panelPresentation = resolvePanelPresentation(block as Record<string, unknown>);
+    const panelMeta = block.eyebrow ? (
+      <Typog
+        as="span"
+        area="eyebrow"
+        typography={block.typography}
+        className={`shop-builder-panel-meta ${typographyRoleClass(block.metaTypographyRole)}`}
+        style={panelMetaStyle}
+      >
+        {block.eyebrow}
+      </Typog>
+    ) : null;
 
     return (
-      <div data-builder-block-id={block.id} className={`shop-builder-column-block shop-builder-column-block--panel ${panelLayoutClass} ${typographyRoleClass(block.contentTypographyRole)} ${getUikitCardClass(block.panelStyle ?? block.panelVariant ?? "default", { hover: block.panelHover, padding: block.panelSize })}`} style={{ textAlign: panelTextAlign }}>
+      <div data-builder-block-id={block.id} className={`shop-builder-column-block shop-builder-column-block--panel ${panelLayoutClass} ${typographyRoleClass(block.contentTypographyRole)} ${panelPresentation.className}`} style={{ textAlign: panelTextAlign }}>
+        {panelPresentation.linked && (
+          <a
+            className="shop-builder-panel-link-overlay"
+            href={panelPresentation.linkHref}
+            {...builderLinkTargetProps(block.buttonTarget)}
+            aria-label={block.title || block.buttonLabel || "Open panel"}
+          />
+        )}
         {panelShowMedia && (
           <div
             className={`${panelMediaClass} ${panelImageClass} shop-builder-panel-media${block.imageUrl ? "" : " is-empty"}`.trim()}
@@ -2194,17 +2215,7 @@ export function ContentLayoutBlock({
           />
         )}
         <div className={`uk-card-body shop-builder-panel-content-width-${block.panelContentWidth ?? "auto"}`} style={{ textAlign: panelTextAlign, alignSelf: block.panelVerticalAlign === "center" ? "center" : block.panelVerticalAlign === "bottom" ? "end" : "start" }}>
-          {block.eyebrow && (
-            <Typog
-              as="span"
-              area="eyebrow"
-              typography={block.typography}
-              className={`shop-builder-panel-meta ${typographyRoleClass(block.metaTypographyRole)}`}
-              style={panelMetaStyle}
-            >
-              {block.eyebrow}
-            </Typog>
-          )}
+          {panelPresentation.metaPosition === "above-title" && panelMeta}
           {block.title && (
             <Typog
               as={block.panelTitleElement ?? "h3"}
@@ -2243,6 +2254,7 @@ export function ContentLayoutBlock({
               )}
             </Typog>
           )}
+          {(panelPresentation.metaPosition === "below-title" || panelPresentation.metaPosition === "above-content") && panelMeta}
           {block.body && (
             <Typog
               as="p"
@@ -2280,6 +2292,7 @@ export function ContentLayoutBlock({
               )}
             </Typog>
           )}
+          {panelPresentation.metaPosition === "below-content" && panelMeta}
 
           <RenderChecklist
             items={block.items}
@@ -2289,7 +2302,7 @@ export function ContentLayoutBlock({
             iconSize={block.listIconSize}
           />
 
-          {block.panelActionVisible !== false && block.buttonLabel && block.buttonUrl && (
+          {!panelPresentation.linked && block.panelActionVisible !== false && block.buttonLabel && block.buttonUrl && (
             <Typog
               as="a"
               area="button"

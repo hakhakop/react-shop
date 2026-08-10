@@ -72,9 +72,15 @@
     "updatedAt": "2026-07-31T06:56:59.554Z"
   },
   {
-    "key": "page:devstack-pricing",
-    "title": "Devstack Pricing",
-    "slug": "devstack-pricing",
-    "updatedAt": "2026-08-09T16:49:22.522Z"
+    "key": "page:ne2",
+    "title": "ne2",
+    "slug": "ne2",
+    "updatedAt": "2026-07-31T07:46:25.884Z"
+  },
+  {
+    "key": "page:new3",
+    "title": "new3",
+    "slug": "new3",
+    "updatedAt": "2026-07-31T16:05:08.471Z"
   }
 ]

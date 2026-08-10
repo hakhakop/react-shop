@@ -598,6 +598,23 @@ const sourceCardVariant = (
     : "default";
 };
 
+const sourcePanelVariant = (
+  value: unknown,
+): NonNullable<BuilderLayoutBlock["panelVariant"]> => {
+  const normalized = typeof value === "string" ? value.trim().toLowerCase() : "";
+  if (["card-default", "default"].includes(normalized)) return "default";
+  // YOOtheme's Card Hover is the default card surface with its hover state
+  // enabled; it is not an independent surface token.
+  if (normalized === "card-hover") return "default";
+  if (["card-primary", "primary"].includes(normalized)) return "primary";
+  if (["card-secondary", "secondary"].includes(normalized)) return "secondary";
+  if (["", "blank", "none"].includes(normalized)) return "blank";
+  if (["tile-default", "tile-muted", "tile-primary", "tile-secondary"].includes(normalized)) {
+    return normalized as NonNullable<BuilderLayoutBlock["panelVariant"]>;
+  }
+  return "default";
+};
+
 const sourceGridButtonStyle = (
   value: unknown,
 ): NonNullable<NonNullable<BuilderLayoutBlock["gridItems"]>[number]["buttonStyle"]> | undefined => {
@@ -858,8 +875,8 @@ const mapStaticElement = (
       warnings.push(`${path}: panel image asset could not be resolved and was left empty.`);
     }
     warnUnsupported(path, props, [
-      "content", "image", "image_width", "image_height", "image_fit", "image_ratio", "image_position", "image_loading", "link", "link_style", "link_text", "link_target", "link_size", "link_fullwidth", "link_margin", "meta_style",
-      "text_align", "title", "title_element", "panel_style", "image_align", "image_grid_width",
+      "content", "image", "image_width", "image_height", "image_fit", "image_ratio", "image_position", "image_loading", "link", "link_style", "link_text", "link_target", "link_size", "link_fullwidth", "link_margin", "meta", "meta_style",
+      "text_align", "title", "title_element", "panel_style", "panel_padding", "panel_link", "panel_link_hover", "panel_image_no_padding", "height_expand", "panel_expand", "image_align", "image_grid_width",
       "title_align", "meta_align", "meta_element", "title_margin", "link_margin", "margin", "margin_remove_bottom",
       ...GENERAL_POSITION_KEYS,
     ], warnings);
@@ -867,6 +884,7 @@ const mapStaticElement = (
       id: sourcePathId(path, "panel"),
       kind: "panel",
       title: asString(props.title) ?? "",
+      eyebrow: asString(props.meta) ?? "",
       body: asString(props.content) ?? "",
       imageUrl: resolveYoothemeAssetUrl(props.image),
       imageAlt: asString(props.title) ?? "",
@@ -882,8 +900,26 @@ const mapStaticElement = (
       panelActionSize: sourceButtonSize(props.link_size),
       fullWidthButton: props.link_fullwidth === true || props.link_fullwidth === "true",
       linkMarginTop: sourceMargin(props.link_margin),
-      panelVariant: sourceCardVariant(props.panel_style),
-      panelStyle: sourcePanelStyle(props.panel_style) ?? "default",
+      panelVariant: sourcePanelVariant(props.panel_style),
+      // `panelVariant` is the canonical Panel surface owner. `panelStyle`
+      // remains a legacy document alias and must not mask an imported Card
+      // Primary/Secondary value during rendering.
+      panelStyle: typeof props.panel_style === "string" && /^(?:card|tile)-/.test(props.panel_style)
+        ? undefined
+        : sourcePanelStyle(props.panel_style),
+      panelSize: props.panel_padding === "small" || props.panel_padding === "default" || props.panel_padding === "large"
+        ? props.panel_padding
+        : "none",
+      panelImageNoPadding: props.panel_image_no_padding === true || props.panel_image_no_padding === "true",
+      linkPanel: props.panel_link === true || props.panel_link === "true",
+      panelHover: props.panel_link_hover === true || props.panel_link_hover === "true" || props.panel_style === "card-hover",
+      panelHeightExpand: props.height_expand === true || props.height_expand === "true",
+      panelExpand: props.panel_expand === "image" || props.panel_expand === "content" || props.panel_expand === "both"
+        ? props.panel_expand
+        : "none",
+      panelMetaPosition: props.meta_align === "above-title" || props.meta_align === "below-title" || props.meta_align === "above-content" || props.meta_align === "below-content"
+        ? props.meta_align
+        : undefined,
       panelShowMedia: Boolean(props.image),
       panelMediaPlacement: props.image_align === "left" || props.image_align === "right" ? props.image_align : "top",
       panelMediaWidth: props.image_grid_width === "1-2" ? "medium" : "large",

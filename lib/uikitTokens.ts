@@ -281,7 +281,9 @@ export function getUikitCardClass(
 
   // Padding modifier
   const pad = options?.padding?.toLowerCase();
-  if (pad === "small" || pad === "xs" || pad === "sm") {
+  if (pad === "none" || pad === "0") {
+    classes.push("uk-card-none");
+  } else if (pad === "small" || pad === "xs" || pad === "sm") {
     classes.push(isTile ? "uk-padding-small" : "uk-card-small");
   } else if (pad === "large" || pad === "lg" || pad === "xl") {
     classes.push(isTile ? "uk-padding-large" : "uk-card-large");

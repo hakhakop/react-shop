@@ -429,6 +429,7 @@ export function ImageSettingsGroup({
   block,
   update,
   showFrameless = false,
+  defaultFrameless = false,
   showLinkImage = false,
   showDimensions = true,
   showFrameControls = true,
@@ -448,6 +449,7 @@ export function ImageSettingsGroup({
   block: BuilderLayoutBlock;
   update: (patch: any) => void;
   showFrameless?: boolean;
+  defaultFrameless?: boolean;
   /** Exposes the canonical `linkImage` behavior when the parent provides a link URL. */
   showLinkImage?: boolean;
   /** Image Content owns source dimensions in the standalone YOOtheme UI. */
@@ -587,7 +589,7 @@ export function ImageSettingsGroup({
         <InspectorFieldRow
           label="Link"
           isOverridden={values.linkImage !== undefined}
-          inheritedValueText="Off"
+          inheritedValueText={defaultFrameless ? "On" : "Off"}
           onReset={() => update({ linkImage: undefined })}
         >
           <InspectorSwitch
@@ -673,7 +675,7 @@ export function ImageSettingsGroup({
           onReset={() => update({ [framelessKey]: undefined })}
         >
           <InspectorSwitch
-            checked={Boolean(values[framelessKey])}
+            checked={values[framelessKey] === undefined ? defaultFrameless : Boolean(values[framelessKey])}
             onChange={(checked) => update({ [framelessKey]: checked })}
             label="Align image without padding"
           />
@@ -926,6 +928,13 @@ export function CardSettingsGroup({
   sizeOptions,
   defaultSize = "default",
   showLink = false,
+  linkFirst = false,
+  sizeLabel = "Size",
+  hoverLabel = "Enable hover effect",
+  showHeight = false,
+  showImageNoPadding = false,
+  surfaceValue,
+  onSurfaceChange,
   keys = {
     variant: "panelVariant",
     size: "panelSize",
@@ -940,6 +949,17 @@ export function CardSettingsGroup({
   sizeOptions?: Array<{ value: string; label: string }>;
   defaultSize?: string;
   showLink?: boolean;
+  linkFirst?: boolean;
+  sizeLabel?: string;
+  hoverLabel?: string;
+  /** Panel-only YOOtheme height/expansion semantics belong to its Panel group. */
+  showHeight?: boolean;
+  /** Panel-only image padding semantics belong to its Panel group. */
+  showImageNoPadding?: boolean;
+  /** Adapts a composed canonical surface state to a YOOtheme-facing choice. */
+  surfaceValue?: (values: Record<string, unknown>) => string | undefined;
+  /** Normalizes a YOOtheme-facing choice into the canonical surface state. */
+  onSurfaceChange?: (value: string) => Record<string, unknown>;
   keys?: {
     variant: string;
     size: string;
@@ -962,9 +982,9 @@ export function CardSettingsGroup({
       >
         {surfaceOptions ? (
           <InspectorSelect
-            value={String(values[keys.variant] ?? "none")}
+            value={String(surfaceValue?.(values) ?? values[keys.variant] ?? "none")}
             options={surfaceOptions}
-            onChange={(value) => update({ [keys.variant]: value })}
+            onChange={(value) => update(onSurfaceChange?.(value) ?? { [keys.variant]: value })}
             ariaLabel="Panel style"
           />
         ) : (
@@ -977,8 +997,38 @@ export function CardSettingsGroup({
         )}
       </InspectorFieldRow>
 
+      {showLink && linkFirst && (
+        <InspectorFieldRow
+          label="Link"
+          isOverridden={values[linkKey] !== undefined}
+          inheritedValueText="Off"
+          onReset={() => update({ [linkKey]: undefined })}
+        >
+          <InspectorSwitch
+            checked={Boolean(values[linkKey])}
+            onChange={(checked) => update({ [linkKey]: checked })}
+            label="Link entire panel"
+          />
+        </InspectorFieldRow>
+      )}
+
+      {linkFirst && (
+        <InspectorFieldRow
+          label="Hover effect"
+          isOverridden={values[keys.hover] !== undefined}
+          inheritedValueText="None"
+          onReset={() => update({ [keys.hover]: undefined })}
+        >
+          <InspectorSwitch
+            checked={Boolean(values[keys.hover])}
+            onChange={(checked) => update({ [keys.hover]: checked })}
+            label={hoverLabel}
+          />
+        </InspectorFieldRow>
+      )}
+
       <InspectorFieldRow
-        label="Size"
+        label={sizeLabel}
         isOverridden={values[keys.size] !== undefined}
         inheritedValueText={defaultSize === "none" ? "None" : "Default"}
         onReset={() => update({ [keys.size]: undefined })}
@@ -991,20 +1041,60 @@ export function CardSettingsGroup({
         />
       </InspectorFieldRow>
 
-      <InspectorFieldRow
-        label="Hover effect"
-        isOverridden={values[keys.hover] !== undefined}
-        inheritedValueText="None"
-        onReset={() => update({ [keys.hover]: undefined })}
-      >
-        <InspectorSwitch
-          checked={Boolean(values[keys.hover])}
-          onChange={(checked) => update({ [keys.hover]: checked })}
-          label="Enable hover effect"
-        />
-      </InspectorFieldRow>
+      {!linkFirst && (
+        <InspectorFieldRow
+          label="Hover effect"
+          isOverridden={values[keys.hover] !== undefined}
+          inheritedValueText="None"
+          onReset={() => update({ [keys.hover]: undefined })}
+        >
+          <InspectorSwitch
+            checked={Boolean(values[keys.hover])}
+            onChange={(checked) => update({ [keys.hover]: checked })}
+            label={hoverLabel}
+          />
+        </InspectorFieldRow>
+      )}
 
-      {showLink && (
+      {showImageNoPadding && (
+        <InspectorFieldRow
+          label="Image"
+          isOverridden={values.panelImageNoPadding !== undefined}
+          inheritedValueText="With padding"
+          onReset={() => update({ panelImageNoPadding: undefined })}
+        >
+          <InspectorSwitch
+            checked={values.panelImageNoPadding === true}
+            onChange={(checked) => update({ panelImageNoPadding: checked })}
+            label="Image without padding"
+          />
+        </InspectorFieldRow>
+      )}
+
+      {showHeight && (
+        <>
+          <InspectorFieldRow label="Height">
+            <InspectorSwitch
+              checked={values.panelHeightExpand === true}
+              onChange={(checked) => update({ panelHeightExpand: checked, panelExpand: checked ? values.panelExpand ?? "none" : "none" })}
+              label="Fill the available column space"
+            />
+          </InspectorFieldRow>
+          <InspectorFieldRow label="Expand Content">
+            <InspectorSelect
+              value={String(values.panelExpand ?? "none")}
+              options={[
+                { value: "none", label: "None" }, { value: "image", label: "Image" },
+                { value: "content", label: "Content" }, { value: "both", label: "Image and Content" },
+              ]}
+              onChange={(value) => update({ panelExpand: value, panelHeightExpand: value !== "none" ? true : values.panelHeightExpand })}
+              ariaLabel="Panel expand content"
+            />
+          </InspectorFieldRow>
+        </>
+      )}
+
+      {showLink && !linkFirst && (
         <InspectorFieldRow
           label="Link"
           isOverridden={values[linkKey] !== undefined}

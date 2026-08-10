@@ -286,8 +286,8 @@
     },
     {
       "id": "menu_42gviu3v5",
-      "label": "Devstack Pricing",
-      "url": "/devstack-pricing",
+      "label": "New Menu Item",
+      "url": "/",
       "parentId": null
     }
   ],
@@ -312,7 +312,7 @@
   "sectionTitleRotation": "left",
   "sectionTitleBreakpoint": "x-large",
   "headerSticky": true,
-  "updatedAt": "2026-08-09T16:49:39.503Z",
+  "updatedAt": "2026-08-09T16:49:27.552Z",
   "headerCustomHeight": 92,
   "headingXLargeFontSize": "44px",
   "headingLargeFontSize": "38px",

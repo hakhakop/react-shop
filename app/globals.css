@@ -1893,6 +1893,7 @@ a {
 .shop-builder-main .uk-card-body {
   padding: var(--uk-card-padding, 30px);
 }
+.shop-builder-main .uk-card-none .uk-card-body { padding: 0; }
 .shop-builder-main .uk-card-small .uk-card-body { padding: var(--uk-card-padding-small, 15px); }
 .shop-builder-main .uk-card-large .uk-card-body { padding: var(--uk-card-padding-large, 40px); }
 .shop-builder-main .uk-card-default {

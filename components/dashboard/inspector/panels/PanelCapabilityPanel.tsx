@@ -83,14 +83,24 @@ export default function PanelCapabilityPanel({ block, tab, shellSettings, update
           update={updateSemantic}
           title="PANEL"
           showLink
-          keys={{ variant: "panelStyle", size: "panelSize", hover: "panelHover", link: "linkPanel" }}
+          linkFirst
+          sizeLabel="Padding"
+          hoverLabel="Add hover style"
+          showHeight
+          showImageNoPadding
+          surfaceValue={(values) => values.panelVariant === "default" && values.panelHover === true ? "card-hover" : String(values.panelVariant ?? "blank")}
+          onSurfaceChange={(value) => value === "card-hover"
+            ? { panelVariant: "default", panelHover: true }
+            : { panelVariant: value, panelHover: undefined }}
+          keys={{ variant: "panelVariant", size: "panelSize", hover: "panelHover", link: "linkPanel" }}
           surfaceOptions={[
-            { value: "none", label: "None" },
-            { value: "card-default", label: "Card Default" },
-            { value: "card-primary", label: "Card Primary" },
-            { value: "card-secondary", label: "Card Secondary" },
+            { value: "blank", label: "None" },
+            { value: "default", label: "Card Default" },
+            { value: "primary", label: "Card Primary" },
+            { value: "secondary", label: "Card Secondary" },
             { value: "card-hover", label: "Card Hover" },
             { value: "tile-default", label: "Tile Default" },
+            { value: "tile-muted", label: "Tile Muted" },
             { value: "tile-primary", label: "Tile Primary" },
             { value: "tile-secondary", label: "Tile Secondary" },
           ]}
@@ -102,8 +112,6 @@ export default function PanelCapabilityPanel({ block, tab, shellSettings, update
             { value: "large", label: "Large" },
           ]}
         />
-        <MediaSettingsGroup block={block} update={updateSemantic} />
-        <ImageSettingsGroup block={block} update={updateSemantic} />
         <TitleSettingsGroup
           block={block}
           update={updateSemantic}
@@ -118,7 +126,8 @@ export default function PanelCapabilityPanel({ block, tab, shellSettings, update
           update={updateSemantic}
           showAlignment={false}
           showHtmlElement={false}
-          keys={{ role: "metaTypographyRole", align: "panelTextAlign", level: "panelMetaHtmlElement" }}
+          showPosition
+          keys={{ role: "metaTypographyRole", align: "panelTextAlign", level: "panelMetaHtmlElement", position: "panelMetaPosition" }}
         />
         <ContentSettingsGroup
           block={block}
@@ -126,10 +135,22 @@ export default function PanelCapabilityPanel({ block, tab, shellSettings, update
           showAlignment={false}
           keys={{ role: "contentTypographyRole", align: "panelTextAlign" }}
         />
+        <ImageSettingsGroup
+          block={block}
+          update={updateSemantic}
+          showDimensions={false}
+          showFrameControls={false}
+          keys={{
+            width: "imageWidth", height: "imageHeight", ratio: "imageRatio", fit: "imageFit",
+            loading: "imageLoading", shape: "imageShape", shadow: "imageShadow",
+            decoration: "imageBoxDecoration", align: "imageAlignment",
+          }}
+        />
+        <MediaSettingsGroup block={block} update={updateSemantic} title="IMAGE LAYOUT" />
         <ActionSettingsGroup
           block={block}
           update={updateSemantic}
-          title="ACTION BUTTON"
+          title="LINK"
           showVisibilityToggle
           showFullWidth
           showMargin
