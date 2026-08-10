@@ -38,9 +38,13 @@ export function resolveCanonicalGridAction(
 ): CanonicalGridAction {
   const raw = block as BuilderLayoutBlock & Record<string, unknown>;
   const rawItem = item as GridActionItem & Record<string, unknown>;
+  // A Grid link belongs to its item. Grid-level link text/style are shared
+  // presentation defaults only; they must never manufacture `Read more → #`
+  // for an item with no canonical URL.
+  const itemUrl = rawItem.buttonUrl ?? rawItem.linkUrl ?? rawItem.link;
   return {
-    label: String(raw.buttonLabel ?? rawItem.buttonLabel ?? raw.linkText ?? "Read more"),
-    url: String(raw.buttonUrl ?? rawItem.buttonUrl ?? "#"),
+    label: String(rawItem.buttonLabel ?? raw.buttonLabel ?? raw.linkText ?? "").trim(),
+    url: typeof itemUrl === "string" ? itemUrl.trim() : "",
     target: String(raw.buttonTarget ?? raw.linkTarget ?? rawItem.buttonTarget ?? "_self"),
     style: normalizeActionStyle(
       raw.buttonStyle ?? rawItem.actionStyle ?? rawItem.buttonStyle ?? raw.linkStyle,

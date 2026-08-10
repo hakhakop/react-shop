@@ -65,6 +65,7 @@ import {
   ArrowUpRight,
 } from "lucide-react";
 import Image from "next/image";
+import { GridCardsClient } from "@/components/builder/GridCardsClient";
 import { useTranslation } from "@/components/i18n/LanguageProvider";
 import { isLocale, localeLabels } from "@/lib/i18n";
 import {
@@ -15518,669 +15519,97 @@ function PreviewSection({
                         ) : block.kind === "products" ? (
                           <UikitProducts block={block} isCanvas products={previewProducts} categoryTree={previewCategoryTree} />
                         ) : block.kind === "grid" ? (
-                          (() => {
-                            const rawGridBlock = block as any;
-                            const gridGapClass = gridSpacingClass(
-                              block.gridGap,
-                              ["none", "small", "medium", "large", "max"],
-                              "medium",
-                            );
-                            const gridGapCustom =
-                              gridGapClass === "custom"
-                                ? cssSpacingValue(block.gridGap)
-                                : null;
-                            const imagePaddingClass = gridSpacingClass(
-                              rawGridBlock.alignImageWithoutPadding ? "frameless" : block.gridImagePadding,
-                              ["frameless", "none", "small", "medium", "max"],
-                              "none",
-                            );
-                            const imagePaddingCustom =
-                              imagePaddingClass === "custom"
-                                ? cssSpacingValue(block.gridImagePadding)
-                                : null;
-                            const contentPaddingClass = gridSpacingClass(
-                              block.gridContentPadding,
-                              ["none", "small", "medium", "large"],
-                              "medium",
-                            );
-                            const contentPaddingCustom =
-                              contentPaddingClass === "custom"
-                                ? cssSpacingValue(block.gridContentPadding)
-                                : null;
-                             const gridColsCount = rawGridBlock.columnsDesktop ? (parseInt(rawGridBlock.columnsDesktop, 10) || (rawGridBlock.columnsDesktop.includes("column") ? parseInt(rawGridBlock.columnsDesktop, 10) : 3)) : (block.columns ?? 3);
-                             const colGapVal = rawGridBlock.columnGap ?? block.gridGap ?? "medium";
-                             const rowGapVal = rawGridBlock.rowGap ?? block.rowGap ?? block.gridGap ?? "medium";
-                             const generalMarginClass = (rawGridBlock.margin && rawGridBlock.margin !== "none" && rawGridBlock.margin !== "default") ? `uk-margin-${rawGridBlock.margin}` : "";
-                             const generalTextAlignmentClass = (rawGridBlock.textAlignment && rawGridBlock.textAlignment !== "none") ? `uk-text-${rawGridBlock.textAlignment}` : "";
-                             const generalAnimationClass = (rawGridBlock.animation && rawGridBlock.animation !== "none" && rawGridBlock.animation !== "inherit") ? `uk-animation-${rawGridBlock.animation}` : "";
-                             const generalVisibilityClass = (rawGridBlock.visibility && rawGridBlock.visibility !== "always") ? `uk-${rawGridBlock.visibility}` : "";
-
-                             return (
-                               <div className="shop-builder-column-block shop-builder-column-block--grid">
-                                 <div
-                                   className={`shop-builder-grid shop-builder-grid--gap-${gridGapClass} ${generalMarginClass} ${generalTextAlignmentClass} ${generalAnimationClass} ${generalVisibilityClass} ${rawGridBlock.showDividers ? "uk-grid-divider" : ""} ${rawGridBlock.centerColumns ? "uk-flex-center" : ""}`.trim()}
-                                   style={
-                                     {
-                                       "--shop-builder-grid-columns": gridColsCount,
-                                       ...(gridGapCustom
-                                         ? {
-                                             "--shop-builder-grid-gap":
-                                               gridGapCustom,
-                                           }
-                                         : {}),
-                                       gap: `${colGapVal === "small" ? "15px" : colGapVal === "large" ? "40px" : colGapVal === "none" ? "0px" : "30px"} ${rowGapVal === "small" ? "15px" : rowGapVal === "large" ? "40px" : rowGapVal === "none" ? "0px" : "30px"}`,
-                                     } as CSSProperties
-                                   }
-                                 >
-                                  {(block.gridSource === "products"
-                                    ? previewProducts.map((product) => ({
-                                        id: product.id,
-                                        imageUrl: product.image?.sourceUrl,
-                                        imageAlt:
-                                          product.image?.altText ??
-                                          product.name,
-                                        eyebrow: "Product",
-                                        title: product.name,
-                                        meta: product.price ?? "",
-                                        text: product.attributes?.nodes
-                                          ?.map(
-                                            (attribute) =>
-                                              attribute.label ?? attribute.name,
-                                          )
-                                          .join(", "),
-                                        buttonLabel: "View product",
-                                        buttonUrl: `/product/${product.slug}`,
-                                        buttonAlign: "left" as const,
-                                      }))
-                                    : (block.gridItems ?? [])
-                                  )
-                                    .slice(
-                                      0,
-                                      block.gridSource === "products"
-                                        ? Math.max(
-                                            1,
-                                            (block.columns ?? 3) *
-                                              (block.gridRows ?? 1),
-                                          )
-                                        : typeof block.gridLimit === "number" &&
-                                          block.gridLimit > 0
-                                        ? block.gridLimit
-                                        : (block.gridItems ?? []).length,
-                                    )
-                                    .map((item: any, itemIndex) => {
-                                      const itemTypography =
-                                        ("typography" in item
-                                          ? item.typography
-                                          : undefined) ?? block.typography;
-                                      const gridTitleStyle = {
-                                        color:
-                                          "var(--builder-card-title-color, inherit)",
-                                        fontSize:
-                                          "var(--builder-card-title-size, inherit)",
-                                        fontWeight:
-                                          "var(--builder-card-title-weight, inherit)",
-                                        margin:
-                                          "var(--builder-card-title-margin, 0)",
-                                      } as CSSProperties;
-                                      const panelStyle = rawGridBlock.panelStyle ?? block.gridCardVariant ?? rawGridBlock.cardVariant ?? "none";
-                                      const panelPadding = rawGridBlock.panelSize ?? rawGridBlock.panelPadding ?? "none";
-                                      let panelClass = "";
-                                      if (panelStyle.startsWith("card-") || panelStyle === "default" || panelStyle === "primary" || panelStyle === "secondary") {
-                                        const variant = panelStyle.replace("card-", "");
-                                        panelClass = `uk-card uk-card-${variant || "default"}`.trim();
-                                      } else if (panelStyle.startsWith("tile-")) {
-                                        const variant = panelStyle.replace("tile-", "");
-                                        panelClass = `uk-tile uk-tile-${variant || "default"}`.trim();
-                                      } else {
-                                        panelClass = "shop-builder-panel-plain";
-                                      }
-
-                                      const bodyPaddingClass =
-                                        panelPadding === "small"
-                                          ? "shop-builder-panel-padding-small"
-                                          : panelPadding === "large"
-                                          ? "shop-builder-panel-padding-large"
-                                          : panelPadding === "default"
-                                          ? "shop-builder-panel-padding-default"
-                                          : "shop-builder-panel-padding-none";
-
-                                      const isFrameless = Boolean(rawGridBlock.alignImageWithoutPadding);
-
-                                      const renderGridImageNode = () => {
-                                        if (block.gridShowImage === false || rawGridBlock.showImage === false) return null;
-                                        const isItemImagePlaceholder = !item.imageUrl || !item.imageUrl.trim();
-                                        const mediaPlacement = item.mediaPlacement ?? block.gridMediaPlacement ?? "top";
-                                        const isSideMedia = mediaPlacement === "left" || mediaPlacement === "right";
-                                        const mediaWidth = (item as any).mediaWidth ?? block.gridMediaWidth ?? "medium";
-                                        const mediaAlignment = (item as any).mediaAlignment ?? block.gridMediaAlignment ?? "center";
-                                        const mediaStyle = getUikitPanelMediaStyle({
-                                          ratio: isSideMedia ? undefined : (item.mediaRatio ?? block.imageRatio),
-                                          fit: item.mediaFit ?? block.imageFit,
-                                          alignment: mediaAlignment,
-                                          position: (item as any).imagePosition ?? (block as any).imagePosition,
-                                        });
-                                        const mediaClass = isFrameless ? getUikitPanelMediaClass(mediaPlacement === "left" || mediaPlacement === "right" ? mediaPlacement : "top") : "";
-                                        const imageMarginTopClass = (rawGridBlock.imageMarginTop && rawGridBlock.imageMarginTop !== "none" && rawGridBlock.imageMarginTop !== "default") ? `uk-margin-${rawGridBlock.imageMarginTop}` : "";
-                                        const imageBorderClass = rawGridBlock.imageBorder && rawGridBlock.imageBorder !== "none" ? `uk-border-${rawGridBlock.imageBorder}` : "";
-                                        const imageBoxShadowClass = rawGridBlock.imageBoxShadow && rawGridBlock.imageBoxShadow !== "none" ? `uk-box-shadow-${rawGridBlock.imageBoxShadow}` : "";
-                                        const imageDecorationClass = rawGridBlock.imageBoxDecoration && rawGridBlock.imageBoxDecoration !== "none" ? `uk-background-${rawGridBlock.imageBoxDecoration}` : "";
-                                        const imageDimension = (value: unknown) => value === undefined || value === null || value === "" ? undefined : /^-?\d+(?:\.\d+)?$/.test(String(value)) ? `${value}px` : String(value);
-                                        const imageWidth = imageDimension(rawGridBlock.imageWidth);
-                                        const imageHeight = imageDimension(rawGridBlock.imageHeight);
-                                        const imageMaxWidth =
-                                          typeof rawGridBlock.imageMaxWidth === "number" && rawGridBlock.imageMaxWidth > 0
-                                            ? `${rawGridBlock.imageMaxWidth}px`
-                                            : undefined;
-                                        const hasCropFrame = !imageWidth && !imageHeight && mediaStyle.aspectRatio && mediaStyle.aspectRatio !== "auto";
-
-                                        return (
-                                          <div
-                                            className={`${mediaClass} ${imageMarginTopClass} ${imageBorderClass} ${imageBoxShadowClass} ${imageDecorationClass} shop-builder-grid-image shop-builder-grid-image--align-${mediaAlignment} ${
-                                              isItemImagePlaceholder ? "is-empty" : ""
-                                            }`.trim()}
-                                            style={{
-                                              maxWidth: imageMaxWidth,
-                                              aspectRatio: hasCropFrame ? mediaStyle.aspectRatio : "auto",
-                                            } as CSSProperties}
-                                            onClick={(event) => {
-                                              if (block.gridSource !== "products") {
-                                                event.stopPropagation();
-                                                onUploadGridItemImage(
-                                                  section.id,
-                                                  columnKey,
-                                                  blockKey,
-                                                  itemIndex,
-                                                  item.imageUrl,
-                                                );
-                                              }
-                                            }}
-                                          >
-                                            {!isItemImagePlaceholder ? (
-                                              <>
-                                                <Image
-                                                  src={item.imageUrl!}
-                                                  alt={
-                                                    item.imageAlt ||
-                                                    item.title ||
-                                                    ""
-                                                  }
-                                                  width={420}
-                                                  height={420}
-                                                  loading={rawGridBlock.imageLoading === "eager" || rawGridBlock.imageLoading === true ? "eager" : "lazy"}
-                                                  className={`${rawGridBlock.imageHoverTransition && rawGridBlock.imageHoverTransition !== "none" ? `uk-transition-${rawGridBlock.imageHoverTransition} uk-transition-opaque` : ""}`.trim()}
-                                                  style={{
-                                                    position: "relative",
-                                                    width: imageWidth ?? "100%",
-                                                    height: imageHeight === "auto" ? "auto" : imageHeight ?? (hasCropFrame ? "100%" : "auto"),
-                                                    maxWidth: "100%",
-                                                    objectFit: mediaStyle.objectFit,
-                                                    objectPosition: mediaStyle.backgroundPosition,
-                                                  }}
-                                                />
-                                                {block.gridSource !==
-                                                  "products" && (
-                                                  <button
-                                                    type="button"
-                                                    className="builder-preview-image-upload"
-                                                    onClick={(event) => {
-                                                      event.stopPropagation();
-                                                      onUploadGridItemImage(
-                                                        section.id,
-                                                        columnKey,
-                                                        blockKey,
-                                                        itemIndex,
-                                                        item.imageUrl,
-                                                      );
-                                                    }}
-                                                  >
-                                                    <ImageIcon size={13} />
-                                                    <span>Change image</span>
-                                                  </button>
-                                                )}
-                                              </>
-                                            ) : block.gridSource !==
-                                              "products" ? (
-                                              <div className="builder-media-placeholder-container">
-                                                <svg
-                                                  className="builder-media-placeholder-bg"
-                                                  viewBox="0 0 800 520"
-                                                  preserveAspectRatio="none"
-                                                  fill="none"
-                                                  xmlns="http://www.w3.org/2000/svg"
-                                                >
-                                                  <defs>
-                                                    <linearGradient id="bgGradGrid" x1="0" y1="0" x2="800" y2="520" gradientUnits="userSpaceOnUse">
-                                                      <stop offset="0%" stopColor="#F2F4F8"/>
-                                                      <stop offset="100%" stopColor="#EAEEF4"/>
-                                                    </linearGradient>
-                                                  </defs>
-                                                  <rect width="800" height="520" rx="16" fill="url(#bgGradGrid)"/>
-                                                  <circle cx="760" cy="40" r="230" fill="#FFFFFF" fillOpacity="0.5"/>
-                                                  <circle cx="40" cy="480" r="220" fill="#FFFFFF" fillOpacity="0.45"/>
-                                                  <rect x="24" y="24" width="752" height="472" rx="18" fill="none" stroke="#CBD5E1" strokeWidth="2" strokeDasharray="6 6"/>
-                                                  <g fill="#BCC6D5">
-                                                    <circle cx="56" cy="56" r="2.2"/><circle cx="70" cy="56" r="2.2"/><circle cx="84" cy="56" r="2.2"/><circle cx="98" cy="56" r="2.2"/><circle cx="112" cy="56" r="2.2"/>
-                                                    <circle cx="56" cy="70" r="2.2"/><circle cx="70" cy="70" r="2.2"/><circle cx="84" cy="70" r="2.2"/><circle cx="98" cy="70" r="2.2"/><circle cx="112" cy="70" r="2.2"/>
-                                                    <circle cx="56" cy="84" r="2.2"/><circle cx="70" cy="84" r="2.2"/><circle cx="84" cy="84" r="2.2"/><circle cx="98" cy="84" r="2.2"/><circle cx="112" cy="84" r="2.2"/>
-                                                  </g>
-                                                  <g fill="#BCC6D5">
-                                                    <circle cx="688" cy="436" r="2.2"/><circle cx="702" cy="436" r="2.2"/><circle cx="716" cy="436" r="2.2"/><circle cx="730" cy="436" r="2.2"/><circle cx="744" cy="436" r="2.2"/>
-                                                    <circle cx="688" cy="450" r="2.2"/><circle cx="702" cy="450" r="2.2"/><circle cx="716" cy="450" r="2.2"/><circle cx="730" cy="450" r="2.2"/><circle cx="744" cy="450" r="2.2"/>
-                                                    <circle cx="688" cy="464" r="2.2"/><circle cx="702" cy="464" r="2.2"/><circle cx="716" cy="464" r="2.2"/><circle cx="730" cy="464" r="2.2"/><circle cx="744" cy="464" r="2.2"/>
-                                                  </g>
-                                                </svg>
-                                                <div className="builder-media-placeholder-content">
-                                                  <div className="builder-media-placeholder-icon-frame">
-                                                    <svg viewBox="0 0 120 90" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                      <rect width="120" height="90" rx="14" fill="none" stroke="#B8C3D2" strokeWidth="4.5"/>
-                                                      <circle cx="90" cy="30" r="10" fill="#B8C3D2"/>
-                                                      <path d="M 8 78 L 46 36 C 48.5 33.5 53.5 33.5 56 36 L 84 68 L 92 58 C 94.5 55.5 99.5 55.5 102 58 L 112 78 Z" fill="#B8C3D2"/>
-                                                    </svg>
-                                                  </div>
-                                                  <h4 className="builder-media-placeholder-title">Select an image</h4>
-                                                  <p className="builder-media-placeholder-subtitle">Drag and drop, upload, or choose from your media library</p>
-                                                  <button type="button" className="builder-media-placeholder-btn">
-                                                    <Upload size={14} />
-                                                    <span>Choose Image</span>
-                                                  </button>
-                                                </div>
-                                              </div>
-                                            ) : null}
-                                          </div>
-                                        );
-                                      };
-
-                                      return (
-                                        <article
-                                          key={
-                                            item.id ??
-                                            `${blockKey}-grid-${itemIndex}`
-                                          }
-                                          draggable={
-                                            block.gridSource !== "products"
-                                          }
-                                          className={`${panelClass} ${(item as any).cardHover ?? rawGridBlock.panelHover ?? block.gridCardHover ? "uk-card-hover" : ""} ${getUikitPanelLayoutClass(item.mediaPlacement ?? block.gridMediaPlacement ?? "top", item.mediaWidth ?? block.gridMediaWidth ?? "medium")} shop-builder-grid-card ${isFrameless ? "is-image-frameless" : "is-image-none"} is-content-${contentPaddingClass} is-frame-${
-                                            block.gridImageFrame ?? "none"
-                                          } ${
-                                            draggingItem?.blockKey ===
-                                              blockKey &&
-                                            draggingItem?.fromIndex ===
-                                              itemIndex
-                                              ? "is-dragging-grid"
-                                              : ""
-                                          } ${
-                                            draggingItem &&
-                                            dropHoverIndex === itemIndex &&
-                                            draggingItem.blockKey === blockKey
-                                              ? "is-drag-over-grid"
-                                              : ""
-                                          }`}
-                                          style={
-                                            {
-                                              textAlign: item.textAlign ?? "left",
-                                              ...(imagePaddingCustom
-                                                ? {
-                                                    "--shop-builder-grid-image-padding":
-                                                      imagePaddingCustom,
-                                                  }
-                                                : {}),
-                                              ...(contentPaddingCustom
-                                                ? {
-                                                    "--shop-builder-grid-content-padding":
-                                                      contentPaddingCustom,
-                                                  }
-                                                : {}),
-                                            } as CSSProperties
-                                          }
-                                          onDragStart={(event) => {
-                                            if (block.gridSource === "products")
-                                              return;
-                                            event.stopPropagation();
-                                            event.dataTransfer.setData(
-                                              "text/plain",
-                                              `grid-item:${blockKey}:${itemIndex}`,
-                                            );
-                                            event.dataTransfer.effectAllowed =
-                                              "move";
-                                            setDraggingItem({
-                                              kind: "grid",
-                                              blockKey,
-                                              fromIndex: itemIndex,
-                                            });
-                                          }}
-                                          onDragOver={(event) => {
-                                            if (
-                                              !draggingItem ||
-                                              draggingItem.kind !== "grid" ||
-                                              draggingItem.blockKey !== blockKey
-                                            )
-                                              return;
-                                            if (
-                                              draggingItem.fromIndex ===
-                                              itemIndex
-                                            ) {
-                                              setDropHoverIndex(null);
-                                              return;
-                                            }
-                                            event.preventDefault();
-                                            event.dataTransfer.dropEffect =
-                                              "move";
-                                            if (dropHoverIndex !== itemIndex) {
-                                              setDropHoverIndex(itemIndex);
-                                            }
-                                          }}
-                                          onDragLeave={() => {
-                                            if (dropHoverIndex === itemIndex) {
-                                              setDropHoverIndex(null);
-                                            }
-                                          }}
-                                          onDrop={(event) => {
-                                            event.preventDefault();
-                                            event.stopPropagation();
-                                            setDropHoverIndex(null);
-                                            if (
-                                              !draggingItem ||
-                                              draggingItem.kind !== "grid" ||
-                                              draggingItem.blockKey !== blockKey
-                                            )
-                                              return;
-                                            if (
-                                              draggingItem.fromIndex ===
-                                              itemIndex
-                                            ) {
-                                              setDraggingItem(null);
-                                              return;
-                                            }
-                                            onMoveGridItem(
-                                              section.id,
-                                              columnKey,
-                                              blockKey,
-                                              draggingItem.fromIndex,
-                                              itemIndex,
-                                            );
-                                            setDraggingItem(null);
-                                          }}
-                                          onDragEnd={() => {
-                                            setDraggingItem(null);
-                                            setDropHoverIndex(null);
-                                          }}
-                                        >
-                                          {block.gridSource !== "products" && (
-                                            <>
-                                              <div className="builder-preview-grid-item-tools">
-                                                <button
-                                                  type="button"
-                                                  onMouseDown={(event) =>
-                                                    event.stopPropagation()
-                                                  }
-                                                  onClick={(event) => {
-                                                    event.stopPropagation();
-                                                    onDuplicateGridItem(
-                                                      section.id,
-                                                      columnKey,
-                                                      blockKey,
-                                                      itemIndex,
-                                                    );
-                                                  }}
-                                                  title="Duplicate item"
-                                                >
-                                                  <Copy size={12} />
-                                                </button>
-                                                <button
-                                                  type="button"
-                                                  onMouseDown={(event) =>
-                                                    event.stopPropagation()
-                                                  }
-                                                  onClick={(event) => {
-                                                    event.stopPropagation();
-                                                    onDeleteGridItem(
-                                                      section.id,
-                                                      columnKey,
-                                                      blockKey,
-                                                      itemIndex,
-                                                    );
-                                                  }}
-                                                  title="Delete item"
-                                                >
-                                                  <Trash2 size={12} />
-                                                </button>
-                                              </div>
-                                              <span
-                                                className="builder-preview-grid-drag-handle"
-                                                aria-hidden="true"
-                                              >
-                                                ::
-                                              </span>
-                                            </>
-                                          )}
-
-                                          {/* Flush edge-to-edge image rendered before inner padded content */}
-                                          {isFrameless && renderGridImageNode()}
-
-                                          <div className={`${bodyPaddingClass} shop-builder-grid-content ${typographyRoleClass(block.contentTypographyRole)}`.trim()}>
-                                            {/* Padded image rendered inside content */}
-                                            {!isFrameless && renderGridImageNode()}
-                                            {block.gridSource !== "products" ? (
-                                              (() => {
-                                                const TitleTag = (rawGridBlock.gridTitleLevel ?? item.titleElement ?? block.headingLevel ?? "h3") as any;
-                                                const titleStyleVal = rawGridBlock.gridTitleSize ?? rawGridBlock.titleStyle ?? item.titleStyle;
-                                                const titleHeadingClass = (titleStyleVal && titleStyleVal !== "none")
-                                                  ? (titleStyleVal.startsWith("heading-") || ["h1","h2","h3","h4","h5","h6"].includes(titleStyleVal)
-                                                    ? `uk-${titleStyleVal}`
-                                                    : getUikitHeadingClass(titleStyleVal, titleStyleVal))
-                                                  : "";
-                                                const titleDecorationClass = (rawGridBlock.titleDecoration && rawGridBlock.titleDecoration !== "none")
-                                                  ? `uk-heading-${rawGridBlock.titleDecoration}`
-                                                  : "";
-                                                const titleColorVal = rawGridBlock.titleColor ?? rawGridBlock.gridTitleColor;
-                                                const titleColorClass = titleColorVal && titleColorVal !== "none" && titleColorVal !== "default"
-                                                  ? (titleColorVal.startsWith("uk-text-") ? titleColorVal : `uk-text-${titleColorVal}`)
-                                                  : "";
-                                                const titleMarginTopClass = (rawGridBlock.titleMarginTop && rawGridBlock.titleMarginTop !== "none" && rawGridBlock.titleMarginTop !== "default")
-                                                  ? `uk-margin-${rawGridBlock.titleMarginTop}`
-                                                  : "";
-
-                                                const metaStyleVal = rawGridBlock.metaStyle ?? "text-meta";
-                                                const metaStyleClass = (metaStyleVal && metaStyleVal !== "none") ? `uk-${metaStyleVal}` : "shop-builder-grid-meta";
-                                                const metaMarginTopClass = (rawGridBlock.metaMarginTop && rawGridBlock.metaMarginTop !== "none" && rawGridBlock.metaMarginTop !== "default")
-                                                  ? `uk-margin-${rawGridBlock.metaMarginTop}`
-                                                  : "";
-                                                const rawMetaAlign = rawGridBlock.gridMetaAlign ?? rawGridBlock.metaAlignment ?? "below-title";
-                                                const metaAlign = rawMetaAlign === "above" ? "above-title" : rawMetaAlign === "below" ? "below-title" : rawMetaAlign === "content" ? "below-content" : rawMetaAlign;
-                                                const MetaTag = (rawGridBlock.gridMetaHtmlElement ?? "div") as any;
-
-                                                const contentStyleVal = rawGridBlock.contentStyle;
-                                                const contentStyleClass = getUikitTextClass(contentStyleVal) || "shop-builder-body";
-                                                const contentMarginTopClass = (rawGridBlock.contentMarginTop && rawGridBlock.contentMarginTop !== "none" && rawGridBlock.contentMarginTop !== "default")
-                                                  ? `uk-margin-${rawGridBlock.contentMarginTop}`
-                                                  : "";
-
-                                                const renderMetaNode = () => (
-                                                  block.gridShowMeta !== false && rawGridBlock.showMeta !== false && item.meta ? (
-                                                    <InlineEditableText
-                                                      as={MetaTag}
-                                                      className={`shop-builder-grid-meta ${metaStyleClass} ${metaMarginTopClass} ${typographyRoleClass(block.metaTypographyRole)}`.trim()}
-                                                      typography={itemTypography}
-                                                      value={item.meta}
-                                                      onChange={(meta) =>
-                                                        onUpdateGridItem(
-                                                          section.id,
-                                                          columnKey,
-                                                          blockKey,
-                                                          itemIndex,
-                                                          { meta },
-                                                        )
-                                                      }
-                                                    />
-                                                  ) : null
-                                                );
-
-                                                const renderTitleNode = () => (
-                                                  rawGridBlock.showTitle !== false && item.title ? (
-                                                    <InlineEditableText
-                                                      as={TitleTag}
-                                                      className={`shop-builder-title ${titleHeadingClass} ${titleDecorationClass} ${titleColorClass} ${titleMarginTopClass} ${typographyRoleClass(block.titleTypographyRole)}`.trim()}
-                                                      typography={itemTypography}
-                                                      style={gridTitleStyle}
-                                                      value={item.title}
-                                                      onChange={(title) =>
-                                                        onUpdateGridItem(
-                                                          section.id,
-                                                          columnKey,
-                                                          blockKey,
-                                                          itemIndex,
-                                                          { title },
-                                                        )
-                                                      }
-                                                    />
-                                                  ) : null
-                                                );
-
-                                                const renderContentNode = () => (
-                                                  block.gridShowText !== false && rawGridBlock.showContent !== false && item.text ? (
-                                                    <InlineEditableText
-                                                      as="p"
-                                                      className={`${contentStyleClass} ${contentMarginTopClass} ${typographyRoleClass(block.contentTypographyRole)}`.trim()}
-                                                      typography={itemTypography}
-                                                      value={item.text}
-                                                      onChange={(text) =>
-                                                        onUpdateGridItem(
-                                                          section.id,
-                                                          columnKey,
-                                                          blockKey,
-                                                          itemIndex,
-                                                          { text },
-                                                        )
-                                                      }
-                                                    />
-                                                  ) : null
-                                                );
-
-                                                return (
-                                                  <>
-                                                    {item.iconName && <WebPagesIcon name={item.iconName} size={item.iconSize ?? 20} />}
-                                                    {block.gridShowEyebrow !== false && item.eyebrow && (
-                                                      <InlineEditableText
-                                                        as="span"
-                                                        className={`shop-builder-eyebrow ${typographyRoleClass(block.metaTypographyRole)}`}
-                                                        typography={itemTypography}
-                                                        value={item.eyebrow}
-                                                        onChange={(eyebrow) =>
-                                                          onUpdateGridItem(
-                                                            section.id,
-                                                            columnKey,
-                                                            blockKey,
-                                                            itemIndex,
-                                                            { eyebrow },
-                                                          )
-                                                        }
-                                                      />
-                                                    )}
-                                                    {metaAlign === "above-title" && renderMetaNode()}
-                                                    {renderTitleNode()}
-                                                    {metaAlign === "below-title" && renderMetaNode()}
-                                                    {renderContentNode()}
-                                                    {metaAlign === "below-content" && renderMetaNode()}
-
-                                                    <RenderDashboardChecklist
-                                                      items={"items" in item ? item.items : undefined}
-                                                      iconName={"listIcon" in item ? item.listIcon : undefined}
-                                                      colorScheme={"listIconColorScheme" in item ? item.listIconColorScheme : undefined}
-                                                      typography={itemTypography}
-                                                    />
-
-                                                    {block.gridShowButton !== false && rawGridBlock.showLink !== false && (() => {
-                                                      const action = resolveCanonicalGridAction(block, item);
-                                                      const linkMarginTopClass = getUikitMarginClass(action.margin);
-                                                      return (
-                                                        <div
-                                                          className={`shop-builder-grid-button shop-builder-grid-button--${item.buttonAlign ?? "left"} ${linkMarginTopClass}`.trim()}
-                                                        >
-                                                          <a
-                                                            className={`shop-builder-grid-action builder-grid-action ${getUikitButtonClass(action.style, action.size)} ${action.fullWidth ? "uk-width-1-1" : ""}`.trim()}
-                                                            href={action.url}
-                                                            {...builderLinkTargetProps(action.target)}
-                                                          >
-                                                            {action.label}
-                                                          </a>
-                                                        </div>
-                                                      );
-                                                    })()}
-                                                  </>
-                                                );
-                                              })()
-                                            ) : (
-                                              <>
-                                                {item.iconName && <WebPagesIcon name={item.iconName} size={item.iconSize ?? 20} />}
-                                                {block.gridShowEyebrow !==
-                                                  false &&
-                                                  item.eyebrow && (
-                                                    <DashboardTypog
-                                                      as="span"
-                                                      area="eyebrow"
-                                                      typography={itemTypography}
-                                                    >
-                                                      {item.eyebrow}
-                                                    </DashboardTypog>
-                                                  )}
-                                                {item.title && (
-                                                  <DashboardTypog
-                                                    as={(item.titleElement ?? "h3") as any}
-                                                    area="title"
-                                                    typography={itemTypography}
-                                                    style={gridTitleStyle}
-                                                  >
-                                                    {item.title}
-                                                  </DashboardTypog>
-                                                )}
-                                                {block.gridShowMeta !== false &&
-                                                  item.meta && (
-                                                    <DashboardTypog
-                                                      as="small"
-                                                      area="body"
-                                                      typography={itemTypography}
-                                                    >
-                                                      {item.meta}
-                                                    </DashboardTypog>
-                                                  )}
-                                                {block.gridShowText !== false &&
-                                                  item.text && (
-                                                    <DashboardTypog
-                                                      as="p"
-                                                      area="body"
-                                                      typography={itemTypography}
-                                                    >
-                                                      {item.text}
-                                                    </DashboardTypog>
-                                                  )}
-                                                {block.gridShowButton !==
-                                                  false &&
-                                                  item.buttonLabel && (() => {
-                                                    const action = resolveCanonicalGridAction(block, item);
-                                                    return (
-                                                    <div
-                                                      className={`shop-builder-grid-button shop-builder-grid-button--${item.buttonAlign ?? "left"} ${getUikitMarginClass(action.margin)}`.trim()}
-                                                    >
-                                                      <a
-                                                        className={`shop-builder-grid-action builder-grid-action ${getUikitButtonClass(action.style, action.size)} ${action.fullWidth ? "uk-width-1-1" : ""}`.trim()}
-                                                        href={action.url}
-                                                        {...builderLinkTargetProps(action.target)}
-                                                      >
-                                                        {action.label}
-                                                      </a>
-                                                    </div>
-                                                    );
-                                                  })()}
-                                              </>
-                                            )}
-                                          </div>
-                                        </article>
-                                      );
-                                    })}
+                          <GridCardsClient
+                            block={block}
+                            items={block.gridItems ?? []}
+                            gridTitleStyle={{
+                              color: "var(--builder-card-title-color, inherit)",
+                              fontSize: "var(--builder-card-title-size, inherit)",
+                              fontWeight: "var(--builder-card-title-weight, inherit)",
+                              textAlign: "var(--builder-card-title-align, inherit)" as React.CSSProperties["textAlign"],
+                              margin: "var(--builder-card-title-margin, 0)",
+                            }}
+                            gridGapClass={gridSpacingClass(block.gridGap, ["none", "small", "medium", "large", "max"], "medium")}
+                            gridGapCustom={gridSpacingClass(block.gridGap, ["none", "small", "medium", "large", "max"], "medium") === "custom" ? cssSpacingValue(block.gridGap) : null}
+                            imagePaddingClass={Boolean((block as any).alignImageWithoutPadding) ? "frameless" : gridSpacingClass(block.gridImagePadding, ["frameless", "none", "small", "medium", "max"], "none")}
+                            imagePaddingCustom={gridSpacingClass(block.gridImagePadding, ["frameless", "none", "small", "medium", "max"], "none") === "custom" ? cssSpacingValue(block.gridImagePadding) : null}
+                            contentPaddingClass={gridSpacingClass(block.gridContentPadding, ["none", "small", "medium", "large"], "medium")}
+                            contentPaddingCustom={gridSpacingClass(block.gridContentPadding, ["none", "small", "medium", "large"], "medium") === "custom" ? cssSpacingValue(block.gridContentPadding) : null}
+                            limit={typeof block.gridLimit === "number" && block.gridLimit > 0 ? block.gridLimit : (block.gridItems?.length ?? 999)}
+                            itemChrome={(item, itemIndex) => (
+                              <>
+                                <div className="builder-preview-grid-item-tools" data-builder-grid-item-id={item.id ?? itemIndex}>
+                                  <button
+                                    type="button"
+                                    onMouseDown={(event) => event.stopPropagation()}
+                                    onClick={(event) => {
+                                      event.stopPropagation();
+                                      onSelectBlock(section.id, columnKey, blockKey);
+                                      onOpenInspector();
+                                    }}
+                                    aria-label={`Edit grid item ${itemIndex + 1}`}
+                                    title="Edit item"
+                                  >
+                                    <Pencil size={12} />
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onMouseDown={(event) => event.stopPropagation()}
+                                    onClick={(event) => {
+                                      event.stopPropagation();
+                                      onDuplicateGridItem(section.id, columnKey, blockKey, itemIndex);
+                                    }}
+                                    aria-label={`Duplicate grid item ${itemIndex + 1}`}
+                                    title="Duplicate item"
+                                  >
+                                    <Copy size={12} />
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onMouseDown={(event) => event.stopPropagation()}
+                                    onClick={(event) => {
+                                      event.stopPropagation();
+                                      onDeleteGridItem(section.id, columnKey, blockKey, itemIndex);
+                                    }}
+                                    aria-label={`Delete grid item ${itemIndex + 1}`}
+                                    title="Delete item"
+                                  >
+                                    <Trash2 size={12} />
+                                  </button>
                                 </div>
-                              </div>
-                            );
-                          })()
+                                <span className="builder-preview-grid-drag-handle" aria-hidden="true">::</span>
+                              </>
+                            )}
+                            itemProps={(_, itemIndex) => ({
+                              draggable: block.gridSource !== "products",
+                              onDragStart: (event) => {
+                                if (block.gridSource === "products") return;
+                                event.stopPropagation();
+                                setDraggingItem({ kind: "grid", blockKey, fromIndex: itemIndex });
+                              },
+                              onDragOver: (event) => {
+                                if (draggingItem?.kind !== "grid" || draggingItem.blockKey !== blockKey || draggingItem.fromIndex === itemIndex) return;
+                                event.preventDefault();
+                                if (dropHoverIndex !== itemIndex) setDropHoverIndex(itemIndex);
+                              },
+                              onDragLeave: () => {
+                                if (dropHoverIndex === itemIndex) setDropHoverIndex(null);
+                              },
+                              onDrop: (event) => {
+                                event.preventDefault();
+                                if (draggingItem?.kind === "grid" && draggingItem.blockKey === blockKey && draggingItem.fromIndex !== itemIndex) {
+                                  onMoveGridItem(section.id, columnKey, blockKey, draggingItem.fromIndex, itemIndex);
+                                }
+                                setDraggingItem(null);
+                                setDropHoverIndex(null);
+                              },
+                              onDragEnd: () => {
+                                setDraggingItem(null);
+                                setDropHoverIndex(null);
+                              },
+                              className: `${draggingItem?.kind === "grid" && draggingItem.blockKey === blockKey && draggingItem.fromIndex === itemIndex ? "is-dragging-grid" : ""} ${draggingItem?.kind === "grid" && draggingItem.blockKey === blockKey && dropHoverIndex === itemIndex ? "is-drag-over-grid" : ""}`.trim(),
+                            })}
+                          />
                         ) : block.kind === "badgeGrid" ? (
                           <UikitBadgeGrid block={block} />
                         ) : block.kind === "fluentForm" ? (

@@ -8,7 +8,6 @@ import { InspectorFieldRow, InspectorTextField, InspectorTextarea } from "@/comp
 import {
   ImageSettingsGroup,
   CardSettingsGroup,
-  MediaSettingsGroup,
   ActionSettingsGroup,
   ContentSettingsGroup,
   MetaSettingsGroup,
@@ -88,17 +87,12 @@ export default function PanelCapabilityPanel({ block, tab, shellSettings, update
           hoverLabel="Add hover style"
           showHeight
           showImageNoPadding
-          surfaceValue={(values) => values.panelVariant === "default" && values.panelHover === true ? "card-hover" : String(values.panelVariant ?? "blank")}
-          onSurfaceChange={(value) => value === "card-hover"
-            ? { panelVariant: "default", panelHover: true }
-            : { panelVariant: value, panelHover: undefined }}
           keys={{ variant: "panelVariant", size: "panelSize", hover: "panelHover", link: "linkPanel" }}
           surfaceOptions={[
             { value: "blank", label: "None" },
             { value: "default", label: "Card Default" },
             { value: "primary", label: "Card Primary" },
             { value: "secondary", label: "Card Secondary" },
-            { value: "card-hover", label: "Card Hover" },
             { value: "tile-default", label: "Tile Default" },
             { value: "tile-muted", label: "Tile Muted" },
             { value: "tile-primary", label: "Tile Primary" },
@@ -127,6 +121,7 @@ export default function PanelCapabilityPanel({ block, tab, shellSettings, update
           showAlignment={false}
           showHtmlElement={false}
           showPosition
+          positionLabel="Alignment"
           keys={{ role: "metaTypographyRole", align: "panelTextAlign", level: "panelMetaHtmlElement", position: "panelMetaPosition" }}
         />
         <ContentSettingsGroup
@@ -140,18 +135,18 @@ export default function PanelCapabilityPanel({ block, tab, shellSettings, update
           update={updateSemantic}
           showDimensions={false}
           showFrameControls={false}
+          showAlignment={false}
+          mediaLayout={{ placement: "panelMediaPlacement", width: "panelMediaWidth" }}
           keys={{
             width: "imageWidth", height: "imageHeight", ratio: "imageRatio", fit: "imageFit",
             loading: "imageLoading", shape: "imageShape", shadow: "imageShadow",
             decoration: "imageBoxDecoration", align: "imageAlignment",
           }}
         />
-        <MediaSettingsGroup block={block} update={updateSemantic} title="IMAGE LAYOUT" />
         <ActionSettingsGroup
           block={block}
           update={updateSemantic}
           title="LINK"
-          showVisibilityToggle
           showFullWidth
           showMargin
           keys={{

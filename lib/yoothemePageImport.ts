@@ -4,6 +4,7 @@ import type {
 } from "@/components/dashboard/builderTypes";
 import type { BuilderShellSettings } from "@/lib/builderShell";
 import type { BuilderVisualStyle } from "@/lib/builderVisualStyle";
+import { sanitizeHtml } from "@/lib/safeHtml";
 import {
   normalizeYoothemeMedia,
   normalizeYoothemeGridPanelPresentation,
@@ -592,7 +593,10 @@ const sourcePanelStyle = (
 const sourceCardVariant = (
   value: unknown,
 ): NonNullable<BuilderLayoutBlock["gridCardVariant"]> => {
-  const normalized = typeof value === "string" ? value.replace(/^(?:card|tile)-/, "") : "default";
+  const normalized = typeof value === "string" ? value.trim().toLowerCase().replace(/^(?:card|tile)-/, "") : "";
+  // An omitted YOOtheme panel_style means Grid Panel Style = None. It must
+  // remain distinct from Card Default through import and rendering.
+  if (normalized === "" || normalized === "none" || normalized === "blank") return "blank";
   return normalized === "primary" || normalized === "secondary" || normalized === "blank"
     ? normalized
     : "default";
@@ -623,6 +627,15 @@ const sourceGridButtonStyle = (
   return style as NonNullable<NonNullable<BuilderLayoutBlock["gridItems"]>[number]["buttonStyle"]>;
 };
 
+/** YOOtheme stores filter tags as a comma-separated item field. */
+const sourceGridTags = (value: unknown): string[] | undefined => {
+  const values = Array.isArray(value) ? value : typeof value === "string" ? value.split(",") : [];
+  const tags = values
+    .map((entry) => String(entry).trim())
+    .filter(Boolean);
+  return tags.length ? Array.from(new Set(tags)) : undefined;
+};
+
 const sourceGridItem = (
   node: YoothemeSourceNode,
   path: string,
@@ -632,6 +645,7 @@ const sourceGridItem = (
   const props = sourceProps(node);
   const media = normalizeYoothemeMedia({ ...parentProps, ...props });
   const panelStyle = sourcePanelStyle(props.panel_style ?? parentProps.panel_style);
+  const hasItemPanelStyle = Object.prototype.hasOwnProperty.call(props, "panel_style");
   if (Object.prototype.hasOwnProperty.call(props, "image") && !resolveYoothemeAssetUrl(props.image)) {
     warnings.push(`${path}: image asset could not be resolved and was left empty.`);
   }
@@ -643,15 +657,23 @@ const sourceGridItem = (
     id: sourcePathId(path, "grid-item"),
     imageUrl: resolveYoothemeAssetUrl(props.image),
     imageAlt: asString(props.image_alt) ?? asString(props.title) ?? "",
-    title: asString(props.title) ?? "",
+    // Both source fields are authored as rich HTML in the DevStack fixtures.
+    // Normalize them at the same safe boundary used by the WebPages rich editor.
+    title: sanitizeHtml(asString(props.title) ?? ""),
     meta: asString(props.meta) ?? "",
-    text: asString(props.content) ?? "",
+    text: sanitizeHtml(asString(props.content) ?? ""),
+    tags: sourceGridTags(props.tags),
     buttonLabel: asString(props.link_text) ?? asString(parentProps.link_text) ?? undefined,
     buttonUrl: asString(props.link) ?? undefined,
     buttonStyle: sourceGridButtonStyle(props.link_style),
     buttonTarget: props.link_target === "blank" ? "_blank" : "_self",
-    renderer: panelStyle ? "card" : "plain",
-    cardVariant: sourceCardVariant(props.panel_style ?? parentProps.panel_style),
+    // The Grid owns its default Card surface. Retain an item value only when
+    // YOOtheme explicitly set one, otherwise future Grid style changes inherit.
+    ...(hasItemPanelStyle ? {
+      renderer: panelStyle ? "card" : "plain",
+      cardVariant: sourceCardVariant(props.panel_style),
+      ...(props.panel_style === "card-hover" ? { cardHover: true } : {}),
+    } : {}),
     mediaPlacement: props.image_align === "left" || props.image_align === "right" ? props.image_align : "top",
     mediaFit: media.imageFit ?? "natural",
     imagePosition: media.imagePosition,
@@ -825,6 +847,10 @@ const mapStaticElement = (
       "show_content", "show_image", "show_link", "show_meta", "show_title", "text_align",
       "title_element", "title_style", "title_align", "meta_align", "meta_element",
       "title_margin", "link_margin", "margin", "margin_remove_bottom",
+      // Filter navigation has an existing Grid owner. More detailed filter
+      // layout options remain unsupported until the responsive runtime owns
+      // them, but the source enablement/style must reach item tags.
+      "filter", "filter_style",
       ...GENERAL_POSITION_KEYS,
     ], warnings);
     return withSourceGeneralVisualStyle({
@@ -836,9 +862,12 @@ const mapStaticElement = (
       gridShowMeta: props.show_meta !== false,
       gridShowText: props.show_content !== false,
       gridShowButton: props.show_link !== false,
+      enableFilter: props.filter === true || props.filter === "true",
+      filterStyle: props.filter_style === "subnav-pill" ? "pill" : props.filter_style === "tab" ? "tabs" : "subnav",
       gridItemRenderer: panelStyle ? "card" : "plain",
       gridCardVariant: sourceCardVariant(props.panel_style),
-      gridCardSize: props.panel_padding === "large" ? "large" : props.panel_padding === "small" ? "small" : "default",
+      gridCardSize: props.panel_padding === "large" ? "large" : props.panel_padding === "small" ? "small" : props.panel_padding === "default" ? "default" : "none",
+      gridCardHover: props.panel_style === "card-hover",
       gridMediaPlacement: props.image_align === "left" || props.image_align === "right" ? props.image_align : "top",
       gridItemAlign: sourceAlignment(props.text_align),
       gridGap: typeof props.grid_column_gap === "string" ? props.grid_column_gap : undefined,
@@ -850,7 +879,11 @@ const mapStaticElement = (
       centerRows: Boolean(props.grid_column_align),
       columnsPhonePortrait: typeof props.grid_default === "string" ? props.grid_default : undefined,
       columnsPhoneLandscape: typeof props.grid_small === "string" ? props.grid_small : undefined,
-      columnsDesktop: typeof props.grid_medium === "string" ? props.grid_medium : undefined,
+      // UIkit's `grid_medium` is the Tablet Landscape tier. Keep it on the
+      // matching canonical owner instead of the later Desktop tier.
+      columnsTabletLandscape: typeof props.grid_medium === "string" && props.grid_medium !== ""
+        ? props.grid_medium
+        : undefined,
       gridMediaWidth: props.image_grid_width === "1-3" ? "small" : props.image_grid_width === "1-2" ? "medium" : "large",
       ...normalizeYoothemeMedia(props),
       imageMaxWidth: sourceImageMaxWidth(props),

@@ -1,571 +1,8 @@
 {
-  "home": {
-    "version": 1,
-    "key": "home",
-    "page": "home",
-    "targetType": "page",
-    "design": {
-      "preset": "princity",
-      "colorScheme": "auto",
-      "pageBackground": "#f7f7f4",
-      "textColor": "#111111",
-      "mutedTextColor": "#5f5f58",
-      "accentColor": "#a4be7b",
-      "surfaceColor": "#efefe9",
-      "buttonBackground": "#111111",
-      "buttonTextColor": "#ffffff",
-      "radius": "8px",
-      "sectionMaxWidth": "1640px",
-      "sectionGutter": "48px",
-      "headingFontFamily": "inherit",
-      "headingSize": "clamp(42px, 8vw, 126px)",
-      "headingWeight": "760",
-      "headingLineHeight": "0.92",
-      "cardBg": "#efefe9",
-      "cardRadius": "8px",
-      "cardBorder": "transparent",
-      "cardShadow": "0 12px 30px rgba(17,17,17,0.06)",
-      "cardShadowHover": "0 18px 42px rgba(17,17,17,0.1)",
-      "cardImageBg": "#ffffff",
-      "cardImagePadding": "clamp(22px, 2.4vw, 36px)"
-    },
-    "sections": [
-      {
-        "id": "yootheme-section-1",
-        "kind": "contentLayout",
-        "title": "Grid shared-renderer acceptance",
-        "background": "transparent",
-        "preserveColor": false,
-        "overlap": false,
-        "textColor": "none",
-        "contentMode": "boxed",
-        "maxWidth": "default",
-        "removeHorizontalPadding": false,
-        "expandOneSide": "none",
-        "sectionHeight": "auto",
-        "contentVerticalAlign": "top",
-        "sectionPadding": "default",
-        "htmlElement": "div",
-        "stickyEffect": "none",
-        "headerTransparent": false,
-        "pullUnderHeader": false,
-        "headerTextColor": "none",
-        "sectionTitleRotation": "none",
-        "visible": true,
-        "layout": "1-col",
-        "layoutColumns": 1,
-        "layoutRows": 1,
-        "layoutItems": [
-          {
-            "id": "yootheme-section-1-row-1-column-1",
-            "rowId": "yootheme-section-1-row-1",
-            "rowLayout": "1-col",
-            "blocks": [
-              {
-                "id": "yootheme-grid-0-0-0-0",
-                "kind": "grid",
-                "gridSource": "static",
-                "gridItems": [
-                  {
-                    "id": "yootheme-grid-item-0-0-0-0-0",
-                    "imageUrl": "/wp-content/uploads/yootheme/icon-deployment.svg",
-                    "imageAlt": "Platform <em>Pro</em>",
-                    "title": "Platform <em>Pro</em>",
-                    "meta": "Product",
-                    "text": "<p>Platform <strong>content</strong></p>",
-                    "tags": [
-                      "Product",
-                      "Featured"
-                    ],
-                    "buttonLabel": "Open item",
-                    "buttonUrl": "/platform",
-                    "buttonTarget": "_self",
-                    "renderer": "card",
-                    "cardVariant": "primary",
-                    "mediaPlacement": "top",
-                    "mediaFit": "natural"
-                  },
-                  {
-                    "id": "yootheme-grid-item-0-0-0-0-1",
-                    "imageUrl": "/wp-content/uploads/yootheme/icon-automation.svg",
-                    "imageAlt": "Automation",
-                    "title": "Automation",
-                    "meta": "Workflow",
-                    "text": "Automation content",
-                    "tags": [
-                      "Workflow"
-                    ],
-                    "buttonLabel": "Open item",
-                    "buttonUrl": "/automation",
-                    "buttonTarget": "_self",
-                    "mediaPlacement": "top",
-                    "mediaFit": "natural"
-                  },
-                  {
-                    "id": "yootheme-grid-item-0-0-0-0-2",
-                    "imageUrl": "/wp-content/uploads/yootheme/icon-security.svg",
-                    "imageAlt": "Security",
-                    "title": "Security",
-                    "meta": "Product",
-                    "text": "Security content",
-                    "tags": [
-                      "Product"
-                    ],
-                    "buttonLabel": "Open item",
-                    "buttonUrl": "/security",
-                    "buttonTarget": "_self",
-                    "mediaPlacement": "top",
-                    "mediaFit": "natural"
-                  }
-                ],
-                "gridShowImage": true,
-                "gridShowMeta": true,
-                "gridShowText": true,
-                "gridShowButton": true,
-                "enableFilter": true,
-                "filterStyle": "pill",
-                "gridItemRenderer": "card",
-                "gridCardVariant": "default",
-                "gridCardSize": "large",
-                "gridCardHover": true,
-                "gridMediaPlacement": "top",
-                "gridGap": "large",
-                "gridRowGap": "small",
-                "showDividers": true,
-                "centerRows": true,
-                "columnsPhonePortrait": "1",
-                "columnsPhoneLandscape": "2",
-                "columnsTabletLandscape": "3",
-                "gridMediaWidth": "medium",
-                "imageBorder": "none",
-                "imageBoxShadow": "none",
-                "imageBoxDecoration": "none",
-                "imageHoverTransition": "none",
-                "linkImage": false,
-                "buttonLabel": "Open item",
-                "buttonStyle": "secondary",
-                "buttonTarget": "_blank",
-                "size": "large",
-                "fullWidthButton": true,
-                "linkMarginTop": "medium",
-                "visualStyle": {
-                  "margin": {
-                    "top": "0"
-                  },
-                  "card": {
-                    "titleMargin": "0",
-                    "buttonMargin": "var(--uk-global-margin-medium)"
-                  }
-                },
-                "enableLightbox": true
-              }
-            ]
-          }
-        ]
-      }
-    ],
-    "updatedAt": "2026-08-10T10:45:51.971Z"
-  },
-  "header": {
-    "version": 1,
-    "key": "header",
-    "page": "header",
-    "targetType": "header",
-    "design": {
-      "preset": "princity",
-      "colorScheme": "auto",
-      "pageBackground": "#f7f7f4",
-      "textColor": "#111111",
-      "mutedTextColor": "#5f5f58",
-      "accentColor": "#a4be7b",
-      "surfaceColor": "#efefe9",
-      "buttonBackground": "#111111",
-      "buttonTextColor": "#ffffff",
-      "radius": "8px",
-      "sectionMaxWidth": "1640px",
-      "sectionGutter": "48px",
-      "headingFontFamily": "inherit",
-      "headingSize": "clamp(42px, 8vw, 126px)",
-      "headingWeight": "760",
-      "headingLineHeight": "0.92",
-      "cardBg": "#efefe9",
-      "cardRadius": "8px",
-      "cardBorder": "transparent",
-      "cardShadow": "0 12px 30px rgba(17,17,17,0.06)",
-      "cardShadowHover": "0 18px 42px rgba(17,17,17,0.1)",
-      "cardImageBg": "#ffffff",
-      "cardImagePadding": "clamp(22px, 2.4vw, 36px)"
-    },
-    "sections": [
-      {
-        "id": "header-document",
-        "kind": "contentLayout",
-        "title": "Header",
-        "headerUtilityMigrationVersion": 3,
-        "background": "transparent",
-        "backgroundMode": "full",
-        "contentMode": "boxed",
-        "colorScheme": "inherit",
-        "layout": "header-row",
-        "layoutColumns": 3,
-        "layoutItems": [
-          {
-            "id": "header-top-left",
-            "rowId": "header-top-row",
-            "rowLayout": "halves",
-            "blocks": [
-              {
-                "id": "header-language",
-                "kind": "headerLanguage",
-                "headerLanguageDisplay": "native"
-              }
-            ]
-          },
-          {
-            "id": "header-top-right",
-            "rowId": "header-top-row",
-            "rowLayout": "halves",
-            "blocks": [
-              {
-                "id": "header-utility-account",
-                "kind": "headerAccount",
-                "headerUtilityAction": "account",
-                "headerUtilityVariant": "muted"
-              },
-              {
-                "id": "header-utility-search",
-                "kind": "headerSearch",
-                "headerUtilityAction": "search",
-                "headerUtilityVariant": "muted"
-              }
-            ]
-          },
-          {
-            "id": "header-main-left",
-            "rowId": "header-main-row",
-            "rowLayout": "quarters-1-2-1",
-            "blocks": [
-              {
-                "id": "header-logo",
-                "kind": "image",
-                "headerBrandMode": "logo",
-                "headerBrandText": "Header Parity Site",
-                "imageMaxWidth": 180,
-                "imageAlt": "Header Parity Site logo",
-                "imageUrl": "https://cms.webpages.am/wp-content/uploads/2026/06/premium-16.png"
-              }
-            ]
-          },
-          {
-            "id": "header-main-center",
-            "rowId": "header-main-row",
-            "rowLayout": "quarters-1-2-1",
-            "blocks": [
-              {
-                "id": "header-navigation",
-                "kind": "menu",
-                "title": "Navigation",
-                "menuSource": "main",
-                "menuActiveIndicator": "underline",
-                "elementAlign": "right"
-              }
-            ]
-          },
-          {
-            "id": "header-main-right",
-            "rowId": "header-main-row",
-            "rowLayout": "quarters-1-2-1",
-            "blocks": [
-              {
-                "id": "header-button",
-                "kind": "button",
-                "buttonLabel": "Contact Us",
-                "buttonUrl": "/contact",
-                "buttonStyle": "default",
-                "size": "default"
-              },
-              {
-                "id": "header-utility-theme",
-                "kind": "headerTheme",
-                "headerUtilityAction": "theme",
-                "headerUtilityVariant": "muted"
-              },
-              {
-                "id": "header-utility-cart",
-                "kind": "headerCart",
-                "headerUtilityAction": "cart",
-                "headerUtilityVariant": "muted"
-              }
-            ]
-          }
-        ],
-        "visible": true,
-        "headerArchitectureVersion": 2,
-        "headerVisible": true,
-        "headerTransparent": false,
-        "headerOverlay": false,
-        "headerLayout": "two-row",
-        "headerBehavior": "sticky-on-scroll-up",
-        "headerWidthMode": "boxed",
-        "headerBackgroundMode": "default",
-        "headerTextMode": "auto",
-        "headerZIndex": 40,
-        "headerTopToolbarVisible": false,
-        "headerTopToolbarText": "",
-        "headerTopToolbarPhone": "",
-        "headerTopToolbarMeta": "",
-        "headerHeight": "auto"
-      }
-    ],
-    "updatedAt": "2026-08-04T12:06:08.432Z"
-  },
-  "footer": {
-    "version": 1,
-    "key": "footer",
-    "page": "footer",
-    "targetType": "footer",
-    "design": {
-      "preset": "princity",
-      "colorScheme": "auto",
-      "pageBackground": "#f7f7f4",
-      "textColor": "#111111",
-      "mutedTextColor": "#5f5f58",
-      "accentColor": "#a4be7b",
-      "surfaceColor": "#efefe9",
-      "buttonBackground": "#111111",
-      "buttonTextColor": "#ffffff",
-      "radius": "8px",
-      "sectionMaxWidth": "1640px",
-      "sectionGutter": "48px",
-      "headingFontFamily": "inherit",
-      "headingSize": "clamp(42px, 8vw, 126px)",
-      "headingWeight": "760",
-      "headingLineHeight": "0.92",
-      "cardBg": "#efefe9",
-      "cardRadius": "8px",
-      "cardBorder": "transparent",
-      "cardShadow": "0 12px 30px rgba(17,17,17,0.06)",
-      "cardShadowHover": "0 18px 42px rgba(17,17,17,0.1)",
-      "cardImageBg": "#ffffff",
-      "cardImagePadding": "clamp(22px, 2.4vw, 36px)"
-    },
-    "sections": [
-      {
-        "id": "contentLayout-mrwgqvba-qbh05",
-        "kind": "contentLayout",
-        "title": "",
-        "background": "#ffffff",
-        "backgroundMode": "boxed",
-        "contentMode": "boxed",
-        "colorScheme": "inherit",
-        "topSpacing": "inherit",
-        "bottomSpacing": "inherit",
-        "topMargin": "inherit",
-        "bottomMargin": "inherit",
-        "pullUnderHeader": false,
-        "visible": true,
-        "eyebrow": "",
-        "body": "",
-        "layout": "whole",
-        "layoutColumns": 1,
-        "layoutItems": [
-          {
-            "id": "layout-row-msem1u7q-column-1",
-            "rowId": "layout-row-msem1u7q",
-            "rowLayout": "3-col-equal",
-            "blocks": []
-          },
-          {
-            "id": "layout-row-msem1u7q-column-2",
-            "rowId": "layout-row-msem1u7q",
-            "blocks": [],
-            "rowLayout": "3-col-equal"
-          },
-          {
-            "id": "layout-row-msem1u7q-column-3",
-            "rowId": "layout-row-msem1u7q",
-            "blocks": [],
-            "rowLayout": "3-col-equal"
-          }
-        ],
-        "layoutRows": 1
-      },
-      {
-        "id": "footer-document",
-        "kind": "contentLayout",
-        "title": "Footer",
-        "background": "#17211d",
-        "backgroundMode": "full",
-        "contentMode": "boxed",
-        "colorScheme": "dark",
-        "topSpacing": "medium",
-        "bottomSpacing": "medium",
-        "layout": "thirds",
-        "layoutColumns": 3,
-        "layoutItems": [
-          {
-            "id": "footer-document-column-1",
-            "rowId": "footer-document-row",
-            "rowLayout": "thirds",
-            "blocks": [
-              {
-                "id": "footer-about",
-                "kind": "text",
-                "title": "Header Parity Site",
-                "body": "A concise closing statement that reinforces what you offer and who you help.",
-                "typography": {
-                  "title": {
-                    "fontFamily": "inherit",
-                    "fontSize": "clamp(28px, 3.5vw, 48px)",
-                    "fontWeight": "700",
-                    "lineHeight": "1.08",
-                    "letterSpacing": "-0.02em",
-                    "color": "inherit",
-                    "textAlign": "left"
-                  },
-                  "body": {
-                    "fontFamily": "inherit",
-                    "fontSize": "16px",
-                    "fontWeight": "400",
-                    "lineHeight": "1.65",
-                    "letterSpacing": "0",
-                    "color": "inherit",
-                    "textAlign": "left"
-                  },
-                  "eyebrow": {
-                    "fontFamily": "inherit",
-                    "fontSize": "12px",
-                    "fontWeight": "700",
-                    "lineHeight": "1.2",
-                    "letterSpacing": "0.08em",
-                    "color": "inherit",
-                    "textAlign": "left",
-                    "textTransform": "uppercase"
-                  }
-                }
-              }
-            ]
-          },
-          {
-            "id": "footer-document-column-2",
-            "rowId": "footer-document-row",
-            "rowLayout": "thirds",
-            "blocks": [
-              {
-                "id": "footer-links",
-                "kind": "list",
-                "title": "Explore",
-                "items": [
-                  "About",
-                  "Services",
-                  "Testimonials",
-                  "Contact"
-                ],
-                "listItems": [
-                  {
-                    "id": "footer-links-item-1",
-                    "text": "About"
-                  },
-                  {
-                    "id": "footer-links-item-2",
-                    "text": "Services"
-                  },
-                  {
-                    "id": "footer-links-item-3",
-                    "text": "Testimonials"
-                  },
-                  {
-                    "id": "footer-links-item-4",
-                    "text": "Contact"
-                  }
-                ],
-                "listPresentation": "default",
-                "listMarker": "none",
-                "listAlign": "left",
-                "listSpacing": "default"
-              }
-            ]
-          },
-          {
-            "id": "footer-document-column-3",
-            "rowId": "footer-document-row",
-            "rowLayout": "thirds",
-            "blocks": [
-              {
-                "id": "footer-contact",
-                "kind": "text",
-                "eyebrow": "Contact",
-                "title": "Start a conversation",
-                "body": "hello@example.com\n+1 000 000 0000",
-                "typography": {
-                  "title": {
-                    "fontFamily": "inherit",
-                    "fontSize": "clamp(28px, 3.5vw, 48px)",
-                    "fontWeight": "700",
-                    "lineHeight": "1.08",
-                    "letterSpacing": "-0.02em",
-                    "color": "inherit",
-                    "textAlign": "left"
-                  },
-                  "body": {
-                    "fontFamily": "inherit",
-                    "fontSize": "16px",
-                    "fontWeight": "400",
-                    "lineHeight": "1.65",
-                    "letterSpacing": "0",
-                    "color": "inherit",
-                    "textAlign": "left"
-                  },
-                  "eyebrow": {
-                    "fontFamily": "inherit",
-                    "fontSize": "12px",
-                    "fontWeight": "700",
-                    "lineHeight": "1.2",
-                    "letterSpacing": "0.08em",
-                    "color": "inherit",
-                    "textAlign": "left",
-                    "textTransform": "uppercase"
-                  }
-                }
-              }
-            ]
-          }
-        ],
-        "visible": true
-      }
-    ],
-    "updatedAt": "2026-08-04T12:05:22.695Z"
-  },
   "page:pricing": {
-    "version": 1,
     "key": "page:pricing",
     "page": "page:pricing",
     "targetType": "page",
-    "design": {
-      "preset": "princity",
-      "colorScheme": "auto",
-      "pageBackground": "#f7f7f4",
-      "textColor": "#111111",
-      "mutedTextColor": "#5f5f58",
-      "accentColor": "#a4be7b",
-      "surfaceColor": "#efefe9",
-      "buttonBackground": "#111111",
-      "buttonTextColor": "#ffffff",
-      "radius": "8px",
-      "sectionMaxWidth": "1640px",
-      "sectionGutter": "48px",
-      "headingFontFamily": "inherit",
-      "headingSize": "clamp(42px, 8vw, 126px)",
-      "headingWeight": "760",
-      "headingLineHeight": "0.92",
-      "cardBg": "#efefe9",
-      "cardRadius": "8px",
-      "cardBorder": "transparent",
-      "cardShadow": "0 12px 30px rgba(17,17,17,0.06)",
-      "cardShadowHover": "0 18px 42px rgba(17,17,17,0.1)",
-      "cardImageBg": "#ffffff",
-      "cardImagePadding": "clamp(22px, 2.4vw, 36px)"
-    },
     "sections": [
       {
         "id": "yootheme-section-1",
@@ -662,7 +99,7 @@
                     "imageAlt": "<p class=\"uk-margin-remove\">$0</p><p class=\"uk-text-meta uk-margin-remove\">Per user / per month</p>",
                     "title": "<p class=\"uk-margin-remove\">$0</p><p class=\"uk-text-meta uk-margin-remove\">Per user / per month</p>",
                     "meta": "Free",
-                    "text": "<ul class=\"uk-list uk-list-large\">\n    <li>\n        <div class=\"uk-grid-small\">\n            <div class=\"uk-width-auto\">\n                <img src=\"https://cms.webpages.am/wp-content/uploads/yootheme/check.svg\" width=\"12\" height=\"9\" class=\"uk-text-success\" loading=\"lazy\">\n            </div>\n            <div class=\"uk-width-expand\">Run 1 Job at a Time</div>\n        </div>\n    </li>\n    <li>\n        <div class=\"uk-grid-small\">\n            <div class=\"uk-width-auto\">\n                <img src=\"https://cms.webpages.am/wp-content/uploads/yootheme/check.svg\" width=\"12\" height=\"9\" class=\"uk-text-success\" loading=\"lazy\">\n            </div>\n            <div class=\"uk-width-expand\">\n                <div>Standard Build Machines</div>\n                <div class=\"uk-text-meta\">Lorem ipsum dolor sit amet</div>\n            </div>\n        </div>\n    </li>\n    <li>\n        <div class=\"uk-grid-small\">\n            <div class=\"uk-width-auto\">\n                <img src=\"https://cms.webpages.am/wp-content/uploads/yootheme/check.svg\" width=\"12\" height=\"9\" class=\"uk-text-success\" loading=\"lazy\">\n            </div>\n            <div class=\"uk-width-expand\">\n                <div>Up to 3 Users</div>\n                <div class=\"uk-text-meta\">Lorem ipsum dolor sit amet</div>\n            </div>\n        </div>\n    </li>\n    <li>\n        <div class=\"uk-grid-small\">\n            <div class=\"uk-width-auto\">\n                <img src=\"https://cms.webpages.am/wp-content/uploads/yootheme/check.svg\" width=\"12\" height=\"9\" class=\"uk-text-success\" loading=\"lazy\">\n            </div>\n            <div class=\"uk-width-expand\">Community Support</div>\n        </div>\n    </li>\n</ul>",
+                    "text": "<ul class=\"uk-list uk-list-large\">\n    <li>\n        <div class=\"uk-grid-small\">\n            <div class=\"uk-width-auto\">\n                <img src=\"wp-content/uploads/yootheme/check.svg\" width=\"12\" height=\"9\" class=\"uk-text-success\" loading=\"lazy\">\n            </div>\n            <div class=\"uk-width-expand\">Run 1 Job at a Time</div>\n        </div>\n    </li>\n    <li>\n        <div class=\"uk-grid-small\">\n            <div class=\"uk-width-auto\">\n                <img src=\"wp-content/uploads/yootheme/check.svg\" width=\"12\" height=\"9\" class=\"uk-text-success\" loading=\"lazy\">\n            </div>\n            <div class=\"uk-width-expand\">\n                <div>Standard Build Machines</div>\n                <div class=\"uk-text-meta\">Lorem ipsum dolor sit amet</div>\n            </div>\n        </div>\n    </li>\n    <li>\n        <div class=\"uk-grid-small\">\n            <div class=\"uk-width-auto\">\n                <img src=\"wp-content/uploads/yootheme/check.svg\" width=\"12\" height=\"9\" class=\"uk-text-success\" loading=\"lazy\">\n            </div>\n            <div class=\"uk-width-expand\">\n                <div>Up to 3 Users</div>\n                <div class=\"uk-text-meta\">Lorem ipsum dolor sit amet</div>\n            </div>\n        </div>\n    </li>\n    <li>\n        <div class=\"uk-grid-small\">\n            <div class=\"uk-width-auto\">\n                <img src=\"wp-content/uploads/yootheme/check.svg\" width=\"12\" height=\"9\" class=\"uk-text-success\" loading=\"lazy\">\n            </div>\n            <div class=\"uk-width-expand\">Community Support</div>\n        </div>\n    </li>\n</ul>",
                     "tags": [
                       "Monthly"
                     ],
@@ -779,8 +216,6 @@
                 "gridShowMeta": true,
                 "gridShowText": true,
                 "gridShowButton": true,
-                "enableFilter": true,
-                "filterStyle": "pill",
                 "gridItemRenderer": "card",
                 "gridCardVariant": "default",
                 "gridCardSize": "large",
@@ -849,7 +284,7 @@
               {
                 "id": "yootheme-image-0-0-0-4",
                 "kind": "image",
-                "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/background-square-02.png",
+                "imageUrl": "/wp-content/uploads/yootheme/background-square-02.png",
                 "imageAlt": "",
                 "imageMaxWidth": 700,
                 "imageWidth": "700",
@@ -879,7 +314,7 @@
               {
                 "id": "yootheme-image-0-0-0-5",
                 "kind": "image",
-                "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/background-square-04.png",
+                "imageUrl": "/wp-content/uploads/yootheme/background-square-04.png",
                 "imageAlt": "",
                 "imageMaxWidth": 450,
                 "imageWidth": "450",
@@ -912,7 +347,7 @@
               {
                 "id": "yootheme-image-0-0-0-6",
                 "kind": "image",
-                "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/background-square-02.png",
+                "imageUrl": "/wp-content/uploads/yootheme/background-square-02.png",
                 "imageAlt": "",
                 "imageMaxWidth": 600,
                 "imageWidth": "600",
@@ -1030,7 +465,7 @@
               {
                 "id": "yootheme-image-1-0-0-3",
                 "kind": "image",
-                "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/background-square-03.png",
+                "imageUrl": "/wp-content/uploads/yootheme/background-square-03.png",
                 "imageAlt": "",
                 "imageMaxWidth": 800,
                 "imageWidth": "800",
@@ -1059,7 +494,7 @@
               {
                 "id": "yootheme-image-1-0-0-4",
                 "kind": "image",
-                "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/background-square-02.png",
+                "imageUrl": "/wp-content/uploads/yootheme/background-square-02.png",
                 "imageAlt": "",
                 "imageMaxWidth": 450,
                 "imageWidth": "450",
@@ -1198,6 +633,6 @@
         ]
       }
     ],
-    "updatedAt": "2026-08-10T11:01:28.897Z"
+    "updatedAt": "2026-08-10T10:40:58.287Z"
   }
 }

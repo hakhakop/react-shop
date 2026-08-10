@@ -333,13 +333,15 @@ export type BuilderLayoutBlock = {
   gridRowGap?: "none" | "small" | "medium" | "large";
   gridItemRenderer?: "plain" | "card";
   gridCardVariant?: "default" | "primary" | "secondary" | "blank";
-  gridCardSize?: "small" | "default" | "large";
+  gridCardSize?: "none" | "small" | "default" | "large";
   gridCardHover?: boolean;
   gridItems?: {
     id?: string;
     imageUrl?: string;
     imageAlt?: string;
     eyebrow?: string;
+    /** Canonical Grid filter metadata. Source tags normalize to this array. */
+    tags?: string[];
     title?: string;
     meta?: string;
     text?: string;

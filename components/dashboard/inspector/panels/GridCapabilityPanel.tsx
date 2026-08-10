@@ -9,6 +9,7 @@ import type {
 import type { BuilderShellSettings } from "@/lib/builderShell";
 import { BUILDER_LINK_TARGET_OPTIONS } from "@/lib/websiteBuilderLinks";
 import IconPicker from "@/components/dashboard/inspector/IconPicker";
+import RichTextEditor from "@/components/dashboard/RichTextEditor";
 import RepeatableItemShell from "@/components/dashboard/inspector/RepeatableItemShell";
 import { BuilderImageUrlControl } from "@/components/dashboard/inspector/panels/InspectorSharedControls";
 import {
@@ -29,6 +30,7 @@ import {
   InspectorTextarea,
   InspectorDivision,
 } from "@/components/dashboard/inspector/InspectorControls";
+import { sanitizeHtml } from "@/lib/safeHtml";
 
 type Props = {
   block: BuilderLayoutBlock;
@@ -65,6 +67,18 @@ const gapOptions = [
 ];
 
 type GridItem = NonNullable<BuilderLayoutBlock["gridItems"]>[number];
+
+const itemPanelStyleOptions = [
+  { value: "inherit", label: "Inherit Grid Style" },
+  { value: "blank", label: "None" },
+  { value: "default", label: "Card Default" },
+  { value: "primary", label: "Card Primary" },
+  { value: "secondary", label: "Card Secondary" },
+  { value: "card-hover", label: "Card Hover" },
+];
+
+const tagsToText = (tags?: string[]) => tags?.join(", ") ?? "";
+const parseTags = (value: string) => Array.from(new Set(value.split(",").map((tag) => tag.trim()).filter(Boolean)));
 
 export default function GridCapabilityPanel({
   block,
@@ -165,14 +179,15 @@ export default function GridCapabilityPanel({
                   {activeTab === "content" && (
                     <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginTop: "8px" }}>
                       <InspectorFieldRow label="Title">
-                        <InspectorTextField
+                        <InspectorTextarea
                           value={item.title ?? ""}
                           onChange={(value) =>
                             updateItems(
-                              items.map((entry, i) => (i === index ? { ...entry, title: value } : entry))
+                              items.map((entry, i) => (i === index ? { ...entry, title: sanitizeHtml(value) } : entry))
                             )
                           }
                           ariaLabel={`Item ${index + 1} title`}
+                          placeholder="Title (inline HTML such as <br> is supported)"
                         />
                       </InspectorFieldRow>
                       <InspectorFieldRow label="Meta">
@@ -187,14 +202,15 @@ export default function GridCapabilityPanel({
                         />
                       </InspectorFieldRow>
                       <InspectorFieldRow label="Content">
-                        <InspectorTextarea
+                        <RichTextEditor
                           value={item.text ?? ""}
                           onChange={(value) =>
                             updateItems(
-                              items.map((entry, i) => (i === index ? { ...entry, text: value } : entry))
+                              items.map((entry, i) => (i === index ? { ...entry, text: sanitizeHtml(value) } : entry))
                             )
                           }
-                          ariaLabel={`Item ${index + 1} content`}
+                          placeholder="Write item content..."
+                          minHeight="180px"
                         />
                       </InspectorFieldRow>
                       <InspectorFieldRow label="Image">
@@ -219,6 +235,17 @@ export default function GridCapabilityPanel({
                           }
                         />
                       </InspectorFieldRow>
+                      <InspectorFieldRow label="Image Alt">
+                        <InspectorTextField
+                          value={item.imageAlt ?? ""}
+                          onChange={(value) =>
+                            updateItems(
+                              items.map((entry, i) => (i === index ? { ...entry, imageAlt: value } : entry))
+                            )
+                          }
+                          ariaLabel={`Item ${index + 1} image alt`}
+                        />
+                      </InspectorFieldRow>
                       <InspectorFieldRow label="Link">
                         <InspectorTextField
                           value={item.buttonUrl ?? ""}
@@ -229,6 +256,59 @@ export default function GridCapabilityPanel({
                           }
                           ariaLabel={`Item ${index + 1} link`}
                           placeholder="http://"
+                        />
+                      </InspectorFieldRow>
+                      <InspectorFieldRow label="Link Text">
+                        <InspectorTextField
+                          value={item.buttonLabel ?? ""}
+                          onChange={(value) =>
+                            updateItems(
+                              items.map((entry, i) => (i === index ? { ...entry, buttonLabel: value } : entry))
+                            )
+                          }
+                          ariaLabel={`Item ${index + 1} link text`}
+                        />
+                      </InspectorFieldRow>
+                      <InspectorFieldRow label="Tags">
+                        <InspectorTextField
+                          value={tagsToText(item.tags)}
+                          onChange={(value) =>
+                            updateItems(
+                              items.map((entry, i) =>
+                                i === index ? { ...entry, tags: parseTags(value) } : entry
+                              )
+                            )
+                          }
+                          ariaLabel={`Item ${index + 1} tags`}
+                          placeholder="blue, white, black"
+                        />
+                      </InspectorFieldRow>
+                      <p className="builder-inspector-field-help">Enter a comma-separated list of tags for the Grid filter.</p>
+                      <InspectorFieldRow label="Panel Style">
+                        <InspectorSelect
+                          value={item.cardVariant === undefined ? "inherit" : item.cardHover ? "card-hover" : item.cardVariant}
+                          options={itemPanelStyleOptions}
+                          onChange={(value) =>
+                            updateItems(
+                              items.map((entry, i) => {
+                                if (i !== index) return entry;
+                                if (value === "inherit") {
+                                  const { cardVariant: _cardVariant, cardHover: _cardHover, renderer: _renderer, ...inherited } = entry;
+                                  return inherited;
+                                }
+                                if (value === "card-hover") {
+                                  return { ...entry, renderer: "card", cardVariant: "default", cardHover: true };
+                                }
+                                return {
+                                  ...entry,
+                                  renderer: value === "blank" ? "plain" : "card",
+                                  cardVariant: value as GridItem["cardVariant"],
+                                  cardHover: false,
+                                };
+                              })
+                            )
+                          }
+                          ariaLabel={`Item ${index + 1} panel style`}
                         />
                       </InspectorFieldRow>
                     </div>
@@ -246,17 +326,6 @@ export default function GridCapabilityPanel({
                             )
                           }
                           ariaLabel={`Item ${index + 1} target`}
-                        />
-                      </InspectorFieldRow>
-                      <InspectorFieldRow label="Link Text">
-                        <InspectorTextField
-                          value={item.buttonLabel ?? ""}
-                          onChange={(value) =>
-                            updateItems(
-                              items.map((entry, i) => (i === index ? { ...entry, buttonLabel: value } : entry))
-                            )
-                          }
-                          ariaLabel={`Item ${index + 1} link text`}
                         />
                       </InspectorFieldRow>
                     </div>
@@ -305,34 +374,10 @@ export default function GridCapabilityPanel({
             <label className="builder-inspector-checkbox-row">
               <input
                 type="checkbox"
-                checked={Boolean((block as any).gridShowVideo)}
-                onChange={(e) => update({ gridShowVideo: e.target.checked } as any)}
-              />
-              <span>Show the video</span>
-            </label>
-            <label className="builder-inspector-checkbox-row">
-              <input
-                type="checkbox"
                 checked={block.gridShowButton !== false}
                 onChange={(e) => update({ gridShowButton: e.target.checked })}
               />
               <span>Show the link</span>
-            </label>
-            <label className="builder-inspector-checkbox-row">
-              <input
-                type="checkbox"
-                checked={Boolean((block as any).gridShowHoverImage)}
-                onChange={(e) => update({ gridShowHoverImage: e.target.checked } as any)}
-              />
-              <span>Show the hover image</span>
-            </label>
-            <label className="builder-inspector-checkbox-row">
-              <input
-                type="checkbox"
-                checked={Boolean((block as any).gridShowHoverVideo)}
-                onChange={(e) => update({ gridShowHoverVideo: e.target.checked } as any)}
-              />
-              <span>Show the hover video</span>
             </label>
             <small style={{ color: "var(--builder-ui-muted)", fontSize: "11px", marginTop: "4px" }}>
               Show or hide content fields without the need to delete the content itself.
@@ -348,48 +393,6 @@ export default function GridCapabilityPanel({
       <div className="builder-inspector-stack" data-uikit-capability="grid-settings">
         {/* GRID SECTION */}
         <InspectorDivision title="GRID">
-          <InspectorFieldRow
-            label="Masonry"
-            isOverridden={(block as any).masonry !== undefined && (block as any).masonry !== "none"}
-            inheritedValueText="None"
-            onReset={() => update({ masonry: undefined } as any)}
-          >
-            <InspectorSelect
-              value={(block as any).masonry ?? "none"}
-              options={[
-                { value: "none", label: "None" },
-                { value: "pack", label: "Pack" },
-                { value: "next", label: "Next" },
-              ]}
-              onChange={(value) => update({ masonry: value } as any)}
-              ariaLabel="Masonry"
-            />
-          </InspectorFieldRow>
-
-          <InspectorFieldRow
-            label="Parallax"
-            isOverridden={(block as any).parallax !== undefined && (block as any).parallax !== 0}
-            inheritedValueText="0"
-            onReset={() => update({ parallax: undefined } as any)}
-          >
-            <div style={{ display: "flex", alignItems: "center", gap: "8px", width: "100%" }}>
-              <input
-                type="range"
-                min={-200}
-                max={200}
-                value={Number((block as any).parallax ?? 0)}
-                onChange={(e) => update({ parallax: Number(e.target.value) } as any)}
-                style={{ flex: 1 }}
-              />
-              <input
-                type="number"
-                value={Number((block as any).parallax ?? 0)}
-                onChange={(e) => update({ parallax: Number(e.target.value) } as any)}
-                style={{ width: "50px", padding: "4px", fontSize: "11px", borderRadius: "4px", border: "1px solid var(--builder-ui-border)" }}
-              />
-            </div>
-          </InspectorFieldRow>
-
           <InspectorFieldRow
             label="Justify columns"
             isOverridden={Boolean((block as any).justifyColumns)}
@@ -491,6 +494,10 @@ export default function GridCapabilityPanel({
                 { value: "auto", label: "Auto" },
                 { value: "1", label: "1 Column" },
                 { value: "2", label: "2 Columns" },
+                { value: "3", label: "3 Columns" },
+                { value: "4", label: "4 Columns" },
+                { value: "5", label: "5 Columns" },
+                { value: "6", label: "6 Columns" },
               ]}
               onChange={(v) => update({ columnsPhonePortrait: v } as any)}
               ariaLabel="Phone Portrait Columns"
@@ -517,12 +524,12 @@ export default function GridCapabilityPanel({
           </InspectorFieldRow>
           <InspectorFieldRow
             label="Tablet Landscape"
-            isOverridden={block.columns !== undefined}
+            isOverridden={(block as any).columnsTabletLandscape !== undefined || block.columns !== undefined}
             inheritedValueText="Inherit"
-            onReset={() => update({ columns: undefined })}
+            onReset={() => update({ columnsTabletLandscape: undefined } as any)}
           >
             <InspectorSelect
-              value={String(block.columns ?? "inherit")}
+              value={String((block as any).columnsTabletLandscape ?? block.columns ?? "inherit")}
               options={[
                 { value: "inherit", label: "Inherit" },
                 { value: "auto", label: "Auto" },
@@ -533,7 +540,7 @@ export default function GridCapabilityPanel({
                 { value: "5", label: "5 Columns" },
                 { value: "6", label: "6 Columns" },
               ]}
-              onChange={(v) => update({ columns: v === "inherit" ? undefined : Number(v) })}
+              onChange={(v) => update({ columnsTabletLandscape: v === "inherit" ? undefined : v } as any)}
               ariaLabel="Tablet Landscape Columns"
             />
           </InspectorFieldRow>
@@ -587,35 +594,18 @@ export default function GridCapabilityPanel({
         <InspectorDivision title="FILTER">
           <InspectorFieldRow
             label="Filter"
-            isOverridden={Boolean((block as any).enableFilterNav)}
+            isOverridden={Boolean((block as any).enableFilter)}
             inheritedValueText="Off"
-            onReset={() => update({ enableFilterNav: false } as any)}
+            onReset={() => update({ enableFilter: false } as any)}
           >
             <label className="builder-inspector-checkbox-row">
               <input
                 type="checkbox"
-                checked={Boolean((block as any).enableFilterNav)}
-                onChange={(e) => update({ enableFilterNav: e.target.checked } as any)}
+                checked={Boolean((block as any).enableFilter)}
+                onChange={(e) => update({ enableFilter: e.target.checked } as any)}
               />
               <span>Enable filter navigation</span>
             </label>
-          </InspectorFieldRow>
-          <InspectorFieldRow
-            label="Animation"
-            isOverridden={(block as any).filterAnimation !== undefined && (block as any).filterAnimation !== "slide"}
-            inheritedValueText="Slide"
-            onReset={() => update({ filterAnimation: undefined } as any)}
-          >
-            <InspectorSelect
-              value={(block as any).filterAnimation ?? "slide"}
-              options={[
-                { value: "slide", label: "Slide" },
-                { value: "fade", label: "Fade" },
-                { value: "none", label: "None" },
-              ]}
-              onChange={(v) => update({ filterAnimation: v } as any)}
-              ariaLabel="Filter Animation"
-            />
           </InspectorFieldRow>
           <InspectorFieldRow
             label="Style"
@@ -628,10 +618,25 @@ export default function GridCapabilityPanel({
               options={[
                 { value: "tabs", label: "Tabs" },
                 { value: "subnav", label: "Subnav" },
-                { value: "pills", label: "Pills" },
+                { value: "pill", label: "Pills" },
               ]}
               onChange={(v) => update({ filterStyle: v } as any)}
               ariaLabel="Filter Style"
+            />
+          </InspectorFieldRow>
+        </InspectorDivision>
+
+        <InspectorDivision title="LIGHTBOX">
+          <InspectorFieldRow
+            label="Lightbox"
+            isOverridden={Boolean((block as any).enableLightbox)}
+            inheritedValueText="Off"
+            onReset={() => update({ enableLightbox: undefined } as any)}
+          >
+            <InspectorSwitch
+              checked={Boolean((block as any).enableLightbox)}
+              onChange={(checked) => update({ enableLightbox: checked } as any)}
+              label="Enable lightbox gallery"
             />
           </InspectorFieldRow>
         </InspectorDivision>
@@ -641,13 +646,12 @@ export default function GridCapabilityPanel({
           update={update}
           title="PANEL"
           showLink
-          keys={{ variant: "panelStyle", size: "panelSize", hover: "panelHover", link: "linkPanel" }}
+          keys={{ variant: "gridCardVariant", size: "gridCardSize", hover: "gridCardHover", link: "linkPanel" }}
           surfaceOptions={[
-            { value: "none", label: "None" },
-            { value: "card-default", label: "Card Default" },
-            { value: "card-primary", label: "Card Primary" },
-            { value: "card-secondary", label: "Card Secondary" },
-            { value: "card-hover", label: "Card Hover" },
+            { value: "blank", label: "None" },
+            { value: "default", label: "Card Default" },
+            { value: "primary", label: "Card Primary" },
+            { value: "secondary", label: "Card Secondary" },
             { value: "tile-default", label: "Tile Default" },
             { value: "tile-primary", label: "Tile Primary" },
             { value: "tile-secondary", label: "Tile Secondary" },
@@ -694,9 +698,10 @@ export default function GridCapabilityPanel({
         <ActionSettingsGroup
           block={block}
           update={update}
-          title="DEFAULT ACTION"
+          title="LINK"
           showFullWidth
           showMargin
+          terminology="link"
           keys={{ label: "buttonLabel", url: "buttonUrl", target: "buttonTarget", style: "buttonStyle", size: "size", width: "fullWidthButton", margin: "linkMarginTop" }}
         />
       </div>

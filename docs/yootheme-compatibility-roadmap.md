@@ -252,24 +252,41 @@ comparison.
 
 - **YOOtheme semantics:** panel/card/tile variants, padding, hover, whole-panel links, media placement/width, title/meta/content order, image-without-padding, and height/expansion behavior.
 - **Canonical owners:** `panelVariant`, `panelSize`, `panelHover`, `linkPanel`, `panelImageNoPadding`, `panelHeightExpand`, `panelExpand`, and `panelMetaPosition` on the existing Panel block. `resolvePanelPresentation` is the sole presentation resolver, used by both `DashboardBuilder` and `StorefrontBuilderRenderer`; existing Global Card variables remain the surface, text, border-radius, and shadow owner.
-- **Inspector/UI:** the Panel Settings screen now follows the live YOOtheme order: **Panel** (Style, Link, Hover, Padding, Image without padding, Height, Expand Content), **Title**, **Meta**, **Content**, **Image**, the clearly separated WebPages-only structural **Image Layout**, then **Link**. Card Hover is represented as the canonical default-card + hover state rather than a parallel surface token. Width/ratio/fit are retained internally for canonical media resolution but are not presented as false YOOtheme Panel Image controls.
+- **Inspector/UI:** verified against the live YOOtheme Panel screen: one canonical Settings composition in the order **Panel** (Style, Link, Hover, Padding, Image without padding, Height, Expand Content), **Title**, **Meta**, **Content**, **Image**, **Link**, then shared **General**. The former duplicate `layout` + `style` composition was removed. `Card Hover` is imported as the canonical Default-card + `panelHover` state and is exposed only by **Add hover style**, not as a second Style option. Panel media placement/grid width now live in the **Image** group under the matching Alignment/Grid width semantics; the overlapping Image alignment, standalone Image Layout group, and non-YOOtheme Show action switch are absent. Width/ratio/fit remain internal canonical media semantics, not false YOOtheme Panel Image controls.
 - **Import mapping:** `panel_style` (including Card Hover and tile variants), `panel_padding`, `panel_link`, `panel_link_hover`, `panel_image_no_padding`, `height_expand`, `panel_expand`, `meta`, and `meta_align` normalize into those owners. Legacy `panelStyle` remains a compatibility read alias and cannot mask an imported Primary/Secondary canonical variant.
 - **Builder/frontend:** both render through `resolvePanelPresentation`; the same UIkit classes govern Card/Tile variant, padding, hover, whole-panel link overlay, media padding, meta position, and expansion. Linked panels suppress the separate action exactly as YOOtheme makes the panel link the primary action.
 - **Inheritance:** Global Card tokens → canonical Panel variant/padding/hover → explicit local Panel state. No Panel-specific global color/shadow system was added.
 - **Explicit unsupported:** responsive `image_grid_breakpoint`, hover image/video, modal/lightbox interaction, and YOOtheme text/link sub-controls for which no canonical WebPages consumer exists remain absent and reported by the importer; they are not stored as Panel-only compatibility state.
-- **Acceptance:** met. `tests/panel-card-acceptance.spec.ts` fresh-imports a Card Primary Panel and proves canonical persistence, padded media, 40px Card Large body padding, height/content expansion, below-content meta order, whole-panel `_blank` link, hover class, action suppression, inspector values, and Builder/storefront parity. It also verifies Card Default/Primary/Secondary/Hover and Tile Muted normalize into the shared resolver. Type-check passes. In the live DevStack Builder/storefront, the existing imported Integrate/Automate/Innovate Panels resolve matching `uk-card-default`, flush media (`-30px` horizontal/top margins), and 30px body padding; the live inspector was compared directly with the YOOtheme Panel screen.
+- **Acceptance:** met. `tests/panel-card-acceptance.spec.ts` fresh-imports a Card Primary Panel and proves canonical persistence, padded media, 40px Card Large body padding, height/content expansion, below-content meta order, whole-panel `_blank` link, hover class, action suppression, inspector values, and Builder/storefront parity. It also asserts exactly one Panel Settings composition and verifies the cleaned surface has no Card Hover duplicate, Image Layout group, or Show action toggle, while the canonical Panel media alignment/grid-width controls remain populated. Type-check passes. In the live DevStack Builder/storefront, the existing imported Panel inspector was compared directly with the YOOtheme Panel screen and the resulting single composition left Panel rendering unchanged.
 
 ### 8. Grid — PARTIAL
 
+**Phase 8 completion (2026-08-10):** `GridCardsClient` is now the one
+canonical Grid presentation/runtime path. `DashboardBuilder` supplies only
+Builder adapters: selection, Inspector entry, duplicate/delete controls, and
+HTML drag/reorder handlers. It no longer owns a second Grid layout, card,
+media, filter, action, or lightbox presentation implementation. The adapter
+preserves source item indices after filtering, so copy/delete/reorder always
+operate on the persisted collection rather than its temporary filtered view.
+
+The Grid inspector was reduced to controls with active canonical consumers:
+**Grid**, **Columns**, **Filter**, **Lightbox**, **Panel**, **Title**, **Meta**,
+**Content**, **Image**, and **Link**. Masonry, parallax, filter animation, and
+video/hover-media visibility controls were removed rather than retained as
+inert compatibility state. Filter uses `enableFilter` / `filterStyle`; lightbox
+uses `enableLightbox`; Panel uses `gridCardVariant` / `gridCardSize` /
+`gridCardHover`. `panel_style: card-hover` now maps to the canonical default
+Card surface plus hover state, including per-item card-hover imports.
+
 - **YOOtheme semantics:** source/content items, responsive columns, column/row gaps, dividers, alignment/justify, masonry, parallax, filters, lightbox, item media, panel/card, title/meta/content/link layout and visibility.
 - **Existing owners:** grid block, `GridCardsClient`, Grid inspector/style controls, UIkit grid/card helpers.
-- **Missing capability:** shared static/product Grid renderer semantics, responsive grid breakpoints, complete title/meta/link presentation, filter/lightbox policy, masonry/parallax decisions.
-- **Inspector/UI:** Grid layout/media/presentation groups reflect the same owner contract as Panel and Image.
-- **Import mapping:** Grid source fields map to grid-level canonical controls; item fields map to item content only.
-- **Builder/frontend:** eliminate drift between dashboard grid code and `GridCardsClient` before adding further semantics.
+- **Missing capability:** none within the currently supported static Grid surface.
+- **Inspector/UI:** Grid layout/media/presentation groups reflect the same owner contract as Panel and Image. Supported values appear once, in the YOOtheme-comparable order above.
+- **Import mapping:** Grid source fields map to grid-level canonical controls; item fields map to item content only. `card-hover` maps to default Card + canonical hover rather than a parallel variant.
+- **Builder/frontend:** both render `GridCardsClient`; Builder-only item chrome decorates shared cards and never owns Grid presentation.
 - **Inheritance:** global gutters/card tokens and shared media/typography presentation values must apply unless overridden.
-- **Explicit unsupported:** masonry/parallax/query/filter behaviors until a single frontend-capable grid engine exists.
-- **Acceptance:** fixture grids preserve columns, gaps, card variants, media, title/meta/content/link layout, and visibility in both surfaces.
+- **Explicit unsupported:** masonry, grid parallax, item animation, hover image/video, video, advanced filter layout/alignment/width/breakpoint configuration, `lightbox_bg_close`, and WordPress dynamic query grids. They remain absent from the inspector and continue to be reported by the importer; the supported local category filter and lightbox enablement are not presented as equivalents for those advanced YOOtheme behaviors.
+- **Content-tab recovery (in progress):** The real Pricing fixture proves that Grid item `title` and `content` are rich HTML, not plain strings. They now normalize through the shared safe rich-text boundary; Title accepts safe inline markup and Content uses the canonical WYSIWYG editor. That shared editor now has compact **Visual | HTML** modes: Source preserves safe imported markup until a Visual edit changes it, and Source edits re-enter through the same sanitizer used by Visual editing. A live Pricing-item round trip verified headings, paragraphs, strong/emphasis, and links in Source → Visual → Publish → reload; the persisted safe link gained its expected `rel` value, and the original nested imported UIkit markup was restored and survived reload unchanged. `GridCardsClient` consumes the resulting sanitized rich HTML for both Builder and storefront rather than rendering it as a plain string. Source `tags` maps to the canonical `gridItems[].tags` array, which is the same data consumed by shared Grid filtering. `filter: true` and `filter_style` now map to the existing Grid filter owner so the fresh Pricing import exposes Monthly/Yearly filter controls. An item `panel_style` is retained only when explicitly authored and resolves before the inherited Grid Card style; an unstyled item remains **Inherit Grid Style**. Focused Grid coverage now protects sanitized rich title/content, tag filtering, explicit item Card style, and Builder/storefront shared rendering. Remaining acceptance: one final fresh-import Builder/storefront parity pass for the complete Phase 8 fixture, then Phase 8 can return to COMPLETE.
 
 ### 9. Slider / Slideshow / Overlay — PARTIAL
 

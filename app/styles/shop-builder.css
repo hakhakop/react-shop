@@ -278,24 +278,30 @@ body.dark {
 .shop-builder-section--expand-right .shop-builder-section-content { margin-left: auto; margin-right: 0; }
 
 .shop-builder-grid {
-  grid-template-columns: repeat(var(--shop-builder-grid-columns, 3), minmax(0, 1fr));
+  grid-template-columns: var(--shop-builder-grid-template, repeat(var(--shop-builder-grid-columns, 3), minmax(0, 1fr)));
 }
 
 @media (min-width: 640px) {
   .shop-builder-grid {
-    grid-template-columns: repeat(var(--shop-builder-grid-columns-phone-landscape, var(--shop-builder-grid-columns, 3)), minmax(0, 1fr));
+    grid-template-columns: var(--shop-builder-grid-template-phone-landscape, var(--shop-builder-grid-template, repeat(var(--shop-builder-grid-columns-phone-landscape, var(--shop-builder-grid-columns, 3)), minmax(0, 1fr))));
   }
 }
 
 @media (min-width: 960px) {
   .shop-builder-grid {
-    grid-template-columns: repeat(var(--shop-builder-grid-columns-desktop, var(--shop-builder-grid-columns-tablet, var(--shop-builder-grid-columns, 3))), minmax(0, 1fr));
+    grid-template-columns: var(--shop-builder-grid-template-tablet, var(--shop-builder-grid-template-phone-landscape, var(--shop-builder-grid-template, repeat(var(--shop-builder-grid-columns-tablet, var(--shop-builder-grid-columns, 3)), minmax(0, 1fr)))));
   }
 }
 
 @media (min-width: 1200px) {
   .shop-builder-grid {
-    grid-template-columns: repeat(var(--shop-builder-grid-columns-xlarge, var(--shop-builder-grid-columns-desktop, var(--shop-builder-grid-columns, 3))), minmax(0, 1fr));
+    grid-template-columns: var(--shop-builder-grid-template-desktop, var(--shop-builder-grid-template-tablet, var(--shop-builder-grid-template, repeat(var(--shop-builder-grid-columns-desktop, var(--shop-builder-grid-columns, 3)), minmax(0, 1fr)))));
+  }
+}
+
+@media (min-width: 1600px) {
+  .shop-builder-grid {
+    grid-template-columns: var(--shop-builder-grid-template-xlarge, var(--shop-builder-grid-template-desktop, var(--shop-builder-grid-template, repeat(var(--shop-builder-grid-columns-xlarge, var(--shop-builder-grid-columns, 3)), minmax(0, 1fr)))));
   }
 }
 
@@ -1315,9 +1321,48 @@ body.dark {
 }
 
 .shop-builder-grid {
-  display: grid;
-  grid-template-columns: repeat(var(--shop-builder-grid-columns, 3), minmax(0, 1fr));
+  display: var(--shop-builder-grid-display, var(--shop-builder-grid-display-base, grid));
+  grid-template-columns: var(--shop-builder-grid-template, repeat(var(--shop-builder-grid-columns, 3), minmax(0, 1fr)));
+  flex-wrap: wrap;
   gap: var(--shop-builder-grid-gap, var(--builder-structure-card-gap, 16px));
+}
+
+/* This block intentionally follows the legacy Grid base rule above. It is the
+   canonical responsive cascade used by both Builder and storefront. */
+@media (min-width: 640px) {
+  .shop-builder-grid {
+    grid-template-columns: var(--shop-builder-grid-template-phone-landscape, var(--shop-builder-grid-template, repeat(var(--shop-builder-grid-columns-phone-landscape, var(--shop-builder-grid-columns, 3)), minmax(0, 1fr))));
+    --shop-builder-grid-image-width: var(--shop-builder-grid-image-width-phone-landscape, var(--shop-builder-grid-image-width-base, 100%));
+    --shop-builder-grid-card-width: var(--shop-builder-grid-card-width-phone-landscape, var(--shop-builder-grid-card-width-base, auto));
+    --shop-builder-grid-display: var(--shop-builder-grid-display-phone-landscape, var(--shop-builder-grid-display-base, grid));
+  }
+}
+
+@media (min-width: 960px) {
+  .shop-builder-grid {
+    grid-template-columns: var(--shop-builder-grid-template-tablet, var(--shop-builder-grid-template-phone-landscape, var(--shop-builder-grid-template, repeat(var(--shop-builder-grid-columns-tablet, var(--shop-builder-grid-columns, 3)), minmax(0, 1fr)))));
+    --shop-builder-grid-image-width: var(--shop-builder-grid-image-width-tablet, var(--shop-builder-grid-image-width-phone-landscape, var(--shop-builder-grid-image-width-base, 100%)));
+    --shop-builder-grid-card-width: var(--shop-builder-grid-card-width-tablet, var(--shop-builder-grid-card-width-phone-landscape, var(--shop-builder-grid-card-width-base, auto)));
+    --shop-builder-grid-display: var(--shop-builder-grid-display-tablet, var(--shop-builder-grid-display-phone-landscape, var(--shop-builder-grid-display-base, grid)));
+  }
+}
+
+@media (min-width: 1200px) {
+  .shop-builder-grid {
+    grid-template-columns: var(--shop-builder-grid-template-desktop, var(--shop-builder-grid-template-tablet, var(--shop-builder-grid-template, repeat(var(--shop-builder-grid-columns-desktop, var(--shop-builder-grid-columns, 3)), minmax(0, 1fr)))));
+    --shop-builder-grid-image-width: var(--shop-builder-grid-image-width-desktop, var(--shop-builder-grid-image-width-tablet, var(--shop-builder-grid-image-width-phone-landscape, var(--shop-builder-grid-image-width-base, 100%))));
+    --shop-builder-grid-card-width: var(--shop-builder-grid-card-width-desktop, var(--shop-builder-grid-card-width-tablet, var(--shop-builder-grid-card-width-phone-landscape, var(--shop-builder-grid-card-width-base, auto))));
+    --shop-builder-grid-display: var(--shop-builder-grid-display-desktop, var(--shop-builder-grid-display-tablet, var(--shop-builder-grid-display-phone-landscape, var(--shop-builder-grid-display-base, grid))));
+  }
+}
+
+@media (min-width: 1600px) {
+  .shop-builder-grid {
+    grid-template-columns: var(--shop-builder-grid-template-xlarge, var(--shop-builder-grid-template-desktop, var(--shop-builder-grid-template, repeat(var(--shop-builder-grid-columns-xlarge, var(--shop-builder-grid-columns, 3)), minmax(0, 1fr)))));
+    --shop-builder-grid-image-width: var(--shop-builder-grid-image-width-xlarge, var(--shop-builder-grid-image-width-desktop, var(--shop-builder-grid-image-width-tablet, var(--shop-builder-grid-image-width-phone-landscape, var(--shop-builder-grid-image-width-base, 100%)))));
+    --shop-builder-grid-card-width: var(--shop-builder-grid-card-width-xlarge, var(--shop-builder-grid-card-width-desktop, var(--shop-builder-grid-card-width-tablet, var(--shop-builder-grid-card-width-phone-landscape, var(--shop-builder-grid-card-width-base, auto)))));
+    --shop-builder-grid-display: var(--shop-builder-grid-display-xlarge, var(--shop-builder-grid-display-desktop, var(--shop-builder-grid-display-tablet, var(--shop-builder-grid-display-phone-landscape, var(--shop-builder-grid-display-base, grid)))));
+  }
 }
 
 .shop-builder-grid--gap-none {
@@ -1358,6 +1403,7 @@ body.dark {
 
 .shop-builder-grid-card {
   min-width: 0;
+  width: var(--shop-builder-grid-card-width, var(--shop-builder-grid-card-width-base, auto));
   position: relative;
   overflow: hidden;
   border-radius: var(--builder-card-radius, var(--builder-radius, 8px));
@@ -1365,6 +1411,10 @@ body.dark {
     transform 180ms ease,
     box-shadow 180ms ease,
     background-color 180ms ease;
+}
+
+.shop-builder-grid-card .shop-builder-grid-content {
+  width: var(--shop-builder-grid-card-width, var(--shop-builder-grid-card-width-base, auto));
 }
 
 .builder-card-preset--none .shop-builder-grid-card,
@@ -1956,6 +2006,13 @@ body.dark {
   box-shadow: 0 22px 48px rgba(17, 17, 17, 0.1);
 }
 
+/* Canonical Grid Panel hover is opt-in. This explicit disabled state also
+   prevents old generic builder hover presets from reviving a false setting. */
+.shop-builder-grid-card--hover-disabled:hover {
+  transform: none !important;
+  box-shadow: inherit !important;
+}
+
 /* Hero/Grid instance actions use the canonical UIkit button contract. */
 .shop-builder-hero-action,
 .shop-builder-grid-action {
@@ -2292,12 +2349,6 @@ body.dark {
   color: var(--builder-card-content-color, var(--builder-active-muted, var(--builder-muted, #5f5f58)));
   font-size: var(--builder-card-content-size, inherit);
   line-height: var(--builder-card-content-line-height, inherit);
-}
-
-@media (max-width: 760px) {
-  .shop-builder-grid {
-    grid-template-columns: 1fr;
-  }
 }
 
 .shop-builder-panel-media {

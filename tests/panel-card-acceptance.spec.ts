@@ -105,9 +105,15 @@ test("Phase 7 Panel/Card imports canonical presentation and matches Builder/stor
     await page.getByRole("button", { name: "Edit element" }).click();
     await page.getByRole("button", { name: "Settings", exact: true }).click();
     const inspector = page.locator('[data-uikit-capability="panel-settings"]');
+    await expect(inspector).toHaveCount(1);
     await expect(inspector.getByText("PANEL", { exact: true }).first()).toBeVisible();
     await expect(inspector.getByLabel("Panel style", { exact: true }).first()).toHaveValue("primary");
     await expect(inspector.getByLabel("Panel expand content", { exact: true }).first()).toHaveValue("content");
+    await expect(inspector.getByRole("option", { name: "Card Hover", exact: true })).toHaveCount(0);
+    await expect(inspector.getByText("IMAGE LAYOUT", { exact: true })).toHaveCount(0);
+    await expect(inspector.getByLabel("Panel media alignment", { exact: true }).getByRole("radio", { name: "Top", exact: true })).toBeChecked();
+    await expect(inspector.getByLabel("Panel media grid width", { exact: true })).toHaveValue("large");
+    await expect(inspector.getByText("Show action", { exact: true })).toHaveCount(0);
 
     const builder = await panelState(page, true);
     expect(builder).toMatchObject({ mediaMarginTop: "40px", bodyPadding: "40px", bodyDisplay: "flex", metaAfterContent: true, overlayHref: "/panel-target", overlayTarget: "_blank", actionCount: 0 });

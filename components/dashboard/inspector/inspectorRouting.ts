@@ -107,7 +107,10 @@ export const INSPECTOR_ELEMENT_CAPABILITIES: Partial<Record<LayoutBlockKind, Ins
   panel: {
     capabilities: ["content", "style", "advanced"],
     composes: ["content", "component-presentation", "media", "link", "layout", "general", "animation"],
-    settingsSources: ["layout", "style"],
+    // PanelCapabilityPanel owns one unified Settings surface. Rendering both
+    // legacy sources mounts the same controls twice without adding a distinct
+    // canonical capability.
+    settingsSources: ["style"],
     panel: PanelCapabilityPanel,
     settingsLabel: "Settings",
   },

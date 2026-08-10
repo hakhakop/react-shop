@@ -6,7 +6,8 @@ import Underline from "@tiptap/extension-underline";
 import LinkExtension from "@tiptap/extension-link";
 import Placeholder from "@tiptap/extension-placeholder";
 import TextAlign from "@tiptap/extension-text-align";
-import { useEffect, useCallback } from "react";
+import { useEffect, useCallback, useRef, useState } from "react";
+import { sanitizeHtml } from "@/lib/safeHtml";
 import {
   Bold,
   Italic,
@@ -18,6 +19,8 @@ import {
   ListOrdered,
   Quote,
   Link as LinkIcon,
+  Code2,
+  Eye,
   Undo,
   Redo,
 } from "lucide-react";
@@ -35,6 +38,10 @@ export default function RichTextEditor({
   placeholder = "Write...",
   minHeight = "120px",
 }: RichTextEditorProps) {
+  const [mode, setMode] = useState<"visual" | "html">("visual");
+  const [sourceValue, setSourceValue] = useState(value);
+  const visualWasEdited = useRef(false);
+  const latestExternalValue = useRef(value);
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
@@ -50,15 +57,24 @@ export default function RichTextEditor({
     ],
     content: value,
     onUpdate: ({ editor }) => {
-      onChange(editor.getHTML());
+      visualWasEdited.current = true;
+      const html = sanitizeHtml(editor.getHTML());
+      setSourceValue(html);
+      onChange(html);
     },
   });
 
   useEffect(() => {
-    if (editor && value !== editor.getHTML()) {
-      editor.commands.setContent(value, { emitUpdate: false });
+    if (value !== latestExternalValue.current) {
+      latestExternalValue.current = value;
+      if (mode === "html") return;
+      setSourceValue(value);
+      visualWasEdited.current = false;
+      if (editor && value !== editor.getHTML()) {
+        editor.commands.setContent(value, { emitUpdate: false });
+      }
     }
-  }, [value, editor]);
+  }, [value, editor, mode]);
 
   const toggleLink = useCallback(() => {
     if (!editor) return;
@@ -74,9 +90,57 @@ export default function RichTextEditor({
 
   if (!editor) return null;
 
+  const switchToHtml = () => {
+    // Tiptap can represent the supported editing schema, but an imported
+    // YOOtheme fragment can legitimately carry extra safe markup/classes.
+    // Keep that original persisted source until Visual editing changes it.
+    setSourceValue(visualWasEdited.current ? editor.getHTML() : value);
+    setMode("html");
+  };
+
+  const switchToVisual = () => {
+    const html = sanitizeHtml(sourceValue);
+    latestExternalValue.current = html;
+    setSourceValue(html);
+    editor.commands.setContent(html, { emitUpdate: false });
+    visualWasEdited.current = false;
+    onChange(html);
+    setMode("visual");
+  };
+
+  const updateSource = (html: string) => {
+    setSourceValue(html);
+    // Persist through the same safe HTML boundary as Visual mode. The raw
+    // source remains visible while editing, so incomplete markup is not lost.
+    const sanitized = sanitizeHtml(html);
+    latestExternalValue.current = sanitized;
+    onChange(sanitized);
+  };
+
   return (
     <div className="richtext-editor">
       <div className="richtext-toolbar">
+        <div className="richtext-mode-toggle" role="tablist" aria-label="Editor mode">
+          <button
+            type="button"
+            role="tab"
+            aria-selected={mode === "visual"}
+            className={mode === "visual" ? "is-active" : undefined}
+            onClick={switchToVisual}
+          >
+            <Eye size={13} /> Visual
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={mode === "html"}
+            className={mode === "html" ? "is-active" : undefined}
+            onClick={switchToHtml}
+          >
+            <Code2 size={13} /> HTML
+          </button>
+        </div>
+        {mode === "visual" && <>
         <ToolbarButton
           onClick={() => editor.chain().focus().toggleBold().run()}
           active={editor.isActive("bold")}
@@ -173,11 +237,23 @@ export default function RichTextEditor({
         >
           <Redo size={14} />
         </ToolbarButton>
+        </>}
       </div>
 
-      <div className="richtext-content">
-        <EditorContent editor={editor} style={{ minHeight }} />
-      </div>
+      {mode === "visual" ? (
+        <div className="richtext-content">
+          <EditorContent editor={editor} style={{ minHeight }} />
+        </div>
+      ) : (
+        <textarea
+          className="richtext-source"
+          aria-label="HTML source"
+          spellCheck={false}
+          value={sourceValue}
+          onChange={(event) => updateSource(event.target.value)}
+          style={{ minHeight }}
+        />
+      )}
     </div>
   );
 }

@@ -199,6 +199,12 @@
       "label": "Shop",
       "url": "/shop",
       "parentId": null
+    },
+    {
+      "id": "menu_qljk9vdiy",
+      "label": "Pricing",
+      "url": "/pricing",
+      "parentId": null
     }
   ],
   "headingXLargeFontSize": "44px",
@@ -230,7 +236,7 @@
   "buttonTextColorSemantic": "#6F40F1",
   "buttonHoverShadow": "-2px -2px 5px rgba(255, 255, 255, 0.7), 2px 2px 5px rgba(11, 89, 150, 0.3)",
   "pageContainerMaxWidth": "1500px",
-  "updatedAt": "2026-08-09T16:42:17.319Z",
+  "updatedAt": "2026-08-10T10:56:12.853Z",
   "accordionTitleFontSize": "18px",
   "accordionTitleHoverColor": "#6F40F1",
   "accordionContentMarginTop": "15px",

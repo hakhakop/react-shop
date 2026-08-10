@@ -201,6 +201,7 @@ export function MetaSettingsGroup({
   showColor = false,
   showPosition = false,
   showHtmlElement = true,
+  positionLabel = "Position",
   keys = {
     role: "metaTypographyRole",
     align: "metaAlign",
@@ -217,6 +218,8 @@ export function MetaSettingsGroup({
   showColor?: boolean;
   showPosition?: boolean;
   showHtmlElement?: boolean;
+  /** Some YOOtheme components name their content-order choice Alignment. */
+  positionLabel?: string;
   keys?: {
     role: string;
     align: string;
@@ -290,7 +293,7 @@ export function MetaSettingsGroup({
 
       {showPosition && (
         <InspectorFieldRow
-          label="Position"
+          label={positionLabel}
           isOverridden={values[positionKey] !== undefined}
           inheritedValueText="Below title"
           onReset={() => update({ [positionKey]: undefined })}
@@ -433,6 +436,8 @@ export function ImageSettingsGroup({
   showLinkImage = false,
   showDimensions = true,
   showFrameControls = true,
+  showAlignment = true,
+  mediaLayout,
   keys = {
     width: "imageWidth",
     height: "imageHeight",
@@ -456,6 +461,10 @@ export function ImageSettingsGroup({
   showDimensions?: boolean;
   /** Ratio/Fit are WebPages framing behavior, not YOOtheme Image Settings. */
   showFrameControls?: boolean;
+  /** Hide when a component owns image placement through its structural layout. */
+  showAlignment?: boolean;
+  /** Structural Panel media placement remains a Panel owner but is presented in YOOtheme's Image group. */
+  mediaLayout?: { placement: string; width: string };
   keys?: {
     width: string;
     height: string;
@@ -655,17 +664,53 @@ export function ImageSettingsGroup({
         />
       </InspectorFieldRow>
 
-      <InspectorFieldRow
-        label="Alignment"
-        isOverridden={values[keys.align] !== undefined}
-        inheritedValueText="Center"
-        onReset={() => update({ [keys.align]: undefined })}
-      >
-        <InspectorAlignmentControl
-          value={String(values[keys.align] ?? "center")}
-          onChange={(value) => update({ [keys.align]: value })}
-        />
-      </InspectorFieldRow>
+      {showAlignment && (
+        <InspectorFieldRow
+          label="Alignment"
+          isOverridden={values[keys.align] !== undefined}
+          inheritedValueText="Center"
+          onReset={() => update({ [keys.align]: undefined })}
+        >
+          <InspectorAlignmentControl
+            value={String(values[keys.align] ?? "center")}
+            onChange={(value) => update({ [keys.align]: value })}
+          />
+        </InspectorFieldRow>
+      )}
+
+      {mediaLayout && (
+        <>
+          <InspectorFieldRow
+            label="Alignment"
+            isOverridden={values[mediaLayout.placement] !== undefined}
+            inheritedValueText="Top"
+            onReset={() => update({ [mediaLayout.placement]: undefined })}
+          >
+            <InspectorMediaPlacementControl
+              value={(values[mediaLayout.placement] ?? "top") as "top" | "left" | "right"}
+              onChange={(value) => update({ [mediaLayout.placement]: value })}
+              ariaLabel="Panel media alignment"
+            />
+          </InspectorFieldRow>
+          <InspectorFieldRow
+            label="Grid width"
+            isOverridden={values[mediaLayout.width] !== undefined}
+            inheritedValueText="Medium"
+            onReset={() => update({ [mediaLayout.width]: undefined })}
+          >
+            <InspectorSelect
+              value={String(values[mediaLayout.width] ?? "medium")}
+              options={[
+                { value: "small", label: "Small" },
+                { value: "medium", label: "Medium" },
+                { value: "large", label: "Large" },
+              ]}
+              onChange={(value) => update({ [mediaLayout.width]: value })}
+              ariaLabel="Panel media grid width"
+            />
+          </InspectorFieldRow>
+        </>
+      )}
 
       {showFrameless && (
         <InspectorFieldRow
@@ -749,6 +794,7 @@ export function ActionSettingsGroup({
   showFullWidth = false,
   showMargin = false,
   showPresentation = true,
+  terminology = "action",
   keys = {
     visible: "panelActionVisible",
     label: "buttonLabel",
@@ -767,6 +813,8 @@ export function ActionSettingsGroup({
   showMargin?: boolean;
   /** Content tabs use the same action contract without repeating style controls. */
   showPresentation?: boolean;
+  /** Grid uses YOOtheme's Link vocabulary while keeping the same owner. */
+  terminology?: "action" | "link";
   keys?: {
     visible?: string;
     label?: string;
@@ -787,6 +835,9 @@ export function ActionSettingsGroup({
   const visibleKey = keys.visible;
   const widthKey = keys.width;
   const marginKey = keys.margin;
+  const labelLabel = terminology === "link" ? "Link text" : "Action label";
+  const urlLabel = terminology === "link" ? "Link URL" : "Action URL";
+  const targetLabel = terminology === "link" ? "Link target" : "Action target";
 
   return (
     <InspectorDivision title={title}>
@@ -807,7 +858,7 @@ export function ActionSettingsGroup({
 
       {labelKey && (
         <InspectorFieldRow
-          label="Action label"
+          label={labelLabel}
           isOverridden={values[labelKey] !== undefined}
           inheritedValueText="Action"
           onReset={() => update({ [labelKey]: undefined })}
@@ -815,14 +866,14 @@ export function ActionSettingsGroup({
           <InspectorTextField
             value={String(values[labelKey] ?? "")}
             onChange={(val) => update({ [labelKey]: val })}
-            ariaLabel="Action label"
+            ariaLabel={labelLabel}
           />
         </InspectorFieldRow>
       )}
 
       {urlKey && (
         <InspectorFieldRow
-          label="Action URL"
+          label={urlLabel}
           isOverridden={values[urlKey] !== undefined}
           inheritedValueText="#"
           onReset={() => update({ [urlKey]: undefined })}
@@ -830,14 +881,14 @@ export function ActionSettingsGroup({
           <InspectorTextField
             value={String(values[urlKey] ?? "")}
             onChange={(val) => update({ [urlKey]: val })}
-            ariaLabel="Action URL"
+            ariaLabel={urlLabel}
           />
         </InspectorFieldRow>
       )}
 
       {targetKey && (
         <InspectorFieldRow
-          label="Action target"
+          label={targetLabel}
           isOverridden={values[targetKey] !== undefined}
           inheritedValueText="Same window"
           onReset={() => update({ [targetKey]: undefined })}
@@ -846,7 +897,7 @@ export function ActionSettingsGroup({
             value={String(values[targetKey] ?? "_self")}
             options={BUILDER_LINK_TARGET_OPTIONS}
             onChange={(val) => update({ [targetKey]: val })}
-            ariaLabel="Action target"
+            ariaLabel={targetLabel}
           />
         </InspectorFieldRow>
       )}
@@ -933,8 +984,6 @@ export function CardSettingsGroup({
   hoverLabel = "Enable hover effect",
   showHeight = false,
   showImageNoPadding = false,
-  surfaceValue,
-  onSurfaceChange,
   keys = {
     variant: "panelVariant",
     size: "panelSize",
@@ -956,10 +1005,6 @@ export function CardSettingsGroup({
   showHeight?: boolean;
   /** Panel-only image padding semantics belong to its Panel group. */
   showImageNoPadding?: boolean;
-  /** Adapts a composed canonical surface state to a YOOtheme-facing choice. */
-  surfaceValue?: (values: Record<string, unknown>) => string | undefined;
-  /** Normalizes a YOOtheme-facing choice into the canonical surface state. */
-  onSurfaceChange?: (value: string) => Record<string, unknown>;
   keys?: {
     variant: string;
     size: string;
@@ -982,9 +1027,9 @@ export function CardSettingsGroup({
       >
         {surfaceOptions ? (
           <InspectorSelect
-            value={String(surfaceValue?.(values) ?? values[keys.variant] ?? "none")}
+            value={String(values[keys.variant] ?? "none")}
             options={surfaceOptions}
-            onChange={(value) => update(onSurfaceChange?.(value) ?? { [keys.variant]: value })}
+            onChange={(value) => update({ [keys.variant]: value })}
             ariaLabel="Panel style"
           />
         ) : (
