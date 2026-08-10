@@ -862,7 +862,8 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
     };
   }
 
-  if (kind === "slider") {
+  if (kind === "slider" || kind === "slideshow" || kind === "overlaySlider") {
+    const isOverlaySlider = kind === "overlaySlider";
     return {
       id,
       kind,
@@ -870,25 +871,26 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
         {
           id: `${id}-slide-1`,
           imageUrl: PREMIUM_IMAGE_PLACEHOLDER,
-          imageAlt: "Slideshow image 1",
+          imageAlt: isOverlaySlider ? "Overlay slider image 1" : "Slideshow image 1",
           imagePadding: "frameless",
         },
         {
           id: `${id}-slide-2`,
           imageUrl: PREMIUM_IMAGE_PLACEHOLDER,
-          imageAlt: "Slideshow image 2",
+          imageAlt: isOverlaySlider ? "Overlay slider image 2" : "Slideshow image 2",
           imagePadding: "frameless",
         },
         {
           id: `${id}-slide-3`,
           imageUrl: PREMIUM_IMAGE_PLACEHOLDER,
-          imageAlt: "Slideshow image 3",
+          imageAlt: isOverlaySlider ? "Overlay slider image 3" : "Slideshow image 3",
           imagePadding: "frameless",
         },
       ],
       carouselSettings: {
-        variant: "image-only",
-        slideMode: "image-only",
+        presentation: isOverlaySlider ? "overlay-slider" : "slideshow",
+        variant: isOverlaySlider ? "overlay" : "hero",
+        slideMode: isOverlaySlider ? "overlay" : "hero",
         aspectRatio: "16:9",
         loop: true,
         autoplay: false,
@@ -896,7 +898,7 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
         align: "start",
         dragFree: false,
         effect: "slide",
-        spaceBetween: 24,
+        spaceBetween: isOverlaySlider ? 30 : 0,
         cardsPerView: 1,
         showArrows: true,
         showDots: true,
@@ -905,6 +907,18 @@ export function createLayoutBlock(kind: LayoutBlockKind): BuilderLayoutBlock {
         paginationStyle: "minimal-dots",
         paginationPosition: "bottom",
         overlayGradient: "none",
+        ...(isOverlaySlider
+          ? {
+              overlayMode: "cover" as const,
+              overlayDisplay: "always" as const,
+              overlayPadding: "default",
+              itemWidthMode: "fixed" as const,
+              overlayLink: false,
+            }
+          : {
+              slideshowHeight: "auto" as const,
+              slideshowRatio: "16:9",
+            }),
         pauseOnHover: true,
       },
       elementPadding: "xs",
@@ -1294,7 +1308,8 @@ export function createSection(kind: SectionKind): BuilderSection {
     };
   }
 
-  if (kind === "slider") {
+  if (kind === "slider" || kind === "slideshow" || kind === "overlaySlider") {
+    const isOverlaySlider = kind === "overlaySlider";
     return {
       ...base,
       background: "#ffffff",
@@ -1304,25 +1319,26 @@ export function createSection(kind: SectionKind): BuilderSection {
         {
           id: "slide-1",
           imageUrl: PREMIUM_IMAGE_PLACEHOLDER,
-          imageAlt: "Slideshow image 1",
+          imageAlt: isOverlaySlider ? "Overlay slider image 1" : "Slideshow image 1",
           imagePadding: "frameless",
         },
         {
           id: "slide-2",
           imageUrl: PREMIUM_IMAGE_PLACEHOLDER,
-          imageAlt: "Slideshow image 2",
+          imageAlt: isOverlaySlider ? "Overlay slider image 2" : "Slideshow image 2",
           imagePadding: "frameless",
         },
         {
           id: "slide-3",
           imageUrl: PREMIUM_IMAGE_PLACEHOLDER,
-          imageAlt: "Slideshow image 3",
+          imageAlt: isOverlaySlider ? "Overlay slider image 3" : "Slideshow image 3",
           imagePadding: "frameless",
         },
       ],
       carouselSettings: {
-        variant: "image-only",
-        slideMode: "image-only",
+        presentation: isOverlaySlider ? "overlay-slider" : "slideshow",
+        variant: isOverlaySlider ? "overlay" : "hero",
+        slideMode: isOverlaySlider ? "overlay" : "hero",
         aspectRatio: "16:9",
         loop: true,
         autoplay: false,
@@ -1337,6 +1353,18 @@ export function createSection(kind: SectionKind): BuilderSection {
         paginationStyle: "minimal-dots",
         paginationPosition: "bottom",
         overlayGradient: "none",
+        ...(isOverlaySlider
+          ? {
+              overlayMode: "cover" as const,
+              overlayDisplay: "always" as const,
+              overlayPadding: "default",
+              itemWidthMode: "fixed" as const,
+              overlayLink: false,
+            }
+          : {
+              slideshowHeight: "auto" as const,
+              slideshowRatio: "16:9",
+            }),
       },
     };
   }

@@ -79,6 +79,26 @@ export default function ImageCapabilityPanel({ block, tab, shellSettings, update
               ariaLabel="Image Caption"
             />
           </InspectorFieldRow>
+          <InspectorFieldRow label="Make SVG stylable with CSS">
+            <input
+              type="checkbox"
+              checked={image.imageSvgInline === true}
+              onChange={(event) => update({ imageSvgInline: event.target.checked || undefined })}
+              aria-label="Make SVG stylable with CSS"
+            />
+          </InspectorFieldRow>
+          {image.imageSvgInline === true && <InspectorFieldRow label="SVG color">
+            <InspectorSelect
+              value={image.imageSvgColor ?? "primary"}
+              options={[
+                { value: "primary", label: "Primary" }, { value: "secondary", label: "Secondary" },
+                { value: "default", label: "Default" }, { value: "muted", label: "Muted" },
+                { value: "inverse", label: "Inverse" },
+              ]}
+              onChange={(value) => update({ imageSvgColor: value })}
+              ariaLabel="SVG color"
+            />
+          </InspectorFieldRow>}
         </InspectorDivision>
 
         <InspectorDivision title="LINK">

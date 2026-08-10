@@ -247,6 +247,18 @@ function resolveExpression(raw: string, values: Map<string, string>, trail: stri
       if (depth !== 0) return { reason: `Unbalanced function expression: ${value.slice(index)}` };
       if (!SUPPORTED_FUNCTIONS.has(name)) {
         if (OPAQUE_CSS_FUNCTIONS.has(name)) {
+          // CSS functions such as linear-gradient() are retained as CSS, but
+          // their arguments can still contain YOOtheme LESS color functions.
+          // Resolve those nested expressions before persisting the CSS value.
+          const args = splitTopLevel(value.slice(index + match[0].length, end));
+          const resolvedArgs = args.map((arg) => resolveExpression(arg, values, trail));
+          if (resolvedArgs.some((arg) => !arg.value)) return { reason: resolvedArgs.find((arg) => !arg.value)?.reason };
+          const resolvedCssFunction = `${name}(${resolvedArgs.map((arg) => arg.value).join(", ")})`;
+          if (resolvedCssFunction !== value.slice(index, end + 1)) {
+            value = `${value.slice(0, index)}${resolvedCssFunction}${value.slice(end + 1)}`;
+            changed = true;
+            break;
+          }
           index = end;
           continue;
         }
@@ -355,6 +367,11 @@ const destinationMap: Record<string, { destination: string; domain: string }> = 
   "card-default-background": { destination: "shellSettings.cardBackground", domain: "Surfaces" },
   "card-primary-background": { destination: "shellSettings.cardPrimaryBackground", domain: "Surfaces" },
   "card-secondary-background": { destination: "shellSettings.cardSecondaryBackground", domain: "Surfaces" },
+  // DevStack expresses the visual Primary/Secondary card surfaces through
+  // internal gradient tokens rather than UIkit's plain card-* backgrounds.
+  // Both names normalize into the same visible Card Background owners.
+  "internal-card-primary-gradient": { destination: "shellSettings.cardPrimaryBackground", domain: "Cards" },
+  "internal-card-secondary-gradient": { destination: "shellSettings.cardSecondaryBackground", domain: "Cards" },
   "card-hover-background": { destination: "shellSettings.cardDefaultHoverBackground", domain: "Cards" },
   "card-border-radius": { destination: "shellSettings.cardBorderRadius", domain: "Surfaces" },
   "card-default-border": { destination: "shellSettings.cardDefaultBorder", domain: "Cards" },

@@ -5,6 +5,7 @@ import DashboardBuilder from "@/components/dashboard/DashboardBuilder";
 import { getCurrentUser } from "@/lib/auth";
 import { loginRedirectFor } from "@/lib/saasRoutes";
 import SaaSI18nProvider from "@/components/i18n/SaaSI18nProvider";
+import { getWordPressBaseUrl } from "@/lib/wordpressUrl";
 
 export const metadata = {
   title: "Root Website Builder",
@@ -51,6 +52,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
           saasUserRole={user.role}
           primaryContentLanguage="hy"
           enabledContentLanguages={["hy", "en", "ru"]}
+          wordpressMediaOrigin={getWordPressBaseUrl()}
         />
       </Suspense>
     </SaaSI18nProvider>

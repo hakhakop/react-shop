@@ -45,12 +45,12 @@ export function resolveCanonicalGridAction(
   return {
     label: String(rawItem.buttonLabel ?? raw.buttonLabel ?? raw.linkText ?? "").trim(),
     url: typeof itemUrl === "string" ? itemUrl.trim() : "",
-    target: String(raw.buttonTarget ?? raw.linkTarget ?? rawItem.buttonTarget ?? "_self"),
+    target: String(rawItem.buttonTarget ?? rawItem.linkTarget ?? raw.buttonTarget ?? raw.linkTarget ?? "_self"),
     style: normalizeActionStyle(
-      raw.buttonStyle ?? rawItem.actionStyle ?? rawItem.buttonStyle ?? raw.linkStyle,
+      rawItem.buttonStyle ?? rawItem.actionStyle ?? raw.buttonStyle ?? raw.linkStyle,
     ),
     size: normalizeActionSize(
-      raw.size ?? rawItem.actionSize ?? raw.linkButtonSize,
+      rawItem.actionSize ?? raw.size ?? raw.linkButtonSize,
     ),
     fullWidth: raw.fullWidthButton === true || raw.linkFullWidth === true,
     margin: typeof raw.linkMarginTop === "string" ? raw.linkMarginTop : undefined,

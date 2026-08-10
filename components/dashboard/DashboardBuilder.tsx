@@ -106,6 +106,7 @@ import { createPortal } from "react-dom";
 import CarouselBlock, {
   type CarouselSlide,
 } from "@/components/blocks/CarouselBlock";
+import { resolveCarouselPresentation } from "@/lib/carouselPresentation";
 import BuilderScrollAnimations from "@/components/builder/BuilderScrollAnimations";
 import StorefrontBuilderRenderer, {
   BodyText,
@@ -164,9 +165,10 @@ import {
   getUikitPanelMediaStyle,
 } from "@/lib/uikitTokens";
 import { elementAdvancedScope, parseSafeElementAttributes, resolveElementAdvanced } from "@/lib/elementAdvanced";
-import { getGeneralElementShellStyle } from "@/lib/builderElementShell";
+import { getGeneralElementShellClassName, getGeneralElementShellStyle } from "@/lib/builderElementShell";
 import { resolveCanonicalGridAction } from "@/lib/builderActions";
 import { resolvePanelPresentation } from "@/lib/panelPresentation";
+import { resolveBuilderMediaUrls } from "@/lib/builderMediaUrls";
 import { resolveSectionBackground, sectionBackgroundClass } from "@/lib/semanticBackgrounds";
 import {
   getUikitColumnWidthClass,
@@ -472,12 +474,16 @@ function getBuilderTemplateDragType(
 // Memoized to prevent Swiper from remounting on every DashboardBuilder state change
 const PreviewSliderBlock = memo(function PreviewSliderBlock({
   section,
+  shellSettings,
 }: {
   section: BuilderSection;
+  shellSettings: BuilderShellSettings;
 }) {
-  const slides = (section.slides ?? []).map(
+  const carousel = resolveCarouselPresentation(section.carouselSettings, section.slides as any[], shellSettings) as { settings: any; slides: any[] };
+  const slides = carousel.slides.map(
     (slide, index) =>
       ({
+        ...slide,
         id: slide.id ?? `preview-slide-${index}`,
         imageUrl: slide.imageUrl,
         imageAlt: slide.imageAlt,
@@ -511,7 +517,7 @@ const PreviewSliderBlock = memo(function PreviewSliderBlock({
       )}
       <CarouselBlock
         slides={slides}
-        settings={section.carouselSettings}
+        settings={carousel.settings}
         className="builder-preview-carousel"
       />
     </div>
@@ -879,6 +885,18 @@ function sectionSchemeStyle(section: BuilderSection) {
       "--builder-active-surface": darkScheme.surfaceColor,
       "--builder-active-button-bg": darkScheme.buttonBackground,
       "--builder-active-button-text": darkScheme.buttonTextColor,
+      // Mirror the storefront's semantic inverse Section action context.
+      // Builder-only chrome decorates this surface; it must not own a second
+      // button palette.
+      "--uk-button-secondary-background": "transparent",
+      "--uk-button-secondary-text": "var(--uk-global-inverse-color, #fff)",
+      "--uk-button-secondary-border": "var(--uk-global-inverse-color, #fff)",
+      "--uk-button-secondary-hover-background": "var(--uk-global-inverse-color, #fff)",
+      "--uk-button-secondary-hover-text": "var(--uk-global-emphasis-color, #111)",
+      "--uk-button-secondary-hover-border": "var(--uk-global-inverse-color, #fff)",
+      "--uk-button-text-color": "var(--uk-global-inverse-color, #fff)",
+      "--uk-button-link-color": "var(--uk-global-inverse-color, #fff)",
+      "--uk-global-link-color": "var(--uk-global-inverse-color, #fff)",
     } as CSSProperties;
   }
 
@@ -1893,6 +1911,8 @@ export type DashboardBuilderProps = {
   saasUserRole?: SaaSUserRole;
   primaryContentLanguage?: string;
   enabledContentLanguages?: string[];
+  /** Server-provided CMS origin for canonical imported WordPress media URLs. */
+  wordpressMediaOrigin?: string | null;
 };
 
 export default function DashboardBuilder({
@@ -1902,6 +1922,7 @@ export default function DashboardBuilder({
   saasUserRole,
   primaryContentLanguage = "hy",
   enabledContentLanguages = [primaryContentLanguage],
+  wordpressMediaOrigin = null,
 }: DashboardBuilderProps) {
   const router = useRouter();
   const { locale, setLocale, t } = useTranslation();
@@ -2749,7 +2770,10 @@ export default function DashboardBuilder({
     } catch {
       restoredDraftKeysRef.current = new Set();
     }
-    const draft = hydrateDocumentBuilderState(loadInitialState(storageKeys), shellSettings);
+    const draft = hydrateDocumentBuilderState(
+      resolveBuilderMediaUrls(loadInitialState(storageKeys), wordpressMediaOrigin),
+      shellSettings,
+    );
     let localPages: BuilderCustomPage[] = [];
     try {
       const rawPages = window.localStorage.getItem(storageKeys.pages);
@@ -2765,7 +2789,7 @@ export default function DashboardBuilder({
     setBuilderState(draft);
     setSelectedId("");
     setDraftReady(true);
-  }, [storageKeys]);
+  }, [storageKeys, wordpressMediaOrigin]);
 
   useEffect(() => {
     const scheme = builderState.design.colorScheme ?? "auto";
@@ -7506,11 +7530,37 @@ export default function DashboardBuilder({
   const applyYoothemeImport = () => {
     if (!yoothemeImportPreview) return;
 
-    pendingYoothemeDraftInvalidationRef.current = builderState.page;
-    setBuilderState((current) => ({
-      ...current,
-      sections: yoothemeImportPreview.sections,
-    }));
+    const importedState = {
+      ...builderStateRef.current,
+      sections: resolveBuilderMediaUrls(
+        yoothemeImportPreview.sections,
+        wordpressMediaOrigin,
+      ),
+    };
+
+    // Import is the authoritative document replacement boundary. Clear only
+    // this page's stale local draft *before* setState can persist the imported
+    // document into that old draft slot. Publish repeats this safely as a
+    // fallback, but must not be the first invalidation opportunity.
+    try {
+      invalidateImportedBuilderDraft(window.localStorage, {
+        draftsKey: storageKeys.drafts,
+        stateKey: storageKeys.state,
+        pageKey: importedState.page,
+        importedState,
+      });
+      restoredDraftKeysRef.current.delete(importedState.page);
+      skipImportedDraftPersistenceRef.current = {
+        page: importedState.page,
+        signature: JSON.stringify(importedState),
+      };
+    } catch {
+      // The imported document can still be published if browser storage is
+      // unavailable; do not convert a valid import into a failed operation.
+    }
+
+    pendingYoothemeDraftInvalidationRef.current = importedState.page;
+    setBuilderState(importedState);
     if (Object.keys(yoothemeImportPreview.globalStylePatch).length) {
       updateShellSettings(yoothemeImportPreview.globalStylePatch);
     }
@@ -13787,7 +13837,7 @@ function PreviewSection({
   }
 
   if (section.kind === "slider") {
-    return <PreviewSliderBlock section={section} />;
+    return <PreviewSliderBlock section={section} shellSettings={shellSettings} />;
   }
 
   if (section.kind === "scrollPinnedDemo") {
@@ -14578,7 +14628,7 @@ function PreviewSection({
                         className={`builder-preview-layout-block ${builderInteractionClassName(
                           blockTarget,
                           blockInteractionState,
-                        )} ${getUikitMarginClass((block as any).elementMargin ?? block.gridMargin)} shop-builder-element-shell is-${
+                        )} ${getUikitMarginClass((block as any).elementMargin ?? block.gridMargin)} ${getGeneralElementShellClassName(block)} shop-builder-element-shell is-${
                           block.kind ?? "text"
                         } ${legacySurfaceClass} ${
                           block.kind === "scrollPinnedDemo"
@@ -15185,7 +15235,7 @@ function PreviewSection({
                                 area="eyebrow"
                                 className={`shop-builder-eyebrow shop-builder-panel-meta ${typographyRoleClass(block.metaTypographyRole)}`}
                                 typography={block.typography}
-                                style={panelMetaStyle}
+                                style={{ ...panelMetaStyle, ...panelPresentation.colorStyle }}
                                 value={block.eyebrow}
                                 onChange={(eyebrow) =>
                                   onUpdateBlock(section.id, columnKey, blockKey, { eyebrow })
@@ -15194,7 +15244,7 @@ function PreviewSection({
                             ) : null;
 
                             return (
-                              <div data-builder-block-id={block.id} className={`shop-builder-column-block shop-builder-column-block--panel ${panelLayoutClass} ${panelMarginClass} ${panelAnimationClass} ${panelVisibilityClass} ${typographyRoleClass(block.contentTypographyRole)} ${panelPresentation.className}`.trim()} style={{ textAlign: block.panelTextAlign ?? "left" }}>
+                              <div data-builder-block-id={block.id} className={`shop-builder-column-block shop-builder-column-block--panel ${panelLayoutClass} ${panelMarginClass} ${panelAnimationClass} ${panelVisibilityClass} ${typographyRoleClass(block.contentTypographyRole)} ${panelPresentation.className}`.trim()} style={{ textAlign: block.panelTextAlign ?? "left", ...panelPresentation.colorStyle }}>
                                 {panelPresentation.linked && (
                                   <a
                                     className="shop-builder-panel-link-overlay"
@@ -15514,7 +15564,7 @@ function PreviewSection({
                           </div>
                         ) : block.kind === "panelSlider" ? (
                           <UikitSlider block={block} isCanvas panelMode shellSettings={shellSettings} />
-                        ) : block.kind === "slider" ? (
+                        ) : block.kind === "slider" || block.kind === "slideshow" || block.kind === "overlaySlider" ? (
                           <UikitSlider block={block} isCanvas shellSettings={shellSettings} />
                         ) : block.kind === "products" ? (
                           <UikitProducts block={block} isCanvas products={previewProducts} categoryTree={previewCategoryTree} />

@@ -8,6 +8,7 @@
 import type { BuilderShellSettings } from "@/lib/builderShell";
 import { resolveGlobalStyleToken } from "@/lib/globalStyleTokens";
 import { fontFamilyStack } from "@/lib/webFonts";
+import { resolveBackgroundPaint } from "@/lib/backgroundPaint";
 
 export type UikitGlobalsConfig = {
   // Spacing Scale
@@ -83,6 +84,16 @@ export function getUikitGlobalsCssVars(
   };
   const buttonControlHeight = value("controlHeightDefault", value("buttonHeight", "48px"));
   const buttonLargeControlHeight = value("controlHeightLarge", "56px");
+  const backgroundDefault = resolveBackgroundPaint(value("backgroundDefault", value("backgroundColor", "#ffffff")), "#ffffff");
+  const backgroundMuted = resolveBackgroundPaint(value("backgroundMuted", value("mutedBackgroundColor", "#f8fafc")), "#f8fafc");
+  const backgroundPrimary = resolveBackgroundPaint(value("backgroundPrimary", primary), primary);
+  const backgroundSecondary = resolveBackgroundPaint(value("backgroundSecondary", value("secondaryColor", "#64748b")), "#64748b");
+  const cardDefaultBackground = resolveBackgroundPaint(value("cardBackground", "#ffffff"), "#ffffff");
+  const cardPrimaryBackground = resolveBackgroundPaint(value("cardPrimaryBackground", primary), primary);
+  const cardSecondaryBackground = resolveBackgroundPaint(value("cardSecondaryBackground", "#111827"), "#111827");
+  const cardDefaultHoverBackground = resolveBackgroundPaint(value("cardDefaultHoverBackground", cardDefaultBackground), cardDefaultBackground);
+  const cardPrimaryHoverBackground = resolveBackgroundPaint(value("cardPrimaryHoverBackground", cardPrimaryBackground), cardPrimaryBackground);
+  const cardSecondaryHoverBackground = resolveBackgroundPaint(value("cardSecondaryHoverBackground", cardSecondaryBackground), cardSecondaryBackground);
 
   const vars: Record<string, string> = {
     // Spacing scale
@@ -127,17 +138,17 @@ export function getUikitGlobalsCssVars(
     "--uk-global-danger-color": value("dangerColor", "#dc2626"),
     "--uk-global-text-color": value("textColor", "#111827"),
     "--uk-global-muted-text-color": value("mutedTextColor", "#6b7280"),
-    "--uk-global-background-color": value("backgroundDefault", value("backgroundColor", "#ffffff")),
+    "--uk-global-background-color": backgroundDefault,
     // Canonical YOOtheme section background roles. The legacy field names stay
     // readable for existing saved documents, but sections resolve these roles.
-    "--webpages-background-default": value("backgroundDefault", value("backgroundColor", "#ffffff")),
-    "--webpages-background-muted": value("backgroundMuted", value("mutedBackgroundColor", "#f8fafc")),
-    "--webpages-background-primary": value("backgroundPrimary", primary),
-    "--webpages-background-secondary": value("backgroundSecondary", value("secondaryColor", "#64748b")),
-    "--uikit-section-default-bg": value("backgroundDefault", value("backgroundColor", "#ffffff")),
-    "--uikit-section-muted-bg": value("backgroundMuted", value("mutedBackgroundColor", "#f8fafc")),
-    "--uikit-section-primary-bg": value("backgroundPrimary", primary),
-    "--uikit-section-secondary-bg": value("backgroundSecondary", value("secondaryColor", "#64748b")),
+    "--webpages-background-default": backgroundDefault,
+    "--webpages-background-muted": backgroundMuted,
+    "--webpages-background-primary": backgroundPrimary,
+    "--webpages-background-secondary": backgroundSecondary,
+    "--uikit-section-default-bg": backgroundDefault,
+    "--uikit-section-muted-bg": backgroundMuted,
+    "--uikit-section-primary-bg": backgroundPrimary,
+    "--uikit-section-secondary-bg": backgroundSecondary,
     "--uk-global-font-family": fontFamilyStack(bodyFamily, "system-ui, sans-serif"),
     "--uk-heading-font-family": fontFamilyStack(headingFamily, "system-ui, sans-serif"),
     "--webpages-font-primary": fontFamilyStack(primaryFamily, "system-ui, sans-serif"),
@@ -178,7 +189,7 @@ export function getUikitGlobalsCssVars(
     "--uk-global-inverse-color": value("inverseColor", "#fff"),
     "--uk-global-link-color": value("linkColor", primary),
     "--uk-global-link-hover-color": value("linkHoverColor", accent),
-    "--uk-global-muted-background": value("backgroundMuted", value("mutedBackgroundColor", "#f8fafc")),
+    "--uk-global-muted-background": backgroundMuted,
     "--uk-base-selection-background": value("selectionBackground", primary),
     "--uk-base-selection-color": value("selectionColor", "#fff"),
     "--uk-base-ins-background": value("baseInsBackground", "transparent"),
@@ -187,9 +198,9 @@ export function getUikitGlobalsCssVars(
     "--uk-base-mark-color": value("baseMarkColor", primary),
     "--uk-global-border-width": value("borderWidth", "1px"),
     "--uk-global-border-color": value("borderColor", "#e5e7eb"),
-    "--uk-card-default-background": value("cardBackground", "#ffffff"),
-    "--uk-card-primary-background": value("cardPrimaryBackground", primary),
-    "--uk-card-secondary-background": value("cardSecondaryBackground", "#111827"),
+    "--uk-card-default-background": cardDefaultBackground,
+    "--uk-card-primary-background": cardPrimaryBackground,
+    "--uk-card-secondary-background": cardSecondaryBackground,
     "--uk-card-muted-background": "#f8fafc",
 
     // Controls & Radii
@@ -205,9 +216,9 @@ export function getUikitGlobalsCssVars(
     "--uk-card-transition-duration": value("cardTransitionDuration", "0.1s"),
     "--uk-card-shadow": value("cardShadow", "0 8px 24px rgba(0,0,0,.08)"),
     "--uk-card-hover-shadow": value("cardHoverShadow", value("cardShadowHover", "0 8px 24px rgba(0,0,0,.08)")),
-    "--uk-card-default-hover-background": value("cardDefaultHoverBackground", value("cardBackground", "#fff")),
-    "--uk-card-primary-hover-background": value("cardPrimaryHoverBackground", primary),
-    "--uk-card-secondary-hover-background": value("cardSecondaryHoverBackground", "#111827"),
+    "--uk-card-default-hover-background": cardDefaultHoverBackground,
+    "--uk-card-primary-hover-background": cardPrimaryHoverBackground,
+    "--uk-card-secondary-hover-background": cardSecondaryHoverBackground,
     "--uk-card-default-text": value("cardDefaultText", value("mutedTextColor", "#6b7280")),
     "--uk-card-primary-text": value("cardPrimaryText", "#fff"),
     "--uk-card-secondary-text": value("cardSecondaryText", "#fff"),

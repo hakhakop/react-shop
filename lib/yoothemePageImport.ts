@@ -36,6 +36,8 @@ export type YoothemeImportElementKind =
   | "image"
   | "grid"
   | "panel"
+  | "slideshow"
+  | "overlaySlider"
   | "panelSlider";
 
 export type YoothemeImportAnalysis = {
@@ -104,8 +106,12 @@ const ELEMENT_TYPES: Record<string, YoothemeImportElementKind> = {
   grid: "grid",
   grid_item: "grid",
   panel: "panel",
-  "overlay-slider": "panelSlider",
-  "overlay-slider_item": "panelSlider",
+  "panel-slider": "panelSlider",
+  "panel-slider_item": "panelSlider",
+  slideshow: "slideshow",
+  slideshow_item: "slideshow",
+  "overlay-slider": "overlaySlider",
+  "overlay-slider_item": "overlaySlider",
 };
 
 const STRUCTURAL_TYPES = new Set(["layout", "section", "row", "column"]);
@@ -344,13 +350,30 @@ const withSourceGeneralVisualStyle = <T extends BuilderLayoutBlock>(
     ...(layout.maxWidthBreakpoint ? { maxWidthBreakpoint: layout.maxWidthBreakpoint } : {}),
     ...(layout.blockAlign && layout.blockAlign !== "none" ? { elementAlign: layout.blockAlign } : {}),
     ...(layout.textAlign ? { textAlign: layout.textAlign as any, headingAlign: layout.textAlign as any } : {}),
-    ...(layout.marginMode ? { margin: layout.marginMode, marginMode: layout.marginMode } : {}),
     ...(layout.removeTopMargin ? { removeTopMargin: true } : {}),
     ...(layout.removeBottomMargin ? { removeBottomMargin: true } : {}),
     ...(layout.visibilityMode ? { visibility: layout.visibilityMode, visibilityMode: layout.visibilityMode } : {}),
     ...(sourceAnimation(props.animation) ? { animation: { preset: sourceAnimation(props.animation) as any } } : {}),
   };
-  return { ...block, ...direct, visualStyle: { ...(block.visualStyle ?? {}), ...visualStyle, layout: { ...(block.visualStyle?.layout ?? {}), ...(visualStyle.layout ?? {}) }, effects: { ...(block.visualStyle?.effects ?? {}), ...(visualStyle.effects ?? {}) }, card: { ...(block.visualStyle?.card ?? {}), ...(visualStyle.card ?? {}) } } } as T;
+  return {
+    ...block,
+    ...direct,
+    // Native WebPages blocks may inherit Global Element Padding. Imported
+    // YOOtheme blocks deliberately do not: their source owns spacing through
+    // explicit UIkit margin semantics and component internals.
+    elementPadding: "none",
+    spacingContract: "yootheme",
+    visualStyle: {
+      ...(block.visualStyle ?? {}),
+      ...visualStyle,
+      layout: {
+        ...(block.visualStyle?.layout ?? {}),
+        ...(visualStyle.layout ?? {}),
+      },
+      effects: { ...(block.visualStyle?.effects ?? {}), ...(visualStyle.effects ?? {}) },
+      card: { ...(block.visualStyle?.card ?? {}), ...(visualStyle.card ?? {}) },
+    },
+  } as T;
 };
 
 const GENERAL_POSITION_KEYS = [
@@ -690,6 +713,8 @@ const sourceSliderItem = (
 ): NonNullable<BuilderSection["slides"]>[number] => {
   const props = { ...parentProps, ...sourceProps(node) };
   const media = normalizeYoothemeMedia(props);
+  const actionLabel = asString(props.link_text);
+  const actionUrl = asString(props.link);
   return {
     id: sourcePathId(path, "panel-slide"),
     title: asString(props.title) ?? "",
@@ -706,13 +731,83 @@ const sourceSliderItem = (
     imageLoading: media.imageLoading,
     headingLevel: sourceHeadingLevel(props.title_element) ?? "h3",
     metaStyle: sourceTextVariant(props.meta_style) ?? "muted",
-    showAction: Boolean(props.link),
-    buttonLabel: asString(props.link_text) ?? "Read more",
-    buttonUrl: asString(props.link) ?? "#",
+    // YOOtheme distinguishes a whole-panel link from a visible link/button.
+    // Do not manufacture a default action when `link_text` is intentionally
+    // empty; `panel_link` still makes the title/media panel interactive.
+    showAction: Boolean(actionUrl && actionLabel),
+    buttonLabel: actionLabel ?? undefined,
+    buttonUrl: actionUrl ?? undefined,
     buttonTarget: props.link_target === "blank" ? "_blank" : "_self",
     buttonStyle: sourceButtonStyle(props.link_style),
+    linkPanel: props.panel_link === true || props.panel_link === "true",
   };
 };
+
+/** A YOOtheme item can carry a dynamic field binding in `source`, separate
+ * from its authored static props. Phase 9 deliberately imports only actual
+ * static fallback content; bindings themselves belong to Phase 13. */
+const hasDynamicSourceBinding = (node: YoothemeSourceNode) => {
+  const source = node.source;
+  return Boolean(
+    source && typeof source === "object" && !Array.isArray(source) &&
+      Object.keys(source as Record<string, unknown>).length > 0,
+  );
+};
+
+const hasStaticSliderFallback = (node: YoothemeSourceNode) => {
+  const props = sourceProps(node);
+  return ["title", "meta", "content", "image", "video", "link"].some(
+    (key) => asString(props[key]) !== null,
+  );
+};
+
+const sourceStaticSliderItems = (
+  node: YoothemeSourceNode,
+  itemType: string,
+  path: string,
+  parentProps: Record<string, unknown>,
+) => {
+  const items = sourceChildren(node).filter((child) => child.type === itemType);
+  const hasDynamicItemSource = items.some(hasDynamicSourceBinding);
+  const slides = items
+    .filter((child) => !hasDynamicSourceBinding(child) || hasStaticSliderFallback(child))
+    .map((child, index) => sourceSliderItem(child, `${path}.${index}`, parentProps));
+  return {
+    slides,
+    hasDynamicSource: hasDynamicItemSource || hasDynamicSourceBinding(node),
+  };
+};
+
+const sourceSliderGap = (value: unknown) =>
+  value === "small" ? 15 : value === "medium" ? 20 : value === "large" ? 40 : value === "" || value === "none" ? 0 : 30;
+
+/** `1-3` means one third width, i.e. three visible items. */
+const sourceSliderItemsPerView = (value: unknown) => {
+  const match = typeof value === "string" ? value.match(/^(\d+)-(\d+)$/) : null;
+  if (!match) return undefined;
+  const numerator = Number(match[1]);
+  const denominator = Number(match[2]);
+  return numerator > 0 && denominator >= numerator ? Math.min(Math.max(denominator / numerator, 1), 6) : undefined;
+};
+
+/** Normalize the UIkit values at the importer boundary instead of leaking
+ * element-specific strings into the shared carousel contract. */
+const sourceCarouselOverlayPosition = (value: unknown) => {
+  const normalized = asString(value);
+  return [
+    "top-left", "top-right", "bottom-left", "bottom-center", "bottom-right",
+    "center", "center-left", "center-right",
+  ].includes(normalized ?? "") && normalized ? normalized : undefined;
+};
+
+const sourceCarouselOverlayDisplay = (value: unknown) =>
+  value === "hover" || value === "active" ? value : "always";
+
+const sourceCarouselOverlayPadding = (value: unknown) =>
+  value === "small" || value === "large" || value === "none" ? value : "default";
+
+const sourceSlideshowHeight = (value: unknown) =>
+  value === "viewport" ? "viewport" : undefined;
 
 const warnUnsupported = (
   path: string,
@@ -724,6 +819,35 @@ const warnUnsupported = (
   unsupported.forEach((key) => {
     warnings.push(`${path}.${key}: INTENTIONALLY UNSUPPORTED for Compatibility Fixture #1 — no canonical WebPages owner or shared renderer exists.`);
   });
+};
+
+/**
+ * YOOtheme's source/query descriptors describe a dynamic collection rather
+ * than static element content. Dynamic Content / Field Binding is deliberately
+ * a cross-element capability, so Phase 9 must neither persist these objects
+ * nor pretend the carousel can resolve them.
+ */
+const reportUnsupportedDynamicSource = (
+  path: string,
+  props: Record<string, unknown>,
+  staticItemCount: number,
+  warnings: string[],
+): boolean => {
+  const dynamicKeys = Object.keys(props).filter((key) =>
+    key === "source" || key === "query" || key === "content_source" ||
+    key === "item_source" || key.startsWith("source_") || key.startsWith("query_"),
+  ).filter((key) => {
+    const value = props[key];
+    return value !== undefined && value !== null && value !== "" && value !== false;
+  });
+
+  if (dynamicKeys.length === 0) return false;
+
+  const fallback = staticItemCount > 0
+    ? "Static item content was imported; the dynamic binding was not stored."
+    : "The element was not imported because no static fallback items exist.";
+  warnings.push(`${path}: DYNAMIC CONTENT UNSUPPORTED FOR NOW (${dynamicKeys.join(", ")}). ${fallback} Deferred to the cross-element Dynamic Content / Field Binding capability.`);
+  return staticItemCount === 0;
 };
 
 const mapStaticElement = (
@@ -962,33 +1086,133 @@ const mapStaticElement = (
     }, props);
   }
 
-  if (type === "overlay-slider") {
-    const slides = sourceChildren(node)
-      .filter((child) => child.type === "overlay-slider_item")
-      .map((child, index) => sourceSliderItem(child, `${path}.${index}`, props));
+  if (type === "slideshow") {
+    const { slides, hasDynamicSource } = sourceStaticSliderItems(node, "slideshow_item", path, props);
+    if (reportUnsupportedDynamicSource(path, hasDynamicSource ? { ...props, source: props.source ?? true } : props, slides.length, warnings)) return null;
     warnUnsupported(path, props, [
-      "image_width", "image_height", "image_fit", "image_ratio", "image_position", "image_loading", "link_style", "link_text", "meta_style", "nav", "nav_align", "nav_position", "show_content",
-      "show_link", "show_meta", "show_title", "slidenav", "slider_autoplay_pause", "slider_center",
-      "slider_divider", "slider_gap", "text_align", "title_element", "margin", "visibility",
+      "show_title", "show_meta", "show_content", "show_link",
+      "slideshow_height", "slideshow_ratio", "slideshow_animation", "slideshow_autoplay", "slideshow_autoplay_pause", "slideshow_autoplay_interval",
+      "nav", "nav_position", "nav_breakpoint", "slidenav", "slidenav_breakpoint", "slidenav_outside_breakpoint", "text_color",
+      ...GENERAL_POSITION_KEYS,
+    ], warnings);
+    if (props.slideshow_height === "section") {
+      warnings.push(`${path}.slideshow_height: INTENTIONALLY UNSUPPORTED for Compatibility Fixture #1 — viewport subtraction requires cross-section layout measurement and has no canonical shared runtime yet.`);
+    }
+    return withSourceGeneralVisualStyle({
+      id: sourcePathId(path, "slideshow"),
+      kind: "slideshow",
+      slides,
+      carouselSettings: {
+        presentation: "slideshow",
+        // Presentation remains a hero-style slideshow without inheriting the
+        // generic WebPages Hero carousel's synthetic min-height defaults.
+        variant: "slideshow",
+        slideMode: "hero",
+        aspectRatio: asString(props.slideshow_ratio) ?? undefined,
+        slideshowRatio: asString(props.slideshow_ratio) ?? undefined,
+        slideshowHeight: sourceSlideshowHeight(props.slideshow_height),
+        slideshowMinHeight: Number.isFinite(Number(props.slideshow_min_height)) ? Number(props.slideshow_min_height) : undefined,
+        showTitle: props.show_title !== false,
+        showMeta: props.show_meta !== false,
+        showContent: props.show_content !== false,
+        showLink: props.show_link !== false,
+        autoplay: props.slideshow_autoplay === true || props.slideshow_autoplay === "true",
+        autoplayDelayMs: Number.isFinite(Number(props.slideshow_autoplay_interval)) ? Number(props.slideshow_autoplay_interval) * 1000 : undefined,
+        pauseOnHover: props.slideshow_autoplay_pause !== false,
+        showArrows: Boolean(props.slidenav),
+        showDots: Boolean(props.nav),
+        arrowPosition: asString(props.slidenav) === "outside" ? "outer" : "overlay",
+        paginationPosition: asString(props.nav_position) ?? undefined,
+        effect: props.slideshow_animation === "fade" ? "fade" : "slide",
+        overlayTextColor: props.text_color === "light" || props.text_color === "dark" ? props.text_color : undefined,
+      },
+    }, props);
+  }
+
+  if (type === "panel-slider") {
+    const { slides, hasDynamicSource } = sourceStaticSliderItems(node, "panel-slider_item", path, props);
+    if (reportUnsupportedDynamicSource(path, hasDynamicSource ? { ...props, source: props.source ?? true } : props, slides.length, warnings)) return null;
+    warnUnsupported(path, props, [
+      "slider_autoplay", "slider_autoplay_pause", "slider_autoplay_interval", "slider_finite", "slider_gap", "slider_divider", "slider_width_default", "slider_width_small", "slider_width_medium", "slider_width_large", "slider_width_xlarge", "slider_center", "nav", "nav_align", "nav_position", "nav_breakpoint", "slidenav", "slidenav_breakpoint", "slidenav_outside_breakpoint", "text_align", "margin", "margin_remove_bottom",
       ...GENERAL_POSITION_KEYS,
     ], warnings);
     return withSourceGeneralVisualStyle({
       id: sourcePathId(path, "panel-slider"),
       kind: "panelSlider",
-      slides,
+      slides: slides.map((slide) => ({
+        ...slide,
+        // Panel Slider has no implicit Card surface in UIkit. Only an
+        // explicit source panel style may opt into a Card presentation.
+        panelStyle: sourceCardVariant(props.panel_style),
+        panelSize: props.panel_padding === "small" || props.panel_padding === "default" || props.panel_padding === "large"
+          ? props.panel_padding
+          : "none",
+      })),
       carouselSettings: {
+        presentation: "panel-slider",
         variant: "panel",
         slideMode: "panel",
-        loop: true,
-        autoplay: false,
+        autoplay: props.slider_autoplay === true || props.slider_autoplay === "true",
+        autoplayDelayMs: Number.isFinite(Number(props.slider_autoplay_interval)) ? Number(props.slider_autoplay_interval) * 1000 : undefined,
         pauseOnHover: props.slider_autoplay_pause !== false,
-        align: props.slider_center === false ? "start" : "center",
-        spaceBetween: props.slider_gap === "small" ? 15 : props.slider_gap === "large" ? 40 : 30,
+        centered: props.slider_center === true || props.slider_center === "true",
+        loop: !(props.slider_finite === true || props.slider_finite === "true"),
+        spaceBetween: sourceSliderGap(props.slider_gap),
+        divider: props.slider_divider === true || props.slider_divider === "true",
+        cardsPerViewPhone: sourceSliderItemsPerView(props.slider_width_default) ?? 1,
+        cardsPerViewSmall: sourceSliderItemsPerView(props.slider_width_small),
+        cardsPerViewMedium: sourceSliderItemsPerView(props.slider_width_medium),
+        cardsPerViewLarge: sourceSliderItemsPerView(props.slider_width_large ?? props.slider_width_xlarge),
         showArrows: Boolean(props.slidenav),
         showDots: Boolean(props.nav),
         arrowPosition: asString(props.slidenav) ?? undefined,
         paginationPosition: asString(props.nav_position) ?? undefined,
         effect: "slide",
+      },
+    }, props);
+  }
+
+  if (type === "overlay-slider") {
+    const { slides, hasDynamicSource } = sourceStaticSliderItems(node, "overlay-slider_item", path, props);
+    if (reportUnsupportedDynamicSource(path, hasDynamicSource ? { ...props, source: props.source ?? true } : props, slides.length, warnings)) return null;
+    warnUnsupported(path, props, [
+      "show_content", "show_link", "show_meta", "show_title", "nav", "nav_align", "nav_position", "slidenav", "slider_autoplay_pause", "slider_center", "slider_autoplay", "slider_autoplay_interval", "slider_finite",
+      "slider_divider", "slider_gap", "slider_width_default", "slider_width_small", "slider_width_medium", "slider_width_large", "slider_width_xlarge", "overlay_mode", "overlay_display", "overlay_position", "overlay_padding", "text_color", "text_align", "title_element", "margin", "visibility",
+      ...GENERAL_POSITION_KEYS,
+    ], warnings);
+    return withSourceGeneralVisualStyle({
+      id: sourcePathId(path, "overlay-slider"),
+      kind: "overlaySlider",
+      slides,
+      carouselSettings: {
+        presentation: "overlay-slider",
+        variant: "overlay",
+        slideMode: "overlay",
+        showTitle: props.show_title !== false,
+        showMeta: props.show_meta !== false,
+        showContent: props.show_content !== false,
+        showLink: props.show_link !== false,
+        autoplay: props.slider_autoplay === true || props.slider_autoplay === "true",
+        autoplayDelayMs: Number.isFinite(Number(props.slider_autoplay_interval)) ? Number(props.slider_autoplay_interval) * 1000 : undefined,
+        pauseOnHover: props.slider_autoplay_pause !== false,
+        centered: props.slider_center === true || props.slider_center === "true",
+        loop: !(props.slider_finite === true || props.slider_finite === "true"),
+        spaceBetween: sourceSliderGap(props.slider_gap),
+        divider: props.slider_divider === true || props.slider_divider === "true",
+        cardsPerViewPhone: sourceSliderItemsPerView(props.slider_width_default) ?? 1,
+        cardsPerViewSmall: sourceSliderItemsPerView(props.slider_width_small),
+        cardsPerViewMedium: sourceSliderItemsPerView(props.slider_width_medium),
+        cardsPerViewLarge: sourceSliderItemsPerView(props.slider_width_large ?? props.slider_width_xlarge),
+        showArrows: Boolean(props.slidenav),
+        showDots: Boolean(props.nav),
+        arrowPosition: asString(props.slidenav) === "outside" ? "outer" : "overlay",
+        paginationPosition: asString(props.nav_position) ?? undefined,
+        effect: "slide",
+        overlayMode: props.overlay_mode === "caption" ? "caption" : "cover",
+        overlayDisplay: sourceCarouselOverlayDisplay(props.overlay_display),
+        overlayPosition: sourceCarouselOverlayPosition(props.overlay_position),
+        overlayPadding: sourceCarouselOverlayPadding(props.overlay_padding),
+        overlayTextColor: props.text_color === "light" || props.text_color === "dark" ? props.text_color : undefined,
       },
     }, props);
   }

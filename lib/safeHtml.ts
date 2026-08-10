@@ -39,7 +39,14 @@ const safeClass = (attrs: string) => {
  * relies on and never preserves attributes other than a validated link URL.
  */
 function sanitizeServerHtml(html: string): string {
-  const escaped = (value: string) => value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\"/g, "&quot;").replace(/'/g, "&#39;");
+  // Imported rich HTML is sanitized both at the import boundary and again at
+  // rendering. Decode the five safe entities before re-escaping so this
+  // canonical, fail-closed sanitizer remains idempotent instead of turning
+  // `&amp;` into `&amp;amp;` on every render/save cycle.
+  const decodeSafeEntities = (value: string) => value.replace(/&(amp|lt|gt|quot|#39);/gi, (entity) => ({
+    "&amp;": "&", "&lt;": "<", "&gt;": ">", "&quot;": "\"", "&#39;": "'",
+  }[entity.toLowerCase()] ?? entity));
+  const escaped = (value: string) => decodeSafeEntities(value).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\"/g, "&quot;").replace(/'/g, "&#39;");
   const withoutExecutableBlocks = html.replace(/<(script|style|iframe|object|embed)\b[^>]*>[\s\S]*?<\/\1\s*>/gi, "");
   return withoutExecutableBlocks.split(/(<[^>]*>)/g).map((part) => {
     if (!part.startsWith("<")) return escaped(part);

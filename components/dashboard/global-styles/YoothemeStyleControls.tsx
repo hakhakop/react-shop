@@ -6,6 +6,7 @@ import { Search, ChevronDown, Check, Upload, X } from "lucide-react";
 import type { BuilderShellSettings } from "@/lib/builderShell";
 import { GLOBAL_STYLE_TOKEN_DEFAULTS } from "@/lib/globalStyleTokens";
 import { resolveYoothemeLess } from "@/lib/yoothemeLessImporter";
+import { isGradientBackgroundPaint, isValidBackgroundPaint } from "@/lib/backgroundPaint";
 
 // Helper to convert hex to HSL
 function hexToHsl(hexStr: string): { h: number; s: number; l: number } {
@@ -51,12 +52,16 @@ type ColorPickerProps = {
   label: string;
   value: string;
   onChange: (value: string) => void;
+  /** Background properties can also hold a safe CSS paint value. */
+  allowGradient?: boolean;
 };
 
-export function YoothemeColorPicker({ label, value, onChange }: ColorPickerProps) {
+export function YoothemeColorPicker({ label, value, onChange, allowGradient = false }: ColorPickerProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [hexInput, setHexInput] = useState(value || "#ffffff");
+  const [paintInput, setPaintInput] = useState(value || "#ffffff");
+  const [mode, setMode] = useState<"color" | "gradient">(allowGradient && isGradientBackgroundPaint(value) ? "gradient" : "color");
   const swatchRef = useRef<HTMLButtonElement>(null);
   const popoverRef = useRef<HTMLDivElement>(null);
   const [popoverPos, setPopoverPos] = useState<{ top: number; left: number }>({ top: 0, left: 0 });
@@ -73,6 +78,8 @@ export function YoothemeColorPicker({ label, value, onChange }: ColorPickerProps
 
   useEffect(() => {
     setHexInput(value || "#ffffff");
+    setPaintInput(value || "#ffffff");
+    setMode(allowGradient && isGradientBackgroundPaint(value) ? "gradient" : "color");
     const hsl = hexToHsl(value || "#ffffff");
     setHue(hsl.h);
     setSat(hsl.s);
@@ -113,6 +120,11 @@ export function YoothemeColorPicker({ label, value, onChange }: ColorPickerProps
     setIsOpen(!isOpen);
   };
 
+  const commitPaint = (next: string) => {
+    setPaintInput(next);
+    if (isValidBackgroundPaint(next)) onChange(next.trim());
+  };
+
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (
@@ -143,7 +155,8 @@ export function YoothemeColorPicker({ label, value, onChange }: ColorPickerProps
             width: "26px",
             height: "26px",
             borderRadius: "50%",
-            backgroundColor: displayColor,
+            background: allowGradient ? displayColor : undefined,
+            backgroundColor: allowGradient ? undefined : displayColor,
             border: "2px solid rgba(255,255,255,0.2)",
             cursor: "pointer",
             boxShadow: "0 2px 5px rgba(0,0,0,0.3)",
@@ -171,6 +184,25 @@ export function YoothemeColorPicker({ label, value, onChange }: ColorPickerProps
             color: "#f8fafc",
           }}
         >
+          {allowGradient && <div style={{ display: "flex", gap: "6px", marginBottom: "12px" }}>
+            <button type="button" onClick={() => setMode("color")} style={{ flex: 1, padding: "6px", border: 0, borderRadius: "5px", background: mode === "color" ? "#334155" : "transparent", color: "#f8fafc", cursor: "pointer", fontSize: "11px", fontWeight: 700 }}>COLOR</button>
+            <button type="button" onClick={() => setMode("gradient")} style={{ flex: 1, padding: "6px", border: 0, borderRadius: "5px", background: mode === "gradient" ? "#334155" : "transparent", color: "#f8fafc", cursor: "pointer", fontSize: "11px", fontWeight: 700 }}>GRADIENT</button>
+          </div>}
+
+          {mode === "gradient" ? <>
+            <input
+              aria-label={`${label} gradient CSS`}
+              type="text"
+              value={paintInput}
+              onChange={(event) => commitPaint(event.target.value)}
+              onBlur={() => { if (!isValidBackgroundPaint(paintInput)) setPaintInput(value || "#ffffff"); }}
+              style={{ width: "100%", padding: "7px 8px", fontSize: "12px", fontFamily: "monospace", border: `1px solid ${isValidBackgroundPaint(paintInput) ? "#334155" : "#ef4444"}`, borderRadius: "6px", backgroundColor: "#0f172a", color: "#f8fafc" }}
+              placeholder="linear-gradient(...)"
+              spellCheck={false}
+            />
+            <div aria-label={`${label} gradient preview`} style={{ height: "96px", marginTop: "10px", borderRadius: "8px", border: "1px solid rgba(255,255,255,.16)", background: isValidBackgroundPaint(paintInput) ? paintInput : "transparent" }} />
+            <span style={{ display: "block", marginTop: "8px", fontSize: "10px", color: "#94a3b8", textAlign: "center", letterSpacing: ".04em" }}>CSS LINEAR OR RADIAL GRADIENT</span>
+          </> : <>
           {/* Saturation/Lightness 2D Color Box */}
           <div
             style={{
@@ -285,6 +317,7 @@ export function YoothemeColorPicker({ label, value, onChange }: ColorPickerProps
               HEX / KEYWORD
             </span>
           </div>
+          </>}
         </div>,
         document.body
       )}

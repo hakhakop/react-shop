@@ -148,6 +148,8 @@ export type BuilderLayoutBlock = {
   imageWidth?: "auto" | "full" | "small" | "medium" | "large" | "xlarge" | (string & {});
   imageHeight?: string | number;
   imageLoading?: "lazy" | "eager";
+  imageSvgInline?: boolean;
+  imageSvgColor?: string;
   imageLinkUrl?: string;
   imageLinkTarget?: "_self" | "_blank";
   borderRadius?: number;
@@ -155,6 +157,12 @@ export type BuilderLayoutBlock = {
   elementBackgroundMode?: string;
   elementBackground?: string;
   elementPadding?: string;
+  /**
+   * Provenance for the General spacing contract. Imported UIkit/YOOtheme
+   * elements own their spacing through their explicit source margin, rather
+   * than inheriting WebPages' authoring-oriented shell padding default.
+   */
+  spacingContract?: "yootheme";
   elementAlign?: string;
   panelStyle?: BuilderPanelStyle;
   panelVariant?: "default" | "primary" | "secondary" | "blank" | "tile-default" | "tile-muted" | "tile-primary" | "tile-secondary";
@@ -240,6 +248,12 @@ export type BuilderLayoutBlock = {
     fadeCrossFade?: boolean;
     freeModeMomentum?: boolean;
     cardsPerView?: number;
+    cardsPerViewPhone?: number;
+    cardsPerViewSmall?: number;
+    cardsPerViewMedium?: number;
+    cardsPerViewLarge?: number;
+    centered?: boolean;
+    divider?: boolean;
     showArrows?: boolean;
     showDots?: boolean;
     pauseOnHover?: boolean;
@@ -250,10 +264,18 @@ export type BuilderLayoutBlock = {
     kenBurns?: boolean;
     speed?: number;
     slideMode?: string;
+    presentation?: "slideshow" | "overlay-slider" | "panel-slider";
     overlayGradient?: string;
     overlayPosition?: string;
     overlayColor?: string;
     overlayTextColor?: string;
+    overlayMode?: "cover" | "caption";
+    overlayDisplay?: "always" | "hover" | "active";
+    overlayPadding?: string;
+    overlayLink?: boolean;
+    itemWidthMode?: "fixed" | "auto";
+    slideshowHeight?: "auto" | "viewport" | "section";
+    slideshowRatio?: string;
   };
   heroHeadingElement?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
   heroHeadingStyle?: "inherit" | "h1" | "h2" | "h3" | "h4" | "h5" | "article-title" | "small" | "medium" | "large" | "xlarge";

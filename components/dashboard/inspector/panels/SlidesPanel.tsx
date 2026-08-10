@@ -51,7 +51,7 @@ export default function SlidesPanel() {
       {/* Repeated Slides */}
       <div className="builder-inspector-section" style={{ borderTop: "1px solid var(--builder-ui-border)", paddingTop: "14px", marginTop: "14px" }}>
         <div className="builder-field-header" style={{ marginBottom: "10px" }}>
-          <strong>{block.kind === "slider" ? "Slider Slides" : "Story Slides"}</strong>
+          <strong>{block.kind === "slideshow" ? "Slideshow Slides" : block.kind === "slider" ? "Slider Slides" : "Story Slides"}</strong>
           <small>{slides.length} slide{slides.length === 1 ? "" : "s"}</small>
         </div>
 

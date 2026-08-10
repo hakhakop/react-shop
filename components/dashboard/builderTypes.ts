@@ -144,6 +144,8 @@ export type LayoutBlockKind =
   | "table"
   | "text"
   | "slider"
+  | "slideshow"
+  | "overlaySlider"
   | "panelSlider"
   | "embed"
   | "fluentForm"
@@ -298,6 +300,8 @@ export type BuilderLayoutBlock = {
   imageWidth?: "auto" | "full" | "small" | "medium" | "large" | "xlarge" | (string & {});
   imageHeight?: string | number;
   imageLoading?: "lazy" | "eager";
+  imageSvgInline?: boolean;
+  imageSvgColor?: string;
   imageLinkUrl?: string;
   imageLinkTarget?: "_self" | "_blank";
   borderRadius?: number;
@@ -305,6 +309,9 @@ export type BuilderLayoutBlock = {
   elementBackgroundMode?: "default" | "transparent" | "custom";
   elementBackground?: string;
   elementPadding?: "none" | "xs" | "sm" | "md" | "lg" | "xl" | "2xl" | "3xl" | "small" | "medium" | "large" | string;
+  /** Imported UIkit/YOOtheme elements use explicit source margins on the
+   * shared General shell instead of inheriting authoring defaults. */
+  spacingContract?: "yootheme";
   elementAlign?: "left" | "center" | "right";
   panelStyle?: BuilderPanelStyle;
   panelVariant?: "default" | "primary" | "secondary" | "blank" | "tile-default" | "tile-muted" | "tile-primary" | "tile-secondary";
@@ -843,6 +850,8 @@ export type BuilderSection = {
   carouselSettings?: {
     variant?: string;
     slideMode?: string;
+    /** Public semantic adapter over the shared carousel primitive. */
+    presentation?: "slideshow" | "overlay-slider" | "panel-slider";
     loop?: boolean;
     autoplay?: boolean;
     autoplayDelayMs?: number;
@@ -873,6 +882,13 @@ export type BuilderSection = {
     overlayPosition?: string;
     overlayColor?: string;
     overlayTextColor?: string;
+    overlayMode?: "cover" | "caption";
+    overlayDisplay?: "always" | "hover" | "active";
+    overlayPadding?: string;
+    overlayLink?: boolean;
+    itemWidthMode?: "fixed" | "auto";
+    slideshowHeight?: "auto" | "viewport" | "section";
+    slideshowRatio?: string;
     kenBurns?: boolean;
     scrubSpeed?: number;
     pinHeightFactor?: number;

@@ -29,6 +29,8 @@ import { Sparkles } from "lucide-react";
 import { getPublishedHeaderDocumentSettings } from "@/lib/publishedHeaderDocumentSettings";
 import { getUikitGlobalsCssVars } from "@/lib/uikitGlobals";
 import { builderGlobalVisibilityClassName } from "@/lib/builderVisualStyle";
+import { resolveBuilderMediaUrls } from "@/lib/builderMediaUrls";
+import { getWordPressBaseUrl } from "@/lib/wordpressUrl";
 
 type WebsiteFrontendMode = "preview" | "domain";
 
@@ -152,8 +154,11 @@ export default async function WebsiteFrontend({
   const localizedLayout = layout
     ? { ...layout, sections: resolveContentSections(layout.sections as never, activeContentLanguage, website.primaryLanguage) as typeof layout.sections }
     : layout;
+  const resolvedMediaLayout = localizedLayout
+    ? resolveBuilderMediaUrls(localizedLayout, getWordPressBaseUrl(website))
+    : localizedLayout;
 
-  const hasVisibleLayout = localizedLayout?.sections?.some((section) => section.visible);
+  const hasVisibleLayout = resolvedMediaLayout?.sections?.some((section) => section.visible);
 
   if (!hasVisibleLayout && !fallbackContent) {
     return (
@@ -195,9 +200,9 @@ export default async function WebsiteFrontend({
         website={website}
         activeContentLanguage={activeContentLanguage}
       />
-      {localizedLayout && hasVisibleLayout ? (
+      {resolvedMediaLayout && hasVisibleLayout ? (
         <StorefrontBuilderRenderer
-          layout={localizedLayout}
+          layout={resolvedMediaLayout}
           page={page}
           pageLabel={pageLabelOverride ?? pageLabel(page, customPages)}
           website={website}

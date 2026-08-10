@@ -91,19 +91,19 @@ export function getUikitSectionPaddingClass(token: SpacingScaleToken): string {
   if (value === "none" || value === "0" || value === "0px") {
     return "uk-section uk-padding-remove-vertical";
   }
-  if (value === "xs" || value === "sm" || value === "small") {
+  if (value === "xs" || value === "xsmall") {
     return "uk-section uk-section-xsmall";
   }
-  if (value === "md" || value === "medium") {
+  if (value === "sm" || value === "small") {
     return "uk-section uk-section-small";
   }
-  if (value === "lg" || value === "large") {
-    return "uk-section"; // default UIkit section padding
+  if (value === "md" || value === "medium" || value === "default") {
+    return "uk-section uk-section-medium";
   }
-  if (value === "xl") {
+  if (value === "lg" || value === "large" || value === "xl") {
     return "uk-section uk-section-large";
   }
-  if (value === "2xl" || value === "3xl") {
+  if (value === "xlarge" || value === "2xl" || value === "3xl") {
     return "uk-section uk-section-xlarge";
   }
 
@@ -602,6 +602,10 @@ export type UikitImageDocumentFields = {
   imageHeight?: string | number | null;
   imagePosition?: string;
   imageBorderRadius?: number | null;
+  /** YOOtheme's "Make SVG stylable with CSS" option. */
+  imageSvgInline?: boolean;
+  /** Semantic color used when the SVG is rendered as a stylable icon. */
+  imageSvgColor?: string;
 };
 
 /** Resolves stored Image fields into the shared UIkit Image semantic contract. */

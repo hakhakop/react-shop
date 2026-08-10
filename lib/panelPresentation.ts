@@ -2,6 +2,91 @@ import { getUikitCardClass } from "@/lib/uikitTokens";
 
 type PanelLike = Record<string, unknown>;
 
+type CardColorRole = "primary" | "secondary" | null;
+
+function cardColorRole(variant: unknown): CardColorRole {
+  const normalized = String(variant ?? "default").trim().toLowerCase();
+  if (["primary", "card-primary", "tile-primary", "accent"].includes(normalized)) return "primary";
+  if (["secondary", "card-secondary", "tile-secondary", "dark"].includes(normalized)) return "secondary";
+  return null;
+}
+
+function hasExplicitColor(value: unknown) {
+  return typeof value === "string" && !["", "inherit", "default", "none"].includes(value.trim().toLowerCase());
+}
+
+/**
+ * Resolve the semantic text/link palette for colored Card and Tile surfaces.
+ * Global Card role tokens remain the source of truth; local color utilities
+ * still win because they apply a concrete color on the child itself.
+ */
+export function resolvePanelColorSemantics(block: PanelLike) {
+  const role = cardColorRole(block.panelVariant ?? block.panelStyle ?? block.cardVariant);
+  if (!role) return {
+    className: "",
+    style: {} as Record<string, string>,
+    metaStyle: {} as Record<string, string>,
+  };
+
+  const text = `var(--uk-card-${role}-text, var(--uk-global-inverse-color, var(--uk-global-color, currentColor)))`;
+  const title = `var(--uk-card-${role}-title, ${text})`;
+  const surface = `var(--uk-card-${role}-background, transparent)`;
+  const hasExplicitActionColor = hasExplicitColor(
+    block.buttonTextColor ?? block.panelActionTextColor ?? block.linkColor,
+  );
+  const hasExplicitMetaColor = hasExplicitColor(block.metaColor ?? block.panelMetaColor);
+  const style: Record<string, string> = {
+    "--uk-global-link-color": text,
+    "--uk-global-link-hover-color": text,
+  };
+
+  // UIkit Default actions are inverse-outline actions on an inverse surface.
+  // Primary/Secondary classes retain their explicit global variant tokens.
+  if (!hasExplicitActionColor) {
+    Object.assign(style, {
+      "--uk-button-default-background": "transparent",
+      "--uk-button-default-text": text,
+      "--uk-button-default-border": text,
+      "--uk-button-default-hover-background": text,
+      "--uk-button-default-hover-text": surface,
+      "--uk-button-default-hover-border": text,
+      "--uk-button-text-color": text,
+      "--uk-button-link-color": text,
+      // YOOtheme's inverse surface contract also applies to an inheriting
+      // primary action.  This matters for DevStack: the global primary button
+      // is a gradient, while a primary Card intentionally presents that same
+      // action as a light/emphasis control.  Keep it token-based so an
+      // explicit action style/color still wins.
+      "--uk-button-primary-gradient": "none",
+      "--uk-button-primary-background": text,
+      "--uk-button-primary-text": "var(--uk-global-emphasis-color, var(--uk-global-color, currentColor))",
+      "--uk-button-primary-border": text,
+      "--uk-button-primary-hover-gradient": "none",
+      "--uk-button-primary-hover-background": text,
+      "--uk-button-primary-hover-text": "var(--uk-global-link-hover-color, var(--uk-global-emphasis-color, currentColor))",
+      "--uk-button-primary-hover-border": text,
+    });
+  }
+
+  if (!hasExplicitColor(block.titleColor ?? block.panelTitleColor)) {
+    style["--builder-card-title-color"] = title;
+  }
+  if (!hasExplicitMetaColor) {
+    style["--builder-card-meta-color"] = text;
+  }
+  if (!hasExplicitColor(block.contentColor ?? block.panelContentColor)) {
+    style["--builder-card-content-color"] = text;
+  }
+
+  return {
+    className: `shop-builder-card--inverse uk-light${hasExplicitMetaColor ? "" : " shop-builder-card--inverse-meta"}`,
+    style,
+    metaStyle: hasExplicitMetaColor
+      ? {}
+      : { color: "var(--builder-card-meta-color, inherit)" },
+  };
+}
+
 /**
  * Canonical Panel/Card presentation resolver shared by the Builder preview
  * and storefront. It owns only Panel presentation; media appearance stays in
@@ -13,6 +98,7 @@ export function resolvePanelPresentation(block: PanelLike) {
     ? block.panelExpand
     : "none";
   const linked = block.linkPanel === true && typeof block.buttonUrl === "string" && block.buttonUrl.length > 0;
+  const colorSemantics = resolvePanelColorSemantics(block);
   const classes = [
     getUikitCardClass(String(block.panelVariant ?? block.panelStyle ?? "default"), {
       hover: block.panelHover === true,
@@ -26,6 +112,7 @@ export function resolvePanelPresentation(block: PanelLike) {
     block.panelHeightExpand === true ? "shop-builder-panel--height-expand" : "",
     expand !== "none" ? `shop-builder-panel--expand-${expand}` : "",
     linked ? "shop-builder-panel--linked" : "",
+    colorSemantics.className,
   ].filter(Boolean).join(" ");
 
   return {
@@ -35,5 +122,6 @@ export function resolvePanelPresentation(block: PanelLike) {
     metaPosition: block.panelMetaPosition === "above-title" || block.panelMetaPosition === "above-content" || block.panelMetaPosition === "below-content"
       ? block.panelMetaPosition
       : "below-title",
+    colorStyle: colorSemantics.style,
   } as const;
 }

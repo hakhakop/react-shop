@@ -69,6 +69,9 @@ export default function SliderCapabilityPanel({
   const slides: any[] = rawBlock.slides ?? [];
   const carouselSettings = rawBlock.carouselSettings ?? {};
   const isPanelSlider = rawBlock.kind === "panelSlider";
+  const isOverlaySlider = rawBlock.kind === "overlaySlider";
+  const isSlideshow = rawBlock.kind === "slideshow";
+  const elementLabel = isPanelSlider ? "Panel Slider" : isOverlaySlider ? "Overlay Slider" : isSlideshow ? "Slideshow" : "Carousel";
   const itemLabel = isPanelSlider ? "Panel" : "Slide";
   const panelSliderItemDefaults = isPanelSlider
     ? {
@@ -154,13 +157,13 @@ export default function SliderCapabilityPanel({
   // --------------------------------------------------------------------------
   if (tab === "content") {
     return (
-      <div className="builder-inspector-stack" data-uikit-capability={isPanelSlider ? "panel-slider-content" : "slider-content"}>
+      <div className="builder-inspector-stack" data-uikit-capability={isPanelSlider ? "panel-slider-content" : isOverlaySlider ? "overlay-slider-content" : "slideshow-content"}>
         <InspectorDivision title="HEADING & INTRO">
           <InspectorFieldRow label="Block Title">
             <InspectorTextField
               value={rawBlock.title ?? ""}
               onChange={(value: string) => update({ title: value })}
-              placeholder={isPanelSlider ? "Panel slider title..." : "Slider title..."}
+              placeholder={`${elementLabel} title...`}
             />
           </InspectorFieldRow>
 
@@ -168,10 +171,27 @@ export default function SliderCapabilityPanel({
             <InspectorTextarea
               value={rawBlock.body ?? ""}
               onChange={(value: string) => update({ body: value })}
-              placeholder={isPanelSlider ? "Panel slider intro text..." : "Slider intro text..."}
+              placeholder={`${elementLabel} intro text...`}
             />
           </InspectorFieldRow>
         </InspectorDivision>
+
+        {!isPanelSlider && (
+          <InspectorDivision title="DISPLAY">
+            <InspectorFieldRow label="Title">
+              <InspectorSwitch checked={carouselSettings.showTitle !== false} onChange={(checked: boolean) => updateCarousel({ showTitle: checked })} label="Show the title" />
+            </InspectorFieldRow>
+            <InspectorFieldRow label="Meta">
+              <InspectorSwitch checked={carouselSettings.showMeta !== false} onChange={(checked: boolean) => updateCarousel({ showMeta: checked })} label="Show the meta text" />
+            </InspectorFieldRow>
+            <InspectorFieldRow label="Content">
+              <InspectorSwitch checked={carouselSettings.showContent !== false} onChange={(checked: boolean) => updateCarousel({ showContent: checked })} label="Show the content" />
+            </InspectorFieldRow>
+            <InspectorFieldRow label="Link">
+              <InspectorSwitch checked={carouselSettings.showLink !== false} onChange={(checked: boolean) => updateCarousel({ showLink: checked })} label="Show the link" />
+            </InspectorFieldRow>
+          </InspectorDivision>
+        )}
 
         <InspectorDivision title={isPanelSlider ? "PANEL SLIDES" : "SLIDES"}>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", marginBottom: "12px" }}>
@@ -235,7 +255,7 @@ export default function SliderCapabilityPanel({
               onClick={() => {
                 if (openWordPressMediaPicker) {
                   openWordPressMediaPicker({
-                    title: `Select ${isPanelSlider ? "Panel Slider" : "Slider"} Media (Select Multiple)`,
+                    title: `Select ${elementLabel} Media (Select Multiple)`,
                     multiple: true,
                     onSelect: (media: any) => {
                       update({
@@ -476,8 +496,8 @@ export default function SliderCapabilityPanel({
   // --------------------------------------------------------------------------
   if (tab === "style") {
     return (
-      <div className="builder-inspector-stack" data-uikit-capability={isPanelSlider ? "panel-slider-settings" : "slider-settings"}>
-        <InspectorDivision title={isPanelSlider ? "SLIDE BEHAVIOR" : "SLIDER & CAROUSEL"}>
+      <div className="builder-inspector-stack" data-uikit-capability={isPanelSlider ? "panel-slider-settings" : isOverlaySlider ? "overlay-slider-settings" : "slideshow-settings"}>
+        <InspectorDivision title={isPanelSlider ? "SLIDE BEHAVIOR" : isOverlaySlider ? "SLIDER" : "SLIDESHOW"}>
           {isPanelSlider ? (
             <>
               <InspectorFieldRow label="Cards at desktop">
@@ -515,6 +535,59 @@ export default function SliderCapabilityPanel({
                   ]}
                 />
               </InspectorFieldRow>
+
+              {([
+                ["cardsPerViewPhone", "Phone Portrait", "1"],
+                ["cardsPerViewSmall", "Phone Landscape", "2"],
+                ["cardsPerViewMedium", "Tablet Landscape", "3"],
+                ["cardsPerViewLarge", "Desktop", "3"],
+              ] as const).map(([key, label, fallback]) => (
+                <InspectorFieldRow key={key} label={label}>
+                  <InspectorSelect
+                    value={String((carouselSettings as any)[key] ?? fallback)}
+                    onChange={(value: string) => updateCarousel({ [key]: Number(value) })}
+                    options={[1, 2, 3, 4, 5, 6].map((value) => ({ value: String(value), label: `${value} column${value === 1 ? "" : "s"}` }))}
+                  />
+                </InspectorFieldRow>
+              ))}
+
+              <InspectorFieldRow label="Divider">
+                <InspectorSwitch checked={(carouselSettings as any).divider === true} onChange={(checked: boolean) => updateCarousel({ divider: checked })} label="Show dividers" />
+              </InspectorFieldRow>
+
+              <InspectorFieldRow label="Center">
+                <InspectorSwitch checked={(carouselSettings as any).centered === true} onChange={(checked: boolean) => updateCarousel({ centered: checked })} label="Center the active slide" />
+              </InspectorFieldRow>
+            </>
+          ) : isOverlaySlider ? (
+            <>
+              <InspectorFieldRow label="Column gap">
+                <InspectorSelect
+                  value={String(carouselSettings.spaceBetween ?? 30)}
+                  onChange={(value: string) => updateCarousel({ spaceBetween: Number(value) })}
+                  options={[{ value: "0", label: "None" }, { value: "15", label: "Small" }, { value: "30", label: "Default" }, { value: "40", label: "Large" }]}
+                />
+              </InspectorFieldRow>
+              <InspectorFieldRow label="Divider">
+                <InspectorSwitch checked={carouselSettings.divider === true} onChange={(checked: boolean) => updateCarousel({ divider: checked })} label="Show dividers" />
+              </InspectorFieldRow>
+              <InspectorFieldRow label="Center">
+                <InspectorSwitch checked={carouselSettings.centered === true} onChange={(checked: boolean) => updateCarousel({ centered: checked })} label="Center the active slide" />
+              </InspectorFieldRow>
+              {([
+                ["cardsPerViewPhone", "Phone Portrait", "1"],
+                ["cardsPerViewSmall", "Phone Landscape", ""],
+                ["cardsPerViewMedium", "Tablet Landscape", "3"],
+                ["cardsPerViewLarge", "Desktop", ""],
+              ] as const).map(([key, label, fallback]) => (
+                <InspectorFieldRow key={key} label={label}>
+                  <InspectorSelect
+                    value={String((carouselSettings as any)[key] ?? fallback)}
+                    onChange={(value: string) => updateCarousel({ [key]: value === "" ? undefined : Number(value) })}
+                    options={[{ value: "", label: "Inherit" }, ...[1, 2, 3, 4, 5, 6].map((value) => ({ value: String(value), label: `${value} column${value === 1 ? "" : "s"}` }))]}
+                  />
+                </InspectorFieldRow>
+              ))}
             </>
           ) : (
             <InspectorFieldRow label="Variant / Layout">
@@ -537,6 +610,18 @@ export default function SliderCapabilityPanel({
               onChange={(checked: boolean) => updateCarousel({ autoplay: checked })}
               label="Autoplay slides"
             />
+          </InspectorFieldRow>
+
+          <InspectorFieldRow label="Autoplay interval">
+            <InspectorSelect
+              value={String(carouselSettings.autoplayDelayMs ?? 5000)}
+              onChange={(value: string) => updateCarousel({ autoplayDelayMs: Number(value) })}
+              options={[5, 7, 10, 15].map((seconds) => ({ value: String(seconds * 1000), label: `${seconds} seconds` }))}
+            />
+          </InspectorFieldRow>
+
+          <InspectorFieldRow label="Pause autoplay on hover">
+            <InspectorSwitch checked={carouselSettings.pauseOnHover !== false} onChange={(checked: boolean) => updateCarousel({ pauseOnHover: checked })} label="Pause on hover" />
           </InspectorFieldRow>
 
           <InspectorFieldRow label="Loop Continuously">
@@ -563,6 +648,70 @@ export default function SliderCapabilityPanel({
             />
           </InspectorFieldRow>
         </InspectorDivision>
+
+        {isSlideshow && (
+          <InspectorDivision title="HEIGHT">
+            <InspectorFieldRow label="Height">
+              <InspectorSelect
+                value={carouselSettings.slideshowHeight === "viewport" ? "viewport" : "auto"}
+                onChange={(value: string) => updateCarousel({ slideshowHeight: value })}
+                options={[{ value: "auto", label: "Auto" }, { value: "viewport", label: "Viewport" }]}
+              />
+            </InspectorFieldRow>
+            <InspectorFieldRow label="Ratio">
+              <InspectorTextField value={carouselSettings.slideshowRatio ?? carouselSettings.aspectRatio ?? ""} onChange={(value: string) => updateCarousel({ slideshowRatio: value || undefined, aspectRatio: value || undefined })} placeholder="16:9" />
+            </InspectorFieldRow>
+          </InspectorDivision>
+        )}
+
+        {isSlideshow && (
+          <InspectorDivision title="TRANSITION">
+            <InspectorFieldRow label="Transition">
+              <InspectorSelect
+                value={carouselSettings.effect ?? "slide"}
+                onChange={(value: string) => updateCarousel({ effect: value })}
+                options={[{ value: "slide", label: "Slide" }, { value: "fade", label: "Fade" }]}
+              />
+            </InspectorFieldRow>
+          </InspectorDivision>
+        )}
+
+        {isOverlaySlider && (
+          <InspectorDivision title="OVERLAY">
+            <InspectorFieldRow label="Mode">
+              <InspectorSelect
+                value={carouselSettings.overlayMode ?? "cover"}
+                onChange={(value: string) => updateCarousel({ overlayMode: value })}
+                options={[{ value: "cover", label: "Cover" }, { value: "caption", label: "Caption" }]}
+              />
+            </InspectorFieldRow>
+            <InspectorFieldRow label="Display">
+              <InspectorSelect
+                value={carouselSettings.overlayDisplay ?? "always"}
+                onChange={(value: string) => updateCarousel({ overlayDisplay: value })}
+                options={[{ value: "always", label: "Always" }, { value: "hover", label: "Hover" }, { value: "active", label: "Active" }]}
+              />
+            </InspectorFieldRow>
+            <InspectorFieldRow label="Position">
+              <InspectorSelect
+                value={carouselSettings.overlayPosition ?? "center"}
+                onChange={(value: string) => updateCarousel({ overlayPosition: value })}
+                options={[
+                  { value: "top-left", label: "Top left" }, { value: "top-right", label: "Top right" },
+                  { value: "bottom-left", label: "Bottom left" }, { value: "bottom-center", label: "Bottom center" },
+                  { value: "bottom-right", label: "Bottom right" }, { value: "center", label: "Center" },
+                ]}
+              />
+            </InspectorFieldRow>
+            <InspectorFieldRow label="Padding">
+              <InspectorSelect
+                value={carouselSettings.overlayPadding ?? "default"}
+                onChange={(value: string) => updateCarousel({ overlayPadding: value })}
+                options={[{ value: "default", label: "Default" }, { value: "small", label: "Small" }, { value: "large", label: "Large" }, { value: "none", label: "None" }]}
+              />
+            </InspectorFieldRow>
+          </InspectorDivision>
+        )}
 
         <InspectorDivision title="NAVIGATION PRESENTATION">
           <InspectorFieldRow

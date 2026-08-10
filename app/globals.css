@@ -1792,7 +1792,7 @@ a {
 .shop-builder-main .uk-h6 { font-size: 0.875rem; line-height: 1.4; }
 .shop-builder-main .uk-article-title { font-size: 2.6rem; line-height: 1.2; }
 
-.shop-builder-main .uk-heading-small { font-size: var(--uk-heading-small-font-size, 2.6rem); line-height: var(--uk-base-line-height, 1.2); font-weight: var(--uk-heading-small-font-weight, var(--uk-heading-font-weight, 700)); }
+.shop-builder-main .uk-heading-small { font-size: var(--uk-heading-small-font-size, 2.6rem); line-height: var(--uk-heading-small-line-height, var(--uk-heading-medium-line-height, 1.2)); font-weight: var(--uk-heading-small-font-weight, var(--uk-heading-font-weight, 700)); }
 .shop-builder-main .uk-heading-medium { font-size: var(--uk-heading-medium-font-size, 2.8875rem); line-height: var(--uk-heading-medium-line-height, var(--uk-base-line-height, 1.1)); font-weight: var(--uk-heading-medium-font-weight, var(--uk-heading-font-weight, 700)); }
 .shop-builder-main .uk-heading-large { font-size: var(--uk-heading-large-font-size, 3.4rem); line-height: var(--uk-base-line-height, 1.1); }
 .shop-builder-main .uk-heading-xlarge { font-size: var(--uk-heading-xlarge-font-size, 4rem); line-height: var(--uk-base-line-height, 1); }
@@ -1885,7 +1885,7 @@ a {
 .shop-builder-main .uk-card {
   position: relative;
   box-sizing: border-box;
-  transition: box-shadow var(--uk-card-transition-duration, 0.1s) ease-in-out, background-color var(--uk-card-transition-duration, 0.1s) ease-in-out, color var(--uk-card-transition-duration, 0.1s) ease-in-out;
+  transition: box-shadow var(--uk-card-transition-duration, 0.1s) ease-in-out, background var(--uk-card-transition-duration, 0.1s) ease-in-out, color var(--uk-card-transition-duration, 0.1s) ease-in-out;
   border-radius: var(--uk-card-border-radius, 0);
   border-width: var(--uk-card-border-width, 1px);
   border-style: solid;
@@ -1938,6 +1938,24 @@ a {
 .shop-builder-main .uk-margin-large { margin-bottom: 70px; }
 .shop-builder-main .uk-margin-remove-top { margin-top: 0; }
 .shop-builder-main .uk-margin-remove-bottom { margin-bottom: 0; }
+
+/*
+ * Imported YOOtheme spacing belongs to the General element shell. Legacy
+ * imported documents can still carry the old `margin` compatibility field
+ * on their component root; suppress only those root margin utilities so the
+ * shell is the single source of vertical flow spacing. Native WebPages
+ * elements deliberately do not receive this marker and keep their current
+ * padding/margin behavior.
+ */
+.shop-builder-element-shell.yootheme-imported-spacing > .shop-builder-column-block.uk-margin,
+.shop-builder-element-shell.yootheme-imported-spacing > .shop-builder-column-block.uk-margin-small,
+.shop-builder-element-shell.yootheme-imported-spacing > .shop-builder-column-block.uk-margin-medium,
+.shop-builder-element-shell.yootheme-imported-spacing > .shop-builder-column-block.uk-margin-large,
+.shop-builder-element-shell.yootheme-imported-spacing > .shop-builder-column-block.uk-margin-xlarge,
+.shop-builder-element-shell.yootheme-imported-spacing > .shop-builder-column-block.uk-margin-remove {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
 
 /* --- UIkit Flex --- */
 .shop-builder-main .uk-flex { display: flex; }

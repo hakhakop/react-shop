@@ -3,7 +3,7 @@
 import React from "react";
 import type { BuilderLayoutBlock } from "@/components/dashboard/builderTypes";
 import type { BuilderShellSettings } from "@/lib/builderShell";
-import { resolveAppearanceValue } from "@/lib/globalStyleTokens";
+import { resolveCarouselPresentation } from "@/lib/carouselPresentation";
 import CarouselBlock, { type CarouselSlide } from "@/components/blocks/CarouselBlock";
 import BuilderLineBreakText from "@/components/builder/BuilderLineBreakText";
 import { Typog } from "@/components/builder/BuilderRenderHelpers";
@@ -39,44 +39,13 @@ const DEFAULT_SLIDES: CarouselSlide[] = [
 export default function UikitSlider({ block, panelMode = false, shellSettings }: Props) {
   const rawBlock = (block ?? {}) as any;
   const rawCarouselSettings = rawBlock.carouselSettings ?? {};
-  const resolveString = (
-    local: unknown,
-    global: string | undefined,
-    componentDefault: string,
-  ) =>
-    resolveAppearanceValue({
-      local: typeof local === "string" ? local : undefined,
-      global,
-      componentDefault,
-    }).value;
-  const resolvedCarouselSettings = {
-    ...rawCarouselSettings,
-    arrowStyle: resolveString(
-      rawCarouselSettings.arrowStyle,
-      panelMode ? undefined : shellSettings?.sliderArrowStyle,
-      "chevron",
-    ),
-    arrowPosition: resolveString(
-      rawCarouselSettings.arrowPosition,
-      panelMode ? undefined : shellSettings?.sliderArrowPosition,
-      "overlay",
-    ),
-    paginationStyle: resolveString(
-      rawCarouselSettings.paginationStyle,
-      panelMode ? undefined : shellSettings?.sliderDotnavStyle,
-      "minimal-dots",
-    ),
-    paginationPosition: resolveString(
-      rawCarouselSettings.paginationPosition,
-      panelMode ? undefined : shellSettings?.sliderDotnavPosition,
-      "bottom",
-    ),
-  };
 
   const panelShared = panelMode
     ? {
-        panelStyle: rawCarouselSettings.panelStyle ?? "default",
-        panelSize: rawCarouselSettings.panelSize ?? "default",
+        // Panel Slider has no implicit Card surface. An authored Panel/Card
+        // style remains explicit; otherwise its items are plain UIkit panels.
+        panelStyle: rawCarouselSettings.panelStyle ?? "blank",
+        panelSize: rawCarouselSettings.panelSize ?? "none",
         panelHover: rawCarouselSettings.panelHover ?? false,
         linkPanel: rawCarouselSettings.linkPanel ?? false,
         imageWidth: rawCarouselSettings.imageWidth,
@@ -92,7 +61,11 @@ export default function UikitSlider({ block, panelMode = false, shellSettings }:
       }
     : null;
 
-  const sourceSlides: CarouselSlide[] = rawBlock.slides?.length
+  // An explicit empty collection is meaningful after a static YOOtheme import:
+  // it must remain empty rather than being replaced by local demonstration
+  // slides in Builder only. Keep the fallback solely for legacy blocks that
+  // never stored a slide collection at all.
+  const sourceSlides: CarouselSlide[] = Array.isArray(rawBlock.slides)
     ? rawBlock.slides
     : DEFAULT_SLIDES;
   const slides: CarouselSlide[] = sourceSlides.map((slide: any, index: number) => ({
@@ -114,32 +87,12 @@ export default function UikitSlider({ block, panelMode = false, shellSettings }:
         linkPanel: slide.linkPanel ?? panelShared?.linkPanel,
         imageWidth: slide.imageWidth ?? panelShared?.imageWidth,
         imageHeight: slide.imageHeight ?? panelShared?.imageHeight,
-        imageRatio: panelMode
-          ? slide.imageRatio ?? panelShared?.imageRatio
-          : resolveString(slide.imageRatio, shellSettings?.imageDefaultRatio, "natural"),
-        imageFit: panelMode
-          ? slide.imageFit ?? panelShared?.imageFit
-          : resolveString(slide.imageFit, shellSettings?.imageDefaultFit, "natural"),
-        imageShape: panelMode
-          ? slide.imageShape ?? panelShared?.imageShape
-          : resolveString(
-              typeof slide.imageShape === "string"
-                ? slide.imageShape
-                : ["rounded", "circle", "pill"].includes(slide.imageBorder)
-                  ? slide.imageBorder
-                  : undefined,
-              shellSettings?.imageDefaultBorder,
-              "none",
-            ),
-        imageShadow: panelMode
-          ? slide.imageShadow ?? panelShared?.imageShadow
-          : resolveString(slide.imageShadow, shellSettings?.imageDefaultShadow, "none"),
-        imageAlignment: panelMode
-          ? slide.imageAlignment ?? panelShared?.imageAlignment
-          : resolveString(slide.imageAlignment, shellSettings?.imageDefaultAlignment, "center"),
-        imageLoading: panelMode
-          ? slide.imageLoading ?? panelShared?.imageLoading
-          : resolveString(slide.imageLoading, shellSettings?.imageDefaultLoading, "lazy"),
+        imageRatio: panelMode ? slide.imageRatio ?? panelShared?.imageRatio : slide.imageRatio,
+        imageFit: panelMode ? slide.imageFit ?? panelShared?.imageFit : slide.imageFit,
+        imageShape: panelMode ? slide.imageShape ?? panelShared?.imageShape : slide.imageShape,
+        imageShadow: panelMode ? slide.imageShadow ?? panelShared?.imageShadow : slide.imageShadow,
+        imageAlignment: panelMode ? slide.imageAlignment ?? panelShared?.imageAlignment : slide.imageAlignment,
+        imageLoading: panelMode ? slide.imageLoading ?? panelShared?.imageLoading : slide.imageLoading,
         imageBoxDecoration: slide.imageBoxDecoration ?? panelShared?.imageBoxDecoration,
         alignImageWithoutPadding: slide.alignImageWithoutPadding ?? panelShared?.alignImageWithoutPadding,
         buttonLabel: slide.buttonLabel || "",
@@ -147,6 +100,7 @@ export default function UikitSlider({ block, panelMode = false, shellSettings }:
         buttonTarget: slide.buttonTarget || "_self",
       }));
 
+  const carousel = resolveCarouselPresentation(rawCarouselSettings, slides, shellSettings) as { settings: any; slides: CarouselSlide[] };
   const marginClass = rawBlock.margin && rawBlock.margin !== "none" ? `uk-margin-${rawBlock.margin}` : "";
   const animationClass = rawBlock.animation && rawBlock.animation !== "none" ? `uk-animation-${rawBlock.animation}` : "";
   const visibilityClass = rawBlock.visibility && rawBlock.visibility !== "always" ? `uk-${rawBlock.visibility}` : "";
@@ -171,11 +125,11 @@ export default function UikitSlider({ block, panelMode = false, shellSettings }:
           __typename: "PageBuilderLayoutPageBuilderCarouselLayoutLayout",
           fieldGroupName: "ReactBuilderColumnSlider",
         }}
-        slides={slides}
+        slides={carousel.slides}
         settings={
           panelMode
             ? {
-                ...resolvedCarouselSettings,
+                ...carousel.settings,
                 headingLevel: rawBlock.headingLevel,
                 headingSize: rawBlock.headingSize,
                 titleTypographyRole: rawBlock.titleTypographyRole,
@@ -191,7 +145,7 @@ export default function UikitSlider({ block, panelMode = false, shellSettings }:
                 effect: rawCarouselSettings.effect ?? "slide",
                 slideMode: "panel",
               }
-            : resolvedCarouselSettings
+            : carousel.settings
         }
       />
     </div>

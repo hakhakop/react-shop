@@ -44,6 +44,8 @@ export const YOOTHEME_LESS_CAPABILITIES: Record<string, YoothemeCapability> = {
   "card-default-background": { owner: "shellSettings.cardBackground", status: "mapped-rendered", ui: "Global Styles › Card › Variants" },
   "card-primary-background": { owner: "shellSettings.cardPrimaryBackground", status: "mapped-rendered", ui: "Global Styles › Card › Variants" },
   "card-secondary-background": { owner: "shellSettings.cardSecondaryBackground", status: "mapped-rendered", ui: "Global Styles › Card › Variants" },
+  "internal-card-primary-gradient": { owner: "shellSettings.cardPrimaryBackground", status: "mapped-rendered", ui: "Global Styles › Card › Primary › Background" },
+  "internal-card-secondary-gradient": { owner: "shellSettings.cardSecondaryBackground", status: "mapped-rendered", ui: "Global Styles › Card › Secondary › Background" },
   "breakpoint-small": { owner: "unsupported: fixed responsive tier", status: "unsupported", ui: "Global Styles › Breakpoints (read-only compatibility note)" },
   "breakpoint-medium": { owner: "unsupported: fixed responsive tier", status: "unsupported", ui: "Global Styles › Breakpoints (read-only compatibility note)" },
   "breakpoint-large": { owner: "unsupported: fixed responsive tier", status: "unsupported", ui: "Global Styles › Breakpoints (read-only compatibility note)" },
@@ -119,7 +121,7 @@ export function normalizeYoothemeSection(props: Record<string, unknown>): Partia
   };
 }
 
-export function normalizeYoothemeMedia(props: Record<string, unknown>): Partial<Pick<BuilderLayoutBlock, "imageFit" | "imageRatio" | "imageAlignment" | "imagePosition" | "imageLoading" | "imageWidth" | "imageHeight">> {
+export function normalizeYoothemeMedia(props: Record<string, unknown>): Partial<Pick<BuilderLayoutBlock, "imageFit" | "imageRatio" | "imageAlignment" | "imagePosition" | "imageLoading" | "imageWidth" | "imageHeight" | "imageSvgInline" | "imageSvgColor">> {
   const width = string(props.image_width);
   const height = string(props.image_height);
   const ratio = string(props.image_ratio);
@@ -133,6 +135,8 @@ export function normalizeYoothemeMedia(props: Record<string, unknown>): Partial<
     ...(ratio === "auto" || ratio === "square" || ratio === "4:5" || ratio === "3:4" || ratio === "16:9" ? { imageRatio: ratio } : {}),
     ...(alignment === "left" || alignment === "center" || alignment === "right" ? { imageAlignment: alignment } : {}),
     ...(position === "top-left" || position === "top-center" || position === "top-right" || position === "center-left" || position === "center" || position === "center-right" || position === "bottom-left" || position === "bottom-center" || position === "bottom-right" ? { imagePosition: position } : {}),
+    ...(props.image_svg_inline === true || props.image_svg_inline === "true" || props.image_svg_inline === "1" ? { imageSvgInline: true } : {}),
+    ...(string(props.image_svg_color) ? { imageSvgColor: string(props.image_svg_color) } : {}),
     ...(props.image_loading === true || props.image_loading === "eager" ? { imageLoading: "eager" } : props.image_loading === false || props.image_loading === "lazy" ? { imageLoading: "lazy" } : {}),
   };
 }

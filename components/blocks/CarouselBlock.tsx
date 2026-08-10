@@ -97,6 +97,8 @@ export type CarouselSlide = {
 export type CarouselSettings = {
   variant?: string | string[];
   slideMode?: "auto" | "image-only" | "hero" | "card" | string | null;
+  /** Canonical public element adapter; the renderer remains shared. */
+  presentation?: "slideshow" | "overlay-slider" | "panel-slider";
   loop?: boolean;
   autoplay?: boolean;
   autoplayDelayMs?: number | string;
@@ -114,6 +116,13 @@ export type CarouselSettings = {
   fadeCrossFade?: boolean | "true" | "false" | 1 | 0 | null;
   freeModeMomentum?: boolean | "true" | "false" | 1 | 0 | null;
   cardsPerView?: number | null;
+  /** Responsive visible-item contract imported from YOOtheme Slider widths. */
+  cardsPerViewPhone?: number | null;
+  cardsPerViewSmall?: number | null;
+  cardsPerViewMedium?: number | null;
+  cardsPerViewLarge?: number | null;
+  centered?: boolean | "true" | "false" | 1 | 0 | null;
+  divider?: boolean | "true" | "false" | 1 | 0 | null;
   showArrows?: boolean | "true" | "false" | 1 | 0 | null;
   showDots?: boolean | "true" | "false" | 1 | 0 | null;
   pauseOnHover?: boolean | "true" | "false" | 1 | 0 | null;
@@ -126,6 +135,19 @@ export type CarouselSettings = {
   overlayPosition?: "bottom-left" | "bottom-center" | "bottom-right" | "center" | "top-left" | "top-right" | string | null;
   overlayColor?: "dark" | "light" | "glass-dark" | "glass-light" | "brand" | string | null;
   overlayTextColor?: "auto" | "light" | "dark" | "brand" | string | null;
+  overlayMode?: "cover" | "caption";
+  overlayDisplay?: "always" | "hover" | "active";
+  overlayPadding?: string | null;
+  /** Visibility belongs to the YOOtheme carousel element, not individual slides. */
+  showTitle?: boolean | "true" | "false" | 1 | 0 | null;
+  showMeta?: boolean | "true" | "false" | 1 | 0 | null;
+  showContent?: boolean | "true" | "false" | 1 | 0 | null;
+  showLink?: boolean | "true" | "false" | 1 | 0 | null;
+  overlayLink?: boolean;
+  itemWidthMode?: "fixed" | "auto";
+  slideshowHeight?: "auto" | "viewport" | "section";
+  slideshowMinHeight?: number | string | null;
+  slideshowRatio?: string | null;
   kenBurns?: boolean | "true" | "false" | 1 | 0 | null;
   headingLevel?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | string | null;
   headingSize?: string | null;
@@ -207,7 +229,10 @@ export default function CarouselBlock({
   const swiperVariant =
     normalizedVariant === "swiper-showcase" ? "showcase" : normalizedVariant;
 
-  const rawCardsPerView = settings?.cardsPerView ?? 1;
+  const rawCardsPerView =
+    settings?.presentation === "overlay-slider" && settings?.cardsPerView === undefined
+      ? settings.cardsPerViewMedium ?? 1
+      : settings?.cardsPerView ?? 1;
   const cardsPerView = Math.min(Math.max(Number(rawCardsPerView) || 1, 1), 6);
 
   const rawDelay = Number(settings?.autoplayDelayMs ?? 5000);
@@ -229,6 +254,13 @@ export default function CarouselBlock({
     min: number,
     max: number
   ) => Math.min(Math.max(Number(value ?? fallback) || fallback, min), max);
+
+  const responsiveCardsPerView = {
+    phone: numberSetting(settings?.cardsPerViewPhone, 1, 1, 6),
+    small: numberSetting(settings?.cardsPerViewSmall, Math.min(cardsPerView, 2), 1, 6),
+    medium: numberSetting(settings?.cardsPerViewMedium, cardsPerView, 1, 6),
+    large: numberSetting(settings?.cardsPerViewLarge, cardsPerView, 1, 6),
+  };
 
   const booleanSetting = (
     value: boolean | "true" | "false" | 1 | 0 | null | undefined,
@@ -296,7 +328,15 @@ export default function CarouselBlock({
   const overlayPosition = settings?.overlayPosition ?? "bottom-left";
   const overlayColor = settings?.overlayColor ?? "dark";
   const overlayTextColor = settings?.overlayTextColor ?? "auto";
+  const overlayMode = settings?.overlayMode ?? "cover";
+  const overlayDisplay = settings?.overlayDisplay ?? "always";
+  const overlayPadding = settings?.overlayPadding ?? "default";
+  const slideshowHeight = settings?.slideshowHeight ?? "auto";
   const isKenBurns = booleanSetting(settings?.kenBurns, false);
+  const showTitle = booleanSetting(settings?.showTitle, true);
+  const showMeta = booleanSetting(settings?.showMeta, true);
+  const showContent = booleanSetting(settings?.showContent, true);
+  const showLink = booleanSetting(settings?.showLink, true);
   // arrowStyle="hidden" or showArrows===false both suppress arrows
   const showArrows =
     arrowStyle !== "hidden" && booleanSetting(settings?.showArrows, true);
@@ -346,10 +386,21 @@ export default function CarouselBlock({
         showArrows ? `shop-builder-arrow-pos--${arrowPosition}` : "",
         `shop-builder-pag--${paginationStyle}`,
         `shop-builder-pag-pos--${paginationPosition}`,
+        showDots ? "shop-builder-swiper--has-pagination" : "",
+        settings?.presentation === "slideshow" && slideshowHeight === "viewport"
+          ? `shop-builder-slideshow-height--${slideshowHeight}`
+          : "",
+        settings?.presentation === "overlay-slider" ? `shop-builder-overlay-mode--${overlayMode}` : "",
+        settings?.presentation === "overlay-slider" ? `shop-builder-overlay-display--${overlayDisplay}` : "",
+        settings?.presentation === "overlay-slider" ? `shop-builder-overlay-padding--${overlayPadding}` : "",
+        booleanSetting(settings?.divider, false) ? "shop-builder-slider--divided" : "",
         aspectRatioClass,
         is3DEffect ? "shop-builder-swiper--3d" : "",
         className ?? "",
       ].filter(Boolean).join(" ")}
+      style={settings?.presentation === "slideshow" && toCssDimension(settings.slideshowMinHeight)
+        ? { "--shop-builder-slideshow-min-height": toCssDimension(settings.slideshowMinHeight) } as React.CSSProperties
+        : undefined}
     >
       <Swiper
         key={swiperKey}
@@ -367,11 +418,12 @@ export default function CarouselBlock({
         ]}
         observer={true}
         observeParents={true}
+        breakpointsBase="container"
         slidesPerView={swiperSlidesPerView}
         spaceBetween={spaceBetween}
         effect={swiperEffect}
         speed={transitionSpeedMs}
-        centeredSlides={swiperVariant === "coverflow" || swiperVariant === "showcase" || isMarquee}
+        centeredSlides={booleanSetting(settings?.centered, swiperVariant === "coverflow" || swiperVariant === "showcase" || isMarquee)}
         thumbs={
           swiperVariant === "thumbs" && thumbsSwiper && !thumbsSwiper.destroyed
             ? { swiper: thumbsSwiper }
@@ -434,17 +486,18 @@ export default function CarouselBlock({
           !is3DEffect && !isHeroOrFadeMode && !isMarquee
             ? {
                 320: {
-                  slidesPerView: 1,
+                  slidesPerView: responsiveCardsPerView.phone,
                   spaceBetween: 12,
                 },
                 640: {
-                  slidesPerView: Math.min(cardsPerView, 2),
+                  slidesPerView: responsiveCardsPerView.small,
                   spaceBetween: Math.min(spaceBetween, 16),
                 },
                 1024: {
-                  slidesPerView: cardsPerView,
+                  slidesPerView: responsiveCardsPerView.medium,
                   spaceBetween,
                 },
+                1280: { slidesPerView: responsiveCardsPerView.large, spaceBetween },
               }
             : undefined
         }
@@ -453,7 +506,8 @@ export default function CarouselBlock({
         {slides.map((slide, idx) => {
           const hasRealImage = Boolean(slide.imageUrl && slide.imageUrl.trim());
           const hasTextContent = Boolean(
-            slide.title?.trim() || slide.subtitle?.trim() || slide.text?.trim() || slide.buttonLabel?.trim()
+            (showTitle && slide.title?.trim()) || (showMeta && slide.subtitle?.trim()) ||
+            (showContent && slide.text?.trim()) || (showLink && slide.buttonLabel?.trim())
           );
 
           // Decide effective slide mode
@@ -477,10 +531,13 @@ export default function CarouselBlock({
               : "card";
 
           if (effectiveMode === "panel") {
-            const panelClass = getUikitCardClass(slide.panelStyle ?? "default", {
+            const panelClass = getUikitCardClass(
+              slide.panelStyle ?? (settings?.presentation === "panel-slider" ? "blank" : "default"),
+              {
               hover: slide.panelHover ? "hover" : "none",
-              padding: slide.panelSize ?? "default",
-            });
+              padding: slide.panelSize ?? "none",
+              },
+            );
             const itemImage = resolveUikitImageSemantics({
               imageFit: slide.imageFit ?? undefined,
               imageRatio: slide.imageRatio ?? undefined,
@@ -539,7 +596,7 @@ export default function CarouselBlock({
             const MetaElement = (slide.metaHtmlElement ?? "div") as React.ElementType;
 
             const renderMeta = () =>
-              itemMeta ? (
+              showMeta && itemMeta ? (
                 <MetaElement
                   className={`${itemMetaClass} ${typographyRoleClass(itemMetaRole)} ${metaColorClass}`.trim()}
                 >
@@ -548,9 +605,9 @@ export default function CarouselBlock({
               ) : null;
 
             const renderTitle = () =>
-              slide.title ? (
+              showTitle && slide.title ? (
                 <ItemTitle
-                  className={`${itemTitleClass} ${typographyRoleClass(itemTitleRole)} ${titleColorClass} ${titleDecorationClass}`.trim()}
+                  className={`shop-builder-panel-slider-title ${itemTitleClass} ${typographyRoleClass(itemTitleRole)} ${titleColorClass} ${titleDecorationClass}`.trim()}
                 >
                   {slide.linkPanel ? (
                     <a href={panelLinkUrl} {...panelLinkProps}>{slide.title}</a>
@@ -627,13 +684,13 @@ export default function CarouselBlock({
                     {metaPosition === "above-title" && renderMeta()}
                     {renderTitle()}
                     {metaPosition !== "above-title" && metaPosition !== "below-content" && renderMeta()}
-                    {slide.text && (
+                    {showContent && slide.text && (
                       <div className={`${itemContentClass} ${typographyRoleClass(itemContentRole)}`.trim()}>
                         {slide.text}
                       </div>
                     )}
                     {metaPosition === "below-content" && renderMeta()}
-                    {hasAction && (
+                    {showLink && hasAction && (
                       <a
                         href={panelLinkUrl}
                         className={`${itemButtonClass} shop-builder-panel-slider-action ${slide.fullWidthButton ? "uk-width-1-1" : ""}`.trim()}
@@ -682,10 +739,10 @@ export default function CarouselBlock({
                       {overlayGradient !== "none" && (
                         <div className={`shop-builder-media-overlay shop-builder-media-overlay--${overlayGradient}`} />
                       )}
-                      {(slide.title || slide.badge) && (
+                      {((showTitle && slide.title) || slide.badge) && (
                         <div className="absolute bottom-4 left-4 z-10 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-black/60 backdrop-blur-md text-white text-xs font-semibold">
                           {slide.badge && <span className="opacity-75">{slide.badge}</span>}
-                          {slide.title && (
+                          {showTitle && slide.title && (
                             <SlideTitle className={`${titleClass} ${typographyRoleClass(titleRole)}`.trim()}>
                               {slide.title}
                             </SlideTitle>
@@ -718,8 +775,12 @@ export default function CarouselBlock({
                 ? "absolute bottom-4 left-4 right-4 md:left-1/2 md:-translate-x-1/2 md:max-w-md items-center text-center"
                 : overlayPosition === "bottom-right"
                 ? "absolute bottom-4 left-4 right-4 md:left-auto md:right-4 md:max-w-md items-end text-right"
-                : overlayPosition === "center"
+              : overlayPosition === "center"
                 ? "absolute top-1/2 -translate-y-1/2 left-4 right-4 md:left-1/2 md:-translate-x-1/2 md:max-w-md items-center text-center"
+                : overlayPosition === "center-left"
+                ? "absolute top-1/2 -translate-y-1/2 left-4 right-4 md:right-auto md:max-w-md items-start text-left"
+                : overlayPosition === "center-right"
+                ? "absolute top-1/2 -translate-y-1/2 left-4 right-4 md:left-auto md:max-w-md items-end text-right"
                 : overlayPosition === "top-left"
                 ? "absolute top-4 left-4 right-4 md:right-auto md:max-w-md items-start text-left"
                 : overlayPosition === "top-right"
@@ -776,7 +837,7 @@ export default function CarouselBlock({
 
             return (
               <SwiperSlide key={slide.id || idx}>
-                <article className={`shop-builder-overlay-slide-card group relative w-full ${settings?.aspectRatio ? "" : "min-h-[240px] md:min-h-[320px]"} overflow-hidden rounded-2xl`}>
+                <article className={`shop-builder-overlay-slide-card group relative w-full ${settings?.aspectRatio ? "" : "shop-builder-overlay-slide-card--natural"} overflow-hidden rounded-2xl`}>
                   {hasRealImage ? (
                     <>
                       <Image
@@ -815,23 +876,23 @@ export default function CarouselBlock({
                   )}
 
                   {/* Dynamic Color-Aware & Positioned Text Overlay */}
-                  <div className={`z-10 flex flex-col gap-2.5 ${posClass} ${backdropClass}`}>
+                  <div className={`shop-builder-overlay-slide-content z-10 flex flex-col gap-2.5 ${posClass} ${backdropClass}`}>
                     {slide.badge && (
                       <span className={textColors.badge}>
                         {slide.badge}
                       </span>
                     )}
-                    {slide.title && (
+                    {showTitle && slide.title && (
                       <SlideTitle className={`${titleClass} ${typographyRoleClass(titleRole)} ${textColors.title}`.trim()}>
                         {slide.title}
                       </SlideTitle>
                     )}
-                    {slide.subtitle && (
+                    {showMeta && slide.subtitle && (
                       <div className={`${metaClass} ${typographyRoleClass(metaRole)} ${textColors.text}`.trim()}>
                         {slide.subtitle}
                       </div>
                     )}
-                    {slide.text && (
+                    {showContent && slide.text && (
                       <div className={`${contentClass} ${typographyRoleClass(contentRole)} text-xs md:text-sm line-clamp-3 ${textColors.text}`.trim()}>
                         {slide.text}
                       </div>
@@ -841,7 +902,7 @@ export default function CarouselBlock({
                         {slide.price}
                       </div>
                     )}
-                    {slide.buttonLabel && slide.buttonUrl && (
+                    {showLink && slide.buttonLabel && slide.buttonUrl && (
                       <a
                         href={slide.buttonUrl}
                         className={buttonClass}
@@ -904,19 +965,19 @@ export default function CarouselBlock({
                       </span>
                     )}
 
-                    {slide.title && (
+                    {showTitle && slide.title && (
                       <SlideTitle className={`${titleClass} ${typographyRoleClass(titleRole)} shop-builder-swiper-title`.trim()}>
                         {slide.title}
                       </SlideTitle>
                     )}
 
-                    {slide.subtitle && (
+                    {showMeta && slide.subtitle && (
                       <div className={`${metaClass} ${typographyRoleClass(metaRole)} shop-builder-swiper-text`.trim()}>
                         {slide.subtitle}
                       </div>
                     )}
 
-                    {slide.text && (
+                    {showContent && slide.text && (
                       <div className={`${contentClass} ${typographyRoleClass(contentRole)} shop-builder-swiper-text`.trim()}>
                         {slide.text}
                       </div>
@@ -926,7 +987,7 @@ export default function CarouselBlock({
                       <div className="shop-builder-swiper-price">{slide.price}</div>
                     )}
 
-                    {slide.buttonLabel && slide.buttonUrl && (
+                    {showLink && slide.buttonLabel && slide.buttonUrl && (
                       <a
                         href={slide.buttonUrl}
                         className={buttonClass}
@@ -976,17 +1037,17 @@ export default function CarouselBlock({
                   {slide.badge && (
                     <span className="shop-builder-slide-badge">{slide.badge}</span>
                   )}
-                  {slide.title && (
+                  {showTitle && slide.title && (
                     <SlideTitle className={`${titleClass} ${typographyRoleClass(titleRole)} shop-builder-slide-title`.trim()}>
                       {slide.title}
                     </SlideTitle>
                   )}
-                  {slide.subtitle && (
+                  {showMeta && slide.subtitle && (
                     <div className={`${metaClass} ${typographyRoleClass(metaRole)} shop-builder-slide-text`.trim()}>
                       {slide.subtitle}
                     </div>
                   )}
-                  {slide.text && (
+                  {showContent && slide.text && (
                     <div className={`${contentClass} ${typographyRoleClass(contentRole)} shop-builder-slide-text`.trim()}>
                       {slide.text}
                     </div>
@@ -994,7 +1055,7 @@ export default function CarouselBlock({
                   {slide.price && (
                     <div className="shop-builder-slide-price">{slide.price}</div>
                   )}
-                  {slide.buttonLabel && slide.buttonUrl && (
+                  {showLink && slide.buttonLabel && slide.buttonUrl && (
                     <a
                       href={slide.buttonUrl}
                       className={buttonClass}

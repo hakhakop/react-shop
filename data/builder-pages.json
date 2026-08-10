@@ -76,5 +76,11 @@
     "title": "Devstack Pricing",
     "slug": "devstack-pricing",
     "updatedAt": "2026-08-09T16:49:22.522Z"
+  },
+  {
+    "key": "page:enterprise",
+    "title": "Enterprise",
+    "slug": "enterprise",
+    "updatedAt": "2026-08-10T14:23:05.683Z"
   }
 ]

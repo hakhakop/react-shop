@@ -1,5 +1,8 @@
 import { expect, test, type Page } from "@playwright/test";
 import { mapYoothemeStaticContent } from "@/lib/yoothemePageImport";
+import { resolveBuilderMediaUrls, resolveWordPressMediaHtml, resolveWordPressMediaUrl } from "@/lib/builderMediaUrls";
+import { resolvePanelColorSemantics } from "@/lib/panelPresentation";
+import { resolveCanonicalGridAction } from "@/lib/builderActions";
 
 const email = "header-parity-20260722@example.test";
 const password = "HeaderParity!2026";
@@ -122,6 +125,69 @@ test("Grid item content normalizes rich HTML, tags, and explicit Card style", ()
   });
   expect(platform.title).toBe("Platform <em>Pro</em>");
   expect(automation.cardVariant).toBeUndefined();
+});
+
+test("colored Panel/Card roles use global inverse semantics while local colors remain explicit", () => {
+  expect(resolvePanelColorSemantics({ panelVariant: "primary" })).toMatchObject({
+    className: expect.stringContaining("shop-builder-card--inverse"),
+    style: {
+      "--builder-card-title-color": expect.stringContaining("--uk-card-primary-title"),
+      "--builder-card-content-color": expect.stringContaining("--uk-card-primary-text"),
+      "--uk-button-default-text": expect.stringContaining("--uk-card-primary-text"),
+      "--uk-button-default-background": "transparent",
+      "--uk-button-primary-gradient": "none",
+      "--uk-button-primary-background": expect.stringContaining("--uk-card-primary-text"),
+      "--uk-button-primary-text": expect.stringContaining("--uk-global-emphasis-color"),
+    },
+  });
+  expect(resolvePanelColorSemantics({ cardVariant: "secondary", titleColor: "primary" }).style)
+    .not.toHaveProperty("--builder-card-title-color");
+  expect(resolvePanelColorSemantics({ panelVariant: "primary" }).metaStyle)
+    .toEqual({ color: "var(--builder-card-meta-color, inherit)" });
+  expect(resolvePanelColorSemantics({ panelVariant: "primary" }).className)
+    .toContain("shop-builder-card--inverse-meta");
+  expect(resolvePanelColorSemantics({ panelVariant: "primary", metaColor: "primary" }).className)
+    .not.toContain("shop-builder-card--inverse-meta");
+  expect(resolvePanelColorSemantics({ panelVariant: "default" }).className).toBe("");
+});
+
+test("item action style overrides the Grid default through the canonical action resolver", () => {
+  const action = resolveCanonicalGridAction({
+    buttonStyle: "default",
+    buttonTarget: "_self",
+  } as any, {
+    id: "item",
+    buttonUrl: "/pricing",
+    buttonLabel: "Select plan",
+    buttonStyle: "secondary",
+    buttonTarget: "_blank",
+  } as any);
+  expect(action).toMatchObject({ style: "secondary", target: "_blank" });
+});
+
+test("WordPress upload URLs resolve once at the shared Builder media boundary", () => {
+  const origin = "https://cms.example.test/";
+  expect(resolveWordPressMediaUrl("/wp-content/uploads/yootheme/hero.jpg", origin))
+    .toBe("https://cms.example.test/wp-content/uploads/yootheme/hero.jpg");
+  expect(resolveWordPressMediaUrl("https://cdn.example.test/hero.jpg", origin))
+    .toBe("https://cdn.example.test/hero.jpg");
+  expect(resolveWordPressMediaUrl("/assets/logo.svg", origin)).toBe("/assets/logo.svg");
+  expect(resolveWordPressMediaHtml('<img src="wp-content/uploads/yootheme/check.svg" width="12">', origin))
+    .toBe('<img src="https://cms.example.test/wp-content/uploads/yootheme/check.svg" width="12">');
+  expect(resolveWordPressMediaHtml('<a href="/pricing"><img src="/assets/icon.svg"></a>', origin))
+    .toBe('<a href="/pricing"><img src="/assets/icon.svg"></a>');
+
+  expect(resolveBuilderMediaUrls({
+    imageUrl: "/wp-content/uploads/yootheme/hero.jpg",
+    gridItems: [{ imageUrl: "/wp-content/uploads/yootheme/card.jpg" }],
+    customAsset: "/assets/logo.svg",
+    text: '<img src="/wp-content/uploads/yootheme/check.svg">',
+  }, origin)).toEqual({
+    imageUrl: "https://cms.example.test/wp-content/uploads/yootheme/hero.jpg",
+    gridItems: [{ imageUrl: "https://cms.example.test/wp-content/uploads/yootheme/card.jpg" }],
+    customAsset: "/assets/logo.svg",
+    text: '<img src="https://cms.example.test/wp-content/uploads/yootheme/check.svg">',
+  });
 });
 
 test("Phase 8 Grid uses one presentation renderer with Builder-only item chrome", async ({ page, context }) => {

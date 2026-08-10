@@ -11,6 +11,7 @@ import {
   getWebsiteRouteSegment,
 } from "@/lib/websites";
 import { ensureWebsiteBuilderData } from "@/lib/websiteBuilderData";
+import { getWordPressBaseUrl } from "@/lib/wordpressUrl";
 import SaaSI18nProvider from "@/components/i18n/SaaSI18nProvider";
 
 export const metadata = {
@@ -88,6 +89,7 @@ export default async function WebsiteBuilderPage({
           saasUserRole={user.role}
           primaryContentLanguage={website.primaryLanguage}
           enabledContentLanguages={website.enabledLanguages}
+          wordpressMediaOrigin={getWordPressBaseUrl(website)}
         />
       </Suspense>
     </div></SaaSI18nProvider>

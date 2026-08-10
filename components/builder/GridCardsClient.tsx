@@ -18,6 +18,7 @@ import { typographyRoleClass } from "@/lib/builderTypography";
 import { builderLinkTargetProps } from "@/lib/websiteBuilderLinks";
 import { resolveCanonicalGridAction } from "@/lib/builderActions";
 import { isRichText, sanitizeHtml } from "@/lib/safeHtml";
+import { resolvePanelColorSemantics } from "@/lib/panelPresentation";
 
 function getUikitMarginClass(val?: string) {
   if (!val || val === "default" || val === "none") return "";
@@ -274,6 +275,13 @@ export function GridCardsClient({
             const isCard = Boolean(panelClass);
             // Explicit false suppresses every Grid-card hover presentation.
             const cardHover = item.cardHover ?? (block.gridCardHover !== undefined ? block.gridCardHover : rawBlock.panelHover) ?? false;
+            const colorSemantics = resolvePanelColorSemantics({
+              ...rawBlock,
+              cardVariant: panelStyle,
+              titleColor: rawBlock.titleColor,
+              metaColor: rawBlock.metaColor,
+              contentColor: rawBlock.contentColor,
+            });
 
             // Title styling & level
             const TitleTag = (rawBlock.gridTitleLevel ?? item.titleElement ?? block.headingLevel ?? "h3") as any;
@@ -343,6 +351,7 @@ export function GridCardsClient({
                   className={`${metaStyleClass} ${metaColorClass} ${metaMarginTopClass} ${typographyRoleClass(block.metaTypographyRole)}`.trim()}
                   area="body"
                   typography={item.typography ?? block.typography}
+                  style={colorSemantics.metaStyle}
                 >
                   {item.meta}
                 </Typog>
@@ -448,12 +457,13 @@ export function GridCardsClient({
             return (
               <article
                 key={item.id}
-                className={`${panelClass} ${cardHover ? "uk-card-hover shop-builder-grid-card--hover-enabled" : "shop-builder-grid-card--hover-disabled"} ${panelLayoutClass} shop-builder-grid-card ${isFrameless ? "is-image-frameless" : "is-image-none"} is-content-${contentPaddingClass} is-frame-${
+                className={`${panelClass} ${colorSemantics.className} ${cardHover ? "uk-card-hover shop-builder-grid-card--hover-enabled" : "shop-builder-grid-card--hover-disabled"} ${panelLayoutClass} shop-builder-grid-card ${isFrameless ? "is-image-frameless" : "is-image-none"} is-content-${contentPaddingClass} is-frame-${
                   block.gridImageFrame ?? "none"
                 } ${builderItemClassName ?? ""}`.trim()}
                 style={
                   {
                     textAlign: item.textAlign ?? rawBlock.textAlignment ?? "left",
+                    ...colorSemantics.style,
                     ...(imagePaddingCustom ? { "--shop-builder-grid-image-padding": imagePaddingCustom } : {}),
                     ...(contentPaddingCustom ? { "--shop-builder-grid-content-padding": contentPaddingCustom } : {}),
                     ...(builderItemStyle ?? {}),

@@ -47,6 +47,7 @@ import Breadcrumbs from "@/components/Breadcrumbs";
 import CarouselBlock, {
   type CarouselSlide,
 } from "@/components/blocks/CarouselBlock";
+import { resolveCarouselPresentation } from "@/lib/carouselPresentation";
 import ScrollPinnedDemo from "@/components/animations/ScrollPinnedDemo";
 import BuilderScrollAnimations from "@/components/builder/BuilderScrollAnimations";
 import PrincityGradientTracker from "@/components/builder/PrincityGradientTracker";
@@ -138,6 +139,7 @@ import {
 } from "@/lib/builderImages";
 import { normalizeSectionTitleBreakpoint, normalizeSectionTitlePosition } from "@/lib/sectionSemantics";
 import { getGeneralElementShellStyle } from "@/lib/builderElementShell";
+import { getGeneralElementShellClassName } from "@/lib/builderElementShell";
 
 export type StorefrontBuilderRendererProps = {
   layout: BuilderLayout;
@@ -369,6 +371,21 @@ function getContextVars(
     "--builder-active-button-text": schemeColors.buttonTextColor,
     "--builder-card-bg": schemeColors.surfaceColor,
     "--builder-card-border": cardBorder,
+    // A semantic dark Section establishes the same inverse action context as
+    // UIkit's `uk-light`: Default remains the light surface, while the
+    // inheriting Secondary/Text action becomes a light outline/link. Local
+    // button colors still win on the action itself.
+    ...(scheme === "dark" ? {
+      "--uk-button-secondary-background": "transparent",
+      "--uk-button-secondary-text": "var(--uk-global-inverse-color, #fff)",
+      "--uk-button-secondary-border": "var(--uk-global-inverse-color, #fff)",
+      "--uk-button-secondary-hover-background": "var(--uk-global-inverse-color, #fff)",
+      "--uk-button-secondary-hover-text": "var(--uk-global-emphasis-color, #111)",
+      "--uk-button-secondary-hover-border": "var(--uk-global-inverse-color, #fff)",
+      "--uk-button-text-color": "var(--uk-global-inverse-color, #fff)",
+      "--uk-button-link-color": "var(--uk-global-inverse-color, #fff)",
+      "--uk-global-link-color": "var(--uk-global-inverse-color, #fff)",
+    } : {}),
   };
 }
 
@@ -1793,7 +1810,7 @@ export function ContentLayoutBlock({
     return <UikitSlider block={block as any} panelMode shellSettings={shellSettings} />;
   }
 
-  if (block.kind === "slider") {
+  if (block.kind === "slider" || block.kind === "slideshow" || block.kind === "overlaySlider") {
     return <UikitSlider block={block as any} shellSettings={shellSettings} />;
   }
 
@@ -2179,14 +2196,14 @@ export function ContentLayoutBlock({
         area="eyebrow"
         typography={block.typography}
         className={`shop-builder-panel-meta ${typographyRoleClass(block.metaTypographyRole)}`}
-        style={panelMetaStyle}
+        style={{ ...panelMetaStyle, ...panelPresentation.colorStyle }}
       >
         {block.eyebrow}
       </Typog>
     ) : null;
 
     return (
-      <div data-builder-block-id={block.id} className={`shop-builder-column-block shop-builder-column-block--panel ${panelLayoutClass} ${typographyRoleClass(block.contentTypographyRole)} ${panelPresentation.className}`} style={{ textAlign: panelTextAlign }}>
+      <div data-builder-block-id={block.id} className={`shop-builder-column-block shop-builder-column-block--panel ${panelLayoutClass} ${typographyRoleClass(block.contentTypographyRole)} ${panelPresentation.className}`} style={{ textAlign: panelTextAlign, ...panelPresentation.colorStyle }}>
         {panelPresentation.linked && (
           <a
             className="shop-builder-panel-link-overlay"
@@ -2478,7 +2495,8 @@ function blockShellClassName(block: BuilderLayoutBlock) {
     ? ""
     : `shop-card-preset--${block.panelStyle ?? "default"}`;
   const advancedClass = resolveElementAdvanced(block).customClass ?? "";
-  return `${uikitMarginClass} shop-builder-element-shell ${legacySurfaceClass} is-padding-${
+  const generalSpacingClass = getGeneralElementShellClassName(block);
+  return `${uikitMarginClass} ${generalSpacingClass} shop-builder-element-shell ${legacySurfaceClass} is-padding-${
     hasBuilderVisualSpacing(
       (block.visualStyle as BuilderVisualStyle | undefined)?.padding,
     )
@@ -2895,19 +2913,10 @@ function SliderSection({
   shellSettings?: Partial<BuilderShellSettings>;
   layoutScheme?: "light" | "dark" | "auto";
 }) {
-  const resolveString = (
-    local: unknown,
-    global: string | undefined,
-    componentDefault: string,
-  ) =>
-    resolveAppearanceValue({
-      local: typeof local === "string" ? local : undefined,
-      global,
-      componentDefault,
-    }).value;
   const carouselSettings = section.carouselSettings ?? {};
   const slides: CarouselSlide[] =
     section.slides?.map((slide, index) => ({
+      ...slide,
       id: slide.id ?? `${section.id}-slide-${index}`,
       title: slide.title,
       subtitle: slide.subtitle,
@@ -2918,15 +2927,17 @@ function SliderSection({
       imageWidth: (slide as any).imageWidth,
       imageHeight: (slide as any).imageHeight,
       imagePadding: slide.imagePadding,
-      imageRatio: resolveString((slide as any).imageRatio, shellSettings?.imageDefaultRatio, "natural"),
-      imageFit: resolveString((slide as any).imageFit, shellSettings?.imageDefaultFit, "cover"),
-      imageShape: resolveString((slide as any).imageShape, shellSettings?.imageDefaultBorder, "none"),
-      imageShadow: resolveString((slide as any).imageShadow, shellSettings?.imageDefaultShadow, "none"),
-      imageAlignment: resolveString((slide as any).imageAlignment, shellSettings?.imageDefaultAlignment, "center"),
-      imageLoading: resolveString((slide as any).imageLoading, shellSettings?.imageDefaultLoading, "lazy"),
+      imageRatio: (slide as any).imageRatio,
+      imageFit: (slide as any).imageFit,
+      imageShape: (slide as any).imageShape,
+      imageShadow: (slide as any).imageShadow,
+      imageAlignment: (slide as any).imageAlignment,
+      imageLoading: (slide as any).imageLoading,
       buttonLabel: slide.buttonLabel,
       buttonUrl: slide.buttonUrl,
     })) ?? [];
+
+  const carousel = resolveCarouselPresentation(carouselSettings, slides as any[], shellSettings) as { settings: any; slides: CarouselSlide[] };
 
   return (
     <SectionFrame
@@ -2943,14 +2954,8 @@ function SliderSection({
           __typename: "PageBuilderLayoutPageBuilderCarouselLayoutLayout",
           fieldGroupName: "ReactBuilderSlider",
         }}
-        slides={slides}
-        settings={{
-          ...carouselSettings,
-          arrowStyle: resolveString(carouselSettings.arrowStyle, shellSettings?.sliderArrowStyle, "chevron"),
-          arrowPosition: resolveString(carouselSettings.arrowPosition, shellSettings?.sliderArrowPosition, "overlay"),
-          paginationStyle: resolveString(carouselSettings.paginationStyle, shellSettings?.sliderDotnavStyle, "minimal-dots"),
-          paginationPosition: resolveString(carouselSettings.paginationPosition, shellSettings?.sliderDotnavPosition, "bottom"),
-        }}
+        slides={carousel.slides}
+        settings={carousel.settings}
       />
     </SectionFrame>
   );

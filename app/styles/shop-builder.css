@@ -29,7 +29,10 @@
   position: relative;
   width: 100%;
   margin: var(--builder-section-margin-top, var(--builder-global-section-margin-top, 0px)) auto var(--builder-section-margin-bottom, var(--builder-global-section-margin-bottom, 0px));
-  padding: var(--builder-section-padding-top, var(--builder-global-section-padding-top, 64px)) clamp(28px, 5vw, 72px) var(--builder-section-padding-bottom, var(--builder-global-section-padding-bottom, 64px));
+  /* UIkit Sections own vertical rhythm only. Horizontal containment belongs
+     to the nested uk-container, whose responsive gutters are shared by the
+     Builder and storefront. */
+  padding: var(--builder-section-padding-top, var(--builder-global-section-padding-top, 64px)) 0 var(--builder-section-padding-bottom, var(--builder-global-section-padding-bottom, 64px));
   border: 0;
   border-radius: 0;
   box-shadow: none;
@@ -195,6 +198,22 @@ body.dark {
 
 .shop-builder-section--content-boxed .shop-builder-section-content {
   max-width: var(--builder-max-width, 1640px);
+}
+
+/* A semantic UIkit container is authoritative over the legacy WebPages
+   content-mode fallback. This keeps imported default/large/xlarge widths
+   on the same token path as native UIkit rendering. */
+.shop-builder-section--content-boxed .shop-builder-section-content.uk-container {
+  max-width: var(--uk-container-default-max-width, 1200px);
+}
+.shop-builder-section--content-boxed .shop-builder-section-content.uk-container-small {
+  max-width: var(--uk-container-small-max-width, 900px);
+}
+.shop-builder-section--content-boxed .shop-builder-section-content.uk-container-large {
+  max-width: var(--uk-container-large-max-width, 1400px);
+}
+.shop-builder-section--content-boxed .shop-builder-section-content.uk-container-xlarge {
+  max-width: var(--uk-container-xlarge-max-width, 1600px);
 }
 
 .shop-builder-section--content-narrow .shop-builder-section-content {
@@ -634,6 +653,12 @@ body.dark {
   --swiper-theme-color: var(--builder-section-text, #111111);
   --swiper-navigation-size: 18px;
   position: relative;
+  padding-bottom: 0;
+}
+
+/* Navigation reserves layout space only when this semantic element actually
+   owns a visible pagination control. */
+.shop-builder-swiper--has-pagination {
   padding-bottom: 42px;
 }
 
@@ -744,6 +769,33 @@ body.dark {
   border-color: var(--button-hover-border-color, var(--button-border-color, transparent));
 }
 
+/* Panel Slider can use any supported title element, including a semantic div.
+   Keep linked titles on the same canonical Card title-token path as headings. */
+.shop-builder-panel-slider-title {
+  color: var(--uk-card-default-title, var(--builder-card-title-color, inherit));
+}
+
+.shop-builder-panel-slider-card.uk-card-primary .shop-builder-panel-slider-title {
+  color: var(--uk-card-primary-title, var(--builder-card-title-color, inherit));
+}
+
+.shop-builder-panel-slider-card.uk-card-secondary .shop-builder-panel-slider-title {
+  color: var(--uk-card-secondary-title, var(--builder-card-title-color, inherit));
+}
+
+.shop-builder-panel-slider-title > a {
+  color: inherit !important;
+  text-decoration: inherit;
+}
+
+/* A UIkit Panel Slider item with Panel Style = None is a plain panel, not a
+   card. Its compact source content must not inherit uk-card-body padding. */
+.shop-builder-swiper--panel
+  .shop-builder-panel-slider-card.uk-card-none
+  .shop-builder-panel-slider-body {
+  padding: 0;
+}
+
 .shop-builder-swiper--hero .shop-builder-swiper-card,
 .shop-builder-swiper--fade .shop-builder-swiper-card {
   min-height: clamp(520px, 58vw, 760px);
@@ -757,6 +809,84 @@ body.dark {
 .shop-builder-swiper--hero .shop-builder-swiper-copy,
 .shop-builder-swiper--fade .shop-builder-swiper-copy {
   max-width: 760px;
+}
+
+/* Canonical Slideshow height contract. The same CarouselBlock emits these
+   classes in Builder and storefront; no surface gets its own height logic. */
+.shop-builder-slideshow-height--viewport .shop-builder-hero-slide-card,
+.shop-builder-slideshow-height--viewport .shop-builder-swiper-media {
+  min-height: 100vh;
+}
+
+/* A YOOtheme Slideshow only owns a source min-height when it is authored.
+   Keep it separate from the generic WebPages Hero carousel fallback. */
+.shop-builder-swiper--slideshow .shop-builder-hero-slide-card,
+.shop-builder-swiper--slideshow .shop-builder-swiper-media {
+  min-height: var(--shop-builder-slideshow-min-height, auto);
+}
+
+/* Static YOOtheme slideshows use a media-led 16:9 frame unless an explicit
+   source height owns the geometry. This is distinct from the Hero minimum. */
+.shop-builder-swiper--slideshow .shop-builder-swiper-media {
+  aspect-ratio: 16 / 9;
+}
+
+/* Slideshow content is an overlay within its media frame. The Hero selector
+   previously supplied this positioning, which made the semantic Slideshow
+   add its copy height below the frame after the Hero class was removed. */
+.shop-builder-swiper--slideshow .shop-builder-swiper-content {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+/* Overlay Slider visibility and padding are element semantics, not image
+   semantics. Swiper's active class supplies the only runtime state needed. */
+.shop-builder-overlay-display--hover .shop-builder-overlay-slide-content,
+.shop-builder-overlay-display--active .shop-builder-overlay-slide-content {
+  opacity: 0;
+  transition: opacity 180ms ease;
+}
+
+.shop-builder-overlay-display--hover .shop-builder-overlay-slide-card:hover .shop-builder-overlay-slide-content,
+.shop-builder-overlay-display--active .swiper-slide-active .shop-builder-overlay-slide-content {
+  opacity: 1;
+}
+
+.shop-builder-overlay-padding--none .shop-builder-overlay-slide-content {
+  padding: 0;
+}
+
+.shop-builder-overlay-padding--small .shop-builder-overlay-slide-content {
+  padding: 1rem;
+}
+
+.shop-builder-overlay-padding--large .shop-builder-overlay-slide-content {
+  padding: 2.5rem;
+}
+
+/* Overlay Slider owns an image/overlay item, not the generic carousel-card
+   320px frame. This preserves its compact static-item geometry. */
+.shop-builder-overlay-slide-card--natural {
+  /* Overlay Slider items are compact media items, not generic 320px cards.
+     Their default source presentation is a 3:2 frame until a canonical
+     explicit ratio overrides it. */
+  aspect-ratio: 3 / 2;
+  min-height: 0;
+}
+
+/* UIkit's caption mode keeps media and content in the same item, but places
+   the caption in normal flow below the image rather than covering it. */
+.shop-builder-overlay-mode--caption .shop-builder-overlay-slide-card {
+  overflow: visible;
+}
+
+.shop-builder-overlay-mode--caption .shop-builder-overlay-slide-content {
+  position: relative !important;
+  inset: auto !important;
+  transform: none !important;
+  max-width: none !important;
+  margin: 0 !important;
 }
 
 .shop-builder-swiper--coverflow {
@@ -936,6 +1066,10 @@ body.dark {
 /* Canonical Panel/Card presentation states shared by Builder and storefront. */
 .shop-builder-column-block--panel {
   position: relative;
+}
+
+.shop-builder-slider--divided .swiper-slide + .swiper-slide {
+  border-inline-start: 1px solid var(--uk-global-border, var(--uk-global-border-color, rgba(0, 0, 0, 0.15)));
 }
 
 .shop-builder-panel-link-overlay {
@@ -1411,6 +1545,20 @@ body.dark {
     transform 180ms ease,
     box-shadow 180ms ease,
     background-color 180ms ease;
+}
+
+/* Grid Panel Style = None is a real presentation state. It must not inherit
+   the generic card clipping, radius, or hover surface merely because every
+   grid item is structurally an article. */
+.shop-builder-grid-card.shop-builder-panel-plain {
+  overflow: visible !important;
+  border-radius: 0;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+.shop-builder-grid-card.shop-builder-panel-plain:hover {
+  transform: none;
+  box-shadow: none;
 }
 
 .shop-builder-grid-card .shop-builder-grid-content {
@@ -2598,6 +2746,15 @@ body.dark {
   gap: 14px;
 }
 
+/* A content-layout section may itself be a grid. Its row wrapper must be
+   shrinkable so intrinsically sized shared children (notably Swiper slides)
+   cannot turn the section's auto grid track into their max-content width. */
+.shop-builder-content-layout-rows-wrapper {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+
 .shop-builder-content-layout-card {
   min-width: 0;
   padding: 0;
@@ -2605,7 +2762,9 @@ body.dark {
   background: transparent;
   display: flex;
   flex-direction: column;
-  gap: var(--builder-element-stack-gap, 16px);
+  /* Element margins are semantic source data. A column does not invent a
+     second vertical rhythm between otherwise normal-flow siblings. */
+  gap: 0;
   transition: box-shadow 0.14s ease, background 0.14s ease;
 }
 
@@ -2615,9 +2774,9 @@ body.dark {
 }
 
 .shop-builder-column-block + .shop-builder-column-block {
-  margin-top: clamp(18px, 3vw, 34px);
-  padding-top: clamp(18px, 3vw, 34px);
-  border-top: 1px solid rgba(17, 17, 17, 0.08);
+  margin-top: 0;
+  padding-top: 0;
+  border-top: 0;
 }
 
 .shop-builder-column-block span,
@@ -5336,6 +5495,7 @@ h6.shop-builder-title { font-size: 0.95rem; line-height: 1.4; font-weight: 600; 
 
 /* UIkit Meta & Content Styles */
 .uk-text-meta { font-size: 0.875rem !important; color: #64748b !important; line-height: 1.4 !important; }
+.shop-builder-card--inverse-meta .uk-text-meta { color: var(--builder-card-meta-color, var(--uk-global-inverse-color, var(--uk-global-color, currentColor))) !important; }
 .uk-text-muted { color: #94a3b8 !important; }
 .uk-text-primary { color: #1e87f0 !important; font-weight: 600 !important; }
 .uk-text-secondary { color: #0f172a !important; font-weight: 600 !important; }
@@ -5360,19 +5520,19 @@ h6.shop-builder-title { font-size: 0.95rem; line-height: 1.4; font-weight: 600; 
 
 /* UIkit Canonical Section Variants & Modifiers */
 .uk-section-default {
-  background-color: var(--uikit-section-default-bg, transparent);
+  background: var(--uikit-section-default-bg, transparent);
   color: var(--uikit-section-default-color, inherit);
 }
 .uk-section-muted {
-  background-color: var(--uikit-section-muted-bg, #f8fafc) !important;
+  background: var(--uikit-section-muted-bg, #f8fafc) !important;
   color: var(--uikit-section-muted-color, #1e293b);
 }
 .uk-section-primary {
-  background-color: var(--uikit-section-primary-bg, #0f172a) !important;
+  background: var(--uikit-section-primary-bg, #0f172a) !important;
   color: var(--uikit-section-primary-color, #ffffff) !important;
 }
 .uk-section-secondary {
-  background-color: var(--uikit-section-secondary-bg, #1e1b4b) !important;
+  background: var(--uikit-section-secondary-bg, #1e1b4b) !important;
   color: var(--uikit-section-secondary-color, #ffffff) !important;
 }
 .uk-section-image {
@@ -5393,25 +5553,48 @@ h6.shop-builder-title { font-size: 0.95rem; line-height: 1.4; font-weight: 600; 
   position: relative;
   z-index: 1;
 }
+.uk-section {
+  /* UIkit Section is responsive: medium global margin on phones, large
+     global margin at the medium breakpoint. */
+  padding-top: var(--uk-global-margin-medium, 40px) !important;
+  padding-bottom: var(--uk-global-margin-medium, 40px) !important;
+}
 .uk-section-xsmall {
-  padding-top: 20px !important;
-  padding-bottom: 20px !important;
+  padding-top: var(--uk-section-padding-xsmall, 20px) !important;
+  padding-bottom: var(--uk-section-padding-xsmall, 20px) !important;
 }
 .uk-section-small {
-  padding-top: 40px !important;
-  padding-bottom: 40px !important;
+  padding-top: var(--uk-section-padding-small, 40px) !important;
+  padding-bottom: var(--uk-section-padding-small, 40px) !important;
 }
 .uk-section-medium {
-  padding-top: 70px !important;
-  padding-bottom: 70px !important;
+  padding-top: var(--uk-section-padding-default, 70px) !important;
+  padding-bottom: var(--uk-section-padding-default, 70px) !important;
 }
 .uk-section-large {
-  padding-top: 100px !important;
-  padding-bottom: 100px !important;
+  padding-top: var(--uk-global-margin-large, 70px) !important;
+  padding-bottom: var(--uk-global-margin-large, 70px) !important;
 }
 .uk-section-xlarge {
-  padding-top: 140px !important;
-  padding-bottom: 140px !important;
+  padding-top: var(--uk-section-padding-xlarge, 140px) !important;
+  padding-bottom: var(--uk-section-padding-xlarge, 140px) !important;
+}
+@media (min-width: 960px) {
+  .uk-section,
+  .uk-section-medium {
+    padding-top: var(--uk-global-margin-large, var(--uk-section-padding-default, 70px)) !important;
+    padding-bottom: var(--uk-global-margin-large, var(--uk-section-padding-default, 70px)) !important;
+  }
+  .uk-section-large {
+    padding-top: var(--uk-global-margin-xlarge, var(--uk-section-padding-xlarge, 140px)) !important;
+    padding-bottom: var(--uk-global-margin-xlarge, var(--uk-section-padding-xlarge, 140px)) !important;
+  }
+  .uk-section-xlarge {
+    /* UIkit's desktop xlarge tier is large + xlarge global margin, not the
+       mobile xlarge value repeated. */
+    padding-top: calc(var(--uk-global-margin-large, 70px) + var(--uk-global-margin-xlarge, 140px)) !important;
+    padding-bottom: calc(var(--uk-global-margin-large, 70px) + var(--uk-global-margin-xlarge, 140px)) !important;
+  }
 }
 .uk-padding-remove-top {
   padding-top: 0 !important;

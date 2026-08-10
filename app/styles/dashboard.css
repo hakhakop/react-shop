@@ -5946,7 +5946,7 @@ body:has([data-scoped-preview-root]) [data-scoped-preview-root] .site-header {
       --builder-section-padding-top,
       var(--builder-global-section-padding-top, 64px)
     )
-    clamp(28px, 5vw, 72px)
+    0
     var(
       --builder-section-padding-bottom,
       var(--builder-global-section-padding-bottom, 64px)
@@ -6028,7 +6028,7 @@ body:has([data-scoped-preview-root]) [data-scoped-preview-root] .site-header {
       --builder-section-padding-top,
       var(--builder-global-section-padding-top, clamp(28px, 5vw, 72px))
     )
-    clamp(28px, 5vw, 72px)
+    0
     var(
       --builder-section-padding-bottom,
       var(--builder-global-section-padding-bottom, clamp(28px, 5vw, 72px))
@@ -6095,8 +6095,10 @@ body:has([data-scoped-preview-root]) [data-scoped-preview-root] .site-header {
 }
 
 .builder-preview-canvas .shop-builder-section {
-  padding-left: clamp(28px, 5vw, 72px);
-  padding-right: clamp(28px, 5vw, 72px);
+  /* The shared Section shell owns vertical padding only. Preserve Builder
+     chrome without reintroducing a horizontal gutter ahead of uk-container. */
+  padding-left: 0;
+  padding-right: 0;
 }
 
 .builder-preview-canvas .shop-builder-section.builder-preview-section--boxed {
@@ -15591,6 +15593,12 @@ body:has([data-scoped-builder-root])
   border-radius: var(--builder-card-radius, 16px);
   overflow: hidden;
   background: transparent;
+}
+
+/* A semantic Slideshow reuses the shared hero-slide markup only. It must not
+   inherit Builder preview Hero minimums; its adapter supplies the frame. */
+.shop-builder-swiper--slideshow .shop-builder-hero-slide-card {
+  min-height: 0;
 }
 
 @media (min-width: 768px) {
