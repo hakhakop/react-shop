@@ -869,6 +869,11 @@ export type BuilderSection = {
     fadeCrossFade?: boolean;
     freeModeMomentum?: boolean;
     cardsPerView?: number;
+    cardsPerViewPhone?: number;
+    cardsPerViewSmall?: number;
+    cardsPerViewMedium?: number;
+    cardsPerViewLarge?: number;
+    cardsPerViewXLarge?: number;
     showArrows?: boolean;
     showDots?: boolean;
     showNavigation?: boolean;

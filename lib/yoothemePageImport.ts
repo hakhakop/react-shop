@@ -1133,7 +1133,10 @@ const mapStaticElement = (
     const { slides, hasDynamicSource } = sourceStaticSliderItems(node, "panel-slider_item", path, props);
     if (reportUnsupportedDynamicSource(path, hasDynamicSource ? { ...props, source: props.source ?? true } : props, slides.length, warnings)) return null;
     warnUnsupported(path, props, [
-      "slider_autoplay", "slider_autoplay_pause", "slider_autoplay_interval", "slider_finite", "slider_gap", "slider_divider", "slider_width_default", "slider_width_small", "slider_width_medium", "slider_width_large", "slider_width_xlarge", "slider_center", "nav", "nav_align", "nav_position", "nav_breakpoint", "slidenav", "slidenav_breakpoint", "slidenav_outside_breakpoint", "text_align", "margin", "margin_remove_bottom",
+      "content_column_breakpoint", "icon_width", "image_grid_breakpoint", "image_grid_width",
+      "image_svg_color", "image_svg_inline",
+      "show_hover_image", "show_hover_video", "show_video",
+      "slidenav_margin", "slider_sets", "title_align", "title_grid_breakpoint", "title_grid_width", "title_hover_style",
       ...GENERAL_POSITION_KEYS,
     ], warnings);
     return withSourceGeneralVisualStyle({
@@ -1152,6 +1155,29 @@ const mapStaticElement = (
         presentation: "panel-slider",
         variant: "panel",
         slideMode: "panel",
+        ...normalizeYoothemeMedia(props),
+        // Panel Slider owns one element-level presentation contract. Item
+        // content is deliberately limited to the source item fields rather
+        // than becoming a nested WebPages Panel/Card editor.
+        showTitle: props.show_title !== false,
+        showImage: props.show_image !== false,
+        showMeta: props.show_meta !== false,
+        showContent: props.show_content !== false,
+        showLink: props.show_link !== false,
+        contentAlign: sourceAlignment(props.text_align),
+        metaPosition: props.meta_align === "above-title" || props.meta_align === "below-content"
+          ? props.meta_align
+          : "below-title",
+        metaHtmlElement: sourceHeadingLevel(props.meta_element) ?? "div",
+        metaStyle: asString(props.meta_style) ?? undefined,
+        headingLevel: sourceHeadingLevel(props.title_element) ?? "h3",
+        headingSize: sourceHeadingSize(props.title_style),
+        imageAlignment: sourceImageAlignment(props),
+        imageFit: "natural",
+        imageRatio: "natural",
+        linkPanel: props.panel_link === true || props.panel_link === "true",
+        buttonStyle: props.link_style ? sourceButtonStyle(props.link_style) : undefined,
+        buttonSize: sourceButtonSize(props.link_size),
         autoplay: props.slider_autoplay === true || props.slider_autoplay === "true",
         autoplayDelayMs: Number.isFinite(Number(props.slider_autoplay_interval)) ? Number(props.slider_autoplay_interval) * 1000 : undefined,
         pauseOnHover: props.slider_autoplay_pause !== false,
@@ -1159,13 +1185,18 @@ const mapStaticElement = (
         loop: !(props.slider_finite === true || props.slider_finite === "true"),
         spaceBetween: sourceSliderGap(props.slider_gap),
         divider: props.slider_divider === true || props.slider_divider === "true",
+        itemWidthMode: props.slider_width === "fixed" ? "fixed" : "auto",
         cardsPerViewPhone: sourceSliderItemsPerView(props.slider_width_default) ?? 1,
         cardsPerViewSmall: sourceSliderItemsPerView(props.slider_width_small),
         cardsPerViewMedium: sourceSliderItemsPerView(props.slider_width_medium),
-        cardsPerViewLarge: sourceSliderItemsPerView(props.slider_width_large ?? props.slider_width_xlarge),
+        cardsPerViewLarge: sourceSliderItemsPerView(props.slider_width_large),
+        cardsPerViewXLarge: sourceSliderItemsPerView(props.slider_width_xlarge),
         showArrows: Boolean(props.slidenav),
         showDots: Boolean(props.nav),
         arrowPosition: asString(props.slidenav) ?? undefined,
+        slidenavBreakpoint: sourceBreakpoint(props.slidenav_breakpoint),
+        slidenavOutsideBreakpoint: sourceBreakpoint(props.slidenav_outside_breakpoint),
+        navigationBreakpoint: sourceBreakpoint(props.nav_breakpoint),
         paginationPosition: asString(props.nav_position) ?? undefined,
         effect: "slide",
       },

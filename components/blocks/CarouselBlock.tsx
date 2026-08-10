@@ -22,13 +22,17 @@ import {
   getUikitImageClass,
   getUikitImageStyle,
   getUikitImageWrapperClass,
+  getUikitSvgColor,
+  getUikitSvgColorClass,
   getUikitPanelMediaStyle,
   getUikitTextClass,
   resolveUikitImageSemantics,
 } from "@/lib/uikitTokens";
 import { typographyRoleClass, type SemanticTypographyRole } from "@/lib/builderTypography";
 import { builderLinkTargetProps } from "@/lib/websiteBuilderLinks";
+import { resolvePanelSliderRuntime } from "@/lib/panelSliderRuntime";
 import { WebPagesIcon } from "@/components/builder/WebPagesIcon";
+import UikitStylableSvg from "@/components/builder/UikitStylableSvg";
 
 // Swiper core & module styles
 import "swiper/css";
@@ -86,6 +90,8 @@ export type CarouselSlide = {
   imageHeight?: string | number | null;
   imageBorder?: string | null;
   imageBoxShadow?: string | null;
+  imageSvgInline?: boolean | null;
+  imageSvgColor?: string | null;
   iconName?: string | null;
   iconSize?: number | null;
   showAction?: boolean | null;
@@ -121,6 +127,7 @@ export type CarouselSettings = {
   cardsPerViewSmall?: number | null;
   cardsPerViewMedium?: number | null;
   cardsPerViewLarge?: number | null;
+  cardsPerViewXLarge?: number | null;
   centered?: boolean | "true" | "false" | 1 | 0 | null;
   divider?: boolean | "true" | "false" | 1 | 0 | null;
   showArrows?: boolean | "true" | "false" | 1 | 0 | null;
@@ -128,6 +135,7 @@ export type CarouselSettings = {
   pauseOnHover?: boolean | "true" | "false" | 1 | 0 | null;
   arrowStyle?: "chevron" | "glass-circle" | "solid-dark" | "minimal-light" | "outer" | "hidden" | string | null;
   arrowPosition?: "overlay" | "outer" | "bottom" | "bottom-right" | "bottom-left" | "top-right" | "top-left" | string | null;
+  slidenavBreakpoint?: "small" | "medium" | "large" | "xlarge" | string | null;
   paginationStyle?: "simple-dots" | "minimal-dots" | "expanding-pills" | "fraction" | "progress" | "thumbs" | "hidden" | string | null;
   paginationPosition?: "bottom" | "top" | "overlay" | string | null;
   aspectRatio?: "auto" | "16:9" | "4:3" | "1:1" | "21:9" | "full" | string | null;
@@ -140,6 +148,7 @@ export type CarouselSettings = {
   overlayPadding?: string | null;
   /** Visibility belongs to the YOOtheme carousel element, not individual slides. */
   showTitle?: boolean | "true" | "false" | 1 | 0 | null;
+  showImage?: boolean | "true" | "false" | 1 | 0 | null;
   showMeta?: boolean | "true" | "false" | 1 | 0 | null;
   showContent?: boolean | "true" | "false" | 1 | 0 | null;
   showLink?: boolean | "true" | "false" | 1 | 0 | null;
@@ -211,6 +220,7 @@ export default function CarouselBlock({
   className,
   onUploadSlideImage,
 }: CarouselBlockProps) {
+  const [panelSliderLocked, setPanelSliderLocked] = useState(false);
   const [mainSwiper, setMainSwiper] = useState<any>(null);
   const [thumbsSwiper, setThumbsSwiper] = useState<any>(null);
 
@@ -255,12 +265,24 @@ export default function CarouselBlock({
     max: number
   ) => Math.min(Math.max(Number(value ?? fallback) || fallback, min), max);
 
+  // UIkit responsive widths inherit forward when a breakpoint is omitted.
+  // Preserve that source cascade exactly; do not synthesize intermediate
+  // visible-item counts from the generic carousel default.
+  const phoneCardsPerView = numberSetting(settings?.cardsPerViewPhone, cardsPerView, 1, 6);
+  const smallCardsPerView = numberSetting(settings?.cardsPerViewSmall, phoneCardsPerView, 1, 6);
+  const mediumCardsPerView = numberSetting(settings?.cardsPerViewMedium, smallCardsPerView, 1, 6);
+  const largeCardsPerView = numberSetting(settings?.cardsPerViewLarge, mediumCardsPerView, 1, 6);
+  const xlargeCardsPerView = numberSetting(settings?.cardsPerViewXLarge, largeCardsPerView, 1, 6);
   const responsiveCardsPerView = {
-    phone: numberSetting(settings?.cardsPerViewPhone, 1, 1, 6),
-    small: numberSetting(settings?.cardsPerViewSmall, Math.min(cardsPerView, 2), 1, 6),
-    medium: numberSetting(settings?.cardsPerViewMedium, cardsPerView, 1, 6),
-    large: numberSetting(settings?.cardsPerViewLarge, cardsPerView, 1, 6),
+    phone: phoneCardsPerView,
+    small: smallCardsPerView,
+    medium: mediumCardsPerView,
+    large: largeCardsPerView,
+    xlarge: xlargeCardsPerView,
   };
+  const panelSliderRuntime = settings?.presentation === "panel-slider"
+    ? resolvePanelSliderRuntime(settings)
+    : null;
 
   const booleanSetting = (
     value: boolean | "true" | "false" | 1 | 0 | null | undefined,
@@ -288,6 +310,8 @@ export default function CarouselBlock({
   const swiperSlidesPerView =
     is3DEffect || isHeroOrFadeMode
       ? 1
+      : panelSliderRuntime
+      ? panelSliderRuntime.slidesPerView
       : isMarquee
       ? "auto"
       : isFreeMode || swiperVariant === "multi-card"
@@ -334,6 +358,7 @@ export default function CarouselBlock({
   const slideshowHeight = settings?.slideshowHeight ?? "auto";
   const isKenBurns = booleanSetting(settings?.kenBurns, false);
   const showTitle = booleanSetting(settings?.showTitle, true);
+  const showImage = booleanSetting(settings?.showImage, true);
   const showMeta = booleanSetting(settings?.showMeta, true);
   const showContent = booleanSetting(settings?.showContent, true);
   const showLink = booleanSetting(settings?.showLink, true);
@@ -363,6 +388,12 @@ export default function CarouselBlock({
     swiperEffect,
     slides.length,
     cardsPerView,
+    panelSliderRuntime?.mode ?? "generic-width",
+    responsiveCardsPerView.phone,
+    responsiveCardsPerView.small,
+    responsiveCardsPerView.medium,
+    responsiveCardsPerView.large,
+    responsiveCardsPerView.xlarge,
     explicitSlideMode,
     arrowPosition,
     overlayPosition,
@@ -382,7 +413,10 @@ export default function CarouselBlock({
       className={[
         "shop-builder-swiper",
         `shop-builder-swiper--${swiperVariant}`,
+        settings?.presentation === "panel-slider" ? "el-element" : "",
+        settings?.presentation === "panel-slider" && panelSliderLocked ? "shop-builder-swiper--locked" : "",
         `shop-builder-arrow--${arrowStyle}`,
+        settings?.slidenavBreakpoint ? `shop-builder-slidenav-from-${settings.slidenavBreakpoint}` : "",
         showArrows ? `shop-builder-arrow-pos--${arrowPosition}` : "",
         `shop-builder-pag--${paginationStyle}`,
         `shop-builder-pag-pos--${paginationPosition}`,
@@ -468,6 +502,19 @@ export default function CarouselBlock({
             : false
         }
         navigation={showArrows}
+        // UIkit does not show slidenav when a Panel Slider has no overflow.
+        // Swiper supplies the same runtime lock signal, shared by Builder and
+        // storefront, rather than a Builder-only item-count approximation.
+        watchOverflow
+        onAfterInit={(swiper) => {
+          if (settings?.presentation === "panel-slider") setPanelSliderLocked(swiper.isLocked);
+        }}
+        onLock={() => {
+          if (settings?.presentation === "panel-slider") setPanelSliderLocked(true);
+        }}
+        onUnlock={() => {
+          if (settings?.presentation === "panel-slider") setPanelSliderLocked(false);
+        }}
         pagination={
           showDots
             ? {
@@ -483,8 +530,18 @@ export default function CarouselBlock({
             : false
         }
         breakpoints={
-          !is3DEffect && !isHeroOrFadeMode && !isMarquee
-            ? {
+          panelSliderRuntime
+            ? panelSliderRuntime.breakpoints
+              ? {
+                  320: { ...panelSliderRuntime.breakpoints[320], spaceBetween: 12 },
+                  640: { ...panelSliderRuntime.breakpoints[640], spaceBetween: Math.min(spaceBetween, 16) },
+                  960: { ...panelSliderRuntime.breakpoints[960], spaceBetween },
+                  1200: { ...panelSliderRuntime.breakpoints[1200], spaceBetween },
+                  1600: { ...panelSliderRuntime.breakpoints[1600], spaceBetween },
+                }
+              : undefined
+            : !is3DEffect && !isHeroOrFadeMode && !isMarquee
+              ? {
                 320: {
                   slidesPerView: responsiveCardsPerView.phone,
                   spaceBetween: 12,
@@ -499,12 +556,13 @@ export default function CarouselBlock({
                 },
                 1280: { slidesPerView: responsiveCardsPerView.large, spaceBetween },
               }
-            : undefined
+              : undefined
         }
         className="w-full"
+        wrapperClass={settings?.presentation === "panel-slider" ? "swiper-wrapper uk-slider-items" : "swiper-wrapper"}
       >
         {slides.map((slide, idx) => {
-          const hasRealImage = Boolean(slide.imageUrl && slide.imageUrl.trim());
+          const hasRealImage = showImage && Boolean(slide.imageUrl && slide.imageUrl.trim());
           const hasTextContent = Boolean(
             (showTitle && slide.title?.trim()) || (showMeta && slide.subtitle?.trim()) ||
             (showContent && slide.text?.trim()) || (showLink && slide.buttonLabel?.trim())
@@ -550,6 +608,7 @@ export default function CarouselBlock({
               imageBoxShadow: slide.imageBoxShadow ?? undefined,
             });
             const itemImageStyle = getUikitImageStyle(itemImage);
+            const isStylableSvg = slide.imageSvgInline === true && /\.svg(?:[?#].*)?$/i.test(slide.imageUrl ?? "");
             const itemMediaStyle = getUikitPanelMediaStyle({
               ratio: itemImage.ratio,
               fit: itemImage.fit === "cover" || itemImage.fit === "contain" || itemImage.fit === "fill"
@@ -594,6 +653,40 @@ export default function CarouselBlock({
               width: itemImageStyle.width ?? "100%",
             };
             const MetaElement = (slide.metaHtmlElement ?? "div") as React.ElementType;
+            const imageLoading = resolveImageLoading(slide.imageLoading, idx === 0 ? "eager" : "lazy");
+            const fallbackPanelImage = (
+              <img
+                src={slide.imageUrl!}
+                alt={slide.imageAlt ?? slide.title ?? ""}
+                className={getUikitImageClass(itemImage)}
+                style={{
+                  position: itemImageStyle.position,
+                  inset: itemImageStyle.inset,
+                  width: "100%",
+                  height: "100%",
+                  objectFit: itemImageStyle.objectFit,
+                  objectPosition: itemMediaStyle.backgroundPosition,
+                }}
+                loading={imageLoading}
+              />
+            );
+            const panelImage = isStylableSvg ? (
+              <UikitStylableSvg
+                src={slide.imageUrl!}
+                alt={slide.imageAlt ?? slide.title ?? undefined}
+                className={`${getUikitImageClass(itemImage)} ${getUikitSvgColorClass(slide.imageSvgColor)} el-image uk-flex-1 uk-object-cover`.trim()}
+                color={getUikitSvgColorClass(slide.imageSvgColor) ? undefined : getUikitSvgColor(slide.imageSvgColor)}
+                fit={itemImage.fit === "cover" || itemImage.fit === "fill" ? itemImage.fit : "contain"}
+                loading={imageLoading}
+                fallback={fallbackPanelImage}
+                style={{
+                  position: itemImageStyle.position,
+                  inset: itemImageStyle.inset,
+                  width: "100%",
+                  height: "100%",
+                }}
+              />
+            ) : fallbackPanelImage;
 
             const renderMeta = () =>
               showMeta && itemMeta ? (
@@ -618,8 +711,11 @@ export default function CarouselBlock({
               ) : null;
 
             return (
-              <SwiperSlide key={slide.id || idx}>
-                <article className={`shop-builder-panel-slider-card ${panelClass}`.trim()}>
+              <SwiperSlide
+                key={slide.id || idx}
+                className={panelSliderRuntime?.mode === "auto" ? "shop-builder-panel-slider-auto-item" : undefined}
+              >
+                <article className={`el-item shop-builder-panel-slider-card ${panelClass}`.trim()}>
                   {hasRealImage ? (
                     <div
                       className={`shop-builder-panel-slider-media ${getUikitImageWrapperClass(itemImage)}`.trim()}
@@ -627,36 +723,10 @@ export default function CarouselBlock({
                     >
                       {slide.linkPanel ? (
                         <a href={panelLinkUrl} {...panelLinkProps} className="shop-builder-panel-slider-media-link">
-                          <img
-                            src={slide.imageUrl!}
-                            alt={slide.imageAlt ?? slide.title ?? ""}
-                            className={getUikitImageClass(itemImage)}
-                            style={{
-                              position: itemImageStyle.position,
-                              inset: itemImageStyle.inset,
-                              width: "100%",
-                              height: "100%",
-                              objectFit: itemImageStyle.objectFit,
-                              objectPosition: itemMediaStyle.backgroundPosition,
-                            }}
-                            loading={resolveImageLoading(slide.imageLoading, idx === 0 ? "eager" : "lazy")}
-                          />
+                          {panelImage}
                         </a>
                       ) : (
-                        <img
-                          src={slide.imageUrl!}
-                          alt={slide.imageAlt ?? slide.title ?? ""}
-                          className={getUikitImageClass(itemImage)}
-                          style={{
-                            position: itemImageStyle.position,
-                            inset: itemImageStyle.inset,
-                            width: "100%",
-                            height: "100%",
-                            objectFit: itemImageStyle.objectFit,
-                            objectPosition: itemMediaStyle.backgroundPosition,
-                          }}
-                          loading={resolveImageLoading(slide.imageLoading, idx === 0 ? "eager" : "lazy")}
-                        />
+                        panelImage
                       )}
                     </div>
                   ) : (

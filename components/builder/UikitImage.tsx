@@ -9,10 +9,13 @@ import {
   getUikitImageAttributes,
   getUikitImageClass,
   getUikitImageWrapperClass,
+  getUikitSvgColor,
+  getUikitSvgColorClass,
 } from "@/lib/uikitTokens";
 import { builderLinkTargetProps } from "@/lib/websiteBuilderLinks";
 import { Image as ImageIcon, Upload } from "lucide-react";
 import Image from "next/image";
+import UikitStylableSvg from "@/components/builder/UikitStylableSvg";
 
 type Props = {
   block: any;
@@ -92,39 +95,32 @@ export default function UikitImage({ block, isCanvas, onUploadImage, shellSettin
   // 3:2 ratio before the real asset can define its natural geometry.
   const usesIntrinsicGeometry = !imageStyle.aspectRatio && !imageStyle.height;
   const isStylableSvg = rawBlock.imageSvgInline === true && /\.svg(?:[?#].*)?$/i.test(rawBlock.imageUrl ?? "");
-  const svgColor = {
-    primary: "var(--uk-global-primary-background, currentColor)",
-    secondary: "var(--uk-global-secondary-background, currentColor)",
-    muted: "var(--uk-global-muted-color, currentColor)",
-    inverse: "var(--uk-global-inverse-color, currentColor)",
-    default: "var(--uk-global-color, currentColor)",
-  }[String(rawBlock.imageSvgColor ?? "primary").toLowerCase()] ?? String(rawBlock.imageSvgColor ?? "currentColor");
-  const renderImage = () => isStylableSvg ? (
-    <span
-      className={`${imageClass} shop-builder-stylable-svg`}
-      role="img"
-      aria-label={rawBlock.imageAlt ?? undefined}
-      style={{
-        width: "100%",
-        height: imageStyle.aspectRatio ? "100%" : "auto",
-        display: "inline-block",
-        aspectRatio: imageStyle.aspectRatio,
-        backgroundColor: svgColor,
-        maskImage: `url("${rawBlock.imageUrl}")`,
-        maskRepeat: "no-repeat",
-        maskPosition: imageStyle.objectPosition ?? "center",
-        maskSize: imageStyle.objectFit === "contain" ? "contain" : "100% 100%",
-        WebkitMaskImage: `url("${rawBlock.imageUrl}")`,
-        WebkitMaskRepeat: "no-repeat",
-        WebkitMaskPosition: imageStyle.objectPosition ?? "center",
-        WebkitMaskSize: imageStyle.objectFit === "contain" ? "contain" : "100% 100%",
-      }}
-    />
-  ) : usesIntrinsicGeometry ? (
+  const svgColor = getUikitSvgColor(rawBlock.imageSvgColor);
+  const svgColorClass = getUikitSvgColorClass(rawBlock.imageSvgColor);
+  const usesContextualSvgColor = Boolean(svgColorClass);
+  const fallbackImage = usesIntrinsicGeometry ? (
     <img className={imageClass} src={rawBlock.imageUrl!} alt={rawBlock.imageAlt ?? ""} loading={imageLoading} {...imageAttributes} style={{ width: "100%", height: "auto", objectFit: imageStyle.objectFit as any, objectPosition: imageStyle.objectPosition }} />
   ) : (
     <Image className={imageClass} src={rawBlock.imageUrl!} alt={rawBlock.imageAlt ?? ""} width={1200} height={800} loading={imageLoading} {...imageAttributes} style={{ width: "100%", height: imageStyle.aspectRatio ? "100%" : "auto", objectFit: imageStyle.objectFit as any, objectPosition: imageStyle.objectPosition, ...(imageStyle.position ? { position: imageStyle.position as any, inset: imageStyle.inset } : {}) }} />
   );
+  const renderImage = () => isStylableSvg ? (
+    <UikitStylableSvg
+      src={rawBlock.imageUrl!}
+      alt={rawBlock.imageAlt}
+      className={`${imageClass} ${svgColorClass}`.trim()}
+      color={usesContextualSvgColor ? undefined : svgColor}
+      fit={imageSemantics.fit === "cover" || imageSemantics.fit === "fill" ? imageSemantics.fit : "contain"}
+      loading={imageLoading}
+      fallback={fallbackImage}
+      style={{
+        width: "100%",
+        height: imageStyle.aspectRatio ? "100%" : "auto",
+        aspectRatio: imageStyle.aspectRatio,
+        position: imageStyle.position,
+        inset: imageStyle.inset,
+      }}
+    />
+  ) : fallbackImage;
 
   const marginClass = rawBlock.margin && rawBlock.margin !== "none" ? `uk-margin-${rawBlock.margin}` : "";
   const textAlignClass = rawBlock.textAlign && rawBlock.textAlign !== "none" ? `uk-text-${rawBlock.textAlign}` : "";

@@ -677,6 +677,42 @@ body.dark {
   box-shadow: 0 16px 32px rgba(15, 23, 42, 0.12);
 }
 
+.shop-builder-swiper .swiper-button-lock {
+  display: none;
+}
+
+.shop-builder-slidenav-from-small .swiper-button-prev,
+.shop-builder-slidenav-from-small .swiper-button-next,
+.shop-builder-slidenav-from-medium .swiper-button-prev,
+.shop-builder-slidenav-from-medium .swiper-button-next,
+.shop-builder-slidenav-from-large .swiper-button-prev,
+.shop-builder-slidenav-from-large .swiper-button-next,
+.shop-builder-slidenav-from-xlarge .swiper-button-prev,
+.shop-builder-slidenav-from-xlarge .swiper-button-next { display: none; }
+@media (min-width: 640px) { .shop-builder-slidenav-from-small .swiper-button-prev, .shop-builder-slidenav-from-small .swiper-button-next { display: flex; } }
+@media (min-width: 960px) { .shop-builder-slidenav-from-medium .swiper-button-prev, .shop-builder-slidenav-from-medium .swiper-button-next { display: flex; } }
+@media (min-width: 1200px) { .shop-builder-slidenav-from-large .swiper-button-prev, .shop-builder-slidenav-from-large .swiper-button-next { display: flex; } }
+@media (min-width: 1600px) { .shop-builder-slidenav-from-xlarge .swiper-button-prev, .shop-builder-slidenav-from-xlarge .swiper-button-next { display: flex; } }
+
+/* Overflow is the authoritative Panel Slider navigation boundary. Keep this
+   after breakpoint visibility rules so a locked control cannot be revived by
+   its responsive display class. */
+.shop-builder-swiper--panel .swiper-button-lock,
+.shop-builder-swiper--panel .swiper-pagination-lock {
+  display: none !important;
+}
+
+/* YOOtheme centers a content-sized list only while every item fits. The
+   imported `.el-element .uk-slider-items` rule is intentionally constrained
+   by Swiper's authoritative overflow state so Fixed/overflowing sliders still
+   begin at the leading edge. */
+.shop-builder-swiper--panel .uk-slider-items {
+  justify-content: flex-start !important;
+}
+.shop-builder-swiper--panel.shop-builder-swiper--locked .uk-slider-items {
+  justify-content: center !important;
+}
+
 .shop-builder-swiper .swiper-pagination-bullet {
   width: 26px;
   height: 3px;
@@ -772,7 +808,7 @@ body.dark {
 /* Panel Slider can use any supported title element, including a semantic div.
    Keep linked titles on the same canonical Card title-token path as headings. */
 .shop-builder-panel-slider-title {
-  color: var(--uk-card-default-title, var(--builder-card-title-color, inherit));
+  color: inherit;
 }
 
 .shop-builder-panel-slider-card.uk-card-primary .shop-builder-panel-slider-title {
@@ -788,12 +824,30 @@ body.dark {
   text-decoration: inherit;
 }
 
+.shop-builder-stylable-svg-host > svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  color: inherit;
+}
+
 /* A UIkit Panel Slider item with Panel Style = None is a plain panel, not a
    card. Its compact source content must not inherit uk-card-body padding. */
 .shop-builder-swiper--panel
   .shop-builder-panel-slider-card.uk-card-none
   .shop-builder-panel-slider-body {
   padding: 0;
+}
+
+/* A source Panel Slider with no Card style presents SVG/media as a plain
+   inline panel. Generic carousel/card backgrounds must not paint behind it. */
+.shop-builder-swiper--panel .shop-builder-panel-slider-card.uk-card-none,
+.shop-builder-swiper--panel .shop-builder-panel-slider-media {
+  background: transparent;
+}
+
+.shop-builder-panel-slider-auto-item {
+  width: auto;
 }
 
 .shop-builder-swiper--hero .shop-builder-swiper-card,

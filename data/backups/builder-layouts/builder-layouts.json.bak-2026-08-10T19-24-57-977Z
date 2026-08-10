@@ -7361,8 +7361,8 @@
                 "headingSize": "small",
                 "headingAlign": "center",
                 "textAlign": "center",
-                "margin": "none",
-                "marginMode": "none",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
                     "marginMode": "none",
@@ -7382,8 +7382,8 @@
                 "textColumnBreakpoint": "medium",
                 "maxWidth": "xlarge",
                 "headingAlign": "center",
-                "margin": "default",
-                "marginMode": "default",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
                     "marginMode": "default",
@@ -7420,8 +7420,8 @@
                 "fullWidthButton": false,
                 "textAlign": "center",
                 "headingAlign": "center",
-                "margin": "medium",
-                "marginMode": "medium",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
                     "marginMode": "medium",
@@ -7451,7 +7451,9 @@
                     "buttonUrl": "?page_id=2#powerful-api",
                     "buttonTarget": "_self",
                     "buttonStyle": "default",
-                    "linkPanel": true
+                    "linkPanel": true,
+                    "panelStyle": "blank",
+                    "panelSize": "none"
                   },
                   {
                     "id": "yootheme-panel-slide-0-0-0-3-1",
@@ -7468,7 +7470,9 @@
                     "buttonUrl": "?page_id=2#efficient-workflow",
                     "buttonTarget": "_self",
                     "buttonStyle": "default",
-                    "linkPanel": true
+                    "linkPanel": true,
+                    "panelStyle": "blank",
+                    "panelSize": "none"
                   },
                   {
                     "id": "yootheme-panel-slide-0-0-0-3-2",
@@ -7485,7 +7489,9 @@
                     "buttonUrl": "?page_id=2#project-management",
                     "buttonTarget": "_self",
                     "buttonStyle": "default",
-                    "linkPanel": true
+                    "linkPanel": true,
+                    "panelStyle": "blank",
+                    "panelSize": "none"
                   },
                   {
                     "id": "yootheme-panel-slide-0-0-0-3-3",
@@ -7502,7 +7508,9 @@
                     "buttonUrl": "?page_id=2#collaboration",
                     "buttonTarget": "_self",
                     "buttonStyle": "default",
-                    "linkPanel": true
+                    "linkPanel": true,
+                    "panelStyle": "blank",
+                    "panelSize": "none"
                   },
                   {
                     "id": "yootheme-panel-slide-0-0-0-3-4",
@@ -7519,7 +7527,9 @@
                     "buttonUrl": "?page_id=2#testimonials",
                     "buttonTarget": "_self",
                     "buttonStyle": "default",
-                    "linkPanel": true
+                    "linkPanel": true,
+                    "panelStyle": "blank",
+                    "panelSize": "none"
                   },
                   {
                     "id": "yootheme-panel-slide-0-0-0-3-5",
@@ -7536,31 +7546,54 @@
                     "buttonUrl": "?page_id=2#community",
                     "buttonTarget": "_self",
                     "buttonStyle": "default",
-                    "linkPanel": true
+                    "linkPanel": true,
+                    "panelStyle": "blank",
+                    "panelSize": "none"
                   }
                 ],
                 "carouselSettings": {
                   "presentation": "panel-slider",
                   "variant": "panel",
                   "slideMode": "panel",
+                  "showTitle": true,
+                  "showImage": true,
+                  "showMeta": true,
+                  "showContent": true,
+                  "showLink": true,
+                  "contentAlign": "center",
+                  "metaPosition": "below-title",
+                  "metaHtmlElement": "div",
+                  "metaStyle": "text-meta",
+                  "headingLevel": "div",
+                  "imageAlignment": "center",
+                  "imageWidth": "58",
+                  "imageLoading": "eager",
+                  "imageFit": "natural",
+                  "imageRatio": "natural",
+                  "linkPanel": true,
+                  "buttonStyle": "default",
                   "autoplay": false,
                   "pauseOnHover": true,
                   "centered": false,
                   "loop": false,
                   "spaceBetween": 30,
                   "divider": false,
+                  "itemWidthMode": "auto",
                   "cardsPerViewPhone": 1,
                   "cardsPerViewMedium": 3,
                   "showArrows": true,
                   "showDots": false,
                   "arrowPosition": "outside",
+                  "slidenavBreakpoint": "xlarge",
+                  "slidenavOutsideBreakpoint": "xlarge",
+                  "navigationBreakpoint": "small",
                   "effect": "slide"
                 },
                 "elementAlign": "center",
                 "textAlign": "center",
                 "headingAlign": "center",
-                "margin": "xlarge",
-                "marginMode": "xlarge",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
                     "marginMode": "xlarge",
@@ -7678,18 +7711,23 @@
                 ],
                 "carouselSettings": {
                   "presentation": "slideshow",
-                  "variant": "hero",
+                  "variant": "slideshow",
                   "slideMode": "hero",
+                  "slideshowMinHeight": 300,
+                  "showTitle": true,
+                  "showMeta": true,
+                  "showContent": true,
+                  "showLink": true,
                   "autoplay": false,
                   "pauseOnHover": true,
                   "showArrows": true,
                   "showDots": true,
-                  "arrowPosition": "default",
+                  "arrowPosition": "overlay",
                   "paginationPosition": "bottom-center",
                   "effect": "slide"
                 },
-                "margin": "default",
-                "marginMode": "default",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
                     "marginMode": "default"
@@ -7767,6 +7805,10 @@
                   "presentation": "overlay-slider",
                   "variant": "overlay",
                   "slideMode": "overlay",
+                  "showTitle": true,
+                  "showMeta": true,
+                  "showContent": true,
+                  "showLink": true,
                   "autoplay": false,
                   "pauseOnHover": true,
                   "centered": false,
@@ -7777,14 +7819,18 @@
                   "cardsPerViewMedium": 3,
                   "showArrows": true,
                   "showDots": true,
-                  "arrowPosition": "default",
+                  "arrowPosition": "overlay",
                   "paginationPosition": "bottom-center",
-                  "effect": "slide"
+                  "effect": "slide",
+                  "overlayMode": "cover",
+                  "overlayDisplay": "always",
+                  "overlayPosition": "center",
+                  "overlayPadding": "default"
                 },
                 "textAlign": "center",
                 "headingAlign": "center",
-                "margin": "default",
-                "marginMode": "default",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
                     "marginMode": "default",
@@ -7848,6 +7894,8 @@
                 "animation": {
                   "preset": "none"
                 },
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
                     "textAlign": "center"
@@ -7866,11 +7914,11 @@
                 "textColumnBreakpoint": "medium",
                 "maxWidth": "xlarge",
                 "headingAlign": "center",
-                "margin": "default",
-                "marginMode": "default",
                 "animation": {
                   "preset": "none"
                 },
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
                     "marginMode": "default",
@@ -7978,11 +8026,11 @@
                 "maxWidth": "medium",
                 "elementAlign": "center",
                 "headingAlign": "center",
-                "margin": "default",
-                "marginMode": "default",
                 "animation": {
                   "preset": "none"
-                }
+                },
+                "elementPadding": "none",
+                "spacingContract": "yootheme"
               }
             ]
           },
@@ -8004,8 +8052,8 @@
                 "imageAlignment": "center",
                 "textAlign": "center",
                 "headingAlign": "center",
-                "margin": "default",
-                "marginMode": "default",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
                     "marginMode": "default",
@@ -8109,11 +8157,11 @@
                 "maxWidth": "medium",
                 "elementAlign": "center",
                 "headingAlign": "center",
-                "margin": "default",
-                "marginMode": "default",
                 "animation": {
                   "preset": "none"
-                }
+                },
+                "elementPadding": "none",
+                "spacingContract": "yootheme"
               }
             ]
           }
@@ -8170,6 +8218,8 @@
                 "animation": {
                   "preset": "none"
                 },
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
                     "maxWidth": "large",
@@ -8194,11 +8244,11 @@
                 "textColumnBreakpoint": "medium",
                 "maxWidth": "large",
                 "headingAlign": "left",
-                "margin": "default",
-                "marginMode": "default",
                 "animation": {
                   "preset": "none"
                 },
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
                     "marginMode": "default",
@@ -8230,11 +8280,11 @@
                 "fullWidthButton": false,
                 "textAlign": "left",
                 "headingAlign": "left",
-                "margin": "medium",
-                "marginMode": "medium",
                 "animation": {
                   "preset": "none"
                 },
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
                     "marginMode": "medium",
@@ -8263,8 +8313,8 @@
                 "imageAlignment": "center",
                 "textAlign": "center",
                 "headingAlign": "center",
-                "margin": "default",
-                "marginMode": "default",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
                     "position": "relative",
@@ -8286,11 +8336,11 @@
                 "imageAlignment": "right",
                 "textAlign": "right",
                 "headingAlign": "right",
-                "margin": "default",
-                "marginMode": "default",
                 "animation": {
                   "preset": "parallax"
                 },
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
                     "position": "absolute",
@@ -8459,11 +8509,11 @@
                 "gridMetaAlign": "below-title",
                 "gridMetaHtmlElement": "div",
                 "headingAlign": "left",
-                "margin": "default",
-                "marginMode": "default",
                 "animation": {
                   "preset": "none"
-                }
+                },
+                "elementPadding": "none",
+                "spacingContract": "yootheme"
               },
               {
                 "id": "yootheme-image-3-1-0-1",
@@ -8475,10 +8525,10 @@
                 "imageSvgColor": "emphasis",
                 "imageShape": "none",
                 "imageAlignment": "left",
-                "margin": "default",
-                "marginMode": "default",
                 "visibility": "xl",
                 "visibilityMode": "xl",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
                     "position": "absolute",
@@ -8544,6 +8594,8 @@
                 "animation": {
                   "preset": "none"
                 },
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
                     "position": "relative",
@@ -8564,11 +8616,11 @@
                 "textColumnBreakpoint": "medium",
                 "maxWidth": "xlarge",
                 "headingAlign": "center",
-                "margin": "default",
-                "marginMode": "default",
                 "animation": {
                   "preset": "none"
                 },
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
                     "position": "relative",
@@ -8602,10 +8654,10 @@
                 "imageAlignment": "center",
                 "textAlign": "center",
                 "headingAlign": "center",
-                "margin": "default",
-                "marginMode": "default",
                 "visibility": "m",
                 "visibilityMode": "m",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
                     "position": "relative",
@@ -8628,13 +8680,13 @@
                 "imageAlignment": "center",
                 "textAlign": "center",
                 "headingAlign": "center",
-                "margin": "default",
-                "marginMode": "default",
                 "visibility": "m",
                 "visibilityMode": "m",
                 "animation": {
                   "preset": "parallax"
                 },
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
                     "position": "absolute",
@@ -8756,11 +8808,11 @@
                 "gridMetaHtmlElement": "div",
                 "elementAlign": "center",
                 "headingAlign": "center",
-                "margin": "large",
-                "marginMode": "large",
                 "animation": {
                   "preset": "fade"
-                }
+                },
+                "elementPadding": "none",
+                "spacingContract": "yootheme"
               },
               {
                 "id": "yootheme-button-4-2-0-1",
@@ -8777,8 +8829,8 @@
                 "fullWidthButton": false,
                 "textAlign": "center",
                 "headingAlign": "center",
-                "margin": "default",
-                "marginMode": "default",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
                     "marginMode": "default",
@@ -8842,6 +8894,8 @@
                 "animation": {
                   "preset": "none"
                 },
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
                     "textAlign": "center"
@@ -8860,11 +8914,11 @@
                 "textColumnBreakpoint": "medium",
                 "maxWidth": "xlarge",
                 "headingAlign": "center",
-                "margin": "default",
-                "marginMode": "default",
                 "animation": {
                   "preset": "none"
                 },
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
                     "marginMode": "default",
@@ -8898,8 +8952,8 @@
                 "imageAlignment": "center",
                 "textAlign": "center",
                 "headingAlign": "center",
-                "margin": "large",
-                "marginMode": "large",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
                     "marginMode": "large",
@@ -8918,11 +8972,11 @@
                 "imageSvgColor": "emphasis",
                 "imageShape": "none",
                 "imageAlignment": "left",
-                "margin": "default",
-                "marginMode": "default",
                 "animation": {
                   "preset": "parallax"
                 },
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
                     "position": "absolute",
@@ -8980,11 +9034,11 @@
                 "gridMetaHtmlElement": "div",
                 "textAlign": "center",
                 "headingAlign": "center",
-                "margin": "none",
-                "marginMode": "none",
                 "animation": {
                   "preset": "none"
-                }
+                },
+                "elementPadding": "none",
+                "spacingContract": "yootheme"
               }
             ]
           },
@@ -9005,8 +9059,8 @@
                 "imageAlignment": "center",
                 "textAlign": "center",
                 "headingAlign": "center",
-                "margin": "large",
-                "marginMode": "large",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
                     "marginMode": "large",
@@ -9025,11 +9079,11 @@
                 "imageSvgColor": "emphasis",
                 "imageShape": "none",
                 "imageAlignment": "left",
-                "margin": "default",
-                "marginMode": "default",
                 "animation": {
                   "preset": "parallax"
                 },
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
                     "position": "absolute",
@@ -9088,11 +9142,11 @@
                 "gridMetaHtmlElement": "div",
                 "textAlign": "center",
                 "headingAlign": "center",
-                "margin": "none",
-                "marginMode": "none",
                 "animation": {
                   "preset": "none"
-                }
+                },
+                "elementPadding": "none",
+                "spacingContract": "yootheme"
               }
             ]
           }
@@ -9143,6 +9197,8 @@
                 "headingSize": "h1",
                 "headingAlign": "center",
                 "textAlign": "center",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
                     "textAlign": "center"
@@ -9166,9 +9222,9 @@
                 "fullWidthButton": false,
                 "textAlign": "center",
                 "headingAlign": "center",
-                "margin": "medium",
-                "marginMode": "medium",
                 "removeBottomMargin": true,
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
                     "marginMode": "medium",
@@ -9238,6 +9294,8 @@
                 "animation": {
                   "preset": "none"
                 },
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
                     "textAlign": "center"
@@ -9256,11 +9314,11 @@
                 "textColumnBreakpoint": "medium",
                 "maxWidth": "xlarge",
                 "headingAlign": "center",
-                "margin": "default",
-                "marginMode": "default",
                 "animation": {
                   "preset": "none"
                 },
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
                     "marginMode": "default",
@@ -9403,9 +9461,9 @@
                 "gridMetaAlign": "below-title",
                 "gridMetaHtmlElement": "div",
                 "headingAlign": "center",
-                "margin": "large",
-                "marginMode": "large",
-                "removeBottomMargin": true
+                "removeBottomMargin": true,
+                "elementPadding": "none",
+                "spacingContract": "yootheme"
               }
             ]
           },
@@ -9424,10 +9482,10 @@
                 "imageSvgColor": "emphasis",
                 "imageShape": "none",
                 "imageAlignment": "left",
-                "margin": "default",
-                "marginMode": "default",
                 "visibility": "l",
                 "visibilityMode": "l",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
                     "position": "absolute",
@@ -9494,6 +9552,8 @@
                 "animation": {
                   "preset": "none"
                 },
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
                     "textAlign": "left",
@@ -9513,11 +9573,11 @@
                 "textColumnBreakpoint": "medium",
                 "maxWidth": "large",
                 "headingAlign": "left",
-                "margin": "default",
-                "marginMode": "default",
                 "animation": {
                   "preset": "none"
                 },
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
                     "marginMode": "default",
@@ -9666,8 +9726,8 @@
                 "maxWidthBreakpoint": "medium",
                 "elementAlign": "right",
                 "headingAlign": "left",
-                "margin": "default",
-                "marginMode": "default"
+                "elementPadding": "none",
+                "spacingContract": "yootheme"
               }
             ]
           },
@@ -9686,10 +9746,10 @@
                 "imageSvgColor": "emphasis",
                 "imageShape": "none",
                 "imageAlignment": "left",
-                "margin": "default",
-                "marginMode": "default",
                 "visibility": "l",
                 "visibilityMode": "l",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
                     "position": "absolute",
@@ -9713,10 +9773,10 @@
                 "imageAlignment": "right",
                 "textAlign": "right",
                 "headingAlign": "right",
-                "margin": "default",
-                "marginMode": "default",
                 "visibility": "l",
                 "visibilityMode": "l",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
                     "position": "absolute",
@@ -9779,6 +9839,8 @@
                 "headingSize": "h1",
                 "headingAlign": "center",
                 "textAlign": "center",
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
                     "textAlign": "center"
@@ -9797,9 +9859,9 @@
                 "textColumnBreakpoint": "medium",
                 "maxWidth": "large",
                 "headingAlign": "center",
-                "margin": "medium",
-                "marginMode": "medium",
                 "removeBottomMargin": true,
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
                     "marginMode": "medium",
@@ -9911,8 +9973,8 @@
                 },
                 "gridMetaAlign": "above-title",
                 "headingAlign": "center",
-                "margin": "default",
-                "marginMode": "default"
+                "elementPadding": "none",
+                "spacingContract": "yootheme"
               }
             ]
           },
@@ -9937,6 +9999,8 @@
                 "textAlign": "center",
                 "headingAlign": "center",
                 "removeBottomMargin": true,
+                "elementPadding": "none",
+                "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
                     "removeBottomMargin": true,
@@ -9951,6 +10015,6 @@
         ]
       }
     ],
-    "updatedAt": "2026-08-10T16:55:40.561Z"
+    "updatedAt": "2026-08-10T19:24:56.777Z"
   }
 }

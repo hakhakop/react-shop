@@ -702,3 +702,23 @@ export function getUikitImageAttributes(image: UikitImageSemantics) {
     "data-uk-img": undefined,
   };
 }
+
+/** Shared renderer semantics for YOOtheme's "Make SVG stylable with CSS" contract. */
+export function getUikitSvgColor(value?: string | null): string {
+  return {
+    primary: "var(--uk-global-primary-background, currentColor)",
+    secondary: "var(--uk-global-secondary-background, currentColor)",
+    muted: "var(--uk-global-muted-color, currentColor)",
+    emphasis: "var(--uk-global-emphasis-color, currentColor)",
+    inverse: "var(--uk-global-inverse-color, currentColor)",
+    default: "var(--uk-global-color, currentColor)",
+  }[String(value ?? "primary").toLowerCase()] ?? String(value ?? "currentColor");
+}
+
+/** YOOtheme applies SVG Style through contextual UIkit text-color classes. */
+export function getUikitSvgColorClass(value?: string | null): string {
+  const normalized = String(value ?? "").toLowerCase();
+  return ["primary", "secondary", "muted", "emphasis"].includes(normalized)
+    ? `uk-text-${normalized}`
+    : "";
+}

@@ -318,7 +318,7 @@
   "sectionTitleRotation": "left",
   "sectionTitleBreakpoint": "x-large",
   "headerSticky": true,
-  "updatedAt": "2026-08-10T17:42:36.034Z",
+  "updatedAt": "2026-08-10T20:14:10.841Z",
   "headerCustomHeight": 92,
   "headingXLargeFontSize": "44px",
   "headingLargeFontSize": "38px",
@@ -403,7 +403,7 @@
   "accordionItemBorder": "#E5E9ED",
   "accordionItemBoxShadow": "inset 0 1px rgba(255, 255, 255, 0.6)",
   "pageContainerMaxWidth": "1600px",
-  "globalStylePresetName": "default Devstak",
+  "globalStylePresetName": "DevStack default",
   "globalStylePresetBackup": {
     "design": {
       "preset": "princity",

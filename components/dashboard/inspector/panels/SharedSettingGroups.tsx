@@ -437,6 +437,7 @@ export function ImageSettingsGroup({
   showDimensions = true,
   showFrameControls = true,
   showAlignment = true,
+  showSvgControls = false,
   mediaLayout,
   keys = {
     width: "imageWidth",
@@ -449,6 +450,8 @@ export function ImageSettingsGroup({
     decoration: "imageBoxDecoration",
     align: "imageAlignment",
     frameless: "alignImageWithoutPadding",
+    svgInline: "imageSvgInline",
+    svgColor: "imageSvgColor",
   },
 }: {
   block: BuilderLayoutBlock;
@@ -463,6 +466,8 @@ export function ImageSettingsGroup({
   showFrameControls?: boolean;
   /** Hide when a component owns image placement through its structural layout. */
   showAlignment?: boolean;
+  /** Compose the canonical YOOtheme stylable-SVG controls where the parent element exposes them. */
+  showSvgControls?: boolean;
   /** Structural Panel media placement remains a Panel owner but is presented in YOOtheme's Image group. */
   mediaLayout?: { placement: string; width: string };
   keys?: {
@@ -476,6 +481,8 @@ export function ImageSettingsGroup({
     decoration?: string;
     align: string;
     frameless?: string;
+    svgInline?: string;
+    svgColor?: string;
   };
 }) {
   const values = block as any;
@@ -485,6 +492,8 @@ export function ImageSettingsGroup({
   const shadowVal = values[keys.shadow] ?? values.imageBoxShadow ?? "none";
   const decorationKey = keys.decoration ?? "imageBoxDecoration";
   const framelessKey = keys.frameless ?? "alignImageWithoutPadding";
+  const svgInlineKey = keys.svgInline ?? "imageSvgInline";
+  const svgColorKey = keys.svgColor ?? "imageSvgColor";
   const decorationVal = values[decorationKey] ?? "none";
 
   return (
@@ -593,6 +602,40 @@ export function ImageSettingsGroup({
           onChange={(value) => update({ [keys.loading]: value })}
         />
       </InspectorFieldRow>
+
+      {showSvgControls && <InspectorFieldRow
+        label="Stylable SVG"
+        isOverridden={values[svgInlineKey] !== undefined}
+        inheritedValueText="Off"
+        onReset={() => update({ [svgInlineKey]: undefined })}
+      >
+        <InspectorSwitch
+          checked={values[svgInlineKey] === true}
+          onChange={(checked) => update({ [svgInlineKey]: checked || undefined })}
+          label="Make SVG stylable with CSS"
+        />
+      </InspectorFieldRow>}
+
+      {showSvgControls && values[svgInlineKey] === true && <InspectorFieldRow
+        label="SVG Style"
+        isOverridden={values[svgColorKey] !== undefined}
+        inheritedValueText="Primary"
+        onReset={() => update({ [svgColorKey]: undefined })}
+      >
+        <InspectorSelect
+          value={String(values[svgColorKey] ?? "primary")}
+          options={[
+            { value: "primary", label: "Primary" },
+            { value: "secondary", label: "Secondary" },
+            { value: "default", label: "Default" },
+            { value: "muted", label: "Muted" },
+            { value: "emphasis", label: "Emphasis" },
+            { value: "inverse", label: "Inverse" },
+          ]}
+          onChange={(value) => update({ [svgColorKey]: value })}
+          ariaLabel="SVG Style"
+        />
+      </InspectorFieldRow>}
 
       {showLinkImage && (
         <InspectorFieldRow

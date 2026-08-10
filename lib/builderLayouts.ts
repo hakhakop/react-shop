@@ -252,6 +252,7 @@ export type BuilderLayoutBlock = {
     cardsPerViewSmall?: number;
     cardsPerViewMedium?: number;
     cardsPerViewLarge?: number;
+    cardsPerViewXLarge?: number;
     centered?: boolean;
     divider?: boolean;
     showArrows?: boolean;
