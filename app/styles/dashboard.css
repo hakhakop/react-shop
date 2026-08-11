@@ -15408,6 +15408,244 @@ body:has([data-scoped-builder-root])
 .builder-preview-canvas .builder-preview-column-toolbar { z-index: 10030 !important; }
 .builder-preview-canvas .builder-preview-block-tools { z-index: 10040 !important; }
 
+/* Phase 1 shared interaction chrome. Canonical Builder objects keep identity
+   and drag/drop behavior; hover/selection outlines and toolbars live here. */
+.builder-shared-interaction-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  pointer-events: none;
+}
+
+/* Keep the canonical Builder document mounted while allowing Chromium to skip
+   layout and paint for distant sections on long pages. The `auto` intrinsic
+   size remembers each section after its first layout, avoiding scroll jumps. */
+.builder-preview-canvas .builder-preview-section {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 900px;
+}
+
+.builder-preview-canvas .builder-preview-section.is-selected,
+.builder-preview-canvas .builder-preview-section:focus-within {
+  content-visibility: visible;
+}
+
+/* Structural insertion boundaries are drag-only. Normal selection uses real
+   content targets plus the fixed hierarchy toolbar—never invisible gutters. */
+.builder-preview-canvas:not(.is-dragging-template-section)
+  .builder-preview-section-insert,
+.builder-preview-canvas:not(.is-dragging-template-row)
+  .builder-interaction-row-boundary {
+  pointer-events: none !important;
+}
+
+.builder-preview-canvas .builder-main-row-frame::before {
+  pointer-events: none !important;
+}
+
+.builder-shared-interaction-frame {
+  position: fixed;
+  box-sizing: border-box;
+  pointer-events: none;
+  outline: 1px solid color-mix(in srgb, var(--builder-ui-accent, #0d73ff) 38%, transparent);
+  outline-offset: -1px;
+}
+
+.builder-shared-interaction-frame.is-selected,
+.builder-shared-interaction-frame.is-editing {
+  outline: 1.5px solid var(--builder-ui-accent, #0d73ff);
+}
+
+.builder-shared-interaction-frame.is-hovered.is-row {
+  outline-style: dashed;
+}
+
+.builder-shared-toolbar-host {
+  position: absolute;
+  top: 0;
+  right: 8px;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.builder-shared-toolbar-host > .builder-context-toolbar,
+.builder-shared-toolbar-host > .builder-preview-block-tools {
+  position: absolute !important;
+  top: 0 !important;
+  right: 0 !important;
+  opacity: 1 !important;
+  transform: translateY(-100%) scale(1) !important;
+  pointer-events: auto !important;
+  z-index: 10040 !important;
+}
+
+.builder-shared-row-insert-trigger {
+  top: auto !important;
+  right: auto !important;
+  bottom: 0 !important;
+  left: 50% !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  transform: translate(-50%, 50%) scale(1) !important;
+  z-index: 10041 !important;
+}
+
+.builder-fixed-selection-toolbar {
+  position: fixed;
+  z-index: 10060;
+  right: max(24px, calc((100vw - min(1180px, 100vw - 48px)) / 2));
+  bottom: 24px;
+  left: max(24px, calc((100vw - min(1180px, 100vw - 48px)) / 2));
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 10px;
+  border: 1px solid color-mix(in srgb, var(--builder-ui-border, #d9dde5) 82%, transparent);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--builder-ui-panel-solid, #ffffff) 94%, transparent);
+  box-shadow: 0 14px 40px rgba(15, 23, 42, 0.18);
+  backdrop-filter: blur(16px);
+  pointer-events: auto;
+}
+
+body:has(.builder-dashboard.is-inspector-docked)
+  .builder-fixed-selection-toolbar {
+  right: max(384px, calc(32vw + 24px));
+}
+
+.builder-fixed-selection-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: 0 0 auto;
+}
+
+.builder-fixed-selection-breadcrumb button,
+.builder-fixed-selection-breadcrumb span,
+.builder-fixed-add-control > button,
+.builder-fixed-add-menu button {
+  min-height: 28px;
+  border: 0;
+  border-radius: 8px;
+  padding: 5px 8px;
+  background: transparent;
+  color: var(--builder-ui-text, #111827);
+  font: inherit;
+  font-size: 11px;
+  font-weight: 750;
+  white-space: nowrap;
+}
+
+.builder-fixed-selection-breadcrumb button:hover,
+.builder-fixed-add-control > button:hover,
+.builder-fixed-add-menu button:hover {
+  background: color-mix(in srgb, var(--builder-ui-accent, #0d73ff) 10%, transparent);
+  color: var(--builder-ui-accent, #0d73ff);
+}
+
+.builder-fixed-selection-breadcrumb button::after {
+  content: "›";
+  margin-left: 8px;
+  opacity: 0.36;
+}
+
+.builder-fixed-selection-breadcrumb span[aria-current="page"] {
+  background: color-mix(in srgb, var(--builder-ui-accent, #0d73ff) 12%, transparent);
+  color: var(--builder-ui-accent, #0d73ff);
+}
+
+.builder-fixed-selection-actions {
+  min-width: 0;
+  flex: 1 1 auto;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.builder-fixed-selection-actions > .builder-context-toolbar,
+.builder-fixed-selection-actions > .builder-preview-block-tools {
+  position: static !important;
+  inset: auto !important;
+  opacity: 1 !important;
+  transform: none !important;
+  pointer-events: auto !important;
+}
+
+.builder-fixed-add-control {
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.builder-fixed-add-control > button {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--builder-ui-accent, #0d73ff);
+  color: #ffffff;
+}
+
+.builder-fixed-add-menu {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 8px);
+  min-width: 140px;
+  display: grid;
+  gap: 2px;
+  padding: 6px;
+  border: 1px solid var(--builder-ui-border, #d9dde5);
+  border-radius: 10px;
+  background: var(--builder-ui-panel-solid, #ffffff);
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.16);
+}
+
+.builder-fixed-add-menu button {
+  width: 100%;
+  text-align: left;
+}
+
+.builder-shared-toolbar-host button {
+  width: 22px !important;
+  height: 22px !important;
+  flex: 0 0 22px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 4px !important;
+  background: transparent !important;
+  color: #475569 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  pointer-events: auto !important;
+  cursor: pointer !important;
+}
+
+.builder-shared-toolbar-host button:disabled {
+  opacity: 0.3 !important;
+  cursor: not-allowed !important;
+}
+
+.builder-preview-canvas
+  .builder-interaction-object:is(
+    .is-interaction-hovered,
+    .is-interaction-selected,
+    .is-interaction-editing
+  ) {
+  outline: none !important;
+}
+
+/* The former row button is replaced by the frame's non-DOM gutter. Events
+   resolve to the row frame and bubble to PreviewCanvas delegation. */
+.builder-preview-canvas .builder-main-row-frame::before {
+  z-index: 7;
+  top: -18px;
+  right: 0;
+  bottom: auto;
+  left: 0;
+  height: 18px;
+}
+
 /* Empty placeholders communicate availability through their content and
    surface only. The canonical interaction object owns the sole hover/selected
    outline; descendants never paint a second technical rectangle. */
@@ -15531,6 +15769,7 @@ body:has([data-scoped-builder-root])
 /* Panel Slider: Swiper owns motion only; slide appearance comes from the
    same UIkit Panel/Card and semantic content contract as Grid. */
 .shop-builder-panel-slider-card {
+  position: relative;
   display: flex;
   flex-direction: column;
   min-height: 100%;
@@ -15543,14 +15782,9 @@ body:has([data-scoped-builder-root])
   background: color-mix(in srgb, var(--global-muted-background, #f5f5f5) 85%, transparent);
 }
 
-.shop-builder-panel-slider-media-link,
 .shop-builder-panel-slider-media img {
   display: block;
   height: 100%;
-}
-
-.shop-builder-panel-slider-media-link {
-  width: 100%;
 }
 
 .shop-builder-panel-slider-placeholder {
@@ -15578,6 +15812,8 @@ body:has([data-scoped-builder-root])
 }
 
 .shop-builder-panel-slider-action {
+  position: relative;
+  z-index: 2;
   align-self: flex-start;
   margin-top: auto;
 }

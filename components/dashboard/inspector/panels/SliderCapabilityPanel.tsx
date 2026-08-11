@@ -6,6 +6,7 @@ import type { BuilderLayoutBlock, InspectorTab } from "@/components/dashboard/bu
 import type { BuilderShellSettings } from "@/lib/builderShell";
 import IconPicker from "@/components/dashboard/inspector/IconPicker";
 import RepeatableItemShell from "@/components/dashboard/inspector/RepeatableItemShell";
+import RichTextEditor from "@/components/dashboard/RichTextEditor";
 import {
   ActionSettingsGroup,
   CardSettingsGroup,
@@ -101,17 +102,32 @@ export default function SliderCapabilityPanel({
       ...patch,
     };
 
+    // `contentAlign` was a short-lived Panel Slider duplicate of General
+    // alignment. Migrate it on the next normal Panel Slider edit, then retain
+    // only the canonical block-level owner.
+    const legacyPanelContentAlignment = isPanelSlider &&
+      (carouselSettings.contentAlign === "left" || carouselSettings.contentAlign === "center" || carouselSettings.contentAlign === "right")
+      ? carouselSettings.contentAlign
+      : undefined;
+    if (isPanelSlider) delete nextCarouselSettings.contentAlign;
+    const panelAlignmentMigration = legacyPanelContentAlignment && rawBlock.textAlign === undefined
+      ? { textAlign: legacyPanelContentAlignment }
+      : {};
+
     if (!isPanelSlider || slides.length === 0) {
-      update({ carouselSettings: nextCarouselSettings } as any);
+      update({ carouselSettings: nextCarouselSettings, ...panelAlignmentMigration } as any);
       return;
     }
 
     const sharedKeys = Object.keys(LEGACY_PANEL_SLIDER_ITEM_DEFAULTS).filter((key) =>
       Object.prototype.hasOwnProperty.call(patch, key),
     );
+    const sharedDimensionKeys = ["imageWidth", "imageHeight"].filter((key) =>
+      Object.prototype.hasOwnProperty.call(patch, key),
+    );
 
-    if (sharedKeys.length === 0) {
-      update({ carouselSettings: nextCarouselSettings } as any);
+    if (sharedKeys.length === 0 && sharedDimensionKeys.length === 0) {
+      update({ carouselSettings: nextCarouselSettings, ...panelAlignmentMigration } as any);
       return;
     }
 
@@ -124,12 +140,21 @@ export default function SliderCapabilityPanel({
           delete nextSlide[key];
         }
       });
+      // Historic imports copied element-level dimensions into every slide.
+      // Remove only a value that exactly matched the previous shared value so
+      // an intentionally different per-item size remains an override.
+      sharedDimensionKeys.forEach((key) => {
+        if (nextSlide[key] === carouselSettings[key]) {
+          delete nextSlide[key];
+        }
+      });
       return nextSlide;
     });
 
     update({
       carouselSettings: nextCarouselSettings,
       slides: migratedSlides,
+      ...panelAlignmentMigration,
     } as any);
   };
   const sharedSettingsBlock = { ...carouselSettings } as BuilderLayoutBlock;
@@ -380,23 +405,37 @@ export default function SliderCapabilityPanel({
                         />
                       </InspectorFieldRow>
 
-                      {!isPanelSlider && <InspectorFieldRow label="Meta">
+                      <InspectorFieldRow label="Meta">
                         <InspectorTextField
                           value={slide.meta ?? slide.subtitle ?? ""}
                           onChange={(value: string) => updateSlide({ meta: value })}
                           placeholder="Meta text..."
                           ariaLabel={`${itemLabel} ${index + 1} meta`}
                         />
-                      </InspectorFieldRow>}
+                      </InspectorFieldRow>
 
                       <InspectorFieldRow label="Content">
-                        <InspectorTextarea
+                        <RichTextEditor
                           value={slide.text ?? ""}
-                          onChange={(value: string) => updateSlide({ text: value })}
+                          onChange={(value) => updateSlide({ text: value })}
                           placeholder={`${itemLabel} content...`}
-                          ariaLabel={`${itemLabel} ${index + 1} content`}
+                          minHeight="120px"
                         />
                       </InspectorFieldRow>
+
+                      {isPanelSlider && <CardSettingsGroup
+                        block={slide as BuilderLayoutBlock}
+                        update={updateSlide}
+                        title="PANEL"
+                        surfaceOptions={[
+                          { value: "blank", label: "None" },
+                          { value: "default", label: "Default" },
+                          { value: "primary", label: "Primary" },
+                          { value: "secondary", label: "Secondary" },
+                        ]}
+                        defaultSize="none"
+                        keys={{ variant: "panelStyle", size: "panelSize", hover: "panelHover", link: "linkPanel" }}
+                      />}
 
                       <InspectorFieldRow label="Image">
                         <BuilderImageUrlControl
@@ -425,14 +464,41 @@ export default function SliderCapabilityPanel({
                         />
                       </InspectorFieldRow>}
 
-                      <InspectorFieldRow label="Link URL">
+                      {isPanelSlider ? <>
+                        <ActionSettingsGroup
+                          block={slide as BuilderLayoutBlock}
+                          update={updateSlide}
+                          title="ACTION"
+                          showVisibilityToggle
+                          keys={{
+                            visible: "showAction",
+                            label: "buttonLabel",
+                            url: "buttonUrl",
+                            target: "buttonTarget",
+                            style: "buttonStyle",
+                            size: "buttonSize",
+                          }}
+                        />
+                        <InspectorFieldRow
+                          label="Link"
+                          isOverridden={slide.linkPanel !== undefined}
+                          inheritedValueText="Off"
+                          onReset={() => updateSlide({ linkPanel: undefined })}
+                        >
+                          <InspectorSwitch
+                            checked={Boolean(slide.linkPanel ?? carouselSettings.linkPanel)}
+                            onChange={(checked) => updateSlide({ linkPanel: checked })}
+                            label="Link entire panel"
+                          />
+                        </InspectorFieldRow>
+                      </> : <InspectorFieldRow label="Link URL">
                         <InspectorTextField
                           value={slide.buttonUrl ?? ""}
                           onChange={(value: string) => updateSlide({ buttonUrl: value })}
                           placeholder="https://..."
                           ariaLabel={`${itemLabel} ${index + 1} link URL`}
                         />
-                      </InspectorFieldRow>
+                      </InspectorFieldRow>}
                     </>
                   ) : !isPanelSlider ? (
                     <>
@@ -526,6 +592,9 @@ export default function SliderCapabilityPanel({
             <InspectorFieldRow label="Gap">
               <InspectorSelect value={String(carouselSettings.spaceBetween ?? 30)} onChange={(value: string) => updateCarousel({ spaceBetween: Number(value) })} options={[{ value: "0", label: "None" }, { value: "15", label: "Small" }, { value: "30", label: "Default" }, { value: "40", label: "Large" }]} />
             </InspectorFieldRow>
+            <InspectorFieldRow label="Divider">
+              <InspectorSwitch checked={carouselSettings.divider === true} onChange={(checked: boolean) => updateCarousel({ divider: checked })} label="Show dividers" />
+            </InspectorFieldRow>
             <InspectorFieldRow label="Center slides"><InspectorSwitch checked={carouselSettings.centered === true} onChange={(checked: boolean) => updateCarousel({ centered: checked })} label="Center" /></InspectorFieldRow>
             <InspectorFieldRow label="Finite"><InspectorSwitch checked={carouselSettings.loop === false} onChange={(checked: boolean) => updateCarousel({ loop: !checked })} label="Stop at the last item" /></InspectorFieldRow>
             <InspectorFieldRow label="Autoplay"><InspectorSwitch checked={carouselSettings.autoplay === true} onChange={(checked: boolean) => updateCarousel({ autoplay: checked })} label="Enable autoplay" /></InspectorFieldRow>
@@ -537,6 +606,7 @@ export default function SliderCapabilityPanel({
             {itemWidth("cardsPerViewSmall", "Phone Landscape")}
             {itemWidth("cardsPerViewMedium", "Medium (Tablet Landscape)", 3)}
             {itemWidth("cardsPerViewLarge", "Large (Desktop)")}
+            {itemWidth("cardsPerViewXLarge", "X-Large (Large Screens)")}
           </InspectorDivision>
 
           <InspectorDivision title="NAVIGATION">
@@ -555,15 +625,47 @@ export default function SliderCapabilityPanel({
             <InspectorFieldRow label="Meta"><InspectorSwitch checked={carouselSettings.showMeta !== false} onChange={(checked: boolean) => updateCarousel({ showMeta: checked })} label="Show meta" /></InspectorFieldRow>
             <InspectorFieldRow label="Content"><InspectorSwitch checked={carouselSettings.showContent !== false} onChange={(checked: boolean) => updateCarousel({ showContent: checked })} label="Show content" /></InspectorFieldRow>
             <InspectorFieldRow label="Link"><InspectorSwitch checked={carouselSettings.showLink !== false} onChange={(checked: boolean) => updateCarousel({ showLink: checked })} label="Show link" /></InspectorFieldRow>
-            <InspectorFieldRow label="Text alignment"><InspectorSelect value={carouselSettings.contentAlign ?? "center"} onChange={(value: string) => updateCarousel({ contentAlign: value })} options={[{ value: "left", label: "Left" }, { value: "center", label: "Center" }, { value: "right", label: "Right" }]} /></InspectorFieldRow>
           </InspectorDivision>
+
+          <TitleSettingsGroup
+            block={sharedSettingsBlock}
+            update={updateCarousel}
+            showFontRole={false}
+            defaultSize="inherit"
+            defaultLevel="h3"
+          />
+
+          <MetaSettingsGroup
+            block={sharedSettingsBlock}
+            update={updateCarousel}
+            showAlignment={false}
+            showStyle
+            showPosition
+            showHtmlElement
+            keys={{
+              role: "metaTypographyRole",
+              align: "metaAlign",
+              level: "metaHtmlElement",
+              style: "metaStyle",
+              color: "metaColor",
+              position: "metaPosition",
+            }}
+          />
 
           <ImageSettingsGroup
             block={sharedSettingsBlock}
             update={updateCarousel}
-            showFrameless
             showFrameControls={false}
+            // Panel Slider's YOOtheme Image Alignment is structural (`top` /
+            // `left`), not the shared Image horizontal alignment. Its shared
+            // media-grid runtime is deferred, so do not expose a misleading
+            // left/center/right substitute in this composition.
+            showAlignment={false}
             showSvgControls
+            showFocalPoint={false}
+            showShadow={false}
+            showDecoration={false}
+            svgColorLabel="SVG Color"
           />
         </div>
       );

@@ -3,7 +3,7 @@
 import React from "react";
 import type { BuilderLayoutBlock } from "@/components/dashboard/builderTypes";
 import type { BuilderShellSettings } from "@/lib/builderShell";
-import { resolveCarouselPresentation } from "@/lib/carouselPresentation";
+import { resolveCarouselContentAlignment, resolveCarouselPresentation } from "@/lib/carouselPresentation";
 import CarouselBlock, { type CarouselSlide } from "@/components/blocks/CarouselBlock";
 import BuilderLineBreakText from "@/components/builder/BuilderLineBreakText";
 import { Typog } from "@/components/builder/BuilderRenderHelpers";
@@ -39,6 +39,13 @@ const DEFAULT_SLIDES: CarouselSlide[] = [
 export default function UikitSlider({ block, panelMode = false, shellSettings }: Props) {
   const rawBlock = (block ?? {}) as any;
   const rawCarouselSettings = rawBlock.carouselSettings ?? {};
+  // Do not let the retired Panel Slider-specific persisted field reach the
+  // shared carousel runtime. General is its single canonical owner.
+  const { contentAlign: _retiredPanelContentAlign, ...panelCarouselSettings } = rawCarouselSettings;
+  // YOOtheme owns Panel Slider text alignment in General. It is deliberately
+  // not a carousel/item setting and does not share any path with image media
+  // placement.
+  const panelContentAlignment = resolveCarouselContentAlignment(rawBlock.textAlign);
 
   const panelShared = panelMode
     ? {
@@ -55,16 +62,23 @@ export default function UikitSlider({ block, panelMode = false, shellSettings }:
         imageShape: rawCarouselSettings.imageShape ?? "none",
         imageShadow: rawCarouselSettings.imageShadow ?? "none",
         imageLoading: rawCarouselSettings.imageLoading ?? "lazy",
-        imageAlignment: rawCarouselSettings.imageAlignment ?? "center",
+        // Structural Panel Slider image placement is deliberately deferred
+        // until it has a truthful canonical owner. Do not fabricate generic
+        // `uk-align-center` margins when the source has no supported local
+        // image-alignment value.
+        imageAlignment: rawCarouselSettings.imageAlignment,
         imageSvgInline: rawCarouselSettings.imageSvgInline,
         imageSvgColor: rawCarouselSettings.imageSvgColor,
-        contentAlign: rawCarouselSettings.contentAlign,
-        headingAlign: rawCarouselSettings.contentAlign,
+        contentAlign: panelContentAlignment,
+        headingAlign: panelContentAlignment,
         gridMetaAlign: rawCarouselSettings.metaPosition,
         metaHtmlElement: rawCarouselSettings.metaHtmlElement,
         metaStyle: rawCarouselSettings.metaStyle,
         headingLevel: rawCarouselSettings.headingLevel,
         headingSize: rawCarouselSettings.headingSize,
+        buttonStyle: rawCarouselSettings.buttonStyle,
+        buttonSize: rawCarouselSettings.buttonSize,
+        linkTarget: rawCarouselSettings.linkTarget,
         imageBoxDecoration: rawCarouselSettings.imageBoxDecoration,
         alignImageWithoutPadding: rawCarouselSettings.alignImageWithoutPadding ?? false,
       }
@@ -106,19 +120,25 @@ export default function UikitSlider({ block, panelMode = false, shellSettings }:
         imageSvgColor: panelMode ? slide.imageSvgColor ?? panelShared?.imageSvgColor : slide.imageSvgColor,
         imageBoxDecoration: slide.imageBoxDecoration ?? panelShared?.imageBoxDecoration,
         alignImageWithoutPadding: slide.alignImageWithoutPadding ?? panelShared?.alignImageWithoutPadding,
-        contentAlign: slide.contentAlign ?? panelShared?.contentAlign,
-        headingAlign: slide.headingAlign ?? panelShared?.headingAlign,
+        contentAlign: panelMode ? panelShared?.contentAlign : slide.contentAlign,
+        headingAlign: panelMode ? panelShared?.headingAlign : slide.headingAlign,
         gridMetaAlign: slide.gridMetaAlign ?? panelShared?.gridMetaAlign,
         metaHtmlElement: slide.metaHtmlElement ?? panelShared?.metaHtmlElement,
         metaStyle: slide.metaStyle ?? panelShared?.metaStyle,
         headingLevel: slide.headingLevel ?? panelShared?.headingLevel,
         headingSize: slide.headingSize ?? panelShared?.headingSize,
-        buttonLabel: slide.buttonLabel || "",
-        buttonUrl: slide.buttonUrl || "#",
-        buttonTarget: slide.buttonTarget || "_self",
+        buttonLabel: slide.buttonLabel ?? "",
+        // A missing source URL is an absent action, not a placeholder link.
+        // Native demonstration slides already carry explicit URLs.
+        buttonUrl: slide.buttonUrl ?? undefined,
+        buttonTarget: slide.buttonTarget ?? panelShared?.linkTarget ?? "_self",
       }));
 
-  const carousel = resolveCarouselPresentation(rawCarouselSettings, slides, shellSettings) as { settings: any; slides: CarouselSlide[] };
+  const carousel = resolveCarouselPresentation(
+    panelMode ? panelCarouselSettings : rawCarouselSettings,
+    slides,
+    shellSettings,
+  ) as { settings: any; slides: CarouselSlide[] };
   const marginClass = rawBlock.margin && rawBlock.margin !== "none" ? `uk-margin-${rawBlock.margin}` : "";
   const animationClass = rawBlock.animation && rawBlock.animation !== "none" ? `uk-animation-${rawBlock.animation}` : "";
   const visibilityClass = rawBlock.visibility && rawBlock.visibility !== "always" ? `uk-${rawBlock.visibility}` : "";
@@ -148,16 +168,22 @@ export default function UikitSlider({ block, panelMode = false, shellSettings }:
           panelMode
             ? {
                 ...carousel.settings,
-                headingLevel: rawBlock.headingLevel,
-                headingSize: rawBlock.headingSize,
-                titleTypographyRole: rawBlock.titleTypographyRole,
-                metaTypographyRole: rawBlock.metaTypographyRole,
-                metaStyle: rawBlock.metaStyle,
-                contentTypographyRole: rawBlock.contentTypographyRole,
-                contentStyle: rawBlock.contentStyle,
-                buttonStyle: rawBlock.buttonStyle,
-                buttonSize: rawBlock.size,
-                linkTarget: rawBlock.linkTarget,
+                // Canonical Panel Slider settings own imported element
+                // presentation. Historic top-level values are fallback-only;
+                // an undefined legacy field must never erase a valid import.
+                headingLevel: carousel.settings.headingLevel ?? rawBlock.headingLevel,
+                headingSize: carousel.settings.headingSize ?? rawBlock.headingSize,
+                titleTypographyRole: carousel.settings.titleTypographyRole ?? rawBlock.titleTypographyRole,
+                metaTypographyRole: carousel.settings.metaTypographyRole ?? rawBlock.metaTypographyRole,
+                metaStyle: carousel.settings.metaStyle ?? rawBlock.metaStyle,
+                contentTypographyRole: carousel.settings.contentTypographyRole ?? rawBlock.contentTypographyRole,
+                contentStyle: carousel.settings.contentStyle ?? rawBlock.contentStyle,
+                // Runtime input only: this is derived directly from General,
+                // never persisted inside carouselSettings.
+                contentAlign: panelContentAlignment,
+                buttonStyle: carousel.settings.buttonStyle ?? rawBlock.buttonStyle,
+                buttonSize: carousel.settings.buttonSize ?? rawBlock.size,
+                linkTarget: carousel.settings.linkTarget ?? rawBlock.linkTarget,
                 cardsPerView: rawCarouselSettings.cardsPerView,
                 variant: "panel",
                 effect: rawCarouselSettings.effect ?? "slide",

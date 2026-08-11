@@ -60,14 +60,29 @@ export function applyContentPatch<T extends TranslatableEntity>(
   } as T;
 }
 
+const resolvedSectionCache = new WeakMap<
+  BuilderSection,
+  Map<string, BuilderSection>
+>();
+
+function resolvedSectionCacheKey(language: string, primaryLanguage: string) {
+  return `${primaryLanguage}\u0000${language}`;
+}
+
 export function resolveContentSections(
   sections: BuilderSection[],
   language: string,
   primaryLanguage: string,
 ) {
+  if (language === primaryLanguage) return sections;
+
+  const cacheKey = resolvedSectionCacheKey(language, primaryLanguage);
   return sections.map((section): BuilderSection => {
+    const cached = resolvedSectionCache.get(section)?.get(cacheKey);
+    if (cached) return cached;
+
     const localized = resolveContentEntity(section, language, primaryLanguage);
-    return {
+    const resolved = {
       ...localized,
       layoutItems: localized.layoutItems?.map((item) => {
         const resolveBlock = (block: BuilderLayoutBlock): BuilderLayoutBlock =>
@@ -102,6 +117,10 @@ export function resolveContentSections(
       slides: localized.slides?.map((entry) => resolveContentEntity(entry, language, primaryLanguage)),
       badges: localized.badges?.map((entry) => resolveContentEntity(entry, language, primaryLanguage)),
     } as BuilderSection;
+    const sectionCache = resolvedSectionCache.get(section) ?? new Map<string, BuilderSection>();
+    sectionCache.set(cacheKey, resolved);
+    resolvedSectionCache.set(section, sectionCache);
+    return resolved;
   });
 }
 

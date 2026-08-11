@@ -84,13 +84,15 @@ test("Button inspector keeps the shared Content, Style, and Advanced rhythm", as
   await page.locator(".builder-element-library-search input").fill("button");
   await page.locator(".builder-element-library-card").filter({ has: page.getByText("Button", { exact: true }) }).first().click();
 
-  const selectedBlock = page.locator(".builder-preview-layout-block.is-selected-block");
+  const selectedBlock = page.locator(
+    ".builder-shared-interaction-frame.is-selected.is-block",
+  );
   await expect(selectedBlock).toBeVisible();
-  await selectedBlock.locator(".builder-preview-block-tools").getByRole("button", { name: "Edit element" }).click();
+  await page.locator(".builder-fixed-selection-toolbar").getByRole("button", { name: "Edit element" }).click();
   const inspector = page.locator(".builder-floating-inspector");
   await expect(inspector).toBeVisible();
   const tabs = inspector.locator(".builder-inspector-tabs button");
-  await expect(tabs).toHaveText(["Content", "Styling", "Advanced"]);
+  await expect(tabs).toHaveText(["Content", "Settings", "Advanced"]);
   await expect(inspector.locator(".builder-field").first()).toHaveCSS("font-size", "11px");
   await page.screenshot({ path: "test-results/dashboard-button-inspector.png", fullPage: true });
 });

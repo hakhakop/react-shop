@@ -41,7 +41,17 @@ export function sanitizeStylableSvg(
   if (colorablePaint(svg.getAttribute("fill"))) svg.setAttribute("fill", "currentColor");
   if (colorablePaint(svg.getAttribute("stroke"))) svg.setAttribute("stroke", "currentColor");
   svg.setAttribute("width", "100%");
-  svg.setAttribute("height", "100%");
+  // `contain` is the natural, non-framing SVG presentation. Leaving a
+  // percentage height here makes a width-only SVG depend on whatever wrapper
+  // stylesheet happens to be present (Builder vs storefront). Preserve the
+  // SVG's intrinsic viewBox ratio instead. Framed cover/fill media retains a
+  // deliberate full-height SVG.
+  if (fit === "contain") {
+    svg.removeAttribute("height");
+    svg.style.setProperty("height", "auto", "important");
+  } else {
+    svg.setAttribute("height", "100%");
+  }
   svg.setAttribute("focusable", "false");
   svg.setAttribute("aria-hidden", "true");
   svg.setAttribute("preserveAspectRatio", fit === "fill" ? "none" : fit === "cover" ? "xMidYMid slice" : "xMidYMid meet");
@@ -54,6 +64,14 @@ const requestUrl = (src: string) => {
   return resolved.origin === window.location.origin
     ? resolved.href
     : `/api/builder-svg?url=${encodeURIComponent(resolved.href)}`;
+};
+
+const intrinsicSvgAspectRatio = (markup: string | null, fit: "contain" | "cover" | "fill") => {
+  if (!markup || fit !== "contain") return undefined;
+  const match = markup.match(/\bviewBox=["']\s*[-+]?\d+(?:\.\d+)?\s+[-+]?\d+(?:\.\d+)?\s+([-+]?\d+(?:\.\d+)?)\s+([-+]?\d+(?:\.\d+)?)["']/i);
+  const width = Number(match?.[1]);
+  const height = Number(match?.[2]);
+  return width > 0 && height > 0 ? `${width} / ${height}` : undefined;
 };
 
 const loadSvg = (src: string, fit: "contain" | "cover" | "fill", svgClassName: string) => {
@@ -97,6 +115,7 @@ export default function UikitStylableSvg({
   const [result, setResult] = useState<{ key: string; markup?: string; failed?: boolean }>({ key: "" });
   const markup = result.key === requestKey ? result.markup ?? null : null;
   const failed = result.key === requestKey && result.failed === true;
+  const naturalAspectRatio = intrinsicSvgAspectRatio(markup, fit);
 
   useEffect(() => {
     let cancelled = false;
@@ -129,7 +148,12 @@ export default function UikitStylableSvg({
       role="img"
       aria-label={alt || undefined}
       data-svg-state={markup ? "ready" : "loading"}
-      style={{ display: "inline-block", ...(color ? { color } : {}), ...style }}
+      style={{
+        display: "inline-block",
+        ...(naturalAspectRatio && style?.height === undefined ? { aspectRatio: naturalAspectRatio } : {}),
+        ...(color ? { color } : {}),
+        ...style,
+      }}
       dangerouslySetInnerHTML={markup ? { __html: markup } : undefined}
     />
   );

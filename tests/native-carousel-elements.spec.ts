@@ -74,7 +74,10 @@ test("static slideshow and overlay-slider fields normalize into shared carousel 
     children: [{ type: "section", children: [{ type: "row", children: [{ type: "column", children: [
       {
         type: "slideshow",
-        props: { slideshow_height: "viewport", slideshow_animation: "fade", show_title: false, show_content: true },
+        props: {
+          slideshow_height: "viewport", slideshow_animation: "fade", show_title: false, show_content: true,
+          show_link: true, link_text: "Read more", overlay_position: "center-left", title_element: "h3",
+        },
         children: [{ type: "slideshow_item", props: { title: "Static", content: "Body", image: "hero.jpg" } }],
       },
       {
@@ -90,7 +93,10 @@ test("static slideshow and overlay-slider fields normalize into shared carousel 
 
   expect(slideshow?.carouselSettings).toMatchObject({
     slideshowHeight: "viewport", effect: "fade", showTitle: false, showContent: true,
+    overlayPosition: "center-left", overlayPadding: "default", headingLevel: "h3", overlayTextColor: "dark",
   });
+  expect(slideshow?.slides?.[0]).toMatchObject({ showAction: false, buttonLabel: "Read more" });
+  expect(slideshow?.slides?.[0]?.buttonUrl).toBeUndefined();
   expect(overlay?.carouselSettings).toMatchObject({
     overlayMode: "cover", overlayDisplay: "hover", overlayPosition: "center", overlayPadding: "large", showLink: false,
   });

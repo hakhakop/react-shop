@@ -219,6 +219,14 @@ const sourceImageAlignment = (
   return sourceAlignment(fallback);
 };
 
+/** The shared Image border/shape owner accepts the same UIkit border tokens. */
+const sourceImageBorder = (
+  value: unknown,
+): "none" | "rounded" | "circle" | "pill" | undefined =>
+  value === "none" || value === "rounded" || value === "circle" || value === "pill"
+    ? value
+    : undefined;
+
 const sourcePosition = (
   value: unknown,
 ): NonNullable<NonNullable<BuilderVisualStyle>["layout"]>["position"] => {
@@ -543,6 +551,11 @@ const sourceHeadingLevel = (
     ? (value as BuilderLayoutBlock["headingLevel"])
     : undefined;
 
+/** Meta uses its own compact HTML-element contract (div/span/p), rather than
+ * the Heading contract. Keep that distinction at the import boundary. */
+const sourceMetaElement = (value: unknown): "div" | "span" | "p" | undefined =>
+  value === "div" || value === "span" || value === "p" ? value : undefined;
+
 const sourceHeadingSize = (
   value: unknown,
 ): BuilderLayoutBlock["headingSize"] | undefined => {
@@ -711,7 +724,8 @@ const sourceSliderItem = (
   path: string,
   parentProps: Record<string, unknown> = {},
 ): NonNullable<BuilderSection["slides"]>[number] => {
-  const props = { ...parentProps, ...sourceProps(node) };
+  const itemProps = sourceProps(node);
+  const props = { ...parentProps, ...itemProps };
   const media = normalizeYoothemeMedia(props);
   const actionLabel = asString(props.link_text);
   const actionUrl = asString(props.link);
@@ -719,26 +733,65 @@ const sourceSliderItem = (
     id: sourcePathId(path, "panel-slide"),
     title: asString(props.title) ?? "",
     meta: asString(props.meta) ?? "",
-    text: asString(props.content) ?? "",
+    // Slider item content uses the same persisted safe-HTML contract as Grid
+    // and Panel content. Keep imported YOOtheme markup intact at the importer
+    // boundary instead of reducing it to plain text in the item adapter.
+    text: sanitizeHtml(asString(props.content) ?? ""),
     imageUrl: resolveYoothemeAssetUrl(props.image),
     imageAlt: asString(props.image_alt) ?? asString(props.title) ?? "",
-    imageWidth: asString(props.image_width) ?? undefined,
-    imageHeight: asString(props.image_height) ?? undefined,
+    // Width and Height are Panel Slider element media defaults. Retain these
+    // on an item only when the source item explicitly authored its own value;
+    // copying a parent value here would mask later element-level edits.
+    ...(asString(itemProps.image_width) ? { imageWidth: asString(itemProps.image_width)! } : {}),
+    ...(asString(itemProps.image_height) ? { imageHeight: asString(itemProps.image_height)! } : {}),
+    ...(Object.prototype.hasOwnProperty.call(itemProps, "image_border")
+      ? { imageShape: sourceImageBorder(itemProps.image_border) ?? "none" }
+      : {}),
     imageFit: media.imageFit,
     imageRatio: media.imageRatio,
     imageAlignment: media.imageAlignment,
     imagePosition: media.imagePosition,
     imageLoading: media.imageLoading,
-    headingLevel: sourceHeadingLevel(props.title_element) ?? "h3",
-    metaStyle: sourceTextVariant(props.meta_style) ?? "muted",
+    // Item fields are true local overrides only. Parent element values belong
+    // to carouselSettings so a missing item value can inherit correctly.
+    ...(sourceHeadingLevel(itemProps.title_element)
+      ? { headingLevel: sourceHeadingLevel(itemProps.title_element) }
+      : {}),
+    ...(sourceHeadingSize(itemProps.title_style)
+      ? { headingSize: sourceHeadingSize(itemProps.title_style) }
+      : {}),
+    ...(sourceTextVariant(itemProps.meta_style)
+      ? { metaStyle: sourceTextVariant(itemProps.meta_style) }
+      : {}),
+    ...(sourceMetaElement(itemProps.meta_element)
+      ? { metaHtmlElement: sourceMetaElement(itemProps.meta_element) }
+      : {}),
+    ...(itemProps.meta_align === "above-title" || itemProps.meta_align === "below-content"
+      ? { gridMetaAlign: itemProps.meta_align }
+      : {}),
     // YOOtheme distinguishes a whole-panel link from a visible link/button.
     // Do not manufacture a default action when `link_text` is intentionally
     // empty; `panel_link` still makes the title/media panel interactive.
     showAction: Boolean(actionUrl && actionLabel),
     buttonLabel: actionLabel ?? undefined,
     buttonUrl: actionUrl ?? undefined,
-    buttonTarget: props.link_target === "blank" ? "_blank" : "_self",
-    buttonStyle: sourceButtonStyle(props.link_style),
+    ...(itemProps.link_target !== undefined
+      ? { buttonTarget: itemProps.link_target === "blank" ? "_blank" : "_self" }
+      : {}),
+    ...(itemProps.link_style !== undefined ? { buttonStyle: sourceButtonStyle(itemProps.link_style) } : {}),
+    ...(sourceButtonSize(itemProps.link_size) ? { buttonSize: sourceButtonSize(itemProps.link_size) } : {}),
+    // Panel/Card presentation belongs to the shared Card owner. Preserve an
+    // explicitly authored item value; parent-level defaults are applied by
+    // the Panel Slider adapter below.
+    ...(Object.prototype.hasOwnProperty.call(itemProps, "panel_style")
+      ? { panelStyle: sourceCardVariant(itemProps.panel_style) }
+      : {}),
+    ...(itemProps.panel_padding === "small" || itemProps.panel_padding === "default" || itemProps.panel_padding === "large"
+      ? { panelSize: itemProps.panel_padding }
+      : {}),
+    ...(Object.prototype.hasOwnProperty.call(itemProps, "panel_link_hover")
+      ? { panelHover: itemProps.panel_link_hover === true || itemProps.panel_link_hover === "true" || itemProps.panel_style === "card-hover" }
+      : {}),
     linkPanel: props.panel_link === true || props.panel_link === "true",
   };
 };
@@ -766,12 +819,19 @@ const sourceStaticSliderItems = (
   itemType: string,
   path: string,
   parentProps: Record<string, unknown>,
+  warnings?: string[],
 ) => {
   const items = sourceChildren(node).filter((child) => child.type === itemType);
   const hasDynamicItemSource = items.some(hasDynamicSourceBinding);
   const slides = items
     .filter((child) => !hasDynamicSourceBinding(child) || hasStaticSliderFallback(child))
-    .map((child, index) => sourceSliderItem(child, `${path}.${index}`, parentProps));
+    .map((child, index) => {
+      const itemPath = `${path}.${index}`;
+      if (itemType === "panel-slider_item" && warnings) {
+        warnPanelSliderFields(itemPath, sourceProps(child), warnings, PANEL_SLIDER_ITEM_SUPPORTED_FIELDS);
+      }
+      return sourceSliderItem(child, itemPath, parentProps);
+    });
   return {
     slides,
     hasDynamicSource: hasDynamicItemSource || hasDynamicSourceBinding(node),
@@ -820,6 +880,82 @@ const warnUnsupported = (
     warnings.push(`${path}.${key}: INTENTIONALLY UNSUPPORTED for Compatibility Fixture #1 — no canonical WebPages owner or shared renderer exists.`);
   });
 };
+
+/**
+ * Panel Slider reporting is deliberately stricter than the legacy generic
+ * allowlist. The adapter has a real owner for the supported keys below,
+ * explicit deferred keys are reported once as DEFERRED, and a newly seen key
+ * is called out as UNHANDLED instead of being mistaken for an intentional
+ * product decision.
+ */
+const PANEL_SLIDER_SUPPORTED_FIELDS = new Set([
+  ...GENERAL_POSITION_KEYS,
+  "animation", "attributes", "attrs", "blend", "class", "css", "visibility",
+  "maxwidth", "maxwidth_breakpoint", "block_align", "block_align_breakpoint", "block_align_fallback",
+  "text_align_breakpoint", "text_align_fallback", "margin", "margin_remove_top", "margin_remove_bottom",
+  "panel_style", "panel_padding", "panel_link", "panel_link_hover",
+  "title", "meta", "content",
+  "show_title", "show_image", "show_meta", "show_content", "show_link",
+  "text_align", "meta_align", "meta_element", "meta_style", "title_element", "title_style",
+  "link", "link_text", "link_style", "link_size", "link_target",
+  "image", "image_alt", "image_width", "image_height", "image_fit", "image_ratio", "image_position", "image_loading", "image_border", "image_svg_inline", "image_svg_color",
+  "slider_autoplay", "slider_autoplay_interval", "slider_autoplay_pause", "slider_center", "slider_finite", "slider_gap", "slider_width",
+  "slider_width_default", "slider_width_small", "slider_width_medium", "slider_width_large", "slider_width_xlarge",
+  "slider_divider", "slidenav", "slidenav_breakpoint", "nav", "nav_position",
+  // Dynamic source descriptors are classified by reportUnsupportedDynamicSource.
+  "source", "query", "content_source", "item_source",
+]);
+
+const PANEL_SLIDER_DEFERRED_FIELDS = new Set([
+  "image_align",
+  "text_color",
+  "nav_breakpoint",
+  "slidenav_outside_breakpoint",
+]);
+
+const PANEL_SLIDER_INTENTIONALLY_UNSUPPORTED_FIELDS = new Set([
+  "content_column_breakpoint", "icon_width", "image_grid_breakpoint", "image_grid_width",
+  "show_hover_image", "show_hover_video", "show_video", "slidenav_margin", "slider_sets",
+  "title_align", "title_grid_breakpoint", "title_grid_width", "title_hover_style",
+  "link_image", "image_transition", "animate_strokes", "image_icon_width", "image_icon_color",
+  "grid_column_gap", "grid_row_gap", "vertical_align", "margin_top", "link_margin", "title_margin",
+  "lightbox_bg_close", "parallax_easing", "item_animation", "item_maxwidth",
+  "panel_expand", "panel_image_no_padding", "meta_color", "title_link",
+]);
+
+const PANEL_SLIDER_DEFERRED_MESSAGES: Record<string, string> = {
+  image_align: "Panel Slider structural image alignment requires the shared media-grid layout runtime, which is not in the current supported scope.",
+  text_color: "Panel Slider has no canonical shared text-context owner that applies this source value across title, meta, content, and actions.",
+  nav_breakpoint: "navigation breakpoint responsiveness is intentionally deferred in the current shared slider runtime.",
+  slidenav_outside_breakpoint: "outside-arrow breakpoint responsiveness is intentionally deferred in the current shared slider runtime.",
+};
+
+const warnPanelSliderFields = (
+  path: string,
+  props: Record<string, unknown>,
+  warnings: string[],
+  supported = PANEL_SLIDER_SUPPORTED_FIELDS,
+) => {
+  Object.keys(props).forEach((key) => {
+    if (supported.has(key)) return;
+    if (PANEL_SLIDER_DEFERRED_FIELDS.has(key)) {
+      warnings.push(`${path}.${key}: DEFERRED — ${PANEL_SLIDER_DEFERRED_MESSAGES[key]}`);
+      return;
+    }
+    if (PANEL_SLIDER_INTENTIONALLY_UNSUPPORTED_FIELDS.has(key)) {
+      warnings.push(`${path}.${key}: INTENTIONALLY UNSUPPORTED for Compatibility Fixture #1 — no canonical WebPages owner or shared renderer exists.`);
+      return;
+    }
+    warnings.push(`${path}.${key}: UNHANDLED YOOtheme Panel Slider source field — no importer classification exists yet.`);
+  });
+};
+
+const PANEL_SLIDER_ITEM_SUPPORTED_FIELDS = new Set([
+  "title", "meta", "content", "image", "image_alt", "image_width", "image_height", "image_fit", "image_ratio", "image_position", "image_loading", "image_border", "image_svg_inline", "image_svg_color",
+  "title_element", "title_style", "meta_align", "meta_element", "meta_style",
+  "link", "link_text", "link_target", "link_style", "link_size", "panel_link",
+  "panel_style", "panel_padding", "panel_link_hover",
+]);
 
 /**
  * YOOtheme's source/query descriptors describe a dynamic collection rather
@@ -1093,6 +1229,7 @@ const mapStaticElement = (
       "show_title", "show_meta", "show_content", "show_link",
       "slideshow_height", "slideshow_ratio", "slideshow_animation", "slideshow_autoplay", "slideshow_autoplay_pause", "slideshow_autoplay_interval",
       "nav", "nav_position", "nav_breakpoint", "slidenav", "slidenav_breakpoint", "slidenav_outside_breakpoint", "text_color",
+      "overlay_position", "overlay_padding", "title_element", "title_style",
       ...GENERAL_POSITION_KEYS,
     ], warnings);
     if (props.slideshow_height === "section") {
@@ -1116,6 +1253,8 @@ const mapStaticElement = (
         showMeta: props.show_meta !== false,
         showContent: props.show_content !== false,
         showLink: props.show_link !== false,
+        headingLevel: sourceHeadingLevel(props.title_element) ?? "h3",
+        headingSize: sourceHeadingSize(props.title_style),
         autoplay: props.slideshow_autoplay === true || props.slideshow_autoplay === "true",
         autoplayDelayMs: Number.isFinite(Number(props.slideshow_autoplay_interval)) ? Number(props.slideshow_autoplay_interval) * 1000 : undefined,
         pauseOnHover: props.slideshow_autoplay_pause !== false,
@@ -1124,38 +1263,44 @@ const mapStaticElement = (
         arrowPosition: asString(props.slidenav) === "outside" ? "outer" : "overlay",
         paginationPosition: asString(props.nav_position) ?? undefined,
         effect: props.slideshow_animation === "fade" ? "fade" : "slide",
-        overlayTextColor: props.text_color === "light" || props.text_color === "dark" ? props.text_color : undefined,
+        overlayPosition: sourceCarouselOverlayPosition(props.overlay_position),
+        overlayPadding: sourceCarouselOverlayPadding(props.overlay_padding),
+        // UIkit Slideshow defaults to the normal dark semantic context. Only
+        // an explicit source `light` value opts into inverse typography.
+        overlayTextColor: props.text_color === "light" ? "light" : "dark",
       },
     }, props);
   }
 
   if (type === "panel-slider") {
-    const { slides, hasDynamicSource } = sourceStaticSliderItems(node, "panel-slider_item", path, props);
+    const { slides, hasDynamicSource } = sourceStaticSliderItems(node, "panel-slider_item", path, props, warnings);
     if (reportUnsupportedDynamicSource(path, hasDynamicSource ? { ...props, source: props.source ?? true } : props, slides.length, warnings)) return null;
-    warnUnsupported(path, props, [
-      "content_column_breakpoint", "icon_width", "image_grid_breakpoint", "image_grid_width",
-      "image_svg_color", "image_svg_inline",
-      "show_hover_image", "show_hover_video", "show_video",
-      "slidenav_margin", "slider_sets", "title_align", "title_grid_breakpoint", "title_grid_width", "title_hover_style",
-      ...GENERAL_POSITION_KEYS,
-    ], warnings);
+    // Panel Slider's Image Alignment is structural (`top` / `left`) and
+    // requires the deferred media-grid layout contract. Do not coerce it into
+    // the unrelated shared Image horizontal alignment owner.
+    const { imageAlignment: _deferredStructuralImageAlignment, ...panelSliderMedia } = normalizeYoothemeMedia(props);
+    warnPanelSliderFields(path, props, warnings);
     return withSourceGeneralVisualStyle({
       id: sourcePathId(path, "panel-slider"),
       kind: "panelSlider",
-      slides: slides.map((slide) => ({
+      slides: slides.map(({ imageAlignment: _deferredItemImageAlignment, ...slide }) => ({
         ...slide,
         // Panel Slider has no implicit Card surface in UIkit. Only an
         // explicit source panel style may opt into a Card presentation.
-        panelStyle: sourceCardVariant(props.panel_style),
-        panelSize: props.panel_padding === "small" || props.panel_padding === "default" || props.panel_padding === "large"
+        panelStyle: slide.panelStyle ?? sourceCardVariant(props.panel_style),
+        panelSize: slide.panelSize ?? (props.panel_padding === "small" || props.panel_padding === "default" || props.panel_padding === "large"
           ? props.panel_padding
-          : "none",
+          : "none"),
+        panelHover: slide.panelHover ?? (props.panel_link_hover === true || props.panel_link_hover === "true" || props.panel_style === "card-hover"),
       })),
       carouselSettings: {
         presentation: "panel-slider",
         variant: "panel",
         slideMode: "panel",
-        ...normalizeYoothemeMedia(props),
+        ...panelSliderMedia,
+        ...(Object.prototype.hasOwnProperty.call(props, "image_border")
+          ? { imageShape: sourceImageBorder(props.image_border) ?? "none" }
+          : {}),
         // Panel Slider owns one element-level presentation contract. Item
         // content is deliberately limited to the source item fields rather
         // than becoming a nested WebPages Panel/Card editor.
@@ -1164,20 +1309,19 @@ const mapStaticElement = (
         showMeta: props.show_meta !== false,
         showContent: props.show_content !== false,
         showLink: props.show_link !== false,
-        contentAlign: sourceAlignment(props.text_align),
         metaPosition: props.meta_align === "above-title" || props.meta_align === "below-content"
           ? props.meta_align
           : "below-title",
-        metaHtmlElement: sourceHeadingLevel(props.meta_element) ?? "div",
+        metaHtmlElement: sourceMetaElement(props.meta_element) ?? "div",
         metaStyle: asString(props.meta_style) ?? undefined,
         headingLevel: sourceHeadingLevel(props.title_element) ?? "h3",
         headingSize: sourceHeadingSize(props.title_style),
-        imageAlignment: sourceImageAlignment(props),
         imageFit: "natural",
         imageRatio: "natural",
         linkPanel: props.panel_link === true || props.panel_link === "true",
         buttonStyle: props.link_style ? sourceButtonStyle(props.link_style) : undefined,
         buttonSize: sourceButtonSize(props.link_size),
+        linkTarget: props.link_target === "blank" ? "_blank" : "_self",
         autoplay: props.slider_autoplay === true || props.slider_autoplay === "true",
         autoplayDelayMs: Number.isFinite(Number(props.slider_autoplay_interval)) ? Number(props.slider_autoplay_interval) * 1000 : undefined,
         pauseOnHover: props.slider_autoplay_pause !== false,

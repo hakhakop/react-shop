@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import {
   Autoplay,
@@ -33,6 +33,9 @@ import { builderLinkTargetProps } from "@/lib/websiteBuilderLinks";
 import { resolvePanelSliderRuntime } from "@/lib/panelSliderRuntime";
 import { WebPagesIcon } from "@/components/builder/WebPagesIcon";
 import UikitStylableSvg from "@/components/builder/UikitStylableSvg";
+import { useBuilderCarouselGeometryCoordinator } from "@/components/builder/BuilderCarouselGeometryCoordinator";
+import { sanitizeHtml } from "@/lib/safeHtml";
+import { resolveCarouselContentAlignment } from "@/lib/carouselPresentation";
 
 // Swiper core & module styles
 import "swiper/css";
@@ -165,6 +168,9 @@ export type CarouselSettings = {
   metaStyle?: string | null;
   contentTypographyRole?: string | null;
   contentStyle?: string | null;
+  /** Shared element content alignment, inherited by Panel Slider items. */
+  contentAlign?: "left" | "center" | "right" | string | null;
+  headingAlign?: "left" | "center" | "right" | string | null;
   buttonStyle?: string | null;
   buttonSize?: string | null;
   linkTarget?: string | null;
@@ -220,9 +226,21 @@ export default function CarouselBlock({
   className,
   onUploadSlideImage,
 }: CarouselBlockProps) {
+  const builderGeometryCoordinator =
+    useBuilderCarouselGeometryCoordinator();
   const [panelSliderLocked, setPanelSliderLocked] = useState(false);
   const [mainSwiper, setMainSwiper] = useState<any>(null);
   const [thumbsSwiper, setThumbsSwiper] = useState<any>(null);
+
+  useEffect(() => {
+    if (!builderGeometryCoordinator || !mainSwiper) return;
+    return builderGeometryCoordinator.register(mainSwiper);
+  }, [builderGeometryCoordinator, mainSwiper]);
+
+  useEffect(() => {
+    if (!builderGeometryCoordinator || !thumbsSwiper) return;
+    return builderGeometryCoordinator.register(thumbsSwiper);
+  }, [builderGeometryCoordinator, thumbsSwiper]);
 
   if (!slides || slides.length === 0) {
     return (
@@ -238,6 +256,14 @@ export default function CarouselBlock({
 
   const swiperVariant =
     normalizedVariant === "swiper-showcase" ? "showcase" : normalizedVariant;
+  const isPanelSlider = settings?.presentation === "panel-slider";
+  const isSlideshow = settings?.presentation === "slideshow";
+  // YOOtheme General → Text Alignment is emitted on the Panel Slider element
+  // itself. Its panel-item flex group inherits that context for both text and
+  // inline media; it is not an Image-alignment setting.
+  const panelContentAlignment = isPanelSlider
+    ? resolveCarouselContentAlignment(settings?.contentAlign)
+    : null;
 
   const rawCardsPerView =
     settings?.presentation === "overlay-slider" && settings?.cardsPerView === undefined
@@ -292,6 +318,27 @@ export default function CarouselBlock({
     if (typeof value === "boolean") return value;
     if (typeof value === "number") return value === 1;
     return value === "true";
+  };
+
+  const hasPanelSliderDivider = isPanelSlider && booleanSetting(settings?.divider, false);
+  // Panel Slider uses UIkit's grid track for its visible gutters/dividers.
+  // Swiper must only own movement: passing the persisted gap here adds a
+  // second margin between slides and changes both intrinsic item geometry and
+  // navigation locking. Keep the canonical token intact for the UIkit track.
+  const swiperSpaceBetween = isPanelSlider ? 0 : spaceBetween;
+  const panelSliderIsEffectivelyLocked = (swiper: any) => {
+    if (!isPanelSlider || !swiper?.wrapperEl) return Boolean(swiper?.isLocked);
+    const trackStyle = window.getComputedStyle(swiper.wrapperEl);
+    const leadingGridGutter = Math.max(0, -Number.parseFloat(trackStyle.marginLeft || "0"));
+    const itemSpan = Array.from(swiper.slides ?? []) as HTMLElement[];
+    const totalItemSpan = itemSpan.reduce(
+      (total: number, slide: HTMLElement) => total + slide.getBoundingClientRect().width,
+      0,
+    );
+    // UIkit's `uk-grid` track intentionally extends left by its leading
+    // gutter. A Panel Slider is locked when all item boxes fit that logical
+    // grid span, rather than only Swiper's clipped viewport width.
+    return totalItemSpan <= swiper.width + leadingGridGutter + 0.5;
   };
 
   const swiperEffect = (() => {
@@ -413,28 +460,34 @@ export default function CarouselBlock({
       className={[
         "shop-builder-swiper",
         `shop-builder-swiper--${swiperVariant}`,
-        settings?.presentation === "panel-slider" ? "el-element" : "",
-        settings?.presentation === "panel-slider" && panelSliderLocked ? "shop-builder-swiper--locked" : "",
+        isPanelSlider ? "el-element" : "",
+        panelContentAlignment ? `uk-text-${panelContentAlignment}` : "",
+        isPanelSlider && panelSliderLocked ? "shop-builder-swiper--locked" : "",
         `shop-builder-arrow--${arrowStyle}`,
         settings?.slidenavBreakpoint ? `shop-builder-slidenav-from-${settings.slidenavBreakpoint}` : "",
         showArrows ? `shop-builder-arrow-pos--${arrowPosition}` : "",
         `shop-builder-pag--${paginationStyle}`,
         `shop-builder-pag-pos--${paginationPosition}`,
         showDots ? "shop-builder-swiper--has-pagination" : "",
-        settings?.presentation === "slideshow" && slideshowHeight === "viewport"
+        isSlideshow ? `shop-builder-slideshow-overlay--${overlayPosition}` : "",
+        isSlideshow ? `shop-builder-slideshow-padding--${overlayPadding}` : "",
+        isSlideshow ? `shop-builder-slideshow-text--${overlayTextColor === "light" ? "light" : "dark"}` : "",
+        isSlideshow && overlayTextColor === "light" ? "uk-light" : "",
+        isSlideshow && slideshowHeight === "viewport"
           ? `shop-builder-slideshow-height--${slideshowHeight}`
           : "",
         settings?.presentation === "overlay-slider" ? `shop-builder-overlay-mode--${overlayMode}` : "",
         settings?.presentation === "overlay-slider" ? `shop-builder-overlay-display--${overlayDisplay}` : "",
         settings?.presentation === "overlay-slider" ? `shop-builder-overlay-padding--${overlayPadding}` : "",
-        booleanSetting(settings?.divider, false) ? "shop-builder-slider--divided" : "",
         aspectRatioClass,
         is3DEffect ? "shop-builder-swiper--3d" : "",
         className ?? "",
       ].filter(Boolean).join(" ")}
-      style={settings?.presentation === "slideshow" && toCssDimension(settings.slideshowMinHeight)
-        ? { "--shop-builder-slideshow-min-height": toCssDimension(settings.slideshowMinHeight) } as React.CSSProperties
-        : undefined}
+      style={{
+        ...(settings?.presentation === "slideshow" && toCssDimension(settings.slideshowMinHeight)
+          ? { "--shop-builder-slideshow-min-height": toCssDimension(settings.slideshowMinHeight) }
+          : {}),
+      } as React.CSSProperties}
     >
       <Swiper
         key={swiperKey}
@@ -450,11 +503,13 @@ export default function CarouselBlock({
           Pagination,
           Thumbs,
         ]}
-        observer={true}
-        observeParents={true}
+        observer={builderGeometryCoordinator ? false : true}
+        observeParents={builderGeometryCoordinator ? false : true}
+        resizeObserver={builderGeometryCoordinator ? false : undefined}
+        updateOnWindowResize={builderGeometryCoordinator ? false : undefined}
         breakpointsBase="container"
         slidesPerView={swiperSlidesPerView}
-        spaceBetween={spaceBetween}
+        spaceBetween={swiperSpaceBetween}
         effect={swiperEffect}
         speed={transitionSpeedMs}
         centeredSlides={booleanSetting(settings?.centered, swiperVariant === "coverflow" || swiperVariant === "showcase" || isMarquee)}
@@ -507,13 +562,16 @@ export default function CarouselBlock({
         // storefront, rather than a Builder-only item-count approximation.
         watchOverflow
         onAfterInit={(swiper) => {
-          if (settings?.presentation === "panel-slider") setPanelSliderLocked(swiper.isLocked);
+          if (isPanelSlider) setPanelSliderLocked(panelSliderIsEffectivelyLocked(swiper));
         }}
-        onLock={() => {
-          if (settings?.presentation === "panel-slider") setPanelSliderLocked(true);
+        onLock={(swiper) => {
+          if (isPanelSlider) setPanelSliderLocked(panelSliderIsEffectivelyLocked(swiper));
         }}
-        onUnlock={() => {
-          if (settings?.presentation === "panel-slider") setPanelSliderLocked(false);
+        onUnlock={(swiper) => {
+          if (isPanelSlider) setPanelSliderLocked(panelSliderIsEffectivelyLocked(swiper));
+        }}
+        onResize={(swiper) => {
+          if (isPanelSlider) setPanelSliderLocked(panelSliderIsEffectivelyLocked(swiper));
         }}
         pagination={
           showDots
@@ -533,11 +591,11 @@ export default function CarouselBlock({
           panelSliderRuntime
             ? panelSliderRuntime.breakpoints
               ? {
-                  320: { ...panelSliderRuntime.breakpoints[320], spaceBetween: 12 },
-                  640: { ...panelSliderRuntime.breakpoints[640], spaceBetween: Math.min(spaceBetween, 16) },
-                  960: { ...panelSliderRuntime.breakpoints[960], spaceBetween },
-                  1200: { ...panelSliderRuntime.breakpoints[1200], spaceBetween },
-                  1600: { ...panelSliderRuntime.breakpoints[1600], spaceBetween },
+                  320: { ...panelSliderRuntime.breakpoints[320], spaceBetween: swiperSpaceBetween },
+                  640: { ...panelSliderRuntime.breakpoints[640], spaceBetween: swiperSpaceBetween },
+                  960: { ...panelSliderRuntime.breakpoints[960], spaceBetween: swiperSpaceBetween },
+                  1200: { ...panelSliderRuntime.breakpoints[1200], spaceBetween: swiperSpaceBetween },
+                  1600: { ...panelSliderRuntime.breakpoints[1600], spaceBetween: swiperSpaceBetween },
                 }
               : undefined
             : !is3DEffect && !isHeroOrFadeMode && !isMarquee
@@ -559,7 +617,11 @@ export default function CarouselBlock({
               : undefined
         }
         className="w-full"
-        wrapperClass={settings?.presentation === "panel-slider" ? "swiper-wrapper uk-slider-items" : "swiper-wrapper"}
+        wrapperClass={
+          isPanelSlider
+            ? ["swiper-wrapper", "uk-slider-items", "uk-grid", hasPanelSliderDivider ? "uk-grid-divider" : ""].filter(Boolean).join(" ")
+            : "swiper-wrapper"
+        }
       >
         {slides.map((slide, idx) => {
           const hasRealImage = showImage && Boolean(slide.imageUrl && slide.imageUrl.trim());
@@ -636,7 +698,9 @@ export default function CarouselBlock({
             );
             const itemMeta = slide.meta ?? slide.subtitle;
             const metaPosition = slide.gridMetaAlign ?? "below-title";
-            const textAlign = slide.contentAlign ?? slide.headingAlign ?? "left";
+            const textAlign = isPanelSlider
+              ? panelContentAlignment!
+              : resolveCarouselContentAlignment(slide.contentAlign ?? slide.headingAlign ?? settings?.contentAlign);
             const titleColorClass = getUikitTextColorClass(slide.titleColor);
             const metaColorClass = getUikitTextColorClass(slide.metaColor);
             const titleDecorationClass =
@@ -645,10 +709,16 @@ export default function CarouselBlock({
                 : "";
             const panelLinkProps = builderLinkTargetProps(slide.buttonTarget || settings?.linkTarget);
             const panelLinkUrl = slide.buttonUrl || "#";
+            const hasPanelLink = slide.linkPanel === true && Boolean(slide.buttonUrl);
             const hasAction = slide.showAction !== false && Boolean(slide.buttonLabel);
             const mediaStyle: React.CSSProperties = {
               aspectRatio: itemMediaStyle.aspectRatio ?? itemImageStyle.aspectRatio,
-              height: toCssDimension(slide.imageHeight),
+              // UIkit's width-only inline icon presentation uses the same
+              // square composition box as its declared icon width. This is
+              // distinct from framed raster media, which continues to use an
+              // authored height/ratio or its natural dimensions.
+              height: toCssDimension(slide.imageHeight) ??
+                (isStylableSvg && itemImageStyle.width ? itemImageStyle.width : undefined),
               maxWidth: itemImageStyle.maxWidth,
               width: itemImageStyle.width ?? "100%",
             };
@@ -674,7 +744,7 @@ export default function CarouselBlock({
               <UikitStylableSvg
                 src={slide.imageUrl!}
                 alt={slide.imageAlt ?? slide.title ?? undefined}
-                className={`${getUikitImageClass(itemImage)} ${getUikitSvgColorClass(slide.imageSvgColor)} el-image uk-flex-1 uk-object-cover`.trim()}
+                className={`${getUikitImageClass(itemImage)} ${getUikitSvgColorClass(slide.imageSvgColor)} el-image`.trim()}
                 color={getUikitSvgColorClass(slide.imageSvgColor) ? undefined : getUikitSvgColor(slide.imageSvgColor)}
                 fit={itemImage.fit === "cover" || itemImage.fit === "fill" ? itemImage.fit : "contain"}
                 loading={imageLoading}
@@ -683,7 +753,6 @@ export default function CarouselBlock({
                   position: itemImageStyle.position,
                   inset: itemImageStyle.inset,
                   width: "100%",
-                  height: "100%",
                 }}
               />
             ) : fallbackPanelImage;
@@ -700,34 +769,39 @@ export default function CarouselBlock({
             const renderTitle = () =>
               showTitle && slide.title ? (
                 <ItemTitle
-                  className={`shop-builder-panel-slider-title ${itemTitleClass} ${typographyRoleClass(itemTitleRole)} ${titleColorClass} ${titleDecorationClass}`.trim()}
+                  className={`shop-builder-panel-slider-title ${hasRealImage ? "uk-margin-top uk-margin-remove-bottom" : ""} ${itemTitleClass} ${typographyRoleClass(itemTitleRole)} ${titleColorClass} ${titleDecorationClass}`.trim()}
                 >
-                  {slide.linkPanel ? (
-                    <a href={panelLinkUrl} {...panelLinkProps}>{slide.title}</a>
-                  ) : (
-                    slide.title
-                  )}
+                  {slide.title}
                 </ItemTitle>
               ) : null;
 
             return (
               <SwiperSlide
                 key={slide.id || idx}
-                className={panelSliderRuntime?.mode === "auto" ? "shop-builder-panel-slider-auto-item" : undefined}
+                className={[
+                  panelSliderRuntime?.mode === "auto" ? "shop-builder-panel-slider-auto-item" : "",
+                  // UIkit's grid divider deliberately omits the first column.
+                  // Swiper owns the carousel movement, so retain that canonical
+                  // grid marker on the initial item rather than recreating a
+                  // divider with a presentation-specific pseudo-element.
+                  hasPanelSliderDivider && idx === 0 ? "uk-first-column" : "",
+                ].filter(Boolean).join(" ") || undefined}
               >
-                <article className={`el-item shop-builder-panel-slider-card ${panelClass}`.trim()}>
+                <article className={`el-item shop-builder-panel-slider-card ${hasPanelLink ? "shop-builder-panel--linked" : ""} ${panelClass}`.trim()}>
+                  {hasPanelLink && (
+                    <a
+                      className="shop-builder-panel-link-overlay"
+                      href={panelLinkUrl}
+                      {...panelLinkProps}
+                      aria-label={slide.title || slide.buttonLabel || "Open panel"}
+                    />
+                  )}
                   {hasRealImage ? (
                     <div
                       className={`shop-builder-panel-slider-media ${getUikitImageWrapperClass(itemImage)}`.trim()}
                       style={mediaStyle}
                     >
-                      {slide.linkPanel ? (
-                        <a href={panelLinkUrl} {...panelLinkProps} className="shop-builder-panel-slider-media-link">
-                          {panelImage}
-                        </a>
-                      ) : (
-                        panelImage
-                      )}
+                      {panelImage}
                     </div>
                   ) : (
                     <button
@@ -742,7 +816,7 @@ export default function CarouselBlock({
 
                   <div
                     className="uk-card-body shop-builder-panel-slider-body"
-                    style={{ textAlign: textAlign as React.CSSProperties["textAlign"] }}
+                    data-panel-slider-content-align={textAlign}
                   >
                     {slide.iconName && (
                       <WebPagesIcon
@@ -755,9 +829,10 @@ export default function CarouselBlock({
                     {renderTitle()}
                     {metaPosition !== "above-title" && metaPosition !== "below-content" && renderMeta()}
                     {showContent && slide.text && (
-                      <div className={`${itemContentClass} ${typographyRoleClass(itemContentRole)}`.trim()}>
-                        {slide.text}
-                      </div>
+                      <div
+                        className={`${itemContentClass} ${typographyRoleClass(itemContentRole)}`.trim()}
+                        dangerouslySetInnerHTML={{ __html: sanitizeHtml(slide.text) }}
+                      />
                     )}
                     {metaPosition === "below-content" && renderMeta()}
                     {showLink && hasAction && (
@@ -1036,7 +1111,7 @@ export default function CarouselBlock({
                     )}
 
                     {showTitle && slide.title && (
-                      <SlideTitle className={`${titleClass} ${typographyRoleClass(titleRole)} shop-builder-swiper-title`.trim()}>
+                      <SlideTitle className={`${titleClass} ${typographyRoleClass(titleRole)} ${isSlideshow ? "uk-margin-remove" : "shop-builder-swiper-title"}`.trim()}>
                         {slide.title}
                       </SlideTitle>
                     )}
@@ -1057,7 +1132,7 @@ export default function CarouselBlock({
                       <div className="shop-builder-swiper-price">{slide.price}</div>
                     )}
 
-                    {showLink && slide.buttonLabel && slide.buttonUrl && (
+                    {showLink && slide.showAction !== false && slide.buttonLabel && slide.buttonUrl && (
                       <a
                         href={slide.buttonUrl}
                         className={buttonClass}
@@ -1146,6 +1221,10 @@ export default function CarouselBlock({
         <div className="shop-builder-thumbs-wrapper mt-4">
           <Swiper
             onSwiper={setThumbsSwiper}
+            observer={builderGeometryCoordinator ? false : undefined}
+            observeParents={builderGeometryCoordinator ? false : undefined}
+            resizeObserver={builderGeometryCoordinator ? false : undefined}
+            updateOnWindowResize={builderGeometryCoordinator ? false : undefined}
             spaceBetween={12}
             slidesPerView={Math.min(slides.length, 6)}
             freeMode={true}

@@ -225,22 +225,22 @@
   "buttonHoverEffect": "lift",
   "menuItems": [
     {
-      "id": "menu_nlbej8tax",
-      "label": "New",
-      "url": "/new-clean-page",
-      "parentId": null
-    },
-    {
       "id": "home",
       "label": "Գլխավոր",
       "url": "/",
       "parentId": null
     },
     {
+      "id": "menu_nlbej8tax",
+      "label": "New",
+      "url": "/new-clean-page",
+      "parentId": "home"
+    },
+    {
       "id": "menu_sbyhyzc43",
       "label": "Օրինակներ",
       "url": "/demos",
-      "parentId": null
+      "parentId": "home"
     },
     {
       "id": "menu_c8gxt1zuo",
@@ -282,11 +282,11 @@
       "id": "shop",
       "label": "Խանութ",
       "url": "/shop",
-      "parentId": null
+      "parentId": "home"
     },
     {
       "id": "menu_02ncte54p",
-      "label": "Devstack Pricing",
+      "label": "Pricing",
       "url": "/devstack-pricing",
       "parentId": null
     },
@@ -294,6 +294,12 @@
       "id": "menu_pgxpaji7n",
       "label": "Enterprise",
       "url": "/enterprise",
+      "parentId": null
+    },
+    {
+      "id": "menu_1fma6iyf3",
+      "label": "Clean",
+      "url": "/clean",
       "parentId": null
     }
   ],
@@ -318,7 +324,7 @@
   "sectionTitleRotation": "left",
   "sectionTitleBreakpoint": "x-large",
   "headerSticky": true,
-  "updatedAt": "2026-08-10T20:14:10.841Z",
+  "updatedAt": "2026-08-11T20:12:57.649Z",
   "headerCustomHeight": 92,
   "headingXLargeFontSize": "44px",
   "headingLargeFontSize": "38px",

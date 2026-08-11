@@ -3,6 +3,14 @@ import { resolveAppearanceValue } from "@/lib/globalStyleTokens";
 
 type RecordValue = Record<string, any>;
 
+export type CarouselContentAlignment = "left" | "center" | "right";
+
+/** Shared content-alignment value normalizer. Media alignment is unrelated. */
+export function resolveCarouselContentAlignment(value: unknown): CarouselContentAlignment {
+  if (value === "left" || value === "center" || value === "right") return value;
+  return "left";
+}
+
 const resolveString = (local: unknown, global: unknown, fallback: string) =>
   resolveAppearanceValue({
     local: typeof local === "string" && !["", "inherit", "default"].includes(local.trim().toLowerCase()) ? local : undefined,
@@ -58,7 +66,14 @@ export function resolveCarouselPresentation(
       imageFit: resolveString(slide.imageFit, shell.imageDefaultFit, "natural"),
       imageShape: resolveString(slide.imageShape, shell.imageDefaultBorder, "none"),
       imageShadow: resolveString(slide.imageShadow, shell.imageDefaultShadow, "none"),
-      imageAlignment: resolveString(slide.imageAlignment, shell.imageDefaultAlignment, "center"),
+      // Panel Slider's structural `image_align` is not equivalent to the
+      // shared Image left/center/right control and remains deferred. In the
+      // meantime it must not inherit a generic image alignment which produces
+      // UIkit float margins the source element never asked for.
+      imageAlignment:
+        presentation === "panel-slider"
+          ? (typeof slide.imageAlignment === "string" && slide.imageAlignment.trim() ? slide.imageAlignment : undefined)
+          : resolveString(slide.imageAlignment, shell.imageDefaultAlignment, "center"),
       imageLoading: resolveString(slide.imageLoading, shell.imageDefaultLoading, "lazy"),
     })),
   };

@@ -662,8 +662,18 @@ body.dark {
   padding-bottom: 42px;
 }
 
-.shop-builder-swiper .swiper {
-  overflow: visible;
+/* Panel Slider follows UIkit's `.uk-slider-container` contract: the slider
+   viewport owns clipped overflow while the track still owns grid dividers.
+   Other carousel presentations retain their existing overflow behavior. */
+.shop-builder-swiper--panel .swiper {
+  overflow: clip !important;
+}
+
+/* UIkit grids intentionally extend their track by the leading gutter. Swiper
+   defaults the wrapper to 100%, which erases that geometry and makes the
+   intrinsic Panel Slider layout disagree with UIkit. */
+.shop-builder-swiper--panel .swiper-wrapper.uk-slider-items {
+  width: auto !important;
 }
 
 .shop-builder-swiper .swiper-button-prev,
@@ -678,6 +688,14 @@ body.dark {
 }
 
 .shop-builder-swiper .swiper-button-lock {
+  display: none;
+}
+
+/* UIkit suppresses slidenav when every grid item fits the logical slider
+   span. Panel Slider derives that state from the same grid geometry even when
+   Swiper's narrower clipped viewport would otherwise keep its arrows alive. */
+.shop-builder-swiper--panel.shop-builder-swiper--locked .swiper-button-prev,
+.shop-builder-swiper--panel.shop-builder-swiper--locked .swiper-button-next {
   display: none;
 }
 
@@ -824,6 +842,13 @@ body.dark {
   text-decoration: inherit;
 }
 
+/* The bundled UIkit stylesheet is not responsible for WebPages' component
+   classes. Preserve Panel Slider's source title stack when media precedes the
+   title, using the shared UIkit margin token rather than a card-specific gap. */
+.shop-builder-panel-slider-title.uk-margin-top {
+  margin-top: var(--uk-margin, 20px) !important;
+}
+
 .shop-builder-stylable-svg-host > svg {
   display: block;
   width: 100%;
@@ -848,6 +873,31 @@ body.dark {
 
 .shop-builder-panel-slider-auto-item {
   width: auto;
+}
+
+/* YOOtheme's General → Text Alignment is applied to the Panel Slider root.
+   Its panel item is a vertical flex group, so the inherited UIkit text context
+   also controls the cross-axis position of inline media and actions. Keep
+   this at the shared Panel Slider composition boundary: it is not the
+   deferred Image Alignment capability. */
+.shop-builder-swiper--panel.uk-text-left .shop-builder-panel-slider-card {
+  align-items: flex-start;
+}
+
+.shop-builder-swiper--panel.uk-text-center .shop-builder-panel-slider-card {
+  align-items: center;
+}
+
+.shop-builder-swiper--panel.uk-text-right .shop-builder-panel-slider-card {
+  align-items: flex-end;
+}
+
+.shop-builder-swiper--panel.uk-text-center .shop-builder-panel-slider-action {
+  align-self: center;
+}
+
+.shop-builder-swiper--panel.uk-text-right .shop-builder-panel-slider-action {
+  align-self: flex-end;
 }
 
 .shop-builder-swiper--hero .shop-builder-swiper-card,
@@ -892,6 +942,45 @@ body.dark {
   position: absolute;
   inset: 0;
   z-index: 1;
+  color: inherit;
+}
+
+/* Slideshow overlay placement is a presentation semantic, distinct from the
+   generic Hero copy layout. UIkit expresses it as a full-cover flex box. */
+.shop-builder-swiper--slideshow.shop-builder-slideshow-overlay--top-left .shop-builder-swiper-content,
+.shop-builder-swiper--slideshow.shop-builder-slideshow-overlay--top-right .shop-builder-swiper-content {
+  justify-content: flex-start;
+}
+
+.shop-builder-swiper--slideshow.shop-builder-slideshow-overlay--center-left .shop-builder-swiper-content,
+.shop-builder-swiper--slideshow.shop-builder-slideshow-overlay--center-right .shop-builder-swiper-content,
+.shop-builder-swiper--slideshow.shop-builder-slideshow-overlay--center .shop-builder-swiper-content {
+  justify-content: center;
+}
+
+.shop-builder-swiper--slideshow.shop-builder-slideshow-overlay--bottom-left .shop-builder-swiper-content,
+.shop-builder-swiper--slideshow.shop-builder-slideshow-overlay--bottom-center .shop-builder-swiper-content,
+.shop-builder-swiper--slideshow.shop-builder-slideshow-overlay--bottom-right .shop-builder-swiper-content {
+  justify-content: flex-end;
+}
+
+.shop-builder-swiper--slideshow.shop-builder-slideshow-overlay--top-right .shop-builder-swiper-content,
+.shop-builder-swiper--slideshow.shop-builder-slideshow-overlay--center-right .shop-builder-swiper-content,
+.shop-builder-swiper--slideshow.shop-builder-slideshow-overlay--bottom-right .shop-builder-swiper-content {
+  align-items: flex-end;
+  text-align: right;
+}
+
+.shop-builder-swiper--slideshow.shop-builder-slideshow-overlay--center .shop-builder-swiper-content,
+.shop-builder-swiper--slideshow.shop-builder-slideshow-overlay--bottom-center .shop-builder-swiper-content {
+  align-items: center;
+  text-align: center;
+}
+
+/* The default YOOtheme Slideshow overlay uses UIkit's canonical uk-padding
+   tier (40px at this desktop reference), not the generic carousel inset. */
+.shop-builder-swiper--slideshow.shop-builder-slideshow-padding--default .shop-builder-swiper-content {
+  padding: 40px;
 }
 
 /* Overlay Slider visibility and padding are element semantics, not image
@@ -1120,10 +1209,6 @@ body.dark {
 /* Canonical Panel/Card presentation states shared by Builder and storefront. */
 .shop-builder-column-block--panel {
   position: relative;
-}
-
-.shop-builder-slider--divided .swiper-slide + .swiper-slide {
-  border-inline-start: 1px solid var(--uk-global-border, var(--uk-global-border-color, rgba(0, 0, 0, 0.15)));
 }
 
 .shop-builder-panel-link-overlay {

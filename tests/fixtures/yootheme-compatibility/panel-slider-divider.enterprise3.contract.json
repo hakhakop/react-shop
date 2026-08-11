@@ -1,0 +1,66 @@
+{
+  "schemaVersion": 2,
+  "id": "panel-slider-layout.enterprise3.v2",
+  "fixture": {
+    "fileName": "enterprise3.json",
+    "sha256": "7f8ac33b0c20fa1a714ff7c89849855c7a51725c9707984dc2f322401d61aa1d",
+    "sourcePath": "children.0.children.0.children.0.children.3",
+    "elementType": "panel-slider",
+    "sliderDivider": true,
+    "sliderWidth": "",
+    "sliderWidthDefault": "1-1",
+    "sliderWidthSmall": "",
+    "sliderWidthMedium": "1-3",
+    "sliderWidthLarge": "",
+    "sliderWidthXLarge": "",
+    "sliderGap": "default",
+    "margin": "xlarge",
+    "textAlign": "center",
+    "panelMatch": true,
+    "panelStyle": "",
+    "panelPadding": "",
+    "imageWidth": "58"
+  },
+  "viewport": { "width": 1704, "height": 1242 },
+  "reference": {
+    "trackRequiredClasses": ["uk-slider-items", "uk-grid", "uk-grid-divider"],
+    "itemCount": 6,
+    "persistedItemWidthMode": "auto",
+    "persistedSpaceBetweenPx": 30,
+    "persistedResponsiveItems": {
+      "phone": 1,
+      "small": null,
+      "medium": 3,
+      "large": null,
+      "xlarge": null
+    },
+    "persistedPanelStyle": "blank",
+    "persistedPanelSize": "none",
+    "effectiveGapPx": 80,
+    "trackMarginLeftPx": -80,
+    "itemPaddingLeftPx": 80,
+    "effectiveItemGeometry": {
+      "mode": "intrinsic",
+      "trackWidthPx": 1280,
+      "viewportWidthPx": 1200,
+      "trackOverhangPx": 80,
+      "itemWidthsPx": [173.453125, 215.75, 236.921875, 181.8984375, 211.7578125, 167.140625]
+    },
+    "divider": { "borderWidthPx": 1, "insetPx": 40 },
+    "panelPaddingPx": [0, 0, 0, 0],
+    "panelWidthsPx": [93.453125, 135.75, 156.921875, 101.8984375, 131.7578125, 87.140625],
+    "panelHeightsPx": [102, 102, 102, 102, 102, 102],
+    "overflowX": "clip",
+    "allItemsFit": true,
+    "navigationVisible": false
+    ,"rootMarginTopPx": 140
+    ,"rootMarginBottomPx": 0
+    ,"rootTextAlign": "center"
+    ,"rootRequiredAlignmentClass": "uk-text-center"
+    ,"textAlignmentMediaOffsetsPx": { "left": 0, "center": 17.7265625, "right": 35.453125 }
+    ,"itemHeightsPx": [102, 102, 102, 102, 102, 102]
+    ,"mediaWidthPx": 58
+    ,"mediaHeightPx": 58
+  },
+  "tolerances": { "geometryPx": 3 }
+}

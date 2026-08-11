@@ -7420,6 +7420,7 @@
                 "fullWidthButton": false,
                 "textAlign": "center",
                 "headingAlign": "center",
+                "elementPadding": "none",
                 "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
@@ -7429,8 +7430,7 @@
                   "customCss": "@media (max-width: 639px) {\n    .el-item a { min-width: 192px; }\n}",
                   "effects": {},
                   "card": {}
-                },
-                "buttonStyle": "default"
+                }
               },
               {
                 "id": "yootheme-panel-slider-0-0-0-3",
@@ -7443,17 +7443,13 @@
                     "text": "",
                     "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/icon-powerful-api.svg",
                     "imageAlt": "Powerful API",
-                    "imageWidth": "58",
                     "imageLoading": "eager",
-                    "headingLevel": "div",
-                    "metaStyle": "meta",
                     "showAction": false,
                     "buttonUrl": "?page_id=2#powerful-api",
-                    "buttonTarget": "_self",
-                    "buttonStyle": "default",
                     "linkPanel": true,
                     "panelStyle": "blank",
-                    "panelSize": "none"
+                    "panelSize": "none",
+                    "panelHover": false
                   },
                   {
                     "id": "yootheme-panel-slide-0-0-0-3-1",
@@ -7462,17 +7458,13 @@
                     "text": "",
                     "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/icon-efficient-workflow.svg",
                     "imageAlt": "Efficient Workflow",
-                    "imageWidth": "58",
                     "imageLoading": "eager",
-                    "headingLevel": "div",
-                    "metaStyle": "meta",
                     "showAction": false,
                     "buttonUrl": "?page_id=2#efficient-workflow",
-                    "buttonTarget": "_self",
-                    "buttonStyle": "default",
                     "linkPanel": true,
                     "panelStyle": "blank",
-                    "panelSize": "none"
+                    "panelSize": "none",
+                    "panelHover": false
                   },
                   {
                     "id": "yootheme-panel-slide-0-0-0-3-2",
@@ -7481,17 +7473,13 @@
                     "text": "",
                     "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/icon-project-management.svg",
                     "imageAlt": "Project Management",
-                    "imageWidth": "58",
                     "imageLoading": "eager",
-                    "headingLevel": "div",
-                    "metaStyle": "meta",
                     "showAction": false,
                     "buttonUrl": "?page_id=2#project-management",
-                    "buttonTarget": "_self",
-                    "buttonStyle": "default",
                     "linkPanel": true,
                     "panelStyle": "blank",
-                    "panelSize": "none"
+                    "panelSize": "none",
+                    "panelHover": false
                   },
                   {
                     "id": "yootheme-panel-slide-0-0-0-3-3",
@@ -7500,17 +7488,13 @@
                     "text": "",
                     "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/icon-collaboration.svg",
                     "imageAlt": "Collaboration",
-                    "imageWidth": "58",
                     "imageLoading": "eager",
-                    "headingLevel": "div",
-                    "metaStyle": "meta",
                     "showAction": false,
                     "buttonUrl": "?page_id=2#collaboration",
-                    "buttonTarget": "_self",
-                    "buttonStyle": "default",
                     "linkPanel": true,
                     "panelStyle": "blank",
-                    "panelSize": "none"
+                    "panelSize": "none",
+                    "panelHover": false
                   },
                   {
                     "id": "yootheme-panel-slide-0-0-0-3-4",
@@ -7519,17 +7503,13 @@
                     "text": "",
                     "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/icon-client-stories.svg",
                     "imageAlt": "Customer Stories",
-                    "imageWidth": "58",
                     "imageLoading": "eager",
-                    "headingLevel": "div",
-                    "metaStyle": "meta",
                     "showAction": false,
                     "buttonUrl": "?page_id=2#testimonials",
-                    "buttonTarget": "_self",
-                    "buttonStyle": "default",
                     "linkPanel": true,
                     "panelStyle": "blank",
-                    "panelSize": "none"
+                    "panelSize": "none",
+                    "panelHover": false
                   },
                   {
                     "id": "yootheme-panel-slide-0-0-0-3-5",
@@ -7538,17 +7518,13 @@
                     "text": "",
                     "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/icon-community.svg",
                     "imageAlt": "Community",
-                    "imageWidth": "58",
                     "imageLoading": "eager",
-                    "headingLevel": "div",
-                    "metaStyle": "meta",
                     "showAction": false,
                     "buttonUrl": "?page_id=2#community",
-                    "buttonTarget": "_self",
-                    "buttonStyle": "default",
                     "linkPanel": true,
                     "panelStyle": "blank",
-                    "panelSize": "none"
+                    "panelSize": "none",
+                    "panelHover": false
                   }
                 ],
                 "carouselSettings": {
@@ -7569,17 +7545,17 @@
                   "metaHtmlElement": "div",
                   "metaStyle": "text-meta",
                   "headingLevel": "div",
-                  "imageAlignment": "center",
                   "imageFit": "natural",
                   "imageRatio": "natural",
                   "linkPanel": true,
                   "buttonStyle": "default",
+                  "linkTarget": "_self",
                   "autoplay": false,
                   "pauseOnHover": true,
                   "centered": false,
                   "loop": false,
                   "spaceBetween": 30,
-                  "divider": false,
+                  "divider": true,
                   "itemWidthMode": "auto",
                   "cardsPerViewPhone": 1,
                   "cardsPerViewMedium": 3,
@@ -7657,12 +7633,8 @@
                     "text": "",
                     "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/blog-post-how-to-analyze-user-data-to-understand-your-potential-buyers-intro.jpg",
                     "imageAlt": "Blog Post How To Analyze User Data To Understand Your Potential Buyers Intro",
-                    "headingLevel": "h3",
-                    "metaStyle": "meta",
                     "showAction": false,
                     "buttonLabel": "Read more",
-                    "buttonTarget": "_self",
-                    "buttonStyle": "default",
                     "linkPanel": false
                   },
                   {
@@ -7672,12 +7644,8 @@
                     "text": "",
                     "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/blog-post-14-super-smart-ways-to-save-time-on-automation-intro.jpg",
                     "imageAlt": "Blog Post 14 Super Smart Ways To Save Time On Automation Intro",
-                    "headingLevel": "h3",
-                    "metaStyle": "meta",
                     "showAction": false,
                     "buttonLabel": "Read more",
-                    "buttonTarget": "_self",
-                    "buttonStyle": "default",
                     "linkPanel": false
                   },
                   {
@@ -7687,12 +7655,8 @@
                     "text": "",
                     "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/blog-post-5-incredible-video-conference-products-you-ll-wish-you-discovered-sooner-intro.jpg",
                     "imageAlt": "Blog Post 5 Incredible Video Conference Products You Ll Wish You Discovered Sooner Intro",
-                    "headingLevel": "h3",
-                    "metaStyle": "meta",
                     "showAction": false,
                     "buttonLabel": "Read more",
-                    "buttonTarget": "_self",
-                    "buttonStyle": "default",
                     "linkPanel": false
                   },
                   {
@@ -7702,12 +7666,8 @@
                     "text": "",
                     "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/blog-post-how-to-build-a-high-efficiency-sales-team-from-the-ground-up-intro.jpg",
                     "imageAlt": "Blog Post How To Build A High Efficiency Sales Team From The Ground Up Intro",
-                    "headingLevel": "h3",
-                    "metaStyle": "meta",
                     "showAction": false,
                     "buttonLabel": "Read more",
-                    "buttonTarget": "_self",
-                    "buttonStyle": "default",
                     "linkPanel": false
                   }
                 ],
@@ -7749,12 +7709,8 @@
                     "text": "",
                     "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/blog-post-14-super-smart-ways-to-save-time-on-automation-intro.jpg",
                     "imageAlt": "Blog Post 14 Super Smart Ways To Save Time On Automation Intro",
-                    "headingLevel": "h3",
-                    "metaStyle": "meta",
                     "showAction": false,
                     "buttonLabel": "Read more",
-                    "buttonTarget": "_self",
-                    "buttonStyle": "default",
                     "linkPanel": false
                   },
                   {
@@ -7764,12 +7720,8 @@
                     "text": "",
                     "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/author-image.jpg",
                     "imageAlt": "Author Image",
-                    "headingLevel": "h3",
-                    "metaStyle": "meta",
                     "showAction": false,
                     "buttonLabel": "Read more",
-                    "buttonTarget": "_self",
-                    "buttonStyle": "default",
                     "linkPanel": false
                   },
                   {
@@ -7779,12 +7731,8 @@
                     "text": "",
                     "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/blog-post-customer-stories-icon-intro.jpg",
                     "imageAlt": "Blog Post Customer Stories Icon Intro",
-                    "headingLevel": "h3",
-                    "metaStyle": "meta",
                     "showAction": false,
                     "buttonLabel": "Read more",
-                    "buttonTarget": "_self",
-                    "buttonStyle": "default",
                     "linkPanel": false
                   },
                   {
@@ -7794,12 +7742,8 @@
                     "text": "",
                     "imageUrl": "https://cms.webpages.am/wp-content/uploads/yootheme/blog-post-customer-stories-icon-teaser.jpg",
                     "imageAlt": "Blog Post Customer Stories Icon Teaser",
-                    "headingLevel": "h3",
-                    "metaStyle": "meta",
                     "showAction": false,
                     "buttonLabel": "Read more",
-                    "buttonTarget": "_self",
-                    "buttonStyle": "default",
                     "linkPanel": false
                   }
                 ],
@@ -8285,6 +8229,7 @@
                 "animation": {
                   "preset": "none"
                 },
+                "elementPadding": "none",
                 "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
@@ -8295,9 +8240,7 @@
                   },
                   "effects": {},
                   "card": {}
-                },
-                "buttonStyle": "default",
-                "size": "default"
+                }
               }
             ]
           },
@@ -8832,6 +8775,7 @@
                 "fullWidthButton": false,
                 "textAlign": "center",
                 "headingAlign": "center",
+                "elementPadding": "none",
                 "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
@@ -8840,9 +8784,7 @@
                   },
                   "effects": {},
                   "card": {}
-                },
-                "buttonStyle": "default",
-                "size": "default"
+                }
               }
             ]
           }
@@ -9041,14 +8983,8 @@
                 "animation": {
                   "preset": "none"
                 },
-                "spacingContract": "yootheme",
-                "panelMediaAlignment": "center",
-                "panelVerticalAlign": "top",
-                "panelTitleStyle": "inherit",
-                "panelContentWidth": "auto",
-                "panelActionVisible": true,
-                "panelActionSize": "default",
-                "panelActionAlign": "inherit"
+                "elementPadding": "none",
+                "spacingContract": "yootheme"
               }
             ]
           },
@@ -9155,14 +9091,8 @@
                 "animation": {
                   "preset": "none"
                 },
-                "spacingContract": "yootheme",
-                "panelMediaAlignment": "center",
-                "panelVerticalAlign": "top",
-                "panelTitleStyle": "inherit",
-                "panelContentWidth": "auto",
-                "panelActionVisible": true,
-                "panelActionSize": "default",
-                "panelActionAlign": "inherit"
+                "elementPadding": "none",
+                "spacingContract": "yootheme"
               }
             ]
           }
@@ -9239,6 +9169,7 @@
                 "textAlign": "center",
                 "headingAlign": "center",
                 "removeBottomMargin": true,
+                "elementPadding": "none",
                 "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
@@ -9248,9 +9179,7 @@
                   },
                   "effects": {},
                   "card": {}
-                },
-                "buttonStyle": "default",
-                "size": "default"
+                }
               }
             ]
           },
@@ -9471,8 +9400,7 @@
                     "zIndex": 1,
                     "marginMode": "large",
                     "removeBottomMargin": true,
-                    "textAlign": "center",
-                    "blockAlignFallback": "center"
+                    "textAlign": "center"
                   },
                   "effects": {}
                 },
@@ -10017,6 +9945,7 @@
                 "textAlign": "center",
                 "headingAlign": "center",
                 "removeBottomMargin": true,
+                "elementPadding": "none",
                 "spacingContract": "yootheme",
                 "visualStyle": {
                   "layout": {
@@ -10025,15 +9954,81 @@
                   },
                   "effects": {},
                   "card": {}
-                },
-                "buttonStyle": "default",
-                "size": "default"
+                }
               }
             ]
           }
         ]
       }
     ],
-    "updatedAt": "2026-08-10T20:14:10.061Z"
+    "updatedAt": "2026-08-11T20:12:57.599Z"
+  },
+  "page:clean": {
+    "version": 1,
+    "key": "page:clean",
+    "page": "page:clean",
+    "targetType": "page",
+    "design": {
+      "preset": "princity",
+      "colorScheme": "auto",
+      "pageBackground": "#f7f7f4",
+      "textColor": "#111111",
+      "mutedTextColor": "#5f5f58",
+      "accentColor": "#a4be7b",
+      "surfaceColor": "#efefe9",
+      "buttonBackground": "#111111",
+      "buttonTextColor": "#ffffff",
+      "radius": "8px",
+      "sectionMaxWidth": "1640px",
+      "sectionGutter": "48px",
+      "headingFontFamily": "inherit",
+      "headingSize": "clamp(42px, 8vw, 126px)",
+      "headingWeight": "760",
+      "headingLineHeight": "0.92",
+      "cardBg": "#efefe9",
+      "cardRadius": "8px",
+      "cardBorder": "transparent",
+      "cardShadow": "0 12px 30px rgba(17,17,17,0.06)",
+      "cardShadowHover": "0 18px 42px rgba(17,17,17,0.1)",
+      "cardImageBg": "#ffffff",
+      "cardImagePadding": "clamp(22px, 2.4vw, 36px)"
+    },
+    "sections": [
+      {
+        "id": "page:clean-content",
+        "kind": "contentLayout",
+        "title": "Page introduction",
+        "background": "#f7f7f4",
+        "backgroundMode": "full",
+        "contentMode": "boxed",
+        "colorScheme": "inherit",
+        "layout": "whole",
+        "layoutColumns": 1,
+        "topSpacing": "medium",
+        "bottomSpacing": "medium",
+        "layoutItems": [
+          {
+            "id": "page:clean-content-column",
+            "rowId": "page:clean-content-row",
+            "rowLayout": "whole",
+            "blocks": [
+              {
+                "id": "page:clean-hero",
+                "kind": "hero",
+                "eyebrow": "New page",
+                "title": "Clean",
+                "body": "Introduce this page with a clear headline, useful context, and a focused next step.",
+                "buttonLabel": "Get Started",
+                "buttonUrl": "#",
+                "buttonStyle": "primary",
+                "elementPadding": "lg"
+              }
+            ]
+          }
+        ],
+        "visible": true
+      }
+    ],
+    "updatedAt": "2026-08-11T05:48:09.805Z"
   }
 }

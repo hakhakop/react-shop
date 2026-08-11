@@ -437,7 +437,11 @@ export function ImageSettingsGroup({
   showDimensions = true,
   showFrameControls = true,
   showAlignment = true,
+  showFocalPoint = true,
+  showShadow = true,
+  showDecoration = true,
   showSvgControls = false,
+  svgColorLabel = "SVG Style",
   mediaLayout,
   keys = {
     width: "imageWidth",
@@ -466,8 +470,16 @@ export function ImageSettingsGroup({
   showFrameControls?: boolean;
   /** Hide when a component owns image placement through its structural layout. */
   showAlignment?: boolean;
+  /** Focal positioning only belongs where the composed media runtime consumes it. */
+  showFocalPoint?: boolean;
+  /** Keep shared shadow semantics available without forcing them into every composition. */
+  showShadow?: boolean;
+  /** Keep shared decoration semantics available without forcing them into every composition. */
+  showDecoration?: boolean;
   /** Compose the canonical YOOtheme stylable-SVG controls where the parent element exposes them. */
   showSvgControls?: boolean;
+  /** Components may use YOOtheme's semantic label while sharing the same color owner. */
+  svgColorLabel?: string;
   /** Structural Panel media placement remains a Panel owner but is presented in YOOtheme's Image group. */
   mediaLayout?: { placement: string; width: string };
   keys?: {
@@ -563,7 +575,7 @@ export function ImageSettingsGroup({
         />
       </InspectorFieldRow>}
 
-      <InspectorFieldRow
+      {showFocalPoint && <InspectorFieldRow
         label="Focal Point"
         isOverridden={values.imagePosition !== undefined}
         inheritedValueText="Center Center"
@@ -585,7 +597,7 @@ export function ImageSettingsGroup({
           onChange={(value) => update({ imagePosition: value === "center" ? undefined : value })}
           ariaLabel="Image focal point"
         />
-      </InspectorFieldRow>
+      </InspectorFieldRow>}
 
       <InspectorFieldRow
         label="Loading"
@@ -617,7 +629,7 @@ export function ImageSettingsGroup({
       </InspectorFieldRow>}
 
       {showSvgControls && values[svgInlineKey] === true && <InspectorFieldRow
-        label="SVG Style"
+        label={svgColorLabel}
         isOverridden={values[svgColorKey] !== undefined}
         inheritedValueText="Primary"
         onReset={() => update({ [svgColorKey]: undefined })}
@@ -633,7 +645,7 @@ export function ImageSettingsGroup({
             { value: "inverse", label: "Inverse" },
           ]}
           onChange={(value) => update({ [svgColorKey]: value })}
-          ariaLabel="SVG Style"
+          ariaLabel={svgColorLabel}
         />
       </InspectorFieldRow>}
 
@@ -670,7 +682,7 @@ export function ImageSettingsGroup({
         />
       </InspectorFieldRow>
 
-      <InspectorFieldRow
+      {showShadow && <InspectorFieldRow
         label="Box Shadow"
         isOverridden={values[keys.shadow] !== undefined || values.imageBoxShadow !== undefined}
         inheritedValueText="None"
@@ -687,9 +699,9 @@ export function ImageSettingsGroup({
           ]}
           onChange={(value) => update({ [keys.shadow]: value, imageBoxShadow: value })}
         />
-      </InspectorFieldRow>
+      </InspectorFieldRow>}
 
-      <InspectorFieldRow
+      {showDecoration && <InspectorFieldRow
         label="Box Decoration"
         isOverridden={values[decorationKey] !== undefined}
         inheritedValueText="None"
@@ -705,7 +717,7 @@ export function ImageSettingsGroup({
           ]}
           onChange={(value) => update({ [decorationKey]: value })}
         />
-      </InspectorFieldRow>
+      </InspectorFieldRow>}
 
       {showAlignment && (
         <InspectorFieldRow

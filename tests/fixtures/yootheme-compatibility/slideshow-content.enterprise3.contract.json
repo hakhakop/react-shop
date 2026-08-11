@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "id": "slideshow-content.enterprise3.v1",
+  "fixture": {
+    "fileName": "enterprise3.json",
+    "sha256": "7f8ac33b0c20fa1a714ff7c89849855c7a51725c9707984dc2f322401d61aa1d",
+    "sourcePath": "children.1.children.0.children.0.children.0",
+    "elementType": "slideshow",
+    "overlayPosition": "center-left",
+    "overlayPadding": "default",
+    "titleElement": "h3",
+    "titleStyle": "",
+    "itemCount": 4,
+    "itemsWithUrl": 0
+  },
+  "viewport": { "width": 1704, "height": 1242 },
+  "reference": {
+    "frameWidthPx": 1200,
+    "frameHeightPx": 675,
+    "overlayPosition": "center-left",
+    "overlayPaddingPx": [40, 40, 40, 40],
+    "title": {
+      "tag": "h3",
+      "fontSizePx": 24,
+      "lineHeightPx": 33.6,
+      "fontWeight": 600,
+      "color": "rgb(13, 10, 70)",
+      "centerOffsetYPx": 0
+    },
+    "actionCount": 0
+  },
+  "tolerances": { "geometryPx": 1 }
+}
